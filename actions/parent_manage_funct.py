@@ -25,6 +25,7 @@ from ..lib.qgis_tools import snap_to_background_layers, get_event_point, add_mar
 
 from ..core.utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
 
+
 def reset_lists(ids, list_ids):
     """ Reset list of selected records """
 
@@ -231,10 +232,10 @@ def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=N
         if table_object == 'element':
             set_combo(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
             set_combo(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
-                           field_id='expl_id', field_name='name')
+                      field_id='expl_id', field_name='name')
             set_calendars(dialog, 'builtdate', 'config_param_user', 'value', 'edit_builtdate_vdefault')
             set_combo(dialog, 'workcat_id', 'cat_work',
-                           'edit_workcat_vdefault', field_id='id', field_name='id')
+                      'edit_workcat_vdefault', field_id='id', field_name='id')
 
         if single_tool_mode is not None:
             layers = remove_selection(single_tool_mode, layers=layers)
@@ -331,8 +332,9 @@ def add_point(vertex_marker):
     global_vars.canvas.setMapTool(emit_point)
     global_vars.canvas.xyCoordinates.connect(partial(mouse_move, vertex_marker))
     emit_point.canvasClicked.connect(partial(get_xy, vertex_marker, emit_point, return_point))
-    
+
     return return_point
+
 
 def mouse_move(vertex_marker, point):
 
@@ -348,7 +350,7 @@ def mouse_move(vertex_marker, point):
         vertex_marker.hide()
 
 
-def get_xy(emit_point, vertex_marker, return_point ,point):
+def get_xy(emit_point, vertex_marker, return_point, point):
     """ Get coordinates of selected point """
 
     # Setting x, y coordinates from point
@@ -744,7 +746,7 @@ def selection_init(dialog, table_object, query=False, geom_type=None, layers=Non
     """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
     from .multiple_selection import MultipleSelection
-    
+
     if geom_type in ('all', None):
         geom_type = 'arc'
     multiple_selection = MultipleSelection(layers, geom_type, parent_manage=None,

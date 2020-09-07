@@ -43,47 +43,47 @@ from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
 
 def open_web_browser(dialog, widget=None):
     """ Display url using the default browser """
-    
+
     if widget is not None:
         url = qt_tools.getWidgetText(dialog, widget)
         if url == 'null':
             url = 'http://www.giswater.org'
     else:
         url = 'http://www.giswater.org'
-    
+
     webbrowser.open(url)
 
 
 def get_plugin_version():
     """ Get plugin version from metadata.txt file """
-    
+
     # Check if metadata file exists
     metadata_file = os.path.join(global_vars.plugin_dir, 'metadata.txt')
     if not os.path.exists(metadata_file):
         message = "Metadata file not found"
         global_vars.controller.show_warning(message, parameter=metadata_file)
         return None
-    
+
     metadata = configparser.ConfigParser()
     metadata.read(metadata_file)
     plugin_version = metadata.get('general', 'version')
     if plugin_version is None:
         message = "Plugin version not found"
         global_vars.controller.show_warning(message)
-    
+
     return plugin_version
 
 
 def get_file_dialog(dialog, widget):
     """ Get file dialog """
-    
+
     # Check if selected file exists. Set default value if necessary
     file_path = qt_tools.getWidgetText(dialog, widget)
     if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
         folder_path = global_vars.plugin_dir
     else:
         folder_path = os.path.dirname(file_path)
-    
+
     # Open dialog to select file
     os.chdir(folder_path)
     file_dialog = QFileDialog()
@@ -96,12 +96,12 @@ def get_file_dialog(dialog, widget):
 
 def get_folder_dialog(dialog, widget):
     """ Get folder dialog """
-    
+
     # Check if selected folder exists. Set default value if necessary
     folder_path = qt_tools.getWidgetText(dialog, widget)
     if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
         folder_path = os.path.expanduser("~")
-    
+
     # Open dialog to select folder
     os.chdir(folder_path)
     file_dialog = QFileDialog()
@@ -128,7 +128,7 @@ def multi_row_selector(dialog, tableleft, tableright, field_id_left, field_id_ri
     :param aql: (add query left) Query added to the left side (used in basic.py def basic_exploitation_selector())
     :return:
     """
-    
+
     # fill QTableView all_rows
     tbl_all_rows = dialog.findChild(QTableView, "all_rows")
     tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -139,39 +139,39 @@ def multi_row_selector(dialog, tableleft, tableright, field_id_left, field_id_ri
     query_left += f" WHERE cur_user = current_user)"
     query_left += f" AND  {field_id_left} > -1"
     query_left += aql
-    
+
     fill_table_by_query(tbl_all_rows, query_left + f" ORDER BY {name};")
     hide_colums(tbl_all_rows, hide_left)
     tbl_all_rows.setColumnWidth(1, 200)
-    
+
     # fill QTableView selected_rows
     tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
     tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
-    
+
     query_right = f"SELECT {tableleft}.{name}, cur_user, {tableleft}.{field_id_left}, {tableright}.{field_id_right}"
     query_right += f" FROM {schema_name}.{tableleft}"
     query_right += f" JOIN {schema_name}.{tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
-    
+
     query_right += " WHERE cur_user = current_user"
-    
+
     fill_table_by_query(tbl_selected_rows, query_right + f" ORDER BY {name};")
     hide_colums(tbl_selected_rows, hide_right)
     tbl_selected_rows.setColumnWidth(0, 200)
-    
+
     # Button select
     dialog.btn_select.clicked.connect(partial(multi_rows_selector, tbl_all_rows, tbl_selected_rows,
                                               field_id_left, tableright, field_id_right, query_left, query_right, field_id_right))
-    
+
     # Button unselect
     query_delete = f"DELETE FROM {schema_name}.{tableright}"
     query_delete += f" WHERE current_user = cur_user AND {tableright}.{field_id_right}="
     dialog.btn_unselect.clicked.connect(partial(unselector, tbl_all_rows, tbl_selected_rows, query_delete,
                                                 query_left, query_right, field_id_right))
-    
+
     # QLineEdit
     dialog.txt_name.textChanged.connect(partial(query_like_widget_text, dialog, dialog.txt_name,
                                                 tbl_all_rows, tableleft, tableright, field_id_right, field_id_left, name, aql))
-    
+
     # Order control
     tbl_all_rows.horizontalHeader().sectionClicked.connect(partial(order_by_column, tbl_all_rows, query_left))
     tbl_selected_rows.horizontalHeader().sectionClicked.connect(
@@ -199,7 +199,7 @@ def hide_colums(widget, comuns_to_hide):
 
 
 def unselector(qtable_left, qtable_right, query_delete, query_left, query_right, field_id_right):
-    
+
     selected_list = qtable_right.selectionModel().selectedRows()
     if len(selected_list) == 0:
         message = "Any record selected"
@@ -212,7 +212,7 @@ def unselector(qtable_left, qtable_right, query_delete, query_left, query_right,
         expl_id.append(id_)
     for i in range(0, len(expl_id)):
         global_vars.controller.execute_sql(query_delete + str(expl_id[i]))
-    
+
     # Refresh
     oder_by = {0: "ASC", 1: "DESC"}
     sort_order = qtable_left.horizontalHeader().sortIndicatorOrder()
@@ -220,7 +220,7 @@ def unselector(qtable_left, qtable_right, query_delete, query_left, query_right,
     col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
     query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
     fill_table_by_query(qtable_left, query_left)
-    
+
     sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
     idx = qtable_right.horizontalHeader().sortIndicatorSection()
     col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
@@ -241,9 +241,9 @@ def multi_rows_selector(qtable_left, qtable_right, id_ori,
         :param query_left:
         :param field_id:
     """
-    
+
     selected_list = qtable_left.selectionModel().selectedRows()
-    
+
     if len(selected_list) == 0:
         message = "Any record selected"
         global_vars.controller.show_warning(message)
@@ -262,7 +262,7 @@ def multi_rows_selector(qtable_left, qtable_right, id_ori,
                f" FROM {tablename_des}"
                f" WHERE {id_des} = '{expl_id[i]}' AND cur_user = current_user")
         row = global_vars.controller.get_row(sql)
-        
+
         if row:
             # if exist - show warning
             message = "Id already selected"
@@ -271,7 +271,7 @@ def multi_rows_selector(qtable_left, qtable_right, id_ori,
             sql = (f"INSERT INTO {tablename_des} ({field_id}, cur_user) "
                    f" VALUES ({expl_id[i]}, current_user)")
             global_vars.controller.execute_sql(sql)
-    
+
     # Refresh
     oder_by = {0: "ASC", 1: "DESC"}
     sort_order = qtable_left.horizontalHeader().sortIndicatorOrder()
@@ -279,7 +279,7 @@ def multi_rows_selector(qtable_left, qtable_right, id_ori,
     col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
     query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
     fill_table_by_query(qtable_right, query_right)
-    
+
     sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
     idx = qtable_right.horizontalHeader().sortIndicatorSection()
     col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
@@ -291,21 +291,21 @@ def multi_rows_selector(qtable_left, qtable_right, id_ori,
 def fill_table(widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit, expr_filter=None):
     """ Set a model with selected filter.
     Attach that model to selected table """
-    
+
     if global_vars.schema_name not in table_name:
         table_name = global_vars.schema_name + "." + table_name
-    
+
     # Set model
     model = QSqlTableModel()
     model.setTable(table_name)
     model.setEditStrategy(set_edit_strategy)
     model.setSort(0, 0)
     model.select()
-    
+
     # Check for errors
     if model.lastError().isValid():
         global_vars.controller.show_warning(model.lastError().text())
-    
+
     # Attach model to table view
     widget.setModel(model)
     if expr_filter:
@@ -317,12 +317,12 @@ def fill_table_by_query(qtable, query):
     :param qtable: QTableView to show
     :param query: query to set model
     """
-    
+
     model = QSqlQueryModel()
     model.setQuery(query)
     qtable.setModel(model)
     qtable.show()
-    
+
     # Check for errors
     if model.lastError().isValid():
         global_vars.controller.show_warning(model.lastError().text())
@@ -331,7 +331,7 @@ def fill_table_by_query(qtable, query):
 def query_like_widget_text(dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l,
                            name='name', aql=''):
     """ Fill the QTableView by filtering through the QLineEdit"""
-    
+
     schema_name = global_vars.schema_name.replace('"', '')
     query = qt_tools.getWidgetText(dialog, text_line, return_string_null=False).lower()
     sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
@@ -346,7 +346,7 @@ def query_like_widget_text(dialog, text_line, qtable, tableleft, tableright, fie
 
 def set_icon(widget, icon):
     """ Set @icon to selected @widget """
-    
+
     # Get icons folder
     icons_folder = os.path.join(global_vars.plugin_dir, 'icons')
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
@@ -358,7 +358,7 @@ def set_icon(widget, icon):
 
 def check_expression(expr_filter, log_info=False):
     """ Check if expression filter @expr_filter is valid """
-    
+
     if log_info:
         global_vars.controller.log_info(expr_filter)
     expr = QgsExpression(expr_filter)
@@ -366,7 +366,7 @@ def check_expression(expr_filter, log_info=False):
         message = "Expression Error"
         global_vars.controller.log_warning(message, parameter=expr_filter)
         return False, expr
-    
+
     return True, expr
 
 
@@ -376,7 +376,7 @@ def refresh_map_canvas(restore_cursor=False):
     global_vars.canvas.refreshAllLayers()
     for layer_refresh in global_vars.canvas.layers():
         layer_refresh.triggerRepaint()
-    
+
     if restore_cursor:
         set_cursor_restore()
 
@@ -393,29 +393,29 @@ def set_cursor_restore():
 
 def get_cursor_multiple_selection():
     """ Set cursor for multiple selection """
-    
+
     path_folder = os.path.join(os.path.dirname(__file__), os.pardir)
     path_cursor = os.path.join(path_folder, 'icons', '201.png')
     if os.path.exists(path_cursor):
         cursor = QCursor(QPixmap(path_cursor))
     else:
         cursor = QCursor(Qt.ArrowCursor)
-    
+
     return cursor
 
 
 def set_table_columns(dialog, widget, table_name, sort_order=0, isQStandardItemModel=False, schema_name=None):
     """ Configuration of tables. Set visibility and width of columns """
-    
+
     widget = qt_tools.getWidget(dialog, widget)
     if not widget:
         return
-    
+
     if schema_name is not None:
         config_table = f"{schema_name}.config_form_tableview"
     else:
         config_table = f"config_form_tableview"
-    
+
     # Set width and alias of visible columns
     columns_to_delete = []
     sql = (f"SELECT columnindex, width, alias, status"
@@ -425,7 +425,7 @@ def set_table_columns(dialog, widget, table_name, sort_order=0, isQStandardItemM
     rows = global_vars.controller.get_rows(sql, log_info=False)
     if not rows:
         return
-    
+
     for row in rows:
         if not row['status']:
             columns_to_delete.append(row['columnindex'] - 1)
@@ -435,7 +435,7 @@ def set_table_columns(dialog, widget, table_name, sort_order=0, isQStandardItemM
                 width = 100
             widget.setColumnWidth(row['columnindex'] - 1, width)
             widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
-    
+
     # Set order
     if isQStandardItemModel:
         widget.model().sort(sort_order, Qt.AscendingOrder)
@@ -445,13 +445,13 @@ def set_table_columns(dialog, widget, table_name, sort_order=0, isQStandardItemM
     # Delete columns
     for column in columns_to_delete:
         widget.hideColumn(column)
-    
+
     return widget
 
 
 def disconnect_signal_selection_changed():
     """ Disconnect signal selectionChanged """
-    
+
     try:
         global_vars.canvas.selectionChanged.disconnect()
     except Exception:
@@ -461,7 +461,7 @@ def disconnect_signal_selection_changed():
 
 
 def set_label_current_psector(dialog):
-    
+
     sql = ("SELECT t1.name FROM plan_psector AS t1 "
            " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
            " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
@@ -477,14 +477,14 @@ def multi_rows_delete(widget, table_name, column_id):
     :param table_name: table origin
     :param column_id: Refers to the id of the source table
     """
-    
+
     # Get selected rows
     selected_list = widget.selectionModel().selectedRows()
     if len(selected_list) == 0:
         message = "Any record selected"
         global_vars.controller.show_warning(message)
         return
-    
+
     inf_text = ""
     list_id = ""
     for i in range(0, len(selected_list)):
@@ -506,10 +506,10 @@ def multi_rows_delete(widget, table_name, column_id):
 
 def select_features_by_expr(layer, expr):
     """ Select features of @layer applying @expr """
-    
+
     if not layer:
         return
-    
+
     if expr is None:
         layer.removeSelection()
     else:
@@ -524,22 +524,22 @@ def select_features_by_expr(layer, expr):
 
 def hide_void_groupbox(dialog):
     """ Hide empty groupbox """
-    
+
     grb_list = {}
     grbox_list = dialog.findChildren(QGroupBox)
     for grbox in grbox_list:
-        
+
         widget_list = grbox.findChildren(QWidget)
         if len(widget_list) == 0:
             grb_list[grbox.objectName()] = 0
             grbox.setVisible(False)
-    
+
     return grb_list
 
 
 def zoom_to_selected_features(layer, geom_type=None, zoom=None):
     """ Zoom to selected features of the @layer with @geom_type """
-    
+
     if not layer:
         return
 
@@ -571,7 +571,7 @@ def make_list_for_completer(sql):
     :param sql: Query to be executed, where will we get the list of items (string)
     :return list_items: List with the result of the query executed (List) ["item1","item2","..."]
     """
-    
+
     rows = global_vars.controller.get_rows(sql)
     list_items = []
     if rows:
@@ -585,7 +585,7 @@ def set_completer_lineedit(qlineedit, list_items):
     :param qlineedit: Object where to set the completer (QLineEdit)
     :param list_items: List of items to set into the completer (List)["item1","item2","..."]
     """
-    
+
     completer = QCompleter()
     completer.setCaseSensitivity(Qt.CaseInsensitive)
     completer.setMaxVisibleItems(10)
@@ -602,7 +602,7 @@ def get_max_rectangle_from_coords(list_coord):
     """ Returns the minimum rectangle(x1, y1, x2, y2) of a series of coordinates
     :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
     """
-    
+
     coords = list_coord.group(1)
     polygon = coords.split(',')
     x, y = polygon[0].split(' ')
@@ -620,12 +620,12 @@ def get_max_rectangle_from_coords(list_coord):
             min_y = y
         if y > max_y:
             max_y = y
-    
+
     return max_x, max_y, min_x, min_y
 
 
 def zoom_to_rectangle(x1, y1, x2, y2, margin=5):
-    
+
     rect = QgsRectangle(float(x1) - margin, float(y1) - margin, float(x2) + margin, float(y2) + margin)
     global_vars.canvas.setExtent(rect)
     global_vars.canvas.refresh()
@@ -633,19 +633,19 @@ def zoom_to_rectangle(x1, y1, x2, y2, margin=5):
 
 def create_action(action_name, action_group, icon_num=None, text=None):
     """ Creates a new action with selected parameters """
-    
+
     icon = None
     icon_folder = global_vars.plugin_dir + '/icons/'
     icon_path = icon_folder + icon_num + '.png'
     if os.path.exists(icon_path):
         icon = QIcon(icon_path)
-    
+
     if icon is None:
         action = QAction(text, action_group)
     else:
         action = QAction(icon, text, action_group)
     action.setObjectName(action_name)
-    
+
     return action
 
 
@@ -659,7 +659,7 @@ def set_arrow_cursor():
 
 def delete_layer_from_toc(layer_name):
     """ Delete layer from toc if exist """
-    
+
     layer = None
     for lyr in list(QgsProject.instance().mapLayers().values()):
         if lyr.name() == layer_name:
@@ -668,7 +668,7 @@ def delete_layer_from_toc(layer_name):
     if layer is not None:
         # Remove layer
         QgsProject.instance().removeMapLayer(layer)
-        
+
         # Remove group if is void
         root = QgsProject.instance().layerTreeRoot()
         group = root.findGroup('GW Temporal Layers')
@@ -681,7 +681,7 @@ def delete_layer_from_toc(layer_name):
 
 def create_body(form='', feature='', filter_fields='', extras=None):
     """ Create and return parameters as body to functions"""
-    
+
     client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
     form = f'"form":{{{form}}}, '
     feature = f'"feature":{{{feature}}}, '
@@ -692,19 +692,19 @@ def create_body(form='', feature='', filter_fields='', extras=None):
         data += ', ' + extras
     data += f'}}}}$$'
     body = "" + client + form + feature + data
-    
+
     return body
 
 
 def get_composers_list():
-    
+
     layour_manager = QgsProject.instance().layoutManager().layouts()
     active_composers = [layout for layout in layour_manager]
     return active_composers
 
 
 def get_composer_index(name):
-    
+
     index = 0
     composers = get_composers_list()
     for comp_view in composers:
@@ -712,7 +712,7 @@ def get_composer_index(name):
         if composer_name == name:
             break
         index += 1
-    
+
     return index
 
 
@@ -724,7 +724,7 @@ def set_restriction(dialog, widget_to_ignore, restriction):
     :param restriction: roles that do not have access. tuple = ('role1', 'role1', 'role1', ...)
     :return:
     """
-    
+
     project_vars = global_vars.project_vars
     role = project_vars['role']
     role = global_vars.controller.get_restriction(role)
@@ -742,7 +742,7 @@ def set_restriction(dialog, widget_to_ignore, restriction):
 
 
 def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
-    
+
     sql = (f"SELECT MIN(LEAST({field_from}, {field_to})),"
            f" MAX(GREATEST({field_from}, {field_to}))"
            f" FROM {table_name}")
@@ -760,7 +760,7 @@ def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
 
 
 def get_values_from_catalog(table_name, typevalue, order_by='id'):
-    
+
     sql = (f"SELECT id, idval"
            f" FROM {table_name}"
            f" WHERE typevalue = '{typevalue}'"
@@ -774,7 +774,7 @@ def integer_validator(value, widget, btn_accept):
         This function is called in def set_datatype_validator(self, value, widget, btn)
         widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
     """
-    
+
     if value is None or bool(re.search("^\d*$", value)):
         widget.setStyleSheet(None)
         btn_accept.setEnabled(True)
@@ -788,7 +788,7 @@ def double_validator(value, widget, btn_accept):
         This function is called in def set_datatype_validator(self, value, widget, btn)
         widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
     """
-    
+
     if value is None or bool(re.search("^\d*$", value)) or bool(re.search("^\d+\.\d+$", value)):
         widget.setStyleSheet(None)
         btn_accept.setEnabled(True)
@@ -801,12 +801,12 @@ def open_file_path(filter_="All (*.*)"):
     """ Open QFileDialog """
     msg = global_vars.controller.tr("Select DXF file")
     path, filter_ = QFileDialog.getOpenFileName(None, msg, "", filter_)
-    
+
     return path, filter_
 
 
 def show_exceptions_msg(title, msg=""):
-    
+
     cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
     dlg_info = DialogTextUi()
     dlg_info.btn_accept.setVisible(False)
@@ -825,7 +825,7 @@ def put_combobox(qtable, rows, field, widget_pos, combo_values):
     :param combo_values: List of items to populate QComboBox (["..", "..."])
     :return:
     """
-    
+
     for x in range(0, len(rows)):
         combo = QComboBox()
         row = rows[x]
@@ -847,7 +847,7 @@ def update_status(combo, qtable, pos_x, widget_pos):
     :param widget_pos:Position of the widget where we want to update value (integer)
     :return:
     """
-    
+
     elem = combo.itemData(combo.currentIndex())
     i = qtable.model().index(pos_x, widget_pos)
     qtable.model().setData(i, elem[0])
@@ -856,7 +856,7 @@ def update_status(combo, qtable, pos_x, widget_pos):
 
 
 def get_feature_by_id(layer, id_, field_id):
-    
+
     expr = "" + str(field_id) + "= '" + str(id_) + "'"
     features = layer.getFeatures(QgsFeatureRequest().setFilterExpression(expr))
     for feature in features:
@@ -872,13 +872,13 @@ def document_insert(dialog, tablename, field, field_value):
     :param field: Field of the table to make the where clause (string)
     :param field_value: Value to compare in the clause where (string)
     """
-    
+
     doc_id = dialog.doc_id.text()
     if not doc_id:
         message = "You need to insert doc_id"
         global_vars.controller.show_warning(message)
         return
-    
+
     # Check if document already exist
     sql = (f"SELECT doc_id"
            f" FROM {tablename}"
@@ -888,7 +888,7 @@ def document_insert(dialog, tablename, field, field_value):
         msg = "Document already exist"
         global_vars.controller.show_warning(msg)
         return
-    
+
     # Insert into new table
     sql = (f"INSERT INTO {tablename} (doc_id, {field})"
            f" VALUES ('{doc_id}', '{field_value}')")
@@ -896,13 +896,13 @@ def document_insert(dialog, tablename, field, field_value):
     if status:
         message = "Document inserted successfully"
         global_vars.controller.show_info(message)
-    
+
     dialog.tbl_document.model().select()
 
 
 def document_open(qtable):
     """ Open selected document """
-    
+
     # Get selected rows
     field_index = qtable.model().fieldIndex('path')
     selected_list = qtable.selectionModel().selectedRows(field_index)
@@ -914,7 +914,7 @@ def document_open(qtable):
         message = "More then one document selected. Select just one document."
         global_vars.controller.show_warning(message)
         return
-    
+
     path = selected_list[0].data()
     # Check if file exist
     if os.path.exists(path):
@@ -930,14 +930,14 @@ def document_open(qtable):
 
 def document_delete(qtable, tablename):
     """ Delete record from selected rows in tbl_document """
-    
+
     # Get selected rows. 0 is the column of the pk 0 'id'
     selected_list = qtable.selectionModel().selectedRows(0)
     if len(selected_list) == 0:
         message = "Any record selected"
         global_vars.controller.show_info_box(message)
         return
-    
+
     selected_id = []
     for index in selected_list:
         doc_id = index.data()
@@ -960,7 +960,7 @@ def document_delete(qtable, tablename):
 
 
 def get_all_actions():
-    
+
     actions_list = global_vars.iface.mainWindow().findChildren(QAction)
     for action in actions_list:
         global_vars.controller.log_info(str(action.objectName()))
@@ -975,16 +975,16 @@ def get_points(list_coord=None):
     """ Return list of QgsPoints taken from geometry
     :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
     """
-    
+
     coords = list_coord.group(1)
     polygon = coords.split(',')
     points = []
-    
+
     for i in range(0, len(polygon)):
         x, y = polygon[i].split(' ')
         point = QgsPointXY(float(x), float(y))
         points.append(point)
-    
+
     return points
 
 
@@ -998,7 +998,7 @@ def draw(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(2
         return
     list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
     max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
-    
+
     if reset_rb:
         rubber_band.reset()
     if str(max_x) == str(min_x) and str(max_y) == str(min_y):
@@ -1015,17 +1015,17 @@ def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, d
     """
     :param duration_time: integer milliseconds ex: 3000 for 3 seconds
     """
-    
+
     if is_new:
         rb = QgsRubberBand(global_vars.canvas, 0)
     else:
         rb = rubber_band
-    
+
     rb.setIconSize(10)
     rb.setColor(color)
     rb.setWidth(width)
     rb.addPoint(point)
-    
+
     # wait to simulate a flashing effect
     if duration_time is not None:
         QTimer.singleShot(duration_time, rb.reset)
@@ -1039,7 +1039,7 @@ def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, inde
     rubber_band.reset()
     layer = global_vars.controller.get_layer_by_tablename(layer_name)
     if not layer: return
-    
+
     row = index.row()
     column_index = qt_tools.get_col_index_by_col_name(qtable, field_id)
     _id = index.sibling(row, column_index).data()
@@ -1058,7 +1058,7 @@ def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, du
     """ Draw 'line' over canvas following list of points
      :param duration_time: integer milliseconds ex: 3000 for 3 seconds
      """
-    
+
     rb = rubber_band
     rb.setIconSize(20)
     polyline = QgsGeometry.fromPolylineXY(points)
@@ -1066,22 +1066,22 @@ def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, du
     rb.setColor(color)
     rb.setWidth(width)
     rb.show()
-    
+
     # wait to simulate a flashing effect
     if duration_time is not None:
         QTimer.singleShot(duration_time, rb.reset)
-    
+
     return rb
 
 
 def resetRubberbands(rubber_band):
-    
+
     rubber_band.reset()
 
 
 
 def restore_user_layer(user_current_layer=None):
-    
+
     if user_current_layer:
         global_vars.iface.setActiveLayer(user_current_layer)
     else:
@@ -1092,29 +1092,29 @@ def restore_user_layer(user_current_layer=None):
 
 
 def set_style_mapzones():
-    
+
     extras = f'"mapzones":""'
     body = create_body(extras=extras)
     json_return = global_vars.controller.get_json('gw_fct_getstylemapzones', body)
     if not json_return:
         return False
-    
+
     for mapzone in json_return['body']['data']['mapzones']:
-        
+
         # Loop for each mapzone returned on json
         lyr = global_vars.controller.get_layer_by_tablename(mapzone['layer'])
         categories = []
         status = mapzone['status']
         if status == 'Disable':
             pass
-        
+
         if lyr:
             # Loop for each id returned on json
             for id in mapzone['values']:
                 # initialize the default symbol for this geometry type
                 symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
                 symbol.setOpacity(float(mapzone['opacity']))
-                
+
                 # Setting simp
                 R = random.randint(0, 255)
                 G = random.randint(0, 255)
@@ -1128,24 +1128,24 @@ def set_style_mapzones():
                         R = random.randint(0, 255)
                         G = random.randint(0, 255)
                         B = random.randint(0, 255)
-                
+
                 elif status == 'Random':
                     R = random.randint(0, 255)
                     G = random.randint(0, 255)
                     B = random.randint(0, 255)
-                
+
                 # Setting sytle
                 layer_style = {'color': '{}, {}, {}'.format(int(R), int(G), int(B))}
                 symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
-                
+
                 if symbol_layer is not None:
                     symbol.changeSymbolLayer(0, symbol_layer)
                 category = QgsRendererCategory(id['id'], symbol, str(id['id']))
                 categories.append(category)
-                
+
                 # apply symbol to layer renderer
                 lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
-                
+
                 # repaint layer
                 lyr.triggerRepaint()
 
@@ -1165,10 +1165,10 @@ def manage_return_manager(json_result, sql, rubber_band):
     try:
         margin = 1
         opacity = 100
-        
+
         if 'zoom' in return_manager and 'margin' in return_manager['zoom']:
             margin = return_manager['zoom']['margin']
-        
+
         if 'style' in return_manager and 'ruberband' in return_manager['style']:
             # Set default values
             width = 3
@@ -1181,9 +1181,9 @@ def manage_return_manager(json_result, sql, rubber_band):
             if 'width' in return_manager['style']['ruberband']:
                 width = return_manager['style']['ruberband']['width']
             draw(json_result, rubber_band, margin, color=color, width=width)
-        
+
         else:
-            
+
             for key, value in list(json_result['body']['data'].items()):
                 if key.lower() in ('point', 'line', 'polygon'):
                     if key not in json_result['body']['data']:
@@ -1192,27 +1192,27 @@ def manage_return_manager(json_result, sql, rubber_band):
                         continue
                     if len(json_result['body']['data'][key]['features']) == 0:
                         continue
-                    
+
                     layer_name = f'{key}'
                     if 'layerName' in json_result['body']['data'][key]:
                         if json_result['body']['data'][key]['layerName']:
                             layer_name = json_result['body']['data'][key]['layerName']
-                    
+
                     delete_layer_from_toc(layer_name)
-                    
+
                     # Get values for create and populate layer
                     counter = len(json_result['body']['data'][key]['features'])
                     geometry_type = json_result['body']['data'][key]['geometryType']
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
 
                     populate_vlayer(v_layer, json_result['body']['data'], key, counter)
-                    
+
                     # Get values for set layer style
                     opacity = 100
                     style_type = json_result['body']['returnManager']['style']
                     if 'style' in return_manager and 'transparency' in return_manager['style'][key]:
                         opacity = return_manager['style'][key]['transparency'] * 255
-                    
+
                     if style_type[key]['style'] == 'categorized':
                         color_values = {}
                         for item in json_result['body']['returnManager']['style'][key]['values']:
@@ -1221,7 +1221,7 @@ def manage_return_manager(json_result, sql, rubber_band):
                         cat_field = str(style_type[key]['field'])
                         size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
                         categoryze_layer(v_layer, cat_field, size, color_values)
-                    
+
                     elif style_type[key]['style'] == 'random':
                         size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
                         if geometry_type == 'Point':
@@ -1229,7 +1229,7 @@ def manage_return_manager(json_result, sql, rubber_band):
                         else:
                             v_layer.renderer().symbol().setWidth(size)
                         v_layer.renderer().symbol().setOpacity(opacity)
-                    
+
                     elif style_type[key]['style'] == 'qml':
                         style_id = style_type[key]['id']
                         extras = f'"style_id":"{style_id}"'
@@ -1239,7 +1239,7 @@ def manage_return_manager(json_result, sql, rubber_band):
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']
                                 create_qml(v_layer, qml)
-                    
+
                     elif style_type[key]['style'] == 'unique':
                         color = style_type[key]['values']['color']
                         size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
@@ -1253,7 +1253,7 @@ def manage_return_manager(json_result, sql, rubber_band):
 
                     global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
                     set_margin(v_layer, margin)
-    
+
     except Exception as e:
         global_vars.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
 
@@ -1264,14 +1264,14 @@ def manage_layer_manager(json_result, sql):
     :param json_result: Json result of a query (Json)
     :return: None
     """
-    
+
     try:
         layermanager = json_result['body']['layerManager']
     except KeyError:
         return
-    
+
     try:
-        
+
         # force visible and in case of does not exits, load it
         if 'visible' in layermanager:
             for lyr in layermanager['visible']:
@@ -1287,7 +1287,7 @@ def manage_layer_manager(json_result, sql):
                     style_id = lyr[layer_name]['style_id']
                     from_postgres_to_toc(layer_name, the_geom, field_id, group=group, style_id=style_id)
                 global_vars.controller.set_layer_visible(layer)
-        
+
         # force reload dataProvider in order to reindex.
         if 'index' in layermanager:
             for lyr in layermanager['index']:
@@ -1295,13 +1295,13 @@ def manage_layer_manager(json_result, sql):
                 layer = global_vars.controller.get_layer_by_tablename(layer_name)
                 if layer:
                     global_vars.controller.set_layer_index(layer)
-        
+
         # Set active
         if 'active' in layermanager:
             layer = global_vars.controller.get_layer_by_tablename(layermanager['active'])
             if layer:
                 global_vars.iface.setActiveLayer(layer)
-        
+
         # Set zoom to extent with a margin
         if 'zoom' in layermanager:
             layer = global_vars.controller.get_layer_by_tablename(layermanager['zoom']['layer'])
@@ -1313,7 +1313,7 @@ def manage_layer_manager(json_result, sql):
                 set_margin(layer, margin)
                 if prev_layer:
                     global_vars.iface.setActiveLayer(prev_layer)
-        
+
         # Set snnaping options
         if 'snnaping' in layermanager:
             for layer_name in layermanager['snnaping']:
@@ -1333,14 +1333,14 @@ def manage_layer_manager(json_result, sql):
                     QgsProject.instance().snappingConfigChanged.emit(
                         snapping_config)
             set_snapping_mode()
-    
-    
+
+
     except Exception as e:
         global_vars.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
 
 
 def set_margin(layer, margin):
-    
+
     extent = QgsRectangle()
     extent.setMinimal()
     extent.combineExtentWith(layer.extent())
@@ -1359,7 +1359,7 @@ def manage_actions(json_result, sql):
     :param json_result: Json result of a query (Json)
     :return: None
     """
-    
+
     try:
         actions = json_result['body']['python_actions']
     except KeyError:

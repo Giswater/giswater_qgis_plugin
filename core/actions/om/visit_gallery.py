@@ -23,13 +23,14 @@ from .... import global_vars
 from ....actions.parent_functs import set_icon
 from ....actions.parent_manage_funct import close_dialog
 
+
 class GwVisitGallery:
 
     def __init__(self):
         """ Class to control 'Add element' of toolbar 'edit' """
-        
+
         self.controller = global_vars.controller
-        
+
 
     def manage_gallery(self):
 

@@ -220,6 +220,7 @@ def qgis_manage_snapping_layer(layername, snapping_type=0, tolerance=15.0):
 
     QgsSnappingUtils.LayerConfig(layer, snapping_type, tolerance, QgsTolerance.Pixels)
 
+
 def init_snapping_config():
     pass
 
@@ -239,7 +240,7 @@ def get_snapping_options():
 
 def enable_snapping(enable=False):
     """ Enable/Disable snapping of all layers """
-    
+
     QgsProject.instance().blockSignals(True)
     snapping_config = get_snapping_options()
 

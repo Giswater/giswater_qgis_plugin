@@ -31,8 +31,8 @@ class MultipleSelection(QgsMapTool):
         :param table_object:
         :param dialog:
         """
-        
-        
+
+
         self.layers = layers
         self.geom_type = geom_type
         self.iface = global_vars.iface
@@ -85,7 +85,7 @@ class MultipleSelection(QgsMapTool):
         # Disconnect signal to enhance process
         # We will reconnect it when processing last layer of the group
         disconnect_signal_selection_changed()
-        
+
         if self.manage_new_psector:
             self.manage_new_psector.disconnect_signal_selection_changed()
 
@@ -93,10 +93,10 @@ class MultipleSelection(QgsMapTool):
             if i == len(self.layers[self.geom_type]) - 1:
                 if self.mincut:
                     self.mincut.connect_signal_selection_changed("mincut_connec")
-                
+
                 if self.parent_manage:
                     connect_signal_selection_changed(self.dialog, self.table_object, layers=self.layers)
-                
+
                 if self.manage_new_psector:
                     self.manage_new_psector.connect_signal_selection_changed(
                         self.manage_new_psector.dlg_plan_psector, self.table_object)

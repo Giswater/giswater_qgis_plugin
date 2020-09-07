@@ -24,7 +24,7 @@ from ....actions.api_parent_functs import create_body, put_widgets,  \
     close_dialog, set_setStyleSheet, add_lineedit, set_widget_size, set_data_type, manage_lineedit, add_combobox, \
     add_checkbox, add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_textarea, \
     add_spinbox, add_tableview, set_headers, populate_table, set_columns_config
-from ....lib.qgis_tools import set_snapping_mode, remove_marker, get_snapping_options, enable_snapping,snap_to_node, \
+from ....lib.qgis_tools import set_snapping_mode, remove_marker, get_snapping_options, enable_snapping, snap_to_node, \
     snap_to_connec_gully, get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
     get_snapped_feature, get_snapped_feature_id, apply_snapping_options
 
@@ -39,7 +39,7 @@ class GwDimensioning:
         self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
         self.canvas = global_vars.canvas
-        
+
         self.vertex_marker = QgsVertexMarker(self.canvas)
 
 
@@ -176,7 +176,7 @@ class GwDimensioning:
         extras = f'"fields":{{{fields}}}'
         body = create_body(feature=feature, extras=extras)
         result = self.controller.get_json('gw_fct_setdimensioning', body)
-     
+
         # Close dialog
         close_dialog(self.dlg_dim)
 
@@ -297,7 +297,7 @@ class GwDimensioning:
             action.setChecked(False)
 
     def orientation(self, action):
-    
+
         emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(emit_point)
         if self.deactivate_signals(action, emit_point):

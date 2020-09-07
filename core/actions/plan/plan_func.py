@@ -20,7 +20,7 @@ from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, sa
 from .... import global_vars
 
 from ....actions.parent_functs import fill_table, set_table_columns, \
-    set_label_current_psector,  show_exceptions_msg
+    set_label_current_psector, show_exceptions_msg
 
 
 class GwPlan:
@@ -29,7 +29,7 @@ class GwPlan:
         """ Class to control toolbar 'master' """
         self.config_dict = {}
         self.manage_new_psector = GwPsector()
-        
+
         self.project_type = global_vars.project_type
         self.controller = global_vars.controller
         self.iface = global_vars.iface

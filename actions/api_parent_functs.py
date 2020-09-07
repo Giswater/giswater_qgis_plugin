@@ -1098,6 +1098,7 @@ def set_setStyleSheet(field, widget, wtype='label'):
 
 """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
+
 def action_open_url(dialog, result):
 
     widget = None

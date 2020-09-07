@@ -49,12 +49,12 @@ class GwSearch:
         self.controller = global_vars.controller
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
-        
+
         self.json_search = {}
         self.lbl_visible = False
         self.dlg_search = None
         self.is_mincut = False
-        
+
         self.rubber_band = QgsRubberBand(self.canvas)
 
 
@@ -97,7 +97,7 @@ class GwSearch:
         if dlg_mincut and len(complet_list["form"]) == 1:
             main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
             main_tab.setStyleSheet("QTabBar::tab { background-color: transparent; text-align:left;"
-                                   "border: 1px solid transparent;}"    
+                                   "border: 1px solid transparent;}"
                                    "QTabWidget::pane { background-color: #fcfcfc; border: 1 solid #dadada;}")
 
         first_tab = None

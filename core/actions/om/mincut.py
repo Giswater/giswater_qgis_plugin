@@ -38,7 +38,7 @@ from ....ui_manager import MincutComposer
 
 from .... import global_vars
 
-from ....actions.parent_functs import  set_icon, fill_table, set_table_columns, \
+from ....actions.parent_functs import set_icon, fill_table, set_table_columns, \
     restore_user_layer, resetRubberbands, refresh_map_canvas, create_body, \
     set_cursor_restore, get_cursor_multiple_selection, zoom_to_rectangle, disconnect_signal_selection_changed, \
     set_cursor_wait, get_composers_list, get_composer_index
@@ -47,11 +47,12 @@ from ...utils.layer_tools import delete_layer_from_toc, populate_info_text
 from ....lib.qgis_tools import get_event_point, snap_to_current_layer, get_snapped_layer, get_snapped_feature, \
     get_snapped_feature_id, get_snapped_point, snap_to_background_layers, add_marker, get_snapping_options, apply_snapping_options
 
+
 class GwMincut:
 
     def __init__(self):
         """ Class constructor """
-        
+
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
         self.controller = global_vars.controller
@@ -75,7 +76,7 @@ class GwMincut:
         self.set_states()
         self.current_state = None
         self.is_new = True
-        
+
         self.previous_snapping = None
 
 
@@ -107,7 +108,7 @@ class GwMincut:
         # Parametrize list of layers
         self.layers['connec'] = self.controller.get_group_layers('connec')
         self.layers_connec = self.layers['connec']
-        
+
         self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
 
         # Set active and current layer
@@ -217,7 +218,7 @@ class GwMincut:
         if self.states != {}:
             qt_tools.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
 
-        self.current_state = 0        
+        self.current_state = 0
         self.sql_connec = ""
         self.sql_hydro = ""
 
@@ -324,7 +325,7 @@ class GwMincut:
         qt_tools.setCalendarDate(self.dlg_mincut, "cbx_recieved_day", date_start)
         qt_tools.setCalendarDate(self.dlg_mincut, "cbx_date_start_predict", date_start)
         qt_tools.setCalendarDate(self.dlg_mincut, "cbx_date_end_predict", date_start)
-        
+
         # Get current time
         current_time = QTime.currentTime()
         self.dlg_mincut.cbx_recieved_time.setTime(current_time)
@@ -394,7 +395,7 @@ class GwMincut:
             self.controller.log_info(f"{type(e).__name__} --> {e}")
         except AttributeError as e:
             self.controller.log_info(f"{type(e).__name__} --> {e}")
-            
+
         try:
             self.emit_point.canvasClicked.disconnect()
         except TypeError as e:
@@ -1468,7 +1469,7 @@ class GwMincut:
 
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        
+
         self.init_mincut_canvas()
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.canceled = False
@@ -1577,7 +1578,7 @@ class GwMincut:
 
         self.disconnect_snapping(False)
         layer = get_snapped_layer(result)
-        
+
         # Check feature
         layers_arc = self.controller.get_group_layers('arc')
         self.layernames_arc = []
@@ -1776,8 +1777,8 @@ class GwMincut:
 
     def custom_mincut_execute(self, elem_id):
         """ Custom mincut. Execute function 'gw_fct_mincut_valve_unaccess' """
-        
-        # Change cursor to 'WaitCursor'     
+
+        # Change cursor to 'WaitCursor'
         set_cursor_wait()
 
         result_mincut_id = qt_tools.getWidgetText(self.dlg_mincut, "result_mincut_id")
@@ -1871,7 +1872,7 @@ class GwMincut:
 
         expr_filter = f"result_id={result_mincut_id}"
         qt_tools.set_qtv_config(self.dlg_mincut.tbl_hydro)
-        fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer',  expr_filter=expr_filter)
+        fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
 
         # Depend of mincut_state and mincut_clase desable/enable widgets
         # Current_state == '0': Planified
@@ -2005,7 +2006,7 @@ class GwMincut:
 
     def connect_signal_selection_changed(self, option):
         """ Connect signal selectionChanged """
-        
+
         try:
             if option == "mincut_connec":
                 global_vars.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))

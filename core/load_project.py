@@ -66,7 +66,7 @@ class LoadProject(QObject):
         self.schema_name = self.schema_name.replace('"', '')
         set_parser_value('load_project', 'schema_name', f'{self.schema_name}')
         self.controller.set_schema_name(self.schema_name)
-        
+
         # TEMP
         global_vars.schema_name = self.schema_name
         global_vars.project_type = self.controller.get_project_type()
@@ -251,13 +251,13 @@ class LoadProject(QObject):
             if not parser.has_section("toolbars_position") or not parser.has_option('toolbars_position', 'toolbars_order'):
                 parser = self.init_user_config_file(path, toolbar_names)
         parser.read(path)
-        
+
         toolbars_order = parser['toolbars_position']['toolbars_order'].split(',')
-        
+
         # Check if both arrays contain the same elements regardless of the order
         if Counter(toolbars_order) != Counter(toolbar_names):
             toolbars_order = toolbar_names
-        
+
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
         for tb in toolbars_order:
             self.create_toolbar(tb)
@@ -307,10 +307,10 @@ class LoadProject(QObject):
 
         if list_actions is None:
             return
-        
+
         if type(list_actions) != list:
             list_actions = [list_actions]
-        
+
         toolbar_name = self.translate(f'toolbar_{toolbar_id}_name')
         plugin_toolbar = PluginToolbar(toolbar_id, toolbar_name, True)
 
@@ -427,7 +427,7 @@ class LoadProject(QObject):
         parser.add_section('toolbars_position')
 
         parser.set('toolbars_position', 'toolbars_order', ",".join(toolbar_names))
-        
+
         # Writing our configuration file to 'user.config'
         with open(path, 'w') as configfile:
             parser.write(configfile)

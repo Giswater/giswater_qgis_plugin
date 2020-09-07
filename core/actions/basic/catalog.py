@@ -25,7 +25,7 @@ class GwCatalog:
 
     def __init__(self):
         """ Class to control toolbar 'om_ws' """
-        
+
         self.controller = global_vars.controller
 
 

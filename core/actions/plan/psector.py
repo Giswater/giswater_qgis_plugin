@@ -44,7 +44,7 @@ class GwPsector:
 
     def __init__(self):
         """ Class to control 'New Psector' of toolbar 'master' """
-        
+
         self.controller = global_vars.controller
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
@@ -432,7 +432,7 @@ class GwPsector:
         sql = "SELECT DISTINCT(id) FROM v_ui_document ORDER BY id"
         list_items = make_list_for_completer(sql)
         set_completer_lineedit(self.dlg_plan_psector.doc_id, list_items)
-        
+
         if psector_id is not None:
             sql = (f"SELECT other, gexpenses, vat "
                    f"FROM plan_psector "
@@ -446,11 +446,11 @@ class GwPsector:
                 other = float(row[0]) if row[0] is not None else 0
                 gexpenses = float(row[1]) if row[1] is not None else 0
                 vat = float(row[2]) if row[2] is not None else 0
-    
+
             qt_tools.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, other)
             qt_tools.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, gexpenses)
             qt_tools.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, vat)
-    
+
             qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_total_node', self.sys_currency['symbol'])
             qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_total_arc', self.sys_currency['symbol'])
             qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_total_other', self.sys_currency['symbol'])
@@ -745,7 +745,7 @@ class GwPsector:
 
 
     def calc_pec_pem(self, dialog):
-        
+
         if qt_tools.getWidgetText(dialog, 'pec') not in('null', None):
             pec = float(qt_tools.getWidgetText(dialog, 'pec'))
         else:
@@ -776,7 +776,7 @@ class GwPsector:
 
 
     def calc_pca_pecvat(self, dialog):
-        
+
         if qt_tools.getWidgetText(dialog, 'pca') not in('null', None):
             pca = float(qt_tools.getWidgetText(dialog, 'pca'))
         else:
@@ -837,7 +837,7 @@ class GwPsector:
         """ Connect signal selectionChanged """
 
         try:
-            #TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
+            # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.canvas.selectionChanged.connect(
                 partial(selection_changed, dialog, table_object, self.geom_type, query, plan_om='plan',
                         layers=self.layers, list_ids=self.list_ids))
@@ -1249,7 +1249,7 @@ class GwPsector:
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
         """ Populate the QTableView by filtering through the QLineEdit"""
 
-        schema_name = self.schema_name.replace('"','')
+        schema_name = self.schema_name.replace('"', '')
         query = qt_tools.getWidgetText(dialog, text_line).lower()
         if query == 'null':
             query = ""
@@ -1362,7 +1362,7 @@ class GwPsector:
 
     def manage_document(self, qtable):
         """ Access GUI to manage documents e.g Execute action of button 34 """
-        
+
         psector_id = qt_tools.getText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
         manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.manage_document(tablename='psector', qtable=qtable, item_id=psector_id)

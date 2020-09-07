@@ -33,6 +33,7 @@ from ..lib.qgis_tools import qgis_get_layer_by_tablename, qgis_get_layer_source,
     qgis_get_layer_primary_key, qgis_get_layers
 from ..core.utils.giswater_tools import get_parser_value, set_parser_value
 
+
 class DaoController:
 
     def __init__(self, plugin_name, iface, logger_name='plugin', create_logger=True):

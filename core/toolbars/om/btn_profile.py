@@ -417,7 +417,7 @@ class GwProfileButton(GwParentMapTool):
             self.draw_nodes(self.nodes[i], self.nodes[i - 1], i)
         # Draw ground first node and nodes between first and last node
         for i in range(1, self.t):
-            self.first_top_x = self.links[i - 1].start_point # start_point = total_x
+            self.first_top_x = self.links[i - 1].start_point  # start_point = total_x
             self.node_top_x = self.links[i].start_point  # start_point = total_x
             self.first_top_y = self.links[i - 1].node_id  # node_id = top_n1
             self.node_top_y = self.links[i - 1].geom  # geom = top_n2
@@ -485,7 +485,7 @@ class GwProfileButton(GwParentMapTool):
         self.rect = self.fig1.patch
         self.rect.set_facecolor('white')
 
-       
+
     def set_parameters(self, arcs, nodes, terrains):
         """ Get and calculate parameters and values for drawing """
 
@@ -820,7 +820,7 @@ class GwProfileButton(GwParentMapTool):
 
         # Fill top_elevation and node_id for all nodes
         plt.annotate(' ' + '\n' + str(round(self.nodes[indx].descript['top_elev'], 2)) + '\n' + ' ',
-                     xy=(Decimal(start_point), self.min_top_elev - \
+                     xy=(Decimal(start_point), self.min_top_elev -
                          Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
                      fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
@@ -994,7 +994,7 @@ class GwProfileButton(GwParentMapTool):
 
         # Fill top_elevation and node_id for all nodes
         plt.annotate(' ' + '\n' + str(round(self.links[indx].descript['top_elev'], 2)) + '\n' + ' ',
-                     xy=(Decimal(start_point), self.min_top_elev - \
+                     xy=(Decimal(start_point), self.min_top_elev -
                          Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
                      fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
@@ -1113,8 +1113,8 @@ class GwProfileButton(GwParentMapTool):
         for i in range(1, self.n):
             if (self.nodes[i].top_elev - self.nodes[i].ymax) < self.min_top_elev:
                 self.min_top_elev = Decimal(self.nodes[i].top_elev - self.nodes[i].ymax)
-            if (self.nodes[i].descript['top_elev'] - self.nodes[i].descript ['ymax']) < self.min_top_elev_descript:
-                self.min_top_elev_descript = Decimal(self.nodes[i].descript['top_elev'] - self.nodes[i].descript ['ymax'])
+            if (self.nodes[i].descript['top_elev'] - self.nodes[i].descript['ymax']) < self.min_top_elev_descript:
+                self.min_top_elev_descript = Decimal(self.nodes[i].descript['top_elev'] - self.nodes[i].descript['ymax'])
 
         # Search y coordinate max_top_elev
         self.max_top_elev = self.nodes[0].top_elev

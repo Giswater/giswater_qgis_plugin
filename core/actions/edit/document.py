@@ -133,7 +133,7 @@ class GwDocument:
         self.dlg_add_doc.tab_feature.currentChanged.connect(
             partial(tab_feature_changed, self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"]))
 
-        #TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_doc.doc_id.textChanged.connect(partial(exist_object, self.dlg_add_doc, table_object,
                                                             self.single_tool_mode, layers=self.layers, ids=self.ids,
                                                             list_ids=self.list_ids))

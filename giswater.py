@@ -227,14 +227,14 @@ class Giswater(QObject):
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
         if len(own_toolbars) == 0:
             return
-        
+
         sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
-        
+
         # Check if section toolbars_position exists in file
         if 'toolbars_position' not in parser:
             parser = configparser.RawConfigParser()
             parser.add_section('toolbars_position')
-        
+
         parser['toolbars_position']['toolbars_order'] = ",".join(sorted_toolbar_ids)
 
         with open(path, 'w') as configfile:

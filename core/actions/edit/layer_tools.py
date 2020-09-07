@@ -19,6 +19,7 @@ from lib import qt_tools
 
 from .... import global_vars
 
+
 class GwLayerTools:
 
     def __init__(self):
@@ -29,7 +30,7 @@ class GwLayerTools:
         self.settings = global_vars.settings
         self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
-        
+
         self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name
         self.project_type = None

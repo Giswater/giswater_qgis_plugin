@@ -41,7 +41,7 @@ from ....ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainW
 
 from ....actions.parent_functs import set_icon, set_dates_from_to
 from ....actions.api_parent_functs import get_visible_layers, create_body, \
-    draw, populate_basic_info,  put_widgets, fill_child, \
+    draw, populate_basic_info, put_widgets, fill_child, \
     check_actions, action_open_url, api_action_help, \
     get_feature_by_expr, set_setStyleSheet, set_data_type, add_lineedit, set_widget_size, manage_lineedit, add_combobox, \
     add_checkbox, get_values, add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, \
@@ -50,6 +50,7 @@ from ....actions.api_parent_functs import get_visible_layers, create_body, \
 from ....lib.qgis_tools import get_snapping_options, get_event_point, snap_to_current_layer, get_snapped_layer, \
     get_snapped_feature, add_marker, enable_snapping, snap_to_layer, apply_snapping_options, snap_to_arc, snap_to_node
 
+
 class GwInfo(QObject):
 
     # :var signal_activate: emitted from def cancel_snapping_tool(self, dialog, action) in order to re-start CadApiInfo
@@ -57,30 +58,30 @@ class GwInfo(QObject):
 
     def __init__(self, tab_type):
         """ Class constructor """
-        
+
         super().__init__()
-        
+
         self.iface = global_vars.iface
         self.settings = global_vars.settings
         self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
-        
+
         self.new_feature_id = None
         self.layer_new_feature = None
         self.tab_type = tab_type
         self.rubber_band = QgsRubberBand(self.canvas, 0)
 
-    
+
     def get_info_from_coordinates(self, point, tab_type):
         return self.open_form(point=point, tab_type=tab_type)
-    
-    
+
+
     def get_info_from_id(self, table_name, feature_id, tab_type=None, is_add_schema=None):
         return self.open_form(table_name=table_name, feature_id=feature_id, tab_type=tab_type, is_add_schema=is_add_schema)
-    
-    
+
+
     def get_feature_insert(self, point, feature_cat, new_feature_id, layer_new_feature, tab_type, new_feature):
         return self.open_form(point=point, feature_cat=feature_cat, new_feature_id=new_feature_id, layer_new_feature=layer_new_feature, tab_type=tab_type, new_feature=new_feature)
 
@@ -573,24 +574,24 @@ class GwInfo(QObject):
 
 
     def activate_snapping(self, complet_result, ep):
-        
+
         rb_interpolate = []
         self.interpolate_result = None
         self.rubber_band.reset()
         dlg_dtext = DialogTextUi()
         load_settings(dlg_dtext)
-        
+
         qt_tools.setWidgetText(dlg_dtext, dlg_dtext.txt_infolog, 'Interpolate tool')
         dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
                                    "interpolation\nNode1: \nNode2:")
-        
+
         dlg_dtext.btn_accept.clicked.connect(partial(self.chek_for_existing_values, dlg_dtext))
         dlg_dtext.btn_close.clicked.connect(partial(close_dialog, dlg_dtext))
         dlg_dtext.rejected.connect(partial(save_settings, dlg_dtext))
         dlg_dtext.rejected.connect(partial(self.remove_interpolate_rb, rb_interpolate))
-        
+
         open_dialog(dlg_dtext, dlg_name='dialog_text')
-        
+
         # Set circle vertex marker
         color = QColor(255, 100, 255)
         self.vertex_marker = QgsVertexMarker(global_vars.canvas)
@@ -598,20 +599,20 @@ class GwInfo(QObject):
         self.vertex_marker.setColor(color)
         self.vertex_marker.setIconSize(15)
         self.vertex_marker.setPenWidth(3)
-        
+
         self.node1 = None
         self.node2 = None
-        
+
         global_vars.canvas.setMapTool(ep)
         # We redraw the selected feature because self.canvas.setMapTool(emit_point) erases it
         draw(complet_result[0], self.rubber_band, None, False)
-        
+
         # Store user snapping configuration
         self.previous_snapping = get_snapping_options
 
         self.layer_node = global_vars.controller.get_layer_by_tablename("v_edit_node")
         global_vars.iface.setActiveLayer(self.layer_node)
-        
+
         global_vars.canvas.xyCoordinates.connect(partial(self.mouse_move))
         ep.canvasClicked.connect(partial(self.snapping_node, ep, dlg_dtext, rb_interpolate))
 
@@ -622,7 +623,7 @@ class GwInfo(QObject):
         if button == 2:
             self.dlg_destroyed(self.layer)
             return
-    
+
         # Get coordinates
         event_point = get_event_point(point=point)
         if not event_point:
@@ -650,11 +651,11 @@ class GwInfo(QObject):
                     rb_interpolate.append(rb)
                     dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
                     global_vars.controller.show_message(message, message_level=0, parameter=self.node2)
-    
+
         if self.node1 and self.node2:
             global_vars.canvas.xyCoordinates.disconnect()
             ep.canvasClicked.disconnect()
-        
+
             global_vars.iface.setActiveLayer(self.layer)
             global_vars.iface.mapCanvas().scene().removeItem(self.vertex_marker)
             extras = f'"parameters":{{'
@@ -665,10 +666,10 @@ class GwInfo(QObject):
             body = create_body(extras=extras)
             self.interpolate_result = global_vars.controller.get_json('gw_fct_node_interpolate', body, log_sql=True)
             populate_info_text(dlg_dtext, self.interpolate_result['body']['data'])
-    
-    
+
+
     def chek_for_existing_values(self, dlg_dtext):
-        
+
         text = False
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
             widget = self.dlg_cf.findChild(QWidget, k)
@@ -682,10 +683,10 @@ class GwInfo(QObject):
                     break
         if not text:
             self.set_values(dlg_dtext)
-    
-    
+
+
     def set_values(self, dlg_dtext):
-        
+
         # Set values tu info form
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
             widget = self.dlg_cf.findChild(QWidget, k)
@@ -718,13 +719,13 @@ class GwInfo(QObject):
         # Remove the circumferences made by the interpolate
         for rb in rb_interpolate:
             global_vars.iface.mapCanvas().scene().removeItem(rb)
-    
-    
+
+
     def mouse_move(self, point):
-        
+
         # Get clicked point
         event_point = get_event_point(point=point)
-        
+
         # Snapping
         result = snap_to_current_layer(event_point)
         if result.isValid():
@@ -736,22 +737,22 @@ class GwInfo(QObject):
 
 
     def change_hemisphere(self, dialog):
-        
+
         # Set map tool emit point and signals
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
         self.previous_map_tool = global_vars.canvas.mapTool()
         global_vars.canvas.setMapTool(emit_point)
         emit_point.canvasClicked.connect(partial(self.action_rotation_canvas_clicked, dialog, emit_point))
-    
-    
+
+
     def action_rotation_canvas_clicked(self, dialog, emit_point, point, btn):
-        
+
         print(point)
-        
+
         if btn == Qt.RightButton:
             global_vars.canvas.setMapTool(self.previous_map_tool)
             return
-        
+
         existing_point_x = None
         existing_point_y = None
         viewname = global_vars.controller.get_layer_source_table_name(self.layer)
@@ -759,11 +760,11 @@ class GwInfo(QObject):
                f" FROM {viewname}"
                f" WHERE node_id = '{self.feature_id}'")
         row = global_vars.controller.get_row(sql)
-        
+
         if row:
             existing_point_x = row[0]
             existing_point_y = row[1]
-        
+
         if existing_point_x:
             sql = (f"UPDATE node"
                    f" SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}), "
@@ -773,13 +774,13 @@ class GwInfo(QObject):
             if not status:
                 global_vars.canvas.setMapTool(self.previous_map_tool)
                 return
-        
+
         sql = (f"SELECT rotation FROM node "
                f" WHERE node_id = '{self.feature_id}'")
         row = global_vars.controller.get_row(sql)
         if row:
             qt_tools.setWidgetText(dialog, "rotation", str(row[0]))
-        
+
         sql = (f"SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}),"
                f" ST_Point({point.x()}, {point.y()})))")
         row = global_vars.controller.get_row(sql)
@@ -808,17 +809,17 @@ class GwInfo(QObject):
         global_vars.canvas.xyCoordinates.connect(self.api_action_copy_paste_mouse_move)
         emit_point.canvasClicked.connect(partial(self.api_action_copy_paste_canvas_clicked, dialog, tab_type, emit_point))
         self.geom_type = geom_type
-    
+
         # Store user snapping configuration
         self.previous_snapping = get_snapping_options
 
         # Clear snapping
         enable_snapping()
-    
+
         # Set snapping
         layer = global_vars.iface.activeLayer()
         snap_to_layer(layer)
-    
+
         # Set marker
         color = QColor(255, 100, 255)
         self.vertex_marker = QgsVertexMarker(global_vars.canvas)
@@ -829,49 +830,49 @@ class GwInfo(QObject):
         self.vertex_marker.setColor(color)
         self.vertex_marker.setIconSize(15)
         self.vertex_marker.setPenWidth(3)
-    
-    
+
+
     def api_action_copy_paste_mouse_move(self, point):
         """ Slot function when mouse is moved in the canvas.
             Add marker if any feature is snapped
         """
-        
+
         # Hide marker and get coordinates
         self.vertex_marker.hide()
         event_point = get_event_point(point=point)
-        
+
         # Snapping
         result = snap_to_current_layer(event_point)
         if not result.isValid():
             return
-        
+
         # Add marker to snapped feature
         add_marker(result, self.vertex_marker)
-    
-    
+
+
     def api_action_copy_paste_canvas_clicked(self, dialog, tab_type, emit_point, point, btn):
         """ Slot function when canvas is clicked """
-        
+
         if btn == Qt.RightButton:
             self.api_disable_copy_paste(dialog, emit_point)
             return
-        
+
         # Get clicked point
         event_point = get_event_point(point=point)
-        
+
         # Snapping
         result = snap_to_current_layer(event_point)
         if not result.isValid():
             self.api_disable_copy_paste(dialog, emit_point)
             return
-        
+
         layer = global_vars.iface.activeLayer()
         layername = layer.name()
-        
+
         # Get the point. Leave selection
         snapped_feature = get_snapped_feature(result, True)
         snapped_feature_attr = snapped_feature.attributes()
-        
+
         aux = f'"{self.geom_type}_id" = '
         aux += f"'{self.feature_id}'"
         expr = QgsExpression(aux)
@@ -880,7 +881,7 @@ class GwInfo(QObject):
             global_vars.controller.show_warning(message, parameter=expr.parserErrorString())
             self.api_disable_copy_paste(dialog, emit_point)
             return
-        
+
         fields = layer.dataProvider().fields()
         layer.startEditing()
         it = layer.getFeatures(QgsFeatureRequest(expr))
@@ -888,7 +889,7 @@ class GwInfo(QObject):
         if not feature_list:
             self.api_disable_copy_paste(dialog, emit_point)
             return
-        
+
         # Select only first element of the feature list
         feature = feature_list[0]
         feature_id = feature.attribute(str(self.geom_type) + '_id')
@@ -898,7 +899,7 @@ class GwInfo(QObject):
         snapped_feature_attr[0] = feature_id
         snapped_feature_attr_aux = []
         fields_aux = []
-        
+
         # Iterate over all fields and copy only specific ones
         for i in range(0, len(fields)):
             if fields[i].name() == 'sector_id' or fields[i].name() == 'dma_id' or fields[i].name() == 'expl_id' \
@@ -911,10 +912,10 @@ class GwInfo(QObject):
                 if fields[i].name() == str(self.geom_type) + '_type':
                     snapped_feature_attr_aux.append(snapped_feature_attr[i])
                     fields_aux.append(fields[i].name())
-        
+
         for i in range(0, len(fields_aux)):
             msg += f"{fields_aux[i]}: {snapped_feature_attr_aux[i]}\n"
-        
+
         # Ask confirmation question showing fields that will be copied
         answer = global_vars.controller.ask_question(msg, "Update records", None)
         if answer:
@@ -922,9 +923,9 @@ class GwInfo(QObject):
                 for x in range(0, len(fields_aux)):
                     if fields[i].name() == fields_aux[x]:
                         layer.changeAttributeValue(feature.id(), i, snapped_feature_attr_aux[x])
-            
+
             layer.commitChanges()
-            
+
             # dialog.refreshFeature()
             for i in range(0, len(fields_aux)):
                 widget = dialog.findChild(QWidget, tab_type + "_" + fields_aux[i])
@@ -942,7 +943,7 @@ class GwInfo(QObject):
         action_widget = dialog.findChild(QAction, "actionCopyPaste")
         if action_widget:
             action_widget.setChecked(False)
-    
+
         try:
             apply_snapping_options(self.previous_snapping)
             self.vertex_marker.hide()
@@ -950,7 +951,7 @@ class GwInfo(QObject):
             emit_point.canvasClicked.disconnect()
         except:
             pass
-    
+
 
     def manage_docker_close(self):
 
@@ -1175,9 +1176,9 @@ class GwInfo(QObject):
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
         widget = add_calendar(dialog, field, my_json=self.my_json, complet_result=self.complet_result,
-                                   new_feature_id=self.new_feature_id, new_feature=self.new_feature,
-                                   layer_new_feature=self.layer_new_feature,
-                                   feature_id=self.feature_id, feature_type=self.feature_type, layer=self.layer)
+                              new_feature_id=self.new_feature_id, new_feature=self.new_feature,
+                              layer_new_feature=self.layer_new_feature,
+                              feature_id=self.feature_id, feature_type=self.feature_type, layer=self.layer)
         widget = self.set_auto_update_dateedit(field, dialog, widget)
         return widget
 
@@ -1458,7 +1459,7 @@ class GwInfo(QObject):
             def integer_validator(self, value, widget, btn_accept)
             def double_validator(self, value, widget, btn_accept)
         """
-        
+
         value = qt_tools.getWidgetText(dialog, widget, return_string_null=False)
         try:
             getattr(self, f"{widget.property('datatype')}_validator")(value, widget, btn)
@@ -1467,8 +1468,8 @@ class GwInfo(QObject):
             pass
 
 
-    def check_min_max_value(self,dialog, widget, btn_accept):
-        
+    def check_min_max_value(self, dialog, widget, btn_accept):
+
         value = qt_tools.getWidgetText(dialog, widget, return_string_null=False)
         try:
             if value and ((widget.property('minValue') and float(value) < float(widget.property('minValue'))) or
@@ -1523,7 +1524,7 @@ class GwInfo(QObject):
 
         return widget
 
-    
+
     def reload_fields(self, dialog, result, p_widget):
         """
         :param dialog: QDialog where find and set widgets
@@ -2447,6 +2448,8 @@ class GwInfo(QObject):
 
 
     # creat the new visit GUI
+
+
     def update_visit_table(self):
         """ Convenience fuction set as slot to update table after a Visit GUI close. """
         table_name = "v_ui_event_x_" + self.geom_type

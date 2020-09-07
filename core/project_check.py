@@ -23,7 +23,7 @@ class GwProjectCheck:
 
     def __init__(self):
         """ Class to control Composer button """
-        
+
         self.controller = global_vars.controller
         self.schema_name = global_vars.schema_name
 

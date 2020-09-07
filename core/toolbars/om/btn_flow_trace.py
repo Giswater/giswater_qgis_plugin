@@ -100,7 +100,7 @@ class GwFlowTraceButton(GwParentMapTool):
 
 
     def deactivate(self):
-        
+
         # Call parent method
         super().deactivate()
 

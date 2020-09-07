@@ -27,7 +27,7 @@ class GwPsectorDuplicate(QObject):
         """ Class to control 'Workcat end' of toolbar 'edit' """
 
         super().__init__()
-        
+
         self.controller = global_vars.controller
 
 

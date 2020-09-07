@@ -24,15 +24,16 @@ from ....actions.parent_manage_funct import set_selectionbehavior, remove_select
     selection_init, add_point, set_completer_feature_id, set_model_to_table, fill_table_object, set_table_columns, \
     filter_by_id, delete_selected_object
 
+
 class GwElement:
 
     def __init__(self):
         """ Class to control 'Add element' of toolbar 'edit' """
-        
+
         self.iface = global_vars.iface
         self.controller = global_vars.controller
         self.schema_name = global_vars.schema_name
-        
+
         self.vertex_marker = QgsVertexMarker(global_vars.canvas)
 
 

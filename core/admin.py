@@ -34,12 +34,10 @@ from ..ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjectI
     MainGisProjectUi, ToolboxUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
 
 from .. import global_vars
-
 from ..actions.parent_functs import get_folder_dialog, set_table_columns
 from ..actions.api_parent_functs import create_body, construct_form_param_user
 from .utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
 from .utils.layer_tools import populate_info_text
-
 
 
 class GwAdmin:
@@ -643,7 +641,7 @@ class GwAdmin:
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep):
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                            sub_folder + os.sep + 'utils' + os.sep, no_ct=no_ct)
                                     if status is False:
                                         return False
@@ -659,7 +657,7 @@ class GwAdmin:
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN'):
-                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                    status = self.executeFiles(self.folderUpdates + folder +
                                                                os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
@@ -667,12 +665,12 @@ class GwAdmin:
                         else:
                             if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep):
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                            sub_folder + os.sep + 'utils' + os.sep, no_ct=no_ct)
                                     if status is False:
                                         return False
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, ''):
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                            sub_folder + os.sep + project_type + os.sep, no_ct=no_ct)
                                     if status is False:
                                         return False
@@ -682,7 +680,7 @@ class GwAdmin:
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN'):
-                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                    status = self.executeFiles(self.folderUpdates + folder +
                                                                os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
@@ -691,7 +689,7 @@ class GwAdmin:
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                            sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
                                         return False
@@ -703,8 +701,8 @@ class GwAdmin:
                                     if status is False:
                                         return False
                                 if self.process_folder(
-                                        self.folderUpdates + folder + os.sep + sub_folder + \
-                                            os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                        self.folderUpdates + folder + os.sep + sub_folder +
+                                    os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                         '') is True:
                                     status = self.executeFiles(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -712,7 +710,7 @@ class GwAdmin:
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                    status = self.executeFiles(self.folderUpdates + folder +
                                                                os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
@@ -720,7 +718,7 @@ class GwAdmin:
                         else:
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                            sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
                                         return False
@@ -737,7 +735,7 @@ class GwAdmin:
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                    status = self.executeFiles(self.folderUpdates + folder +
                                                                os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
@@ -746,22 +744,22 @@ class GwAdmin:
 
             if not os.path.exists(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + ''):
                 return
-            folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + \
+            folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) +
                              os.sep + os.sep + 'updates' + os.sep + ''))
             for folder in folders:
-                sub_folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + \
+                sub_folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) +
                                      os.sep + os.sep + 'updates' + os.sep + folder))
                 for sub_folder in sub_folders:
                     if new_project:
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > '31100':
                                 if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), '') is True:
-                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + \
+                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep +
                                                                folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', '') is True:
-                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + \
+                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' +
                                                                os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
@@ -770,7 +768,7 @@ class GwAdmin:
                             if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder,
                                                        '') is True:
-                                    status = self.load_sql(self.sql_dir + os.sep + str(project_type) + \
+                                    status = self.load_sql(self.sql_dir + os.sep + str(project_type) +
                                                            os.sep + 'updates' + os.sep + folder + os.sep + sub_folder)
                                     if status is False:
                                         return False
@@ -789,7 +787,7 @@ class GwAdmin:
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                            sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
                                         return False
@@ -807,7 +805,7 @@ class GwAdmin:
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                    status = self.executeFiles(self.folderUpdates + folder +
                                                                os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
@@ -815,7 +813,7 @@ class GwAdmin:
                         else:
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                            sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
                                         return False
@@ -827,8 +825,8 @@ class GwAdmin:
                                     if status is False:
                                         return False
                                 if self.process_folder(
-                                        self.folderUpdates + folder + os.sep + sub_folder + \
-                                            os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                        self.folderUpdates + folder + os.sep + sub_folder +
+                                    os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                         '') is True:
                                     status = self.executeFiles(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -836,7 +834,7 @@ class GwAdmin:
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                    status = self.executeFiles(self.folderUpdates + folder +
                                                                os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
@@ -882,18 +880,18 @@ class GwAdmin:
                     if new_project:
                         if str(sub_folder) <= '31100':
                             if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                        sub_folder + os.sep + 'utils' + os.sep)
                                 if status is False:
                                     return False
                             if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, '') is True:
-                                status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                        sub_folder + os.sep + project_type + os.sep)
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.folderUpdates + folder + os.sep + sub_folder + \
-                                        os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.folderUpdates + folder + os.sep + sub_folder +
+                                os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -901,14 +899,14 @@ class GwAdmin:
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is False:
-                                status = self.executeFiles(self.folderUpdates + folder + \
+                                status = self.executeFiles(self.folderUpdates + folder +
                                                            os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                 if status is False:
                                     return False
                     else:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= '31100':
                             if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                        sub_folder + os.sep + 'utils' + os.sep)
                                 if status is False:
                                     return False
@@ -920,8 +918,8 @@ class GwAdmin:
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.folderUpdates + folder + os.sep + sub_folder + \
-                                        os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.folderUpdates + folder + os.sep + sub_folder +
+                                os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -929,7 +927,7 @@ class GwAdmin:
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', '') is True:
-                                status = self.executeFiles(self.folderUpdates + folder + \
+                                status = self.executeFiles(self.folderUpdates + folder +
                                                            os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                 if status is False:
                                     return False
@@ -939,23 +937,23 @@ class GwAdmin:
             if not os.path.exists(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + ''):
                 return True
 
-            folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + \
+            folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) +
                              os.sep + os.sep + 'updates' + os.sep + ''))
             for folder in folders:
-                sub_folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + \
+                sub_folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) +
                                      os.sep + os.sep + 'updates' + os.sep + folder))
                 for sub_folder in sub_folders:
                     if new_project:
                         if str(sub_folder) <= '31100':
                             if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder, '') is True:
-                                status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep + \
+                                status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep +
                                                        os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + '')
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + \
-                                                                folder + os.sep + sub_folder + os.sep + \
-                                                                    'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep +
+                                folder + os.sep + sub_folder + os.sep +
+                                'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(self.sql_dir + os.sep + str(
                                     project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -963,7 +961,7 @@ class GwAdmin:
                                 if status is False:
                                     return False
                             elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' +
                                                            os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
                                 if status is False:
                                     return False
@@ -971,14 +969,14 @@ class GwAdmin:
                     else:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= '31100':
                             if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder, '') is True:
-                                status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep + \
+                                status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep +
                                                        os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + '')
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + \
-                                                                folder + os.sep + sub_folder + os.sep + \
-                                                                    'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep +
+                                folder + os.sep + sub_folder + os.sep +
+                                'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(self.sql_dir + os.sep + str(
                                     project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -986,7 +984,7 @@ class GwAdmin:
                                 if status is False:
                                     return False
                             elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' +
                                                            os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
                                 if status is False:
                                     return False
@@ -1148,18 +1146,18 @@ class GwAdmin:
                 if new_api:
                     if self.read_all_updates == 'TRUE':
                         if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, '') is True:
-                            status = self.executeFiles(self.folderUpdatesApi + folder + \
+                            status = self.executeFiles(self.folderUpdatesApi + folder +
                                                        os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                             if status is False:
                                 return False
                         if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep, '') is True:
-                            status = self.executeFiles(self.folderUpdatesApi + folder + \
+                            status = self.executeFiles(self.folderUpdatesApi + folder +
                                                        os.sep + sub_folder + os.sep + project_type + os.sep + '')
                             if status is False:
                                 return False
                         if self.process_folder(
-                                self.folderUpdatesApi + folder + os.sep + sub_folder + \
-                                    os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                self.folderUpdatesApi + folder + os.sep + sub_folder +
+                            os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                 '') is True:
                             status = self.executeFiles(
                                 self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -1167,7 +1165,7 @@ class GwAdmin:
                             if status is False:
                                 return False
                         elif self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                            status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + \
+                            status = self.executeFiles(self.folderUpdatesApi + folder + os.sep +
                                                        sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
                             if status is False:
                                 return False
@@ -1176,7 +1174,7 @@ class GwAdmin:
                             if status is False:
                                 return False
                         if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_tablect) is True:
-                            status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                            status = self.executeFiles(self.sql_dir + os.sep + 'api' +
                                                        os.sep + self.file_pattern_tablect)
                             if status is False:
                                 return False
@@ -1184,13 +1182,13 @@ class GwAdmin:
                         if str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
                                                    '') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                status = self.executeFiles(self.folderUpdatesApi + folder +
                                                            os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                                 if status is False:
                                     return False
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
                                                    '') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                status = self.executeFiles(self.folderUpdatesApi + folder +
                                                            os.sep + sub_folder + os.sep + project_type + os.sep + '')
                                 if status is False:
                                     return False
@@ -1210,12 +1208,12 @@ class GwAdmin:
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_trg) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' +
                                                            os.sep + self.file_pattern_trg)
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_tablect) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' +
                                                            os.sep + self.file_pattern_tablect)
                                 if status is False:
                                     return False
@@ -1224,7 +1222,7 @@ class GwAdmin:
                     if self.read_all_updates == 'TRUE':
                         if str(sub_folder) > str(self.project_version).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, '') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                status = self.executeFiles(self.folderUpdatesApi + folder +
                                                            os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                                 if status is False:
                                     return False
@@ -1236,8 +1234,8 @@ class GwAdmin:
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + \
-                                        os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.folderUpdatesApi + folder + os.sep + sub_folder +
+                                os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -1245,17 +1243,17 @@ class GwAdmin:
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + \
+                                status = self.executeFiles(self.folderUpdatesApi + folder + os.sep +
                                                            sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_trg) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' +
                                                            os.sep + self.file_pattern_trg)
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_tablect) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' +
                                                            os.sep + self.file_pattern_tablect)
                                 if status is False:
                                     return False
@@ -1263,13 +1261,13 @@ class GwAdmin:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
                                                    '') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                status = self.executeFiles(self.folderUpdatesApi + folder +
                                                            os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                                 if status is False:
                                     return False
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
                                                    '') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                status = self.executeFiles(self.folderUpdatesApi + folder +
                                                            os.sep + sub_folder + os.sep + project_type + os.sep + '')
                                 if status is False:
                                     return False
@@ -1289,12 +1287,12 @@ class GwAdmin:
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_trg) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' +
                                                            os.sep + self.file_pattern_trg)
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_tablect) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' +
                                                            os.sep + self.file_pattern_tablect)
                                 if status is False:
                                     return False
@@ -1730,6 +1728,8 @@ class GwAdmin:
 
 
     # TODO: Rename this function => Update all versions from changelog file.
+
+
     def update(self, project_type):
 
         msg = "Are you sure to update the project schema to last version?"
@@ -2179,12 +2179,12 @@ class GwAdmin:
         elif str(self.plugin_version) > str(self.project_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                         '(Schema version is lower than plugin version, please update schema)')
+                                   '(Schema version is lower than plugin version, please update schema)')
             self.dlg_readsql.btn_info.setEnabled(True)
         elif str(self.plugin_version) < str(self.project_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                         '(Schema version is higher than plugin version, please update plugin)')
+                                   '(Schema version is higher than plugin version, please update plugin)')
             self.dlg_readsql.btn_info.setEnabled(False)
         else:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
@@ -2513,9 +2513,9 @@ class GwAdmin:
 
 
     def execute_import_inp(self, accepted=False, schema_type=''):
- 
-        is_test = False;
-	
+
+        is_test = False
+
         if accepted:
 
             # Set wait cursor
@@ -2888,6 +2888,8 @@ class GwAdmin:
 
 
     # TODO:: Enhance this function and use parametric parameters
+
+
     def update_selected_sys_fild(self, widget):
 
         selected_list = widget.selectionModel().selectedRows()
@@ -3016,8 +3018,8 @@ class GwAdmin:
         qt_tools.setWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
 
 
-    # TODO:: Enhance this function and use parametric parameters
     def manage_update_sys_field(self, form_name):
+        # TODO:: Enhance this function and use parametric parameters
 
         schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
@@ -3170,7 +3172,7 @@ class GwAdmin:
                         value = qt_tools.get_item_data(self.dlg_manage_fields, widget, 0)
                     elif type(widget) is QCheckBox:
                         value = qt_tools.isChecked(self.dlg_manage_fields, widget)
-                    elif type(widget) is QgsDateTimeEdit :
+                    elif type(widget) is QgsDateTimeEdit:
                         value = qt_tools.getCalendarDate(self.dlg_manage_fields, widget)
                     elif type(widget) is QPlainTextEdit:
                         value = widget.document().toPlainText()

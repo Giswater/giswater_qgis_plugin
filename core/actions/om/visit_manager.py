@@ -32,13 +32,14 @@ from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, sa
 
 from .... import global_vars
 
-from ....actions.parent_functs import  set_icon, document_delete, document_open, create_body, \
+from ....actions.parent_functs import set_icon, document_delete, document_open, create_body, \
     set_dates_from_to, get_values_from_catalog
 from ....actions.parent_manage_funct import set_selectionbehavior, close_dialog, add_point, \
     check_expression, disconnect_signal_selection_changed, connect_signal_selection_changed, remove_selection, \
     select_features_by_ids, refresh_map_canvas, fill_widget_with_fields, fill_table_object, enable_feature_type, \
     insert_feature, delete_records, selection_init, set_completer_feature_id, set_table_model, lazy_configuration, \
     set_table_columns, delete_selected_object, set_completer_object, hide_generic_layers, selection_changed
+
 
 class GwVisitManager:
 
@@ -47,7 +48,7 @@ class GwVisitManager:
 
     def __init__(self):
         """ Class to control 'Add visit' of toolbar 'edit' """
-        
+
         self.controller = global_vars.controller
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
@@ -124,7 +125,7 @@ class GwVisitManager:
         self.feature_type_parameter = None
 
         # Reset geometry
-        self.point_xy = {"x":None, "y":None}
+        self.point_xy = {"x": None, "y": None}
 
         # Set icons
         set_icon(self.dlg_add_visit.btn_feature_insert, "111")
@@ -623,7 +624,7 @@ class GwVisitManager:
 
         # manage arriving tab
         self.current_tab_index = index
-        
+
         # Set user devault parameter
         parameter_id = self.controller.get_config('om_visit_parameter_vdefault')
         if parameter_id:
@@ -881,7 +882,7 @@ class GwVisitManager:
 
         # set timeStart and timeEnd as the min/max dave values get from model
         set_dates_from_to(self.dlg_man.date_event_from, self.dlg_man.date_event_to,
-                               'om_visit', 'startdate', 'enddate')
+                          'om_visit', 'startdate', 'enddate')
 
         # set date events
         self.dlg_man.date_event_from.dateChanged.connect(partial(self.filter_visit, self.dlg_man,
@@ -1057,7 +1058,7 @@ class GwVisitManager:
 
     def manage_document(self, qtable):
         """Access GUI to manage documents e.g Execute action of button 34 """
-        
+
         visit_id = qt_tools.getText(self.dlg_add_visit, self.dlg_add_visit.visit_id)
         manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.manage_document(
@@ -1377,7 +1378,7 @@ class GwVisitManager:
         if not om_event_parameter.fetch():
             return
         dlg_name = None
-        if om_event_parameter.form_type  == 'event_ud_arc_standard':
+        if om_event_parameter.form_type == 'event_ud_arc_standard':
             _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
             position_value = self.dlg_add_visit.tbl_event.model().record(0).value('position_value')
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
