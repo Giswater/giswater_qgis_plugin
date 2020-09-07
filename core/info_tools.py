@@ -14,6 +14,7 @@ from ..actions.api_parent_functs import create_body
 
 
 class GwInfoTools:
+
     def __init__(self):
         """ Class to control functions called from data base """
 

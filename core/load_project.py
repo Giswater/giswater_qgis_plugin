@@ -19,11 +19,9 @@ from .utils.giswater_tools import set_parser_value
 from .. import global_vars
 from ..ui_manager import DialogTextUi
 from ..core.info_tools import GwInfoTools
-
 from ..core.notify_tools import GwNotifyTools
 from .actions.basic.search import GwSearch
 from ..lib.qgis_tools import qgis_get_layer_source, get_qgis_project_variables, qgis_manage_snapping_layer
-
 from .toolbars import buttons
 
 

@@ -5,8 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ..parent_action import GwParentAction
-
 from qgis.core import QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel, QgsLayoutExporter
 from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtGui import QRegExpValidator
@@ -18,24 +16,22 @@ import json
 from functools import partial
 
 from lib import qt_tools
+from ..parent_action import GwParentAction
 from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
-
 from ....ui_manager import FastPrintUi
-
 from .... import global_vars
-
 from ....actions.parent_functs import hide_void_groupbox, get_composers_list
 from ....actions.api_parent_functs import create_body, put_widgets, get_values, draw_rectangle, set_setStyleSheet, \
     add_lineedit, set_widget_size, set_data_type, add_combobox
 
 
 class GwPrintButton(GwParentAction):
-    def __init__(self, icon_path, text, toolbar, action_group):
-        super().__init__(icon_path, text, toolbar, action_group)
 
+    def __init__(self, icon_path, text, toolbar, action_group):
+
+        super().__init__(icon_path, text, toolbar, action_group)
         self.destroyed = False
         self.printer = None
-
         self.rubber_band = QgsRubberBand(global_vars.canvas)
 
 

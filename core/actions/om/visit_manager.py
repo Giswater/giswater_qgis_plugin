@@ -29,12 +29,10 @@ from core.models.om_visit_parameter import OmVisitParameter
 from ....ui_manager import VisitUi, VisitEvent, VisitEventRehab, LotVisitManagerUi
 from ..edit.document import GwDocument
 from ...utils.giswater_tools import close_dialog, load_settings, open_dialog
-
 from .... import global_vars
-
 from ....actions.parent_functs import set_icon, document_delete, document_open, create_body, \
     set_dates_from_to, get_values_from_catalog
-from ....actions.parent_manage_funct import set_selectionbehavior, close_dialog, add_point, \
+from ....actions.parent_manage_funct import set_selectionbehavior, add_point, \
     check_expression, disconnect_signal_selection_changed, connect_signal_selection_changed, remove_selection, \
     select_features_by_ids, refresh_map_canvas, fill_widget_with_fields, fill_table_object, enable_feature_type, \
     insert_feature, delete_records, selection_init, set_completer_feature_id, set_table_model, lazy_configuration, \

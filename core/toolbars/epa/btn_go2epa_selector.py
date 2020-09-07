@@ -5,12 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ..parent_action import GwParentAction
-
 from functools import partial
 
 from .... import global_vars
 from lib import qt_tools
+from ..parent_action import GwParentAction
 from ....ui_manager import Go2EpaSelectorUi
 from ...utils.giswater_tools import close_dialog, load_settings, open_dialog
 

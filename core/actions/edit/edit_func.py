@@ -10,7 +10,6 @@ from qgis.PyQt.QtCore import QSettings
 from ..basic.info import GwInfo
 from ..epa.element import GwElement
 from ..edit.document import GwDocument
-
 from .... import global_vars
 
 

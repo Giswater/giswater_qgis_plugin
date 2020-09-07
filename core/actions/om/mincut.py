@@ -25,7 +25,6 @@ from ...tasks.task import GwTask
 from lib import qt_tools
 from ...actions.basic.search import GwSearch
 from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
-
 from .mincut_manager import GwMincutManager
 from ....actions.multiple_selection import MultipleSelection
 from ....ui_manager import DialogTextUi
@@ -34,18 +33,15 @@ from ....ui_manager import MincutEndUi
 from ....ui_manager import MincutHydrometer
 from ....ui_manager import MincutConnec
 from ....ui_manager import MincutComposer
-
-
 from .... import global_vars
-
 from ....actions.parent_functs import set_icon, fill_table, set_table_columns, \
     restore_user_layer, resetRubberbands, refresh_map_canvas, create_body, \
     set_cursor_restore, get_cursor_multiple_selection, zoom_to_rectangle, disconnect_signal_selection_changed, \
     set_cursor_wait, get_composers_list, get_composer_index
 from ...utils.layer_tools import delete_layer_from_toc, populate_info_text
-
 from ....lib.qgis_tools import get_event_point, snap_to_current_layer, get_snapped_layer, get_snapped_feature, \
-    get_snapped_feature_id, get_snapped_point, snap_to_background_layers, add_marker, get_snapping_options, apply_snapping_options
+    get_snapped_feature_id, get_snapped_point, snap_to_background_layers, add_marker, get_snapping_options, \
+    apply_snapping_options
 
 
 class GwMincut:

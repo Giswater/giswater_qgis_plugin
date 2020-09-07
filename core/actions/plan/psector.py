@@ -23,12 +23,9 @@ from functools import partial
 
 from lib import qt_tools
 from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
-
 from ....ui_manager import Plan_psector, PsectorRapportUi
 from ..edit.document import GwDocument
-
 from .... import global_vars
-
 from ....actions.parent_functs import set_icon, hilight_feature_by_id, \
     select_features_by_expr, zoom_to_selected_features, document_open, document_delete, make_list_for_completer, \
     set_completer_lineedit, set_restriction, get_folder_dialog

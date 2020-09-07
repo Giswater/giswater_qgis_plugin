@@ -20,10 +20,10 @@
 from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt
+
 from .... import global_vars
 from ..parent_maptool import GwParentMapTool
 from ....ui_manager import DialogTextUi
-
 from ...utils.giswater_tools import populate_info_text, create_body, refresh_legend
 from ....lib.qgis_tools import get_snapping_options, enable_snapping, get_event_point, snap_to_current_layer, \
     add_marker, get_snapped_layer, get_snapped_point, get_snapped_feature, get_snapped_feature_id
@@ -35,8 +35,6 @@ class GwArcDivideButton(GwParentMapTool):
 
     def __init__(self, icon_path, text, toolbar, action_group):
         """ Class constructor """
-
-        # Call ParentMapTool constructor
         super().__init__(icon_path, text, toolbar, action_group)
 
 

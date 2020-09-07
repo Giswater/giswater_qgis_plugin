@@ -17,7 +17,6 @@ class GwDimensioningButton(GwParentMapTool):
     def __init__(self, icon_path, text, toolbar, action_group):
         """ Class constructor """
 
-        # Call ParentMapTool constructor
         super().__init__(icon_path, text, toolbar, action_group)
         self.suppres_form = None
 

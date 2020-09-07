@@ -5,8 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ..parent_action import GwParentAction
-
 from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QSpinBox, QGroupBox, QSpacerItem, \
@@ -17,14 +15,15 @@ import operator
 from functools import partial
 
 from lib import qt_tools
+from ..parent_action import GwParentAction
 from ...utils.giswater_tools import load_settings, open_dialog, close_dialog
-
 from ....ui_manager import ConfigUi
 from ....actions.parent_functs import hide_void_groupbox
 from ....actions.api_parent_functs import create_body
 
 
 class GwConfigButton(GwParentAction):
+
     def __init__(self, icon_path, text, toolbar, action_group):
         super().__init__(icon_path, text, toolbar, action_group)
 

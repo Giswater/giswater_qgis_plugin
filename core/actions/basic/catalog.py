@@ -20,7 +20,6 @@ from ....actions.api_parent_functs import create_body
 from ....ui_manager import InfoCatalogUi
 
 
-
 class GwCatalog:
 
     def __init__(self):

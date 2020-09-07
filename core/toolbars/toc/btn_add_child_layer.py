@@ -5,17 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ..parent_action import GwParentAction
-
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtWidgets import QAction, QApplication, QMenu
 from qgis.PyQt.QtGui import QCursor
 
 from functools import partial
 
+from ..parent_action import GwParentAction
 from ...project_check import GwProjectCheck
 from ...tasks.tsk_config_layer import GwConfigLayerTask
-
 from ...utils.layer_tools import from_postgres_to_toc
 from ....lib.qgis_tools import get_qgis_project_variables
 from ....actions.parent_functs import get_cursor_multiple_selection
@@ -25,13 +23,12 @@ from ...utils.giswater_tools import create_body
 class GwAddChildLayerButton(GwParentAction):
 
     def __init__(self, icon_path, text, toolbar, action_group):
-        super().__init__(icon_path, text, toolbar, action_group)
 
+        super().__init__(icon_path, text, toolbar, action_group)
         self.project_vars = get_qgis_project_variables()
         self.qgis_project_infotype = self.project_vars['infotype']
         self.qgis_project_add_schema = self.project_vars['add_schema']
         self.available_layers = None
-
         self.config_layers()
 
 

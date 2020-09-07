@@ -16,7 +16,6 @@ import os
 from random import randrange
 
 from lib import qt_tools
-
 from .... import global_vars
 
 

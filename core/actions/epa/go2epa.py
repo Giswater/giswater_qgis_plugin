@@ -20,7 +20,6 @@ from ...tasks.tsk_go2epa import GwGo2EpaTask
 from ...admin import GwAdmin
 from ....ui_manager import Go2EpaUI, HydrologySelector, Multirow_selector
 from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
-
 from ....actions.parent_functs import multi_row_selector
 
 

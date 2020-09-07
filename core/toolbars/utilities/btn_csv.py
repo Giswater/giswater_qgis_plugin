@@ -5,8 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ..parent_action import GwParentAction
-
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QFileDialog
 
@@ -16,17 +14,16 @@ from encodings.aliases import aliases
 from functools import partial
 
 from lib import qt_tools
+from ..parent_action import GwParentAction
 from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
-
 from ....ui_manager import CsvUi
-
 from .... import global_vars
-
 from ....actions.parent_functs import create_body
 from ...utils.layer_tools import populate_info_text
 
 
 class GwCSVButton(GwParentAction):
+
     def __init__(self, icon_path, text, toolbar, action_group):
         super().__init__(icon_path, text, toolbar, action_group)
 

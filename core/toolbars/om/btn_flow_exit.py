@@ -14,16 +14,12 @@ from ....lib.qgis_tools import get_event_point, snap_to_current_layer, add_marke
 
 
 class GwFlowExitButton(GwParentMapTool):
-    """
-        Button 57: Flow exit
-    """
+    """ Button 57: Flow exit """
 
     def __init__(self, icon_path, text, toolbar, action_group):
         """ Class constructor """
 
-        # Call ParentMapTool constructor
         super().__init__(icon_path, text, toolbar, action_group)
-
         self.layers_added = []
 
 

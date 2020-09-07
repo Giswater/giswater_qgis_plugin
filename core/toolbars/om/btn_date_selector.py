@@ -5,8 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ..parent_action import GwParentAction
-
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtWidgets import QDateEdit, QPushButton
 
@@ -14,9 +12,9 @@ from datetime import datetime
 from functools import partial
 
 from lib import qt_tools
+from ..parent_action import GwParentAction
 from ...utils.giswater_tools import close_dialog, load_settings, open_dialog
 from ....ui_manager import SelectorDate
-
 from ....actions.parent_functs import refresh_map_canvas
 
 

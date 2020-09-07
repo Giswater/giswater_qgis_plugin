@@ -18,8 +18,8 @@ from ...lib.qgis_tools import get_snapping_options, apply_snapping_options, enab
 from ... import global_vars
 
 
-
 class GwParentMapTool(QgsMapTool):
+
     def __init__(self, icon_path, text, toolbar, action_group):
 
         self.iface = global_vars.iface

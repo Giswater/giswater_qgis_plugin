@@ -5,28 +5,24 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ..parent_action import GwParentAction
-
 from qgis.PyQt.QtCore import QStringListModel
 from qgis.PyQt.QtWidgets import QCompleter
 
 from functools import partial
 
 from lib import qt_tools
+from ..parent_action import GwParentAction
 from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
-
 from ....ui_manager import FeatureDelete
-
 from ....actions.parent_functs import set_icon, disconnect_signal_selection_changed
 from ....actions.api_parent_functs import set_completer_object_api, create_body
 from ...utils.layer_tools import populate_info_text
 
 
-
 class GwDeleteFeatureButton(GwParentAction):
+
     def __init__(self, icon_path, text, toolbar, action_group):
         super().__init__(icon_path, text, toolbar, action_group)
-
         self.dlg_feature_delete = None
 
 

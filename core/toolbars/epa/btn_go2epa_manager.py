@@ -5,8 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ..parent_action import GwParentAction
-
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtWidgets import QAbstractItemView
 from qgis.PyQt.QtGui import QRegExpValidator
@@ -14,9 +12,9 @@ from qgis.PyQt.QtGui import QRegExpValidator
 from functools import partial
 
 from lib import qt_tools
+from ..parent_action import GwParentAction
 from ....ui_manager import EpaManager
 from ...utils.giswater_tools import load_settings, open_dialog, close_dialog
-
 from ....actions.api_parent_functs import fill_table
 from ....actions.parent_functs import set_table_columns, multi_rows_delete
 

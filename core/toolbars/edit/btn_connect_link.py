@@ -16,9 +16,7 @@
  ***************************************************************************/
 
 """
-
 # -*- coding: utf-8 -*-
-
 from qgis.core import QgsVectorLayer, QgsRectangle
 from qgis.PyQt.QtCore import QRect, Qt
 from qgis.PyQt.QtWidgets import QApplication
@@ -41,7 +39,6 @@ class GwConnectLinkButton(GwParentMapTool):
     def __init__(self, icon_path, text, toolbar, action_group):
         """ Class constructor """
 
-        # Call ParentMapTool constructor
         super().__init__(icon_path, text, toolbar, action_group)
 
         self.dragging = False

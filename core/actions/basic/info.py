@@ -34,10 +34,8 @@ from ..om.visit_manager import GwVisitManager
 
 from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
 from ...utils.layer_tools import populate_info_text
-
 from ....ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
-
 
 from ....actions.parent_functs import set_icon, set_dates_from_to
 from ....actions.api_parent_functs import get_visible_layers, create_body, \

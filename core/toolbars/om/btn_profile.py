@@ -26,7 +26,6 @@ from ....ui_manager import ProfilesList
 from ....actions.parent_functs import set_icon
 from ...utils.giswater_tools import close_dialog, create_body, get_parser_value, load_settings, open_dialog, \
     save_settings, set_parser_value
-
 from ....lib.qgis_tools import get_snapper, get_event_point, snap_to_current_layer, get_snapped_layer, add_marker, \
     get_snapped_feature
 

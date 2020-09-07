@@ -17,7 +17,6 @@ from . import global_vars
 from .core.load_project import LoadProject
 from .core.admin import GwAdmin
 from .dao.controller import DaoController
-
 from .lib.qgis_tools import get_value_from_metadata
 
 

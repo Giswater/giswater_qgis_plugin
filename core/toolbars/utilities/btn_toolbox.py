@@ -5,8 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ..parent_action import GwParentAction
-
 from qgis.core import QgsProject
 from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt
@@ -20,18 +18,19 @@ from collections import OrderedDict
 from functools import partial
 
 from lib import qt_tools
+from ..parent_action import GwParentAction
 from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
 from ...utils.layer_tools import add_temp_layer
-
 from ....actions.parent_functs import show_exceptions_msg
 from ....actions.api_parent_functs import create_body, set_style_mapzones, construct_form_param_user
 from ....ui_manager import ToolboxDockerUi, ToolboxUi
 
 
 class GwToolBoxButton(GwParentAction):
-    def __init__(self, icon_path, text, toolbar, action_group):
-        super().__init__(icon_path, text, toolbar, action_group)
 
+    def __init__(self, icon_path, text, toolbar, action_group):
+
+        super().__init__(icon_path, text, toolbar, action_group)
         self.function_list = []
         self.rbt_checked = {}
         self.is_paramtetric = True

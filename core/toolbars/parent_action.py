@@ -7,12 +7,14 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QIcon
+
 import os
 
 from ... import global_vars
 
 
 class GwParentAction:
+
     def __init__(self, icon_path, text, toolbar, action_group):
 
         self.iface = global_vars.iface

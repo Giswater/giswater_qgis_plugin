@@ -10,13 +10,11 @@ from qgis.PyQt.QtCore import pyqtSignal, QObject
 from functools import partial
 
 from lib import qt_tools
-
 from ...utils.giswater_tools import close_dialog, load_settings, open_dialog
 from ...utils.layer_tools import populate_info_text
 from ....ui_manager import PsectorDuplicate
 from .... import global_vars
 from ....actions.parent_functs import create_body
-
 
 
 class GwPsectorDuplicate(QObject):
