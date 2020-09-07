@@ -663,7 +663,7 @@ class ParentManage(ParentAction, object):
         try:
             # Get selected rows
             selected_list = widget.selectionModel().selectedRows()
-        except AttributeError as e:
+        except AttributeError:
             selected_list = []
 
         if len(selected_list) == 0:
@@ -1022,7 +1022,7 @@ class ParentManage(ParentAction, object):
         widget.setModel(model)
 
 
-    def filter_by_id(self, dialog, widget_table, widget_txt, table_object, field_object_id='id'):
+    def filter_by_id(self, dialog, widget_table, widget_txt, table_object):
 
         field_object_id = "id"
         if table_object == "element":

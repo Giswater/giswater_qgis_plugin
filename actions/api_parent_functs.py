@@ -782,7 +782,6 @@ def accept(dialog, complet_result, _json, p_widget=None, clear_json=False, close
     :param _json:
     :param p_widget:
     :param clear_json:
-    :param close_dialog:
     :return:
     """
 

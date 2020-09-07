@@ -799,7 +799,6 @@ def open_file_path(filter_="All (*.*)"):
 
 def show_exceptions_msg(title, msg=""):
 
-    cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
     dlg_info = DialogTextUi()
     dlg_info.btn_accept.setVisible(False)
     dlg_info.btn_close.clicked.connect(partial(close_dialog, dlg_info))
@@ -981,13 +980,15 @@ def get_points(list_coord=None):
 
 
 def draw(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
+
     try:
         if complet_result['body']['feature']['geometry'] is None:
             return
         if complet_result['body']['feature']['geometry']['st_astext'] is None:
             return
-    except KeyError as e:
+    except KeyError:
         return
+
     list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
     max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
 
@@ -1071,7 +1072,6 @@ def resetRubberbands(rubber_band):
     rubber_band.reset()
 
 
-
 def restore_user_layer(user_current_layer=None):
 
     if user_current_layer:
@@ -1149,6 +1149,7 @@ def manage_return_manager(json_result, sql, rubber_band):
     :param sql: query executed (String)
     :return: None
     """
+
     try:
         return_manager = json_result['body']['returnManager']
     except KeyError:

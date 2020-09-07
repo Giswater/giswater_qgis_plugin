@@ -858,7 +858,6 @@ class ParentAction(object):
 
     def show_exceptions_msg(self, title, msg=""):
 
-        cat_exception = {'KeyError': 'Key on returned json from ddbb is missed.'}
         self.dlg_info = DialogTextUi()
         self.dlg_info.btn_accept.setVisible(False)
         self.dlg_info.btn_close.clicked.connect(partial(close_dialog, self.dlg_info))
@@ -1040,13 +1039,15 @@ class ParentAction(object):
 
 
     def draw(self, complet_result, margin=None, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
+
         try:
             if complet_result['body']['feature']['geometry'] is None:
                 return
             if complet_result['body']['feature']['geometry']['st_astext'] is None:
                 return
-        except KeyError as e:
+        except KeyError:
             return
+
         list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
         max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
 

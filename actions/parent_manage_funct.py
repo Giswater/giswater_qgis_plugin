@@ -1008,7 +1008,7 @@ def fill_table_object(widget, table_name, expr_filter=None):
     widget.setModel(model)
 
 
-def filter_by_id(dialog, widget_table, widget_txt, table_object, field_object_id='id'):
+def filter_by_id(dialog, widget_table, widget_txt, table_object):
 
     field_object_id = "id"
     if table_object == "element":
