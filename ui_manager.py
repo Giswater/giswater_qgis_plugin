@@ -505,7 +505,6 @@ class MainQtDialogUi(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('main_ui.ui')
 class MainUi(GwMainWindow, FORM_CLASS):
     dlg_closed = QtCore.pyqtSignal()
-    pass
 
 
 FORM_CLASS = get_ui_class('main_dbproject.ui')

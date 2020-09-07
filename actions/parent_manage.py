@@ -19,7 +19,7 @@ from lib import qt_tools
 from .parent import ParentAction
 from .multiple_selection import MultipleSelection
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..core.utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
+from ..core.utils.giswater_tools import close_dialog
 
 
 class ParentManage(ParentAction, object):

@@ -14,7 +14,7 @@ from collections import OrderedDict
 
 from lib import qt_tools
 
-from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog
 from .... import global_vars
 from ....actions.api_parent_functs import create_body
 from ....ui_manager import InfoCatalogUi

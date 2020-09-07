@@ -6,10 +6,8 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsApplication
-from qgis.PyQt.QtCore import QDate, QStringListModel, QTime, Qt, QRegExp
-from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, \
-    QFileDialog
-from qgis.PyQt.QtGui import QRegExpValidator
+from qgis.PyQt.QtCore import QDate, QStringListModel, QTime, Qt
+from qgis.PyQt.QtWidgets import QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, QFileDialog
 
 import os
 import sys
@@ -20,11 +18,10 @@ from lib import qt_tools
 from ..epa.go2epa_options import GwGo2EpaOptions
 from ...tasks.tsk_go2epa import GwGo2EpaTask
 from ...admin import GwAdmin
-from ....ui_manager import Go2EpaSelectorUi, EpaManager, Go2EpaUI, HydrologySelector, Multirow_selector
-from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, save_settings, set_parser_value
+from ....ui_manager import Go2EpaUI, HydrologySelector, Multirow_selector
+from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
 
-from ....actions.api_parent_functs import fill_table
-from ....actions.parent_functs import multi_row_selector, set_table_columns, multi_rows_delete
+from ....actions.parent_functs import multi_row_selector
 
 
 class GwGo2Epa:

@@ -22,19 +22,15 @@ import re
 import subprocess
 import sys
 import webbrowser
-if 'nt' in sys.builtin_module_names:
-    import ctypes
 
 from functools import partial
 
 from .. import global_vars
 from lib import qt_tools
 from ..core.actions.edit.layer_tools import GwLayerTools
-from ..core.utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
-
+from ..core.utils.giswater_tools import close_dialog, open_dialog
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-
-from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
+from ..ui_manager import DialogTextUi
 
 
 class ParentAction(object):

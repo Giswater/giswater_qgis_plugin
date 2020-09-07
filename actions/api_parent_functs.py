@@ -5,13 +5,13 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPointXY, QgsVectorLayer
+from qgis.core import QgsVectorLayer
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsGeometry
-from qgis.gui import QgsVertexMarker, QgsDateTimeEdit
+from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QStringListModel
 from qgis.PyQt.QtGui import QColor, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
-from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QAction
+from qgis.PyQt.QtWidgets import QCompleter, QDateEdit, QDoubleSpinBox, QFrame, QSpinBox, QToolButton
 from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QApplication
 from qgis.PyQt.QtSql import QSqlTableModel
 
@@ -26,10 +26,9 @@ from functools import partial
 from .. import global_vars
 from lib import qt_tools
 from ..core.utils.hyperlink_label import GwHyperLinkLabel
-from ..ui_manager import DialogTextUi
 
-from .parent_functs import create_body, draw, draw_point, get_points, draw_polyline, open_file_path, set_style_mapzones
-from ..core.utils.giswater_tools import close_dialog, save_settings
+from .parent_functs import create_body, draw_polyline, get_points, open_file_path, set_style_mapzones
+from ..core.utils.giswater_tools import close_dialog
 
 from ..core.utils.layer_tools import manage_geometry, export_layer_to_db, delete_layer_from_toc, from_dxf_to_toc
 

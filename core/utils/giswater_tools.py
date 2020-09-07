@@ -1,5 +1,4 @@
-from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
-from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QApplication
+from qgis.PyQt.QtWidgets import QTabWidget
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor, QPixmap
 from qgis.core import QgsProject, QgsExpression
@@ -7,7 +6,6 @@ from qgis.core import QgsProject, QgsExpression
 import configparser
 from ... import global_vars
 import os
-from functools import partial
 import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes

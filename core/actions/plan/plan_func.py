@@ -15,7 +15,7 @@ from lib import qt_tools
 from .psector import GwPsector
 from ....ui_manager import PsectorManagerUi, PriceManagerUi
 from .psector_duplicate import GwPsectorDuplicate
-from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog
 
 from .... import global_vars
 

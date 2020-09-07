@@ -15,7 +15,7 @@ from ....ui_manager import NodeTypeChange
 from ...actions.basic.catalog import GwCatalog
 from ...actions.basic.info import GwInfo
 from ..parent_maptool import GwParentMapTool
-from ...utils.giswater_tools import close_dialog, load_settings, save_settings, open_dialog, check_expression
+from ...utils.giswater_tools import check_expression, close_dialog, load_settings, open_dialog
 
 from ....actions.parent_functs import restore_user_layer
 from ....lib.qgis_tools import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \

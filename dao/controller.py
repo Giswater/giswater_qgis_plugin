@@ -922,7 +922,6 @@ class DaoController:
 
         except Exception as e:
             self.log_info(f"{widget_name} --> {type(e).__name__} --> {e}")
-            pass
 
 
     def get_layer_by_layername(self, layername, log_info=False):

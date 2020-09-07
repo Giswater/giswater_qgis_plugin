@@ -18,7 +18,7 @@ from .core.load_project import LoadProject
 from .core.admin import GwAdmin
 from .dao.controller import DaoController
 
-from .lib.qgis_tools import get_value_from_metadata, enable_python_console
+from .lib.qgis_tools import get_value_from_metadata
 
 
 class Giswater(QObject):

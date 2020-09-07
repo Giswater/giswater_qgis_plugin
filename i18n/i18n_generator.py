@@ -17,7 +17,7 @@ from ..ui_manager import MainQtDialogUi
 
 from .. import global_vars
 from ..actions.parent_functs import get_plugin_version
-from ..core.utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, save_settings, set_parser_value
+from ..core.utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
 
 
 class GwI18NGenerator:

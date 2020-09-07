@@ -28,7 +28,7 @@ from core.models.om_visit_x_gully import OmVisitXGully
 from core.models.om_visit_parameter import OmVisitParameter
 from ....ui_manager import VisitUi, VisitEvent, VisitEventRehab, LotVisitManagerUi
 from ..edit.document import GwDocument
-from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog
 
 from .... import global_vars
 

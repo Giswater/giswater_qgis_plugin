@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QSettings
-from functools import partial
 
 from ..basic.info import GwInfo
 from ..epa.element import GwElement

@@ -22,23 +22,15 @@ import re
 import subprocess
 import sys
 import webbrowser
-if 'nt' in sys.builtin_module_names:
-    import ctypes
 
 from functools import partial
 
 from .. import global_vars
 from lib import qt_tools
-
-from ..core.utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
+from ..core.utils.giswater_tools import close_dialog, open_dialog
 from ..core.utils.layer_tools import populate_vlayer, categoryze_layer, create_qml, from_postgres_to_toc
-
 from ..lib.qgis_tools import snap_to_layer, set_snapping_mode, get_snapping_options
-
-from ..ui_manager import DialogTextUi, GwDialog, GwMainWindow
-
-
-# self.plugin_version = self.get_plugin_version()
+from ..ui_manager import DialogTextUi
 
 
 def open_web_browser(dialog, widget=None):

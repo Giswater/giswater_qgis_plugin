@@ -17,7 +17,7 @@ from ....ui_manager import FeatureReplace, InfoWorkcatUi
 from ...actions.basic.catalog import GwCatalog
 # from ...utils.giswater_tools import *
 from ...utils.layer_tools import populate_info_text
-from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, refresh_legend, save_settings
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, refresh_legend
 from ....lib import qt_tools
 from ....lib.qgis_tools import get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
     get_snapped_feature, get_snapping_options, enable_snapping, snap_to_node, snap_to_connec_gully, set_snapping_mode

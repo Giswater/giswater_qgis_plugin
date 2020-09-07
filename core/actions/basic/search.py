@@ -27,7 +27,7 @@ from ..edit.document import GwDocument
 from ..plan.psector import GwPsector
 from ..om.visit_manager import GwVisitManager
 from ....ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
-from ...utils.giswater_tools import get_parser_value, load_settings, open_dialog, save_settings, set_parser_value, close_dialog
+from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
 
 from ....actions.parent_functs import zoom_to_rectangle, get_max_rectangle_from_coords, set_icon, \
     make_list_for_completer, set_completer_lineedit, document_insert, document_delete, document_open, \
@@ -710,7 +710,6 @@ class GwSearch:
         except:
             msg = "File path doesn't exist or you dont have permission or file is opened"
             self.controller.show_warning(msg)
-            pass
 
 
     def write_to_csv(self, dialog, folder_path=None, all_rows=None):

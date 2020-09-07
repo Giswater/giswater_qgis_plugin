@@ -15,7 +15,7 @@ import urllib.parse
 from functools import partial
 
 from ...utils.extended_qlabel import GwExtendedQLabel
-from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog
 
 from ....ui_manager import Gallery, GalleryZoom
 

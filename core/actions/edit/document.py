@@ -10,7 +10,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 from functools import partial
 
 from lib import qt_tools
-from ...utils.giswater_tools import load_settings, open_dialog, save_settings
+from ...utils.giswater_tools import load_settings, open_dialog
 
 from ....ui_manager import DocUi, DocManager
 from .... import global_vars

@@ -1465,7 +1465,6 @@ class GwInfo(QObject):
             getattr(self, f"{widget.property('datatype')}_validator")(value, widget, btn)
         except AttributeError:
             """ If the function called by getattr don't exist raise this exception """
-            pass
 
 
     def check_min_max_value(self, dialog, widget, btn_accept):

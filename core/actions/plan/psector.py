@@ -22,10 +22,9 @@ from collections import OrderedDict
 from functools import partial
 
 from lib import qt_tools
-from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, save_settings, set_parser_value
+from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
 
 from ....ui_manager import Plan_psector, PsectorRapportUi
-from ....actions.multiple_selection import MultipleSelection
 from ..edit.document import GwDocument
 
 from .... import global_vars
@@ -36,8 +35,7 @@ from ....actions.parent_functs import set_icon, hilight_feature_by_id, \
 from ....actions.parent_manage_funct import set_selectionbehavior, remove_selection, \
     set_table_columns, check_expression, fill_table_object, insert_feature, delete_records, tab_feature_changed, \
     set_completer_feature_id, reload_qtable, refresh_map_canvas, disconnect_signal_selection_changed, \
-    get_cursor_multiple_selection, selection_changed, hide_generic_layers, set_completer_object, disconnect_snapping, \
-    selection_init
+    selection_changed, hide_generic_layers, set_completer_object, disconnect_snapping, selection_init
 
 
 class GwPsector:

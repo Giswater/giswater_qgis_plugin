@@ -23,7 +23,7 @@ from .parent_functs import check_expression, get_cursor_multiple_selection, set_
 
 from ..lib.qgis_tools import snap_to_background_layers, get_event_point, add_marker
 
-from ..core.utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
+from ..core.utils.giswater_tools import close_dialog
 
 
 def reset_lists(ids, list_ids):

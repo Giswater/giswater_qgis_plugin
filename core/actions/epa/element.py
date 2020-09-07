@@ -12,7 +12,7 @@ from functools import partial
 
 from lib import qt_tools
 
-from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, save_settings
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog
 
 from ....ui_manager import ElementUi, ElementManager
 
