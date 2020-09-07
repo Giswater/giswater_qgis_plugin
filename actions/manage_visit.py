@@ -189,12 +189,41 @@ class ManageVisit(ParentManage, QObject):
             self.dlg_add_visit.btn_feature_snapping.setEnabled(False)
             self.dlg_add_visit.tab_feature.setEnabled(False)
 
+        # Zoom to selected geometry or relations
+        if self.it_is_new_visit is False:
+            visit_layer = self.controller.get_layer_by_tablename('v_edit_om_visit')
+            if visit_layer:
+                visit_layer.selectByExpression(f'"id"={visit_id}')
+                box = visit_layer.boundingBoxOfSelected()
+                if not box.isNull():
+                    self.zoom_box(box)
+                else:
+                    for layer in self.layers[self.geom_type]:
+                        box = layer.boundingBoxOfSelected()
+                        self.zoom_box(box)
+
         # Open the dialog
         if open_dialog:
             # If the new visit dont come from info emit signal
             if self.locked_geom_type is None:
                 self.feature_type.currentIndexChanged.emit(0)
             self.open_dialog(self.dlg_add_visit, dlg_name="visit")
+
+
+    def zoom_box(self, box):
+        """
+        :param box: (QgsRectangle)
+        """
+        # When it is a point, and only one, it must be converted into a rectangle to be able to zoom
+        if not box.isNull():
+            if box.xMinimum() == box.xMaximum() and box.yMinimum() == box.yMaximum():
+                box.setXMaximum(box.xMaximum() + 0.0001)
+                box.setYMaximum(box.yMaximum() + 0.0001)
+                box.setXMaximum(box.xMinimum() + 0.0001)
+                box.setYMaximum(box.yMinimum() + 0.0001)
+            box.set(box.xMinimum() - 10, box.yMinimum() - 10, box.xMaximum() + 10, box.yMaximum() + 10)
+            self.iface.mapCanvas().setExtent(box)
+            self.iface.mapCanvas().refresh()
 
 
     def set_signals(self):
