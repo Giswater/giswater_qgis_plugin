@@ -10,7 +10,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 from functools import partial
 
 from lib import qt_tools
-from ...utils.giswater_tools import load_settings, open_dialog
+from ...utils.giswater_tools import load_settings, open_dialog, close_dialog
 from ....ui_manager import DocUi, DocManager
 from .... import global_vars
 from ....actions.parent_functs import set_icon, open_web_browser, get_file_dialog
@@ -287,6 +287,7 @@ class GwDocument:
 
         # Open form
         open_dialog(self.dlg_man, dlg_name='doc_manager')
+
 
     def open_selected_object_document(self, dialog, widget, table_object):
 

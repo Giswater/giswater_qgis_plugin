@@ -716,6 +716,7 @@ class GwProfileButton(GwParentMapTool):
                  self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2), legend['code'], fontsize=7.5,
                  horizontalalignment='center', verticalalignment='center')
 
+        # noinspection PyUnusedLocal
         scale = self.profile_json['body']['data']['scale']
         title = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
         if title in (None, 'null'):

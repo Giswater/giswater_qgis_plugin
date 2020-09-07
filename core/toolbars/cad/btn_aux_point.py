@@ -13,6 +13,7 @@ from qgis.PyQt.QtGui import QDoubleValidator
 from functools import partial
 
 from lib import qt_tools
+from .... import global_vars
 from ..parent_maptool import GwParentMapTool
 from ....ui_manager import AuxPoint
 from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
