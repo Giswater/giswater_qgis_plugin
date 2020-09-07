@@ -26,10 +26,8 @@ from functools import partial
 from .. import global_vars
 from lib import qt_tools
 from ..core.utils.hyperlink_label import GwHyperLinkLabel
-
-from .parent_functs import create_body, draw, draw_point, draw_polyline, get_points, open_file_path, set_style_mapzones
+from .parent_functs import create_body, draw_polyline, get_points, open_file_path, set_style_mapzones
 from ..core.utils.giswater_tools import close_dialog
-
 from ..core.utils.layer_tools import manage_geometry, export_layer_to_db, delete_layer_from_toc, from_dxf_to_toc
 
 

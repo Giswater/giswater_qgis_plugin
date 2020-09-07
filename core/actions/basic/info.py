@@ -37,14 +37,13 @@ from ...utils.layer_tools import populate_info_text
 from ....ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
 
-from ....actions.parent_functs import set_icon, set_dates_from_to
-from ....actions.api_parent_functs import get_visible_layers, create_body, \
-    draw, populate_basic_info, put_widgets, fill_child, \
-    check_actions, action_open_url, api_action_help, \
-    get_feature_by_expr, set_setStyleSheet, set_data_type, add_lineedit, set_widget_size, manage_lineedit, add_combobox, \
-    add_checkbox, get_values, add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, \
+from ....actions.parent_functs import set_icon, set_dates_from_to, draw, draw_point
+from ....actions.api_parent_functs import get_visible_layers, create_body,  populate_basic_info, put_widgets, \
+    fill_child, check_actions, action_open_url, api_action_help, get_feature_by_expr, set_setStyleSheet, \
+    set_data_type, add_lineedit, set_widget_size, manage_lineedit, add_combobox, add_checkbox, get_values, \
+    add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, \
     add_textarea, add_spinbox, add_tableview, set_headers, populate_table, set_columns_config, set_completer_object, \
-    fill_table, clear_gridlayout, add_frame, add_label, set_completer_object_api, draw_point
+    fill_table, clear_gridlayout, add_frame, add_label, set_completer_object_api
 from ....lib.qgis_tools import get_snapping_options, get_event_point, snap_to_current_layer, get_snapped_layer, \
     get_snapped_feature, add_marker, enable_snapping, snap_to_layer, apply_snapping_options, snap_to_arc, snap_to_node
 
