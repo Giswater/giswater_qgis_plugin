@@ -195,6 +195,7 @@ class ManageVisit(ParentManage, QObject):
             if visit_layer:
                 visit_layer.selectByExpression(f'"id"={visit_id}')
                 box = visit_layer.boundingBoxOfSelected()
+                visit_layer.removeSelection()
                 if not box.isNull():
                     self.zoom_box(box)
                 else:
