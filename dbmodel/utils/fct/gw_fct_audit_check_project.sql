@@ -15,6 +15,8 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "feature":{}, "data":{"filterFields":{}, "addSchema":"ud_sample", "qgisVersion":"3.10.003.1", "initProject":"false", "pageInfo":{}, "version":"3.3.019", "fid":1}}$$);
 
+ SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"3.4.019", "fid":101, "initProject":true, "addSchema":"ud", "mainSchema":"ws", "projecRole":"", "infoType":"None", "qgisVersion":"3.10.4-A Coruña", "osVersion":"Windows 10"}}$$);
+
 -- fid: main: 101
 	om: 125
 	graf: 211
@@ -263,7 +265,7 @@ BEGIN
 		-- looking for additional schema 
 		IF v_addschema IS NOT NULL AND v_addschema != v_schemaname THEN
 			EXECUTE 'SET search_path = '||v_addschema||', public';
-			PERFORM gw_fct_setselectors(p_data);
+			DELETE FROM selector_expl WHERE cur_user = current_user;			
 			SET search_path = 'SCHEMA_NAME', public;
 		END IF;
 	ELSE
