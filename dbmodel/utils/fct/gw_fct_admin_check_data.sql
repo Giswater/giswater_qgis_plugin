@@ -222,9 +222,9 @@ BEGIN
 	WHERE sys_addfields.active IS TRUE AND param_name not IN (SELECT columnname FROM config_form_fields JOIN cat_feature ON cat_feature.child_layer=formname);
 
 	IF v_count > 0 THEN
-		v_errortext=concat('ERROR: There is/are ',v_count,'addfields that are not defined in config_form_fields. Addfields: ',v_view_list,'.');
-		INSERT INTO audit_check_data (fid,  criticity, error_message, count)
-		VALUES (195, 3, v_errortext, v_count);
+		v_errortext=concat('ERROR: There is/are ',v_count,' addfields that are not defined in config_form_fields. Addfields: ',v_view_list,'.');
+		INSERT INTO audit_check_data (fid,  criticity, error_message)
+		VALUES (195, 3, v_errortext);
 	ELSE
 		INSERT INTO audit_check_data (fid,  criticity, error_message, count)
 		VALUES (195, 1, 'INFO: All addfields are defined in config_form_fields.', 0);

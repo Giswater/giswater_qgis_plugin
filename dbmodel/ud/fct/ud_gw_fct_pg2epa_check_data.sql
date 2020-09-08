@@ -156,12 +156,15 @@ BEGIN
 	
 	
 	RAISE NOTICE '5- Check for missed features on inp tables';
-		v_querytext = '(SELECT arc_id, ''arc'' as feature_tpe FROM arc WHERE arc_id NOT IN (select arc_id from inp_conduit UNION select arc_id from inp_virtual UNION select arc_id from inp_weir 
-				UNION select arc_id from inp_pump UNION select arc_id from inp_outlet UNION select arc_id from inp_orifice) AND state > 0 AND epa_type !=''NOT DEFINED''
+		v_querytext = '(SELECT arc_id, ''arc'' as feature_tpe FROM arc JOIN
+				(select arc_id from inp_conduit UNION select arc_id from inp_virtual UNION select arc_id from inp_weir UNION select arc_id from inp_pump UNION select arc_id from inp_outlet UNION select arc_id from inp_orifice) a
+				USING (arc_id) 
+				WHERE state > 0 AND epa_type !=''NOT DEFINED'' AND a.arc_id IS NULL
 				UNION
-				SELECT node_id, ''node'' FROM node WHERE node_id NOT IN(
-				select node_id from inp_junction UNION select node_id from inp_storage UNION select node_id from inp_outfall UNION select node_id from inp_divider)
-				AND state >0 AND epa_type !=''NOT DEFINED'') a';
+				SELECT node_id, ''node'' FROM node JOIN
+				(select node_id from inp_junction UNION select node_id from inp_storage UNION select node_id from inp_outfall UNION select node_id from inp_divider) a
+				USING (node_id) 
+				WHERE state > 0 AND epa_type !=''NOT DEFINED'' AND a.node_id IS NULL) a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 
