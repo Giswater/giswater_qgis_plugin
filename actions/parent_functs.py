@@ -1007,6 +1007,7 @@ def draw(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(2
         zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
     return rubber_band
 
+
 def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
     """
     :param duration_time: integer milliseconds ex: 3000 for 3 seconds

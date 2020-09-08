@@ -303,7 +303,7 @@ class GwInfo(QObject):
 
     def open_generic_form(self, complet_result):
 
-        draw(complet_result, self.rubber_band, zoom=False)
+        self.rubber_band = draw(complet_result, self.rubber_band, zoom=False)
         self.hydro_info_dlg = InfoGenericUi()
         load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(close_dialog, self.hydro_info_dlg))
@@ -604,7 +604,7 @@ class GwInfo(QObject):
 
         global_vars.canvas.setMapTool(ep)
         # We redraw the selected feature because self.canvas.setMapTool(emit_point) erases it
-        draw(complet_result[0], self.rubber_band, None, False)
+        self.rubber_band = draw(complet_result[0], self.rubber_band, None, False)
 
         # Store user snapping configuration
         self.previous_snapping = get_snapping_options

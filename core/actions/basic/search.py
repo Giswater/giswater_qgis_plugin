@@ -776,16 +776,6 @@ class GwSearch:
         self.ApiCF = GwInfo(tab_type='data')
         complet_result, dialog = self.ApiCF.get_info_from_id(table_name=table_name, feature_id=feature_id, tab_type='data')
 
-        # Get list of all coords in field geometry
-        list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
-
-        points = get_points(list_coord)
-        self.reset_rubber_band()
-        draw_polyline(points)
-
-        max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
-        zoom_to_rectangle(max_x, max_y, min_x, min_y)
-
 
     def fill_label_data(self, workcat_id, table_name, extension=None):
 
