@@ -274,7 +274,7 @@ class GwSearch:
             max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
             self.rubber_band.reset()
             point = QgsPointXY(float(max_x), float(max_y))
-            draw_point(point)
+            self.rubber_band = draw_point(point, self.rubber_band)
             zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=100)
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
             self.manage_visit.dlg_add_visit.rejected.connect(self.rubber_band.reset)
