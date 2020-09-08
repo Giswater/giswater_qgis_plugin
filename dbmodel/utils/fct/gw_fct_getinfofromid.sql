@@ -154,6 +154,7 @@ BEGIN
 	v_toolbar := (p_data ->> 'data')::json->> 'toolBar';
 	v_islayer := (p_data ->> 'feature')::json->> 'isLayer';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
+	v_editable = (p_data ->> 'data')::json->> 'editable';
 
 	-- control strange null
 	IF lower(v_addschema) = 'none' or v_addschema = '' THEN 
@@ -600,6 +601,7 @@ BEGIN
 		     ', "toggledition":'|| v_toggledition ||
 		     ', "feature":'|| v_featureinfo ||
 		      ',"data":{"linkPath":' || v_linkpath ||
+		      	      ',"editable":' || v_editable ||
 			      ',"parentFields":' || v_parentfields ||
 			      ',"fields":' || v_fields || 
 			      '}'||

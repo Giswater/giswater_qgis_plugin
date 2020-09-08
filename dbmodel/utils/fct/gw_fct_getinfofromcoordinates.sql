@@ -32,7 +32,7 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
 			"toolBar":"epa",
 			"coordinates":{"epsg":25831, "xcoord":419204.96, "ycoord":4576509.27, "zoomRatio":1000}}}$$)
 
- SELECT gw_fct_getinfofromcoordinates($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"None", "activeLayer":"", "visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None", "coordinates":{"xcoord":418911.7807826943,"ycoord":4576796.706092382, "zoomRatio":5804.613871393841}}}$$);
+ SELECT gw_fct_getinfofromcoordinates($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "editable":"false", "rolePermissions":"None", "activeLayer":"", "visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None", "coordinates":{"xcoord":418911.7807826943,"ycoord":4576796.706092382, "zoomRatio":5804.613871393841}}}$$);
 
  SELECT gw_fct_getinfofromcoordinates($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "rolePermissions":"None", "activeLayer":"", "visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None", "coordinates":{"xcoord":418894.6048028714,"ycoord":4576612.785781575, "zoomRatio":2105.7904524867854}}}$$);
 
@@ -70,6 +70,7 @@ v_addschema text;
 v_projectrole text; 
 v_flag boolean = false;
 v_infotype text;
+v_data json;
 
 
 BEGIN
@@ -92,6 +93,8 @@ BEGIN
 	v_projectrole = (p_data ->> 'data')::json->> 'projecRole';
 	v_addschema = (p_data ->> 'data')::json->> 'addSchema';
 	v_infotype = (p_data ->> 'data')::json->> 'infoType';
+	v_iseditable = (p_data ->> 'data')::json->> 'editable';
+
 	
 	-- profilactic control of schema name
 	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null'
@@ -207,14 +210,24 @@ BEGIN
 		-- RAISE NOTICE 'Searching for layer....loop number: % layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;    
 		END IF;
 	END LOOP;
-	
+
+	IF v_iseditable THEN
+
+		-- Get editability of layer
+		EXECUTE 'SELECT (CASE WHEN is_editable=TRUE AND layer_id = any('||quote_literal(v_visiblelayer)||'::text[]) THEN ''True'' ELSE ''False'' END) 
+		FROM  '||quote_ident(v_config_layer)||' WHERE layer_id='||quote_literal(v_layer.layer_id)||';'
+			INTO v_iseditable;
+	END IF;
+
 	-- looking for additional schema 
 	IF v_addschema IS NOT NULL AND v_addschema != v_schemaname AND v_flag IS FALSE THEN
+
+		v_data = gw_fct_json_object_set_key((p_data->>'data')::json, 'editable', 'false'::text);
+		p_data = gw_fct_json_object_set_key(p_data, 'data', v_data::text);
 		
 		EXECUTE 'SET search_path = '||v_addschema||', public';
 		SELECT gw_fct_getinfofromcoordinates(p_data) INTO v_return;
 		SET search_path = 'SCHEMA_NAME', public;
-		RAISE NOTICE 'returned';
 		RETURN v_return;
 	END IF;
 	
@@ -228,11 +241,6 @@ BEGIN
 		v_toolbar = 'basic';
 	END IF;
     
-	-- Get editability of layer
-	EXECUTE 'SELECT (CASE WHEN is_editable=TRUE AND layer_id = any('||quote_literal(v_visiblelayer)||'::text[]) THEN ''True'' ELSE ''False'' END) 
-            FROM  '||quote_ident(v_config_layer)||' WHERE layer_id='||quote_literal(v_layer.layer_id)||';'
-            INTO v_iseditable;
-
 	PERFORM gw_fct_debug(concat('{"data":{"msg":"Toolbar", "variables":"',v_toolbar,'"}}')::json);
 			
 	--   Call and return gw_fct_getinfofromid
