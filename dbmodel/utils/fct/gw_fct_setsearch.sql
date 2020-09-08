@@ -19,18 +19,18 @@ SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "fo
 
 SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"workcat"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "workcat_search":{"text":"w"}, "addSchema":"None"}}$$);
 
-SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"addNetwork"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"SCHEMA_NAME"}}$$);
+SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"addNetwork"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"ud"}}$$);
 
- SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "searchType":"None", "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"SCHEMA_NAME"}}$$);
+ SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "searchType":"None", "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"ud"}}$$);
 
 SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "searchType":"None", "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"None"}}$$);
 
 SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "searchType":"arc", "net_type":{"id":"v_edit_arc", "name":"Arcs"}, "net_code":{"text":"5"}, "addSchema":"None"}}$$);
 
-SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"add_network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"SCHEMA_NAME"}}$$);
+SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"add_network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"ud"}}$$);
 
 
- SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"add_network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"", "name":""}, "net_code":{"text":"4"}, "addSchema":"SCHEMA_NAME"}}$$);
+ SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"add_network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"", "name":""}, "net_code":{"text":"4"}, "addSchema":"ud"}}$$);
 
 MAIN ISSUES
 -----------
@@ -52,7 +52,7 @@ v_version json;
 v_projecttype character varying;
 v_count integer;
 v_querytext text;
-v_featuretype text;
+v_searchtype text;
 v_partial text;
 
 --network
@@ -60,7 +60,7 @@ v_network_layername text;
 v_network_idname text;
 v_network_code text;
 v_network_catalog text;
-v_value json;
+v_value text;
 v_network_all json;
 
 --muni
@@ -142,7 +142,7 @@ BEGIN
 
 	-- Get tab
 	v_tab := ((p_data->>'form')::json)->>'tabName';
-	v_featuretype := (p_data->>'data')::json->>'searchType';
+	v_searchtype := (p_data->>'data')::json->>'searchType';
 	v_addschema := (p_data->>'data')::json->>'addSchema';
 	
 	-- profilactic control of schema name
@@ -160,7 +160,7 @@ BEGIN
 	IF v_addschema IS NOT NULL AND v_addschema != v_schemaname AND v_tab = 'add_network' THEN
 	
 		EXECUTE 'SET search_path = '||v_addschema||', public';
-		SELECT gw_fct_getinfofromid(p_data) INTO v_return;
+		SELECT gw_fct_setsearch(p_data) INTO v_return;
 		SET search_path = 'SCHEMA_NAME', public;
 		RETURN v_return;
 	END IF;
@@ -170,14 +170,17 @@ BEGIN
 	IF v_tab = 'network' OR v_tab = 'add_network' THEN
 
 		-- profilactic control of nulls
-		IF v_featuretype is null OR v_featuretype = 'None' THEN v_featuretype = 'all'; end if;
+		IF v_searchtype is null OR v_searchtype = 'None' THEN v_searchtype = 'all'; end if;
 
 		-- get values from database config variable
-		v_value = (SELECT value FROM config_param_system WHERE value::json->>'search_type' = v_featuretype and parameter like '%basic_search_network%');
-			v_network_layername = v_value->>'sys_table_id';
-			v_network_idname = v_value->>'sys_id_field';
-			v_network_code = v_value->>'sys_search_field';
-			v_network_catalog = v_value->>'cat_field';
+		v_value = (SELECT value FROM config_param_system WHERE value::json->>'search_type' = v_searchtype and parameter like '%basic_search_network%');
+	
+		v_network_layername = v_value::json->>'sys_table_id';
+		v_network_idname = v_value::json->>'sys_id_field';
+		v_network_code = v_value::json->>'sys_search_field';
+		v_network_catalog = v_value::json->>'cat_field';
+
+		IF v_value IS NULL THEN v_value ='all'; END IF;
 				
 		-- get values from init json
 		v_combo := ((p_data->>'data')::json)->>'net_type';
@@ -187,7 +190,7 @@ BEGIN
 		v_textarg := concat(v_edittext->>'text' ,'%');
 
 		-- built first part of query
-		IF v_featuretype = 'all' THEN -- feature search is for the whole system
+		IF v_searchtype = 'all' THEN -- feature search is for the whole system
 			FOR v_network_all IN SELECT value FROM config_param_system WHERE parameter like '%basic_search_network_%' 
 			LOOP
 				IF  v_network_all->>'search_type' IS NOT NULL THEN
@@ -206,7 +209,7 @@ BEGIN
 		ELSE
 			-- buid querytext
 			v_querytext= concat('SELECT ',v_network_idname,' AS sys_id, ', v_network_code,' AS search_field, ', v_network_catalog,' AS cat_id,', 
-					quote_literal(v_network_idname)::text,' AS sys_idname,',quote_literal(v_featuretype)::text,' AS search_type, ',
+					quote_literal(v_network_idname)::text,' AS sys_idname,',quote_literal(v_searchtype)::text,' AS search_type, ',
 					quote_literal(v_network_layername)::text,'::text AS sys_table_id 
 					FROM ', v_network_layername);
 		END IF;			 
@@ -214,8 +217,7 @@ BEGIN
 		-- built second part of query
 		IF v_idarg = '' THEN 
 
-			v_value	 = '{}';
-			-- Get Ids for type combo
+			-- Get values for type combo
 			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
 			CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname
 			FROM ('||(v_querytext)||')b
@@ -223,15 +225,16 @@ BEGIN
 			ORDER BY length(search_field::text) asc LIMIT 10) a'
 			INTO v_response;
 		ELSE 
-			-- Get values for type combo    
+			-- Get values type combo    
 			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (SELECT sys_id, sys_table_id, 
-			CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, '||quote_literal(v_value::json->>'search_type')::text||' 
+			CONCAT (search_field, '' : '', cat_id) AS display_name, sys_idname, '||quote_literal(v_searchtype)::text||'  as search_type
 			FROM ('||(v_querytext)||')b
 			WHERE CONCAT (search_field, '' : '', cat_id) ILIKE ' || quote_literal(v_textarg) || ' AND sys_table_id = '||quote_literal(v_idarg)||'
 			ORDER BY length(search_field::text) asc LIMIT 10) a'
 			INTO v_response;
-
 		END IF;
+
+
 
 	-- address
 	ELSIF v_tab = 'address' THEN
