@@ -1541,6 +1541,9 @@ class Giswater(QObject):
                             layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintUnique,
                                                  QgsFieldConstraints.ConstraintStrengthHard)
 
+                if 'ismandatory' in field and not field['ismandatory']:
+                    layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
+                                             QgsFieldConstraints.ConstraintStrengthSoft)
                 # Manage editability
                 self.set_read_only(layer, field, fieldIndex)
 
@@ -1552,9 +1555,6 @@ class Giswater(QObject):
                             valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
                     # Set values into valueMap
                     editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
-                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
-                elif field['widgettype'] == 'text':
-                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
                 elif field['widgettype'] == 'check':
                     config = {'CheckedState': 'true', 'UncheckedState': 'false'}
@@ -1568,7 +1568,9 @@ class Giswater(QObject):
                               'field_iso_format': False}
                     editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
-
+                else:
+                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
         if msg_failed != "":
             self.controller.show_exceptions_msg("Execute failed.", msg_failed)
 
