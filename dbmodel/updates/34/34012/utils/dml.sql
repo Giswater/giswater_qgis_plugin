@@ -300,6 +300,3 @@ VALUES ('v_edit_samplepoint','form_feature', 'district_id', 'integer', 'combo', 
 'SELECT a.district_id AS id, a.name AS idval FROM ext_district a JOIN ext_municipality m USING (muni_id) WHERE district_id IS NOT NULL ', true, 'muni_id', 'AND m.muni_id',
 'lyt_data_3', 'district_id - Identificador del barrio con el que se vincula el elemento. A escoger entre los disponibles en el desplegable (se filtra en función del municipio seleccionado)',
 true) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
-
-UPDATE config_form_fields SET datatype = 'string' WHERE datatype = 'text';
-DELETE FROM config_typevalue WHERE id = 'text' AND typevalue = 'datatype_typevalue';

@@ -52,7 +52,7 @@ v_fullfilter text;
 v_finalquery text;
 v_querytab text;
 v_orderby text;
-v_layermanager json;
+v_geometry text;
 
 BEGIN
 
@@ -67,8 +67,9 @@ BEGIN
 	v_selector_type := (p_data ->> 'data')::json->> 'selectorType';
 	v_currenttab := (p_data ->> 'form')::json->> 'currentTab';
 	v_filterfrominput := (p_data ->> 'data')::json->> 'filterText';
-	v_layermanager := (p_data ->> 'layermanager');
+	v_geometry := ((p_data ->> 'data')::json->>'geometry');
 
+	raise notice 'p_data %', v_geometry;
 	
 	-- get system variables:
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
@@ -183,6 +184,7 @@ BEGIN
 	v_manageall := COALESCE(v_manageall, FALSE);	
 	v_selectionMode = COALESCE(v_selectionMode, '');
 	v_currenttab = COALESCE(v_currenttab, '');
+	v_geometry = COALESCE(v_geometry, '{}');
 
 	-- Return
 	IF v_firsttab IS FALSE THEN
@@ -198,8 +200,8 @@ BEGIN
 			',"body":{"message":{"level":1, "text":"This is a test message"}'||
 			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||'}'||
 			',"feature":{}'||
-			',"layermanager":{}'||
-			',"data":{}}'||
+			',"data":{"geometry":'||v_geometry||'}'||
+			'}'||
 		    '}')::json;
 	END IF;
 

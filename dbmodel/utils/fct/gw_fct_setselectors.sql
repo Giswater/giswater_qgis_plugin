@@ -37,6 +37,7 @@ v_return json;
 v_table text;
 v_tableid text;
 v_checkall boolean;
+v_geometry text;
 
 BEGIN
 
@@ -121,13 +122,19 @@ BEGIN
 
 	END IF;
 
+	-- get envelope
+	SELECT row_to_json (a) 
+	INTO v_geometry
+	FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
+	FROM (SELECT st_collect(the_geom) as the_geom FROM v_edit_arc) b) a;
 
 	-- control nulls
 	v_layermanager = COALESCE (v_layermanager, '{}');
 
 	-- Return
-	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"selectorType":"',v_selectortype,'"}, "layermanager":'||v_layermanager||'}');
-	RETURN gw_fct_json_create_return(gw_fct_getselectors(v_return), 2870);
+	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"geometry":',v_geometry,', "selectorType":"',v_selectortype,'"}, "layermanager":'||v_layermanager||'}');
+	RETURN gw_fct_getselectors(v_return);
+
 	
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
