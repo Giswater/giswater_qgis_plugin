@@ -3184,6 +3184,4 @@ class GwInfo(QObject):
             self.controller.log_info("FAIL open_node")
             return
 
-        margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        draw(complet_result[0], self.rubber_band, margin)
 
