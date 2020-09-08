@@ -80,7 +80,7 @@ CREATE OR REPLACE VIEW v_edit_vnode AS
 
 
 CREATE OR REPLACE VIEW vu_arc AS 
-WITH vu_node AS (
+WITH query_node AS (
          SELECT node.node_id,
             node.top_elev,
             node.custom_top_elev,
@@ -204,8 +204,8 @@ WITH vu_node AS (
     arc.the_geom
    FROM arc
      JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
-     LEFT JOIN vu_node a ON a.node_id::text = arc.node_1::text
-     LEFT JOIN vu_node b ON b.node_id::text = arc.node_2::text
+     LEFT JOIN query_node a ON a.node_id::text = arc.node_1::text
+     LEFT JOIN query_node b ON b.node_id::text = arc.node_2::text
      JOIN sector ON sector.sector_id = arc.sector_id
      JOIN cat_feature ON arc.arc_type::text = cat_feature.id::text
      JOIN dma ON arc.dma_id = dma.dma_id

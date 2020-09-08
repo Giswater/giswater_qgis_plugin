@@ -52,7 +52,7 @@ CREATE OR REPLACE VIEW v_edit_vnode AS
 
 
 CREATE OR REPLACE VIEW vu_arc AS 
-WITH vu_node AS (SELECT node_id, elevation, depth, nodetype_id, staticpressure FROM node JOIN cat_node ON nodecat_id = id)
+WITH query_node AS (SELECT node_id, elevation, depth, nodetype_id, staticpressure FROM node JOIN cat_node ON nodecat_id = id)
  SELECT arc.arc_id,
     arc.code,
     arc.node_1,
@@ -143,8 +143,8 @@ WITH vu_node AS (SELECT node_id, elevation, depth, nodetype_id, staticpressure F
      LEFT JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
      JOIN cat_feature ON cat_feature.id::text = cat_arc.arctype_id::text
      LEFT JOIN dma ON arc.dma_id = dma.dma_id
-     LEFT JOIN vu_node a ON a.node_id::text = arc.node_1::text
-     LEFT JOIN vu_node b ON b.node_id::text = arc.node_2::text
+     LEFT JOIN query_node a ON a.node_id::text = arc.node_1::text
+     LEFT JOIN query_node b ON b.node_id::text = arc.node_2::text
      LEFT JOIN dqa ON arc.dqa_id = dqa.dqa_id
      LEFT JOIN presszone ON presszone.presszone_id::text = arc.presszone_id::text
      LEFT JOIN ext_streetaxis c ON c.id::text = arc.streetaxis_id::text
