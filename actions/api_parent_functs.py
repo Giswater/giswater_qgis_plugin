@@ -1480,12 +1480,14 @@ def set_selector(dialog, widget, is_alone, selector_vars):
     json_result = global_vars.controller.get_json('gw_fct_setselectors', body, log_sql=True)
 
     if str(tab_name) == 'tab_exploitation':
-        # Reload layer, zoom to layer, style mapzones and refresh canvas
-        layer = global_vars.controller.get_layer_by_tablename('v_edit_arc')
-        if layer:
-            global_vars.iface.setActiveLayer(layer)
-            global_vars.iface.zoomToActiveLayer()
-        set_style_mapzones()
+
+        # Zoom to exploitation
+        x1 = json_result['body']['data']['geometry']['x1']
+        y1 = json_result['body']['data']['geometry']['y1']
+        x2 = json_result['body']['data']['geometry']['x2']
+        y2 = json_result['body']['data']['geometry']['y2']
+        if x1 is not None:
+            self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
 
     # Refresh canvas
     global_vars.controller.set_layer_index('v_edit_arc')
