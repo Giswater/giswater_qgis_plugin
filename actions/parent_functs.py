@@ -997,13 +997,15 @@ def draw(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(2
         rubber_band.reset()
     if str(max_x) == str(min_x) and str(max_y) == str(min_y):
         point = QgsPointXY(float(max_x), float(max_y))
-        draw_point(point, rubber_band, color, width)
+        rubber_band = QgsRubberBand(global_vars.canvas, 0)
+        rubber_band = draw_point(point, rubber_band, color, width)
     else:
         points = get_points(list_coord)
-        draw_polyline(points, rubber_band, color, width)
+        rubber_band = QgsRubberBand(global_vars.canvas, 2)
+        rubber_band = draw_polyline(points, rubber_band, color, width)
     if margin is not None:
         zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
-
+    return rubber_band
 
 def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
     """

@@ -328,7 +328,7 @@ class GwInfo(QObject):
         self.dlg_cf = InfoFeatureUi(sub_tag)
         load_settings(self.dlg_cf)
 
-        draw(complet_result[0], self.rubber_band, 10)
+        self.rubber_band = draw(complet_result[0], self.rubber_band, 10)
 
         if feature_id:
             self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 25, self.dlg_cf.pos().y() + 25, self.dlg_cf.width(),
