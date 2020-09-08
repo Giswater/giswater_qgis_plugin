@@ -200,16 +200,6 @@ class GwSearch:
             if not complet_result:
                 return
 
-            margin = float(complet_result[0]['body']['feature']['zoomCanvasMargin']['mts'])
-            draw(complet_result[0], self.rubber_band, margin)
-            # TODO: This removes the draw? Intended behaviour?
-            self.rubber_band.reset()
-
-        # Tab 'search'
-        elif tab_selected == 'search':
-            # TODO
-            return
-
         # Tab 'address' (streets)
         elif tab_selected == 'address' and 'id' in item and 'sys_id' not in item:
             polygon = item['st_astext']
