@@ -35,8 +35,7 @@ ON CONFLICT (typevalue, id) DO NOTHING;
 --update addfields vdefault
 UPDATE sys_param_user SET id = concat('edit_addfield_', sys_param_user.id) 
 FROM sys_addfields WHERE sys_param_user.id = concat(param_name,'_',lower(cat_feature_id),'_vdefault');
-<<<<<<< HEAD
-=======
+
 
 UPDATE config_param_user SET parameter = concat('edit_addfield_',config_param_user.parameter ) 
 FROM sys_addfields WHERE config_param_user.parameter = concat(param_name,'_',lower(cat_feature_id),'_vdefault');
@@ -94,4 +93,3 @@ DELETE FROM sys_function WHERE function_name='gw_trg_edit_lot_x_user';
 DELETE FROM sys_function WHERE function_name='gw_trg_edit_team_x_user';
 DELETE FROM sys_function WHERE function_name='gw_trg_edit_team_x_vehicle';
 DELETE FROM sys_function WHERE function_name='gw_trg_edit_team_x_visitclass';
->>>>>>> b293b923d... Bug fix on previous commit
