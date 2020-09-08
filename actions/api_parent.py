@@ -1470,7 +1470,7 @@ class ApiParent(ParentAction):
 
     def gw_function_dxf(self, **kwargs):
         """ Function called in def add_button(self, dialog, field): -->
-                widget.clicked.connect(partial(getattr(self, function_name), dialog, widget)) """
+                widget.clicked.connect(partial(getattr(module, function_name), **kwargs)) """
 
         path, filter_ = self.open_file_path(filter_="DXF Files (*.dxf)")
         if not path:

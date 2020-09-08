@@ -220,10 +220,17 @@ def set_widget_size(widget, field):
     return widget
 
 
-def add_button(dialog, field, temp_layers_added=None):
-
+def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name__]):
+    """
+    :param dialog: (QDialog)
+    :param field: Part of json where find info (Json)
+    :param temp_layers_added: List of layers added to the toc
+    :param module: Module where find 'function_name', if 'function_name' is not in this module
+    :return: (QWidget)
+    """
     widget = QPushButton()
     widget.setObjectName(field['widgetname'])
+
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
@@ -234,7 +241,7 @@ def add_button(dialog, field, temp_layers_added=None):
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             function_name = field['widgetfunction']
-            exist = global_vars.controller.check_python_function(sys.modules[__name__], function_name)
+            exist = global_vars.controller.check_python_function(module, function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
                 global_vars.controller.show_message(msg, 2)
@@ -244,7 +251,7 @@ def add_button(dialog, field, temp_layers_added=None):
             global_vars.controller.show_message(message, 2, parameter=widget.objectName())
 
     kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name, 'temp_layers_added': temp_layers_added}
-    widget.clicked.connect(partial(getattr(sys.modules[__name__], function_name), **kwargs))
+    widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
 
@@ -1129,7 +1136,7 @@ def set_open_url(widget):
 
 def gw_function_dxf(**kwargs):
     """ Function called in def add_button(self, dialog, field): -->
-            widget.clicked.connect(partial(getattr(sys.modules[__name__], function_name), **kwargs))
+            widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
             widget.clicked.connect(partial(getattr(sys.modules[__name__], func_name), widget)) """
 
     path, filter_ = open_file_path(filter_="DXF Files (*.dxf)")

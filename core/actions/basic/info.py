@@ -1186,7 +1186,7 @@ class GwInfo(QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = add_button(dialog, field)
+        widget = add_button(dialog, field, module=self)
         widget = set_widget_size(widget, field)
         return widget
 
