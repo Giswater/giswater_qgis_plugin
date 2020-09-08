@@ -1864,12 +1864,14 @@ class ApiParent(ParentAction):
         json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
 
         if str(tab_name) == 'tab_exploitation':
-            # Reload layer, zoom to layer, style mapzones and refresh canvas
-            layer = self.controller.get_layer_by_tablename('v_edit_arc')
-            if layer:
-                self.iface.setActiveLayer(layer)
-                self.iface.zoomToActiveLayer()
-            self.set_style_mapzones()
+
+            # Zoom to exploitation
+            x1 = json_result['body']['data']['geometry']['x1']
+            y1 = json_result['body']['data']['geometry']['y1']
+            x2 = json_result['body']['data']['geometry']['x2']
+            y2 = json_result['body']['data']['geometry']['y2']
+            if x1 is not None:
+                self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
 
         # Refresh canvas
         self.controller.set_layer_index('v_edit_arc')
