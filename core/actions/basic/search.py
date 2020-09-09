@@ -328,7 +328,7 @@ class GwSearch:
             extras_search += f'"addSchema":"{qgis_project_add_schema}"'
             extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
             body = create_body(form=form_search, extras=extras_search)
-            result = self.controller.get_json('gw_fct_setsearch', body, log_sql=True)
+            result = self.controller.get_json('gw_fct_setsearch', body, rubber_band=self.rubber_band, log_sql=True)
             if not result:
                 return False
 
@@ -361,7 +361,7 @@ class GwSearch:
 
             extras_search_add += f', "{line_edit_add.property("columnname")}":{{"text":"{value}"}}'
             body = create_body(form=form_search_add, extras=extras_search_add)
-            result = self.controller.get_json('gw_fct_setsearchadd', body, log_sql=True)
+            result = self.controller.get_json('gw_fct_setsearchadd', body, rubber_band=self.rubber_band, log_sql=True)
             if not result:
                 return False
 

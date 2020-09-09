@@ -181,7 +181,7 @@ class GwInfo(QObject):
         if function_name is None:
             return False, None
 
-        json_result = self.controller.get_json(function_name, body)
+        json_result = self.controller.get_json(function_name, body, rubber_band=self.rubber_band)
         if json_result is None:
             return False, None
 
@@ -328,7 +328,12 @@ class GwInfo(QObject):
         self.dlg_cf = InfoFeatureUi(sub_tag)
         load_settings(self.dlg_cf)
 
-        draw(complet_result[0], self.rubber_band)
+        # If in the get_json function we have received a rubberband, it is not necessary to redraw it.
+        # But if it has not been received, it is drawn
+        try:
+            exist_rb = complet_result[0]['body']['returnManager']['style']['ruberband']
+        except KeyError:
+            draw(complet_result[0], self.rubber_band)
 
         if feature_id:
             self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 25, self.dlg_cf.pos().y() + 25, self.dlg_cf.width(),

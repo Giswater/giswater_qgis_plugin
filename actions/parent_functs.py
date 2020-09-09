@@ -1135,7 +1135,7 @@ def set_style_mapzones():
                 lyr.triggerRepaint()
 
 
-def manage_return_manager(json_result, sql, rubber_band):
+def manage_return_manager(json_result, sql, rubber_band=None):
     """
     Manage options for layers (active, visible, zoom and indexing)
     :param json_result: Json result of a query (Json)

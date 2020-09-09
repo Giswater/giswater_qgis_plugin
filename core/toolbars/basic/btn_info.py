@@ -138,7 +138,7 @@ class GwInfoButton(GwParentMapTool):
         extras += f'"visibleLayers":{visible_layers}, '
         extras += f'"zoomScale":{scale_zoom} '
         body = create_body(extras=extras)
-        json_result = self.controller.get_json('gw_fct_getlayersfromcoordinates', body)
+        json_result = self.controller.get_json('gw_fct_getlayersfromcoordinates', body, rubber_band=self.rubber_band)
         if not json_result:
             return False
 

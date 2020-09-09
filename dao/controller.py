@@ -767,7 +767,7 @@ class DaoController:
 
 
     def get_json(self, function_name, parameters=None, schema_name=None, commit=True, log_sql=False,
-                 log_result=False, json_loads=False, is_notify=False):
+                 log_result=False, json_loads=False, is_notify=False, rubber_band=None):
         """ Manage execution API function
         :param function_name: Name of function to call (text)
         :param parameters: Parameters for function (json) or (query parameters)
@@ -815,7 +815,7 @@ class DaoController:
 
         try:
             # Layer styles
-            manage_return_manager(json_result, sql)
+            manage_return_manager(json_result, sql, rubber_band)
             manage_layer_manager(json_result, sql)
             manage_actions(json_result, sql)
         except Exception:
