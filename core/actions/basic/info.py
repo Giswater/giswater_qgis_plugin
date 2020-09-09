@@ -303,7 +303,7 @@ class GwInfo(QObject):
 
     def open_generic_form(self, complet_result):
 
-        self.rubber_band = draw(complet_result, self.rubber_band, zoom=False)
+        draw(complet_result, self.rubber_band, zoom=False)
         self.hydro_info_dlg = InfoGenericUi()
         load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(close_dialog, self.hydro_info_dlg))
@@ -328,7 +328,7 @@ class GwInfo(QObject):
         self.dlg_cf = InfoFeatureUi(sub_tag)
         load_settings(self.dlg_cf)
 
-        self.rubber_band = draw(complet_result[0], self.rubber_band, 10)
+        draw(complet_result[0], self.rubber_band)
 
         if feature_id:
             self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 25, self.dlg_cf.pos().y() + 25, self.dlg_cf.width(),
@@ -604,7 +604,7 @@ class GwInfo(QObject):
 
         global_vars.canvas.setMapTool(ep)
         # We redraw the selected feature because self.canvas.setMapTool(emit_point) erases it
-        self.rubber_band = draw(complet_result[0], self.rubber_band, None, False)
+        draw(complet_result[0], self.rubber_band, None, False)
 
         # Store user snapping configuration
         self.previous_snapping = get_snapping_options
@@ -636,16 +636,16 @@ class GwInfo(QObject):
                 snapped_feat = get_snapped_feature(result)
                 element_id = snapped_feat.attribute('node_id')
                 message = "Selected node"
+                rb = QgsRubberBand(global_vars.canvas, 0)
                 if self.node1 is None:
                     self.node1 = str(element_id)
-                    rb = draw_point(QgsPointXY(result.point()), self.rubber_band, color=QColor(
-                        0, 150, 55, 100), width=10, is_new=True)
+                    draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10, is_new=True)
                     rb_interpolate.append(rb)
                     dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
                     global_vars.controller.show_message(message, message_level=0, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
-                    rb = draw_point(QgsPointXY(result.point()), self.rubber_band, color=QColor(
+                    draw_point(QgsPointXY(result.point()), rb, color=QColor(
                         0, 150, 55, 100), width=10, is_new=True)
                     rb_interpolate.append(rb)
                     dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")

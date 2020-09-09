@@ -618,7 +618,7 @@ def get_max_rectangle_from_coords(list_coord):
 
 def zoom_to_rectangle(x1, y1, x2, y2, margin=5):
 
-    rect = QgsRectangle(float(x1) - margin, float(y1) - margin, float(x2) + margin, float(y2) + margin)
+    rect = QgsRectangle(float(x1) + margin, float(y1) + margin, float(x2) - margin, float(y2) - margin)
     global_vars.canvas.setExtent(rect)
     global_vars.canvas.refresh()
 
@@ -997,15 +997,12 @@ def draw(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(2
         rubber_band.reset()
     if str(max_x) == str(min_x) and str(max_y) == str(min_y):
         point = QgsPointXY(float(max_x), float(max_y))
-        rubber_band = QgsRubberBand(global_vars.canvas, 0)
-        rubber_band = draw_point(point, rubber_band, color, width)
+        draw_point(point, rubber_band, color, width)
     else:
         points = get_points(list_coord)
-        rubber_band = QgsRubberBand(global_vars.canvas, 2)
-        rubber_band = draw_polyline(points, rubber_band, color, width)
+        draw_polyline(points, rubber_band, color, width)
     if margin is not None:
         zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
-    return rubber_band
 
 
 def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
@@ -1013,20 +1010,15 @@ def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, d
     :param duration_time: integer milliseconds ex: 3000 for 3 seconds
     """
 
-    if is_new:
-        rb = QgsRubberBand(global_vars.canvas, 0)
-    else:
-        rb = rubber_band
-
-    rb.setIconSize(10)
-    rb.setColor(color)
-    rb.setWidth(width)
-    rb.addPoint(point)
+    rubber_band.reset(0)
+    rubber_band.setIconSize(10)
+    rubber_band.setColor(color)
+    rubber_band.setWidth(width)
+    rubber_band.addPoint(point)
 
     # wait to simulate a flashing effect
     if duration_time is not None:
-        QTimer.singleShot(duration_time, rb.reset)
-    return rb
+        QTimer.singleShot(duration_time, rubber_band.reset)
 
 
 def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, index):
@@ -1056,19 +1048,16 @@ def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, du
      :param duration_time: integer milliseconds ex: 3000 for 3 seconds
      """
 
-    rb = rubber_band
-    rb.setIconSize(20)
+    rubber_band.setIconSize(20)
     polyline = QgsGeometry.fromPolylineXY(points)
-    rb.setToGeometry(polyline, None)
-    rb.setColor(color)
-    rb.setWidth(width)
-    rb.show()
+    rubber_band.setToGeometry(polyline, None)
+    rubber_band.setColor(color)
+    rubber_band.setWidth(width)
+    rubber_band.show()
 
     # wait to simulate a flashing effect
     if duration_time is not None:
-        QTimer.singleShot(duration_time, rb.reset)
-
-    return rb
+        QTimer.singleShot(duration_time, rubber_band.reset)
 
 
 def resetRubberbands(rubber_band):

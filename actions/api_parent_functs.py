@@ -643,21 +643,17 @@ def draw_polygon(points, rubber_band, border=QColor(255, 0, 0, 100), width=3, du
     """
 
     rubber_band.setIconSize(20)
-
-    rb = rubber_band
     polygon = QgsGeometry.fromPolygonXY([points])
-    rb.setToGeometry(polygon, None)
-    rb.setColor(border)
+    rubber_band.setToGeometry(polygon, None)
+    rubber_band.setColor(border)
     if fill_color:
-        rb.setFillColor(fill_color)
-    rb.setWidth(width)
-    rb.show()
+        rubber_band.setFillColor(fill_color)
+    rubber_band.setWidth(width)
+    rubber_band.show()
 
     # wait to simulate a flashing effect
     if duration_time is not None:
         QTimer.singleShot(duration_time, rubber_band.reset)
-
-    return rb
 
 
 def fill_table(widget, table_name, filter_=None):

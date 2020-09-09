@@ -200,6 +200,13 @@ class GwSearch:
             if not complet_result:
                 return
 
+            # self.Api CF.get_info_from_id (...) in turn ends up calling self.open_custom_form (...) which will draw the
+            # line on the feature but not zoom. Here, with draw we redraw simply to zoom and so that there are not two
+            # ruberbands (the one from self.open_custom_form (...) and this one) we delete these
+            margin = float(complet_result[0]['body']['feature']['zoomCanvasMargin']['mts'])
+            draw(complet_result[0], self.rubber_band, margin)
+            self.rubber_band.reset()
+
         # Tab 'address' (streets)
         elif tab_selected == 'address' and 'id' in item and 'sys_id' not in item:
             polygon = item['st_astext']
@@ -218,8 +225,7 @@ class GwSearch:
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
-            self.rubber_band = QgsRubberBand(self.canvas, 0)
-            self.rubber_band = draw_point(point, self.rubber_band, duration_time=5000)
+            draw_point(point, self.rubber_band, duration_time=5000)
             zoom_to_rectangle(x1, y1, x1, y1, margin=100)
             self.canvas.refresh()
 
@@ -228,8 +234,7 @@ class GwSearch:
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
-            self.rubber_band = QgsRubberBand(self.canvas, 0)
-            self.rubber_band = draw_point(point, self.rubber_band)
+            draw_point(point, self.rubber_band)
             zoom_to_rectangle(x1, y1, x1, y1, margin=100)
             self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
 
@@ -241,9 +246,7 @@ class GwSearch:
                 self.controller.show_warning(msg)
                 return
             points = get_points(list_coord)
-            self.rubber_band.reset()
-            self.rubber_band = QgsRubberBand(self.canvas, 2)
-            self.rubber_band = draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
+            draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
             zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self.workcat_open_table_items(item)
@@ -274,7 +277,7 @@ class GwSearch:
             max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
             self.rubber_band.reset()
             point = QgsPointXY(float(max_x), float(max_y))
-            self.rubber_band = draw_point(point, self.rubber_band)
+            draw_point(point, self.rubber_band)
             zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=100)
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
             self.manage_visit.dlg_add_visit.rejected.connect(self.rubber_band.reset)
@@ -775,6 +778,11 @@ class GwSearch:
 
         self.ApiCF = GwInfo(tab_type='data')
         complet_result, dialog = self.ApiCF.get_info_from_id(table_name=table_name, feature_id=feature_id, tab_type='data')
+
+        # Get list of all coords in field geometry
+        list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
+        max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
+        zoom_to_rectangle(max_x, max_y, min_x, min_y, 1)
 
 
     def fill_label_data(self, workcat_id, table_name, extension=None):

@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import QAction, QMenu
 from functools import partial
 import re
 import os
-
+from .... import global_vars
 from ..parent_maptool import GwParentMapTool
 from ...actions.basic.info import GwInfo
 from ....actions.parent_functs import get_max_rectangle_from_coords, draw_point
@@ -26,9 +26,11 @@ class GwInfoButton(GwParentMapTool):
     def __init__(self, icon_path, text, toolbar, action_group):
         super().__init__(icon_path, text, toolbar, action_group)
 
+        self.rubber_band = QgsRubberBand(global_vars.canvas)
         self.tab_type = None
         # Used when the signal 'signal_activate' is emitted from the info, do not open another form
         self.block_signal = False
+
 
 
     def create_point(self, event):
@@ -217,17 +219,15 @@ class GwInfoButton(GwParentMapTool):
             self.rubber_band.reset()
         if str(max_x) == str(min_x) and str(max_y) == str(min_y):
             point = QgsPointXY(float(max_x), float(max_y))
-            self.rubber_band = QgsRubberBand(self.canvas, 0)
-            self.rubber_band = draw_point(point, self.rubber_band)
+            draw_point(point, self.rubber_band)
         else:
             points = get_points(list_coord)
-            self.rubber_band = QgsRubberBand(self.canvas, 2)
-            self.rubber_band = draw_polyline(points, self.rubber_band)
+            draw_polyline(points, self.rubber_band)
 
 
     def get_info_from_selected_id(self, action, tab_type):
         """ Set active selected layer """
-
+        self.rubber_band.reset()
         parent_menu = action.associatedWidgets()[0]
         layer = self.controller.get_layer_by_layername(parent_menu.title())
         if layer:
