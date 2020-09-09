@@ -187,9 +187,11 @@ class GwDimensioning:
             self.canvas.xyCoordinates.disconnect()
         except TypeError:
             pass
-
-        if emit_point:
+        
+        try:
             emit_point.canvasClicked.disconnect()
+        except TypeError:
+            pass
 
         if not action.isChecked():
             action.setChecked(False)
