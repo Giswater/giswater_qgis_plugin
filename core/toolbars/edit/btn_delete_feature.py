@@ -90,6 +90,7 @@ class GwDeleteFeatureButton(GwParentAction):
             return
 
         set_completer_object_api(completer, model, widget, rows_typeahead)
+        self.dlg_feature_delete.feature_id.setStyleSheet(None)
 
 
     def show_feature_relation(self):
@@ -105,8 +106,8 @@ class GwDeleteFeatureButton(GwParentAction):
         extras = '"feature_id":"' + feature_id + '"'
         body = create_body(feature=feature, extras=extras)
         result = self.controller.get_json('gw_fct_getfeaturerelation', body, log_sql=True)
-        if not result:
-            return
+        if not result or ('status' in result and result['status'] == 'Failed'):
+            return False
 
         # Construct message result
         result_msg = ''
@@ -125,14 +126,22 @@ class GwDeleteFeatureButton(GwParentAction):
         # Get feature_type and feature_id
         feature_type = qt_tools.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
         feature_id = qt_tools.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
+        
+        if feature_id == 'null':
+            self.dlg_feature_delete.feature_id.setStyleSheet("border: 1px solid red")
+            return
 
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = create_body(feature=feature, extras=extras)
         complet_result = self.controller.get_json('gw_fct_feature_delete', body, log_sql=True)
+
         if not complet_result:
             self.controller.show_message("Function gw_fct_feature_delete executed with no result ", 3)
             return
+
+        if 'status' in complet_result and complet_result['status'] == 'Failed':
+            return False
 
         # Populate tab info
         change_tab = False
@@ -188,6 +197,7 @@ class GwDeleteFeatureButton(GwParentAction):
 
 
     def set_active_layer(self):
+        self.dlg_feature_delete.feature_id.setStyleSheet(None)
 
         # Get current layer and remove selection
         current_layer = self.iface.activeLayer()
@@ -202,3 +212,4 @@ class GwDeleteFeatureButton(GwParentAction):
 
         # Clear feature id field
         qt_tools.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, '')
+        self.dlg_feature_delete.feature_id.setStyleSheet(None)
