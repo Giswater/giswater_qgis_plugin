@@ -367,6 +367,7 @@ BEGIN
 		SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
 		AND t.relname = $1 
 		AND s.nspname = $2
+		AND a.attname = ''visit_id''
 		ORDER BY a.attnum LIMIT 1'
 		INTO v_idname
 		USING v_tablename, v_schemaname;
