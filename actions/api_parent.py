@@ -9,7 +9,7 @@ from qgis.core import QgsPointXY, QgsVectorLayer
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsGeometry
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QStringListModel
-from qgis.PyQt.QtGui import QColor, QStandardItemModel, QStandardItem
+from qgis.PyQt.QtGui import QColor, QFontMetrics, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QAction
 from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QApplication
@@ -500,6 +500,18 @@ class ApiParent(ParentAction):
             widget.setProperty('columnname', field['columnname'])
         if 'value' in field:
             widget.setText(field['value'])
+
+        # Set height as a function of text lines
+        font = widget.document().defaultFont()
+        fm = QFontMetrics(font)
+        text_size = fm.size(0, widget.toPlainText())
+        if text_size.height() < 26:
+            widget.setMinimumHeight(36)
+            widget.setMaximumHeight(36)
+        else:
+            # Need to modify to avoid scroll
+            widget.setMaximumHeight(text_size.height() + 10)
+
         if 'iseditable' in field:
             widget.setReadOnly(not field['iseditable'])
             if not field['iseditable']:
@@ -696,6 +708,10 @@ class ApiParent(ParentAction):
             widget.setProperty('selectedId', field['selectedId'])
         else:
             widget.setProperty('selectedId', None)
+        if 'iseditable' in field:
+            widget.setEnabled(field['iseditable'])
+            if not field['iseditable']:
+                widget.setStyleSheet("QComboBox { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
         return widget
 
 
@@ -1425,7 +1441,7 @@ class ApiParent(ParentAction):
     def get_values(self, dialog, widget, _json=None):
 
         value = None
-        if type(widget) in(QLineEdit, QSpinBox, QDoubleSpinBox) and widget.isReadOnly() is False:
+        if type(widget) in(QLineEdit, QTextEdit, QSpinBox, QDoubleSpinBox) and widget.isReadOnly() is False:
             value = utils_giswater.getWidgetText(dialog, widget, return_string_null=False)
         elif type(widget) is QComboBox and widget.isEnabled():
             value = utils_giswater.get_item_data(dialog, widget, 0)

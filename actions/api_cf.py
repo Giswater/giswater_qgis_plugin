@@ -923,6 +923,7 @@ class ApiCF(ApiParent, QObject):
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
         widget = self.add_textarea(field)
+        widget = self.set_auto_update_textarea(field, dialog, widget)
         return widget
 
 
@@ -1092,10 +1093,13 @@ class ApiCF(ApiParent, QObject):
             for widget in widget_list:
                 for field in result['fields']:
                     if widget.objectName() == field['widgetname']:
-                        if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
+                        if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
                             widget.setReadOnly(not enable)
                             widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                        elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
+                        elif type(widget) in (QComboBox, QgsDateTimeEdit):
+                            widget.setEnabled(enable)
+                            widget.setStyleSheet("QWidget {color: rgb(0, 0, 0)}")
+                        elif type(widget) is QCheckBox:
                             widget.setEnabled(enable)
                         elif type(widget) is QPushButton:
                             # Manage the clickability of the buttons according to the configuration
@@ -1118,15 +1122,20 @@ class ApiCF(ApiParent, QObject):
                     continue
                 for field in result['fields']:
                     if widget.objectName() == field['widgetname']:
-                        if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit):
+                        if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
                             widget.setReadOnly(not field['iseditable'])
                             if not field['iseditable']:
                                 widget.setFocusPolicy(Qt.NoFocus)
-                                widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                                widget.setStyleSheet(None)
                             else:
                                 widget.setFocusPolicy(Qt.StrongFocus)
                                 widget.setStyleSheet(None)
-                        elif type(widget) in(QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
+                        elif type(widget) in (QComboBox, QgsDateTimeEdit):
+                            widget.setEnabled(field['iseditable'])
+                            widget.setStyleSheet(None)
+                            widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
+                                field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
+                        elif type(widget) in (QCheckBox, QPushButton):
                             widget.setEnabled(field['iseditable'])
                             widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
                                 field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
@@ -1223,6 +1232,24 @@ class ApiCF(ApiParent, QObject):
 
         return widget
 
+
+    def set_auto_update_textarea(self, field, dialog, widget):
+
+        if self.check_tab_data(dialog):
+            if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
+                _json = {}
+                widget.textChanged.connect(partial(self.clean_my_json, widget))
+                widget.textChanged.connect(partial(self.get_values, dialog, widget, _json))
+                widget.textChanged.connect(
+                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
+            else:
+                widget.textChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+
+            widget.textChanged.connect(partial(self.enabled_accept, dialog))
+            widget.textChanged.connect(partial(self.check_datatype_validator, dialog, widget, dialog.btn_accept))
+            widget.textChanged.connect(partial(self.check_min_max_value, dialog, widget, dialog.btn_accept))
+
+        return widget
 
     def reload_fields(self, dialog, result, p_widget):
         """
