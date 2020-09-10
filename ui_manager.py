@@ -43,7 +43,7 @@ class GwDialog(QDialog):
         if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
             QWhatsThis.leaveWhatsThisMode()
             parser = configparser.ConfigParser()
-            path = os.path.dirname(__file__) + os.sep + 'config' + os.sep + 'init2.config'
+            path = os.path.dirname(__file__) + os.sep + 'config' + os.sep + 'init.config'
             if not os.path.exists(path):
                 print(f"File not found: {path}")
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual')
@@ -93,7 +93,7 @@ class GwMainWindow(QMainWindow):
         if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
             QWhatsThis.leaveWhatsThisMode()
             parser = configparser.ConfigParser()
-            path = os.path.dirname(__file__) + os.sep + 'config' + os.sep + 'init2.config'
+            path = os.path.dirname(__file__) + os.sep + 'config' + os.sep + 'init.config'
             if not os.path.exists(path):
                 print(f"File not found: {path}")
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual')
