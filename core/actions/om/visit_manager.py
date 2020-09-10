@@ -64,6 +64,7 @@ class GwVisitManager:
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
                      open_dlg=True, is_new_from_cf=False):
+
         """ Button 64. Add visit.
         if visit_id => load record related to the visit_id
         if geom_type => lock geom_type in relations tab
@@ -163,6 +164,13 @@ class GwVisitManager:
         self.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         set_selectionbehavior(self.dlg_add_visit)
+
+        # Check the default dates, if it does not exist force today
+        _date = QDate.currentDate()
+        date_string = self.controller.get_config('om_visit_startdate_vdefault')
+        if date_string:
+            _date = datetime.strptime(date_string[0], '%Y/%m/%d')
+        self.dlg_add_visit.startdate.setDate(_date)
 
         # Check the default dates, if it does not exist force today
         _date = QDate.currentDate()
@@ -278,6 +286,19 @@ class GwVisitManager:
             self.manage_visit(visit_id=selected_object_id)
         elif "v_ui_om_visitman_x_" in table_object:
             self.manage_visit(visit_id=selected_object_id)
+
+
+    def zoom_box(self, box):
+        # When it is a point, and only one, it must be converted into a rectangle to be able to zoom
+        if not box.isNull():
+            if box.xMinimum() == box.xMaximum() and box.yMinimum() == box.yMaximum():
+                box.setXMaximum(box.xMaximum() + 0.0001)
+                box.setYMaximum(box.yMaximum() + 0.0001)
+                box.setXMaximum(box.xMinimum() + 0.0001)
+                box.setYMaximum(box.yMinimum() + 0.0001)
+            box.set(box.xMinimum() - 10, box.yMinimum() - 10, box.xMaximum() + 10, box.yMaximum() + 10)
+            self.iface.mapCanvas().setExtent(box)
+            self.iface.mapCanvas().refresh()
 
 
     def set_signals(self):
@@ -398,9 +419,17 @@ class GwVisitManager:
         self.controller.execute_sql(sql)
 
 
+    def get_geom(self):
+
+        sql = f"SELECT St_AsText((select the_geom from om_visit where id={self.current_visit.id})::text)"
+        row = self.controller.get_row(sql, log_sql=True)
+        return row
+
+
     def manage_rejected(self):
         """Do all action when closed the dialog with Cancel or X.
         e.g. all necessary rollbacks and cleanings."""
+
         try:
             self.canvas.setMapTool(self.previous_map_tool)
             # removed current working visit. This should cascade removing of all related records
@@ -628,6 +657,7 @@ class GwVisitManager:
         if parameter_id:
             qt_tools.set_combo_itemData(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
 
+
     def set_parameter_id_combo(self, dialog):
         """ Set parameter_id combo basing on current selections """
 
@@ -645,9 +675,9 @@ class GwVisitManager:
 
         # Set user devault parameter
         parameter_id = self.controller.get_config('om_visit_parameter_vdefault')
-        print(parameter_id)
         if parameter_id:
             qt_tools.set_combo_itemData(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
+
 
     def get_feature_type_of_parameter(self):
         """ Get feature type of selected parameter """
