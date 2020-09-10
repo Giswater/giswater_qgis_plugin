@@ -792,6 +792,33 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity, error_message, count)
 		VALUES (125, 1, 'INFO: No automatic links with out-of-range Longitude found.',v_count);
 	END IF;
+    
+    RAISE NOTICE '25 - Duplicated ID values between arc, node, connec, gully';
+	IF v_project_type = 'WS' THEN
+		v_querytext = 'SELECT node_id AS feature_id FROM node JOIN arc ON arc.arc_id=node.node_id
+					UNION SELECT node_id FROM node JOIN connec ON connec.connec_id=node.node_id
+					UNION SELECT arc.arc_id FROM arc JOIN connec ON connec.connec_id=arc.arc_id';	
+	ELSIF v_project_type = 'UD' THEN
+		v_querytext = 'SELECT node_id AS feature_id FROM node JOIN arc ON arc.arc_id=node.node_id
+					UNION SELECT node_id FROM node JOIN connec ON connec.connec_id=node.node_id
+					UNION SELECT node_id FROM node JOIN gully ON gully.gully_id=node.node_id
+					UNION SELECT connec_id FROM connec JOIN gully ON gully.gully_id=connec.connec_id
+					UNION SELECT arc.arc_id FROM arc JOIN connec ON connec.connec_id=arc.arc_id	
+					UNION SELECT arc.arc_id FROM arc JOIN gully ON gully.gully_id=arc.arc_id';	
+	END IF;
+
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+
+	IF v_count = 1 THEN
+		INSERT INTO audit_check_data (fid, criticity, error_message)
+		VALUES (125, 2, concat('WARNING: There is ',v_count,' feature with duplicated ID value between arc, node, connec, gully '));
+	ELSIF v_count > 1 THEN
+		INSERT INTO audit_check_data (fid, criticity, error_message)
+		VALUES (125, 2, concat('WARNING: There are ',v_count,' features with duplicated ID values between arc, node, connec, gully '));
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, error_message)
+		VALUES (125, 1, 'INFO: All features have a diferent ID to be correctly identified');
+	END IF;
 		
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 3, '');
