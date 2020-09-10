@@ -9,7 +9,7 @@ from qgis.core import QgsVectorLayer
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsGeometry
 from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QStringListModel
-from qgis.PyQt.QtGui import QColor, QStandardItemModel, QStandardItem
+from qgis.PyQt.QtGui import QColor, QFontMetrics, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QCompleter, QDateEdit, QDoubleSpinBox, QFrame, QSpinBox, QToolButton
 from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QApplication
@@ -265,6 +265,18 @@ def add_textarea(field):
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
         widget.setText(field['value'])
+
+    # Set height as a function of text lines
+    font = widget.document().defaultFont()
+    fm = QFontMetrics(font)
+    text_size = fm.size(0, widget.toPlainText())
+    if text_size.height() < 26:
+        widget.setMinimumHeight(36)
+        widget.setMaximumHeight(36)
+    else:
+        # Need to modify to avoid scroll
+        widget.setMaximumHeight(text_size.height() + 10)
+
     if 'iseditable' in field:
         widget.setReadOnly(not field['iseditable'])
         if not field['iseditable']:
@@ -462,7 +474,10 @@ def add_combobox(field):
         widget.setProperty('selectedId', field['selectedId'])
     else:
         widget.setProperty('selectedId', None)
-
+    if 'iseditable' in field:
+        widget.setEnabled(field['iseditable'])
+        if not field['iseditable']:
+            widget.setStyleSheet("QComboBox { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
     return widget
 
 
@@ -1038,7 +1053,7 @@ def get_values_changed_param_user(dialog, chk, widget, field, list, value=None):
 def get_values(dialog, widget, _json=None, layer=None):
 
     value = None
-    if type(widget) in(QLineEdit, QSpinBox, QDoubleSpinBox) and widget.isReadOnly() is False:
+    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit) and widget.isReadOnly() is False:
         value = qt_tools.getWidgetText(dialog, widget, return_string_null=False)
     elif type(widget) is QComboBox and widget.isEnabled():
         value = qt_tools.get_item_data(dialog, widget, 0)
