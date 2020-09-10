@@ -771,6 +771,7 @@ class ApiCF(ApiParent, QObject):
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
         widget = self.add_textarea(field)
+        widget = self.set_auto_update_textarea(field, dialog, widget)
         return widget
 
 
@@ -931,44 +932,50 @@ class ApiCF(ApiParent, QObject):
 
 
     def disable_all(self, dialog, result, enable):
-
-        widget_list = dialog.findChildren(QWidget)
-        for widget in widget_list:
-            for field in result['fields']:
-                if widget.objectName() == field['widgetname']:
-                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
-                        widget.setReadOnly(not enable)
-                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                    elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
-                        widget.setEnabled(enable)
-                    elif type(widget) is QPushButton:
-                        # Manage the clickability of the buttons according to the configuration
-                        # in the table config_api_form_fields simultaneously with the edition,
-                        # but giving preference to the configuration when iseditable is True
-                        if not field['iseditable']:
-                            widget.setEnabled(field['iseditable'])
-
-        self.new_feature_id = None
+        try:
+            widget_list = dialog.findChildren(QWidget)
+            for widget in widget_list:
+                for field in result['fields']:
+                    if widget.objectName() == field['widgetname']:
+                        if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
+                            widget.setReadOnly(not enable)
+                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                        elif type(widget) in (QCheckBox, QComboBox, QgsDateTimeEdit):
+                            widget.setEnabled(enable)
+                            widget.setStyleSheet("QWidget {color: rgb(0, 0, 0)}")
+                        elif type(widget) is QPushButton:
+                            # Manage the clickability of the buttons according to the configuration
+                            # in the table config_api_form_fields simultaneously with the edition,
+                            # but giving preference to the configuration when iseditable is True
+                            if not field['iseditable']:
+                                widget.setEnabled(field['iseditable'])
+        except RuntimeError:
+            pass
+        finally:
+            self.new_feature_id = None
 
 
     def enable_all(self, dialog, result):
-
-        widget_list = dialog.findChildren(QWidget)
-        for widget in widget_list:
-            for field in result['fields']:
-                if widget.objectName() == field['widgetname']:
-                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
-                        widget.setReadOnly(not field['iseditable'])
-                        if not field['iseditable']:
-                            widget.setFocusPolicy(Qt.NoFocus)
-                            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                        else:
-                            widget.setFocusPolicy(Qt.StrongFocus)
-                            widget.setStyleSheet("QLineEdit { background: rgb(255, 255, 255); color: rgb(0, 0, 0)}")
-                    elif type(widget) in(QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
-                        widget.setEnabled(field['iseditable'])
-                        widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
-                            field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
+        try:
+            widget_list = dialog.findChildren(QWidget)
+            for widget in widget_list:
+                for field in result['fields']:
+                    if widget.objectName() == field['widgetname']:
+                        if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
+                            widget.setReadOnly(not field['iseditable'])
+                            if not field['iseditable']:
+                                widget.setFocusPolicy(Qt.NoFocus)
+                                widget.setStyleSheet(None)
+                            else:
+                                widget.setFocusPolicy(Qt.StrongFocus)
+                                widget.setStyleSheet(None)
+                        elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
+                            widget.setStyleSheet(None)
+                            widget.setEnabled(field['iseditable'])
+                            widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
+                                field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
+        except RuntimeError:
+            pass
 
 
     def enable_actions(self, enabled):
