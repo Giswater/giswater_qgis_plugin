@@ -484,12 +484,12 @@ BEGIN
 
 		-- Get editability
 		------------------------
-		IF v_editable THEN 
+		IF v_editable IS FALSE THEN 
+			v_editable := FALSE;
+		ELSE
 			EXECUTE 'SELECT gw_fct_getpermissions($${"tableName":"'||quote_ident(v_tablename)||'"}$$::json)'
 				INTO v_permissions;
 				v_editable := v_permissions->>'isEditable';
-		ELSE
-			v_editable := FALSE;
 		END IF;
 	
 		--  Get if field's table are configured on config_info_layer_field
