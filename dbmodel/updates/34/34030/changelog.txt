@@ -1,4 +1,4 @@
-3.4.018
+3.4.030
 *************
 - Enhance grafanalytics function using config_valve table
 - Bug fix from previous developments
