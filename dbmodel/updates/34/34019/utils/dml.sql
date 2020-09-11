@@ -32,9 +32,13 @@ INSERT INTO config_toolbox VALUES (2524, 'Import swmm inp file', TRUE, '{"featur
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle) VALUES ('datatype_typevalue', 'text', 'text', 'text')
 ON CONFLICT (typevalue, id) DO NOTHING;
 
+--update user's vdefault
+UPDATE sys_param_user SET id = concat('edit_', sys_param_user.id) 
+FROM sys_addfields WHERE sys_param_user.id = concat(param_name,'_','_vdefault');
+
+
 --update addfields vdefault
-UPDATE sys_param_user SET id = concat('edit_addfield_', sys_param_user.id) 
-FROM sys_addfields WHERE sys_param_user.id = concat(param_name,'_',lower(cat_feature_id),'_vdefault');
+UPDATE config_param_user SET parameter = concat('edit_', parameter) FROM sys_param_user WHERE sys_param_user.id = concat('edit_',parameter);
 
 
 UPDATE config_param_user SET parameter = concat('edit_addfield_',config_param_user.parameter ) 
@@ -45,6 +49,7 @@ DELETE FROM sys_param_user WHERE id IN (SELECT concat(lower(id),'_vdefault') FRO
 
 DELETE FROM config_param_user WHERE parameter IN (SELECT concat(lower(id),'_vdefault') FROM cat_feature);
 
+DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM sys_param_user) ;
 
 
 /*
@@ -93,3 +98,6 @@ DELETE FROM sys_function WHERE function_name='gw_trg_edit_lot_x_user';
 DELETE FROM sys_function WHERE function_name='gw_trg_edit_team_x_user';
 DELETE FROM sys_function WHERE function_name='gw_trg_edit_team_x_vehicle';
 DELETE FROM sys_function WHERE function_name='gw_trg_edit_team_x_visitclass';
+
+UPDATE sys_table SET sys_role = 'role_basic' WHERE id = 'audit_check_data';
+UPDATE sys_table SET sys_role = 'role_basic' WHERE id = 'selector_inp_hydrology';
