@@ -133,10 +133,8 @@ WITH query_node AS (SELECT node_id, elevation, depth, nodetype_id, staticpressur
     arc.depth,
     arc.adate,
     arc.adescript,
-    sector.stylesheet AS sector_style,
     dma.stylesheet AS dma_style,
-    presszone.stylesheet AS presszone_style,
-    dqa.stylesheet AS dqa_style
+    presszone.stylesheet AS presszone_style
    FROM arc
      LEFT JOIN sector ON arc.sector_id = sector.sector_id
      LEFT JOIN exploitation ON arc.expl_id = exploitation.expl_id
