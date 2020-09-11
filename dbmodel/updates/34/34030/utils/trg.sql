@@ -37,3 +37,11 @@ CREATE INDEX anl_connec_index
   ON anl_connec
   USING gist
   (the_geom);
+  
+  
+ALTER TABLE temp_csv DROP CONSTRAINT temp_csv2pg_csv2pgcat_id_fkey2;
+
+ALTER TABLE temp_csv
+  ADD CONSTRAINT temp_csv_fid_fkey FOREIGN KEY (fid)
+      REFERENCES sys_fprocess (fid) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE RESTRICT;
