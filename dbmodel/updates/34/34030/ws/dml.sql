@@ -55,8 +55,6 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, input_p
 VALUES (2980, 'gw_fct_setmincut', 'utils', 'function', 'json', 'json', NULL, 'role_edit') ON CONFLICT (id) DO NOTHING;
 
 
-
-
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2244,'gw_fct_mincut_result_overlap','{"style":{"point":{"style":"qml", "id":"106"},  "line":{"style":"qml", "id":"105"}, "polygon":{"style":"qml", "id":"107"}}}',NULL,NULL) 
 ON CONFLICT (id) DO NOTHING;
