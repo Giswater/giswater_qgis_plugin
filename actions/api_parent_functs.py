@@ -26,7 +26,7 @@ from functools import partial
 from .. import global_vars
 from lib import qt_tools
 from ..core.utils.hyperlink_label import GwHyperLinkLabel
-from .parent_functs import create_body, draw_polyline, get_points, open_file_path, set_style_mapzones
+from .parent_functs import create_body, draw_polyline, get_points, open_file_path, zoom_to_rectangle
 from ..core.utils.giswater_tools import close_dialog
 from ..core.utils.layer_tools import manage_geometry, export_layer_to_db, delete_layer_from_toc, from_dxf_to_toc
 
@@ -1498,14 +1498,16 @@ def set_selector(dialog, widget, is_alone, selector_vars):
     json_result = global_vars.controller.get_json('gw_fct_setselectors', body, log_sql=True)
 
     if str(tab_name) == 'tab_exploitation':
-
-        # Zoom to exploitation
-        x1 = json_result['body']['data']['geometry']['x1']
-        y1 = json_result['body']['data']['geometry']['y1']
-        x2 = json_result['body']['data']['geometry']['x2']
-        y2 = json_result['body']['data']['geometry']['y2']
-        if x1 is not None:
-            self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+        try:
+            # Zoom to exploitation
+            x1 = json_result['body']['data']['geometry']['x1']
+            y1 = json_result['body']['data']['geometry']['y1']
+            x2 = json_result['body']['data']['geometry']['x2']
+            y2 = json_result['body']['data']['geometry']['y2']
+            if x1 is not None:
+                zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+        except KeyError:
+            pass
 
     # Refresh canvas
     global_vars.controller.set_layer_index('v_edit_arc')
