@@ -1554,25 +1554,6 @@ class GwInfo(QObject):
         return widget
 
 
-    def set_auto_update_textarea(self, field, dialog, widget):
-
-        if self.check_tab_data(dialog):
-            if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
-                _json = {}
-                widget.textChanged.connect(partial(self.clean_my_json, widget))
-                widget.textChanged.connect(partial(self.get_values, dialog, widget, _json, self.layer))
-                widget.textChanged.connect(
-                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
-            else:
-                widget.textChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
-
-            widget.textChanged.connect(partial(self.enabled_accept, dialog))
-            widget.textChanged.connect(partial(self.check_datatype_validator, dialog, widget, dialog.btn_accept))
-            widget.textChanged.connect(partial(self.check_min_max_value, dialog, widget, dialog.btn_accept))
-
-        return widget
-
-
     def reload_fields(self, dialog, result, p_widget):
         """
         :param dialog: QDialog where find and set widgets
