@@ -308,6 +308,10 @@ class ManageVisit(ParentManage, QObject):
         # Update geometry field (if user have selected a point)
         if self.x:
             self.update_geom()
+            
+        layer = self.controller.get_layer_by_tablename('v_edit_om_visit')
+        if layer:
+            layer.dataProvider().forceReload()
 
         # If new visit, execute PG function
         if self.it_is_new_visit:
@@ -392,7 +396,7 @@ class ManageVisit(ParentManage, QObject):
 
         # C) load all related events in the relative table
         self.filter = f"visit_id = '{text}'"
-        table_name = f"{self.schema_name}.om_visit_event"
+        table_name = f"{self.schema_name}.v_ui_om_event"
         self.fill_table_object(self.tbl_event, table_name, self.filter)
         self.set_configuration(dialog, self.tbl_event, table_name)
         self.manage_events_changed()
