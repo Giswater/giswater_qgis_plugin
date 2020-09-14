@@ -22,6 +22,7 @@ DECLARE
 	v_idvnode text;
 	v_channel text;
 	v_schemaname text;
+	v_arc_id text;
 	
 BEGIN 
 
@@ -30,30 +31,43 @@ BEGIN
 	v_table_name:= TG_ARGV[0];
 	v_schemaname='SCHEMA_NAME';
 
+	-- getting table
 	IF v_table_name = 'connec' THEN
 		SELECT the_geom INTO v_feature_geom FROM connec WHERE connec_id=NEW.connec_id;
 	ELSIF v_table_name = 'gully' THEN
 		SELECT the_geom INTO v_feature_geom FROM gully WHERE gully_id=NEW.gully_id;
 	END IF;
-	
-	-- update values on plan psector table
-	IF NEW.userdefined_geom IS NOT TRUE THEN
-		v_link_geom := ST_ShortestLine(v_feature_geom, (SELECT the_geom FROM arc WHERE arc_id=NEW.arc_id));
-		v_vnode_geom = ST_EndPoint(v_link_geom);
-		
-		IF NEW.arc_id IS NULL THEN 
-			v_userdefined_geom=NULL;
-		ELSE
-			v_userdefined_geom=FALSE;
-		END IF;
-	ELSE	
-		v_arc_geom = (SELECT the_geom FROM arc WHERE arc_id=NEW.arc_id);
-		v_point_aux := St_closestpoint(v_arc_geom, St_endpoint(v_link_geom));
-		v_link_geom  := ST_SetPoint(v_link_geom, ST_NumPoints(v_link_geom) - 1, v_point_aux);
-		v_vnode_geom = ST_EndPoint(v_link_geom);
-		v_userdefined_geom = TRUE;
+
+
+	-- getting arc_geom
+	IF NEW.arc_id IS NOT NULL THEN
+		v_arc_geom =  (SELECT the_geom FROM arc WHERE arc_id=NEW.arc_id);
+	ELSE
+		-- getting closest arc
+		SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, v_edit_connec c WHERE st_dwithin(a.the_geom, c.the_geom, 100) AND connec_id = NEW.connec_id AND a.state = 2
+		ORDER BY st_distance (a.the_geom, c.the_geom) LIMIT 1;
+
+		-- this update makes a recall of self.trigger but in this case with NEW.arc_id IS NOT NULL recall will finish next one
+		UPDATE plan_psector_x_connec SET arc_id = v_arc_id WHERE id=NEW.id;
 	END IF;
 
+	IF v_arc_geom IS NOT NULL THEN
+
+		-- update values on plan psector table
+		IF NEW.userdefined_geom IS NOT TRUE THEN
+			v_link_geom := ST_ShortestLine(v_feature_geom, v_arc_geom);
+			v_vnode_geom = ST_EndPoint(v_link_geom);
+			v_userdefined_geom=FALSE;
+		ELSE	
+			v_point_aux := St_closestpoint(v_arc_geom, St_endpoint(v_link_geom));
+			v_link_geom  := ST_SetPoint(v_link_geom, ST_NumPoints(v_link_geom) - 1, v_point_aux);
+			v_vnode_geom = ST_EndPoint(v_link_geom);
+			v_userdefined_geom = TRUE;
+		END IF;
+	ELSE
+		v_link_geom =  NULL;
+		v_vnode_geom =  NULL;
+	END IF;
 
 	-- update plan_psector tables
 	IF v_table_name = 'connec' THEN

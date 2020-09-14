@@ -54,6 +54,8 @@ v_array_node_id json;
 v_node_id text;
 v_workcat_id_end text;
 v_enddate date;
+v_state_node int2;
+v_state_arc int2;
 
 BEGIN
 
@@ -84,13 +86,10 @@ BEGIN
     INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (214, null, 4, 'ARC FUSION');
     INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (214, null, 4, '-------------------------------------------------------------');
 
-
     -- Check if the node exists
     SELECT node_id INTO v_exists_node_id FROM v_edit_node WHERE node_id = v_node_id;
     SELECT the_geom INTO v_node_geom FROM node WHERE node_id = v_node_id;
-
-   
-
+ 
     -- Compute proceed
     IF FOUND THEN
 
@@ -107,173 +106,202 @@ BEGIN
             SELECT * INTO v_my_record1 FROM v_edit_arc WHERE node_1 = v_node_id OR node_2 = v_node_id ORDER BY arc_id DESC LIMIT 1;
             SELECT * INTO v_my_record2 FROM v_edit_arc WHERE node_1 = v_node_id OR node_2 = v_node_id ORDER BY arc_id ASC LIMIT 1;
 
+            -- get states
+            SELECT state INTO v_state_node FROM node WHERE node_id = v_node_id;
+            SELECT state INTO v_state_arc FROM arc WHERE arc_id = v_my_record1.arc_id;
+            
             INSERT INTO audit_check_data (fid,  criticity, error_message)
             VALUES (214, 1, concat('Arcs related to selected node: ', v_my_record1.arc_id,', ',v_my_record2.arc_id,'.'));
 
             -- Compare arcs
-            IF  v_my_record1.arccat_id = v_my_record2.arccat_id AND
-                v_my_record1.sector_id = v_my_record2.sector_id AND
-                v_my_record1.expl_id = v_my_record2.expl_id AND
-                v_my_record1.state = v_my_record2.state
-                THEN
+            IF  v_my_record1.arccat_id = v_my_record2.arccat_id AND v_my_record1.sector_id = v_my_record2.sector_id AND
+                v_my_record1.expl_id = v_my_record2.expl_id AND v_my_record1.state = v_my_record2.state THEN
 
-                -- Final geometry
-                IF v_my_record1.node_1 = v_node_id THEN
-                    IF v_my_record2.node_1 = v_node_id THEN
-                        v_point_array1 := ARRAY(SELECT (ST_DumpPoints(ST_Reverse(v_my_record1.the_geom))).geom);
-                        v_point_array2 := array_cat(v_point_array1, ARRAY(SELECT (ST_DumpPoints(v_my_record2.the_geom)).geom));
-                    ELSE
-                        v_point_array1 := ARRAY(SELECT (ST_DumpPoints(v_my_record2.the_geom)).geom);
-                        v_point_array2 := array_cat(v_point_array1, ARRAY(SELECT (ST_DumpPoints(v_my_record1.the_geom)).geom));
-                    END IF;
-                ELSE
-                    IF v_my_record2.node_1 = v_node_id THEN
-                        v_point_array1 := ARRAY(SELECT (ST_DumpPoints(v_my_record1.the_geom)).geom);
-                        v_point_array2 := array_cat(v_point_array1, ARRAY(SELECT (ST_DumpPoints(v_my_record2.the_geom)).geom));
-                    ELSE
-                        v_point_array1 := ARRAY(SELECT (ST_DumpPoints(v_my_record2.the_geom)).geom);
-                        v_point_array2 := array_cat(v_point_array1, ARRAY(SELECT (ST_DumpPoints(ST_Reverse(v_my_record1.the_geom))).geom));
-                    END IF;
-                END IF;
+			-- Final geometry
+			IF v_my_record1.node_1 = v_node_id THEN
+			    IF v_my_record2.node_1 = v_node_id THEN
+				v_point_array1 := ARRAY(SELECT (ST_DumpPoints(ST_Reverse(v_my_record1.the_geom))).geom);
+				v_point_array2 := array_cat(v_point_array1, ARRAY(SELECT (ST_DumpPoints(v_my_record2.the_geom)).geom));
+			    ELSE
+				v_point_array1 := ARRAY(SELECT (ST_DumpPoints(v_my_record2.the_geom)).geom);
+				v_point_array2 := array_cat(v_point_array1, ARRAY(SELECT (ST_DumpPoints(v_my_record1.the_geom)).geom));
+			    END IF;
+			ELSE
+			    IF v_my_record2.node_1 = v_node_id THEN
+				v_point_array1 := ARRAY(SELECT (ST_DumpPoints(v_my_record1.the_geom)).geom);
+				v_point_array2 := array_cat(v_point_array1, ARRAY(SELECT (ST_DumpPoints(v_my_record2.the_geom)).geom));
+			    ELSE
+				v_point_array1 := ARRAY(SELECT (ST_DumpPoints(v_my_record2.the_geom)).geom);
+				v_point_array2 := array_cat(v_point_array1, ARRAY(SELECT (ST_DumpPoints(ST_Reverse(v_my_record1.the_geom))).geom));
+			    END IF;
+			END IF;
 
-            v_arc_geom := ST_MakeLine(v_point_array2);
+		    v_arc_geom := ST_MakeLine(v_point_array2);
 
+		    SELECT * INTO v_new_record FROM v_edit_arc WHERE arc_id = v_my_record1.arc_id;
 
-            SELECT * INTO v_new_record FROM v_edit_arc WHERE arc_id = v_my_record1.arc_id;
+		    -- Create a new arc values
+		    v_new_record.the_geom := v_arc_geom;
+		    v_new_record.node_1 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_StartPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
+		    v_new_record.node_2 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
+		    v_new_record.arc_id := (SELECT nextval('urn_id_seq'));
 
-            -- Create a new arc values
-            v_new_record.the_geom := v_arc_geom;
-            v_new_record.node_1 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_StartPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
-            v_new_record.node_2 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
-            v_new_record.arc_id := (SELECT nextval('urn_id_seq'));
+		    --Compare addfields and assign them to new arc
+		    FOR rec_param IN SELECT DISTINCT parameter_id, param_name FROM man_addfields_value
+			JOIN sys_addfields ON sys_addfields.id = man_addfields_value.parameter_id WHERE feature_id=v_my_record1.arc_id
+			OR feature_id=v_my_record2.arc_id
+		    LOOP
 
-            --Compare addfields and assign them to new arc
-            FOR rec_param IN SELECT DISTINCT parameter_id, param_name FROM man_addfields_value
-                JOIN sys_addfields ON sys_addfields.id = man_addfields_value.parameter_id WHERE feature_id=v_my_record1.arc_id
-                OR feature_id=v_my_record2.arc_id
-            LOOP
+		    SELECT * INTO rec_addfield1 FROM man_addfields_value WHERE feature_id=v_my_record1.arc_id and parameter_id=rec_param.parameter_id;
+		    SELECT * INTO rec_addfield2 FROM man_addfields_value WHERE feature_id=v_my_record2.arc_id and parameter_id=rec_param.parameter_id;
 
-            SELECT * INTO rec_addfield1 FROM man_addfields_value WHERE feature_id=v_my_record1.arc_id and parameter_id=rec_param.parameter_id;
-            SELECT * INTO rec_addfield2 FROM man_addfields_value WHERE feature_id=v_my_record2.arc_id and parameter_id=rec_param.parameter_id;
+			IF rec_addfield1.value_param!=rec_addfield2.value_param  THEN
+			    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			    "data":{"message":"3008", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;
 
-                IF rec_addfield1.value_param!=rec_addfield2.value_param  THEN
-                    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                    "data":{"message":"3008", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;
+			ELSIF rec_addfield2.value_param IS NULL and rec_addfield1.value_param IS NOT NULL THEN
+			    UPDATE man_addfields_value SET feature_id=v_new_record.arc_id WHERE feature_id=v_my_record1.arc_id AND parameter_id=rec_param.parameter_id;
+			ELSIF rec_addfield1.value_param IS NULL and rec_addfield2.value_param IS NOT NULL THEN
+			    UPDATE man_addfields_value SET feature_id=v_new_record.arc_id WHERE feature_id=v_my_record2.arc_id AND parameter_id=rec_param.parameter_id;
+			ELSE
+			   UPDATE man_addfields_value SET feature_id=v_new_record.arc_id WHERE feature_id=v_my_record1.arc_id AND parameter_id=rec_param.parameter_id;
+		       END IF;
 
-                ELSIF rec_addfield2.value_param IS NULL and rec_addfield1.value_param IS NOT NULL THEN
-                    UPDATE man_addfields_value SET feature_id=v_new_record.arc_id WHERE feature_id=v_my_record1.arc_id AND parameter_id=rec_param.parameter_id;
-                ELSIF rec_addfield1.value_param IS NULL and rec_addfield2.value_param IS NOT NULL THEN
-                    UPDATE man_addfields_value SET feature_id=v_new_record.arc_id WHERE feature_id=v_my_record2.arc_id AND parameter_id=rec_param.parameter_id;
-                ELSE
-                   UPDATE man_addfields_value SET feature_id=v_new_record.arc_id WHERE feature_id=v_my_record1.arc_id AND parameter_id=rec_param.parameter_id;
-               END IF;
+			IF  rec_addfield1.value_param!=rec_addfield2.value_param  THEN
+			
+			ELSE
+			    v_array_addfields:= array_append(v_array_addfields, rec_param.param_name::text);
+			END IF;
+		    END LOOP;
 
-                IF  rec_addfield1.value_param!=rec_addfield2.value_param  THEN
-                
-                ELSE
-                    v_array_addfields:= array_append(v_array_addfields, rec_param.param_name::text);
-                END IF;
-            END LOOP;
+		    IF v_array_addfields is not null THEN
+			INSERT INTO audit_check_data (fid,  criticity, error_message)
+			VALUES (214, 1, concat('Copy values for addfields: ', array_to_string(v_array_addfields,','),'.'));
+		    END IF;
 
-            IF v_array_addfields is not null THEN
-                INSERT INTO audit_check_data (fid,  criticity, error_message)
-                VALUES (214, 1, concat('Copy values for addfields: ', array_to_string(v_array_addfields,','),'.'));
-            END IF;
+		    -- temporary dissable the arc_searchnodes_control in order to use the node1 and node2 getted before
+		    -- to get values topocontrol arc needs to be before, but this is not possible
+		    UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', false) WHERE parameter = 'edit_arc_searchnodes';
+		    INSERT INTO v_edit_arc SELECT v_new_record.*;
+		    UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', true) WHERE parameter = 'edit_arc_searchnodes';
 
-            -- temporary dissable the arc_searchnodes_control in order to use the node1 and node2 getted before
-            -- to get values topocontrol arc needs to be before, but this is not possible
-            UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', false) WHERE parameter = 'edit_arc_searchnodes';
-            INSERT INTO v_edit_arc SELECT v_new_record.*;
-            UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', true) WHERE parameter = 'edit_arc_searchnodes';
+		    UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
+			    
+		    --Insert data on audit_arc_traceability table
+		    INSERT INTO audit_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", cur_user) 
+		    VALUES ('ARC FUSION', v_new_record.arc_id, v_my_record2.arc_id,v_my_record1.arc_id,v_exists_node_id, CURRENT_TIMESTAMP, CURRENT_USER);
 
-            UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
-                    
-            --Insert data on audit_arc_traceability table
-            INSERT INTO audit_arc_traceability ("type", arc_id, arc_id1, arc_id2, node_id, "tstamp", cur_user) 
-            VALUES ('ARC FUSION', v_new_record.arc_id, v_my_record2.arc_id,v_my_record1.arc_id,v_exists_node_id, CURRENT_TIMESTAMP, CURRENT_USER);
-                
-            -- Update complementary information from old arcs to new one
-            SELECT count(id) INTO v_count FROM element_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-            IF v_count > 0 THEN
-                UPDATE element_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			-- update nodes
+			SELECT count(node_id) INTO v_count FROM node WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			IF v_count > 0 THEN
+				UPDATE node SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
-                INSERT INTO audit_check_data (fid,  criticity, error_message)
-                VALUES (214, 1, concat('Copy ',v_count,' elements from old arcs to new one.'));
-            END IF;
+				INSERT INTO audit_check_data (fid,  criticity, error_message)
+				VALUES (214, 1, concat('Reconnect ',v_count,' nodes.'));
+			END IF;
 
-            SELECT count(id) INTO v_count FROM doc_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-            IF v_count > 0 THEN
-                UPDATE doc_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			-- update links related to node
+			IF  (SELECT link_id FROM link WHERE exit_type='NODE' and exit_id=v_node_id LIMIT 1) IS NOT NULL THEN
+			    
+				-- insert one vnode (indenpendently of the number of links. Only one vnode must replace the node)
+				INSERT INTO vnode (state, the_geom) 
+				VALUES (v_new_record.state, v_node_geom) 
+				RETURNING vnode_id INTO v_vnode;
+				
+				-- update link with new vnode
+				UPDATE link SET exit_type='VNODE', exit_id=v_vnode WHERE exit_type='NODE' and exit_id=v_node_id;  
+			END IF;    
+			
+		    IF v_state_node = 1 THEN
 
-                INSERT INTO audit_check_data (fid,  criticity, error_message)
-                VALUES (214, 1, concat('Copy ',v_count,' documents from old arcs to new one.'));
-            END IF;
+			-- update elements
+			SELECT count(id) INTO v_count FROM element_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			IF v_count > 0 THEN
+				UPDATE element_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
-            SELECT count(id) INTO v_count FROM om_visit_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-            IF v_count > 0 THEN
-                UPDATE om_visit_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+				INSERT INTO audit_check_data (fid,  criticity, error_message)
+				VALUES (214, 1, concat('Copy ',v_count,' elements from old arcs to new one.'));
+			END IF;
 
-                INSERT INTO audit_check_data (fid,  criticity, error_message)
-                VALUES (214, 1, concat('Copy ',v_count,' visits from old arcs to new one.'));
-            END IF;
+			-- update documents
+			SELECT count(id) INTO v_count FROM doc_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			IF v_count > 0 THEN
+				UPDATE doc_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
-            SELECT count(connec_id) INTO v_count FROM connec WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-            IF v_count > 0 THEN
-               UPDATE connec SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+				INSERT INTO audit_check_data (fid,  criticity, error_message)
+				VALUES (214, 1, concat('Copy ',v_count,' documents from old arcs to new one.'));
+			END IF;
 
-                INSERT INTO audit_check_data (fid,  criticity, error_message)
-                VALUES (214, 1, concat('Reconnect ',v_count,' connecs.'));
-            END IF;
+			-- update visits
+			SELECT count(id) INTO v_count FROM om_visit_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			IF v_count > 0 THEN
+				UPDATE om_visit_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
-            SELECT count(node_id) INTO v_count FROM node WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-            IF v_count > 0 THEN
-                UPDATE node SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+				INSERT INTO audit_check_data (fid,  criticity, error_message)
+				VALUES (214, 1, concat('Copy ',v_count,' visits from old arcs to new one.'));
+			END IF;
+		    
+			-- update connecs
+			SELECT count(connec_id) INTO v_count FROM connec WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			IF v_count > 0 THEN
+				UPDATE connec SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
-                INSERT INTO audit_check_data (fid,  criticity, error_message)
-                VALUES (214, 1, concat('Reconnect ',v_count,' nodes.'));
-            END IF;
+				INSERT INTO audit_check_data (fid,  criticity, error_message)
+				VALUES (214, 1, concat('Reconnect ',v_count,' connecs.'));
+			END IF;
 
-            -- update links related to node
-            IF  (SELECT link_id FROM link WHERE exit_type='NODE' and exit_id=v_node_id LIMIT 1) IS NOT NULL THEN
-            
-                -- insert one vnode (indenpendently of the number of links. Only one vnode must replace the node)
-                INSERT INTO vnode (state, the_geom) 
-                VALUES (v_new_record.state, v_node_geom) 
-                RETURNING vnode_id INTO v_vnode;
-                
-                -- update link with new vnode
-                UPDATE link SET exit_type='VNODE', exit_id=v_vnode WHERE exit_type='NODE' and exit_id=v_node_id;  
-            END IF;
-    
-            IF v_project_type='UD' THEN
-                SELECT count(gully_id) INTO v_count FROM gully WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-                IF v_count > 0 THEN
-                    UPDATE gully SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			-- update gullies
+			IF v_project_type='UD' THEN
+				SELECT count(gully_id) INTO v_count FROM gully WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			IF v_count > 0 THEN
+				UPDATE gully SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
-                    INSERT INTO audit_check_data (fid,  criticity, error_message)
-                    VALUES (214, 1, concat('Reconnect ',v_count,' gullies.'));
-                END IF;
-                
-            END IF;
+				INSERT INTO audit_check_data (fid,  criticity, error_message)
+				    VALUES (214, 1, concat('Reconnect ',v_count,' gullies.'));
+				END IF;
+			END IF;
 
-            -- Delete information of arc deleted
-            DELETE FROM arc WHERE arc_id = v_my_record1.arc_id;
-            DELETE FROM arc WHERE arc_id = v_my_record2.arc_id;
+			-- Delete arcs
+			DELETE FROM arc WHERE arc_id = v_my_record1.arc_id;
+			DELETE FROM arc WHERE arc_id = v_my_record2.arc_id;
 
-            INSERT INTO audit_check_data (fid,  criticity, error_message)
-            VALUES (214, 1, concat('Delete arcs: ',v_my_record1.arc_id,', ',v_my_record2.arc_id,'.'));
+			-- Moving to obsolete the previous node
+			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Change state of node  ',v_node_id,' to obsolete.'));
+			UPDATE node SET state=0, workcat_id_end=v_workcat_id_end, enddate=v_enddate WHERE node_id = v_node_id;
+		    
+		    ELSIF v_state_node = 2 THEN -- psector
 
-            -- create links that were related to deprecated node
-        
-            -- Moving to obsolete the previous node
-            UPDATE node SET state=0, workcat_id_end=v_workcat_id_end, enddate=v_enddate WHERE node_id = v_node_id;
+			-- update connecs
+			SELECT count(connec_id) INTO v_count FROM plan_psector_x_connec WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			IF v_count > 0 THEN
+				UPDATE plan_psector_x_connec SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Reconnect ',v_count,' connecs.'));
+			END IF;
 
-            INSERT INTO audit_check_data (fid,  criticity, error_message)
-            VALUES (214, 1, concat('Change state of node  ',v_node_id,' to obsolete.'));
+			-- update gullies
+			IF v_project_type = 'UD' THEN
+				SELECT count(gully_id) INTO v_count FROM plan_psector_x_gully WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+				IF v_count > 0 THEN
+					UPDATE plan_psector_x_gully SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+					INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Reconnect ',v_count,' gullies.'));
+				END IF;
+			END IF;
+			
+			-- Delete arcs
+			DELETE FROM arc WHERE arc_id = v_my_record1.arc_id;
+			DELETE FROM arc WHERE arc_id = v_my_record2.arc_id;
+
+			-- Delete node
+			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Delete planned node ',v_node_id));
+			DELETE FROM node WHERE node_id = v_node_id;
+		
+		    END IF;
+		    
+		    INSERT INTO audit_check_data (fid,  criticity, error_message)
+		    VALUES (214, 1, concat('Delete arcs: ',v_my_record1.arc_id,', ',v_my_record2.arc_id,'.'));
 
             -- Arcs has different types
             ELSE
-
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                 "data":{"message":"2004", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;
 
@@ -281,7 +309,6 @@ BEGIN
          
         -- Node has not 2 arcs
         ELSE
-
             EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
             "data":{"message":"2006", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;  
         END IF;
