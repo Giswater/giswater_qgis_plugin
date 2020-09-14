@@ -59,7 +59,8 @@ BEGIN
 
 	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_info_layer_x_type) THEN
 		INSERT INTO sys_table(id, descript, sys_role, sys_criticity, qgis_role_id, qgis_criticity)
-	    VALUES (v_view_name, concat('Custom editable view for ',v_cat_feature), 'role_edit', 0, null,0);
+	    VALUES (v_view_name, concat('Custom editable view for ',v_cat_feature), 'role_edit', 0, null,0)
+	    ON CONFLICT (id) DO NOTHING;
 
 	    PERFORM gw_fct_admin_role_permissions();
 	
@@ -136,7 +137,7 @@ BEGIN
 		INSERT INTO config_form_fields (formname,formtype,columnname,datatype,widgettype, layoutname, layoutorder,
 			label, ismandatory, isparent, iseditable, isautoupdate) 
 		VALUES (v_view_name,'form_feature', rec.column_name, v_datatype, v_widgettype, 'lyt_data_1',v_orderby, 
-			rec.column_name, false, false,true,false);
+			rec.column_name, false, false,true,false) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
 	END LOOP;
 
@@ -168,7 +169,7 @@ BEGIN
 		INSERT INTO config_form_fields (formname,formtype,columnname,datatype,widgettype, layoutname,layoutorder,
 			label, ismandatory,isparent,iseditable,isautoupdate) 
 		VALUES (v_view_name,'form_feature',rec.param_name, v_datatype,v_widgettype, 'lyt_data_1',v_orderby,
-			rec.param_name, rec.is_mandatory, false,rec.iseditable,false);
+			rec.param_name, rec.is_mandatory, false,rec.iseditable,false) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 				
 	END LOOP;
 
