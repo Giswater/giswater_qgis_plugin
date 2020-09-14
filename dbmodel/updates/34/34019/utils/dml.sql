@@ -98,6 +98,7 @@ DELETE FROM sys_function WHERE function_name='gw_trg_edit_lot_x_user';
 DELETE FROM sys_function WHERE function_name='gw_trg_edit_team_x_user';
 DELETE FROM sys_function WHERE function_name='gw_trg_edit_team_x_vehicle';
 DELETE FROM sys_function WHERE function_name='gw_trg_edit_team_x_visitclass';
+DELETE FROM sys_function WHERE function_name='gw_fct_setvehicleload';
 
 UPDATE sys_table SET sys_role = 'role_basic' WHERE id = 'audit_check_data';
 UPDATE sys_table SET sys_role = 'role_basic' WHERE id = 'selector_inp_hydrology';
