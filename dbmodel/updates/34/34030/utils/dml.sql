@@ -251,7 +251,6 @@ UPDATE om_typevalue SET addparam = '{"go2plan":true}' WHERE typevalue = 'visit_p
 UPDATE config_user_x_expl SET active = TRUE;
 UPDATE config_visit_class_x_feature SET active = TRUE;
 UPDATE config_visit_class_x_parameter SET active = TRUE;
-UPDATE config_visit_class_x_workorder SET active = TRUE;
 UPDATE config_visit_parameter SET active = TRUE;
 UPDATE sys_foreignkey SET active = TRUE;
 
