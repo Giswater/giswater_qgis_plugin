@@ -299,6 +299,10 @@ class GwVisitManager(ParentManage, QObject):
         # Update geometry field (if user have selected a point)
         if self.x:
             self.update_geom()
+            
+        layer = self.controller.get_layer_by_tablename('v_edit_om_visit')
+        if layer:
+            layer.dataProvider().forceReload()
 
         # If new visit, execute PG function
         if self.it_is_new_visit:
