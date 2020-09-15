@@ -23,7 +23,7 @@ SELECT gw_fct_om_check_data($${
 SELECT * FROM audit_check_data WHERE fid = 125
 
 --fid:  main: 125
-	other: 104,187,188,196,197,201,202,203,204,205,206,
+	other: 104,187,188,196,197,201,202,203,204,205,257,
 
 */
 
@@ -75,8 +75,8 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid = 125 AND cur_user=current_user;
 	
 	-- delete old values on anl table
-	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (110,201,202,204,205,206);
-	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (104, 196, 197, 188, 123, 202 );
+	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (210,201,202,204,205,257);
+	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (103, 196, 197, 188, 223, 202 );
 	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (177,187, 202);
 
 	-- Starting process
@@ -109,24 +109,24 @@ BEGIN
 	END IF;
 
 	
-	RAISE NOTICE '02 - Check node_1 or node_2 nulls (fid:  104)';
+	RAISE NOTICE '02 - Check node_1 or node_2 nulls (fid:  103)';
 	v_querytext = '(SELECT arc_id,arccat_id,the_geom FROM '||v_edit||'arc WHERE state > 0 AND node_1 IS NULL UNION SELECT arc_id, arccat_id, the_geom FROM '
 	||v_edit||'arc WHERE state > 0 AND node_2 IS NULL) a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom)
-			SELECT 104, arc_id, arccat_id, ''node_1 or node_2 nulls'', the_geom FROM ', v_querytext);
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 3, concat('ERROR: There is/are ',v_count,' arc''s without node_1 or node_2.'),v_count);
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
+			SELECT 103, arc_id, arccat_id, ''node_1 or node_2 nulls'', the_geom FROM ', v_querytext);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 3, '103', concat('ERROR: There is/are ',v_count,' arc''s without node_1 or node_2.'),v_count);
+		INSERT INTO audit_check_data (fid,criticity,  error_message, count)
 		VALUES (125, 3, concat('SELECT * FROM anl_arc WHERE fid = 104 AND cur_user=current_user'), v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: No arc''s without node_1 or node_2 nodes found.', v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+		VALUES (125, 1, '103','INFO: No arc''s without node_1 or node_2 nodes found.', v_count);
 	END IF;
 
-	RAISE NOTICE '03 - Chec state 1 arcs with state 0 nodes (196)';
+	RAISE NOTICE '03 - Check state 1 arcs with state 0 nodes (196)';
 	v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a JOIN '||v_edit||'node n ON node_1=node_id WHERE a.state =1 AND n.state=0 UNION
 			SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a JOIN '||v_edit||'node n ON node_2=node_id WHERE a.state =1 AND n.state=0) a';
 			
@@ -135,16 +135,16 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom)
 		SELECT 196, arc_id, arccat_id, ''Arc with state=1 using nodes with state = 0'', the_geom FROM ', v_querytext);
 
-		INSERT INTO audit_check_data (fid,  criticity, error_message, count)
-		VALUES (125, 3, concat('ERROR: There is/are ',v_count,' arcs with state=1 using extremals nodes with state = 0. Please, check your data before continue'),v_count);
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 3,'196', concat('ERROR: There is/are ',v_count,' arcs with state=1 using extremals nodes with state = 0. Please, check your data before continue'),v_count);
+		INSERT INTO audit_check_data (fid,criticity, error_message, count)
 		VALUES (125, 3, concat('SELECT * FROM anl_arc WHERE fid = 196 AND cur_user=current_user'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: No arcs with state=1 using nodes with state=0 found.',v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+		VALUES (125, 1,'196', 'INFO: No arcs with state=1 using nodes with state=0 found.',v_count);
 	END IF;
 
-	RAISE NOTICE '04 - check conduits (UD) with negative slope and inverted slope is not checked';
+	RAISE NOTICE '04 - check conduits (UD) with negative slope and inverted slope is not checked (251)';
 	IF v_project_type  ='UD' THEN
 
 		IF v_edit IS NULL THEN 
@@ -155,17 +155,17 @@ BEGIN
 		
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid,  criticity, error_message)
-			VALUES (125, 3, concat('ERROR: There is/are ',v_count,' arcs with inverted slope false and slope negative values. Please, check your data before continue'));
-			INSERT INTO audit_check_data (fid, criticity, error_message)
-			VALUES (125, 3, concat('SELECT * FROM (v_edit)arc WHERE state > 0 AND (sys_)slope < 0 AND inverted_slope IS FALSE'));
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 3, '251',concat('ERROR: There is/are ',v_count,' arcs with inverted slope false and slope negative values. Please, check your data before continue'),v_count);
+			INSERT INTO audit_check_data (fid, criticity,  error_message, count)
+			VALUES (125, 3, concat('SELECT * FROM (v_edit)arc WHERE state > 0 AND slope < 0 AND inverted_slope IS FALSE'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 1, 'INFO: No arcs with inverted slope checked found.',v_count);
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 1, '251','INFO: No arcs with inverted slope checked found.',v_count);
 		END IF;	
 	END IF;
 
-	RAISE NOTICE '05 - Chec state 1 arcs with state 2 nodes (197)';
+	RAISE NOTICE '05 - Check state 1 arcs with state 2 nodes (197)';
 	v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a JOIN '||v_edit||'node n ON node_1=node_id WHERE a.state =1 AND n.state=2 UNION
 			SELECT a.arc_id, arccat_id, a.the_geom FROM '||v_edit||'arc a JOIN '||v_edit||'node n ON node_2=node_id WHERE a.state =1 AND n.state=2) a';
 			
@@ -174,16 +174,16 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom)
 		SELECT 197, arc_id, arccat_id, ''Arcs with state=1 using nodes with state = 2'', the_geom FROM ', v_querytext);
 
-		INSERT INTO audit_check_data (fid,  criticity, error_message, count)
-		VALUES (125, 3, concat('ERROR: There is/are ',v_count,' arcs with state=1 using extremals nodes with state = 2. Please, check your data before continue'),v_count);
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+		VALUES (125, '197', 3, concat('ERROR: There is/are ',v_count,' arcs with state=1 using extremals nodes with state = 2. Please, check your data before continue'),v_count);
 		INSERT INTO audit_check_data (fid, criticity, error_message, count)
 		VALUES (125, 3, concat('SELECT * FROM anl_arc WHERE fid = 197 AND cur_user=current_user'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: No arcs with state=1 using nodes with state=0 found.',v_count);
+		INSERT INTO audit_check_data (fid,result_id, criticity, error_message, count)
+		VALUES (125, '197',1, 'INFO: No arcs with state=1 using nodes with state=0 found.',v_count);
 	END IF;	
 
-	RAISE NOTICE '06 - Check all state=2 are involved in at least in one psector';
+	RAISE NOTICE '06 - Check all state=2 are involved in at least in one psector (252)';
 	v_querytext = 'SELECT a.arc_id FROM '||v_edit||'arc a RIGHT JOIN plan_psector_x_arc USING (arc_id) WHERE a.state = 2 AND a.arc_id IS NULL
 			UNION
 			SELECT a.node_id FROM '||v_edit||'node a RIGHT JOIN plan_psector_x_node USING (node_id) WHERE a.state = 2 AND a.node_id IS NULL
@@ -197,26 +197,26 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid,  criticity, error_message, count)
-		VALUES (125, 3, concat('ERROR: There is/are ',v_count,' features with state=2 without psector assigned. Please, check your data before continue'),v_count);
+		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, count)
+		VALUES (125, 3, '252', concat('ERROR: There is/are ',v_count,' features with state=2 without psector assigned. Please, check your data before continue'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: No features with state=2 without psector assigned.',v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 1, '252', 'INFO: No features with state=2 without psector assigned.',v_count);
 	END IF;
 
 
-	RAISE NOTICE '07 - Check state_type nulls (arc, node)';
+	RAISE NOTICE '07 - Check state_type nulls (arc, node) (175)';
 
 	v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE state > 0 AND state_type IS NULL 
 		        UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE state > 0 AND state_type IS NULL) a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid,  criticity, error_message, count)
-		VALUES (125, 3, concat('ERROR: There is/are ',v_count,' topologic features (arc, node) with state_type with NULL values. Please, check your data before continue'),v_count);
+		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, count)
+		VALUES (125, 3, '175',concat('ERROR: There is/are ',v_count,' topologic features (arc, node) with state_type with NULL values. Please, check your data before continue'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: No topologic features (arc, node) with state_type NULL values found.',v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 1, '175', 'INFO: No topologic features (arc, node) with state_type NULL values found.',v_count);
 	END IF;
 
 
@@ -227,13 +227,13 @@ BEGIN
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom)
 		SELECT 187, node_id, nodecat_id, ''Nodes with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
-		INSERT INTO audit_check_data (fid,  criticity, error_message, count)
-		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue'),v_count);
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+		VALUES (125,'187', 2, concat('WARNING: There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue'),v_count);
 		INSERT INTO audit_check_data (fid, criticity, error_message, count)
 		VALUES (125, 2, concat('SELECT * FROM anl_node WHERE fid = 187 AND cur_user=current_user'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: No nodes with state > 0 AND state_type.is_operative on FALSE found.',v_count);
+		INSERT INTO audit_check_data (fid,  result_id,criticity, error_message, count)
+		VALUES (125, '187', 1, 'INFO: No nodes with state > 0 AND state_type.is_operative on FALSE found.',v_count);
 	END IF;
 
 
@@ -246,13 +246,13 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom)
 			SELECT 188, arc_id, arccat_id, ''arcs with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
 
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' arc(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue'),v_count);
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+		VALUES (125, '188', 2, concat('WARNING: There is/are ',v_count,' arc(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue'),v_count);
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
 		VALUES (125, 2, concat('SELECT * FROM anl_arc WHERE fid = 188 AND cur_user=current_user'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: No arcs with state > 0 AND state_type.is_operative on FALSE found.',v_count);
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+		VALUES (125, '188', 1, 'INFO: No arcs with state > 0 AND state_type.is_operative on FALSE found.',v_count);
 	END IF;
 
 	RAISE NOTICE '09 - check if all tanks are defined in config_mincut_inlet  (fid: 177)';
@@ -270,15 +270,15 @@ BEGIN
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom)
 			SELECT 177, node_id, nodecat_id, ''Tanks not defined in config_mincut_inlet'', the_geom FROM (', v_querytext,')a');
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 2, concat('WARNING: There is/are ',v_count,' tanks which are not defined on config_mincut_inlet. Node_id: ',v_feature_id,'. Please, check your data before continue'),v_count);
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+			VALUES (125,'177', 2, concat('WARNING: There is/are ',v_count,' tanks which are not defined on config_mincut_inlet. Node_id: ',v_feature_id,'. Please, check your data before continue'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 1, 'INFO: All tanks are defined in config_mincut_inlet.',v_count);
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+			VALUES (125, '177', 1, 'INFO: All tanks are defined in config_mincut_inlet.',v_count);
 		END IF;
 	END IF;
 
-	RAISE NOTICE '09 - check if drawn arc direction is the same as defined node_1, node_2';
+	RAISE NOTICE '09 - check if drawn arc direction is the same as defined node_1, node_2 (223)';
 
 	v_querytext = 'SELECT a.arc_id , arccat_id, a.the_geom FROM arc a, node n WHERE st_dwithin(st_startpoint(a.the_geom), n.the_geom, 0.0001) and node_2 = node_id
 			UNION
@@ -288,30 +288,30 @@ BEGIN
 
 	IF v_count > 0 THEN
 		EXECUTE concat('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom)
-		SELECT 123, arc_id, arccat_id, ''Drawing direction different than definition of node_1, node_2'', the_geom FROM (',v_querytext,')a');
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' arcs with drawing direction different than definition of node_1, node_2'),v_count);
+		SELECT 223, arc_id, arccat_id, ''Drawing direction different than definition of node_1, node_2'', the_geom FROM (',v_querytext,')a');
+		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+		VALUES (125, 2, '223', concat('WARNING: There is/are ',v_count,' arcs with drawing direction different than definition of node_1, node_2'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: No arcs with drawing direction different than definition of node_1, node_2',v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+		VALUES (125, 1, '223', 'INFO: No arcs with drawing direction different than definition of node_1, node_2',v_count);
 	END IF;
 
-	RAISE NOTICE '10 - Check nulls customer code for connecs (110)';
+	RAISE NOTICE '10 - Check nulls customer code for connecs (210)';
 	v_querytext = 'SELECT connec_id FROM '||v_edit||'connec WHERE state=1 and customer_code IS NULL';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;
 
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom)
-		SELECT 110, connec_id, connecat_id, ''Connecs with null customer code'', the_geom FROM connec WHERE connec_id IN (', v_querytext,')');
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' connec with customer code null. Please, check your data before continue'),v_count);
+		SELECT 210, connec_id, connecat_id, ''Connecs with null customer code'', the_geom FROM connec WHERE connec_id IN (', v_querytext,')');
+		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+		VALUES (125, 2, '210', concat('WARNING: There is/are ',v_count,' connec with customer code null. Please, check your data before continue'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: No connecs with null customer code.',v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+		VALUES (125, 1, '210','INFO: No connecs with null customer code.',v_count);
 	END IF;
 
-	RAISE NOTICE '11 - Check unique customer code for connecs with state=1';
+	RAISE NOTICE '11 - Check unique customer code for connecs with state=1 (201)';
 	v_querytext = 'SELECT customer_code FROM '||v_edit||'connec WHERE state=1 and customer_code IS NOT NULL group by customer_code having count(*) > 1';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;
@@ -319,15 +319,15 @@ BEGIN
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom)
 		SELECT 201, connec_id, connecat_id, ''Connecs with customer code duplicated'', the_geom FROM connec WHERE customer_code IN (', v_querytext,')');
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' connec customer code duplicated. Please, check your data before continue'),v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 2, '201', concat('WARNING: There is/are ',v_count,' connec customer code duplicated. Please, check your data before continue'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: No connecs with customer code duplicated.',v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 1, '201', 'INFO: No connecs with customer code duplicated.',v_count);
 	END IF;
 
 
-	RAISE NOTICE '12 - Check if all id are integers';
+	RAISE NOTICE '12 - Check if all id are integers (202)';
 	IF v_project_type = 'WS' THEN
 		v_querytext = '(SELECT CASE WHEN arc_id~E''^\\d+$'' THEN CAST (arc_id AS INTEGER)
 						ELSE 0 END  as feature_id, ''ARC'' as type, arccat_id as featurecat, the_geom FROM '||v_edit||'arc
@@ -370,14 +370,14 @@ BEGIN
 			WHERE feature_id=0 AND type = ''GULLY'' ');
 		END IF;
 
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 3, concat('ERROR: There is/are ',v_count,' which id is not an integer. Please, check your data before continue'),v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 3, '202', concat('ERROR: There is/are ',v_count,' which id is not an integer. Please, check your data before continue'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: All features with id integer.',v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 1, '202', 'INFO: All features with id integer.',v_count);
 	END IF;
 
-	RAISE NOTICE '13 - Check state not according with state_type';
+	RAISE NOTICE '13 - Check state not according with state_type (253)';
 	IF v_project_type = 'UD' THEN
 		v_querytext =  'SELECT a.state, state_type FROM '||v_edit||'arc a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
 				UNION SELECT a.state, state_type FROM '||v_edit||'node a JOIN value_state_type b ON id=state_type WHERE a.state <> b.state
@@ -387,12 +387,12 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 3, concat('ERROR: There is/are ',v_count,' features(s) with state without concordance with state_type. Please, check your data before continue'),v_count);
+			INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+			VALUES (125, 3, '253', concat('ERROR: There is/are ',v_count,' features(s) with state without concordance with state_type. Please, check your data before continue'),v_count);
 			
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 1, 'INFO: No features without concordance againts state and state_type.',v_count);
+			INSERT INTO audit_check_data (fid, criticity,result_id, error_message, count)
+			VALUES (125, 1, '253','INFO: No features without concordance againts state and state_type.',v_count);
 		END IF;
 		
 	ELSIF v_project_type = 'WS' THEN
@@ -405,16 +405,16 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 3, concat('ERROR: There is/are ',v_count,' features(s) with state without concordance with state_type. Please, check your data before continue'),v_count);
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 3, '253', concat('ERROR: There is/are ',v_count,' features(s) with state without concordance with state_type. Please, check your data before continue'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 1, 'INFO: No features without concordance againts state and state_type.',v_count);
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 1, '253', 'INFO: No features without concordance againts state and state_type.',v_count);
 		END IF;
 	END IF;
 
 
-	RAISE NOTICE '14 - Check code with null values';
+	RAISE NOTICE '14 - Check code with null values (254)';
 	IF v_project_type ='UD' THEN
 		v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
 					UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE code IS NULL
@@ -425,11 +425,11 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid,  criticity, error_message, count)
-			VALUES (125, 3, concat('ERROR: There is/are ',v_count,' with code with NULL values. Please, check your data before continue'),v_count);
+			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, count)
+			VALUES (125, 3, '254', concat('ERROR: There is/are ',v_count,' with code with NULL values. Please, check your data before continue'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 1, 'INFO: No features (arc, node, connec, gully, element) with NULL values on code found.',v_count);
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 1, '254', 'INFO: No features (arc, node, connec, gully, element) with NULL values on code found.',v_count);
 		END IF;
 
 	ELSIF v_project_type ='WS' THEN
@@ -441,15 +441,15 @@ BEGIN
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid,  criticity, error_message, count)
-			VALUES (125, 3, concat('ERROR: There is/are ',v_count,' with code with NULL values. Please, check your data before continue'),v_count);
+			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, count)
+			VALUES (125, 3, '254', concat('ERROR: There is/are ',v_count,' with code with NULL values. Please, check your data before continue'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 1, 'INFO: No features (arc, node, connec, element) with NULL values on code found.',v_count);
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 1, '254', 'INFO: No features (arc, node, connec, element) with NULL values on code found.',v_count);
 		END IF;
 	END IF;
 			
-	RAISE NOTICE '15 - Check for orphan polygons on polygon table';
+	RAISE NOTICE '15 - Check for orphan polygons on polygon table (255)';
 	IF v_project_type ='UD' THEN
 
 		v_querytext = '(SELECT pol_id FROM polygon EXCEPT SELECT pol_id FROM (select pol_id from gully UNION select pol_id from man_chamber 
@@ -458,17 +458,27 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid,  criticity, error_message, count)
-			VALUES (125, 2, concat('WARNING: There is/are ',v_count,' polygons without parent (gully, netgully, chamber, storage or wwtp).  We recommend you to clean data before continue.'),v_count);
+			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, count)
+			VALUES (125, 2, '255', concat('WARNING: There is/are ',v_count,' polygons without parent (gully, netgully, chamber, storage or wwtp).  We recommend you to clean data before continue.'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 1, 'INFO: No polygons without parent feature (gully, netgully, chamber, storage or wwtp) found.',v_count);
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 1, '255','INFO: No polygons without parent feature (gully, netgully, chamber, storage or wwtp) found.',v_count);
 		END IF;
-	ELSIF v_project_type ='WS' THEN
+	ELSIF v_project_type='WS' THEN
+		v_querytext = '(SELECT pol_id FROM polygon EXCEPT SELECT pol_id FROM (select pol_id from man_register UNION select pol_id from man_tank UNION select pol_id from man_fountain) a) b';
 
+		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+		
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, count)
+			VALUES (125, 2, '255', concat('WARNING: There is/are ',v_count,' polygons without parent (register, tank, fountain).  We recommend you to clean data before continue.'), v_count);
+		ELSE
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 1, '255', 'INFO: No polygons without parent feature (register, tank, fountain) found.', v_count);
+		END IF;
 	END IF;
 
-	RAISE NOTICE '16 - Check for orphan rows on man_addfields values table';
+	RAISE NOTICE '16 - Check for orphan rows on man_addfields values table (256)';
 	IF v_project_type ='UD' THEN
 
 		v_querytext = 'SELECT * FROM man_addfields_value a LEFT JOIN 
@@ -477,31 +487,33 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 2, concat('WARNING: There is/are ',v_count,' rows on man_addfields_value without parent feature. We recommend you to clean data before continue.'),v_count);
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 2, '256', concat('WARNING: There is/are ',v_count,' rows on man_addfields_value without parent feature. We recommend you to clean data before continue.'),v_count);
 			INSERT INTO audit_check_data (fid, criticity, error_message, count)
 			VALUES (125, 2, concat('SELECT * FROM man_addfields_value WHERE feature_id NOT IN (SELECT arc_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec UNION SELECT gully_id FROM gully)'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 1, 'INFO: No rows without feature found on man_addfields_value table.',v_count);
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 1, '256', 'INFO: No rows without feature found on man_addfields_value table.',v_count);
 		END IF;	
-
 	ELSIF v_project_type='WS' THEN
-		v_querytext = '(SELECT pol_id FROM polygon EXCEPT SELECT pol_id FROM (select pol_id from man_register UNION select pol_id from man_tank UNION select pol_id from man_fountain) a) b';
+		v_querytext = 'SELECT * FROM man_addfields_value a LEFT JOIN 
+			      (SELECT arc_id as feature_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec) b USING (feature_id) WHERE b.feature_id IS NULL';
 
-		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
-		
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+	
 		IF v_count > 0 THEN
-			INSERT INTO audit_check_data (fid,  criticity, error_message, count)
-			VALUES (125, 2, concat('WARNING: There is/are ',v_count,' polygons without parent (register, tank, fountain).  We recommend you to clean data before continue.'), v_count);
-		ELSE
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 2, '256', concat('WARNING: There is/are ',v_count,' rows on man_addfields_value without parent feature. We recommend you to clean data before continue.'),v_count);
 			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 1, 'INFO: No polygons without parent feature (register, tank, fountain) found.', v_count);
-		END IF;
+			VALUES (125, 2, concat('SELECT * FROM man_addfields_value WHERE feature_id NOT IN (SELECT arc_id FROM arc UNION SELECT node_id FROM node UNION SELECT connec_id FROM connec UNION SELECT gully_id FROM gully)'),v_count);
+		ELSE
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 1, '256', 'INFO: No rows without feature found on man_addfields_value table.',v_count);
+		END IF;	
 
 	END IF;
 	
-	RAISE NOTICE '17 - connec/gully without link';
+	RAISE NOTICE '17 - connec/gully without link (204)';
 	v_querytext = 'SELECT connec_id,connecat_id,the_geom from '||v_edit||'connec WHERE state= 1 
 					AND connec_id NOT IN (select feature_id from link)';
 
@@ -511,11 +523,11 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom)
 		SELECT 204, connec_id, connecat_id, ''Connecs without links'', the_geom FROM (', v_querytext,')a');
 
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' connecs without links.'),v_count);
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+		VALUES (125, '204', 2, concat('WARNING: There is/are ',v_count,' connecs without links.'),v_count);
 	ELSE
-		INSERT INTO audit_check_data 	(fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: All connecs have links.',v_count);
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+		VALUES (125, '204',1, 'INFO: All connecs have links.',v_count);
 	END IF;
 
 	IF v_project_type = 'UD' THEN 
@@ -529,16 +541,16 @@ BEGIN
 			EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom)
 			SELECT 204, gully_id, gratecat_id, ''Gullies without links'', the_geom FROM (', v_querytext,')a');
 
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 2, concat('WARNING: There is/are ',v_count,' gullies without links.'), v_count);
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+			VALUES (125, '204',2, concat('WARNING: There is/are ',v_count,' gullies without links.'), v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 1, 'INFO: All gullies have links.', v_count);
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+			VALUES (125,'204', 1, 'INFO: All gullies have links.', v_count);
 		END IF;
 	
 	END IF;
 
-	RAISE NOTICE '18 - connec/gully without arc_id or with arc_id different than the one to which points its link';
+	RAISE NOTICE '18 - connec/gully without arc_id or with arc_id different than the one to which points its link (257)';
 	IF (SELECT count(*) FROM arc ) < 20000 THEN -- too big
 	
 		v_querytext = 'SELECT  '||v_edit||'connec.connec_id,  '||v_edit||'connec.connecat_id,  '||v_edit||'connec.the_geom
@@ -557,13 +569,13 @@ BEGIN
 
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom)
-			SELECT 206, connec_id, connecat_id, ''Connecs without or with incorrect arc_id'', the_geom FROM (', v_querytext,')a');
+			SELECT 257, connec_id, connecat_id, ''Connecs without or with incorrect arc_id'', the_geom FROM (', v_querytext,')a');
 
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 2, concat('WARNING: There is/are ',v_count,' connecs without or with incorrect arc_id.'),v_count);
+			INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+			VALUES (125, 2, '257', concat('WARNING: There is/are ',v_count,' connecs without or with incorrect arc_id.'),v_count);
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 1, 'INFO: All connecs have correct arc_id.',v_count);
+			INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+			VALUES (125, 1, '257', 'INFO: All connecs have correct arc_id.',v_count);
 		END IF;
 
 		IF v_project_type = 'UD' THEN
@@ -583,81 +595,81 @@ BEGIN
 
 			IF v_count > 0 THEN
 				EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom)
-				SELECT 206, gully_id, gratecat_id, ''Gullies without or with incorrect arc_id'', the_geom FROM (', v_querytext,')a');
+				SELECT 257, gully_id, gratecat_id, ''Gullies without or with incorrect arc_id'', the_geom FROM (', v_querytext,')a');
 
-				INSERT INTO audit_check_data (fid, criticity, error_message, count)
-				VALUES (125, 2, concat('WARNING: There is/are ',v_count,' gullies without or with incorrect arc_id.'),v_count);
+				INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+				VALUES (125, 2, '257', concat('WARNING: There is/are ',v_count,' gullies without or with incorrect arc_id.'),v_count);
 			ELSE
-				INSERT INTO audit_check_data (fid, criticity, error_message, count)
-				VALUES (125, 1, 'INFO: All gullies have correct arc_id.', v_count);
+				INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+				VALUES (125, 1, '257', 'INFO: All gullies have correct arc_id.', v_count);
 			END IF;
 		END IF;
 	END IF;
 
-	RAISE NOTICE '19 - Check vnode inconsistency (link without vnode)';
+	RAISE NOTICE '19 - Check vnode inconsistency (link without vnode) (258)';
 	v_querytext = 'SELECT * FROM v_edit_link LEFT JOIN vnode ON vnode_id = exit_id::integer where exit_type =''VNODE'' AND vnode_id IS NULL';
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' vnode links without vnode. This will be automatic repaired.'), v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+		VALUES (125, 2, '258',concat('WARNING: There is/are ',v_count,' vnode links without vnode. This will be automatic repaired.'), v_count);
 		
 		PERFORM gw_fct_vnode_repair();	
 		
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: All vnode links have vnode.',v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+		VALUES (125, 1, '258', 'INFO: All vnode links have vnode.',v_count);
 
 	END IF;
 	
-	RAISE NOTICE '20 - Check vnode inconsistency (vnode without link)';
+	RAISE NOTICE '20 - Check vnode inconsistency (vnode without link) (259)';
 	v_querytext = 'SELECT vnode_id FROM vnode LEFT JOIN link ON vnode_id = exit_id::integer where link_id IS NULL';
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
 	IF v_count > 0 THEN
 	
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' vnodes without link. They will be automatically repaired'),v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 2, '259',concat('WARNING: There is/are ',v_count,' vnodes without link. They will be automatically repaired'),v_count);
 		
 		EXECUTE 'DELETE FROM vnode WHERE vnode_id IN ('||v_querytext||')';
 		
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: All vnodes have vnode link.', v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 1, '259', 'INFO: All vnodes have vnode link.', v_count);
 
 	END IF;
 	
 
-	RAISE NOTICE '21 - links without feature_id';
+	RAISE NOTICE '21 - links without feature_id (260)';
 	v_querytext = 'SELECT link_id, the_geom FROM link where feature_id is null and state > 0';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 3, concat('ERROR: There is/are ',v_count,' links with state > 0 without feature_id.'), v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+		VALUES (125, 3, '260', concat('ERROR: There is/are ',v_count,' links with state > 0 without feature_id.'), v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: All links state > 0 have feature_id.', v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 1, '260', 'INFO: All links state > 0 have feature_id.', v_count);
 	END IF;
 
-	RAISE NOTICE 'links without exit_id';
+	RAISE NOTICE 'links without exit_id (261)';
 	v_querytext = 'SELECT link_id, the_geom FROM link where exit_id is null and state > 0';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 3, concat('ERROR: There is/are ',v_count,' links with state > 0 without exit_id. To repair it you can query:'),v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 3, '261',concat('ERROR: There is/are ',v_count,' links with state > 0 without exit_id. To repair it you can query:'),v_count);
 		INSERT INTO audit_check_data (fid, criticity, error_message, count)
 		VALUES (125, 3, 'UPDATE link SET exit_id = a.vnode_id FROM (SELECT link_id, vnode_id FROM link, vnode WHERE st_dwithin(st_endpoint(link.the_geom), vnode.the_geom, 0.01) AND exit_id IS NULL)a WHERE link.link_id = a.link_id',v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: All links state > 0 have exit_id.',v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 1, '261', 'INFO: All links state > 0 have exit_id.',v_count);
 	END IF;
 
-	RAISE NOTICE 'Chained connecs/gullies which has different arc_id than the final connec/gully.';
+	RAISE NOTICE 'Chained connecs/gullies which has different arc_id than the final connec/gully. (205)';
 	IF v_project_type = 'WS' THEN 
 		v_querytext = 'with c as (
 					Select '||v_edit||'connec.connec_id as id, arc_id as arc, '||v_edit||'connec.connecat_id as 
@@ -692,26 +704,26 @@ BEGIN
 			EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom)
 			SELECT 205, id, feature_catalog, ''Chained connecs or gullies with different arc_id'', the_geom FROM (', v_querytext,')a');
 
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 2, concat('WARNING: There is/are ',v_count,' chained connecs or gullies with different arc_id.'),v_count);
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 2, '205', concat('WARNING: There is/are ',v_count,' chained connecs or gullies with different arc_id.'),v_count);
 		ELSIF v_project_type = 'WS' THEN
 			EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom)
 			SELECT 205, id, feature_catalog, ''Chained connecs with different arc_id'', the_geom FROM (', v_querytext,')a');
 
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 2, concat('WARNING: There is/are ',v_count,' chained connecs with different arc_id.'),v_count);
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 2, '205',concat('WARNING: There is/are ',v_count,' chained connecs with different arc_id.'),v_count);
 		END IF;
 	ELSE
 		IF v_project_type = 'UD' THEN	
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 1, 'INFO: All chained connecs and gullies have the same arc_id',v_count);
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 1, '205','INFO: All chained connecs and gullies have the same arc_id',v_count);
 		ELSIF v_project_type = 'WS' THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message, count)
-			VALUES (125, 1, 'INFO: All chained connecs have the same arc_id', v_count);
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+			VALUES (125, 1, '205','INFO: All chained connecs have the same arc_id', v_count);
 		END IF;
 	END IF;
 
-	RAISE NOTICE '22 - features with state 1 and end date';
+	RAISE NOTICE '22 - features with state 1 and end date (262)';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where state = 1 and enddate is not null
 					UNION SELECT node_id from '||v_edit||'node where state = 1 and enddate is not null
@@ -726,14 +738,14 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' features on service with value of end date.'),v_count);
+		INSERT INTO audit_check_data (fid, criticity,result_id, error_message, count)
+		VALUES (125, 2, '262',concat('WARNING: There is/are ',v_count,' features on service with value of end date.'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: No features on service have value of end date', v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 1, '262', 'INFO: No features on service have value of end date', v_count);
 	END IF;
 
-	RAISE NOTICE 'features with state 0 and without end date';
+	RAISE NOTICE 'features with state 0 and without end date (263)';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where state = 0 and enddate is null
 					UNION SELECT node_id from '||v_edit||'node where state = 0 and enddate is null
@@ -748,14 +760,14 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' features with state 0 without value of end date.'), v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+		VALUES (125, 2, '263', concat('WARNING: There is/are ',v_count,' features with state 0 without value of end date.'), v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: No features with state 0 are missing the end date',v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+		VALUES (125, 1, '263','INFO: No features with state 0 are missing the end date',v_count);
 	END IF;
 
-	RAISE NOTICE '23 - features with state 1 and end date';
+	RAISE NOTICE '23 - features with state 1 and end date before start date (264)';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where enddate < builtdate
 					UNION SELECT node_id from '||v_edit||'node where enddate < builtdate
@@ -770,30 +782,30 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' features with end date earlier than built date.'),v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 2, '264',concat('WARNING: There is/are ',v_count,' features with end date earlier than built date.'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: No features with end date earlier than built date',v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 1, '264','INFO: No features with end date earlier than built date',v_count);
 	END IF;
 
-	RAISE NOTICE '24 - Automatic links with more than 100 mts (longitude out-of-range)';
+	RAISE NOTICE '24 - Automatic links with more than 100 mts (longitude out-of-range) (265)';
 	EXECUTE 'SELECT count(*) FROM v_edit_link where userdefined_geom  = false AND st_length(the_geom) > 100'
 	INTO v_count;
 
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' automatic links with longitude out-of-range found.'),v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+		VALUES (125, 2, '265', concat('WARNING: There is/are ',v_count,' automatic links with longitude out-of-range found.'),v_count);
 		INSERT INTO audit_check_data (fid, criticity, error_message, count)
 		VALUES (125, 2, concat('QUERY: SELECT count(*) FROM v_edit_link where userdefined_geom  = false AND st_length(the_geom) > 100'),v_count);
 		INSERT INTO audit_check_data (fid, criticity, error_message, count)
 		VALUES (125, 2, concat('HINT: If link is ok, change userdefined_geom from false to true. Does not make sense automatic link with this longitude.'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
-		VALUES (125, 1, 'INFO: No automatic links with out-of-range Longitude found.',v_count);
+		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, count)
+		VALUES (125, 1,'265', 'INFO: No automatic links with out-of-range Longitude found.',v_count);
 	END IF;
     
-    RAISE NOTICE '25 - Duplicated ID values between arc, node, connec, gully';
+    RAISE NOTICE '25 - Duplicated ID values between arc, node, connec, gully (266)';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT node_id AS feature_id FROM node JOIN arc ON arc.arc_id=node.node_id
 					UNION SELECT node_id FROM node JOIN connec ON connec.connec_id=node.node_id
@@ -810,14 +822,14 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 	IF v_count = 1 THEN
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (125, 2, concat('WARNING: There is ',v_count,' feature with duplicated ID value between arc, node, connec, gully '));
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 2, '266', concat('WARNING: There is ',v_count,' feature with duplicated ID value between arc, node, connec, gully '), v_count);
 	ELSIF v_count > 1 THEN
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (125, 2, concat('WARNING: There are ',v_count,' features with duplicated ID values between arc, node, connec, gully '));
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 2, '266', concat('WARNING: There are ',v_count,' features with duplicated ID values between arc, node, connec, gully '));
 	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (125, 1, 'INFO: All features have a diferent ID to be correctly identified');
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
+		VALUES (125, 1, '266','INFO: All features have a diferent ID to be correctly identified',v_count);
 	END IF;
 		
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 4, '');
@@ -847,7 +859,7 @@ BEGIN
 	AND fid IN (177,187, 202)
 	UNION
 	SELECT id, connec_id, connecat_id, state, expl_id, descript,fid, the_geom FROM anl_connec WHERE cur_user="current_user"()
-	AND fid IN (110,201,202,204,205,206)) row) features;
+	AND fid IN (210,201,202,204,205,257)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 
@@ -867,7 +879,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (104, 196, 197, 188, 123, 202)) row) features;
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (103, 196, 197, 188, 223, 202)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
