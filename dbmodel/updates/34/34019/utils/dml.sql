@@ -51,6 +51,9 @@ DELETE FROM config_param_user WHERE parameter IN (SELECT concat(lower(id),'_vdef
 
 DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM sys_param_user) ;
 
+-- 2020/15/09
+UPDATE sys_param_user SET id ='basic_search_exploitation_vdefault' WHERE id = 'basic_search_exploitation_vdefaut';
+UPDATE sys_param_user SET id ='basic_search_municipality_vdefault' WHERE id = 'basic_search_municipality_vdefaut';
 
 /*
 2020/09/08
