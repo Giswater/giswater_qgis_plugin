@@ -33,14 +33,10 @@ DROP TRIGGER IF EXISTS gw_trg_config_control ON config_form_fields;
 CREATE TRIGGER gw_trg_config_control BEFORE INSERT OR UPDATE OR DELETE
 ON SCHEMA_NAME.config_form_fields FOR EACH ROW EXECUTE PROCEDURE gw_trg_config_control('config_form_fields');
 
-CREATE INDEX anl_connec_index
-  ON anl_connec
-  USING gist
-  (the_geom);
-  
- CREATE TRIGGER gw_trg_edit_element_pol
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_element_pol
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_element_pol();
+CREATE INDEX anl_connec_index ON anl_connec 
+USING gist (the_geom);
+
+DROP TRIGGER IF EXISTS gw_trg_edit_element_pol ON v_edit_element_pol;
+CREATE TRIGGER gw_trg_edit_element_pol INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_element_pol
+  FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_element_pol();
 
