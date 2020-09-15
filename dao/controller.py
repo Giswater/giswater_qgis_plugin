@@ -960,7 +960,7 @@ class DaoController(object):
         for cur_layer in layers:
             uri_table = self.get_layer_source_table_name(cur_layer)
             table_schema = self.get_layer_schema(cur_layer)
-            if (uri_table is not None and uri_table == tablename) and main_schema in (None, table_schema):
+            if (uri_table is not None and uri_table == tablename) and main_schema in ('', None, table_schema):
                 layer = cur_layer
                 break
 
