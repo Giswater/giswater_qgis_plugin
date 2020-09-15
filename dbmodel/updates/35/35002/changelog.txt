@@ -1,3 +1,4 @@
-3.4.031
+3.5.002
 *************
-- Bug fix from previous developments
+- Drop table config_form_groupbox
+- New process to audit projecte (table audit_fid_log)
