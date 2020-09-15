@@ -162,7 +162,7 @@ class AddLayer(object):
                     self.populate_vlayer(self.v_layer, data, k, counter, group)
                     if 'qmlPath' in data[k] and data[k]['qmlPath']:
                         qml_path = data[k]['qmlPath']
-                        self.load_qml(v_layer, qml_path)
+                        self.load_qml(self.v_layer, qml_path)
                     elif 'category_field' in data[k] and data[k]['category_field']:
                         cat_field = data[k]['category_field']
                         size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
