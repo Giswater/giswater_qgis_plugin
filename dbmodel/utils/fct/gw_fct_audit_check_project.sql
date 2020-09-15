@@ -285,6 +285,18 @@ BEGIN
 		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 	END IF;
 	
+	-- Force state selector in case of null values for addschema
+	IF v_addschema IS NOT NULL THEN
+
+		EXECUTE 'SET search_path = '||v_addschema||', public';
+		IF (SELECT count(*) FROM selector_state WHERE cur_user=current_user) < 1 THEN 
+			INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
+			v_errortext=concat('Set feature state = 1 for addschema and user');
+			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+		END IF;
+		SET search_path = 'SCHEMA_NAME';
+	END IF;
+	
 	-- Force hydrometer selector in case of null values
 	IF (SELECT count(*) FROM selector_hydrometer WHERE cur_user=current_user) < 1 THEN 
 	  	INSERT INTO selector_hydrometer (state_id, cur_user) VALUES (1, current_user);
