@@ -1406,19 +1406,24 @@ class GwVisitManager:
         if not om_event_parameter.fetch():
             return
         dlg_name = None
-        if om_event_parameter.form_type == 'event_ud_arc_standard':
+        if om_event_parameter.form_type in ('event_ud_arc_standard', 'event_standard'):
+            event_code = self.dlg_add_visit.tbl_event.model().record(0).value('event_code')
             _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
             position_value = self.dlg_add_visit.tbl_event.model().record(0).value('position_value')
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
             self.dlg_event = VisitEvent()
             load_settings(self.dlg_event)
-            # disable position_x fields because not allowed in multiple view
             self.populate_position_id()
             dlg_name = 'visit_event'
             # set fixed values
-            qt_tools.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
-            qt_tools.setWidgetText(self.dlg_event, self.dlg_event.position_value, position_value)
-            qt_tools.setWidgetText(self.dlg_event, self.dlg_event.text, text)
+            if event_code not in ('NULL', None):
+                qt_tools.setWidgetText(self.dlg_event, self.dlg_event.event_code, event_code)
+            if _value not in ('NULL', None):
+                qt_tools.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
+            if position_value not in ('NULL', None):
+                qt_tools.setWidgetText(self.dlg_event, self.dlg_event.position_value, position_value)
+            if text not in ('NULL', None):
+                qt_tools.setWidgetText(self.dlg_event, self.dlg_event.text, text)
             self.dlg_event.position_id.setEnabled(False)
             self.dlg_event.position_value.setEnabled(False)
 
