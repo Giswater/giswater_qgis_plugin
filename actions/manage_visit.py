@@ -1330,7 +1330,6 @@ class ManageVisit(ParentManage, QObject):
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
             self.dlg_event = VisitEvent()
             self.load_settings(self.dlg_event)
-            # disable position_x fields because not allowed in multiple view
             self.populate_position_id()
             dlg_name = 'visit_event'
             # set fixed values
@@ -1342,6 +1341,7 @@ class ManageVisit(ParentManage, QObject):
                 utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.position_value, position_value)
             if text not in ('NULL', None):
                 utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
+            # disable position_x fields because not allowed in multiple view
             self.dlg_event.position_id.setEnabled(False)
             self.dlg_event.position_value.setEnabled(False)
 
