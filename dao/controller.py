@@ -955,9 +955,11 @@ class DaoController(object):
 
         # Iterate over all layers
         layer = None
+        main_schema = self.plugin_settings_value('gwMainSchema')
         for cur_layer in layers:
             uri_table = self.get_layer_source_table_name(cur_layer)
-            if uri_table is not None and uri_table == tablename:
+            table_schema = self.get_layer_schema(cur_layer)
+            if (uri_table is not None and uri_table == tablename) and main_schema in (None, table_schema):
                 layer = cur_layer
                 break
 
@@ -1049,6 +1051,24 @@ class DaoController(object):
             uri_table = uri[pos_end_schema + 2:pos_fi]
 
         return uri_table
+
+
+    def get_layer_schema(self, layer):
+        """ Get table or view schema_name of selected layer """
+
+        if layer is None:
+            return None
+
+        table_schema = None
+        uri = layer.dataProvider().dataSourceUri().lower()
+
+        pos_ini = uri.find('table=')
+        pos_end_schema = uri.rfind('.')
+        pos_fi = uri.find('" ')
+        if pos_ini != -1 and pos_fi != -1:
+            table_schema = uri[pos_ini+7:pos_end_schema-1]
+
+        return table_schema
 
 
     def get_layer_primary_key(self, layer=None):
