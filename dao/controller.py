@@ -955,7 +955,8 @@ class DaoController(object):
 
         # Iterate over all layers
         layer = None
-        main_schema = self.plugin_settings_value('gwMainSchema')
+        main_schema = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwMainSchema')
+
         for cur_layer in layers:
             uri_table = self.get_layer_source_table_name(cur_layer)
             table_schema = self.get_layer_schema(cur_layer)
