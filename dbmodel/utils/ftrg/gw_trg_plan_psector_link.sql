@@ -11,18 +11,18 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_plan_psector_link()
 $BODY$
 DECLARE 
     
-	v_link_geom public.geometry;
-	v_vnode_geom public.geometry;
-	v_table_name text;
-	v_feature_geom public.geometry;
-	v_point_aux public.geometry;
-	v_arc_geom public.geometry;
-	v_userdefined_geom boolean;
-	v_idlink text;
-	v_idvnode text;
-	v_channel text;
-	v_schemaname text;
-	v_arc_id text;
+v_link_geom public.geometry;
+v_vnode_geom public.geometry;
+v_table_name text;
+v_feature_geom public.geometry;
+v_point_aux public.geometry;
+v_arc_geom public.geometry;
+v_userdefined_geom boolean;
+v_idlink text;
+v_idvnode text;
+v_channel text;
+v_schemaname text;
+v_arc_id text;
 	
 BEGIN 
 
@@ -38,7 +38,6 @@ BEGIN
 		SELECT the_geom INTO v_feature_geom FROM gully WHERE gully_id=NEW.gully_id;
 	END IF;
 
-
 	-- getting arc_geom
 	IF NEW.arc_id IS NOT NULL THEN
 		v_arc_geom =  (SELECT the_geom FROM arc WHERE arc_id=NEW.arc_id);
@@ -49,6 +48,7 @@ BEGIN
 
 		-- this update makes a recall of self.trigger but in this case with NEW.arc_id IS NOT NULL recall will finish next one
 		UPDATE plan_psector_x_connec SET arc_id = v_arc_id WHERE id=NEW.id;
+		RETURN NEW;
 	END IF;
 
 	IF v_arc_geom IS NOT NULL THEN
@@ -72,12 +72,8 @@ BEGIN
 	-- update plan_psector tables
 	IF v_table_name = 'connec' THEN
 		UPDATE plan_psector_x_connec SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
-		v_idlink = (SELECT link_id FROM v_edit_link WHERE psector_rowid=NEW.id AND feature_type ='CONNEC' LIMIT 1);
-		v_idvnode = (SELECT vnode_id FROM v_edit_vnode WHERE psector_rowid=NEW.id AND feature_type ='CONNEC' LIMIT 1);
 	ELSIF v_table_name = 'gully' THEN
 		UPDATE plan_psector_x_gully SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
-		v_idlink  = (SELECT link_id FROM v_edit_link WHERE psector_rowid=NEW.id AND feature_type ='GULLY' LIMIT 1);
-		v_idvnode = (SELECT vnode_id FROM v_edit_vnode WHERE psector_rowid=NEW.id AND feature_type ='GULLY' LIMIT 1);
 	END IF;	
 
 	-- notify to qgis in order to reindex geometries for snapping
