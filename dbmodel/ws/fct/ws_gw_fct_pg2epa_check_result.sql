@@ -58,9 +58,6 @@ v_buildmodeval text;
 v_usenetworkgeom boolean;
 v_usenetworkdemand boolean;
 v_defaultdemand	float;
-v_qmlpointpath text = '';
-v_qmllinepath text = '';
-v_qmlpolpath text = '';
 v_doublen2a integer;
 v_curvedefault text;
 v_options json;
@@ -510,7 +507,7 @@ BEGIN
 	FROM  anl_node WHERE cur_user="current_user"() AND fid = 159) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
+	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
 
 	IF v_fid::text = 127::text THEN
 		v_result_point = '{}';
