@@ -1324,6 +1324,7 @@ class ManageVisit(ParentManage, QObject):
             return
         dlg_name = None
         if om_event_parameter.form_type in ('event_ud_arc_standard', 'event_standard'):
+            event_code = self.dlg_add_visit.tbl_event.model().record(0).value('event_code')
             _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
             position_value = self.dlg_add_visit.tbl_event.model().record(0).value('position_value')
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
@@ -1333,9 +1334,14 @@ class ManageVisit(ParentManage, QObject):
             self.populate_position_id()
             dlg_name = 'visit_event'
             # set fixed values
-            utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
-            utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.position_value, position_value)
-            utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
+            if event_code not in ('NULL', None):
+                utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.event_code, event_code)
+            if _value not in ('NULL', None):
+                utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
+            if position_value not in ('NULL', None):
+                utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.position_value, position_value)
+            if text not in ('NULL', None):
+                utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
             self.dlg_event.position_id.setEnabled(False)
             self.dlg_event.position_value.setEnabled(False)
 
@@ -1362,15 +1368,6 @@ class ManageVisit(ParentManage, QObject):
             self.dlg_event.position_id.setEnabled(True)
             self.dlg_event.position_value.setEnabled(True)
 
-        elif om_event_parameter.form_type == 'event_standard':
-            _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
-            text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
-            self.dlg_event = VisitEvent()
-            self.load_settings(self.dlg_event)
-            if _value not in ('NULL', None):
-                utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
-            if text not in ('NULL', None):
-                utils_giswater.setWidgetText(self.dlg_event, self.dlg_event.text, text)
 
         # Manage QTableView docx_x_event
         utils_giswater.set_qtv_config(self.dlg_event.tbl_docs_x_event)
