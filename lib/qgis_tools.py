@@ -161,6 +161,24 @@ def qgis_get_layer_source_table_name(layer):
     return uri_table
 
 
+def qgis_get_layer_schema(layer):
+    """ Get table or view schema_name of selected layer """
+
+    if layer is None:
+        return None
+
+    table_schema = None
+    uri = layer.dataProvider().dataSourceUri().lower()
+
+    pos_ini = uri.find('table=')
+    pos_end_schema = uri.rfind('.')
+    pos_fi = uri.find('" ')
+    if pos_ini != -1 and pos_fi != -1:
+        table_schema = uri[pos_ini + 7:pos_end_schema - 1]
+
+    return table_schema
+
+
 def qgis_get_layer_primary_key(layer=None):
     """ Get primary key of selected layer """
 
@@ -188,9 +206,12 @@ def qgis_get_layer_by_tablename(tablename, show_warning=False, log_info=False):
 
     # Iterate over all layers
     layer = None
+    project_vars = get_qgis_project_variables()
+    main_schema = project_vars['main_schema']
     for cur_layer in layers:
         uri_table = qgis_get_layer_source_table_name(cur_layer)
-        if uri_table is not None and uri_table == tablename:
+        table_schema = qgis_get_layer_schema(cur_layer)
+        if (uri_table is not None and uri_table == tablename) and main_schema in (None, table_schema):
             layer = cur_layer
             break
 
