@@ -42,7 +42,6 @@ v_querytext text;
 v_querytextres record;
 v_i integer;
 v_count text;
-v_qmlpointpath	text;
 v_error_context text;
 	
 BEGIN
@@ -61,8 +60,6 @@ BEGIN
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 
-	--select default geometry style
-	SELECT regexp_replace(row(value)::text, '["()"]', '', 'g')  INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 
 	-- Computing process
 	IF v_array != '()' THEN
@@ -136,7 +133,7 @@ BEGIN
   	FROM  anl_node WHERE cur_user="current_user"() AND fid=111) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
+	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results

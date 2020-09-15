@@ -38,9 +38,6 @@ v_result_polygon json;
 v_querytext text;
 v_result_id text;
 v_defaultdemand	float;
-v_qmlpointpath text = '';
-v_qmllinepath text = '';
-v_qmlpolpath text = '';
 v_error_context text;
 v_fid integer;
 
@@ -55,10 +52,6 @@ BEGIN
 
 	-- select config values
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version order by 1 desc limit 1 ;
-
-	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
-	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
-	SELECT value INTO v_qmlpolpath FROM config_param_user WHERE parameter='qgis_qml_pollayer_path' AND cur_user=current_user;
 
 	-- init variables
 	v_count=0;
@@ -325,7 +318,7 @@ BEGIN
 	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 111, 113, 187)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
+	v_result_point = concat ('{"geometryType":"Point",  "features":',v_result, '}'); 
 
 	--lines
 	v_result = null;
@@ -340,7 +333,7 @@ BEGIN
 	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result,'}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
 
 	--polygons
 	v_result = null;
@@ -355,7 +348,7 @@ BEGIN
 	FROM  anl_polygon WHERE cur_user="current_user"() AND fid =14) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_polygon = concat ('{"geometryType":"Polygon","qmlPath":"',v_qmlpolpath,'", "features":',v_result, '}');
+	v_result_polygon = concat ('{"geometryType":"Polygon", "features":',v_result, '}');
 
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 

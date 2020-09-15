@@ -23,8 +23,6 @@ SELECT SCHEMA_NAME.gw_fct_flow_exit($${
 DECLARE 
 
   v_result_json json;
-  v_qmllinepath text;
-  v_qmlpointpath text;
   v_result json;
   v_result_info text;
   v_result_point json;
