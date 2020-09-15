@@ -1490,8 +1490,7 @@ class GwVisitManager:
                 value = getattr(self.dlg_event, field_name).toPlainText()
             if type(getattr(self.dlg_event, field_name)) is QComboBox:
                 value = qt_tools.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
-            if value and str(value) != 'NULL':
-                setattr(event, field_name, value)
+            setattr(event, field_name, value)
 
         # set fixed values
         self.dlg_event.parameter_id.setText(parameter_id)
@@ -1511,8 +1510,7 @@ class GwVisitManager:
                     value = getattr(self.dlg_event, field_name).toPlainText()
                 elif type(getattr(self.dlg_event, field_name)) is QComboBox:
                     value = qt_tools.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
-                if value and str(value) != 'NULL':
-                    setattr(event, field_name, value)
+                setattr(event, field_name, value)
 
             # update the record
             event.upsert()
