@@ -24,24 +24,24 @@ INSERT INTO config_visit_class VALUES (3, 'Leak on node', NULL, true, false, fal
 
 SELECT setval('SCHEMA_NAME.om_visit_class_id_seq', (SELECT max(id) FROM config_visit_class), true);
 
-INSERT INTO config_visit_parameter VALUES ('leak_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'leak on connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_des');
-INSERT INTO config_visit_parameter VALUES ('leak_arc', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'leak on arc', 'event_standard', 'defaultvalue', FALSE, 'arc_insp_des');
-INSERT INTO config_visit_parameter VALUES ('leak_node', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'leak on node', 'event_standard', 'defaultvalue',FALSE, 'node_insp_des');
+INSERT INTO config_visit_parameter VALUES ('leak_connec', NULL, 'INSPECTION', 'CONNEC', 'text', NULL, 'leak on connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_des');
+INSERT INTO config_visit_parameter VALUES ('leak_arc', NULL, 'INSPECTION', 'ARC', 'text', NULL, 'leak on arc', 'event_standard', 'defaultvalue', FALSE, 'arc_insp_des');
+INSERT INTO config_visit_parameter VALUES ('leak_node', NULL, 'INSPECTION', 'NODE', 'text', NULL, 'leak on node', 'event_standard', 'defaultvalue',FALSE, 'node_insp_des');
 
-INSERT INTO config_visit_parameter VALUES ('sediments_arc', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Sediments in arc', 'event_standard', 'defaultvalue',FALSE, 'arc_insp_sed');
-INSERT INTO config_visit_parameter VALUES ('clean_arc', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Clean of arc', 'event_standard', 'defaultvalue', FALSE, 'arc_cln_exec');
-INSERT INTO config_visit_parameter VALUES ('defect_arc', NULL, 'INSPECTION', 'ARC', 'TEXT', NULL, 'Defects of arc', 'event_standard', 'defaultvalue', FALSE, 'arc_defect');
+INSERT INTO config_visit_parameter VALUES ('sediments_arc', NULL, 'INSPECTION', 'ARC', 'text', NULL, 'Sediments in arc', 'event_standard', 'defaultvalue',FALSE, 'arc_insp_sed');
+INSERT INTO config_visit_parameter VALUES ('clean_arc', NULL, 'INSPECTION', 'ARC', 'text', NULL, 'Clean of arc', 'event_standard', 'defaultvalue', FALSE, 'arc_cln_exec');
+INSERT INTO config_visit_parameter VALUES ('defect_arc', NULL, 'INSPECTION', 'ARC', 'text', NULL, 'Defects of arc', 'event_standard', 'defaultvalue', FALSE, 'arc_defect');
 
-INSERT INTO config_visit_parameter VALUES ('sediments_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'Sediments in connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_sed');
-INSERT INTO config_visit_parameter VALUES ('clean_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'Clean of connec', 'event_standard', 'defaultvalue',FALSE, 'con_cln_exec');
-INSERT INTO config_visit_parameter VALUES ('defect_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'Defects of connec', 'event_standard', 'defaultvalue', FALSE, 'connec_defect');
+INSERT INTO config_visit_parameter VALUES ('sediments_connec', NULL, 'INSPECTION', 'CONNEC', 'text', NULL, 'Sediments in connec', 'event_standard', 'defaultvalue',FALSE, 'con_insp_sed');
+INSERT INTO config_visit_parameter VALUES ('clean_connec', NULL, 'INSPECTION', 'CONNEC', 'text', NULL, 'Clean of connec', 'event_standard', 'defaultvalue',FALSE, 'con_cln_exec');
+INSERT INTO config_visit_parameter VALUES ('defect_connec', NULL, 'INSPECTION', 'CONNEC', 'text', NULL, 'Defects of connec', 'event_standard', 'defaultvalue', FALSE, 'connec_defect');
 
-INSERT INTO config_visit_parameter VALUES ('sediments_node', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Sediments in node', 'event_standard', 'defaultvalue',FALSE, 'node_insp_sed');
-INSERT INTO config_visit_parameter VALUES ('clean_node', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Clean of node', 'event_standard', 'defaultvalue',FALSE, 'node_cln_exec');
-INSERT INTO config_visit_parameter VALUES ('defect_node', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Defects of node', 'event_standard', 'defaultvalue', FALSE, 'node_defect');
+INSERT INTO config_visit_parameter VALUES ('sediments_node', NULL, 'INSPECTION', 'NODE', 'text', NULL, 'Sediments in node', 'event_standard', 'defaultvalue',FALSE, 'node_insp_sed');
+INSERT INTO config_visit_parameter VALUES ('clean_node', NULL, 'INSPECTION', 'NODE', 'text', NULL, 'Clean of node', 'event_standard', 'defaultvalue',FALSE, 'node_cln_exec');
+INSERT INTO config_visit_parameter VALUES ('defect_node', NULL, 'INSPECTION', 'NODE', 'text', NULL, 'Defects of node', 'event_standard', 'defaultvalue', FALSE, 'node_defect');
 
-INSERT INTO config_visit_parameter VALUES ('incident_comment', NULL, 'INSPECTION', 'ALL', 'TEXT', NULL, 'incident_comment', 'event_standard', 'defaultvalue', FALSE, 'incident_comment');
-INSERT INTO config_visit_parameter VALUES ('incident_type', NULL, 'INSPECTION', 'ALL', 'TEXT', NULL, 'incident type', 'event_standard', 'defaultvalue', FALSE, 'incident_type');
+INSERT INTO config_visit_parameter VALUES ('incident_comment', NULL, 'INSPECTION', 'ALL', 'text', NULL, 'incident_comment', 'event_standard', 'defaultvalue', FALSE, 'incident_comment');
+INSERT INTO config_visit_parameter VALUES ('incident_type', NULL, 'INSPECTION', 'ALL', 'text', NULL, 'incident type', 'event_standard', 'defaultvalue', FALSE, 'incident_type');
 
 
 INSERT INTO config_visit_class_x_parameter VALUES (5, 'sediments_node');

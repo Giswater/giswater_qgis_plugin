@@ -65,3 +65,7 @@ INSERT INTO config_toolbox VALUES (2522, 'Import epanet inp file', TRUE, '{"feat
 INSERT INTO config_toolbox VALUES (2524, 'Import swmm inp file', TRUE, '{"featureType":[]}', '[{"widgetname":"createSubcGeom", "label":"Create subcatchments geometry:", "widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":1,"value":"true"}]', null, TRUE)  ON CONFLICT (id) DO NOTHING;
 
 DELETE FROM sys_table WHERE id = 'config_form_groupbox';
+
+
+--2020/09/15
+UPDATE config_visit_parameter SET data_type = lower(data_type);
