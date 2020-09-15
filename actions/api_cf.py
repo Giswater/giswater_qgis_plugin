@@ -486,9 +486,10 @@ class ApiCF(ApiParent, QObject):
 
         self.show_actions('tab_data')
 
-        # TODO action_edit.setEnabled(lo que venga del json segun permisos)
-        # action_edit.setVisible(True)
-        # action_edit.setEnabled(True)
+        try:
+            action_edit.setEnabled(self.complet_result[0]['body']['feature']['permissions']['isEditable'])
+        except KeyError:
+            pass
 
         # Set actions icon
         self.set_icon(action_edit, "101")
@@ -584,7 +585,7 @@ class ApiCF(ApiParent, QObject):
             else:
                 self.disable_all(self.dlg_cf, result, False)
 
-        if action_edit.isVisible():
+        if action_edit.isEnabled():
             # SIGNALS
             self.layer.editingStarted.connect(partial(self.check_actions, action_edit, True))
             self.layer.editingStopped.connect(partial(self.check_actions, action_edit, False))
