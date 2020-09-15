@@ -32,7 +32,6 @@ v_result json;
 v_result_info json;
 v_result_point json;
 v_array text;
-v_qmlpointpath text;
 v_error_context text;
  
 BEGIN
@@ -51,9 +50,7 @@ BEGIN
     -- Reset values
     DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=132;
 		
-    --select default geometry style
-    SELECT regexp_replace(row(value)::text, '["()"]', '', 'g')  INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
-		
+
   -- Computing process
   IF v_array != '()' THEN
     EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom)
@@ -90,7 +87,7 @@ v_result = null;
     FROM  anl_node WHERE cur_user="current_user"() AND fid=132) row) features;
 
   v_result := COALESCE(v_result, '{}'); 
-  v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
+  v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results

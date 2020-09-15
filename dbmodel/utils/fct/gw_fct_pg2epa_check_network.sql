@@ -26,7 +26,7 @@ SELECT * FROM audit_check_data WHERE fid = 139
 SELECT * FROM temp_anlgraf;
 
 -- fid: main:139
-	other: 227,231,233,238
+	other: 227,231,233,228
 
 */
 
@@ -48,8 +48,6 @@ v_querytext text;
 v_count integer = 0;
 v_min float;
 v_max float;
-v_qmllinepath text;
-v_qmlpointpath text;
 v_version text;
 
 BEGIN
@@ -63,10 +61,6 @@ BEGIN
 	-- get project type
 	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
 	v_version = (SELECT giswater FROM sys_version LIMIT 1);
-	
-	-- get user variables
-	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
-	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 	
 	-- manage no found results
 	IF (SELECT result_id FROM rpt_cat_result WHERE result_id=v_result_id) IS NULL THEN
@@ -85,7 +79,7 @@ BEGIN
 	
 	DELETE FROM temp_anlgraf;
 	DELETE FROM anl_arc where cur_user=current_user AND fid IN (232,231,139);
-	DELETE FROM anl_node where cur_user=current_user AND fid IN (233,238,139);
+	DELETE FROM anl_node where cur_user=current_user AND fid IN (233,228,139);
 	DELETE FROM audit_check_data where cur_user=current_user AND fid = 139;
 		
 	IF v_fid is null THEN
@@ -109,7 +103,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 0, '-------------------------');
 
 
-	RAISE NOTICE '1 - Check result orphan nodes on rpt tables (fid:  238)';
+	RAISE NOTICE '1 - Check result orphan nodes on rpt tables (fid:  228)';
 	v_querytext = '(SELECT node_id, nodecat_id, the_geom FROM (
 			SELECT node_id FROM temp_node where result_id = '||quote_literal(v_result_id)||' and sector_id > 0 EXCEPT 
 			(SELECT node_1 as node_id FROM temp_arc where result_id = '||quote_literal(v_result_id)||' UNION
@@ -119,12 +113,12 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0  THEN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom)
-		SELECT 238, node_id, nodecat_id, ''Orphan node'', the_geom FROM ', v_querytext);
-		INSERT INTO audit_check_data (fid, criticity, error_message, count)
+		SELECT 228, node_id, nodecat_id, ''Orphan node'', the_geom FROM ', v_querytext);
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, count)
 		VALUES (v_fid, 3, concat('ERROR: There is/are ',v_count,
-		' node''s orphan on this result. Some inconsistency may have been generated because state_type (238).'),v_count);
+		' node''s orphan on this result. Some inconsistency may have been generated because state_type (228).'),v_count);
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
+		INSERT INTO audit_check_data (fid, result_id, criticity, result_id, error_message, count)
 		VALUES (v_fid, v_result_id, 1, 'INFO: No node(s) orphan found on this result.', v_count);
 	END IF;
 
@@ -385,7 +379,7 @@ BEGIN
 		) row) features;
   	
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}');
+	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 	
 	--lines
 	v_result = null;
@@ -401,7 +395,7 @@ BEGIN
 			 ) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result, '}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 
 	
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 

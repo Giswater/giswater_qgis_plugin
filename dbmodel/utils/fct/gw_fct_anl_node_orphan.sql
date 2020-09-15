@@ -37,7 +37,6 @@ v_result_point json;
 v_array text;
 v_selectionmode text;
 v_worklayer text;
-v_qmlpointpath	text;
 v_projectype text;
 v_partialquery text;
 v_isarcdivide text;
@@ -58,9 +57,6 @@ BEGIN
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 	v_isarcdivide := (((p_data ->>'data')::json->>'parameters')::json->>'isArcDivide')::text;
-
-	--select default geometry style
-	SELECT  regexp_replace(row(value)::text, '["()"]', '', 'g') INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=107;
@@ -119,7 +115,7 @@ BEGIN
   	FROM  anl_node WHERE cur_user="current_user"() AND fid=107) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
+	v_result_point = concat ('{"geometryType":"Point","features":',v_result, '}'); 
 
 
 	IF v_saveondatabase IS FALSE THEN 

@@ -46,8 +46,6 @@ v_array text;
 v_partcount integer = 0;
 v_totcount integer = 0;
 v_version text;
-v_qmlpointpath text;
-v_qmllinepath text;
 v_error_context text;
 
 BEGIN
@@ -64,10 +62,6 @@ BEGIN
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 	v_arcsearchnodes := ((p_data ->>'data')::json->>'parameters')::json->>'arcSearchNodes';
-
-	--select default geometry style
-	SELECT regexp_replace(row(value)::text, '["()"]', '', 'g')  INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
-	SELECT regexp_replace(row(value)::text, '["()"]', '', 'g')  INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
 
 	-- Reset values
     DELETE FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid = 103;
@@ -122,7 +116,7 @@ BEGIN
   	FROM  anl_arc_x_node WHERE cur_user="current_user"() AND fid = 103) row) features;
   	
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}');
+	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 	
 
 	--lines
@@ -139,7 +133,7 @@ BEGIN
   	FROM  anl_arc_x_node WHERE cur_user="current_user"() AND fid = 103) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result, '}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results

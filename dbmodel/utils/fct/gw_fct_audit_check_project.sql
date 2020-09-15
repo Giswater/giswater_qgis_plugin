@@ -59,9 +59,6 @@ v_result_polygon json;
 v_result json;
 v_result_info json;
 v_qgis_version text;
-v_qmlpointpath text = '';
-v_qmllinepath text = '';
-v_qmlpolpath text = '';
 v_user_control boolean = false;
 v_layer_log boolean = false;
 v_error_context text;
@@ -113,9 +110,6 @@ BEGIN
 	END IF;
 	
 	-- get user parameters
-	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
-	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
-	SELECT value INTO v_qmlpolpath FROM config_param_user WHERE parameter='qgis_qml_pollayer_path' AND cur_user=current_user;
 	SELECT value INTO v_user_control FROM config_param_user where parameter='utils_checkproject_database' AND cur_user=current_user;
 	SELECT value INTO v_layer_log FROM config_param_user where parameter='utils_checkproject_qgislayer' AND cur_user=current_user;
 	SELECT value INTO v_hidden_form FROM config_param_user where parameter='qgis_form_initproject_hidden' AND cur_user=current_user;
@@ -530,7 +524,7 @@ BEGIN
 			) row) features;
 
 			v_result := COALESCE(v_result, '{}'); 
-			v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result,',"category_field":"descript"}'); 
+			v_result_point = concat ('{"geometryType":"Point", "features":',v_result,',"category_field":"descript"}'); 
 
 			--lines
 			v_result = null;
@@ -548,7 +542,7 @@ BEGIN
 			) row) features;
 
 			v_result := COALESCE(v_result, '{}'); 
-			v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result, ',"category_field":"descript"}');
+			v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, ',"category_field":"descript"}');
 
 		END IF;
 

@@ -34,8 +34,6 @@ v_result_point json;
 v_result_line json;
 v_querytext text;
 v_count integer;
-v_qmlpointpath text;
-v_qmllinepath text;
 v_errcontext text;
 
 BEGIN
@@ -50,9 +48,6 @@ BEGIN
 	
 	-- select config values
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
-
-	SELECT value INTO v_qmlpointpath FROM config_param_user WHERE parameter='qgis_qml_pointlayer_path' AND cur_user=current_user;
-	SELECT value INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid = 173 AND cur_user=current_user;
@@ -120,7 +115,7 @@ BEGIN
   	FROM  anl_connec WHERE cur_user="current_user"() AND fid = 192) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
+	v_result_point = concat ('{"geometryType":"Point","features":',v_result, '}'); 
 	-- lines
 	v_result = null;
 	SELECT jsonb_agg(features.feature) INTO v_result
@@ -134,7 +129,7 @@ BEGIN
   	FROM  anl_arc WHERE cur_user="current_user"() AND fid = 190) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result,'}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
 
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 

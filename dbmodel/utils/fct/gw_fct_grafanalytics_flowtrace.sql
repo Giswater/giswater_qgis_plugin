@@ -169,7 +169,7 @@ BEGIN
 	(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"", "features":',v_result,'}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
 
 
 	-- Control nulls

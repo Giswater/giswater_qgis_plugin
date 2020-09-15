@@ -25,9 +25,6 @@ v_result_info json;
 v_result_point json;
 v_result_line json;
 v_result_polygon json;
-v_qmlpointpath text;
-v_qmllinepath text;
-v_qmlpolpath text;
 v_project_type text;
 v_version text;
 v_stats json;
@@ -189,7 +186,7 @@ BEGIN
   	FROM  anl_node WHERE cur_user="current_user"() AND  fid IN (107, 114, 164, 166, 170, 171, 198)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "qmlPath":"',v_qmlpointpath,'", "features":',v_result, '}'); 
+	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
 
 	--lines
 	v_result = null;
@@ -204,7 +201,7 @@ BEGIN
   	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (103, 114, 139)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result,'}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
 
 	--polygons
 	v_result = null;
@@ -219,7 +216,7 @@ BEGIN
   	FROM  anl_polygon WHERE cur_user="current_user"() AND fid = 114) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"Polygon", "qmlPath":"',v_qmllinepath,'", "features":',v_result,'}'); 
+	v_result_line = concat ('{"geometryType":"Polygon", "features":',v_result,'}'); 
 
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 

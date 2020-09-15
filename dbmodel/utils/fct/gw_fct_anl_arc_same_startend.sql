@@ -32,7 +32,6 @@ v_result_info json;
 v_result_line json;
 v_array text;
 v_version text;
-v_qmllinepath text;
 v_error_context text;
 
 BEGIN
@@ -48,9 +47,6 @@ BEGIN
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
-
-	--select default geometry style
-	SELECT regexp_replace(row(value)::text, '["()"]', '', 'g') INTO v_qmllinepath FROM config_param_user WHERE parameter='qgis_qml_linelayer_path' AND cur_user=current_user;
 
 	-- Reset values
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid = 104;
@@ -85,7 +81,7 @@ BEGIN
   	FROM  anl_arc WHERE cur_user="current_user"() AND fid = 104) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"',v_qmllinepath,'", "features":',v_result, '}'); 
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 
 
 	IF v_saveondatabase IS FALSE THEN 
 		-- delete previous results
