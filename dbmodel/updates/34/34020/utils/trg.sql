@@ -37,3 +37,10 @@ CREATE INDEX anl_connec_index
   ON anl_connec
   USING gist
   (the_geom);
+  
+ CREATE TRIGGER gw_trg_edit_element_pol
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_element_pol
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_element_pol();
+
