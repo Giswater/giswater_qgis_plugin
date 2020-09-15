@@ -13,8 +13,11 @@ version=3.4.020
 
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
 # End of mandatory metadata
-changelog=Version 3.4.020 (xx/xx/2020)
-   - 
+changelog=Version 3.4.020 (15/09/2020)
+   - Bug fix on get default values for visit and search
+   - Zoom to selected geometry or relations on visit
+   - Manage QTextEdit on custom forms
+   - Add event_code to insert event form
 
 
 # Tags are comma separated with spaces allowed
