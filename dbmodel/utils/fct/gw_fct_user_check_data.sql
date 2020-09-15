@@ -13,11 +13,11 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_user_check_data(p_data json)
 $BODY$
 
 	/*EXAMPLE
-	
+		
 
-	SELECT SCHEMA_NAME.gw_fct_user_check_data($${"client":
-	{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-	"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text
+		SELECT SCHEMA_NAME.gw_fct_user_check_data($${"client":
+		{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+		"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"logProject":"false"}}}$$)::text
 
 -- fid: 251
 
@@ -36,6 +36,7 @@ v_warning_val integer;
 v_groupby text;
 json_result json[];
 rec_result text;
+v_log_project boolean;
 
 v_result_id text;
 v_result text;
@@ -61,6 +62,8 @@ BEGIN
 	
 	-- select config values
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
+
+	v_log_project = ((((p_data::JSON ->> 'data')::json ->> 'parameters')::json) ->>'logProject')::boolean;
 
 	-- init variables
 	v_count=0;
@@ -93,8 +96,6 @@ BEGIN
 		SELECT (rec.addparam::json ->> 'groupBy') INTO v_groupby;
 
 		
-raise notice 'v_groupby,%',v_groupby;
-
 		IF v_groupby IS NULL THEN
 			EXECUTE rec.querytext
 			INTO v_count;
@@ -106,11 +107,10 @@ raise notice 'v_groupby,%',v_groupby;
 			''groupBy'', a.'||v_groupby||') AS feature
 			FROM ('||rec.querytext||')a) features;'
 			INTO json_result;
-			raise notice 'json_result,%',json_result;
 		END IF;
 
 		
-		IF rec.target::integer = 1 THEN
+		IF rec.target = 'ERROR' THEN
 			IF v_count::integer < v_warning_val THEN
 				v_criticity = 1;
 			ELSIF  v_count::integer >= v_warning_val AND  v_count::integer < v_error_val THEN
@@ -123,16 +123,30 @@ raise notice 'v_groupby,%',v_groupby;
 		END IF;
 		
 		IF v_groupby IS NULL THEN
-			INSERT INTO audit_fid_log (fid, count, criticity)
-			VALUES (rec.fid,  v_count, v_criticity);
+			IF v_log_project THEN
+				INSERT INTO audit_fid_log (fid, count, criticity)
+				VALUES (rec.fid,  v_count, v_criticity);
+			END IF;
+
+			INSERT INTO audit_check_data(fid, result_id, criticity, error_message,  count)
+			SELECT 251,rec.fid, v_criticity, sys_fprocess.fprocess_name, (rec_result::json ->> 'count') 
+			FROM sys_fprocess WHERE sys_fprocess.fid = rec.fid;
+
 		ELSE 
 			FOREACH rec_result IN ARRAY(json_result) LOOP
-			raise notice 'v_groupby,%',v_groupby;
-				INSERT INTO audit_fid_log (fid, count, criticity, groupby)
-				VALUES (rec.fid,  (rec_result::json ->> 'count'), v_criticity, (rec_result::json ->>'groupBy'));
+				IF v_log_project THEN
+					INSERT INTO audit_fid_log (fid, count, criticity, groupby)
+					VALUES (rec.fid,  (rec_result::json ->> 'count'), v_criticity, (rec_result::json ->>'groupBy'));
+				END IF;
+
+				INSERT INTO audit_check_data(fid, result_id, criticity, error_message,  count)
+				SELECT 251,rec.fid, v_criticity, concat(sys_fprocess.fprocess_name,' - ',(rec_result::json ->>'groupBy')), (rec_result::json ->> 'count') 
+				FROM sys_fprocess WHERE sys_fprocess.fid = rec.fid;
+
 			END LOOP;
 			
 		END IF;
+
 	END LOOP;
 	
 
@@ -150,7 +164,7 @@ raise notice 'v_groupby,%',v_groupby;
 	
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
-
+	
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 			 ',"body":{"form":{}'||
