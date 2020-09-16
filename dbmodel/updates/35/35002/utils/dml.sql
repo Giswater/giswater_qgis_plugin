@@ -35,8 +35,13 @@ UPDATE config_function set layermanager = '{"visible": ["v_edit_dimensions"]}' W
 --2020/09/16
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
 VALUES ('2998', 'gw_fct_user_check_data', 'utils', 'function','json', 'json', 
-'Function to analyze data quality using queries defined by user', 'role_basic', NULL) ON CONFLICT (id) DO NOTHING;
+'Function to analyze data quality using queries defined by user', 'role_om', NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
 VALUES ('3000', 'gw_fct_audit_log_project', 'utils', 'function','json', 'json', 
-'Function that executes all check functions and copy data into statistic table (audit_fid_log)', 'role_basic', NULL);
+'Function that executes all check functions and copy data into statistic table (audit_fid_log)', 'role_om', NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_toolbox(id, alias, isparametric, functionparams, inputparams, observ, active)
+VALUES (2998,'User check data', TRUE, '{"featureType":[]}', 
+'[{"widgetname":"checkType", "label":"Check type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["User"],"comboNames":["User"], "selectedId":"User"}]',
+null, TRUE) ON CONFLICT (id) DO NOTHING;
