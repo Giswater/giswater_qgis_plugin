@@ -586,7 +586,7 @@ class MincutParent(ParentAction):
                            f"on same macroexploitation and has conflicts at least with one. <br>"
                            f"<b>It's not possible to continue. You can try to modify start-end values .</b><br>"
                            f"For more information take a look on v_anl_arc or query: <br>")
-                    utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.lbl_text, msg)
+                    utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.lbl_title, msg)
                     text = (f"SELECT arc_id, result_id, descript, the_geom FROM anl_arc "
                             f"WHERE fprocesscat_id=31 and cur_user=current_user; ")
                     utils_giswater.setWidgetText(self.dlg_binfo, self.dlg_binfo.txt_infolog, text)
