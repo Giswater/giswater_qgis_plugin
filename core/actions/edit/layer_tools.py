@@ -82,7 +82,7 @@ class GwLayerTools:
         """
 
         sql = f'DROP TABLE "{layer.name()}";'
-        self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql)
 
         schema_name = self.controller.credentials['schema'].replace('"', '')
         self.set_uri()
@@ -118,7 +118,7 @@ class GwLayerTools:
                     style_id = layer[3]
                     if style_id is not None:
                         body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-                        style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                        style = self.controller.get_json('gw_fct_getstyle', body)
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']
@@ -132,7 +132,7 @@ class GwLayerTools:
             # therefore, we define it with "-1"
             if style_id not in (None, "-1"):
                 body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-                style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                style = self.controller.get_json('gw_fct_getstyle', body)
                 if 'styles' in style['body']:
                     if 'style' in style['body']['styles']:
                         qml = style['body']['styles']['style']

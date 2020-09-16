@@ -100,7 +100,7 @@ def set_completer_object(dialog, table_object):
     sql = (f"SELECT DISTINCT({field_object_id})"
            f" FROM {table_object}")
 
-    rows = global_vars.controller.get_rows(sql, log_sql=True)
+    rows = global_vars.controller.get_rows(sql)
     if rows is None:
         return
 
@@ -1250,7 +1250,7 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
         extras += f'"{widget_name}":"{value}", '
     extras = extras[:-2]
     body = create_body(extras)
-    result = global_vars.controller.get_json('gw_fct_check_importdxf', None, log_sql=True)
+    result = global_vars.controller.get_json('gw_fct_check_importdxf', None)
     if not result:
         return False
 
@@ -1306,7 +1306,7 @@ def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=N
         form = f'"currentTab":"{current_tab}"'
         extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
         body = create_body(form=form, extras=extras)
-        json_result = global_vars.controller.get_json('gw_fct_getselectors', body, log_sql=True)
+        json_result = global_vars.controller.get_json('gw_fct_getselectors', body)
     else:
         json_result = is_setselector
         for x in range(dialog.main_tab.count() - 1, -1, -1):
@@ -1495,7 +1495,7 @@ def set_selector(dialog, widget, is_alone, selector_vars):
             f'"addSchema":"{qgis_project_add_schema}"'
 
     body = create_body(extras=extras)
-    json_result = global_vars.controller.get_json('gw_fct_setselectors', body, log_sql=True)
+    json_result = global_vars.controller.get_json('gw_fct_setselectors', body)
 
     if str(tab_name) == 'tab_exploitation':
         try:

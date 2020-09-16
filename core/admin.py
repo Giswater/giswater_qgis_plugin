@@ -1920,7 +1920,7 @@ class GwAdmin:
         # Populate visit class
         # TODO:: Populate combo from visitclass manager and wip
         # sql = ("SELECT id, idval FROM config_visit_class")
-        # rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        # rows = self.controller.get_rows(sql, commit=True)
         # qt_tools.set_item_data(self.dlg_readsql.cmb_visit_class, rows, 1)
 
         # Set listeners
@@ -1937,11 +1937,11 @@ class GwAdmin:
 
         # Manage widgets
         sql = "SELECT id, id as idval FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2"
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
         qt_tools.set_item_data(self.dlg_manage_visit_class.feature_type, rows, 1)
 
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue ='visit_type'"
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         qt_tools.set_item_data(self.dlg_manage_visit_class.visit_type, rows, 1)
 
         # Set listeners
@@ -1959,19 +1959,19 @@ class GwAdmin:
 
         # Manage widgets
         sql = "SELECT id, id as idval FROM om_visit_parameter_type"
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
         qt_tools.set_item_data(self.dlg_manage_visit_param.parameter_type, rows, 1)
 
         sql = "SELECT id, idval FROM config_typevalue WHERE typevalue = 'datatype'"
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
         qt_tools.set_item_data(self.dlg_manage_visit_param.data_type, rows, 1)
 
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_form_type'"
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
         qt_tools.set_item_data(self.dlg_manage_visit_param.form_type, rows, 1)
 
         sql = "SELECT id, idval FROM config_typevalue WHERE typevalue = 'widgettype'"
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
         qt_tools.set_item_data(self.dlg_manage_visit_param.widget_type, rows, 1)
 
         # Set listeners
@@ -2472,7 +2472,7 @@ class GwAdmin:
         body = create_body(extras=extras)
         self.task1.setProgress(50)
         result = self.controller.get_json('gw_fct_admin_schema_clone', body,
-                                          schema_name=schema, log_sql=True, commit=False)
+                                          schema_name=schema, commit=False)
         if not result:
             return
         self.task1.setProgress(100)
@@ -2549,7 +2549,7 @@ class GwAdmin:
 
             body = create_body(extras=extras)
             sql = ("SELECT " + str(function_name) + "(" + body + ")::text")
-            row = self.controller.get_row(sql, log_sql=True, commit=False)
+            row = self.controller.get_row(sql, commit=False)
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
@@ -2661,12 +2661,12 @@ class GwAdmin:
             content = f.read()
         sql = ("INSERT INTO " + schema_name + ".temp_csv(source, csv1, fid) VALUES('" +
                str(form_name_ui) + "', '" + str(content) + "', 247);")
-        status = self.controller.execute_sql(sql, log_sql=True)
+        status = self.controller.execute_sql(sql)
 
         # Import xml to database
         sql = ("SELECT " + schema_name + ".gw_fct_import_ui_xml('" + str(form_name_ui) + "', " +
                str(status_update_childs) + ")::text")
-        status = self.controller.execute_sql(sql, log_sql=True)
+        status = self.controller.execute_sql(sql)
         self.manage_result_message(status, parameter="Import data into 'config_form_fields'")
 
         # Clear temp_csv
@@ -2689,7 +2689,7 @@ class GwAdmin:
         # Export xml from database
         sql = ("SELECT " + schema_name + ".gw_fct_export_ui_xml('"
                + str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
-        status = self.controller.execute_sql(sql, log_sql=True)
+        status = self.controller.execute_sql(sql)
         if status is False:
             msg = "Process finished with some errors"
             self.controller.show_info_box(msg, "Warning", parameter="Function import/export")
@@ -2699,7 +2699,7 @@ class GwAdmin:
         sql = ("SELECT csv1 FROM " + schema_name + ".temp_csv "
                "WHERE cur_user = current_user AND source = '" + str(form_name_ui) + "' "
                "ORDER BY id DESC")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if not row:
             return
 
@@ -2731,7 +2731,7 @@ class GwAdmin:
         schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
         # Clear temp_csv
         sql = f"DELETE FROM {schema_name}.temp_csv WHERE cur_user = current_user"
-        status = self.controller.execute_sql(sql, log_sql=True)
+        status = self.controller.execute_sql(sql)
 
 
     def select_file_ui(self):
@@ -2998,20 +2998,20 @@ class GwAdmin:
         # Populate widgettype combo
         sql = (f"SELECT DISTINCT(id), idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         qt_tools.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
 
         # Populate datatype combo
         sql = (f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         qt_tools.set_item_data(self.dlg_manage_fields.datatype, rows, 1)
 
         # Populate widgetfunction combo
         sql = (f"SELECT null as id, null as idval UNION ALL "
                f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         qt_tools.set_item_data(self.dlg_manage_fields.widgetfunction, rows, 1)
 
         # Set default value for formtype widget
@@ -3077,7 +3077,7 @@ class GwAdmin:
                    f"FROM {schema_name}.ve_config_addfields "
                    f"WHERE cat_feature_id = '" + form_name + "'")
 
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         qt_tools.set_item_data(self.dlg_manage_fields.cmb_fields, rows, 1)
 
 
@@ -3135,7 +3135,7 @@ class GwAdmin:
         param_name = qt_tools.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.columnname)
         sql = (f"SELECT param_name FROM {schema_name}.sys_addfields "
                f"WHERE param_name = '{param_name}' AND  cat_feature_id = '{form_name}' ")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
 
         if action == 'create':
 

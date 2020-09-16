@@ -141,7 +141,7 @@ class GwGo2EpaTask(QgsTask):
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         body = self.create_body(extras=extras)
         function_name = 'gw_fct_pg2epa_main'
-        json_result = self.controller.get_json(function_name, body, log_sql=True)
+        json_result = self.controller.get_json(function_name, body)
         if json_result is None:
             return False
 

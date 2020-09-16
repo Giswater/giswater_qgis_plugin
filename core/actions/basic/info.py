@@ -669,7 +669,7 @@ class GwInfo(QObject):
             extras += f'"node1":"{self.node1}", '
             extras += f'"node2":"{self.node2}"}}'
             body = create_body(extras=extras)
-            self.interpolate_result = global_vars.controller.get_json('gw_fct_node_interpolate', body, log_sql=True)
+            self.interpolate_result = global_vars.controller.get_json('gw_fct_node_interpolate', body)
             populate_info_text(dlg_dtext, self.interpolate_result['body']['data'])
 
 
@@ -2124,7 +2124,7 @@ class GwInfo(QObject):
                " WHERE connec_id = '" + str(self.feature_id) + "' "
                " ORDER BY hydrometer_customer_code")
         rows_list = []
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         rows_list.append(['', ''])
         if rows:
             for row in rows:
@@ -2405,7 +2405,7 @@ class GwInfo(QObject):
         if event_type_value != 'null':
             sql += f" AND parameter_type ILIKE '%{event_type_value}%'"
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if rows:
             rows.append(['', ''])
             qt_tools.set_item_data(self.dlg_cf.event_id, rows, 1)

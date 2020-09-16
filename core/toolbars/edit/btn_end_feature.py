@@ -134,7 +134,7 @@ class GwEndFeatureButton(GwParentAction):
             sql = (f"UPDATE config_param_user "
                    f"SET value = '{value}' "
                    f"WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
-            self.controller.execute_sql(sql, log_sql=True)
+            self.controller.execute_sql(sql)
         else:
             sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                    f"VALUES ('edit_arc_downgrade_force', '{value}', current_user)")
@@ -559,10 +559,10 @@ class GwEndFeatureButton(GwParentAction):
             sql = (f"SELECT DISTINCT(id)"
                    f" FROM {table_object}"
                    f" WHERE id = '{cat_work_id}'")
-            row = self.controller.get_row(sql, log_info=False, log_sql=True)
+            row = self.controller.get_row(sql, log_info=False)
             if row is None:
                 sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
-                self.controller.execute_sql(sql, log_sql=True)
+                self.controller.execute_sql(sql)
                 sql = "SELECT id FROM cat_work ORDER BY id"
                 rows = self.controller.get_rows(sql)
                 if rows:

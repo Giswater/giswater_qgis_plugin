@@ -130,7 +130,7 @@ class GwMincutManager:
                    f"JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
                    f"JOIN om_mincut AS t2 ON t1.result_id = t2.id "
                    f"WHERE result_id = {id_}")
-            rows = self.controller.get_rows(sql, log_sql=True)
+            rows = self.controller.get_rows(sql)
             if not rows:
                 inf_text += "\nClients: None(No messages will be sent)"
                 continue
@@ -164,7 +164,7 @@ class GwMincutManager:
                    f"JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
                    f"JOIN om_mincut AS t2 ON t1.result_id = t2.id "
                    f"WHERE result_id = {id_}")
-            rows = self.controller.get_rows(sql, log_sql=True)
+            rows = self.controller.get_rows(sql)
             if not rows:
                 continue
 

@@ -83,7 +83,7 @@ class GwDimensioning:
         if db_return is None:
             body = create_body()
             function_name = 'gw_fct_getdimensioning'
-            json_result = self.controller.get_json(function_name, body, log_sql=True)
+            json_result = self.controller.get_json(function_name, body)
             if json_result is None:
                 return False
             db_return = [json_result]

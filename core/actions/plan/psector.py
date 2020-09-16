@@ -233,7 +233,7 @@ class GwPsector:
                    f"observ, atlas_id, scale, rotation, active, ext_code, status "
                    f"FROM plan_psector "
                    f"WHERE psector_id = {psector_id}")
-            row = self.controller.get_row(sql, log_sql=True)
+            row = self.controller.get_row(sql)
 
             if not row:
                 return
@@ -490,7 +490,7 @@ class GwPsector:
         sql = (f"UPDATE plan_psector "
                f"SET enable_all = '{value}' "
                f"WHERE psector_id = '{psector_id}'")
-        self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql)
         refresh_map_canvas()
 
 
@@ -1024,7 +1024,7 @@ class GwPsector:
                f"WHERE table_name = {viewname} "
                f"AND table_schema = '" + self.schema_name.replace('"', '') + "' "
                f"ORDER BY ordinal_position;")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if not rows or rows is None or rows == '':
             message = "Check fields from table or view"
             self.controller.show_warning(message, parameter=viewname)
@@ -1093,7 +1093,7 @@ class GwPsector:
 
         if not self.update:
             sql += " RETURNING psector_id;"
-            new_psector_id = self.controller.execute_returning(sql, log_sql=True)
+            new_psector_id = self.controller.execute_returning(sql)
             qt_tools.setText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id and self.plan_om == 'plan':
                 row = self.controller.get_config('plan_psector_vdefault')
@@ -1105,9 +1105,9 @@ class GwPsector:
                 else:
                     sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                            f" VALUES ('plan_psector_vdefault', '{new_psector_id[0]}', current_user);")
-                self.controller.execute_sql(sql, log_sql=True)
+                self.controller.execute_sql(sql)
         else:
-            self.controller.execute_sql(sql, log_sql=True)
+            self.controller.execute_sql(sql)
 
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, True)
         self.delete_psector_selector('selector_plan_psector')

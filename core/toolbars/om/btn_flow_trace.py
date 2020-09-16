@@ -50,7 +50,7 @@ class GwFlowTraceButton(GwParentMapTool):
             elem_id = self.snapped_feat.attribute('node_id')
             feature_id = f'"id":["{elem_id}"]'
             body = create_body(feature=feature_id)
-            result = self.controller.get_json(function_name, body, log_sql=True)
+            result = self.controller.get_json(function_name, body)
             if not result:
                 return
 

@@ -260,7 +260,7 @@ class GwPrintButton(GwParentAction):
         feature = '"feature":{''}, '
         data = '"data":' + str(my_json)
         body = "$${" + client + form + feature + data + "}$$"
-        json_result = self.controller.get_json('gw_fct_setprint', body, log_sql=True)
+        json_result = self.controller.get_json('gw_fct_setprint', body)
         if not json_result:
             return False
 

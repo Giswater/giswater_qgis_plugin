@@ -197,5 +197,5 @@ class Table(object):
             else:
                 sql += " WHERE {}".format(where_clause)
 
-        return self.controller().execute_sql(sql, commit=commit, log_sql=True)
+        return self.controller().execute_sql(sql, commit=commit)
 

@@ -154,7 +154,7 @@ class GwProfileButton(GwParentMapTool):
         body = create_body(extras=extras)
 
         # Execute query
-        self.profile_json = self.controller.get_json('gw_fct_getprofilevalues', body, log_sql=True)
+        self.profile_json = self.controller.get_json('gw_fct_getprofilevalues', body)
 
         # Manage level and message from query result
         if self.profile_json['message']:
@@ -207,7 +207,7 @@ class GwProfileButton(GwParentMapTool):
             f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, ' \
             f'"ev":1000}}, "title":"{title}", "date":"{date}"'
         body = create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_setprofile', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_setprofile', body)
         if result is None: return
         message = f"{result['message']}"
         self.controller.show_info(message)
@@ -221,7 +221,7 @@ class GwProfileButton(GwParentMapTool):
 
         # Get profils on database
         body = create_body()
-        result_profile = self.controller.get_json('gw_fct_getprofile', body, log_sql=True)
+        result_profile = self.controller.get_json('gw_fct_getprofile', body)
         if not result_profile:
             return
         message = f"{result_profile['message']}"
@@ -352,7 +352,7 @@ class GwProfileButton(GwParentMapTool):
                     # Populate list arcs
                     extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
                     body = create_body(extras=extras)
-                    result = self.controller.get_json('gw_fct_getprofilevalues', body, log_sql=True)
+                    result = self.controller.get_json('gw_fct_getprofilevalues', body)
                     self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
                     self.remove_selection()
                     list_arcs = []
@@ -1288,7 +1288,7 @@ class GwProfileButton(GwParentMapTool):
 
         extras = f'"profile_id":"{profile_id}", "action":"delete"'
         body = create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_setprofile', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_setprofile', body)
         message = f"{result['message']}"
         self.controller.show_info(message)
 

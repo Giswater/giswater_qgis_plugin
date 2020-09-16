@@ -111,7 +111,7 @@ class ApiParent(ParentAction):
         sql = (f"SELECT DISTINCT({field_object_id})"
                f" FROM {table_object}")
 
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if rows is None:
             return
 
@@ -1151,7 +1151,7 @@ class ApiParent(ParentAction):
             extras += f'"node1":"{self.node1}", '
             extras += f'"node2":"{self.node2}"}}'
             body = self.create_body(extras=extras)
-            self.interpolate_result = self.controller.get_json('gw_fct_node_interpolate', body, log_sql=True)
+            self.interpolate_result = self.controller.get_json('gw_fct_node_interpolate', body)
             self.add_layer.populate_info_text(self.dlg_dtext, self.interpolate_result['body']['data'])
 
 
@@ -1594,7 +1594,7 @@ class ApiParent(ParentAction):
             extras += f'"{widget_name}":"{value}", '
         extras = extras[:-2]
         body = self.create_body(extras)
-        result = self.controller.get_json('gw_fct_check_importdxf', None, log_sql=True)
+        result = self.controller.get_json('gw_fct_check_importdxf', None)
         if not result:
             return False
 
@@ -1650,7 +1650,7 @@ class ApiParent(ParentAction):
             form = f'"currentTab":"{current_tab}"'
             extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
             body = self.create_body(form=form, extras=extras)
-            json_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
+            json_result = self.controller.get_json('gw_fct_getselectors', body)
         else:
             json_result = is_setselector
             for x in range(dialog.main_tab.count() - 1, -1, -1):
@@ -1838,7 +1838,7 @@ class ApiParent(ParentAction):
                 f'"addSchema":"{qgis_project_add_schema}"'
 
         body = self.create_body(extras=extras)
-        json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
+        json_result = self.controller.get_json('gw_fct_setselectors', body)
 
         if str(tab_name) == 'tab_exploitation':
             # Reload layer, zoom to layer, style mapzones and refresh canvas

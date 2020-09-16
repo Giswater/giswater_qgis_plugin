@@ -40,7 +40,7 @@ class GwConfigButton(GwParentAction):
         result = self.get_layers_name()
 
         body = create_body(form='"formName":"config"', extras=result)
-        json_result = self.controller.get_json('gw_fct_getconfig', body, log_sql=True)
+        json_result = self.controller.get_json('gw_fct_getconfig', body)
         if not json_result:
             return False
 
@@ -236,7 +236,7 @@ class GwConfigButton(GwParentAction):
         my_json = json.dumps(self.list_update)
         extras = f'"fields":{my_json}'
         body = create_body(form='"formName":"config"', extras=extras)
-        json_result = self.controller.get_json('gw_fct_setconfig', body, log_sql=True)
+        json_result = self.controller.get_json('gw_fct_setconfig', body)
         if not json_result:
             return False
 
@@ -444,7 +444,7 @@ class GwConfigButton(GwParentAction):
         combo_id = qt_tools.get_item_data(self.dlg_config, widget)
         # TODO cambiar por gw_fct_getchilds
         sql = f"SELECT gw_fct_getcombochilds('config' ,'' ,'' ,'{combo_parent}', '{combo_id}','')"
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         # TODO::Refactor input and output for function "gw_fct_getcombochilds" and refactor "row[0]['fields']"
         for combo_child in row[0]['fields']:
             if combo_child is not None:

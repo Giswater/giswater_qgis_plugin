@@ -405,7 +405,7 @@ class GwVisitManager:
         feature = f'"id":"{self.current_visit.id}"'
         body = create_body(feature=feature)
         sql = f"SELECT gw_fct_om_visit_multiplier({body})::text"
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         self.controller.log_info(f"execute_pgfunction: {row}")
 
 
@@ -422,7 +422,7 @@ class GwVisitManager:
     def get_geom(self):
 
         sql = f"SELECT St_AsText((select the_geom from om_visit where id={self.current_visit.id})::text)"
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         return row
 
 
@@ -1734,7 +1734,7 @@ class GwVisitManager:
                f"FROM om_visit_event "
                f"INNER JOIN config_visit_parameter ON parameter_id = config_visit_parameter.id "
                f"WHERE visit_id = {visit_id}")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if row:
             parameter_id = row["parameter_id"]
             feature_type = row["feature_type"].lower()

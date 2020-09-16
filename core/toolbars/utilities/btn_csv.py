@@ -89,7 +89,7 @@ class GwCSVButton(GwParentAction):
                f" FROM {table_name}"
                f" JOIN sys_function ON function_name =  functionname"
                f" WHERE sys_role IN {roles} AND active is True ORDER BY orderby")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if not rows:
             message = "You do not have permission to execute this application"
             self.dlg_csv.lbl_info.setText(self.controller.tr(message))
@@ -140,7 +140,7 @@ class GwCSVButton(GwParentAction):
         extras += f', "fid":"{fid_aux}"'
         body = create_body(extras=extras)
 
-        result = self.controller.get_json(self.func_name, body, log_sql=True)
+        result = self.controller.get_json(self.func_name, body)
         if not result:
             return
         else:
@@ -243,7 +243,7 @@ class GwCSVButton(GwParentAction):
 
         sql = (f"DELETE FROM {temp_tablename} "
                f"WHERE fid = '{fid_aux}' AND cur_user = current_user")
-        self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql)
 
 
     def get_delimiter(self, dialog):

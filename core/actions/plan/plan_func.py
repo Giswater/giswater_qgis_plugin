@@ -203,7 +203,7 @@ class GwPlan:
                 sql = "DELETE FROM selector_plan_result WHERE result_id in ("
                 if list_id != '':
                     sql += f"{list_id}) AND cur_user = current_user;"
-                    self.controller.execute_sql(sql, log_sql=True)
+                    self.controller.execute_sql(sql)
                     qt_tools.setWidgetText(dialog, label, '')
             sql = (f"DELETE FROM {table_name}"
                    f" WHERE {column_id} IN ({list_id});")
@@ -221,7 +221,7 @@ class GwPlan:
         # Set current value
         sql = (f"SELECT name FROM plan_result_cat WHERE result_id IN (SELECT result_id FROM selector_plan_result "
                f"WHERE cur_user = current_user)")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if row:
             qt_tools.setWidgetText(self.dlg_merm, 'lbl_vdefault_price', str(row[0]))
 

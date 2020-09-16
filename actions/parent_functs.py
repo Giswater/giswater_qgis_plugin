@@ -1220,7 +1220,7 @@ def manage_return_manager(json_result, sql, rubber_band=None):
                         style_id = style_type[key]['id']
                         extras = f'"style_id":"{style_id}"'
                         body = create_body(extras=extras)
-                        style = global_vars.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                        style = global_vars.controller.get_json('gw_fct_getstyle', body)
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']

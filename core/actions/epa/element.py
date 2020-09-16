@@ -266,7 +266,7 @@ class GwElement:
                f" WHERE feature_type = 'ELEMENT' "
                f" AND (featurecat_id = '{element_type}' OR featurecat_id is null)"
                f" ORDER BY location_type")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         qt_tools.set_item_data(self.dlg_add_element.location_type, rows, add_empty=True)
         if rows:
             qt_tools.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)
@@ -395,7 +395,7 @@ class GwElement:
                 sql_values += ", null"
             if element_id == '':
                 sql += sql_values + ") RETURNING element_id;"
-                new_elem_id = self.controller.execute_returning(sql, log_sql=True)
+                new_elem_id = self.controller.execute_returning(sql)
                 sql_values = ""
                 sql = ""
                 element_id = str(new_elem_id[0])
@@ -472,7 +472,7 @@ class GwElement:
                 sql += (f"\nINSERT INTO element_x_connec (element_id, connec_id)"
                         f" VALUES ('{element_id}', '{feature_id}');")
 
-        status = self.controller.execute_sql(sql, log_sql=True)
+        status = self.controller.execute_sql(sql)
         if status:
             self.element_id = element_id
             self.layers = manage_close(self.dlg_add_element, table_object, excluded_layers=[], layers=self.layers)
@@ -485,7 +485,7 @@ class GwElement:
         sql = (f"SELECT DISTINCT(id), id FROM cat_element"
                f" WHERE elementtype_id = '{element_type}'"
                f" ORDER BY id")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         qt_tools.set_item_data(self.dlg_add_element.elementcat_id, rows, 1)
 
 

@@ -291,7 +291,7 @@ def set_selector(dialog, widget, is_alone, controller):
 				 f'"addSchema":"{qgis_project_add_schema}"'
 	
 	body = create_body(extras=extras)
-	json_result = controller.get_json('gw_fct_setselectors', body, log_sql=True)
+	json_result = controller.get_json('gw_fct_setselectors', body)
 	
 	if str(tab_name) == 'tab_exploitation':
 		# Reload layer, zoom to layer, style mapzones and refresh canvas
@@ -363,7 +363,7 @@ def get_selector(dialog, selector_type, controller, filter=False, widget=None, t
 		form = f'"currentTab":"{current_tab}"'
 		extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
 		body = create_body(form=form, extras=extras)
-		json_result = controller.get_json('gw_fct_getselectors', body, log_sql=True)
+		json_result = controller.get_json('gw_fct_getselectors', body)
 	else:
 		json_result = is_setselector
 		for x in range(dialog.main_tab.count() - 1, -1, -1):

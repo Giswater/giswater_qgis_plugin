@@ -180,7 +180,7 @@ class GwNotifyTools:
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = create_body(feature=feature, extras=extras)
-            result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True, log_sql=True)
+            result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True)
             if not result:
                 continue
             for field in result['body']['data']['fields']:

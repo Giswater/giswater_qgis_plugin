@@ -139,7 +139,7 @@ class GwProjectCheck:
                f" VALUES('qgis_form_initproject_hidden', '{value[state]}', current_user) "
                f" ON CONFLICT  (parameter, cur_user) "
                f" DO UPDATE SET value='{value[state]}'")
-        self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql)
 
 
     def get_missing_layers(self, dialog, m_layers, critical_level):
@@ -204,7 +204,7 @@ class GwProjectCheck:
                     if layer:
                         extras = f'"style_id":"{style_id}"'
                         body = create_body(extras=extras)
-                        style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                        style = self.controller.get_json('gw_fct_getstyle', body)
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']

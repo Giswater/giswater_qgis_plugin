@@ -282,7 +282,7 @@ class GwMincut:
         mincut_id = qt_tools.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         sql = (f"SELECT notified FROM om_mincut "
                f"WHERE id = '{mincut_id}'")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if not row or row[0] is None:
             text = "Nothing to show"
             self.controller.show_info_box(str(text), "Sms info")
@@ -644,7 +644,7 @@ class GwMincut:
         self.disconnect_snapping()
         sql = (f"SELECT mincut_state, mincut_class FROM om_mincut "
                f" WHERE id = '{result_mincut_id}'")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if not row or (str(row[0]) != '0' or str(row[1]) != '1'):
             self.dlg_mincut.closeMainWin = False
             self.dlg_mincut.mincutCanceled = True
@@ -656,7 +656,7 @@ class GwMincut:
         extras = f'"step":"check", '  # check
         extras += f'"result":"{result_mincut_id_text}"'
         body = create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_mincut_result_overlap', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_mincut_result_overlap', body)
         if not result:
             return
 
@@ -686,7 +686,7 @@ class GwMincut:
         extras = f'"step":"continue", '
         extras += f'"result":"{result_mincut_id_text}"'
         body = create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_mincut_result_overlap', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_mincut_result_overlap', body)
         self.mincut_ok(result)
 
 
@@ -1602,12 +1602,12 @@ class GwMincut:
 
             sql = ("INSERT INTO om_mincut (mincut_state)"
                    " VALUES (0) RETURNING id;")
-            new_mincut_id = self.controller.execute_returning(sql, log_sql=True)
+            new_mincut_id = self.controller.execute_returning(sql)
             if new_mincut_id[0] < 1:
                 real_mincut_id = 1
                 sql = (f"UPDATE om_mincut SET(id) = (1) "
                        f"WHERE id = {new_mincut_id[0]};")
-                self.controller.execute_sql(sql, log_sql=True)
+                self.controller.execute_sql(sql)
             else:
                 real_mincut_id = new_mincut_id[0]
 
@@ -1621,7 +1621,7 @@ class GwMincut:
         extras = f'"valveUnaccess":{{"status":"false"}}, '
         extras += f'"mincutId":"{real_mincut_id}", "arcId":"{elem_id}"'
         body = create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
+        complet_result = self.controller.get_json('gw_fct_setmincut', body)
         if complet_result in (False, None): return False
 
         if 'mincutOverlap' in complet_result:
@@ -1652,7 +1652,7 @@ class GwMincut:
                    f" anl_user = current_user, anl_feature_type = '{elem_type.upper()}',"
                    f" anl_feature_id = '{elem_id}'"
                    f" WHERE id = '{real_mincut_id}'")
-            status = self.controller.execute_sql(sql, log_sql=True)
+            status = self.controller.execute_sql(sql)
             self.task1.setProgress(50)
             if not status:
                 message = "Error updating element in table, you need to review data"
@@ -1672,7 +1672,7 @@ class GwMincut:
             sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;\n"
                    f"INSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
                    f" (current_user, {real_mincut_id});")
-            self.controller.execute_sql(sql, log_error=True, log_sql=True)
+            self.controller.execute_sql(sql, log_error=True)
             self.task1.setProgress(75)
             # Refresh map canvas
             refresh_map_canvas()
@@ -1783,7 +1783,7 @@ class GwMincut:
             extras = f'"valveUnaccess":{{"status":"true", "nodeId":{elem_id}}}, '
             extras += f'"mincutId":"{result_mincut_id}"'
             body = create_body(extras=extras)
-            result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
+            result = self.controller.get_json('gw_fct_setmincut', body)
 
         # Refresh map canvas
         refresh_map_canvas(True)
@@ -1825,7 +1825,7 @@ class GwMincut:
                f" INNER JOIN cat_users"
                f" ON cat_users.id = om_mincut.assigned_to"
                f" WHERE om_mincut.id = '{result_mincut_id}'")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if not row:
             return
 

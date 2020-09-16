@@ -1311,7 +1311,7 @@ class DaoController:
                "UNION SELECT DISTINCT parent_layer "
                "FROM cat_feature "
                "WHERE upper(feature_type) = '" + geom_type.upper() + "';")
-        rows = self.get_rows(sql, log_sql=True)
+        rows = self.get_rows(sql)
         if rows:
             for row in rows:
                 layer = self.get_layer_by_tablename(row[0])
@@ -1457,7 +1457,7 @@ class DaoController:
         """ Set parameter search_path for current QGIS project """
 
         sql = f"SET search_path = {schema_name}, public;"
-        self.execute_sql(sql, log_sql=True)
+        self.execute_sql(sql)
 
 
     def set_path_from_qfiledialog(self, qtextedit, path):

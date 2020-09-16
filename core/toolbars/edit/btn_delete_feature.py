@@ -82,7 +82,7 @@ class GwDeleteFeatureButton(GwParentAction):
         # Get child layer
         sql = (f"SELECT array_agg({feature_type}_id) FROM {feature_type} "
                f"WHERE {feature_type}_id LIKE '%{feature_id}%' LIMIT 10")
-        rows_typeahead = self.controller.get_rows(sql, log_sql=True)
+        rows_typeahead = self.controller.get_rows(sql)
         rows_typeahead = rows_typeahead[0][0]
 
         if rows_typeahead is None:
@@ -105,7 +105,7 @@ class GwDeleteFeatureButton(GwParentAction):
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = create_body(feature=feature, extras=extras)
-        result = self.controller.get_json('gw_fct_getfeaturerelation', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_getfeaturerelation', body)
         if not result or ('status' in result and result['status'] == 'Failed'):
             return False
 
@@ -134,7 +134,7 @@ class GwDeleteFeatureButton(GwParentAction):
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = create_body(feature=feature, extras=extras)
-        complet_result = self.controller.get_json('gw_fct_feature_delete', body, log_sql=True)
+        complet_result = self.controller.get_json('gw_fct_feature_delete', body)
 
         if not complet_result:
             self.controller.show_message("Function gw_fct_feature_delete executed with no result ", 3)

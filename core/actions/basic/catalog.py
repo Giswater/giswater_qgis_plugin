@@ -39,7 +39,7 @@ class GwCatalog:
         feature = f'"feature_type":"{feature_type}"'
         body = create_body(form, feature)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return
@@ -116,7 +116,7 @@ class GwCatalog:
 
         body = create_body(form=form, feature=feature, extras=extras)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         if complet_result[0]['status'] == "Failed":
             self.controller.log_warning(complet_result[0])
@@ -138,7 +138,7 @@ class GwCatalog:
         extras = f'"fields":{{"matcat_id":"{matcat_id_value}"}}'
         body = create_body(form=form, feature=feature, extras=extras)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']
         for field in result['fields']:
@@ -168,7 +168,7 @@ class GwCatalog:
         combo_id = qt_tools.get_item_data(self.dlg_catalog, widget)
         # TODO cambiar por gw_fct_getchilds
         sql = f"SELECT gw_fct_getcombochilds('catalog' ,'' ,'' ,'{combo_parent}', '{combo_id}','{geom_type}')"
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         for combo_child in row[0]['fields']:
             if combo_child is not None:
                 self.populate_child(combo_child, row)
@@ -190,7 +190,7 @@ class GwCatalog:
         exists = self.controller.check_function('gw_api_get_catalog_id')
         if exists:
             sql = f"SELECT gw_api_get_catalog_id('{metcat_value}', '{pn_value}', '{dn_value}', '{geom_type}', 9)"
-            row = self.controller.get_row(sql, log_sql=True)
+            row = self.controller.get_row(sql)
             self.populate_combo(widget_id, row[0]['catalog_id'][0])
 
 

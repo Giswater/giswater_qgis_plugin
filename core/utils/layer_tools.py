@@ -68,7 +68,7 @@ def export_layer_to_db(layer, crs):
     """
 
     sql = f'DROP TABLE "{layer.name()}";'
-    global_vars.controller.execute_sql(sql, log_sql=True)
+    global_vars.controller.execute_sql(sql)
 
     schema_name = global_vars.controller.credentials['schema'].replace('"', '')
     uri = get_uri()
@@ -104,7 +104,7 @@ def from_postgres_to_toc(tablename=None, the_geom="the_geom", field_id="id", chi
                 style_id = layer[3]
                 if style_id is not None:
                     body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-                    style = global_vars.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                    style = global_vars.controller.get_json('gw_fct_getstyle', body)
                     if 'styles' in style['body']:
                         if 'style' in style['body']['styles']:
                             qml = style['body']['styles']['style']
@@ -118,7 +118,7 @@ def from_postgres_to_toc(tablename=None, the_geom="the_geom", field_id="id", chi
         # therefore, we define it with "-1"
         if style_id not in (None, "-1"):
             body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-            style = global_vars.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+            style = global_vars.controller.get_json('gw_fct_getstyle', body)
             if 'styles' in style['body']:
                 if 'style' in style['body']['styles']:
                     qml = style['body']['styles']['style']

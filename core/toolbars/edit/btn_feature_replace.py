@@ -228,7 +228,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                 row = self.controller.get_row(sql, log_info=False)
                 if row is None:
                     sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
-                    self.controller.execute_sql(sql, log_sql=True)
+                    self.controller.execute_sql(sql)
 
                     sql = "SELECT id FROM cat_work ORDER BY id"
                     rows = self.controller.get_rows(sql)
@@ -301,7 +301,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             # Execute SQL function and show result to the user
             function_name = "gw_fct_feature_replace"
             sql = f"SELECT {function_name}({body})::text"
-            row = self.controller.get_row(sql, log_sql=True)
+            row = self.controller.get_row(sql)
             if not row:
                 message = "Error replacing feature"
                 self.controller.show_warning(message)
@@ -337,12 +337,12 @@ class GwFeatureReplaceButton(GwParentMapTool):
                         sql = (f"UPDATE {self.geom_view} "
                                f"SET {field_cat_id} = '{featurecat_id}' "
                                f"WHERE {self.geom_type}_id = '{row[0]}'")
-                    self.controller.execute_sql(sql, log_sql=True)
+                    self.controller.execute_sql(sql)
                     if self.project_type == 'ud':
                         sql = (f"UPDATE {self.geom_view} "
                                f"SET {self.geom_type}_type = '{feature_type_new}' "
                                f"WHERE {self.geom_type}_id = '{row[0]}'")
-                        self.controller.execute_sql(sql, log_sql=True)
+                        self.controller.execute_sql(sql)
 
                 message = "Values has been updated"
                 self.controller.show_info(message)
