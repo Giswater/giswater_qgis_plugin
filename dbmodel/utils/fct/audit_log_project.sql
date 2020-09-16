@@ -19,7 +19,6 @@ $BODY$
 	{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 	"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text
 
--- fid: 251
 
 */
 
@@ -90,7 +89,7 @@ BEGIN
 				'"line":{"geometryType":"", "values":[]}'||','||
 				'"polygon":{"geometryType":"", "values":[]}'||
 			   '}}'||
-		'}')::json, 2776);
+		'}')::json, 3000);
 
 END;
 $BODY$

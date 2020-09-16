@@ -179,7 +179,7 @@ BEGIN
 				'"line":{"geometryType":"", "values":[]}'||','||
 				'"polygon":{"geometryType":"", "values":[]}'||
 			   '}}'||
-		'}')::json, 2776);
+		'}')::json, 2998);
 
 
 		--  Exception handling
