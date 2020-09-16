@@ -30,7 +30,7 @@ UPDATE config_visit_parameter SET data_type = lower(data_type);
 UPDATE sys_param_user SET dv_querytext =$$SELECT UNNEST(ARRAY (select (text_column::json->>'list_tables_name')::text[] from temp_table where fid =163 and cur_user = current_user)) as id, 
 UNNEST(ARRAY (select (text_column::json->>'list_layers_name')::text[] FROM temp_table WHERE fid = 163 and cur_user = current_user)) as idval $$ WHERE id = 'edit_cadtools_baselayer_vdefault';
 
-UPDATE config_function set layer_manager = {"visible": ["v_edit_dimensions"]} WHERE id = 2824;
+UPDATE config_function set layermanager = '{"visible": ["v_edit_dimensions"]}' WHERE id = 2824;
 
 --2020/09/16
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
