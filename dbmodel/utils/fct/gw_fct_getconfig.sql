@@ -40,8 +40,6 @@ v_project_type text;
 tabUser json;
 combo_json_parent json;
 combo_json_child json;
-combo_rows json[];
-combo_rows_child json[];
 v_selected_id text;
 query_text text;
 aux_json_child json;
@@ -62,7 +60,9 @@ field_value_parent text;
 v_orderby_child text;
 v_dv_querytext_child text;
 p_tgop text = 'INSERT';
-   
+v_layers_name text;
+v_layers_table text;
+
 BEGIN
 
 	-- Set search path to local schema
@@ -84,7 +84,15 @@ BEGIN
     ELSE
 	v_epaversion='5.0.022';
     END IF;
+    
+	-- Get layers and table names
+    v_layers_name = ((p_data ->> 'data')::json->> 'list_layers_name')::text;
+    v_layers_table = ((p_data ->> 'data')::json->> 'list_tables_name')::text;
 
+	-- Delete and insert layers and table names into temp_table
+    DELETE FROM temp_table where fid=163 and cur_user=current_user;
+    INSERT INTO temp_table(fid, text_column, cur_user) VALUES (163, '{"list_layers_name":"'||v_layers_name||'", "list_tables_name":"'||v_layers_table||'"}', current_user);
+    
 	-- Create tabs array
     v_formtabs := '[';
 
