@@ -30,20 +30,17 @@ class GwConfigButton(GwParentAction):
 
     def clicked_event(self):
 
-        # Remove layers name from temp_table
-        sql = "DELETE FROM temp_table WHERE fid = 163 AND cur_user = current_user;"
-        self.controller.execute_sql(sql)
-
-        # Set layers name in temp_table
-        self.set_layers_name()
-
         # Get user and role
         super_users = self.settings.value('system_variables/super_users')
         cur_user = self.controller.get_current_user()
 
         self.list_update = []
-        body = create_body(form='"formName":"config"')
-        json_result = self.controller.get_json('gw_fct_getconfig', body)
+
+        # Get visible layers name from TOC
+        result = self.get_layers_name()
+
+        body = create_body(form='"formName":"config"', extras=result)
+        json_result = self.controller.get_json('gw_fct_getconfig', body, log_sql=True)
         if not json_result:
             return False
 
@@ -209,26 +206,21 @@ class GwConfigButton(GwParentAction):
         open_dialog(self.dlg_config, dlg_name='config')
 
 
-    def set_layers_name(self):
-        """ Insert the name of all the TOC layers, then populate the cad_combo_layers """
+
+    def get_layers_name(self):
+        """ Returns the name of all the layers visible in the TOC, then populate the cad_combo_layers """
 
         layers = self.iface.mapCanvas().layers()
         if not layers:
             return
-        layers_name = '{"list_layers_name":"{'
+        layers_name = '"list_layers_name":"{'
         tables_name = '"list_tables_name":"{'
         for layer in layers:
             layers_name += f"{layer.name()}, "
             tables_name += f"{self.controller.get_layer_source_table_name(layer)}, "
-        result = layers_name[:-2] + '}", ' + tables_name[:-2] + '}"}'
+        result = layers_name[:-2] + '}", ' + tables_name[:-2] + '}"'
 
-        # This statement is executed so that the gw_fct_getconfig function can collect the values​inserted in the
-        # temp_table and thus know which layers are loaded in the toc. Then with these values the QComboBox
-        # "CAD tools base layer" is filled. The layer selected in said QComboBox will be the layer used by default in
-        # the "aux_circle" and "aux_point" tools.
-        sql = f'INSERT INTO temp_table (fid, text_column, cur_user) VALUES (163, $${result}$$, current_user);'
-        self.controller.execute_sql(sql, log_sql=True)
-
+        return result
 
     def get_event_combo_parent(self, row):
 
