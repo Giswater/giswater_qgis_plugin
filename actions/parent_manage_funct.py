@@ -389,6 +389,8 @@ def tab_feature_changed(dialog, table_object, excluded_layers=[]):
 
     global_vars.iface.actionPan().trigger()
 
+    return geom_type
+
 
 def set_completer_object(dialog, table_object):
     """ Set autocomplete of widget @table_object + "_id"
@@ -849,7 +851,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
     disconnect_signal_selection_changed()
 
     if geom_type in ('all', None):
-        tab_feature_changed(dialog, table_object)
+        geom_type = tab_feature_changed(dialog, table_object)
 
     # Clear list of ids
     if remove_ids:

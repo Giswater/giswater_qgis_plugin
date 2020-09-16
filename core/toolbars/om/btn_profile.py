@@ -208,6 +208,7 @@ class GwProfileButton(GwParentMapTool):
             f'"ev":1000}}, "title":"{title}", "date":"{date}"'
         body = create_body(extras=extras)
         result = self.controller.get_json('gw_fct_setprofile', body, log_sql=True)
+        if result is None: return
         message = f"{result['message']}"
         self.controller.show_info(message)
 

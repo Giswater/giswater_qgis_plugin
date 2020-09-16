@@ -98,6 +98,8 @@ class GwPsector:
 
         self.update = False  # if false: insert; if true: update
 
+        self.geom_type = "arc"
+
         # Remove all previous selections
         self.layers = remove_selection(True, layers=self.layers)
 
@@ -458,13 +460,11 @@ class GwPsector:
             qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pca', self.sys_currency['symbol'])
 
         # Adding auto-completion to a QLineEdit for default feature
-        self.geom_type = "arc"
         viewname = "v_edit_" + self.geom_type
         set_completer_feature_id(self.dlg_plan_psector.feature_id, self.geom_type, viewname)
 
         # Set default tab 'arc'
         self.dlg_plan_psector.tab_feature.setCurrentIndex(0)
-        self.geom_type = "arc"
         tab_feature_changed(self.dlg_plan_psector, table_object, excluded_layers=["v_edit_element"])
 
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
