@@ -1416,12 +1416,6 @@ class AddNewLot(ParentManage):
         # TODO:: Add trigger editable view into v_om_team_x_vehicle
         # table_name = 'om_team_x_vehicle'
 
-        widget = QPushButton()
-        widget.setText(str('Test'))
-        widget.setStyleSheet("Text-align:left")
-        widget.setFlat(True)
-        widget.setObjectName("test")
-
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
         self.fill_table(self.dlg_basic_table.tbl_basic, table_name, QSqlTableModel.OnManualSubmit)
         self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)

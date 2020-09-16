@@ -944,7 +944,6 @@ class ParentAction(object):
 
     def get_all_actions(self):
 
-        self.controller.log_info(str("TEST"))
         actions_list = self.iface.mainWindow().findChildren(QAction)
         for action in actions_list:
            self.controller.log_info(str(action.objectName()))
