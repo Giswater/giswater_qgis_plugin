@@ -25,3 +25,7 @@ DELETE FROM sys_table WHERE id = 'config_form_groupbox';
 
 --2020/09/15
 UPDATE config_visit_parameter SET data_type = lower(data_type);
+
+-- 2020/16/09
+UPDATE sys_param_user SET dv_querytext =$$SELECT UNNEST(ARRAY (select (text_column::json->>'list_tables_name')::text[] from temp_table where fid =163 and cur_user = current_user)) as id, 
+UNNEST(ARRAY (select (text_column::json->>'list_layers_name')::text[] FROM temp_table WHERE fid = 163 and cur_user = current_user)) as idval $$ WHERE id = 'edit_cadtools_baselayer_vdefault';
