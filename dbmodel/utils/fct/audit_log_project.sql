@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 3000
 
 -- DROP FUNCTION SCHEMA_NAME.gw_fct_audit_log_project(json);
 
@@ -64,15 +64,15 @@ BEGIN
 
 	PERFORM gw_fct_user_check_data($${"client":
 	{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-	"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"logProject":true}}}$$)::text;
+	"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Stats"}}}$$)::text;
 
 	EXECUTE 'SELECT gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 	"feature":{}, "data":{"filterFields":{}, "addSchema":"ud_sample", "qgisVersion":"3.10.003.1", 
 	"initProject":"false", "pageInfo":{}, "version":"'||v_version||'", "fid":1}}$$)';
 
-
 	INSERT INTO audit_fid_log (fid,fcount,criticity,tstamp)
-	SELECT result_id, count, criticity, tstamp WHERE fid IN (101, 125, 211, 115, 195) AND cur_user = current_user;
+	SELECT result_id::integer, fcount, criticity, tstamp FROM audit_check_data WHERE fid IN (125, 211, 115, 195) AND cur_user = current_user
+	AND result_id IS NOT NULL;
 
 	-- get results
 	-- info

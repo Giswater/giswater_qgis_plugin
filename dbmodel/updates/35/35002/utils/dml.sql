@@ -31,3 +31,12 @@ UPDATE sys_param_user SET dv_querytext =$$SELECT UNNEST(ARRAY (select (text_colu
 UNNEST(ARRAY (select (text_column::json->>'list_layers_name')::text[] FROM temp_table WHERE fid = 163 and cur_user = current_user)) as idval $$ WHERE id = 'edit_cadtools_baselayer_vdefault';
 
 UPDATE config_function set layer_manager = {"visible": ["v_edit_dimensions"]} WHERE id = 2824;
+
+--2020/09/16
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
+VALUES ('2998', 'gw_fct_user_check_data', 'utils', 'function','json', 'json', 
+'Function to analyze data quality using queries defined by user', 'role_basic', NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
+VALUES ('3000', 'gw_fct_audit_log_project', 'utils', 'function','json', 'json', 
+'Function that executes all check functions and copy data into statistic table (audit_fid_log)', 'role_basic', NULL);

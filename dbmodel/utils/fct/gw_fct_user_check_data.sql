@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 2998
 
 -- DROP FUNCTION SCHEMA_NAME.gw_fct_user_check_data(json);
 
@@ -15,9 +15,13 @@ $BODY$
 	/*EXAMPLE
 		
 
-		SELECT SCHEMA_NAME.gw_fct_user_check_data($${"client":
-		{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-		"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"logProject":"false"}}}$$)::text
+	SELECT SCHEMA_NAME.gw_fct_user_check_data($${"client":
+	{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+	"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Stats"}}}$$)::text
+
+	--Project - audit_check_project - only errors
+	--User - errors and info
+	--Stats - errors and info for statistics (data copied to audit_fid_log)
 
 -- fid: 251
 
@@ -26,7 +30,6 @@ $BODY$
 DECLARE
 
 v_schemaname text;
-rec_count record;
 v_count text;
 v_project_type text;
 v_version text;
@@ -36,22 +39,15 @@ v_warning_val integer;
 v_groupby text;
 json_result json[];
 rec_result text;
-v_log_project boolean;
+v_log_project text;
+rec record;
+v_target text;
+v_infotext text;
 
 v_result_id text;
 v_result text;
 v_result_info json;
-
-v_view_list text;
-v_errortext text;
-v_definition text;
-v_querytext text;
-v_feature_list text;
-v_param_list text;
-rec_fields text;
-v_field_array text[];
-
-rec record;
+v_error_context text;
 
 BEGIN
 
@@ -63,7 +59,13 @@ BEGIN
 	-- select config values
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 
-	v_log_project = ((((p_data::JSON ->> 'data')::json ->> 'parameters')::json) ->>'logProject')::boolean;
+	v_log_project = ((((p_data::JSON ->> 'data')::json ->> 'parameters')::json) ->>'checkType')::text;
+	
+	IF v_log_project = 'Project' THEN
+		v_target= '''ERROR''';
+	ELSE
+		v_target = '''ERROR'',''INFO''';
+	END IF;
 
 	-- init variables
 	v_count=0;
@@ -88,14 +90,12 @@ BEGIN
 	INSERT INTO selector_state (state_id) SELECT id FROM value_state ON conflict(state_id, cur_user) DO NOTHING; 
 	INSERT INTO selector_expl (expl_id) SELECT expl_id FROM exploitation ON conflict(expl_id, cur_user) DO NOTHING; 
 
-	FOR rec IN (SELECT * FROM config_fprocess WHERE fid::text ILIKE '9%' ORDER BY orderby) LOOP
+	FOR rec IN EXECUTE 'SELECT * FROM config_fprocess WHERE fid::text ILIKE ''9%'' AND target IN ('||v_target||') ORDER BY orderby' LOOP
 		
-
 		SELECT (rec.addparam::json ->> 'criticityLimits')::json->> 'warning' INTO v_warning_val;
 		SELECT (rec.addparam::json ->> 'criticityLimits')::json->> 'error' INTO v_error_val;
 		SELECT (rec.addparam::json ->> 'groupBy') INTO v_groupby;
 
-		
 		IF v_groupby IS NULL THEN
 			EXECUTE rec.querytext
 			INTO v_count;
@@ -103,44 +103,49 @@ BEGIN
 		ELSE 	
 			EXECUTE 'SELECT array_agg(features.feature) FROM (
 			SELECT jsonb_build_object(
-			''count'',   a.count,
+			''fcount'',   a.count,
 			''groupBy'', a.'||v_groupby||') AS feature
 			FROM ('||rec.querytext||')a) features;'
 			INTO json_result;
+					raise notice 'json_result,%',json_result;
 		END IF;
+
 
 		
 		IF rec.target = 'ERROR' THEN
 			IF v_count::integer < v_warning_val THEN
 				v_criticity = 1;
+				v_infotext = 'INFO: ';
 			ELSIF  v_count::integer >= v_warning_val AND  v_count::integer < v_error_val THEN
 				v_criticity = 2;
+				v_infotext = 'WARNING: ';
 			ELSE
 				v_criticity = 3;
+				v_infotext = 'ERROR: ';
 			END IF;
 		ELSE
 			v_criticity = 0;
 		END IF;
 		
 		IF v_groupby IS NULL THEN
-			IF v_log_project THEN
-				INSERT INTO audit_fid_log (fid, count, criticity)
-				VALUES (rec.fid,  v_count, v_criticity);
+			IF v_log_project = 'Stats' THEN
+				INSERT INTO audit_fid_log (fid, fcount, criticity)
+				VALUES (rec.fid,  v_count::integer, v_criticity);
 			END IF;
-
-			INSERT INTO audit_check_data(fid, result_id, criticity, error_message,  count)
-			SELECT 251,rec.fid, v_criticity, sys_fprocess.fprocess_name, (rec_result::json ->> 'count') 
+			INSERT INTO audit_check_data(fid, result_id, criticity, error_message,  fcount)
+			SELECT 251,rec.fid, v_criticity, concat(v_infotext,sys_fprocess.fprocess_name, ': ',v_count), v_count::integer
 			FROM sys_fprocess WHERE sys_fprocess.fid = rec.fid;
 
-		ELSE 
+		ELSIF json_result IS NOT NULL AND v_groupby IS NOT NULL THEN
 			FOREACH rec_result IN ARRAY(json_result) LOOP
-				IF v_log_project THEN
-					INSERT INTO audit_fid_log (fid, count, criticity, groupby)
-					VALUES (rec.fid,  (rec_result::json ->> 'count'), v_criticity, (rec_result::json ->>'groupBy'));
+			
+				IF v_log_project = 'Stats'  THEN
+					INSERT INTO audit_fid_log (fid, fcount, criticity, groupby)
+					VALUES (rec.fid,  (rec_result::json ->> 'fcount')::integer, v_criticity, (rec_result::json ->>'groupBy'));
 				END IF;
 
-				INSERT INTO audit_check_data(fid, result_id, criticity, error_message,  count)
-				SELECT 251,rec.fid, v_criticity, concat(sys_fprocess.fprocess_name,' - ',(rec_result::json ->>'groupBy')), (rec_result::json ->> 'count') 
+				INSERT INTO audit_check_data(fid, result_id, criticity, error_message, fcount)
+				SELECT 251,rec.fid, v_criticity, concat(v_infotext,sys_fprocess.fprocess_name,' - ',(rec_result::json ->>'groupBy'),': ',(rec_result::json ->> 'fcount')), (rec_result::json ->> 'fcount')::integer
 				FROM sys_fprocess WHERE sys_fprocess.fid = rec.fid;
 
 			END LOOP;
@@ -176,6 +181,12 @@ BEGIN
 			   '}}'||
 		'}')::json, 2776);
 
+
+		--  Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
+	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	  
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
