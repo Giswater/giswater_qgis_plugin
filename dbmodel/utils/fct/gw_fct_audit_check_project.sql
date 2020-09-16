@@ -23,6 +23,7 @@ SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":4, "infoType
 	epa: 225
 	plan: 115
 	admin: 195
+	user: 251
 */
 
 DECLARE 
@@ -372,6 +373,18 @@ BEGIN
 			WHERE fid=195 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
 			
 		END IF;
+
+		EXECUTE 'SELECT gw_fct_user_check_data($${"client":
+		{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+		"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Project"}}}$$)::text';
+		
+		-- insert results 
+		INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
+		SELECT 101, criticity, result_id, 
+		replace(replace(replace(error_message,'WARNING:', 'WARNING (DB USER):'),'ERROR:', 'ERROR (DB USER):'),'INFO:', 'INFO (DB USER):'),
+		 fcount FROM audit_check_data 
+		WHERE fid=251 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
+			
 	END IF;
 
 	-- force hydrometer_selector
