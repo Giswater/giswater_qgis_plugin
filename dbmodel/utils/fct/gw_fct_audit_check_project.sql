@@ -326,8 +326,8 @@ BEGIN
 			"client":{"device":4, "infoType":1, "lang":"ES"},
 			"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem"}}}$$)';
 			-- insert results 
-			INSERT INTO audit_check_data  (fid, criticity, error_message)
-			SELECT 101, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
+			INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
+			SELECT 101, criticity, result_id, replace(error_message,':', ' (DB OM):'), fcount FROM audit_check_data 
 			WHERE fid=125 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6 ;
 
 			IF v_project_type = 'WS' THEN
@@ -336,8 +336,8 @@ BEGIN
 				"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem", "grafClass":"ALL"}}}$$)';
 				-- insert results 
-				INSERT INTO audit_check_data  (fid, criticity, error_message)
-				SELECT 101, criticity, replace(error_message,':', ' (DB GRAF):') FROM audit_check_data 
+				INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
+				SELECT 101, criticity, result_id, replace(error_message,':', ' (DB GRAF):'), fcount FROM audit_check_data 
 				WHERE fid=211 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6 ;
 			END IF;
 		END IF;
@@ -347,8 +347,8 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_pg2epa_check_data($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{}}$$)';
 				-- insert results 
-				INSERT INTO audit_check_data  (fid, criticity, error_message)
-				SELECT 101, criticity, replace(error_message,':', ' (DB EPA):') FROM audit_check_data 
+				INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
+				SELECT 101, criticity, result_id, replace(error_message,':', ' (DB EPA):'), fcount FROM audit_check_data 
 				WHERE fid=225 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
 		END IF;
 
@@ -357,8 +357,8 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_plan_check_data($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{}}$$)';
 				-- insert results 
-				INSERT INTO audit_check_data  (fid, criticity, error_message)
-				SELECT 101, criticity, replace(error_message,':', ' (DB PLAN):') FROM audit_check_data 
+				INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
+				SELECT 101, criticity, result_id, replace(error_message,':', ' (DB PLAN):'), fcount FROM audit_check_data 
 				WHERE fid=115 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
 		END IF;
 
@@ -367,8 +367,8 @@ BEGIN
 			{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 			"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text';
 			-- insert results 
-			INSERT INTO audit_check_data  (fid, criticity, error_message)
-			SELECT 101, criticity, replace(error_message,':', ' (DB ADMIN):') FROM audit_check_data 
+			INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
+			SELECT 101, criticity, result_id, replace(error_message,':', ' (DB ADMIN):'), fcount FROM audit_check_data 
 			WHERE fid=195 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
 			
 		END IF;
