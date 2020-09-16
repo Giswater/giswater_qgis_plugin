@@ -12,7 +12,6 @@ from datetime import datetime
 from functools import partial
 
 from .. import utils_giswater
-from .add_lot import AddNewLot
 from .manage_visit import ManageVisit
 from .manage_new_psector import ManageNewPsector
 from .parent import ParentAction
@@ -27,7 +26,6 @@ class Om(ParentAction):
         """ Class to control toolbar 'om_ws' """
 
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-        self.new_lot = AddNewLot(iface, settings, controller, plugin_dir)
         self.manage_visit = ManageVisit(iface, settings, controller, plugin_dir)
         self.manage_new_psector = ManageNewPsector(iface, settings, controller, plugin_dir)
         self.crm_trace = CrmTrace(iface, settings, controller, plugin_dir)
@@ -305,21 +303,6 @@ class Om(ParentAction):
         except:
             self.from_date = QDate.currentDate()
             self.to_date = QDate.currentDate().addDays(1)
-
-
-    def om_add_lot(self):
-        """ Button 74: Add new lot """
-        self.new_lot.manage_lot()
-
-
-    def om_lot_management(self):
-        """ Button 75: Lot management """
-        self.new_lot.lot_manager()
-
-
-    def om_selector_lot(self):
-        """ Button 76: Lot selector """
-        self.new_lot.lot_selector()
 
 
     def custom_trace(self):

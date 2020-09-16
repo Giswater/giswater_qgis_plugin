@@ -122,11 +122,6 @@ class ElementUi(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('lot.ui')
-class LotUi(GwDialog, FORM_CLASS):
-    pass
-
-
 FORM_CLASS = get_ui_class('visit.ui')
 class VisitUi(GwDialog, FORM_CLASS):
     pass
@@ -365,11 +360,6 @@ class ProfilesList(GwDialog, FORM_CLASS):
     pass
 
 
-FORM_CLASS = get_ui_class('lot_management.ui')
-class LotManagement(GwDialog, FORM_CLASS):
-    pass
-
-
 FORM_CLASS = get_ui_class('main_addfields.ui')
 class MainFields(GwDialog, FORM_CLASS):
     pass
@@ -523,11 +513,6 @@ class InfoCrossectUi(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('selector_date.ui')
 class SelectorDate(GwDialog, FORM_CLASS):
-    pass
-
-
-FORM_CLASS = get_ui_class('lot_usermanager.ui')
-class LotUserManager(GwMainWindow, FORM_CLASS):
     pass
 
 
