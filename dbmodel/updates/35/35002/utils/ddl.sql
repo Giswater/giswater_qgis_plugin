@@ -16,7 +16,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_check
 CREATE TABLE audit_fid_log
 (id serial NOT NULL  PRIMARY KEY,
 fid smallint,
-count integer,
+fcount integer,
 groupby text,
 criticity integer,
 tstamp timestamp without time zone DEFAULT now()

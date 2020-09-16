@@ -71,7 +71,7 @@ BEGIN
 	"initProject":"false", "pageInfo":{}, "version":"'||v_version||'", "fid":1}}$$)';
 
 
-	INSERT INTO audit_fid_log (fid,count,criticity,tstamp)
+	INSERT INTO audit_fid_log (fid,fcount,criticity,tstamp)
 	SELECT result_id, count, criticity, tstamp WHERE fid IN (101, 125, 211, 115, 195) AND cur_user = current_user;
 
 	-- get results
