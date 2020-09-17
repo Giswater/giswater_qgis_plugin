@@ -125,6 +125,7 @@ BEGIN
 			END IF;
 		ELSE
 			v_criticity = 0;
+			v_infotext  = 'INFO: ';
 		END IF;
 		
 		IF v_groupby IS NULL THEN
