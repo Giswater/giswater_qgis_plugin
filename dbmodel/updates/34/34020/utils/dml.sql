@@ -106,7 +106,3 @@ VALUES (265, 'Automatic links with more than 100m', 'utils') ON CONFLICT (fid) D
 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type)
 VALUES (266, 'Duplicated ID between arc, node, connec, gully', 'utils') ON CONFLICT (fid) DO NOTHING;
-
--- 2020/16/09
-UPDATE sys_param_user SET dv_querytext =$$SELECT UNNEST(ARRAY (select (text_column::json->>'list_tables_name')::text[] from temp_table where fid =163 and cur_user = current_user)) as id, 
-UNNEST(ARRAY (select (text_column::json->>'list_layers_name')::text[] FROM temp_table WHERE fid = 163 and cur_user = current_user)) as idval $$ WHERE id = 'edit_cadtools_baselayer_vdefault';
