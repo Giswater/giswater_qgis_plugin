@@ -361,7 +361,9 @@ class GwToolBox(ApiParent):
             extras += '}'
 
         body = self.create_body(feature=feature_field, extras=extras)
-        json_result = self.controller.get_json(function_name, body)
+        json_result = self.controller.get_json(function_name, body, log_sql=True)
+        self.add_layer.populate_info_text(dialog, json_result['body']['data'], True, True, 1, True)
+
         dialog.progressBar.setAlignment(Qt.AlignCenter)
         dialog.progressBar.setMinimum(0)
         dialog.progressBar.setMaximum(1)
