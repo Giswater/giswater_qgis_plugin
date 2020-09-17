@@ -51,5 +51,7 @@ VALUES ('3002', 'gw_fct_setplan', 'utils', 'function','json', 'json',
 'Function that returns qgis layer configuration for masterplan', 'role_master', NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function(id, function_name, returnmanager, layermanager, actions)
-VALUES ('3002', 'gw_fct_setplan',null,
+VALUES ('3002', 'gw_fct_setplan','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
+"polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',
 '{"visible": ["v_plan_current_psector"], "zoom":{"layer":"v_plan_current_psector", "margin":20}}',null) ON CONFLICT (id) DO NOTHING;
