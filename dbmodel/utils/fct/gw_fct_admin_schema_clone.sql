@@ -245,15 +245,14 @@ BEGIN
 	v_result_point = '{"geometryType":"", "features":[]}';
 
 	--  Return
-	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Copy schema done successfully"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Copy schema done successfully"}, "version":"'||v_version||'"'||
 			 ',"body":{"form":{}'||
 			 ',"data":{ "info":'||v_result_info||','||
-				'"setVisibleLayers":[]'||','||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
 			   '}'||
-		'}')::json;
+		'}')::json, 2122);
 		
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

@@ -42,3 +42,6 @@ INSERT INTO config_toolbox(id, alias, isparametric, functionparams, inputparams,
 VALUES (2998,'User check data', TRUE, '{"featureType":[]}', 
 '[{"widgetname":"checkType", "label":"Check type:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["User"],"comboNames":["User"], "selectedId":"User"}]',
 null, TRUE) ON CONFLICT (id) DO NOTHING;
+
+--2020/09/17
+DELETE FROM sys_param_user WHERE id IN ('qgis_qml_linelayer_path', 'qgis_qml_pointlayer_path','qgis_qml_polygonlayer_path');

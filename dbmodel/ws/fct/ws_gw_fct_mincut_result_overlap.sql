@@ -47,7 +47,6 @@ v_result_info json;
 v_result_point json;
 v_result_line json;
 v_result_pol json;
-v_visiblelayer text;
 v_error_context text;
 v_signal text;
 v_geometry text;
@@ -70,7 +69,6 @@ BEGIN
 	-- get input data 
 	v_step :=  ((p_data ->>'data')::json->>'step')::text;
 	v_mincutid :=  ((p_data ->>'data')::json->>'result')::integer;
-	v_visiblelayer := '"v_om_mincut_arc", "v_om_mincut_node", "v_om_mincut_connec", "v_anl_mincut_init_point"';
 
 	-- Reset temporal tables
 	DELETE FROM audit_check_data WHERE fid = 216 and cur_user=current_user;
@@ -383,8 +381,7 @@ BEGIN
 				'"geometry":"'||v_geometry||'",'|| 			
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
-				'"polygon":'||v_result_pol||','||
-				'"setVisibleLayers":['||v_visiblelayer||']}'||
+				'"polygon":'||v_result_pol||'}'||
 			', "actions":{"overlap":"' || v_signal || '"}}}')::json, 2244);
 		
 	ELSIF v_step  = 'continue' THEN
@@ -467,8 +464,7 @@ BEGIN
 		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version.giswater||'"'||
 			',"body":{"form":{}'||
 			',"data":{ "info":'||v_result_info||','||
-				  '"geometry":"'||v_geometry||'",'|| 			
-				  '"setVisibleLayers":['||v_visiblelayer||']'||
+				  '"geometry":"'||v_geometry||'"'|| 
 			'}}'||
 			'}')::json, 2244);
 	END IF;

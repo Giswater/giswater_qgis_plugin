@@ -67,7 +67,7 @@ BEGIN
 		v_result  = (SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT 1::integer as id, 'No result found whith this name....' as  message)row);
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 		RETURN ('{"status":"Accepted", "message":{"level":1, "text":"No result found"}, "version":"'||v_version||'"'||
-			',"body":{"form":{}, "data":{"info":'||v_result_info||',"setVisibleLayers":[] }}}')::json;		
+			',"body":{"form":{}, "data":{"info":'||v_result_info||'}}}')::json;		
 	END IF; 
 	
 	-- elements
@@ -407,8 +407,7 @@ BEGIN
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
-				'"line":'||v_result_line||','||
-				'"setVisibleLayers":[]'||
+				'"line":'||v_result_line||
 		       '}}'||
 	    '}')::json, 2680);
 

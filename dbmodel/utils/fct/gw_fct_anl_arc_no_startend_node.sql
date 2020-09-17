@@ -154,8 +154,7 @@ BEGIN
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
-				'"line":'||v_result_line||','||
-				'"setVisibleLayers":[]'||
+				'"line":'||v_result_line||
 		       '}}'||
 	    '}')::json, 2102);
 

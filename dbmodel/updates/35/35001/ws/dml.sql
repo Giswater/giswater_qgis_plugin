@@ -56,7 +56,9 @@ VALUES (2980, 'gw_fct_setmincut', 'utils', 'function', 'json', 'json', NULL, 'ro
 
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2244,'gw_fct_mincut_result_overlap','{"style":{"point":{"style":"qml", "id":"106"},  "line":{"style":"qml", "id":"105"}, "polygon":{"style":"qml", "id":"107"}}}',NULL,NULL) 
+VALUES(2244,'gw_fct_mincut_result_overlap',
+'{"style":{"point":{"style":"qml", "id":"106"},  "line":{"style":"qml", "id":"105"}, "polygon":{"style":"qml", "id":"107"}}}',
+'{"visible": ["v_om_mincut_arc", "v_om_mincut_node", "v_om_mincut_connec", "v_anl_mincut_init_point"]}',NULL) 
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
@@ -75,7 +77,7 @@ VALUES(2522,'gw_fct_import_epanet_inp',NULL,'{"visible": ["v_edit_arc", "v_edit_
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2706,'gw_fct_grafanalytics_minsector','{"style":{"point":{"style":"random","field":"fid","width":2,"transparency":0.5}},
 "line":{"style":"random","field":"fid","width":2,"transparency":0.5},
-"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}',NULL,NULL) ON CONFLICT (id) DO NOTHING;
+"polygon":{"style":"random","field":"fid","width":2,"transparency":0.5}}','{"visible": ["v_minsector"]}',NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2710,'gw_fct_grafanalytics_mapzones',NULL, NULL,'["style_mapzones"]') ON CONFLICT (id) DO NOTHING;

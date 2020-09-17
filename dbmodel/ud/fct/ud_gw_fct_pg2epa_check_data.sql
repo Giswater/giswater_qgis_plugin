@@ -367,8 +367,8 @@ BEGIN
 			',"data":{"info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
-				'"polygon":'||v_result_polygon||','||
-				'"setVisibleLayers":[] }'||
+				'"polygon":'||v_result_polygon||
+				'}'||
 			'}'||
 		'}')::json, 2431);
 

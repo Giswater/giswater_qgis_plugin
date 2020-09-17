@@ -75,7 +75,6 @@ v_updatemapzgeom integer;
 v_geomparamupdate float;
 v_srid integer;
 v_input json;
-v_visible_layer text;
 v_usepsectors boolean;
 v_concavehull float = 0.85;
 v_error_context text;
@@ -99,7 +98,6 @@ BEGIN
 	
 	-- select config values
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version order by 1 desc limit 1;
-	v_visible_layer = 'v_minsector';
 
 	-- set variables
 	v_fid=134;
@@ -375,7 +373,6 @@ BEGIN
 	
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_visible_layer := COALESCE(v_visible_layer, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 	v_result_polygon := COALESCE(v_result_polygon, '{}');
@@ -384,7 +381,6 @@ BEGIN
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
-				'"setVisibleLayers":["'||v_visible_layer||'"],'||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||

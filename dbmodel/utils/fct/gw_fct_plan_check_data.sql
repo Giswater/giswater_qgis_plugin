@@ -388,7 +388,6 @@ BEGIN
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
-		     	'"setVisibleLayers":[]'||','||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||

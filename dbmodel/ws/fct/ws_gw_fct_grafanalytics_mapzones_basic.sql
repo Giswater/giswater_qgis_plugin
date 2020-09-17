@@ -38,7 +38,7 @@ BEGIN
 	v_updatetattributes = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateFeature');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	
-	v_data = concat ('{"data":{"parameters":{"grafClass":"',v_class,'", "exploitation": "[',v_expl,']", "updateFeature":"FALSE", "updateMapZone":"0", "debug":"FALSE", "setVisibleLayers":[]}}}');
+	v_data = concat ('{"data":{"parameters":{"grafClass":"',v_class,'", "exploitation": "[',v_expl,']", "updateFeature":"FALSE", "updateMapZone":"0", "debug":"FALSE"}}}');
 
 	RETURN gw_fct_grafanalytics_mapzones(v_data);
 	

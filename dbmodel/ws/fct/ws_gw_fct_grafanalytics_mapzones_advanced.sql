@@ -54,7 +54,7 @@ BEGIN
 	v_forceopen = COALESCE (v_forceopen, '[]');
 
 	v_data = concat ('{"data":{"parameters":{"grafClass":"',v_class,'", "exploitation": [',v_expl,'], "updateFeature":"TRUE",
-	"updateMapZone":',v_updatemapzone,', "forceOpen":',v_forceopen,', "forceClose":',v_forceclose,', "geomParamUpdate":',v_paramupdate,', "debug":"FALSE", "setVisibleLayers":[]}}}');
+	"updateMapZone":',v_updatemapzone,', "forceOpen":',v_forceopen,', "forceClose":',v_forceclose,', "geomParamUpdate":',v_paramupdate,', "debug":"FALSE"}}}');
 
 	RETURN gw_fct_grafanalytics_mapzones(v_data);
 

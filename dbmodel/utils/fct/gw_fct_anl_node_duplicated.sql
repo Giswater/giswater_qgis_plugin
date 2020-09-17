@@ -105,8 +105,7 @@ BEGIN
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
-				'"point":'||v_result_point||','||
-				'"setVisibleLayers":[]'||
+				'"point":'||v_result_point||
 			'}}'||
 	    '}')::json, 2108);
 

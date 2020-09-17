@@ -180,8 +180,7 @@ BEGIN
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Mapzones dynamic analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}, "data":{ "info":'||v_result_info||','||
-					  '"line":'||v_result_line||','||
-					  '"setVisibleLayers":[]'||
+					  '"line":'||v_result_line||
 					  '}}}')::json, 2772);
 
 	--  Exception handling
