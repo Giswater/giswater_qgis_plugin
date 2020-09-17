@@ -6,10 +6,10 @@ or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
 from qgis.core import QgsPointXY
-from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
+from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, \
-    QSizePolicy, QSpacerItem
+from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, QGridLayout, QLabel,\
+    QLineEdit, QPushButton, QSizePolicy, QSpacerItem, QSpinBox, QTextEdit, QWidget
 
 from functools import partial
 
@@ -20,10 +20,10 @@ from ....ui_manager import DimensioningUi
 from .... import global_vars
 
 from ....actions.parent_functs import set_icon
-from ....actions.api_parent_functs import create_body, put_widgets,  \
+from ....actions.api_parent_functs import check_actions, create_body, put_widgets,  \
     close_dialog, set_setStyleSheet, add_lineedit, set_widget_size, set_data_type, manage_lineedit, add_combobox, \
     add_checkbox, add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_textarea, \
-    add_spinbox, add_tableview, set_headers, populate_table, set_columns_config
+    add_spinbox, add_tableview, set_headers, populate_table, set_columns_config, enable_all, disable_all
 from ....lib.qgis_tools import set_snapping_mode, remove_marker, get_snapping_options, enable_snapping, snap_to_node, \
     snap_to_connec_gully, get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
     get_snapped_feature, get_snapped_feature_id, apply_snapping_options
@@ -43,19 +43,11 @@ class GwDimensioning:
         self.vertex_marker = QgsVertexMarker(self.canvas)
 
 
-    def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None):
-
+    def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None, rubber_band=None):
         self.dlg_dim = DimensioningUi()
         load_settings(self.dlg_dim)
 
-        # Set signals
-        actionSnapping = self.dlg_dim.findChild(QAction, "actionSnapping")
-        actionSnapping.triggered.connect(partial(self.snapping, actionSnapping))
-        set_icon(actionSnapping, "103")
 
-        actionOrientation = self.dlg_dim.findChild(QAction, "actionOrientation")
-        actionOrientation.triggered.connect(partial(self.orientation, actionOrientation))
-        set_icon(actionOrientation, "133")
 
         # Set layers dimensions, node and connec
         self.layer_dimensions = self.controller.get_layer_by_tablename("v_edit_dimensions")
@@ -72,10 +64,39 @@ class GwDimensioning:
 
         #qgis_feature = self.get_feature_by_id(self.layer_dimensions, fid, 'id')
 
+        # ACTION SIGNALS
+        actionSnapping = self.dlg_dim.findChild(QAction, "actionSnapping")
+        actionSnapping.triggered.connect(partial(self.snapping, actionSnapping))
+        set_icon(actionSnapping, "103")
+
+        actionOrientation = self.dlg_dim.findChild(QAction, "actionOrientation")
+        actionOrientation.triggered.connect(partial(self.orientation, actionOrientation))
+        set_icon(actionOrientation, "133")
+
+        if self.layer_dimensions:
+            if self.layer_dimensions.isEditable():
+                actionSnapping.setEnabled(True)
+                actionOrientation.setEnabled(True)
+                enable_all(self.dlg_dim, db_return[0]['body']['data'])
+            else:
+                actionSnapping.setEnabled(False)
+                actionOrientation.setEnabled(False)
+                disable_all(self.dlg_dim, db_return[0]['body']['data'], False)
+
+        # LAYER SIGNALS
+        self.layer_dimensions.editingStarted.connect(lambda: actionSnapping.setEnabled(True))
+        self.layer_dimensions.editingStopped.connect(lambda: actionSnapping.setEnabled(False))
+        self.layer_dimensions.editingStarted.connect(lambda: actionOrientation.setEnabled(True))
+        self.layer_dimensions.editingStopped.connect(lambda: actionOrientation.setEnabled(False))
+        self.layer_dimensions.editingStarted.connect(partial(enable_all, self.dlg_dim, db_return[0]['body']['data']))
+        self.layer_dimensions.editingStopped.connect(partial(disable_all, self.dlg_dim, db_return[0]['body']['data'], False))
+
+        # WIDGETS SIGNALS
         self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, qgis_feature, layer))
         self.dlg_dim.btn_cancel.clicked.connect(partial(self.cancel_dimensioning))
         self.dlg_dim.dlg_closed.connect(partial(self.cancel_dimensioning))
         self.dlg_dim.dlg_closed.connect(partial(save_settings, self.dlg_dim))
+        self.dlg_dim.dlg_closed.connect(rubber_band.reset)
 
         self.create_map_tips()
 

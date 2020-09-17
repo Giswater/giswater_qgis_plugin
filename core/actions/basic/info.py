@@ -43,7 +43,7 @@ from ....actions.api_parent_functs import get_visible_layers, create_body,  popu
     set_data_type, add_lineedit, set_widget_size, manage_lineedit, add_combobox, add_checkbox, get_values, \
     add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, \
     add_textarea, add_spinbox, add_tableview, set_headers, populate_table, set_columns_config, set_completer_object, \
-    fill_table, clear_gridlayout, add_frame, add_label, set_completer_object_api
+    fill_table, clear_gridlayout, add_frame, add_label, set_completer_object_api, enable_all, disable_all
 from ....lib.qgis_tools import get_snapping_options, get_event_point, snap_to_current_layer, get_snapped_layer, \
     get_snapped_feature, add_marker, enable_snapping, snap_to_layer, apply_snapping_options, snap_to_arc, snap_to_node
 
@@ -230,7 +230,7 @@ class GwInfo(QObject):
             if self.lyr_dim:
                 self.api_dim = GwDimensioning()
                 feature_id = self.complet_result[0]['body']['feature']['id']
-                result, dialog = self.api_dim.open_dimensioning_form(None, self.lyr_dim, self.complet_result, feature_id)
+                result, dialog = self.api_dim.open_dimensioning_form(None, self.lyr_dim, self.complet_result, feature_id, self.rubber_band)
                 return result, dialog
 
         elif template == 'info_feature':
@@ -501,16 +501,19 @@ class GwInfo(QObject):
 
         if self.layer:
             if self.layer.isEditable():
-                self.enable_all(self.dlg_cf, result)
+                enable_all(self.dlg_cf, result)
             else:
-                self.disable_all(self.dlg_cf, result, False)
+                disable_all(self.dlg_cf, result, False)
+                self.new_feature_id = None
 
         if action_edit.isEnabled():
             # SIGNALS
             self.layer.editingStarted.connect(partial(check_actions, action_edit, True))
             self.layer.editingStopped.connect(partial(check_actions, action_edit, False))
-            self.layer.editingStarted.connect(partial(self.enable_all, self.dlg_cf, result))
-            self.layer.editingStopped.connect(partial(self.disable_all, self.dlg_cf, result, False))
+            self.layer.editingStarted.connect(partial(enable_all, self.dlg_cf, result))
+            self.layer.editingStopped.connect(partial(disable_all, self.dlg_cf, result, False))
+            self.layer.editingStopped.connect(lambda: setattr(self, 'new_feature_id', None))
+
             # Actions
             self.enable_actions(self.layer.isEditable())
             self.layer.editingStarted.connect(partial(self.enable_actions, True))
@@ -1393,58 +1396,7 @@ class GwInfo(QObject):
         return scale_zoom
 
 
-    def disable_all(self, dialog, result, enable):
 
-        try:
-            widget_list = dialog.findChildren(QWidget)
-            for widget in widget_list:
-                for field in result['fields']:
-                    if widget.objectName() == field['widgetname']:
-                        if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
-                            widget.setReadOnly(not enable)
-                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                        elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
-                            widget.setEnabled(enable)
-                            widget.setStyleSheet("QWidget {color: rgb(0, 0, 0)}")
-                        elif type(widget) is QPushButton:
-                            # Manage the clickability of the buttons according to the configuration
-                            # in the table config_api_form_fields simultaneously with the edition,
-                            # but giving preference to the configuration when iseditable is True
-                            if not field['iseditable']:
-                                widget.setEnabled(field['iseditable'])
-        except RuntimeError:
-            pass
-        finally:
-            self.new_feature_id = None
-
-
-    def enable_all(self, dialog, result):
-
-        try:
-            widget_list = dialog.findChildren(QWidget)
-            for widget in widget_list:
-                if widget.property('keepDisbled'):
-                    continue
-                for field in result['fields']:
-                    if widget.objectName() == field['widgetname']:
-                        if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
-                            widget.setReadOnly(not field['iseditable'])
-                            if not field['iseditable']:
-                                widget.setFocusPolicy(Qt.NoFocus)
-                                widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                            else:
-                                widget.setFocusPolicy(Qt.StrongFocus)
-                                widget.setStyleSheet(None)
-                        elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
-                            widget.setEnabled(field['iseditable'])
-                            if not field['iseditable']:
-                                widget.setFocusPolicy(Qt.NoFocus)
-                                widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                            else:
-                                widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
-                                    field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
-        except RuntimeError:
-            pass
 
 
     def enable_actions(self, enabled):

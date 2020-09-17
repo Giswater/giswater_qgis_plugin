@@ -1531,3 +1531,56 @@ def manage_filter(dialog, widget, action, selector_vars):
         selector_vars[f"var_txt_filter_{tab_name}"] = qt_tools.getWidgetText(dialog, widget)
     else:
         selector_vars[f"var_txt_filter_{tab_name}"] = ''
+
+
+
+def disable_all(dialog, result, enable):
+
+    try:
+        widget_list = dialog.findChildren(QWidget)
+        for widget in widget_list:
+            for field in result['fields']:
+                if widget.property('columnname') == field['columnname']:
+                    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
+                        widget.setReadOnly(not enable)
+                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                    elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
+                        widget.setEnabled(enable)
+                        widget.setStyleSheet("QWidget {color: rgb(0, 0, 0)}")
+                    elif type(widget) is QPushButton:
+                        # Manage the clickability of the buttons according to the configuration
+                        # in the table config_api_form_fields simultaneously with the edition,
+                        # but giving preference to the configuration when iseditable is True
+                        if not field['iseditable']:
+                            widget.setEnabled(field['iseditable'])
+    except RuntimeError as e:
+        pass
+
+
+def enable_all(dialog, result):
+
+    try:
+        widget_list = dialog.findChildren(QWidget)
+        for widget in widget_list:
+            if widget.property('keepDisbled'):
+                continue
+            for field in result['fields']:
+                if widget.property('columnname') == field['columnname']:
+                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
+                        widget.setReadOnly(not field['iseditable'])
+                        if not field['iseditable']:
+                            widget.setFocusPolicy(Qt.NoFocus)
+                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                        else:
+                            widget.setFocusPolicy(Qt.StrongFocus)
+                            widget.setStyleSheet(None)
+                    elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
+                        widget.setEnabled(field['iseditable'])
+                        if not field['iseditable']:
+                            widget.setFocusPolicy(Qt.NoFocus)
+                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                        else:
+                            widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
+                                field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
+    except RuntimeError:
+        pass
