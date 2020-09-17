@@ -432,6 +432,8 @@ class ApiParent(ParentAction):
                     qt_tools.setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
                 elif qt_tools.getWidgetType(dialog, widget) is QComboBox:
                     qt_tools.set_combo_itemData(widget, str(snapped_feature_attr_aux[i]), 0)
+                elif qt_tools.getWidgetType(dialog, widget) is QgsDateTimeEdit:
+                    qt_tools.setCalendarDate(dialog, widget, snapped_feature_attr_aux[i])
 
         self.api_disable_copy_paste(dialog)
 
