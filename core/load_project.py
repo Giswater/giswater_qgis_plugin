@@ -19,6 +19,7 @@ from .utils.pg_man import PgMan
 from .. import global_vars
 from ..lib.qgis_tools import QgisTools
 from ..ui_manager import DialogTextUi
+from ..core.info_tools import GwInfoTools
 from ..core.notify_tools import GwNotifyTools
 from ..actions.parent import ParentAction
 
@@ -97,6 +98,8 @@ class LoadProject(QObject):
         status = self.check_layers_from_distinct_schema()
         if status is False:
             return
+
+        self.controller.gw_infotools = GwInfoTools(self.iface, self.settings, self.controller, self.plugin_dir)
 
         # TODO: Refactor this
         self.controller.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)

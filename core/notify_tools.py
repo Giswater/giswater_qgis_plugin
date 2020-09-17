@@ -133,7 +133,7 @@ class GwNotifyTools(ParentAction):
             params = function['parameters']
             try:
                 # getattr(self, function_name)(**params)
-                getattr(self.controller.gw_actions, function_name)(**params)
+                getattr(self.controller.gw_infotools, function_name)(**params)
             except AttributeError as e:
                 # If function_name not exist as python function
                 self.controller.log_warning(f"Exception error: {e}")
