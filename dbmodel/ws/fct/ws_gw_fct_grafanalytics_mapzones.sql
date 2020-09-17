@@ -136,8 +136,6 @@ v_count3 integer;
 v_geomparamupdate float;
 v_visible_layer text;
 v_concavehull float = 0.9;
-v_pointqmlpath text;
-v_lineqmlpath text;
 v_error_context text;
 v_audit_result text;
 v_level integer;
@@ -251,16 +249,7 @@ BEGIN
 
 	IF v_audit_result IS NULL THEN
 
-		-- select user values
-		EXECUTE 'SELECT value::json->>'''||v_table||''' FROM config_param_user WHERE parameter = ''qgis_qml_pointlayer_path'' and cur_user = current_user'
-		INTO v_pointqmlpath;
-		EXECUTE 'SELECT value::json->>'''||v_table||''' FROM config_param_user WHERE parameter = ''qgis_qml_linelayer_path'' and cur_user = current_user'
-		INTO v_lineqmlpath;
-
-		-- Adding quotes to control nulls
-		v_pointqmlpath := COALESCE(v_pointqmlpath, '""'); 
-		v_lineqmlpath := COALESCE(v_lineqmlpath, '""'); 
-		
+	
 		-- reset graf & audit_log tables
 		DELETE FROM anl_arc where cur_user=current_user and fid=v_fid;
 		DELETE FROM anl_node where cur_user=current_user and fid=v_fid;
@@ -732,7 +721,7 @@ BEGIN
 		(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid)) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
-		v_result_line = concat ('{"geometryType":"LineString", "qmlPath":"", "features":',v_result,'}'); 
+		v_result_line = concat ('{"geometryType":"LineString","features":',v_result,'}'); 
 
 
 		-- disconnected connecs
@@ -749,7 +738,7 @@ BEGIN
 		(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid)) row) features;
 
 		v_result := COALESCE(v_result, '{}'); 
-		v_result_point = concat ('{"geometryType":"Point", "qmlPath":"", "features":',v_result, '}'); 
+		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
 
 
 	ELSE -- all features in order to make a more complex log
@@ -772,7 +761,7 @@ BEGIN
 
 		v_result := COALESCE(v_result, '{}'); 
 
-		v_result_line = concat ('{"geometryType":"LineString", "qmlPath":'||v_lineqmlpath||', "features":',v_result, '}');
+		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
 
 		-- connec elements
 		v_result = null;
@@ -791,7 +780,7 @@ BEGIN
 		INTO v_result;
 
 		v_result := COALESCE(v_result, '{}'); 
-		v_result_point = concat ('{"geometryType":"Point", "qmlPath":'||v_pointqmlpath||', "features":',v_result, '}');
+		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 	END IF;
 
 	IF v_audit_result is null THEN
