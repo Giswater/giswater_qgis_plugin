@@ -342,6 +342,7 @@ class GwPsector(ParentManage):
         # Set signals
         self.dlg_plan_psector.btn_accept.clicked.connect(partial(self.insert_or_update_new_psector,
                                                                  'v_edit_plan_psector', True))
+        self.dlg_plan_psector.btn_accept.clicked.connect(partial(self.set_plan))
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
         self.dlg_plan_psector.psector_type.currentIndexChanged.connect(partial(self.populate_result_id,
@@ -1084,12 +1085,17 @@ class GwPsector(ParentManage):
         self.delete_psector_selector('selector_plan_psector')
         self.insert_psector_selector('selector_plan_psector', 'psector_id',
                                      qt_tools.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id))
-
+                
         if close_dlg:
             self.reload_states_selector()
             self.close_dialog(self.dlg_plan_psector)
 
 
+    def set_plan(self):
+        body = self.create_body()
+        self.controller.get_json('gw_fct_setplan', body, log_sql=True)
+        
+        
     def price_selector(self, dialog, tableleft, tableright, field_id_right):
 
         # fill QTableView all_rows
