@@ -49,7 +49,10 @@ CREATE OR REPLACE VIEW v_edit_element AS
   WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 
-CREATE OR REPLACE VIEW v_edit_element_pol AS 
+
+DROP TRIGGER IF EXISTS gw_trg_edit_element_pol ON v_edit_element_pol;
+DROP VIEW IF EXISTS v_edit_element_pol;
+CREATE OR REPLACE VIEW ve_pol_element AS 
  SELECT e.pol_id,
     e.element_id,
     polygon.the_geom

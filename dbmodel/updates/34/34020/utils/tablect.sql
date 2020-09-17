@@ -9,3 +9,12 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
       
 ALTER TABLE temp_csv DROP CONSTRAINT IF EXISTS temp_csv2pg_csv2pgcat_id_fkey2;
+
+ALTER TABLE element_x_arc DROP CONSTRAINT IF EXISTS element_x_arc_unique;
+ALTER TABLE element_x_arc ADD CONSTRAINT element_x_arc_unique UNIQUE(element_id, arc_id);
+  
+ALTER TABLE element_x_node DROP CONSTRAINT IF EXISTS element_x_node_unique;
+ALTER TABLE element_x_node ADD CONSTRAINT element_x_node_unique UNIQUE(element_id, node_id);
+  
+ALTER TABLE element_x_connec DROP CONSTRAINT IF EXISTS element_x_connec_unique;
+ALTER TABLE element_x_connec ADD CONSTRAINT element_x_connec_unique UNIQUE(element_id, connec_id);
