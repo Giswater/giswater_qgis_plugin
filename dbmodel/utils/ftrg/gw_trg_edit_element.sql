@@ -37,6 +37,7 @@ v_x float;
 v_y float;
 v_new_pol_id varchar(16);
 v_srid integer;
+v_project_type text;
 
 v_feature text;
 v_tablefeature text;
@@ -51,27 +52,20 @@ BEGIN
 		v_unitsfactor = 1;
 	END IF;
 
-	v_srid = (SELECT epsg FROM version limit 1);
+	v_srid = (SELECT epsg FROM sys_version limit 1);
+	v_project_type = (SELECT project_type FROM sys_version limit 1);
 
 	-- get associated feature
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-		v_feature = (SELECT node_id FROM v_edit_node WHERE st_dwithin(the_geom, NEW.the_geom, 0.001));
+		SELECT node_id, 'node'::text INTO v_feature, v_tablefeature FROM v_edit_node WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
 		IF v_feature IS NULL THEN
-			v_feature = (SELECT arc_id FROM v_edit_arc WHERE st_dwithin(the_geom, NEW.the_geom, 0.001));
+			SELECT connec_id, 'connec'::text INTO v_feature, v_tablefeature FROM v_edit_connec WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
 			IF v_feature IS NULL THEN
-				v_feature = (SELECT connec_id FROM v_edit_connec WHERE st_dwithin(the_geom, NEW.the_geom, 0.001));		
-				IF v_feature IS NULL THEN
-					v_feature = (SELECT gully_id FROM v_edit_gully WHERE st_dwithin(the_geom, NEW.the_geom, 0.001));				
-					IF v_feature IS NULL THEN
-						v_tablefeature = 'gully';
-					END IF;
-				ELSE
-					v_tablefeature = 'connec';
+				SELECT arc_id, 'arc'::text INTO v_feature, v_tablefeature FROM v_edit_arc WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);		
+				IF v_feature IS NULL AND v_project_type='UD' THEN
+					SELECT gully_id, 'gully'::text INTO v_feature, v_tablefeature FROM v_edit_gully WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
 				END IF;
-			ELSE
-				v_tablefeature = 'arc';
 			END IF;
-		v_tablefeature = 'node';
 		END IF;
 	END IF;
  	
@@ -83,12 +77,6 @@ BEGIN
 			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 			NEW.element_id:= (SELECT nextval('urn_id_seq'));
 		END IF;
-
-		-- update element_x_feature table
-		IF v_tablefeature IS NOT NULL THEN
-			EXECUTE 'INSERT INTO element_x_'||v_tablefeature||' ('||v_tablefeature'_id, element_id) VALUES ('||v_feature||','||NEW.element_id||')';
-		END IF;
-		
 
 		-- Cat element
 		IF (NEW.elementcat_id IS NULL) THEN
@@ -226,6 +214,12 @@ BEGIN
 		NEW.function_type, NEW.category_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, 
 		NEW.ownercat_id, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.publish, 
 		NEW.inventory, NEW.undelete, NEW.expl_id, NEW.num_elements, v_new_pol_id);
+
+		-- update element_x_feature table
+		IF v_tablefeature IS NOT NULL AND v_feature IS NOT NULL THEN
+			EXECUTE 'INSERT INTO element_x_'||v_tablefeature||' ('||v_tablefeature||'_id, element_id) VALUES ('||v_feature||','||NEW.element_id||') ON CONFLICT 
+			('||v_tablefeature||'_id, element_id) DO NOTHING';
+		END IF;
 			
 		RETURN NEW;			
 
