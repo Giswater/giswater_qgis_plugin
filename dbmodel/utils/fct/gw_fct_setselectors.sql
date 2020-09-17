@@ -37,7 +37,6 @@ v_expl integer;
 v_addschema text;
 v_error_context text;
 v_selectortype text;
-v_layermanager json;
 v_schemaname text;
 v_return json;
 v_table text;
@@ -92,7 +91,6 @@ BEGIN
 	v_columnname = v_parameter_selector->>'selector_id'; 
 	v_table = v_parameter_selector->>'table';
 	v_tableid = v_parameter_selector->>'table_id';	
-	v_layermanager = v_parameter_selector->>'layermanager'; 
 
 	-- get expl from muni
 	IF v_selectortype = 'explfrommuni' THEN
@@ -134,11 +132,10 @@ BEGIN
 	FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
 	FROM (SELECT st_collect(the_geom) as the_geom FROM v_edit_arc) b) a;
 
-	-- control nulls
-	v_layermanager = COALESCE (v_layermanager, '{}');
+
 
 	-- Return
-	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"geometry":',v_geometry,', "selectorType":"',v_selectortype,'"}, "layermanager":'||v_layermanager||'}');
+	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"geometry":',v_geometry,', "selectorType":"',v_selectortype,'"}'}');
 	RETURN gw_fct_getselectors(v_return);
 
 	

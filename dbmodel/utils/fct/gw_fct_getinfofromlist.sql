@@ -28,7 +28,6 @@ v_featuretype text;
 v_lotfeaturetype text;
 v_projecttype text;
 v_activelayer json;
-v_layermanager json;
 v_rectgeometry text;
 v_rectgeometry_json json;
 v_id text;
@@ -66,7 +65,6 @@ BEGIN
 
 		-- set layer manager
 		v_activelayer := concat ('"ve_lot_x_',lower(v_lotfeaturetype),'"');
-		v_layerManager := concat ('{"activeLayer":',v_activelayer,',"visibleLayers":',v_activelayer,'}');
 
 		raise notice 'v_activelayer %', v_activelayer;
  		-- set zoom on canvas

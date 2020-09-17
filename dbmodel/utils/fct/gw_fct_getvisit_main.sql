@@ -111,7 +111,6 @@ v_activedatatab boolean;
 v_activefilestab boolean;
 v_client json;
 v_pageinfo json;
-v_layermanager json;
 v_filterfields json;
 v_data json;
 isnewvisit boolean default false;
@@ -739,7 +738,6 @@ BEGIN
 	v_message := COALESCE(v_message, '{}');
 	v_forminfo := COALESCE(v_forminfo, '{}');
 	v_tablename := COALESCE(v_tablename, '{}');
-	v_layermanager := COALESCE(v_layermanager, '{}');
 	v_geometry := COALESCE(v_geometry, '{}');
 
 	-- If project is offline dont send id
@@ -751,8 +749,7 @@ BEGIN
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'||v_version||
              ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idName":"visit_id", "id":'||v_id||'}'||
 		    ', "form":'||v_forminfo||
-		    ', "data":{"layerManager":'||v_layermanager||
-		               ',"geometry":'|| v_geometry ||'}}'||
+		    ', "data":{"geometry":'|| v_geometry ||'}}'||
 		    '}')::json;
 END;
 $BODY$
