@@ -437,7 +437,7 @@ class ApiParent(ParentAction):
         for i in range(0, len(fields)):
             if fields[i].name() == 'sector_id' or fields[i].name() == 'dma_id' or fields[i].name() == 'expl_id' \
                     or fields[i].name() == 'state' or fields[i].name() == 'state_type' \
-                    or fields[i].name() == layername + '_workcat_id' or fields[i].name() == layername + '_builtdate' \
+                    or fields[i].name() == 'workcat_id' or fields[i].name() == 'builtdate' \
                     or fields[i].name() == 'verified' or fields[i].name() == str(self.geom_type) + 'cat_id':
                 snapped_feature_attr_aux.append(snapped_feature_attr[i])
                 fields_aux.append(fields[i].name())
