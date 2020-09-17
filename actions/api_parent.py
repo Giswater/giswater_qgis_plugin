@@ -430,6 +430,8 @@ class ApiParent(ParentAction):
                     utils_giswater.setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
                 elif utils_giswater.getWidgetType(dialog, widget) is QComboBox:
                     utils_giswater.set_combo_itemData(widget, str(snapped_feature_attr_aux[i]), 0)
+                elif utils_giswater.getWidgetType(dialog, widget) is QgsDateTimeEdit:
+                    utils_giswater.setCalendarDate(dialog, widget, snapped_feature_attr_aux[i])
 
         self.api_disable_copy_paste(dialog)
 
