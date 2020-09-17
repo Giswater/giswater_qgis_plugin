@@ -20,7 +20,7 @@ from functools import partial
 from lib import qt_tools
 from ..parent_action import GwParentAction
 from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
-from ...utils.layer_tools import add_temp_layer
+from ...utils.layer_tools import add_temp_layer, populate_info_text
 from ....actions.parent_functs import show_exceptions_msg, set_style_mapzones
 from ....actions.api_parent_functs import create_body, construct_form_param_user
 from ....ui_manager import ToolboxDockerUi, ToolboxUi
@@ -356,6 +356,8 @@ class GwToolBoxButton(GwParentAction):
 
         body = create_body(feature=feature_field, extras=extras)
         json_result = self.controller.get_json(function_name, body)
+        populate_info_text(dialog, json_result['body']['data'], True, True, 1, True)
+
         dialog.progressBar.setAlignment(Qt.AlignCenter)
         dialog.progressBar.setMinimum(0)
         dialog.progressBar.setMaximum(1)
