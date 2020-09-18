@@ -1452,7 +1452,7 @@ class DaoController(object):
     def check_role(self, role_name):
         """ Check if @role_name exists """
 
-        sql = f"SELECT * FROM pg_roles WHERE lower(rolname) = '{role_name}'"
+        sql = f"SELECT * FROM pg_roles WHERE rolname = '{role_name}'"
         row = self.get_row(sql, log_info=False)
         return row
 
