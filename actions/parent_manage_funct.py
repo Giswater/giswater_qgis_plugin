@@ -621,7 +621,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
     """ Delete selected elements of the table """
 
     disconnect_signal_selection_changed()
-
+    geom_type = tab_feature_changed(dialog, table_object)
     if type(table_object) is str:
         widget_name = f"tbl_{table_object}_x_{geom_type}"
         widget = qt_tools.getWidget(dialog, widget_name)
@@ -745,7 +745,7 @@ def selection_init(dialog, table_object, query=False, geom_type=None, layers=Non
     """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
     from .multiple_selection import MultipleSelection
-
+    geom_type = tab_feature_changed(dialog, table_object)
     if geom_type in ('all', None):
         geom_type = 'arc'
     multiple_selection = MultipleSelection(layers, geom_type, parent_manage=None,

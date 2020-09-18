@@ -475,7 +475,7 @@ def add_combobox(field):
     else:
         widget.setProperty('selectedId', None)
     if 'iseditable' in field:
-        widget.setEnabled(field['iseditable'])
+        widget.setEnabled(bool(field['iseditable']))
         if not field['iseditable']:
             widget.setStyleSheet("QComboBox { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
     return widget
