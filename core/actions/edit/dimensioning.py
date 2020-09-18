@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
 from qgis.core import QgsPointXY
-from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsMapTip, QgsVertexMarker
+from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsMapTip, QgsRubberBand, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, QGridLayout, QLabel,\
     QLineEdit, QPushButton, QSizePolicy, QSpacerItem, QSpinBox, QTextEdit, QWidget
@@ -19,7 +19,7 @@ from ...utils.giswater_tools import load_settings, open_dialog, save_settings
 from ....ui_manager import DimensioningUi
 from .... import global_vars
 
-from ....actions.parent_functs import set_icon
+from ....actions.parent_functs import restore_user_layer, set_icon
 from ....actions.api_parent_functs import check_actions, create_body, put_widgets,  \
     close_dialog, set_setStyleSheet, add_lineedit, set_widget_size, set_data_type, manage_lineedit, add_combobox, \
     add_checkbox, add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_textarea, \
@@ -47,8 +47,7 @@ class GwDimensioning:
         self.dlg_dim = DimensioningUi()
         load_settings(self.dlg_dim)
 
-
-
+        self.user_current_layer = self.iface.activeLayer()
         # Set layers dimensions, node and connec
         self.layer_dimensions = self.controller.get_layer_by_tablename("v_edit_dimensions")
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
@@ -64,6 +63,19 @@ class GwDimensioning:
 
         #qgis_feature = self.get_feature_by_id(self.layer_dimensions, fid, 'id')
 
+        # when funcion is called from new feature
+        if db_return is None:
+            rubber_band = QgsRubberBand(self.canvas, 0)
+            body = create_body()
+            function_name = 'gw_fct_getdimensioning'
+            json_result = self.controller.get_json(function_name, body)
+            if json_result is None:
+                return False
+            db_return = [json_result]
+
+        # get id from db response
+        self.fid = db_return[0]['body']['feature']['id']
+
         # ACTION SIGNALS
         actionSnapping = self.dlg_dim.findChild(QAction, "actionSnapping")
         actionSnapping.triggered.connect(partial(self.snapping, actionSnapping))
@@ -73,15 +85,6 @@ class GwDimensioning:
         actionOrientation.triggered.connect(partial(self.orientation, actionOrientation))
         set_icon(actionOrientation, "133")
 
-        if self.layer_dimensions:
-            if self.layer_dimensions.isEditable():
-                actionSnapping.setEnabled(True)
-                actionOrientation.setEnabled(True)
-                enable_all(self.dlg_dim, db_return[0]['body']['data'])
-            else:
-                actionSnapping.setEnabled(False)
-                actionOrientation.setEnabled(False)
-                disable_all(self.dlg_dim, db_return[0]['body']['data'], False)
 
         # LAYER SIGNALS
         self.layer_dimensions.editingStarted.connect(lambda: actionSnapping.setEnabled(True))
@@ -100,18 +103,6 @@ class GwDimensioning:
 
         self.create_map_tips()
 
-        # when funcion is called from new feature
-        if db_return is None:
-            body = create_body()
-            function_name = 'gw_fct_getdimensioning'
-            json_result = self.controller.get_json(function_name, body)
-            if json_result is None:
-                return False
-            db_return = [json_result]
-
-        # get id from db response
-        self.fid = db_return[0]['body']['feature']['id']
-
         layout_list = []
         for field in db_return[0]['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
@@ -123,9 +114,8 @@ class GwDimensioning:
                 qt_tools.setWidgetText(self.dlg_dim, widget, self.fid)
             layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
 
-            # profilactic issue to prevent missed layouts againts db response and form
+            # Profilactic issue to prevent missed layouts againts db response and form
             if layout is not None:
-
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
                 if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                     layout_list.append(layout)
@@ -145,6 +135,17 @@ class GwDimensioning:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             layout.addItem(vertical_spacer1)
 
+        if self.layer_dimensions:
+            self.iface.setActiveLayer(self.layer_dimensions)
+            if self.layer_dimensions.isEditable():
+                actionSnapping.setEnabled(True)
+                actionOrientation.setEnabled(True)
+                enable_all(self.dlg_dim, db_return[0]['body']['data'])
+            else:
+                actionSnapping.setEnabled(False)
+                actionOrientation.setEnabled(False)
+                disable_all(self.dlg_dim, db_return[0]['body']['data'], False)
+
         title = f"DIMENSIONING - {self.fid}"
         open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
         return False, False
@@ -154,6 +155,7 @@ class GwDimensioning:
 
         self.iface.actionRollbackEdits().trigger()
         close_dialog(self.dlg_dim)
+        restore_user_layer(self.user_current_layer)
 
 
     def save_dimensioning(self, qgis_feature, layer):

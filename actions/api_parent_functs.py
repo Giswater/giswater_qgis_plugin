@@ -1553,6 +1553,8 @@ def disable_all(dialog, result, enable):
                         # but giving preference to the configuration when iseditable is True
                         if not field['iseditable']:
                             widget.setEnabled(field['iseditable'])
+                    break
+
     except RuntimeError as e:
         pass
 
