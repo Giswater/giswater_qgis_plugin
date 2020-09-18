@@ -1017,13 +1017,15 @@ class GwInfo(QObject):
 
 
     def get_last_value(self):
-
-        widgets = self.dlg_cf.tab_data.findChildren(QWidget)
-        for widget in widgets:
-            if widget.hasFocus():
-                value = qt_tools.getWidgetText(self.dlg_cf, widget)
-                if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
-                    self.my_json[str(widget.property('columnname'))] = str(value)
+        try:
+            widgets = self.dlg_cf.tab_data.findChildren(QWidget)
+            for widget in widgets:
+                if widget.hasFocus():
+                    value = qt_tools.getWidgetText(self.dlg_cf, widget)
+                    if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
+                        self.my_json[str(widget.property('columnname'))] = str(value)
+        except RuntimeError as e:
+            pass
 
 
     def start_editing(self, layer):
