@@ -272,7 +272,6 @@ class GwDimensioning:
 
         layer = self.layer_dimensions
         self.iface.setActiveLayer(layer)
-        layer.startEditing()
 
         # Get coordinates
         event_point = get_event_point(point=point)
@@ -312,7 +311,9 @@ class GwDimensioning:
                 return
 
             depth = snapped_feat.attribute(fieldname)
-            if depth:
+            if depth in ('', None, 0, '0', 'NULL'):
+                qt_tools.setText(self.dlg_dim, "depth", None)
+            else:
                 qt_tools.setText(self.dlg_dim, "depth", depth)
             qt_tools.setText(self.dlg_dim, "feature_id", element_id)
             qt_tools.setText(self.dlg_dim, "feature_type", feat_type.upper())
@@ -320,6 +321,7 @@ class GwDimensioning:
             apply_snapping_options(self.previous_snapping)
             self.deactivate_signals(action, emit_point)
             action.setChecked(False)
+
 
     def orientation(self, action):
 
