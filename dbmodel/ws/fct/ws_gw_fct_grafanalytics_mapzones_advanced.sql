@@ -30,8 +30,11 @@ v_expl integer;
 v_updatemapzone integer;
 v_data json;
 v_paramupdate float;
-v_forceclose text;
+v_floodfromnode text;
+v_forceclosed text;
 v_forceopen text;
+v_usepsector text;
+
 
 BEGIN
 
@@ -42,19 +45,21 @@ BEGIN
 	v_updatemapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_paramupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
-	v_forceclose = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'forceClose');
+	v_floodfromnode = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodFromNode');
+	v_forceclosed = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'forceClosed');
 	v_forceopen = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'forceOpen');
+	v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector');
 
-	-- control nulls;
+	-- control of null values
 	IF v_paramupdate IS NULL THEN v_paramupdate = 5; END IF;
-	IF v_updatemapzone IS NULL THEN
-		v_updatemapzone = 1;
-	END IF;
-	v_forceclose = COALESCE (v_forceclose, '[]');
-	v_forceopen = COALESCE (v_forceopen, '[]');
+	IF v_floodfromnode IS NULL THEN v_floodfromnode = ''; END IF;
+	IF v_forceclosed IS NULL THEN v_forceclosed = ''; END IF;
+	IF v_forceopen IS NULL THEN v_forceopen = ''; END IF;
+	IF v_usepsector IS NULL THEN v_usepsector = FALSE ; END IF;
+	IF v_updatemapzone IS NULL THEN v_updatemapzone = 1; END IF;
 
 	v_data = concat ('{"data":{"parameters":{"grafClass":"',v_class,'", "exploitation": [',v_expl,'], "updateFeature":"TRUE",
-	"updateMapZone":',v_updatemapzone,', "forceOpen":',v_forceopen,', "forceClose":',v_forceclose,', "geomParamUpdate":',v_paramupdate,', "debug":"FALSE"}}}');
+	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ',"floodFromNode":"',v_floodfromnode,'", "forceOpen": [',v_forceopen,'], "forceClosed":[',v_forceclosed,'], "usePlanPsector": ',v_usepsector,', "debug":"FALSE"}}}');
 
 	RETURN gw_fct_grafanalytics_mapzones(v_data);
 
