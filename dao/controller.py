@@ -1931,20 +1931,23 @@ class DaoController(object):
         """ Save QDockWidget position (1=Left, 2=Right, 4=Top, 8=Bottom),
             remove from iface and del class
         """
-
-        if self.dlg_docker:
-            if not self.dlg_docker.isFloating():
-                cur_user = self.get_current_user()
-                docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
-                self.plugin_settings_set_value(f"docker_info_{cur_user}", docker_pos)
-                widget = self.dlg_docker.widget()
-                if widget:
-                    widget.close()
-                    del widget
-                    self.dlg_docker.setWidget(None)
-                    self.docker_type = None
-                self.iface.removeDockWidget(self.dlg_docker)
-
+        try:
+            if self.dlg_docker:
+                if not self.dlg_docker.isFloating():
+                    cur_user = self.get_current_user()
+                    docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
+                    self.plugin_settings_set_value(f"docker_info_{cur_user}", docker_pos)
+                    widget = self.dlg_docker.widget()
+                    if widget:
+                        widget.close()
+                        del widget
+                        self.dlg_docker.setWidget(None)
+                        self.docker_type = None
+                    self.iface.removeDockWidget(self.dlg_docker)
+                    self.dlg_docker = None
+        except AttributeError:
+            self.docker_type = None
+            self.dlg_docker = None
 
     def manage_docker_options(self):
         """ Check if user want dock the dialog or not """
