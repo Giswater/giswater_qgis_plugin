@@ -915,10 +915,14 @@ class ApiCF(ApiParent, QObject):
         result = json.loads(row[0], object_pairs_hook=OrderedDict)
 
         if "Accepted" in result['status']:
-            level = result['message']['level']
-            msg = result['message']['text']
-            self.controller.show_message(msg, message_level=level)
-            self.reload_fields(dialog, row, p_widget)
+            try:
+                level = result['message']['level']
+                msg = result['message']['text']
+                self.controller.show_message(msg, message_level=level)
+            except KeyError:
+                pass
+            finally:
+                self.reload_fields(dialog, row, p_widget)
         elif "Failed" in result['status']:
             msg = "FAIL"
             self.controller.show_message(msg, message_level=2)
