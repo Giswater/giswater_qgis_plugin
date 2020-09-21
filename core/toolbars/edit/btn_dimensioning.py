@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QSettings, Qt
 
-from ...actions.edit.dimensioning import GwDimensioning
+from core.actions.dimensioning import GwDimensioning
 from ..parent_maptool import GwParentMapTool
 
 

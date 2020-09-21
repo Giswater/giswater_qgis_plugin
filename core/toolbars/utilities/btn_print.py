@@ -15,10 +15,10 @@ from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit
 import json
 from functools import partial
 
-from lib import qt_tools
-from ..parent_action import GwParentAction
-from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
-from ....ui_manager import FastPrintUi
+from lib import tools_qt
+from ..parent_dialog import GwParentAction
+from ...utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog
+from core.ui.ui_manager import FastPrintUi
 from .... import global_vars
 from ....actions.parent_functs import hide_void_groupbox, get_composers_list
 from ....actions.api_parent_functs import create_body, put_widgets, get_values, draw_rectangle, set_setStyleSheet, \
@@ -71,14 +71,14 @@ class GwPrintButton(GwParentAction):
         w_rotation = self.dlg_composer.findChild(QLineEdit, "data_rotation")
         if w_rotation:
             w_rotation.editingFinished.connect(partial(self.set_rotation, w_rotation))
-            qt_tools.setWidgetText(self.dlg_composer, w_rotation, rotation)
+            tools_qt.setWidgetText(self.dlg_composer, w_rotation, rotation)
 
         w_scale = self.dlg_composer.findChild(QLineEdit, "data_scale")
         if w_scale:
             w_scale.editingFinished.connect(partial(self.set_scale, w_scale))
             reg_exp = QRegExp("\d{0,8}[\r]?")
             w_scale.setValidator(QRegExpValidator(reg_exp))
-            qt_tools.setWidgetText(self.dlg_composer, w_scale, scale)
+            tools_qt.setWidgetText(self.dlg_composer, w_scale, scale)
         self.my_json['rotation'] = rotation
         self.my_json['scale'] = scale
 

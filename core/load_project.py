@@ -15,20 +15,20 @@ from collections import OrderedDict, Counter
 
 from .models.plugin_toolbar import PluginToolbar
 from .utils.pg_man import PgMan
-from .utils.giswater_tools import set_parser_value
+from .utils.tools_giswater import set_parser_value
 from .. import global_vars
-from ..ui_manager import DialogTextUi
+from core.ui.ui_manager import DialogTextUi
 from ..core.info_tools import GwInfoTools
 from ..core.notify_tools import GwNotifyTools
-from .actions.basic.search import GwSearch
-from ..lib.qgis_tools import qgis_get_layer_source, get_qgis_project_variables, qgis_manage_snapping_layer
+from core.actions.search import GwSearch
+from ..lib.tools_qgis import qgis_get_layer_source, get_qgis_project_variables, qgis_manage_snapping_layer
 from .toolbars import buttons
 
 
 class LoadProject(QObject):
 
     def __init__(self):
-        """ Class to manage layers. Refactor code from giswater.py """
+        """ Class to manage layers. Refactor code from main.py """
 
         super().__init__()
 

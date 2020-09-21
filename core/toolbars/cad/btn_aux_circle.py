@@ -12,11 +12,11 @@ from qgis.PyQt.QtGui import QDoubleValidator
 
 from functools import partial
 
-from ....lib import qt_tools
+from ....lib import tools_qt
 from ..parent_maptool import GwParentMapTool
-from ....ui_manager import AuxCircle
-from ...utils.giswater_tools import load_settings, open_dialog, close_dialog
-from ....lib.qgis_tools import get_event_point, snap_to_current_layer, snap_to_background_layers, add_marker, \
+from core.ui.ui_manager import AuxCircle
+from ...utils.tools_giswater import load_settings, open_dialog, close_dialog
+from ....lib.tools_qgis import get_event_point, snap_to_current_layer, snap_to_background_layers, add_marker, \
     get_snapping_options, get_snapped_point
 
 
@@ -55,7 +55,7 @@ class GwAuxCircleButton(GwParentMapTool):
         self.radius = self.dlg_create_circle.radius.text()
         if not self.radius:
             self.radius = 0.1
-        self.delete_prev = qt_tools.isChecked(self.dlg_create_circle, self.dlg_create_circle.chk_delete_prev)
+        self.delete_prev = tools_qt.isChecked(self.dlg_create_circle, self.dlg_create_circle.chk_delete_prev)
 
         if self.layer_circle:
             self.layer_circle.startEditing()

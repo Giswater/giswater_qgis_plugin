@@ -12,12 +12,12 @@ from qgis.PyQt.QtGui import QDoubleValidator
 
 from functools import partial
 
-from lib import qt_tools
+from lib import tools_qt
 from .... import global_vars
 from ..parent_maptool import GwParentMapTool
-from ....ui_manager import AuxPoint
-from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
-from ....lib.qgis_tools import get_event_point, snap_to_current_layer, snap_to_background_layers, add_marker, \
+from core.ui.ui_manager import AuxPoint
+from ...utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
+from ....lib.tools_qgis import get_event_point, snap_to_current_layer, snap_to_background_layers, add_marker, \
     get_snapping_options, get_snapped_point
 
 
@@ -71,7 +71,7 @@ class GwAuxPointButton(GwParentMapTool):
         if not self.dist_y:
             self.dist_y = 0
 
-        self.delete_prev = qt_tools.isChecked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
+        self.delete_prev = tools_qt.isChecked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
         if self.layer_points:
             self.layer_points.startEditing()
             close_dialog(self.dlg_create_point)

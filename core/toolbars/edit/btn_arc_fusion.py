@@ -19,12 +19,12 @@
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt, QDate
 
-from lib import qt_tools
+from lib import tools_qt
 from ..parent_maptool import GwParentMapTool
-from ....ui_manager import ArcFusionUi
+from core.ui.ui_manager import ArcFusionUi
 from functools import partial
-from ...utils.giswater_tools import load_settings, open_dialog, close_dialog, create_body, populate_info_text
-from ....lib.qgis_tools import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \
+from ...utils.tools_giswater import load_settings, open_dialog, close_dialog, create_body, populate_info_text
+from ....lib.tools_qgis import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \
     enable_snapping
 
 
@@ -68,11 +68,11 @@ class GwArcFusionButton(GwParentMapTool):
             # Fill ComboBox workcat_id_end
             sql = "SELECT id FROM cat_work ORDER BY id"
             rows = self.controller.get_rows(sql)
-            qt_tools.fillComboBox(self.dlg_fusion, "workcat_id_end", rows, False)
+            tools_qt.fillComboBox(self.dlg_fusion, "workcat_id_end", rows, False)
 
             # Set QDateEdit to current date
             current_date = QDate.currentDate()
-            qt_tools.setCalendarDate(self.dlg_fusion, "enddate", current_date)
+            tools_qt.setCalendarDate(self.dlg_fusion, "enddate", current_date)
 
             # Set signals
             self.dlg_fusion.btn_accept.clicked.connect(self.exec_fusion)

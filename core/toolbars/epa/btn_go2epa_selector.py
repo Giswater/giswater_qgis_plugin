@@ -8,10 +8,10 @@ or (at your option) any later version.
 from functools import partial
 
 from .... import global_vars
-from lib import qt_tools
-from ..parent_action import GwParentAction
-from ....ui_manager import Go2EpaSelectorUi
-from ...utils.giswater_tools import close_dialog, load_settings, open_dialog
+from lib import tools_qt
+from ..parent_dialog import GwParentAction
+from core.ui.ui_manager import Go2EpaSelectorUi
+from ...utils.tools_giswater import close_dialog, load_settings, open_dialog
 
 
 class GwGo2EpaSelectorButton(GwParentAction):
@@ -29,9 +29,9 @@ class GwGo2EpaSelectorButton(GwParentAction):
         self.dlg_go2epa_result = Go2EpaSelectorUi()
         load_settings(self.dlg_go2epa_result)
         if self.project_type == 'ud':
-            qt_tools.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_time")
+            tools_qt.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_time")
         if self.project_type == 'ws':
-            qt_tools.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_datetime")
+            tools_qt.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_datetime")
         self.dlg_go2epa_result.btn_accept.clicked.connect(self.result_selector_accept)
         self.dlg_go2epa_result.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_go2epa_result))
         self.dlg_go2epa_result.rejected.connect(partial(close_dialog, self.dlg_go2epa_result))
@@ -40,17 +40,17 @@ class GwGo2EpaSelectorButton(GwParentAction):
         sql = ("SELECT DISTINCT(result_id), result_id "
                "FROM v_ui_rpt_cat_result ORDER BY result_id")
         rows = self.controller.get_rows(sql)
-        qt_tools.set_item_data(self.dlg_go2epa_result.rpt_selector_result_id, rows)
+        tools_qt.set_item_data(self.dlg_go2epa_result.rpt_selector_result_id, rows)
         rows = self.controller.get_rows(sql, add_empty_row=True)
-        qt_tools.set_item_data(self.dlg_go2epa_result.rpt_selector_compare_id, rows)
+        tools_qt.set_item_data(self.dlg_go2epa_result.rpt_selector_compare_id, rows)
 
         if self.project_type == 'ws':
 
             sql = ("SELECT DISTINCT time, time FROM rpt_arc "
                    "WHERE result_id ILIKE '%%' ORDER BY time")
             rows = self.controller.get_rows(sql, add_empty_row=True)
-            qt_tools.set_item_data(self.dlg_go2epa_result.cmb_time_to_show, rows)
-            qt_tools.set_item_data(self.dlg_go2epa_result.cmb_time_to_compare, rows)
+            tools_qt.set_item_data(self.dlg_go2epa_result.cmb_time_to_show, rows)
+            tools_qt.set_item_data(self.dlg_go2epa_result.cmb_time_to_compare, rows)
 
             self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
                 self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_time_to_show))
@@ -60,20 +60,20 @@ class GwGo2EpaSelectorButton(GwParentAction):
         elif self.project_type == 'ud':
 
             # Populate GroupBox Selector date
-            result_id = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
+            result_id = tools_qt.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
             sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                    f"WHERE result_id = '{result_id}' "
                    f"ORDER BY resultdate")
             rows = self.controller.get_rows(sql)
             if rows is not None:
-                qt_tools.set_item_data(self.dlg_go2epa_result.cmb_sel_date, rows)
-                selector_date = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date, 0)
+                tools_qt.set_item_data(self.dlg_go2epa_result.cmb_sel_date, rows)
+                selector_date = tools_qt.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date, 0)
                 sql = (f"SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
                        f"WHERE result_id = '{result_id}' "
                        f"AND resultdate = '{selector_date}' "
                        f"ORDER BY resulttime")
                 rows = self.controller.get_rows(sql, add_empty_row=True)
-                qt_tools.set_item_data(self.dlg_go2epa_result.cmb_sel_time, rows)
+                tools_qt.set_item_data(self.dlg_go2epa_result.cmb_sel_time, rows)
 
             self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(self.populate_date_time,
                                                                                               self.dlg_go2epa_result.cmb_sel_date))
@@ -83,21 +83,21 @@ class GwGo2EpaSelectorButton(GwParentAction):
 
 
             # Populate GroupBox Selector compare
-            result_id_to_comp = qt_tools.get_item_data(self.dlg_go2epa_result,
+            result_id_to_comp = tools_qt.get_item_data(self.dlg_go2epa_result,
                                                        self.dlg_go2epa_result.rpt_selector_result_id, 0)
             sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                    f"WHERE result_id = '{result_id_to_comp}' "
                    f"ORDER BY resultdate ")
             rows = self.controller.get_rows(sql)
             if rows:
-                qt_tools.set_item_data(self.dlg_go2epa_result.cmb_com_date, rows)
-                selector_cmp_date = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date, 0)
+                tools_qt.set_item_data(self.dlg_go2epa_result.cmb_com_date, rows)
+                selector_cmp_date = tools_qt.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date, 0)
                 sql = (f"SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
                        f"WHERE result_id = '{result_id_to_comp}' "
                        f"AND resultdate = '{selector_cmp_date}' "
                        f"ORDER BY resulttime")
                 rows = self.controller.get_rows(sql, add_empty_row=True)
-                qt_tools.set_item_data(self.dlg_go2epa_result.cmb_com_time, rows)
+                tools_qt.set_item_data(self.dlg_go2epa_result.cmb_com_time, rows)
 
             self.dlg_go2epa_result.rpt_selector_compare_id.currentIndexChanged.connect(partial(
                 self.populate_date_time, self.dlg_go2epa_result.cmb_com_date))
@@ -108,11 +108,11 @@ class GwGo2EpaSelectorButton(GwParentAction):
         sql = "SELECT result_id FROM selector_rpt_main"
         row = self.controller.get_row(sql)
         if row:
-            qt_tools.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_result_id, row["result_id"], 0)
+            tools_qt.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_result_id, row["result_id"], 0)
         sql = "SELECT result_id FROM selector_rpt_compare"
         row = self.controller.get_row(sql)
         if row:
-            qt_tools.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_compare_id, row["result_id"], 0)
+            tools_qt.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_compare_id, row["result_id"], 0)
 
         # Open the dialog
         open_dialog(self.dlg_go2epa_result, dlg_name='go2epa_selector')
@@ -132,9 +132,9 @@ class GwGo2EpaSelectorButton(GwParentAction):
         self.controller.execute_sql(sql)
 
         # Get new values from widgets of type QComboBox
-        rpt_selector_result_id = qt_tools.get_item_data(
+        rpt_selector_result_id = tools_qt.get_item_data(
             self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
-        rpt_selector_compare_id = qt_tools.get_item_data(
+        rpt_selector_compare_id = tools_qt.get_item_data(
             self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
         if rpt_selector_result_id not in (None, -1, ''):
             sql = (f"INSERT INTO selector_rpt_main (result_id, cur_user)"
@@ -147,8 +147,8 @@ class GwGo2EpaSelectorButton(GwParentAction):
             self.controller.execute_sql(sql)
 
         if self.project_type == 'ws':
-            time_to_show = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
-            time_to_compare = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
+            time_to_show = tools_qt.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
+            time_to_compare = tools_qt.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
             if time_to_show not in (None, -1, ''):
                 sql = (f"INSERT INTO selector_rpt_main_tstep (timestep, cur_user)"
                        f" VALUES ('{time_to_show}', '{user}');\n")
@@ -159,10 +159,10 @@ class GwGo2EpaSelectorButton(GwParentAction):
                 self.controller.execute_sql(sql)
 
         elif self.project_type == 'ud':
-            date_to_show = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date)
-            time_to_show = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_time)
-            date_to_compare = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date)
-            time_to_compare = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_time)
+            date_to_show = tools_qt.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date)
+            time_to_show = tools_qt.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_time)
+            date_to_compare = tools_qt.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date)
+            time_to_compare = tools_qt.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_time)
             if date_to_show not in (None, -1, ''):
                 sql = (f"INSERT INTO selector_rpt_main_tstep (resultdate, resulttime, cur_user)"
                        f" VALUES ('{date_to_show}', '{time_to_show}', '{user}');\n")
@@ -181,7 +181,7 @@ class GwGo2EpaSelectorButton(GwParentAction):
     def populate_time(self, combo_result, combo_time):
         """ Populate combo times """
 
-        result_id = qt_tools.get_item_data(self.dlg_go2epa_result, combo_result)
+        result_id = tools_qt.get_item_data(self.dlg_go2epa_result, combo_result)
         if self.project_type == 'ws':
             field = "time"
         else:
@@ -193,15 +193,15 @@ class GwGo2EpaSelectorButton(GwParentAction):
                f"ORDER BY {field};")
 
         rows = self.controller.get_rows(sql, add_empty_row=True)
-        qt_tools.set_item_data(combo_time, rows)
+        tools_qt.set_item_data(combo_time, rows)
 
 
     def populate_date_time(self, combo_date):
 
-        result_id = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
+        result_id = tools_qt.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
         sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                f"WHERE result_id = '{result_id}' "
                f"ORDER BY resultdate")
         rows = self.controller.get_rows(sql)
-        qt_tools.set_item_data(combo_date, rows)
+        tools_qt.set_item_data(combo_date, rows)
 

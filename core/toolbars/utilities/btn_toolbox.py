@@ -17,13 +17,13 @@ import json
 from collections import OrderedDict
 from functools import partial
 
-from lib import qt_tools
-from ..parent_action import GwParentAction
-from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
+from lib import tools_qt
+from ..parent_dialog import GwParentAction
+from ...utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
 from ...utils.layer_tools import add_temp_layer, populate_info_text
 from ....actions.parent_functs import show_exceptions_msg, set_style_mapzones
 from ....actions.api_parent_functs import create_body, construct_form_param_user
-from ....ui_manager import ToolboxDockerUi, ToolboxUi
+from core.ui.ui_manager import ToolboxDockerUi, ToolboxUi
 
 
 class GwToolBoxButton(GwParentAction):
@@ -144,7 +144,7 @@ class GwToolBoxButton(GwParentAction):
 
     def set_selected_layer(self, dialog, combo):
 
-        layer_name = qt_tools.get_item_data(dialog, combo, 1)
+        layer_name = tools_qt.get_item_data(dialog, combo, 1)
         layer = self.controller.get_layer_by_tablename(layer_name)
         if layer is None:
             self.controller.show_warning("Layer not found", parameter=layer_name)
@@ -175,17 +175,17 @@ class GwToolBoxButton(GwParentAction):
                 continue
             if type(widget) in (QCheckBox, QRadioButton):
                 value = get_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}")
-                qt_tools.setChecked(dialog, widget, value)
+                tools_qt.setChecked(dialog, widget, value)
 
             elif type(widget) is QComboBox:
                 if widget.property('selectedId') in (None, '', 'NULL'):
                     value = get_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}")
                 else:
                     value = widget.property('selectedId')
-                qt_tools.set_combo_itemData(widget, value, 0)
+                tools_qt.set_combo_itemData(widget, value, 0)
             elif type(widget) in (QLineEdit, QSpinBox):
                 value = get_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}")
-                qt_tools.setWidgetText(dialog, widget, value)
+                tools_qt.setWidgetText(dialog, widget, value)
 
 
     def save_parametric_values(self, dialog, function):
@@ -198,10 +198,10 @@ class GwToolBoxButton(GwParentAction):
             if type(widget) is QCheckBox:
                 set_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{widget.isChecked()}")
             elif type(widget) is QComboBox:
-                value = qt_tools.get_item_data(dialog, widget, 0)
+                value = tools_qt.get_item_data(dialog, widget, 0)
                 set_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{value}")
             elif type(widget) in (QLineEdit, QSpinBox):
-                value = qt_tools.getWidgetText(dialog, widget, False, False)
+                value = tools_qt.getWidgetText(dialog, widget, False, False)
                 set_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{value}")
 
 
@@ -213,25 +213,25 @@ class GwToolBoxButton(GwParentAction):
             geom_type = get_parser_value('toolbox', f"{function_name}_cmb_geom_type")
         else:
             geom_type = dialog.cmb_geom_type.property('selectedId')
-        qt_tools.set_combo_itemData(dialog.cmb_geom_type, geom_type, 0)
+        tools_qt.set_combo_itemData(dialog.cmb_geom_type, geom_type, 0)
         if dialog.cmb_layers.property('selectedId') in (None, '', 'NULL'):
             layer = get_parser_value('toolbox', f"{function_name}_cmb_layers")
         else:
             layer = dialog.cmb_layers.property('selectedId')
-        qt_tools.set_combo_itemData(dialog.cmb_layers, layer, 0)
+        tools_qt.set_combo_itemData(dialog.cmb_layers, layer, 0)
 
         if get_parser_value('toolbox', f"{function_name}_rbt_previous") == 'True':
-            qt_tools.setChecked(dialog, 'rbt_previous', True)
+            tools_qt.setChecked(dialog, 'rbt_previous', True)
         else:
-            qt_tools.setChecked(dialog, 'rbt_layer', True)
+            tools_qt.setChecked(dialog, 'rbt_layer', True)
 
     def save_settings_values(self, dialog, function):
         """ Save QGIS settings related with toolbox options """
 
         function_name = function[0]['functionname']
-        geom_type = qt_tools.get_item_data(dialog, dialog.cmb_geom_type, 0)
+        geom_type = tools_qt.get_item_data(dialog, dialog.cmb_geom_type, 0)
         set_parser_value('toolbox', f"{function_name}_cmb_geom_type", f"{geom_type}")
-        layer = qt_tools.get_item_data(dialog, dialog.cmb_layers, 0)
+        layer = tools_qt.get_item_data(dialog, dialog.cmb_layers, 0)
         set_parser_value('toolbox', f"{function_name}_cmb_layers", f"{layer}")
         set_parser_value('toolbox', f"{function_name}_rbt_previous", f"{dialog.rbt_previous.isChecked()}")
 
@@ -270,7 +270,7 @@ class GwToolBoxButton(GwParentAction):
 
         if function[0]['input_params']['featureType']:
             layer = None
-            layer_name = qt_tools.get_item_data(dialog, combo, 1)
+            layer_name = tools_qt.get_item_data(dialog, combo, 1)
             if layer_name != -1:
                 layer = self.set_selected_layer(dialog, combo)
                 if not layer:
@@ -288,7 +288,7 @@ class GwToolBoxButton(GwParentAction):
                 feature_id_list += ']'
             elif selection_mode == 'previousSelection' and layer is not None:
                 features = layer.selectedFeatures()
-                feature_type = qt_tools.get_item_data(dialog, dialog.cmb_geom_type, 0)
+                feature_type = tools_qt.get_item_data(dialog, dialog.cmb_geom_type, 0)
                 for feature in features:
                     feature_id = feature.attribute(feature_type + "_id")
                     feature_id_list += f'"{feature_id}", '
@@ -299,7 +299,7 @@ class GwToolBoxButton(GwParentAction):
 
             if layer_name != -1:
                 feature_field = f'"tableName":"{layer_name}", '
-                feature_type = qt_tools.get_item_data(dialog, dialog.cmb_geom_type, 0)
+                feature_type = tools_qt.get_item_data(dialog, dialog.cmb_geom_type, 0)
                 feature_field += f'"featureType":"{feature_type}", '
             feature_field += feature_id_list
 
@@ -314,24 +314,24 @@ class GwToolBoxButton(GwParentAction):
                         param_name = widget.objectName()
                         if type(widget) in ('', QLineEdit):
                             widget.setStyleSheet(None)
-                            value = qt_tools.getWidgetText(dialog, widget, False, False)
+                            value = tools_qt.getWidgetText(dialog, widget, False, False)
                             extras += f'"{param_name}":"{value}", '.replace('""', 'null')
                             if value is '' and widget.property('ismandatory'):
                                 widget_is_void = True
                                 widget.setStyleSheet("border: 1px solid red")
                         elif type(widget) in ('', QSpinBox, QDoubleSpinBox):
-                            value = qt_tools.getWidgetText(dialog, widget, False, False)
+                            value = tools_qt.getWidgetText(dialog, widget, False, False)
                             if value == '':
                                 value = 0
                             extras += f'"{param_name}":"{value}", '
                         elif type(widget) in ('', QComboBox):
-                            value = qt_tools.get_item_data(dialog, widget, 0)
+                            value = tools_qt.get_item_data(dialog, widget, 0)
                             extras += f'"{param_name}":"{value}", '
                         elif type(widget) in ('', QCheckBox):
-                            value = qt_tools.isChecked(dialog, widget)
+                            value = tools_qt.isChecked(dialog, widget)
                             extras += f'"{param_name}":"{str(value).lower()}", '
                         elif type(widget) in ('', QgsDateTimeEdit):
-                            value = qt_tools.getCalendarDate(dialog, widget)
+                            value = tools_qt.getCalendarDate(dialog, widget)
                             if value == "" or value is None:
                                 extras += f'"{param_name}":null, '
                             else:
@@ -460,7 +460,7 @@ class GwToolBoxButton(GwParentAction):
             feat_types.append(elem)
         if feat_types and len(feat_types) <= 1:
             self.dlg_functions.cmb_geom_type.setVisible(False)
-        qt_tools.set_item_data(self.dlg_functions.cmb_geom_type, feat_types, 1)
+        tools_qt.set_item_data(self.dlg_functions.cmb_geom_type, feat_types, 1)
 
 
     def get_all_group_layers(self, geom_type):
@@ -508,7 +508,7 @@ class GwToolBoxButton(GwParentAction):
 
     def populate_layer_combo(self):
 
-        geom_type = qt_tools.get_item_data(self.dlg_functions, self.dlg_functions.cmb_geom_type, 0)
+        geom_type = tools_qt.get_item_data(self.dlg_functions, self.dlg_functions.cmb_geom_type, 0)
         self.layers = []
         self.layers = self.get_all_group_layers(geom_type)
 
@@ -529,7 +529,7 @@ class GwToolBoxButton(GwParentAction):
             elem.append(None)
             layers.append(elem)
 
-        qt_tools.set_item_data(self.dlg_functions.cmb_layers, layers, sort_combo=False)
+        tools_qt.set_item_data(self.dlg_functions.cmb_layers, layers, sort_combo=False)
 
 
     def populate_trv(self, trv_widget, result, expand=False):

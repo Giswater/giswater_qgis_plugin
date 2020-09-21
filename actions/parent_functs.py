@@ -26,18 +26,18 @@ import webbrowser
 from functools import partial
 
 from .. import global_vars
-from lib import qt_tools
-from ..core.utils.giswater_tools import close_dialog, open_dialog
+from lib import tools_qt
+from ..core.utils.tools_giswater import close_dialog, open_dialog
 from ..core.utils.layer_tools import populate_vlayer, categoryze_layer, create_qml, from_postgres_to_toc
-from ..lib.qgis_tools import snap_to_layer, set_snapping_mode, get_snapping_options
-from ..ui_manager import DialogTextUi
+from ..lib.tools_qgis import snap_to_layer, set_snapping_mode, get_snapping_options
+from core.ui.ui_manager import DialogTextUi
 
 
 def open_web_browser(dialog, widget=None):
     """ Display url using the default browser """
 
     if widget is not None:
-        url = qt_tools.getWidgetText(dialog, widget)
+        url = tools_qt.getWidgetText(dialog, widget)
         if url == 'null':
             url = 'http://www.giswater.org'
     else:
@@ -70,7 +70,7 @@ def get_file_dialog(dialog, widget):
     """ Get file dialog """
 
     # Check if selected file exists. Set default value if necessary
-    file_path = qt_tools.getWidgetText(dialog, widget)
+    file_path = tools_qt.getWidgetText(dialog, widget)
     if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
         folder_path = global_vars.plugin_dir
     else:
@@ -83,14 +83,14 @@ def get_file_dialog(dialog, widget):
     message = "Select file"
     folder_path, filter_ = file_dialog.getOpenFileName(parent=None, caption=global_vars.controller.tr(message))
     if folder_path:
-        qt_tools.setWidgetText(dialog, widget, str(folder_path))
+        tools_qt.setWidgetText(dialog, widget, str(folder_path))
 
 
 def get_folder_dialog(dialog, widget):
     """ Get folder dialog """
 
     # Check if selected folder exists. Set default value if necessary
-    folder_path = qt_tools.getWidgetText(dialog, widget)
+    folder_path = tools_qt.getWidgetText(dialog, widget)
     if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
         folder_path = os.path.expanduser("~")
 
@@ -102,7 +102,7 @@ def get_folder_dialog(dialog, widget):
     folder_path = file_dialog.getExistingDirectory(
         parent=None, caption=global_vars.controller.tr(message), directory=folder_path)
     if folder_path:
-        qt_tools.setWidgetText(dialog, widget, str(folder_path))
+        tools_qt.setWidgetText(dialog, widget, str(folder_path))
 
 
 def multi_row_selector(dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
@@ -325,7 +325,7 @@ def query_like_widget_text(dialog, text_line, qtable, tableleft, tableright, fie
     """ Fill the QTableView by filtering through the QLineEdit"""
 
     schema_name = global_vars.schema_name.replace('"', '')
-    query = qt_tools.getWidgetText(dialog, text_line, return_string_null=False).lower()
+    query = tools_qt.getWidgetText(dialog, text_line, return_string_null=False).lower()
     sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
            f"(SELECT {tableleft}.{name} FROM {schema_name}.{tableleft}"
            f" RIGHT JOIN {schema_name}.{tableright}"
@@ -399,7 +399,7 @@ def get_cursor_multiple_selection():
 def set_table_columns(dialog, widget, table_name, sort_order=0, isQStandardItemModel=False, schema_name=None):
     """ Configuration of tables. Set visibility and width of columns """
 
-    widget = qt_tools.getWidget(dialog, widget)
+    widget = tools_qt.getWidget(dialog, widget)
     if not widget:
         return
 
@@ -460,7 +460,7 @@ def set_label_current_psector(dialog):
     row = global_vars.controller.get_row(sql)
     if not row:
         return
-    qt_tools.setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
+    tools_qt.setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
 
 
 def multi_rows_delete(widget, table_name, column_id):
@@ -803,7 +803,7 @@ def show_exceptions_msg(title, msg=""):
     dlg_info.btn_accept.setVisible(False)
     dlg_info.btn_close.clicked.connect(partial(close_dialog, dlg_info))
     dlg_info.setWindowTitle(title)
-    qt_tools.setWidgetText(dlg_info, dlg_info.txt_infolog, msg)
+    tools_qt.setWidgetText(dlg_info, dlg_info.txt_infolog, msg)
     open_dialog(dlg_info, dlg_name='dialog_text')
 
 
@@ -821,9 +821,9 @@ def put_combobox(qtable, rows, field, widget_pos, combo_values):
         combo = QComboBox()
         row = rows[x]
         # Populate QComboBox
-        qt_tools.set_item_data(combo, combo_values, 1)
+        tools_qt.set_item_data(combo, combo_values, 1)
         # Set QCombobox to wanted item
-        qt_tools.set_combo_itemData(combo, str(row[field]), 1)
+        tools_qt.set_combo_itemData(combo, str(row[field]), 1)
         # Get index and put QComboBox into QTableView at index position
         idx = qtable.model().index(x, widget_pos)
         qtable.setIndexWidget(idx, combo)
@@ -1030,7 +1030,7 @@ def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, inde
     if not layer: return
 
     row = index.row()
-    column_index = qt_tools.get_col_index_by_col_name(qtable, field_id)
+    column_index = tools_qt.get_col_index_by_col_name(qtable, field_id)
     _id = index.sibling(row, column_index).data()
     feature = get_feature_by_id(layer, _id, field_id)
     try:

@@ -10,14 +10,14 @@ from qgis.PyQt.QtCore import Qt
 
 from functools import partial
 
-from lib import qt_tools
-from ....ui_manager import NodeTypeChange
-from ...actions.basic.catalog import GwCatalog
-from ...actions.basic.info import GwInfo
+from lib import tools_qt
+from core.ui.ui_manager import NodeTypeChange
+from core.actions.catalog import GwCatalog
+from core.actions.info import GwInfo
 from ..parent_maptool import GwParentMapTool
-from ...utils.giswater_tools import check_expression, close_dialog, load_settings, open_dialog
+from ...utils.tools_giswater import check_expression, close_dialog, load_settings, open_dialog
 from ....actions.parent_functs import restore_user_layer
-from ....lib.qgis_tools import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \
+from ....lib.tools_qgis import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \
     enable_snapping
 
 
@@ -37,7 +37,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
     def open_catalog(self):
 
         # Get feature_type
-        feature_type = qt_tools.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
+        feature_type = tools_qt.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
         if feature_type is 'null':
             msg = "New node type is null. Please, select a valid value."
             self.controller.show_info_box(msg, "Info")
@@ -50,8 +50,8 @@ class GwNodeTypeChangeButton(GwParentMapTool):
         """ Update current type of node and save changes in database """
 
         project_type = self.controller.get_project_type()
-        node_node_type_new = qt_tools.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
-        node_nodecat_id = qt_tools.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id)
+        node_node_type_new = tools_qt.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
+        node_nodecat_id = tools_qt.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id)
 
         layer = False
         if node_node_type_new != "null":
@@ -130,7 +130,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
             node_type = feature.attribute('node_type')
             sql = "SELECT DISTINCT(id), id FROM cat_node  ORDER BY id"
             rows = self.controller.get_rows(sql)
-            qt_tools.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
+            tools_qt.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
         self.dlg_chg_node_type.node_node_type.setText(node_type)
         self.dlg_chg_node_type.btn_catalog.clicked.connect(partial(self.open_catalog))
@@ -141,7 +141,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
         sql = ("SELECT DISTINCT(id) FROM cat_feature WHERE active is True "
                "AND feature_type = 'NODE' ORDER BY id")
         rows = self.controller.get_rows(sql)
-        qt_tools.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
+        tools_qt.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
 
         # Open dialog
         open_dialog(self.dlg_chg_node_type, dlg_name='nodetype_change', maximize_button=False)
@@ -149,7 +149,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 
     def filter_catalog(self):
 
-        node_node_type_new = qt_tools.getWidgetText(self.dlg_chg_node_type,
+        node_node_type_new = tools_qt.getWidgetText(self.dlg_chg_node_type,
                                                     self.dlg_chg_node_type.node_node_type_new)
 
         if node_node_type_new == "null":
@@ -158,7 +158,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
         # Populate catalog_id
         sql = f"SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '{node_node_type_new}' ORDER BY id"
         rows = self.controller.get_rows(sql)
-        qt_tools.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
+        tools_qt.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
 
     """ QgsMapTools inherited event functions """

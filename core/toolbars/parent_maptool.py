@@ -13,7 +13,7 @@ from qgis.PyQt.QtCore import Qt
 
 import os
 
-from ...lib.qgis_tools import get_snapping_options, apply_snapping_options, enable_snapping, get_event_point, \
+from ...lib.tools_qgis import get_snapping_options, apply_snapping_options, enable_snapping, get_event_point, \
     snap_to_current_layer, add_marker
 from ... import global_vars
 

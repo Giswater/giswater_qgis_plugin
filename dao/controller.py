@@ -24,12 +24,12 @@ import sys
 from .. import global_vars
 from .pg_dao import PgDao
 from .logger import Logger
-from lib import os_tools, qt_tools
-from ..ui_manager import DialogTextUi, DockerUi
+from lib import tools_os, tools_qt
+from core.ui.ui_manager import DialogTextUi, DockerUi
 from ..actions.parent_functs import manage_return_manager, manage_layer_manager, manage_actions
-from ..lib.qgis_tools import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
+from ..lib.tools_qgis import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
     qgis_get_layer_primary_key, qgis_get_layers
-from ..core.utils.giswater_tools import get_parser_value, set_parser_value
+from ..core.utils.tools_giswater import get_parser_value, set_parser_value
 
 
 class DaoController:
@@ -524,7 +524,7 @@ class DaoController:
         widget = self.iface.messageBar().createMessage(self.tr(text, context_name), self.tr(inf_text))
         button = QPushButton(widget)
         button.setText(self.tr("Open file"))
-        button.clicked.connect(partial(os_tools.open_file, file_path))
+        button.clicked.connect(partial(tools_os.open_file, file_path))
         widget.layout().addWidget(button)
         self.iface.messageBar().pushWidget(widget, 1)
 
@@ -1579,7 +1579,7 @@ class DaoController:
         try:
             stack_level += stack_level_increase
             module_path = inspect.stack()[stack_level][1]
-            file_name = os_tools.get_file_with_parents(module_path, 2)
+            file_name = tools_os.get_file_with_parents(module_path, 2)
             function_line = inspect.stack()[stack_level][2]
             function_name = inspect.stack()[stack_level][3]
 
@@ -1659,7 +1659,7 @@ class DaoController:
 
                 stack_level += stack_level_increase
                 module_path = inspect.stack()[stack_level][1]
-                file_name = os_tools.get_file_with_parents(module_path, 2)
+                file_name = tools_os.get_file_with_parents(module_path, 2)
                 function_line = inspect.stack()[stack_level][2]
                 function_name = inspect.stack()[stack_level][3]
 
@@ -1695,7 +1695,7 @@ class DaoController:
         self.dlg_info.setWindowTitle(window_title)
         if title:
             self.dlg_info.lbl_text.setText(title)
-        qt_tools.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
+        tools_qt.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.set_text_bold(self.dlg_info.txt_infolog)
         self.dlg_info.show()

@@ -16,7 +16,7 @@ import re
 import os
 from .... import global_vars
 from ..parent_maptool import GwParentMapTool
-from ...actions.basic.info import GwInfo
+from core.actions.info import GwInfo
 from ....actions.parent_functs import get_max_rectangle_from_coords, draw_point
 from ....actions.api_parent_functs import create_body, get_visible_layers, draw_polyline, get_points
 

@@ -15,11 +15,11 @@ from qgis.PyQt.QtCore import Qt, QDate, QDateTime, QStringListModel
 
 from functools import partial
 
-from lib import qt_tools
+from lib import tools_qt
 from .. import global_vars
 from .parent_functs import check_expression, get_cursor_multiple_selection, set_table_columns, refresh_map_canvas
-from ..lib.qgis_tools import snap_to_background_layers, get_event_point, add_marker
-from ..core.utils.giswater_tools import close_dialog
+from ..lib.tools_qgis import snap_to_background_layers, get_event_point, add_marker
+from ..core.utils.tools_giswater import close_dialog
 
 
 def reset_lists(ids, list_ids):
@@ -54,7 +54,7 @@ def reset_model(dialog, table_object, geom_type):
 
     table_relation = f"{table_object}_x_{geom_type}"
     widget_name = f"tbl_{table_relation}"
-    widget = qt_tools.getWidget(dialog, widget_name)
+    widget = tools_qt.getWidget(dialog, widget_name)
     if widget:
         widget.setModel(None)
 
@@ -104,24 +104,24 @@ def reset_widgets(dialog, table_object):
     """ Clear contents of input widgets """
 
     if table_object == "doc":
-        qt_tools.setWidgetText(dialog, "doc_type", "")
-        qt_tools.setWidgetText(dialog, "observ", "")
-        qt_tools.setWidgetText(dialog, "path", "")
+        tools_qt.setWidgetText(dialog, "doc_type", "")
+        tools_qt.setWidgetText(dialog, "observ", "")
+        tools_qt.setWidgetText(dialog, "path", "")
     elif table_object == "element":
-        qt_tools.setWidgetText(dialog, "elementcat_id", "")
-        qt_tools.setWidgetText(dialog, "state", "")
-        qt_tools.setWidgetText(dialog, "expl_id", "")
-        qt_tools.setWidgetText(dialog, "ownercat_id", "")
-        qt_tools.setWidgetText(dialog, "location_type", "")
-        qt_tools.setWidgetText(dialog, "buildercat_id", "")
-        qt_tools.setWidgetText(dialog, "workcat_id", "")
-        qt_tools.setWidgetText(dialog, "workcat_id_end", "")
-        qt_tools.setWidgetText(dialog, "comment", "")
-        qt_tools.setWidgetText(dialog, "observ", "")
-        qt_tools.setWidgetText(dialog, "path", "")
-        qt_tools.setWidgetText(dialog, "rotation", "")
-        qt_tools.setWidgetText(dialog, "verified", "")
-        qt_tools.setWidgetText(dialog, dialog.num_elements, "")
+        tools_qt.setWidgetText(dialog, "elementcat_id", "")
+        tools_qt.setWidgetText(dialog, "state", "")
+        tools_qt.setWidgetText(dialog, "expl_id", "")
+        tools_qt.setWidgetText(dialog, "ownercat_id", "")
+        tools_qt.setWidgetText(dialog, "location_type", "")
+        tools_qt.setWidgetText(dialog, "buildercat_id", "")
+        tools_qt.setWidgetText(dialog, "workcat_id", "")
+        tools_qt.setWidgetText(dialog, "workcat_id_end", "")
+        tools_qt.setWidgetText(dialog, "comment", "")
+        tools_qt.setWidgetText(dialog, "observ", "")
+        tools_qt.setWidgetText(dialog, "path", "")
+        tools_qt.setWidgetText(dialog, "rotation", "")
+        tools_qt.setWidgetText(dialog, "verified", "")
+        tools_qt.setWidgetText(dialog, dialog.num_elements, "")
 
 
 def fill_widgets(dialog, table_object, row):
@@ -129,9 +129,9 @@ def fill_widgets(dialog, table_object, row):
 
     if table_object == "doc":
 
-        qt_tools.setWidgetText(dialog, "doc_type", row["doc_type"])
-        qt_tools.setWidgetText(dialog, "observ", row["observ"])
-        qt_tools.setWidgetText(dialog, "path", row["path"])
+        tools_qt.setWidgetText(dialog, "doc_type", row["doc_type"])
+        tools_qt.setWidgetText(dialog, "observ", row["observ"])
+        tools_qt.setWidgetText(dialog, "path", row["path"])
 
     elif table_object == "element":
 
@@ -151,29 +151,29 @@ def fill_widgets(dialog, table_object, row):
             if row_aux:
                 expl_id = row_aux[0]
 
-        qt_tools.setWidgetText(dialog, "code", row['code'])
+        tools_qt.setWidgetText(dialog, "code", row['code'])
         sql = (f"SELECT elementtype_id FROM cat_element"
                f" WHERE id = '{row['elementcat_id']}'")
         row_type = global_vars.controller.get_row(sql)
         if row_type:
-            qt_tools.setWidgetText(dialog, "element_type", row_type[0])
+            tools_qt.setWidgetText(dialog, "element_type", row_type[0])
 
-        qt_tools.setWidgetText(dialog, "elementcat_id", row['elementcat_id'])
-        qt_tools.setWidgetText(dialog, "num_elements", row['num_elements'])
-        qt_tools.setWidgetText(dialog, "state", state)
-        qt_tools.set_combo_itemData(dialog.state_type, f"{row['state_type']}", 0)
-        qt_tools.setWidgetText(dialog, "expl_id", expl_id)
-        qt_tools.setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
-        qt_tools.setWidgetText(dialog, "location_type", row['location_type'])
-        qt_tools.setWidgetText(dialog, "buildercat_id", row['buildercat_id'])
-        qt_tools.setWidgetText(dialog, "builtdate", row['builtdate'])
-        qt_tools.setWidgetText(dialog, "workcat_id", row['workcat_id'])
-        qt_tools.setWidgetText(dialog, "workcat_id_end", row['workcat_id_end'])
-        qt_tools.setWidgetText(dialog, "comment", row['comment'])
-        qt_tools.setWidgetText(dialog, "observ", row['observ'])
-        qt_tools.setWidgetText(dialog, "link", row['link'])
-        qt_tools.setWidgetText(dialog, "verified", row['verified'])
-        qt_tools.setWidgetText(dialog, "rotation", row['rotation'])
+        tools_qt.setWidgetText(dialog, "elementcat_id", row['elementcat_id'])
+        tools_qt.setWidgetText(dialog, "num_elements", row['num_elements'])
+        tools_qt.setWidgetText(dialog, "state", state)
+        tools_qt.set_combo_itemData(dialog.state_type, f"{row['state_type']}", 0)
+        tools_qt.setWidgetText(dialog, "expl_id", expl_id)
+        tools_qt.setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
+        tools_qt.setWidgetText(dialog, "location_type", row['location_type'])
+        tools_qt.setWidgetText(dialog, "buildercat_id", row['buildercat_id'])
+        tools_qt.setWidgetText(dialog, "builtdate", row['builtdate'])
+        tools_qt.setWidgetText(dialog, "workcat_id", row['workcat_id'])
+        tools_qt.setWidgetText(dialog, "workcat_id_end", row['workcat_id_end'])
+        tools_qt.setWidgetText(dialog, "comment", row['comment'])
+        tools_qt.setWidgetText(dialog, "observ", row['observ'])
+        tools_qt.setWidgetText(dialog, "link", row['link'])
+        tools_qt.setWidgetText(dialog, "verified", row['verified'])
+        tools_qt.setWidgetText(dialog, "rotation", row['rotation'])
         if str(row['undelete']) == 'True':
             dialog.undelete.setChecked(True)
 
@@ -181,7 +181,7 @@ def fill_widgets(dialog, table_object, row):
 def get_records_geom_type(dialog, table_object, geom_type, ids=None, list_ids=None, layers=None):
     """ Get records of @geom_type associated to selected @table_object """
 
-    object_id = qt_tools.getWidgetText(dialog, table_object + "_id")
+    object_id = tools_qt.getWidgetText(dialog, table_object + "_id")
     table_relation = table_object + "_x_" + geom_type
     widget_name = "tbl_" + table_relation
 
@@ -214,7 +214,7 @@ def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=N
     field_object_id = "id"
     if table_object == "element":
         field_object_id = table_object + "_id"
-    object_id = qt_tools.getWidgetText(dialog, table_object + "_id")
+    object_id = tools_qt.getWidgetText(dialog, table_object + "_id")
 
     # Check if we already have data with selected object_id
     sql = (f"SELECT * "
@@ -275,9 +275,9 @@ def populate_combo(dialog, widget, table_name, field_name="id"):
            f" FROM {table_name}"
            f" ORDER BY {field_name}")
     rows = global_vars.controller.get_rows(sql)
-    qt_tools.fillComboBox(dialog, widget, rows)
+    tools_qt.fillComboBox(dialog, widget, rows)
     if rows:
-        qt_tools.setCurrentIndex(dialog, widget, 0)
+        tools_qt.setCurrentIndex(dialog, widget, 0)
 
 
 def set_combo(dialog, widget, table_name, parameter, field_id='id', field_name='id'):
@@ -288,7 +288,7 @@ def set_combo(dialog, widget, table_name, parameter, field_id='id', field_name='
            f" WHERE parameter = '{parameter}' AND cur_user = current_user")
     row = global_vars.controller.get_row(sql)
     if row:
-        qt_tools.setWidgetText(dialog, widget, row[0])
+        tools_qt.setWidgetText(dialog, widget, row[0])
 
 
 def set_calendars(dialog, widget, table_name, value, parameter):
@@ -303,7 +303,7 @@ def set_calendars(dialog, widget, table_name, value, parameter):
         date = QDate.fromString(row[0], 'yyyy-MM-dd')
     else:
         date = QDate.currentDate()
-    qt_tools.setCalendarDate(dialog, widget, date)
+    tools_qt.setCalendarDate(dialog, widget, date)
 
 
 def add_point(vertex_marker):
@@ -397,7 +397,7 @@ def set_completer_object(dialog, table_object):
         getting id's from selected @table_object
     """
 
-    widget = qt_tools.getWidget(dialog, table_object + "_id")
+    widget = tools_qt.getWidget(dialog, table_object + "_id")
     if not widget:
         return
 
@@ -508,7 +508,7 @@ def reload_table(dialog, table_object, geom_type, expr_filter):
 
     if type(table_object) is str:
         widget_name = f"tbl_{table_object}_x_{geom_type}"
-        widget = qt_tools.getWidget(dialog, widget_name)
+        widget = tools_qt.getWidget(dialog, widget_name)
         if not widget:
             message = "Widget not found"
             global_vars.controller.log_info(message, parameter=widget_name)
@@ -552,7 +552,7 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
 
     # Attach model to selected widget
     if type(table_object) is str:
-        widget = qt_tools.getWidget(dialog, table_object)
+        widget = tools_qt.getWidget(dialog, table_object)
         if not widget:
             message = "Widget not found"
             global_vars.controller.log_info(message, parameter=table_object)
@@ -624,7 +624,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
     geom_type = tab_feature_changed(dialog, table_object)
     if type(table_object) is str:
         widget_name = f"tbl_{table_object}_x_{geom_type}"
-        widget = qt_tools.getWidget(dialog, widget_name)
+        widget = tools_qt.getWidget(dialog, widget_name)
         if not widget:
             message = "Widget not found"
             global_vars.controller.show_warning(message, parameter=widget_name)
@@ -825,7 +825,7 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
 def delete_feature_at_plan(dialog, geom_type, list_id):
     """ Delete features_id to table plan_@geom_type_x_psector"""
 
-    value = qt_tools.getWidgetText(dialog, dialog.psector_id)
+    value = tools_qt.getWidgetText(dialog, dialog.psector_id)
     sql = (f"DELETE FROM plan_psector_x_{geom_type} "
            f"WHERE {geom_type}_id IN ({list_id}) AND psector_id = '{value}'")
     global_vars.controller.execute_sql(sql)
@@ -833,8 +833,8 @@ def delete_feature_at_plan(dialog, geom_type, list_id):
 
 def enable_feature_type(dialog, widget_name='tbl_relation', ids=None):
 
-    feature_type = qt_tools.getWidget(dialog, 'feature_type')
-    widget_table = qt_tools.getWidget(dialog, widget_name)
+    feature_type = tools_qt.getWidget(dialog, 'feature_type')
+    widget_table = tools_qt.getWidget(dialog, widget_name)
     if feature_type is not None and widget_table is not None:
         if len(ids) > 0:
             feature_type.setEnabled(False)
@@ -858,7 +858,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
         ids = []
 
     field_id = f"{geom_type}_id"
-    feature_id = qt_tools.getWidgetText(dialog, "feature_id")
+    feature_id = tools_qt.getWidgetText(dialog, "feature_id")
     expr_filter = f"{field_id} = '{feature_id}'"
 
     # Check expression
@@ -928,7 +928,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
 def insert_feature_to_plan(dialog, geom_type, ids=None):
     """ Insert features_id to table plan_@geom_type_x_psector """
 
-    value = qt_tools.getWidgetText(dialog, dialog.psector_id)
+    value = tools_qt.getWidgetText(dialog, dialog.psector_id)
     for i in range(len(ids)):
         sql = (f"SELECT {geom_type}_id "
                f"FROM plan_psector_x_{geom_type} "
@@ -944,9 +944,9 @@ def insert_feature_to_plan(dialog, geom_type, ids=None):
 def reload_qtable(dialog, geom_type):
     """ Reload QtableView """
 
-    value = qt_tools.getWidgetText(dialog, dialog.psector_id)
+    value = tools_qt.getWidgetText(dialog, dialog.psector_id)
     expr = f"psector_id = '{value}'"
-    qtable = qt_tools.getWidget(dialog, f'tbl_psector_x_{geom_type}')
+    qtable = tools_qt.getWidget(dialog, f'tbl_psector_x_{geom_type}')
     fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
     set_table_columns(dialog, qtable, f"plan_psector_x_{geom_type}")
     refresh_map_canvas()
@@ -1012,7 +1012,7 @@ def filter_by_id(dialog, widget_table, widget_txt, table_object):
     field_object_id = "id"
     if table_object == "element":
         field_object_id = table_object + "_id"
-    object_id = qt_tools.getWidgetText(dialog, widget_txt)
+    object_id = tools_qt.getWidgetText(dialog, widget_txt)
     if object_id != 'null':
         expr = f"{field_object_id}::text ILIKE '%{object_id}%'"
         # Refresh model with selected filter

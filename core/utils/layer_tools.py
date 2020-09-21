@@ -16,7 +16,7 @@ import os
 from random import randrange
 import sys
 
-from lib import qt_tools
+from lib import tools_qt
 
 from ... import global_vars
 
@@ -321,7 +321,7 @@ def populate_info_text(dialog, data, force_tab=True, reset_text=True, tab_idx=1,
     """
 
     change_tab = False
-    text = qt_tools.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
+    text = tools_qt.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
 
     if reset_text:
         text = ""
@@ -334,7 +334,7 @@ def populate_info_text(dialog, data, force_tab=True, reset_text=True, tab_idx=1,
             else:
                 text += "\n"
 
-    qt_tools.setWidgetText(dialog, 'txt_infolog', text + "\n")
+    tools_qt.setWidgetText(dialog, 'txt_infolog', text + "\n")
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
     if qtabwidget is not None:
         if change_tab and qtabwidget is not None:
@@ -361,7 +361,7 @@ def disable_tabs(dialog):
 
     btn_cancel = dialog.findChild(QPushButton, 'btn_cancel')
     if btn_cancel:
-        qt_tools.setWidgetText(dialog, btn_accept, 'Close')
+        tools_qt.setWidgetText(dialog, btn_accept, 'Close')
 
 
 def populate_vlayer(virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):

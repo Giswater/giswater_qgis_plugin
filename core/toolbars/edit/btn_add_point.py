@@ -10,8 +10,8 @@ from qgis.PyQt.QtGui import QKeySequence
 
 from functools import partial
 
-from ..parent_action import GwParentAction
-from ...actions.edit.edit_func import GwEdit
+from ..parent_dialog import GwParentAction
+from core.actions.edit_func import GwEdit
 from ...utils.pg_man import PgMan
 from .... import global_vars
 

@@ -11,10 +11,10 @@ from qgis.PyQt.QtGui import QRegExpValidator
 
 from functools import partial
 
-from lib import qt_tools
-from ..parent_action import GwParentAction
-from ....ui_manager import EpaManager
-from ...utils.giswater_tools import load_settings, open_dialog, close_dialog
+from lib import tools_qt
+from ..parent_dialog import GwParentAction
+from core.ui.ui_manager import EpaManager
+from ...utils.tools_giswater import load_settings, open_dialog, close_dialog
 from ....actions.api_parent_functs import fill_table
 from ....actions.parent_functs import set_table_columns, multi_rows_delete
 
@@ -56,7 +56,7 @@ class GwGo2EpaManagerButton(GwParentAction):
 
         sql = "SELECT result_id FROM v_ui_rpt_cat_result ORDER BY result_id"
         rows = self.controller.get_rows(sql)
-        qt_tools.fillComboBox(self.dlg_manager, self.dlg_manager.txt_result_id, rows)
+        tools_qt.fillComboBox(self.dlg_manager, self.dlg_manager.txt_result_id, rows)
 
 
     def filter_by_result_id(self):
@@ -64,7 +64,7 @@ class GwGo2EpaManagerButton(GwParentAction):
         table = self.dlg_manager.tbl_rpt_cat_result
         widget_txt = self.dlg_manager.txt_result_id
         tablename = 'v_ui_rpt_cat_result'
-        result_id = qt_tools.getWidgetText(self.dlg_manager, widget_txt)
+        result_id = tools_qt.getWidgetText(self.dlg_manager, widget_txt)
         if result_id != 'null':
             expr = f" result_id ILIKE '%{result_id}%'"
             # Refresh model with selected filter

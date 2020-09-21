@@ -23,11 +23,11 @@ from qgis.PyQt.QtWidgets import QApplication
 
 from functools import partial
 
-from ....ui_manager import DialogTextUi
+from core.ui.ui_manager import DialogTextUi
 from ..parent_maptool import GwParentMapTool
-from ...utils.giswater_tools import get_cursor_multiple_selection, load_settings, close_dialog, open_dialog, \
+from ...utils.tools_giswater import get_cursor_multiple_selection, load_settings, close_dialog, open_dialog, \
     populate_info_text, create_body
-from ....lib.qgis_tools import get_event_point, snap_to_background_layers, get_snapped_layer, \
+from ....lib.tools_qgis import get_event_point, snap_to_background_layers, get_snapped_layer, \
     get_snapped_feature_id, get_snapping_options, get_layer, check_connec_group, check_gully_group, enable_snapping, \
     snap_to_connec_gully
 
