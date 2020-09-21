@@ -76,7 +76,7 @@ BEGIN
 	v_expl=json_agg(v_expl);	
 
 	-- get variables (from config_param_system)
-	v_costfield = (SELECT (value::json->>'arc')::json->>'costField' FROM config_param_system WHERE parameter='grafanalytics_lrs_graf');
+	v_costfield = (SELECT (value::json->>'arc')::json->>'costField' FROM config_param_system WHERE parameter='utils_grafanalytics_lrs_graf');
 	v_valuefield = (SELECT (value::json->>'nodeChild')::json->>'valueField' FROM config_param_system WHERE parameter='utils_grafanalytics_lrs_feature');
 	v_headerfield = (SELECT (value::json->>'nodeChild')::json->>'headerField' FROM config_param_system WHERE parameter='utils_grafanalytics_lrs_feature');
 	
