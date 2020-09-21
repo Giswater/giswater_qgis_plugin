@@ -44,3 +44,5 @@ WHERE id = 2768;
 INSERT INTO config_param_system (parameter, value, descript, label, isenabled, project_type) VALUES ('utils_grafanalytics_automatic_trigger', '{"status":"false", "parameters":{"updateMapZone":2, "geomParamUpdate":10, "usePlanPsector":false}}', 'Automatic trigger of graf analytics used when valve status is modified (open or close)', 'Automatic grafanalytics trigger', true, 'ws')
 ON CONFLICT (parameter) DO NOTHING;
 
+UPDATE config_form_fields SET iseditable=FALSE WHERE columnname IN ('nodetype_1', 'nodetype_2', 'elevation1', 'elevation2', 'depth1', 'depth2') AND formname like 've_arc%';
+
