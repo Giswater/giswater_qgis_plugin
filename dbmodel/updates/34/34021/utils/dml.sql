@@ -83,3 +83,7 @@ UPDATE sys_param_user SET dv_querytext = 'SELECT UNNEST(ARRAY (select (text_colu
 
 
 UPDATE sys_table SET sys_role = 'role_edit' WHERE id ilike 've_pol%';
+
+--2020/09/21
+UPDATE config_param_system SET parameter = 'utils_grafanalytics_lrs_feature' WHERE parameter = 'grafanalytics_lrs_feature';
+UPDATE config_param_system SET parameter = 'utils_grafanalytics_lrs_graf' WHERE parameter = 'grafanalytics_lrs_graf';
