@@ -135,7 +135,7 @@ BEGIN
 
 
 	-- Return
-	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"geometry":',v_geometry,', "selectorType":"',v_selectortype,'"}'}');
+	v_return = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"currentTab":"', v_tabname,'"}, "feature":{}, "data":{"geometry":',v_geometry,', "selectorType":"',v_selectortype,'"}}');
 	RETURN gw_fct_getselectors(v_return);
 
 	
