@@ -185,8 +185,8 @@ BEGIN
 	EXECUTE v_querytext;
 
 	-- set proposed = false for check valves (as they act as automatic mode)
-	v_querytext = 'UPDATE om_mincut_valve v SET proposed=FALSE FROM (SELECT node_id FROM config_checkvalve) a 
-		       WHERE a.node_id = v.node_id AND active IS TRUE AND result_id = '||v_mincutid;
+	v_querytext = 'UPDATE om_mincut_valve v SET proposed=FALSE FROM (SELECT node_id FROM config_checkvalve WHERE active IS TRUE ) a 
+		       WHERE a.node_id = v.node_id AND result_id = '||v_mincutid;
 	EXECUTE v_querytext;
 
 	
