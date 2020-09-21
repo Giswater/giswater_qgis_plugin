@@ -81,7 +81,7 @@ BEGIN
 	
 
 	-- Get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 	INTO v_apiversion;
 
 	IF v_action = 'delete' THEN
@@ -92,7 +92,11 @@ BEGIN
 		EXECUTE 'SELECT DISTINCT(profile_id) FROM om_profile WHERE profile_id = ''' || v_profile_id || '''::text' INTO v_profile;
 		IF v_profile IS NULL THEN
 			-- Populate values
-			v_values = '{"initNode":'||v_init_node||', "endNode":'||v_end_node||', "listArcs":"'||COALESCE(v_list_arcs, '[]')||'", "linksDistance":'||v_linksDistance||', "legendFactor":'||v_legendFactor||', "papersize":{"id":'||v_papersize_id||', "customDim":{"xdim":'||v_papersize_xdim||', "ydim":'||v_papersize_ydim||'}}, "title":"'||v_title||'", "date":"'||v_date||'", "scale":{"scaleToFit":'||v_scaletofit||', "eh":'||v_scale_eh||', "ev":'||v_scale_ev||'}}';
+			v_values = concat('{"initNode":"',v_init_node,'", "endNode":"',v_end_node,'", "listArcs":',COALESCE(v_list_arcs, '[]'),', 
+			"linksDistance":"',v_linksDistance,'", "legendFactor":"',v_legendFactor,'", "papersize":{"id":"',v_papersize_id,'", 
+			"customDim":{"xdim":"',v_papersize_xdim,'", "ydim":"',v_papersize_ydim,'"}}, "title":"'||v_title||'", "date":"',v_date,'", 
+			"scale":{"scaleToFit":"',v_scaletofit,'", "eh":"',v_scale_eh,'", "ev":"',v_scale_ev,'"}}');
+
 			EXECUTE 'INSERT INTO om_profile (profile_id, values) VALUES ('''||v_profile_id||''', '''||v_values||''')';
 			
 			v_message := 'Values has been updated';
