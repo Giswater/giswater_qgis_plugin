@@ -877,10 +877,14 @@ def accept(dialog, complet_result, _json, p_widget=None, clear_json=False, close
         _json = {}
 
     if "Accepted" in json_result['status']:
-        level = result['message']['level']
-        msg = result['message']['text']
-        global_vars.controller.show_message(msg, message_level=level)
-        reload_fields(dialog, json_result, p_widget)
+        try:
+            level = json_result['message']['level']
+            msg = json_result['message']['text']
+            global_vars.controller.show_message(msg, message_level=level)
+        except KeyError:
+            pass
+        finally:
+            reload_fields(dialog, json_result, p_widget)
     elif "Failed" in json_result['status']:
         # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
         return
