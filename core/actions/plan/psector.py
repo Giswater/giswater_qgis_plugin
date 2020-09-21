@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from qgis.gui import QgsRubberBand
 from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
@@ -21,17 +22,30 @@ from collections import OrderedDict
 from functools import partial
 
 from lib import qt_tools
+from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
 from ....ui_manager import Plan_psector, PsectorRapportUi
-from ....actions.parent_manage import ParentManage
-from ....actions.multiple_selection import MultipleSelection
 from ..edit.document import GwDocument
+from .... import global_vars
+from ....actions.parent_functs import set_icon, hilight_feature_by_id, \
+    select_features_by_expr, zoom_to_selected_features, document_open, document_delete, make_list_for_completer, \
+    set_completer_lineedit, set_restriction, get_folder_dialog
+from ....actions.parent_manage_funct import set_selectionbehavior, remove_selection, \
+    set_table_columns, check_expression, fill_table_object, insert_feature, delete_records, tab_feature_changed, \
+    set_completer_feature_id, reload_qtable, refresh_map_canvas, disconnect_signal_selection_changed, \
+    selection_changed, hide_generic_layers, set_completer_object, disconnect_snapping, selection_init
 
 
-class GwPsector(ParentManage):
+class GwPsector:
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
         """ Class to control 'New Psector' of toolbar 'master' """
-        ParentManage.__init__(self, iface, settings, controller, plugin_dir)
+
+        self.controller = global_vars.controller
+        self.iface = global_vars.iface
+        self.canvas = global_vars.canvas
+        self.schema_name = global_vars.schema_name
+
+        self.rubber_band = QgsRubberBand(self.canvas)
 
 
     def new_psector(self, psector_id=None, plan_om=None, is_api=False):
@@ -43,18 +57,37 @@ class GwPsector(ParentManage):
 
         # Create the dialog and signals
         self.dlg_plan_psector = Plan_psector()
-        self.load_settings(self.dlg_plan_psector)
+        load_settings(self.dlg_plan_psector)
         self.plan_om = str(plan_om)
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
-        self.set_selectionbehavior(self.dlg_plan_psector)
+        set_selectionbehavior(self.dlg_plan_psector)
         self.project_type = self.controller.get_project_type()
 
         # Get layers of every geom_type
         self.list_elemets = {}
-        self.reset_lists()
-        self.reset_layers()
+
+        # Get layers of every geom_type
+
+        # Setting lists
+        self.ids = []
+        self.list_ids = {}
+        self.list_ids['arc'] = []
+        self.list_ids['node'] = []
+        self.list_ids['connec'] = []
+        self.list_ids['gully'] = []
+        self.list_ids['element'] = []
+
+        # Setting layers
+        self.layers = {}
+        self.layers['arc'] = []
+        self.layers['node'] = []
+        self.layers['connec'] = []
+        self.layers['gully'] = []
+        self.layers['element'] = []
+
+
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
@@ -65,17 +98,19 @@ class GwPsector(ParentManage):
 
         self.update = False  # if false: insert; if true: update
 
+        self.geom_type = "arc"
+
         # Remove all previous selections
-        self.remove_selection(True)
+        self.layers = remove_selection(True, layers=self.layers)
 
         # Set icons
-        self.set_icon(self.dlg_plan_psector.btn_insert, "111")
-        self.set_icon(self.dlg_plan_psector.btn_delete, "112")
-        self.set_icon(self.dlg_plan_psector.btn_snapping, "137")
-        self.set_icon(self.dlg_plan_psector.btn_doc_insert, "111")
-        self.set_icon(self.dlg_plan_psector.btn_doc_delete, "112")
-        self.set_icon(self.dlg_plan_psector.btn_doc_new, "34")
-        self.set_icon(self.dlg_plan_psector.btn_open_doc, "170")
+        set_icon(self.dlg_plan_psector.btn_insert, "111")
+        set_icon(self.dlg_plan_psector.btn_delete, "112")
+        set_icon(self.dlg_plan_psector.btn_snapping, "137")
+        set_icon(self.dlg_plan_psector.btn_doc_insert, "111")
+        set_icon(self.dlg_plan_psector.btn_doc_delete, "112")
+        set_icon(self.dlg_plan_psector.btn_doc_new, "34")
+        set_icon(self.dlg_plan_psector.btn_open_doc, "170")
 
         table_object = "psector"
 
@@ -183,22 +218,22 @@ class GwPsector(ParentManage):
                 self.dlg_plan_psector.chk_enable_all.setChecked(row[0])
             self.fill_table(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc",
                 set_edit_triggers=QTableView.DoubleClicked)
-            self.set_table_columns(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc")
+            set_table_columns(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc")
             self.fill_table(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node",
                 set_edit_triggers=QTableView.DoubleClicked)
-            self.set_table_columns(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node")
+            set_table_columns(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node")
             self.fill_table(self.dlg_plan_psector, self.qtbl_connec, "plan_psector_x_connec",
                 set_edit_triggers=QTableView.DoubleClicked)
-            self.set_table_columns(self.dlg_plan_psector, self.qtbl_connec, "plan_psector_x_connec")
+            set_table_columns(self.dlg_plan_psector, self.qtbl_connec, "plan_psector_x_connec")
             if self.project_type.upper() == 'UD':
                 self.fill_table(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully",
                                 set_edit_triggers=QTableView.DoubleClicked)
-                self.set_table_columns(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully")
+                set_table_columns(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully")
             sql = (f"SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, "
                    f"observ, atlas_id, scale, rotation, active, ext_code, status "
                    f"FROM plan_psector "
                    f"WHERE psector_id = {psector_id}")
-            row = self.controller.get_row(sql, log_sql=True)
+            row = self.controller.get_row(sql)
 
             if not row:
                 return
@@ -251,26 +286,26 @@ class GwPsector(ParentManage):
             self.qtbl_arc.model().setFilter(expr)
             self.qtbl_arc.model().select()
             self.qtbl_arc.clicked.connect(
-                partial(self.hilight_feature_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", 5))
+                partial(hilight_feature_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
 
             expr = " psector_id = " + str(psector_id)
             self.qtbl_node.model().setFilter(expr)
             self.qtbl_node.model().select()
             self.qtbl_node.clicked.connect(
-                partial(self.hilight_feature_by_id, self.qtbl_node, "v_edit_node", "node_id", 1))
+                partial(hilight_feature_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band, 1))
 
             expr = " psector_id = " + str(psector_id)
             self.qtbl_connec.model().setFilter(expr)
             self.qtbl_connec.model().select()
             self.qtbl_connec.clicked.connect(
-                partial(self.hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", 1))
+                partial(hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
 
             if self.project_type.upper() == 'UD':
                 expr = " psector_id = " + str(psector_id)
                 self.qtbl_gully.model().setFilter(expr)
                 self.qtbl_gully.model().select()
                 self.qtbl_gully.clicked.connect(
-                    partial(self.hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", 1))
+                    partial(hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
 
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
@@ -293,11 +328,11 @@ class GwPsector(ParentManage):
             if layer:
 
                 expr_filter = f"psector_id = '{psector_id}'"
-                (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+                (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
                 if not is_valid:
                     return
 
-                self.select_features_by_expr(layer, expr)
+                select_features_by_expr(layer, expr)
 
                 # Get canvas extend in order to create a QgsRectangle
                 ext = self.canvas.extent()
@@ -317,14 +352,14 @@ class GwPsector(ParentManage):
                         psector_rec = feature.geometry().boundingBox()
                         # Do zoom when QgsRectangles don't intersect
                         if not canvas_rec.intersects(psector_rec):
-                            self.zoom_to_selected_features(layer)
+                            zoom_to_selected_features(layer)
                         if psector_rec.width() < (canvas_width * 10) / 100 or psector_rec.height() < (canvas_height * 10) / 100:
-                            self.zoom_to_selected_features(layer)
+                            zoom_to_selected_features(layer)
                         layer.removeSelection()
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
-            self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
-            self.tbl_document.doubleClicked.connect(partial(self.document_open, self.tbl_document))
+            fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
+            self.tbl_document.doubleClicked.connect(partial(document_open, self.tbl_document))
 
         else:
 
@@ -356,16 +391,21 @@ class GwPsector(ParentManage):
             self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
         self.dlg_plan_psector.btn_unselect.clicked.connect(partial(self.update_total,
             self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
-        self.dlg_plan_psector.btn_insert.clicked.connect(partial(self.insert_feature,
-            self.dlg_plan_psector, table_object, True))
-        self.dlg_plan_psector.btn_delete.clicked.connect(partial(self.delete_records,
-            self.dlg_plan_psector, table_object, True))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
+        self.dlg_plan_psector.btn_insert.clicked.connect(partial(insert_feature,
+            self.dlg_plan_psector, table_object, True, geom_type=self.geom_type, ids=self.ids, layers=self.layers,
+                                                                 list_ids=self.list_ids))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
+        self.dlg_plan_psector.btn_delete.clicked.connect(partial(delete_records,
+            self.dlg_plan_psector, table_object, True, geom_type=self.geom_type, layers=self.layers,
+                                                                 ids=self.ids, list_ids=self.list_ids))
         self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
-        self.dlg_plan_psector.btn_snapping.clicked.connect(partial(self.selection_init,
-            self.dlg_plan_psector, table_object, True))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
+        self.dlg_plan_psector.btn_snapping.clicked.connect(partial(selection_init,
+            self.dlg_plan_psector, table_object, True, geom_type=self.geom_type, layers=self.layers))
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
-        self.dlg_plan_psector.tab_feature.currentChanged.connect(partial(self.tab_feature_changed,
+        self.dlg_plan_psector.tab_feature.currentChanged.connect(partial(tab_feature_changed,
             self.dlg_plan_psector, table_object, excluded_layers=["v_edit_element"]))
         self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
         viewname = 'v_edit_plan_psector_x_other'
@@ -381,16 +421,16 @@ class GwPsector(ParentManage):
 
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
         self.dlg_plan_psector.btn_doc_delete.clicked.connect(
-            partial(self.document_delete, self.tbl_document, 'doc_x_psector'))
+            partial(document_delete, self.tbl_document, 'doc_x_psector'))
         self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
-        self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(self.document_open, self.tbl_document))
+        self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(document_open, self.tbl_document))
         self.cmb_status.currentIndexChanged.connect(partial(self.show_status_warning))
 
         # Create list for completer QLineEdit
         sql = "SELECT DISTINCT(id) FROM v_ui_document ORDER BY id"
-        list_items = self.make_list_for_completer(sql)
-        self.set_completer_lineedit(self.dlg_plan_psector.doc_id, list_items)
-        
+        list_items = make_list_for_completer(sql)
+        set_completer_lineedit(self.dlg_plan_psector.doc_id, list_items)
+
         if psector_id is not None:
             sql = (f"SELECT other, gexpenses, vat "
                    f"FROM plan_psector "
@@ -404,11 +444,11 @@ class GwPsector(ParentManage):
                 other = float(row[0]) if row[0] is not None else 0
                 gexpenses = float(row[1]) if row[1] is not None else 0
                 vat = float(row[2]) if row[2] is not None else 0
-    
+
             qt_tools.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, other)
             qt_tools.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, gexpenses)
             qt_tools.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, vat)
-    
+
             qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_total_node', self.sys_currency['symbol'])
             qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_total_arc', self.sys_currency['symbol'])
             qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_total_other', self.sys_currency['symbol'])
@@ -421,21 +461,19 @@ class GwPsector(ParentManage):
             qt_tools.setWidgetText(self.dlg_plan_psector, 'cur_pca', self.sys_currency['symbol'])
 
         # Adding auto-completion to a QLineEdit for default feature
-        self.geom_type = "arc"
         viewname = "v_edit_" + self.geom_type
-        self.set_completer_feature_id(self.dlg_plan_psector.feature_id, self.geom_type, viewname)
+        set_completer_feature_id(self.dlg_plan_psector.feature_id, self.geom_type, viewname)
 
         # Set default tab 'arc'
         self.dlg_plan_psector.tab_feature.setCurrentIndex(0)
-        self.geom_type = "arc"
-        self.tab_feature_changed(self.dlg_plan_psector, table_object, excluded_layers=["v_edit_element"])
+        tab_feature_changed(self.dlg_plan_psector, table_object, excluded_layers=["v_edit_element"])
 
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
-        self.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
+        set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
 
         # Open dialog
-        self.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector', maximize_button=False)
+        open_dialog(self.dlg_plan_psector, dlg_name='plan_psector', maximize_button=False)
 
 
     def enable_all(self):
@@ -444,17 +482,17 @@ class GwPsector(ParentManage):
         psector_id = qt_tools.getWidgetText(self.dlg_plan_psector, "psector_id")
         sql = f"SELECT gw_fct_plan_psector_enableall({value}, '{psector_id}')"
         self.controller.execute_sql(sql)
-        self.reload_qtable(self.dlg_plan_psector, 'arc')
-        self.reload_qtable(self.dlg_plan_psector, 'node')
-        self.reload_qtable(self.dlg_plan_psector, 'connec')
+        reload_qtable(self.dlg_plan_psector, 'arc')
+        reload_qtable(self.dlg_plan_psector, 'node')
+        reload_qtable(self.dlg_plan_psector, 'connec')
         if self.project_type.upper() == 'UD':
-            self.reload_qtable(self.dlg_plan_psector, 'gully')
+            reload_qtable(self.dlg_plan_psector, 'gully')
 
         sql = (f"UPDATE plan_psector "
                f"SET enable_all = '{value}' "
                f"WHERE psector_id = '{psector_id}'")
-        self.controller.execute_sql(sql, log_sql=True)
-        self.refresh_map_canvas()
+        self.controller.execute_sql(sql)
+        refresh_map_canvas()
 
 
     def update_total(self, dialog, qtable):
@@ -481,25 +519,26 @@ class GwPsector(ParentManage):
         default_file_name = qt_tools.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.name)
 
         self.dlg_psector_rapport = PsectorRapportUi()
-        self.load_settings(self.dlg_psector_rapport)
+        load_settings(self.dlg_psector_rapport)
 
         qt_tools.setWidgetText(self.dlg_psector_rapport, 'txt_composer_path', default_file_name + " comp.pdf")
         qt_tools.setWidgetText(self.dlg_psector_rapport, 'txt_csv_detail_path', default_file_name + " detail.csv")
         qt_tools.setWidgetText(self.dlg_psector_rapport, 'txt_csv_path', default_file_name + ".csv")
 
-        self.dlg_psector_rapport.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_psector_rapport))
+        self.dlg_psector_rapport.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_psector_rapport))
         self.dlg_psector_rapport.btn_ok.clicked.connect(partial(self.generate_rapports))
-        self.dlg_psector_rapport.btn_path.clicked.connect(partial(self.get_folder_dialog, self.dlg_psector_rapport,
+        self.dlg_psector_rapport.btn_path.clicked.connect(partial(get_folder_dialog, self.dlg_psector_rapport,
             self.dlg_psector_rapport.txt_path))
 
-        qt_tools.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path,
-                               self.controller.plugin_settings_value('psector_rapport_path'))
-        qt_tools.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer,
-                            bool(self.controller.plugin_settings_value('psector_rapport_chk_composer')))
-        qt_tools.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail,
-                            self.controller.plugin_settings_value('psector_rapport_chk_csv_detail'))
-        qt_tools.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv,
-                            self.controller.plugin_settings_value('psector_rapport_chk_csv'))
+        value = get_parser_value('psector_rapport', 'psector_rapport_path')
+        qt_tools.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path, value)
+        value = get_parser_value('psector_rapport', 'psector_rapport_chk_composer')
+        qt_tools.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer, value)
+        value = get_parser_value('psector_rapport', 'psector_rapport_chk_csv_detail')
+        qt_tools.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail, value)
+        value = get_parser_value('psector_rapport', 'psector_rapport_chk_csv')
+        qt_tools.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv, value)
+
         if qt_tools.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path) == 'null':
             if 'nt' in sys.builtin_module_names:
                 plugin_dir = os.path.expanduser("~\Documents")
@@ -509,7 +548,7 @@ class GwPsector(ParentManage):
         self.populate_cmb_templates()
 
         # Open dialog
-        self.open_dialog(self.dlg_psector_rapport, dlg_name='psector_rapport', maximize_button=False)
+        open_dialog(self.dlg_psector_rapport, dlg_name='psector_rapport', maximize_button=False)
 
 
     def populate_cmb_templates(self):
@@ -546,19 +585,18 @@ class GwPsector(ParentManage):
 
 
     def generate_rapports(self):
-        
-        self.controller.plugin_settings_set_value("psector_rapport_path",
-            qt_tools.getWidgetText(self.dlg_psector_rapport, 'txt_path'))
-        self.controller.plugin_settings_set_value("psector_rapport_chk_composer",
-            qt_tools.isChecked(self.dlg_psector_rapport, 'chk_composer'))
-        self.controller.plugin_settings_set_value("psector_rapport_chk_csv_detail",
-            qt_tools.isChecked(self.dlg_psector_rapport, 'chk_csv_detail'))
-        self.controller.plugin_settings_set_value("psector_rapport_chk_csv",
-            qt_tools.isChecked(self.dlg_psector_rapport, 'chk_csv'))
-        
+        set_parser_value('psector_rapport', 'psector_rapport_path',
+                         f"{qt_tools.getWidgetText(self.dlg_psector_rapport, 'txt_path')}")
+        set_parser_value('psector_rapport', 'psector_rapport_chk_composer',
+                         f"{qt_tools.isChecked(self.dlg_psector_rapport, 'chk_composer')}")
+        set_parser_value('psector_rapport', 'psector_rapport_chk_csv_detail',
+                         f"{qt_tools.isChecked(self.dlg_psector_rapport, 'chk_csv_detail')}")
+        set_parser_value('psector_rapport', 'psector_rapport_chk_csv',
+                         f"{qt_tools.isChecked(self.dlg_psector_rapport, 'chk_csv')}")
+
         folder_path = qt_tools.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
-            self.get_folder_dialog(self.dlg_psector_rapport.txt_path)
+            get_folder_dialog(self.dlg_psector_rapport.txt_path)
             folder_path = qt_tools.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
 
         # Generate Composer
@@ -600,7 +638,7 @@ class GwPsector(ParentManage):
             path = folder_path + '/' + file_name
             self.generate_csv(path, viewname)
 
-        self.close_dialog(self.dlg_psector_rapport)
+        close_dialog(self.dlg_psector_rapport)
 
 
     def generate_composer(self, path):
@@ -703,7 +741,7 @@ class GwPsector(ParentManage):
 
 
     def calc_pec_pem(self, dialog):
-        
+
         if qt_tools.getWidgetText(dialog, 'pec') not in('null', None):
             pec = float(qt_tools.getWidgetText(dialog, 'pec'))
         else:
@@ -734,7 +772,7 @@ class GwPsector(ParentManage):
 
 
     def calc_pca_pecvat(self, dialog):
-        
+
         if qt_tools.getWidgetText(dialog, 'pca') not in('null', None):
             pca = float(qt_tools.getWidgetText(dialog, 'pca'))
         else:
@@ -788,26 +826,17 @@ class GwPsector(ParentManage):
         self.dlg_plan_psector.btn_snapping.setEnabled(enabled)
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
-        self.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
-
-    def selection_init(self, dialog, table_object, query=True):
-        """ Set canvas map tool to an instance of class 'MultipleSelection' """
-
-        multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
-                                               manage_new_psector=self, table_object=table_object)
-        self.disconnect_signal_selection_changed()
-        self.canvas.setMapTool(multiple_selection)
-        self.connect_signal_selection_changed(dialog, table_object, query)
-        cursor = self.get_cursor_multiple_selection()
-        self.canvas.setCursor(cursor)
+        set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
 
 
     def connect_signal_selection_changed(self, dialog, table_object, query=True):
         """ Connect signal selectionChanged """
 
         try:
+            # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.canvas.selectionChanged.connect(
-                partial(self.selection_changed, dialog, table_object, self.geom_type, query))
+                partial(selection_changed, dialog, table_object, self.geom_type, query, plan_om='plan',
+                        layers=self.layers, list_ids=self.list_ids))
         except Exception:
             pass
 
@@ -856,7 +885,7 @@ class GwPsector(ParentManage):
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
             psector_id = qt_tools.getWidgetText(self.dlg_plan_psector, 'psector_id')
             expr = f"psector_id = '{psector_id}'"
-            self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", expr_filter=expr)
+            fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", expr_filter=expr)
 
         sql = (f"SELECT other, gexpenses, vat"
                f" FROM plan_psector "
@@ -871,7 +900,7 @@ class GwPsector(ParentManage):
 
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
-        self.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
+        set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
 
 
     def populate_result_id(self, combo, table_name):
@@ -932,21 +961,21 @@ class GwPsector(ParentManage):
     def close_psector(self, cur_active_layer=None):
         """ Close dialog and disconnect snapping """
 
-        self.resetRubberbands()
+        self.rubber_band.reset()
         self.reload_states_selector()
         if cur_active_layer:
             self.iface.setActiveLayer(cur_active_layer)
-        self.remove_selection(True)
+        self.layers = remove_selection(True, layers=self.layers)
         self.reset_model_psector("arc")
         self.reset_model_psector("node")
         self.reset_model_psector("connec")
         if self.project_type.upper() == 'UD':
             self.reset_model_psector("gully")
         self.reset_model_psector("other")
-        self.close_dialog(self.dlg_plan_psector)
-        self.hide_generic_layers(excluded_layers=["v_edit_element"])
-        self.disconnect_snapping()
-        self.disconnect_signal_selection_changed()
+        close_dialog(self.dlg_plan_psector)
+        hide_generic_layers(excluded_layers=["v_edit_element"])
+        disconnect_snapping()
+        disconnect_signal_selection_changed()
 
 
     def reset_model_psector(self, geom_type):
@@ -996,7 +1025,7 @@ class GwPsector(ParentManage):
                f"WHERE table_name = {viewname} "
                f"AND table_schema = '" + self.schema_name.replace('"', '') + "' "
                f"ORDER BY ordinal_position;")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if not rows or rows is None or rows == '':
             message = "Check fields from table or view"
             self.controller.show_warning(message, parameter=viewname)
@@ -1065,7 +1094,7 @@ class GwPsector(ParentManage):
 
         if not self.update:
             sql += " RETURNING psector_id;"
-            new_psector_id = self.controller.execute_returning(sql, log_sql=True)
+            new_psector_id = self.controller.execute_returning(sql)
             qt_tools.setText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id and self.plan_om == 'plan':
                 row = self.controller.get_config('plan_psector_vdefault')
@@ -1077,9 +1106,9 @@ class GwPsector(ParentManage):
                 else:
                     sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                            f" VALUES ('plan_psector_vdefault', '{new_psector_id[0]}', current_user);")
-                self.controller.execute_sql(sql, log_sql=True)
+                self.controller.execute_sql(sql)
         else:
-            self.controller.execute_sql(sql, log_sql=True)
+            self.controller.execute_sql(sql)
 
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, True)
         self.delete_psector_selector('selector_plan_psector')
@@ -1088,7 +1117,7 @@ class GwPsector(ParentManage):
                 
         if close_dlg:
             self.reload_states_selector()
-            self.close_dialog(self.dlg_plan_psector)
+            close_dialog(self.dlg_plan_psector)
 
 
     def set_plan(self):
@@ -1102,7 +1131,7 @@ class GwPsector(ParentManage):
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.fill_table(dialog, tbl_all_rows, tableleft)
-        self.set_table_columns(dialog, tbl_all_rows, tableleft)
+        set_table_columns(dialog, tbl_all_rows, tableleft)
 
         # fill QTableView selected_rows
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
@@ -1110,7 +1139,7 @@ class GwPsector(ParentManage):
         expr = f" psector_id = '{qt_tools.getWidgetText(dialog, 'psector_id')}'"
         # Refresh model with selected filter
         self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
-        self.set_table_columns(dialog, tbl_selected_rows, tableright)
+        set_table_columns(dialog, tbl_selected_rows, tableright)
 
         # Button select
         dialog.btn_select.clicked.connect(partial(self.rows_selector, dialog, tbl_all_rows, tbl_selected_rows, 'id',
@@ -1187,7 +1216,7 @@ class GwPsector(ParentManage):
         expr = f" psector_id = '{qt_tools.getWidgetText(dialog, 'psector_id')}'"
         # Refresh model with selected filter
         self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
-        self.set_table_columns(dialog, tbl_selected_rows, tableright)
+        set_table_columns(dialog, tbl_selected_rows, tableright)
         self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
 
 
@@ -1214,14 +1243,14 @@ class GwPsector(ParentManage):
         expr = f" psector_id = '{qt_tools.getWidgetText(dialog, 'psector_id')}'"
         # Refresh model with selected filter
         self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
-        self.set_table_columns(dialog, tbl_selected_rows, tableright)
+        set_table_columns(dialog, tbl_selected_rows, tableright)
         self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
 
 
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
         """ Populate the QTableView by filtering through the QLineEdit"""
 
-        schema_name = self.schema_name.replace('"','')
+        schema_name = self.schema_name.replace('"', '')
         query = qt_tools.getWidgetText(dialog, text_line).lower()
         if query == 'null':
             query = ""
@@ -1334,11 +1363,11 @@ class GwPsector(ParentManage):
 
     def manage_document(self, qtable):
         """ Access GUI to manage documents e.g Execute action of button 34 """
-        
+
         psector_id = qt_tools.getText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
-        manage_document = GwDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
+        manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.manage_document(tablename='psector', qtable=qtable, item_id=psector_id)
-        dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
+        dlg_docman.btn_accept.clicked.connect(partial(set_completer_object, dlg_docman, 'doc'))
         qt_tools.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
 
 

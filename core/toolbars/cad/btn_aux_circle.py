@@ -12,18 +12,21 @@ from qgis.PyQt.QtGui import QDoubleValidator
 
 from functools import partial
 
-from lib import qt_tools
+from ....lib import qt_tools
 from ..parent_maptool import GwParentMapTool
 from ....ui_manager import AuxCircle
 from ...utils.giswater_tools import load_settings, open_dialog, close_dialog
+from ....lib.qgis_tools import get_event_point, snap_to_current_layer, snap_to_background_layers, add_marker, \
+    get_snapping_options, get_snapped_point
+
 
 class GwAuxCircleButton(GwParentMapTool):
     """ Button 71: Add circle """
 
-    def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
+    def __init__(self, icon_path, text, toolbar, action_group):
         """ Class constructor """
 
-        super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
+        super().__init__(icon_path, text, toolbar, action_group)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_circle = False
         self.layer_circle = None
@@ -34,7 +37,7 @@ class GwAuxCircleButton(GwParentMapTool):
 
         # Create the dialog and signals
         self.dlg_create_circle = AuxCircle()
-        load_settings(self.dlg_create_circle, self.controller)
+        load_settings(self.dlg_create_circle)
         self.cancel_circle = False
         validator = QDoubleValidator(0.00, 999.00, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
@@ -44,7 +47,7 @@ class GwAuxCircleButton(GwParentMapTool):
         self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
         self.dlg_create_circle.radius.setFocus()
 
-        open_dialog(self.dlg_create_circle, self.controller, dlg_name='auxcircle')
+        open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
 
 
     def get_radius(self, point):
@@ -56,7 +59,7 @@ class GwAuxCircleButton(GwParentMapTool):
 
         if self.layer_circle:
             self.layer_circle.startEditing()
-            close_dialog(self.dlg_create_circle, self.controller)
+            close_dialog(self.dlg_create_circle)
             if self.delete_prev:
                 selection = self.layer_circle.getFeatures()
                 self.layer_circle.selectByIds([f.id() for f in selection])
@@ -85,7 +88,7 @@ class GwAuxCircleButton(GwParentMapTool):
 
     def cancel(self):
 
-        close_dialog(self.dlg_create_circle, self.controller)
+        close_dialog(self.dlg_create_circle)
         self.cancel_map_tool()
         if self.layer_circle:
             if self.layer_circle.isEditable():
@@ -108,16 +111,16 @@ class GwAuxCircleButton(GwParentMapTool):
 
         # Hide marker and get coordinates
         self.vertex_marker.hide()
-        event_point = self.snapper_manager.get_event_point(event)
+        event_point = get_event_point(event)
 
         # Snapping
         if self.snap_to_selected_layer:
-            result = self.snapper_manager.snap_to_current_layer(event_point)
+            result = snap_to_current_layer(event_point)
         else:
-            result = self.snapper_manager.snap_to_background_layers(event_point)
+            result = snap_to_background_layers(event_point)
 
         # Add marker
-        self.snapper_manager.add_marker(result, self.vertex_marker)
+        add_marker(result, self.vertex_marker)
 
 
     def canvasReleaseEvent(self, event):
@@ -127,11 +130,11 @@ class GwAuxCircleButton(GwParentMapTool):
             # Get coordinates
             x = event.pos().x()
             y = event.pos().y()
-            event_point = self.snapper_manager.get_event_point(event)
+            event_point = get_event_point(event)
 
             # Create point with snap reference
-            result = self.snapper_manager.snap_to_background_layers(event_point)
-            point = self.snapper_manager.get_snapped_point(result)
+            result = snap_to_background_layers(event_point)
+            point = get_snapped_point(result)
 
             # Create point with mouse cursor reference
             if point is None:
@@ -165,7 +168,7 @@ class GwAuxCircleButton(GwParentMapTool):
             self.controller.show_info(message)
 
         # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
+        self.previous_snapping = get_snapping_options()
 
         # Get current layer
         self.current_layer = self.iface.activeLayer()

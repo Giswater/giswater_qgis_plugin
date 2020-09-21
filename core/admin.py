@@ -27,26 +27,32 @@ from functools import partial
 from time import sleep
 
 from lib import qt_tools
-from ..actions.api_parent import ApiParent
 from .admin_gis_project import GwAdminGisProject
 from .tasks.task import GwTask
 from ..i18n.i18n_generator import GwI18NGenerator
 from ..ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjectInfoUi, \
     MainGisProjectUi, ToolboxUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
 
+from .. import global_vars
+from ..actions.parent_functs import get_folder_dialog, set_table_columns
+from ..actions.api_parent_functs import create_body, construct_form_param_user
+from .utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
+from .utils.layer_tools import populate_info_text
 
-class GwAdmin(ApiParent):
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+class GwAdmin:
+
+    def __init__(self):
         """ Class to control toolbar 'om_ws' """
 
         # Initialize instance attributes
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-        self.iface = iface
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir
-        self.schema_name = self.controller.schema_name
+        self.iface = global_vars.iface
+        self.settings = global_vars.settings
+        self.controller = global_vars.controller
+        self.plugin_dir = global_vars.plugin_dir
+        self.schema_name = global_vars.schema_name
+        self.plugin_version = global_vars.plugin_version
+        self.canvas = global_vars.canvas
         self.project_type = None
         self.dlg_readsql = None
         self.dlg_info = None
@@ -161,7 +167,7 @@ class GwAdmin(ApiParent):
 
         # Create dialog object
         self.dlg_readsql = MainUi()
-        self.load_settings(self.dlg_readsql)
+        load_settings(self.dlg_readsql)
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
         if self.dev_user != 'TRUE':
@@ -202,7 +208,7 @@ class GwAdmin(ApiParent):
     def set_signals(self):
         """ Set signals. Function has to be executed only once (during form initialization) """
 
-        self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql))
+        self.dlg_readsql.btn_close.clicked.connect(partial(self.close_dialog_admin, self.dlg_readsql))
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self.open_create_project))
         self.dlg_readsql.btn_custom_load_file.clicked.connect(
             partial(self.load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
@@ -217,7 +223,7 @@ class GwAdmin(ApiParent):
         self.cmb_project_type.currentIndexChanged.connect(partial(self.set_info_project))
         self.cmb_project_type.currentIndexChanged.connect(partial(self.update_manage_ui))
         self.dlg_readsql.btn_custom_select_file.clicked.connect(
-            partial(self.get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
+            partial(get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
         self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
         self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
@@ -241,7 +247,7 @@ class GwAdmin(ApiParent):
 
     def manage_translations(self):
 
-        qm_gen = GwI18NGenerator(self.iface, self.settings, self.controller, self.plugin_dir)
+        qm_gen = GwI18NGenerator()
         qm_gen.init_dialog()
 
 
@@ -283,7 +289,7 @@ class GwAdmin(ApiParent):
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             qt_tools.setWidgetText(self.dlg_readsql, 'lbl_status_text', msg)
             qt_tools.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
-            self.open_dialog(self.dlg_readsql, dlg_name='main_ui')
+            open_dialog(self.dlg_readsql, dlg_name='main_ui')
             return
 
         # Create extension postgis if not exist
@@ -328,13 +334,12 @@ class GwAdmin(ApiParent):
             qt_tools.dis_enable_dialog(self.dlg_readsql, True)
 
         # Load last schema name selected and project type
-        if str(self.controller.plugin_settings_value('last_project_type_selected')) != '':
+        if get_parser_value('admin', 'last_project_type_selected') not in ('', None):
             qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
-                                   str(self.controller.plugin_settings_value('last_project_type_selected')))
-
-        if str(self.controller.plugin_settings_value('last_schema_name_selected')) != '':
+                                   get_parser_value('admin', 'last_project_type_selected'))
+        if get_parser_value('admin', 'last_schema_name_selected') not in ('', None):
             qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name,
-                                   str(self.controller.plugin_settings_value('last_schema_name_selected')))
+                                   get_parser_value('admin', 'last_schema_name_selected'))
 
         if show_dialog:
             self.manage_docker()
@@ -348,7 +353,7 @@ class GwAdmin(ApiParent):
                 self.controller.dock_dialog(self.dlg_readsql)
                 self.dlg_readsql.dlg_closed.connect(self.controller.close_docker)
             else:
-                self.open_dialog(self.dlg_readsql, dlg_name='main_ui')
+                open_dialog(self.dlg_readsql, dlg_name='main_ui')
         except RuntimeError as e:
             self.controller.log_info(str(e))
 
@@ -371,7 +376,7 @@ class GwAdmin(ApiParent):
             settings.setValue('username', user_name)
             settings.endGroup()
 
-        self.close_dialog(dialog)
+        self.close_dialog_admin(dialog)
         self.init_sql(True)
 
 
@@ -412,8 +417,8 @@ class GwAdmin(ApiParent):
         result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
             roletype, sample, get_database_parameters)
 
-        self.close_dialog(self.dlg_create_gis_project)
-        self.close_dialog(self.dlg_readsql)
+        self.close_dialog_admin(self.dlg_create_gis_project)
+        self.close_dialog_admin(self.dlg_readsql)
         if result is True:
             self.open_project(qgs_path)
 
@@ -438,7 +443,7 @@ class GwAdmin(ApiParent):
 
         # Create GIS project dialog
         self.dlg_create_gis_project = MainGisProjectUi()
-        self.load_settings(self.dlg_create_gis_project)
+        load_settings(self.dlg_create_gis_project)
 
         # Set default values
         schema_name = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -456,13 +461,13 @@ class GwAdmin(ApiParent):
 
         # Set listeners
         self.dlg_create_gis_project.btn_gis_folder.clicked.connect(
-            partial(self.get_folder_dialog, self.dlg_create_gis_project, "txt_gis_folder"))
+            partial(get_folder_dialog, self.dlg_create_gis_project, "txt_gis_folder"))
         self.dlg_create_gis_project.btn_accept.clicked.connect(partial(self.gis_create_project))
-        self.dlg_create_gis_project.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_create_gis_project))
+        self.dlg_create_gis_project.btn_close.clicked.connect(partial(self.close_dialog_admin, self.dlg_create_gis_project))
         self.dlg_create_gis_project.chk_is_sample.stateChanged.connect(partial(self.sample_state_changed))
 
         # Open MainWindow
-        self.open_dialog(self.dlg_create_gis_project, dlg_name='main_gisproject')
+        open_dialog(self.dlg_create_gis_project, dlg_name='main_gisproject')
 
 
     def sample_state_changed(self):
@@ -636,7 +641,7 @@ class GwAdmin(ApiParent):
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep):
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                            sub_folder + os.sep + 'utils' + os.sep, no_ct=no_ct)
                                     if status is False:
                                         return False
@@ -652,7 +657,7 @@ class GwAdmin(ApiParent):
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN'):
-                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                    status = self.executeFiles(self.folderUpdates + folder +
                                                                os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
@@ -660,12 +665,12 @@ class GwAdmin(ApiParent):
                         else:
                             if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep):
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                            sub_folder + os.sep + 'utils' + os.sep, no_ct=no_ct)
                                     if status is False:
                                         return False
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, ''):
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                            sub_folder + os.sep + project_type + os.sep, no_ct=no_ct)
                                     if status is False:
                                         return False
@@ -675,7 +680,7 @@ class GwAdmin(ApiParent):
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN'):
-                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                    status = self.executeFiles(self.folderUpdates + folder +
                                                                os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
@@ -684,7 +689,7 @@ class GwAdmin(ApiParent):
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                            sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
                                         return False
@@ -696,8 +701,8 @@ class GwAdmin(ApiParent):
                                     if status is False:
                                         return False
                                 if self.process_folder(
-                                        self.folderUpdates + folder + os.sep + sub_folder + \
-                                            os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                        self.folderUpdates + folder + os.sep + sub_folder +
+                                    os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                         '') is True:
                                     status = self.executeFiles(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -705,7 +710,7 @@ class GwAdmin(ApiParent):
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                    status = self.executeFiles(self.folderUpdates + folder +
                                                                os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
@@ -713,7 +718,7 @@ class GwAdmin(ApiParent):
                         else:
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                            sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
                                         return False
@@ -730,7 +735,7 @@ class GwAdmin(ApiParent):
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                    status = self.executeFiles(self.folderUpdates + folder +
                                                                os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
@@ -739,22 +744,22 @@ class GwAdmin(ApiParent):
 
             if not os.path.exists(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + ''):
                 return
-            folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + \
+            folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) +
                              os.sep + os.sep + 'updates' + os.sep + ''))
             for folder in folders:
-                sub_folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + \
+                sub_folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) +
                                      os.sep + os.sep + 'updates' + os.sep + folder))
                 for sub_folder in sub_folders:
                     if new_project:
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > '31100':
                                 if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), '') is True:
-                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + \
+                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep +
                                                                folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', '') is True:
-                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + \
+                                    status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' +
                                                                os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
@@ -763,7 +768,7 @@ class GwAdmin(ApiParent):
                             if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder,
                                                        '') is True:
-                                    status = self.load_sql(self.sql_dir + os.sep + str(project_type) + \
+                                    status = self.load_sql(self.sql_dir + os.sep + str(project_type) +
                                                            os.sep + 'updates' + os.sep + folder + os.sep + sub_folder)
                                     if status is False:
                                         return False
@@ -782,7 +787,7 @@ class GwAdmin(ApiParent):
                         if self.read_all_updates == 'TRUE':
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                            sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
                                         return False
@@ -800,7 +805,7 @@ class GwAdmin(ApiParent):
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                    status = self.executeFiles(self.folderUpdates + folder +
                                                                os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
@@ -808,7 +813,7 @@ class GwAdmin(ApiParent):
                         else:
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                    status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                    status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                            sub_folder + os.sep + 'utils' + os.sep)
                                     if status is False:
                                         return False
@@ -820,8 +825,8 @@ class GwAdmin(ApiParent):
                                     if status is False:
                                         return False
                                 if self.process_folder(
-                                        self.folderUpdates + folder + os.sep + sub_folder + \
-                                            os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                        self.folderUpdates + folder + os.sep + sub_folder +
+                                    os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                         '') is True:
                                     status = self.executeFiles(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -829,7 +834,7 @@ class GwAdmin(ApiParent):
                                     if status is False:
                                         return False
                                 elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                    status = self.executeFiles(self.folderUpdates + folder + \
+                                    status = self.executeFiles(self.folderUpdates + folder +
                                                                os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                     if status is False:
                                         return False
@@ -875,18 +880,18 @@ class GwAdmin(ApiParent):
                     if new_project:
                         if str(sub_folder) <= '31100':
                             if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                        sub_folder + os.sep + 'utils' + os.sep)
                                 if status is False:
                                     return False
                             if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + project_type + os.sep, '') is True:
-                                status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                        sub_folder + os.sep + project_type + os.sep)
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.folderUpdates + folder + os.sep + sub_folder + \
-                                        os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.folderUpdates + folder + os.sep + sub_folder +
+                                os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -894,14 +899,14 @@ class GwAdmin(ApiParent):
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is False:
-                                status = self.executeFiles(self.folderUpdates + folder + \
+                                status = self.executeFiles(self.folderUpdates + folder +
                                                            os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                 if status is False:
                                     return False
                     else:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= '31100':
                             if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
-                                status = self.load_sql(self.folderUpdates + folder + os.sep + \
+                                status = self.load_sql(self.folderUpdates + folder + os.sep +
                                                        sub_folder + os.sep + 'utils' + os.sep)
                                 if status is False:
                                     return False
@@ -913,8 +918,8 @@ class GwAdmin(ApiParent):
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.folderUpdates + folder + os.sep + sub_folder + \
-                                        os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.folderUpdates + folder + os.sep + sub_folder +
+                                os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -922,7 +927,7 @@ class GwAdmin(ApiParent):
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', '') is True:
-                                status = self.executeFiles(self.folderUpdates + folder + \
+                                status = self.executeFiles(self.folderUpdates + folder +
                                                            os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
                                 if status is False:
                                     return False
@@ -932,23 +937,23 @@ class GwAdmin(ApiParent):
             if not os.path.exists(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + ''):
                 return True
 
-            folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + \
+            folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) +
                              os.sep + os.sep + 'updates' + os.sep + ''))
             for folder in folders:
-                sub_folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) + \
+                sub_folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) +
                                      os.sep + os.sep + 'updates' + os.sep + folder))
                 for sub_folder in sub_folders:
                     if new_project:
                         if str(sub_folder) <= '31100':
                             if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder, '') is True:
-                                status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep + \
+                                status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep +
                                                        os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + '')
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + \
-                                                                folder + os.sep + sub_folder + os.sep + \
-                                                                    'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep +
+                                folder + os.sep + sub_folder + os.sep +
+                                'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(self.sql_dir + os.sep + str(
                                     project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -956,7 +961,7 @@ class GwAdmin(ApiParent):
                                 if status is False:
                                     return False
                             elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' +
                                                            os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
                                 if status is False:
                                     return False
@@ -964,14 +969,14 @@ class GwAdmin(ApiParent):
                     else:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= '31100':
                             if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder, '') is True:
-                                status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep + \
+                                status = self.load_sql(self.sql_dir + os.sep + str(project_type) + os.sep +
                                                        os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + '')
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + \
-                                                                folder + os.sep + sub_folder + os.sep + \
-                                                                    'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep +
+                                folder + os.sep + sub_folder + os.sep +
+                                'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(self.sql_dir + os.sep + str(
                                     project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -979,7 +984,7 @@ class GwAdmin(ApiParent):
                                 if status is False:
                                     return False
                             elif self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' +
                                                            os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
                                 if status is False:
                                     return False
@@ -989,7 +994,7 @@ class GwAdmin(ApiParent):
 
     def load_sample_data(self, project_type=False):
 
-        sql = (f"UPDATE {self.schema}.sys_version SET sample=True ")
+        sql = f"UPDATE {self.schema}.sys_version SET sample = True"
         self.controller.execute_sql(sql, commit=False)
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':
@@ -1141,18 +1146,18 @@ class GwAdmin(ApiParent):
                 if new_api:
                     if self.read_all_updates == 'TRUE':
                         if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, '') is True:
-                            status = self.executeFiles(self.folderUpdatesApi + folder + \
+                            status = self.executeFiles(self.folderUpdatesApi + folder +
                                                        os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                             if status is False:
                                 return False
                         if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep, '') is True:
-                            status = self.executeFiles(self.folderUpdatesApi + folder + \
+                            status = self.executeFiles(self.folderUpdatesApi + folder +
                                                        os.sep + sub_folder + os.sep + project_type + os.sep + '')
                             if status is False:
                                 return False
                         if self.process_folder(
-                                self.folderUpdatesApi + folder + os.sep + sub_folder + \
-                                    os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                self.folderUpdatesApi + folder + os.sep + sub_folder +
+                            os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                 '') is True:
                             status = self.executeFiles(
                                 self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -1160,7 +1165,7 @@ class GwAdmin(ApiParent):
                             if status is False:
                                 return False
                         elif self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                            status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + \
+                            status = self.executeFiles(self.folderUpdatesApi + folder + os.sep +
                                                        sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
                             if status is False:
                                 return False
@@ -1169,7 +1174,7 @@ class GwAdmin(ApiParent):
                             if status is False:
                                 return False
                         if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_tablect) is True:
-                            status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                            status = self.executeFiles(self.sql_dir + os.sep + 'api' +
                                                        os.sep + self.file_pattern_tablect)
                             if status is False:
                                 return False
@@ -1177,13 +1182,13 @@ class GwAdmin(ApiParent):
                         if str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
                                                    '') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                status = self.executeFiles(self.folderUpdatesApi + folder +
                                                            os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                                 if status is False:
                                     return False
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
                                                    '') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                status = self.executeFiles(self.folderUpdatesApi + folder +
                                                            os.sep + sub_folder + os.sep + project_type + os.sep + '')
                                 if status is False:
                                     return False
@@ -1203,12 +1208,12 @@ class GwAdmin(ApiParent):
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_trg) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' +
                                                            os.sep + self.file_pattern_trg)
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_tablect) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' +
                                                            os.sep + self.file_pattern_tablect)
                                 if status is False:
                                     return False
@@ -1217,7 +1222,7 @@ class GwAdmin(ApiParent):
                     if self.read_all_updates == 'TRUE':
                         if str(sub_folder) > str(self.project_version).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, '') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                status = self.executeFiles(self.folderUpdatesApi + folder +
                                                            os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                                 if status is False:
                                     return False
@@ -1229,8 +1234,8 @@ class GwAdmin(ApiParent):
                                 if status is False:
                                     return False
                             if self.process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + \
-                                        os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                    self.folderUpdatesApi + folder + os.sep + sub_folder +
+                                os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                     '') is True:
                                 status = self.executeFiles(
                                     self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -1238,17 +1243,17 @@ class GwAdmin(ApiParent):
                                 if status is False:
                                     return False
                             elif self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + os.sep + \
+                                status = self.executeFiles(self.folderUpdatesApi + folder + os.sep +
                                                            sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_trg) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' +
                                                            os.sep + self.file_pattern_trg)
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_tablect) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' +
                                                            os.sep + self.file_pattern_tablect)
                                 if status is False:
                                     return False
@@ -1256,13 +1261,13 @@ class GwAdmin(ApiParent):
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
                                                    '') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                status = self.executeFiles(self.folderUpdatesApi + folder +
                                                            os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
                                 if status is False:
                                     return False
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
                                                    '') is True:
-                                status = self.executeFiles(self.folderUpdatesApi + folder + \
+                                status = self.executeFiles(self.folderUpdatesApi + folder +
                                                            os.sep + sub_folder + os.sep + project_type + os.sep + '')
                                 if status is False:
                                     return False
@@ -1282,12 +1287,12 @@ class GwAdmin(ApiParent):
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_trg) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' +
                                                            os.sep + self.file_pattern_trg)
                                 if status is False:
                                     return False
                             if self.process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_tablect) is True:
-                                status = self.executeFiles(self.sql_dir + os.sep + 'api' + \
+                                status = self.executeFiles(self.sql_dir + os.sep + 'api' +
                                                            os.sep + self.file_pattern_tablect)
                                 if status is False:
                                     return False
@@ -1301,7 +1306,7 @@ class GwAdmin(ApiParent):
 
         # Create dialog
         self.dlg_import_inp = ToolboxUi()
-        self.load_settings(self.dlg_import_inp)
+        load_settings(self.dlg_import_inp)
 
         # Hide widgets
         self.dlg_import_inp.grb_input_layer.setVisible(False)
@@ -1310,15 +1315,15 @@ class GwAdmin(ApiParent):
         self.dlg_import_inp.progressBar.setVisible(False)
 
         if schema_type.lower() == 'ws':
-            extras = '"filterText":"Import inp epanet file"'
+            extras = '"function":2522'
         elif schema_type.lower() == 'ud':
-            extras = '"filterText":"Import inp swmm file"'
+            extras = '"function":2524'
         else:
             self.error_count = self.error_count + 1
             return
 
         extras += ', "isToolbox":false'
-        body = self.create_body(extras=extras)
+        body = create_body(extras=extras)
         complet_result = self.controller.get_json('gw_fct_gettoolbox', body, schema_name=self.schema, commit=False)
         if not complet_result:
             return False
@@ -1330,7 +1335,7 @@ class GwAdmin(ApiParent):
         self.dlg_import_inp.btn_close.clicked.connect(partial(self.execute_import_inp, accepted=False))
 
         # Open dialog
-        self.open_dialog(self.dlg_import_inp, dlg_name='main_importinp')
+        open_dialog(self.dlg_import_inp, dlg_name='main_importinp')
 
 
     def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False, srid=None):
@@ -1510,10 +1515,10 @@ class GwAdmin(ApiParent):
         self.project_issample = example_data
 
         # Save in settings
-        self.controller.plugin_settings_set_value('project_name_schema', project_name_schema)
-        self.controller.plugin_settings_set_value('project_title_schema', project_title_schema)
+        set_parser_value('admin', 'project_name_schema', f'{project_name_schema}')
+        set_parser_value('admin', 'project_title_schema', f'{project_title_schema}')
         inp_file_path = qt_tools.getWidgetText(self.dlg_readsql_create_project, 'data_file')
-        self.controller.plugin_settings_set_value('inp_file_path', inp_file_path)
+        set_parser_value('admin', 'inp_file_path', f'{inp_file_path}')
 
         # Check if project name is valid
         if not self.check_project_name(project_name_schema, project_title_schema):
@@ -1599,25 +1604,25 @@ class GwAdmin(ApiParent):
             # TODO:
             if not is_test:
                 self.task1.setProgress(100)
-            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_import_data')
+            set_parser_value('admin', 'create_schema_type', 'rdb_import_data')
             msg = ("The sql files have been correctly executed."
                    "\nNow, a form will be opened to manage the import inp.")
             self.controller.show_info_box(msg, "Info")
             self.execute_import_data(schema_type=project_type)
             return
         elif self.rdb_sample.isChecked() and example_data:
-            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample')
+            set_parser_value('admin', 'create_schema_type', 'rdb_sample')
             self.load_sample_data(project_type=project_type)
             if not is_test:
                 self.task1.setProgress(80)
         elif self.rdb_sample_dev.isChecked():
-            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_sample_dev')
+            set_parser_value('admin', 'create_schema_type', 'rdb_sample_dev')
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
             if not is_test:
                 self.task1.setProgress(80)
         elif self.rdb_data.isChecked():
-            self.controller.plugin_settings_set_value('create_schema_type', 'rdb_data')
+            set_parser_value('admin', 'create_schema_type', 'rdb_data')
 
         self.manage_process_result(project_name_schema, is_test)
 
@@ -1633,7 +1638,7 @@ class GwAdmin(ApiParent):
         self.manage_result_message(status, parameter="Create project")
         if status:
             self.controller.dao.commit()
-            self.close_dialog(self.dlg_readsql_create_project)
+            self.close_dialog_admin(self.dlg_readsql_create_project)
             if not is_test:
                 self.populate_data_schema_name(self.cmb_project_type)
                 if schema_name is not None:
@@ -1694,7 +1699,7 @@ class GwAdmin(ApiParent):
             self.event_change_connection()
             qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
             if close_dlg_rename:
-                self.close_dialog(self.dlg_readsql_rename)
+                self.close_dialog_admin(self.dlg_readsql_rename)
         else:
             self.controller.dao.rollback()
 
@@ -1723,6 +1728,8 @@ class GwAdmin(ApiParent):
 
 
     # TODO: Rename this function => Update all versions from changelog file.
+
+
     def update(self, project_type):
 
         msg = "Are you sure to update the project schema to last version?"
@@ -1744,7 +1751,7 @@ class GwAdmin(ApiParent):
         self.manage_result_message(status, parameter="Update project")
         if status:
             self.controller.dao.commit()
-            self.close_dialog(self.dlg_readsql_show_info)
+            self.close_dialog_admin(self.dlg_readsql_show_info)
         else:
             self.controller.dao.rollback()
 
@@ -1842,7 +1849,7 @@ class GwAdmin(ApiParent):
             credentials['db'], credentials['user'], credentials['password'], credentials['sslmode'])
 
         if not self.logged:
-            self.close_dialog(self.dlg_readsql)
+            self.close_dialog_admin(self.dlg_readsql)
             self.create_credentials_form(set_connection=connection_name)
         else:
             if str(self.plugin_version) > str(self.project_version):
@@ -1913,7 +1920,7 @@ class GwAdmin(ApiParent):
         # Populate visit class
         # TODO:: Populate combo from visitclass manager and wip
         # sql = ("SELECT id, idval FROM config_visit_class")
-        # rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        # rows = self.controller.get_rows(sql, commit=True)
         # qt_tools.set_item_data(self.dlg_readsql.cmb_visit_class, rows, 1)
 
         # Set listeners
@@ -1926,21 +1933,21 @@ class GwAdmin(ApiParent):
 
         # Create the dialog and signals
         self.dlg_manage_visit_class = MainVisitClass()
-        self.load_settings(self.dlg_manage_visit_class)
+        load_settings(self.dlg_manage_visit_class)
 
         # Manage widgets
         sql = "SELECT id, id as idval FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2"
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
         qt_tools.set_item_data(self.dlg_manage_visit_class.feature_type, rows, 1)
 
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue ='visit_type'"
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         qt_tools.set_item_data(self.dlg_manage_visit_class.visit_type, rows, 1)
 
         # Set listeners
 
         # Open dialog
-        self.open_dialog(self.dlg_manage_visit_class, dlg_name='main_visitclass')
+        open_dialog(self.dlg_manage_visit_class, dlg_name='main_visitclass')
         return
 
 
@@ -1948,29 +1955,29 @@ class GwAdmin(ApiParent):
         return
         # Create the dialog and signals
         self.dlg_manage_visit_param = MainVisitParam()
-        self.load_settings(self.dlg_manage_visit_param)
+        load_settings(self.dlg_manage_visit_param)
 
         # Manage widgets
         sql = "SELECT id, id as idval FROM om_visit_parameter_type"
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
         qt_tools.set_item_data(self.dlg_manage_visit_param.parameter_type, rows, 1)
 
         sql = "SELECT id, idval FROM config_typevalue WHERE typevalue = 'datatype'"
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
         qt_tools.set_item_data(self.dlg_manage_visit_param.data_type, rows, 1)
 
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_form_type'"
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
         qt_tools.set_item_data(self.dlg_manage_visit_param.form_type, rows, 1)
 
         sql = "SELECT id, idval FROM config_typevalue WHERE typevalue = 'widgettype'"
-        rows = self.controller.get_rows(sql, log_sql=True, commit=True)
+        rows = self.controller.get_rows(sql, commit=True)
         qt_tools.set_item_data(self.dlg_manage_visit_param.widget_type, rows, 1)
 
         # Set listeners
 
         # Open dialog
-        self.open_dialog(self.dlg_manage_visit_param, dlg_name='main_visitparam')
+        open_dialog(self.dlg_manage_visit_param, dlg_name='main_visitparam')
         return
 
 
@@ -1987,7 +1994,7 @@ class GwAdmin(ApiParent):
 
         # Create dialog
         self.dlg_readsql_show_info = MainProjectInfoUi()
-        self.load_settings(self.dlg_readsql_show_info)
+        load_settings(self.dlg_readsql_show_info)
 
         info_updates = self.dlg_readsql_show_info.findChild(QTextEdit, 'info_updates')
         self.message_update = ''
@@ -2000,11 +2007,11 @@ class GwAdmin(ApiParent):
             self.dlg_readsql_show_info.btn_update.setEnabled(False)
 
         # Set listeners
-        self.dlg_readsql_show_info.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_readsql_show_info))
+        self.dlg_readsql_show_info.btn_close.clicked.connect(partial(self.close_dialog_admin, self.dlg_readsql_show_info))
         self.dlg_readsql_show_info.btn_update.clicked.connect(partial(self.update, self.project_type_selected))
 
         # Open dialog
-        self.open_dialog(self.dlg_readsql_show_info, dlg_name='main_projectinfo')
+        open_dialog(self.dlg_readsql_show_info, dlg_name='main_projectinfo')
 
 
     def read_info_version(self):
@@ -2029,19 +2036,9 @@ class GwAdmin(ApiParent):
         return True
 
 
-    def close_dialog(self, dlg):
+    def close_dialog_admin(self, dlg):
         """ Close dialog """
-
-        try:
-            self.save_settings(dlg)
-            dlg.close()
-            map_tool = self.canvas.mapTool()
-            # If selected map tool is from the plugin, set 'Pan' as current one
-            if map_tool.toolName() == '':
-                self.iface.actionPan().trigger()
-        except AttributeError:
-            pass
-
+        close_dialog(dlg)
         self.schema = None
 
 
@@ -2182,12 +2179,12 @@ class GwAdmin(ApiParent):
         elif str(self.plugin_version) > str(self.project_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                         '(Schema version is lower than plugin version, please update schema)')
+                                   '(Schema version is lower than plugin version, please update schema)')
             self.dlg_readsql.btn_info.setEnabled(True)
         elif str(self.plugin_version) < str(self.project_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                         '(Schema version is higher than plugin version, please update plugin)')
+                                   '(Schema version is higher than plugin version, please update plugin)')
             self.dlg_readsql.btn_info.setEnabled(False)
         else:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
@@ -2228,7 +2225,7 @@ class GwAdmin(ApiParent):
         """ Initialize dialog (only once) """
 
         self.dlg_readsql_create_project = MainDbProjectUi()
-        self.load_settings(self.dlg_readsql_create_project)
+        load_settings(self.dlg_readsql_create_project)
 
         # Find Widgets in form
         self.project_name = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_name')
@@ -2240,14 +2237,13 @@ class GwAdmin(ApiParent):
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
 
         # Load user values
-        self.project_name.setText(str(self.controller.plugin_settings_value('project_name_schema')))
-        self.project_title.setText(str(self.controller.plugin_settings_value('project_title_schema')))
-        create_schema_type = self.controller.plugin_settings_value('create_schema_type')
-        if create_schema_type:
+        self.project_name.setText(get_parser_value('admin', 'project_name_schema'))
+        self.project_title.setText(get_parser_value('admin', 'project_title_schema'))
+        create_schema_type = get_parser_value('admin', 'create_schema_type')
+        if create_schema_type == 'True':
             qt_tools.setChecked(self.dlg_readsql_create_project, str(create_schema_type))
-
-        if str(self.controller.plugin_settings_value('inp_file_path')) != 'null':
-            self.data_file.setText(str(self.controller.plugin_settings_value('inp_file_path')))
+        if get_parser_value('admin', 'inp_file_path') not in ('null', None):
+            self.data_file.setText(get_parser_value('admin', 'inp_file_path'))
 
         # TODO: do and call listener for buton + table -> temp_csv
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
@@ -2291,7 +2287,7 @@ class GwAdmin(ApiParent):
 
         self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
         self.dlg_readsql_create_project.btn_close.clicked.connect(
-            partial(self.close_dialog, self.dlg_readsql_create_project))
+            partial(self.close_dialog_admin, self.dlg_readsql_create_project))
         self.dlg_readsql_create_project.btn_push_file.clicked.connect(partial(self.select_file_inp))
         self.cmb_create_project_type.currentIndexChanged.connect(
             partial(self.change_project_type, self.cmb_create_project_type))
@@ -2316,7 +2312,7 @@ class GwAdmin(ApiParent):
 
         # Open dialog
         self.dlg_readsql_create_project.setWindowTitle(f"Create Project - {self.connection_name}")
-        self.open_dialog(self.dlg_readsql_create_project, dlg_name='main_dbproject')
+        open_dialog(self.dlg_readsql_create_project, dlg_name='main_dbproject')
 
 
     def open_rename(self):
@@ -2329,17 +2325,17 @@ class GwAdmin(ApiParent):
 
         # Create dialog
         self.dlg_readsql_rename = MainRenameProjUi()
-        self.load_settings(self.dlg_readsql_rename)
+        load_settings(self.dlg_readsql_rename)
 
         schema = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         # Set listeners
         self.dlg_readsql_rename.btn_accept.clicked.connect(partial(self.rename_project_data_schema, schema))
-        self.dlg_readsql_rename.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_readsql_rename))
+        self.dlg_readsql_rename.btn_cancel.clicked.connect(partial(self.close_dialog_admin, self.dlg_readsql_rename))
 
         # Open dialog
         self.dlg_readsql_rename.setWindowTitle(f'Rename project - {schema}')
-        self.open_dialog(self.dlg_readsql_rename, dlg_name='main_renameproj')
+        open_dialog(self.dlg_readsql_rename, dlg_name='main_renameproj')
 
 
     def executeFiles(self, filedir, i18n=False, no_ct=False, log_folder=True, log_files=False):
@@ -2442,17 +2438,17 @@ class GwAdmin(ApiParent):
 
         # Create dialog
         self.dlg_readsql_copy = MainRenameProjUi()
-        self.load_settings(self.dlg_readsql_copy)
+        load_settings(self.dlg_readsql_copy)
 
         schema = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         # Set listeners
         self.dlg_readsql_copy.btn_accept.clicked.connect(partial(self.copy_project_data_schema, schema))
-        self.dlg_readsql_copy.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_readsql_copy))
+        self.dlg_readsql_copy.btn_cancel.clicked.connect(partial(self.close_dialog_admin, self.dlg_readsql_copy))
 
         # Open dialog
         self.dlg_readsql_copy.setWindowTitle('Copy project - ' + schema)
-        self.open_dialog(self.dlg_readsql_copy, dlg_name='main_renameproj')
+        open_dialog(self.dlg_readsql_copy, dlg_name='main_renameproj')
 
 
     def copy_project_data_schema(self, schema):
@@ -2473,10 +2469,10 @@ class GwAdmin(ApiParent):
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(0)
         extras = f'"parameters":{{"source_schema":"{schema}", "dest_schema":"{new_schema_name}"}}'
-        body = self.create_body(extras=extras)
+        body = create_body(extras=extras)
         self.task1.setProgress(50)
         result = self.controller.get_json('gw_fct_admin_schema_clone', body,
-                                          schema_name=schema, log_sql=True, commit=False)
+                                          schema_name=schema, commit=False)
         if not result:
             return
         self.task1.setProgress(100)
@@ -2488,7 +2484,7 @@ class GwAdmin(ApiParent):
             self.controller.dao.commit()
             self.event_change_connection()
             qt_tools.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(new_schema_name))
-            self.close_dialog(self.dlg_readsql_copy)
+            self.close_dialog_admin(self.dlg_readsql_copy)
         else:
             self.controller.dao.rollback()
 
@@ -2517,6 +2513,8 @@ class GwAdmin(ApiParent):
 
 
     def execute_import_inp(self, accepted=False, schema_type=''):
+
+        is_test = False
 
         if accepted:
 
@@ -2549,9 +2547,9 @@ class GwAdmin(ApiParent):
             self.dlg_import_inp.progressBar.setAlignment(Qt.AlignCenter)
             self.dlg_import_inp.progressBar.setFormat("")
 
-            body = self.create_body(extras=extras)
+            body = create_body(extras=extras)
             sql = ("SELECT " + str(function_name) + "(" + body + ")::text")
-            row = self.controller.get_row(sql, log_sql=True, commit=False)
+            row = self.controller.get_row(sql, commit=False)
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
@@ -2571,8 +2569,8 @@ class GwAdmin(ApiParent):
             self.error_count = 0
 
         # Close dialog
-        self.close_dialog(self.dlg_import_inp)
-        self.close_dialog(self.dlg_readsql_create_project)
+        self.close_dialog_admin(self.dlg_import_inp)
+        self.close_dialog_admin(self.dlg_readsql_create_project)
 
 
     def create_qgis_template(self):
@@ -2663,12 +2661,12 @@ class GwAdmin(ApiParent):
             content = f.read()
         sql = ("INSERT INTO " + schema_name + ".temp_csv(source, csv1, fid) VALUES('" +
                str(form_name_ui) + "', '" + str(content) + "', 247);")
-        status = self.controller.execute_sql(sql, log_sql=True)
+        status = self.controller.execute_sql(sql)
 
         # Import xml to database
         sql = ("SELECT " + schema_name + ".gw_fct_import_ui_xml('" + str(form_name_ui) + "', " +
                str(status_update_childs) + ")::text")
-        status = self.controller.execute_sql(sql, log_sql=True)
+        status = self.controller.execute_sql(sql)
         self.manage_result_message(status, parameter="Import data into 'config_form_fields'")
 
         # Clear temp_csv
@@ -2691,7 +2689,7 @@ class GwAdmin(ApiParent):
         # Export xml from database
         sql = ("SELECT " + schema_name + ".gw_fct_export_ui_xml('"
                + str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
-        status = self.controller.execute_sql(sql, log_sql=True)
+        status = self.controller.execute_sql(sql)
         if status is False:
             msg = "Process finished with some errors"
             self.controller.show_info_box(msg, "Warning", parameter="Function import/export")
@@ -2701,7 +2699,7 @@ class GwAdmin(ApiParent):
         sql = ("SELECT csv1 FROM " + schema_name + ".temp_csv "
                "WHERE cur_user = current_user AND source = '" + str(form_name_ui) + "' "
                "ORDER BY id DESC")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if not row:
             return
 
@@ -2733,7 +2731,7 @@ class GwAdmin(ApiParent):
         schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
         # Clear temp_csv
         sql = f"DELETE FROM {schema_name}.temp_csv WHERE cur_user = current_user"
-        status = self.controller.execute_sql(sql, log_sql=True)
+        status = self.controller.execute_sql(sql)
 
 
     def select_file_ui(self):
@@ -2807,7 +2805,7 @@ class GwAdmin(ApiParent):
         feature = '"catFeature":"' + form_name + '"'
         extras = '"multi_create":' + str(
             qt_tools.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_create)).lower() + ''
-        body = self.create_body(feature=feature, extras=extras)
+        body = create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
 
         # Execute query
@@ -2820,7 +2818,7 @@ class GwAdmin(ApiParent):
 
         # Create the dialog and signals
         self.dlg_manage_sys_fields = MainSysFields()
-        self.load_settings(self.dlg_manage_sys_fields)
+        load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
         self.chk_multi_insert = None
 
@@ -2835,8 +2833,8 @@ class GwAdmin(ApiParent):
         self.manage_update_field(self.dlg_manage_sys_fields, form_name_fields, tableview='ve_config_sysfields')
 
         # Set listeners
-        self.dlg_manage_sys_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_sys_fields))
-        self.dlg_manage_sys_fields.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_manage_sys_fields))
+        self.dlg_manage_sys_fields.btn_cancel.clicked.connect(partial(self.close_dialog_admin, self.dlg_manage_sys_fields))
+        self.dlg_manage_sys_fields.btn_accept.clicked.connect(partial(self.close_dialog_admin, self.dlg_manage_sys_fields))
         self.dlg_manage_sys_fields.tbl_update.doubleClicked.connect(
             partial(self.update_selected_sys_fild, self.dlg_manage_sys_fields.tbl_update))
         self.dlg_manage_sys_fields.btn_open.clicked.connect(
@@ -2846,14 +2844,14 @@ class GwAdmin(ApiParent):
         self.dlg_manage_sys_fields.setWindowTitle(window_title)
         self.manage_update_sys_field(form_name_fields)
 
-        self.open_dialog(self.dlg_manage_sys_fields)
+        open_dialog(self.dlg_manage_sys_fields)
 
 
     def open_manage_field(self, action):
 
         # Create the dialog and signals
         self.dlg_manage_fields = MainFields()
-        self.load_settings(self.dlg_manage_fields)
+        load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
         # Remove unused tabs
@@ -2879,17 +2877,19 @@ class GwAdmin(ApiParent):
         # Set listeners
         self.dlg_manage_fields.btn_accept.clicked.connect(
             partial(self.manage_accept, action, form_name_fields, self.model_update_table))
-        self.dlg_manage_fields.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_manage_fields))
+        self.dlg_manage_fields.btn_cancel.clicked.connect(partial(self.close_dialog_admin, self.dlg_manage_fields))
         self.dlg_manage_fields.tbl_update.doubleClicked.connect(
             partial(self.update_selected_addfild, self.dlg_manage_fields.tbl_update))
         self.dlg_manage_fields.btn_open.clicked.connect(
             partial(self.update_selected_addfild, self.dlg_manage_fields.tbl_update))
 
-        self.open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
+        open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
         self.dlg_manage_fields.setWindowTitle(window_title)
 
 
     # TODO:: Enhance this function and use parametric parameters
+
+
     def update_selected_sys_fild(self, widget):
 
         selected_list = widget.selectionModel().selectedRows()
@@ -2900,9 +2900,9 @@ class GwAdmin(ApiParent):
             return
 
         # Create the dialog and signals
-        self.close_dialog(self.dlg_manage_sys_fields)
+        self.close_dialog_admin(self.dlg_manage_sys_fields)
         self.dlg_manage_sys_fields = MainSysFields()
-        self.load_settings(self.dlg_manage_sys_fields)
+        load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
 
         form_name_fields = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
@@ -2938,7 +2938,7 @@ class GwAdmin(ApiParent):
                 value = None
             qt_tools.setWidgetText(self.dlg_manage_sys_fields, result, value)
 
-        self.open_dialog(self.dlg_manage_sys_fields)
+        open_dialog(self.dlg_manage_sys_fields)
 
 
     def update_selected_addfild(self, widget):
@@ -2950,9 +2950,9 @@ class GwAdmin(ApiParent):
             return
 
         # Create the dialog and signals
-        self.close_dialog(self.dlg_manage_fields)
+        self.close_dialog_admin(self.dlg_manage_fields)
         self.dlg_manage_fields = MainFields()
-        self.load_settings(self.dlg_manage_fields)
+        load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
         form_name_fields = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
@@ -2988,7 +2988,7 @@ class GwAdmin(ApiParent):
                 value = None
             qt_tools.setWidgetText(self.dlg_manage_fields, result, value)
 
-        self.open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
+        open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
 
 
     def manage_create_field(self, form_name):
@@ -2998,28 +2998,28 @@ class GwAdmin(ApiParent):
         # Populate widgettype combo
         sql = (f"SELECT DISTINCT(id), idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         qt_tools.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
 
         # Populate datatype combo
         sql = (f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         qt_tools.set_item_data(self.dlg_manage_fields.datatype, rows, 1)
 
         # Populate widgetfunction combo
         sql = (f"SELECT null as id, null as idval UNION ALL "
                f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         qt_tools.set_item_data(self.dlg_manage_fields.widgetfunction, rows, 1)
 
         # Set default value for formtype widget
         qt_tools.setWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
 
 
-    # TODO:: Enhance this function and use parametric parameters
     def manage_update_sys_field(self, form_name):
+        # TODO:: Enhance this function and use parametric parameters
 
         schema_name = qt_tools.getWidgetText(self.dlg_readsql, 'project_schema_name')
 
@@ -3029,7 +3029,7 @@ class GwAdmin(ApiParent):
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
         expr_filter = "cat_feature_id = '" + form_name + "'"
         self.fill_table(qtable, 've_config_sysfields', self.model_update_table, expr_filter)
-        self.set_table_columns(self.dlg_manage_sys_fields, qtable, 've_config_sysfields', schema_name=schema_name)
+        set_table_columns(self.dlg_manage_sys_fields, qtable, 've_config_sysfields', schema_name=schema_name)
 
 
     def manage_update_field(self, dialog, form_name, tableview):
@@ -3055,7 +3055,7 @@ class GwAdmin(ApiParent):
             expr_filter = "cat_feature_id = '" + form_name + "'"
 
         self.fill_table(qtable, tableview, self.model_update_table, expr_filter)
-        self.set_table_columns(dialog, qtable, tableview, schema_name=schema_name)
+        set_table_columns(dialog, qtable, tableview, schema_name=schema_name)
 
 
     def manage_delete_field(self, form_name):
@@ -3077,13 +3077,13 @@ class GwAdmin(ApiParent):
                    f"FROM {schema_name}.ve_config_addfields "
                    f"WHERE cat_feature_id = '" + form_name + "'")
 
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         qt_tools.set_item_data(self.dlg_manage_fields.cmb_fields, rows, 1)
 
 
     def manage_close_dlg(self, dlg_to_close):
 
-        self.close_dialog(dlg_to_close)
+        self.close_dialog_admin(dlg_to_close)
         if dlg_to_close.objectName() == 'dlg_man_sys_fields':
             self.update_sys_fields()
         elif dlg_to_close.objectName() == 'dlg_man_addfields':
@@ -3123,7 +3123,7 @@ class GwAdmin(ApiParent):
         self.controller.execute_sql(sql)
 
         # Close dialog
-        self.close_dialog(self.dlg_manage_sys_fields)
+        self.close_dialog_admin(self.dlg_manage_sys_fields)
         self.update_sys_fields()
 
 
@@ -3135,7 +3135,7 @@ class GwAdmin(ApiParent):
         param_name = qt_tools.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.columnname)
         sql = (f"SELECT param_name FROM {schema_name}.sys_addfields "
                f"WHERE param_name = '{param_name}' AND  cat_feature_id = '{form_name}' ")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
 
         if action == 'create':
 
@@ -3172,7 +3172,7 @@ class GwAdmin(ApiParent):
                         value = qt_tools.get_item_data(self.dlg_manage_fields, widget, 0)
                     elif type(widget) is QCheckBox:
                         value = qt_tools.isChecked(self.dlg_manage_fields, widget)
-                    elif type(widget) is QgsDateTimeEdit :
+                    elif type(widget) is QgsDateTimeEdit:
                         value = qt_tools.getCalendarDate(self.dlg_manage_fields, widget)
                     elif type(widget) is QPlainTextEdit:
                         value = widget.document().toPlainText()
@@ -3185,7 +3185,7 @@ class GwAdmin(ApiParent):
             feature = '"catFeature":"' + form_name + '"'
             extras = '"action":"CREATE", "multi_create":' + \
                 str(self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
-            body = self.create_body(feature=feature, extras=extras)
+            body = create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
@@ -3227,7 +3227,7 @@ class GwAdmin(ApiParent):
             feature = '"catFeature":"' + form_name + '"'
             extras = '"action":"UPDATE"'
             extras += ', "multi_create":' + str(self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
-            body = self.create_body(feature=feature, extras=extras)
+            body = create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
@@ -3245,7 +3245,7 @@ class GwAdmin(ApiParent):
             feature = '"catFeature":"' + form_name + '"'
             extras = '"action":"DELETE", "multi_create":' + str(
                 self.chk_multi_insert).lower() + ',"parameters":{"columnname":"' + field_value + '"}'
-            body = self.create_body(feature=feature, extras=extras)
+            body = create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
             json_result = self.controller.get_json('gw_fct_admin_manage_addfields', body,
@@ -3253,7 +3253,7 @@ class GwAdmin(ApiParent):
             self.manage_json_message(json_result, parameter="Delete function")
 
         # Close dialog
-        self.close_dialog(self.dlg_manage_fields)
+        self.close_dialog_admin(self.dlg_manage_fields)
 
         if action == 'update':
             self.open_manage_field('update')
@@ -3377,7 +3377,7 @@ class GwAdmin(ApiParent):
                 dialog.setWindowTitle(function[0]['alias'])
                 dialog.txt_info.setText(str(function[0]['descript']))
                 self.function_list = []
-                self.construct_form_param_user(dialog, function, 0, self.function_list)
+                construct_form_param_user(dialog, function, 0, self.function_list)
                 status = True
                 break
 
@@ -3388,7 +3388,7 @@ class GwAdmin(ApiParent):
 
         for k, v in list(data.items()):
             if str(k) == "info":
-                self.add_layer.populate_info_text(dialog, data)
+                populate_info_text(dialog, data)
 
 
     def manage_result_message(self, status, msg_ok=None, msg_error=None, parameter=None):
@@ -3425,9 +3425,8 @@ class GwAdmin(ApiParent):
         # Save last Project schema name and type selected
         schema_name = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         project_type = qt_tools.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-
-        self.controller.plugin_settings_set_value('last_project_type_selected', project_type)
-        self.controller.plugin_settings_set_value('last_schema_name_selected', schema_name)
+        set_parser_value('admin', 'last_project_type_selected', f'{project_type}')
+        set_parser_value('admin', 'last_schema_name_selected', f'{schema_name}')
 
 
     def create_credentials_form(self, set_connection):
@@ -3446,7 +3445,7 @@ class GwAdmin(ApiParent):
         self.dlg_credentials.btn_accept.clicked.connect(partial(self.set_credentials, self.dlg_credentials))
         self.dlg_credentials.cmb_connection.currentIndexChanged.connect(
             partial(self.set_credentials, self.dlg_credentials, new_connection=True))
-        self.open_dialog(self.dlg_credentials, dlg_name='main_credentials', maximize_button=False)
+        open_dialog(self.dlg_credentials, dlg_name='main_credentials', maximize_button=False)
 
 
     def manage_user_params(self):

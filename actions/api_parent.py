@@ -111,7 +111,7 @@ class ApiParent(ParentAction):
         sql = (f"SELECT DISTINCT({field_object_id})"
                f" FROM {table_object}")
 
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if rows is None:
             return
 
@@ -367,7 +367,6 @@ class ApiParent(ParentAction):
             return
 
         layer = self.iface.activeLayer()
-        layername = layer.name()
 
         # Get the point. Leave selection
         snapped_feature = self.snapper_manager.get_snapped_feature(result, True)
@@ -404,7 +403,7 @@ class ApiParent(ParentAction):
         for i in range(0, len(fields)):
             if fields[i].name() == 'sector_id' or fields[i].name() == 'dma_id' or fields[i].name() == 'expl_id' \
                     or fields[i].name() == 'state' or fields[i].name() == 'state_type' \
-                    or fields[i].name() == layername + '_workcat_id' or fields[i].name() == layername + '_builtdate' \
+                    or fields[i].name() == 'workcat_id' or fields[i].name() == 'builtdate' \
                     or fields[i].name() == 'verified' or fields[i].name() == str(self.geom_type) + 'cat_id':
                 snapped_feature_attr_aux.append(snapped_feature_attr[i])
                 fields_aux.append(fields[i].name())
@@ -433,6 +432,8 @@ class ApiParent(ParentAction):
                     qt_tools.setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
                 elif qt_tools.getWidgetType(dialog, widget) is QComboBox:
                     qt_tools.set_combo_itemData(widget, str(snapped_feature_attr_aux[i]), 0)
+                elif qt_tools.getWidgetType(dialog, widget) is QgsDateTimeEdit:
+                    qt_tools.setCalendarDate(dialog, widget, snapped_feature_attr_aux[i])
 
         self.api_disable_copy_paste(dialog)
 
@@ -1151,7 +1152,7 @@ class ApiParent(ParentAction):
             extras += f'"node1":"{self.node1}", '
             extras += f'"node2":"{self.node2}"}}'
             body = self.create_body(extras=extras)
-            self.interpolate_result = self.controller.get_json('gw_fct_node_interpolate', body, log_sql=True)
+            self.interpolate_result = self.controller.get_json('gw_fct_node_interpolate', body)
             self.add_layer.populate_info_text(self.dlg_dtext, self.interpolate_result['body']['data'])
 
 
@@ -1594,7 +1595,7 @@ class ApiParent(ParentAction):
             extras += f'"{widget_name}":"{value}", '
         extras = extras[:-2]
         body = self.create_body(extras)
-        result = self.controller.get_json('gw_fct_check_importdxf', None, log_sql=True)
+        result = self.controller.get_json('gw_fct_check_importdxf', None)
         if not result:
             return False
 
@@ -1650,7 +1651,7 @@ class ApiParent(ParentAction):
             form = f'"currentTab":"{current_tab}"'
             extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
             body = self.create_body(form=form, extras=extras)
-            json_result = self.controller.get_json('gw_fct_getselectors', body, log_sql=True)
+            json_result = self.controller.get_json('gw_fct_getselectors', body)
         else:
             json_result = is_setselector
             for x in range(dialog.main_tab.count() - 1, -1, -1):
@@ -1838,7 +1839,7 @@ class ApiParent(ParentAction):
                 f'"addSchema":"{qgis_project_add_schema}"'
 
         body = self.create_body(extras=extras)
-        json_result = self.controller.get_json('gw_fct_setselectors', body, log_sql=True)
+        json_result = self.controller.get_json('gw_fct_setselectors', body)
 
         if str(tab_name) == 'tab_exploitation':
             # Reload layer, zoom to layer, style mapzones and refresh canvas

@@ -13,10 +13,12 @@ import json
 import threading
 from collections import OrderedDict
 
-from ..actions.parent import ParentAction
+from .. import global_vars
+
+from ..actions.parent_functs import create_body
 
 
-class GwNotifyTools(ParentAction):
+class GwNotifyTools:
     # :var conn_failed: some times, when user click so fast 2 actions, LISTEN channel is stopped, and we need to
     #                   re-LISTEN all channels
 
@@ -25,15 +27,14 @@ class GwNotifyTools(ParentAction):
     conn_failed = False
     list_channels = None
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
         """ Class to control notify from PostgresSql """
 
-        ParentAction.__init__(self, iface, settings, controller, plugin_dir)
-        self.iface = iface
-        self.canvas = self.iface.mapCanvas()
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir
+        self.iface = global_vars.iface
+        self.canvas = global_vars.canvas
+        self.settings = global_vars.settings
+        self.controller = global_vars.controller
+        self.plugin_dir = global_vars.plugin_dir
 
 
     def start_listening(self, list_channels):
@@ -120,7 +121,7 @@ class GwNotifyTools(ParentAction):
 
     def execute_functions(self, complet_result):
         """
-        functions called in -> getattr(self.controller.gw_actions, function_name)(**params)
+        functions called in -> getattr(self.controller.gw_infotools, function_name)(**params)
             def set_layer_index(self, **kwargs)
             def refresh_attribute_table(self, **kwargs)
             def refresh_canvas(self, **kwargs)
@@ -178,8 +179,8 @@ class GwNotifyTools(ParentAction):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
-            body = self.create_body(feature=feature, extras=extras)
-            result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True, log_sql=True)
+            body = create_body(feature=feature, extras=extras)
+            result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True)
             if not result:
                 continue
             for field in result['body']['data']['fields']:

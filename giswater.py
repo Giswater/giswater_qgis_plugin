@@ -14,10 +14,10 @@ import os.path
 import sys
 
 from . import global_vars
-from .lib.qgis_tools import QgisTools
 from .core.load_project import LoadProject
 from .core.admin import GwAdmin
 from .dao.controller import DaoController
+from .lib.qgis_tools import get_value_from_metadata
 
 
 class Giswater(QObject):
@@ -45,14 +45,29 @@ class Giswater(QObject):
         self.action = None
         self.action_info = None
         self.toolButton = None
-        self.gw_actions = None
 
-        # Initialize plugin directory
+
+    def initGui(self):
+        """ Create the menu entries and toolbar icons inside the QGIS GUI """
+
+        # Initialize plugin
+        self.init_plugin()
+
+        # Force project read (to work with PluginReloader)
+        self.project_read(False)
+
+
+    def init_plugin(self):
+        """ Plugin main initialization function """
+
+        # Initialize plugin global variables
         self.plugin_dir = os.path.dirname(__file__)
-        self.qgis_tools = QgisTools(iface, self.plugin_dir)
-        global_vars.init_qgis_tools(self.qgis_tools)
-        self.plugin_name = self.qgis_tools.get_value_from_metadata('name', 'giswater')
+        global_vars.plugin_dir = self.plugin_dir
+        global_vars.iface = self.iface
+        self.plugin_name = get_value_from_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
+
+        global_vars.init_global(self.iface, self.iface.mapCanvas(), self.plugin_dir, self.plugin_name)
 
         # Check if config file exists
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
@@ -64,15 +79,28 @@ class Giswater(QObject):
         # Set plugin and QGIS settings: stored in the registry (on Windows) or .ini file (on Unix)
         global_vars.init_settings(setting_file)
         global_vars.init_qgis_settings(self.plugin_name)
-        global_vars.plugin_settings_set_value('aaa', 'vbrgs')
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
-        enable_python_console = global_vars.settings.value('system_variables/enable_python_console', 'FALSE').upper()
-        if enable_python_console == 'TRUE':
-            self.qgis_tools.enable_python_console()
+        # python_enable_console = global_vars.settings.value('system_variables/enable_python_console', 'FALSE').upper()
+        # if python_enable_console == 'TRUE':
+        #     enable_python_console()
 
         # Define signals
         self.set_signals()
+
+        # Set controller (no database connection yet)
+        self.controller = DaoController(self.plugin_name, self.iface, create_logger=True)
+        self.controller.set_plugin_dir(self.plugin_dir)
+        global_vars.controller = self.controller
+
+        # Set main information button (always visible)
+        self.set_info_button()
+
+        # Manage section 'actions_list' of config file
+        self.manage_section_actions_list()
+
+        # Manage section 'toolbars' of config file
+        self.manage_section_toolbars()
 
 
     def set_signals(self):
@@ -100,7 +128,7 @@ class Giswater(QObject):
             self.action = QAction("Show info", self.iface.mainWindow())
 
         self.toolButton.setDefaultAction(self.action)
-        self.update_sql = GwAdmin(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.update_sql = GwAdmin()
         self.action.triggered.connect(self.update_sql.init_sql)
 
 
@@ -113,33 +141,6 @@ class Giswater(QObject):
             self.iface.removeToolBarIcon(self.action_info)
         self.action = None
         self.action_info = None
-
-
-    def initGui(self):
-        """ Create the menu entries and toolbar icons inside the QGIS GUI """
-
-        # Initialize plugin
-        self.init_plugin()
-
-        # Force project read (to work with PluginReloader)
-        self.project_read(False)
-
-
-    def init_plugin(self):
-        """ Plugin main initialization function """
-
-        # Set controller (no database connection yet)
-        self.controller = DaoController(self.plugin_name, self.iface, create_logger=True)
-        self.controller.set_plugin_dir(self.plugin_dir)
-
-        # Set main information button (always visible)
-        self.set_info_button()
-
-        # Manage section 'actions_list' of config file
-        self.manage_section_actions_list()
-
-        # Manage section 'toolbars' of config file
-        self.manage_section_toolbars()
 
 
     def manage_section_actions_list(self):
@@ -198,7 +199,7 @@ class Giswater(QObject):
         self.unload(False)
 
         # Create class to manage code that performs project configuration
-        self.load_project = LoadProject(self.iface, global_vars.settings, self.controller, self.plugin_dir)
+        self.load_project = LoadProject()
         self.load_project.project_read(show_warning)
 
 
@@ -226,15 +227,14 @@ class Giswater(QObject):
         if len(own_toolbars) == 0:
             return
 
+        sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
+
         # Check if section toolbars_position exists in file
         if 'toolbars_position' not in parser:
             parser = configparser.RawConfigParser()
             parser.add_section('toolbars_position')
 
-        # Save position of Giswater toolbars
-        for w in own_toolbars:
-            parser['toolbars_position'][f'pos_{x}'] = f"{w.property('gw_name')},{w.x()},{w.y()}"
-            x += 1
+        parser['toolbars_position']['toolbars_order'] = ",".join(sorted_toolbar_ids)
 
         with open(path, 'w') as configfile:
             parser.write(configfile)

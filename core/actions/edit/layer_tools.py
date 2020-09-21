@@ -16,18 +16,20 @@ import os
 from random import randrange
 
 from lib import qt_tools
+from .... import global_vars
 
 
-class GwLayerTools(object):
+class GwLayerTools:
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
 
         # Initialize instance attributes
-        self.iface = iface
-        self.canvas = self.iface.mapCanvas()
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir
+        self.iface = global_vars.iface
+        self.canvas = global_vars.canvas
+        self.settings = global_vars.settings
+        self.controller = global_vars.controller
+        self.plugin_dir = global_vars.plugin_dir
+
         self.dao = self.controller.dao
         self.schema_name = self.controller.schema_name
         self.project_type = None
@@ -80,7 +82,7 @@ class GwLayerTools(object):
         """
 
         sql = f'DROP TABLE "{layer.name()}";'
-        self.controller.execute_sql(sql, log_sql=True)
+        self.controller.execute_sql(sql)
 
         schema_name = self.controller.credentials['schema'].replace('"', '')
         self.set_uri()
@@ -116,7 +118,7 @@ class GwLayerTools(object):
                     style_id = layer[3]
                     if style_id is not None:
                         body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-                        style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                        style = self.controller.get_json('gw_fct_getstyle', body)
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']
@@ -130,7 +132,7 @@ class GwLayerTools(object):
             # therefore, we define it with "-1"
             if style_id not in (None, "-1"):
                 body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-                style = self.controller.get_json('gw_fct_getstyle', body, log_sql=True)
+                style = self.controller.get_json('gw_fct_getstyle', body)
                 if 'styles' in style['body']:
                     if 'style' in style['body']['styles']:
                         qml = style['body']['styles']['style']
@@ -186,7 +188,7 @@ class GwLayerTools(object):
 
         text_result = None
         temp_layers_added = []
-        srid = self.controller.plugin_settings_value('srid')
+        srid = global_vars.srid
         for k, v in list(data.items()):
             if str(k) == "info":
                 text_result = self.populate_info_text(dialog, data, force_tab, reset_text, tab_idx, disable_tabs)

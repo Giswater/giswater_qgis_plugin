@@ -12,8 +12,8 @@ import os.path
 import sys
 
 from giswater_qgis_plugin.dao.controller import DaoController
-from giswater_qgis_plugin.actions.update_sql import UpdateSQL
-from giswater_qgis_plugin.actions.manage_visit import ManageVisit
+from giswater_qgis_plugin.core.admin import GwAdmin
+from giswater_qgis_plugin.core.actions.om.visit_manager import GwVisitManager
 
 
 class TestGiswater(QObject):
@@ -31,7 +31,7 @@ class TestGiswater(QObject):
         # Initialize instance attributes
         self.iface = iface
         self.controller = None
-        self.update_sql = None
+        self.gw_admin = None
 
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(os.path.dirname(__file__))
@@ -62,14 +62,12 @@ class TestGiswater(QObject):
         # Set controller (no database connection yet)
         self.controller = DaoController(self.settings, self.plugin_name, self.iface, create_logger=True)
         self.controller.set_plugin_dir(self.plugin_dir)
-        self.controller.set_qgis_settings(self.qgis_settings)
-        self.controller.set_giswater(self)
         if schema_name:
             self.controller.set_schema_name(schema_name)
 
         # Set test classes
-        self.update_sql = UpdateSQL(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.gw_admin = GwAdmin(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.visit_manager = GwVisitManager(self.iface, self.settings, self.controller, self.plugin_dir)
 
 
     def get_value_from_metadata(self, parameter, default_value):

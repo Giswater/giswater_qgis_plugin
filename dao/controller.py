@@ -15,7 +15,6 @@ from qgis.PyQt.QtWidgets import QCheckBox, QGroupBox, QLabel, QMessageBox, QPush
 import configparser
 import json
 import os
-
 from collections import OrderedDict
 from functools import partial
 import inspect
@@ -27,16 +26,19 @@ from .pg_dao import PgDao
 from .logger import Logger
 from lib import os_tools, qt_tools
 from ..ui_manager import DialogTextUi, DockerUi
+from ..actions.parent_functs import manage_return_manager, manage_layer_manager, manage_actions
+from ..lib.qgis_tools import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
+    qgis_get_layer_primary_key, qgis_get_layers
+from ..core.utils.giswater_tools import get_parser_value, set_parser_value
 
 
-class DaoController(object):
+class DaoController:
 
     def __init__(self, plugin_name, iface, logger_name='plugin', create_logger=True):
         """ Class constructor """
 
         self.settings = global_vars.settings
         self.qgis_settings = global_vars.qgis_settings
-        self.qgis_tools = global_vars.qgis_tools
         self.plugin_name = plugin_name
         self.iface = iface
         self.translator = None
@@ -58,8 +60,8 @@ class DaoController(object):
         self.docker_type = None
         self.show_docker = None
         self.prev_maptool = None
-        self.parent = None
         self.gw_infotools = None
+
         if create_logger:
             self.set_logger(logger_name)
 
@@ -764,7 +766,7 @@ class DaoController(object):
 
 
     def get_json(self, function_name, parameters=None, schema_name=None, commit=True, log_sql=False,
-                 log_result=False, json_loads=False, is_notify=False):
+                 log_result=False, json_loads=False, is_notify=False, rubber_band=None):
         """ Manage execution API function
         :param function_name: Name of function to call (text)
         :param parameters: Parameters for function (json) or (query parameters)
@@ -812,9 +814,9 @@ class DaoController(object):
 
         try:
             # Layer styles
-            self.parent.manage_return_manager(json_result, sql)
-            self.parent.manage_layer_manager(json_result, sql)
-            self.parent.manage_actions(json_result, sql)
+            manage_return_manager(json_result, sql, rubber_band)
+            manage_layer_manager(json_result, sql)
+            manage_actions(json_result, sql)
         except Exception:
             pass
 
@@ -919,7 +921,6 @@ class DaoController(object):
 
         except Exception as e:
             self.log_info(f"{widget_name} --> {type(e).__name__} --> {e}")
-            pass
 
 
     def get_layer_by_layername(self, layername, log_info=False):
@@ -938,25 +939,25 @@ class DaoController(object):
     def get_layer_by_tablename(self, tablename, show_warning=False, log_info=False):
         """ Iterate over all layers and get the one with selected @tablename """
 
-        return self.qgis_tools.qgis_get_layer_by_tablename(tablename, show_warning, log_info)
+        return qgis_get_layer_by_tablename(tablename, show_warning, log_info)
 
 
     def get_layer_source(self, layer):
         """ Get database connection paramaters of @layer """
 
-        return self.qgis_tools.qgis_get_layer_source(layer)
+        return qgis_get_layer_source(layer)
 
 
     def get_layer_source_table_name(self, layer):
         """ Get table or view name of selected layer """
 
-        return self.qgis_tools.qgis_get_layer_source_table_name(layer)
+        return qgis_get_layer_source_table_name(layer)
 
 
     def get_layer_primary_key(self, layer=None):
         """ Get primary key of selected layer """
 
-        return self.qgis_tools.qgis_get_layer_primary_key(layer)
+        return qgis_get_layer_primary_key(layer)
 
 
     def get_project_user(self):
@@ -1309,7 +1310,7 @@ class DaoController(object):
                "UNION SELECT DISTINCT parent_layer "
                "FROM cat_feature "
                "WHERE upper(feature_type) = '" + geom_type.upper() + "';")
-        rows = self.get_rows(sql, log_sql=True)
+        rows = self.get_rows(sql)
         if rows:
             for row in rows:
                 layer = self.get_layer_by_tablename(row[0])
@@ -1322,7 +1323,7 @@ class DaoController(object):
     def check_role(self, role_name):
         """ Check if @role_name exists """
 
-        sql = f"SELECT * FROM pg_roles WHERE lower(rolname) = '{role_name}'"
+        sql = f"SELECT * FROM pg_roles WHERE rolname = '{role_name}'"
         row = self.get_row(sql, log_info=False)
         return row
 
@@ -1448,14 +1449,14 @@ class DaoController(object):
     def get_layers(self):
         """ Return layers in the same order as listed in TOC """
 
-        return self.qgis_tools.qgis_get_layers()
+        return qgis_get_layers()
 
 
     def set_search_path(self, schema_name):
         """ Set parameter search_path for current QGIS project """
 
         sql = f"SET search_path = {schema_name}, public;"
-        self.execute_sql(sql, log_sql=True)
+        self.execute_sql(sql)
 
 
     def set_path_from_qfiledialog(self, qtextedit, path):
@@ -1755,32 +1756,35 @@ class DaoController(object):
         """ Save QDockWidget position (1=Left, 2=Right, 4=Top, 8=Bottom),
             remove from iface and del class
         """
-
-        if self.dlg_docker:
-            if not self.dlg_docker.isFloating():
-                cur_user = self.get_current_user()
-                docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
-                self.plugin_settings_set_value(f"docker_info_{cur_user}", docker_pos)
-                widget = self.dlg_docker.widget()
-                if widget:
-                    widget.close()
-                    del widget
-                    self.dlg_docker.setWidget(None)
-                    self.docker_type = None
-                self.iface.removeDockWidget(self.dlg_docker)
+        try:
+            if self.dlg_docker:
+                if not self.dlg_docker.isFloating():
+                    docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
+                    widget = self.dlg_docker.widget()
+                    if widget:
+                        widget.close()
+                        del widget
+                        self.dlg_docker.setWidget(None)
+                        self.docker_type = None
+                        set_parser_value('docker_info', 'position', f'{docker_pos}')
+                    self.iface.removeDockWidget(self.dlg_docker)
+                    self.dlg_docker = None
+        except AttributeError:
+            self.docker_type = None
+            self.dlg_docker = None
 
 
     def manage_docker_options(self):
         """ Check if user want dock the dialog or not """
 
         # Load last docker position
-        cur_user = self.get_current_user()
-        pos = self.plugin_settings_value(f"docker_info_{cur_user}")
-
-        # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
-        self.dlg_docker.position = 2
-        if type(pos) is int and pos in (1, 2, 4, 8):
-            self.dlg_docker.position = pos
+        try:
+            # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
+            pos = int(get_parser_value('docker_info', 'position'))
+            if pos in (1, 2, 4, 8):
+                self.dlg_docker.position = pos
+        except:
+            self.dlg_docker.position = 2
 
         # TODO: Check this
         # If user want to dock the dialog, we reset rubberbands for each info

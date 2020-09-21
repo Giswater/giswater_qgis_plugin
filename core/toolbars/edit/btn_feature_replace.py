@@ -6,26 +6,31 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QCompleter
-from qgis.PyQt.QtCore import QDate, QStringListModel
+from qgis.PyQt.QtCore import QDate, QStringListModel, Qt
 
 import json
 from collections import OrderedDict
 from datetime import datetime
+from functools import partial
 
+from ....actions.api_parent_functs import create_body
 from ....ui_manager import FeatureReplace, InfoWorkcatUi
 from ...actions.basic.catalog import GwCatalog
-from ...utils.giswater_tools import *
-
+from ...utils.layer_tools import populate_info_text
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, refresh_legend
+from ....lib import qt_tools
+from ....lib.qgis_tools import get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
+    get_snapped_feature, get_snapping_options, enable_snapping, snap_to_node, snap_to_connec_gully, set_snapping_mode
 from ..parent_maptool import GwParentMapTool
 
 
 class GwFeatureReplaceButton(GwParentMapTool):
     """ Button 44: User select one feature. Execute SQL function: 'gw_fct_feature_replace' """
 
-    def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
+    def __init__(self, icon_path, text, toolbar, action_group):
         """ Class constructor """
 
-        super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
+        super().__init__(icon_path, text, toolbar, action_group)
         self.current_date = QDate.currentDate().toString('yyyy-MM-dd')
         self.project_type = None
         self.geom_type = None
@@ -53,7 +58,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
         # Create the dialog and signals
         self.dlg_replace = FeatureReplace()
-        load_settings(self.dlg_replace, self.controller)
+        load_settings(self.dlg_replace)
 
         sql = "SELECT id FROM cat_work ORDER BY id"
         rows = self.controller.get_rows(sql)
@@ -116,10 +121,10 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg_replace.btn_accept.clicked.connect(partial(self.get_values, self.dlg_replace))
-        self.dlg_replace.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_replace, self.controller))
+        self.dlg_replace.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_replace))
         self.dlg_replace.rejected.connect(self.cancel_map_tool)
         # Open dialog
-        open_dialog(self.dlg_replace, self.controller, maximize_button=False)
+        open_dialog(self.dlg_replace, maximize_button=False)
 
 
     def open_catalog(self):
@@ -134,7 +139,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         sql = f"SELECT lower(feature_type) FROM cat_feature WHERE id = '{feature_type}'"
         row = self.controller.get_row(sql)
 
-        self.catalog = GwCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.catalog = GwCatalog()
         self.catalog.api_catalog(self.dlg_replace, 'featurecat_id', row[0], feature_type)
 
 
@@ -164,7 +169,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
     def new_workcat(self):
 
         self.dlg_new_workcat = InfoWorkcatUi()
-        load_settings(self.dlg_new_workcat, self.controller)
+        load_settings(self.dlg_new_workcat)
         qt_tools.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
 
         table_object = "cat_work"
@@ -172,10 +177,10 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
         # Set signals
         self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
-        self.dlg_new_workcat.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_new_workcat, self.controller))
+        self.dlg_new_workcat.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_new_workcat))
 
         # Open dialog
-        open_dialog(self.dlg_new_workcat, self.controller, dlg_name='info_workcat')
+        open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
 
 
     def manage_new_workcat_accept(self, table_object):
@@ -223,7 +228,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                 row = self.controller.get_row(sql, log_info=False)
                 if row is None:
                     sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
-                    self.controller.execute_sql(sql, log_sql=True)
+                    self.controller.execute_sql(sql)
 
                     sql = "SELECT id FROM cat_work ORDER BY id"
                     rows = self.controller.get_rows(sql)
@@ -232,7 +237,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                         current_index = self.dlg_replace.workcat_id_end.findText(str(cat_work_id))
                         self.dlg_replace.workcat_id_end.setCurrentIndex(current_index)
 
-                    close_dialog(self.dlg_new_workcat, self.controller)
+                    close_dialog(self.dlg_new_workcat, self.controller.plugin_name)
                 else:
                     msg = "This Workcat is already exist"
                     self.controller.show_info_box(msg, "Warning")
@@ -296,13 +301,13 @@ class GwFeatureReplaceButton(GwParentMapTool):
             # Execute SQL function and show result to the user
             function_name = "gw_fct_feature_replace"
             sql = f"SELECT {function_name}({body})::text"
-            row = self.controller.get_row(sql, log_sql=True)
+            row = self.controller.get_row(sql)
             if not row:
                 message = "Error replacing feature"
                 self.controller.show_warning(message)
                 self.deactivate()
                 self.set_action_pan()
-                close_dialog(dialog, self.controller, set_action_pan=False)
+                close_dialog(dialog, self.controller.plugin_name)
                 return
 
             complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -332,12 +337,12 @@ class GwFeatureReplaceButton(GwParentMapTool):
                         sql = (f"UPDATE {self.geom_view} "
                                f"SET {field_cat_id} = '{featurecat_id}' "
                                f"WHERE {self.geom_type}_id = '{row[0]}'")
-                    self.controller.execute_sql(sql, log_sql=True)
+                    self.controller.execute_sql(sql)
                     if self.project_type == 'ud':
                         sql = (f"UPDATE {self.geom_view} "
                                f"SET {self.geom_type}_type = '{feature_type_new}' "
                                f"WHERE {self.geom_type}_id = '{row[0]}'")
-                        self.controller.execute_sql(sql, log_sql=True)
+                        self.controller.execute_sql(sql)
 
                 message = "Values has been updated"
                 self.controller.show_info(message)
@@ -376,15 +381,15 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
         # Hide marker and get coordinates
         self.vertex_marker.hide()
-        event_point = self.snapper_manager.get_event_point(event)
+        event_point = get_event_point(event)
 
         # Snapping layers 'v_edit_'
-        result = self.snapper_manager.snap_to_background_layers(event_point)
-        if self.snapper_manager.result_is_valid():
-            layer = self.snapper_manager.get_snapped_layer(result)
+        result = snap_to_background_layers(event_point)
+        if result.isValid():
+            layer = get_snapped_layer(result)
             tablename = self.controller.get_layer_source_table_name(layer)
             if tablename and 'v_edit' in tablename:
-                self.snapper_manager.add_marker(result, self.vertex_marker)
+                add_marker(result, self.vertex_marker)
 
 
     def canvasReleaseEvent(self, event):
@@ -393,17 +398,17 @@ class GwFeatureReplaceButton(GwParentMapTool):
             self.cancel_map_tool()
             return
 
-        event_point = self.snapper_manager.get_event_point(event)
+        event_point = get_event_point(event)
 
         # Snapping
-        result = self.snapper_manager.snap_to_background_layers(event_point)
-        if not self.snapper_manager.result_is_valid():
+        result = snap_to_background_layers(event_point)
+        if not result.isValid():
             return
 
         # Get snapped feature
-        snapped_feat = self.snapper_manager.get_snapped_feature(result)
+        snapped_feat = get_snapped_feature(result)
         if snapped_feat:
-            layer = self.snapper_manager.get_snapped_layer(result)
+            layer = get_snapped_layer(result)
             tablename = self.controller.get_layer_source_table_name(layer)
 
             if tablename and 'v_edit' in tablename:
@@ -432,20 +437,17 @@ class GwFeatureReplaceButton(GwParentMapTool):
         # Check button
         self.action.setChecked(True)
 
-        # Set main snapping layers
-        self.snapper_manager.set_snapping_layers()
-
         # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
+        self.previous_snapping = get_snapping_options()
 
         # Disable snapping
-        self.snapper_manager.enable_snapping()
+        enable_snapping()
 
         # Set snapping to 'node', 'connec' and 'gully'
-        self.snapper_manager.snap_to_node()
-        self.snapper_manager.snap_to_connec_gully()
+        snap_to_node()
+        snap_to_connec_gully()
 
-        self.snapper_manager.set_snapping_mode()
+        set_snapping_mode()
 
         # Change cursor
         self.canvas.setCursor(self.cursor)

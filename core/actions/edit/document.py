@@ -10,20 +10,28 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 from functools import partial
 
 from lib import qt_tools
+from ...utils.giswater_tools import load_settings, open_dialog, close_dialog
 from ....ui_manager import DocUi, DocManager
-from ....actions.parent_manage import ParentManage
+from .... import global_vars
+from ....actions.parent_functs import set_icon, open_web_browser, get_file_dialog
+from ....actions.parent_manage_funct import set_selectionbehavior, remove_selection, \
+    populate_combo, set_completer_object, set_completer_feature_id, manage_close, tab_feature_changed, exist_object, \
+    insert_feature, delete_records, selection_init, set_model_to_table, fill_table_object, set_table_columns, \
+    filter_by_id, delete_selected_object
 
 
-class GwDocument(ParentManage):
+class GwDocument:
 
-    def __init__(self, iface, settings, controller, plugin_dir, single_tool=True):
+    def __init__(self, single_tool=True):
         """ Class to control action 'Add document' of toolbar 'edit' """
-        ParentManage.__init__(self, iface, settings, controller, plugin_dir)
 
         # parameter to set if the document manager is working as
         # single tool or integrated in another tool
         self.single_tool_mode = single_tool
         self.previous_dialog = None
+        self.iface = global_vars.iface
+        self.controller = global_vars.controller
+        self.schema_name = global_vars.schema_name
 
 
     def edit_add_file(self):
@@ -35,17 +43,33 @@ class GwDocument(ParentManage):
 
         # Create the dialog and signals
         self.dlg_add_doc = DocUi()
-        self.load_settings(self.dlg_add_doc)
+        load_settings(self.dlg_add_doc)
         self.doc_id = None
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
 
-        self.set_selectionbehavior(self.dlg_add_doc)
+        set_selectionbehavior(self.dlg_add_doc)
 
         # Get layers of every geom_type
-        self.reset_lists()
-        self.reset_layers()
+
+        # Setting lists
+        self.ids = []
+        self.list_ids = {}
+        self.list_ids['arc'] = []
+        self.list_ids['node'] = []
+        self.list_ids['connec'] = []
+        self.list_ids['gully'] = []
+        self.list_ids['element'] = []
+
+        # Setting layers
+        self.layers = {}
+        self.layers['arc'] = []
+        self.layers['node'] = []
+        self.layers['connec'] = []
+        self.layers['gully'] = []
+        self.layers['element'] = []
+
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
@@ -60,18 +84,18 @@ class GwDocument(ParentManage):
 
         # Remove all previous selections
         if self.single_tool_mode:
-            self.remove_selection(True)
+            self.layers = remove_selection(True, layers=self.layers)
         if feature is not None:
             layer = self.iface.activeLayer()
             layer.selectByIds([feature.id()])
 
         # Set icons
-        self.set_icon(self.dlg_add_doc.btn_insert, "111")
-        self.set_icon(self.dlg_add_doc.btn_delete, "112")
-        self.set_icon(self.dlg_add_doc.btn_snapping, "137")
+        set_icon(self.dlg_add_doc.btn_insert, "111")
+        set_icon(self.dlg_add_doc.btn_delete, "112")
+        set_icon(self.dlg_add_doc.btn_snapping, "137")
 
         # Fill combo boxes
-        self.populate_combo(self.dlg_add_doc, "doc_type", "doc_type")
+        populate_combo(self.dlg_add_doc, "doc_type", "doc_type")
 
         # Set current/selected date and link
         if row:
@@ -82,29 +106,45 @@ class GwDocument(ParentManage):
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"
-        self.set_completer_object(self.dlg_add_doc, table_object)
+        set_completer_object(self.dlg_add_doc, table_object)
 
         # Adding auto-completion to a QLineEdit for default feature
         if geom_type is None:
             geom_type = "arc"
         viewname = f"v_edit_{geom_type}"
-        self.set_completer_feature_id(self.dlg_add_doc.feature_id, geom_type, viewname)
+        set_completer_feature_id(self.dlg_add_doc.feature_id, geom_type, viewname)
 
         # Set signals
-        self.dlg_add_doc.btn_path_url.clicked.connect(partial(self.open_web_browser, self.dlg_add_doc, "path"))
-        self.dlg_add_doc.btn_path_doc.clicked.connect(partial(self.get_file_dialog, self.dlg_add_doc, "path"))
+        self.dlg_add_doc.btn_path_url.clicked.connect(partial(open_web_browser, self.dlg_add_doc, "path"))
+        self.dlg_add_doc.btn_path_doc.clicked.connect(partial(get_file_dialog, self.dlg_add_doc, "path"))
         self.dlg_add_doc.btn_accept.clicked.connect(
             partial(self.manage_document_accept, table_object, tablename, qtable, item_id))
+        # TODO: Set variable  self.layers using return parameters
         self.dlg_add_doc.btn_cancel.clicked.connect(
-            partial(self.manage_close, self.dlg_add_doc, table_object, cur_active_layer, excluded_layers=["v_edit_element"]))
-        self.dlg_add_doc.rejected.connect(partial(self.manage_close, self.dlg_add_doc,
-                                          table_object, cur_active_layer, excluded_layers=["v_edit_element"]))
+            partial(manage_close, self.dlg_add_doc, table_object, cur_active_layer, excluded_layers=["v_edit_element"],
+                    single_tool_mode=self.single_tool_mode, layers=self.layers))
+        # TODO: Set variable  self.layers using return parameters
+        self.dlg_add_doc.rejected.connect(
+            partial(manage_close, self.dlg_add_doc, table_object, cur_active_layer, excluded_layers=["v_edit_element"],
+                    single_tool_mode=self.single_tool_mode, layers=self.layers))
         self.dlg_add_doc.tab_feature.currentChanged.connect(
-            partial(self.tab_feature_changed, self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"]))
-        self.dlg_add_doc.doc_id.textChanged.connect(partial(self.exist_object, self.dlg_add_doc, table_object))
-        self.dlg_add_doc.btn_insert.clicked.connect(partial(self.insert_feature, self.dlg_add_doc, table_object))
-        self.dlg_add_doc.btn_delete.clicked.connect(partial(self.delete_records, self.dlg_add_doc, table_object))
-        self.dlg_add_doc.btn_snapping.clicked.connect(partial(self.selection_init, self.dlg_add_doc, table_object))
+            partial(tab_feature_changed, self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"]))
+
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
+        self.dlg_add_doc.doc_id.textChanged.connect(partial(exist_object, self.dlg_add_doc, table_object,
+                                                            self.single_tool_mode, layers=self.layers, ids=self.ids,
+                                                            list_ids=self.list_ids))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
+        self.dlg_add_doc.btn_insert.clicked.connect(partial(insert_feature, self.dlg_add_doc, table_object,
+                                                            geom_type=geom_type, ids=self.ids, layers=self.layers,
+                                                            list_ids=self.list_ids))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
+        self.dlg_add_doc.btn_delete.clicked.connect(partial(delete_records, self.dlg_add_doc, table_object,
+                                                            geom_type=geom_type, layers=self.layers, ids=self.ids,
+                                                            list_ids=self.list_ids))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
+        self.dlg_add_doc.btn_snapping.clicked.connect(partial(selection_init, self.dlg_add_doc, table_object,
+                                                              geom_type=geom_type, layers=self.layers))
         if feature:
             self.dlg_add_doc.tabWidget.currentChanged.connect(
                 partial(self.fill_table_doc, self.dlg_add_doc, geom_type, feature[geom_type + "_id"]))
@@ -112,10 +152,10 @@ class GwDocument(ParentManage):
         # Set default tab 'arc'
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        self.tab_feature_changed(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"])
+        tab_feature_changed(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"])
 
         # Open the dialog
-        self.open_dialog(self.dlg_add_doc, dlg_name='doc', maximize_button=False)
+        open_dialog(self.dlg_add_doc, dlg_name='doc', maximize_button=False)
 
         return self.dlg_add_doc
 
@@ -129,7 +169,7 @@ class GwDocument(ParentManage):
 
         # Set model of selected widget
         table_name = f"{self.schema_name}.v_edit_{geom_type}"
-        self.set_model_to_table(widget, table_name, expr_filter)
+        set_model_to_table(widget, table_name, expr_filter)
 
 
     def manage_document_accept(self, table_object, tablename=None, qtable=None, item_id=None):
@@ -158,7 +198,7 @@ class GwDocument(ParentManage):
             if doc_id == 'null':
                 sql = (f"INSERT INTO doc (doc_type, path, observ, date)"
                        f" VALUES ('{doc_type}', '{path}', '{observ}', '{date}') RETURNING id;")
-                new_doc_id = self.controller.execute_returning(sql, log_sql=True)
+                new_doc_id = self.controller.execute_returning(sql)
                 sql = ""
                 doc_id = str(new_doc_id[0])
             else:
@@ -206,7 +246,8 @@ class GwDocument(ParentManage):
         status = self.controller.execute_sql(sql)
         if status:
             self.doc_id = doc_id
-            self.manage_close(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"])
+            manage_close(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"],
+                         single_tool_mode=self.single_tool_mode, layers=self.layers)
 
         if tablename is None:
             return
@@ -215,7 +256,7 @@ class GwDocument(ParentManage):
                    f" VALUES('{doc_id}', '{item_id}')")
             self.controller.execute_sql(sql)
             expr = f"{tablename}_id = '{item_id}'"
-            self.fill_table_object(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr_filter=expr)
+            fill_table_object(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr_filter=expr)
 
 
     def edit_document(self):
@@ -223,28 +264,51 @@ class GwDocument(ParentManage):
 
         # Create the dialog
         self.dlg_man = DocManager()
-        self.load_settings(self.dlg_man)
+        load_settings(self.dlg_man)
         self.dlg_man.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"
-        self.set_completer_object(self.dlg_man, table_object)
+        set_completer_object(self.dlg_man, table_object)
 
         # Set a model with selected filter. Attach that model to selected table
-        self.fill_table_object(self.dlg_man.tbl_document, self.schema_name + "." + table_object)
-        self.set_table_columns(self.dlg_man, self.dlg_man.tbl_document, table_object)
+        fill_table_object(self.dlg_man.tbl_document, self.schema_name + "." + table_object)
+        set_table_columns(self.dlg_man, self.dlg_man.tbl_document, table_object)
 
         # Set dignals
         self.dlg_man.doc_id.textChanged.connect(
-            partial(self.filter_by_id, self.dlg_man, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object))
+            partial(filter_by_id, self.dlg_man, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object))
         self.dlg_man.tbl_document.doubleClicked.connect(
-            partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_document, table_object))
-        self.dlg_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_man))
-        self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
+            partial(self.open_selected_object_document, self.dlg_man, self.dlg_man.tbl_document, table_object))
+        self.dlg_man.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_man))
+        self.dlg_man.rejected.connect(partial(close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(
-            partial(self.delete_selected_object, self.dlg_man.tbl_document, table_object))
+            partial(delete_selected_object, self.dlg_man.tbl_document, table_object))
 
         # Open form
-        self.open_dialog(self.dlg_man, dlg_name='doc_manager')
+        open_dialog(self.dlg_man, dlg_name='doc_manager')
+
+
+    def open_selected_object_document(self, dialog, widget, table_object):
+
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        row = selected_list[0].row()
+
+        # Get object_id from selected row
+        field_object_id = "id"
+        widget_id = table_object + "_id"
+        selected_object_id = widget.model().record(row).value(field_object_id)
+
+        # Close this dialog and open selected object
+        dialog.close()
+
+        self.manage_document(row=widget.model().record(row))
+        qt_tools.setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
+
 
 

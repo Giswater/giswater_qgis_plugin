@@ -11,18 +11,31 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.PyQt.QtGui import QColor
 
-from ..map_tools.snapping_utils_v3 import SnappingConfigManager
+from .parent_manage_funct import disconnect_signal_selection_changed, connect_signal_selection_changed
+from .. import global_vars
+from ..lib.qgis_tools import get_event_point, snap_to_background_layers, get_snapped_feature
 
 
 class MultipleSelection(QgsMapTool):
 
-    def __init__(self, iface, controller, layers,
+    def __init__(self, layers, geom_type,
                  mincut=None, parent_manage=None, manage_new_psector=None, table_object=None, dialog=None):
-        """ Class constructor """
+        """
+        Class constructor
+        :param layers: dict of list of layers {'arc': [v_edit_node, ...]}
+        :param geom_type:
+        :param mincut:
+        :param parent_manage:
+        :param manage_new_psector:
+        :param table_object:
+        :param dialog:
+        """
+
 
         self.layers = layers
-        self.iface = iface
-        self.canvas = self.iface.mapCanvas()
+        self.geom_type = geom_type
+        self.iface = global_vars.iface
+        self.canvas = global_vars.canvas
         self.mincut = mincut
         self.parent_manage = parent_manage
         self.manage_new_psector = manage_new_psector
@@ -32,17 +45,13 @@ class MultipleSelection(QgsMapTool):
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
 
-        self.controller = controller
+        self.controller = global_vars.controller
         self.rubber_band = QgsRubberBand(self.canvas, 2)
         self.rubber_band.setColor(QColor(255, 100, 255))
         self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
         self.rubber_band.setWidth(1)
         self.reset()
         self.selected_features = []
-
-        # Snapper
-        self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper = self.snapper_manager.get_snapper()
 
 
     def reset(self):
@@ -74,20 +83,19 @@ class MultipleSelection(QgsMapTool):
 
         # Disconnect signal to enhance process
         # We will reconnect it when processing last layer of the group
-        if self.mincut:
-            self.mincut.disconnect_signal_selection_changed()
-        if self.parent_manage:
-            self.parent_manage.disconnect_signal_selection_changed()
+        disconnect_signal_selection_changed()
+
         if self.manage_new_psector:
             self.manage_new_psector.disconnect_signal_selection_changed()
 
-        for i in range(len(self.layers)):
-            layer = self.layers[i]
-            if i == len(self.layers) - 1:
+        for i, layer in enumerate(self.layers[self.geom_type]):
+            if i == len(self.layers[self.geom_type]) - 1:
                 if self.mincut:
                     self.mincut.connect_signal_selection_changed("mincut_connec")
+
                 if self.parent_manage:
-                    self.parent_manage.connect_signal_selection_changed(self.dialog, self.table_object)
+                    connect_signal_selection_changed(self.dialog, self.table_object, layers=self.layers)
+
                 if self.manage_new_psector:
                     self.manage_new_psector.connect_signal_selection_changed(
                         self.manage_new_psector.dlg_plan_psector, self.table_object)
@@ -108,11 +116,11 @@ class MultipleSelection(QgsMapTool):
 
             # Selection one by one
             else:
-                event_point = self.snapper_manager.get_event_point(event)
-                result = self.snapper_manager.snap_to_background_layers(event_point)
-                if self.snapper_manager.result_is_valid():
+                event_point = get_event_point(event)
+                result = snap_to_background_layers(event_point)
+                if result.isValid():
                     # Get the point. Leave selection
-                    self.snapper_manager.get_snapped_feature(result, True)
+                    get_snapped_feature(result, True)
 
         self.rubber_band.hide()
 

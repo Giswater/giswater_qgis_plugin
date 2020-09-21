@@ -8,8 +8,8 @@ or (at your option) any later version.
 from qgis.core import QgsApplication, QgsProviderRegistry
 from qgis.PyQt.QtWidgets import QDialog
 
-from test_giswater import TestGiswater
-from actions.create_gis_project import CreateGisProject
+from test.test_giswater import TestGiswater
+from core.admin_gis_project import GwAdminGisProject
 
 
 # dummy instance to replace qgis.utils.iface
@@ -83,13 +83,13 @@ class TestQgis:
         if not self.connect_to_database(self.service_name):
             return False
 
-        self.test_giswater.update_sql.init_sql(False, self.user, show_dialog=False)
-        self.test_giswater.update_sql.init_dialog_create_project(project_type)
+        self.test_giswater.gw_admin.init_sql(False, self.user, show_dialog=False)
+        self.test_giswater.gw_admin.init_dialog_create_project(project_type)
         if project_name is None:
             project_name = f"test_{project_type}"
         if project_title is None:
             project_title = f"test_{project_type}"
-        self.test_giswater.update_sql.create_project_data_schema(project_name, project_title, project_type,
+        self.test_giswater.gw_admin.create_project_data_schema(project_name, project_title, project_type,
             '25831', 'EN', is_test=True, exec_last_process=True, example_data=True)
 
         print("Finish create_project")
@@ -109,10 +109,10 @@ class TestQgis:
         if not self.connect_to_database(self.service_name):
             return False
 
-        self.test_giswater.update_sql.init_sql(False, self.user, show_dialog=False)
-        self.test_giswater.update_sql.init_dialog_create_project(project_type)
+        self.test_giswater.gw_admin.init_sql(False, self.user, show_dialog=False)
+        self.test_giswater.gw_admin.init_dialog_create_project(project_type)
         project_name = f"test_{project_type}"
-        self.test_giswater.update_sql.load_updates(project_type, schema_name=project_name)
+        self.test_giswater.gw_admin.load_updates(project_type, schema_name=project_name)
 
         print("Finish update_project")
 
@@ -131,8 +131,8 @@ class TestQgis:
         if not self.connect_to_database(self.service_name):
             return False
 
-        self.test_giswater.update_sql.init_sql(False, self.user, show_dialog=False)
-        self.test_giswater.update_sql.init_dialog_create_project(project_type)
+        self.test_giswater.gw_admin.init_sql(False, self.user, show_dialog=False)
+        self.test_giswater.gw_admin.init_dialog_create_project(project_type)
 
         # Generate QGIS project
         project_name = f"test_{project_type}"
@@ -142,7 +142,7 @@ class TestQgis:
         roletype = 'admin'
         sample = True
         get_database_parameters = False
-        gis = CreateGisProject(self.test_giswater.controller, self.test_giswater.plugin_dir)
+        gis = GwAdminGisProject(self.test_giswater.controller, self.test_giswater.plugin_dir)
         gis.set_database_parameters("host", "port", "db", "user", "password", "25831")
         gis.gis_project_database(gis_folder, gis_file, project_type, project_name, export_passwd,
             roletype, sample, get_database_parameters)
@@ -165,8 +165,8 @@ class TestQgis:
             return False
 
         self.test_giswater.controller.set_search_path(project_name)
-        self.test_giswater.manage_visit.manage_visit(open_dialog=False)
-        dlg = self.test_giswater.manage_visit.dlg_add_visit
+        self.test_giswater.visit_manager.visit_manager(open_dialog=False)
+        dlg = self.test_giswater.visit_manager.dlg_add_visit
         res = dlg.exec()
         if res == QDialog.Accepted:
             print('Accepted')

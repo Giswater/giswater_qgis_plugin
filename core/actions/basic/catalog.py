@@ -13,21 +13,19 @@ from functools import partial
 from collections import OrderedDict
 
 from lib import qt_tools
-from ....actions.api_parent import ApiParent
+
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog
+from .... import global_vars
+from ....actions.api_parent_functs import create_body
 from ....ui_manager import InfoCatalogUi
 
 
-class GwCatalog(ApiParent):
+class GwCatalog:
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
         """ Class to control toolbar 'om_ws' """
 
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-
-
-    def set_project_type(self, project_type):
-
-        self.project_type = project_type
+        self.controller = global_vars.controller
 
 
     def api_catalog(self, previous_dialog, widget_name, geom_type, feature_type):
@@ -39,9 +37,9 @@ class GwCatalog(ApiParent):
         form_name = 'upsert_catalog_' + geom_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
-        body = self.create_body(form, feature)
+        body = create_body(form, feature)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if not row:
             self.controller.show_message("NOT ROW FOR: " + sql, 2)
             return
@@ -51,8 +49,8 @@ class GwCatalog(ApiParent):
         self.filter_form = QGridLayout()
 
         self.dlg_catalog = InfoCatalogUi()
-        self.load_settings(self.dlg_catalog)
-        self.dlg_catalog.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_catalog))
+        load_settings(self.dlg_catalog)
+        self.dlg_catalog.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_catalog))
         self.dlg_catalog.btn_accept.clicked.connect(partial(self.fill_geomcat_id, previous_dialog, widget_name))
 
         main_layout = self.dlg_catalog.widget.findChild(QGridLayout, 'main_layout')
@@ -98,7 +96,7 @@ class GwCatalog(ApiParent):
                                          pnom, dnom, id, feature_type, geom_type))
 
         # Open form
-        self.open_dialog(self.dlg_catalog, dlg_name='info_catalog')
+        open_dialog(self.dlg_catalog, dlg_name='info_catalog')
 
 
     def get_api_catalog(self, matcat_id, pnom, dnom, id, feature_type, geom_type):
@@ -116,9 +114,9 @@ class GwCatalog(ApiParent):
         elif self.controller.get_project_type() == 'ud':
             extras = f'"fields":{{"matcat_id":"{matcat_id_value}", "shape":"{pn_value}", "geom1":"{dn_value}"}}'
 
-        body = self.create_body(form=form, feature=feature, extras=extras)
+        body = create_body(form=form, feature=feature, extras=extras)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         if complet_result[0]['status'] == "Failed":
             self.controller.log_warning(complet_result[0])
@@ -138,9 +136,9 @@ class GwCatalog(ApiParent):
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
         extras = f'"fields":{{"matcat_id":"{matcat_id_value}"}}'
-        body = self.create_body(form=form, feature=feature, extras=extras)
+        body = create_body(form=form, feature=feature, extras=extras)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']
         for field in result['fields']:
@@ -170,7 +168,7 @@ class GwCatalog(ApiParent):
         combo_id = qt_tools.get_item_data(self.dlg_catalog, widget)
         # TODO cambiar por gw_fct_getchilds
         sql = f"SELECT gw_fct_getcombochilds('catalog' ,'' ,'' ,'{combo_parent}', '{combo_id}','{geom_type}')"
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         for combo_child in row[0]['fields']:
             if combo_child is not None:
                 self.populate_child(combo_child, row)
@@ -192,7 +190,7 @@ class GwCatalog(ApiParent):
         exists = self.controller.check_function('gw_api_get_catalog_id')
         if exists:
             sql = f"SELECT gw_api_get_catalog_id('{metcat_value}', '{pn_value}', '{dn_value}', '{geom_type}', 9)"
-            row = self.controller.get_row(sql, log_sql=True)
+            row = self.controller.get_row(sql)
             self.populate_combo(widget_id, row[0]['catalog_id'][0])
 
 
@@ -201,16 +199,6 @@ class GwCatalog(ApiParent):
         child = self.dlg_catalog.findChild(QComboBox, str(combo_child['widgetname']))
         if child:
             self.populate_combo(child, combo_child)
-
-
-    def close_dialog(self, dlg=None):
-        """ Close dialog """
-        try:
-            self.save_settings(dlg)
-            dlg.close()
-
-        except AttributeError:
-            pass
 
 
     def add_combobox(self, dialog, field):
@@ -262,5 +250,5 @@ class GwCatalog(ApiParent):
             message = "Widget not found"
             self.controller.show_message(message, 2, parameter=str(widget_name))
 
-        self.close_dialog(self.dlg_catalog)
+        close_dialog(self.dlg_catalog)
 

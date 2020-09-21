@@ -43,7 +43,7 @@ class GwDialog(QDialog):
         if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
             QWhatsThis.leaveWhatsThisMode()
             parser = configparser.ConfigParser()
-            path = os.path.dirname(__file__) + os.sep + 'config' + os.sep + 'init2.config'
+            path = os.path.dirname(__file__) + os.sep + 'config' + os.sep + 'init.config'
             if not os.path.exists(path):
                 print(f"File not found: {path}")
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual')
@@ -58,7 +58,7 @@ class GwDialog(QDialog):
             try:
                 web_tag = parser.get('web_tag', tag)
                 webbrowser.open_new_tab(f'https://giswater.org/giswater-manual/#{web_tag}')
-            except Exception as e:
+            except Exception:
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual')
             finally:
                 return True
@@ -79,8 +79,13 @@ class GwMainWindow(QMainWindow):
 
 
     def closeEvent(self, event):
-        self.dlg_closed.emit()
-        return super().closeEvent(event)
+        try:
+            self.dlg_closed.emit()
+            return super().closeEvent(event)
+        except RuntimeError:
+            # This exception jumps, for example, when closing the mincut dialog when it is in docker
+            # RuntimeError: wrapped C/C++ object of type Mincut has been deleted
+            pass
 
 
     def eventFilter(self, object, event):
@@ -88,7 +93,7 @@ class GwMainWindow(QMainWindow):
         if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
             QWhatsThis.leaveWhatsThisMode()
             parser = configparser.ConfigParser()
-            path = os.path.dirname(__file__) + os.sep + 'config' + os.sep + 'init2.config'
+            path = os.path.dirname(__file__) + os.sep + 'config' + os.sep + 'init.config'
             if not os.path.exists(path):
                 print(f"File not found: {path}")
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual')
@@ -102,7 +107,7 @@ class GwMainWindow(QMainWindow):
             try:
                 web_tag = parser.get('web_tag', tag)
                 webbrowser.open_new_tab(f'https://giswater.org/giswater-manual/#{web_tag}')
-            except Exception as e:
+            except Exception:
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual')
             return True
         return False
@@ -500,7 +505,6 @@ class MainQtDialogUi(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('main_ui.ui')
 class MainUi(GwMainWindow, FORM_CLASS):
     dlg_closed = QtCore.pyqtSignal()
-    pass
 
 
 FORM_CLASS = get_ui_class('main_dbproject.ui')

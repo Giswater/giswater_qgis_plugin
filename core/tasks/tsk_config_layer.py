@@ -14,6 +14,7 @@ class GwConfigLayerTask(QgsTask):
     """ This shows how to subclass QgsTask """
 
     fake_progress = pyqtSignal()
+
     def __init__(self, description, controller):
 
         super().__init__(description, QgsTask.CanCancel)
@@ -70,7 +71,7 @@ class GwConfigLayerTask(QgsTask):
     def get_layers_to_config(self):
         """ Get available layers to be configured """
 
-        schema_name = self.schema_name.replace('"','')
+        schema_name = self.schema_name.replace('"', '')
         sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
               f"UNION "
               f"SELECT DISTINCT(child_layer) FROM cat_feature "
@@ -133,7 +134,7 @@ class GwConfigLayerTask(QgsTask):
             if not complet_result:
                 continue
 
-            #self.controller.log_info(str(complet_result))
+            # self.controller.log_info(str(complet_result))
             if not 'body' in complet_result:
                 self.controller.log_info("Not 'body'")
                 continue
@@ -141,7 +142,7 @@ class GwConfigLayerTask(QgsTask):
                 self.controller.log_info("Not 'data'")
                 continue
 
-            #self.controller.log_info(complet_result['body']['data']['fields'])
+            # self.controller.log_info(complet_result['body']['data']['fields'])
             for field in complet_result['body']['data']['fields']:
                 valuemap_values = {}
 

@@ -5,7 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import Qt, QDate, QObject, QStringListModel, pyqtSignal
+from qgis.gui import QgsVertexMarker
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
     QTextEdit, QPushButton, QComboBox, QTabWidget
@@ -26,27 +27,44 @@ from core.models.om_visit_x_node import OmVisitXNode
 from core.models.om_visit_x_gully import OmVisitXGully
 from core.models.om_visit_parameter import OmVisitParameter
 from ....ui_manager import VisitUi, VisitEvent, VisitEventRehab, LotVisitManagerUi
-from ....actions.parent_manage import ParentManage
 from ..edit.document import GwDocument
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog
+from .... import global_vars
+from ....actions.parent_functs import set_icon, document_delete, document_open, create_body, \
+    set_dates_from_to, get_values_from_catalog
+from ....actions.parent_manage_funct import set_selectionbehavior, add_point, \
+    check_expression, disconnect_signal_selection_changed, connect_signal_selection_changed, remove_selection, \
+    select_features_by_ids, refresh_map_canvas, fill_widget_with_fields, fill_table_object, enable_feature_type, \
+    insert_feature, delete_records, selection_init, set_completer_feature_id, set_table_model, lazy_configuration, \
+    set_table_columns, delete_selected_object, set_completer_object, hide_generic_layers, selection_changed
 
 
-class GwVisitManager(ParentManage, QObject):
+class GwVisitManager:
 
     # event emitted when a new Visit is added when GUI is closed/accepted
     visit_added = pyqtSignal(int)
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
         """ Class to control 'Add visit' of toolbar 'edit' """
 
-        QObject.__init__(self)
-        ParentManage.__init__(self, iface, settings, controller, plugin_dir)
+        self.controller = global_vars.controller
+        self.canvas = global_vars.canvas
+        self.schema_name = global_vars.schema_name
+        self.iface = global_vars.iface
+
         self.geom_type = None
         self.event_parameter_id = None
         self.event_feature_type = None
 
+        self.vertex_marker = QgsVertexMarker(global_vars.canvas)
+
+        self.lazy_widget = None
+        self.lazy_init_function = None
+
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
-                     open_dialog=True, is_new_from_cf=False):
+                     open_dlg=True, is_new_from_cf=False):
+
         """ Button 64. Add visit.
         if visit_id => load record related to the visit_id
         if geom_type => lock geom_type in relations tab
@@ -54,7 +72,7 @@ class GwVisitManager(ParentManage, QObject):
         if single_tool notify that the tool is used called from another dialog."""
 
         # parameter to set if the dialog is working as single tool or integrated in another tool
-        self.single_tool_mode = single_tool
+        global_vars.single_tool_mode = single_tool
 
         # bool to distinguish if we entered to edit an exisiting Visit or creating a new one
         self.it_is_new_visit = (not visit_id)
@@ -67,14 +85,30 @@ class GwVisitManager(ParentManage, QObject):
         # Create the dialog and signals and related ORM Visit class
         self.current_visit = OmVisit(self.controller)
         self.dlg_add_visit = VisitUi(tag)
-        self.load_settings(self.dlg_add_visit)
+        load_settings(self.dlg_add_visit)
 
         # Get expl_id from previus dialog
         self.expl_id = expl_id
 
         # Get layers of every geom_type
-        self.reset_lists()
-        self.reset_layers()
+
+        # Setting lists
+        self.ids = []
+        self.list_ids = {}
+        self.list_ids['arc'] = []
+        self.list_ids['node'] = []
+        self.list_ids['connec'] = []
+        self.list_ids['gully'] = []
+        self.list_ids['element'] = []
+
+        # Setting layers
+        self.layers = {}
+        self.layers['arc'] = []
+        self.layers['node'] = []
+        self.layers['connec'] = []
+        self.layers['gully'] = []
+        self.layers['element'] = []
+
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
@@ -90,18 +124,17 @@ class GwVisitManager(ParentManage, QObject):
         self.feature_type_parameter = None
 
         # Reset geometry
-        self.x = None
-        self.y = None
+        self.point_xy = {"x": None, "y": None}
 
         # Set icons
-        self.set_icon(self.dlg_add_visit.btn_feature_insert, "111")
-        self.set_icon(self.dlg_add_visit.btn_feature_delete, "112")
-        self.set_icon(self.dlg_add_visit.btn_feature_snapping, "137")
-        self.set_icon(self.dlg_add_visit.btn_doc_insert, "111")
-        self.set_icon(self.dlg_add_visit.btn_doc_delete, "112")
-        self.set_icon(self.dlg_add_visit.btn_doc_new, "134")
-        self.set_icon(self.dlg_add_visit.btn_open_doc, "170")
-        self.set_icon(self.dlg_add_visit.btn_add_geom, "133")
+        set_icon(self.dlg_add_visit.btn_feature_insert, "111")
+        set_icon(self.dlg_add_visit.btn_feature_delete, "112")
+        set_icon(self.dlg_add_visit.btn_feature_snapping, "137")
+        set_icon(self.dlg_add_visit.btn_doc_insert, "111")
+        set_icon(self.dlg_add_visit.btn_doc_delete, "112")
+        set_icon(self.dlg_add_visit.btn_doc_new, "134")
+        set_icon(self.dlg_add_visit.btn_open_doc, "170")
+        set_icon(self.dlg_add_visit.btn_add_geom, "133")
 
         # tab events
         self.tabs = self.dlg_add_visit.findChild(QTabWidget, 'tab_widget')
@@ -130,7 +163,14 @@ class GwVisitManager(ParentManage, QObject):
         self.tbl_document = self.dlg_add_visit.findChild(QTableView, "tbl_document")
         self.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        self.set_selectionbehavior(self.dlg_add_visit)
+        set_selectionbehavior(self.dlg_add_visit)
+
+        # Check the default dates, if it does not exist force today
+        _date = QDate.currentDate()
+        date_string = self.controller.get_config('om_visit_startdate_vdefault')
+        if date_string:
+            _date = datetime.strptime(date_string[0], '%Y/%m/%d')
+        self.dlg_add_visit.startdate.setDate(_date)
 
         # Check the default dates, if it does not exist force today
         _date = QDate.currentDate()
@@ -172,7 +212,7 @@ class GwVisitManager(ParentManage, QObject):
         self.event_feature_type_selected(self.dlg_add_visit, "arc")
 
         # Force tab_feature_changed
-        self.tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"])
+        self.tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"], layers=self.layers)
 
         # Manage relation locking
         if self.locked_geom_type:
@@ -200,11 +240,52 @@ class GwVisitManager(ParentManage, QObject):
                         self.zoom_box(box)
 
         # Open the dialog
-        if open_dialog:
+        if open_dlg:
             # If the new visit dont come from info emit signal
             if is_new_from_cf is False:
                 self.feature_type.currentIndexChanged.emit(0)
-            self.open_dialog(self.dlg_add_visit, dlg_name="visit")
+            open_dialog(self.dlg_add_visit, dlg_name="visit")
+
+
+    def zoom_box(self, box):
+        """
+        :param box: (QgsRectangle)
+        """
+        # When it is a point, and only one, it must be converted into a rectangle to be able to zoom
+        if not box.isNull():
+            if box.xMinimum() == box.xMaximum() and box.yMinimum() == box.yMaximum():
+                box.setXMaximum(box.xMaximum() + 0.0001)
+                box.setYMaximum(box.yMaximum() + 0.0001)
+                box.setXMaximum(box.xMinimum() + 0.0001)
+                box.setYMaximum(box.yMinimum() + 0.0001)
+            box.set(box.xMinimum() - 10, box.yMinimum() - 10, box.xMaximum() + 10, box.yMaximum() + 10)
+            self.iface.mapCanvas().setExtent(box)
+            self.iface.mapCanvas().refresh()
+
+
+    def open_selected_object_visit(self, dialog, widget, table_object):
+
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        row = selected_list[0].row()
+
+        # Get object_id from selected row
+        field_object_id = "id"
+        if "v_ui_om_visitman_x_" in table_object:
+            field_object_id = "visit_id"
+        selected_object_id = widget.model().record(row).value(field_object_id)
+
+        # Close this dialog and open selected object
+        dialog.close()
+
+        if table_object == "v_ui_om_visit":
+            self.manage_visit(visit_id=selected_object_id)
+        elif "v_ui_om_visitman_x_" in table_object:
+            self.manage_visit(visit_id=selected_object_id)
 
 
     def zoom_box(self, box):
@@ -223,7 +304,7 @@ class GwVisitManager(ParentManage, QObject):
     def set_signals(self):
 
         self.dlg_add_visit.rejected.connect(self.manage_rejected)
-        self.dlg_add_visit.rejected.connect(partial(self.close_dialog, self.dlg_add_visit))
+        self.dlg_add_visit.rejected.connect(partial(close_dialog, self.dlg_add_visit))
         self.dlg_add_visit.accepted.connect(partial(self.update_relations, self.dlg_add_visit))
         self.dlg_add_visit.accepted.connect(self.manage_accepted)
         self.dlg_add_visit.btn_event_insert.clicked.connect(self.event_insert)
@@ -233,11 +314,11 @@ class GwVisitManager(ParentManage, QObject):
         self.visit_id.textChanged.connect(partial(self.manage_visit_id_change, self.dlg_add_visit))
         self.dlg_add_visit.btn_doc_insert.clicked.connect(self.document_insert)
         self.dlg_add_visit.btn_doc_delete.clicked.connect(
-            partial(self.document_delete, self.tbl_document, "doc_x_visit"))
+            partial(document_delete, self.tbl_document, "doc_x_visit"))
         self.dlg_add_visit.btn_doc_new.clicked.connect(self.manage_document)
-        self.dlg_add_visit.btn_open_doc.clicked.connect(partial(self.document_open, self.tbl_document))
-        self.tbl_document.doubleClicked.connect(partial(self.document_open, self.tbl_document))
-        self.dlg_add_visit.btn_add_geom.clicked.connect(self.add_point)
+        self.dlg_add_visit.btn_open_doc.clicked.connect(partial(document_open, self.tbl_document))
+        self.tbl_document.doubleClicked.connect(partial(document_open, self.tbl_document))
+        self.dlg_add_visit.btn_add_geom.clicked.connect(self.add_feature_clicked)
 
         # Fill combo boxes of the form and related events
         self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
@@ -245,6 +326,11 @@ class GwVisitManager(ParentManage, QObject):
             partial(self.event_feature_type_selected, self.dlg_add_visit, None))
         self.feature_type.currentIndexChanged.connect(partial(self.manage_tabs_enabled, True))
         self.parameter_id.currentIndexChanged.connect(self.get_feature_type_of_parameter)
+
+
+    def add_feature_clicked(self):
+        self.previous_map_tool = global_vars.canvas.mapTool()
+        self.point_xy = add_point(self.vertex_marker)
 
 
     def set_locked_relation(self):
@@ -269,17 +355,17 @@ class GwVisitManager(ParentManage, QObject):
         # Set 'expr_filter' with features that are in the list
         if self.locked_feature_id:
             expr_filter = f'"{self.geom_type}_id" IN (\'{self.locked_feature_id}\')'
-            (is_valid, expr) = self.check_expression(expr_filter)
+            (is_valid, expr) = check_expression(expr_filter)
             if not is_valid:
                 return
 
             # do selection allowing @table_name to be linked to canvas selectionChanged
             widget_name = f'tbl_visit_x_{self.geom_type}'
             widget_table = qt_tools.getWidget(self.dlg_add_visit, widget_name)
-            self.disconnect_signal_selection_changed()
-            self.connect_signal_selection_changed(self.dlg_add_visit, widget_table)
-            self.select_features_by_ids(self.geom_type, expr)
-            self.disconnect_signal_selection_changed()
+            disconnect_signal_selection_changed()
+            connect_signal_selection_changed(self.dlg_add_visit, widget_table, geom_type=self.geom_type)
+            select_features_by_ids(self.geom_type, expr)
+            disconnect_signal_selection_changed()
 
 
     def manage_accepted(self):
@@ -293,11 +379,11 @@ class GwVisitManager(ParentManage, QObject):
             self.manage_leave_visit_tab()
 
         # Remove all previous selections
-        self.disconnect_signal_selection_changed()
-        self.remove_selection()
+        disconnect_signal_selection_changed()
+        self.layers = remove_selection(layers=self.layers)
 
         # Update geometry field (if user have selected a point)
-        if self.x:
+        if self.point_xy['x'] is not None:
             self.update_geom()
             
         layer = self.controller.get_layer_by_tablename('v_edit_om_visit')
@@ -314,32 +400,33 @@ class GwVisitManager(ParentManage, QObject):
         layer = self.controller.get_layer_by_tablename('v_edit_om_visit')
         if layer:
             layer.dataProvider().forceReload()
-        self.refresh_map_canvas()
+        refresh_map_canvas()
 
 
     def execute_pgfunction(self):
         """ Execute function 'gw_fct_om_visit_multiplier' """
 
         feature = f'"id":"{self.current_visit.id}"'
-        body = self.create_body(feature=feature)
+        body = create_body(feature=feature)
         sql = f"SELECT gw_fct_om_visit_multiplier({body})::text"
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         self.controller.log_info(f"execute_pgfunction: {row}")
 
 
     def update_geom(self):
         """ Update geometry field """
 
-        srid = self.controller.plugin_settings_value('srid')
+        srid = global_vars.srid
         sql = (f"UPDATE om_visit"
-               f" SET the_geom = ST_SetSRID(ST_MakePoint({self.x},{self.y}), {srid})"
+               f" SET the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
                f" WHERE id = {self.current_visit.id}")
         self.controller.execute_sql(sql)
 
 
     def get_geom(self):
+
         sql = f"SELECT St_AsText((select the_geom from om_visit where id={self.current_visit.id})::text)"
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         return row
 
 
@@ -348,18 +435,14 @@ class GwVisitManager(ParentManage, QObject):
         e.g. all necessary rollbacks and cleanings."""
 
         try:
-            if hasattr(self, 'xyCoordinates_conected'):
-                if self.xyCoordinates_conected:
-                    self.canvas.xyCoordinates.disconnect()
-                    self.xyCoordinates_conected = False
             self.canvas.setMapTool(self.previous_map_tool)
             # removed current working visit. This should cascade removing of all related records
             if hasattr(self, 'it_is_new_visit') and self.it_is_new_visit:
                 self.current_visit.delete()
 
             # Remove all previous selections
-            self.disconnect_signal_selection_changed()
-            self.remove_selection()
+            disconnect_signal_selection_changed()
+            self.layers = remove_selection(layers=self.layers)
         except Exception as e:
             self.controller.log_info(f"manage_rejected: {e}")
 
@@ -389,7 +472,7 @@ class GwVisitManager(ParentManage, QObject):
         exist = self.current_visit.fetch()
         if exist:
             # B) Fill the GUI values of the current visit
-            self.fill_widget_with_fields(self.dlg_add_visit, self.current_visit, self.current_visit.field_names())
+            fill_widget_with_fields(self.dlg_add_visit, self.current_visit, self.current_visit.field_names())
             # Get parameter_id and feature_type from his event
             self.event_parameter_id, self.event_feature_type = self.get_data_from_event(self.visit_id_value)
             qt_tools.set_combo_itemData(self.dlg_add_visit.parameter_id, self.event_parameter_id, 0)
@@ -397,13 +480,13 @@ class GwVisitManager(ParentManage, QObject):
         # C) load all related events in the relative table
         self.filter = f"visit_id = '{text}'"
         table_name = f"{self.schema_name}.v_ui_om_event"
-        self.fill_table_object(self.tbl_event, table_name, self.filter)
+        fill_table_object(self.tbl_event, table_name, self.filter)
         self.set_configuration(dialog, self.tbl_event, table_name)
         self.manage_events_changed()
 
         # D) load all related documents in the relative table
         table_name = f"{self.schema_name}.v_ui_doc_x_visit"
-        self.fill_table_object(self.tbl_document, table_name, self.filter)
+        fill_table_object(self.tbl_document, table_name, self.filter)
         self.set_configuration(dialog, self.tbl_document, table_name)
 
         # E) load all related Relations in the relative table
@@ -486,7 +569,7 @@ class GwVisitManager(ParentManage, QObject):
             self.update_relations_geom_type(self.geom_type)
 
         widget_name = f"tbl_visit_x_{self.geom_type}"
-        self.enable_feature_type(dialog, widget_name)
+        enable_feature_type(dialog, widget_name, ids=self.ids)
 
 
     def delete_relations_geom_type(self, geom_type):
@@ -590,6 +673,7 @@ class GwVisitManager(ParentManage, QObject):
             sql += f"AND UPPER(feature_type) = '{self.feature_type.currentText().upper()}' "
         sql += f"ORDER BY id"
         rows = self.controller.get_rows(sql)
+        print(rows)
         if rows:
             qt_tools.set_item_data(dialog.parameter_id, rows, 1)
 
@@ -678,15 +762,21 @@ class GwVisitManager(ParentManage, QObject):
         except Exception as e:
             self.controller.log_info(f"manage_geom_type_selected exception: {e}")
         finally:
+            # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
-                partial(self.insert_feature, self.dlg_add_visit, widget_table))
+                partial(insert_feature, self.dlg_add_visit, widget_table, geom_type=self.geom_type, ids=self.ids,
+                        layers=self.layers, list_ids=self.list_ids, lazy_widget=self.lazy_widget,
+                        lazy_init_function=self.lazy_init_function))
+            # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_delete.clicked.connect(
-                partial(self.delete_records, self.dlg_add_visit, widget_table))
+                partial(delete_records, self.dlg_add_visit, widget_table, geom_type=self.geom_type, layers=self.layers,
+                        ids=self.ids, list_ids=self.list_ids, lazy_widget=self.lazy_widget,
+                        lazy_init_function=self.lazy_init_function))
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
-                partial(self.selection_init, self.dlg_add_visit, widget_table))
+                partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
-        self.set_completer_feature_id(self.dlg_add_visit.feature_id, self.geom_type, viewname)
+        set_completer_feature_id(self.dlg_add_visit.feature_id, self.geom_type, viewname)
 
 
     def config_relation_table(self, dialog):
@@ -730,19 +820,19 @@ class GwVisitManager(ParentManage, QObject):
             return
 
         viewname = f"v_edit_{geom_type}"
-        self.set_completer_feature_id(dialog.feature_id, geom_type, viewname)
+        set_completer_feature_id(dialog.feature_id, geom_type, viewname)
 
         # set table model and completer
         # set a fake where expression to avoid to set model to None
         fake_filter = f'{geom_type}_id IN (-1)'
         widget_name = f'tbl_visit_x_{geom_type}'
-        self.set_table_model(dialog, widget_name, geom_type, fake_filter)
+        set_table_model(dialog, widget_name, geom_type, fake_filter)
 
         # set the callback to setup all events later
         # its not possible to setup listener in this moment beacouse set_table_model without
         # a valid expression parameter return a None model => no events can be triggered
         widget_table = qt_tools.getWidget(dialog, widget_name)
-        self.lazy_configuration(widget_table, self.config_relation_table)
+        self.lazy_widget, self.lazy_init_function = lazy_configuration(widget_table, self.config_relation_table)
 
         # check if there are features related to the current visit
         if not self.visit_id.text():
@@ -766,7 +856,7 @@ class GwVisitManager(ParentManage, QObject):
         # Select list of related features
         # Set 'expr_filter' with features that are in the list
         expr_filter = f"{geom_type}_id IN ({','.join(ids)})"
-        (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
 
@@ -775,10 +865,10 @@ class GwVisitManager(ParentManage, QObject):
             widget_table = qt_tools.getWidget(self.dlg_add_visit, widget_name)
 
         # Do selection allowing @widget_table to be linked to canvas selectionChanged
-        self.disconnect_signal_selection_changed()
-        self.connect_signal_selection_changed(self.dlg_add_visit, widget_table)
-        self.select_features_by_ids(geom_type, expr)
-        self.disconnect_signal_selection_changed()
+        disconnect_signal_selection_changed()
+        connect_signal_selection_changed(self.dlg_add_visit, widget_table, geom_type=geom_type)
+        select_features_by_ids(geom_type, expr)
+        disconnect_signal_selection_changed()
 
 
     def edit_visit(self, geom_type=None, feature_id=None):
@@ -786,7 +876,7 @@ class GwVisitManager(ParentManage, QObject):
 
         # Create the dialog
         self.dlg_man = LotVisitManagerUi()
-        self.load_settings(self.dlg_man)
+        load_settings(self.dlg_man)
         self.dlg_man.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         if geom_type is None:
@@ -795,8 +885,8 @@ class GwVisitManager(ParentManage, QObject):
             filed_to_filter = "ext_code"
             table_object = "v_ui_om_visit"
             expr_filter = ""
-            self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
-            self.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
+            fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
+            set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
         else:
             # Set a model with selected filter. Attach that model to selected table
             qt_tools.setWidgetText(self.dlg_man, self.dlg_man.lbl_filter, 'Filter by code')
@@ -804,27 +894,27 @@ class GwVisitManager(ParentManage, QObject):
             table_object = "v_ui_om_visitman_x_" + str(geom_type)
             expr_filter = f"{geom_type}_id = '{feature_id}'"
             # Refresh model with selected filter
-            self.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object, expr_filter)
-            self.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
+            fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object, expr_filter)
+            set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
 
         # manage save and rollback when closing the dialog
-        self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
-        self.dlg_man.accepted.connect(partial(self.open_selected_object, self.dlg_man,
+        self.dlg_man.rejected.connect(partial(close_dialog, self.dlg_man))
+        self.dlg_man.accepted.connect(partial(self.open_selected_object_visit, self.dlg_man,
                                       self.dlg_man.tbl_visit, table_object))
 
         # Set signals
         self.dlg_man.tbl_visit.doubleClicked.connect(
-            partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
+            partial(self.open_selected_object_visit, self.dlg_man, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_open.clicked.connect(
-            partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
+            partial(self.open_selected_object_visit, self.dlg_man, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_delete.clicked.connect(
-            partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
+            partial(delete_selected_object, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.txt_filter.textChanged.connect(partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit,
             self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
 
         # set timeStart and timeEnd as the min/max dave values get from model
-        self.set_dates_from_to(self.dlg_man.date_event_from, self.dlg_man.date_event_to,
-                               'om_visit', 'startdate', 'enddate')
+        set_dates_from_to(self.dlg_man.date_event_from, self.dlg_man.date_event_to,
+                          'om_visit', 'startdate', 'enddate')
 
         # set date events
         self.dlg_man.date_event_from.dateChanged.connect(partial(self.filter_visit, self.dlg_man,
@@ -833,7 +923,7 @@ class GwVisitManager(ParentManage, QObject):
             self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
 
         # Open form
-        self.open_dialog(self.dlg_man, dlg_name="lot_visitmanager")
+        open_dialog(self.dlg_man, dlg_name="lot_visitmanager")
 
 
     def filter_visit(self, dialog, widget_table, widget_txt, table_object, expr_filter, filed_to_filter):
@@ -907,7 +997,7 @@ class GwVisitManager(ParentManage, QObject):
                 qt_tools.set_combo_itemData(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
 
         # Fill ComboBox status
-        rows = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
+        rows = get_values_from_catalog('om_typevalue', 'visit_cat_status')
         if rows:
             qt_tools.set_item_data(self.dlg_add_visit.status, rows, 1, sort_combo=True)
             status = self.controller.get_config('om_visit_status_vdefault')
@@ -1000,13 +1090,13 @@ class GwVisitManager(ParentManage, QObject):
 
     def manage_document(self, qtable):
         """Access GUI to manage documents e.g Execute action of button 34 """
-        
+
         visit_id = qt_tools.getText(self.dlg_add_visit, self.dlg_add_visit.visit_id)
-        manage_document = GwDocument(self.iface, self.settings, self.controller, self.plugin_dir, single_tool=False)
+        manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.manage_document(
             tablename='visit', qtable=self.dlg_add_visit.tbl_document, item_id=visit_id)
         qt_tools.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
-        dlg_docman.btn_accept.clicked.connect(partial(self.set_completer_object, dlg_docman, 'doc'))
+        dlg_docman.btn_accept.clicked.connect(partial(set_completer_object, dlg_docman, 'doc'))
 
 
     def event_insert(self):
@@ -1034,12 +1124,12 @@ class GwVisitManager(ParentManage, QObject):
         dlg_name = None
         if form_type in ('event_ud_arc_standard', 'event_standard'):
             self.dlg_event = VisitEvent()
-            self.load_settings(self.dlg_event)
+            load_settings(self.dlg_event)
             self.populate_position_id()
             dlg_name = 'visit_event'
         elif form_type == 'event_ud_arc_rehabit':
             self.dlg_event = VisitEventRehab()
-            self.load_settings(self.dlg_event)
+            load_settings(self.dlg_event)
             self.populate_position_id()
             dlg_name = 'visit_event_rehab'
             self.dlg_event.position_id.setEnabled(True)
@@ -1320,19 +1410,24 @@ class GwVisitManager(ParentManage, QObject):
         if not om_event_parameter.fetch():
             return
         dlg_name = None
-        if om_event_parameter.form_type  == 'event_ud_arc_standard':
+        if om_event_parameter.form_type in ('event_ud_arc_standard', 'event_standard'):
+            event_code = self.dlg_add_visit.tbl_event.model().record(0).value('event_code')
             _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
             position_value = self.dlg_add_visit.tbl_event.model().record(0).value('position_value')
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
             self.dlg_event = VisitEvent()
-            self.load_settings(self.dlg_event)
-            # disable position_x fields because not allowed in multiple view
+            load_settings(self.dlg_event)
             self.populate_position_id()
             dlg_name = 'visit_event'
             # set fixed values
-            qt_tools.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
-            qt_tools.setWidgetText(self.dlg_event, self.dlg_event.position_value, position_value)
-            qt_tools.setWidgetText(self.dlg_event, self.dlg_event.text, text)
+            if event_code not in ('NULL', None):
+                qt_tools.setWidgetText(self.dlg_event, self.dlg_event.event_code, event_code)
+            if _value not in ('NULL', None):
+                qt_tools.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
+            if position_value not in ('NULL', None):
+                qt_tools.setWidgetText(self.dlg_event, self.dlg_event.position_value, position_value)
+            if text not in ('NULL', None):
+                qt_tools.setWidgetText(self.dlg_event, self.dlg_event.text, text)
             self.dlg_event.position_id.setEnabled(False)
             self.dlg_event.position_value.setEnabled(False)
 
@@ -1345,7 +1440,7 @@ class GwVisitManager(ParentManage, QObject):
             geom3 = self.dlg_add_visit.tbl_event.model().record(0).value('geom3')
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
             self.dlg_event = VisitEventRehab()
-            self.load_settings(self.dlg_event)
+            load_settings(self.dlg_event)
             self.populate_position_id()
             dlg_name = 'visit_event_rehab'
             self.dlg_event.position_value.setText(str(position_value))
@@ -1372,7 +1467,7 @@ class GwVisitManager(ParentManage, QObject):
             text = index.sibling(row, column_index).data()
 
             self.dlg_event = VisitEvent()
-            self.load_settings(self.dlg_event)
+            load_settings(self.dlg_event)
             if event_code not in ('NULL', None):
                 qt_tools.setWidgetText(self.dlg_event, self.dlg_event.event_code, event_code)
             if _value not in ('NULL', None):
@@ -1399,8 +1494,7 @@ class GwVisitManager(ParentManage, QObject):
                 value = getattr(self.dlg_event, field_name).toPlainText()
             if type(getattr(self.dlg_event, field_name)) is QComboBox:
                 value = qt_tools.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
-            if value and str(value) != 'NULL':
-                setattr(event, field_name, value)
+            setattr(event, field_name, value)
 
         # set fixed values
         self.dlg_event.parameter_id.setText(parameter_id)
@@ -1420,8 +1514,7 @@ class GwVisitManager(ParentManage, QObject):
                     value = getattr(self.dlg_event, field_name).toPlainText()
                 elif type(getattr(self.dlg_event, field_name)) is QComboBox:
                     value = qt_tools.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
-                if value and str(value) != 'NULL':
-                    setattr(event, field_name, value)
+                setattr(event, field_name, value)
 
             # update the record
             event.upsert()
@@ -1567,7 +1660,7 @@ class GwVisitManager(ParentManage, QObject):
         qt_tools.set_item_data(self.dlg_event.position_id, node_list, 1, True, False)
 
 
-    def tab_feature_changed(self, dialog, table_object='visit', excluded_layers=[]):
+    def tab_feature_changed(self, dialog, table_object='visit', excluded_layers=[], layers=None):
         """ Set geom_type and layer depending selected tab """
 
         # Get selected tab to set geometry type
@@ -1584,7 +1677,7 @@ class GwVisitManager(ParentManage, QObject):
         if self.geom_type == '':
             return
 
-        self.hide_generic_layers(excluded_layers=excluded_layers)
+        hide_generic_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_{table_object}_x_{self.geom_type}"
         viewname = f"v_edit_{self.geom_type}"
         widget_table = qt_tools.getWidget(dialog, widget_name)
@@ -1596,21 +1689,34 @@ class GwVisitManager(ParentManage, QObject):
         except Exception as e:
             self.controller.log_info(f"tab_feature_changed exception: {e}")
         finally:
+            # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
-                partial(self.insert_feature, self.dlg_add_visit, widget_table))
+                partial(insert_feature, self.dlg_add_visit, widget_table, self.geom_type, ids=self.ids,
+                        layers=self.layers, list_ids=self.list_ids))
+            # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_delete.clicked.connect(
-                partial(self.delete_records, self.dlg_add_visit, widget_table))
+                partial(delete_records, self.dlg_add_visit, widget_table, geom_type=self.geom_type, layers=self.layers,
+                        ids=self.ids, list_ids=self.list_ids, lazy_widget=self.lazy_widget,
+                        lazy_init_function=self.lazy_init_function))
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
-                partial(self.selection_init, self.dlg_add_visit, widget_table))
+                partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
-        self.set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
-        self.selection_changed(dialog, widget_table, self.geom_type, False)
+        set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
+        self.ids, self.layers, self.list_ids = selection_changed(dialog, widget_table, self.geom_type, False,
+                                                                 layers=self.layers, list_ids=self.list_ids,
+                                                                 lazy_widget=self.lazy_widget,
+                                                                 lazy_init_function=self.lazy_init_function)
 
         try:
             self.iface.actionPan().trigger()
         except Exception:
             pass
+
+
+    def feature_snapping_clicked(self, dialog, table_object):
+        self.previous_map_tool = global_vars.canvas.mapTool()
+        selection_init(dialog, table_object, geom_type=self.geom_type, layers=self.layers)
 
 
     def manage_visit_multifeature(self):
@@ -1632,7 +1738,7 @@ class GwVisitManager(ParentManage, QObject):
                f"FROM om_visit_event "
                f"INNER JOIN config_visit_parameter ON parameter_id = config_visit_parameter.id "
                f"WHERE visit_id = {visit_id}")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if row:
             parameter_id = row["parameter_id"]
             feature_type = row["feature_type"].lower()

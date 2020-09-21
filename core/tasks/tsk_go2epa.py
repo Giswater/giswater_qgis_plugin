@@ -12,7 +12,8 @@ import re
 import os
 import subprocess
 
-from ..actions.edit.layer_tools import GwLayerTools
+from ... import global_vars
+from ..utils.layer_tools import add_temp_layer
 
 
 class GwGo2EpaTask(QgsTask):
@@ -20,11 +21,11 @@ class GwGo2EpaTask(QgsTask):
 
     fake_progress = pyqtSignal()
 
-    def __init__(self, description, controller, go2epa):
+    def __init__(self, description, go2epa):
 
         super().__init__(description, QgsTask.CanCancel)
         self.exception = None
-        self.controller = controller
+        self.controller = global_vars.controller
         self.go2epa = go2epa
         self.error_msg = None
         self.message = None
@@ -32,7 +33,6 @@ class GwGo2EpaTask(QgsTask):
         self._file = None
         self.fid = 140
         self.set_variables_from_go2epa()
-        self.add_layer = GwLayerTools(self.controller.iface, None, controller, None)
         # self.progressChanged.connect(self.progress_changed)
 
 
@@ -80,7 +80,7 @@ class GwGo2EpaTask(QgsTask):
                     if self.complet_result['status'] == "Accepted":
                         if 'body' in self.complet_result:
                             if 'data' in self.complet_result['body']:
-                                self.add_layer.add_temp_layer(self.dlg_go2epa, self.complet_result['body']['data'],
+                                add_temp_layer(self.dlg_go2epa, self.complet_result['body']['data'],
                                     'INP results', True, True, 1, False, disable_tabs=False)
 
             if self.import_result and self.rpt_result:
@@ -88,7 +88,7 @@ class GwGo2EpaTask(QgsTask):
                     if self.rpt_result['status'] == "Accepted":
                         if 'body' in self.rpt_result:
                             if 'data' in self.rpt_result['body']:
-                                self.add_layer.add_temp_layer(self.dlg_go2epa, self.rpt_result['body']['data'],
+                                add_temp_layer(self.dlg_go2epa, self.rpt_result['body']['data'],
                                     'RPT results', True, True, 1, False, disable_tabs=False)
                         self.message = self.rpt_result['message']['text']
 
@@ -141,7 +141,7 @@ class GwGo2EpaTask(QgsTask):
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         body = self.create_body(extras=extras)
         function_name = 'gw_fct_pg2epa_main'
-        json_result = self.controller.get_json(function_name, body, log_sql=True)
+        json_result = self.controller.get_json(function_name, body)
         if json_result is None:
             return False
 

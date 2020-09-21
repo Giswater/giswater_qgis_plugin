@@ -9,19 +9,17 @@ from qgis.PyQt.QtCore import Qt
 
 from ..parent_maptool import GwParentMapTool
 from ...utils.giswater_tools import create_body
+from ....lib.qgis_tools import get_event_point, snap_to_current_layer, add_marker, get_snapped_feature, \
+    get_snapping_options, enable_snapping, snap_to_node
 
 
 class GwFlowExitButton(GwParentMapTool):
-    """
-        Button 57: Flow exit
-    """
+    """ Button 57: Flow exit """
 
-    def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
+    def __init__(self, icon_path, text, toolbar, action_group):
         """ Class constructor """
 
-        # Call ParentMapTool constructor
-        super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
-
+        super().__init__(icon_path, text, toolbar, action_group)
         self.layers_added = []
 
 
@@ -31,14 +29,14 @@ class GwFlowExitButton(GwParentMapTool):
 
         # Hide marker and get coordinates
         self.vertex_marker.hide()
-        event_point = self.snapper_manager.get_event_point(event)
+        event_point = get_event_point(event)
 
         # Snapping
-        result = self.snapper_manager.snap_to_current_layer(event_point)
-        if self.snapper_manager.result_is_valid():
-            self.snapper_manager.add_marker(result, self.vertex_marker)
+        result = snap_to_current_layer(event_point)
+        if result.isValid():
+            add_marker(result, self.vertex_marker)
             # Data for function
-            self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
+            self.snapped_feat = get_snapped_feature(result)
 
 
     def canvasReleaseEvent(self, event):
@@ -52,7 +50,7 @@ class GwFlowExitButton(GwParentMapTool):
             elem_id = self.snapped_feat.attribute('node_id')
             feature_id = f'"id":["{elem_id}"]'
             body = create_body(feature=feature_id)
-            result = self.controller.get_json(function_name, body, log_sql=True)
+            result = self.controller.get_json(function_name, body)
             if not result:
                 return
 
@@ -73,17 +71,14 @@ class GwFlowExitButton(GwParentMapTool):
         # Check button
         self.action.setChecked(True)
 
-        # Set main snapping layers
-        self.snapper_manager.set_snapping_layers()
-
         # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
+        self.previous_snapping = get_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.enable_snapping()
+        enable_snapping()
 
         # Set snapping to node
-        self.snapper_manager.snap_to_node()
+        snap_to_node()
 
         # Change cursor
         self.canvas.setCursor(self.cursor)
@@ -101,7 +96,7 @@ class GwFlowExitButton(GwParentMapTool):
 
 
     def deactivate(self):
-        
+
         # Call parent method
         super().deactivate()
 

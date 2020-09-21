@@ -5,18 +5,17 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-from qgis.core import QgsGeometry, QgsMapToPixel, QgsPointXY, QgsVectorLayer
-from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand, QgsVertexMarker
-from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QPoint, QRegExp, QStringListModel, Qt
-from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QRegExpValidator, QStandardItem, QStandardItemModel
+from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY
+from qgis.gui import QgsDateTimeEdit, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand
+from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, QStringListModel, Qt
+from qgis.PyQt.QtGui import QColor, QRegExpValidator, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
-    QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu, QPushButton, QSizePolicy, \
+    QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
 
 import json
 import os
-import re
 import subprocess
 import urllib.parse as parse
 import sys
@@ -27,146 +26,61 @@ from functools import partial
 from .... import global_vars
 from lib import qt_tools
 from .catalog import GwCatalog
-from ....actions.api_parent import ApiParent
+from ..edit.dimensioning import GwDimensioning
 from ..edit.document import GwDocument
 from ..epa.element import GwElement
 from ..om.visit_gallery import GwVisitGallery
 from ..om.visit_manager import GwVisitManager
-from ....map_tools.snapping_utils_v3 import SnappingConfigManager
-from ....ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi
-from ..edit.dimensioning import GwDimensioning
+
+from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
+from ...utils.layer_tools import populate_info_text
+from ....ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
+    DialogTextUi
+
+from ....actions.parent_functs import set_icon, set_dates_from_to, draw, draw_point
+from ....actions.api_parent_functs import get_visible_layers, create_body,  populate_basic_info, put_widgets, \
+    fill_child, check_actions, action_open_url, api_action_help, get_feature_by_expr, set_setStyleSheet, \
+    set_data_type, add_lineedit, set_widget_size, manage_lineedit, add_combobox, add_checkbox, get_values, \
+    add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, \
+    add_textarea, add_spinbox, add_tableview, set_headers, populate_table, set_columns_config, set_completer_object, \
+    fill_table, clear_gridlayout, add_frame, add_label, set_completer_object_api, enable_all, disable_all
+from ....lib.qgis_tools import get_snapping_options, get_event_point, snap_to_current_layer, get_snapped_layer, \
+    get_snapped_feature, add_marker, enable_snapping, snap_to_layer, apply_snapping_options, snap_to_arc, snap_to_node
 
 
-class GwInfo(ApiParent, QObject):
+class GwInfo(QObject):
 
     # :var signal_activate: emitted from def cancel_snapping_tool(self, dialog, action) in order to re-start CadApiInfo
     signal_activate = pyqtSignal()
 
-    def __init__(self, iface, settings, controller, plugin_dir, tab_type):
+    def __init__(self, tab_type):
         """ Class constructor """
 
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-        QObject.__init__(self)
-        self.iface = iface
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir
+        super().__init__()
+
+        self.iface = global_vars.iface
+        self.settings = global_vars.settings
+        self.controller = global_vars.controller
+        self.plugin_dir = global_vars.plugin_dir
+        self.canvas = global_vars.canvas
+        self.schema_name = global_vars.schema_name
+
         self.new_feature_id = None
         self.layer_new_feature = None
         self.tab_type = tab_type
+        self.rubber_band = QgsRubberBand(self.canvas, 0)
 
 
-    def hilight_feature(self, point, rb_list, tab_type=None):
-
-        cursor = QCursor()
-        x = cursor.pos().x()
-        y = cursor.pos().y()
-        click_point = QPoint(x + 5, y + 5)
-
-        visible_layers = self.get_visible_layers(as_list=True)
-        scale_zoom = self.iface.mapCanvas().scale()
-
-        # Get layers under mouse clicked
-        extras = f'"pointClickCoords":{{"xcoord":{point.x()}, "ycoord":{point.y()}}}, '
-        extras += f'"visibleLayers":{visible_layers}, '
-        extras += f'"zoomScale":{scale_zoom} '
-        body = self.create_body(extras=extras)
-        json_result = self.controller.get_json('gw_fct_getlayersfromcoordinates', body)
-        if not json_result:
-            return False
-
-        # hide QMenu identify if no feature under mouse
-        len_layers = len(json_result['body']['data']['layersNames'])
-        if len_layers == 0:
-            return False
-
-        self.icon_folder = self.plugin_dir + '/icons/'
-
-        # Right click main QMenu
-        main_menu = QMenu()
-
-        # Create one menu for each layer
-        for layer in json_result['body']['data']['layersNames']:
-            layer_name = self.controller.get_layer_by_tablename(layer['layerName'])
-            icon_path = self.icon_folder + layer['icon'] + '.png'
-            if os.path.exists(str(icon_path)):
-                icon = QIcon(icon_path)
-                sub_menu = main_menu.addMenu(icon, layer_name.name())
-            else:
-                sub_menu = main_menu.addMenu(layer_name.name())
-            # Create one QAction for each id
-            for feature in layer['ids']:
-                action = QAction(str(feature['id']), None)
-                sub_menu.addAction(action)
-                action.triggered.connect(partial(self.set_active_layer, action, tab_type))
-                action.hovered.connect(partial(self.draw_by_action, feature, rb_list))
-
-        main_menu.addSeparator()
-        # Identify all
-        cont = 0
-        for layer in json_result['body']['data']['layersNames']:
-            cont += len(layer['ids'])
-        action = QAction(f'Identify all ({cont})', None)
-        action.hovered.connect(partial(self.identify_all, json_result, rb_list))
-        main_menu.addAction(action)
-        main_menu.addSeparator()
-        main_menu.exec_(click_point)
+    def get_info_from_coordinates(self, point, tab_type):
+        return self.open_form(point=point, tab_type=tab_type)
 
 
-    def identify_all(self, complet_list, rb_list):
-
-        self.resetRubberbands()
-        for rb in rb_list:
-            rb.reset()
-        for layer in complet_list['body']['data']['layersNames']:
-            for feature in layer['ids']:
-                points = []
-                list_coord = re.search('\((.*)\)', str(feature['geometry']))
-                coords = list_coord.group(1)
-                polygon = coords.split(',')
-                for i in range(0, len(polygon)):
-                    x, y = polygon[i].split(' ')
-                    point = QgsPointXY(float(x), float(y))
-                    points.append(point)
-                rb = QgsRubberBand(self.canvas)
-                polyline = QgsGeometry.fromPolylineXY(points)
-                rb.setToGeometry(polyline, None)
-                rb.setColor(QColor(255, 0, 0, 100))
-                rb.setWidth(5)
-                rb.show()
-                rb_list.append(rb)
+    def get_info_from_id(self, table_name, feature_id, tab_type=None, is_add_schema=None):
+        return self.open_form(table_name=table_name, feature_id=feature_id, tab_type=tab_type, is_add_schema=is_add_schema)
 
 
-    def draw_by_action(self, feature, rb_list, reset_rb=True):
-        """ Draw lines based on geometry """
-
-        for rb in rb_list:
-            rb.reset()
-        if feature['geometry'] is None:
-            return
-
-        list_coord = re.search('\((.*)\)', str(feature['geometry']))
-        max_x, max_y, min_x, min_y = self.get_max_rectangle_from_coords(list_coord)
-        if reset_rb is True:
-            self.resetRubberbands()
-        if str(max_x) == str(min_x) and str(max_y) == str(min_y):
-            point = QgsPointXY(float(max_x), float(max_y))
-            self.draw_point(point)
-        else:
-            points = self.get_points(list_coord)
-            self.draw_polyline(points)
-
-
-    def set_active_layer(self, action, tab_type):
-        """ Set active selected layer """
-
-        parent_menu = action.associatedWidgets()[0]
-        layer = self.controller.get_layer_by_layername(parent_menu.title())
-        if layer:
-            layer_source = self.controller.get_layer_source(layer)
-            self.iface.setActiveLayer(layer)
-            complet_result, dialog = self.open_form(
-                table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type)
+    def get_feature_insert(self, point, feature_cat, new_feature_id, layer_new_feature, tab_type, new_feature):
+        return self.open_form(point=point, feature_cat=feature_cat, new_feature_id=new_feature_id, layer_new_feature=layer_new_feature, tab_type=tab_type, new_feature=new_feature)
 
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None,
@@ -195,7 +109,7 @@ class GwInfo(ApiParent, QObject):
         self.tab_type = tab_type
 
         # Get project variables
-        project_vars = global_vars.get_project_vars()
+        project_vars = global_vars.project_vars
         qgis_project_add_schema = project_vars['add_schema']
         qgis_project_main_schema = project_vars['main_schema']
         qgis_project_infotype = project_vars['infotype']
@@ -235,12 +149,12 @@ class GwInfo(ApiParent, QObject):
             self.iface.actionPan().trigger()
             feature = f'"tableName":"{feature_cat.child_layer.lower()}"'
             extras += f', "coordinates":{{{point}}}'
-            body = self.create_body(feature=feature, extras=extras)
+            body = create_body(feature=feature, extras=extras)
             function_name = 'gw_fct_getfeatureinsert'
 
         # Click over canvas
         elif point:
-            visible_layer = self.get_visible_layers(as_list=True)
+            visible_layer = get_visible_layers(as_list=True)
             scale_zoom = self.iface.mapCanvas().scale()
             extras += f', "activeLayer":"{active_layer}"'
             extras += f', "visibleLayer":{visible_layer}'
@@ -249,25 +163,25 @@ class GwInfo(ApiParent, QObject):
             extras += f', "infoType":"{qgis_project_infotype}"'
             extras += f', "projecRole":"{qgis_project_role}"'
             extras += f', "coordinates":{{"xcoord":{point.x()},"ycoord":{point.y()}, "zoomRatio":{scale_zoom}}}'
-            body = self.create_body(extras=extras)
+            body = create_body(extras=extras)
             function_name = 'gw_fct_getinfofromcoordinates'
 
         # Comes from QPushButtons node1 or node2 from custom form or RightButton
         elif feature_id:
             if is_add_schema is True:
-                project_vars = global_vars.get_project_vars()
+                project_vars = global_vars.project_vars
                 add_schema = project_vars['add_schema']
                 extras = f'"addSchema":"{add_schema}"'
             else:
                 extras = '"addSchema":""'
             feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
-            body = self.create_body(feature=feature, extras=extras)
+            body = create_body(feature=feature, extras=extras)
             function_name = 'gw_fct_getinfofromid'
 
         if function_name is None:
             return False, None
 
-        json_result = self.controller.get_json(function_name, body)
+        json_result = self.controller.get_json(function_name, body, rubber_band=self.rubber_band)
         if json_result is None:
             return False, None
 
@@ -275,17 +189,16 @@ class GwInfo(ApiParent, QObject):
         if not row or row[0] is False:
             return False, None
 
+        # When insert feature failed
+        if 'status' in row[0] and row[0]['status'] == 'Failed':
+            return False, None
+
         # When something is wrong
-        if row[0]['message']:
+        if 'message' in row[0] and row[0]['message']:
             level = 1
             if 'level' in row[0]['message']:
                 level = int(row[0]['message']['level'])
             self.controller.show_message(row[0]['message']['text'], level)
-            return False, None
-
-        # When insert feature failed
-        if row[0]['status'] == "Failed":
-            self.controller.show_message(row[0]['message']['text'], 2)
             return False, None
 
         # Control fail when insert new feature
@@ -315,9 +228,9 @@ class GwInfo(ApiParent, QObject):
         elif template == 'dimensioning':
             self.lyr_dim = self.controller.get_layer_by_tablename("v_edit_dimensions", show_warning=True)
             if self.lyr_dim:
-                self.api_dim = GwDimensioning(self.iface, self.settings, self.controller, self.plugin_dir)
+                self.api_dim = GwDimensioning()
                 feature_id = self.complet_result[0]['body']['feature']['id']
-                result, dialog = self.api_dim.open_form(None, self.lyr_dim, self.complet_result, feature_id)
+                result, dialog = self.api_dim.open_dimensioning_form(None, self.lyr_dim, self.complet_result, feature_id, self.rubber_band)
                 return result, dialog
 
         elif template == 'info_feature':
@@ -336,7 +249,7 @@ class GwInfo(ApiParent, QObject):
         elif template == 'visit':
             visit_id = self.complet_result[0]['body']['feature']['id']
             layers_visibility = self.get_layers_visibility()
-            manage_visit = GwVisitManager(self.iface, self.settings, self.controller, self.plugin_dir)
+            manage_visit = GwVisitManager()
             manage_visit.manage_visit(visit_id=visit_id, tag='info')
             manage_visit.dlg_add_visit.rejected.connect(partial(self.restore_layers_visibility, layers_visibility))
 
@@ -390,19 +303,21 @@ class GwInfo(ApiParent, QObject):
 
     def open_generic_form(self, complet_result):
 
-        self.draw(complet_result, zoom=False)
+        draw(complet_result, self.rubber_band, zoom=False)
         self.hydro_info_dlg = InfoGenericUi()
-        self.load_settings(self.hydro_info_dlg)
-        self.hydro_info_dlg.btn_close.clicked.connect(partial(self.close_dialog, self.hydro_info_dlg))
-        self.hydro_info_dlg.rejected.connect(partial(self.close_dialog, self.hydro_info_dlg))
+        load_settings(self.hydro_info_dlg)
+        self.hydro_info_dlg.btn_close.clicked.connect(partial(close_dialog, self.hydro_info_dlg))
+        self.hydro_info_dlg.rejected.connect(partial(close_dialog, self.hydro_info_dlg))
         field_id = str(self.complet_result[0]['body']['feature']['idName'])
-        result = self.populate_basic_info(self.hydro_info_dlg, complet_result, field_id)
+        result = populate_basic_info(self.hydro_info_dlg, complet_result, field_id, self.my_json,
+                 new_feature_id=self.new_feature_id, new_feature=self.new_feature, layer_new_feature=self.layer_new_feature,
+                 feature_id=self.feature_id, feature_type=self.feature_type, layer=self.layer)
 
         # Disable button accept for info on generic form
         self.hydro_info_dlg.btn_accept.setEnabled(False)
-        self.hydro_info_dlg.rejected.connect(partial(self.resetRubberbands))
+        self.hydro_info_dlg.rejected.connect(self.rubber_band.reset)
         # Open dialog
-        self.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
+        open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 
         return result, self.hydro_info_dlg
 
@@ -411,7 +326,14 @@ class GwInfo(ApiParent, QObject):
 
         # Dialog
         self.dlg_cf = InfoFeatureUi(sub_tag)
-        self.load_settings(self.dlg_cf)
+        load_settings(self.dlg_cf)
+
+        # If in the get_json function we have received a rubberband, it is not necessary to redraw it.
+        # But if it has not been received, it is drawn
+        try:
+            exist_rb = complet_result[0]['body']['returnManager']['style']['ruberband']
+        except KeyError:
+            draw(complet_result[0], self.rubber_band)
 
         if feature_id:
             self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 25, self.dlg_cf.pos().y() + 25, self.dlg_cf.width(),
@@ -484,46 +406,47 @@ class GwInfo(ApiParent, QObject):
 
         self.show_actions('tab_data')
 
-        # TODO action_edit.setEnabled(lo que venga del json segun permisos)
-        # action_edit.setVisible(True)
-        # action_edit.setEnabled(True)
+        try:
+            action_edit.setEnabled(self.complet_result[0]['body']['feature']['permissions']['isEditable'])
+        except KeyError:
+            pass
 
         # Set actions icon
-        self.set_icon(action_edit, "101")
-        self.set_icon(action_copy_paste, "107b")
-        self.set_icon(action_rotation, "107c")
-        self.set_icon(action_catalog, "195")
-        self.set_icon(action_workcat, "193")
-        self.set_icon(action_get_arc_id, "209")
-        self.set_icon(action_get_parent_id, "210")
-        self.set_icon(action_zoom_in, "103")
-        self.set_icon(action_zoom_out, "107")
-        self.set_icon(action_centered, "104")
-        self.set_icon(action_link, "173")
-        self.set_icon(action_section, "207")
-        self.set_icon(action_help, "73")
-        self.set_icon(action_interpolate, "194")
+        set_icon(action_edit, "101")
+        set_icon(action_copy_paste, "107b")
+        set_icon(action_rotation, "107c")
+        set_icon(action_catalog, "195")
+        set_icon(action_workcat, "193")
+        set_icon(action_get_arc_id, "209")
+        set_icon(action_get_parent_id, "210")
+        set_icon(action_zoom_in, "103")
+        set_icon(action_zoom_out, "107")
+        set_icon(action_centered, "104")
+        set_icon(action_link, "173")
+        set_icon(action_section, "207")
+        set_icon(action_help, "73")
+        set_icon(action_interpolate, "194")
         # self.set_icon(action_switch_arc_id, "141")
 
         # Set buttons icon
         # tab elements
-        self.set_icon(self.dlg_cf.btn_insert, "111b")
-        self.set_icon(self.dlg_cf.btn_delete, "112b")
-        self.set_icon(self.dlg_cf.btn_new_element, "131b")
-        self.set_icon(self.dlg_cf.btn_open_element, "134b")
+        set_icon(self.dlg_cf.btn_insert, "111b")
+        set_icon(self.dlg_cf.btn_delete, "112b")
+        set_icon(self.dlg_cf.btn_new_element, "131b")
+        set_icon(self.dlg_cf.btn_open_element, "134b")
         # tab hydrometer
-        self.set_icon(self.dlg_cf.btn_link, "70b")
+        set_icon(self.dlg_cf.btn_link, "70b")
         # tab om
-        self.set_icon(self.dlg_cf.btn_open_visit, "65b")
-        self.set_icon(self.dlg_cf.btn_new_visit, "64b")
-        self.set_icon(self.dlg_cf.btn_open_gallery, "136b")
-        self.set_icon(self.dlg_cf.btn_open_visit_doc, "170b")
-        self.set_icon(self.dlg_cf.btn_open_visit_event, "134b")
+        set_icon(self.dlg_cf.btn_open_visit, "65b")
+        set_icon(self.dlg_cf.btn_new_visit, "64b")
+        set_icon(self.dlg_cf.btn_open_gallery, "136b")
+        set_icon(self.dlg_cf.btn_open_visit_doc, "170b")
+        set_icon(self.dlg_cf.btn_open_visit_event, "134b")
         # tab doc
-        self.set_icon(self.dlg_cf.btn_doc_insert, "111b")
-        self.set_icon(self.dlg_cf.btn_doc_delete, "112b")
-        self.set_icon(self.dlg_cf.btn_doc_new, "131b")
-        self.set_icon(self.dlg_cf.btn_open_doc, "170b")
+        set_icon(self.dlg_cf.btn_doc_insert, "111b")
+        set_icon(self.dlg_cf.btn_doc_delete, "112b")
+        set_icon(self.dlg_cf.btn_doc_new, "131b")
+        set_icon(self.dlg_cf.btn_open_doc, "170b")
 
         # Get feature type as geom_type (node, arc, connec, gully)
         self.geom_type = str(complet_result[0]['body']['feature']['featureType'])
@@ -557,7 +480,7 @@ class GwInfo(ApiParent, QObject):
                     layout.addWidget(label, 0, field['layoutorder'])
                     layout.addWidget(widget, 1, field['layoutorder'])
                 else:
-                    self.put_widgets(self.dlg_cf, field, label, widget)
+                    put_widgets(self.dlg_cf, field, label, widget)
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
@@ -570,7 +493,7 @@ class GwInfo(ApiParent, QObject):
                 if field['widgettype'] == 'combo':
                     widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
                     if widget is not None:
-                        widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_cf, widget,
+                        widget.currentIndexChanged.connect(partial(fill_child, self.dlg_cf, widget,
                             self.feature_type, self.tablename, self.field_id))
 
         # Set variables
@@ -578,21 +501,24 @@ class GwInfo(ApiParent, QObject):
 
         if self.layer:
             if self.layer.isEditable():
-                self.enable_all(self.dlg_cf, result)
+                enable_all(self.dlg_cf, result)
             else:
-                self.disable_all(self.dlg_cf, result, False)
+                disable_all(self.dlg_cf, result, False)
+                self.new_feature_id = None
 
-        if action_edit.isVisible():
+        if action_edit.isEnabled():
             # SIGNALS
-            self.layer.editingStarted.connect(partial(self.check_actions, action_edit, True))
-            self.layer.editingStopped.connect(partial(self.check_actions, action_edit, False))
-            self.layer.editingStarted.connect(partial(self.enable_all, self.dlg_cf, result))
-            self.layer.editingStopped.connect(partial(self.disable_all, self.dlg_cf, result, False))
+            self.layer.editingStarted.connect(partial(check_actions, action_edit, True))
+            self.layer.editingStopped.connect(partial(check_actions, action_edit, False))
+            self.layer.editingStarted.connect(partial(enable_all, self.dlg_cf, result))
+            self.layer.editingStopped.connect(partial(disable_all, self.dlg_cf, result, False))
+            self.layer.editingStopped.connect(lambda: setattr(self, 'new_feature_id', None))
+
             # Actions
             self.enable_actions(self.layer.isEditable())
             self.layer.editingStarted.connect(partial(self.enable_actions, True))
             self.layer.editingStopped.connect(partial(self.enable_actions, False))
-            self.layer.editingStopped.connect(partial(self.get_last_value))
+            self.layer.editingStopped.connect(self.get_last_value)
 
         action_edit.setChecked(self.layer.isEditable())
         action_edit.triggered.connect(partial(self.start_editing, self.layer))
@@ -605,10 +531,10 @@ class GwInfo(ApiParent, QObject):
         action_centered.triggered.connect(partial(self.api_action_centered, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, self.layer))
         action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, self.dlg_cf, self.geom_type, tab_type))
-        action_rotation.triggered.connect(partial(self.action_rotation, self.dlg_cf))
-        action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
+        action_rotation.triggered.connect(partial(self.change_hemisphere, self.dlg_cf))
+        action_link.triggered.connect(partial(action_open_url, self.dlg_cf, result))
         action_section.triggered.connect(partial(self.open_section_form))
-        action_help.triggered.connect(partial(self.api_action_help, self.geom_type))
+        action_help.triggered.connect(partial(api_action_help, self.geom_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
         action_interpolate.triggered.connect(partial(self.activate_snapping, complet_result, self.ep))
 
@@ -630,17 +556,16 @@ class GwInfo(ApiParent, QObject):
             btn_cancel.setVisible(False)
 
         else:
-            btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
+            btn_cancel.clicked.connect(partial(close_dialog, self.dlg_cf))
             btn_cancel.clicked.connect(self.roll_back)
             btn_accept.clicked.connect(partial(
                 self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
             self.dlg_cf.dlg_closed.connect(self.roll_back)
-            self.dlg_cf.dlg_closed.connect(partial(self.controller.parent.resetRubberbands))
-            self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
-            self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
+            self.dlg_cf.dlg_closed.connect(self.rubber_band.reset)
+            self.dlg_cf.dlg_closed.connect(partial(save_settings, self.dlg_cf))
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
-            self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
-
+            self.dlg_cf.key_pressed.connect(partial(close_dialog, self.dlg_cf))
+        self.dlg_cf.dlg_closed.connect(self.disconect_signals)
         # Set title
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
         row = self.controller.get_config('admin_customform_param', 'value', 'config_param_system')
@@ -650,17 +575,403 @@ class GwInfo(ApiParent, QObject):
                 toolbox_cf.setItemText(int(result['index']), result['text'])
 
         # Open dialog
-        self.open_dialog(self.dlg_cf, dlg_name='info_feature')
+        open_dialog(self.dlg_cf, dlg_name='info_feature')
         self.dlg_cf.setWindowTitle(title)
 
         return self.complet_result, self.dlg_cf
 
 
+    def disconect_signals(self):
+        try:
+            self.layer.editingStopped.disconnect(self.get_last_value)
+        except:
+            pass
+
+
+    def activate_snapping(self, complet_result, ep):
+
+        rb_interpolate = []
+        self.interpolate_result = None
+        self.rubber_band.reset()
+        dlg_dtext = DialogTextUi()
+        load_settings(dlg_dtext)
+
+        qt_tools.setWidgetText(dlg_dtext, dlg_dtext.txt_infolog, 'Interpolate tool')
+        dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
+                                   "interpolation\nNode1: \nNode2:")
+
+        dlg_dtext.btn_accept.clicked.connect(partial(self.chek_for_existing_values, dlg_dtext))
+        dlg_dtext.btn_close.clicked.connect(partial(close_dialog, dlg_dtext))
+        dlg_dtext.rejected.connect(partial(save_settings, dlg_dtext))
+        dlg_dtext.rejected.connect(partial(self.remove_interpolate_rb, rb_interpolate))
+
+        open_dialog(dlg_dtext, dlg_name='dialog_text')
+
+        # Set circle vertex marker
+        color = QColor(255, 100, 255)
+        self.vertex_marker = QgsVertexMarker(global_vars.canvas)
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        self.vertex_marker.setColor(color)
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setPenWidth(3)
+
+        self.node1 = None
+        self.node2 = None
+
+        global_vars.canvas.setMapTool(ep)
+        # We redraw the selected feature because self.canvas.setMapTool(emit_point) erases it
+        draw(complet_result[0], self.rubber_band, None, False)
+
+        # Store user snapping configuration
+        self.previous_snapping = get_snapping_options
+
+        self.layer_node = global_vars.controller.get_layer_by_tablename("v_edit_node")
+        global_vars.iface.setActiveLayer(self.layer_node)
+
+        global_vars.canvas.xyCoordinates.connect(partial(self.mouse_move))
+        ep.canvasClicked.connect(partial(self.snapping_node, ep, dlg_dtext, rb_interpolate))
+
+
+    def snapping_node(self, ep, dlg_dtext, rb_interpolate, point, button):
+        """ Get id of selected nodes (node1 and node2) """
+
+        if button == 2:
+            self.dlg_destroyed(self.layer)
+            return
+
+        # Get coordinates
+        event_point = get_event_point(point=point)
+        if not event_point:
+            return
+        # Snapping
+        result = snap_to_current_layer(event_point)
+        if result.isValid():
+            layer = get_snapped_layer(result)
+            # Check feature
+            if layer == self.layer_node:
+                snapped_feat = get_snapped_feature(result)
+                element_id = snapped_feat.attribute('node_id')
+                message = "Selected node"
+                rb = QgsRubberBand(global_vars.canvas, 0)
+                if self.node1 is None:
+                    self.node1 = str(element_id)
+                    draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10, is_new=True)
+                    rb_interpolate.append(rb)
+                    dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
+                    global_vars.controller.show_message(message, message_level=0, parameter=self.node1)
+                elif self.node1 != str(element_id):
+                    self.node2 = str(element_id)
+                    draw_point(QgsPointXY(result.point()), rb, color=QColor(
+                        0, 150, 55, 100), width=10, is_new=True)
+                    rb_interpolate.append(rb)
+                    dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
+                    global_vars.controller.show_message(message, message_level=0, parameter=self.node2)
+
+        if self.node1 and self.node2:
+            global_vars.canvas.xyCoordinates.disconnect()
+            ep.canvasClicked.disconnect()
+
+            global_vars.iface.setActiveLayer(self.layer)
+            global_vars.iface.mapCanvas().scene().removeItem(self.vertex_marker)
+            extras = f'"parameters":{{'
+            extras += f'"x":{self.last_point[0]}, '
+            extras += f'"y":{self.last_point[1]}, '
+            extras += f'"node1":"{self.node1}", '
+            extras += f'"node2":"{self.node2}"}}'
+            body = create_body(extras=extras)
+            self.interpolate_result = global_vars.controller.get_json('gw_fct_node_interpolate', body)
+            populate_info_text(dlg_dtext, self.interpolate_result['body']['data'])
+
+
+    def chek_for_existing_values(self, dlg_dtext):
+
+        text = False
+        for k, v in self.interpolate_result['body']['data']['fields'][0].items():
+            widget = self.dlg_cf.findChild(QWidget, k)
+            if widget:
+                text = qt_tools.getWidgetText(self.dlg_cf, widget, False, False)
+                if text:
+                    msg = "Do you want to overwrite custom values?"
+                    answer = global_vars.controller.ask_question(msg, "Overwrite values")
+                    if answer:
+                        self.set_values(dlg_dtext)
+                    break
+        if not text:
+            self.set_values(dlg_dtext)
+
+
+    def set_values(self, dlg_dtext):
+
+        # Set values tu info form
+        for k, v in self.interpolate_result['body']['data']['fields'][0].items():
+            widget = self.dlg_cf.findChild(QWidget, k)
+            if widget:
+                widget.setStyleSheet(None)
+                qt_tools.setWidgetText(self.dlg_cf, widget, f'{v}')
+                widget.editingFinished.emit()
+        close_dialog(dlg_dtext)
+
+
+    def dlg_destroyed(self, layer=None, vertex=None):
+
+        self.dlg_is_destroyed = True
+        if layer is not None:
+            global_vars.iface.setActiveLayer(layer)
+        if vertex is not None:
+            global_vars.iface.mapCanvas().scene().removeItem(vertex)
+        else:
+            if hasattr(self, 'vertex_marker'):
+                if self.vertex_marker is not None:
+                    global_vars.iface.mapCanvas().scene().removeItem(self.vertex_marker)
+        try:
+            global_vars.canvas.xyCoordinates.disconnect()
+        except:
+            pass
+
+
+    def remove_interpolate_rb(self, rb_interpolate):
+
+        # Remove the circumferences made by the interpolate
+        for rb in rb_interpolate:
+            global_vars.iface.mapCanvas().scene().removeItem(rb)
+
+
+    def mouse_move(self, point):
+
+        # Get clicked point
+        event_point = get_event_point(point=point)
+
+        # Snapping
+        result = snap_to_current_layer(event_point)
+        if result.isValid():
+            layer = get_snapped_layer(result)
+            if layer == self.layer_node:
+                add_marker(result, self.vertex_marker)
+        else:
+            self.vertex_marker.hide()
+
+
+    def change_hemisphere(self, dialog):
+
+        # Set map tool emit point and signals
+        emit_point = QgsMapToolEmitPoint(global_vars.canvas)
+        self.previous_map_tool = global_vars.canvas.mapTool()
+        global_vars.canvas.setMapTool(emit_point)
+        emit_point.canvasClicked.connect(partial(self.action_rotation_canvas_clicked, dialog, emit_point))
+
+
+    def action_rotation_canvas_clicked(self, dialog, emit_point, point, btn):
+
+        print(point)
+
+        if btn == Qt.RightButton:
+            global_vars.canvas.setMapTool(self.previous_map_tool)
+            return
+
+        existing_point_x = None
+        existing_point_y = None
+        viewname = global_vars.controller.get_layer_source_table_name(self.layer)
+        sql = (f"SELECT ST_X(the_geom), ST_Y(the_geom)"
+               f" FROM {viewname}"
+               f" WHERE node_id = '{self.feature_id}'")
+        row = global_vars.controller.get_row(sql)
+
+        if row:
+            existing_point_x = row[0]
+            existing_point_y = row[1]
+
+        if existing_point_x:
+            sql = (f"UPDATE node"
+                   f" SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}), "
+                   f" ST_Point({point.x()}, {point.y()}))))"
+                   f" WHERE node_id = '{self.feature_id}'")
+            status = global_vars.controller.execute_sql(sql)
+            if not status:
+                global_vars.canvas.setMapTool(self.previous_map_tool)
+                return
+
+        sql = (f"SELECT rotation FROM node "
+               f" WHERE node_id = '{self.feature_id}'")
+        row = global_vars.controller.get_row(sql)
+        if row:
+            qt_tools.setWidgetText(dialog, "rotation", str(row[0]))
+
+        sql = (f"SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}),"
+               f" ST_Point({point.x()}, {point.y()})))")
+        row = global_vars.controller.get_row(sql)
+        if row:
+            qt_tools.setWidgetText(dialog, "hemisphere", str(row[0]))
+            message = "Hemisphere of the node has been updated. Value is"
+            global_vars.controller.show_info(message, parameter=str(row[0]))
+
+        # Disable Rotation
+        action_widget = dialog.findChild(QAction, "actionRotation")
+        if action_widget:
+            action_widget.setChecked(False)
+        try:
+            emit_point.canvasClicked.disconnect()
+            global_vars.canvas.setMapTool(self.previous_map_tool)
+        except Exception as e:
+            global_vars.controller.log_info(type(e).__name__)
+
+
+    def api_action_copy_paste(self, dialog, geom_type, tab_type=None):
+        """ Copy some fields from snapped feature to current feature """
+
+        # Set map tool emit point and signals
+        emit_point = QgsMapToolEmitPoint(global_vars.canvas)
+        global_vars.canvas.setMapTool(emit_point)
+        global_vars.canvas.xyCoordinates.connect(self.api_action_copy_paste_mouse_move)
+        emit_point.canvasClicked.connect(partial(self.api_action_copy_paste_canvas_clicked, dialog, tab_type, emit_point))
+        self.geom_type = geom_type
+
+        # Store user snapping configuration
+        self.previous_snapping = get_snapping_options
+
+        # Clear snapping
+        enable_snapping()
+
+        # Set snapping
+        layer = global_vars.iface.activeLayer()
+        snap_to_layer(layer)
+
+        # Set marker
+        color = QColor(255, 100, 255)
+        self.vertex_marker = QgsVertexMarker(global_vars.canvas)
+        if geom_type == 'node':
+            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        elif geom_type == 'arc':
+            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        self.vertex_marker.setColor(color)
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setPenWidth(3)
+
+
+    def api_action_copy_paste_mouse_move(self, point):
+        """ Slot function when mouse is moved in the canvas.
+            Add marker if any feature is snapped
+        """
+
+        # Hide marker and get coordinates
+        self.vertex_marker.hide()
+        event_point = get_event_point(point=point)
+
+        # Snapping
+        result = snap_to_current_layer(event_point)
+        if not result.isValid():
+            return
+
+        # Add marker to snapped feature
+        add_marker(result, self.vertex_marker)
+
+
+    def api_action_copy_paste_canvas_clicked(self, dialog, tab_type, emit_point, point, btn):
+        """ Slot function when canvas is clicked """
+
+        if btn == Qt.RightButton:
+            self.api_disable_copy_paste(dialog, emit_point)
+            return
+
+        # Get clicked point
+        event_point = get_event_point(point=point)
+
+        # Snapping
+        result = snap_to_current_layer(event_point)
+        if not result.isValid():
+            self.api_disable_copy_paste(dialog, emit_point)
+            return
+
+        layer = global_vars.iface.activeLayer()
+        layername = layer.name()
+
+        # Get the point. Leave selection
+        snapped_feature = get_snapped_feature(result, True)
+        snapped_feature_attr = snapped_feature.attributes()
+
+        aux = f'"{self.geom_type}_id" = '
+        aux += f"'{self.feature_id}'"
+        expr = QgsExpression(aux)
+        if expr.hasParserError():
+            message = "Expression Error"
+            global_vars.controller.show_warning(message, parameter=expr.parserErrorString())
+            self.api_disable_copy_paste(dialog, emit_point)
+            return
+
+        fields = layer.dataProvider().fields()
+        layer.startEditing()
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        feature_list = [i for i in it]
+        if not feature_list:
+            self.api_disable_copy_paste(dialog, emit_point)
+            return
+
+        # Select only first element of the feature list
+        feature = feature_list[0]
+        feature_id = feature.attribute(str(self.geom_type) + '_id')
+        msg = (f"Selected snapped feature_id to copy values from: {snapped_feature_attr[0]}\n"
+               f"Do you want to copy its values to the current node?\n\n")
+        # Replace id because we don't have to copy it!
+        snapped_feature_attr[0] = feature_id
+        snapped_feature_attr_aux = []
+        fields_aux = []
+
+        # Iterate over all fields and copy only specific ones
+        for i in range(0, len(fields)):
+            if fields[i].name() == 'sector_id' or fields[i].name() == 'dma_id' or fields[i].name() == 'expl_id' \
+                    or fields[i].name() == 'state' or fields[i].name() == 'state_type' \
+                    or fields[i].name() == layername + '_workcat_id' or fields[i].name() == layername + '_builtdate' \
+                    or fields[i].name() == 'verified' or fields[i].name() == str(self.geom_type) + 'cat_id':
+                snapped_feature_attr_aux.append(snapped_feature_attr[i])
+                fields_aux.append(fields[i].name())
+            if global_vars.project_type == 'ud':
+                if fields[i].name() == str(self.geom_type) + '_type':
+                    snapped_feature_attr_aux.append(snapped_feature_attr[i])
+                    fields_aux.append(fields[i].name())
+
+        for i in range(0, len(fields_aux)):
+            msg += f"{fields_aux[i]}: {snapped_feature_attr_aux[i]}\n"
+
+        # Ask confirmation question showing fields that will be copied
+        answer = global_vars.controller.ask_question(msg, "Update records", None)
+        if answer:
+            for i in range(0, len(fields)):
+                for x in range(0, len(fields_aux)):
+                    if fields[i].name() == fields_aux[x]:
+                        layer.changeAttributeValue(feature.id(), i, snapped_feature_attr_aux[x])
+
+            layer.commitChanges()
+
+            # dialog.refreshFeature()
+            for i in range(0, len(fields_aux)):
+                widget = dialog.findChild(QWidget, tab_type + "_" + fields_aux[i])
+                if qt_tools.getWidgetType(dialog, widget) is QLineEdit:
+                    qt_tools.setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
+                elif qt_tools.getWidgetType(dialog, widget) is QComboBox:
+                    qt_tools.set_combo_itemData(widget, str(snapped_feature_attr_aux[i]), 0)
+
+        self.api_disable_copy_paste(dialog, emit_point)
+
+
+    def api_disable_copy_paste(self, dialog, emit_point):
+        """ Disable actionCopyPaste and set action 'Identify' """
+
+        action_widget = dialog.findChild(QAction, "actionCopyPaste")
+        if action_widget:
+            action_widget.setChecked(False)
+
+        try:
+            apply_snapping_options(self.previous_snapping)
+            self.vertex_marker.hide()
+            global_vars.canvas.xyCoordinates.disconnect()
+            emit_point.canvasClicked.disconnect()
+        except:
+            pass
+
+
     def manage_docker_close(self):
 
         self.roll_back()
-        self.resetRubberbands()
-        self.controller.parent.resetRubberbands()
+        self.rubber_band.reset()
         self.set_vdefault_edition()
 
 
@@ -668,7 +979,7 @@ class GwInfo(ApiParent, QObject):
         """ Get current QgsFeature """
 
         expr_filter = f"{self.field_id} = '{self.feature_id}'"
-        self.feature = self.get_feature_by_expr(self.layer, expr_filter)
+        self.feature = get_feature_by_expr(self.layer, expr_filter)
         return self.feature
 
 
@@ -700,7 +1011,7 @@ class GwInfo(ApiParent, QObject):
         canvas.zoomToSelected(layer)
         canvas.zoomOut()
         expr_filter = f"{self.field_id} = '{self.feature_id}'"
-        self.feature = self.get_feature_by_expr(self.layer, expr_filter)
+        self.feature = get_feature_by_expr(self.layer, expr_filter)
         return self.feature
 
 
@@ -713,13 +1024,15 @@ class GwInfo(ApiParent, QObject):
 
 
     def get_last_value(self):
-
-        widgets = self.dlg_cf.tab_data.findChildren(QWidget)
-        for widget in widgets:
-            if widget.hasFocus():
-                value = qt_tools.getWidgetText(self.dlg_cf, widget)
-                if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
-                    self.my_json[str(widget.property('columnname'))] = str(value)
+        try:
+            widgets = self.dlg_cf.tab_data.findChildren(QWidget)
+            for widget in widgets:
+                if widget.hasFocus():
+                    value = qt_tools.getWidgetText(self.dlg_cf, widget)
+                    if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
+                        self.my_json[str(widget.property('columnname'))] = str(value)
+        except RuntimeError as e:
+            pass
 
 
     def start_editing(self, layer):
@@ -734,7 +1047,7 @@ class GwInfo(ApiParent, QObject):
         if self.my_json == '' or str(self.my_json) == '{}':
             return
         elif action_is_checked:
-            self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
+            self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dlg=False)
 
 
     def roll_back(self):
@@ -771,7 +1084,7 @@ class GwInfo(ApiParent, QObject):
             label.setObjectName('lbl_' + field['widgetname'])
             label.setText(field['label'].capitalize())
             if field['stylesheet'] is not None and 'label' in field['stylesheet']:
-                label = self.set_setStyleSheet(field, label)
+                label = set_setStyleSheet(field, label)
             if 'tooltip' in field:
                 label.setToolTip(field['tooltip'])
             else:
@@ -798,12 +1111,12 @@ class GwInfo(ApiParent, QObject):
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
 
-        widget = self.add_lineedit(field)
-        widget = self.set_widget_size(widget, field)
+        widget = add_lineedit(field)
+        widget = set_widget_size(widget, field)
         widget = self.set_min_max_values(widget, field)
         widget = self.set_reg_exp(widget, field)
         widget = self.set_auto_update_lineedit(field, dialog, widget)
-        widget = self.set_data_type(field, widget)
+        widget = set_data_type(field, widget)
         widget = self.set_max_length(widget, field)
 
         return widget
@@ -851,7 +1164,7 @@ class GwInfo(ApiParent, QObject):
         """
         completer = QCompleter()
         widget = self.manage_text(dialog, complet_result, field)
-        widget = self.manage_lineedit(field, dialog, widget, completer)
+        widget = manage_lineedit(field, dialog, widget, completer)
         return widget
 
 
@@ -859,8 +1172,8 @@ class GwInfo(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.add_combobox(field)
-        widget = self.set_widget_size(widget, field)
+        widget = add_combobox(field)
+        widget = set_widget_size(widget, field)
         widget = self.set_auto_update_combobox(field, dialog, widget)
         return widget
 
@@ -869,8 +1182,8 @@ class GwInfo(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.add_checkbox(field)
-        widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+        widget = add_checkbox(field)
+        widget.stateChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
         widget = self.set_auto_update_checkbox(field, dialog, widget)
         return widget
 
@@ -879,7 +1192,10 @@ class GwInfo(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.add_calendar(dialog, field)
+        widget = add_calendar(dialog, field, my_json=self.my_json, complet_result=self.complet_result,
+                              new_feature_id=self.new_feature_id, new_feature=self.new_feature,
+                              layer_new_feature=self.layer_new_feature,
+                              feature_id=self.feature_id, feature_type=self.feature_type, layer=self.layer)
         widget = self.set_auto_update_dateedit(field, dialog, widget)
         return widget
 
@@ -888,8 +1204,8 @@ class GwInfo(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.add_button(dialog, field)
-        widget = self.set_widget_size(widget, field)
+        widget = add_button(dialog, field, module=self)
+        widget = set_widget_size(widget, field)
         return widget
 
 
@@ -897,8 +1213,8 @@ class GwInfo(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.add_hyperlink(field)
-        widget = self.set_widget_size(widget, field)
+        widget = add_hyperlink(field)
+        widget = set_widget_size(widget, field)
         return widget
 
 
@@ -906,7 +1222,7 @@ class GwInfo(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.add_horizontal_spacer()
+        widget = add_horizontal_spacer()
         return widget
 
 
@@ -914,7 +1230,7 @@ class GwInfo(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.add_verical_spacer()
+        widget = add_vertical_spacer()
         return widget
 
 
@@ -922,7 +1238,8 @@ class GwInfo(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.add_textarea(field)
+
+        widget = add_textarea(field)
         widget = self.set_auto_update_textarea(field, dialog, widget)
         return widget
 
@@ -931,7 +1248,7 @@ class GwInfo(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.add_spinbox(field)
+        widget = add_spinbox(field)
         widget = self.set_auto_update_spinbox(field, dialog, widget)
         return widget
 
@@ -948,10 +1265,10 @@ class GwInfo(ApiParent, QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.add_tableview(complet_result, field)
-        widget = self.set_headers(widget, field)
-        widget = self.populate_table(widget, field)
-        widget = self.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
+        widget = add_tableview(complet_result, field)
+        widget = set_headers(widget, field)
+        widget = populate_table(widget, field)
+        widget = set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
         qt_tools.set_qtv_config(widget)
         return widget
 
@@ -959,13 +1276,13 @@ class GwInfo(ApiParent, QObject):
     def open_section_form(self):
 
         dlg_sections = InfoCrossectUi()
-        self.load_settings(dlg_sections)
+        load_settings(dlg_sections)
 
         # Set dialog not resizable
         dlg_sections.setFixedSize(dlg_sections.size())
 
         feature = '"id":"' + self.feature_id + '"'
-        body = self.create_body(feature=feature)
+        body = create_body(feature=feature)
         json_result = self.controller.get_json('gw_fct_getinfocrossection', body)
         if not json_result:
             return False
@@ -981,18 +1298,18 @@ class GwInfo(ApiParent, QObject):
                 if 'value' in field:
                     qt_tools.setWidgetText(dlg_sections, widget, field['value'])
 
-        dlg_sections.btn_close.clicked.connect(partial(self.close_dialog, dlg_sections))
-        self.open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
+        dlg_sections.btn_close.clicked.connect(partial(close_dialog, dlg_sections))
+        open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
 
 
-    def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dialog=True):
+    def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True):
         """
         :param dialog:
         :param complet_result:
         :param _json:
         :param p_widget:
         :param clear_json:
-        :param close_dialog:
+        :param close_dlg:
         :return:
         """
 
@@ -1000,7 +1317,7 @@ class GwInfo(ApiParent, QObject):
             if self.controller.dlg_docker:
                 self.controller.dlg_docker.setMinimumWidth(dialog.width())
                 self.controller.close_docker()
-            self.close_dialog(dialog)
+            close_dialog(dialog)
             return
 
         p_table_id = complet_result['body']['feature']['tableName']
@@ -1044,7 +1361,7 @@ class GwInfo(ApiParent, QObject):
                 if self.controller.dlg_docker:
                     self.controller.dlg_docker.setMinimumWidth(dialog.width())
                     self.controller.close_docker()
-                self.close_dialog(dialog)
+                close_dialog(dialog)
                 return
             if self.new_feature.attribute(id_name) is not None:
                 feature = f'"id":"{self.new_feature.attribute(id_name)}", '
@@ -1059,7 +1376,7 @@ class GwInfo(ApiParent, QObject):
         feature += f'"featureType":"{self.feature_type}", '
         feature += f'"tableName":"{p_table_id}"'
         extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
-        body = self.create_body(feature=feature, extras=extras)
+        body = create_body(feature=feature, extras=extras)
         json_result = self.controller.get_json('gw_fct_setfields', body)
         if not json_result:
             return
@@ -1075,11 +1392,11 @@ class GwInfo(ApiParent, QObject):
             # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
             return
 
-        if close_dialog:
+        if close_dlg:
             if self.controller.dlg_docker:
                 self.controller.dlg_docker.setMinimumWidth(dialog.width())
                 self.controller.close_docker()
-            self.close_dialog(dialog)
+            close_dialog(dialog)
 
 
     def get_scale_zoom(self):
@@ -1088,58 +1405,7 @@ class GwInfo(ApiParent, QObject):
         return scale_zoom
 
 
-    def disable_all(self, dialog, result, enable):
 
-        try:
-            widget_list = dialog.findChildren(QWidget)
-            for widget in widget_list:
-                for field in result['fields']:
-                    if widget.objectName() == field['widgetname']:
-                        if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
-                            widget.setReadOnly(not enable)
-                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                        elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
-                            widget.setEnabled(enable)
-                            widget.setStyleSheet("QWidget {color: rgb(0, 0, 0)}")
-                        elif type(widget) is QPushButton:
-                            # Manage the clickability of the buttons according to the configuration
-                            # in the table config_api_form_fields simultaneously with the edition,
-                            # but giving preference to the configuration when iseditable is True
-                            if not field['iseditable']:
-                                widget.setEnabled(field['iseditable'])
-        except RuntimeError:
-            pass
-        finally:
-            self.new_feature_id = None
-
-
-    def enable_all(self, dialog, result):
-
-        try:
-            widget_list = dialog.findChildren(QWidget)
-            for widget in widget_list:
-                if widget.property('keepDisbled'):
-                    continue
-                for field in result['fields']:
-                    if widget.objectName() == field['widgetname']:
-                        if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
-                            widget.setReadOnly(not field['iseditable'])
-                            if not field['iseditable']:
-                                widget.setFocusPolicy(Qt.NoFocus)
-                                widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                            else:
-                                widget.setFocusPolicy(Qt.StrongFocus)
-                                widget.setStyleSheet(None)
-                        elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
-                            widget.setEnabled(field['iseditable'])
-                            if not field['iseditable']:
-                                widget.setFocusPolicy(Qt.NoFocus)
-                                widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                            else:
-                                widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
-                                    field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
-        except RuntimeError:
-            pass
 
 
     def enable_actions(self, enabled):
@@ -1166,17 +1432,16 @@ class GwInfo(ApiParent, QObject):
             def integer_validator(self, value, widget, btn_accept)
             def double_validator(self, value, widget, btn_accept)
         """
-        
+
         value = qt_tools.getWidgetText(dialog, widget, return_string_null=False)
         try:
             getattr(self, f"{widget.property('datatype')}_validator")(value, widget, btn)
         except AttributeError:
             """ If the function called by getattr don't exist raise this exception """
-            pass
 
 
-    def check_min_max_value(self,dialog, widget, btn_accept):
-        
+    def check_min_max_value(self, dialog, widget, btn_accept):
+
         value = qt_tools.getWidgetText(dialog, widget, return_string_null=False)
         try:
             if value and ((widget.property('minValue') and float(value) < float(widget.property('minValue'))) or
@@ -1219,11 +1484,11 @@ class GwInfo(ApiParent, QObject):
             if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
                 _json = {}
                 widget.editingFinished.connect(partial(self.clean_my_json, widget))
-                widget.editingFinished.connect(partial(self.get_values, dialog, widget, _json))
+                widget.editingFinished.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.editingFinished.connect(
                     partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
             else:
-                widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
+                widget.editingFinished.connect(partial(get_values, dialog, widget, self.my_json))
 
             widget.textChanged.connect(partial(self.enabled_accept, dialog))
             widget.textChanged.connect(partial(self.check_datatype_validator, dialog, widget, dialog.btn_accept))
@@ -1238,11 +1503,11 @@ class GwInfo(ApiParent, QObject):
             if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
                 _json = {}
                 widget.textChanged.connect(partial(self.clean_my_json, widget))
-                widget.textChanged.connect(partial(self.get_values, dialog, widget, _json, self.layer))
+                widget.textChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.textChanged.connect(
                     partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
             else:
-                widget.textChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+                widget.textChanged.connect(partial(get_values, dialog, widget, self.my_json))
 
             widget.textChanged.connect(partial(self.enabled_accept, dialog))
             widget.textChanged.connect(partial(self.check_datatype_validator, dialog, widget, dialog.btn_accept))
@@ -1285,11 +1550,11 @@ class GwInfo(ApiParent, QObject):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
-                widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, _json))
+                widget.currentIndexChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.currentIndexChanged.connect(partial(
                     self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
-                widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+                widget.currentIndexChanged.connect(partial(get_values, dialog, widget, self.my_json))
 
         return widget
 
@@ -1300,11 +1565,11 @@ class GwInfo(ApiParent, QObject):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.dateChanged.connect(partial(self.clean_my_json, widget))
-                widget.dateChanged.connect(partial(self.get_values, dialog, widget, _json))
+                widget.dateChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.dateChanged.connect(partial(
                     self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
-                widget.dateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+                widget.dateChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
 
         return widget
 
@@ -1315,11 +1580,11 @@ class GwInfo(ApiParent, QObject):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.valueChanged.connect(partial(self.clean_my_json, widget))
-                widget.valueChanged.connect(partial(self.get_values, dialog, widget, _json))
+                widget.valueChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.valueChanged.connect(partial(
                     self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
-                widget.valueChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+                widget.valueChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
 
         return widget
 
@@ -1330,17 +1595,17 @@ class GwInfo(ApiParent, QObject):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.stateChanged.connect(partial(self.clean_my_json, widget))
-                widget.stateChanged.connect(partial(self.get_values, dialog, widget, _json))
+                widget.stateChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.stateChanged.connect(partial(
                     self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
-                widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
+                widget.stateChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
         return widget
 
 
     def open_catalog(self, tab_type, feature_type):
 
-        self.catalog = GwCatalog(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.catalog = GwCatalog()
 
         # Check geom_type
         if self.geom_type == 'connec':
@@ -1426,7 +1691,7 @@ class GwInfo(ApiParent, QObject):
 
         table_element = "v_ui_element_x_" + self.geom_type
         self.fill_tbl_element_man(self.dlg_cf, self.tbl_element, table_element, self.filter)
-        self.set_columns_config(self.tbl_element, table_element)
+        set_columns_config(self.tbl_element, table_element)
 
 
     def fill_tbl_element_man(self, dialog, widget, table_name, expr_filter):
@@ -1454,7 +1719,7 @@ class GwInfo(ApiParent, QObject):
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "element"
-        self.set_completer_object(dialog, self.table_object)
+        set_completer_object(dialog, self.table_object)
 
 
     def open_selected_element(self, dialog, widget):
@@ -1564,19 +1829,19 @@ class GwInfo(ApiParent, QObject):
     def manage_element(self, dialog, element_id=None, feature=None):
         """ Execute action of button 33 """
 
-        elem = GwElement(self.iface, self.settings, self.controller, self.plugin_dir)
+        elem = GwElement()
         elem.manage_element(True, feature, self.geom_type)
         elem.dlg_add_element.accepted.connect(partial(self.manage_element_new, dialog, elem))
         elem.dlg_add_element.rejected.connect(partial(self.manage_element_new, dialog, elem))
 
         # Set completer
-        self.set_completer_object(dialog, self.table_object)
+        set_completer_object(dialog, self.table_object)
 
         if element_id:
             qt_tools.setWidgetText(elem.dlg_add_element, "element_id", element_id)
 
         # Open dialog
-        elem.open_dialog(elem.dlg_add_element)
+        open_dialog(elem.dlg_add_element)
 
 
     def manage_element_new(self, dialog, elem):
@@ -1639,8 +1904,8 @@ class GwInfo(ApiParent, QObject):
         """ Fill tab 'Relations' """
 
         table_relations = f"v_ui_{self.geom_type}_x_relations"
-        self.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
-        self.set_columns_config(self.tbl_relations, table_relations)
+        fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
+        set_columns_config(self.tbl_relations, table_relations)
         self.tbl_relations.doubleClicked.connect(partial(self.open_relation, str(self.field_id)))
 
 
@@ -1680,14 +1945,14 @@ class GwInfo(ApiParent, QObject):
             self.controller.show_message(message, parameter=table_name)
             return
 
-        api_cf = GwInfo(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
+        api_cf = GwInfo(self.tab_type)
         complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             self.controller.log_info("FAIL open_relation")
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        self.draw(complet_result[0], margin)
+        draw(complet_result[0], self.rubber_band, margin)
 
 
     """ FUNCTIONS RELATED WITH TAB CONNECTIONS """
@@ -1696,11 +1961,11 @@ class GwInfo(ApiParent, QObject):
         """ Fill tab 'Connections' """
 
         filter_ = f"node_id='{self.feature_id}'"
-        self.fill_table(self.dlg_cf.tbl_upstream, self.schema_name + ".v_ui_node_x_connection_upstream", filter_)
-        self.set_columns_config(self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
+        fill_table(self.dlg_cf.tbl_upstream, self.schema_name + ".v_ui_node_x_connection_upstream", filter_)
+        set_columns_config(self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
 
-        self.fill_table(self.dlg_cf.tbl_downstream, self.schema_name + ".v_ui_node_x_connection_downstream", filter_)
-        self.set_columns_config(self.dlg_cf.tbl_downstream, "v_ui_node_x_connection_downstream")
+        fill_table(self.dlg_cf.tbl_downstream, self.schema_name + ".v_ui_node_x_connection_downstream", filter_)
+        set_columns_config(self.dlg_cf.tbl_downstream, "v_ui_node_x_connection_downstream")
 
         self.dlg_cf.tbl_upstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
         self.dlg_cf.tbl_downstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
@@ -1718,14 +1983,14 @@ class GwInfo(ApiParent, QObject):
         row = selected_list[0].row()
         table_name = qtable.model().record(row).value("sys_table_id")
         feature_id = qtable.model().record(row).value("feature_id")
-        api_cf = GwInfo(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
+        api_cf = GwInfo(self.tab_type)
         complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             self.controller.log_info("FAIL open_up_down_stream")
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        self.draw(complet_result[0], margin)
+        draw(complet_result[0], self.rubber_band, margin)
 
 
     """ FUNCTIONS RELATED WITH TAB HYDROMETER"""
@@ -1736,7 +2001,7 @@ class GwInfo(ApiParent, QObject):
         table_hydro = "v_ui_hydrometer"
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
         self.fill_tbl_hydrometer(self.tbl_hydrometer, table_hydro)
-        self.set_columns_config(self.tbl_hydrometer, table_hydro)
+        set_columns_config(self.tbl_hydrometer, table_hydro)
         txt_hydrometer_id.textChanged.connect(partial(self.fill_tbl_hydrometer, self.tbl_hydrometer, table_hydro))
         self.tbl_hydrometer.doubleClicked.connect(partial(self.open_selected_hydro, self.tbl_hydrometer))
         self.dlg_cf.findChild(QPushButton, "btn_link").clicked.connect(self.check_url)
@@ -1758,7 +2023,7 @@ class GwInfo(ApiParent, QObject):
         feature_id = index.sibling(row, column_index).data()
 
         # return
-        api_cf = GwInfo(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
+        api_cf = GwInfo(self.tab_type)
         complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             self.controller.log_info("FAIL open_selected_hydro")
@@ -1820,7 +2085,7 @@ class GwInfo(ApiParent, QObject):
                " WHERE connec_id = '" + str(self.feature_id) + "' "
                " ORDER BY hydrometer_customer_code")
         rows_list = []
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         rows_list.append(['', ''])
         if rows:
             for row in rows:
@@ -1828,7 +2093,7 @@ class GwInfo(ApiParent, QObject):
         qt_tools.set_item_data(self.dlg_cf.cmb_hyd_customer_code, rows_list, 1)
 
         self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
-        self.set_columns_config(self.tbl_hydrometer_value, table_hydro_value)
+        set_columns_config(self.tbl_hydrometer_value, table_hydro_value)
 
         self.dlg_cf.cmb_cat_period_id_filter.currentIndexChanged.connect(
             partial(self.fill_tbl_hydrometer_values, self.tbl_hydrometer_value, table_hydro_value))
@@ -1849,7 +2114,7 @@ class GwInfo(ApiParent, QObject):
 
         # Set model of selected widget
         self.set_model_to_table(qtable, self.schema_name + "." + table_name, filter_, QSqlTableModel.OnFieldChange)
-        self.set_columns_config(self.tbl_hydrometer_value, table_name)
+        set_columns_config(self.tbl_hydrometer_value, table_name)
 
 
     def set_filter_hydrometer_values(self, widget):
@@ -1875,7 +2140,7 @@ class GwInfo(ApiParent, QObject):
         table_event_geom = "v_ui_event_x_" + geom_type
         self.fill_tbl_event(self.tbl_event_cf, table_event_geom, self.filter)
         self.tbl_event_cf.doubleClicked.connect(self.open_visit_event)
-        self.set_columns_config(self.tbl_event_cf, table_event_geom)
+        set_columns_config(self.tbl_event_cf, table_event_geom)
 
 
     def fill_tbl_event(self, widget, table_name, filter_):
@@ -1888,7 +2153,7 @@ class GwInfo(ApiParent, QObject):
         self.date_event_to = self.dlg_cf.findChild(QDateEdit, "date_event_to")
         self.date_event_from = self.dlg_cf.findChild(QDateEdit, "date_event_from")
 
-        self.set_dates_from_to(self.date_event_from, self.date_event_to, table_name, 'visit_start', 'visit_end')
+        set_dates_from_to(self.date_event_from, self.date_event_to, table_name, 'visit_start', 'visit_end')
 
         btn_open_visit = self.dlg_cf.findChild(QPushButton, "btn_open_visit")
         btn_new_visit = self.dlg_cf.findChild(QPushButton, "btn_new_visit")
@@ -1944,8 +2209,8 @@ class GwInfo(ApiParent, QObject):
 
         # Open dialog event_standard
         self.dlg_event_full = VisitEventFull()
-        self.load_settings(self.dlg_event_full)
-        self.dlg_event_full.rejected.connect(partial(self.close_dialog, self.dlg_event_full))
+        load_settings(self.dlg_event_full)
+        self.dlg_event_full.rejected.connect(partial(close_dialog, self.dlg_event_full))
         # Get all data for one visit
         sql = (f"SELECT * FROM om_visit_event"
                f" WHERE id = '{self.event_id}' AND visit_id = '{self.visit_id}'")
@@ -1984,10 +2249,10 @@ class GwInfo(ApiParent, QObject):
             widget.setReadOnly(True)
             widget.setStyleSheet("QWidget { background: rgb(242, 242, 242);"
                                  " color: rgb(100, 100, 100)}")
-        self.dlg_event_full.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_event_full))
+        self.dlg_event_full.btn_close.clicked.connect(partial(close_dialog, self.dlg_event_full))
         self.dlg_event_full.tbl_docs_x_event.doubleClicked.connect(self.open_file)
         qt_tools.set_qtv_config(self.dlg_event_full.tbl_docs_x_event)
-        self.open_dialog(self.dlg_event_full, 'visit_event_full')
+        open_dialog(self.dlg_event_full, 'visit_event_full')
 
 
     def populate_tbl_docs_x_event(self):
@@ -2101,7 +2366,7 @@ class GwInfo(ApiParent, QObject):
         if event_type_value != 'null':
             sql += f" AND parameter_type ILIKE '%{event_type_value}%'"
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if rows:
             rows.append(['', ''])
             qt_tools.set_item_data(self.dlg_cf.event_id, rows, 1)
@@ -2168,16 +2433,18 @@ class GwInfo(ApiParent, QObject):
     def open_visit(self):
         """ Call button 65: om_visit_management """
 
-        manage_visit = GwVisitManager(self.iface, self.settings, self.controller, self.plugin_dir)
+        manage_visit = GwVisitManager()
         manage_visit.visit_added.connect(self.update_visit_table)
         manage_visit.edit_visit(self.geom_type, self.feature_id)
 
 
     # creat the new visit GUI
+
+
     def update_visit_table(self):
         """ Convenience fuction set as slot to update table after a Visit GUI close. """
         table_name = "v_ui_event_x_" + self.geom_type
-        self.set_dates_from_to(self.date_event_from, self.date_event_to, table_name, 'visit_start', 'visit_end')
+        set_dates_from_to(self.date_event_from, self.date_event_to, table_name, 'visit_start', 'visit_end')
         self.tbl_event_cf.model().select()
 
 
@@ -2191,7 +2458,7 @@ class GwInfo(ApiParent, QObject):
             self.controller.show_warning(msg)
             return
 
-        manage_visit = GwVisitManager(self.iface, self.settings, self.controller, self.plugin_dir)
+        manage_visit = GwVisitManager()
         manage_visit.visit_added.connect(self.update_visit_table)
         # TODO: the following query fix a (for me) misterious bug
         # the DB connection is not available during manage_visit.manage_visit first call
@@ -2205,7 +2472,7 @@ class GwInfo(ApiParent, QObject):
         """ Open gallery of selected record of the table """
 
         # Open Gallery
-        gal = GwVisitGallery(self.iface, self.settings, self.controller, self.plugin_dir)
+        gal = GwVisitGallery()
         gal.manage_gallery()
         gal.fill_gallery(self.visit_id, self.event_id)
 
@@ -2254,8 +2521,8 @@ class GwInfo(ApiParent, QObject):
         else:
             # If more then one document is attached open dialog with list of documents
             self.dlg_load_doc = VisitDocument()
-            self.load_settings(self.dlg_load_doc)
-            self.dlg_load_doc.rejected.connect(partial(self.close_dialog, self.dlg_load_doc))
+            load_settings(self.dlg_load_doc)
+            self.dlg_load_doc.rejected.connect(partial(close_dialog, self.dlg_load_doc))
             btn_open_doc = self.dlg_load_doc.findChild(QPushButton, "btn_open")
             btn_open_doc.clicked.connect(self.open_selected_doc)
 
@@ -2268,7 +2535,7 @@ class GwInfo(ApiParent, QObject):
                 item_doc = QListWidgetItem(str(row[0]))
                 self.tbl_list_doc.addItem(item_doc)
 
-            self.open_dialog(self.dlg_load_doc, dlg_name='visit_document')
+            open_dialog(self.dlg_load_doc, dlg_name='visit_document')
 
 
     def open_selected_doc(self):
@@ -2315,7 +2582,7 @@ class GwInfo(ApiParent, QObject):
 
         table_document = "v_ui_doc_x_" + self.geom_type
         self.fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
-        self.set_columns_config(self.tbl_document, table_document)
+        set_columns_config(self.tbl_document, table_document)
 
 
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
@@ -2334,7 +2601,7 @@ class GwInfo(ApiParent, QObject):
         btn_doc_new = self.dlg_cf.findChild(QPushButton, "btn_doc_new")
 
         # Set max and min dates
-        self.set_dates_from_to(self.date_document_from, self.date_document_to, table_name, 'date', 'date')
+        set_dates_from_to(self.date_document_from, self.date_document_to, table_name, 'date', 'date')
 
         # Set model of selected widget
         self.set_model_to_table(widget, self.schema_name + "." + table_name, expr_filter)
@@ -2358,7 +2625,7 @@ class GwInfo(ApiParent, QObject):
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "doc"
-        self.set_completer_object(dialog, self.table_object)
+        set_completer_object(dialog, self.table_object)
 
         # Set filter expresion
         self.set_filter_table_man(widget)
@@ -2427,13 +2694,13 @@ class GwInfo(ApiParent, QObject):
     def manage_new_document(self, dialog, doc_id=None, feature=None):
         """ Execute action of button 34 """
 
-        doc = GwDocument(self.iface, self.settings, self.controller, self.plugin_dir)
+        doc = GwDocument()
         doc.manage_document(feature=feature, geom_type=self.geom_type)
         doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, dialog, doc))
         doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, dialog, doc))
 
         # Set completer
-        self.set_completer_object(dialog, self.table_object)
+        set_completer_object(dialog, self.table_object)
         if doc_id:
             qt_tools.setWidgetText(dialog, "doc_id", doc_id)
 
@@ -2466,7 +2733,7 @@ class GwInfo(ApiParent, QObject):
         """ Put filter widgets into layout and set headers into QTableView """
 
         rpt_layout1 = dialog.findChild(QGridLayout, "rpt_layout1")
-        self.clear_gridlayout(rpt_layout1)
+        clear_gridlayout(rpt_layout1)
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
         complet_list = self.get_list(complet_result, tab_name=tab_name)
@@ -2498,7 +2765,7 @@ class GwInfo(ApiParent, QObject):
                 if 'isparent' in field:
                     if field['isparent']:
                         widget = dialog.findChild(QComboBox, field['widgetname'])
-                        widget.currentIndexChanged.connect(partial(self.fill_child, dialog, widget, self.feature_type,
+                        widget.currentIndexChanged.connect(partial(fill_child, dialog, widget, self.feature_type,
                             self.tablename, self.field_id))
 
         return complet_list, widget_list
@@ -2523,7 +2790,7 @@ class GwInfo(ApiParent, QObject):
         form = f'"formName":"{form_name}", "tabName":"{tab_name}"'
         id_name = complet_result[0]['body']['feature']['idName']
         feature = f'"tableName":"{self.tablename}", "idName":"{id_name}", "id":"{self.feature_id}"'
-        body = self.create_body(form, feature, filter_fields)
+        body = create_body(form, feature, filter_fields)
         function_name = 'gw_fct_getlist'
         json_result = self.controller.get_json(function_name, body)
         if json_result is None:
@@ -2548,8 +2815,8 @@ class GwInfo(ApiParent, QObject):
             if field['widgettype'] == "tableview":
                 qtable = dialog.findChild(QTableView, field['widgetname'])
                 if qtable:
-                    self.set_headers(qtable, field)
-                    self.populate_table(qtable, field)
+                    set_headers(qtable, field)
+                    populate_table(qtable, field)
 
         return complet_list
 
@@ -2592,14 +2859,14 @@ class GwInfo(ApiParent, QObject):
         feature_id = index.sibling(row, column_index).data()
 
         # return
-        api_cf = GwInfo(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
+        api_cf = GwInfo(self.tab_type)
         complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             self.controller.log_info("FAIL open_rpt_result")
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        self.draw(complet_result[0], margin)
+        draw(complet_result[0], self.rubber_band, margin)
 
 
     """ FUNCTIONS RELATED WITH TAB PLAN """
@@ -2616,7 +2883,7 @@ class GwInfo(ApiParent, QObject):
             feature += f'"tableName":"{self.tablename}", '
             feature += f'"idName":"{self.field_id}", '
             feature += f'"id":"{self.feature_id}"'
-            body = self.create_body(form, feature, filter_fields='')
+            body = create_body(form, feature, filter_fields='')
             json_result = self.controller.get_json('gw_fct_getinfoplan', body)
             if not json_result:
                 return False
@@ -2629,7 +2896,7 @@ class GwInfo(ApiParent, QObject):
                     label = QLabel()
                     if field['widgettype'] == 'divider':
                         for x in range(0, 2):
-                            line = self.add_frame(field, x)
+                            line = add_frame(field, x)
                             plan_layout.addWidget(line, field['layoutorder'], x)
                     else:
                         label = QLabel()
@@ -2642,7 +2909,7 @@ class GwInfo(ApiParent, QObject):
                             label.setToolTip(field['label'].capitalize())
 
                     if field['widgettype'] == 'label':
-                        widget = self.add_label(field)
+                        widget = add_label(field)
                         widget.setAlignment(Qt.AlignRight)
                         label.setWordWrap(True)
                         plan_layout.addWidget(label, field['layoutorder'], 0)
@@ -2669,19 +2936,21 @@ class GwInfo(ApiParent, QObject):
             return
 
         self.dlg_new_workcat = InfoGenericUi()
-        self.load_settings(self.dlg_new_workcat)
+        load_settings(self.dlg_new_workcat)
 
         # Set signals
-        self.dlg_new_workcat.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_new_workcat))
-        self.dlg_new_workcat.rejected.connect(partial(self.close_dialog, self.dlg_new_workcat))
+        self.dlg_new_workcat.btn_close.clicked.connect(partial(close_dialog, self.dlg_new_workcat))
+        self.dlg_new_workcat.rejected.connect(partial(close_dialog, self.dlg_new_workcat))
         self.dlg_new_workcat.btn_accept.clicked.connect(
             partial(self.cf_manage_new_workcat_accept, 'cat_work', tab_type))
 
-        self.populate_basic_info(self.dlg_new_workcat, complet_list, self.field_id)
+        populate_basic_info(self.dlg_new_workcat, complet_list, self.field_id, self.my_json,
+                 new_feature_id=self.new_feature_id, new_feature=self.new_feature, layer_new_feature=self.layer_new_feature,
+                 feature_id=self.feature_id, feature_type=self.feature_type, layer=self.layer)
 
         # Open dialog
         self.dlg_new_workcat.setWindowTitle("Create workcat")
-        self.open_dialog(self.dlg_new_workcat, dlg_name='info_generic')
+        open_dialog(self.dlg_new_workcat, dlg_name='info_generic')
 
 
     def cf_manage_new_workcat_accept(self, table_object, tab_type):
@@ -2744,10 +3013,10 @@ class GwInfo(ApiParent, QObject):
                         cmb_workcat_id = self.dlg_cf.findChild(QWidget, tab_type + "_workcat_id")
                         model = QStringListModel()
                         completer = QCompleter()
-                        self.set_completer_object_api(completer, model, cmb_workcat_id, rows[0])
+                        set_completer_object_api(completer, model, cmb_workcat_id, rows[0])
                         qt_tools.setWidgetText(self.dlg_cf, cmb_workcat_id, cat_work_id)
                         self.my_json[str(cmb_workcat_id.property('columnname'))] = str(cat_work_id)
-                    self.close_dialog(self.dlg_new_workcat)
+                    close_dialog(self.dlg_new_workcat)
                 else:
                     msg = "This workcat already exists"
                     self.controller.show_info_box(msg, "Warning")
@@ -2795,31 +3064,23 @@ class GwInfo(ApiParent, QObject):
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.vertex_marker.setPenWidth(3)
 
-        # Snapper
-        self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper_manager.set_controller(self.controller)
-        self.snapper = self.snapper_manager.get_snapper()
-
         # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
+        self.previous_snapping = get_snapping_options
 
         # Disable snapping
-        self.snapper_manager.enable_snapping()
-
-        # Set snapping to 'arc' and 'node'
-        self.snapper_manager.set_snapping_layers()
+        enable_snapping()
 
         # if we are doing info over connec or over node
         if option == 'arc':
-            self.snapper_manager.snap_to_arc()
+            snap_to_arc()
         elif option == 'node':
-            self.snapper_manager.snap_to_node()
+            snap_to_node()
 
         # Set signals
         self.canvas.xyCoordinates.connect(partial(self.mouse_moved, layer))
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
-        self.emit_point.canvasClicked.connect(partial(self.get_id, dialog, action, option))
+        emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(emit_point)
+        emit_point.canvasClicked.connect(partial(self.get_id, dialog, action, option))
 
 
     def mouse_moved(self, layer, point):
@@ -2831,16 +3092,16 @@ class GwInfo(ApiParent, QObject):
 
         # Get clicked point
         self.vertex_marker.hide()
-        event_point = self.snapper_manager.get_event_point(point=point)
+        event_point = get_event_point(point=point)
 
         # Snapping
-        result = self.snapper_manager.snap_to_current_layer(event_point)
-        if self.snapper_manager.result_is_valid():
-            layer = self.snapper_manager.get_snapped_layer(result)
+        result = snap_to_current_layer(event_point)
+        if result.isValid():
+            layer = get_snapped_layer(result)
             # Check feature
             viewname = self.controller.get_layer_source_table_name(layer)
             if viewname == layer_name:
-                self.snapper_manager.add_marker(result, self.vertex_marker)
+                add_marker(result, self.vertex_marker)
 
 
     def get_id(self, dialog, action, option, point, event):
@@ -2855,20 +3116,19 @@ class GwInfo(ApiParent, QObject):
             return
 
         # Get coordinates
-        event_point = self.snapper_manager.get_event_point(point=point)
+        event_point = get_event_point(point=point)
 
         # Snapping
-        result = self.snapper_manager.snap_to_current_layer(event_point)
-
-        if not self.snapper_manager.result_is_valid():
+        result = snap_to_current_layer(event_point)
+        if not result.isValid():
             return
         # Get the point. Leave selection
-        snapped_feat = self.snapper_manager.get_snapped_feature(result)
+        snapped_feat = get_snapped_feature(result)
         feat_id = snapped_feat.attribute(f'{options[option][0]}')
         widget = dialog.findChild(QWidget, f"{options[option][1]}")
         widget.setFocus()
         qt_tools.setWidgetText(dialog, widget, str(feat_id))
-        self.snapper_manager.recover_snapping_options()
+        apply_snapping_options(self.previous_snapping)
         self.cancel_snapping_tool(dialog, action)
 
 
@@ -2880,12 +3140,12 @@ class GwInfo(ApiParent, QObject):
         self.signal_activate.emit()
 
 
-    def disconnect_snapping(self, action_pan=True):
+    def disconnect_snapping(self, action_pan=True, emit_point=None):
         """ Select 'Pan' as current map tool and disconnect snapping """
 
+        emit_point.canvasClicked.disconnect()
         try:
             self.canvas.xyCoordinates.disconnect()
-            self.emit_point.canvasClicked.disconnect()
             if action_pan:
                 self.iface.actionPan().trigger()
             self.vertex_marker.hide()
@@ -2910,13 +3170,11 @@ class GwInfo(ApiParent, QObject):
         widget = kwargs['widget']
 
         feature_id = qt_tools.getWidgetText(dialog, widget)
-        self.ApiCF = GwInfo(self.iface, self.settings, self.controller, self.plugin_dir, self.tab_type)
+        self.ApiCF = GwInfo(self.tab_type)
         complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=feature_id,
             tab_type=self.tab_type, is_docker=False)
         if not complet_result:
             self.controller.log_info("FAIL open_node")
             return
 
-        margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        self.draw(complet_result[0], margin)
 

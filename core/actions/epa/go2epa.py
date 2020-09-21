@@ -6,37 +6,33 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsApplication
-from qgis.PyQt.QtCore import QDate, QStringListModel, QTime, Qt, QRegExp
-from qgis.PyQt.QtWidgets import QAbstractItemView, QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, \
-    QFileDialog
-from qgis.PyQt.QtGui import QRegExpValidator
+from qgis.PyQt.QtCore import QDate, QStringListModel, QTime, Qt
+from qgis.PyQt.QtWidgets import QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, QFileDialog
 
 import os
 import sys
 from functools import partial
 
+from .... import global_vars
 from lib import qt_tools
 from ..epa.go2epa_options import GwGo2EpaOptions
-from ....actions.api_parent import ApiParent
 from ...tasks.tsk_go2epa import GwGo2EpaTask
 from ...admin import GwAdmin
-from ....ui_manager import Go2EpaSelectorUi, EpaManager, Go2EpaUI, HydrologySelector, Multirow_selector
+from ....ui_manager import Go2EpaUI, HydrologySelector, Multirow_selector
+from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
+from ....actions.parent_functs import multi_row_selector
 
 
-class GwGo2Epa(ApiParent):
+class GwGo2Epa:
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
         """ Class to control toolbar 'go2epa' """
 
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-
-        self.g2epa_opt = GwGo2EpaOptions(iface, settings, controller, plugin_dir)
+        self.g2epa_opt = GwGo2EpaOptions()
         self.iterations = 0
-        self.project_type = controller.get_project_type()
-
-
-    def set_project_type(self, project_type):
-        self.project_type = project_type
+        self.controller = global_vars.controller
+        self.project_type = self.controller.get_project_type()
+        self.plugin_dir = global_vars.plugin_dir
 
 
     def go2epa(self):
@@ -47,7 +43,7 @@ class GwGo2Epa(ApiParent):
 
         # Create dialog
         self.dlg_go2epa = Go2EpaUI()
-        self.load_settings(self.dlg_go2epa)
+        load_settings(self.dlg_go2epa)
         self.load_user_values()
         if self.project_type in 'ws':
             self.dlg_go2epa.chk_export_subcatch.setVisible(False)
@@ -82,7 +78,7 @@ class GwGo2Epa(ApiParent):
             self.dlg_go2epa.btn_cancel.clicked.disconnect()
             self.dlg_go2epa.btn_cancel.clicked.connect(self.controller.close_docker)
         else:
-            self.open_dialog(self.dlg_go2epa, dlg_name='go2epa')
+            open_dialog(self.dlg_go2epa, dlg_name='go2epa')
 
 
     def set_signals(self):
@@ -91,8 +87,8 @@ class GwGo2Epa(ApiParent):
         self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
         self.dlg_go2epa.btn_accept.clicked.connect(self.go2epa_accept)
-        self.dlg_go2epa.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_go2epa))
-        self.dlg_go2epa.rejected.connect(partial(self.close_dialog, self.dlg_go2epa))
+        self.dlg_go2epa.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_go2epa))
+        self.dlg_go2epa.rejected.connect(partial(close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.btn_options.clicked.connect(self.epa_options)
 
 
@@ -178,60 +174,52 @@ class GwGo2Epa(ApiParent):
     def load_user_values(self):
         """ Load QGIS settings related with file_manager """
 
-        cur_user = self.controller.get_current_user()
-
         self.dlg_go2epa.txt_result_name.setMaxLength(16)
-        self.result_name = self.controller.plugin_settings_value('go2epa_RESULT_NAME' + cur_user)
+        self.result_name = get_parser_value('go2epa', 'go2epa_RESULT_NAME')
         self.dlg_go2epa.txt_result_name.setText(self.result_name)
-        self.file_inp = self.controller.plugin_settings_value('go2epa_FILE_INP' + cur_user)
+        self.file_inp = get_parser_value('go2epa', 'go2epa_FILE_INP')
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
-        self.file_rpt = self.controller.plugin_settings_value('go2epa_FILE_RPT' + cur_user)
+        self.file_rpt = get_parser_value('go2epa', 'go2epa_FILE_RPT')
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
 
-        value = self.controller.plugin_settings_value('go2epa_chk_NETWORK_GEOM' + cur_user)
-        if str(value) == 'true':
-            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, True)
-        value = self.controller.plugin_settings_value('go2epa_chk_INP' + cur_user)
-        if str(value) == 'true':
-            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, True)
-        value = self.controller.plugin_settings_value('go2epa_chk_UD' + cur_user)
-        if str(value) == 'true':
-            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, True)
-        value = self.controller.plugin_settings_value('go2epa_chk_EPA' + cur_user)
-        if str(value) == 'true':
-            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, True)
-        value = self.controller.plugin_settings_value('go2epa_chk_RPT' + cur_user)
-        if str(value) == 'true':
-            qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, True)
+        value = get_parser_value('go2epa', 'go2epa_chk_NETWORK_GEOM')
+        qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, value)
+        value = get_parser_value('go2epa', 'go2epa_chk_INP')
+        qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, value)
+        value = get_parser_value('go2epa', 'go2epa_chk_UD')
+        qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, value)
+        value = get_parser_value('go2epa', 'go2epa_chk_EPA')
+        qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, value)
+        value = get_parser_value('go2epa', 'go2epa_chk_RPT')
+        qt_tools.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, value)
 
 
     def save_user_values(self):
         """ Save QGIS settings related with file_manager """
 
-        cur_user = self.controller.get_current_user()
-        self.controller.plugin_settings_set_value('go2epa_RESULT_NAME' + cur_user,
-            qt_tools.getWidgetText(self.dlg_go2epa, 'txt_result_name', return_string_null=False))
-        self.controller.plugin_settings_set_value('go2epa_FILE_INP' + cur_user,
-            qt_tools.getWidgetText(self.dlg_go2epa, 'txt_file_inp', return_string_null=False))
-        self.controller.plugin_settings_set_value('go2epa_FILE_RPT' + cur_user,
-            qt_tools.getWidgetText(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False))
-        self.controller.plugin_settings_set_value('go2epa_chk_NETWORK_GEOM' + cur_user,
-            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check))
-        self.controller.plugin_settings_set_value('go2epa_chk_INP' + cur_user,
-            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export))
-        self.controller.plugin_settings_set_value('go2epa_chk_UD' + cur_user,
-            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch))
-        self.controller.plugin_settings_set_value('go2epa_chk_EPA' + cur_user,
-            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec))
-        self.controller.plugin_settings_set_value('go2epa_chk_RPT' + cur_user,
-            qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result))
+        set_parser_value('go2epa', 'go2epa_RESULT_NAME',
+                         f"{qt_tools.getWidgetText(self.dlg_go2epa, 'txt_result_name', return_string_null=False)}")
+        set_parser_value('go2epa', 'go2epa_FILE_INP',
+                         f"{qt_tools.getWidgetText(self.dlg_go2epa, 'txt_file_inp', return_string_null=False)}")
+        set_parser_value('go2epa', 'go2epa_FILE_RPT',
+                         f"{qt_tools.getWidgetText(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False)}")
+        set_parser_value('go2epa', 'go2epa_chk_NETWORK_GEOM',
+                         f"{qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)}")
+        set_parser_value('go2epa', 'go2epa_chk_INP',
+                         f"{qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)}")
+        set_parser_value('go2epa', 'go2epa_chk_UD',
+                         f"{qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)}")
+        set_parser_value('go2epa', 'go2epa_chk_EPA',
+                         f"{qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)}")
+        set_parser_value('go2epa', 'go2epa_chk_RPT',
+                         f"{qt_tools.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)}")
 
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right, aql=""):
         """ Load the tables in the selection form """
 
         dlg_psector_sel = Multirow_selector('dscenario')
-        self.load_settings(dlg_psector_sel)
+        load_settings(dlg_psector_sel)
         dlg_psector_sel.btn_ok.clicked.connect(dlg_psector_sel.close)
 
         if tableleft == 'cat_dscenario':
@@ -243,9 +231,9 @@ class GwGo2Epa(ApiParent):
             qt_tools.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected,
                                    self.controller.tr('Selected dscenarios', context_name='labels'))
 
-        self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
+        multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
 
-        self.open_dialog(dlg_psector_sel)
+        open_dialog(dlg_psector_sel)
 
 
     def epa_options(self):
@@ -259,7 +247,7 @@ class GwGo2Epa(ApiParent):
         """ Dialog hydrology_selector.ui """
 
         self.dlg_hydrology_selector = HydrologySelector()
-        self.load_settings(self.dlg_hydrology_selector)
+        load_settings(self.dlg_hydrology_selector)
 
         self.dlg_hydrology_selector.btn_accept.clicked.connect(self.save_hydrology)
         self.dlg_hydrology_selector.hydrology.currentIndexChanged.connect(self.update_labels)
@@ -286,7 +274,7 @@ class GwGo2Epa(ApiParent):
             qt_tools.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 0)
 
         self.update_labels()
-        self.open_dialog(self.dlg_hydrology_selector)
+        open_dialog(self.dlg_hydrology_selector)
 
 
     def save_hydrology(self):
@@ -306,7 +294,7 @@ class GwGo2Epa(ApiParent):
 
         message = "Values has been update"
         self.controller.show_info(message)
-        self.close_dialog(self.dlg_hydrology_selector)
+        close_dialog(self.dlg_hydrology_selector)
 
 
     def update_labels(self):
@@ -340,7 +328,7 @@ class GwGo2Epa(ApiParent):
         self.file_inp = qt_tools.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
         # Set default value if necessary
         if self.file_inp is None or self.file_inp == '':
-            self.file_inp = self.plugin_dir
+            self.file_inp = global_vars.plugin_dir
 
         # Get directory of that file
         folder_path = os.path.dirname(self.file_inp)
@@ -357,7 +345,7 @@ class GwGo2Epa(ApiParent):
 
         # Set default value if necessary
         if self.file_rpt is None or self.file_rpt == '':
-            self.file_rpt = self.plugin_dir
+            self.file_rpt = global_vars.plugin_dir
 
         # Get directory of that file
         folder_path = os.path.dirname(self.file_rpt)
@@ -402,7 +390,7 @@ class GwGo2Epa(ApiParent):
 
         # Set background task 'Go2Epa'
         description = f"Go2Epa"
-        self.task_go2epa = GwGo2EpaTask(description, self.controller, self)
+        self.task_go2epa = GwGo2EpaTask(description, self)
         QgsApplication.taskManager().addTask(self.task_go2epa)
         QgsApplication.taskManager().triggerTask(self.task_go2epa)
 
@@ -448,190 +436,6 @@ class GwGo2Epa(ApiParent):
             self.dlg_go2epa.chk_only_check.setEnabled(True)
 
 
-    def go2epa_result_selector(self):
-        """ Button 29: Epa result selector """
-
-        # Create the dialog and signals
-        self.dlg_go2epa_result = Go2EpaSelectorUi()
-        self.load_settings(self.dlg_go2epa_result)
-        if self.project_type == 'ud':
-            qt_tools.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_time")
-        if self.project_type == 'ws':
-            qt_tools.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_datetime")
-        self.dlg_go2epa_result.btn_accept.clicked.connect(self.result_selector_accept)
-        self.dlg_go2epa_result.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_go2epa_result))
-        self.dlg_go2epa_result.rejected.connect(partial(self.close_dialog, self.dlg_go2epa_result))
-
-        # Set values from widgets of type QComboBox
-        sql = ("SELECT DISTINCT(result_id), result_id "
-               "FROM v_ui_rpt_cat_result ORDER BY result_id")
-        rows = self.controller.get_rows(sql)
-        qt_tools.set_item_data(self.dlg_go2epa_result.rpt_selector_result_id, rows)
-        rows = self.controller.get_rows(sql, add_empty_row=True)
-        qt_tools.set_item_data(self.dlg_go2epa_result.rpt_selector_compare_id, rows)
-
-        if self.project_type == 'ws':
-
-            sql = ("SELECT DISTINCT time, time FROM rpt_arc "
-                   "WHERE result_id ILIKE '%%' ORDER BY time")
-            rows = self.controller.get_rows(sql, add_empty_row=True)
-            qt_tools.set_item_data(self.dlg_go2epa_result.cmb_time_to_show, rows)
-            qt_tools.set_item_data(self.dlg_go2epa_result.cmb_time_to_compare, rows)
-
-            self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
-                self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_time_to_show))
-            self.dlg_go2epa_result.rpt_selector_compare_id.currentIndexChanged.connect(partial(
-                self.populate_time, self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_time_to_compare))
-
-        elif self.project_type == 'ud':
-
-            # Populate GroupBox Selector date
-            result_id = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
-            sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
-                   f"WHERE result_id = '{result_id}' "
-                   f"ORDER BY resultdate")
-            rows = self.controller.get_rows(sql)
-            if rows is not None:
-                qt_tools.set_item_data(self.dlg_go2epa_result.cmb_sel_date, rows)
-                selector_date = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date, 0)
-                sql = (f"SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
-                       f"WHERE result_id = '{result_id}' "
-                       f"AND resultdate = '{selector_date}' "
-                       f"ORDER BY resulttime")
-                rows = self.controller.get_rows(sql, add_empty_row=True)
-                qt_tools.set_item_data(self.dlg_go2epa_result.cmb_sel_time, rows)
-
-            self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(self.populate_date_time,
-                        self.dlg_go2epa_result.cmb_sel_date))
-
-            self.dlg_go2epa_result.cmb_sel_date.currentIndexChanged.connect(partial(self.populate_time,
-                                   self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_sel_time))
-
-
-            # Populate GroupBox Selector compare
-            result_id_to_comp = qt_tools.get_item_data(self.dlg_go2epa_result,
-                                                       self.dlg_go2epa_result.rpt_selector_result_id, 0)
-            sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
-                   f"WHERE result_id = '{result_id_to_comp}' "
-                   f"ORDER BY resultdate ")
-            rows = self.controller.get_rows(sql)
-            if rows:
-                qt_tools.set_item_data(self.dlg_go2epa_result.cmb_com_date, rows)
-                selector_cmp_date = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date, 0)
-                sql = (f"SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
-                       f"WHERE result_id = '{result_id_to_comp}' "
-                       f"AND resultdate = '{selector_cmp_date}' "
-                       f"ORDER BY resulttime")
-                rows = self.controller.get_rows(sql, add_empty_row=True)
-                qt_tools.set_item_data(self.dlg_go2epa_result.cmb_com_time, rows)
-
-            self.dlg_go2epa_result.rpt_selector_compare_id.currentIndexChanged.connect(partial(
-                self.populate_date_time, self.dlg_go2epa_result.cmb_com_date))
-            self.dlg_go2epa_result.cmb_com_date.currentIndexChanged.connect(partial(self.populate_time,
-                self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_com_time))
-
-        # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
-        sql = "SELECT result_id FROM selector_rpt_main"
-        row = self.controller.get_row(sql)
-        if row:
-            qt_tools.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_result_id, row["result_id"], 0)
-        sql = "SELECT result_id FROM selector_rpt_compare"
-        row = self.controller.get_row(sql)
-        if row:
-            qt_tools.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_compare_id, row["result_id"], 0)
-
-        # Open the dialog
-        self.open_dialog(self.dlg_go2epa_result, dlg_name='go2epa_selector')
-
-
-    def populate_date_time(self, combo_date):
-
-        result_id = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
-        sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
-               f"WHERE result_id = '{result_id}' "
-               f"ORDER BY resultdate")
-        rows = self.controller.get_rows(sql)
-        qt_tools.set_item_data(combo_date, rows)
-
-
-    def populate_time(self, combo_result, combo_time):
-        """ Populate combo times """
-
-        result_id = qt_tools.get_item_data(self.dlg_go2epa_result, combo_result)
-        if self.project_type == 'ws':
-            field = "time"
-        else:
-            field = "resulttime"
-
-        sql = (f"SELECT DISTINCT {field}, {field} "
-               f"FROM rpt_arc "
-               f"WHERE result_id ILIKE '{result_id}' "
-               f"ORDER BY {field};")
-
-        rows = self.controller.get_rows(sql, add_empty_row=True)
-        qt_tools.set_item_data(combo_time, rows)
-
-
-    def result_selector_accept(self):
-        """ Update current values to the table """
-
-        # Set project user
-        user = self.controller.get_project_user()
-
-        # Delete previous values
-        sql = (f"DELETE FROM selector_rpt_main WHERE cur_user = '{user}';\n"
-               f"DELETE FROM selector_rpt_compare WHERE cur_user = '{user}';\n")
-        sql += (f"DELETE FROM selector_rpt_main_tstep WHERE cur_user = '{user}';\n"
-               f"DELETE FROM selector_rpt_compare_tstep WHERE cur_user = '{user}';\n")
-        self.controller.execute_sql(sql)
-
-        # Get new values from widgets of type QComboBox
-        rpt_selector_result_id = qt_tools.get_item_data(
-            self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
-        rpt_selector_compare_id = qt_tools.get_item_data(
-            self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
-        if rpt_selector_result_id not in (None, -1, ''):
-            sql = (f"INSERT INTO selector_rpt_main (result_id, cur_user)"
-                   f" VALUES ('{rpt_selector_result_id}', '{user}');\n")
-            self.controller.execute_sql(sql)
-
-        if rpt_selector_compare_id not in (None, -1, ''):
-            sql = (f"INSERT INTO selector_rpt_compare (result_id, cur_user)"
-                   f" VALUES ('{rpt_selector_compare_id}', '{user}');\n")
-            self.controller.execute_sql(sql)
-
-        if self.project_type == 'ws':
-            time_to_show = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
-            time_to_compare = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
-            if time_to_show not in (None, -1, ''):
-                sql = (f"INSERT INTO selector_rpt_main_tstep (timestep, cur_user)"
-                       f" VALUES ('{time_to_show}', '{user}');\n")
-                self.controller.execute_sql(sql)
-            if time_to_compare not in (None, -1, ''):
-                sql = (f"INSERT INTO selector_rpt_compare_tstep (timestep, cur_user)"
-                       f" VALUES ('{time_to_compare}', '{user}');\n")
-                self.controller.execute_sql(sql)
-
-        elif self.project_type == 'ud':
-            date_to_show = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date)
-            time_to_show = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_time)
-            date_to_compare = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date)
-            time_to_compare = qt_tools.get_item_data(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_time)
-            if date_to_show not in (None, -1, ''):
-                sql = (f"INSERT INTO selector_rpt_main_tstep (resultdate, resulttime, cur_user)"
-                       f" VALUES ('{date_to_show}', '{time_to_show}', '{user}');\n")
-                self.controller.execute_sql(sql)
-            if date_to_compare not in (None, -1, ''):
-                sql = (f"INSERT INTO selector_rpt_compare_tstep (resultdate, resulttime, cur_user)"
-                       f" VALUES ('{date_to_compare}', '{time_to_compare}', '{user}');\n")
-                self.controller.execute_sql(sql)
-
-        # Show message to user
-        message = "Values has been updated"
-        self.controller.show_info(message)
-        self.close_dialog(self.dlg_go2epa_result)
-
-
     def go2epa_options_get_data(self, tablename, dialog):
         """ Get data from selected table """
 
@@ -645,7 +449,7 @@ class GwGo2Epa(ApiParent):
         # Iterate over all columns and populate its corresponding widget
         columns = []
         for i in range(0, len(row)):
-            column_name = self.dao.get_column_name(i)
+            column_name = self.controller.dao.get_column_name(i)
             widget = dialog.findChild(QWidget, column_name)
             widget_type = qt_tools.getWidgetType(dialog, widget)
             if row[column_name] is not None:
@@ -676,57 +480,7 @@ class GwGo2Epa(ApiParent):
         return columns
 
 
-    def go2epa_result_manager(self):
-        """ Button 25: Epa result manager """
-
-        # Create the dialog
-        self.dlg_manager = EpaManager()
-        self.load_settings(self.dlg_manager)
-
-        # Manage widgets
-        reg_exp = QRegExp("^[A-Za-z0-9_]{1,16}$")
-        self.dlg_manager.txt_result_id.setValidator(QRegExpValidator(reg_exp))
-
-        # Fill combo box and table view
-        self.fill_combo_result_id()
-        self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
-        self.set_table_columns(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
-
-        # Set signals
-        self.dlg_manager.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
-                                                            'rpt_cat_result', 'result_id'))
-        self.dlg_manager.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_manager))
-        self.dlg_manager.rejected.connect(partial(self.close_dialog, self.dlg_manager))
-        self.dlg_manager.txt_result_id.editTextChanged.connect(self.filter_by_result_id)
-
-        # Open form
-        self.open_dialog(self.dlg_manager, dlg_name='go2epa_manager')
-
-
-    def fill_combo_result_id(self):
-
-        sql = "SELECT result_id FROM v_ui_rpt_cat_result ORDER BY result_id"
-        rows = self.controller.get_rows(sql)
-        qt_tools.fillComboBox(self.dlg_manager, self.dlg_manager.txt_result_id, rows)
-
-
-    def filter_by_result_id(self):
-
-        table = self.dlg_manager.tbl_rpt_cat_result
-        widget_txt = self.dlg_manager.txt_result_id
-        tablename = 'v_ui_rpt_cat_result'
-        result_id = qt_tools.getWidgetText(self.dlg_manager, widget_txt)
-        if result_id != 'null':
-            expr = f" result_id ILIKE '%{result_id}%'"
-            # Refresh model with selected filter
-            table.model().setFilter(expr)
-            table.model().select()
-        else:
-            self.fill_table(table, tablename)
-
-
     def update_sql(self):
-        usql = GwAdmin(self.iface, self.settings, self.controller, self.plugin_dir)
+        usql = GwAdmin()
         usql.init_sql()
 

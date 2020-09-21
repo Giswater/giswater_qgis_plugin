@@ -6,51 +6,48 @@ or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
 from qgis.core import QgsPointXY
-from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
+from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsMapTip, QgsRubberBand, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, \
-    QSizePolicy, QSpacerItem
+from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, QGridLayout, QLabel,\
+    QLineEdit, QPushButton, QSizePolicy, QSpacerItem, QSpinBox, QTextEdit, QWidget
 
 from functools import partial
 
 from lib import qt_tools
-from ....actions.api_parent import ApiParent
-from ....map_tools.snapping_utils_v3 import SnappingConfigManager
+from ...utils.giswater_tools import load_settings, open_dialog, save_settings
+
 from ....ui_manager import DimensioningUi
+from .... import global_vars
+
+from ....actions.parent_functs import restore_user_layer, set_icon
+from ....actions.api_parent_functs import check_actions, create_body, put_widgets,  \
+    close_dialog, set_setStyleSheet, add_lineedit, set_widget_size, set_data_type, manage_lineedit, add_combobox, \
+    add_checkbox, add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_textarea, \
+    add_spinbox, add_tableview, set_headers, populate_table, set_columns_config, enable_all, disable_all
+from ....lib.qgis_tools import set_snapping_mode, remove_marker, get_snapping_options, enable_snapping, snap_to_node, \
+    snap_to_connec_gully, get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
+    get_snapped_feature, get_snapped_feature_id, apply_snapping_options
 
 
-class GwDimensioning(ApiParent):
+class GwDimensioning:
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
         """ Class constructor """
 
-        ApiParent.__init__(self, iface, settings, controller, plugin_dir)
-        self.iface = iface
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir
-        self.canvas = self.iface.mapCanvas()
+        self.iface = global_vars.iface
+        self.settings = global_vars.settings
+        self.controller = global_vars.controller
+        self.plugin_dir = global_vars.plugin_dir
+        self.canvas = global_vars.canvas
 
-        # Snapper
-        self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper_manager.set_controller(self.controller)
-        self.snapper = self.snapper_manager.get_snapper()
+        self.vertex_marker = QgsVertexMarker(self.canvas)
 
 
-    def open_form(self, qgis_feature=None, layer=None, db_return=None, fid=None):
-
+    def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None, rubber_band=None):
         self.dlg_dim = DimensioningUi()
-        self.load_settings(self.dlg_dim)
+        load_settings(self.dlg_dim)
 
-        # Set signals
-        actionSnapping = self.dlg_dim.findChild(QAction, "actionSnapping")
-        actionSnapping.triggered.connect(partial(self.snapping, actionSnapping))
-        self.set_icon(actionSnapping, "103")
-
-        actionOrientation = self.dlg_dim.findChild(QAction, "actionOrientation")
-        actionOrientation.triggered.connect(partial(self.orientation, actionOrientation))
-        self.set_icon(actionOrientation, "133")
-
+        self.user_current_layer = self.iface.activeLayer()
         # Set layers dimensions, node and connec
         self.layer_dimensions = self.controller.get_layer_by_tablename("v_edit_dimensions")
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
@@ -66,24 +63,45 @@ class GwDimensioning(ApiParent):
 
         #qgis_feature = self.get_feature_by_id(self.layer_dimensions, fid, 'id')
 
-        self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, qgis_feature, layer))
-        self.dlg_dim.btn_cancel.clicked.connect(partial(self.cancel_dimensioning))
-        self.dlg_dim.dlg_closed.connect(partial(self.cancel_dimensioning))
-        self.dlg_dim.dlg_closed.connect(partial(self.save_settings, self.dlg_dim))
-
-        self.create_map_tips()
-
         # when funcion is called from new feature
         if db_return is None:
-            body = self.create_body()
+            rubber_band = QgsRubberBand(self.canvas, 0)
+            body = create_body()
             function_name = 'gw_fct_getdimensioning'
-            json_result = self.controller.get_json(function_name, body, log_sql=True)
+            json_result = self.controller.get_json(function_name, body)
             if json_result is None:
                 return False
             db_return = [json_result]
 
         # get id from db response
         self.fid = db_return[0]['body']['feature']['id']
+
+        # ACTION SIGNALS
+        actionSnapping = self.dlg_dim.findChild(QAction, "actionSnapping")
+        actionSnapping.triggered.connect(partial(self.snapping, actionSnapping))
+        set_icon(actionSnapping, "103")
+
+        actionOrientation = self.dlg_dim.findChild(QAction, "actionOrientation")
+        actionOrientation.triggered.connect(partial(self.orientation, actionOrientation))
+        set_icon(actionOrientation, "133")
+
+
+        # LAYER SIGNALS
+        self.layer_dimensions.editingStarted.connect(lambda: actionSnapping.setEnabled(True))
+        self.layer_dimensions.editingStopped.connect(lambda: actionSnapping.setEnabled(False))
+        self.layer_dimensions.editingStarted.connect(lambda: actionOrientation.setEnabled(True))
+        self.layer_dimensions.editingStopped.connect(lambda: actionOrientation.setEnabled(False))
+        self.layer_dimensions.editingStarted.connect(partial(enable_all, self.dlg_dim, db_return[0]['body']['data']))
+        self.layer_dimensions.editingStopped.connect(partial(disable_all, self.dlg_dim, db_return[0]['body']['data'], False))
+
+        # WIDGETS SIGNALS
+        self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, qgis_feature, layer))
+        self.dlg_dim.btn_cancel.clicked.connect(partial(self.cancel_dimensioning))
+        self.dlg_dim.dlg_closed.connect(partial(self.cancel_dimensioning))
+        self.dlg_dim.dlg_closed.connect(partial(save_settings, self.dlg_dim))
+        self.dlg_dim.dlg_closed.connect(rubber_band.reset)
+
+        self.create_map_tips()
 
         layout_list = []
         for field in db_return[0]['body']['data']['fields']:
@@ -96,9 +114,8 @@ class GwDimensioning(ApiParent):
                 qt_tools.setWidgetText(self.dlg_dim, widget, self.fid)
             layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
 
-            # profilactic issue to prevent missed layouts againts db response and form
+            # Profilactic issue to prevent missed layouts againts db response and form
             if layout is not None:
-
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
                 if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                     layout_list.append(layout)
@@ -111,22 +128,34 @@ class GwDimensioning(ApiParent):
                     layout.addWidget(label, 0, field['layoutorder'])
                     layout.addWidget(widget, 1, field['layoutorder'])
                 else:
-                    self.put_widgets(self.dlg_dim, field, label, widget)
+                    put_widgets(self.dlg_dim, field, label, widget)
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             layout.addItem(vertical_spacer1)
 
+        if self.layer_dimensions:
+            self.iface.setActiveLayer(self.layer_dimensions)
+            if self.layer_dimensions.isEditable():
+                actionSnapping.setEnabled(True)
+                actionOrientation.setEnabled(True)
+                enable_all(self.dlg_dim, db_return[0]['body']['data'])
+            else:
+                actionSnapping.setEnabled(False)
+                actionOrientation.setEnabled(False)
+                disable_all(self.dlg_dim, db_return[0]['body']['data'], False)
+
         title = f"DIMENSIONING - {self.fid}"
-        self.open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
+        open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
         return False, False
 
 
     def cancel_dimensioning(self):
 
         self.iface.actionRollbackEdits().trigger()
-        self.close_dialog(self.dlg_dim)
+        close_dialog(self.dlg_dim)
+        restore_user_layer(self.user_current_layer)
 
 
     def save_dimensioning(self, qgis_feature, layer):
@@ -168,22 +197,22 @@ class GwDimensioning(ApiParent):
         feature = '"tableName":"v_edit_dimensions", '
         feature += f'"id":"{self.fid}"'
         extras = f'"fields":{{{fields}}}'
-        body = self.create_body(feature=feature, extras=extras)
+        body = create_body(feature=feature, extras=extras)
         result = self.controller.get_json('gw_fct_setdimensioning', body)
-     
+
         # Close dialog
-        self.close_dialog(self.dlg_dim)
+        close_dialog(self.dlg_dim)
 
 
-    def deactivate_signals(self, action):
-        self.snapper_manager.remove_marker()
+    def deactivate_signals(self, action, emit_point=None):
+        self.vertex_marker.hide()
         try:
             self.canvas.xyCoordinates.disconnect()
         except TypeError:
             pass
-
+        
         try:
-            self.emit_point.canvasClicked.disconnect()
+            emit_point.canvasClicked.disconnect()
         except TypeError:
             pass
 
@@ -197,41 +226,40 @@ class GwDimensioning(ApiParent):
     def snapping(self, action):
 
         # Set active layer and set signals
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
-        if self.deactivate_signals(action):
+        emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(emit_point)
+        if self.deactivate_signals(action, emit_point):
             return
 
-        self.snapper_manager.set_snapping_layers()
-        self.snapper_manager.remove_marker()
-        self.snapper_manager.store_snapping_options()
-        self.snapper_manager.enable_snapping()
-        self.snapper_manager.snap_to_node()
-        self.snapper_manager.snap_to_connec_gully()
-        self.snapper_manager.set_snapping_mode()
+        remove_marker(self.vertex_marker)
+        self.previous_snapping = get_snapping_options()
+        enable_snapping()
+        snap_to_node()
+        snap_to_connec_gully()
+        set_snapping_mode()
 
         self.dlg_dim.actionOrientation.setChecked(False)
         self.iface.setActiveLayer(self.layer_node)
         self.canvas.xyCoordinates.connect(self.mouse_move)
-        self.emit_point.canvasClicked.connect(partial(self.click_button_snapping, action))
+        emit_point.canvasClicked.connect(partial(self.click_button_snapping, action, emit_point))
 
 
     def mouse_move(self, point):
 
         # Hide marker and get coordinates
-        self.snapper_manager.remove_marker()
-        event_point = self.snapper_manager.get_event_point(point=point)
+        self.vertex_marker.hide()
+        event_point = get_event_point(point=point)
 
         # Snapping
-        result = self.snapper_manager.snap_to_background_layers(event_point)
-        if self.snapper_manager.result_is_valid():
-            layer = self.snapper_manager.get_snapped_layer(result)
+        result = snap_to_background_layers(event_point)
+        if result.isValid():
+            layer = get_snapped_layer(result)
             # Check feature
             if layer == self.layer_node or layer == self.layer_connec:
-                self.snapper_manager.add_marker(result)
+                add_marker(result, self.vertex_marker)
 
 
-    def click_button_snapping(self, action, point, btn):
+    def click_button_snapping(self, action, emit_point, point, btn):
 
         if not self.layer_dimensions:
             return
@@ -239,21 +267,20 @@ class GwDimensioning(ApiParent):
         if btn == Qt.RightButton:
             if btn == Qt.RightButton:
                 action.setChecked(False)
-                self.deactivate_signals(action)
+                self.deactivate_signals(action, emit_point)
                 return
 
         layer = self.layer_dimensions
         self.iface.setActiveLayer(layer)
-        layer.startEditing()
 
         # Get coordinates
-        event_point = self.snapper_manager.get_event_point(point=point)
+        event_point = get_event_point(point=point)
 
         # Snapping
-        result = self.snapper_manager.snap_to_background_layers(event_point)
-        if self.snapper_manager.result_is_valid():
+        result = snap_to_background_layers(event_point)
+        if result.isValid():
 
-            layer = self.snapper_manager.get_snapped_layer(result)
+            layer = get_snapped_layer(result)
             # Check feature
             if layer == self.layer_node:
                 feat_type = 'node'
@@ -263,8 +290,8 @@ class GwDimensioning(ApiParent):
                 return
 
             # Get the point
-            snapped_feat = self.snapper_manager.get_snapped_feature(result)
-            feature_id = self.snapper_manager.get_snapped_feature_id(result)
+            snapped_feat = get_snapped_feature(result)
+            feature_id = get_snapped_feature_id(result)
             element_id = snapped_feat.attribute(feat_type + '_id')
 
             # Leave selection
@@ -284,42 +311,44 @@ class GwDimensioning(ApiParent):
                 return
 
             depth = snapped_feat.attribute(fieldname)
-            if depth:
+            if depth in ('', None, 0, '0', 'NULL'):
+                qt_tools.setText(self.dlg_dim, "depth", None)
+            else:
                 qt_tools.setText(self.dlg_dim, "depth", depth)
             qt_tools.setText(self.dlg_dim, "feature_id", element_id)
             qt_tools.setText(self.dlg_dim, "feature_type", feat_type.upper())
 
-            self.snapper_manager.recover_snapping_options()
-            self.deactivate_signals(action)
+            apply_snapping_options(self.previous_snapping)
+            self.deactivate_signals(action, emit_point)
             action.setChecked(False)
+
 
     def orientation(self, action):
 
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
-        if self.deactivate_signals(action):
+        emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(emit_point)
+        if self.deactivate_signals(action, emit_point):
             return
 
-        self.snapper_manager.set_snapping_layers()
-        self.snapper_manager.remove_marker()
-        self.snapper_manager.store_snapping_options()
-        self.snapper_manager.enable_snapping()
-        self.snapper_manager.snap_to_node()
-        self.snapper_manager.snap_to_connec_gully()
-        self.snapper_manager.set_snapping_mode()
+        remove_marker(self.vertex_marker)
+        self.previous_snapping = get_snapping_options()
+        enable_snapping()
+        snap_to_node()
+        snap_to_connec_gully()
+        set_snapping_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)
-        self.emit_point.canvasClicked.connect(partial(self.click_button_orientation, action))
+        emit_point.canvasClicked.connect(partial(self.click_button_orientation, action, emit_point))
 
 
-    def click_button_orientation(self, action, point, btn):
+    def click_button_orientation(self, action, emit_point, point, btn):
 
         if not self.layer_dimensions:
             return
 
         if btn == Qt.RightButton:
             action.setChecked(False)
-            self.deactivate_signals(action)
+            self.deactivate_signals(action, emit_point)
             return
 
         self.x_symbol = self.dlg_dim.findChild(QLineEdit, "x_symbol")
@@ -329,8 +358,8 @@ class GwDimensioning(ApiParent):
         self.y_symbol = self.dlg_dim.findChild(QLineEdit, "y_symbol")
         self.y_symbol.setText(str(int(point.y())))
 
-        self.snapper_manager.recover_snapping_options()
-        self.deactivate_signals(action)
+        apply_snapping_options(self.previous_snapping)
+        self.deactivate_signals(action, emit_point)
         action.setChecked(False)
 
     def create_map_tips(self):
@@ -391,44 +420,44 @@ class GwDimensioning(ApiParent):
             label.setObjectName('lbl_' + field['widgetname'])
             label.setText(field['label'].capitalize())
             if field['stylesheet'] is not None and 'label' in field['stylesheet']:
-                label = self.set_setStyleSheet(field, label)
+                label = set_setStyleSheet(field, label)
             if 'tooltip' in field:
                 label.setToolTip(field['tooltip'])
             else:
                 label.setToolTip(field['label'].capitalize())
         if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
             completer = QCompleter()
-            widget = self.add_lineedit(field)
-            widget = self.set_widget_size(widget, field)
-            widget = self.set_data_type(field, widget)
+            widget = add_lineedit(field)
+            widget = set_widget_size(widget, field)
+            widget = set_data_type(field, widget)
             if field['widgettype'] == 'typeahead':
-                widget = self.manage_lineedit(field, dialog, widget, completer)
+                widget = manage_lineedit(field, dialog, widget, completer)
         elif field['widgettype'] == 'combo':
-            widget = self.add_combobox(field)
-            widget = self.set_widget_size(widget, field)
+            widget = add_combobox(field)
+            widget = set_widget_size(widget, field)
         elif field['widgettype'] == 'check':
-            widget = self.add_checkbox(field)
+            widget = add_checkbox(field)
         elif field['widgettype'] == 'datetime':
-            widget = self.add_calendar(dialog, field)
+            widget = add_calendar(dialog, field)
         elif field['widgettype'] == 'button':
-            widget = self.add_button(dialog, field)
-            widget = self.set_widget_size(widget, field)
+            widget = add_button(dialog, field)
+            widget = set_widget_size(widget, field)
         elif field['widgettype'] == 'hyperlink':
-            widget = self.add_hyperlink(field)
-            widget = self.set_widget_size(widget, field)
+            widget = add_hyperlink(field)
+            widget = set_widget_size(widget, field)
         elif field['widgettype'] == 'hspacer':
-            widget = self.add_horizontal_spacer()
+            widget = add_horizontal_spacer()
         elif field['widgettype'] == 'vspacer':
-            widget = self.add_verical_spacer()
+            widget = add_vertical_spacer()
         elif field['widgettype'] == 'textarea':
-            widget = self.add_textarea(field)
+            widget = add_textarea(field)
         elif field['widgettype'] in 'spinbox':
-            widget = self.add_spinbox(field)
+            widget = add_spinbox(field)
         elif field['widgettype'] == 'tableview':
-            widget = self.add_tableview(db_return, field)
-            widget = self.set_headers(widget, field)
-            widget = self.populate_table(widget, field)
-            widget = self.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
+            widget = add_tableview(db_return, field)
+            widget = set_headers(widget, field)
+            widget = populate_table(widget, field)
+            widget = set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
             qt_tools.set_qtv_config(widget)
         widget.setObjectName(widget.property('columnname'))
 

@@ -13,18 +13,21 @@ from qgis.PyQt.QtGui import QDoubleValidator
 from functools import partial
 
 from lib import qt_tools
+from .... import global_vars
 from ..parent_maptool import GwParentMapTool
 from ....ui_manager import AuxPoint
-from ...utils.giswater_tools import load_settings, open_dialog, close_dialog
+from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
+from ....lib.qgis_tools import get_event_point, snap_to_current_layer, snap_to_background_layers, add_marker, \
+    get_snapping_options, get_snapped_point
 
 
 class GwAuxPointButton(GwParentMapTool):
     """ Button 72: Add point """
 
-    def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
+    def __init__(self, icon_path, text, toolbar, action_group):
         """ Class constructor """
 
-        super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
+        super().__init__(icon_path, text, toolbar, action_group)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_point = False
         self.layer_points = None
@@ -37,7 +40,7 @@ class GwAuxPointButton(GwParentMapTool):
 
         # Create the dialog and signals
         self.dlg_create_point = AuxPoint()
-        load_settings(self.dlg_create_point, self.controller)
+        load_settings(self.dlg_create_point)
 
         validator = QDoubleValidator(-99999.99, 99999.999, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
@@ -48,19 +51,19 @@ class GwAuxPointButton(GwParentMapTool):
         self.dlg_create_point.dist_x.setFocus()
         self.dlg_create_point.btn_accept.clicked.connect(partial(self.get_values, point_1, point_2))
         self.dlg_create_point.btn_cancel.clicked.connect(self.cancel)
-        rb_left = self.controller.plugin_settings_value(self.dlg_create_point.rb_left.objectName())
-        if rb_left == 'true':
+
+        if get_parser_value('cadtools', f"{self.dlg_create_point.rb_left.objectName()}") == 'True':
             self.dlg_create_point.rb_left.setChecked(True)
         else:
             self.dlg_create_point.rb_right.setChecked(True)
-        
-        open_dialog(self.dlg_create_point, self.controller, dlg_name='auxpoint', maximize_button=False)
+
+        open_dialog(self.dlg_create_point, dlg_name='auxpoint', maximize_button=False)
 
 
     def get_values(self, point_1, point_2):
+        set_parser_value('cadtools', f"{self.dlg_create_point.rb_left.objectName()}",
+                         f"{self.dlg_create_point.rb_left.isChecked()}")
 
-        self.controller.plugin_settings_set_value(self.dlg_create_point.rb_left.objectName(),
-                                                  self.dlg_create_point.rb_left.isChecked())
         self.dist_x = self.dlg_create_point.dist_x.text()
         if not self.dist_x:
             self.dist_x = 0
@@ -71,7 +74,7 @@ class GwAuxPointButton(GwParentMapTool):
         self.delete_prev = qt_tools.isChecked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
         if self.layer_points:
             self.layer_points.startEditing()
-            close_dialog(self.dlg_create_point, self.controller)
+            close_dialog(self.dlg_create_point)
             if self.dlg_create_point.rb_left.isChecked():
                 self.direction = 1
             else:
@@ -100,10 +103,10 @@ class GwAuxPointButton(GwParentMapTool):
 
     def cancel(self):
 
-        self.controller.plugin_settings_set_value(self.dlg_create_point.rb_left.objectName(),
-                                                  self.dlg_create_point.rb_left.isChecked())
+        set_parser_value('cadtools', f"{self.dlg_create_point.rb_left.objectName()}",
+                         f"{self.dlg_create_point.rb_left.isChecked()}")
 
-        close_dialog(self.dlg_create_point, self.controller)
+        close_dialog(self.dlg_create_point)
         self.iface.setActiveLayer(self.current_layer)
         if self.layer_points:
             if self.layer_points.isEditable():
@@ -126,17 +129,17 @@ class GwAuxPointButton(GwParentMapTool):
 
         # Hide highlight and get coordinates
         self.vertex_marker.hide()
-        event_point = self.snapper_manager.get_event_point(event)
+        event_point = get_event_point(event)
 
         # Snapping
         if self.snap_to_selected_layer:
-            result = self.snapper_manager.snap_to_current_layer(event_point)
+            result = snap_to_current_layer(event_point)
         else:
-            result = self.snapper_manager.snap_to_background_layers(event_point)
+            result = snap_to_background_layers(event_point)
 
-        if self.snapper_manager.result_is_valid():
+        if result.isValid():
             # Get the point and add marker on it
-            self.snapper_manager.add_marker(result, self.vertex_marker)
+            add_marker(result, self.vertex_marker)
 
 
     def canvasReleaseEvent(self, event):
@@ -146,13 +149,13 @@ class GwAuxPointButton(GwParentMapTool):
             # Get coordinates
             x = event.pos().x()
             y = event.pos().y()
-            event_point = self.snapper_manager.get_event_point(event)
+            event_point = get_event_point(event)
 
             # Create point with snap reference
-            result = self.snapper_manager.snap_to_background_layers(event_point)
+            result = snap_to_background_layers(event_point)
             point = None
-            if self.snapper_manager.result_is_valid():
-                point = self.snapper_manager.get_snapped_point(result)
+            if result.isValid():
+                point = get_snapped_point(result)
 
             # Create point with mouse cursor reference
             if point is None:
@@ -178,7 +181,7 @@ class GwAuxPointButton(GwParentMapTool):
 
         self.snap_to_selected_layer = False
         # Get SRID
-        self.srid = self.controller.plugin_settings_value('srid')
+        self.srid = global_vars.srid
 
         # Check button
         self.action.setChecked(True)
@@ -192,7 +195,7 @@ class GwAuxPointButton(GwParentMapTool):
             self.controller.show_info(message)
 
         # Store user snapping configuration
-        self.snapper_manager.store_snapping_options()
+        self.previous_snapping = get_snapping_options()
 
         # Get current layer
         self.current_layer = self.iface.activeLayer()

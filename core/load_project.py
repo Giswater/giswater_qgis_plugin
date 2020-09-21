@@ -11,46 +11,35 @@ from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
 import os
 import json
 import configparser
-from collections import OrderedDict
-import sys
+from collections import OrderedDict, Counter
 
 from .models.plugin_toolbar import PluginToolbar
 from .utils.pg_man import PgMan
+from .utils.giswater_tools import set_parser_value
 from .. import global_vars
-from ..lib.qgis_tools import QgisTools
 from ..ui_manager import DialogTextUi
 from ..core.info_tools import GwInfoTools
 from ..core.notify_tools import GwNotifyTools
-from ..actions.parent import ParentAction
-
 from .actions.basic.search import GwSearch
-
-from .toolbars.basic.basic import *
-from .toolbars.edit.edit import *
-from .toolbars.cad.cad import *
-from .toolbars.epa.epa import *
-from .toolbars.toc.toc import *
-from .toolbars.plan.plan import *
-from .toolbars.utilities.utilities import *
-from .toolbars.om.om import *
+from ..lib.qgis_tools import qgis_get_layer_source, get_qgis_project_variables, qgis_manage_snapping_layer
+from .toolbars import buttons
 
 
 class LoadProject(QObject):
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
         """ Class to manage layers. Refactor code from giswater.py """
 
-        super(LoadProject, self).__init__()
+        super().__init__()
 
-        self.iface = iface
-        self.settings = settings
-        self.controller = controller
-        self.plugin_dir = plugin_dir
-        self.qgis_tools = QgisTools(iface, self.plugin_dir)
-        self.pg_man = PgMan(controller)
+        self.iface = global_vars.iface
+        self.settings = global_vars.settings
+        self.controller = global_vars.controller
+        self.plugin_dir = global_vars.plugin_dir
+        self.pg_man = PgMan(global_vars.controller)
         self.plugin_toolbars = {}
         self.buttons_to_hide = []
-        self.plugin_name = self.qgis_tools.get_value_from_metadata('name', 'giswater')
+        self.plugin_name = global_vars.plugin_dir
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep
 
         self.buttons = {}
@@ -69,11 +58,15 @@ class LoadProject(QObject):
 
         # Manage schema name
         self.controller.get_current_user()
-        layer_source = self.qgis_tools.qgis_get_layer_source(self.layer_node)
+        layer_source = qgis_get_layer_source(self.layer_node)
         self.schema_name = layer_source['schema']
         self.schema_name = self.schema_name.replace('"', '')
-        self.controller.plugin_settings_set_value("schema_name", self.schema_name)
+        set_parser_value('load_project', 'schema_name', f'{self.schema_name}')
         self.controller.set_schema_name(self.schema_name)
+
+        # TEMP
+        global_vars.schema_name = self.schema_name
+        global_vars.project_type = self.controller.get_project_type()
 
         # Manage locale and corresponding 'i18n' file
         self.controller.manage_translation(self.plugin_name)
@@ -88,21 +81,18 @@ class LoadProject(QObject):
 
         # Get SRID from table node
         srid = self.controller.get_srid('v_edit_node', self.schema_name)
-        self.controller.plugin_settings_set_value("srid", srid)
+        global_vars.srid = srid
 
         # Get variables from qgis project
-        self.project_vars = self.qgis_tools.get_qgis_project_variables()
-        global_vars.set_project_vars(self.project_vars)
+        self.project_vars = get_qgis_project_variables()
+        global_vars.project_vars = self.project_vars
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self.check_layers_from_distinct_schema()
         if status is False:
             return
 
-        self.controller.gw_infotools = GwInfoTools(self.iface, self.settings, self.controller, self.plugin_dir)
-
-        # TODO: Refactor this
-        self.controller.parent = ParentAction(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.controller.gw_infotools = GwInfoTools()
 
         # Get water software from table 'version'
         self.project_type = self.controller.get_project_type()
@@ -126,15 +116,14 @@ class LoadProject(QObject):
 
         # Create a thread to listen selected database channels
         if global_vars.settings.value('system_variables/use_notify').upper() == 'TRUE':
-            self.notify = GwNotifyTools(self.iface, global_vars.settings, self.controller, self.plugin_dir)
-            self.notify.set_controller(self.controller)
+            self.notify = GwNotifyTools()
             list_channels = ['desktop', self.controller.current_user]
             self.notify.start_listening(list_channels)
 
         # Open automatically 'search docker' depending its value in user settings
         open_search = self.controller.get_user_setting_value('open_search', 'true')
         if open_search == 'true':
-            GwSearch(self.iface, self.settings, self.controller, self.plugin_dir).api_search()
+            GwSearch().api_search()
 
         # call dynamic mapzones repaint
         self.pg_man.set_style_mapzones()
@@ -256,19 +245,19 @@ class LoadProject(QObject):
             parser = self.init_user_config_file(path, toolbar_names)
         else:
             parser.read(path)
-            if not parser.has_section("toolbars_position"):
+            if not parser.has_section("toolbars_position") or not parser.has_option('toolbars_position', 'toolbars_order'):
                 parser = self.init_user_config_file(path, toolbar_names)
-
         parser.read(path)
-        # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
-        for pos, tb in enumerate(toolbar_names):
-            # If not exists, add it and set it in last position
-            if not parser.has_option('toolbars_position', f'pos_{pos}'):
-                parser['toolbars_position'][f'pos_{pos}'] = f"{tb},{4000},{98}"
 
-            toolbar_id = parser.get("toolbars_position", f'pos_{pos}').split(',')
-            if toolbar_id:
-                self.create_toolbar(toolbar_id[0], toolbar_id[1], toolbar_id[2])
+        toolbars_order = parser['toolbars_position']['toolbars_order'].split(',')
+
+        # Check if both arrays contain the same elements regardless of the order
+        if Counter(toolbars_order) != Counter(toolbar_names):
+            toolbars_order = toolbar_names
+
+        # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
+        for tb in toolbars_order:
+            self.create_toolbar(tb)
 
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()
@@ -283,7 +272,7 @@ class LoadProject(QObject):
                     text = self.translate(f'{index_action}_text')
 
                     icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
-                    button = getattr(sys.modules[__name__], button_def)(icon_path, text, plugin_toolbar.toolbar, ag, self.iface, self.settings, self.controller, self.plugin_dir)
+                    button = getattr(buttons, button_def)(icon_path, text, plugin_toolbar.toolbar, ag)
 
                     self.buttons[index_action] = button
 
@@ -309,12 +298,15 @@ class LoadProject(QObject):
         self.enable_toolbar("toc")
 
 
-    def create_toolbar(self, toolbar_id, x=None, y=None):
+    def create_toolbar(self, toolbar_id):
 
         list_actions = self.settings.value(f"toolbars/{toolbar_id}")
 
         if list_actions is None:
             return
+
+        if type(list_actions) != list:
+            list_actions = [list_actions]
 
         toolbar_name = self.translate(f'toolbar_{toolbar_id}_name')
         plugin_toolbar = PluginToolbar(toolbar_id, toolbar_name, True)
@@ -330,17 +322,14 @@ class LoadProject(QObject):
         plugin_toolbar.list_actions = list_actions
         self.plugin_toolbars[toolbar_id] = plugin_toolbar
 
-        if x and y:
-            self.set_toolbar_position(toolbar_id, x, y)
-
 
     def manage_snapping_layers(self):
         """ Manage snapping of layers """
 
-        self.qgis_tools.qgis_manage_snapping_layer('v_edit_arc', snapping_type=2)
-        self.qgis_tools.qgis_manage_snapping_layer('v_edit_connec', snapping_type=0)
-        self.qgis_tools.qgis_manage_snapping_layer('v_edit_node', snapping_type=0)
-        self.qgis_tools.qgis_manage_snapping_layer('v_edit_gully', snapping_type=0)
+        qgis_manage_snapping_layer('v_edit_arc', snapping_type=2)
+        qgis_manage_snapping_layer('v_edit_connec', snapping_type=0)
+        qgis_manage_snapping_layer('v_edit_node', snapping_type=0)
+        qgis_manage_snapping_layer('v_edit_gully', snapping_type=0)
 
 
     def check_user_roles(self):
@@ -425,13 +414,6 @@ class LoadProject(QObject):
             self.buttons[key].action.setVisible(not hide)
 
 
-    def set_toolbar_position(self, toolbar_id, x, y):
-
-        toolbar = self.plugin_toolbars[toolbar_id].toolbar
-        if toolbar:
-            toolbar.move(int(x), int(y))
-
-
     def init_user_config_file(self, path, toolbar_names):
         """ Initialize UI config file with default values """
 
@@ -440,8 +422,8 @@ class LoadProject(QObject):
         # Create file and configure section 'toolbars_position'
         parser = configparser.RawConfigParser()
         parser.add_section('toolbars_position')
-        for pos, tb in enumerate(toolbar_names):
-            parser.set('toolbars_position', f'pos_{pos}', f'{tb}, {pos * 10}, 98')
+
+        parser.set('toolbars_position', 'toolbars_order', ",".join(toolbar_names))
 
         # Writing our configuration file to 'user.config'
         with open(path, 'w') as configfile:

@@ -6,19 +6,31 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
+from qgis.gui import QgsVertexMarker
 
 from functools import partial
 
 from lib import qt_tools
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog
 from ....ui_manager import ElementUi, ElementManager
-from ....actions.parent_manage import ParentManage
+from .... import global_vars
+from ....actions.parent_functs import set_icon
+from ....actions.parent_manage_funct import set_selectionbehavior, remove_selection, \
+    set_completer_object, manage_close, tab_feature_changed, exist_object, insert_feature, delete_records, \
+    selection_init, add_point, set_completer_feature_id, set_model_to_table, fill_table_object, set_table_columns, \
+    filter_by_id, delete_selected_object
 
 
-class GwElement(ParentManage):
+class GwElement:
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self):
         """ Class to control 'Add element' of toolbar 'edit' """
-        ParentManage.__init__(self, iface, settings, controller, plugin_dir)
+
+        self.iface = global_vars.iface
+        self.controller = global_vars.controller
+        self.schema_name = global_vars.schema_name
+
+        self.vertex_marker = QgsVertexMarker(global_vars.canvas)
 
 
     def manage_element(self, new_element_id=True, feature=None, geom_type=None):
@@ -28,17 +40,33 @@ class GwElement(ParentManage):
 
         # Create the dialog and signals
         self.dlg_add_element = ElementUi()
-        self.load_settings(self.dlg_add_element)
+        load_settings(self.dlg_add_element)
         self.element_id = None
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
 
-        self.set_selectionbehavior(self.dlg_add_element)
+        set_selectionbehavior(self.dlg_add_element)
 
         # Get layers of every geom_type
-        self.reset_lists()
-        self.reset_layers()
+
+        # Setting lists
+        self.ids = []
+        self.list_ids = {}
+        self.list_ids['arc'] = []
+        self.list_ids['node'] = []
+        self.list_ids['connec'] = []
+        self.list_ids['gully'] = []
+        self.list_ids['element'] = []
+
+        # Setting layers
+        self.layers = {}
+        self.layers['arc'] = []
+        self.layers['node'] = []
+        self.layers['connec'] = []
+        self.layers['gully'] = []
+        self.layers['element'] = []
+
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
@@ -52,13 +80,13 @@ class GwElement(ParentManage):
             self.layers['gully'] = self.controller.get_group_layers('gully')
 
         # Set icons
-        self.set_icon(self.dlg_add_element.btn_add_geom, "133")
-        self.set_icon(self.dlg_add_element.btn_insert, "111")
-        self.set_icon(self.dlg_add_element.btn_delete, "112")
-        self.set_icon(self.dlg_add_element.btn_snapping, "137")
+        set_icon(self.dlg_add_element.btn_add_geom, "133")
+        set_icon(self.dlg_add_element.btn_insert, "111")
+        set_icon(self.dlg_add_element.btn_delete, "112")
+        set_icon(self.dlg_add_element.btn_snapping, "137")
 
         # Remove all previous selections
-        self.remove_selection(True)
+        self.layers = remove_selection(True, layers=self.layers)
         if feature:
             layer = self.iface.activeLayer()
             layer.selectByIds([feature.id()])
@@ -73,31 +101,42 @@ class GwElement(ParentManage):
 
         # Adding auto-completion to a QLineEdit
         table_object = "element"
-        self.set_completer_object(self.dlg_add_element, table_object)
+        set_completer_object(self.dlg_add_element, table_object)
 
         # Set signals
         self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
         self.dlg_add_element.btn_accept.clicked.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
+        # TODO: Set variable  self.layers using return parameters
         self.dlg_add_element.btn_cancel.clicked.connect(
-            partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[]))
+            partial(manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[],
+                    layers=self.layers))
         self.dlg_add_element.btn_cancel.clicked.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
+        # TODO: Set variable  self.layers using return parameters
         self.dlg_add_element.rejected.connect(
-            partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[]))
+            partial(manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[],
+                    layers=self.layers))
         self.dlg_add_element.rejected.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
-            partial(self.tab_feature_changed, self.dlg_add_element, table_object, []))
+            partial(tab_feature_changed, self.dlg_add_element, table_object, []))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.element_id.textChanged.connect(
-            partial(self.exist_object, self.dlg_add_element, table_object))
+            partial(exist_object, self.dlg_add_element, table_object, layers=self.layers,
+                    ids=self.ids, list_ids=self.list_ids))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_insert.clicked.connect(
-            partial(self.insert_feature, self.dlg_add_element, table_object))
+            partial(insert_feature, self.dlg_add_element, table_object, geom_type=geom_type, ids=self.ids,
+                    layers=self.layers, list_ids=self.list_ids))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_delete.clicked.connect(
-            partial(self.delete_records, self.dlg_add_element, table_object))
+            partial(delete_records, self.dlg_add_element, table_object, geom_type=geom_type, layers=self.layers,
+                    ids=self.ids, list_ids=self.list_ids))
+        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_snapping.clicked.connect(
-            partial(self.selection_init, self.dlg_add_element, table_object))
-        self.dlg_add_element.btn_add_geom.clicked.connect(self.add_point)
+            partial(selection_init, self.dlg_add_element, table_object, geom_type=geom_type, layers=self.layers))
+        self.point_xy = self.dlg_add_element.btn_add_geom.clicked.connect(partial(add_point, self.vertex_marker))
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
 
         # Fill combo boxes of the form and related events
@@ -157,7 +196,7 @@ class GwElement(ParentManage):
             self.set_default_values()
 
         # Adding auto-completion to a QLineEdit for default feature
-        self.set_completer_feature_id(self.dlg_add_element.feature_id, "arc", "v_edit_arc")
+        set_completer_feature_id(self.dlg_add_element.feature_id, "arc", "v_edit_arc")
 
         if feature:
             self.dlg_add_element.tabWidget.currentChanged.connect(partial(self.fill_tbl_new_element,
@@ -166,7 +205,7 @@ class GwElement(ParentManage):
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        self.tab_feature_changed(self.dlg_add_element, table_object)
+        tab_feature_changed(self.dlg_add_element, table_object)
 
         # Force layer v_edit_element set active True
         if layer_element:
@@ -178,10 +217,11 @@ class GwElement(ParentManage):
 
         self.update_location_cmb()
         if not self.new_element_id:
-            self.exist_object(self.dlg_add_element, 'element')
+            self.ids, self.layers, self.list_ids = exist_object(self.dlg_add_element, 'element', layers=self.layers,
+                                                                ids=self.ids, list_ids=self.list_ids)
 
         # Open the dialog
-        self.open_dialog(self.dlg_add_element, dlg_name='element', maximize_button=False)
+        open_dialog(self.dlg_add_element, dlg_name='element', maximize_button=False)
         return self.dlg_add_element
 
 
@@ -226,7 +266,7 @@ class GwElement(ParentManage):
                f" WHERE feature_type = 'ELEMENT' "
                f" AND (featurecat_id = '{element_type}' OR featurecat_id is null)"
                f" ORDER BY location_type")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         qt_tools.set_item_data(self.dlg_add_element.location_type, rows, add_empty=True)
         if rows:
             qt_tools.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)
@@ -241,11 +281,11 @@ class GwElement(ParentManage):
 
         # Set model of selected widget
         table_name = f"{self.schema_name}.v_edit_{geom_type}"
-        self.set_model_to_table(widget, table_name, expr_filter)
+        set_model_to_table(widget, table_name, expr_filter)
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "element"
-        self.set_completer_object(dialog, self.table_object)
+        set_completer_object(dialog, self.table_object)
 
 
     def manage_element_accept(self, table_object):
@@ -288,7 +328,7 @@ class GwElement(ParentManage):
         expl_id = qt_tools.get_item_data(self.dlg_add_element, self.dlg_add_element.expl_id)
 
         # Get SRID
-        srid = self.controller.plugin_settings_value('srid')
+        srid = global_vars.srid
 
         # Check if this element already exists
         sql = (f"SELECT DISTINCT(element_id)"
@@ -344,9 +384,9 @@ class GwElement(ParentManage):
             else:
                 sql_values += ", null"
 
-            if str(self.x) != "":
-                sql_values += f", ST_SetSRID(ST_MakePoint({self.x},{self.y}), {srid})"
-                self.x = ""
+            if str(self.point_xy['x']) != "":
+                sql_values += f", ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
+                self.point_xy['x'] = ""
             else:
                 sql_values += ", null"
             if code:
@@ -355,7 +395,7 @@ class GwElement(ParentManage):
                 sql_values += ", null"
             if element_id == '':
                 sql += sql_values + ") RETURNING element_id;"
-                new_elem_id = self.controller.execute_returning(sql, log_sql=True)
+                new_elem_id = self.controller.execute_returning(sql)
                 sql_values = ""
                 sql = ""
                 element_id = str(new_elem_id[0])
@@ -406,8 +446,8 @@ class GwElement(ParentManage):
                 sql += f", verified = '{verified}'"
             else:
                 sql += ", verified = null"
-            if str(self.x) != "":
-                sql += f", the_geom = ST_SetSRID(ST_MakePoint({self.x},{self.y}), {srid})"
+            if str(self.point_xy['x']) != "":
+                sql += f", the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
 
             sql += f" WHERE element_id = '{element_id}';"
 
@@ -432,10 +472,10 @@ class GwElement(ParentManage):
                 sql += (f"\nINSERT INTO element_x_connec (element_id, connec_id)"
                         f" VALUES ('{element_id}', '{feature_id}');")
 
-        status = self.controller.execute_sql(sql, log_sql=True)
+        status = self.controller.execute_sql(sql)
         if status:
             self.element_id = element_id
-            self.manage_close(self.dlg_add_element, table_object, excluded_layers=[])
+            self.layers = manage_close(self.dlg_add_element, table_object, excluded_layers=[], layers=self.layers)
 
 
     def filter_elementcat_id(self):
@@ -445,7 +485,7 @@ class GwElement(ParentManage):
         sql = (f"SELECT DISTINCT(id), id FROM cat_element"
                f" WHERE elementtype_id = '{element_type}'"
                f" ORDER BY id")
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         qt_tools.set_item_data(self.dlg_add_element.elementcat_id, rows, 1)
 
 
@@ -454,28 +494,51 @@ class GwElement(ParentManage):
 
         # Create the dialog
         self.dlg_man = ElementManager()
-        self.load_settings(self.dlg_man)
+        load_settings(self.dlg_man)
         self.dlg_man.tbl_element.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Adding auto-completion to a QLineEdit
         table_object = "element"
-        self.set_completer_object(self.dlg_man, table_object)
+        set_completer_object(self.dlg_man, table_object)
 
         # Set a model with selected filter. Attach that model to selected table
-        self.fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)
-        self.set_table_columns(self.dlg_man, self.dlg_man.tbl_element, table_object)
+        fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)
+        set_table_columns(self.dlg_man, self.dlg_man.tbl_element, table_object)
 
         # Set signals
-        self.dlg_man.element_id.textChanged.connect(partial(self.filter_by_id, self.dlg_man, self.dlg_man.tbl_element,
+        self.dlg_man.element_id.textChanged.connect(partial(filter_by_id, self.dlg_man, self.dlg_man.tbl_element,
             self.dlg_man.element_id, table_object))
-        self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object, self.dlg_man,
+        self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object_element, self.dlg_man,
             self.dlg_man.tbl_element, table_object))
-        self.dlg_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_man))
-        self.dlg_man.rejected.connect(partial(self.close_dialog, self.dlg_man))
-        self.dlg_man.btn_delete.clicked.connect(partial(self.delete_selected_object, self.dlg_man.tbl_element,
+        self.dlg_man.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_man))
+        self.dlg_man.rejected.connect(partial(close_dialog, self.dlg_man))
+        self.dlg_man.btn_delete.clicked.connect(partial(delete_selected_object, self.dlg_man.tbl_element,
             table_object))
 
         # Open form
-        self.open_dialog(self.dlg_man, dlg_name='element_manager')
+        open_dialog(self.dlg_man, dlg_name='element_manager')
+
+
+    def open_selected_object_element(self, dialog, widget, table_object):
+
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+
+        row = selected_list[0].row()
+
+        # Get object_id from selected row
+        widget_id = table_object + "_id"
+        field_object_id = table_object + "_id"
+
+        selected_object_id = widget.model().record(row).value(field_object_id)
+
+        # Close this dialog and open selected object
+        dialog.close()
+
+        self.manage_element(new_element_id=False)
+        qt_tools.setWidgetText(self.dlg_add_element, widget_id, selected_object_id)
 
 

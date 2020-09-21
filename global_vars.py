@@ -8,11 +8,33 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import QSettings
 import sys
 
+iface = None
+canvas = None
+plugin_dir = None
+plugin_name = None
+
+
+# TODO: Proper initialization
+schema_name = None
+project_type = None
+plugin_version = None
+
+controller = None
 settings = None
 qgis_settings = None
-plugin_name = None
-qgis_tools = None
 project_vars = {}
+action_select_arc = None
+action_select_plot = None
+srid = None
+
+
+def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name):
+
+    global iface, canvas, plugin_dir, plugin_name
+    iface = p_iface
+    canvas = p_canvas
+    plugin_dir = p_plugin_dir
+    plugin_name = p_plugin_name
 
 
 def init_settings(setting_file):
@@ -30,12 +52,6 @@ def init_qgis_settings(p_plugin_name):
     qgis_settings.setIniCodec(sys.getfilesystemencoding())
 
 
-def init_qgis_tools(p_qgis_tools):
-
-    global qgis_tools
-    qgis_tools = p_qgis_tools
-
-
 def plugin_settings_set_value(key, value):
 
     global plugin_name
@@ -48,13 +64,4 @@ def plugin_settings_value(key, default_value=""):
     key = plugin_name + "/" + key
     value = qgis_settings.value(key, default_value)
     return value
-
-
-def set_project_vars(p_project_vars):
-    global project_vars
-    project_vars = p_project_vars
-
-
-def get_project_vars():
-    return project_vars
 

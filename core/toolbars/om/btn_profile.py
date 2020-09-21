@@ -23,7 +23,11 @@ from lib import qt_tools
 from ..parent_maptool import GwParentMapTool
 from ....ui_manager import Profile
 from ....ui_manager import ProfilesList
-from ...utils.giswater_tools import load_settings, save_settings, create_body, open_dialog, close_dialog
+from ....actions.parent_functs import set_icon
+from ...utils.giswater_tools import close_dialog, create_body, get_parser_value, load_settings, open_dialog, \
+    save_settings, set_parser_value
+from ....lib.qgis_tools import get_snapper, get_event_point, snap_to_current_layer, get_snapped_layer, add_marker, \
+    get_snapped_feature
 
 
 class NodeData:
@@ -55,11 +59,11 @@ class NodeData:
 class GwProfileButton(GwParentMapTool):
     """ Button 43: Draw_profiles """
 
-    def __init__(self, icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir):
+    def __init__(self, icon_path, text, toolbar, action_group):
         """ Class constructor """
 
         # Call ParentMapTool constructor
-        super().__init__(icon_path, text, toolbar, action_group, iface, settings, controller, plugin_dir)
+        super().__init__(icon_path, text, toolbar, action_group)
 
         self.list_of_selected_nodes = []
         self.nodes = []
@@ -76,7 +80,7 @@ class GwProfileButton(GwParentMapTool):
 
         # Set dialog
         self.dlg_draw_profile = Profile()
-        load_settings(self.dlg_draw_profile, self.controller)
+        load_settings(self.dlg_draw_profile)
         self.dlg_draw_profile.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         # Declare composer path widget
@@ -87,6 +91,7 @@ class GwProfileButton(GwParentMapTool):
 
         # Toolbar actions
         action = self.dlg_draw_profile.findChild(QAction, "actionProfile")
+        set_icon(action, "131")
         action.triggered.connect(partial(self.activate_snapping_node))
         self.action_profile = action
 
@@ -98,7 +103,7 @@ class GwProfileButton(GwParentMapTool):
         self.dlg_draw_profile.btn_save_profile.clicked.connect(self.save_profile)
         self.dlg_draw_profile.btn_load_profile.clicked.connect(self.open_profile)
         self.dlg_draw_profile.btn_clear_profile.clicked.connect(self.clear_profile)
-        self.dlg_draw_profile.dlg_closed.connect(partial(save_settings, self.dlg_draw_profile, self.controller))
+        self.dlg_draw_profile.dlg_closed.connect(partial(save_settings, self.dlg_draw_profile))
         self.dlg_draw_profile.dlg_closed.connect(partial(self.remove_selection, actionpan=True))
 
         # Set calendar date as today
@@ -106,9 +111,9 @@ class GwProfileButton(GwParentMapTool):
 
         # Set last parameters
         qt_tools.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance,
-                                     self.controller.plugin_settings_value('minDistanceProfile'))
+                            get_parser_value('btn_profile', 'minDistanceProfile'))
         qt_tools.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title,
-                                     self.controller.plugin_settings_value('titleProfile'))
+                               get_parser_value('btn_profile', 'titleProfile'))
 
         # Show form in docker
         self.controller.init_docker('qgis_form_docker')
@@ -116,7 +121,7 @@ class GwProfileButton(GwParentMapTool):
             # self.controller.manage_translation('draw_profile', self.dlg_draw_profile)
             self.controller.dock_dialog(self.dlg_draw_profile)
         else:
-            open_dialog(self.dlg_draw_profile, self.controller)
+            open_dialog(self.dlg_draw_profile)
 
 
     def deactivate(self):
@@ -149,7 +154,7 @@ class GwProfileButton(GwParentMapTool):
         body = create_body(extras=extras)
 
         # Execute query
-        self.profile_json = self.controller.get_json('gw_fct_getprofilevalues', body, log_sql=True)
+        self.profile_json = self.controller.get_json('gw_fct_getprofilevalues', body)
 
         # Manage level and message from query result
         if self.profile_json['message']:
@@ -166,9 +171,9 @@ class GwProfileButton(GwParentMapTool):
                          self.profile_json['body']['data']['terrain'])
 
         # Save profile values
-        self.controller.plugin_settings_set_value("minDistanceProfile", links_distance)
-        self.controller.plugin_settings_set_value("titleProfile", qt_tools.getWidgetText(self.dlg_draw_profile,
-            self.dlg_draw_profile.txt_title))
+        set_parser_value('btn_profile', 'minDistanceProfile', f'{links_distance}')
+        set_parser_value('btn_profile', 'titleProfile',
+                         f'{qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)}')
 
         # Maximize window (after drawing)
         self.plot.show()
@@ -202,7 +207,8 @@ class GwProfileButton(GwParentMapTool):
             f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, ' \
             f'"ev":1000}}, "title":"{title}", "date":"{date}"'
         body = create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_setprofile', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_setprofile', body)
+        if result is None: return
         message = f"{result['message']}"
         self.controller.show_info(message)
 
@@ -211,17 +217,17 @@ class GwProfileButton(GwParentMapTool):
         """ Open dialog profile_list.ui """
 
         self.dlg_load = ProfilesList()
-        load_settings(self.dlg_load, self.controller)
+        load_settings(self.dlg_load)
 
         # Get profils on database
         body = create_body()
-        result_profile = self.controller.get_json('gw_fct_getprofile', body, log_sql=True)
+        result_profile = self.controller.get_json('gw_fct_getprofile', body)
         if not result_profile:
             return
         message = f"{result_profile['message']}"
         self.controller.show_info(message)
 
-        self.dlg_load.rejected.connect(partial(close_dialog, self.dlg_load.rejected, self.controller))
+        self.dlg_load.rejected.connect(partial(close_dialog, self.dlg_load.rejected))
         self.dlg_load.btn_open.clicked.connect(partial(self.load_profile, result_profile))
         self.dlg_load.btn_delete_profile.clicked.connect(partial(self.delete_profile))
 
@@ -230,7 +236,7 @@ class GwProfileButton(GwParentMapTool):
             item_arc = QListWidgetItem(str(profile['profile_id']))
             self.dlg_load.tbl_profiles.addItem(item_arc)
 
-        open_dialog(self.dlg_load, self.controller)
+        open_dialog(self.dlg_load)
         self.deactivate()
 
 
@@ -243,7 +249,7 @@ class GwProfileButton(GwParentMapTool):
             self.controller.show_warning(message)
             return
 
-        close_dialog(self.dlg_load, self.controller)
+        close_dialog(self.dlg_load)
 
         profile_id = self.dlg_load.tbl_profiles.currentItem().text()
 
@@ -294,7 +300,7 @@ class GwProfileButton(GwParentMapTool):
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-        self.snapper = self.snapper_manager.get_snapper()
+        self.snapper = get_snapper()
         self.iface.setActiveLayer(self.layer_node)
         self.canvas.xyCoordinates.connect(self.mouse_move)
         self.emit_point.canvasClicked.connect(partial(self.snapping_node))
@@ -302,14 +308,14 @@ class GwProfileButton(GwParentMapTool):
 
     def mouse_move(self, point):
 
-        event_point = self.snapper_manager.get_event_point(point=point)
+        event_point = get_event_point(point=point)
 
         # Snapping
-        result = self.snapper_manager.snap_to_current_layer(event_point)
-        if self.snapper_manager.result_is_valid():
-            layer = self.snapper_manager.get_snapped_layer(result)
+        result = snap_to_current_layer(event_point)
+        if result.isValid():
+            layer = get_snapped_layer(result)
             if layer == self.layer_node:
-                self.snapper_manager.add_marker(result, self.vertex_marker)
+                add_marker(result, self.vertex_marker)
         else:
             self.vertex_marker.hide()
 
@@ -317,17 +323,17 @@ class GwProfileButton(GwParentMapTool):
     def snapping_node(self, point):   # @UnusedVariable
 
         # Get clicked point
-        event_point = self.snapper_manager.get_event_point(point=point)
+        event_point = get_event_point(point=point)
 
         # Snapping
-        result = self.snapper_manager.snap_to_current_layer(event_point)
+        result = snap_to_current_layer(event_point)
 
-        if self.snapper_manager.result_is_valid():
+        if result.isValid():
             # Check feature
-            layer = self.snapper_manager.get_snapped_layer(result)
+            layer = get_snapped_layer(result)
             if layer == self.layer_node:
                 # Get the point
-                snapped_feat = self.snapper_manager.get_snapped_feature(result)
+                snapped_feat = get_snapped_feature(result)
                 element_id = snapped_feat.attribute('node_id')
                 self.element_id = str(element_id)
 
@@ -346,7 +352,7 @@ class GwProfileButton(GwParentMapTool):
                     # Populate list arcs
                     extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
                     body = create_body(extras=extras)
-                    result = self.controller.get_json('gw_fct_getprofilevalues', body, log_sql=True)
+                    result = self.controller.get_json('gw_fct_getprofilevalues', body)
                     self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
                     self.remove_selection()
                     list_arcs = []
@@ -411,7 +417,7 @@ class GwProfileButton(GwParentMapTool):
             self.draw_nodes(self.nodes[i], self.nodes[i - 1], i)
         # Draw ground first node and nodes between first and last node
         for i in range(1, self.t):
-            self.first_top_x = self.links[i - 1].start_point # start_point = total_x
+            self.first_top_x = self.links[i - 1].start_point  # start_point = total_x
             self.node_top_x = self.links[i].start_point  # start_point = total_x
             self.first_top_y = self.links[i - 1].node_id  # node_id = top_n1
             self.node_top_y = self.links[i - 1].geom  # geom = top_n2
@@ -479,7 +485,7 @@ class GwProfileButton(GwParentMapTool):
         self.rect = self.fig1.patch
         self.rect.set_facecolor('white')
 
-       
+
     def set_parameters(self, arcs, nodes, terrains):
         """ Get and calculate parameters and values for drawing """
 
@@ -711,6 +717,7 @@ class GwProfileButton(GwParentMapTool):
                  self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2), legend['code'], fontsize=7.5,
                  horizontalalignment='center', verticalalignment='center')
 
+        # noinspection PyUnusedLocal
         scale = self.profile_json['body']['data']['scale']
         title = qt_tools.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
         if title in (None, 'null'):
@@ -814,7 +821,7 @@ class GwProfileButton(GwParentMapTool):
 
         # Fill top_elevation and node_id for all nodes
         plt.annotate(' ' + '\n' + str(round(self.nodes[indx].descript['top_elev'], 2)) + '\n' + ' ',
-                     xy=(Decimal(start_point), self.min_top_elev - \
+                     xy=(Decimal(start_point), self.min_top_elev -
                          Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
                      fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
@@ -988,7 +995,7 @@ class GwProfileButton(GwParentMapTool):
 
         # Fill top_elevation and node_id for all nodes
         plt.annotate(' ' + '\n' + str(round(self.links[indx].descript['top_elev'], 2)) + '\n' + ' ',
-                     xy=(Decimal(start_point), self.min_top_elev - \
+                     xy=(Decimal(start_point), self.min_top_elev -
                          Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
                      fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
@@ -1107,8 +1114,8 @@ class GwProfileButton(GwParentMapTool):
         for i in range(1, self.n):
             if (self.nodes[i].top_elev - self.nodes[i].ymax) < self.min_top_elev:
                 self.min_top_elev = Decimal(self.nodes[i].top_elev - self.nodes[i].ymax)
-            if (self.nodes[i].descript['top_elev'] - self.nodes[i].descript ['ymax']) < self.min_top_elev_descript:
-                self.min_top_elev_descript = Decimal(self.nodes[i].descript['top_elev'] - self.nodes[i].descript ['ymax'])
+            if (self.nodes[i].descript['top_elev'] - self.nodes[i].descript['ymax']) < self.min_top_elev_descript:
+                self.min_top_elev_descript = Decimal(self.nodes[i].descript['top_elev'] - self.nodes[i].descript['ymax'])
 
         # Search y coordinate max_top_elev
         self.max_top_elev = self.nodes[0].top_elev
@@ -1281,7 +1288,7 @@ class GwProfileButton(GwParentMapTool):
 
         extras = f'"profile_id":"{profile_id}", "action":"delete"'
         body = create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_setprofile', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_setprofile', body)
         message = f"{result['message']}"
         self.controller.show_info(message)
 
