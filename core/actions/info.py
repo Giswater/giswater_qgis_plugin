@@ -23,7 +23,7 @@ import webbrowser
 from collections import OrderedDict
 from functools import partial
 
-from .... import global_vars
+import global_vars
 from lib import tools_qt
 from core.actions.catalog import GwCatalog
 from core.actions.dimensioning import GwDimensioning

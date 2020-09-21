@@ -21,15 +21,15 @@ import inspect
 import traceback
 import sys
 
-from .. import global_vars
+import global_vars
 from .pg_dao import PgDao
 from .logger import Logger
 from lib import tools_os, tools_qt
 from core.ui.ui_manager import DialogTextUi, DockerUi
-from ..actions.parent_functs import manage_return_manager, manage_layer_manager, manage_actions
-from ..lib.tools_qgis import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
+from actions.parent_functs import manage_return_manager, manage_layer_manager, manage_actions
+from lib.tools_qgis import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
     qgis_get_layer_primary_key, qgis_get_layers
-from ..core.utils.tools_giswater import get_parser_value, set_parser_value
+from core.utils.tools_giswater import get_parser_value, set_parser_value
 
 
 class DaoController:

@@ -21,11 +21,11 @@ from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt
 
-from .... import global_vars
-from ..parent_maptool import GwParentMapTool
+import global_vars
+from core.toolbars.parent_maptool import GwParentMapTool
 from core.ui.ui_manager import DialogTextUi
-from ...utils.tools_giswater import populate_info_text, create_body, refresh_legend
-from ....lib.tools_qgis import get_snapping_options, enable_snapping, get_event_point, snap_to_current_layer, \
+from core.utils.tools_giswater import populate_info_text, create_body, refresh_legend
+from lib.tools_qgis import get_snapping_options, enable_snapping, get_event_point, snap_to_current_layer, \
     add_marker, get_snapped_layer, get_snapped_point, get_snapped_feature, get_snapped_feature_id
 
 

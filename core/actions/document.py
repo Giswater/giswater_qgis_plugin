@@ -12,7 +12,7 @@ from functools import partial
 from lib import tools_qt
 from core.utils.tools_giswater import load_settings, open_dialog, close_dialog
 from core.ui.ui_manager import DocUi, DocManager
-from .... import global_vars
+import global_vars
 from actions.parent_functs import set_icon, open_web_browser, get_file_dialog
 from actions.parent_manage_funct import set_selectionbehavior, remove_selection, \
     populate_combo, set_completer_object, set_completer_feature_id, manage_close, tab_feature_changed, exist_object, \

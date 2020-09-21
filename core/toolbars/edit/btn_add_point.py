@@ -10,10 +10,10 @@ from qgis.PyQt.QtGui import QKeySequence
 
 from functools import partial
 
-from ..parent_dialog import GwParentAction
+from core.toolbars.parent_dialog import GwParentAction
 from core.actions.edit_func import GwEdit
-from ...utils.pg_man import PgMan
-from .... import global_vars
+from core.utils.pg_man import PgMan
+import global_vars
 
 
 class GwAddPointButton(GwParentAction):

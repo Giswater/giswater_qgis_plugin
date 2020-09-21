@@ -17,7 +17,7 @@ from lib import tools_qt
 from core.utils.tools_giswater import load_settings, open_dialog, save_settings
 
 from core.ui.ui_manager import DimensioningUi
-from .... import global_vars
+import global_vars
 
 from actions.parent_functs import restore_user_layer, set_icon
 from actions.api_parent_functs import check_actions, create_body, put_widgets,  \

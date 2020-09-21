@@ -14,11 +14,11 @@ from qgis.PyQt.QtWidgets import QAction, QMenu
 from functools import partial
 import re
 import os
-from .... import global_vars
-from ..parent_maptool import GwParentMapTool
+import global_vars
+from core.toolbars.parent_maptool import GwParentMapTool
 from core.actions.info import GwInfo
-from ....actions.parent_functs import get_max_rectangle_from_coords, draw_point
-from ....actions.api_parent_functs import create_body, get_visible_layers, draw_polyline, get_points
+from actions.parent_functs import get_max_rectangle_from_coords, draw_point
+from actions.api_parent_functs import create_body, get_visible_layers, draw_polyline, get_points
 
 
 class GwInfoButton(GwParentMapTool):

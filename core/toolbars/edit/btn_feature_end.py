@@ -14,11 +14,11 @@ from functools import partial
 from datetime import datetime
 
 from lib import tools_qt
-from ..parent_dialog import GwParentAction
-from ...utils.tools_giswater import close_dialog, load_settings, open_dialog
+from core.toolbars.parent_dialog import GwParentAction
+from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
 from core.ui.ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
-from ....actions.parent_functs import set_icon
-from ....actions.parent_manage_funct import remove_selection, set_selectionbehavior, \
+from actions.parent_functs import set_icon
+from actions.parent_manage_funct import remove_selection, set_selectionbehavior, \
     set_completer_object, insert_feature, selection_init, delete_records, tab_feature_changed, set_completer_feature_id, \
     hide_generic_layers, disconnect_snapping, disconnect_signal_selection_changed, set_completer_widget
 

@@ -13,7 +13,7 @@ from lib import tools_qt
 from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
 from core.utils.layer_tools import populate_info_text
 from core.ui.ui_manager import PsectorDuplicate
-from .... import global_vars
+import global_vars
 from actions.parent_functs import create_body
 
 

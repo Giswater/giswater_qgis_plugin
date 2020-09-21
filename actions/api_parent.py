@@ -22,11 +22,11 @@ import sys
 import webbrowser
 from functools import partial
 
-from .. import global_vars
+import global_vars
 from lib import tools_qt
-from .parent import ParentAction
-from ..core.utils.hyperlink_label import GwHyperLinkLabel
-from ..map_tools.snapping_utils_v3 import SnappingConfigManager
+from actions.parent import ParentAction
+from core.utils.hyperlink_label import GwHyperLinkLabel
+from map_tools.snapping_utils_v3 import SnappingConfigManager
 from core.ui.ui_manager import DialogTextUi
 
 

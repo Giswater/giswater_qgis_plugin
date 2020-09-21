@@ -13,9 +13,9 @@ import json
 import threading
 from collections import OrderedDict
 
-from .. import global_vars
+import global_vars
 
-from ..actions.parent_functs import create_body
+from actions.parent_functs import create_body
 
 
 class GwNotifyTools:

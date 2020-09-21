@@ -14,7 +14,7 @@ from qgis.PyQt.QtCore import QPoint
 
 import configparser
 import os.path
-from .. import global_vars
+import global_vars
 
 
 def get_value_from_metadata(parameter, default_value):

@@ -14,10 +14,10 @@ from lib import tools_qt
 from core.ui.ui_manager import NodeTypeChange
 from core.actions.catalog import GwCatalog
 from core.actions.info import GwInfo
-from ..parent_maptool import GwParentMapTool
-from ...utils.tools_giswater import check_expression, close_dialog, load_settings, open_dialog
-from ....actions.parent_functs import restore_user_layer
-from ....lib.tools_qgis import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \
+from core.toolbars.parent_maptool import GwParentMapTool
+from core.utils.tools_giswater import check_expression, close_dialog, load_settings, open_dialog
+from actions.parent_functs import restore_user_layer
+from lib.tools_qgis import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \
     enable_snapping
 
 

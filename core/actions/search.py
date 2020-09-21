@@ -20,7 +20,7 @@ import re
 import sys
 from functools import partial
 
-from .... import global_vars
+import global_vars
 from lib import tools_qt
 from core.actions.info import GwInfo
 from core.actions.document import GwDocument

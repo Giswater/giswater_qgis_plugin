@@ -13,7 +13,7 @@ from functools import partial
 from lib import tools_qt
 from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
 from core.ui.ui_manager import ElementUi, ElementManager
-from .... import global_vars
+import global_vars
 from actions.parent_functs import set_icon
 from actions.parent_manage_funct import set_selectionbehavior, remove_selection, \
     set_completer_object, manage_close, tab_feature_changed, exist_object, insert_feature, delete_records, \

@@ -8,7 +8,7 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import QSettings, Qt
 
 from core.actions.dimensioning import GwDimensioning
-from ..parent_maptool import GwParentMapTool
+from core.toolbars.parent_maptool import GwParentMapTool
 
 
 class GwDimensioningButton(GwParentMapTool):

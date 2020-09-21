@@ -15,11 +15,11 @@ import operator
 from functools import partial
 
 from lib import tools_qt
-from ..parent_dialog import GwParentAction
-from ...utils.tools_giswater import load_settings, open_dialog, close_dialog
+from core.toolbars.parent_dialog import GwParentAction
+from core.utils.tools_giswater import load_settings, open_dialog, close_dialog
 from core.ui.ui_manager import ConfigUi
-from ....actions.parent_functs import hide_void_groupbox
-from ....actions.api_parent_functs import create_body
+from actions.parent_functs import hide_void_groupbox
+from actions.api_parent_functs import create_body
 
 
 class GwConfigButton(GwParentAction):

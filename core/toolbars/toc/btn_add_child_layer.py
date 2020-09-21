@@ -11,13 +11,13 @@ from qgis.PyQt.QtGui import QCursor
 
 from functools import partial
 
-from ..parent_dialog import GwParentAction
-from ...load_project_check import GwProjectCheck
-from ...tasks.task_layer_config import GwConfigLayerTask
-from ...utils.layer_tools import from_postgres_to_toc
-from ....lib.tools_qgis import get_qgis_project_variables
-from ....actions.parent_functs import get_cursor_multiple_selection
-from ...utils.tools_giswater import create_body
+from core.toolbars.parent_dialog import GwParentAction
+from core.load_project_check import GwProjectCheck
+from core.tasks.task_layer_config import GwConfigLayerTask
+from core.utils.layer_tools import from_postgres_to_toc
+from lib.tools_qgis import get_qgis_project_variables
+from actions.parent_functs import get_cursor_multiple_selection
+from core.utils.tools_giswater import create_body
 
 
 class GwAddChildLayerButton(GwParentAction):

@@ -12,11 +12,11 @@ from qgis.PyQt.QtGui import QRegExpValidator
 from functools import partial
 
 from lib import tools_qt
-from ..parent_dialog import GwParentAction
+from core.toolbars.parent_dialog import GwParentAction
 from core.ui.ui_manager import EpaManager
-from ...utils.tools_giswater import load_settings, open_dialog, close_dialog
-from ....actions.api_parent_functs import fill_table
-from ....actions.parent_functs import set_table_columns, multi_rows_delete
+from core.utils.tools_giswater import load_settings, open_dialog, close_dialog
+from actions.api_parent_functs import fill_table
+from actions.parent_functs import set_table_columns, multi_rows_delete
 
 
 class GwGo2EpaManagerButton(GwParentAction):

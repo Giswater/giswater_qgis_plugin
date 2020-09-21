@@ -16,7 +16,7 @@ from core.actions.psector import GwPsector
 from core.ui.ui_manager import PsectorManagerUi, PriceManagerUi
 from core.actions.psector_duplicate import GwPsectorDuplicate
 from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
-from .... import global_vars
+import global_vars
 from actions.parent_functs import fill_table, set_table_columns, set_label_current_psector, show_exceptions_msg
 
 

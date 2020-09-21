@@ -20,7 +20,7 @@ from functools import partial
 from lib import tools_qt
 from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, save_current_tab,\
     save_settings
-from .... import global_vars
+import global_vars
 from core.ui.ui_manager import SelectorUi, MincutManagerUi
 from actions.api_parent_functs import get_selector
 from actions.parent_functs import set_dates_from_to, set_icon, set_table_columns

@@ -13,7 +13,7 @@ import configparser
 import os.path
 import sys
 
-from . import global_vars
+import global_vars
 from .core.load_project import LoadProject
 from .core.btn_admin import GwAdmin
 from .dao.controller import DaoController

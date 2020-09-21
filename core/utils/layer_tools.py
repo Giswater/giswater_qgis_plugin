@@ -18,7 +18,7 @@ import sys
 
 from lib import tools_qt
 
-from ... import global_vars
+import global_vars
 
 
 

@@ -20,11 +20,11 @@
 from qgis.PyQt.QtCore import Qt, QDate
 
 from lib import tools_qt
-from ..parent_maptool import GwParentMapTool
+from core.toolbars.parent_maptool import GwParentMapTool
 from core.ui.ui_manager import ArcFusionUi
 from functools import partial
-from ...utils.tools_giswater import load_settings, open_dialog, close_dialog, create_body, populate_info_text
-from ....lib.tools_qgis import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \
+from core.utils.tools_giswater import load_settings, open_dialog, close_dialog, create_body, populate_info_text
+from lib.tools_qgis import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \
     enable_snapping
 
 

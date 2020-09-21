@@ -12,8 +12,8 @@ import re
 import os
 import subprocess
 
-from ... import global_vars
-from ..utils.layer_tools import add_temp_layer
+import global_vars
+from core.utils.layer_tools import add_temp_layer
 
 
 class GwGo2EpaTask(QgsTask):

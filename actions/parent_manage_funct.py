@@ -16,10 +16,10 @@ from qgis.PyQt.QtCore import Qt, QDate, QDateTime, QStringListModel
 from functools import partial
 
 from lib import tools_qt
-from .. import global_vars
-from .parent_functs import check_expression, get_cursor_multiple_selection, set_table_columns, refresh_map_canvas
-from ..lib.tools_qgis import snap_to_background_layers, get_event_point, add_marker
-from ..core.utils.tools_giswater import close_dialog
+import global_vars
+from actions.parent_functs import check_expression, get_cursor_multiple_selection, set_table_columns, refresh_map_canvas
+from lib.tools_qgis import snap_to_background_layers, get_event_point, add_marker
+from core.utils.tools_giswater import close_dialog
 
 
 def reset_lists(ids, list_ids):

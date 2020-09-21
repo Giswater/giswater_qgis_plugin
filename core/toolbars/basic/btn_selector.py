@@ -5,14 +5,14 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ..parent_dialog import GwParentAction
+from core.toolbars.parent_dialog import GwParentAction
 from functools import partial
 
-from ...utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, save_current_tab, \
+from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, save_current_tab, \
     save_settings
 from core.ui.ui_manager import SelectorUi
-from .... import global_vars
-from ....actions.api_parent_functs import get_selector
+import global_vars
+from actions.api_parent_functs import get_selector
 
 
 class GwSelectorButton(GwParentAction):

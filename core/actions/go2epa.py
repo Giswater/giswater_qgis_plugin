@@ -13,7 +13,7 @@ import os
 import sys
 from functools import partial
 
-from .... import global_vars
+import global_vars
 from lib import tools_qt
 from core.actions.go2epa_options import GwGo2EpaOptions
 from core.tasks.task_go2epa import GwGo2EpaTask

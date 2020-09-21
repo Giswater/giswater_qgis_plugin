@@ -12,10 +12,10 @@ from datetime import datetime
 from functools import partial
 
 from lib import tools_qt
-from ..parent_dialog import GwParentAction
-from ...utils.tools_giswater import close_dialog, load_settings, open_dialog
+from core.toolbars.parent_dialog import GwParentAction
+from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
 from core.ui.ui_manager import SelectorDate
-from ....actions.parent_functs import refresh_map_canvas
+from actions.parent_functs import refresh_map_canvas
 
 
 class GwDateSelectorButton(GwParentAction):

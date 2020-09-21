@@ -10,7 +10,7 @@ from qgis.PyQt.QtGui import QIcon
 
 import os
 
-from ... import global_vars
+import global_vars
 
 
 class GwParentAction:

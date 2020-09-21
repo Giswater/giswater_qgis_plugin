@@ -17,7 +17,7 @@ from functools import partial
 from core.utils.extended_qlabel import GwExtendedQLabel
 from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
 from core.ui.ui_manager import Gallery, GalleryZoom
-from .... import global_vars
+import global_vars
 from actions.parent_functs import set_icon
 
 

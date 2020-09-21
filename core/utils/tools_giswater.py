@@ -4,13 +4,13 @@ from qgis.PyQt.QtGui import QCursor, QPixmap
 from qgis.core import QgsProject, QgsExpression
 
 import configparser
-from ... import global_vars
+import global_vars
 import os
 import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
-from ...lib import tools_qt
+from lib import tools_qt
 from core.ui.ui_manager import GwDialog, GwMainWindow
 
 

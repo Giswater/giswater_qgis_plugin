@@ -14,14 +14,14 @@ import configparser
 from collections import OrderedDict, Counter
 
 from .models.plugin_toolbar import PluginToolbar
-from .utils.pg_man import PgMan
-from .utils.tools_giswater import set_parser_value
-from .. import global_vars
+from core.utils.pg_man import PgMan
+from core.utils.tools_giswater import set_parser_value
+import global_vars
 from core.ui.ui_manager import DialogTextUi
-from ..core.info_tools import GwInfoTools
-from ..core.notify_tools import GwNotifyTools
+from core.info_tools import GwInfoTools
+from core.notify_tools import GwNotifyTools
 from core.actions.search import GwSearch
-from ..lib.tools_qgis import qgis_get_layer_source, get_qgis_project_variables, qgis_manage_snapping_layer
+from lib.tools_qgis import qgis_get_layer_source, get_qgis_project_variables, qgis_manage_snapping_layer
 from .toolbars import buttons
 
 

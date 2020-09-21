@@ -10,7 +10,7 @@ from qgis.PyQt.QtCore import QSettings
 from core.actions.info import GwInfo
 from core.actions.element import GwElement
 from core.actions.document import GwDocument
-from .... import global_vars
+import global_vars
 
 
 class GwEdit:

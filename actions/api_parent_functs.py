@@ -23,12 +23,12 @@ import webbrowser
 import json
 from functools import partial
 
-from .. import global_vars
+import global_vars
 from lib import tools_qt
-from ..core.utils.hyperlink_label import GwHyperLinkLabel
-from .parent_functs import create_body, draw_polyline, get_points, open_file_path, zoom_to_rectangle
-from ..core.utils.tools_giswater import close_dialog
-from ..core.utils.layer_tools import manage_geometry, export_layer_to_db, delete_layer_from_toc, from_dxf_to_toc
+from core.utils.hyperlink_label import GwHyperLinkLabel
+from actions.parent_functs import create_body, draw_polyline, get_points, open_file_path, zoom_to_rectangle
+from core.utils.tools_giswater import close_dialog
+from core.utils.layer_tools import manage_geometry, export_layer_to_db, delete_layer_from_toc, from_dxf_to_toc
 
 
 def get_visible_layers(as_list=False):

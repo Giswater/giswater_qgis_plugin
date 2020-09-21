@@ -13,7 +13,7 @@ from functools import partial
 from lib import tools_qt
 from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
 from core.ui.ui_manager import Go2EpaOptionsUi
-from .... import global_vars
+import global_vars
 from actions.api_parent_functs import create_body, construct_form_param_user, manage_child
 
 
