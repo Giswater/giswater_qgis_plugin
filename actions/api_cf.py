@@ -714,13 +714,15 @@ class ApiCF(ApiParent, QObject):
 
 
     def get_last_value(self):
-
-        widgets = self.dlg_cf.tab_data.findChildren(QWidget)
-        for widget in widgets:
-            if widget.hasFocus():
-                value = utils_giswater.getWidgetText(self.dlg_cf, widget)
-                if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
-                    self.my_json[str(widget.property('columnname'))] = str(value)
+        try:
+            widgets = self.dlg_cf.tab_data.findChildren(QWidget)
+            for widget in widgets:
+                if widget.hasFocus():
+                    value = utils_giswater.getWidgetText(self.dlg_cf, widget)
+                    if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
+                        self.my_json[str(widget.property('columnname'))] = str(value)
+        except RuntimeError:
+            pass
 
 
     def start_editing(self, layer):
