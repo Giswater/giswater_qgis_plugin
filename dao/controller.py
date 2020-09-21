@@ -15,7 +15,6 @@ from qgis.PyQt.QtWidgets import QCheckBox, QGroupBox, QLabel, QMessageBox, QPush
 import configparser
 import json
 import os
-
 from collections import OrderedDict
 from functools import partial
 import inspect
@@ -27,7 +26,6 @@ from .pg_dao import PgDao
 from .logger import Logger
 from lib import os_tools, qt_tools
 from ..ui_manager import DialogTextUi, DockerUi
-
 from ..actions.parent_functs import manage_return_manager, manage_layer_manager, manage_actions
 from ..lib.qgis_tools import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
     qgis_get_layer_primary_key, qgis_get_layers
@@ -63,6 +61,7 @@ class DaoController:
         self.show_docker = None
         self.prev_maptool = None
         self.gw_infotools = None
+
         if create_logger:
             self.set_logger(logger_name)
 
