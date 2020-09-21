@@ -595,7 +595,7 @@ class ApiCF(ApiParent, QObject):
             self.enable_actions(self.layer.isEditable())
             self.layer.editingStarted.connect(partial(self.enable_actions, True))
             self.layer.editingStopped.connect(partial(self.enable_actions, False))
-            self.layer.editingStopped.connect(partial(self.get_last_value))
+            self.layer.editingStopped.connect(self.get_last_value)
 
         action_edit.setChecked(self.layer.isEditable())
         action_edit.triggered.connect(partial(self.start_editing, self.layer))
@@ -642,6 +642,7 @@ class ApiCF(ApiParent, QObject):
             self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
             self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
+        self.dlg_cf.dlg_closed.connect(self.disconect_signals)
 
         # Set title
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
@@ -656,6 +657,13 @@ class ApiCF(ApiParent, QObject):
         self.dlg_cf.setWindowTitle(title)
 
         return self.complet_result, self.dlg_cf
+
+
+    def disconect_signals(self):
+        try:
+            self.layer.editingStopped.disconnect(self.get_last_value)
+        except:
+            pass
 
 
     def manage_docker_close(self):
