@@ -128,7 +128,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('--------------------------------------------------------------------------------------'));
    
  	-- starting process
-	FOR v_visit IN SELECT * FROM temp_csv2pg WHERE fid = v_fid AND cur_user=current_user
+	FOR v_visit IN SELECT * FROM temp_csv WHERE fid = v_fid AND cur_user=current_user
 	LOOP
 		RAISE NOTICE 'v_visit %', v_visit;
 	
@@ -237,16 +237,16 @@ BEGIN
 	END LOOP;
 
 	-- Delete values on temporal table
-	DELETE FROM temp_csv2pg WHERE cur_user=current_user AND fid=v_fid;
+	DELETE FROM temp_csv WHERE cur_user=current_user AND fid=v_fid;
 
 	
 
 	-- manage log (fprocesscat 42)
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Reading values from temp_csv2pg table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Reading values from temp_csv table -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on om_visit table -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on ',v_featuretable,' table -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on om_visit_event table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Deleting values from temp_csv2pg -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Deleting values from temp_csv -> Done'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Process finished'));
 
 
