@@ -1497,7 +1497,6 @@ class Giswater(QObject):
         if cursor:
             self.iface.mapCanvas().setCursor(cursor)
 
-
     def selection_changed(self):
         """ Get selected muni_id and execute function setselectors """
 
@@ -1527,6 +1526,8 @@ class Giswater(QObject):
             # For trigger Giswater info
             action_info = self.iface.mainWindow().findChild(QAction, 'map_tool_api_info_data')
             action_info.trigger()
+
+            self.parent.set_style_mapzones()
 
 
     def get_cursor_multiple_selection(self):
