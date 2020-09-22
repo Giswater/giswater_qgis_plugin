@@ -2193,9 +2193,6 @@ CREATE OR REPLACE VIEW v_ui_plan_node_cost AS
 	 JOIN v_price_compost ON cat_node.cost::text = v_price_compost.id::text
 	 JOIN v_plan_node ON node.node_id::text = v_plan_node.node_id::text;
 
-ALTER TABLE v_ui_plan_node_cost
-  OWNER TO postgres;
-
 
 
 
