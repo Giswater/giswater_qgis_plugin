@@ -75,7 +75,11 @@ class GwMainWindow(QMainWindow):
 
     def closeEvent(self, event):
         self.dlg_closed.emit()
-        return super().closeEvent(event)
+        try:
+            return super().closeEvent(event)
+        except RuntimeError:
+            pass
+
 
 
     def eventFilter(self, object, event):
