@@ -327,7 +327,7 @@ def add_point(vertex_marker):
     emit_point = QgsMapToolEmitPoint(global_vars.canvas)
     global_vars.canvas.setMapTool(emit_point)
     global_vars.canvas.xyCoordinates.connect(partial(mouse_move, vertex_marker))
-    emit_point.canvasClicked.connect(partial(get_xy, vertex_marker, emit_point, return_point))
+    emit_point.canvasClicked.connect(partial(get_xy, vertex_marker, return_point, emit_point))
 
     return return_point
 
@@ -346,7 +346,7 @@ def mouse_move(vertex_marker, point):
         vertex_marker.hide()
 
 
-def get_xy(emit_point, vertex_marker, return_point, point):
+def get_xy(vertex_marker, return_point, emit_point, point):
     """ Get coordinates of selected point """
 
     # Setting x, y coordinates from point
