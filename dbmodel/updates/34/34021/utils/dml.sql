@@ -94,3 +94,10 @@ UPDATE config_form_tabs SET orderby=2 WHERE formname='selector_basic' AND tabnam
 UPDATE config_form_tabs SET orderby=3 WHERE formname='selector_basic' AND tabname='tab_hydro_state' AND orderby IS NULL;
 UPDATE config_form_tabs SET orderby=4 WHERE formname='selector_basic' AND tabname='tab_psector' AND orderby IS NULL;
 UPDATE config_form_tabs SET orderby=5 WHERE formname='selector_basic' AND tabname='tab_sector' AND orderby IS NULL;
+
+
+UPDATE sys_param_user SET layoutorder=2, layoutname = 'lyt_connec_gully_vdef' WHERE id='feat_fountain_vdefault';
+UPDATE sys_param_user SET layoutorder=3, layoutname = 'lyt_connec_gully_vdef' WHERE id='feat_greentap_vdefault';
+UPDATE sys_param_user SET layoutorder=4, layoutname = 'lyt_connec_gully_vdef' WHERE id='feat_tap_vdefault';
+UPDATE sys_param_user SET layoutorder=5, layoutname = 'lyt_connec_gully_vdef' WHERE id='feat_vconnec_vdefault';
+UPDATE sys_param_user SET layoutorder=6, layoutname = 'lyt_connec_gully_vdef' WHERE id='feat_wjoin_vdefault';
