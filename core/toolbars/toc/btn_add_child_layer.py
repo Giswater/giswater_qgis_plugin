@@ -16,7 +16,7 @@ from ...project_check import GwProjectCheck
 from ...tasks.tsk_config_layer import GwConfigLayerTask
 from ...utils.layer_tools import from_postgres_to_toc
 from ....lib.qgis_tools import get_qgis_project_variables
-from ....actions.parent_functs import get_cursor_multiple_selection
+from ....actions.parent_functs import get_cursor_multiple_selection, set_style_mapzones
 from ...utils.giswater_tools import create_body
 
 
@@ -193,6 +193,7 @@ class GwAddChildLayerButton(GwParentAction):
             self.layer_muni.triggerRepaint()
             self.iface.actionPan().trigger()
             self.iface.actionZoomIn().trigger()
+            set_style_mapzones()
 
 
 
