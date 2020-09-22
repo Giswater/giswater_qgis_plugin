@@ -87,3 +87,10 @@ UPDATE sys_table SET sys_role = 'role_edit' WHERE id ilike 've_pol%';
 --2020/09/21
 UPDATE config_param_system SET parameter = 'utils_grafanalytics_lrs_feature' WHERE parameter = 'grafanalytics_lrs_feature';
 UPDATE config_param_system SET parameter = 'utils_grafanalytics_lrs_graf' WHERE parameter = 'grafanalytics_lrs_graf';
+
+--2020/09/22
+UPDATE config_form_tabs SET orderby=1 WHERE formname='selector_basic' AND tabname='tab_exploitation' AND orderby IS NULL;
+UPDATE config_form_tabs SET orderby=2 WHERE formname='selector_basic' AND tabname='tab_network_state' AND orderby IS NULL;
+UPDATE config_form_tabs SET orderby=3 WHERE formname='selector_basic' AND tabname='tab_hydro_state' AND orderby IS NULL;
+UPDATE config_form_tabs SET orderby=4 WHERE formname='selector_basic' AND tabname='tab_psector' AND orderby IS NULL;
+UPDATE config_form_tabs SET orderby=5 WHERE formname='selector_basic' AND tabname='tab_sector' AND orderby IS NULL;
