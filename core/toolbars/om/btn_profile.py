@@ -262,7 +262,7 @@ class GwProfileButton(GwParentMapTool):
                 self.endNode = profile['values']['endNode']
 
                 self.dlg_draw_profile.txt_profile_id.setText(str(profile_id))
-                list_arcs = json.loads(profile['values']['listArcs'])
+                list_arcs = profile['values']['listArcs']
                 self.dlg_draw_profile.tbl_list_arc.clear()
                 for arc in list_arcs:
                     item_arc = QListWidgetItem(str(arc))
@@ -275,7 +275,7 @@ class GwProfileButton(GwParentMapTool):
 
                 self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
                 self.remove_selection()
-                list_arcs = json.loads(profile['values']['listArcs'])
+                list_arcs = profile['values']['listArcs']
                 expr_filter = "\"arc_id\" IN ("
                 for arc in list_arcs:
                     expr_filter += f"'{arc}', "
