@@ -603,8 +603,11 @@ BEGIN
 				WHEN 'matcat_id' THEN	
 					field_value = v_matcat_id;
 				WHEN concat(lower(v_catfeature.feature_type),'cat_id') THEN	
-					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a 
-					WHERE (a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = concat('edit_', lower(v_catfeature.feature_type), 'cat_vdefault');
+					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a
+					 WHERE a->>'parameter' = concat('feat_', lower(v_catfeature.id), '_vdefault');
+				WHEN 'connecat_id' THEN    
+					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a
+					WHERE a->>'parameter' = concat('feat_', lower(v_catfeature.id), '_vdefault');
 
 
 				-- *_type
