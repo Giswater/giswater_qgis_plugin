@@ -34,6 +34,8 @@ from ....actions.parent_manage_funct import set_selectionbehavior, remove_select
     set_completer_feature_id, reload_qtable, refresh_map_canvas, disconnect_signal_selection_changed, \
     selection_changed, hide_generic_layers, set_completer_object, disconnect_snapping, selection_init
 
+from ....actions.api_parent_functs import create_body
+
 
 class GwPsector:
 
@@ -786,7 +788,7 @@ class GwPsector:
         qt_tools.setWidgetText(dialog, 'pca_pecvat', res)
 
 
-    def calulate_percents(self, tablename, psector_id, field):
+    def calulate_percents(self, tablename, field):
         psector_id = qt_tools.getWidgetText(self.dlg_plan_psector, "psector_id")
 
         sql = ("UPDATE " + tablename + " "
@@ -1121,7 +1123,7 @@ class GwPsector:
 
 
     def set_plan(self):
-        body = self.create_body()
+        body = create_body()
         self.controller.get_json('gw_fct_setplan', body, log_sql=True)
         
         
