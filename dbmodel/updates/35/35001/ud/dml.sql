@@ -14,16 +14,16 @@ ON CONFLICT (id) DO NOTHING;
 
 
 -- 2020/07/20
-INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_arc', 101, 'GW Layers');
-INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_connec', 102, 'GW Layers');
-INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_link', 103, 'GW Layers');
-INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_node', 104, 'GW Layers');
-INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_gully', 105, 'GW Layers');
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_arc', 101, 'GW Layers') ON CONFLICT (id) DO NOTHING;
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_connec', 102, 'GW Layers') ON CONFLICT (id) DO NOTHING;
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_link', 103, 'GW Layers') ON CONFLICT (id) DO NOTHING;
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_node', 104, 'GW Layers') ON CONFLICT (id) DO NOTHING;
+INSERT INTO config_table(id, style, group_layer) VALUES('v_edit_gully', 105, 'GW Layers') ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO config_table(id, style) VALUES('v_anl_flow_arc', 106);
-INSERT INTO config_table(id, style) VALUES('v_anl_flow_connec', 107);
-INSERT INTO config_table(id, style) VALUES('v_anl_flow_gully', 108);
-INSERT INTO config_table(id, style) VALUES('v_anl_flow_node', 109);
+INSERT INTO config_table(id, style) VALUES('v_anl_flow_arc', 106) ON CONFLICT (id) DO NOTHING;
+INSERT INTO config_table(id, style) VALUES('v_anl_flow_connec', 107) ON CONFLICT (id) DO NOTHING;
+INSERT INTO config_table(id, style) VALUES('v_anl_flow_gully', 108) ON CONFLICT (id) DO NOTHING;
+INSERT INTO config_table(id, style) VALUES('v_anl_flow_node', 109) ON CONFLICT (id) DO NOTHING;
 
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
@@ -2393,7 +2393,7 @@ def my_form_open(dialog, layer, feature):
   <mapTip></mapTip>
   <layerGeometryType>1</layerGeometryType>
 </qgis>
-$$, true);
+$$, true) ON CONFLICT (id) DO NOTHING;
 
 
 INSERT INTO sys_style (id, idval, styletype, stylevalue, active)
