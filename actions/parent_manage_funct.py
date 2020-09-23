@@ -600,6 +600,9 @@ def lazy_configuration(widget, init_function):
 def select_features_by_ids(geom_type, expr, layers=None):
     """ Select features of layers of group @geom_type applying @expr """
 
+    if layers is None:
+        return
+    
     if not geom_type in layers:
         return
 
