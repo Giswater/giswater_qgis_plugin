@@ -146,8 +146,7 @@ BEGIN
 	SELECT ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_epsg) INTO v_point;
 	
 	-- Get feature
-	v_sql := 'SELECT layer_id, 0 as orderby, addparam->>''geomType'' as geomtype FROM  '||quote_ident(v_config_layer)||' WHERE layer_id= '||quote_literal(v_activelayer)||' UNION
-              SELECT layer_id, orderby , addparam->>''geomType'' as geomtype FROM  '||quote_ident(v_config_layer)||' WHERE layer_id = any('||quote_literal(v_visiblelayer)||'::text[]) UNION 
+	v_sql := 'SELECT layer_id, orderby , addparam->>''geomType'' as geomtype FROM  '||quote_ident(v_config_layer)||' WHERE layer_id = any('||quote_literal(v_visiblelayer)||'::text[]) UNION 
               SELECT DISTINCT ON (layer_id) layer_id, orderby+100, addparam->>''geomType'' as geomtype FROM  '||quote_ident(v_config_layer)||' JOIN cat_feature ON parent_layer=layer_id 
               WHERE child_layer = any('||quote_literal(v_visiblelayer)||'::text[]) ORDER BY orderby';
 
