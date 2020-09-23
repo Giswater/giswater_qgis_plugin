@@ -1162,7 +1162,7 @@ def gw_function_dxf(**kwargs):
 
     dialog = kwargs['dialog']
     widget = kwargs['widget']
-    temp_layers_added = kwargs['temp_layer_added']
+    temp_layers_added = kwargs['temp_layers_added']
     complet_result = manage_dxf(dialog, path, False, True)
 
     for layer in complet_result['temp_layers_added']:
