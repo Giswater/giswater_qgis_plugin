@@ -80,20 +80,21 @@ class ApiConfig(ApiParent):
         groupBox_9 = QGroupBox("Node")
         groupBox_10 = QGroupBox("Arc")
         groupBox_11 = QGroupBox("Utils")
-        groupBox_12 = QGroupBox(f"Connec&&Gully")
+        groupBox_12 = QGroupBox(f"Connec")
+        groupBox_13 = QGroupBox(f"Gully")
 
-        groupBox_13 = QGroupBox("Topology")
-        groupBox_14 = QGroupBox("Builder")
-        groupBox_15 = QGroupBox("Review")
-        groupBox_16 = QGroupBox("Analysis")
-        groupBox_17 = QGroupBox("System")
+        groupBox_14 = QGroupBox("Topology")
+        groupBox_15 = QGroupBox("Builder")
+        groupBox_16 = QGroupBox("Review")
+        groupBox_17 = QGroupBox("Analysis")
+        groupBox_18 = QGroupBox("System")
 
-        groupBox_18 = QGroupBox("Fluid type")
-        groupBox_19 = QGroupBox("Location type")
-        groupBox_20 = QGroupBox("Category type")
-        groupBox_21 = QGroupBox("Function type")
+        groupBox_19 = QGroupBox("Fluid type")
+        groupBox_20 = QGroupBox("Location type")
+        groupBox_21 = QGroupBox("Category type")
+        groupBox_22 = QGroupBox("Function type")
 
-        groupBox_22 = QGroupBox("Addfields")
+        groupBox_23 = QGroupBox("Addfields")
 
 
         self.basic_form = QGridLayout()
@@ -109,6 +110,7 @@ class ApiConfig(ApiParent):
         self.cat_form = QGridLayout()
         self.utils_form = QGridLayout()
         self.connec_form = QGridLayout()
+        self.gully_form = QGridLayout()
 
         self.topology_form = QGridLayout()
         self.builder_form = QGridLayout()
@@ -140,19 +142,20 @@ class ApiConfig(ApiParent):
         groupBox_10.setLayout(self.cat_form)
         groupBox_11.setLayout(self.utils_form)
         groupBox_12.setLayout(self.connec_form)
+        groupBox_13.setLayout(self.gully_form)
 
-        groupBox_13.setLayout(self.topology_form)
-        groupBox_14.setLayout(self.builder_form)
-        groupBox_15.setLayout(self.review_form)
-        groupBox_16.setLayout(self.analysis_form)
-        groupBox_17.setLayout(self.system_form)
+        groupBox_14.setLayout(self.topology_form)
+        groupBox_15.setLayout(self.builder_form)
+        groupBox_16.setLayout(self.review_form)
+        groupBox_17.setLayout(self.analysis_form)
+        groupBox_18.setLayout(self.system_form)
 
-        groupBox_18.setLayout(self.fluid_type_form)
-        groupBox_19.setLayout(self.location_type_form)
-        groupBox_20.setLayout(self.category_type_form)
-        groupBox_21.setLayout(self.function_type_form)
+        groupBox_19.setLayout(self.fluid_type_form)
+        groupBox_20.setLayout(self.location_type_form)
+        groupBox_21.setLayout(self.category_type_form)
+        groupBox_22.setLayout(self.function_type_form)
 
-        groupBox_22 .setLayout(self.addfields_form)
+        groupBox_23 .setLayout(self.addfields_form)
 
         page1_layout1.addWidget(groupBox_1)
         page1_layout1.addWidget(groupBox_2)
@@ -167,19 +170,20 @@ class ApiConfig(ApiParent):
         page2_layout1.addWidget(groupBox_10)
         page2_layout2.addWidget(groupBox_11)
         page2_layout2.addWidget(groupBox_12)
+        page2_layout2.addWidget(groupBox_13)
 
-        admin_layout1.addWidget(groupBox_13)
-        admin_layout2.addWidget(groupBox_14)
+        admin_layout1.addWidget(groupBox_14)
         admin_layout2.addWidget(groupBox_15)
         admin_layout2.addWidget(groupBox_16)
         admin_layout2.addWidget(groupBox_17)
+        admin_layout2.addWidget(groupBox_18)
 
-        man_layout1.addWidget(groupBox_18)
-        man_layout2.addWidget(groupBox_19)
+        man_layout1.addWidget(groupBox_19)
         man_layout2.addWidget(groupBox_20)
         man_layout2.addWidget(groupBox_21)
+        man_layout2.addWidget(groupBox_22)
 
-        addfields_layout1.addWidget(groupBox_22)
+        addfields_layout1.addWidget(groupBox_23)
 
         verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -303,8 +307,10 @@ class ApiConfig(ApiParent):
                     self.order_widgets(field, self.cat_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_utils_vdef':
                     self.order_widgets(field, self.utils_form, lbl, chk, widget)
-                elif field['layoutname'] == 'lyt_connec_gully_vdef':
+                elif field['layoutname'] == 'lyt_connec_vdef':
                     self.order_widgets(field, self.connec_form, lbl, chk, widget)
+                elif field['layoutname'] == 'lyt_gully_vdef':
+                    self.order_widgets(field, self.gully_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_fluid_type':
                     self.order_widgets(field, self.fluid_type_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_location_type':
