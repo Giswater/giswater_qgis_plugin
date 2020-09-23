@@ -67,7 +67,8 @@ BEGIN
 	END IF;
 
 	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_info_layer_x_type) THEN
-		INSERT INTO config_info_layer_x_type(tableinfo_id, infotype_id, tableinfotype_id) VALUES (v_view_name,1,v_view_name);
+		INSERT INTO config_info_layer_x_type(tableinfo_id, infotype_id, tableinfotype_id) VALUES (v_view_name,1,v_view_name)
+		ON CONFLICT (tableinfo_id, infotype_id) DO NOTHING;
 	END IF;
 
 	--select list of fields different than id from config_form_fields
