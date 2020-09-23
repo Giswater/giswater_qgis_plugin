@@ -96,10 +96,19 @@ UPDATE config_form_tabs SET orderby=4 WHERE formname='selector_basic' AND tabnam
 UPDATE config_form_tabs SET orderby=5 WHERE formname='selector_basic' AND tabname='tab_sector' AND orderby IS NULL;
 
 
-UPDATE sys_param_user SET layoutorder=2, layoutname = 'lyt_connec_gully_vdef' WHERE id='feat_fountain_vdefault';
-UPDATE sys_param_user SET layoutorder=3, layoutname = 'lyt_connec_gully_vdef' WHERE id='feat_greentap_vdefault';
-UPDATE sys_param_user SET layoutorder=4, layoutname = 'lyt_connec_gully_vdef' WHERE id='feat_tap_vdefault';
-UPDATE sys_param_user SET layoutorder=5, layoutname = 'lyt_connec_gully_vdef' WHERE id='feat_vconnec_vdefault';
-UPDATE sys_param_user SET layoutorder=6, layoutname = 'lyt_connec_gully_vdef' WHERE id='feat_wjoin_vdefault';
-
 UPDATE sys_table SET notify_action ='[{"channel":"user","name":"set_layer_index", "enabled":"true", "trg_fields":"the_geom","featureType":["connec", "v_edit_link"]}]' WHERE id = 'connec';
+
+INSERT INTO config_param_system (parameter, value, descript, isenabled, project_type, datatype) VALUES ('plan_psector_execute_action', '{"mode":"disabled"}',
+'Define which mode psector trigger would use. Modes: "disabled", "onService"(transform all features afected by psector to its planified state and makes a
+ copy of psector), "obsolete"(set all features afected to obsolete but manage their state_type)', FALSE, 'utils', 'json');
+ 
+ INSERT INTO sys_message VALUES (3134, 'There''s no default value for Obsolete state_type', 'You need to define one default value for Obsolete state_type', 2, TRUE, 'utils');
+ INSERT INTO sys_message VALUES (3136, 'There''s no default value for On Service state_type', 'You need to define one default value for On Service state_type', 2, TRUE, 'utils');
+
+ UPDATE config_param_system SET value='{"table":"plan_psector", "selector":"selector_psector", "table_id":"psector_id",  "selector_id":"psector_id",  "label":"psector_id, '' - '', name", "orderBy":"psector_id",
+"manageAll":true, "query_filter":" AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)",
+"layermanager":{"active":"v_edit_psector", "visible":["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_gully"], "addToc":["v_edit_psector"]},
+"typeaheadFilter":" AND lower(concat(expl_id, '' - '', name))"}' WHERE parameter='basic_selector_tab_psector';
+
+UPDATE config_param_system SET value='{"table":"sector", "selector":"selector_sector", "table_id":"sector_id",  "selector_id":"sector_id",  "label":"sector_id, '' - '', name", "orderBy":"sector_id",
+"manageAll":true, "query_filter":" AND sector_id > 0"}' WHERE parameter='basic_selector_tab_sector';
