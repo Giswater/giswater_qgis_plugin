@@ -26,6 +26,8 @@ v_project_type text;
 
 BEGIN
 
+	v_target = ((p_data ->>'data')::json->>'target')::text; 
+
 	-- search path
 	EXECUTE 'SET search_path = '||v_target||', public';
 
