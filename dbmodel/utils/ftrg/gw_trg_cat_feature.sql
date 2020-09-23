@@ -71,6 +71,10 @@ BEGIN
 		-- set layoutorder
 		SELECT max(layoutorder)+1 INTO v_layoutorder FROM sys_param_user WHERE formname='config' and layoutname=v_layout;
 
+		IF v_layoutorder IS NULL THEN 
+			v_layoutorder=1;
+		END IF;
+
 		IF v_projecttype = 'WS' THEN
 			v_partialquerytext =  concat('JOIN cat_feature ON cat_feature.id = ',
 			lower(NEW.feature_type),'type_id WHERE cat_feature.id = ',quote_literal(NEW.id));
