@@ -13,7 +13,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE sys_style ALTER styletype TYPE character varying(30);
 
 
-CREATE TABLE SCHEMA_NAME.config_function
+CREATE TABLE IF NOT EXISTS SCHEMA_NAME.config_function 
 (
   id integer NOT NULL,
   function_name text NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE SCHEMA_NAME.config_function
   CONSTRAINT config_function_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE SCHEMA_NAME.config_table
+CREATE TABLE IF NOT EXISTS SCHEMA_NAME.config_table
 (
   id text NOT NULL,
   style integer NOT NULL,

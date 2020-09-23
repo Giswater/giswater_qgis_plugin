@@ -13,7 +13,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_f
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_check_data", "column":"fcount", "dataType":"integer", "isUtils":"False"}}$$);
 
 
-CREATE TABLE audit_fid_log
+CREATE TABLE IF NOT EXISTS audit_fid_log
 (id serial NOT NULL  PRIMARY KEY,
 fid smallint,
 fcount integer,
