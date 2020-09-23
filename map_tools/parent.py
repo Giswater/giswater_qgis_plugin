@@ -1,20 +1,8 @@
 """
-/***************************************************************************
-        begin                : 2016-08-24
-        copyright            : (C) 2016 by BGEO SL
-        email                : derill@bgeo.es
-        git sha              : $Format:%H$
- ***************************************************************************/
-
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsDataSourceUri, QgsExpression, QgsProject, QgsVectorLayer, QgsWkbTypes
