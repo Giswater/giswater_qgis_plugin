@@ -101,3 +101,5 @@ UPDATE sys_param_user SET layoutorder=3, layoutname = 'lyt_connec_gully_vdef' WH
 UPDATE sys_param_user SET layoutorder=4, layoutname = 'lyt_connec_gully_vdef' WHERE id='feat_tap_vdefault';
 UPDATE sys_param_user SET layoutorder=5, layoutname = 'lyt_connec_gully_vdef' WHERE id='feat_vconnec_vdefault';
 UPDATE sys_param_user SET layoutorder=6, layoutname = 'lyt_connec_gully_vdef' WHERE id='feat_wjoin_vdefault';
+
+UPDATE sys_table SET notify_action ='[{"channel":"user","name":"set_layer_index", "enabled":"true", "trg_fields":"the_geom","featureType":["connec", "v_edit_link"]}]' WHERE id = 'connec';
