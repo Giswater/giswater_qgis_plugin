@@ -226,7 +226,7 @@ BEGIN
 	RAISE NOTICE 'Form number: %', v_forminfo;
 
 	-- Get feature type
-	EXECUTE 'SELECT lower(feature_type) FROM cat_feature WHERE  parent_layer = $1 LIMIT 1'
+	EXECUTE 'SELECT lower(feature_type) FROM cat_feature WHERE  (parent_layer = $1 OR child_layer = $1) LIMIT 1'
 		INTO v_featuretype
 		USING v_tablename;
 	v_featuretype := LOWER(v_featuretype); 
