@@ -1488,7 +1488,7 @@ class GwInfo(QObject):
                 widget.editingFinished.connect(
                     partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
             else:
-                widget.editingFinished.connect(partial(get_values, dialog, widget, self.my_json))
+                widget.editingFinished.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
 
             widget.textChanged.connect(partial(self.enabled_accept, dialog))
             widget.textChanged.connect(partial(self.check_datatype_validator, dialog, widget, dialog.btn_accept))
@@ -1507,7 +1507,7 @@ class GwInfo(QObject):
                 widget.textChanged.connect(
                     partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
             else:
-                widget.textChanged.connect(partial(get_values, dialog, widget, self.my_json))
+                widget.textChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
 
             widget.textChanged.connect(partial(self.enabled_accept, dialog))
             widget.textChanged.connect(partial(self.check_datatype_validator, dialog, widget, dialog.btn_accept))
@@ -1554,7 +1554,7 @@ class GwInfo(QObject):
                 widget.currentIndexChanged.connect(partial(
                     self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
-                widget.currentIndexChanged.connect(partial(get_values, dialog, widget, self.my_json))
+                widget.currentIndexChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
 
         return widget
 
