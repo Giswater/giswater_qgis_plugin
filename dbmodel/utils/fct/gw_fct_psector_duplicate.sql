@@ -110,8 +110,8 @@ BEGIN
 	SELECT string_agg(arc_id,',') INTO v_feature_list FROM plan_psector_x_arc  WHERE psector_id=v_old_psector_id and state=0;
 
 	IF v_feature_list IS NOT NULL THEN
-		INSERT INTO plan_psector_x_arc(arc_id, psector_id, state, doable, descript) 
-		SELECT arc_id, v_new_psector_id, state, doable, descript FROM plan_psector_x_arc WHERE psector_id=v_old_psector_id and state=0;
+		INSERT INTO plan_psector_x_arc(arc_id, psector_id, state, doable, descript, addparam) 
+		SELECT arc_id, v_new_psector_id, state, doable, descript, addparam FROM plan_psector_x_arc WHERE psector_id=v_old_psector_id and state=0;
 
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied arcs with state 0: ', v_feature_list ));
 	END IF;
