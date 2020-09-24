@@ -47,38 +47,7 @@ BEGIN
 	IF (NEW.link_id IS NULL) THEN
 		NEW.link_id:= (SELECT nextval('link_link_id_seq'));
 	END IF;			
-		
-        -- Sector ID
-        IF (NEW.sector_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM sector) = 0) THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       			 "data":{"message":"1008", "function":"1116","debug_msg":null}}$$);';
-            END IF;
-			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
-			IF (NEW.sector_id IS NULL) THEN
-				NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_sector_vdefault' AND "cur_user"="current_user"());
-			END IF;
-            IF (NEW.sector_id IS NULL) THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       			 "data":{"message":"1010", "function":"1116","debug_msg":"'||NEW.link_id::text||'"}}$$);';
-            END IF;
-        END IF;
-        
-        -- Dma ID
-        IF (NEW.dma_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM dma) = 0) THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       			 "data":{"message":"1012", "function":"1116","debug_msg":null}}$$);';
-            END IF;
-			NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
-			IF (NEW.dma_id IS NULL) THEN
-				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"());
-			END IF; 
-            IF (NEW.dma_id IS NULL) THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       			 "data":{"message":"1014", "function":"1116","debug_msg":"'||NEW.link_id::text||'"}}$$);';
-            END IF;
-        END IF;
+	
 
 		-- State
         IF (NEW.state IS NULL) THEN
@@ -338,7 +307,7 @@ BEGIN
 		
 
 		INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, 
-		state, the_geom, vnode_topelev)
+		state, the_geom, vnode_topelev)	
 		VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, NEW.expl_id, NEW.exit_id, NEW.exit_type, TRUE,
 		NEW.state, NEW.the_geom, NEW.vnode_topelev );
 		
