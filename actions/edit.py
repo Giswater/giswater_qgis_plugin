@@ -49,6 +49,8 @@ class Edit(ParentAction):
         self.snapper_manager.snap_to_node()
         self.snapper_manager.snap_to_connec_gully()
         self.snapper_manager.set_snapping_mode()
+        self.iface.actionAddFeature().toggled.connect(self.action_is_checked)
+
         self.feature_cat = feature_cat
         self.layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
         if self.layer:
@@ -62,7 +64,6 @@ class Edit(ParentAction):
             self.layer.startEditing()
             self.iface.actionAddFeature().trigger()
             self.layer.featureAdded.connect(self.open_new_feature)
-            self.iface.actionAddFeature().toggled.connect(self.action_is_checked)
 
         else:
             message = "Layer not found"
@@ -72,11 +73,6 @@ class Edit(ParentAction):
         """ Recover snapping options when action add feature is un-checked """
         if not self.iface.actionAddFeature().isChecked():
             self.snapper_manager.recover_snapping_options()
-
-    def recover_previus_maptool(self):
-        if self.controller.prev_maptool:
-            self.iface.mapCanvas().setMapTool(self.controller.prev_maptool)
-            self.controller.prev_maptool = None
 
 
     def open_new_feature(self, feature_id):
