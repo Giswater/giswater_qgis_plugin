@@ -1149,7 +1149,7 @@ def manage_return_manager(json_result, sql, rubber_band=None):
         return
     srid = global_vars.srid
     try:
-        margin = 1
+        margin = None
         opacity = 100
 
         if 'zoom' in return_manager and 'margin' in return_manager['zoom']:
