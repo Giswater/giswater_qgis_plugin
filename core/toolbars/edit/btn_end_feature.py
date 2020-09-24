@@ -147,7 +147,7 @@ class GwEndFeatureButton(GwParentAction):
         sql = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0'
         rows = self.controller.get_rows(sql)
         qt_tools.set_item_data(self.dlg_work_end.cmb_statetype_end, rows, 1)
-        row = self.controller.get_config('statetype_end_vdefault')
+        row = self.controller.get_config('edit_statetype_0_vdefault')
 
         if row:
             qt_tools.set_combo_itemData(self.dlg_work_end.cmb_statetype_end, row[0], 0)
@@ -164,7 +164,7 @@ class GwEndFeatureButton(GwParentAction):
         rows = self.controller.get_rows(sql)
         qt_tools.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         qt_tools.set_autocompleter(self.dlg_work_end.workcat_id_end)
-        row = self.controller.get_config('edit_workcat_end_vdefault')
+        row = self.controller.get_config('edit_workcat_vdefault')
         if row:
             qt_tools.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 
