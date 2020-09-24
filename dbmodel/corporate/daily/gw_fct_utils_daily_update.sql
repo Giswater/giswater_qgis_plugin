@@ -9,31 +9,31 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION utils.gw_fct_utils_daily_update()
 
-RETURNS integer AS
+RETURNS json AS
 $BODY$
 
 DECLARE 
 v_return integer;
+v_error_context text;
 
 BEGIN 
 
-
 	-- Daily updates
-	PERFORM crm.gw_fct_crm2gis();
-	PERFORM ud.gw_fct_refresh_mat_view();
-	PERFORM ws.gw_fct_refresh_mat_view();
-	PERFORM ws.gw_fct_utils_update_dma_hydroval();
+    
+    
 
 	-- Log
-	INSERT INTO utils.audit_log (fid, log_message) VALUES (248, 'Ok');
-
+	INSERT INTO utils.audit_log (fprocesscat_id, log_message) VALUES (999, 'Ok');
+    RETURN ('{"status":"Accepted"}')::json;
 	
-	RETURN 0;
+	
 
 --  Exception handling
 	EXCEPTION WHEN OTHERS THEN         
-	INSERT INTO utils.audit_log (fid, log_message) VALUES (248, 'Ko. The process has not been executed');
-	RETURN 1;
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;	
+	INSERT INTO utils.audit_log (fprocesscat_id, log_message) VALUES (999, '{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}');
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 
 END;
 $BODY$
