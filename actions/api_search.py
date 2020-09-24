@@ -612,6 +612,8 @@ class ApiSearch(ApiParent):
                           f'"addSchema":"{qgis_project_add_schema}"')
                 body = self.create_body(extras=extras)
                 self.controller.get_json('gw_fct_setselectors', body)
+                
+        self.refresh_map_canvas()
 
 
     def update_selector_workcat(self, workcat_id):
