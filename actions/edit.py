@@ -13,7 +13,7 @@ from .manage_document import ManageDocument
 from .manage_workcat_end import ManageWorkcatEnd
 from .delete_feature import DeleteFeature
 from .parent import ParentAction
-
+from ..map_tools.snapping_utils_v3 import SnappingConfigManager
 
 class Edit(ParentAction):
 
@@ -27,6 +27,12 @@ class Edit(ParentAction):
         self.delete_feature = DeleteFeature(iface, settings, controller, plugin_dir)
         self.suppres_form = None
 
+        # Snapper
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager.set_controller(self.controller)
+        self.snapper = self.snapper_manager.get_snapper()
+        self.snapper_manager.set_snapping_layers()
+
 
     def set_project_type(self, project_type):
         self.project_type = project_type
@@ -35,6 +41,14 @@ class Edit(ParentAction):
     def edit_add_feature(self, feature_cat):
         """ Button 01, 02: Add 'node' or 'arc' """
 
+        # Store user snapping configuration
+        self.snapper_manager.store_snapping_options()
+
+        # Set snapping to 'node', 'connec' and 'gully'
+        self.snapper_manager.snap_to_arc()
+        self.snapper_manager.snap_to_node()
+        self.snapper_manager.snap_to_connec_gully()
+        self.snapper_manager.set_snapping_mode()
         self.feature_cat = feature_cat
         self.layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
         if self.layer:
@@ -48,13 +62,24 @@ class Edit(ParentAction):
             self.layer.startEditing()
             self.iface.actionAddFeature().trigger()
             self.layer.featureAdded.connect(self.open_new_feature)
+            self.iface.actionAddFeature().toggled.connect(self.action_is_checked)
+
         else:
             message = "Layer not found"
             self.controller.show_warning(message, parameter=feature_cat.parent_layer)
 
+    def action_is_checked(self):
+        """ Recover snapping options when action add feature is un-checked """
+        if not self.iface.actionAddFeature().isChecked():
+            self.snapper_manager.recover_snapping_options()
+
+    def recover_previus_maptool(self):
+        if self.controller.prev_maptool:
+            self.iface.mapCanvas().setMapTool(self.controller.prev_maptool)
+            self.controller.prev_maptool = None
+
 
     def open_new_feature(self, feature_id):
-
         self.layer.featureAdded.disconnect(self.open_new_feature)
         feature = self.get_feature_by_id(self.layer, feature_id)
 
