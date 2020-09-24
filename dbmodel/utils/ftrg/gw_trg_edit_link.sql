@@ -64,7 +64,7 @@ BEGIN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       				"data":{"message":"2012", "function":"1116","debug_msg":"'||NEW.link_id::text||'"}}$$);';
+					"data":{"message":"2012", "function":"1116","debug_msg":"'||NEW.link_id::text||'"}}$$);';
 				END IF;		
 			END IF;
 		END IF;	
@@ -97,7 +97,7 @@ BEGIN
 			
 			IF v_connect IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       			"data":{"message":"3070", "function":"1116","debug_msg":null}}$$);';
+				"data":{"message":"3070", "function":"1116","debug_msg":null}}$$);';
 			END IF;		
 		END IF;
 
@@ -114,7 +114,7 @@ BEGIN
 		IF v_projectype = 'WS' AND v_node IS NOT NULL THEN
 			IF v_node.node_id IN (SELECT node_id FROM inp_valve UNION SELECT node_id FROM inp_pump) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       			"data":{"message":"3072", "function":"1116","debug_msg":null}}$$);';
+				"data":{"message":"3072", "function":"1116","debug_msg":null}}$$);';
 			END IF;
 		END IF;
 		
@@ -150,7 +150,7 @@ BEGIN
 		-- feature control
 		IF NEW.feature_type IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       		"data":{"message":"3074", "function":"1116","debug_msg":null}}$$);';
+			"data":{"message":"3074", "function":"1116","debug_msg":null}}$$);';
 		END IF;	
 
 		-- end control
@@ -200,7 +200,6 @@ BEGIN
 			ELSIF v_projectype='WS' AND NEW.ispsectorgeom IS FALSE THEN
 				UPDATE connec SET presszone_id = v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id
 				WHERE connec_id=v_connec1.connec_id;
-				
 			END IF;
 		
 			NEW.exit_type='VNODE';
@@ -222,9 +221,9 @@ BEGIN
 				expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
 				WHERE connec_id=v_connec1.connec_id;
 			ELSIF NEW.ispsectorgeom IS TRUE THEN
-				UPDATE plan_psector_x_connec SET arc_id=v_arc.arc_id WHERE plan_psector_x_connec.id=NEW.psector_rowid;
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 			END IF;
-			
 			
 			-- specific updates for projectype
 			IF v_projectype='UD' THEN
@@ -235,7 +234,8 @@ BEGIN
 					expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
 					WHERE gully_id=v_gully1.gully_id;
 				ELSIF NEW.ispsectorgeom IS TRUE THEN
-					UPDATE plan_psector_x_gully SET arc_id=v_arc.arc_id WHERE plan_psector_x_gully.id=NEW.psector_rowid;
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';				
 				END IF;
 				
 			ELSIF v_projectype='WS' AND NEW.ispsectorgeom IS FALSE THEN
@@ -257,7 +257,8 @@ BEGIN
 				sector_id=v_connec2.sector_id, pjoint_type=v_connec2.pjoint_type, pjoint_id=v_connec2.pjoint_id
 				WHERE connec_id=v_connec1.connec_id;
 			ELSIF NEW.ispsectorgeom IS TRUE THEN
-				UPDATE plan_psector_x_connec SET arc_id=v_connec2.arc_id WHERE plan_psector_x_connec.id=NEW.psector_rowid;
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 			END IF;
 				
 			-- specific updates for projectype
@@ -269,21 +270,19 @@ BEGIN
 					sector_id=v_connec2.sector_id, pjoint_type=v_connec2.pjoint_type, pjoint_id=v_connec2.pjoint_id
 					WHERE gully_id=v_gully1.gully_id;
 				ELSIF NEW.ispsectorgeom IS TRUE THEN
-					UPDATE plan_psector_x_gully SET arc_id=v_connec2.arc_id WHERE plan_psector_x_gully.id=NEW.psector_rowid;
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';				
 				END IF;
 		
 			ELSIF v_projectype='WS' AND NEW.ispsectorgeom IS FALSE THEN
 				UPDATE connec SET presszone_id = v_connec2.presszone_id, dqa_id=v_connec2.dqa_id, minsector_id=v_connec2.minsector_id
-				WHERE connec_id=v_connec1.connec_id;
-					
+				WHERE connec_id=v_connec1.connec_id;	
 			END IF;
 		
 			NEW.exit_type='CONNEC';
 			NEW.exit_id=v_connec2.connec_id;
 			v_end_point = v_connec2.the_geom;
 			v_end_state= v_connec2.state;
-
-			
 		END IF;
 		
 		IF v_projectype='UD' THEN
@@ -299,22 +298,24 @@ BEGIN
 					sector_id=v_gully2.sector_id
 					WHERE connec_id=v_connec1.connec_id;
 				ELSIF NEW.ispsectorgeom IS TRUE THEN
-					UPDATE plan_psector_x_gully SET arc_id=v_gully2.arc_id WHERE plan_psector_x_gully.id=NEW.psector_rowid;
-					UPDATE plan_psector_x_connec SET arc_id=v_gully2.arc_id WHERE plan_psector_x_connec.id=NEW.psector_rowid;
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 				END IF;
 							
-					
 				NEW.exit_type='GULLY';
 				NEW.exit_id=v_gully2.gully_id;
 				v_end_point = v_gully2.the_geom;
 				v_end_state = v_gully2.state;
 			END IF;
+		ELSE 
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 		END IF;
 		
 		-- control of null exit_type
 		IF NEW.exit_type IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       		"data":{"message":"2015", "function":"1116","debug_msg":null}}$$);';
+			"data":{"message":"2015", "function":"1116","debug_msg":null}}$$);';
 		END IF;
 		
 		-- upsert link
@@ -362,13 +363,6 @@ BEGIN
 			END IF;
 						
 		ELSE -- if geometry comes from psector_plan tables then 
-
-			-- control endfeature (only VNODE it is possible)
-			/*RAISE EXCEPTION 'NEW.exit_type %', NEW.exit_type;
-			IF NEW.exit_type IS NULL THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       			"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
-			END IF;*/
 			
 			-- if geometry have changed by user 
 			IF st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
