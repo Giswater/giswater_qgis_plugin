@@ -120,7 +120,7 @@ class ManageWorkcatEnd(ParentManage):
         sql = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0'
         rows = self.controller.get_rows(sql)
         utils_giswater.set_item_data(self.dlg_work_end.cmb_statetype_end, rows, 1)
-        row = self.controller.get_config('statetype_end_vdefault')
+        row = self.controller.get_config('edit_statetype_0_vdefault')
 
         if row:
             utils_giswater.set_combo_itemData(self.dlg_work_end.cmb_statetype_end, row[0], 0)
@@ -137,7 +137,7 @@ class ManageWorkcatEnd(ParentManage):
         rows = self.controller.get_rows(sql)
         utils_giswater.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         utils_giswater.set_autocompleter(self.dlg_work_end.workcat_id_end)
-        row = self.controller.get_config('edit_workcat_end_vdefault')
+        row = self.controller.get_config('edit_workcat_vdefault')
         if row:
             utils_giswater.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 
