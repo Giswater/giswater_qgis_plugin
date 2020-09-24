@@ -18,16 +18,30 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
+	-- control if connect has link
+	IF TG_OP = 'INSERT' AND (SELECT link_id FROM link WHERE feature_id = NEW.connec_id) IS NULL THEN
+		raise exception 'Before use connec on plan mode you need to create a related link';
+		
+	END IF;
+
 	SELECT connec.state, connec.arc_id INTO v_stateaux, v_arcaux FROM connec WHERE connec_id=NEW.connec_id;
 		
-	IF v_stateaux=1	THEN 
+	IF NEW.state IS NULL THEN
 		NEW.state=0;
+	END IF;
+	
+	IF NEW.state = 1 AND v_stateaux = 1 THEN
+		NEW.doable=false;
+		-- looking for arc_id state=2 closest
+	
+	ELSIF NEW.state = 0 AND v_stateaux=1 THEN
 		NEW.doable=false;
 		NEW.arc_id=v_arcaux;
 		
 	ELSIF v_stateaux=2 THEN
 		NEW.state=1;
 		NEW.doable=true;
+		-- looking for arc_id state=2 closest
 	END IF;
 
 RETURN NEW;

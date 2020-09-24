@@ -586,13 +586,13 @@ BEGIN
 
 							-- insert connec's on alternative in order to reconnect
 							INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable)
-							SELECT v_psector, connec_id, v_arc_id, 1,true FROM connec WHERE arc_id = v_arc_id
+							SELECT v_psector, connec_id, NULL, 1,false FROM connec WHERE arc_id = v_arc_id
 							ON CONFLICT DO NOTHING;
 
-							-- insert gullie's on alternative in order to reconnect
+							-- insert gully's on alternative in order to reconnect
 							IF v_project_type='UD' THEN
 								INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable)
-								SELECT v_psector, gully_id, v_arc_id, 1, true FROM gully WHERE arc_id = v_arc_id
+								SELECT v_psector, gully_id, NULL, 1, false FROM gully WHERE arc_id = v_arc_id
 								ON CONFLICT DO NOTHING;
 							END IF;
 							
@@ -617,10 +617,13 @@ BEGIN
 								
 								INSERT INTO audit_check_data (fid,  criticity, error_message)
 								VALUES (212, 1, 'Update psector_x_arc as doable for fictitious arcs.');
-							ELSE
-								UPDATE plan_psector_x_arc SET state=0 where arc_id=v_arc_id;
-							END IF;							
+							END IF;	
+
+							DELETE FROM plan_psector_x_arc WHERE arc_id=v_arc_id AND psector_id=v_psector;
+
+							UPDATE plan_psector_x_connec SET arc_id=NULL WHERE arc_id=v_arc_id AND psector_id=v_psector;				
 						END IF;
+
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1,concat('Insert old arc as downgraded into current psector: ',v_psector,'.'));

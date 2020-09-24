@@ -31,6 +31,8 @@ BEGIN
 	v_table_name:= TG_ARGV[0];
 	v_schemaname='SCHEMA_NAME';
 
+	IF NEW.arc_id='' THEN NEW.arc_id=NULL; END IF;
+
 	-- getting table
 	IF v_table_name = 'connec' THEN
 		SELECT the_geom INTO v_feature_geom FROM connec WHERE connec_id=NEW.connec_id;
@@ -38,21 +40,26 @@ BEGIN
 		SELECT the_geom INTO v_feature_geom FROM gully WHERE gully_id=NEW.gully_id;
 	END IF;
 
+
 	-- getting arc_geom
 	IF NEW.arc_id IS NOT NULL THEN
 		v_arc_geom =  (SELECT the_geom FROM arc WHERE arc_id=NEW.arc_id);
 	ELSE
 		-- getting closest arc
-		SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, v_edit_connec c WHERE st_dwithin(a.the_geom, c.the_geom, 100) AND connec_id = NEW.connec_id AND a.state = 2
+		SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, v_edit_connec c WHERE st_dwithin(a.the_geom, c.the_geom, 1000) AND connec_id = NEW.connec_id AND a.state = 2
 		ORDER BY st_distance (a.the_geom, c.the_geom) LIMIT 1;
 
 		-- this update makes a recall of self.trigger but in this case with NEW.arc_id IS NOT NULL recall will finish next one
 		UPDATE plan_psector_x_connec SET arc_id = v_arc_id WHERE id=NEW.id;
+        
 		RETURN NEW;
+        
 	END IF;
+
 
 	IF v_arc_geom IS NOT NULL THEN
 
+    
 		-- update values on plan psector table
 		IF NEW.userdefined_geom IS NOT TRUE THEN
 			v_link_geom := ST_ShortestLine(v_feature_geom, v_arc_geom);
@@ -64,18 +71,30 @@ BEGIN
 			v_vnode_geom = ST_EndPoint(v_link_geom);
 			v_userdefined_geom = TRUE;
 		END IF;
+		
+		-- update plan_psector tables
+		IF v_table_name = 'connec' THEN
+			UPDATE plan_psector_x_connec SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
+
+		ELSIF v_table_name = 'gully' THEN
+			UPDATE plan_psector_x_gully SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
+
+		END IF;	
+
 	ELSE
-		v_link_geom =  NULL;
-		v_vnode_geom =  NULL;
+		IF v_table_name = 'connec' THEN
+			UPDATE plan_psector_x_connec SET link_geom=NULL, vnode_geom=NULL, userdefined_geom=NULL WHERE id=NEW.id;
+
+		ELSIF v_table_name = 'gully' THEN
+			UPDATE plan_psector_x_gully SET link_geom=NULL, vnode_geom=NULL, userdefined_geom=NULL WHERE id=NEW.id;
+
+		END IF;	
+	
 	END IF;
 
-	-- update plan_psector tables
-	IF v_table_name = 'connec' THEN
-		UPDATE plan_psector_x_connec SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
-	ELSIF v_table_name = 'gully' THEN
-		UPDATE plan_psector_x_gully SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
-	END IF;	
 
+
+    
 	-- notify to qgis in order to reindex geometries for snapping
 	v_channel := replace (current_user::text,'.','_');
 	PERFORM pg_notify (v_channel, '{"functionAction":{"functions":[{"name":"set_layer_index","parameters":{"tableName":"v_edit_link"}}],"user":"'

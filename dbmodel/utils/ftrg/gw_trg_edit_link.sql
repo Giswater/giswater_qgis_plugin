@@ -175,21 +175,29 @@ BEGIN
 				v_end_point = v_vnode.the_geom;
 				v_node_id = v_vnode.vnode_id;
 			END IF;
-		
-			-- update connec
-			UPDATE connec SET arc_id=v_arc.arc_id, expl_id=v_arc.expl_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id, dma_id=v_arc.dma_id, 
-			sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
-			WHERE connec_id=v_connec1.connec_id;
+			
+			--update connec or plan_psector_x_connec.arc_id
+			IF NEW.ispsectorgeom IS FALSE THEN
+				UPDATE connec SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id, 
+				expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
+				WHERE connec_id=v_connec1.connec_id;
+			ELSIF NEW.ispsectorgeom IS TRUE THEN
+				UPDATE plan_psector_x_connec SET arc_id=v_arc.arc_id WHERE plan_psector_x_connec.id=NEW.psector_rowid;
+			END IF;
 
 			-- specific updates for projectype
-			IF v_projectype='UD' then
-				IF v_gully1.gully_id IS NOT NULL  THEN
-					UPDATE gully SET arc_id=v_arc.arc_id, expl_id=v_arc.expl_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id, dma_id=v_arc.dma_id, 
-					sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
+			IF v_projectype='UD' THEN
+			
+				--update gully or plan_psector_x_gully.arc_id
+				IF NEW.ispsectorgeom IS FALSE THEN
+					UPDATE gully SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id,
+					expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
 					WHERE gully_id=v_gully1.gully_id;
-				END IF;	
+				ELSIF NEW.ispsectorgeom IS TRUE THEN
+					UPDATE plan_psector_x_gully SET arc_id=v_arc.arc_id WHERE plan_psector_x_gully.id=NEW.psector_rowid;
+				END IF;
 				
-			ELSIF v_projectype='WS' THEN
+			ELSIF v_projectype='WS' AND NEW.ispsectorgeom IS FALSE THEN
 				UPDATE connec SET presszone_id = v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id
 				WHERE connec_id=v_connec1.connec_id;
 				
@@ -207,24 +215,33 @@ BEGIN
 			IF v_arc.arc_id IS NULL THEN
 				SELECT * INTO v_arc FROM arc WHERE node_2=v_node.node_id LIMIT 1;
 			END IF;
-			
-			-- update common fields of connec
-			UPDATE connec SET arc_id=v_arc.arc_id, expl_id=v_node.expl_id, feature_id=v_node.node_id, featurecat_id=v_node.node_type, dma_id=v_node.dma_id, 
-			sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
-			WHERE connec_id=v_connec1.connec_id;
-			
-			IF v_projectype='UD' THEN
-				-- Update connec or gully arc_id
-				IF v_gully1.gully_id IS NOT NULL  THEN
-					UPDATE gully SET arc_id=v_arc.arc_id, expl_id=v_node.expl_id, featurecat_id=v_node.node_type, feature_id=v_node.node_id, dma_id=v_node.dma_id, 
-					sector_id=v_node.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
-					WHERE gully_id=v_gully1.gully_id;				
-				END IF;
-			
-			ELSIF v_projectype='WS' THEN
-				UPDATE connec SET presszone_id = v_node.presszone_id, dqa_id=v_node.dqa_id, minsector_id=v_node.minsector_id
+
+			--update connec or plan_psector_x_connec.arc_id
+			IF NEW.ispsectorgeom IS FALSE THEN
+				UPDATE connec SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id, 
+				expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
 				WHERE connec_id=v_connec1.connec_id;
-	
+			ELSIF NEW.ispsectorgeom IS TRUE THEN
+				UPDATE plan_psector_x_connec SET arc_id=v_arc.arc_id WHERE plan_psector_x_connec.id=NEW.psector_rowid;
+			END IF;
+			
+			
+			-- specific updates for projectype
+			IF v_projectype='UD' THEN
+			
+				--update gully or plan_psector_x_gully.arc_id
+				IF NEW.ispsectorgeom IS FALSE THEN
+					UPDATE gully SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id,
+					expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
+					WHERE gully_id=v_gully1.gully_id;
+				ELSIF NEW.ispsectorgeom IS TRUE THEN
+					UPDATE plan_psector_x_gully SET arc_id=v_arc.arc_id WHERE plan_psector_x_gully.id=NEW.psector_rowid;
+				END IF;
+				
+			ELSIF v_projectype='WS' AND NEW.ispsectorgeom IS FALSE THEN
+				UPDATE connec SET presszone_id = v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id
+				WHERE connec_id=v_connec1.connec_id;
+				
 			END IF;
 				
 			NEW.exit_type='NODE';
@@ -233,18 +250,29 @@ BEGIN
 			v_end_state= v_node.state;
 		
 		ELSIF v_connec2.connec_id IS NOT NULL THEN
-				
-			-- update common fields of connec (ud / ws)
-			UPDATE connec SET arc_id=v_connec2.arc_id, expl_id=v_connec2.expl_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, 
-			sector_id=v_connec2.sector_id, pjoint_type=v_connec2.pjoint_type, pjoint_id=v_connec2.pjoint_id
-			WHERE connec_id=v_connec1.connec_id;
-		
-			IF v_projectype='UD' then
-				UPDATE gully SET arc_id=v_connec2.arc_id, expl_id=v_connec2.expl_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, 
+
+			--update connec or plan_psector_x_connec.arc_id
+			IF NEW.ispsectorgeom IS FALSE THEN
+				UPDATE connec SET arc_id=v_connec2.arc_id, expl_id=v_connec2.expl_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, 
 				sector_id=v_connec2.sector_id, pjoint_type=v_connec2.pjoint_type, pjoint_id=v_connec2.pjoint_id
-				WHERE gully_id=v_gully1.gully_id;
-	
-			ELSIF v_projectype='WS' THEN
+				WHERE connec_id=v_connec1.connec_id;
+			ELSIF NEW.ispsectorgeom IS TRUE THEN
+				UPDATE plan_psector_x_connec SET arc_id=v_connec2.arc_id WHERE plan_psector_x_connec.id=NEW.psector_rowid;
+			END IF;
+				
+			-- specific updates for projectype
+			IF v_projectype='UD' THEN
+			
+				--update gully or plan_psector_x_gully.arc_id
+				IF NEW.ispsectorgeom IS FALSE THEN
+					UPDATE gully SET arc_id=v_connec2.arc_id, expl_id=v_connec2.expl_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, 
+					sector_id=v_connec2.sector_id, pjoint_type=v_connec2.pjoint_type, pjoint_id=v_connec2.pjoint_id
+					WHERE gully_id=v_gully1.gully_id;
+				ELSIF NEW.ispsectorgeom IS TRUE THEN
+					UPDATE plan_psector_x_gully SET arc_id=v_connec2.arc_id WHERE plan_psector_x_gully.id=NEW.psector_rowid;
+				END IF;
+		
+			ELSIF v_projectype='WS' AND NEW.ispsectorgeom IS FALSE THEN
 				UPDATE connec SET presszone_id = v_connec2.presszone_id, dqa_id=v_connec2.dqa_id, minsector_id=v_connec2.minsector_id
 				WHERE connec_id=v_connec1.connec_id;
 					
@@ -260,11 +288,21 @@ BEGIN
 		
 		IF v_projectype='UD' THEN
 			IF v_gully2.gully_id IS NOT NULL THEN
+
+				--update gully or plan_psector_x_gully.arc_id
+				IF NEW.ispsectorgeom IS FALSE THEN
+					UPDATE gully SET arc_id=v_gully2.arc_id, expl_id=v_gully2.expl_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, 
+					sector_id=v_gully2.sector_id
+					WHERE gully_id=v_gully1.gully_id;
+					
+					UPDATE connec SET arc_id=v_gully2.arc_id, expl_id=v_gully2.expl_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, 
+					sector_id=v_gully2.sector_id
+					WHERE connec_id=v_connec1.connec_id;
+				ELSIF NEW.ispsectorgeom IS TRUE THEN
+					UPDATE plan_psector_x_gully SET arc_id=v_gully2.arc_id WHERE plan_psector_x_gully.id=NEW.psector_rowid;
+					UPDATE plan_psector_x_connec SET arc_id=v_gully2.arc_id WHERE plan_psector_x_connec.id=NEW.psector_rowid;
+				END IF;
 							
-				UPDATE connec SET arc_id=v_gully2.arc_id, expl_id=v_gully2.expl_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, sector_id=v_gully2.sector_id
-				WHERE connec_id=v_connec1.connec_id;
-							UPDATE gully SET arc_id=v_gully2.arc_id, expl_id=v_gully2.expl_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, sector_id=v_gully2.sector_id
-				WHERE gully_id=v_gully1.gully_id;
 					
 				NEW.exit_type='GULLY';
 				NEW.exit_id=v_gully2.gully_id;
@@ -326,10 +364,11 @@ BEGIN
 		ELSE -- if geometry comes from psector_plan tables then 
 
 			-- control endfeature (only VNODE it is possible)
-			IF NEW.exit_type!='VNODE' THEN
+			/*RAISE EXCEPTION 'NEW.exit_type %', NEW.exit_type;
+			IF NEW.exit_type IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        			"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
-			END IF;
+			END IF;*/
 			
 			-- if geometry have changed by user 
 			IF st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
@@ -337,6 +376,7 @@ BEGIN
 				v_end_point = ST_EndPoint(NEW.the_geom);
 			ELSE 
 				v_userdefined_geom  = FALSE;
+
 			END IF;
 
 			IF v_projectype = 'WS' THEN
