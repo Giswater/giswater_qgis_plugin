@@ -26,3 +26,8 @@ tstamp timestamp without time zone DEFAULT now()
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_function", "column":"layermanager"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_function", "column":"sytle"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_function", "column":"actions"}}$$);
+
+--2020/09/24 
+DROP FUNCTION OF EXISTS gw_fct_edit_check_data(json);
+DROP FUNCTION OF EXISTS gw_fct_getinsertfeature(json);
+DROP FUNCTION OF EXISTS gw_fct_admin_schema_copy(json);

@@ -55,3 +55,9 @@ VALUES ('3002', 'gw_fct_setplan','{"style":{"point":{"style":"unique", "values":
 "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
 "polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}',
 '{"visible": ["v_plan_current_psector"], "zoom":{"layer":"v_plan_current_psector", "margin":20}}',null) ON CONFLICT (id) DO NOTHING;
+
+
+--2020/09/24
+DELETE FROM sys_function WHERE id = 2660;
+DELETE FROM sys_function WHERE id = 2588;
+DELETE FROM sys_function WHERE id = 2722;
