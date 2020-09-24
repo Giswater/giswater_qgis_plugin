@@ -20,8 +20,8 @@ BEGIN
 
 	-- control if connect has link
 	IF TG_OP = 'INSERT' AND (SELECT link_id FROM link WHERE feature_id = NEW.connec_id) IS NULL THEN
-        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-         "data":{"message":"3138", "function":"2936","debug_msg":null}}$$);';
+        /*EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+         "data":{"message":"3138", "function":"2936","debug_msg":null}}$$);';*/
 	END IF;
 
 	SELECT connec.state, connec.arc_id INTO v_stateaux, v_arcaux FROM connec WHERE connec_id=NEW.connec_id;
