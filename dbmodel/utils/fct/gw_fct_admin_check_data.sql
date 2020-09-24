@@ -69,8 +69,118 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (195, null, 1, '-------');
 
 
-	--CHECK CHILD VIEWS FOR ACTIVE FEATURES
+	--CHECK VALUES ON OBLIGATORY CAT_FEATURE_* FIELDS
 
+	--check if all features have value on field active
+	SELECT count(*), string_agg(id,', ')  INTO v_count,v_feature_list FROM cat_feature WHERE active IS NULL;
+
+	IF v_count > 0 THEN
+		v_errortext=concat('ERROR: There is/are ',v_count,' features without value on field "active". Features - ',v_feature_list::text,'.');
+
+		INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+		VALUES (195, 3, v_errortext, v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+		VALUES (195, 1, 'INFO: All features have value on field "active"', 0);
+	END IF;
+
+	--check if all features have value on field code_autofill
+	SELECT count(*), string_agg(id,', ')  INTO v_count,v_feature_list FROM cat_feature WHERE code_autofill IS NULL;
+
+	IF v_count > 0 THEN
+		v_errortext=concat('ERROR: There is/are ',v_count,' features without value on field "code_autofill". Features - ',v_feature_list::text,'.');
+
+		INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+		VALUES (195, 3, v_errortext, v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+		VALUES (195, 1, 'INFO: All features have value on field "code_autofill"', 0);
+	END IF;
+
+	--check if all nodes have value on field num_arcs
+	SELECT count(*), string_agg(id,', ')  INTO v_count,v_feature_list FROM cat_feature_node WHERE num_arcs IS NULL;
+
+	IF v_count > 0 THEN
+		v_errortext=concat('ERROR: There is/are ',v_count,' nodes without value on field "num_arcs". Features - ',v_feature_list::text,'.');
+
+		INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+		VALUES (195, 3, v_errortext, v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+		VALUES (195, 1, 'INFO: All nodes have value on field "num_arcs"', 0);
+	END IF;
+
+	--check if all nodes have value on field isarcdivide
+	SELECT count(*), string_agg(id,', ')  INTO v_count,v_feature_list FROM cat_feature_node WHERE isarcdivide IS NULL;
+
+	IF v_count > 0 THEN
+		v_errortext=concat('ERROR: There is/are ',v_count,' nodes without value on field "isarcdivide". Features - ',v_feature_list::text,'.');
+
+		INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+		VALUES (195, 3, v_errortext, v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+		VALUES (195, 1, 'INFO: All nodes have value on field "isarcdivide"', 0);
+	END IF;
+
+	IF v_project_type = 'WS' THEN
+		--check if all nodes have value on field isarcdivide
+		SELECT count(*), string_agg(id,', ')  INTO v_count,v_feature_list FROM cat_feature_node WHERE graf_delimiter IS NULL;
+
+		IF v_count > 0 THEN
+			v_errortext=concat('ERROR: There is/are ',v_count,' nodes without value on field "graf_delimiter". Features - ',v_feature_list::text,'.');
+
+			INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+			VALUES (195, 3, v_errortext, v_count);
+		ELSE
+			INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+			VALUES (195, 1, 'INFO: All nodes have value on field "graf_delimiter"', 0);
+		END IF;
+	END IF;
+
+	IF v_project_type = 'UD' THEN
+		--check if all nodes have value on field isexitupperintro
+		SELECT count(*), string_agg(id,', ')  INTO v_count,v_feature_list FROM cat_feature_node WHERE isexitupperintro IS NULL;
+
+		IF v_count > 0 THEN
+			v_errortext=concat('ERROR: There is/are ',v_count,' nodes without value on field "isexitupperintro". Features - ',v_feature_list::text,'.');
+
+			INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+			VALUES (195, 3, v_errortext, v_count);
+		ELSE
+			INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+			VALUES (195, 1, 'INFO: All nodes have value on field "isexitupperintro"', 0);
+		END IF;
+	END IF;
+	
+	--check if all nodes have value on field choose_hemisphere
+	SELECT count(*), string_agg(id,', ')  INTO v_count,v_feature_list FROM cat_feature_node WHERE choose_hemisphere IS NULL;
+
+	IF v_count > 0 THEN
+		v_errortext=concat('ERROR: There is/are ',v_count,' nodes without value on field "choose_hemisphere". Features - ',v_feature_list::text,'.');
+
+		INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+		VALUES (195, 3, v_errortext, v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+		VALUES (195, 1, 'INFO: All nodes have value on field "choose_hemisphere"', 0);
+	END IF;
+
+	--check if all nodes have value on field isprofilesurface
+	SELECT count(*), string_agg(id,', ')  INTO v_count,v_feature_list FROM cat_feature_node WHERE isprofilesurface IS NULL;
+
+	IF v_count > 0 THEN
+		v_errortext=concat('ERROR: There is/are ',v_count,' nodes without value on field "isprofilesurface". Features - ',v_feature_list::text,'.');
+
+		INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+		VALUES (195, 3, v_errortext, v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid,  criticity, error_message, fcount)
+		VALUES (195, 1, 'INFO: All nodes have value on field "isprofilesurface"', 0);
+	END IF;
+	
+
+	--CHECK CHILD VIEWS FOR ACTIVE FEATURES
 	--list active cat_feature
 	v_querytext = 'SELECT * FROM cat_feature WHERE active IS TRUE;';
 	FOR rec IN EXECUTE v_querytext LOOP
