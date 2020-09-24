@@ -112,3 +112,5 @@ INSERT INTO config_param_system (parameter, value, descript, isenabled, project_
 
 UPDATE config_param_system SET value='{"table":"sector", "selector":"selector_sector", "table_id":"sector_id",  "selector_id":"sector_id",  "label":"sector_id, '' - '', name", "orderBy":"sector_id",
 "manageAll":true, "query_filter":" AND sector_id > 0"}' WHERE parameter='basic_selector_tab_sector';
+
+ INSERT INTO sys_message VALUES (3138, 'Before use connec on planified mode you need to create a related link', NULL, 2, TRUE, 'utils');
