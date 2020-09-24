@@ -454,12 +454,14 @@ class ApiSearch(ApiParent):
             return False
 
         self.update_selector_workcat(workcat_id)
+        current_selectors = self.get_current_selectors()
         self.force_expl(workcat_id)
         # TODO ZOOM TO SELECTED WORKCAT
         #self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
         self.items_dialog = SearchWorkcat()
         self.items_dialog.setWindowTitle(f'Workcat: {display_name}')
+
         self.set_icon(self.items_dialog.btn_doc_insert, "111")
         self.set_icon(self.items_dialog.btn_doc_delete, "112")
         self.set_icon(self.items_dialog.btn_doc_new, "34")
@@ -505,12 +507,13 @@ class ApiSearch(ApiParent):
         self.items_dialog.btn_close.clicked.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.btn_path.clicked.connect(
             partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
+        self.items_dialog.rejected.connect(partial(self.restore_selectors, current_selectors))
         self.items_dialog.rejected.connect(partial(self.close_dialog, self.items_dialog))
         self.items_dialog.rejected.connect(partial(self.resetRubberbands))
-        self.items_dialog.btn_state1.clicked.connect(
-            partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
-        self.items_dialog.btn_state0.clicked.connect(
-            partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
+        self.items_dialog.btn_state1.clicked.connect(partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
+        self.items_dialog.btn_state1.clicked.connect(partial(self.fill_label_data, workcat_id, 'v_ui_workcat_x_feature', None))
+        self.items_dialog.btn_state0.clicked.connect(partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
+        self.items_dialog.btn_state0.clicked.connect(partial(self.fill_label_data, workcat_id, 'v_ui_workcat_x_feature_end', '_end'))
         self.items_dialog.btn_export_to_csv.clicked.connect(
             partial(self.export_to_csv, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end,
                     self.items_dialog.txt_path))
@@ -553,6 +556,17 @@ class ApiSearch(ApiParent):
         utils_giswater.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
 
 
+    def get_current_selectors(self):
+        """ Take the current selector_expl and selector_state to restore them at the end of the operation """
+
+        current_tab = self.controller.plugin_settings_value(f"dlg_selector_basic")
+        form = f'"currentTab":"{current_tab}"'
+        extras = f'"selectorType":"selector_basic", "filterText":""'
+        body = self.create_body(form=form, extras=extras)
+        json_result = self.controller.get_json('gw_fct_getselectors', body)
+        return json_result
+
+
     def force_expl(self, workcat_id):
         """ Active exploitations are compared with workcat farms.
             If there is consistency nothing happens, if there is no consistency force this exploitations to selector."""
@@ -577,6 +591,27 @@ class ApiSearch(ApiParent):
                 self.controller.execute_sql(sql)
             msg = "Your exploitation selector has been updated"
             self.controller.show_info(msg)
+
+
+    def restore_selectors(self, current_selectors):
+        """ Restore selector_expl and selector_state to how the user had it """
+        qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+        for form_tab in current_selectors['body']['form']['formTabs']:
+            if form_tab['tableName'] not in ('selector_expl', 'selector_state'):
+                continue
+            selector_type = form_tab['selectorType']
+            tab_name = form_tab['tabName']
+            if form_tab['tableName'] == 'selector_expl':
+                field_id = 'expl_id'
+            elif form_tab['tableName'] == 'selector_state':
+                field_id = 'id'
+            for field in form_tab['fields']:
+                _id = field[field_id]
+                extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", '
+                          f'"id":"{_id}", "isAlone":"False", "value":"{field["value"]}", '
+                          f'"addSchema":"{qgis_project_add_schema}"')
+                body = self.create_body(extras=extras)
+                self.controller.get_json('gw_fct_setselectors', body)
 
 
     def update_selector_workcat(self, workcat_id):
