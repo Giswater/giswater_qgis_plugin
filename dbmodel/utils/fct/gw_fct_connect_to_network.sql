@@ -241,12 +241,14 @@ BEGIN
 			-- Update connect attributes
 			IF v_feature_type ='CONNEC' THEN       
 		   
-				UPDATE connec SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type=v_pjointtype, pjoint_id=v_pjointid
+				UPDATE connec SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, 
+				pjoint_type=v_pjointtype, pjoint_id=v_pjointid
 				WHERE connec_id = v_connect_id;
 
 				-- update specific fields for ws projects
 				IF v_projecttype = 'WS' THEN
-					UPDATE connec SET dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id,presszone_id=v_arc.presszone_id WHERE connec_id = v_connect_id;
+					UPDATE connec SET dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id,presszone_id=v_arc.presszone_id, fluid_type = v_arc.fluid_type 
+					WHERE connec_id = v_connect_id;
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (217, null, 4, concat('Update mapzone values.'));
 				END IF;

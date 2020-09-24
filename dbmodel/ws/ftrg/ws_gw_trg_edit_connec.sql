@@ -350,7 +350,7 @@ BEGIN
 
 		--Location type
 		IF NEW.location_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_location_vdefault' AND cur_user = current_user)  = v_featurecat THEN
-			NEW.location_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_location_vdefault' AND cur_user = current_user);
+			NEW.location_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_featureval_location_vdefault' AND cur_user = current_user);
 		END IF;
 
 		IF NEW.location_type IS NULL THEN
@@ -358,13 +358,17 @@ BEGIN
 		END IF;
 
 		--Fluid type
+		IF NEW.arc_id IS NOT NULL THEN
+				NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
+		END IF;
+
 		IF NEW.fluid_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_fluid_vdefault' AND cur_user = current_user)  = v_featurecat THEN
 			NEW.fluid_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_featureval_fluid_vdefault' AND cur_user = current_user);
 		END IF;
 
 		IF NEW.fluid_type IS NULL THEN
 			NEW.fluid_type = (SELECT value FROM config_param_user WHERE parameter = 'connec_fluid_vdefault' AND cur_user = current_user);
-		END IF;
+		END IF;		
 
 		--Category type
 		IF NEW.category_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_category_vdefault' AND cur_user = current_user)  = v_featurecat THEN
@@ -469,7 +473,7 @@ BEGIN
 
 				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
-				SELECT arc_id INTO v_arc_id FROM connec WHERE connec_id=NEW.connec_id;
+				
 			END IF;
 
 		ELSIF NEW.state=2 THEN
@@ -482,7 +486,9 @@ BEGIN
 			SELECT arc_id INTO v_arc_id FROM connec WHERE connec_id=NEW.connec_id;
 			v_psector_vdefault=(SELECT value::integer FROM config_param_user WHERE config_param_user.parameter::text = 'plan_psector_vdefault'::text AND 
 			config_param_user.cur_user::name = "current_user"());
-			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id) VALUES (NEW.connec_id, v_psector_vdefault, 1, true, v_arc_id);
+			INSERT INTO plan_psector_x_connec (connec_id, psector_id, state, doable, arc_id) 
+			VALUES (NEW.connec_id, v_psector_vdefault, 1, true, v_arc_id);
+		
 		END IF;
 			
 
@@ -547,6 +553,15 @@ BEGIN
 
 					EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
 					"feature":{"id":'|| array_to_json(array_agg(NEW.connec_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
+				ELSE
+
+					IF NEW.arc_id IS NOT NULL THEN
+						NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
+						NEW.dma_id = (SELECT dma_id FROM arc WHERE arc_id = NEW.arc_id);
+						NEW.presszone_id = (SELECT presszone_id FROM arc WHERE arc_id = NEW.arc_id);
+						NEW.sector_id = (SELECT sector_id FROM arc WHERE arc_id = NEW.arc_id);
+						NEW.dqa_id = (SELECT dqa_id FROM arc WHERE arc_id = NEW.arc_id);
+					END IF;
 				END IF;
 
 			-- when arc_id comes from plan psector tables
