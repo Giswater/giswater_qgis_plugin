@@ -27,7 +27,7 @@ from ..edit.document import GwDocument
 from ..plan.psector import GwPsector
 from ..om.visit_manager import GwVisitManager
 from ....ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
-from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
+from ...utils.giswater_tools import close_dialog, create_body, get_parser_value, load_settings, open_dialog, set_parser_value
 from ....actions.parent_functs import zoom_to_rectangle, get_max_rectangle_from_coords, set_icon, \
     make_list_for_completer, set_completer_lineedit, document_insert, document_delete, document_open, \
     set_table_columns, refresh_map_canvas, draw, draw_point
@@ -465,12 +465,14 @@ class GwSearch:
             return False
 
         self.update_selector_workcat(workcat_id)
+        current_selectors = self.get_current_selectors()
         self.force_expl(workcat_id)
         # TODO ZOOM TO SELECTED WORKCAT
         #self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
         self.items_dialog = SearchWorkcat()
         self.items_dialog.setWindowTitle(f'Workcat: {display_name}')
+
         set_icon(self.items_dialog.btn_doc_insert, "111")
         set_icon(self.items_dialog.btn_doc_delete, "112")
         set_icon(self.items_dialog.btn_doc_new, "34")
@@ -516,6 +518,7 @@ class GwSearch:
         self.items_dialog.btn_close.clicked.connect(partial(close_dialog, self.items_dialog))
         self.items_dialog.btn_path.clicked.connect(
             partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
+        self.items_dialog.rejected.connect(partial(self.restore_selectors, current_selectors))
         self.items_dialog.rejected.connect(partial(close_dialog, self.items_dialog))
         self.items_dialog.rejected.connect(self.rubber_band.reset)
         self.items_dialog.btn_state1.clicked.connect(
@@ -562,6 +565,39 @@ class GwSearch:
         dlg_docman = manage_document.manage_document(tablename='workcat', qtable=qtable, item_id=item_id)
         dlg_docman.btn_accept.clicked.connect(partial(set_completer_object, dlg_docman, 'doc'))
         qt_tools.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
+
+
+    def get_current_selectors(self):
+        """ Take the current selector_expl and selector_state to restore them at the end of the operation """
+
+        current_tab = get_parser_value('last_tabs', 'dlg_selector_basic')
+        form = f'"currentTab":"{current_tab}"'
+        extras = f'"selectorType":"selector_basic", "filterText":""'
+        body = create_body(form=form, extras=extras)
+        json_result = self.controller.get_json('gw_fct_getselectors', body)
+        return json_result
+
+
+    def restore_selectors(self, current_selectors):
+        """ Restore selector_expl and selector_state to how the user had it """
+        qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+        for form_tab in current_selectors['body']['form']['formTabs']:
+            if form_tab['tableName'] not in ('selector_expl', 'selector_state'):
+                continue
+            selector_type = form_tab['selectorType']
+            tab_name = form_tab['tabName']
+            field_id = None
+            if form_tab['tableName'] == 'selector_expl':
+                field_id = 'expl_id'
+            elif form_tab['tableName'] == 'selector_state':
+                field_id = 'id'
+            for field in form_tab['fields']:
+                _id = field[field_id]
+                extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", '
+                          f'"id":"{_id}", "isAlone":"False", "value":"{field["value"]}", '
+                          f'"addSchema":"{qgis_project_add_schema}"')
+                body = create_body(extras=extras)
+                self.controller.get_json('gw_fct_setselectors', body)
 
 
     def force_expl(self, workcat_id):
