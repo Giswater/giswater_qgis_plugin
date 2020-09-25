@@ -45,10 +45,10 @@ class Edit(ParentAction):
         self.snapper_manager.store_snapping_options()
 
         # Set snapping to 'node', 'connec' and 'gully'
+        self.snapper_manager.set_snapping_mode()
         self.snapper_manager.snap_to_arc()
         self.snapper_manager.snap_to_node()
         self.snapper_manager.snap_to_connec_gully()
-        self.snapper_manager.set_snapping_mode()
         self.iface.actionAddFeature().toggled.connect(self.action_is_checked)
 
         self.feature_cat = feature_cat
@@ -77,6 +77,7 @@ class Edit(ParentAction):
 
 
     def open_new_feature(self, feature_id):
+        self.snapper_manager.recover_snapping_options()
         self.layer.featureAdded.disconnect(self.open_new_feature)
         feature = self.get_feature_by_id(self.layer, feature_id)
 
