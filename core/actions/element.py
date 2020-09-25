@@ -15,11 +15,13 @@ from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
 from core.ui.ui_manager import ElementUi, ElementManager
 import global_vars
 from actions.parent_functs import set_icon
-from actions.parent_manage_funct import set_selectionbehavior, remove_selection, \
-    set_completer_object, manage_close, tab_feature_changed, exist_object, insert_feature, delete_records, \
-    selection_init, add_point, set_completer_feature_id, set_model_to_table, fill_table_object, set_table_columns, \
-    filter_by_id, delete_selected_object
+from actions.parent_manage_funct import set_completer_object, tab_feature_changed, exist_object, \
+    set_completer_widget, set_table_columns
 
+from lib.tools_qgis import remove_selection, add_point, selection_init
+from lib.tools_qt import delete_records, manage_close, fill_table_object, filter_by_id, delete_selected_object, \
+    set_selectionbehavior, set_model_to_table
+from lib.tools_db import insert_feature
 
 class GwElement:
 
@@ -196,7 +198,7 @@ class GwElement:
             self.set_default_values()
 
         # Adding auto-completion to a QLineEdit for default feature
-        set_completer_feature_id(self.dlg_add_element.feature_id, "arc", "v_edit_arc")
+        set_completer_widget("v_edit_arc", self.dlg_add_element.feature_id, "arc_id", )
 
         if feature:
             self.dlg_add_element.tabWidget.currentChanged.connect(partial(self.fill_tbl_new_element,

@@ -270,6 +270,28 @@ def get_cursor_multiple_selection():
     return cursor
 
 
+def hide_generic_layers(excluded_layers=[]):
+    """ Hide generic layers """
+
+    layer = global_vars.controller.get_layer_by_tablename("v_edit_arc")
+    if layer and "v_edit_arc" not in excluded_layers:
+        global_vars.controller.set_layer_visible(layer)
+    layer = global_vars.controller.get_layer_by_tablename("v_edit_node")
+    if layer and "v_edit_node" not in excluded_layers:
+        global_vars.controller.set_layer_visible(layer)
+    layer = global_vars.controller.get_layer_by_tablename("v_edit_connec")
+    if layer and "v_edit_connec" not in excluded_layers:
+        global_vars.controller.set_layer_visible(layer)
+    layer = global_vars.controller.get_layer_by_tablename("v_edit_element")
+    if layer and "v_edit_element" not in excluded_layers:
+        global_vars.controller.set_layer_visible(layer)
+
+    if global_vars.project_type == 'ud':
+        layer = global_vars.controller.get_layer_by_tablename("v_edit_gully")
+        if layer and "v_edit_gully" not in excluded_layers:
+            global_vars.controller.set_layer_visible(layer)
+
+
 # Doesn't work because of hasattr and getattr
 '''
 

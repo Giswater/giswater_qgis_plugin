@@ -28,15 +28,19 @@ from core.models.om_visit_x_gully import OmVisitXGully
 from core.models.om_visit_parameter import OmVisitParameter
 from core.ui.ui_manager import VisitUi, VisitEvent, VisitEventRehab, LotVisitManagerUi
 from core.actions.document import GwDocument
-from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
+from core.utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers
 import global_vars
 from actions.parent_functs import set_icon, document_delete, document_open, create_body, \
     set_dates_from_to, get_values_from_catalog
-from actions.parent_manage_funct import set_selectionbehavior, add_point, \
-    check_expression, disconnect_signal_selection_changed, connect_signal_selection_changed, remove_selection, \
-    select_features_by_ids, refresh_map_canvas, fill_widget_with_fields, fill_table_object, enable_feature_type, \
-    insert_feature, delete_records, selection_init, set_completer_feature_id, set_table_model, lazy_configuration, \
-    set_table_columns, delete_selected_object, set_completer_object, hide_generic_layers, selection_changed
+from actions.parent_manage_funct import check_expression, disconnect_signal_selection_changed, connect_signal_selection_changed, \
+    refresh_map_canvas, enable_feature_type, \
+    set_table_model, init_function, \
+    set_table_columns, set_completer_object
+
+from lib.tools_qgis import remove_selection, add_point, selection_init, selection_changed, select_features_by_ids
+from lib.tools_qt import delete_records, fill_table_object, delete_selected_object, set_selectionbehavior
+from lib.tools_db import insert_feature
+
 
 
 class GwVisitManager:
@@ -472,7 +476,7 @@ class GwVisitManager:
         exist = self.current_visit.fetch()
         if exist:
             # B) Fill the GUI values of the current visit
-            fill_widget_with_fields(self.dlg_add_visit, self.current_visit, self.current_visit.field_names())
+            self.fill_widget_with_fields(self.dlg_add_visit, self.current_visit, self.current_visit.field_names())
             # Get parameter_id and feature_type from his event
             self.event_parameter_id, self.event_feature_type = self.get_data_from_event(self.visit_id_value)
             tools_qt.set_combo_itemData(self.dlg_add_visit.parameter_id, self.event_parameter_id, 0)
@@ -776,7 +780,7 @@ class GwVisitManager:
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
-        set_completer_feature_id(self.dlg_add_visit.feature_id, self.geom_type, viewname)
+        set_completer_widget(viewname, self.dlg_add_visit.feature_id, concat(str(self.geom_type),"_id"))
 
 
     def config_relation_table(self, dialog):
@@ -820,7 +824,7 @@ class GwVisitManager:
             return
 
         viewname = f"v_edit_{geom_type}"
-        set_completer_feature_id(dialog.feature_id, geom_type, viewname)
+        set_completer_widget(viewname, dialog.feature_id, concat(str(geom_type),"_id"))
 
         # set table model and completer
         # set a fake where expression to avoid to set model to None
@@ -832,13 +836,24 @@ class GwVisitManager:
         # its not possible to setup listener in this moment beacouse set_table_model without
         # a valid expression parameter return a None model => no events can be triggered
         widget_table = tools_qt.getWidget(dialog, widget_name)
-        self.lazy_widget, self.lazy_init_function = lazy_configuration(widget_table, self.config_relation_table)
+        self.lazy_widget, self.lazy_init_function = self.lazy_configuration(widget_table, self.config_relation_table)
 
         # check if there are features related to the current visit
         if not self.visit_id.text():
             return
 
         self.get_features_visit_geom_type(self.visit_id.text(), geom_type, widget_table)
+
+
+    def lazy_configuration(self, widget, init_function):
+        """set the init_function where all necessary events are set.
+        This is necessary to allow a lazy setup of the events because set_table_events
+        can create a table with a None model loosing any event connection."""
+
+        lazy_widget = widget
+        lazy_init_function = init_function
+
+        return lazy_widget, lazy_init_function
 
 
     def get_features_visit_geom_type(self, visit_id, geom_type, widget_table=None):
@@ -1702,7 +1717,7 @@ class GwVisitManager:
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
-        set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
+        set_completer_widget(viewname, dialog.feature_id, concat(str(self.geom_type), "_id"))
         self.ids, self.layers, self.list_ids = selection_changed(dialog, widget_table, self.geom_type, False,
                                                                  layers=self.layers, list_ids=self.list_ids,
                                                                  lazy_widget=self.lazy_widget,
@@ -1745,3 +1760,38 @@ class GwVisitManager:
 
         return parameter_id, feature_type
 
+
+    def fill_widget_with_fields(self, dialog, data_object, field_names):
+        """Fill the Widget with value get from data_object limited to
+        the list of field_names."""
+
+        for field_name in field_names:
+            value = getattr(data_object, field_name)
+            if not hasattr(dialog, field_name):
+                continue
+
+            widget = getattr(dialog, field_name)
+            if type(widget) == QDateEdit:
+                widget.setDate(value if value else QDate.currentDate())
+            elif type(widget) == QDateTimeEdit:
+                widget.setDateTime(value if value else QDateTime.currentDateTime())
+
+            if type(widget) in [QLineEdit, QTextEdit]:
+                if value:
+                    widget.setText(value)
+                else:
+                    widget.clear()
+            if type(widget) in [QComboBox]:
+                if not value:
+                    widget.setCurrentIndex(0)
+                    continue
+                # look the value in item text
+                index = widget.findText(str(value))
+                if index >= 0:
+                    widget.setCurrentIndex(index)
+                    continue
+                # look the value in itemData
+                index = widget.findData(value)
+                if index >= 0:
+                    widget.setCurrentIndex(index)
+                    continue

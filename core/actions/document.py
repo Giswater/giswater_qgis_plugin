@@ -14,11 +14,13 @@ from core.utils.tools_giswater import load_settings, open_dialog, close_dialog
 from core.ui.ui_manager import DocUi, DocManager
 import global_vars
 from actions.parent_functs import set_icon, open_web_browser, get_file_dialog
-from actions.parent_manage_funct import set_selectionbehavior, remove_selection, \
-    populate_combo, set_completer_object, set_completer_feature_id, manage_close, tab_feature_changed, exist_object, \
-    insert_feature, delete_records, selection_init, set_model_to_table, fill_table_object, set_table_columns, \
-    filter_by_id, delete_selected_object
+from actions.parent_manage_funct import set_completer_object, set_completer_widget, tab_feature_changed, exist_object, \
+    set_table_columns
 
+from lib.tools_qgis import remove_selectionl, selection_init
+from lib.tools_qt import populate_combo_with_query, delete_records, manage_close, fill_table_object, filter_by_id, \
+    delete_selected_object, set_selectionbehavior, set_model_to_table
+from lib.tools_db import insert_feature
 
 class GwDocument:
 
@@ -95,7 +97,7 @@ class GwDocument:
         set_icon(self.dlg_add_doc.btn_snapping, "137")
 
         # Fill combo boxes
-        populate_combo(self.dlg_add_doc, "doc_type", "doc_type")
+        populate_combo_with_query(self.dlg_add_doc, "doc_type", "doc_type")
 
         # Set current/selected date and link
         if row:
@@ -112,7 +114,7 @@ class GwDocument:
         if geom_type is None:
             geom_type = "arc"
         viewname = f"v_edit_{geom_type}"
-        set_completer_feature_id(self.dlg_add_doc.feature_id, geom_type, viewname)
+        set_completer_widget(viewname, self.dlg_add_doc.feature_id, concat(str(geom_type), "_id"))
 
         # Set signals
         self.dlg_add_doc.btn_path_url.clicked.connect(partial(open_web_browser, self.dlg_add_doc, "path"))

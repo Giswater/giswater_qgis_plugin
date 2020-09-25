@@ -16,6 +16,7 @@ import configparser
 import os.path
 import global_vars
 
+from actions.parent_manage_funct import enable_feature_type
 
 def get_value_from_metadata(parameter, default_value):
     """ Get @parameter from metadata.txt file """
@@ -563,3 +564,327 @@ def get_feature_by_expr(layer, expr_filter):
         return feature
 
     return False
+
+
+def remove_selection(remove_groups=True, layers=None):
+    """ Remove all previous selections """
+
+    layer = global_vars.controller.get_layer_by_tablename("v_edit_arc")
+    if layer:
+        layer.removeSelection()
+    layer = global_vars.controller.get_layer_by_tablename("v_edit_node")
+    if layer:
+        layer.removeSelection()
+    layer = global_vars.controller.get_layer_by_tablename("v_edit_connec")
+    if layer:
+        layer.removeSelection()
+    layer = global_vars.controller.get_layer_by_tablename("v_edit_element")
+    if layer:
+        layer.removeSelection()
+
+    if global_vars.project_type == 'ud':
+        layer = global_vars.controller.get_layer_by_tablename("v_edit_gully")
+        if layer:
+            layer.removeSelection()
+
+    try:
+        if remove_groups:
+            for layer in layers['arc']:
+                layer.removeSelection()
+            for layer in layers['node']:
+                layer.removeSelection()
+            for layer in layers['connec']:
+                layer.removeSelection()
+            for layer in layers['gully']:
+                layer.removeSelection()
+            for layer in layers['element']:
+                layer.removeSelection()
+    except:
+        pass
+
+    global_vars.canvas.refresh()
+
+    return layers
+
+
+def add_point(vertex_marker):
+    """ Create the appropriate map tool and connect to the corresponding signal """
+
+    # Declare return variable
+    return_point = {}
+
+    active_layer = global_vars.iface.activeLayer()
+    if active_layer is None:
+        active_layer = global_vars.controller.get_layer_by_tablename('version')
+        global_vars.iface.setActiveLayer(active_layer)
+
+    # Vertex marker
+    vertex_marker.setColor(QColor(255, 100, 255))
+    vertex_marker.setIconSize(15)
+    vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+    vertex_marker.setPenWidth(3)
+
+    # Snapper
+    emit_point = QgsMapToolEmitPoint(global_vars.canvas)
+    global_vars.canvas.setMapTool(emit_point)
+    global_vars.canvas.xyCoordinates.connect(partial(mouse_move, vertex_marker))
+    emit_point.canvasClicked.connect(partial(get_xy, vertex_marker, emit_point, return_point))
+
+    return return_point
+
+
+def mouse_move(vertex_marker, point):
+
+    # Hide marker and get coordinates
+    vertex_marker.hide()
+    event_point = get_event_point(point=point)
+
+    # Snapping
+    result = snap_to_background_layers(event_point)
+    if result.isValid():
+        add_marker(result, vertex_marker)
+    else:
+        vertex_marker.hide()
+
+
+def mouse_move(vertex_marker, point):
+
+    # Hide marker and get coordinates
+    vertex_marker.hide()
+    event_point = get_event_point(point=point)
+
+    # Snapping
+    result = snap_to_background_layers(event_point)
+    if result.isValid():
+        add_marker(result, vertex_marker)
+    else:
+        vertex_marker.hide()
+
+
+def get_xy(emit_point, vertex_marker, return_point, point):
+    """ Get coordinates of selected point """
+
+    # Setting x, y coordinates from point
+    return_point['x'] = point.x()
+    return_point['y'] = point.y()
+
+
+    message = "Geometry has been added!"
+    global_vars.controller.show_info(message)
+    emit_point.canvasClicked.disconnect()
+    global_vars.canvas.xyCoordinates.disconnect()
+    global_vars.iface.mapCanvas().refreshAllLayers()
+    vertex_marker.hide()
+
+
+def selection_init(dialog, table_object, query=False, geom_type=None, layers=None):
+    """ Set canvas map tool to an instance of class 'MultipleSelection' """
+
+    from .multiple_selection import MultipleSelection
+    geom_type = tab_feature_changed(dialog, table_object)
+    if geom_type in ('all', None):
+        geom_type = 'arc'
+    multiple_selection = MultipleSelection(layers, geom_type, parent_manage=None,
+                                           table_object=table_object, dialog=dialog)
+    disconnect_signal_selection_changed()
+    global_vars.canvas.setMapTool(multiple_selection)
+    connect_signal_selection_changed(dialog, table_object, query, geom_type)
+    cursor = get_cursor_multiple_selection()
+    global_vars.canvas.setCursor(cursor)
+
+
+def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None, layers=None, list_ids=None,
+                      lazy_widget=None, lazy_init_function=None):
+    """ Slot function for signal 'canvas.selectionChanged' """
+
+    disconnect_signal_selection_changed()
+    field_id = f"{geom_type}_id"
+
+    ids = []
+
+    if layers is None: return
+
+    # Iterate over all layers of the group
+    for layer in layers[geom_type]:
+        if layer.selectedFeatureCount() > 0:
+            # Get selected features of the layer
+            features = layer.selectedFeatures()
+            for feature in features:
+                # Append 'feature_id' into the list
+                selected_id = feature.attribute(field_id)
+                if selected_id not in ids:
+                    ids.append(selected_id)
+
+    if geom_type == 'arc':
+        list_ids['arc'] = ids
+    elif geom_type == 'node':
+        list_ids['node'] = ids
+    elif geom_type == 'connec':
+        list_ids['connec'] = ids
+    elif geom_type == 'gully':
+        list_ids['gully'] = ids
+    elif geom_type == 'element':
+        list_ids['element'] = ids
+
+    expr_filter = None
+    if len(ids) > 0:
+        # Set 'expr_filter' with features that are in the list
+        expr_filter = f'"{field_id}" IN ('
+        for i in range(len(ids)):
+            expr_filter += f"'{ids[i]}', "
+        expr_filter = expr_filter[:-2] + ")"
+
+        # Check expression
+        (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
+        if not is_valid:
+            return
+
+        select_features_by_ids(geom_type, expr, layers=layers)
+
+    # Reload contents of table 'tbl_@table_object_x_@geom_type'
+    if query:
+        insert_feature_to_plan(dialog, geom_type, ids=ids)
+        if plan_om == 'plan':
+            layers = remove_selection()
+        reload_qtable(dialog, geom_type)
+    else:
+        reload_table(dialog, table_object, geom_type, expr_filter)
+        apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
+
+    # Remove selection in generic 'v_edit' layers
+    if plan_om == 'plan':
+        layers = remove_selection(False)
+    enable_feature_type(dialog, table_object, ids=ids)
+    connect_signal_selection_changed(dialog, table_object, geom_type)
+
+    return ids, layers, list_ids
+
+
+def select_features_by_ids(geom_type, expr, layers=None):
+    """ Select features of layers of group @geom_type applying @expr """
+
+    if layers is None: return
+
+    if not geom_type in layers: return
+
+    # Build a list of feature id's and select them
+    for layer in layers[geom_type]:
+        if expr is None:
+            layer.removeSelection()
+        else:
+            it = layer.getFeatures(QgsFeatureRequest(expr))
+            id_list = [i.id() for i in it]
+            if len(id_list) > 0:
+                layer.selectByIds(id_list)
+            else:
+                layer.removeSelection()
+
+
+def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type=None, ids=None, layers=None,
+                   list_ids=None, lazy_widget=None, lazy_init_function=None):
+    """ Select feature with entered id. Set a model with selected filter.
+        Attach that model to selected table
+    """
+
+    disconnect_signal_selection_changed()
+
+    if geom_type in ('all', None):
+        geom_type = tab_feature_changed(dialog, table_object)
+
+    # Clear list of ids
+    if remove_ids:
+        ids = []
+
+    field_id = f"{geom_type}_id"
+    feature_id = tools_qt.getWidgetText(dialog, "feature_id")
+    expr_filter = f"{field_id} = '{feature_id}'"
+
+    # Check expression
+    (is_valid, expr) = check_expression(expr_filter)
+    if not is_valid:
+        return None
+
+    # Select features of layers applying @expr
+    select_features_by_ids(geom_type, expr, layers=layers)
+
+    if feature_id == 'null':
+        message = "You need to enter a feature id"
+        global_vars.controller.show_info_box(message)
+        return
+
+    # Iterate over all layers of the group
+    for layer in layers[geom_type]:
+        if layer.selectedFeatureCount() > 0:
+            # Get selected features of the layer
+            features = layer.selectedFeatures()
+            for feature in features:
+                # Append 'feature_id' into the list
+                selected_id = feature.attribute(field_id)
+                if selected_id not in ids:
+                    ids.append(selected_id)
+        if feature_id not in ids:
+            # If feature id doesn't exist in list -> add
+            ids.append(str(feature_id))
+
+    # Set expression filter with features in the list
+    expr_filter = f'"{field_id}" IN (  '
+    for i in range(len(ids)):
+        expr_filter += f"'{ids[i]}', "
+    expr_filter = expr_filter[:-2] + ")"
+
+    # Check expression
+    (is_valid, expr) = check_expression(expr_filter)
+    if not is_valid:
+        return
+
+    # Select features with previous filter
+    # Build a list of feature id's and select them
+    for layer in layers[geom_type]:
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        id_list = [i.id() for i in it]
+        if len(id_list) > 0:
+            layer.selectByIds(id_list)
+
+    # Reload contents of table 'tbl_???_x_@geom_type'
+    if query:
+        insert_feature_to_plan(dialog, geom_type, ids=ids)
+        layers = remove_selection()
+    else:
+        reload_table(dialog, table_object, geom_type, expr_filter)
+        apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
+
+    # Update list
+    list_ids[geom_type] = ids
+    enable_feature_type(dialog, table_object, ids=ids)
+    connect_signal_selection_changed(dialog, table_object, geom_type)
+
+    global_vars.controller.log_info(list_ids[geom_type])
+
+    return ids, layers, list_ids
+
+
+def insert_feature_to_plan(dialog, geom_type, ids=None):
+    """ Insert features_id to table plan_@geom_type_x_psector """
+
+    value = tools_qt.getWidgetText(dialog, dialog.psector_id)
+    for i in range(len(ids)):
+        sql = (f"SELECT {geom_type}_id "
+               f"FROM plan_psector_x_{geom_type} "
+               f"WHERE {geom_type}_id = '{ids[i]}' AND psector_id = '{value}'")
+        row = global_vars.controller.get_row(sql)
+        if not row:
+            sql = (f"INSERT INTO plan_psector_x_{geom_type}"
+                   f"({geom_type}_id, psector_id) VALUES('{ids[i]}', '{value}')")
+            global_vars.controller.execute_sql(sql)
+        reload_qtable(dialog, geom_type)
+
+
+def disconnect_snapping():
+    """ Select 'Pan' as current map tool and disconnect snapping """
+
+    try:
+        global_vars.iface.actionPan().trigger()
+        global_vars.canvas.xyCoordinates.disconnect()
+    except:
+        pass
+

@@ -22,18 +22,21 @@ from collections import OrderedDict
 from functools import partial
 
 from lib import tools_qt
-from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
+from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
+    hide_generic_layers
 from core.ui.ui_manager import Plan_psector, PsectorRapportUi
 from core.actions.document import GwDocument
 import global_vars
 from actions.parent_functs import set_icon, hilight_feature_by_id, \
     select_features_by_expr, zoom_to_selected_features, document_open, document_delete, make_list_for_completer, \
     set_completer_lineedit, set_restriction, get_folder_dialog
-from actions.parent_manage_funct import set_selectionbehavior, remove_selection, \
-    set_table_columns, check_expression, fill_table_object, insert_feature, delete_records, tab_feature_changed, \
-    set_completer_feature_id, reload_qtable, refresh_map_canvas, disconnect_signal_selection_changed, \
-    selection_changed, hide_generic_layers, set_completer_object, disconnect_snapping, selection_init
+from actions.parent_manage_funct import set_table_columns, check_expression, tab_feature_changed, \
+    set_completer_widget, refresh_map_canvas, disconnect_signal_selection_changed, \
+    set_completer_object
 
+from lib.tools_qgis import remove_selection, selection_init, selection_changed, disconnect_snapping
+from lib.tools_qt import delete_records, fill_table_object, set_selectionbehavior
+from lib.tools_db import insert_feature
 
 class GwPsector:
 
@@ -462,7 +465,7 @@ class GwPsector:
 
         # Adding auto-completion to a QLineEdit for default feature
         viewname = "v_edit_" + self.geom_type
-        set_completer_feature_id(self.dlg_plan_psector.feature_id, self.geom_type, viewname)
+        set_completer_widget(viewname, self.dlg_plan_psector.feature_id, concat(str(self.geom_type),"_id"))
 
         # Set default tab 'arc'
         self.dlg_plan_psector.tab_feature.setCurrentIndex(0)
@@ -482,11 +485,11 @@ class GwPsector:
         psector_id = tools_qt.getWidgetText(self.dlg_plan_psector, "psector_id")
         sql = f"SELECT gw_fct_plan_psector_enableall({value}, '{psector_id}')"
         self.controller.execute_sql(sql)
-        reload_qtable(self.dlg_plan_psector, 'arc')
-        reload_qtable(self.dlg_plan_psector, 'node')
-        reload_qtable(self.dlg_plan_psector, 'connec')
+        self.reload_qtable(self.dlg_plan_psector, 'arc')
+        self.reload_qtable(self.dlg_plan_psector, 'node')
+        self.reload_qtable(self.dlg_plan_psector, 'connec')
         if self.project_type.upper() == 'UD':
-            reload_qtable(self.dlg_plan_psector, 'gully')
+            self.reload_qtable(self.dlg_plan_psector, 'gully')
 
         sql = (f"UPDATE plan_psector "
                f"SET enable_all = '{value}' "
@@ -1378,3 +1381,36 @@ class GwPsector:
               "according to the system variables plan_psector_statetype, " \
               "plan_statetype_planned and plan_statetype_ficticious, will be triggered."
         self.controller.show_details(msg, 'Message warning')
+
+
+    def reload_qtable(self, dialog, geom_type):
+        """ Reload QtableView """
+
+        value = tools_qt.getWidgetText(dialog, dialog.psector_id)
+        expr = f"psector_id = '{value}'"
+        qtable = tools_qt.getWidget(dialog, f'tbl_psector_x_{geom_type}')
+        self.fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
+        set_table_columns(dialog, qtable, f"plan_psector_x_{geom_type}")
+        refresh_map_canvas()
+
+
+    def fill_table_by_expr(self, qtable, table_name, expr):
+        """
+        :param qtable: QTableView to show
+        :param expr: expression to set model
+        """
+        if global_vars.schema_name not in table_name:
+            table_name = global_vars.schema_name + "." + table_name
+
+        model = QSqlTableModel()
+        model.setTable(table_name)
+        model.setFilter(expr)
+        model.setEditStrategy(QSqlTableModel.OnFieldChange)
+        qtable.setEditTriggers(QTableView.DoubleClicked)
+        model.select()
+        qtable.setModel(model)
+        qtable.show()
+
+        # Check for errors
+        if model.lastError().isValid():
+            global_vars.controller.show_warning(model.lastError().text())
