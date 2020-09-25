@@ -230,9 +230,10 @@ class ApiConfig(ApiParent):
 
                 chk = QCheckBox()
                 chk.setObjectName('chk_' + field['widgetname'])
-                if field['checked'] == "True":
+
+                if field['checked'] in ('true', 'True', 'TRUE', True):
                     chk.setChecked(True)
-                elif field['checked'] == "False":
+                elif field['checked'] in ('false', 'False', 'FALSE', False):
                     chk.setChecked(False)
                 chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
@@ -352,9 +353,9 @@ class ApiConfig(ApiParent):
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'checkbox' or field['widgettype'] == 'check':
                     widget = QCheckBox()
-                    if field['value'].lower() == 'true':
+                    if field['value'] in ('true', 'True', 'TRUE', True):
                         widget.setChecked(True)
-                    elif field['value'].lower() == 'FALSE':
+                    elif field['value'] in ('false', 'False', 'FALSE', False):
                         widget.setChecked(False)
                     widget.stateChanged.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
