@@ -111,4 +111,4 @@ CREATE OR REPLACE VIEW v_edit_link AS
              LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
              LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
              LEFT JOIN plan_psector_x_gully USING (arc_id, gully_id))a
-			 WHERE state > 0;
+			 WHERE state > 0 AND link_id IS NOT NULL;

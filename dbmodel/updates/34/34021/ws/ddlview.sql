@@ -62,10 +62,10 @@ CREATE OR REPLACE VIEW v_edit_link AS
                     ELSE plan_psector_x_connec.id
                 END AS psector_rowid,
             arc.fluid_type
-           FROM SCHEMA_NAME.link
-             RIGHT JOIN SCHEMA_NAME.v_edit_connec ON link.feature_id::text = v_edit_connec.connec_id::text
-             LEFT JOIN SCHEMA_NAME.arc USING (arc_id)
-             LEFT JOIN SCHEMA_NAME.sector ON sector.sector_id::text = arc.sector_id::text
-             LEFT JOIN SCHEMA_NAME.dma ON dma.dma_id::text = arc.dma_id::text
-             LEFT JOIN SCHEMA_NAME.plan_psector_x_connec USING (arc_id, connec_id))a
-			WHERE state > 0;
+           FROM link
+             RIGHT JOIN v_edit_connec ON link.feature_id::text = v_edit_connec.connec_id::text
+             LEFT JOIN arc USING (arc_id)
+             LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
+             LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
+             LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id))a
+			WHERE state > 0 AND link_id IS NOT NULL;
