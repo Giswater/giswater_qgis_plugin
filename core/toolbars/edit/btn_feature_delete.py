@@ -12,12 +12,12 @@ from functools import partial
 
 from lib import tools_qt
 from core.toolbars.parent_dialog import GwParentAction
-from core.utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog
+from core.utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body
 from core.ui.ui_manager import FeatureDelete
 from actions.parent_functs import set_icon, disconnect_signal_selection_changed
-from actions.api_parent_functs import set_completer_object_api, create_body
 from core.utils.layer_tools import populate_info_text
 
+from lib.tools_qt import set_completer_object_api
 
 class GwDeleteFeatureButton(GwParentAction):
 

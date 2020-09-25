@@ -17,6 +17,7 @@ import os
 import operator
 
 from core.utils.hyperlink_label import GwHyperLinkLabel
+from lib.tools_other import gw_function_dxf
 
 
 def fillComboBox(dialog, widget, rows, allow_nulls=True, clear_combo=True):
@@ -604,3 +605,878 @@ def eval_regex(widget, reg_exp, button, placeholder, text):
         else:
             button.setEnabled(True)
 
+
+def set_completer_object_api(completer, model, widget, list_items, max_visible=10):
+    """ Set autocomplete of widget @table_object + "_id"
+        getting id's from selected @table_object.
+        WARNING: Each QLineEdit needs their own QCompleter and their own QStringListModel!!!
+    """
+
+    # Set completer and model: add autocomplete in the widget
+    completer.setCaseSensitivity(Qt.CaseInsensitive)
+    completer.setMaxVisibleItems(max_visible)
+    widget.setCompleter(completer)
+    completer.setCompletionMode(1)
+    model.setStringList(list_items)
+    completer.setModel(model)
+
+
+def set_completer_object(dialog, table_object):
+    """ Set autocomplete of widget @table_object + "_id"
+        getting id's from selected @table_object
+    """
+
+    widget = getWidget(dialog, table_object + "_id")
+    if not widget:
+        return
+
+    # Set SQL
+    field_object_id = "id"
+    if table_object == "element":
+        field_object_id = table_object + "_id"
+    sql = (f"SELECT DISTINCT({field_object_id})"
+           f" FROM {table_object}")
+
+    rows = global_vars.controller.get_rows(sql)
+    if rows is None:
+        return
+
+    for i in range(0, len(rows)):
+        aux = rows[i]
+        rows[i] = str(aux[0])
+
+    # Set completer and model: add autocomplete in the widget
+    completer = QCompleter()
+    completer.setCaseSensitivity(Qt.CaseInsensitive)
+    widget.setCompleter(completer)
+    model = QStringListModel()
+    model.setStringList(rows)
+    completer.setModel(model)
+
+
+def check_actions(action, enabled):
+
+    try:
+        action.setChecked(enabled)
+    except RuntimeError:
+        pass
+
+
+def api_action_help(geom_type):
+    """ Open PDF file with selected @project_type and @geom_type """
+
+    # Get locale of QGIS application
+    locale = QSettings().value('locale/userLocale').lower()
+    if locale == 'es_es':
+        locale = 'es'
+    elif locale == 'es_ca':
+        locale = 'ca'
+    elif locale == 'en_us':
+        locale = 'en'
+    project_type = global_vars.controller.get_project_type()
+    # Get PDF file
+    pdf_folder = os.path.join(global_vars.plugin_dir, 'png')
+    pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
+
+    # Open PDF if exists. If not open Spanish version
+    if os.path.exists(pdf_path):
+        os.system(pdf_path)
+    else:
+        locale = "es"
+        pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
+        if os.path.exists(pdf_path):
+            os.system(pdf_path)
+        else:
+            message = "File not found"
+            global_vars.controller.show_warning(message, parameter=pdf_path)
+
+
+def set_widget_size(widget, field):
+
+    if 'widgetdim' in field:
+        if field['widgetdim']:
+            widget.setMaximumWidth(field['widgetdim'])
+            widget.setMinimumWidth(field['widgetdim'])
+
+    return widget
+
+
+def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name__]):
+    """
+    :param dialog: (QDialog)
+    :param field: Part of json where find info (Json)
+    :param temp_layers_added: List of layers added to the toc
+    :param module: Module where find 'function_name', if 'function_name' is not in this module
+    :return: (QWidget)
+    """
+    widget = QPushButton()
+    widget.setObjectName(field['widgetname'])
+
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    if 'value' in field:
+        widget.setText(field['value'])
+    widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
+    function_name = 'no_function_associated'
+    real_name = widget.objectName()[5:len(widget.objectName())]
+    if 'widgetfunction' in field:
+        if field['widgetfunction'] is not None:
+            function_name = field['widgetfunction']
+            exist = global_vars.controller.check_python_function(module, function_name)
+            if not exist:
+                msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
+                global_vars.controller.show_message(msg, 2)
+                return widget
+        else:
+            message = "Parameter button_function is null for button"
+            global_vars.controller.show_message(message, 2, parameter=widget.objectName())
+
+    kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name, 'temp_layers_added': temp_layers_added}
+    widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
+
+    return widget
+
+
+def add_textarea(field):
+    """ Add widgets QTextEdit type """
+
+    widget = QTextEdit()
+    widget.setObjectName(field['widgetname'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    if 'value' in field:
+        widget.setText(field['value'])
+
+    # Set height as a function of text lines
+    font = widget.document().defaultFont()
+    fm = QFontMetrics(font)
+    text_size = fm.size(0, widget.toPlainText())
+    if text_size.height() < 26:
+        widget.setMinimumHeight(36)
+        widget.setMaximumHeight(36)
+    else:
+        # Need to modify to avoid scroll
+        widget.setMaximumHeight(text_size.height() + 10)
+
+    if 'iseditable' in field:
+        widget.setReadOnly(not field['iseditable'])
+        if not field['iseditable']:
+            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+
+    return widget
+
+
+def add_lineedit(field):
+    """ Add widgets QLineEdit type """
+
+    widget = QLineEdit()
+    widget.setObjectName(field['widgetname'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    if 'placeholder' in field:
+        widget.setPlaceholderText(field['placeholder'])
+    if 'value' in field:
+        widget.setText(field['value'])
+    if 'iseditable' in field:
+        widget.setReadOnly(not field['iseditable'])
+        if not field['iseditable']:
+            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+
+    return widget
+
+
+def set_data_type(field, widget):
+
+    widget.setProperty('datatype', field['datatype'])
+    return widget
+
+
+def manage_lineedit(field, dialog, widget, completer):
+
+    if field['widgettype'] == 'typeahead':
+        if 'queryText' not in field or 'queryTextFilter' not in field:
+            return widget
+        model = QStringListModel()
+        widget.textChanged.connect(partial(populate_lineedit, completer, model, field, dialog, widget))
+
+    return widget
+
+
+def populate_lineedit(completer, model, field, dialog, widget):
+    """ Set autocomplete of widget @table_object + "_id"
+        getting id's from selected @table_object.
+        WARNING: Each QLineEdit needs their own QCompleter and their own QStringListModel!!!
+    """
+
+    if not widget:
+        return
+    parent_id = ""
+    if 'parentId' in field:
+        parent_id = field["parentId"]
+
+    extras = f'"queryText":"{field["queryText"]}"'
+    extras += f', "queryTextFilter":"{field["queryTextFilter"]}"'
+    extras += f', "parentId":"{parent_id}"'
+    extras += f', "parentValue":"{getWidgetText(dialog, "data_" + str(field["parentId"]))}"'
+    extras += f', "textToSearch":"{getWidgetText(dialog, widget)}"'
+    body = create_body(extras=extras)
+    complet_list = global_vars.controller.get_json('gw_fct_gettypeahead', body)
+    if not complet_list:
+        return False
+
+    list_items = []
+    for field in complet_list['body']['data']:
+        list_items.append(field['idval'])
+    set_completer_object_api(completer, model, widget, list_items)
+
+
+def add_tableview(complet_result, field):
+    """ Add widgets QTableView type """
+
+    widget = QTableView()
+    widget.setObjectName(field['widgetname'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    function_name = 'no_function_asociated'
+    real_name = widget.objectName()[5:len(widget.objectName())]
+    if 'widgetfunction' in field:
+        if field['widgetfunction'] is not None:
+            function_name = field['widgetfunction']
+            exist = global_vars.controller.check_python_function(sys.modules[__name__], function_name)
+            if not exist:
+                msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
+                global_vars.controller.show_message(msg, 2)
+                return widget
+
+    # Call def gw_api_open_rpt_result(self, widget, complet_result) of class ApiCf
+    # noinspection PyUnresolvedReferences
+    widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), widget, complet_result))
+
+    return widget
+
+
+def set_headers(widget, field):
+
+    standar_model = widget.model()
+    if standar_model is None:
+        standar_model = QStandardItemModel()
+    # Related by Qtable
+    widget.setModel(standar_model)
+    widget.horizontalHeader().setStretchLastSection(True)
+
+    # # Get headers
+    headers = []
+    for x in field['value'][0]:
+        headers.append(x)
+    # Set headers
+    standar_model.setHorizontalHeaderLabels(headers)
+
+    return widget
+
+
+def populate_table(widget, field):
+
+    standar_model = widget.model()
+    for item in field['value']:
+        row = []
+        for value in item.values():
+            row.append(QStandardItem(str(value)))
+        if len(row) > 0:
+            standar_model.appendRow(row)
+
+    return widget
+
+
+def set_columns_config(widget, table_name, sort_order=0, isQStandardItemModel=False):
+    """ Configuration of tables. Set visibility and width of columns """
+
+    # Set width and alias of visible columns
+    columns_to_delete = []
+    sql = (f"SELECT columnindex, width, alias, status FROM config_form_tableview"
+           f" WHERE tablename = '{table_name}' ORDER BY columnindex")
+    rows = global_vars.controller.get_rows(sql, log_info=True)
+    if not rows:
+        return widget
+
+    for row in rows:
+        if not row['status']:
+            columns_to_delete.append(row['columnindex'] - 1)
+        else:
+            width = row['width']
+            if width is None:
+                width = 100
+            widget.setColumnWidth(row['columnindex'] - 1, width)
+            if row['alias'] is not None:
+                widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
+
+    # Set order
+    if isQStandardItemModel:
+        widget.model().sort(sort_order, Qt.AscendingOrder)
+    else:
+        widget.model().setSort(sort_order, Qt.AscendingOrder)
+        widget.model().select()
+    # Delete columns
+    for column in columns_to_delete:
+        widget.hideColumn(column)
+
+    return widget
+
+
+def add_checkbox(field):
+
+    widget = QCheckBox()
+    widget.setObjectName(field['widgetname'])
+    widget.setProperty('columnname', field['columnname'])
+    if 'value' in field:
+        if field['value'] in ("t", "true", True):
+            widget.setChecked(True)
+    if 'iseditable' in field:
+        widget.setEnabled(field['iseditable'])
+    return widget
+
+
+def add_combobox(field):
+
+    widget = QComboBox()
+    widget.setObjectName(field['widgetname'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    widget = populate_combo(widget, field)
+    if 'selectedId' in field:
+        set_combo_itemData(widget, field['selectedId'], 0)
+        widget.setProperty('selectedId', field['selectedId'])
+    else:
+        widget.setProperty('selectedId', None)
+    if 'iseditable' in field:
+        widget.setEnabled(bool(field['iseditable']))
+        if not field['iseditable']:
+            widget.setStyleSheet("QComboBox { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+    return widget
+
+
+def fill_child(dialog, widget, feature_type, tablename, field_id):
+    """ Find QComboBox child and populate it
+    :param dialog: QDialog
+    :param widget: QComboBox parent
+    :param feature_type: PIPE, ARC, JUNCTION, VALVE...
+    :param tablename: view of DB
+    :param field_id: Field id of tablename
+    """
+
+    combo_parent = widget.property('columnname')
+    combo_id = get_item_data(dialog, widget)
+
+    feature = f'"featureType":"{feature_type}", '
+    feature += f'"tableName":"{tablename}", '
+    feature += f'"idName":"{field_id}"'
+    extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
+    body = create_body(feature=feature, extras=extras)
+    result = global_vars.controller.get_json('gw_fct_getchilds', body)
+    if not result:
+        return False
+
+    for combo_child in result['body']['data']:
+        if combo_child is not None:
+            manage_child(dialog, widget, combo_child)
+
+
+def manage_child(dialog, combo_parent, combo_child):
+    child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
+    if child:
+        child.setEnabled(True)
+
+        populate_child(dialog, combo_child)
+        if 'widgetcontrols' not in combo_child or not combo_child['widgetcontrols'] or \
+                'enableWhenParent' not in combo_child['widgetcontrols']:
+            return
+        #
+        if (str(get_item_data(dialog, combo_parent, 0)) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
+                and (get_item_data(dialog, combo_parent, 0) not in (None, '')):
+            # The keepDisbled property is used to keep the edition enabled or disabled,
+            # when we activate the layer and call the "enable_all" function
+            child.setProperty('keepDisbled', False)
+            child.setEnabled(True)
+        else:
+            child.setProperty('keepDisbled', True)
+            child.setEnabled(False)
+
+
+def populate_child(dialog, combo_child):
+
+    child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
+    if child:
+        populate_combo(child, combo_child)
+
+
+def populate_combo(widget, field):
+    # Generate list of items to add into combo
+
+    widget.blockSignals(True)
+    widget.clear()
+    widget.blockSignals(False)
+    combolist = []
+    if 'comboIds' in field:
+        if 'isNullValue' in field and field['isNullValue']:
+            combolist.append(['', ''])
+        for i in range(0, len(field['comboIds'])):
+            elem = [field['comboIds'][i], field['comboNames'][i]]
+            combolist.append(elem)
+
+    # Populate combo
+    for record in combolist:
+        widget.addItem(record[1], record)
+
+    return widget
+
+
+def add_frame(field, x=None):
+
+    widget = QFrame()
+    widget.setObjectName(f"{field['widgetname']}_{x}")
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    widget.setFrameShape(QFrame.HLine)
+    widget.setFrameShadow(QFrame.Sunken)
+
+    return widget
+
+
+def add_label(field):
+    """ Add widgets QLineEdit type """
+
+    widget = QLabel()
+    widget.setTextInteractionFlags(Qt.TextSelectableByMouse)
+    widget.setObjectName(field['widgetname'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    if 'value' in field:
+        widget.setText(field['value'])
+
+    return widget
+
+
+def set_calendar_empty(widget):
+    """ Set calendar empty when click inner button of QgsDateTimeEdit because aesthetically it looks better"""
+    widget.setEmpty()
+
+
+def add_hyperlink(field):
+
+    widget = GwHyperLinkLabel()
+    widget.setObjectName(field['widgetname'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    if 'value' in field:
+        widget.setText(field['value'])
+    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+    widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
+    func_name = 'no_function_associated'
+    real_name = widget.objectName()[5:len(widget.objectName())]
+    if 'widgetfunction' in field:
+        if field['widgetfunction'] is not None:
+            func_name = field['widgetfunction']
+            exist = global_vars.controller.check_python_function(sys.modules[__name__], func_name)
+            if not exist:
+                msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
+                global_vars.controller.show_message(msg, 2)
+                return widget
+        else:
+            message = "Parameter widgetfunction is null for widget"
+            global_vars.controller.show_message(message, 2, parameter=real_name)
+    else:
+        message = "Parameter not found"
+        global_vars.controller.show_message(message, 2, parameter='widgetfunction')
+
+    # Call function (self, widget) or def no_function_associated(self, widget=None, message_level=1)
+    widget.clicked.connect(partial(getattr(sys.modules[__name__], func_name), widget))
+
+    return widget
+
+
+def add_horizontal_spacer():
+
+    widget = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
+    return widget
+
+
+def add_vertical_spacer():
+
+    widget = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+    return widget
+
+
+def add_spinbox(field):
+
+    widget = None
+    if 'value' in field:
+        if field['widgettype'] == 'spinbox':
+            widget = QSpinBox()
+    widget.setObjectName(field['widgetname'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    if 'value' in field:
+        if field['widgettype'] == 'spinbox' and field['value'] != "":
+            widget.setValue(int(field['value']))
+    if 'iseditable' in field:
+        widget.setReadOnly(not field['iseditable'])
+        if not field['iseditable']:
+            widget.setStyleSheet("QDoubleSpinBox { background: rgb(0, 250, 0); color: rgb(100, 100, 100)}")
+
+    return widget
+
+
+def fill_table(widget, table_name, filter_=None):
+    """ Set a model with selected filter.
+    Attach that model to selected table """
+
+    if global_vars.schema_name not in table_name:
+        table_name = global_vars.schema_name + "." + table_name
+
+    # Set model
+    model = QSqlTableModel()
+    model.setTable(table_name)
+    model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+    model.setSort(0, 0)
+    if filter_:
+        model.setFilter(filter_)
+    model.select()
+
+    # Check for errors
+    if model.lastError().isValid():
+        global_vars.controller.show_warning(model.lastError().text())
+
+    # Attach model to table view
+    widget.setModel(model)
+
+
+def populate_basic_info(dialog, result, field_id, my_json=None, new_feature_id=None, new_feature=None,
+                        layer_new_feature=None, feature_id=None, feature_type=None, layer=None):
+
+    fields = result[0]['body']['data']
+    if 'fields' not in fields:
+        return
+    grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
+
+    for x, field in enumerate(fields["fields"]):
+
+        label = QLabel()
+        label.setObjectName('lbl_' + field['label'])
+        label.setText(field['label'].capitalize())
+
+        if 'tooltip' in field:
+            label.setToolTip(field['tooltip'])
+        else:
+            label.setToolTip(field['label'].capitalize())
+
+        widget = None
+        if field['widgettype'] in ('text', 'textline') or field['widgettype'] == 'typeahead':
+            completer = QCompleter()
+            widget = add_lineedit(field)
+            widget = set_widget_size(widget, field)
+            widget = set_data_type(field, widget)
+            if field['widgettype'] == 'typeahead':
+                widget = manage_lineedit(field, dialog, widget, completer)
+
+        elif field['widgettype'] == 'datetime':
+            widget = add_calendar(dialog, field, my_json, new_feature_id=new_feature_id, new_feature=new_feature,
+                                  layer_new_feature=layer_new_feature, feature_id=feature_id, feature_type=feature_type,
+                                  layer=layer)
+        elif field['widgettype'] == 'hyperlink':
+            widget = add_hyperlink(field)
+        elif field['widgettype'] == 'textarea':
+            widget = add_textarea(field)
+        elif field['widgettype'] in ('combo', 'combobox'):
+            widget = QComboBox()
+            populate_combo(widget, field)
+            widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        elif field['widgettype'] in ('check', 'checkbox'):
+            widget = add_checkbox(field)
+            widget.stateChanged.connect(partial(get_values, dialog, widget, my_json, layer))
+        elif field['widgettype'] == 'button':
+            widget = add_button(dialog, field)
+
+        grid_layout.addWidget(label, x, 0)
+        grid_layout.addWidget(widget, x, 1)
+
+    verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+    grid_layout.addItem(verticalSpacer1)
+
+    return result
+
+
+def clear_gridlayout(layout):
+    """  Remove all widgets of layout """
+
+    while layout.count() > 0:
+        child = layout.takeAt(0).widget()
+        if child:
+            child.setParent(None)
+            child.deleteLater()
+
+
+def add_calendar(dialog, field, my_json=None, complet_result=None, new_feature_id=None, new_feature=None,
+                 layer_new_feature=None, feature_id=None, feature_type=None, layer=None):
+
+    widget = QgsDateTimeEdit()
+    widget.setObjectName(field['widgetname'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    widget.setAllowNull(True)
+    widget.setCalendarPopup(True)
+    widget.setDisplayFormat('dd/MM/yyyy')
+    if 'value' in field and field['value'] not in ('', None, 'null'):
+        date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
+        setCalendarDate(dialog, widget, date)
+    else:
+        widget.clear()
+    btn_calendar = widget.findChild(QToolButton)
+
+    if field['isautoupdate']:
+        _json = {}
+        btn_calendar.clicked.connect(partial(get_values, dialog, widget, _json, layer))
+        btn_calendar.clicked.connect(
+            partial(accept, dialog, complet_result[0], _json, p_widget=feature_id, clear_json=True,
+                    close_dlg=False, new_feature_id=new_feature_id, new_feature=new_feature,
+                    layer_new_feature=layer_new_feature, feature_id=feature_id, feature_type=feature_type))
+    else:
+        btn_calendar.clicked.connect(partial(get_values, dialog, widget, my_json, layer))
+    btn_calendar.clicked.connect(partial(set_calendar_empty, widget))
+
+    return widget
+
+
+def construct_form_param_user(dialog, row, pos, _json, temp_layers_added=None):
+
+    field_id = ''
+    if 'fields' in row[pos]:
+        field_id = 'fields'
+    elif 'return_type' in row[pos]:
+        if row[pos]['return_type'] not in ('', None):
+            field_id = 'return_type'
+
+    if field_id == '':
+        return
+
+    for field in row[pos][field_id]:
+        if field['label']:
+            lbl = QLabel()
+            lbl.setObjectName('lbl' + field['widgetname'])
+            lbl.setText(field['label'])
+            lbl.setMinimumSize(160, 0)
+            lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            if 'tooltip' in field:
+                lbl.setToolTip(field['tooltip'])
+
+            widget = None
+            if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
+                widget = QLineEdit()
+                if 'isMandatory' in field:
+                    widget.setProperty('is_mandatory', field['isMandatory'])
+                else:
+                    widget.setProperty('is_mandatory', True)
+                widget.setText(field['value'])
+                if 'widgetcontrols' in field and field['widgetcontrols']:
+                    if 'regexpControl' in field['widgetcontrols']:
+                        if field['widgetcontrols']['regexpControl'] is not None:
+                            pass
+                widget.editingFinished.connect(
+                    partial(get_values_changed_param_user, dialog, None, widget, field, _json))
+                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            elif field['widgettype'] == 'combo':
+                widget = add_combobox(field)
+                widget.currentIndexChanged.connect(
+                    partial(get_values_changed_param_user, dialog, None, widget, field, _json))
+                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            elif field['widgettype'] == 'check':
+                widget = QCheckBox()
+                if field['value'] is not None and field['value'].lower() == "true":
+                    widget.setChecked(True)
+                else:
+                    widget.setChecked(False)
+                widget.stateChanged.connect(partial(get_values_changed_param_user,
+                                            dialog, None, widget, field, _json))
+                widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            elif field['widgettype'] == 'datetime':
+                widget = QgsDateTimeEdit()
+                widget.setAllowNull(True)
+                widget.setCalendarPopup(True)
+                widget.setDisplayFormat('yyyy/MM/dd')
+                date = QDate.currentDate()
+                if 'value' in field and field['value'] not in ('', None, 'null'):
+                    date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
+                widget.setDate(date)
+                widget.dateChanged.connect(partial(get_values_changed_param_user,
+                                           dialog, None, widget, field, _json))
+                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            elif field['widgettype'] == 'spinbox':
+                widget = QDoubleSpinBox()
+                if 'value' in field and field['value'] not in(None, ""):
+                    value = float(str(field['value']))
+                    widget.setValue(value)
+                # noinspection PyUnresolvedReferences
+                widget.valueChanged.connect(partial(get_values_changed_param_user,
+                                            dialog, None, widget, field, _json))
+                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            elif field['widgettype'] == 'button':
+                widget = add_button(dialog, field, temp_layers_added)
+                widget = set_widget_size(widget, field)
+
+            # Set editable/readonly
+            if type(widget) in (QLineEdit, QDoubleSpinBox):
+                if 'iseditable' in field:
+                    if str(field['iseditable']) == "False":
+                        widget.setReadOnly(True)
+                        widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+                if type(widget) == QLineEdit:
+                    if 'placeholder' in field:
+                        widget.setPlaceholderText(field['placeholder'])
+            elif type(widget) in (QComboBox, QCheckBox):
+                if 'iseditable' in field:
+                    if str(field['iseditable']) == "False":
+                        widget.setEnabled(False)
+            widget.setObjectName(field['widgetname'])
+            if 'iseditable' in field:
+                widget.setEnabled(bool(field['iseditable']))
+
+            put_widgets(dialog, field, lbl, widget)
+
+
+def put_widgets(dialog, field, lbl, widget):
+    """ Insert widget into layout """
+
+    layout = dialog.findChild(QGridLayout, field['layoutname'])
+    if layout in (None, 'null', 'NULL', 'Null'):
+        return
+    layout.addWidget(lbl, int(field['layoutorder']), 0)
+    layout.addWidget(widget, int(field['layoutorder']), 2)
+    layout.setColumnStretch(2, 1)
+
+
+def get_values_changed_param_user(dialog, chk, widget, field, list, value=None):
+
+    elem = {}
+    if type(widget) is QLineEdit:
+        value = getWidgetText(dialog, widget, return_string_null=False)
+    elif type(widget) is QComboBox:
+        value = get_item_data(dialog, widget, 0)
+    elif type(widget) is QCheckBox:
+        value = isChecked(dialog, widget)
+    elif type(widget) is QDateEdit:
+        value = getCalendarDate(dialog, widget)
+    # if chk is None:
+    #     elem[widget.objectName()] = value
+    elem['widget'] = str(widget.objectName())
+    elem['value'] = value
+    if chk is not None:
+        if chk.isChecked():
+            # elem['widget'] = str(widget.objectName())
+            elem['chk'] = str(chk.objectName())
+            elem['isChecked'] = str(isChecked(dialog, chk))
+            # elem['value'] = value
+
+    if 'sys_role_id' in field:
+        elem['sys_role_id'] = str(field['sys_role_id'])
+    list.append(elem)
+    global_vars.controller.log_info(str(list))
+
+
+def get_values(dialog, widget, _json=None, layer=None):
+
+    value = None
+    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit) and widget.isReadOnly() is False:
+        value = getWidgetText(dialog, widget, return_string_null=False)
+    elif type(widget) is QComboBox and widget.isEnabled():
+        value = get_item_data(dialog, widget, 0)
+    elif type(widget) is QCheckBox and widget.isEnabled():
+        value = isChecked(dialog, widget)
+    elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
+        value = getCalendarDate(dialog, widget)
+    # Only get values if layer is editable or if layer not exist(need for ApiManageComposer)
+    if layer is None or layer.isEditable():
+        # If widget.isEditable(False) return None, here control it.
+        if str(value) == '' or value is None:
+            _json[str(widget.property('columnname'))] = None
+        else:
+            _json[str(widget.property('columnname'))] = str(value)
+
+
+def set_setStyleSheet(field, widget, wtype='label'):
+
+    if field['stylesheet'] is not None:
+        if wtype in field['stylesheet']:
+            widget.setStyleSheet("QWidget{" + field['stylesheet'][wtype] + "}")
+    return widget
+
+
+def manage_all(dialog, widget_all, selector_vars):
+
+    key_modifier = QApplication.keyboardModifiers()
+    status = isChecked(dialog, widget_all)
+    index = dialog.main_tab.currentIndex()
+    widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
+    if key_modifier == Qt.ShiftModifier:
+        return
+
+    for widget in widget_list:
+        if widget_all is not None:
+            if widget == widget_all or widget.objectName() == widget_all.objectName():
+                continue
+        widget.blockSignals(True)
+        setChecked(dialog, widget, status)
+        widget.blockSignals(False)
+
+    set_selector(dialog, widget_all, False, selector_vars)
+
+
+def disable_all(dialog, result, enable):
+
+    try:
+        widget_list = dialog.findChildren(QWidget)
+        for widget in widget_list:
+            for field in result['fields']:
+                if widget.property('columnname') == field['columnname']:
+                    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
+                        widget.setReadOnly(not enable)
+                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                    elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
+                        widget.setEnabled(enable)
+                        widget.setStyleSheet("QWidget {color: rgb(0, 0, 0)}")
+                    elif type(widget) is QPushButton:
+                        # Manage the clickability of the buttons according to the configuration
+                        # in the table config_api_form_fields simultaneously with the edition,
+                        # but giving preference to the configuration when iseditable is True
+                        if not field['iseditable']:
+                            widget.setEnabled(field['iseditable'])
+                    break
+
+    except RuntimeError as e:
+        pass
+
+
+def enable_all(dialog, result):
+
+    try:
+        widget_list = dialog.findChildren(QWidget)
+        for widget in widget_list:
+            if widget.property('keepDisbled'):
+                continue
+            for field in result['fields']:
+                if widget.property('columnname') == field['columnname']:
+                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
+                        widget.setReadOnly(not field['iseditable'])
+                        if not field['iseditable']:
+                            widget.setFocusPolicy(Qt.NoFocus)
+                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                        else:
+                            widget.setFocusPolicy(Qt.StrongFocus)
+                            widget.setStyleSheet(None)
+                    elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
+                        widget.setEnabled(field['iseditable'])
+                        if not field['iseditable']:
+                            widget.setFocusPolicy(Qt.NoFocus)
+                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                        else:
+                            widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
+                                field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
+    except RuntimeError:
+        pass

@@ -31,9 +31,11 @@ from core.utils.tools_giswater import close_dialog, get_parser_value, load_setti
 from actions.parent_functs import zoom_to_rectangle, get_max_rectangle_from_coords, set_icon, \
     make_list_for_completer, set_completer_lineedit, document_insert, document_delete, document_open, \
     set_table_columns, refresh_map_canvas, draw, draw_point
-from actions.api_parent_functs import create_body, add_lineedit, get_points, draw_polygon, \
-    set_completer_object_api, populate_basic_info, set_completer_object, draw_polyline
+from actions.api_parent_functs import create_body, get_points, \
+    draw_polyline
 
+
+from lib.tools_qt import set_completer_object_api, set_completer_object, add_lineedit, populate_basic_info
 
 class GwSearch:
 
@@ -246,7 +248,7 @@ class GwSearch:
                 self.controller.show_warning(msg)
                 return
             points = get_points(list_coord)
-            draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
+            self.draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
             zoom_to_rectangle(max_x, max_y, min_x, min_y)
             self.workcat_open_table_items(item)
@@ -263,7 +265,7 @@ class GwSearch:
                 return
             points = get_points(list_coord)
             self.rubber_band.reset()
-            draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
+            self.draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
             zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
 
@@ -836,3 +838,22 @@ class GwSearch:
 
                 # Add data to workcat search form
                 widget.setText(f"Total arcs length: {length}")
+
+
+    def draw_polygon(self, points, rubber_band, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
+        """ Draw 'polygon' over canvas following list of points
+        :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+        """
+
+        rubber_band.setIconSize(20)
+        polygon = QgsGeometry.fromPolygonXY([points])
+        rubber_band.setToGeometry(polygon, None)
+        rubber_band.setColor(border)
+        if fill_color:
+            rubber_band.setFillColor(fill_color)
+        rubber_band.setWidth(width)
+        rubber_band.show()
+
+        # wait to simulate a flashing effect
+        if duration_time is not None:
+            QTimer.singleShot(duration_time, rubber_band.reset)

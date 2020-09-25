@@ -22,9 +22,9 @@ from core.utils.tools_giswater import close_dialog, get_parser_value, load_setti
     save_settings
 import global_vars
 from core.ui.ui_manager import SelectorUi, MincutManagerUi
-from actions.api_parent_functs import get_selector
 from actions.parent_functs import set_dates_from_to, set_icon, set_table_columns
 
+from lib.tools_db import get_selector
 
 class GwMincutManager:
 

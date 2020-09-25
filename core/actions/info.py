@@ -32,21 +32,25 @@ from core.actions.element import GwElement
 from core.actions.visit_gallery import GwVisitGallery
 from core.actions.visit_manager import GwVisitManager
 
-from core.utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog
+from core.utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body
 from core.utils.layer_tools import populate_info_text
 from core.ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
 
 from actions.parent_functs import set_icon, set_dates_from_to, draw, draw_point
-from actions.api_parent_functs import get_visible_layers, create_body,  populate_basic_info, put_widgets, \
-    fill_child, check_actions, action_open_url, api_action_help, get_feature_by_expr, set_setStyleSheet, \
-    set_data_type, add_lineedit, set_widget_size, manage_lineedit, add_combobox, add_checkbox, get_values, \
-    add_calendar, add_button, add_hyperlink, add_horizontal_spacer, add_vertical_spacer, \
-    add_textarea, add_spinbox, add_tableview, set_headers, populate_table, set_columns_config, set_completer_object, \
-    fill_table, clear_gridlayout, add_frame, add_label, set_completer_object_api, enable_all, disable_all
+
 from lib.tools_qgis import get_snapping_options, get_event_point, snap_to_current_layer, get_snapped_layer, \
     get_snapped_feature, add_marker, enable_snapping, snap_to_layer, apply_snapping_options, snap_to_arc, snap_to_node
 
+from lib.tools_db import get_visible_layers
+
+from lib.tools_qt import set_completer_object_api, set_completer_object, check_actions, api_action_help, \
+    set_widget_size, add_button, add_textarea, add_lineedit, set_data_type, manage_lineedit, add_tableview, \
+    set_headers, populate_table, set_columns_config, add_checkbox, add_combobox, fill_child, add_frame, add_label, \
+    add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_spinbox, fill_table, populate_basic_info, \
+    add_calendar, put_widgets, get_values, set_setStyleSheet, disable_all, enable_all, clear_gridlayout
+
+from lib.tools_qgis import get_feature_by_expr
 
 class GwInfo(QObject):
 
@@ -532,7 +536,7 @@ class GwInfo(QObject):
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, self.layer))
         action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, self.dlg_cf, self.geom_type, tab_type))
         action_rotation.triggered.connect(partial(self.change_hemisphere, self.dlg_cf))
-        action_link.triggered.connect(partial(action_open_url, self.dlg_cf, result))
+        action_link.triggered.connect(partial(self, action_open_url, self.dlg_cf, result))
         action_section.triggered.connect(partial(self.open_section_form))
         action_help.triggered.connect(partial(api_action_help, self.geom_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
@@ -3178,3 +3182,16 @@ class GwInfo(QObject):
             return
 
 
+    def action_open_url(self, dialog, result):
+
+        widget = None
+        function_name = 'no_function_associated'
+        for field in result['fields']:
+            if field['linkedaction'] == 'action_link':
+                function_name = field['widgetfunction']
+                widget = dialog.findChild(GwHyperLinkLabel, field['widgetname'])
+                break
+
+        if widget:
+            # Call def  function (self, widget)
+            getattr(sys.modules[__name__], function_name)(widget)

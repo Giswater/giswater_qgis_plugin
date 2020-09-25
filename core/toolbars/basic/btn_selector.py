@@ -12,7 +12,8 @@ from core.utils.tools_giswater import close_dialog, get_parser_value, load_setti
     save_settings
 from core.ui.ui_manager import SelectorUi
 import global_vars
-from actions.api_parent_functs import get_selector
+
+from lib.tools_db import get_selector
 
 
 class GwSelectorButton(GwParentAction):

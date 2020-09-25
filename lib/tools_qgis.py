@@ -536,3 +536,30 @@ def select_snapped_feature(result, feature_id):
 
     layer = result.layer()
     layer.select([feature_id])
+
+
+def get_feature_by_id(layer, id, field_id):
+
+    features = layer.getFeatures()
+    for feature in features:
+        if feature[field_id] == id:
+            return feature
+
+    return False
+
+
+def get_feature_by_expr(layer, expr_filter):
+
+    # Check filter and existence of fields
+    expr = QgsExpression(expr_filter)
+    if expr.hasParserError():
+        message = f"{expr.parserErrorString()}: {expr_filter}"
+        global_vars.controller.show_warning(message)
+        return
+
+    it = layer.getFeatures(QgsFeatureRequest(expr))
+    # Iterate over features
+    for feature in it:
+        return feature
+
+    return False
