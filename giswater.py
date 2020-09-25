@@ -1376,10 +1376,11 @@ class Giswater(QObject):
                 if field['label']:
                     layer.setFieldAlias(fieldIndex, field['label'])
 
+                # multiline
+                if field['widgettype'] == 'text':
+                    self.set_column_multiline(layer, field, fieldIndex)
+
                 if 'widgetcontrols' in field:
-                    # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
-                    if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
-                        self.set_column_multiline(layer, field, fieldIndex)
 
                     # Set field constraints
                     if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
@@ -1416,9 +1417,6 @@ class Giswater(QObject):
                               'field_iso_format': False}
                     editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
-                else:
-                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
-                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
         if msg_failed != "":
             self.controller.show_exceptions_msg("Execute failed.", msg_failed)
@@ -1443,10 +1441,11 @@ class Giswater(QObject):
     def set_column_multiline(self, layer, field, fieldIndex):
         """ Set multiline selected fields according table config_api_form_fields.widgetcontrols['setQgisMultiline'] """
 
-        if field['widgettype'] == 'text':
-            if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
-                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
-                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+        if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
+            editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
+        else:
+            editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': False})
+        layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
 
     def create_body(self, form='', feature='', filter_fields='', extras=None):
