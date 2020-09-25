@@ -122,7 +122,6 @@ BEGIN
 							UPDATE arc SET node_2=NEW.node_id WHERE arc_id=v_arc.arc_id AND node_2=v_node.node_id;
 						END IF;
 					ELSE
-						--RAISE EXCEPTION 'AGHSASHASH %', v_arc.arc_id;
 						-- getting values to create new 'fictius' arc
 						SELECT * INTO v_arcrecordtb FROM arc WHERE arc_id = v_arc.arc_id::text;
 							
@@ -177,9 +176,7 @@ BEGIN
 						EXECUTE v_manquerytext1||v_arcrecordtb.arc_id::text||v_manquerytext2;
 				
 						-- insert new records into epa_table
-						EXECUTE v_epaquerytext1||v_arcrecordtb.arc_id::text||v_epaquerytext2;	
-
-						
+						EXECUTE v_epaquerytext1||v_arcrecordtb.arc_id::text||v_epaquerytext2;					
 
 						--Copy addfields from old arc to new arcs	
 						INSERT INTO man_addfields_value (feature_id, parameter_id, value_param)
@@ -258,7 +255,6 @@ BEGIN
 							END IF;
 						END IF;
 							
-	
 					ELSIF (v_noderecord2.node_id = NEW.node_id) THEN
 						-- Coordinates
 						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(v_arcrec."arc_id") USING v_arcrec.the_geom, NEW.the_geom; 
