@@ -15,17 +15,21 @@ $BODY$
 DECLARE 
 v_return integer;
 v_error_context text;
+v_message json;
+
 
 BEGIN 
 
 	-- Daily updates
     
     
+    v_message = coalesce (v_message, '{}');
 
 	-- Log
-	INSERT INTO utils.audit_log (fprocesscat_id, log_message) VALUES (999, 'Ok');
-    RETURN ('{"status":"Accepted"}')::json;
-	
+	INSERT INTO utils.audit_log (fprocesscat_id, log_message) VALUES (999, '{"status":"Accepted", "message":'||v_message||'}');
+    
+    
+    RETURN ('{"status":"Accepted", "message":'||v_message||'}')::json;	
 	
 
 --  Exception handling

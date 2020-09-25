@@ -9,8 +9,8 @@ SET search_path = "utils", public, pg_catalog;
 
 
 
-UPDATE config_param_system SET value='TRUE' WHERE parameter='admin_daily_updates';
+UPDATE config_param_system SET value='TRUE' WHERE parameter='daily_update_mails';
 
 
 INSERT INTO utils.config_param_system VALUES 
-(1, 'admin_daily_updates_mails', '{"mails": [{"mail":"info@bgeo.es"},{"mail":"info@giswater.org"}]}', 'json', 'daily_update_mails', 'Daily update mails');
+(1, 'daily_update_mails', '{"mails": [{"mail":"info@bgeo.es"},{"mail":"info@giswater.org"}]}', 'json', 'daily_update_mails', 'Daily update mails');

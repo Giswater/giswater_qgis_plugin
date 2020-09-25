@@ -9,7 +9,7 @@ This version of Giswater is provided by Giswater Association
 CREATE TABLE utils.audit_log
 (
   id serial NOT NULL,
-  fid smallint,
+  fprocesscat_id smallint,
   log_message text,
   tstamp timestamp without time zone DEFAULT now(),
   user_name text DEFAULT "current_user"(),
