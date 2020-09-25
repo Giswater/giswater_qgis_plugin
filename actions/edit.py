@@ -73,6 +73,7 @@ class Edit(ParentAction):
         """ Recover snapping options when action add feature is un-checked """
         if not self.iface.actionAddFeature().isChecked():
             self.snapper_manager.recover_snapping_options()
+            self.iface.actionAddFeature().toggled.disconnect(self.action_is_checked)
 
 
     def open_new_feature(self, feature_id):
