@@ -75,6 +75,7 @@ v_message json;
 v_geomparamupdate integer;
 v_useplanpsector boolean;
 v_updatemapzone float;
+v_projecttype text;
 
 BEGIN
 
@@ -85,6 +86,9 @@ BEGIN
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
+
+        -- get project type
+        v_projecttype = (SELECT project_type FROM sys_version LIMIT 1);
 
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
@@ -205,86 +209,88 @@ BEGIN
 	v_message = '{"level": 3, "text": "Feature have been succesfully updated."}';
 
 	-- trigger automatic mapzones
-	SELECT type INTO v_type FROM cat_feature JOIN cat_feature_node USING (id) WHERE child_layer = v_tablename AND graf_delimiter !='NONE';
-
-	IF v_type = 'VALVE' AND v_closedstatus IS NOT NULL THEN
-
-		-- getting exploitation
-		v_expl = (SELECT expl_id FROM node WHERE node_id = v_id::text);
-
-		-- getting system variable
-		v_automaticmapzonetrigger = (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger');		
-		
-		IF v_automaticmapzonetrigger THEN
-
-			-- getting variables for trigger automatic mapzones
-			v_geomparamupdate = (SELECT (value::json->>'parameters')::json->>'geomParamUpdate' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
-			v_useplanpsector = (SELECT (value::json->>'parameters')::json->>'usePlanPsector' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
-			v_updatemapzone = (SELECT (value::json->>'parameters')::json->>'updateMapZone' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
+	IF v_projecttype = 'WS' THEN
 	
-			-- FOR v_mapzone
-			FOR v_mapzone IN 
-			SELECT upper(mapzone) FROM (SELECT 'sector' AS mapzone, value::json->>'SECTOR' as status FROM SCHEMA_NAME.config_param_system WHERE parameter='utils_grafanalytics_status'
-			UNION
-			SELECT 'presszone', value::json->>'PRESSZONE' FROM SCHEMA_NAME.config_param_system WHERE parameter='utils_grafanalytics_status'
-			UNION
-			SELECT 'dma', value::json->>'DMA' FROM SCHEMA_NAME.config_param_system WHERE parameter='utils_grafanalytics_status'
-			UNION
-			SELECT 'dqa', value::json->>'DQA' FROM SCHEMA_NAME.config_param_system WHERE parameter='utils_grafanalytics_status') a
-			WHERE status::boolean is true
-			LOOP
-				-- count mapzones
-				EXECUTE 'SELECT count(*) FROM (SELECT DISTINCT '||lower(v_mapzone)||'_id FROM node WHERE node_id IN 
-					(SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text)) a '
-					INTO v_count;
-			
-				IF v_closedstatus IS TRUE OR (v_closedstatus IS FALSE AND v_count = 2) THEN
+		SELECT type INTO v_type FROM cat_feature JOIN cat_feature_node USING (id) WHERE child_layer = v_tablename AND graf_delimiter !='NONE';
+		IF v_type = 'VALVE' AND v_closedstatus IS NOT NULL THEN
 
+			-- getting exploitation
+			v_expl = (SELECT expl_id FROM node WHERE node_id = v_id::text);
+
+			-- getting system variable
+			v_automaticmapzonetrigger = (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger');		
+			
+			IF v_automaticmapzonetrigger THEN
+
+				-- getting variables for trigger automatic mapzones
+				v_geomparamupdate = (SELECT (value::json->>'parameters')::json->>'geomParamUpdate' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
+				v_useplanpsector = (SELECT (value::json->>'parameters')::json->>'usePlanPsector' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
+				v_updatemapzone = (SELECT (value::json->>'parameters')::json->>'updateMapZone' FROM config_param_system WHERE parameter = 'utils_grafanalytics_automatic_trigger'); 
+		
+				-- FOR v_mapzone
+				FOR v_mapzone IN 
+				SELECT upper(mapzone) FROM (SELECT 'sector' AS mapzone, value::json->>'SECTOR' as status FROM SCHEMA_NAME.config_param_system WHERE parameter='utils_grafanalytics_status'
+				UNION
+				SELECT 'presszone', value::json->>'PRESSZONE' FROM SCHEMA_NAME.config_param_system WHERE parameter='utils_grafanalytics_status'
+				UNION
+				SELECT 'dma', value::json->>'DMA' FROM SCHEMA_NAME.config_param_system WHERE parameter='utils_grafanalytics_status'
+				UNION
+				SELECT 'dqa', value::json->>'DQA' FROM SCHEMA_NAME.config_param_system WHERE parameter='utils_grafanalytics_status') a
+				WHERE status::boolean is true
+				LOOP
 					-- count mapzones
 					EXECUTE 'SELECT count(*) FROM (SELECT DISTINCT '||lower(v_mapzone)||'_id FROM node WHERE node_id IN 
-						(SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text)) a WHERE '||lower(v_mapzone)||'_id::integer > 0 '
+						(SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text)) a '
 						INTO v_count;
+				
+					IF v_closedstatus IS TRUE OR (v_closedstatus IS FALSE AND v_count = 2) THEN
 
-					-- getting mapzone id
-					EXECUTE 'SELECT ('||lower(v_mapzone)||'_id) FROM node WHERE node_id IN (SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text) AND 
-						'||lower(v_mapzone)||'_id::integer > 0 LIMIT 1' 
-						INTO v_mapzone_id;
+						-- count mapzones
+						EXECUTE 'SELECT count(*) FROM (SELECT DISTINCT '||lower(v_mapzone)||'_id FROM node WHERE node_id IN 
+							(SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text)) a WHERE '||lower(v_mapzone)||'_id::integer > 0 '
+							INTO v_count;
 
-					-- getting nodeheader id
-					EXECUTE 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' FROM '||lower(v_mapzone)||' WHERE '||lower(v_mapzone)||'_id = '||quote_literal(v_mapzone_id)
-					INTO v_nodeheader;
+						-- getting mapzone id
+						EXECUTE 'SELECT ('||lower(v_mapzone)||'_id) FROM node WHERE node_id IN (SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text) AND 
+							'||lower(v_mapzone)||'_id::integer > 0 LIMIT 1' 
+							INTO v_mapzone_id;
 
-					-- execute grafanalytics function from nodeheader				
-					IF v_nodeheader IS NOT NULL THEN
-						v_querytext = '{"data":{"parameters":{"grafClass":"'||v_mapzone||'", "exploitation":['||v_expl||'], "floodFromNode":"'||v_nodeheader||'", "checkData":false, "updateFeature":true, 
-						"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_geomparamupdate||',"debug":false, "usePlanPsector":'||v_useplanpsector||', "forceOpen":[], "forceClosed":[]}}}';
+						-- getting nodeheader id
+						EXECUTE 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' FROM '||lower(v_mapzone)||' WHERE '||lower(v_mapzone)||'_id = '||quote_literal(v_mapzone_id)
+						INTO v_nodeheader;
+
+						-- execute grafanalytics function from nodeheader				
+						IF v_nodeheader IS NOT NULL THEN
+							v_querytext = '{"data":{"parameters":{"grafClass":"'||v_mapzone||'", "exploitation":['||v_expl||'], "floodFromNode":"'||v_nodeheader||'", "checkData":false, "updateFeature":true, 
+							"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_geomparamupdate||',"debug":false, "usePlanPsector":'||v_useplanpsector||', "forceOpen":[], "forceClosed":[]}}}';
+						ELSE
+							v_querytext = '{"data":{"parameters":{"grafClass":"'||v_mapzone||'", "exploitation":['||v_expl||'], "checkData":false, "updateFeature":true, 
+							"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_geomparamupdate||',"debug":false, "usePlanPsector":'||v_useplanpsector||', "forceOpen":[], "forceClosed":[]}}}';
+						END IF;
+								
+						PERFORM gw_fct_grafanalytics_mapzones(v_querytext::json);
+
+						-- return message 
+						IF v_closedstatus IS TRUE THEN
+							v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully closed. Maybe this operation have been affected on mapzones. Take a look on map for check it"}';
+						ELSIF v_closedstatus IS FALSE THEN
+							IF v_count= 1 THEN
+								v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. If there were disconnected elements, it have been reconnected to mapzone"}';
+							ELSIF v_count =  2 THEN
+								v_message = '{"level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Be carefull because there is a conflict againts two mapzones"}';
+							END IF;
+						END IF;
 					ELSE
-						v_querytext = '{"data":{"parameters":{"grafClass":"'||v_mapzone||'", "exploitation":['||v_expl||'], "checkData":false, "updateFeature":true, 
-						"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_geomparamupdate||',"debug":false, "usePlanPsector":'||v_useplanpsector||', "forceOpen":[], "forceClosed":[]}}}';
-					END IF;
-							
-					PERFORM gw_fct_grafanalytics_mapzones(v_querytext::json);
 
 					-- return message 
-					IF v_closedstatus IS TRUE THEN
-						v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully closed. Maybe this operation have been affected on mapzones. Take a look on map for check it"}';
-					ELSIF v_closedstatus IS FALSE THEN
-						IF v_count= 1 THEN
-							v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. If there were disconnected elements, it have been reconnected to mapzone"}';
-						ELSIF v_count =  2 THEN
-							v_message = '{"level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Be carefull because there is a conflict againts two mapzones"}';
-						END IF;
+					v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened and no mapzones have been updated"}';
+											
 					END IF;
-				ELSE
-
+				END LOOP;
+			ELSE 
 				-- return message 
-				v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened and no mapzones have been updated"}';
-										
-				END IF;
-			END LOOP;
-		ELSE 
-			-- return message 
-			v_message = '{"level": 0, "text": "Feature succesfully updated. Valve status have been succesfully updated but automatic trigger is not enabled to recalculate DYNAMIC MAPZONES"}';							
+				v_message = '{"level": 0, "text": "Feature succesfully updated. Valve status have been succesfully updated but automatic trigger is not enabled to recalculate DYNAMIC MAPZONES"}';			
+			END IF;
 		END IF;
 	END IF;
 
