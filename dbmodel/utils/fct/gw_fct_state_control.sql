@@ -21,6 +21,7 @@ v_psector_vdefault integer;
 v_num_feature integer;
 v_downgrade_force boolean;
 v_state_type integer;
+v_psector_list text;
 
 rec_feature record;
 
@@ -38,10 +39,20 @@ BEGIN
 			IF state_aux!=v_old_state AND (v_downgrade_force IS NOT TRUE) THEN
 
 				-- arcs control
-				SELECT count(arc.arc_id) INTO v_num_feature FROM node, arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state > 0;
+				SELECT count(arc.arc_id) INTO v_num_feature FROM arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state = 1;
 				IF v_num_feature > 0 THEN 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"1072", "function":"2130","debug_msg":"'||feature_id_aux||'"}}$$);';
+				END IF;
+
+				SELECT count(arc.arc_id) INTO v_num_feature FROM arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state = 2;
+				IF v_num_feature > 0 THEN 
+					SELECT string_agg(name::text, ', ') INTO v_psector_list FROM ws_sample34.plan_psector_x_arc JOIN plan_psector USING (psector_id) where arc_id IN 
+					(SELECT arc.arc_id FROM arc WHERE (node_1='1070' OR node_2='1070') AND arc.state = 2); 
+					
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3140", "function":"2130","debug_msg":"'||v_psector_list||'"}}$$);';
+					
 				END IF;
 
 				--link feature control

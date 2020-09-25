@@ -61,3 +61,8 @@ VALUES ('3002', 'gw_fct_setplan','{"style":{"point":{"style":"unique", "values":
 DELETE FROM sys_function WHERE id = 2660;
 DELETE FROM sys_function WHERE id = 2588;
 DELETE FROM sys_function WHERE id = 2722;
+
+--2020/09/25
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
+VALUES (3140, 'Node is connected to arc which is involved in psector', 
+	'Try replacing node with feature replace tool or disconnect it using end feature tool', 2,TRUE,'utils') ON CONFLICT (id) DO NOTHING;
