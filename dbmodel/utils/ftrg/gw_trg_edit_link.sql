@@ -177,7 +177,7 @@ BEGIN
 			END IF;
 			
 			--update connec or plan_psector_x_connec.arc_id
-			IF NEW.ispsectorgeom IS FALSE THEN
+			IF NEW.ispsectorgeom IS NOT TRUE THEN
 				UPDATE connec SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id, 
 				expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
 				WHERE connec_id=v_connec1.connec_id;
@@ -189,7 +189,7 @@ BEGIN
 			IF v_projectype='UD' THEN
 			
 				--update gully or plan_psector_x_gully.arc_id
-				IF NEW.ispsectorgeom IS FALSE THEN
+				IF NEW.ispsectorgeom IS NOT TRUE THEN
 					UPDATE gully SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id,
 					expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
 					WHERE gully_id=v_gully1.gully_id;
@@ -197,7 +197,7 @@ BEGIN
 					UPDATE plan_psector_x_gully SET arc_id=v_arc.arc_id WHERE plan_psector_x_gully.id=NEW.psector_rowid;
 				END IF;
 				
-			ELSIF v_projectype='WS' AND NEW.ispsectorgeom IS FALSE THEN
+			ELSIF v_projectype='WS' AND NEW.ispsectorgeom IS NOT TRUE THEN
 				UPDATE connec SET presszone_id = v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id
 				WHERE connec_id=v_connec1.connec_id;
 			END IF;
@@ -216,9 +216,9 @@ BEGIN
 			END IF;
 
 			--update connec or plan_psector_x_connec.arc_id
-			IF NEW.ispsectorgeom IS FALSE THEN
-				UPDATE connec SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id, 
-				expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
+			IF NEW.ispsectorgeom IS NOT TRUE THEN
+				UPDATE connec SET arc_id=v_arc.arc_id, featurecat_id=v_node.node_type, feature_id=v_node.node_id,
+				expl_id=v_node.expl_id, dma_id=v_node.dma_id, sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
 				WHERE connec_id=v_connec1.connec_id;
 			ELSIF NEW.ispsectorgeom IS TRUE THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -229,16 +229,16 @@ BEGIN
 			IF v_projectype='UD' THEN
 			
 				--update gully or plan_psector_x_gully.arc_id
-				IF NEW.ispsectorgeom IS FALSE THEN
-					UPDATE gully SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id,
-					expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
+				IF NEW.ispsectorgeom IS NOT TRUE THEN
+					UPDATE gully SET arc_id=v_arc.arc_id, featurecat_id=v_node.node_type, feature_id=v_node.node_id,
+					expl_id=v_node.expl_id, dma_id=v_node.dma_id, sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
 					WHERE gully_id=v_gully1.gully_id;
 				ELSIF NEW.ispsectorgeom IS TRUE THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';				
 				END IF;
 				
-			ELSIF v_projectype='WS' AND NEW.ispsectorgeom IS FALSE THEN
+			ELSIF v_projectype='WS' AND NEW.ispsectorgeom IS NOT TRUE THEN
 				UPDATE connec SET presszone_id = v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id
 				WHERE connec_id=v_connec1.connec_id;
 				
@@ -252,7 +252,7 @@ BEGIN
 		ELSIF v_connec2.connec_id IS NOT NULL THEN
 
 			--update connec or plan_psector_x_connec.arc_id
-			IF NEW.ispsectorgeom IS FALSE THEN
+			IF NEW.ispsectorgeom IS NOT TRUE THEN
 				UPDATE connec SET arc_id=v_connec2.arc_id, expl_id=v_connec2.expl_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, 
 				sector_id=v_connec2.sector_id, pjoint_type=v_connec2.pjoint_type, pjoint_id=v_connec2.pjoint_id
 				WHERE connec_id=v_connec1.connec_id;
@@ -265,7 +265,7 @@ BEGIN
 			IF v_projectype='UD' THEN
 			
 				--update gully or plan_psector_x_gully.arc_id
-				IF NEW.ispsectorgeom IS FALSE THEN
+				IF NEW.ispsectorgeom IS NOT TRUE THEN
 					UPDATE gully SET arc_id=v_connec2.arc_id, expl_id=v_connec2.expl_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, 
 					sector_id=v_connec2.sector_id, pjoint_type=v_connec2.pjoint_type, pjoint_id=v_connec2.pjoint_id
 					WHERE gully_id=v_gully1.gully_id;
@@ -274,7 +274,7 @@ BEGIN
 					"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';				
 				END IF;
 		
-			ELSIF v_projectype='WS' AND NEW.ispsectorgeom IS FALSE THEN
+			ELSIF v_projectype='WS' AND NEW.ispsectorgeom IS NOT TRUE THEN
 				UPDATE connec SET presszone_id = v_connec2.presszone_id, dqa_id=v_connec2.dqa_id, minsector_id=v_connec2.minsector_id
 				WHERE connec_id=v_connec1.connec_id;	
 			END IF;
@@ -289,13 +289,13 @@ BEGIN
 			IF v_gully2.gully_id IS NOT NULL THEN
 
 				--update gully or plan_psector_x_gully.arc_id
-				IF NEW.ispsectorgeom IS FALSE THEN
+				IF NEW.ispsectorgeom IS NOT TRUE THEN
 					UPDATE gully SET arc_id=v_gully2.arc_id, expl_id=v_gully2.expl_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, 
-					sector_id=v_gully2.sector_id
+					sector_id=v_gully2.sector_id, pjoint_type=v_gully2.pjoint_type, pjoint_id=v_gully2.pjoint_id
 					WHERE gully_id=v_gully1.gully_id;
 					
 					UPDATE connec SET arc_id=v_gully2.arc_id, expl_id=v_gully2.expl_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, 
-					sector_id=v_gully2.sector_id
+					sector_id=v_gully2.sector_id, pjoint_type=v_gully2.pjoint_type, pjoint_id=v_gully2.pjoint_id
 					WHERE connec_id=v_connec1.connec_id;
 				ELSIF NEW.ispsectorgeom IS TRUE THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -354,7 +354,7 @@ BEGIN
 		
 	ELSIF TG_OP = 'UPDATE' THEN 
 				
-		IF NEW.ispsectorgeom IS FALSE THEN -- if geometry comes from link table
+		IF NEW.ispsectorgeom IS NOT TRUE THEN -- if geometry comes from link table
 
 			IF st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
 				UPDATE link SET userdefined_geom='TRUE', exit_id = NEW.exit_id , exit_type = NEW.exit_type, 
