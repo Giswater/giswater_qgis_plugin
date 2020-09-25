@@ -366,7 +366,20 @@ BEGIN
 				VALUES (143, v_result_id, concat('Reconnect arc ',rec_arc.arc_id,'.'));
 			END LOOP;
 		END IF;
-		
+
+			-- update node_id on on going or planned psectors
+		IF v_feature_type='node' THEN
+			SELECT count(psector_id) INTO v_count FROM plan_psector_x_node JOIN plan_psector USING (psector_id) 
+			WHERE status in (1,2) AND node_id = v_old_feature_id;
+			IF v_count > 0 THEN
+				UPDATE plan_psector_x_node SET node_id = v_id FROM plan_psector pp
+				WHERE pp.psector_id = plan_psector_x_node.psector_id AND status in (1,2) AND node_id = v_old_feature_id;
+
+				INSERT INTO audit_check_data (fid, result_id, error_message)
+				VALUES (143, v_result_id, concat('Replace node id in ',v_count,' psector.'));
+			END IF;
+		END IF;
+
 		-- upgrading and downgrading features
 		v_state_type = (SELECT id FROM value_state_type WHERE state=0 LIMIT 1);
 		
