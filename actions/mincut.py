@@ -1386,6 +1386,7 @@ class MincutParent(ParentAction):
 
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.canceled = False
+
         # Vertex marker
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setColor(QColor(255, 100, 255))
@@ -1400,13 +1401,6 @@ class MincutParent(ParentAction):
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 
-        # Disable snapping
-        self.snapper_manager.enable_snapping()
-        # Set snapping to 'arc' and 'node'
-        self.snapper_manager.set_snapping_layers()
-        self.snapper_manager.snap_to_arc()
-        #self.snapper_manager.snap_to_node()
-
         # Set signals
         self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)        
         self.emit_point.canvasClicked.connect(self.auto_mincut_snapping)
@@ -1419,7 +1413,7 @@ class MincutParent(ParentAction):
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        result = self.snapper_manager.snap_to_background_layers(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if not self.snapper_manager.result_is_valid():
             return
 
@@ -1438,7 +1432,6 @@ class MincutParent(ParentAction):
             self.auto_mincut_execute(element_id, elem_type, point.x(), point.y())
             self.set_visible_mincut_layers()
             self.snapper_manager.recover_snapping_options()
-
 
 
     def set_visible_mincut_layers(self, zoom=False):
@@ -1597,48 +1590,45 @@ class MincutParent(ParentAction):
 
     def custom_mincut(self):
         """ B2-123: Custom mincut analysis. Working just with layer Valve analytics """
-        # Need this 3 lines here becouse if between one action and another we activate Pan, we cant open another valve
-        # This is a safety measure
 
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
+        # Store user snapping configuration
+        self.snapper_manager.store_snapping_options()
 
-        # Disconnect previous connections
-        self.disconnect_snapping(False)
-        
-        # Vertex marker
+        # Set vertex marker propierties
         self.vertex_marker = QgsVertexMarker(self.canvas)
         self.vertex_marker.setColor(QColor(255, 100, 255))
         self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        self.vertex_marker.setPenWidth(3)        
-        
-        # Set snapping icon to circle
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        self.vertex_marker.setPenWidth(3)
 
-        # Set active layer
-        viewname = 'v_anl_mincut_result_valve'
-        layer = self.controller.get_layer_by_tablename(viewname, log_info=True)
-        if layer:
-            self.iface.setActiveLayer(layer)
-            self.controller.set_layer_visible(layer)
-            self.canvas.xyCoordinates.connect(self.mouse_move_valve)
-            self.emit_point.canvasClicked.connect(self.custom_mincut_snapping)
+        # Set active and current layer
+        self.layer = self.controller.get_layer_by_tablename("v_anl_mincut_result_valve")
+        self.iface.setActiveLayer(self.layer)
+        self.current_layer = self.layer
+
+        # Waiting for signals
+        self.canvas.xyCoordinates.connect(self.mouse_move_valve)
+        self.emit_point.canvasClicked.connect(self.custom_mincut_snapping)
+
+        # Waiting for signals
+        self.canvas.xyCoordinates.connect(self.mouse_move_valve)
+        self.emit_point.canvasClicked.connect(self.custom_mincut_snapping)
 
 
     def mouse_move_valve(self, point):
+        """ Waiting for valves when mouse is moved"""
 
         # Get clicked point
-        self.vertex_marker.hide()
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if self.snapper_manager.result_is_valid():
             layer = self.snapper_manager.get_snapped_layer(result)
+
             # Check feature
-            viewname = self.controller.get_layer_source_table_name(layer)
-            if viewname == 'v_anl_mincut_result_valve':
+            tablename = self.controller.get_layer_source_table_name(layer)
+            if tablename == 'v_anl_mincut_result_valve':
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
@@ -1663,48 +1653,54 @@ class MincutParent(ParentAction):
             if viewname == 'v_edit_arc':
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
+    def custom_mincut_snapping(self, point, btn):
+        """ Custom mincut: Snapping to 'valve layers"""
 
-    def custom_mincut_snapping(self, point, btn): # @UnusedVariable
-        """ Custom mincut snapping function """
-
-        # Get clicked point
+        # Get coordinates
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
-        if self.snapper_manager.result_is_valid():
-            # Check feature
-            layer = self.snapper_manager.get_snapped_layer(result)
-            viewname = self.controller.get_layer_source_table_name(layer)
-            if viewname == 'v_anl_mincut_result_valve':
-                # Get the point. Leave selection
-                snapped_feat = self.snapper_manager.get_snapped_feature(result, True)
-                element_id = snapped_feat.attribute('node_id')
-                self.custom_mincut_execute(element_id)
-                self.set_visible_mincut_layers()
+        if not self.snapper_manager.result_is_valid():
+            return
+
+        # Check feature
+        layer = self.snapper_manager.get_snapped_layer(result)
+
+        print("feature_type")
+
+        snapped_feature = self.snapper_manager.get_snapped_feature(result)
+        feature_id = self.snapper_manager.get_snapped_feature_id(result)
+        element_id = snapped_feature.attribute('node_id')
+        print(element_id)
+        layer.select([feature_id])
+
+        # call custom mincut function
+        self.custom_mincut_execute(element_id)
+
+        # Recover snapping options, refresh canvas & set visible layers
+        self.snapper_manager.recover_snapping_options()
+        self.refresh_map_canvas(True)
+        self.set_visible_mincut_layers()
 
 
     def custom_mincut_execute(self, elem_id):
-        """ Custom mincut. Execute function 'gw_fct_mincut_valve_unaccess' """ 
-        
-        # Change cursor to 'WaitCursor'     
-        self.set_cursor_wait()                
-        
-        cur_user = self.controller.get_project_user()               
+        """ Custom mincut. Execute function 'gw_fct_mincut_valve_unaccess' """
+
+        # Change cursor to 'WaitCursor'
+        self.set_cursor_wait()
+
+        cur_user = self.controller.get_project_user()
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
-            sql = (f"SELECT gw_fct_mincut_valve_unaccess"
-                   f"('{elem_id}', '{result_mincut_id}', '{cur_user}');")
+            sql = f"SELECT gw_fct_mincut_valve_unaccess('{elem_id}', '{result_mincut_id}', '{cur_user}');"
             status = self.controller.execute_sql(sql, log_sql=False)
             if status:
                 message = "Custom mincut executed successfully"
                 self.controller.show_info(message)
 
-        # Refresh map canvas
-        self.refresh_map_canvas(True)
-                
         # Disconnect snapping and related signals
-        self.disconnect_snapping(False)        
+        self.disconnect_snapping(False)
 
 
     def remove_selection(self):
