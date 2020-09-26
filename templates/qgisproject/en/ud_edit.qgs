@@ -904,7 +904,7 @@ def my_form_open(dialog, layer, feature):
       <editforminitcodesource>0</editforminitcodesource>
       <editforminitfilepath></editforminitfilepath>
       <editforminitcode><![CDATA[]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable/>
       <labelOnTop/>
@@ -1198,7 +1198,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="connec_id"/>
@@ -1445,7 +1445,7 @@ def my_form_open(dialog, layer, feature):
       <editforminitcodesource>0</editforminitcodesource>
       <editforminitfilepath></editforminitfilepath>
       <editforminitcode><![CDATA[]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable/>
       <labelOnTop/>
@@ -1706,7 +1706,7 @@ def my_form_open(dialog, layer, feature):
       <editforminitcodesource>0</editforminitcodesource>
       <editforminitfilepath></editforminitfilepath>
       <editforminitcode><![CDATA[]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable/>
       <labelOnTop/>
@@ -3534,7 +3534,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="annotation"/>
@@ -3885,7 +3885,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="0" name="id"/>
@@ -4079,7 +4079,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="0" name="id"/>
@@ -5148,7 +5148,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="accessibility"/>
@@ -6954,7 +6954,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="comment"/>
@@ -7247,7 +7247,7 @@ def my_form_open(dialog, layer, feature):
       <editforminitcodesource>0</editforminitcodesource>
       <editforminitfilepath></editforminitfilepath>
       <editforminitcode><![CDATA[]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable/>
       <labelOnTop/>
@@ -7807,7 +7807,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="buildercat_id"/>
@@ -8076,7 +8076,7 @@ def my_form_open(dialog, layer, feature):
       <editforminitcodesource>0</editforminitcodesource>
       <editforminitfilepath></editforminitfilepath>
       <editforminitcode><![CDATA[]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable/>
       <labelOnTop/>
@@ -9116,7 +9116,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="annotation"/>
@@ -9700,7 +9700,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="dma_id"/>
@@ -11155,7 +11155,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="annotation"/>
@@ -11587,7 +11587,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="enddate"/>
@@ -12161,7 +12161,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="builtdate"/>
@@ -12415,7 +12415,7 @@ def my_form_open(dialog, layer, feature):
       <editforminitcodesource>0</editforminitcodesource>
       <editforminitfilepath></editforminitfilepath>
       <editforminitcode><![CDATA[]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable/>
       <labelOnTop/>
@@ -13881,7 +13881,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="node_id"/>
@@ -14110,7 +14110,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="gully_id"/>
@@ -14339,7 +14339,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="node_id"/>
@@ -14568,7 +14568,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="node_id"/>
@@ -14791,7 +14791,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>0</featformsuppress>
+      <featformsuppress>2</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="node_id"/>
