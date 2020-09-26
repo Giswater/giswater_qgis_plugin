@@ -52,8 +52,6 @@ BEGIN
 
         END IF;
 
-        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"2", "function":"1306","debug_msg":null}}$$);';
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
