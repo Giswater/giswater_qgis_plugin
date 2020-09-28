@@ -1522,7 +1522,7 @@ class GwMincut:
             self.auto_mincut_execute(element_id, elem_type, snapped_point.x(), snapped_point.y())
             self.set_visible_mincut_layers()
             apply_snapping_options(self.previous_snapping)
-
+            self.remove_selection()
 
 
     def set_visible_mincut_layers(self, zoom=False):
@@ -1767,6 +1767,8 @@ class GwMincut:
                 element_id = snapped_feat.attribute('node_id')
                 self.custom_mincut_execute(element_id)
                 self.set_visible_mincut_layers()
+                self.remove_selection()
+
 
     def custom_mincut_execute(self, elem_id):
         """ Custom mincut. Execute function 'gw_fct_mincut_valve_unaccess' """
