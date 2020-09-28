@@ -47,7 +47,8 @@ BEGIN
 
 				SELECT count(arc.arc_id) INTO v_num_feature FROM arc WHERE (node_1=feature_id_aux OR node_2=feature_id_aux) AND arc.state = 2;
 				IF v_num_feature > 0 THEN 
-					SELECT string_agg(name::text, ', ') INTO v_psector_list FROM ws_sample34.plan_psector_x_arc JOIN plan_psector USING (psector_id) where arc_id IN 
+					SELECT string_agg(name::text, ', ') INTO v_psector_list FROM plan_psector_x_arc 
+					JOIN plan_psector USING (psector_id) where arc_id IN 
 					(SELECT arc.arc_id FROM arc WHERE (node_1='1070' OR node_2='1070') AND arc.state = 2); 
 					
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
