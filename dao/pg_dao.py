@@ -12,7 +12,9 @@ import psycopg2.extras
 class PgDao(object):
 
     def __init__(self):
+
         self.last_error = None
+        self.set_search_path = None
 
 
     def init_db(self):
@@ -46,11 +48,22 @@ class PgDao(object):
         return status
 
 
+    def reset_db(self):
+        """ Reset database connection """
+
+        self.init_db()
+        if self.set_search_path:
+            print(f"reset_db: {self.set_search_path}")
+            self.execute_sql(self.set_search_path)
+        else:
+            print(f"reset_db: self.set_search_path is None")
+
+
     def check_cursor(self):
         """ Check if cursor is closed """
 
         if self.cursor.closed:
-            self.init_db()
+            self.reset_db()
 
 
     def cursor_execute(self, sql):
@@ -65,9 +78,9 @@ class PgDao(object):
         try:
             self.conn.poll()
         except psycopg2.InterfaceError:
-            self.init_db()
+            self.reset_db()
         except psycopg2.OperationalError:
-            self.init_db()
+            self.reset_db()
 
 
     def get_conn_encoding(self):
