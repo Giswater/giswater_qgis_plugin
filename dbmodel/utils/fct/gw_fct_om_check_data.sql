@@ -852,7 +852,7 @@ BEGIN
 		VALUES (125, 3, concat('ERROR: There are ',v_count,' planned connecs or gullys without reference link'), v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, error_message, fcount)
-		VALUES (125, 1, 'INFO: All features have a diferent ID to be correctly identified', v_count);
+		VALUES (125, 1, 'INFO: All planned connecs or gullys have a reference link', v_count);
 	END IF;
 
 	--	
