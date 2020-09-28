@@ -656,7 +656,14 @@ BEGIN
 			
 			END LOOP;
 		END IF;       
-			
+		
+		--update values of related connecs;
+		IF NEW.fluid_type != OLD.fluid_type THEN
+			UPDATE connec SET fluid_type = NEW.fluid_type WHERE arc_id = NEW.arc_id;
+			UPDATE gully SET fluid_type = NEW.fluid_type WHERE arc_id = NEW.arc_id;
+		END IF;
+
+
 		RETURN NEW;
 
 	 ELSIF TG_OP = 'DELETE' THEN

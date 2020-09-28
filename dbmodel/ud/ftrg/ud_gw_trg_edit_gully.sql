@@ -338,7 +338,7 @@ BEGIN
 
 		--Location type
 		IF NEW.location_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_location_vdefault' AND cur_user = current_user)  = v_featurecat THEN
-			NEW.location_type = (SELECT value FROM config_param_user WHERE parameter = 'featureval_location_vdefault' AND cur_user = current_user);
+			NEW.location_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_featureval_location_vdefault' AND cur_user = current_user);
 		END IF;
 
 		IF NEW.location_type IS NULL THEN
@@ -346,6 +346,10 @@ BEGIN
 		END IF;
 
 		--Fluid type
+		IF NEW.arc_id IS NOT NULL THEN
+				NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
+		END IF;
+
 		IF NEW.fluid_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_fluid_vdefault' AND cur_user = current_user)  = v_featurecat THEN
 			NEW.fluid_type = (SELECT value FROM config_param_user WHERE parameter = 'edit_featureval_fluid_vdefault' AND cur_user = current_user);
 		END IF;
@@ -671,6 +675,11 @@ BEGIN
 						UPDATE polygon SET the_geom = v_the_geom_pol WHERE pol_id = (SELECT pol_id FROM gully WHERE gully_id = NEW.gully_id);
 					END IF;
 				END IF;
+		END IF;
+
+		--fluid_type
+		IF NEW.arc_id IS NOT NULL THEN
+			NEW.fluid_type = (SELECT fluid_type FROM arc WHERE arc_id = NEW.arc_id);
 		END IF;
 
 		-- UPDATE values

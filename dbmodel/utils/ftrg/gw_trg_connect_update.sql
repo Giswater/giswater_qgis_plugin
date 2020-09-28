@@ -80,6 +80,12 @@ BEGIN
 			FROM arc a WHERE a.arc_id = NEW.arc_id;
 		END IF;
 
+		IF v_projectype = 'UD' AND NEW.arc_id IS NOT NULL THEN
+			-- update fields that inherit values from arc
+			UPDATE v_edit_connec SET fluid_type = a.fluid_type FROM arc a WHERE a.arc_id = NEW.arc_id;
+			UPDATE v_edit_gully SET fluid_type = a.fluid_type FROM arc a WHERE a.arc_id = NEW.arc_id;
+		END IF;
+
 	ELSIF v_featuretype='gully' THEN
 	
 		-- Updating polygon geometry in case of exists it
