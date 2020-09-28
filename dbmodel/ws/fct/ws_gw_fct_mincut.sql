@@ -125,7 +125,7 @@ BEGIN
     -- save psector selector 
     DELETE FROM temp_table WHERE fid=288 AND cur_user=current_user;
     INSERT INTO temp_table (fid, text_column)
-    SELECT 288, (array_agg(state_id)) FROM selector_psector WHERE cur_user=current_user;
+    SELECT 288, (array_agg(psector_id)) FROM selector_psector WHERE cur_user=current_user;
 
     -- set psector selector
     DELETE FROM selector_psector WHERE cur_user=current_user;
