@@ -1562,6 +1562,7 @@ class MincutParent(ParentAction):
             self.auto_mincut_execute(element_id, elem_type, snapped_point.x(), snapped_point.y())
             self.set_visible_mincut_layers()
             self.snapper_manager.recover_snapping_options()
+            self.remove_selection()
 
 
     def set_visible_mincut_layers(self, zoom=False):
@@ -1818,6 +1819,7 @@ class MincutParent(ParentAction):
         self.snapper_manager.recover_snapping_options()
         self.refresh_map_canvas(True)
         self.set_visible_mincut_layers()
+        self.remove_selection()
 
 
     def custom_mincut_execute(self, elem_id):
