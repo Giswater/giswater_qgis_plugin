@@ -121,6 +121,15 @@ BEGIN
     -- set state selector
     DELETE FROM selector_state WHERE cur_user=current_user;
     INSERT INTO selector_state (state_id ,cur_user) VALUES (1, current_user);
+
+    -- save psector selector 
+    DELETE FROM temp_table WHERE fid=288 AND cur_user=current_user;
+    INSERT INTO temp_table (fid, text_column)
+    SELECT 288, (array_agg(state_id)) FROM selector_psector WHERE cur_user=current_user;
+
+    -- set psector selector
+    DELETE FROM selector_psector WHERE cur_user=current_user;
+
     
     IF v_debug THEN
 	RAISE NOTICE '4-update values of mincut cat table';
@@ -327,6 +336,11 @@ BEGIN
 	INSERT INTO selector_state (state_id, cur_user)
 	select unnest(text_column::integer[]), current_user from temp_table where fid=199 and cur_user=current_user
 	ON CONFLICT (state_id, cur_user) DO NOTHING;
+
+	-- restore state selector
+	INSERT INTO selector_psector (psector_id, cur_user)
+	select unnest(text_column::integer[]), current_user from temp_table where fid=288 and cur_user=current_user
+	ON CONFLICT (psector_id, cur_user) DO NOTHING;
 
 	-- returning
 	IF v_audit_result is null THEN

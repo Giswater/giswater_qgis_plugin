@@ -73,6 +73,9 @@ VALUES (286, 'Null values on raingage timeseries', 'ud') ON CONFLICT (fid) DO NO
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type)
 VALUES (287, 'Null values on raingage file', 'ud') ON CONFLICT (fid) DO NOTHING;
 
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type)
+VALUES (288, 'Store psector values for specific user', 'utils') ON CONFLICT (fid) DO NOTHING;
+
 
 -- 2020/17/09
 
