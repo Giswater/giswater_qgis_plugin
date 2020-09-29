@@ -15,7 +15,7 @@ from datetime import datetime
 
 from lib import qt_tools
 from ..parent_action import GwParentAction
-from ...utils.giswater_tools import close_dialog, load_settings, open_dialog
+from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, create_body
 from ....ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
 from ....actions.parent_functs import set_icon
 from ....actions.parent_manage_funct import remove_selection, set_selectionbehavior, \
@@ -308,6 +308,10 @@ class GwEndFeatureButton(GwParentAction):
             status = self.controller.execute_sql(sql, log_sql=False)
             if status:
                 self.controller.show_info("Features updated successfully!")
+
+        feature = f'"featureType":"{geom_type}", "featureId":"{ids_list}"'
+        body = create_body(feature=feature)        
+        self.controller.get_json('gw_fct_setendfeature', body)
 
 
     def fill_table(self, widget, table_name, filter_):
