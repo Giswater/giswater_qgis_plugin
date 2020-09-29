@@ -7,12 +7,12 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2120
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_check_delete(text, text);
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_check_delete(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_check_delete(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getcheckdelete(p_data json)
   RETURNS json AS
 $BODY$
 /*
-SELECT SCHEMA_NAME.gw_fct_check_delete($${
+SELECT SCHEMA_NAME.gw_fct_getcheckdelete($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"id":"1007","featureType":"NODE"},
 "data":{}}$$)

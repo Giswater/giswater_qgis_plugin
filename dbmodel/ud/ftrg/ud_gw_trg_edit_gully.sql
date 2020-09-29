@@ -730,7 +730,7 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
 	
-		EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":4, "infoType":1, "lang":"ES"},
+		EXECUTE 'SELECT gw_fct_getcheckdelete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"'||OLD.gully_id||'","featureType":"GULLY"}, "data":{}}$$)';
 	-- delete from polygon table (before the deletion of gully)
 	DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM gully WHERE gully_id=OLD.gully_id);

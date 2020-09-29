@@ -566,7 +566,7 @@ BEGIN
 
      ELSIF TG_OP = 'DELETE' THEN 
 		
-		EXECUTE 'SELECT gw_fct_check_delete($${"client":{"device":4, "infoType":1, "lang":"ES"},
+		EXECUTE 'SELECT gw_fct_getcheckdelete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"'||OLD.arc_id||'","featureType":"ARC"}, "data":{}}$$)';
  
         DELETE FROM arc WHERE arc_id = OLD.arc_id;

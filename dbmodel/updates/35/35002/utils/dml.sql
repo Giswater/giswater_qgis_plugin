@@ -74,3 +74,5 @@ VALUES (3142, 'Node is involved in psector',
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
 VALUES (3004, 'gw_fct_setendfeature', 'utils', 'function','json', 'json', 
 'Function that controls actions related to setting feature to obsolete', 'role_edit', NULL) ON CONFLICT (id) DO NOTHING;
+
+UPDATE sys_function SET function_name='gw_fct_getcheckdelete' WHERE function_name='gw_fct_check_delete';
