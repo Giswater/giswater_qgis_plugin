@@ -66,3 +66,11 @@ DELETE FROM sys_function WHERE id = 2722;
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
 VALUES (3140, 'Node is connected to arc which is involved in psector', 
 	'Try replacing node with feature replace tool or disconnect it using end feature tool', 2,TRUE,'utils') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
+VALUES (3142, 'Node is involved in psector', 
+	'Node is going to be disconnected and set to obsolete.', 1,TRUE,'utils') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
+VALUES (3004, 'gw_fct_setendfeature', 'utils', 'function','json', 'json', 
+'Function that controls actions related to setting feature to obsolete', 'role_edit', NULL) ON CONFLICT (id) DO NOTHING;
