@@ -76,6 +76,8 @@ v_geomparamupdate integer;
 v_useplanpsector boolean;
 v_updatemapzone float;
 v_projecttype text;
+v_oppositenode text;
+
 
 BEGIN
 
@@ -229,16 +231,16 @@ BEGIN
 		
 				-- FOR v_mapzone
 				FOR v_mapzone IN 
-				SELECT upper(mapzone) FROM (SELECT 'sector' AS mapzone, value::json->>'SECTOR' as status FROM SCHEMA_NAME.config_param_system WHERE parameter='utils_grafanalytics_status'
+				SELECT upper(mapzone) FROM (SELECT 'sector' AS mapzone, value::json->>'SECTOR' as status FROM config_param_system WHERE parameter='utils_grafanalytics_status'
 				UNION
-				SELECT 'presszone', value::json->>'PRESSZONE' FROM SCHEMA_NAME.config_param_system WHERE parameter='utils_grafanalytics_status'
+				SELECT 'presszone', value::json->>'PRESSZONE' FROM config_param_system WHERE parameter='utils_grafanalytics_status'
 				UNION
-				SELECT 'dma', value::json->>'DMA' FROM SCHEMA_NAME.config_param_system WHERE parameter='utils_grafanalytics_status'
+				SELECT 'dma', value::json->>'DMA' FROM config_param_system WHERE parameter='utils_grafanalytics_status'
 				UNION
-				SELECT 'dqa', value::json->>'DQA' FROM SCHEMA_NAME.config_param_system WHERE parameter='utils_grafanalytics_status') a
+				SELECT 'dqa', value::json->>'DQA' FROM config_param_system WHERE parameter='utils_grafanalytics_status') a
 				WHERE status::boolean is true
 				LOOP
-					-- count mapzones
+					-- looking for mapzones
 					EXECUTE 'SELECT count(*) FROM (SELECT DISTINCT '||lower(v_mapzone)||'_id FROM node WHERE node_id IN 
 						(SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text)) a '
 						INTO v_count;
@@ -251,13 +253,15 @@ BEGIN
 							INTO v_count;
 
 						-- getting mapzone id
-						EXECUTE 'SELECT ('||lower(v_mapzone)||'_id) FROM node WHERE node_id IN (SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text) AND 
-							'||lower(v_mapzone)||'_id::integer > 0 LIMIT 1' 
+						EXECUTE 'SELECT ('||lower(v_mapzone)||'_id) FROM node WHERE node_id IN (SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text) 
+							AND '||lower(v_mapzone)||'_id::integer > 0 LIMIT 1' 
 							INTO v_mapzone_id;
 
 						-- getting nodeheader id
-						EXECUTE 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' FROM '||lower(v_mapzone)||' WHERE '||lower(v_mapzone)||'_id = '||quote_literal(v_mapzone_id)
-						INTO v_nodeheader;
+						IF v_mapzone_id IS NOT NULL THEN
+							EXECUTE 'SELECT (json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'' FROM '||lower(v_mapzone)||' WHERE '||lower(v_mapzone)||'_id = '||quote_literal(v_mapzone_id)
+							INTO v_nodeheader;
+						END IF;
 
 						-- execute grafanalytics function from nodeheader				
 						IF v_nodeheader IS NOT NULL THEN
@@ -280,12 +284,39 @@ BEGIN
 								v_message = '{"level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Be carefull because there is a conflict againts two mapzones"}';
 							END IF;
 						END IF;
-					ELSE
 
-					-- return message 
-					v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened and no mapzones have been updated"}';
-											
+						IF v_closedstatus IS TRUE THEN
+
+							-- looking for dry side using catching opposite node
+							EXECUTE 'SELECT node_2 FROM arc WHERE node_1 = '''||v_id||''' AND '||lower(v_mapzone)||'_id = 0 UNION SELECT node_1 FROM arc WHERE node_2 ='''||v_id||''' AND '||lower(v_mapzone)||'_id = 0 LIMIT 1'
+								INTO v_oppositenode;
+
+							IF v_oppositenode IS NOT NULL THEN
+
+								-- execute grafanalytics_mapzones using dry side in order to check some header
+								v_querytext = '{"data":{"parameters":{"grafClass":"'||v_mapzone||'", "exploitation":['||v_expl||'], "floodFromNode":"'||v_oppositenode||'", "checkData":false, "updateFeature":true, 
+								"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_geomparamupdate||',"debug":false, "usePlanPsector":'||v_useplanpsector||', "forceOpen":[], "forceClosed":[]}}}';
+
+								PERFORM gw_fct_grafanalytics_mapzones(v_querytext::json);
+								
+								v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully closed. This operation have been affected mapzones scenario. Take a look on map for check it"}';
+							ELSE
+						
+								v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully closed. Maybe this operation have been affected mapzones scenario. Take a look on map for check it"}';	
+							END IF;						
+
+						ELSIF v_closedstatus IS FALSE THEN
+							IF v_count= 1 THEN
+								v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. If there were disconnected elements, it have been reconnected to mapzone"}';
+							ELSIF v_count =  2 THEN
+								v_message = '{"level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Be carefull because there is a conflict againts two mapzones"}';
+							END IF;
+						END IF;
+					ELSE
+						-- return message 
+						v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened and no mapzones have been updated"}';
 					END IF;
+					
 				END LOOP;
 			ELSE 
 				-- return message 

@@ -37,17 +37,17 @@ update connec set sector_id=0, dma_id=0, dqa_id=0, presszone_id=0
 ----------
 TO EXECUTE
 ----------
+select * from exploitation
 
 -- QUERY SAMPLE
 ----------------
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation":[1], "floodFromNode":"113766", "checkData":false, 
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR", "exploitation":[1], "floodFromNode":"113766", "checkData":false, 
 "updateFeature":true, "updateMapZone":2, "geomParamUpdate":15,"debug":false, "usePlanPsector":false, "forceOpen":[], "forceClosed":[]}}}')
-
 
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation":[1], "macroExploitation":[1], "checkData":false, 
 "updateFeature":true, "updateMapZone":2, "geomParamUpdate":15,"debug":false, "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":[2,3,4]}}}');
 
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "nodeHeader":"113952","exploitation":[1], "macroExploitation":[1], 
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "nodeHeader":"113952","exploitation":[1], "macroExploitation":[1], 
 "checkData":false, "updateFeature":true, "updateMapZone":2, "geomParamUpdate":15,"debug":false, "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":[2,3,4]}}}');
 ----------------
 
@@ -258,13 +258,24 @@ BEGIN
 		DELETE FROM anl_arc where cur_user=current_user and fid=v_fid;
 		DELETE FROM anl_node where cur_user=current_user and fid=v_fid;
 		TRUNCATE temp_anlgraf;
+
 		DELETE FROM audit_check_data WHERE fid=v_fid AND cur_user=current_user;
 			
-		-- reset selectors
+		-- save state selector 
+		DELETE FROM temp_table WHERE fid=199 AND cur_user=current_user;
+		INSERT INTO temp_table (fid, text_column)  
+		SELECT 199, (array_agg(state_id)) FROM selector_state WHERE cur_user=current_user;
+		
+		-- reset state selectors
 		DELETE FROM selector_state WHERE cur_user=current_user;
 		INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
-			
-		-- reset exploitation
+
+		-- save expl selector 
+		DELETE FROM temp_table WHERE fid=289 AND cur_user=current_user;
+		INSERT INTO temp_table (fid, text_column)  
+		SELECT 289, (array_agg(expl_id)) FROM selector_expl WHERE cur_user=current_user;			
+		
+		-- reset expl selector
 		IF v_expl IS NOT NULL THEN
 			DELETE FROM selector_expl WHERE cur_user=current_user;
 			INSERT INTO selector_expl (expl_id, cur_user) 
@@ -280,9 +291,9 @@ BEGIN
 		IF v_usepsector IS NOT TRUE THEN
 		
 			-- save psector selector 
-			DELETE FROM temp_table WHERE fid=199 AND cur_user=current_user;
+			DELETE FROM temp_table WHERE fid=288 AND cur_user=current_user;
 			INSERT INTO temp_table (fid, text_column)
-			SELECT 199, (array_agg(psector_id)) FROM selector_psector WHERE cur_user=current_user;
+			SELECT 288, (array_agg(psector_id)) FROM selector_psector WHERE cur_user=current_user;
 
 			-- set psector selector
 			DELETE FROM selector_psector WHERE cur_user=current_user;
@@ -512,7 +523,27 @@ BEGIN
 				END LOOP;
 
 				-- update feature atributes
-				IF v_updatetattributes THEN 
+				IF v_updatetattributes THEN
+
+					-- flood from node may be a header or not. In case of won't be a header by this process we can get header from any node
+					IF v_floodfromnode IS NOT NULL THEN
+
+						-- getting node header	
+						v_floodfromnode = (
+							SELECT node_id FROM (SELECT node_1 as node_id, arc_id FROM anl_arc WHERE fid = 145 AND cur_user = current_user
+							UNION SELECT node_2, arc_id FROM anl_arc WHERE fid = 145 AND cur_user = current_user)a
+							JOIN
+							(SELECT json_array_elements_text((grafconfig->>'use')::json)::json->>'nodeParent' as node_id,
+							json_array_elements_text((json_array_elements_text((grafconfig->>'use')::json)::json->>'toArc')::json) as arc_id, dma_id FROM dma) b
+							USING (node_id, arc_id)
+							LIMIT 1
+							);
+							
+						-- update results
+						UPDATE anl_arc SET descript = v_floodfromnode WHERE fid = 145;
+						UPDATE anl_node SET descript = v_floodfromnode WHERE fid = 145;
+
+					END IF;				
 
 					-- update arc table
 					v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' FROM anl_arc a JOIN 
@@ -797,10 +828,20 @@ BEGIN
     	-- restore state selector (if it's needed)
 	IF v_usepsector IS NOT TRUE THEN
 		INSERT INTO selector_psector (psector_id, cur_user)
-		select unnest(text_column::integer[]), current_user from temp_table where fid=199 and cur_user=current_user
+		select unnest(text_column::integer[]), current_user from temp_table where fid=288 and cur_user=current_user
 		ON CONFLICT (psector_id, cur_user) DO NOTHING;
 	END IF;
 
+	-- restore state selector
+	INSERT INTO selector_state (state_id, cur_user)
+	select unnest(text_column::integer[]), current_user from temp_table where fid=199 and cur_user=current_user
+	ON CONFLICT (state_id, cur_user) DO NOTHING;
+
+	-- restore expl selector
+	INSERT INTO selector_expl (expl_id, cur_user)
+	select unnest(text_column::integer[]), current_user from temp_table where fid=289 and cur_user=current_user
+	ON CONFLICT (expl_id, cur_user) DO NOTHING;
+	
 	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_visible_layer := COALESCE(v_visible_layer, '{}'); 
