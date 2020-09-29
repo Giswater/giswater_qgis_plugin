@@ -117,3 +117,6 @@ UPDATE config_param_system SET value='{"table":"sector", "selector":"selector_se
 "manageAll":true, "query_filter":" AND sector_id > 0"}' WHERE parameter='basic_selector_tab_sector';
 
  INSERT INTO sys_message VALUES (3138, 'Before use connec on planified mode you need to create a related link', NULL, 2, TRUE, 'utils');
+
+ INSERT INTO config_param_system (parameter, value, descript, isenabled, project_type, datatype) VALUES ('admin_publish_user', 'qgisserver','Publish user', FALSE, 'utils', 'text');
+ 

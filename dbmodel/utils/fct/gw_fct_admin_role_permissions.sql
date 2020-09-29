@@ -43,7 +43,6 @@ BEGIN
 	v_schema_array := current_schemas(FALSE);
 	v_schemaname :=v_schema_array[1];
 	
-	v_apiservice = (SELECT value::boolean FROM config_param_system WHERE parameter='sys_api_service');
 	v_vpn_dbuser = (SELECT value::boolean FROM config_param_system WHERE parameter='admin_vpn_permissions');
 	
 	-- Create (if not exists) roles
