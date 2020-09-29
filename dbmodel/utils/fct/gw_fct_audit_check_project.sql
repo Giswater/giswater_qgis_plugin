@@ -74,6 +74,9 @@ v_fid integer;
 v_mainschema text;
 v_projectrole text;
 v_infotype text;
+v_insert_fields json;
+field json;
+query_text text;
 
 BEGIN 
 
@@ -93,6 +96,7 @@ BEGIN
 	v_mainschema := (p_data ->> 'data')::json->> 'mainSchema';
 	v_projectrole := (p_data ->> 'data')::json->> 'projecRole';
 	v_infotype := (p_data ->> 'data')::json->> 'infoType';
+    v_insert_fields := (p_data ->> 'data')::json->> 'fields';
 
 	-- profilactic control of qgis variables
 	IF lower(v_mainschema) = 'none' OR v_mainschema = '' OR lower(v_mainschema) ='null' THEN v_mainschema = null; END IF;
@@ -130,7 +134,17 @@ BEGIN
 	-- init process
 	v_isenabled:=FALSE;
 	v_count=0;
-
+    
+	-- Delete and insert values from python into audit_check_project	
+        DELETE FROM audit_check_project WHERE cur_user = current_user AND fid = 101;
+	query_text=NULL;
+	FOR field in SELECT * FROM json_array_elements(v_insert_fields) LOOP
+		select into query_text concat(query_text, 'INSERT INTO '||v_schemaname||'.audit_check_project (table_schema, table_id, table_dbname, table_host, fid, table_user) ') ;
+		select into query_text concat(query_text, 'VALUES('||quote_literal((field->>'table_schema'))||', '||quote_literal((field->>'table_id'))||', '||quote_literal((field->>'table_dbname'))||', '||quote_literal((field->>'table_host'))||'') ;
+		select into query_text concat(query_text, ', '||quote_literal((field->>'fid'))||', '||quote_literal((field->>'table_user'))||');') ;
+	END LOOP;
+	IF query_text IS NOT NULL THEN EXECUTE query_text; END IF;
+    
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=101 AND cur_user=current_user;
 	
