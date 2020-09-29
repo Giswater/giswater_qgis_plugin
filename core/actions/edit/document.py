@@ -93,7 +93,7 @@ class GwDocument:
         set_icon(self.dlg_add_doc.btn_insert, "111")
         set_icon(self.dlg_add_doc.btn_delete, "112")
         set_icon(self.dlg_add_doc.btn_snapping, "137")
-
+        self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
         # Fill combo boxes
         populate_combo(self.dlg_add_doc, "doc_type", "doc_type")
 
@@ -115,6 +115,7 @@ class GwDocument:
         set_completer_feature_id(self.dlg_add_doc.feature_id, geom_type, viewname)
 
         # Set signals
+        self.dlg_add_doc.doc_type.currentIndexChanged.connect(self.activate_relations)
         self.dlg_add_doc.btn_path_url.clicked.connect(partial(open_web_browser, self.dlg_add_doc, "path"))
         self.dlg_add_doc.btn_path_doc.clicked.connect(partial(get_file_dialog, self.dlg_add_doc, "path"))
         self.dlg_add_doc.btn_accept.clicked.connect(
@@ -158,6 +159,17 @@ class GwDocument:
         open_dialog(self.dlg_add_doc, dlg_name='doc', maximize_button=False)
 
         return self.dlg_add_doc
+
+
+    def activate_relations(self):
+        """ Force user to set doc_id and doc_type """
+        doc_id = qt_tools.getWidgetText(self.dlg_add_doc, self.dlg_add_doc.doc_id, False, False)
+        doc_type = qt_tools.getWidgetText(self.dlg_add_doc, self.dlg_add_doc.doc_type, False, False)
+
+        if doc_id in (None, '', 'null') or doc_type in (None, '', 'null'):
+            self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
+        else:
+            self.dlg_add_doc.tabWidget.setTabEnabled(1, True)
 
 
     def fill_table_doc(self, dialog, geom_type, feature_id):
