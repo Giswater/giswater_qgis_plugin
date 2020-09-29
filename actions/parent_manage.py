@@ -401,6 +401,10 @@ class ParentManage(ParentAction, object):
             self.geom_type = "node"
         elif tab_position == 2:
             self.geom_type = "connec"
+        # This function is used for multiple forms, in some the tab 3 is for elements, in the plan_psector form it is
+        # for gully, in the forms that have elements, they do not have gully, therefore the tab element will also be 3
+        elif tab_position == 3 and dialog.objectName() == 'plan_psector':
+            self.geom_type = "gully"
         elif tab_position == 3:
             self.geom_type = "element"
         elif tab_position == 4:
