@@ -587,23 +587,24 @@ class ApiCF(ApiParent, QObject):
 
         if action_edit.isEnabled():
             # SIGNALS
-            self.layer.editingStarted.connect(partial(self.check_actions, action_edit, True))
-            self.layer.editingStopped.connect(partial(self.check_actions, action_edit, False))
-            self.layer.editingStarted.connect(partial(self.enable_all, self.dlg_cf, result))
-            self.layer.editingStopped.connect(partial(self.disable_all, self.dlg_cf, result, False))
+            self.layer.editingStarted.connect(partial(self.start_edition_signal, action_edit, result))
+            self.layer.editingStopped.connect(partial(self.stop_edition_signal, action_edit, result))
+            # self.layer.editingStarted.connect(partial(self.enable_all, self.dlg_cf, result))
+            # self.layer.editingStopped.connect(partial(self.disable_all, self.dlg_cf, result, False))
             # Actions
             self.enable_actions(self.layer.isEditable())
-            self.layer.editingStarted.connect(partial(self.enable_actions, True))
-            self.layer.editingStopped.connect(partial(self.enable_actions, False))
-            self.layer.editingStopped.connect(self.get_last_value)
+            # self.layer.editingStarted.connect(partial(self.enable_actions, True))
+            # self.layer.editingStopped.connect(partial(self.enable_actions, False))
+            # self.layer.editingStopped.connect(self.get_last_value)
+            # self.layer.editingStopped.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
 
         action_edit.setChecked(self.layer.isEditable())
-        action_edit.triggered.connect(partial(self.start_editing, self.layer))
+
+        # action_edit.triggered.connect(partial(self.start_editing, self.layer))
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_arc_id, 'arc'))
-        action_get_parent_id.triggered.connect(
-            partial(self.get_snapped_feature_id, self.dlg_cf, action_get_parent_id, 'node'))
+        action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_parent_id, 'node'))
         action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.canvas, self.layer))
         action_centered.triggered.connect(partial(self.api_action_centered, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, self.layer))
@@ -635,13 +636,14 @@ class ApiCF(ApiParent, QObject):
         else:
             btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
             btn_cancel.clicked.connect(self.roll_back)
-            btn_accept.clicked.connect(partial(
-                self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
+            btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
             self.dlg_cf.dlg_closed.connect(self.roll_back)
             self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
             self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
             self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
+
+        action_edit.triggered.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
         self.dlg_cf.dlg_closed.connect(self.disconect_signals)
 
         # Set title
@@ -658,6 +660,20 @@ class ApiCF(ApiParent, QObject):
 
         return self.complet_result, self.dlg_cf
 
+
+    def start_edition_signal(self, action_edit, result):
+        self.check_actions(action_edit, True)
+        self.enable_all(self.dlg_cf, result)
+        self.enable_actions(True)
+
+
+    def stop_edition_signal(self, action_edit, result):
+        self.check_actions(action_edit, False)
+        self.disable_all(self.dlg_cf, result, False)
+        self.enable_actions(False)
+        self.get_last_value()
+        self.accept(self.dlg_cf, self.complet_result[0], self.my_json)
+        
 
     def disconect_signals(self):
         try:
@@ -746,6 +762,7 @@ class ApiCF(ApiParent, QObject):
             return
         elif action_is_checked:
             self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').setChecked(action_is_checked)
 
 
     def roll_back(self):
@@ -1006,7 +1023,7 @@ class ApiCF(ApiParent, QObject):
         :param close_dialog:
         :return:
         """
-
+        print(f"self.my_json--> {self.my_json}")
         if _json == '' or str(_json) == '{}':
             if self.controller.dlg_docker:
                 self.controller.dlg_docker.setMinimumWidth(dialog.width())
@@ -1039,14 +1056,19 @@ class ApiCF(ApiParent, QObject):
             return
 
         # If we create a new feature
+        print(f"self.new_feature_id --> {self.new_feature_id}")
+        print(f"LAYER:{self.layer_new_feature.name()}")
         if self.new_feature_id is not None:
             for k, v in list(_json.items()):
                 if k in parent_fields:
+                    print(f"KV:{k} --> {v}")
                     self.new_feature.setAttribute(k, v)
                     _json.pop(k, None)
             self.layer_new_feature.updateFeature(self.new_feature)
 
             status = self.layer_new_feature.commitChanges()
+            self.new_feature_id = None
+            print(f"status --> {status}")
             if status is False:
                 return
 
@@ -1125,8 +1147,7 @@ class ApiCF(ApiParent, QObject):
                                 widget.setEnabled(field['iseditable'])
         except RuntimeError:
             pass
-        finally:
-            self.new_feature_id = None
+
 
 
     def enable_all(self, dialog, result):
