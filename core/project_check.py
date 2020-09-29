@@ -31,10 +31,7 @@ class GwProjectCheck:
     def populate_audit_check_project(self, layers, init_project):
         """ Fill table 'audit_check_project' with layers data """
 
-        sql = ("DELETE FROM audit_check_project "
-               "WHERE cur_user = current_user AND fid = 101")
-        self.controller.execute_sql(sql)
-        sql = ""
+        fields = '"fields":[  '
         for layer in layers:
             if layer is None:
                 continue
@@ -57,21 +54,21 @@ class GwProjectCheck:
                 db_name = layer_source['db']
                 host_name = layer_source['host']
                 table_user = layer_source['user']
-                sql += (f"\nINSERT INTO audit_check_project "
-                        f"(table_schema, table_id, table_dbname, table_host, fid, table_user) "
-                        f"VALUES ('{schema_name}', '{table_name}', '{db_name}', '{host_name}', 101, '{table_user}');")
-
-        status = self.controller.execute_sql(sql)
-        if not status:
-            return False, None
-
+                fields += f'{{"table_schema":"{schema_name}", '
+                fields += f'"table_id":"{table_name}", '
+                fields += f'"table_dbname":"{db_name}", '
+                fields += f'"table_host":"{host_name}", '
+                fields += f'"fid":101, '
+                fields += f'"table_user":"{table_user}"}}, '
+        fields = fields[:-2] + ']'
+        
         # Execute function 'gw_fct_audit_check_project'
-        result = self.execute_audit_check_project(init_project)
+        result = self.execute_audit_check_project(init_project, fields)
 
         return True, result
 
 
-    def execute_audit_check_project(self, init_project):
+    def execute_audit_check_project(self, init_project, fields_to_insert):
         """ Execute function 'gw_fct_audit_check_project' """
 
         # get project variables
@@ -90,6 +87,7 @@ class GwProjectCheck:
         extras += f', "infoType":"{info_type}"'
         extras += f', "qgisVersion":"{Qgis.QGIS_VERSION}"'
         extras += f', "osVersion":"{platform.system()} {platform.release()}"'
+        extras += f', {fields_to_insert}'
         body = create_body(extras=extras)
         result = self.controller.get_json('gw_fct_audit_check_project', body)
         try:
