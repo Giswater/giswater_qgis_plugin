@@ -126,13 +126,13 @@ BEGIN
 			
 			WITH typevalue AS (SELECT * FROM config_typevalue)
 		
-			SELECT '||v_label||', columnname, concat('||quote_literal(p_tabname)||',''_'',columnname) AS widgetname, widgettype,
-			widgetfunction, '||v_device||' hidden, widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby,
+			SELECT '||v_label||', columnname, concat('||quote_literal(p_tabname)||',''_'',columnname) AS widgetname, b.camelstyle,
+			a.camelstyle, '||v_device||' hidden, widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby,
 			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedaction, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
 			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols
 			FROM config_form_fields 
 			LEFT JOIN typevalue a ON a.id = widgetfunction AND a.typevalue = ''widgetfunction_typevalue''
-			LEFT JOIN typevalue b ON b.id = widgettype AND a.typevalue = ''widgettype_typevalue''
+			LEFT JOIN typevalue b ON b.id = widgettype AND b.typevalue = ''widgettype_typevalue''
 			
 			WHERE formname = $1 AND formtype= $2 '||v_clause||' ORDER BY orderby) a'
 				INTO fields_array
