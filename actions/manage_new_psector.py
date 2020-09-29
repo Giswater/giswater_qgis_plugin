@@ -792,6 +792,8 @@ class ManageNewPsector(ParentManage):
 
         multiple_selection = MultipleSelection(self.iface, self.controller, self.layers[self.geom_type],
                                                manage_new_psector=self, table_object=table_object)
+
+        # adding empty line to fix strange bug when gully is used. It seems with space is solved
         self.disconnect_signal_selection_changed()
         self.canvas.setMapTool(multiple_selection)
         self.connect_signal_selection_changed(dialog, table_object, query)
