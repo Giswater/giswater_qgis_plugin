@@ -17,9 +17,8 @@ import os
 import operator
 
 from core.utils.hyperlink_label import GwHyperLinkLabel
-from lib.tools_other import gw_function_dxf
 
-from actions.parent_manage_funct import enable_feature_type
+from core.utils.tools_giswater import enable_feature_type
 
 
 def fillComboBox(dialog, widget, rows, allow_nulls=True, clear_combo=True):
@@ -1595,6 +1594,17 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
     return ids, layers, list_ids
 
 
+def apply_lazy_init(widget, lazy_widget=None, lazy_init_function=None):
+    """Apply the init function related to the model. It's necessary
+    a lazy init because model is changed everytime is loaded."""
+
+    if lazy_widget is None:
+        return
+    if widget != lazy_widget:
+        return
+    lazy_init_function(lazy_widget)
+
+
 def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[], single_tool_mode=None, layers=None):
     """ Close dialog and disconnect snapping """
 
@@ -2033,3 +2043,165 @@ def document_delete(qtable, tablename):
             message = "Document deleted"
             global_vars.controller.show_info(message)
             qtable.model().select()
+
+
+def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=None, list_ids=None):
+    """ Check if selected object (document or element) already exists """
+
+    # Reset list of selected records
+    reset_lists(ids, list_ids)
+
+    field_object_id = "id"
+    if table_object == "element":
+        field_object_id = table_object + "_id"
+    object_id = tools_qt.getWidgetText(dialog, table_object + "_id")
+
+    # Check if we already have data with selected object_id
+    sql = (f"SELECT * "
+           f" FROM {table_object}"
+           f" WHERE {field_object_id} = '{object_id}'")
+    row = global_vars.controller.get_row(sql, log_info=False)
+
+    # If object_id not found: Clear data
+    if not row:
+        reset_widgets(dialog, table_object)
+        if table_object == 'element':
+            set_combo(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
+            set_combo(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
+                      field_id='expl_id', field_name='name')
+            set_calendars(dialog, 'builtdate', 'config_param_user', 'value', 'edit_builtdate_vdefault')
+            set_combo(dialog, 'workcat_id', 'cat_work',
+                      'edit_workcat_vdefault', field_id='id', field_name='id')
+
+        if single_tool_mode is not None:
+            layers = remove_selection(single_tool_mode, layers=layers)
+        else:
+            layers = remove_selection(True, layers=layers)
+        reset_model(dialog, table_object, "arc")
+        reset_model(dialog, table_object, "node")
+        reset_model(dialog, table_object, "connec")
+        reset_model(dialog, table_object, "element")
+        if global_vars.project_type == 'ud':
+            reset_model(dialog, table_object, "gully")
+
+        return layers, ids, list_ids
+
+    # Fill input widgets with data of the @row
+    fill_widgets(dialog, table_object, row)
+
+    # Check related 'arcs'
+    ids, layers, list_ids = get_records_geom_type(dialog, table_object, "arc", ids=ids, list_ids=list_ids, layers=layers)
+
+    # Check related 'nodes'
+    ids, layers, list_ids = get_records_geom_type(dialog, table_object, "node", ids=ids, list_ids=list_ids, layers=layers)
+
+    # Check related 'connecs'
+    ids, layers, list_ids = get_records_geom_type(dialog, table_object, "connec", ids=ids, list_ids=list_ids, layers=layers)
+
+    # Check related 'elements'
+    ids, layers, list_ids = get_records_geom_type(dialog, table_object, "element", ids=ids, list_ids=list_ids, layers=layers)
+
+    # Check related 'gullys'
+    if global_vars.project_type == 'ud':
+        ids, layers, list_ids = get_records_geom_type(dialog, table_object, "gully", ids=ids, list_ids=list_ids, layers=layers)
+
+    return layers, ids, list_ids
+
+
+def get_records_geom_type(dialog, table_object, geom_type, ids=None, list_ids=None, layers=None):
+    """ Get records of @geom_type associated to selected @table_object """
+
+    object_id = tools_qt.getWidgetText(dialog, table_object + "_id")
+    table_relation = table_object + "_x_" + geom_type
+    widget_name = "tbl_" + table_relation
+
+    exists = global_vars.controller.check_table(table_relation)
+    if not exists:
+        global_vars.controller.log_info(f"Not found: {table_relation}")
+        return ids, layers, list_ids
+
+    sql = (f"SELECT {geom_type}_id "
+           f"FROM {table_relation} "
+           f"WHERE {table_object}_id = '{object_id}'")
+    rows = global_vars.controller.get_rows(sql, log_info=False)
+    if rows:
+        for row in rows:
+            list_ids[geom_type].append(str(row[0]))
+            ids.append(str(row[0]))
+
+        expr_filter = get_expr_filter(geom_type, list_ids=list_ids, layers=layers)
+        set_table_model(dialog, widget_name, geom_type, expr_filter)
+
+    return ids, layers, list_ids
+
+
+def set_table_model(dialog, table_object, geom_type, expr_filter):
+    """ Sets a TableModel to @widget_name attached to
+        @table_name and filter @expr_filter
+    """
+
+    expr = None
+    if expr_filter:
+        # Check expression
+        (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
+        if not is_valid:
+            return expr
+
+    # Set a model with selected filter expression
+    table_name = f"v_edit_{geom_type}"
+    if global_vars.schema_name not in table_name:
+        table_name = global_vars.schema_name + "." + table_name
+
+    # Set the model
+    model = QSqlTableModel()
+    model.setTable(table_name)
+    model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+    model.select()
+    if model.lastError().isValid():
+        global_vars.controller.show_warning(model.lastError().text())
+        return expr
+
+    # Attach model to selected widget
+    if type(table_object) is str:
+        widget = tools_qt.getWidget(dialog, table_object)
+        if not widget:
+            message = "Widget not found"
+            global_vars.controller.log_info(message, parameter=table_object)
+            return expr
+    elif type(table_object) is QTableView:
+        # parent_vars.controller.log_debug(f"set_table_model: {table_object.objectName()}")
+        widget = table_object
+    else:
+        msg = "Table_object is not a table name or QTableView"
+        global_vars.controller.log_info(msg)
+        return expr
+
+    if expr_filter:
+        widget.setModel(model)
+        widget.model().setFilter(expr_filter)
+        widget.model().select()
+    else:
+        widget.setModel(None)
+
+    return expr
+
+
+def reload_table(dialog, table_object, geom_type, expr_filter):
+    """ Reload @widget with contents of @tablename applying selected @expr_filter """
+
+    if type(table_object) is str:
+        widget_name = f"tbl_{table_object}_x_{geom_type}"
+        widget = tools_qt.getWidget(dialog, widget_name)
+        if not widget:
+            message = "Widget not found"
+            global_vars.controller.log_info(message, parameter=widget_name)
+            return None
+    elif type(table_object) is QTableView:
+        widget = table_object
+    else:
+        msg = "Table_object is not a table name or QTableView"
+        global_vars.controller.log_info(msg)
+        return None
+
+    expr = set_table_model(dialog, widget, geom_type, expr_filter)
+    return expr

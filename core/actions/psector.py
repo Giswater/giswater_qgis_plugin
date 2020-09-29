@@ -27,11 +27,10 @@ from core.utils.tools_giswater import close_dialog, get_parser_value, load_setti
 from core.ui.ui_manager import Plan_psector, PsectorRapportUi
 from core.actions.document import global_vars
 from actions.parent_manage_funct import set_table_columns, check_expression, tab_feature_changed, \
-    set_completer_widget, refresh_map_canvas, disconnect_signal_selection_changed, \
-    set_completer_object
+    set_completer_widget, refresh_map_canvas, set_completer_object
 
 from lib.tools_qgis import remove_selection, selection_init, selection_changed, disconnect_snapping, \
-    zoom_to_selected_features, insert_feature, get_feature_by_id
+    zoom_to_selected_features, insert_feature, get_feature_by_id, disconnect_signal_selection_changed
 from lib.tools_qt import delete_records, fill_table_object, set_selectionbehavior, get_folder_dialog, set_icon, \
     set_completer_lineedit, set_restriction, document_open, document_delete
 from lib.tools_db import make_list_for_completer

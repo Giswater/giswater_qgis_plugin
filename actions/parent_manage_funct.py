@@ -179,96 +179,6 @@ def fill_widgets(dialog, table_object, row):
             dialog.undelete.setChecked(True)
 
 
-def get_records_geom_type(dialog, table_object, geom_type, ids=None, list_ids=None, layers=None):
-    """ Get records of @geom_type associated to selected @table_object """
-
-    object_id = tools_qt.getWidgetText(dialog, table_object + "_id")
-    table_relation = table_object + "_x_" + geom_type
-    widget_name = "tbl_" + table_relation
-
-    exists = global_vars.controller.check_table(table_relation)
-    if not exists:
-        global_vars.controller.log_info(f"Not found: {table_relation}")
-        return ids, layers, list_ids
-
-    sql = (f"SELECT {geom_type}_id "
-           f"FROM {table_relation} "
-           f"WHERE {table_object}_id = '{object_id}'")
-    rows = global_vars.controller.get_rows(sql, log_info=False)
-    if rows:
-        for row in rows:
-            list_ids[geom_type].append(str(row[0]))
-            ids.append(str(row[0]))
-
-        expr_filter = get_expr_filter(geom_type, list_ids=list_ids, layers=layers)
-        set_table_model(dialog, widget_name, geom_type, expr_filter)
-
-    return ids, layers, list_ids
-
-
-def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=None, list_ids=None):
-    """ Check if selected object (document or element) already exists """
-
-    # Reset list of selected records
-    reset_lists(ids, list_ids)
-
-    field_object_id = "id"
-    if table_object == "element":
-        field_object_id = table_object + "_id"
-    object_id = tools_qt.getWidgetText(dialog, table_object + "_id")
-
-    # Check if we already have data with selected object_id
-    sql = (f"SELECT * "
-           f" FROM {table_object}"
-           f" WHERE {field_object_id} = '{object_id}'")
-    row = global_vars.controller.get_row(sql, log_info=False)
-
-    # If object_id not found: Clear data
-    if not row:
-        reset_widgets(dialog, table_object)
-        if table_object == 'element':
-            set_combo(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
-            set_combo(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
-                      field_id='expl_id', field_name='name')
-            set_calendars(dialog, 'builtdate', 'config_param_user', 'value', 'edit_builtdate_vdefault')
-            set_combo(dialog, 'workcat_id', 'cat_work',
-                      'edit_workcat_vdefault', field_id='id', field_name='id')
-
-        if single_tool_mode is not None:
-            layers = remove_selection(single_tool_mode, layers=layers)
-        else:
-            layers = remove_selection(True, layers=layers)
-        reset_model(dialog, table_object, "arc")
-        reset_model(dialog, table_object, "node")
-        reset_model(dialog, table_object, "connec")
-        reset_model(dialog, table_object, "element")
-        if global_vars.project_type == 'ud':
-            reset_model(dialog, table_object, "gully")
-
-        return layers, ids, list_ids
-
-    # Fill input widgets with data of the @row
-    fill_widgets(dialog, table_object, row)
-
-    # Check related 'arcs'
-    ids, layers, list_ids = get_records_geom_type(dialog, table_object, "arc", ids=ids, list_ids=list_ids, layers=layers)
-
-    # Check related 'nodes'
-    ids, layers, list_ids = get_records_geom_type(dialog, table_object, "node", ids=ids, list_ids=list_ids, layers=layers)
-
-    # Check related 'connecs'
-    ids, layers, list_ids = get_records_geom_type(dialog, table_object, "connec", ids=ids, list_ids=list_ids, layers=layers)
-
-    # Check related 'elements'
-    ids, layers, list_ids = get_records_geom_type(dialog, table_object, "element", ids=ids, list_ids=list_ids, layers=layers)
-
-    # Check related 'gullys'
-    if global_vars.project_type == 'ud':
-        ids, layers, list_ids = get_records_geom_type(dialog, table_object, "gully", ids=ids, list_ids=list_ids, layers=layers)
-
-    return layers, ids, list_ids
-
-
 
 def set_combo(dialog, widget, table_name, parameter, field_id='id', field_name='id'):
     """ Executes query and set combo box """
@@ -411,26 +321,6 @@ def get_expr_filter(geom_type, list_ids=None, layers=None):
     return expr_filter
 
 
-def reload_table(dialog, table_object, geom_type, expr_filter):
-    """ Reload @widget with contents of @tablename applying selected @expr_filter """
-
-    if type(table_object) is str:
-        widget_name = f"tbl_{table_object}_x_{geom_type}"
-        widget = tools_qt.getWidget(dialog, widget_name)
-        if not widget:
-            message = "Widget not found"
-            global_vars.controller.log_info(message, parameter=widget_name)
-            return None
-    elif type(table_object) is QTableView:
-        widget = table_object
-    else:
-        msg = "Table_object is not a table name or QTableView"
-        global_vars.controller.log_info(msg)
-        return None
-
-    expr = set_table_model(dialog, widget, geom_type, expr_filter)
-    return expr
-
 
 def set_table_model(dialog, table_object, geom_type, expr_filter):
     """ Sets a TableModel to @widget_name attached to
@@ -481,59 +371,4 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
         widget.setModel(None)
 
     return expr
-
-
-def apply_lazy_init(widget, lazy_widget=None, lazy_init_function=None):
-    """Apply the init function related to the model. It's necessary
-    a lazy init because model is changed everytime is loaded."""
-
-    if lazy_widget is None:
-        return
-    if widget != lazy_widget:
-        return
-    lazy_init_function(lazy_widget)
-
-
-def lazy_configuration(widget, init_function):
-    """set the init_function where all necessary events are set.
-    This is necessary to allow a lazy setup of the events because set_table_events
-    can create a table with a None model loosing any event connection."""
-
-    lazy_widget = widget
-    lazy_init_function = init_function
-
-    return lazy_widget, lazy_init_function
-
-
-def enable_feature_type(dialog, widget_name='tbl_relation', ids=None):
-
-    feature_type = tools_qt.getWidget(dialog, 'feature_type')
-    widget_table = tools_qt.getWidget(dialog, widget_name)
-    if feature_type is not None and widget_table is not None:
-        if len(ids) > 0:
-            feature_type.setEnabled(False)
-        else:
-            feature_type.setEnabled(True)
-
-
-def connect_signal_selection_changed(dialog, table_object, query=False, geom_type=None, layers=None):
-    """ Connect signal selectionChanged """
-
-    try:
-        if geom_type in ('all', None):
-            geom_type = 'arc'
-        global_vars.canvas.selectionChanged.connect(
-            partial(selection_changed, dialog, table_object, geom_type, query, layers=layers))
-    except Exception as e:
-        global_vars.controller.log_info(f"connect_signal_selection_changed: {e}")
-
-
-def disconnect_signal_selection_changed():
-    """ Disconnect signal selectionChanged """
-
-    try:
-        global_vars.canvas.selectionChanged.disconnect()
-        global_vars.iface.actionPan().trigger()
-    except Exception:
-        pass
 

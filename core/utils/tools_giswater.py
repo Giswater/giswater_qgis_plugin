@@ -395,6 +395,21 @@ def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, du
     if duration_time is not None:
         QTimer.singleShot(duration_time, rubber_band.reset)
 
+
+
+def enable_feature_type(dialog, widget_name='tbl_relation', ids=None):
+
+    feature_type = tools_qt.getWidget(dialog, 'feature_type')
+    widget_table = tools_qt.getWidget(dialog, widget_name)
+    if feature_type is not None and widget_table is not None:
+        if len(ids) > 0:
+            feature_type.setEnabled(False)
+        else:
+            feature_type.setEnabled(True)
+
+
+
+
 # Doesn't work because of hasattr and getattr
 '''
 

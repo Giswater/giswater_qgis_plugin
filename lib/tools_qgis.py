@@ -16,7 +16,8 @@ import configparser
 import os.path
 import global_vars
 
-from actions.parent_manage_funct import enable_feature_type
+from core.utils.tools_giswater import enable_feature_type
+from lib.tools_qt import apply_lazy_init, reload_table
 
 def get_value_from_metadata(parameter, default_value):
     """ Get @parameter from metadata.txt file """
@@ -932,6 +933,18 @@ def disconnect_signal_selection_changed():
         pass
     finally:
         global_vars.iface.actionPan().trigger()
+
+
+def connect_signal_selection_changed(dialog, table_object, query=False, geom_type=None, layers=None):
+    """ Connect signal selectionChanged """
+
+    try:
+        if geom_type in ('all', None):
+            geom_type = 'arc'
+        global_vars.canvas.selectionChanged.connect(
+            partial(selection_changed, dialog, table_object, geom_type, query, layers=layers))
+    except Exception as e:
+        global_vars.controller.log_info(f"connect_signal_selection_changed: {e}")
 
 
 def zoom_to_selected_features(layer, geom_type=None, zoom=None):

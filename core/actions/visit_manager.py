@@ -28,17 +28,16 @@ from core.models.om_visit_x_gully import OmVisitXGully
 from core.models.om_visit_parameter import OmVisitParameter
 from core.ui.ui_manager import VisitUi, VisitEvent, VisitEventRehab, LotVisitManagerUi
 from core.actions.document import GwDocument
-from core.utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers, create_body
+from core.utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers, create_body, \
+    enable_feature_type
 import global_vars
-from actions.parent_manage_funct import check_expression, disconnect_signal_selection_changed, connect_signal_selection_changed, \
-    refresh_map_canvas, enable_feature_type, \
-    set_table_model, init_function, \
-    set_table_columns, set_completer_object
+from actions.parent_manage_funct import check_expression, refresh_map_canvas, \
+    init_function, set_table_columns, set_completer_object
 
 from lib.tools_qgis import remove_selection, add_point, selection_init, selection_changed, select_features_by_ids, \
-    insert_feature
+    insert_feature, disconnect_signal_selection_changed, connect_signal_selection_changed
 from lib.tools_qt import delete_records, fill_table_object, delete_selected_object, set_selectionbehavior, set_icon, \
-    set_dates_from_to, document_open, document_delete
+    set_dates_from_to, document_open, document_delete, set_table_model
 
 
 
