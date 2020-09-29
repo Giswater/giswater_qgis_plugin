@@ -76,8 +76,8 @@ VALUES (287, 'Null values on raingage file', 'ud') ON CONFLICT (fid) DO NOTHING;
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type)
 VALUES (288, 'Store psector values for specific user', 'utils') ON CONFLICT (fid) DO NOTHING;
 
-INSERT INTO sys_fprocess_cat VALUES (289, 'Store exploitation values for especific user', 'utils')
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess VALUES (289, 'Store exploitation values for especific user', 'utils')
+ON CONFLICT (fid) DO NOTHING;
 
 -- 2020/17/09
 
