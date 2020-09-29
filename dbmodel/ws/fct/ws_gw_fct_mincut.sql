@@ -11,8 +11,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut( element_id_arg character v
 $BODY$
 
 /*EXAMPLE
-INSERT INTO SCHEMA_NAME.om_mincut VALUES (1);
-SELECT SCHEMA_NAME.gw_fct_mincut('2001', 'arc', 1)
+INSERT INTO SCHEMA_NAME.om_mincut VALUES (-1);
+SELECT SCHEMA_NAME.gw_fct_mincut('2001', 'arc', -1)
 
 --fid: 199
 
@@ -118,19 +118,18 @@ BEGIN
     INSERT INTO temp_table (fid, text_column)
     SELECT 199, (array_agg(state_id)) FROM selector_state WHERE cur_user=current_user;
 
+    -- save & reset psector selector
+    IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
+		DELETE FROM selector_psector WHERE cur_user = current_user;
+		DELETE FROM temp_table WHERE fprocesscat_id=287 AND user_name=current_user;
+		INSERT INTO temp_table (fprocesscat_id, text_column)  
+		SELECT 287, (array_agg(psector_id)) FROM selector_psector WHERE cur_user=current_user;
+    END IF;
+	
     -- set state selector
     DELETE FROM selector_state WHERE cur_user=current_user;
     INSERT INTO selector_state (state_id ,cur_user) VALUES (1, current_user);
 
-    -- save psector selector 
-    DELETE FROM temp_table WHERE fid=288 AND cur_user=current_user;
-    INSERT INTO temp_table (fid, text_column)
-    SELECT 288, (array_agg(psector_id)) FROM selector_psector WHERE cur_user=current_user;
-
-    -- set psector selector
-    DELETE FROM selector_psector WHERE cur_user=current_user;
-
-    
     IF v_debug THEN
 	RAISE NOTICE '4-update values of mincut cat table';
     END IF;
@@ -336,11 +335,13 @@ BEGIN
 	INSERT INTO selector_state (state_id, cur_user)
 	select unnest(text_column::integer[]), current_user from temp_table where fid=199 and cur_user=current_user
 	ON CONFLICT (state_id, cur_user) DO NOTHING;
-
-	-- restore state selector
-	INSERT INTO selector_psector (psector_id, cur_user)
-	select unnest(text_column::integer[]), current_user from temp_table where fid=288 and cur_user=current_user
-	ON CONFLICT (psector_id, cur_user) DO NOTHING;
+	
+	-- restore psector selector
+	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
+		INSERT INTO selector_psector (psector_id, cur_user)
+		select unnest(text_column::integer[]), current_user from temp_table where fprocesscat_id=287 and user_name=current_user
+		ON CONFLICT (psector_id, cur_user) DO NOTHING;
+	END IF;
 
 	-- returning
 	IF v_audit_result is null THEN
