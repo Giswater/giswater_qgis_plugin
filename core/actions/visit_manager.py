@@ -28,18 +28,17 @@ from core.models.om_visit_x_gully import OmVisitXGully
 from core.models.om_visit_parameter import OmVisitParameter
 from core.ui.ui_manager import VisitUi, VisitEvent, VisitEventRehab, LotVisitManagerUi
 from core.actions.document import GwDocument
-from core.utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers
+from core.utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers, create_body
 import global_vars
-from actions.parent_functs import set_icon, document_delete, document_open, create_body, \
-    set_dates_from_to, get_values_from_catalog
 from actions.parent_manage_funct import check_expression, disconnect_signal_selection_changed, connect_signal_selection_changed, \
     refresh_map_canvas, enable_feature_type, \
     set_table_model, init_function, \
     set_table_columns, set_completer_object
 
-from lib.tools_qgis import remove_selection, add_point, selection_init, selection_changed, select_features_by_ids
-from lib.tools_qt import delete_records, fill_table_object, delete_selected_object, set_selectionbehavior
-from lib.tools_db import insert_feature
+from lib.tools_qgis import remove_selection, add_point, selection_init, selection_changed, select_features_by_ids, \
+    insert_feature
+from lib.tools_qt import delete_records, fill_table_object, delete_selected_object, set_selectionbehavior, set_icon, \
+    set_dates_from_to, document_open, document_delete
 
 
 
@@ -1012,7 +1011,7 @@ class GwVisitManager:
                 tools_qt.set_combo_itemData(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
 
         # Fill ComboBox status
-        rows = get_values_from_catalog('om_typevalue', 'visit_cat_status')
+        rows = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
         if rows:
             tools_qt.set_item_data(self.dlg_add_visit.status, rows, 1, sort_combo=True)
             status = self.controller.get_config('om_visit_status_vdefault')
@@ -1795,3 +1794,13 @@ class GwVisitManager:
                 if index >= 0:
                     widget.setCurrentIndex(index)
                     continue
+
+
+    def get_values_from_catalog(self, table_name, typevalue, order_by='id'):
+
+        sql = (f"SELECT id, idval"
+               f" FROM {table_name}"
+               f" WHERE typevalue = '{typevalue}'"
+               f" ORDER BY {order_by}")
+        rows = global_vars.controller.get_rows(sql)
+        return rows

@@ -15,7 +15,7 @@ from collections import OrderedDict
 
 import global_vars
 
-from actions.parent_functs import create_body
+from core.utils.tools_giswater import create_body
 
 
 class GwNotifyTools:

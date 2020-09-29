@@ -32,12 +32,12 @@ from core.actions.element import GwElement
 from core.actions.visit_gallery import GwVisitGallery
 from core.actions.visit_manager import GwVisitManager
 
-from core.utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body
+from core.utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body, draw, \
+    draw_point
 from core.utils.layer_tools import populate_info_text
 from core.ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
 
-from actions.parent_functs import set_icon, set_dates_from_to, draw, draw_point
 
 from lib.tools_qgis import get_snapping_options, get_event_point, snap_to_current_layer, get_snapped_layer, \
     get_snapped_feature, add_marker, enable_snapping, snap_to_layer, apply_snapping_options, snap_to_arc, snap_to_node
@@ -48,7 +48,8 @@ from lib.tools_qt import set_completer_object_api, set_completer_object, check_a
     set_widget_size, add_button, add_textarea, add_lineedit, set_data_type, manage_lineedit, add_tableview, \
     set_headers, populate_table, set_columns_config, add_checkbox, add_combobox, fill_child, add_frame, add_label, \
     add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_spinbox, fill_table, populate_basic_info, \
-    add_calendar, put_widgets, get_values, set_setStyleSheet, disable_all, enable_all, clear_gridlayout
+    add_calendar, put_widgets, get_values, set_setStyleSheet, disable_all, enable_all, clear_gridlayout, set_icon, \
+    set_dates_from_to, integer_validator
 
 from lib.tools_qgis import get_feature_by_expr
 

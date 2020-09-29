@@ -18,8 +18,8 @@ from core.utils.extended_qlabel import GwExtendedQLabel
 from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
 from core.ui.ui_manager import Gallery, GalleryZoom
 import global_vars
-from actions.parent_functs import set_icon
 
+from lib.tools_qt import set_icon
 
 class GwVisitGallery:
 

@@ -16,9 +16,8 @@ from core.actions.catalog import GwCatalog
 from core.actions.info import GwInfo
 from core.toolbars.parent_maptool import GwParentMapTool
 from core.utils.tools_giswater import check_expression, close_dialog, load_settings, open_dialog
-from actions.parent_functs import restore_user_layer
 from lib.tools_qgis import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \
-    enable_snapping
+    enable_snapping, restore_user_layer
 
 
 class GwNodeTypeChangeButton(GwParentMapTool):
@@ -91,7 +90,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 
         # Check if the expression is valid
         expr_filter = f"node_id = '{self.node_id}'"
-        (is_valid, expr) = check_expression(expr_filter, self.controller)  # @UnusedVariable
+        (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
         if layer:

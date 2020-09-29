@@ -1127,7 +1127,7 @@ def add_spinbox(field):
     return widget
 
 
-def fill_table(widget, table_name, filter_=None):
+def fill_table(widget, table_name, expr_filter=None, set_edit_strategy=QSqlTableModel.OnManualSubmit):
     """ Set a model with selected filter.
     Attach that model to selected table """
 
@@ -1137,10 +1137,8 @@ def fill_table(widget, table_name, filter_=None):
     # Set model
     model = QSqlTableModel()
     model.setTable(table_name)
-    model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+    model.setEditStrategy(set_edit_strategy)
     model.setSort(0, 0)
-    if filter_:
-        model.setFilter(filter_)
     model.select()
 
     # Check for errors
@@ -1149,6 +1147,8 @@ def fill_table(widget, table_name, filter_=None):
 
     # Attach model to table view
     widget.setModel(model)
+    if expr_filter:
+        widget.model().setFilter(expr_filter)
 
 
 def populate_basic_info(dialog, result, field_id, my_json=None, new_feature_id=None, new_feature=None,
@@ -1735,3 +1735,301 @@ def set_model_to_table(widget, table_name, expr_filter):
         widget.setModel(model)
     else:
         global_vars.controller.log_info("set_model_to_table: widget not found")
+
+
+def get_folder_dialog(dialog, widget):
+    """ Get folder dialog """
+
+    # Check if selected folder exists. Set default value if necessary
+    folder_path = tools_qt.getWidgetText(dialog, widget)
+    if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
+        folder_path = os.path.expanduser("~")
+
+    # Open dialog to select folder
+    os.chdir(folder_path)
+    file_dialog = QFileDialog()
+    file_dialog.setFileMode(QFileDialog.Directory)
+    message = "Select folder"
+    folder_path = file_dialog.getExistingDirectory(
+        parent=None, caption=global_vars.controller.tr(message), directory=folder_path)
+    if folder_path:
+        tools_qt.setWidgetText(dialog, widget, str(folder_path))
+
+
+def set_icon(widget, icon):
+    """ Set @icon to selected @widget """
+
+    # Get icons folder
+    icons_folder = os.path.join(global_vars.plugin_dir, 'icons')
+    icon_path = os.path.join(icons_folder, str(icon) + ".png")
+    if os.path.exists(icon_path):
+        widget.setIcon(QIcon(icon_path))
+    else:
+        global_vars.controller.log_info("File not found", parameter=icon_path)
+
+
+def set_table_columns(dialog, widget, table_name, sort_order=0, isQStandardItemModel=False, schema_name=None):
+    """ Configuration of tables. Set visibility and width of columns """
+
+    widget = tools_qt.getWidget(dialog, widget)
+    if not widget:
+        return
+
+    if schema_name is not None:
+        config_table = f"{schema_name}.config_form_tableview"
+    else:
+        config_table = f"config_form_tableview"
+
+    # Set width and alias of visible columns
+    columns_to_delete = []
+    sql = (f"SELECT columnindex, width, alias, status"
+           f" FROM {config_table}"
+           f" WHERE tablename = '{table_name}'"
+           f" ORDER BY columnindex")
+    rows = global_vars.controller.get_rows(sql, log_info=False)
+    if not rows:
+        return
+
+    for row in rows:
+        if not row['status']:
+            columns_to_delete.append(row['columnindex'] - 1)
+        else:
+            width = row['width']
+            if width is None:
+                width = 100
+            widget.setColumnWidth(row['columnindex'] - 1, width)
+            widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
+
+    # Set order
+    if isQStandardItemModel:
+        widget.model().sort(sort_order, Qt.AscendingOrder)
+    else:
+        widget.model().setSort(sort_order, Qt.AscendingOrder)
+        widget.model().select()
+    # Delete columns
+    for column in columns_to_delete:
+        widget.hideColumn(column)
+
+    return widget
+
+
+def multi_rows_delete(widget, table_name, column_id):
+    """ Delete selected elements of the table
+    :param QTableView widget: origin
+    :param table_name: table origin
+    :param column_id: Refers to the id of the source table
+    """
+
+    # Get selected rows
+    selected_list = widget.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        global_vars.controller.show_warning(message)
+        return
+
+    inf_text = ""
+    list_id = ""
+    for i in range(0, len(selected_list)):
+        row = selected_list[i].row()
+        id_ = widget.model().record(row).value(str(column_id))
+        inf_text += f"{id_}, "
+        list_id += f"'{id_}', "
+    inf_text = inf_text[:-2]
+    list_id = list_id[:-2]
+    message = "Are you sure you want to delete these records?"
+    title = "Delete records"
+    answer = global_vars.controller.ask_question(message, title, inf_text)
+    if answer:
+        sql = f"DELETE FROM {table_name}"
+        sql += f" WHERE {column_id} IN ({list_id})"
+        global_vars.controller.execute_sql(sql)
+        widget.model().select()
+
+
+def hide_void_groupbox(dialog):
+    """ Hide empty groupbox """
+
+    grb_list = {}
+    grbox_list = dialog.findChildren(QGroupBox)
+    for grbox in grbox_list:
+
+        widget_list = grbox.findChildren(QWidget)
+        if len(widget_list) == 0:
+            grb_list[grbox.objectName()] = 0
+            grbox.setVisible(False)
+
+    return grb_list
+
+
+def set_completer_lineedit(qlineedit, list_items):
+    """ Set a completer into a QLineEdit
+    :param qlineedit: Object where to set the completer (QLineEdit)
+    :param list_items: List of items to set into the completer (List)["item1","item2","..."]
+    """
+
+    completer = QCompleter()
+    completer.setCaseSensitivity(Qt.CaseInsensitive)
+    completer.setMaxVisibleItems(10)
+    completer.setCompletionMode(0)
+    completer.setFilterMode(Qt.MatchContains)
+    completer.popup().setStyleSheet("color: black;")
+    qlineedit.setCompleter(completer)
+    model = QStringListModel()
+    model.setStringList(list_items)
+    completer.setModel(model)
+
+
+def set_restriction(dialog, widget_to_ignore, restriction):
+    """
+    Set all widget enabled(False) or readOnly(True) except those on the tuple
+    :param dialog:
+    :param widget_to_ignore: tuple = ('widgetname1', 'widgetname2', 'widgetname3', ...)
+    :param restriction: roles that do not have access. tuple = ('role1', 'role1', 'role1', ...)
+    :return:
+    """
+
+    project_vars = global_vars.project_vars
+    role = project_vars['role']
+    role = global_vars.controller.get_restriction(role)
+    if role in restriction:
+        widget_list = dialog.findChildren(QWidget)
+        for widget in widget_list:
+            if widget.objectName() in widget_to_ignore:
+                continue
+            # Set editable/readonly
+            if type(widget) in (QLineEdit, QDoubleSpinBox, QTextEdit):
+                widget.setReadOnly(True)
+                widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+            elif type(widget) in (QComboBox, QCheckBox, QTableView, QPushButton):
+                widget.setEnabled(False)
+
+
+def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
+
+    sql = (f"SELECT MIN(LEAST({field_from}, {field_to})),"
+           f" MAX(GREATEST({field_from}, {field_to}))"
+           f" FROM {table_name}")
+    row = global_vars.controller.get_row(sql, log_sql=False)
+    current_date = QDate.currentDate()
+    if row:
+        if row[0]:
+            widget_from.setDate(row[0])
+        else:
+            widget_from.setDate(current_date)
+        if row[1]:
+            widget_to.setDate(row[1])
+        else:
+            widget_to.setDate(current_date)
+
+
+def integer_validator(value, widget, btn_accept):
+    """ Check if the value is an integer or not.
+        This function is called in def set_datatype_validator(self, value, widget, btn)
+        widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
+    """
+
+    if value is None or bool(re.search("^\d*$", value)):
+        widget.setStyleSheet(None)
+        btn_accept.setEnabled(True)
+    else:
+        widget.setStyleSheet("border: 1px solid red")
+        btn_accept.setEnabled(False)
+
+
+def put_combobox(qtable, rows, field, widget_pos, combo_values):
+    """ Set one column of a QtableView as QComboBox with values from database.
+    :param qtable: QTableView to fill
+    :param rows: List of items to set QComboBox (["..", "..."])
+    :param field: Field to set QComboBox (String)
+    :param widget_pos: Position of the column where we want to put the QComboBox (integer)
+    :param combo_values: List of items to populate QComboBox (["..", "..."])
+    :return:
+    """
+
+    for x in range(0, len(rows)):
+        combo = QComboBox()
+        row = rows[x]
+        # Populate QComboBox
+        tools_qt.set_item_data(combo, combo_values, 1)
+        # Set QCombobox to wanted item
+        tools_qt.set_combo_itemData(combo, str(row[field]), 1)
+        # Get index and put QComboBox into QTableView at index position
+        idx = qtable.model().index(x, widget_pos)
+        qtable.setIndexWidget(idx, combo)
+        # noinspection PyUnresolvedReferences
+        combo.currentIndexChanged.connect(partial(update_status, combo, qtable, x, widget_pos))
+
+
+def update_status(qtable, combo, pos_x, combo_pos, col_update):
+    """ Update values from QComboBox to QTableView
+    :param qtable: QTableView Where update values
+     :param combo: QComboBox from which we will take the value
+    :param pos_x: Position of the row where we want to update value (integer)
+    :param combo_pos: Position of the column where we want to put the QComboBox (integer)
+    :param col_update: Column to update into QTableView.Model() (integer)
+    :return:
+    """
+    elem = combo.itemData(combo.currentIndex())
+    i = qtable.model().index(pos_x, combo_pos)
+    qtable.model().setData(i, elem[0])
+    i = qtable.model().index(pos_x, col_update)
+    qtable.model().setData(i, elem[0])
+
+
+def document_open(qtable):
+    """ Open selected document """
+
+    # Get selected rows
+    field_index = qtable.model().fieldIndex('path')
+    selected_list = qtable.selectionModel().selectedRows(field_index)
+    if not selected_list:
+        message = "Any record selected"
+        global_vars.controller.show_info_box(message)
+        return
+    elif len(selected_list) > 1:
+        message = "More then one document selected. Select just one document."
+        global_vars.controller.show_warning(message)
+        return
+
+    path = selected_list[0].data()
+    # Check if file exist
+    if os.path.exists(path):
+        # Open the document
+        if sys.platform == "win32":
+            os.startfile(path)
+        else:
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, path])
+    else:
+        webbrowser.open(path)
+
+
+def document_delete(qtable, tablename):
+    """ Delete record from selected rows in tbl_document """
+
+    # Get selected rows. 0 is the column of the pk 0 'id'
+    selected_list = qtable.selectionModel().selectedRows(0)
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        global_vars.controller.show_info_box(message)
+        return
+
+    selected_id = []
+    for index in selected_list:
+        doc_id = index.data()
+        selected_id.append(str(doc_id))
+    message = "Are you sure you want to delete these records?"
+    title = "Delete records"
+    answer = global_vars.controller.ask_question(message, title, ','.join(selected_id))
+    if answer:
+        sql = (f"DELETE FROM {tablename}"
+               f" WHERE id IN ({','.join(selected_id)})")
+        status = global_vars.controller.execute_sql(sql)
+        if not status:
+            message = "Error deleting data"
+            global_vars.controller.show_warning(message)
+            return
+        else:
+            message = "Document deleted"
+            global_vars.controller.show_info(message)
+            qtable.model().select()

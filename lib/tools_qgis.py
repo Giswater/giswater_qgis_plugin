@@ -888,3 +888,179 @@ def disconnect_snapping():
     except:
         pass
 
+
+def refresh_map_canvas(restore_cursor=False):
+    """ Refresh all layers present in map canvas """
+
+    global_vars.canvas.refreshAllLayers()
+    for layer_refresh in global_vars.canvas.layers():
+        layer_refresh.triggerRepaint()
+
+    if restore_cursor:
+        set_cursor_restore()
+
+
+def set_cursor_wait():
+    """ Change cursor to 'WaitCursor' """
+    QApplication.setOverrideCursor(Qt.WaitCursor)
+
+
+def set_cursor_restore():
+    """ Restore to previous cursors """
+    QApplication.restoreOverrideCursor()
+
+
+def get_cursor_multiple_selection():
+    """ Set cursor for multiple selection """
+
+    path_folder = os.path.join(os.path.dirname(__file__), os.pardir)
+    path_cursor = os.path.join(path_folder, 'icons', '201.png')
+    if os.path.exists(path_cursor):
+        cursor = QCursor(QPixmap(path_cursor))
+    else:
+        cursor = QCursor(Qt.ArrowCursor)
+
+    return cursor
+
+
+def disconnect_signal_selection_changed():
+    """ Disconnect signal selectionChanged """
+
+    try:
+        global_vars.canvas.selectionChanged.disconnect()
+    except Exception:
+        pass
+    finally:
+        global_vars.iface.actionPan().trigger()
+
+
+def zoom_to_selected_features(layer, geom_type=None, zoom=None):
+    """ Zoom to selected features of the @layer with @geom_type """
+
+    if not layer:
+        return
+
+    global_vars.iface.setActiveLayer(layer)
+    global_vars.iface.actionZoomToSelected().trigger()
+
+    if geom_type and zoom:
+
+        # Set scale = scale_zoom
+        if geom_type in ('node', 'connec', 'gully'):
+            scale = zoom
+
+        # Set scale = max(current_scale, scale_zoom)
+        elif geom_type == 'arc':
+            scale = global_vars.iface.mapCanvas().scale()
+            if int(scale) < int(zoom):
+                scale = zoom
+        else:
+            scale = 5000
+
+        if zoom is not None:
+            scale = zoom
+
+        global_vars.iface.mapCanvas().zoomScale(float(scale))
+
+
+def select_features_by_expr( layer, expr):
+    """ Select features of @layer applying @expr """
+
+    if not layer:
+        return
+
+    if expr is None:
+        layer.removeSelection()
+    else:
+        it = layer.getFeatures(QgsFeatureRequest(expr))
+        # Build a list of feature id's from the previous result and select them
+        id_list = [i.id() for i in it]
+        if len(id_list) > 0:
+            layer.selectByIds(id_list)
+        else:
+            layer.removeSelection()
+
+
+def get_max_rectangle_from_coords(list_coord):
+    """ Returns the minimum rectangle(x1, y1, x2, y2) of a series of coordinates
+    :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
+    """
+
+    coords = list_coord.group(1)
+    polygon = coords.split(',')
+    x, y = polygon[0].split(' ')
+    min_x = x  # start with something much higher than expected min
+    min_y = y
+    max_x = x  # start with something much lower than expected max
+    max_y = y
+    for i in range(0, len(polygon)):
+        x, y = polygon[i].split(' ')
+        if x < min_x:
+            min_x = x
+        if x > max_x:
+            max_x = x
+        if y < min_y:
+            min_y = y
+        if y > max_y:
+            max_y = y
+
+    return max_x, max_y, min_x, min_y
+
+
+def zoom_to_rectangle(x1, y1, x2, y2, margin=5):
+
+    rect = QgsRectangle(float(x1) + margin, float(y1) + margin, float(x2) - margin, float(y2) - margin)
+    global_vars.canvas.setExtent(rect)
+    global_vars.canvas.refresh()
+
+
+def get_composers_list():
+
+    layour_manager = QgsProject.instance().layoutManager().layouts()
+    active_composers = [layout for layout in layour_manager]
+    return active_composers
+
+
+def get_composer_index(name):
+
+    index = 0
+    composers = get_composers_list()
+    for comp_view in composers:
+        composer_name = comp_view.name()
+        if composer_name == name:
+            break
+        index += 1
+
+    return index
+
+
+def get_points(list_coord=None):
+    """ Return list of QgsPoints taken from geometry
+    :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
+    """
+
+    coords = list_coord.group(1)
+    polygon = coords.split(',')
+    points = []
+
+    for i in range(0, len(polygon)):
+        x, y = polygon[i].split(' ')
+        point = QgsPointXY(float(x), float(y))
+        points.append(point)
+
+    return points
+
+
+def resetRubberbands(rubber_band):
+
+    rubber_band.reset()
+
+
+def restore_user_layer(user_current_layer=None):
+
+    if user_current_layer:
+        global_vars.iface.setActiveLayer(user_current_layer)
+    else:
+        layer = global_vars.controller.get_layer_by_tablename('v_edit_node')
+        if layer:
+            global_vars.iface.setActiveLayer(layer)

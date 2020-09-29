@@ -239,15 +239,15 @@ def refresh_legend(controller):
                 ln.setData(current_state, Qt.CheckStateRole)
 
 
-def check_expression(expr_filter, controller, log_info=False):
+def check_expression(expr_filter, log_info=False):
     """ Check if expression filter @expr is valid """
 
     if log_info:
-        controller.log_info(expr_filter)
+        global_vars.controller.log_info(expr_filter)
     expr = QgsExpression(expr_filter)
     if expr.hasParserError():
         message = "Expression Error"
-        controller.log_warning(message, parameter=expr_filter)
+        global_vars.controller.log_warning(message, parameter=expr_filter)
         return False, expr
 
     return True, expr
@@ -291,6 +291,109 @@ def hide_generic_layers(excluded_layers=[]):
         if layer and "v_edit_gully" not in excluded_layers:
             global_vars.controller.set_layer_visible(layer)
 
+
+def get_plugin_version():
+    """ Get plugin version from metadata.txt file """
+
+    # Check if metadata file exists
+    metadata_file = os.path.join(global_vars.plugin_dir, 'metadata.txt')
+    if not os.path.exists(metadata_file):
+        message = "Metadata file not found"
+        global_vars.controller.show_warning(message, parameter=metadata_file)
+        return None
+
+    metadata = configparser.ConfigParser()
+    metadata.read(metadata_file)
+    plugin_version = metadata.get('general', 'version')
+    if plugin_version is None:
+        message = "Plugin version not found"
+        global_vars.controller.show_warning(message)
+
+    return plugin_version
+
+
+def manage_actions(json_result, sql):
+    """
+    Manage options for layers (active, visible, zoom and indexing)
+    :param json_result: Json result of a query (Json)
+    :return: None
+    """
+
+    try:
+        actions = json_result['body']['python_actions']
+    except KeyError:
+        return
+    try:
+        for action in actions:
+            try:
+                function_name = action['funcName']
+                params = action['params']
+                getattr(global_vars.controller.gw_infotools, f"{function_name}")(**params)
+            except AttributeError as e:
+                # If function_name not exist as python function
+                global_vars.controller.log_warning(f"Exception error: {e}")
+            except Exception as e:
+                global_vars.controller.log_debug(f"{type(e).__name__}: {e}")
+    except Exception as e:
+        global_vars.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
+
+
+def draw(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
+
+    try:
+        if complet_result['body']['feature']['geometry'] is None:
+            return
+        if complet_result['body']['feature']['geometry']['st_astext'] is None:
+            return
+    except KeyError:
+        return
+
+    list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
+    max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
+
+    if reset_rb:
+        rubber_band.reset()
+    if str(max_x) == str(min_x) and str(max_y) == str(min_y):
+        point = QgsPointXY(float(max_x), float(max_y))
+        draw_point(point, rubber_band, color, width)
+    else:
+        points = get_points(list_coord)
+        draw_polyline(points, rubber_band, color, width)
+    if margin is not None:
+        zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
+
+
+def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
+    """
+    :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+    """
+
+    rubber_band.reset(0)
+    rubber_band.setIconSize(10)
+    rubber_band.setColor(color)
+    rubber_band.setWidth(width)
+    rubber_band.addPoint(point)
+
+    # wait to simulate a flashing effect
+    if duration_time is not None:
+        QTimer.singleShot(duration_time, rubber_band.reset)
+
+
+def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
+    """ Draw 'line' over canvas following list of points
+     :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+     """
+
+    rubber_band.setIconSize(20)
+    polyline = QgsGeometry.fromPolylineXY(points)
+    rubber_band.setToGeometry(polyline, None)
+    rubber_band.setColor(color)
+    rubber_band.setWidth(width)
+    rubber_band.show()
+
+    # wait to simulate a flashing effect
+    if duration_time is not None:
+        QTimer.singleShot(duration_time, rubber_band.reset)
 
 # Doesn't work because of hasattr and getattr
 '''

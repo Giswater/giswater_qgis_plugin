@@ -16,15 +16,15 @@ from core.utils.tools_giswater import create_body, close_dialog, load_settings, 
 from core.ui.ui_manager import DimensioningUi
 import global_vars
 
-from actions.parent_functs import restore_user_layer, set_icon
 from lib.tools_qgis import set_snapping_mode, remove_marker, get_snapping_options, enable_snapping, snap_to_node, \
     snap_to_connec_gully, get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
-    get_snapped_feature, get_snapped_feature_id, apply_snapping_options
+    get_snapped_feature, get_snapped_feature_id, apply_snapping_options, restore_user_layer
 from lib.tools_qt import set_widget_size, add_button, add_textarea, add_lineedit, set_data_type, \
     manage_lineedit, add_tableview, set_headers, populate_table, set_columns_config, add_checkbox, add_combobox, \
     add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_spinbox, add_calendar, put_widgets, \
     set_setStyleSheet, disable_all, enable_all
 
+from lib.tools_qt import set_icon
 
 class GwDimensioning:
 

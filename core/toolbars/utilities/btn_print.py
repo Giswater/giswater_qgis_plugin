@@ -20,10 +20,10 @@ from core.toolbars.parent_dialog import GwParentAction
 from core.utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body
 from core.ui.ui_manager import FastPrintUi
 import global_vars
-from actions.parent_functs import hide_void_groupbox, get_composers_list
 
 from lib.tools_qt import set_widget_size, add_lineedit, set_data_type, add_combobox, put_widgets, get_values, \
-    set_setStyleSheet
+    set_setStyleSheet, hide_void_groupbox
+from lib.tools_qgis import get_composers_list
 
 class GwPrintButton(GwParentAction):
 

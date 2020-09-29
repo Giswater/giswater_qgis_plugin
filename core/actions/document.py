@@ -13,13 +13,12 @@ from lib import tools_qt
 from core.utils.tools_giswater import load_settings, open_dialog, close_dialog
 from core.ui.ui_manager import DocUi, DocManager
 import global_vars
-from actions.parent_functs import set_icon, open_web_browser, get_file_dialog
 from actions.parent_manage_funct import set_completer_object, set_completer_widget, tab_feature_changed, exist_object, \
     set_table_columns
 
 from lib.tools_qgis import remove_selectionl, selection_init
 from lib.tools_qt import populate_combo_with_query, delete_records, manage_close, fill_table_object, filter_by_id, \
-    delete_selected_object, set_selectionbehavior, set_model_to_table
+    delete_selected_object, set_selectionbehavior, set_model_to_table, set_icon
 from lib.tools_db import insert_feature
 
 class GwDocument:
@@ -117,8 +116,8 @@ class GwDocument:
         set_completer_widget(viewname, self.dlg_add_doc.feature_id, concat(str(geom_type), "_id"))
 
         # Set signals
-        self.dlg_add_doc.btn_path_url.clicked.connect(partial(open_web_browser, self.dlg_add_doc, "path"))
-        self.dlg_add_doc.btn_path_doc.clicked.connect(partial(get_file_dialog, self.dlg_add_doc, "path"))
+        self.dlg_add_doc.btn_path_url.clicked.connect(partial(self.open_web_browser, self.dlg_add_doc, "path"))
+        self.dlg_add_doc.btn_path_doc.clicked.connect(partial(self.get_file_dialog, self.dlg_add_doc, "path"))
         self.dlg_add_doc.btn_accept.clicked.connect(
             partial(self.manage_document_accept, table_object, tablename, qtable, item_id))
         # TODO: Set variable  self.layers using return parameters
@@ -313,4 +312,34 @@ class GwDocument:
         tools_qt.setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
 
 
+    def open_web_browser(self, dialog, widget=None):
+        """ Display url using the default browser """
 
+        if widget is not None:
+            url = tools_qt.getWidgetText(dialog, widget)
+            if url == 'null':
+                url = 'http://www.giswater.org'
+        else:
+            url = 'http://www.giswater.org'
+
+        webbrowser.open(url)
+
+
+    def get_file_dialog(self, dialog, widget):
+        """ Get file dialog """
+
+        # Check if selected file exists. Set default value if necessary
+        file_path = tools_qt.getWidgetText(dialog, widget)
+        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
+            folder_path = global_vars.plugin_dir
+        else:
+            folder_path = os.path.dirname(file_path)
+
+        # Open dialog to select file
+        os.chdir(folder_path)
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.AnyFile)
+        message = "Select file"
+        folder_path, filter_ = file_dialog.getOpenFileName(parent=None, caption=global_vars.controller.tr(message))
+        if folder_path:
+            tools_qt.setWidgetText(dialog, widget, str(folder_path))

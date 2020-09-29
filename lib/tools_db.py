@@ -299,3 +299,17 @@ def manage_filter(dialog, widget, action, selector_vars):
         selector_vars[f"var_txt_filter_{tab_name}"] = tools_qt.getWidgetText(dialog, widget)
     else:
         selector_vars[f"var_txt_filter_{tab_name}"] = ''
+
+
+def make_list_for_completer(sql):
+    """ Prepare a list with the necessary items for the completer
+    :param sql: Query to be executed, where will we get the list of items (string)
+    :return list_items: List with the result of the query executed (List) ["item1","item2","..."]
+    """
+
+    rows = global_vars.controller.get_rows(sql)
+    list_items = []
+    if rows:
+        for row in rows:
+            list_items.append(str(row[0]))
+    return list_items

@@ -17,11 +17,10 @@ import os
 import global_vars
 from core.toolbars.parent_maptool import GwParentMapTool
 from core.actions.info import GwInfo
-from actions.parent_functs import get_max_rectangle_from_coords, draw_point, draw_polyline, get_points
-from core.utils.tools_giswater import create_body
+from core.utils.tools_giswater import create_body, draw_point, draw_polyline
 
 from lib.tools_db import get_visible_layers
-
+from lib.tools_qgis import get_max_rectangle_from_coords, get_points
 
 class GwInfoButton(GwParentMapTool):
 

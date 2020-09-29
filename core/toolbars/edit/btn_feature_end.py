@@ -17,12 +17,11 @@ from lib import tools_qt
 from core.toolbars.parent_dialog import GwParentAction
 from core.utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers
 from core.ui.ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
-from actions.parent_functs import set_icon
 from actions.parent_manage_funct import set_completer_object, tab_feature_changed, \
     disconnect_signal_selection_changed, set_completer_widget
 
 from lib.tools_qgis import remove_selection, selection_init, disconnect_snapping
-from lib.tools_qt import delete_records, set_selectionbehavior
+from lib.tools_qt import delete_records, set_selectionbehavior, set_icon
 from lib.tools_db import insert_feature
 
 

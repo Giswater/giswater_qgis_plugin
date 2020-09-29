@@ -17,11 +17,11 @@ from functools import partial
 
 from lib import tools_qt
 import global_vars
-from actions.parent_functs import check_expression, get_cursor_multiple_selection, set_table_columns, refresh_map_canvas
 from lib.tools_qgis import snap_to_background_layers, get_event_point, add_marker, selection_changed, \
     select_features_by_ids
-from core.utils.tools_giswater import close_dialog, hide_generic_layers
-
+from core.utils.tools_giswater import close_dialog, hide_generic_layers, check_expression
+from lib.tools_qgis import refresh_map_canvas, get_cursor_multiple_selection
+from lib.tools_qt import set_table_columns
 
 def remove_selection(remove_groups=True, layers=None):
     """ Remove all previous selections """
@@ -62,14 +62,6 @@ def remove_selection(remove_groups=True, layers=None):
     global_vars.canvas.refresh()
 
     return layers
-
-
-################################################################
-################################################################
-################################################################
-################################################################
-
-
 
 
 def reset_lists(ids, list_ids):

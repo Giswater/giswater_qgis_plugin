@@ -96,7 +96,7 @@ def from_postgres_to_toc(tablename=None, the_geom="the_geom", field_id="id", chi
     if child_layers is not None:
         for layer in child_layers:
             if layer[0] != 'Load all':
-                uri.setDataSource(schema_name, f'{layer[0]}', the_geom, None, layer[1] + "_id")
+                uri.setDataSource(schema_name, f"{layer[0]}", the_geom, None, layer[1] + "_id")
                 vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
                 group = layer[4] if layer[4] is not None else group
                 group = group if group is not None else 'GW Layers'

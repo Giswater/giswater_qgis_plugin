@@ -27,15 +27,16 @@ from core.actions.document import GwDocument
 from core.actions.psector import GwPsector
 from core.actions.visit_manager import GwVisitManager
 from core.ui.ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
-from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
-from actions.parent_functs import zoom_to_rectangle, get_max_rectangle_from_coords, set_icon, \
-    make_list_for_completer, set_completer_lineedit, document_insert, document_delete, document_open, \
-    set_table_columns, refresh_map_canvas, draw, draw_point
+from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
+    draw, draw_point
 from actions.api_parent_functs import create_body, get_points, \
     draw_polyline
 
 
-from lib.tools_qt import set_completer_object_api, set_completer_object, add_lineedit, populate_basic_info
+from lib.tools_qt import set_completer_object_api, set_completer_object, add_lineedit, populate_basic_info, set_icon, \
+    set_table_columns, set_completer_lineedit, document_open, document_delete
+from lib.tools_qgis import refresh_map_canvas, get_max_rectangle_from_coords, zoom_to_rectangle
+from lib.tools_db import make_list_for_completer
 
 class GwSearch:
 
@@ -506,7 +507,7 @@ class GwSearch:
         table_name_end = "v_ui_workcat_x_feature_end"
         table_doc = "v_ui_doc_x_workcat"
         self.items_dialog.btn_doc_insert.clicked.connect(
-            partial(document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id', item['sys_id']))
+            partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id', item['sys_id']))
         self.items_dialog.btn_doc_delete.clicked.connect(
             partial(document_delete, self.items_dialog.tbl_document, 'doc_x_workcat'))
         self.items_dialog.btn_doc_new.clicked.connect(
@@ -857,3 +858,38 @@ class GwSearch:
         # wait to simulate a flashing effect
         if duration_time is not None:
             QTimer.singleShot(duration_time, rubber_band.reset)
+
+
+    def document_insert(self, dialog, tablename, field, field_value):
+        """ Insert a document related to the current visit
+        :param dialog: (QDialog )
+        :param tablename: Name of the table to make the queries (string)
+        :param field: Field of the table to make the where clause (string)
+        :param field_value: Value to compare in the clause where (string)
+        """
+
+        doc_id = dialog.doc_id.text()
+        if not doc_id:
+            message = "You need to insert doc_id"
+            global_vars.controller.show_warning(message)
+            return
+
+        # Check if document already exist
+        sql = (f"SELECT doc_id"
+               f" FROM {tablename}"
+               f" WHERE doc_id = '{doc_id}' AND {field} = '{field_value}'")
+        row = global_vars.controller.get_row(sql)
+        if row:
+            msg = "Document already exist"
+            global_vars.controller.show_warning(msg)
+            return
+
+        # Insert into new table
+        sql = (f"INSERT INTO {tablename} (doc_id, {field})"
+               f" VALUES ('{doc_id}', '{field_value}')")
+        status = global_vars.controller.execute_sql(sql)
+        if status:
+            message = "Document inserted successfully"
+            global_vars.controller.show_info(message)
+
+        dialog.tbl_document.model().select()

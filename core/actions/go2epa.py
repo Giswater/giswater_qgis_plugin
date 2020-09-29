@@ -20,8 +20,6 @@ from core.tasks.task_go2epa import GwGo2EpaTask
 from core.btn_admin import GwAdmin
 from core.ui.ui_manager import Go2EpaUI, HydrologySelector, Multirow_selector
 from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
-from actions.parent_functs import multi_row_selector
-
 
 class GwGo2Epa:
 
@@ -231,7 +229,7 @@ class GwGo2Epa:
             tools_qt.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected,
                                    self.controller.tr('Selected dscenarios', context_name='labels'))
 
-        multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
+        self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
 
         open_dialog(dlg_psector_sel)
 
@@ -484,3 +482,211 @@ class GwGo2Epa:
         usql = GwAdmin()
         usql.init_sql()
 
+
+    def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
+                           hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+                                      23, 24, 25, 26, 27, 28, 29, 30], hide_right=[1, 2, 3], aql=""):
+        """
+        :param dialog:
+        :param tableleft: Table to consult and load on the left side
+        :param tableright: Table to consult and load on the right side
+        :param field_id_left: ID field of the left table
+        :param field_id_right: ID field of the right table
+        :param name: field name (used in add_lot.py)
+        :param hide_left: Columns to hide from the left table
+        :param hide_right: Columns to hide from the right table
+        :param aql: (add query left) Query added to the left side (used in basic.py def basic_exploitation_selector())
+        :return:
+        """
+
+        # fill QTableView all_rows
+        tbl_all_rows = dialog.findChild(QTableView, "all_rows")
+        tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
+        schema_name = global_vars.schema_name.replace('"', '')
+        query_left = f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
+        query_left += f"(SELECT {schema_name}.{tableleft}.{name} FROM {schema_name}.{tableleft}"
+        query_left += f" RIGHT JOIN {schema_name}.{tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
+        query_left += f" WHERE cur_user = current_user)"
+        query_left += f" AND  {field_id_left} > -1"
+        query_left += aql
+
+        self.fill_table_by_query(tbl_all_rows, query_left + f" ORDER BY {name};")
+        self.hide_colums(tbl_all_rows, hide_left)
+        tbl_all_rows.setColumnWidth(1, 200)
+
+        # fill QTableView selected_rows
+        tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
+        tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        query_right = f"SELECT {tableleft}.{name}, cur_user, {tableleft}.{field_id_left}, {tableright}.{field_id_right}"
+        query_right += f" FROM {schema_name}.{tableleft}"
+        query_right += f" JOIN {schema_name}.{tableright} ON {tableleft}.{field_id_left} = {tableright}.{field_id_right}"
+
+        query_right += " WHERE cur_user = current_user"
+
+        self.fill_table_by_query(tbl_selected_rows, query_right + f" ORDER BY {name};")
+        self.hide_colums(tbl_selected_rows, hide_right)
+        tbl_selected_rows.setColumnWidth(0, 200)
+
+        # Button select
+        dialog.btn_select.clicked.connect(partial(self.multi_rows_selector, tbl_all_rows, tbl_selected_rows,
+                                                  field_id_left, tableright, field_id_right, query_left, query_right,
+                                                  field_id_right))
+
+        # Button unselect
+        query_delete = f"DELETE FROM {schema_name}.{tableright}"
+        query_delete += f" WHERE current_user = cur_user AND {tableright}.{field_id_right}="
+        dialog.btn_unselect.clicked.connect(partial(self.unselector, tbl_all_rows, tbl_selected_rows, query_delete,
+                                                    query_left, query_right, field_id_right))
+
+        # QLineEdit
+        dialog.txt_name.textChanged.connect(partial(self.query_like_widget_text, dialog, dialog.txt_name,
+                                                    tbl_all_rows, tableleft, tableright, field_id_right, field_id_left,
+                                                    name, aql))
+
+        # Order control
+        tbl_all_rows.horizontalHeader().sectionClicked.connect(partial(self.order_by_column, tbl_all_rows, query_left))
+        tbl_selected_rows.horizontalHeader().sectionClicked.connect(
+            partial(self.order_by_column, tbl_selected_rows, query_right))
+
+
+    def order_by_column(self, qtable, query, idx):
+        """
+        :param qtable: QTableView widget
+        :param query: Query for populate QsqlQueryModel
+        :param idx: The index of the clicked column
+        :return:
+        """
+        oder_by = {0: "ASC", 1: "DESC"}
+        sort_order = qtable.horizontalHeader().sortIndicatorOrder()
+        col_to_sort = qtable.model().headerData(idx, Qt.Horizontal)
+        query += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
+        self.fill_table_by_query(qtable, query)
+        refresh_map_canvas()
+
+
+    def hide_colums(self, widget, comuns_to_hide):
+        for i in range(0, len(comuns_to_hide)):
+            widget.hideColumn(comuns_to_hide[i])
+
+
+    def unselector(self, qtable_left, qtable_right, query_delete, query_left, query_right, field_id_right):
+
+        selected_list = qtable_right.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            global_vars.controller.show_warning(message)
+            return
+        expl_id = []
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = str(qtable_right.model().record(row).value(field_id_right))
+            expl_id.append(id_)
+        for i in range(0, len(expl_id)):
+            global_vars.controller.execute_sql(query_delete + str(expl_id[i]))
+
+        # Refresh
+        oder_by = {0: "ASC", 1: "DESC"}
+        sort_order = qtable_left.horizontalHeader().sortIndicatorOrder()
+        idx = qtable_left.horizontalHeader().sortIndicatorSection()
+        col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
+        query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
+        self.fill_table_by_query(qtable_left, query_left)
+
+        sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
+        idx = qtable_right.horizontalHeader().sortIndicatorSection()
+        col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
+        query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
+        self.fill_table_by_query(qtable_right, query_right)
+        refresh_map_canvas()
+
+
+    def multi_rows_selector(self, qtable_left, qtable_right, id_ori,
+                            tablename_des, id_des, query_left, query_right, field_id):
+        """
+            :param qtable_left: QTableView origin
+            :param qtable_right: QTableView destini
+            :param id_ori: Refers to the id of the source table
+            :param tablename_des: table destini
+            :param id_des: Refers to the id of the target table, on which the query will be made
+            :param query_right:
+            :param query_left:
+            :param field_id:
+        """
+
+        selected_list = qtable_left.selectionModel().selectedRows()
+
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            global_vars.controller.show_warning(message)
+            return
+        expl_id = []
+        curuser_list = []
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = qtable_left.model().record(row).value(id_ori)
+            expl_id.append(id_)
+            curuser = qtable_left.model().record(row).value("cur_user")
+            curuser_list.append(curuser)
+        for i in range(0, len(expl_id)):
+            # Check if expl_id already exists in expl_selector
+            sql = (f"SELECT DISTINCT({id_des}, cur_user)"
+                   f" FROM {tablename_des}"
+                   f" WHERE {id_des} = '{expl_id[i]}' AND cur_user = current_user")
+            row = global_vars.controller.get_row(sql)
+
+            if row:
+                # if exist - show warning
+                message = "Id already selected"
+                global_vars.controller.show_info_box(message, "Info", parameter=str(expl_id[i]))
+            else:
+                sql = (f"INSERT INTO {tablename_des} ({field_id}, cur_user) "
+                       f" VALUES ({expl_id[i]}, current_user)")
+                global_vars.controller.execute_sql(sql)
+
+        # Refresh
+        oder_by = {0: "ASC", 1: "DESC"}
+        sort_order = qtable_left.horizontalHeader().sortIndicatorOrder()
+        idx = qtable_left.horizontalHeader().sortIndicatorSection()
+        col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
+        query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
+        self.fill_table_by_query(qtable_right, query_right)
+
+        sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
+        idx = qtable_right.horizontalHeader().sortIndicatorSection()
+        col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
+        query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
+        self.fill_table_by_query(qtable_left, query_left)
+        refresh_map_canvas()
+
+
+    def fill_table_by_query(self, qtable, query):
+        """
+        :param qtable: QTableView to show
+        :param query: query to set model
+        """
+
+        model = QSqlQueryModel()
+        model.setQuery(query)
+        qtable.setModel(model)
+        qtable.show()
+
+        # Check for errors
+        if model.lastError().isValid():
+            global_vars.controller.show_warning(model.lastError().text())
+
+
+    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l,
+                               name='name', aql=''):
+        """ Fill the QTableView by filtering through the QLineEdit"""
+
+        schema_name = global_vars.schema_name.replace('"', '')
+        query = tools_qt.getWidgetText(dialog, text_line, return_string_null=False).lower()
+        sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
+               f"(SELECT {tableleft}.{name} FROM {schema_name}.{tableleft}"
+               f" RIGHT JOIN {schema_name}.{tableright}"
+               f" ON {tableleft}.{field_id_l} = {tableright}.{field_id_r}"
+               f" WHERE cur_user = current_user) AND LOWER({name}::text) LIKE '%{query}%'"
+               f"  AND  {field_id_l} > -1")
+        sql += aql
+        self.fill_table_by_query(qtable, sql)

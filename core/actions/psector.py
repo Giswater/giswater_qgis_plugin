@@ -25,18 +25,16 @@ from lib import tools_qt
 from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
     hide_generic_layers
 from core.ui.ui_manager import Plan_psector, PsectorRapportUi
-from core.actions.document import GwDocument
-import global_vars
-from actions.parent_functs import set_icon, hilight_feature_by_id, \
-    select_features_by_expr, zoom_to_selected_features, document_open, document_delete, make_list_for_completer, \
-    set_completer_lineedit, set_restriction, get_folder_dialog
+from core.actions.document import global_vars
 from actions.parent_manage_funct import set_table_columns, check_expression, tab_feature_changed, \
     set_completer_widget, refresh_map_canvas, disconnect_signal_selection_changed, \
     set_completer_object
 
-from lib.tools_qgis import remove_selection, selection_init, selection_changed, disconnect_snapping
-from lib.tools_qt import delete_records, fill_table_object, set_selectionbehavior
-from lib.tools_db import insert_feature
+from lib.tools_qgis import remove_selection, selection_init, selection_changed, disconnect_snapping, \
+    zoom_to_selected_features, insert_feature, get_feature_by_id
+from lib.tools_qt import delete_records, fill_table_object, set_selectionbehavior, get_folder_dialog, set_icon, \
+    set_completer_lineedit, set_restriction, document_open, document_delete
+from lib.tools_db import make_list_for_completer
 
 class GwPsector:
 
@@ -289,26 +287,26 @@ class GwPsector:
             self.qtbl_arc.model().setFilter(expr)
             self.qtbl_arc.model().select()
             self.qtbl_arc.clicked.connect(
-                partial(hilight_feature_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+                partial(self.hilight_feature_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
 
             expr = " psector_id = " + str(psector_id)
             self.qtbl_node.model().setFilter(expr)
             self.qtbl_node.model().select()
             self.qtbl_node.clicked.connect(
-                partial(hilight_feature_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band, 1))
+                partial(self.hilight_feature_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band, 1))
 
             expr = " psector_id = " + str(psector_id)
             self.qtbl_connec.model().setFilter(expr)
             self.qtbl_connec.model().select()
             self.qtbl_connec.clicked.connect(
-                partial(hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
+                partial(self.hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
 
             if self.project_type.upper() == 'UD':
                 expr = " psector_id = " + str(psector_id)
                 self.qtbl_gully.model().setFilter(expr)
                 self.qtbl_gully.model().select()
                 self.qtbl_gully.clicked.connect(
-                    partial(hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
+                    partial(self.hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
 
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
@@ -335,7 +333,7 @@ class GwPsector:
                 if not is_valid:
                     return
 
-                select_features_by_expr(layer, expr)
+                self.select_features_by_expr(layer, expr)
 
                 # Get canvas extend in order to create a QgsRectangle
                 ext = self.canvas.extent()
@@ -1414,3 +1412,25 @@ class GwPsector:
         # Check for errors
         if model.lastError().isValid():
             global_vars.controller.show_warning(model.lastError().text())
+
+
+    def hilight_feature_by_id(self, qtable, layer_name, field_id, rubber_band, width, index):
+        """ Based on the received index and field_id, the id of the received field_id is searched within the table
+         and is painted in red on the canvas """
+
+        rubber_band.reset()
+        layer = global_vars.controller.get_layer_by_tablename(layer_name)
+        if not layer: return
+
+        row = index.row()
+        column_index = tools_qt.get_col_index_by_col_name(qtable, field_id)
+        _id = index.sibling(row, column_index).data()
+        feature = get_feature_by_id(layer, _id, field_id)
+        try:
+            geometry = feature.geometry()
+            rubber_band.setToGeometry(geometry, None)
+            rubber_band.setColor(QColor(255, 0, 0, 100))
+            rubber_band.setWidth(width)
+            rubber_band.show()
+        except AttributeError:
+            pass

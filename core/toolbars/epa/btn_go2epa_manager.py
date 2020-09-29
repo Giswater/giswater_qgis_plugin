@@ -15,9 +15,8 @@ from lib import tools_qt
 from core.toolbars.parent_dialog import GwParentAction
 from core.ui.ui_manager import EpaManager
 from core.utils.tools_giswater import load_settings, open_dialog, close_dialog
-from actions.parent_functs import set_table_columns, multi_rows_delete
 
-from lib.tools_qt import fill_table
+from lib.tools_qt import fill_table, set_table_columns, multi_rows_delete
 
 class GwGo2EpaManagerButton(GwParentAction):
 

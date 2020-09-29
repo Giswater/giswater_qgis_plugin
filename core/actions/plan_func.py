@@ -17,8 +17,8 @@ from core.ui.ui_manager import PsectorManagerUi, PriceManagerUi
 from core.actions.psector_duplicate import GwPsectorDuplicate
 from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
 import global_vars
-from actions.parent_functs import fill_table, set_table_columns, set_label_current_psector, show_exceptions_msg
 
+from lib.tools_qt import fill_table, set_table_columns
 
 class GwPlan:
 
@@ -68,7 +68,7 @@ class GwPlan:
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
         fill_table(self.qtbl_psm, table_name)
         set_table_columns(self.dlg_psector_mng, self.qtbl_psm, table_name)
-        set_label_current_psector(self.dlg_psector_mng)
+        self.set_label_current_psector(self.dlg_psector_mng)
 
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -93,7 +93,7 @@ class GwPlan:
 
         fill_table(qtbl_psm, "v_ui_plan_psector")
         set_table_columns(dialog, qtbl_psm, "v_ui_plan_psector")
-        set_label_current_psector(dialog)
+        self.set_label_current_psector(dialog)
         open_dialog(dialog)
 
 
@@ -189,7 +189,7 @@ class GwPlan:
             if cur_psector is not None and (str(id_) == str(cur_psector[0])):
                 message = ("You are trying to delete your current psector. "
                            "Please, change your current psector before delete.")
-                show_exceptions_msg('Current psector', self.controller.tr(message))
+                self.controller.show_exceptions_msg('Current psector', self.controller.tr(message))
                 return
 
             list_id += f"'{id_}', "
@@ -238,7 +238,7 @@ class GwPlan:
         self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm, tablename))
 
         set_edit_strategy = QSqlTableModel.OnManualSubmit
-        fill_table(self.tbl_om_result_cat, tablename, set_edit_strategy)
+        fill_table(self.tbl_om_result_cat, tablename, set_edit_strategy=set_edit_strategy)
         set_table_columns(self.tbl_om_result_cat, self.dlg_merm.tbl_om_result_cat, tablename)
 
         # Open form
@@ -291,6 +291,16 @@ class GwPlan:
         psector_id = self.qtbl_psm.model().record(row).value("psector_id")
         self.duplicate_psector = GwPsectorDuplicate()
         self.duplicate_psector.is_duplicated.connect(partial(fill_table, self.qtbl_psm, 'v_ui_plan_psector'))
-        self.duplicate_psector.is_duplicated.connect(partial(set_label_current_psector, self.dlg_psector_mng))
+        self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
 
+
+    def set_label_current_psector(self, dialog):
+
+        sql = ("SELECT t1.name FROM plan_psector AS t1 "
+               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
+               " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
+        row = global_vars.controller.get_row(sql)
+        if not row:
+            return
+        tools_qt.setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
