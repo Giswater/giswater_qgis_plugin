@@ -81,9 +81,15 @@ def get_file_dialog(dialog, widget):
     file_dialog = QFileDialog()
     file_dialog.setFileMode(QFileDialog.AnyFile)
     message = "Select file"
-    folder_path, filter_ = file_dialog.getOpenFileName(parent=None, caption=global_vars.controller.tr(message))
-    if folder_path:
-        qt_tools.setWidgetText(dialog, widget, str(folder_path))
+    files_path, filter_ = file_dialog.getOpenFileNames(parent=None, caption=global_vars.controller.tr(message))
+
+    file_text = ""
+    for file in files_path:
+        file_text += f"{file}\n\n"
+    if files_path:
+        qt_tools.setWidgetText(dialog, widget, str(file_text))
+    return files_path
+
 
 
 def get_folder_dialog(dialog, widget):
