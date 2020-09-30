@@ -175,7 +175,6 @@ class ApiCF(ApiParent, QObject):
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
-        :param feature_type: (arc, node, connec...)
         :param feature_id: id of feature to do info
         :return:
         """
@@ -385,8 +384,6 @@ class ApiCF(ApiParent, QObject):
             if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
                 self.my_json[str(widget.property('columnname'))] = str(value)
 
-        self.controller.log_info(str(self.my_json))
-
 
     def open_generic_form(self, complet_result):
 
@@ -481,7 +478,6 @@ class ApiCF(ApiParent, QObject):
         action_link = self.dlg_cf.findChild(QAction, "actionLink")
         action_help = self.dlg_cf.findChild(QAction, "actionHelp")
         action_interpolate = self.dlg_cf.findChild(QAction, "actionInterpolate")
-        # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
         action_section = self.dlg_cf.findChild(QAction, "actionSection")
 
         self.show_actions('tab_data')
@@ -506,7 +502,6 @@ class ApiCF(ApiParent, QObject):
         self.set_icon(action_section, "207")
         self.set_icon(action_help, "73")
         self.set_icon(action_interpolate, "194")
-        # self.set_icon(action_switch_arc_id, "141")
 
         # Set buttons icon
         # tab elements
@@ -662,20 +657,23 @@ class ApiCF(ApiParent, QObject):
 
 
     def start_edition_signal(self, action_edit, result):
+
         self.check_actions(action_edit, True)
         self.enable_all(self.dlg_cf, result)
         self.enable_actions(True)
 
 
     def stop_edition_signal(self, action_edit, result):
+
         self.check_actions(action_edit, False)
         self.disable_all(self.dlg_cf, result, False)
         self.enable_actions(False)
         self.get_last_value()
         self.accept(self.dlg_cf, self.complet_result[0], self.my_json)
-        
+
 
     def disconect_signals(self):
+
         try:
             self.layer.editingStopped.disconnect(self.get_last_value)
         except:
@@ -738,6 +736,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def get_last_value(self):
+
         try:
             widgets = self.dlg_cf.tab_data.findChildren(QWidget)
             for widget in widgets:
@@ -755,12 +754,15 @@ class ApiCF(ApiParent, QObject):
         self.iface.setActiveLayer(layer)
         self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
         action_is_checked = not self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked()
+        self.controller.log_info(f"start_editing - action_is_checked: {action_is_checked}")
 
         # If the json is empty, we simply activate/deactivate the editing
         # else if editing is active, deactivate edition and save changes
         if self.my_json == '' or str(self.my_json) == '{}':
+            self.controller.log_info("start_editing - return")
             return
         elif action_is_checked:
+            self.controller.log_info("start_editing - accept")
             self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').setChecked(action_is_checked)
 
@@ -1023,11 +1025,13 @@ class ApiCF(ApiParent, QObject):
         :param close_dialog:
         :return:
         """
-        print(f"self.my_json--> {self.my_json}")
+
+        self.controller.log_info(f"self.my_json: {self.my_json}")
         if _json == '' or str(_json) == '{}':
             if self.controller.dlg_docker:
                 self.controller.dlg_docker.setMinimumWidth(dialog.width())
                 self.controller.close_docker()
+            self.controller.log_info(f"accept: close_dialog")
             self.close_dialog(dialog)
             return
 
@@ -1056,19 +1060,15 @@ class ApiCF(ApiParent, QObject):
             return
 
         # If we create a new feature
-        print(f"self.new_feature_id --> {self.new_feature_id}")
-        print(f"LAYER:{self.layer_new_feature.name()}")
         if self.new_feature_id is not None:
             for k, v in list(_json.items()):
                 if k in parent_fields:
-                    print(f"KV:{k} --> {v}")
                     self.new_feature.setAttribute(k, v)
                     _json.pop(k, None)
             self.layer_new_feature.updateFeature(self.new_feature)
 
             status = self.layer_new_feature.commitChanges()
             self.new_feature_id = None
-            print(f"status --> {status}")
             if status is False:
                 return
 
@@ -1147,7 +1147,6 @@ class ApiCF(ApiParent, QObject):
                                 widget.setEnabled(field['iseditable'])
         except RuntimeError:
             pass
-
 
 
     def enable_all(self, dialog, result):
@@ -1287,6 +1286,7 @@ class ApiCF(ApiParent, QObject):
             widget.textChanged.connect(partial(self.check_min_max_value, dialog, widget, dialog.btn_accept))
 
         return widget
+
 
     def reload_fields(self, dialog, result, p_widget):
         """
@@ -1595,6 +1595,7 @@ class ApiCF(ApiParent, QObject):
                    " WHERE id::integer IN (" + list_id + ")")
             self.controller.execute_sql(sql, log_sql=False)
             widget.model().select()
+
 
     """ FUNCTIONS RELATED WITH TAB ELEMENT"""
 
