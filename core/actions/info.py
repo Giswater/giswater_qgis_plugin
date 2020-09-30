@@ -5,6 +5,14 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
+import json
+import os
+import subprocess
+import urllib.parse as parse
+import sys
+import webbrowser
+import global_vars
+
 from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY
 from qgis.gui import QgsDateTimeEdit, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand
 from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, QStringListModel, Qt
@@ -13,18 +21,9 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
-
-import json
-import os
-import subprocess
-import urllib.parse as parse
-import sys
-import webbrowser
 from collections import OrderedDict
 from functools import partial
 
-import global_vars
-from lib import tools_qt
 from core.actions.catalog import GwCatalog
 from core.actions.dimensioning import GwDimensioning
 from core.actions.document import GwDocument
@@ -33,25 +32,22 @@ from core.actions.visit_gallery import GwVisitGallery
 from core.actions.visit_manager import GwVisitManager
 
 from core.utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body, draw, \
-    draw_point
+    draw_point, accept
 from core.utils.layer_tools import populate_info_text
 from core.ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
-
-
 from lib.tools_qgis import get_snapping_options, get_event_point, snap_to_current_layer, get_snapped_layer, \
-    get_snapped_feature, add_marker, enable_snapping, snap_to_layer, apply_snapping_options, snap_to_arc, snap_to_node
-
+    get_snapped_feature, add_marker, enable_snapping, snap_to_layer, apply_snapping_options, snap_to_arc, snap_to_node, \
+    get_feature_by_expr
 from lib.tools_db import get_visible_layers
-
 from lib.tools_qt import set_completer_object_api, set_completer_object, check_actions, api_action_help, \
     set_widget_size, add_button, add_textarea, add_lineedit, set_data_type, manage_lineedit, add_tableview, \
     set_headers, populate_table, set_columns_config, add_checkbox, add_combobox, fill_child, add_frame, add_label, \
     add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_spinbox, fill_table, populate_basic_info, \
     add_calendar, put_widgets, get_values, set_setStyleSheet, disable_all, enable_all, clear_gridlayout, set_icon, \
-    set_dates_from_to, integer_validator
-
-from lib.tools_qgis import get_feature_by_expr
+    set_dates_from_to, getWidgetText, get_item_data, isChecked, getCalendarDate, set_qtv_config, remove_tab_by_tabName, \
+    setWidgetText, getWidgetType, set_combo_itemData, setImage, get_col_index_by_col_name, set_item_data, setText
+from core.utils.hyperlink_label import GwHyperLinkLabel
 
 class GwInfo(QObject):
 
@@ -288,13 +284,13 @@ class GwInfo(QObject):
             widget = dialog.findChild(QWidget, field['widgetname'])
             value = None
             if type(widget) in(QLineEdit, QPushButton, QSpinBox, QDoubleSpinBox):
-                value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
+                value = getWidgetText(dialog, widget, return_string_null=False)
             elif type(widget) is QComboBox:
-                value = tools_qt.get_item_data(dialog, widget, 0)
+                value = get_item_data(dialog, widget, 0)
             elif type(widget) is QCheckBox:
-                value = tools_qt.isChecked(dialog, widget)
+                value = isChecked(dialog, widget)
             elif type(widget) is QgsDateTimeEdit:
-                value = tools_qt.getCalendarDate(dialog, widget)
+                value = getCalendarDate(dialog, widget)
             else:
                 if widget is None:
                     msg = f"Widget {field['columnname']} is not configured or have a bad config"
@@ -348,21 +344,21 @@ class GwInfo(QObject):
         self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
         self.tab_main.currentChanged.connect(self.tab_activation)
         self.tbl_element = self.dlg_cf.findChild(QTableView, "tbl_element")
-        tools_qt.set_qtv_config(self.tbl_element)
+        set_qtv_config(self.tbl_element)
         self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
-        tools_qt.set_qtv_config(self.tbl_relations)
+        set_qtv_config(self.tbl_relations)
         self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
-        tools_qt.set_qtv_config(self.tbl_upstream)
+        set_qtv_config(self.tbl_upstream)
         self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
-        tools_qt.set_qtv_config(self.tbl_downstream)
+        set_qtv_config(self.tbl_downstream)
         self.tbl_hydrometer = self.dlg_cf.findChild(QTableView, "tbl_hydrometer")
-        tools_qt.set_qtv_config(self.tbl_hydrometer)
+        set_qtv_config(self.tbl_hydrometer)
         self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
-        tools_qt.set_qtv_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems, QTableView.CurrentChanged)
+        set_qtv_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems, QTableView.CurrentChanged)
         self.tbl_event_cf = self.dlg_cf.findChild(QTableView, "tbl_event_cf")
-        tools_qt.set_qtv_config(self.tbl_event_cf)
+        set_qtv_config(self.tbl_event_cf)
         self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
-        tools_qt.set_qtv_config(self.tbl_document)
+        set_qtv_config(self.tbl_document)
 
         # Get table name
         self.tablename = complet_result[0]['body']['feature']['tableName']
@@ -390,7 +386,7 @@ class GwInfo(QObject):
 
         for x in range(self.tab_main.count() - 1, 0, -1):
             if self.tab_main.widget(x).objectName() not in tabs_to_show:
-                tools_qt.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
+                remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
 
         # Actions
         action_edit = self.dlg_cf.findChild(QAction, "actionEdit")
@@ -537,7 +533,7 @@ class GwInfo(QObject):
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, self.layer))
         action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, self.dlg_cf, self.geom_type, tab_type))
         action_rotation.triggered.connect(partial(self.change_hemisphere, self.dlg_cf))
-        action_link.triggered.connect(partial(self, action_open_url, self.dlg_cf, result))
+        action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
         action_section.triggered.connect(partial(self.open_section_form))
         action_help.triggered.connect(partial(api_action_help, self.geom_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
@@ -564,7 +560,7 @@ class GwInfo(QObject):
             btn_cancel.clicked.connect(partial(close_dialog, self.dlg_cf))
             btn_cancel.clicked.connect(self.roll_back)
             btn_accept.clicked.connect(partial(
-                self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
+                accept, self.dlg_cf, self.complet_result[0], self.my_json))
             self.dlg_cf.dlg_closed.connect(self.roll_back)
             self.dlg_cf.dlg_closed.connect(self.rubber_band.reset)
             self.dlg_cf.dlg_closed.connect(partial(save_settings, self.dlg_cf))
@@ -601,7 +597,7 @@ class GwInfo(QObject):
         dlg_dtext = DialogTextUi()
         load_settings(dlg_dtext)
 
-        tools_qt.setWidgetText(dlg_dtext, dlg_dtext.txt_infolog, 'Interpolate tool')
+        setWidgetText(dlg_dtext, dlg_dtext.txt_infolog, 'Interpolate tool')
         dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
                                    "interpolation\nNode1: \nNode2:")
 
@@ -694,7 +690,7 @@ class GwInfo(QObject):
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
             widget = self.dlg_cf.findChild(QWidget, k)
             if widget:
-                text = tools_qt.getWidgetText(self.dlg_cf, widget, False, False)
+                text = getWidgetText(self.dlg_cf, widget, False, False)
                 if text:
                     msg = "Do you want to overwrite custom values?"
                     answer = global_vars.controller.ask_question(msg, "Overwrite values")
@@ -712,7 +708,7 @@ class GwInfo(QObject):
             widget = self.dlg_cf.findChild(QWidget, k)
             if widget:
                 widget.setStyleSheet(None)
-                tools_qt.setWidgetText(self.dlg_cf, widget, f'{v}')
+                setWidgetText(self.dlg_cf, widget, f'{v}')
                 widget.editingFinished.emit()
         close_dialog(dlg_dtext)
 
@@ -799,13 +795,13 @@ class GwInfo(QObject):
                f" WHERE node_id = '{self.feature_id}'")
         row = global_vars.controller.get_row(sql)
         if row:
-            tools_qt.setWidgetText(dialog, "rotation", str(row[0]))
+            setWidgetText(dialog, "rotation", str(row[0]))
 
         sql = (f"SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}),"
                f" ST_Point({point.x()}, {point.y()})))")
         row = global_vars.controller.get_row(sql)
         if row:
-            tools_qt.setWidgetText(dialog, "hemisphere", str(row[0]))
+            setWidgetText(dialog, "hemisphere", str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
             global_vars.controller.show_info(message, parameter=str(row[0]))
 
@@ -949,10 +945,10 @@ class GwInfo(QObject):
             # dialog.refreshFeature()
             for i in range(0, len(fields_aux)):
                 widget = dialog.findChild(QWidget, tab_type + "_" + fields_aux[i])
-                if tools_qt.getWidgetType(dialog, widget) is QLineEdit:
-                    tools_qt.setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
-                elif tools_qt.getWidgetType(dialog, widget) is QComboBox:
-                    tools_qt.set_combo_itemData(widget, str(snapped_feature_attr_aux[i]), 0)
+                if getWidgetType(dialog, widget) is QLineEdit:
+                    setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
+                elif getWidgetType(dialog, widget) is QComboBox:
+                    set_combo_itemData(widget, str(snapped_feature_attr_aux[i]), 0)
 
         self.api_disable_copy_paste(dialog, emit_point)
 
@@ -1033,7 +1029,7 @@ class GwInfo(QObject):
             widgets = self.dlg_cf.tab_data.findChildren(QWidget)
             for widget in widgets:
                 if widget.hasFocus():
-                    value = tools_qt.getWidgetText(self.dlg_cf, widget)
+                    value = getWidgetText(self.dlg_cf, widget)
                     if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
                         self.my_json[str(widget.property('columnname'))] = str(value)
         except RuntimeError as e:
@@ -1052,7 +1048,7 @@ class GwInfo(QObject):
         if self.my_json == '' or str(self.my_json) == '{}':
             return
         elif action_is_checked:
-            self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dlg=False)
+            accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dlg=False)
 
 
     def roll_back(self):
@@ -1274,7 +1270,7 @@ class GwInfo(QObject):
         widget = set_headers(widget, field)
         widget = populate_table(widget, field)
         widget = set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
-        tools_qt.set_qtv_config(widget)
+        set_qtv_config(widget)
         return widget
 
 
@@ -1294,123 +1290,23 @@ class GwInfo(QObject):
 
         # Set image
         img = json_result['body']['data']['shapepng']
-        tools_qt.setImage(dlg_sections, 'lbl_section_image', img)
+        setImage(dlg_sections, 'lbl_section_image', img)
 
         # Set values into QLineEdits
         for field in json_result['body']['data']['fields']:
             widget = dlg_sections.findChild(QLineEdit, field['columnname'])
             if widget:
                 if 'value' in field:
-                    tools_qt.setWidgetText(dlg_sections, widget, field['value'])
+                    setWidgetText(dlg_sections, widget, field['value'])
 
         dlg_sections.btn_close.clicked.connect(partial(close_dialog, dlg_sections))
         open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
-
-
-    def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True):
-        """
-        :param dialog:
-        :param complet_result:
-        :param _json:
-        :param p_widget:
-        :param clear_json:
-        :param close_dlg:
-        :return:
-        """
-
-        if _json == '' or str(_json) == '{}':
-            if self.controller.dlg_docker:
-                self.controller.dlg_docker.setMinimumWidth(dialog.width())
-                self.controller.close_docker()
-            close_dialog(dialog)
-            return
-
-        p_table_id = complet_result['body']['feature']['tableName']
-        id_name = complet_result['body']['feature']['idName']
-        parent_fields = complet_result['body']['data']['parentFields']
-        fields_reload = ""
-        list_mandatory = []
-        for field in complet_result['body']['data']['fields']:
-            if p_widget and (field['widgetname'] == p_widget.objectName()):
-                if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
-                    fields_reload = field['widgetcontrols']['autoupdateReloadFields']
-
-            if field['ismandatory']:
-                widget_name = 'data_' + field['columnname']
-                widget = self.dlg_cf.findChild(QWidget, widget_name)
-                widget.setStyleSheet(None)
-                value = tools_qt.getWidgetText(self.dlg_cf, widget)
-                if value in ('null', None, ''):
-                    widget.setStyleSheet("border: 1px solid red")
-                    list_mandatory.append(widget_name)
-
-        if list_mandatory:
-            msg = "Some mandatory values are missing. Please check the widgets marked in red."
-            self.controller.show_warning(msg)
-            return
-
-        # If we create a new feature
-        if self.new_feature_id is not None:
-            for k, v in list(_json.items()):
-                if k in parent_fields:
-                    self.new_feature.setAttribute(k, v)
-                    _json.pop(k, None)
-            self.layer_new_feature.updateFeature(self.new_feature)
-
-            status = self.layer_new_feature.commitChanges()
-            if status is False:
-                return
-
-            my_json = json.dumps(_json)
-            if my_json == '' or str(my_json) == '{}':
-                if self.controller.dlg_docker:
-                    self.controller.dlg_docker.setMinimumWidth(dialog.width())
-                    self.controller.close_docker()
-                close_dialog(dialog)
-                return
-            if self.new_feature.attribute(id_name) is not None:
-                feature = f'"id":"{self.new_feature.attribute(id_name)}", '
-            else:
-                feature = f'"id":"{self.feature_id}", '
-
-        # If we make an info
-        else:
-            my_json = json.dumps(_json)
-            feature = f'"id":"{self.feature_id}", '
-
-        feature += f'"featureType":"{self.feature_type}", '
-        feature += f'"tableName":"{p_table_id}"'
-        extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
-        body = create_body(feature=feature, extras=extras)
-        json_result = self.controller.get_json('gw_fct_setfields', body)
-        if not json_result:
-            return
-
-        if clear_json:
-            _json = {}
-
-        if "Accepted" in json_result['status']:
-            msg = "OK"
-            self.controller.show_message(msg, message_level=3)
-            self.reload_fields(dialog, json_result, p_widget)
-        elif "Failed" in json_result['status']:
-            # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
-            return
-
-        if close_dlg:
-            if self.controller.dlg_docker:
-                self.controller.dlg_docker.setMinimumWidth(dialog.width())
-                self.controller.close_docker()
-            close_dialog(dialog)
 
 
     def get_scale_zoom(self):
 
         scale_zoom = self.iface.mapCanvas().scale()
         return scale_zoom
-
-
-
 
 
     def enable_actions(self, enabled):
@@ -1438,7 +1334,7 @@ class GwInfo(QObject):
             def double_validator(self, value, widget, btn_accept)
         """
 
-        value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
+        value = getWidgetText(dialog, widget, return_string_null=False)
         try:
             getattr(self, f"{widget.property('datatype')}_validator")(value, widget, btn)
         except AttributeError:
@@ -1447,7 +1343,7 @@ class GwInfo(QObject):
 
     def check_min_max_value(self, dialog, widget, btn_accept):
 
-        value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
+        value = getWidgetText(dialog, widget, return_string_null=False)
         try:
             if value and ((widget.property('minValue') and float(value) < float(widget.property('minValue'))) or
                     (widget.property('maxValue') and float(value) > float(widget.property('maxValue')))):
@@ -1491,7 +1387,7 @@ class GwInfo(QObject):
                 widget.editingFinished.connect(partial(self.clean_my_json, widget))
                 widget.editingFinished.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.editingFinished.connect(
-                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
+                    partial(accept, dialog, self.complet_result[0], _json, widget, True, False))
             else:
                 widget.editingFinished.connect(partial(get_values, dialog, widget, self.my_json))
 
@@ -1510,7 +1406,7 @@ class GwInfo(QObject):
                 widget.textChanged.connect(partial(self.clean_my_json, widget))
                 widget.textChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.textChanged.connect(
-                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
+                    partial(accept, dialog, self.complet_result[0], _json, widget, True, False))
             else:
                 widget.textChanged.connect(partial(get_values, dialog, widget, self.my_json))
 
@@ -1535,7 +1431,7 @@ class GwInfo(QObject):
             widget = dialog.findChild(QLineEdit, f'{field["widgetname"]}')
             if widget:
                 value = field["value"]
-                tools_qt.setText(dialog, widget, value)
+                setText(dialog, widget, value)
                 if not field['iseditable']:
                     widget.setStyleSheet("QLineEdit { background: rgb(0, 255, 0); color: rgb(0, 0, 0)}")
                 else:
@@ -1557,7 +1453,7 @@ class GwInfo(QObject):
                 widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
                 widget.currentIndexChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.currentIndexChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+                    accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
                 widget.currentIndexChanged.connect(partial(get_values, dialog, widget, self.my_json))
 
@@ -1572,7 +1468,7 @@ class GwInfo(QObject):
                 widget.dateChanged.connect(partial(self.clean_my_json, widget))
                 widget.dateChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.dateChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+                    accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
                 widget.dateChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
 
@@ -1587,7 +1483,7 @@ class GwInfo(QObject):
                 widget.valueChanged.connect(partial(self.clean_my_json, widget))
                 widget.valueChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.valueChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+                    accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
                 widget.valueChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
 
@@ -1602,7 +1498,7 @@ class GwInfo(QObject):
                 widget.stateChanged.connect(partial(self.clean_my_json, widget))
                 widget.stateChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.stateChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+                    accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
                 widget.stateChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
         return widget
@@ -1751,7 +1647,7 @@ class GwInfo(QObject):
         """ Add object (doc or element) to selected feature """
 
         # Get values from dialog
-        object_id = tools_qt.getWidgetText(self.dlg_cf, table_object + "_id")
+        object_id = getWidgetText(self.dlg_cf, table_object + "_id")
         if object_id == 'null':
             message = "You need to insert data"
             self.controller.show_warning(message, parameter=table_object + "_id")
@@ -1843,7 +1739,7 @@ class GwInfo(QObject):
         set_completer_object(dialog, self.table_object)
 
         if element_id:
-            tools_qt.setWidgetText(elem.dlg_add_element, "element_id", element_id)
+            setWidgetText(elem.dlg_add_element, "element_id", element_id)
 
         # Open dialog
         open_dialog(elem.dlg_add_element)
@@ -1855,7 +1751,7 @@ class GwInfo(QObject):
         if elem.element_id is None:
             return
 
-        tools_qt.setWidgetText(dialog, "element_id", elem.element_id)
+        setWidgetText(dialog, "element_id", elem.element_id)
         self.add_object(self.tbl_element, "element", "v_ui_element")
         self.tbl_element.model().select()
 
@@ -1898,7 +1794,7 @@ class GwInfo(QObject):
 
         if not row:
             # Hide tab 'relations'
-            tools_qt.remove_tab_by_tabName(self.tab_main, "relations")
+            remove_tab_by_tabName(self.tab_main, "relations")
 
         else:
             # Manage signal 'doubleClicked'
@@ -2024,7 +1920,7 @@ class GwInfo(QObject):
         row = index.row()
 
         table_name = 'v_ui_hydrometer'
-        column_index = tools_qt.get_col_index_by_col_name(qtable, 'hydrometer_id')
+        column_index = get_col_index_by_col_name(qtable, 'hydrometer_id')
         feature_id = index.sibling(row, column_index).data()
 
         # return
@@ -2083,7 +1979,7 @@ class GwInfo(QObject):
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
-        tools_qt.set_item_data(self.dlg_cf.cmb_cat_period_id_filter, rows, add_empty=True, sort_combo=False)
+        set_item_data(self.dlg_cf.cmb_cat_period_id_filter, rows, add_empty=True, sort_combo=False)
 
         sql = ("SELECT hydrometer_id, hydrometer_customer_code "
                " FROM v_rtc_hydrometer "
@@ -2095,7 +1991,7 @@ class GwInfo(QObject):
         if rows:
             for row in rows:
                 rows_list.append(row)
-        tools_qt.set_item_data(self.dlg_cf.cmb_hyd_customer_code, rows_list, 1)
+        set_item_data(self.dlg_cf.cmb_hyd_customer_code, rows_list, 1)
 
         self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
         set_columns_config(self.tbl_hydrometer_value, table_hydro_value)
@@ -2109,8 +2005,8 @@ class GwInfo(QObject):
     def fill_tbl_hydrometer_values(self, qtable, table_name):
         """ Fill the table control to show hydrometers values """
 
-        cat_period = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 1)
-        customer_code = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.cmb_hyd_customer_code)
+        cat_period = get_item_data(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 1)
+        customer_code = get_item_data(self.dlg_cf, self.dlg_cf.cmb_hyd_customer_code)
         filter_ = f"connec_id::text = '{self.feature_id}' "
         if cat_period != '':
             filter_ += f" AND cat_period_id::text = '{cat_period}'"
@@ -2126,7 +2022,7 @@ class GwInfo(QObject):
         """ Get Filter for table hydrometer value with combo value"""
 
         # Get combo value
-        cat_period_id_filter = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 0)
+        cat_period_id_filter = get_item_data(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 0)
 
         # Set filter
         expr = f"{self.field_id} = '{self.feature_id}'"
@@ -2194,7 +2090,7 @@ class GwInfo(QObject):
         rows = self.controller.get_rows(sql)
         if rows:
             rows.append(['', ''])
-            tools_qt.set_item_data(self.dlg_cf.event_id, rows)
+            set_item_data(self.dlg_cf.event_id, rows)
         # Fill ComboBox event_type
         sql = (f"SELECT DISTINCT(parameter_type), parameter_type "
                f"FROM {table_name_event_id} "
@@ -2203,7 +2099,7 @@ class GwInfo(QObject):
         rows = self.controller.get_rows(sql)
         if rows:
             rows.append(['', ''])
-            tools_qt.set_item_data(self.dlg_cf.event_type, rows)
+            set_item_data(self.dlg_cf.event_type, rows)
 
         self.set_model_to_table(widget, table_name)
         self.set_filter_table_event(widget)
@@ -2223,25 +2119,25 @@ class GwInfo(QObject):
         if not row:
             return
 
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.id, row['id'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.event_code, row['event_code'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.visit_id, row['visit_id'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.position_id, row['position_id'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.position_value, row['position_value'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.parameter_id, row['parameter_id'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.value, row['value'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.value1, row['value1'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.value2, row['value2'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom1, row['geom1'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom2, row['geom2'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom3, row['geom3'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.xcoord, row['xcoord'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.ycoord, row['ycoord'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.compass, row['compass'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.tstamp, row['tstamp'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.text, row['text'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.index_val, row['index_val'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.is_last, row['is_last'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.id, row['id'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.event_code, row['event_code'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.visit_id, row['visit_id'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.position_id, row['position_id'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.position_value, row['position_value'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.parameter_id, row['parameter_id'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.value, row['value'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.value1, row['value1'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.value2, row['value2'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.geom1, row['geom1'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.geom2, row['geom2'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.geom3, row['geom3'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.xcoord, row['xcoord'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.ycoord, row['ycoord'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.compass, row['compass'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.tstamp, row['tstamp'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.text, row['text'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.index_val, row['index_val'])
+        setWidgetText(self.dlg_event_full, self.dlg_event_full.is_last, row['is_last'])
         self.populate_tbl_docs_x_event()
 
         # Set all QLineEdit readOnly(True)
@@ -2256,7 +2152,7 @@ class GwInfo(QObject):
                                  " color: rgb(100, 100, 100)}")
         self.dlg_event_full.btn_close.clicked.connect(partial(close_dialog, self.dlg_event_full))
         self.dlg_event_full.tbl_docs_x_event.doubleClicked.connect(self.open_file)
-        tools_qt.set_qtv_config(self.dlg_event_full.tbl_docs_x_event)
+        set_qtv_config(self.dlg_event_full.tbl_docs_x_event)
         open_dialog(self.dlg_event_full, 'visit_event_full')
 
 
@@ -2300,7 +2196,7 @@ class GwInfo(QObject):
 
         # Get row index
         index = self.dlg_event_full.tbl_docs_x_event.selectionModel().selectedRows()[0]
-        column_index = tools_qt.get_col_index_by_col_name(self.dlg_event_full.tbl_docs_x_event, 'value')
+        column_index = get_col_index_by_col_name(self.dlg_event_full.tbl_docs_x_event, 'value')
 
         path = index.sibling(index.row(), column_index).data()
         # Check if file exist
@@ -2362,7 +2258,7 @@ class GwInfo(QObject):
 
         # Cascade filter
         table_name_event_id = "config_visit_parameter"
-        event_type_value = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
+        event_type_value = get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
 
         feature_type = {'arc_id': 'ARC', 'connec_id': 'CONNEC', 'gully_id': 'GULLY', 'node_id': 'NODE'}
         # Fill ComboBox event_id
@@ -2374,12 +2270,12 @@ class GwInfo(QObject):
         rows = self.controller.get_rows(sql)
         if rows:
             rows.append(['', ''])
-            tools_qt.set_item_data(self.dlg_cf.event_id, rows, 1)
+            set_item_data(self.dlg_cf.event_id, rows, 1)
 
         # End cascading filter
         # Get selected values in Comboboxes
-        event_type_value = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
-        event_id = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.event_id, 0)
+        event_type_value = get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
+        event_id = get_item_data(self.dlg_cf, self.dlg_cf.event_id, 0)
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
         interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
@@ -2423,10 +2319,10 @@ class GwInfo(QObject):
         expr += f" AND visit_start BETWEEN {interval}"
 
         # Get selected values in Comboboxes
-        event_type_value = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
+        event_type_value = get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
         if event_type_value != 'null':
             expr += f" AND parameter_type ILIKE '%{event_type_value}%'"
-        event_id = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.event_id, 0)
+        event_id = get_item_data(self.dlg_cf, self.dlg_cf.event_id, 0)
         if event_id != 'null':
             expr += f" AND parameter_id ILIKE '%{event_id}%'"
 
@@ -2457,7 +2353,7 @@ class GwInfo(QObject):
         """ Call button 64: om_add_visit """
 
         # Get expl_id to save it on om_visit and show the geometry of visit
-        expl_id = tools_qt.get_item_data(self.dlg_cf, self.tab_type + '_expl_id', 0)
+        expl_id = get_item_data(self.dlg_cf, self.tab_type + '_expl_id', 0)
         if expl_id == -1:
             msg = "Widget expl_id not found"
             self.controller.show_warning(msg)
@@ -2626,7 +2522,7 @@ class GwInfo(QObject):
         rows = self.controller.get_rows(sql)
         if rows:
             rows.append(['', ''])
-        tools_qt.set_item_data(doc_type, rows)
+        set_item_data(doc_type, rows)
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "doc"
@@ -2657,7 +2553,7 @@ class GwInfo(QObject):
         expr += f" AND(date BETWEEN {interval}) AND (date BETWEEN {interval})"
 
         # Get selected values in Comboboxes
-        doc_type_value = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.doc_type, 0)
+        doc_type_value = get_item_data(self.dlg_cf, self.dlg_cf.doc_type, 0)
         if doc_type_value != 'null' and doc_type_value is not None:
             expr += f" AND doc_type ILIKE '%{doc_type_value}%'"
 
@@ -2707,7 +2603,7 @@ class GwInfo(QObject):
         # Set completer
         set_completer_object(dialog, self.table_object)
         if doc_id:
-            tools_qt.setWidgetText(dialog, "doc_id", doc_id)
+            setWidgetText(dialog, "doc_id", doc_id)
 
         # # Open dialog
         # doc.open_dialog(doc.dlg_add_doc)
@@ -2719,7 +2615,7 @@ class GwInfo(QObject):
         if doc.doc_id is None:
             return
 
-        tools_qt.setWidgetText(dialog, "doc_id", doc.doc_id)
+        setWidgetText(dialog, "doc_id", doc.doc_id)
         self.add_object(self.tbl_document, "doc", "v_ui_doc")
 
 
@@ -2833,7 +2729,7 @@ class GwInfo(QObject):
         for widget in widget_list:
             if type(widget) != QTableView:
                 columnname = widget.property('columnname')
-                text = tools_qt.getWidgetText(dialog, widget)
+                text = getWidgetText(dialog, widget)
                 if text != "null":
                     filter_fields += f'"{columnname}":"{text}", '
 
@@ -2860,7 +2756,7 @@ class GwInfo(QObject):
         index = selected_list[0]
         row = index.row()
         table_name = complet_list[0]['body']['feature']['tableName']
-        column_index = tools_qt.get_col_index_by_col_name(qtable, 'sys_id')
+        column_index = get_col_index_by_col_name(qtable, 'sys_id')
         feature_id = index.sibling(row, column_index).data()
 
         # return
@@ -2972,23 +2868,23 @@ class GwInfo(QObject):
         # Get values from dialog
         values = ""
         fields = ""
-        cat_work_id = tools_qt.getWidgetText(self.dlg_new_workcat, cat_work_id)
+        cat_work_id = getWidgetText(self.dlg_new_workcat, cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
             values += f"'{cat_work_id}', "
-        descript = tools_qt.getWidgetText(self.dlg_new_workcat, descript)
+        descript = getWidgetText(self.dlg_new_workcat, descript)
         if descript != "null":
             fields += 'descript, '
             values += f"'{descript}', "
-        link = tools_qt.getWidgetText(self.dlg_new_workcat, link)
+        link = getWidgetText(self.dlg_new_workcat, link)
         if link != "null":
             fields += 'link, '
             values += f"'{link}', "
-        workid_key_1 = tools_qt.getWidgetText(self.dlg_new_workcat, workid_key_1)
+        workid_key_1 = getWidgetText(self.dlg_new_workcat, workid_key_1)
         if workid_key_1 != "null":
             fields += 'workid_key1, '
             values += f"'{workid_key_1}', "
-        workid_key_2 = tools_qt.getWidgetText(self.dlg_new_workcat, workid_key_2)
+        workid_key_2 = getWidgetText(self.dlg_new_workcat, workid_key_2)
         if workid_key_2 != "null":
             fields += 'workid_key2, '
             values += f"'{workid_key_2}', "
@@ -3019,7 +2915,7 @@ class GwInfo(QObject):
                         model = QStringListModel()
                         completer = QCompleter()
                         set_completer_object_api(completer, model, cmb_workcat_id, rows[0])
-                        tools_qt.setWidgetText(self.dlg_cf, cmb_workcat_id, cat_work_id)
+                        setWidgetText(self.dlg_cf, cmb_workcat_id, cat_work_id)
                         self.my_json[str(cmb_workcat_id.property('columnname'))] = str(cat_work_id)
                     close_dialog(self.dlg_new_workcat)
                 else:
@@ -3132,7 +3028,7 @@ class GwInfo(QObject):
         feat_id = snapped_feat.attribute(f'{options[option][0]}')
         widget = dialog.findChild(QWidget, f"{options[option][1]}")
         widget.setFocus()
-        tools_qt.setWidgetText(dialog, widget, str(feat_id))
+        setWidgetText(dialog, widget, str(feat_id))
         apply_snapping_options(self.previous_snapping)
         self.cancel_snapping_tool(dialog, action)
 
@@ -3161,7 +3057,7 @@ class GwInfo(QObject):
     """ OTHER FUNCTIONS """
 
     def set_image(self, dialog, widget):
-        tools_qt.setImage(dialog, widget, "ws_shape.png")
+        setImage(dialog, widget, "ws_shape.png")
 
 
 
@@ -3174,7 +3070,7 @@ class GwInfo(QObject):
         dialog = kwargs['dialog']
         widget = kwargs['widget']
 
-        feature_id = tools_qt.getWidgetText(dialog, widget)
+        feature_id = getWidgetText(dialog, widget)
         self.ApiCF = GwInfo(self.tab_type)
         complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=feature_id,
             tab_type=self.tab_type, is_docker=False)

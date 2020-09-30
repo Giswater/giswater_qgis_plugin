@@ -5,24 +5,22 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QStringListModel
-from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QTableView, QPushButton, QLineEdit, QCompleter, QAbstractItemView
-
 import datetime
 import json
 import os
 import subprocess
+import global_vars
 
+from qgis.PyQt.QtCore import QStringListModel
+from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtWidgets import QTableView, QPushButton, QLineEdit, QCompleter, QAbstractItemView
 from collections import OrderedDict
 from functools import partial
 
 from lib import tools_qt
 from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, save_current_tab,\
     save_settings
-import global_vars
 from core.ui.ui_manager import SelectorUi, MincutManagerUi
-
 from lib.tools_db import get_selector
 from lib.tools_qt import set_icon, set_table_columns, set_dates_from_to
 

@@ -5,19 +5,19 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpressionContextUtils, QgsProject, QgsSnappingConfig, QgsVectorLayer, QgsPointLocator, \
-    QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest
-
-from qgis.PyQt.QtWidgets import QDockWidget
-
-from qgis.PyQt.QtCore import QPoint
-
 import configparser
 import os.path
 import global_vars
+import partial
 
-from core.utils.tools_giswater import enable_feature_type
-from lib.tools_qt import apply_lazy_init, reload_table
+from qgis.core import QgsExpressionContextUtils, QgsProject, QgsSnappingConfig, QgsVectorLayer, QgsPointLocator, \
+    QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsExpression, QgsRectangle
+from qgis.PyQt.QtWidgets import QDockWidget, QApplication
+from qgis.PyQt.QtCore import QPoint, Qt
+from qgis.PyQt.QtGui import QColor, QgsVertexMarker, QgsMapToolEmitPoint, QCursor, QPixmap
+
+from core.utils.tools_giswater import enable_feature_type, tab_feature_changed, check_expression
+from lib.tools_qt import apply_lazy_init, reload_table, reload_qtable, getWidgetText
 
 def get_value_from_metadata(parameter, default_value):
     """ Get @parameter from metadata.txt file """
@@ -681,7 +681,7 @@ def get_xy(emit_point, vertex_marker, return_point, point):
 def selection_init(dialog, table_object, query=False, geom_type=None, layers=None):
     """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
-    from .multiple_selection import MultipleSelection
+    from actions.multiple_selection import MultipleSelection
     geom_type = tab_feature_changed(dialog, table_object)
     if geom_type in ('all', None):
         geom_type = 'arc'
@@ -797,7 +797,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
         ids = []
 
     field_id = f"{geom_type}_id"
-    feature_id = tools_qt.getWidgetText(dialog, "feature_id")
+    feature_id = getWidgetText(dialog, "feature_id")
     expr_filter = f"{field_id} = '{feature_id}'"
 
     # Check expression
@@ -867,7 +867,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
 def insert_feature_to_plan(dialog, geom_type, ids=None):
     """ Insert features_id to table plan_@geom_type_x_psector """
 
-    value = tools_qt.getWidgetText(dialog, dialog.psector_id)
+    value = getWidgetText(dialog, dialog.psector_id)
     for i in range(len(ids)):
         sql = (f"SELECT {geom_type}_id "
                f"FROM plan_psector_x_{geom_type} "

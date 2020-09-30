@@ -5,20 +5,20 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
-
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
 from functools import partial
 
-from lib import tools_qt
 from core.utils.tools_giswater import load_settings, open_dialog, close_dialog, tab_feature_changed
 from core.ui.ui_manager import DocUi, DocManager
-import global_vars
-
-
 from lib.tools_qgis import remove_selection, selection_init, insert_feature
 from lib.tools_qt import populate_combo_with_query, delete_records, manage_close, fill_table_object, filter_by_id, \
     delete_selected_object, set_selectionbehavior, set_model_to_table, set_icon, exist_object, set_completer_object, \
-    set_completer_widget, set_table_columns
+    set_completer_widget, set_table_columns, setWidgetText, getWidgetText, getCalendarDate, setCalendarDate
+
+import global_vars
+import webbrowser
+import os
+
 
 class GwDocument:
 
@@ -99,10 +99,10 @@ class GwDocument:
 
         # Set current/selected date and link
         if row:
-            tools_qt.setCalendarDate(self.dlg_add_doc, 'date', row.value('date'))
-            tools_qt.setWidgetText(self.dlg_add_doc, 'path', row.value('path'))
+            setCalendarDate(self.dlg_add_doc, 'date', row.value('date'))
+            setWidgetText(self.dlg_add_doc, 'path', row.value('path'))
         else:
-            tools_qt.setCalendarDate(self.dlg_add_doc, 'date', None)
+            setCalendarDate(self.dlg_add_doc, 'date', None)
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"
@@ -176,11 +176,11 @@ class GwDocument:
         """ Insert or update table 'document'. Add document to selected feature """
 
         # Get values from dialog
-        doc_id = tools_qt.getWidgetText(self.dlg_add_doc, "doc_id")
-        doc_type = tools_qt.getWidgetText(self.dlg_add_doc, "doc_type", return_string_null=True)
-        date = tools_qt.getCalendarDate(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
-        observ = tools_qt.getWidgetText(self.dlg_add_doc, "observ", return_string_null=False)
-        path = tools_qt.getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
+        doc_id = getWidgetText(self.dlg_add_doc, "doc_id")
+        doc_type = getWidgetText(self.dlg_add_doc, "doc_type", return_string_null=True)
+        date = getCalendarDate(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
+        observ = getWidgetText(self.dlg_add_doc, "observ", return_string_null=False)
+        path = getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
 
         if doc_type == 'null':
             message = "You need to insert doc_type"
@@ -308,14 +308,14 @@ class GwDocument:
         dialog.close()
 
         self.manage_document(row=widget.model().record(row))
-        tools_qt.setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
+        setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
 
 
     def open_web_browser(self, dialog, widget=None):
         """ Display url using the default browser """
 
         if widget is not None:
-            url = tools_qt.getWidgetText(dialog, widget)
+            url = getWidgetText(dialog, widget)
             if url == 'null':
                 url = 'http://www.giswater.org'
         else:
@@ -326,19 +326,21 @@ class GwDocument:
 
     def get_file_dialog(self, dialog, widget):
         """ Get file dialog """
-
         # Check if selected file exists. Set default value if necessary
-        file_path = tools_qt.getWidgetText(dialog, widget)
+        file_path = getWidgetText(dialog, widget)
         if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
             folder_path = global_vars.plugin_dir
         else:
             folder_path = os.path.dirname(file_path)
-
         # Open dialog to select file
         os.chdir(folder_path)
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.AnyFile)
         message = "Select file"
-        folder_path, filter_ = file_dialog.getOpenFileName(parent=None, caption=global_vars.controller.tr(message))
-        if folder_path:
-            tools_qt.setWidgetText(dialog, widget, str(folder_path))
+        files_path, filter_ = file_dialog.getOpenFileNames(parent=None, caption=global_vars.controller.tr(message))
+        file_text = ""
+        for file in files_path:
+            file_text += f"{file}\n\n"
+        if files_path:
+            setWidgetText(dialog, widget, str(file_text))
+        return files_path

@@ -8,7 +8,6 @@ or (at your option) any later version.
 from qgis.core import QgsVectorLayer, QgsRectangle
 from qgis.PyQt.QtCore import QRect, Qt
 from qgis.PyQt.QtWidgets import QApplication
-
 from functools import partial
 
 from core.ui.ui_manager import DialogTextUi

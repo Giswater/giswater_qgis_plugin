@@ -5,15 +5,17 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsProject
+import os
+import json
+import global_vars
+import random
+
+from qgis.core import QgsProject, QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer
 from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox, \
     QGridLayout, QRadioButton, QAbstractItemView
-
-import os
-import json
 from collections import OrderedDict
 from functools import partial
 
@@ -23,7 +25,6 @@ from core.utils.tools_giswater import close_dialog, get_parser_value, load_setti
     create_body
 from core.utils.layer_tools import add_temp_layer, populate_info_text
 from core.ui.ui_manager import ToolboxDockerUi, ToolboxUi
-
 from lib.tools_qt import construct_form_param_user
 
 class GwToolBoxButton(GwParentAction):

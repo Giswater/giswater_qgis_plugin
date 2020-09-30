@@ -5,16 +5,17 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.gui import QgsVertexMarker
-from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal
-from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
-from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
-    QTextEdit, QPushButton, QComboBox, QTabWidget
-
 import os
 import sys
 import subprocess
 import webbrowser
+import global_vars
+
+from qgis.gui import QgsVertexMarker
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal
+from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
+from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
+    QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit, QDateTime
 from datetime import datetime
 from functools import partial
 
@@ -29,14 +30,12 @@ from core.models.om_visit_parameter import OmVisitParameter
 from core.ui.ui_manager import VisitUi, VisitEvent, VisitEventRehab, LotVisitManagerUi
 from core.actions.document import GwDocument
 from core.utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers, create_body, \
-    enable_feature_type
-import global_vars
-from actions.parent_manage_funct import check_expression
-
+    enable_feature_type, check_expression
 from lib.tools_qgis import remove_selection, add_point, selection_init, selection_changed, select_features_by_ids, \
     insert_feature, disconnect_signal_selection_changed, connect_signal_selection_changed, refresh_map_canvas
 from lib.tools_qt import delete_records, fill_table_object, delete_selected_object, set_selectionbehavior, set_icon, \
-    set_dates_from_to, document_open, document_delete, set_table_model, set_completer_object, set_table_columns
+    set_dates_from_to, document_open, document_delete, set_table_model, set_completer_object, set_table_columns, \
+    set_completer_widget
 
 
 

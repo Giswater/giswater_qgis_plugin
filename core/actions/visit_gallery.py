@@ -5,20 +5,19 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QLabel, QPushButton, QLineEdit
-from qgis.PyQt.QtGui import QPixmap
-from qgis.PyQt.QtCore import Qt
-
 import urllib.request
 import urllib.error
 import urllib.parse
+import global_vars
+
+from qgis.PyQt.QtWidgets import QLabel, QPushButton, QLineEdit
+from qgis.PyQt.QtGui import QPixmap
+from qgis.PyQt.QtCore import Qt
 from functools import partial
 
 from core.utils.extended_qlabel import GwExtendedQLabel
 from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
 from core.ui.ui_manager import Gallery, GalleryZoom
-import global_vars
-
 from lib.tools_qt import set_icon
 
 class GwVisitGallery:

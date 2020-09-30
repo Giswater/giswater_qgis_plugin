@@ -10,7 +10,7 @@ from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints
 import os
 
 import global_vars
-from actions.api_parent_functs import create_body
+from core.utils.tools_giswater import create_body
 
 
 class GwInfoTools:

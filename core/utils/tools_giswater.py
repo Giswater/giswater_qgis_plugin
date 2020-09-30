@@ -6,20 +6,22 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 
-from qgis.PyQt.QtWidgets import QTabWidget
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QTabWidget, QColor, QCompleter, QWidget
+from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel
 from qgis.PyQt.QtGui import QCursor, QPixmap
-from qgis.core import QgsProject, QgsExpression
+from qgis.core import QgsProject, QgsExpression, QgsPointXY, QgsGeometry, QgsVectorLayer
 
 import configparser
 import global_vars
 import os
 import sys
+import re
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
-from lib import tools_qt
+from lib.tools_qt import set_completer_widget, getWidgetText, setWidgetText, getWidget
 from core.ui.ui_manager import GwDialog, GwMainWindow
+from lib.tools_qgis import get_max_rectangle_from_coords, get_points, zoom_to_rectangle
 
 
 def load_settings(dialog):
@@ -198,7 +200,7 @@ def create_body(form='', feature='', filter_fields='', extras=None):
 def populate_info_text(dialog, data, force_tab=True, reset_text=True, tab_idx=1):
 
     change_tab = False
-    text = tools_qt.getWidgetText(dialog, 'txt_infolog', return_string_null=False)
+    text = getWidgetText(dialog, 'txt_infolog', return_string_null=False)
     if reset_text:
         text = ""
     for item in data['info']['values']:
@@ -210,7 +212,7 @@ def populate_info_text(dialog, data, force_tab=True, reset_text=True, tab_idx=1)
             else:
                 text += "\n"
 
-    tools_qt.setWidgetText(dialog, 'txt_infolog', text + "\n")
+    setWidgetText(dialog, 'txt_infolog', text + "\n")
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
     if change_tab and qtabwidget is not None:
         qtabwidget.setCurrentIndex(tab_idx)
@@ -399,8 +401,8 @@ def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, du
 
 def enable_feature_type(dialog, widget_name='tbl_relation', ids=None):
 
-    feature_type = tools_qt.getWidget(dialog, 'feature_type')
-    widget_table = tools_qt.getWidget(dialog, widget_name)
+    feature_type = getWidget(dialog, 'feature_type')
+    widget_table = getWidget(dialog, widget_name)
     if feature_type is not None and widget_table is not None:
         if len(ids) > 0:
             feature_type.setEnabled(False)
@@ -439,7 +441,6 @@ def tab_feature_changed(dialog, table_object, excluded_layers=[]):
     """ Set geom_type and layer depending selected tab
         @table_object = ['doc' | 'element' | 'cat_work']
     """
-
     # parent_vars.get_values_from_form(dialog)
     tab_position = dialog.tab_feature.currentIndex()
     geom_type = "arc"
@@ -449,21 +450,249 @@ def tab_feature_changed(dialog, table_object, excluded_layers=[]):
         geom_type = "node"
     elif tab_position == 2:
         geom_type = "connec"
+    # This function is used for multiple forms, in some the tab 3 is for elements, in the plan_psector form it is
+    # for gully(or 4), in the forms that have elements, they do not have gully, therefore the tab element will also be 3
+    elif tab_position == 3 and dialog.objectName() == 'plan_psector':
+        geom_type = "gully"
     elif tab_position == 3:
         geom_type = "element"
     elif tab_position == 4:
         geom_type = "gully"
-
     hide_generic_layers(excluded_layers=excluded_layers)
     viewname = f"v_edit_{geom_type}"
-
     # Adding auto-completion to a QLineEdit
-    set_completer_widget(viewname, dialog.feature_id, concat(str(geom_type),"_id" ))
-
+    set_completer_feature_id(dialog.feature_id, geom_type, viewname)
     global_vars.iface.actionPan().trigger()
-
     return geom_type
 
+
+def set_completer_feature_id(widget, geom_type, viewname):
+    """ Set autocomplete of widget 'feature_id'
+        getting id's from selected @viewname
+    """
+    if geom_type == '':
+        return
+    # Adding auto-completion to a QLineEdit
+    completer = QCompleter()
+    completer.setCaseSensitivity(Qt.CaseInsensitive)
+    widget.setCompleter(completer)
+    model = QStringListModel()
+    sql = (f"SELECT {geom_type}_id"
+           f" FROM {viewname}")
+    row = global_vars.controller.get_rows(sql)
+    if row:
+        for i in range(0, len(row)):
+            aux = row[i]
+            row[i] = str(aux[0])
+        model.setStringList(row)
+        completer.setModel(model)
+
+
+def gw_function_dxf(**kwargs):
+    """ Function called in def add_button(self, dialog, field): -->
+            widget.clicked.connect(partial(getattr(self, function_name), dialog, widget)) """
+
+    path, filter_ = open_file_path(filter_="DXF Files (*.dxf)")
+    if not path:
+        return
+
+    dialog = kwargs['dialog']
+    widget = kwargs['widget']
+    complet_result = manage_dxf(dialog, path, False, True)
+
+    for layer in complet_result['temp_layers_added']:
+        temp_layers_added.append(layer)
+    if complet_result is not False:
+        widget.setText(complet_result['path'])
+
+    dialog.btn_run.setEnabled(True)
+    dialog.btn_cancel.setEnabled(True)
+
+
+def manage_dxf(self, dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=True):
+    """ Select a dxf file and add layers into toc
+    :param dxf_path: path of dxf file
+    :param export_to_db: Export layers to database
+    :param toc: insert layers into TOC
+    :param del_old_layers: look for a layer with the same name as the one to be inserted and delete it
+    :return:
+    """
+
+    srid = self.controller.plugin_settings_value('srid')
+    # Block the signals so that the window does not appear asking for crs / srid and / or alert message
+    self.iface.mainWindow().blockSignals(True)
+    dialog.txt_infolog.clear()
+
+    sql = "DELETE FROM temp_table WHERE fid = 206;\n"
+    self.controller.execute_sql(sql)
+    temp_layers_added = []
+    for type_ in ['LineString', 'Point', 'Polygon']:
+
+        # Get file name without extension
+        dxf_output_filename = os.path.splitext(os.path.basename(dxf_path))[0]
+
+        # Create layer
+        uri = f"{dxf_path}|layername=entities|geometrytype={type_}"
+        dxf_layer = QgsVectorLayer(uri, f"{dxf_output_filename}_{type_}", 'ogr')
+
+        # Set crs to layer
+        crs = dxf_layer.crs()
+        crs.createFromId(srid)
+        dxf_layer.setCrs(crs)
+
+        if not dxf_layer.hasFeatures():
+            continue
+
+        # Get the name of the columns
+        field_names = [field.name() for field in dxf_layer.fields()]
+
+        sql = ""
+        geom_types = {0: 'geom_point', 1: 'geom_line', 2: 'geom_polygon'}
+        for count, feature in enumerate(dxf_layer.getFeatures()):
+            geom_type = feature.geometry().type()
+            sql += (f"INSERT INTO temp_table (fid, text_column, {geom_types[int(geom_type)]})"
+                    f" VALUES (206, '{{")
+            for att in field_names:
+                if feature[att] in (None, 'NULL', ''):
+                    sql += f'"{att}":null , '
+                else:
+                    sql += f'"{att}":"{feature[att]}" , '
+            geometry = self.add_layer.manage_geometry(feature.geometry())
+            sql = sql[:-2] + f"}}', (SELECT ST_GeomFromText('{geometry}', {srid})));\n"
+            if count != 0 and count % 500 == 0:
+                status = self.controller.execute_sql(sql)
+                if not status:
+                    return False
+                sql = ""
+
+        if sql != "":
+            status = self.controller.execute_sql(sql)
+            if not status:
+                return False
+
+        if export_to_db:
+            self.add_layer.export_layer_to_db(dxf_layer, crs)
+
+        if del_old_layers:
+            self.add_layer.delete_layer_from_toc(dxf_layer.name())
+
+        if toc:
+            if dxf_layer.isValid():
+                self.add_layer.from_dxf_to_toc(dxf_layer, dxf_output_filename)
+                temp_layers_added.append(dxf_layer)
+
+    # Unlock signals
+    self.iface.mainWindow().blockSignals(False)
+
+    extras = "  "
+    for widget in dialog.grb_parameters.findChildren(QWidget):
+        widget_name = widget.property('columnname')
+        value = getWidgetText(dialog, widget, add_quote=False)
+        extras += f'"{widget_name}":"{value}", '
+    extras = extras[:-2]
+    body = self.create_body(extras)
+    result = self.controller.get_json('gw_fct_check_importdxf', None)
+    if not result:
+        return False
+
+    return {"path": dxf_path, "result": result, "temp_layers_added": temp_layers_added}
+
+
+def accept(dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True):
+    """
+    :param dialog:
+    :param complet_result:
+    :param _json:
+    :param p_widget:
+    :param clear_json:
+    :param close_dlg:
+    :return:
+    """
+
+    if _json == '' or str(_json) == '{}':
+        if self.controller.dlg_docker:
+            self.controller.dlg_docker.setMinimumWidth(dialog.width())
+            self.controller.close_docker()
+        close_dialog(dialog)
+        return
+
+    p_table_id = complet_result['body']['feature']['tableName']
+    id_name = complet_result['body']['feature']['idName']
+    parent_fields = complet_result['body']['data']['parentFields']
+    fields_reload = ""
+    list_mandatory = []
+    for field in complet_result['body']['data']['fields']:
+        if p_widget and (field['widgetname'] == p_widget.objectName()):
+            if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
+                fields_reload = field['widgetcontrols']['autoupdateReloadFields']
+
+        if field['ismandatory']:
+            widget_name = 'data_' + field['columnname']
+            widget = self.dlg_cf.findChild(QWidget, widget_name)
+            widget.setStyleSheet(None)
+            value = getWidgetText(self.dlg_cf, widget)
+            if value in ('null', None, ''):
+                widget.setStyleSheet("border: 1px solid red")
+                list_mandatory.append(widget_name)
+
+    if list_mandatory:
+        msg = "Some mandatory values are missing. Please check the widgets marked in red."
+        self.controller.show_warning(msg)
+        return
+
+    # If we create a new feature
+    if self.new_feature_id is not None:
+        for k, v in list(_json.items()):
+            if k in parent_fields:
+                self.new_feature.setAttribute(k, v)
+                _json.pop(k, None)
+        self.layer_new_feature.updateFeature(self.new_feature)
+
+        status = self.layer_new_feature.commitChanges()
+        if status is False:
+            return
+
+        my_json = json.dumps(_json)
+        if my_json == '' or str(my_json) == '{}':
+            if self.controller.dlg_docker:
+                self.controller.dlg_docker.setMinimumWidth(dialog.width())
+                self.controller.close_docker()
+            close_dialog(dialog)
+            return
+        if self.new_feature.attribute(id_name) is not None:
+            feature = f'"id":"{self.new_feature.attribute(id_name)}", '
+        else:
+            feature = f'"id":"{self.feature_id}", '
+
+    # If we make an info
+    else:
+        my_json = json.dumps(_json)
+        feature = f'"id":"{self.feature_id}", '
+
+    feature += f'"featureType":"{self.feature_type}", '
+    feature += f'"tableName":"{p_table_id}"'
+    extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
+    body = create_body(feature=feature, extras=extras)
+    json_result = self.controller.get_json('gw_fct_setfields', body)
+    if not json_result:
+        return
+
+    if clear_json:
+        _json = {}
+
+    if "Accepted" in json_result['status']:
+        msg = "OK"
+        self.controller.show_message(msg, message_level=3)
+        self.reload_fields(dialog, json_result, p_widget)
+    elif "Failed" in json_result['status']:
+        # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
+        return
+
+    if close_dlg:
+        if self.controller.dlg_docker:
+            self.controller.dlg_docker.setMinimumWidth(dialog.width())
+            self.controller.close_docker()
+        close_dialog(dialog)
 # Doesn't work because of hasattr and getattr
 '''
 

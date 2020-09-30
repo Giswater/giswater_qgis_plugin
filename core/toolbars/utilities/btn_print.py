@@ -13,17 +13,19 @@ from qgis.PyQt.QtPrintSupport import QPrinter, QPrintDialog
 from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit
 
 import json
+import re
 from functools import partial
 
 from lib import tools_qt
 from core.toolbars.parent_dialog import GwParentAction
-from core.utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body
+from core.utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body, \
+    draw_polyline
 from core.ui.ui_manager import FastPrintUi
 import global_vars
 
 from lib.tools_qt import set_widget_size, add_lineedit, set_data_type, add_combobox, put_widgets, get_values, \
     set_setStyleSheet, hide_void_groupbox
-from lib.tools_qgis import get_composers_list
+from lib.tools_qgis import get_composers_list, get_points
 
 class GwPrintButton(GwParentAction):
 

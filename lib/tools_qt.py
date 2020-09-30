@@ -5,20 +5,30 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.gui import QgsDateTimeEdit
-from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp
-from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator
-from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit
-from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit
-from qgis.PyQt.QtWidgets import QPushButton, QPlainTextEdit, QRadioButton
-
-from functools import partial
 import os
 import operator
+import global_vars
+import re
+import sys
+import subprocess
+import webbrowser
+
+from qgis.gui import QgsDateTimeEdit
+from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, QSettings
+from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator, QFontMetrics, QStandardItemModel, \
+    QStandardItem, QIcon
+from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, \
+    QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, QPlainTextEdit, \
+    QRadioButton, QFrame, QSizePolicy, QSpacerItem, QGridLayout, QToolButton, QApplication, QFileDialog, QGroupBox
+from functools import partial
 
 from core.utils.hyperlink_label import GwHyperLinkLabel
-
-from core.utils.tools_giswater import enable_feature_type
+from core.utils.tools_giswater import enable_feature_type, create_body, accept, tab_feature_changed, check_expression, \
+    close_dialog, hide_generic_layers, reset_lists
+from lib.tools_db import set_selector
+from lib.tools_qgis import disconnect_signal_selection_changed, select_features_by_ids, remove_selection, \
+    connect_signal_selection_changed, disconnect_snapping, refresh_map_canvas
 
 
 def fillComboBox(dialog, widget, rows, allow_nulls=True, clear_combo=True):
@@ -1516,9 +1526,9 @@ def populate_combo_with_query(dialog, widget, table_name, field_name="id"):
            f" FROM {table_name}"
            f" ORDER BY {field_name}")
     rows = global_vars.controller.get_rows(sql)
-    tools_qt.fillComboBox(dialog, widget, rows)
+    fillComboBox(dialog, widget, rows)
     if rows:
-        tools_qt.setCurrentIndex(dialog, widget, 0)
+        setCurrentIndex(dialog, widget, 0)
 
 
 def delete_records(dialog, table_object, query=False, geom_type=None, layers=None, ids=None, list_ids=None,
@@ -1529,7 +1539,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
     geom_type = tab_feature_changed(dialog, table_object)
     if type(table_object) is str:
         widget_name = f"tbl_{table_object}_x_{geom_type}"
-        widget = tools_qt.getWidget(dialog, widget_name)
+        widget = getWidget(dialog, widget_name)
         if not widget:
             message = "Widget not found"
             global_vars.controller.show_warning(message, parameter=widget_name)
@@ -1660,7 +1670,7 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
 def delete_feature_at_plan(dialog, geom_type, list_id):
     """ Delete features_id to table plan_@geom_type_x_psector"""
 
-    value = tools_qt.getWidgetText(dialog, dialog.psector_id)
+    value = getWidgetText(dialog, dialog.psector_id)
     sql = (f"DELETE FROM plan_psector_x_{geom_type} "
            f"WHERE {geom_type}_id IN ({list_id}) AND psector_id = '{value}'")
     global_vars.controller.execute_sql(sql)
@@ -1694,7 +1704,7 @@ def filter_by_id(dialog, widget_table, widget_txt, table_object):
     field_object_id = "id"
     if table_object == "element":
         field_object_id = table_object + "_id"
-    object_id = tools_qt.getWidgetText(dialog, widget_txt)
+    object_id = getWidgetText(dialog, widget_txt)
     if object_id != 'null':
         expr = f"{field_object_id}::text ILIKE '%{object_id}%'"
         # Refresh model with selected filter
@@ -1777,7 +1787,7 @@ def get_folder_dialog(dialog, widget):
     """ Get folder dialog """
 
     # Check if selected folder exists. Set default value if necessary
-    folder_path = tools_qt.getWidgetText(dialog, widget)
+    folder_path = getWidgetText(dialog, widget)
     if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
         folder_path = os.path.expanduser("~")
 
@@ -1789,7 +1799,7 @@ def get_folder_dialog(dialog, widget):
     folder_path = file_dialog.getExistingDirectory(
         parent=None, caption=global_vars.controller.tr(message), directory=folder_path)
     if folder_path:
-        tools_qt.setWidgetText(dialog, widget, str(folder_path))
+        setWidgetText(dialog, widget, str(folder_path))
 
 
 def set_icon(widget, icon):
@@ -1807,7 +1817,7 @@ def set_icon(widget, icon):
 def set_table_columns(dialog, widget, table_name, sort_order=0, isQStandardItemModel=False, schema_name=None):
     """ Configuration of tables. Set visibility and width of columns """
 
-    widget = tools_qt.getWidget(dialog, widget)
+    widget = getWidget(dialog, widget)
     if not widget:
         return
 
@@ -1986,9 +1996,9 @@ def put_combobox(qtable, rows, field, widget_pos, combo_values):
         combo = QComboBox()
         row = rows[x]
         # Populate QComboBox
-        tools_qt.set_item_data(combo, combo_values, 1)
+        set_item_data(combo, combo_values, 1)
         # Set QCombobox to wanted item
-        tools_qt.set_combo_itemData(combo, str(row[field]), 1)
+        set_combo_itemData(combo, str(row[field]), 1)
         # Get index and put QComboBox into QTableView at index position
         idx = qtable.model().index(x, widget_pos)
         qtable.setIndexWidget(idx, combo)
@@ -2080,7 +2090,7 @@ def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=N
     field_object_id = "id"
     if table_object == "element":
         field_object_id = table_object + "_id"
-    object_id = tools_qt.getWidgetText(dialog, table_object + "_id")
+    object_id = getWidgetText(dialog, table_object + "_id")
 
     # Check if we already have data with selected object_id
     sql = (f"SELECT * "
@@ -2137,7 +2147,7 @@ def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=N
 def get_records_geom_type(dialog, table_object, geom_type, ids=None, list_ids=None, layers=None):
     """ Get records of @geom_type associated to selected @table_object """
 
-    object_id = tools_qt.getWidgetText(dialog, table_object + "_id")
+    object_id = getWidgetText(dialog, table_object + "_id")
     table_relation = table_object + "_x_" + geom_type
     widget_name = "tbl_" + table_relation
 
@@ -2189,7 +2199,7 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
 
     # Attach model to selected widget
     if type(table_object) is str:
-        widget = tools_qt.getWidget(dialog, table_object)
+        widget = getWidget(dialog, table_object)
         if not widget:
             message = "Widget not found"
             global_vars.controller.log_info(message, parameter=table_object)
@@ -2217,7 +2227,7 @@ def reload_table(dialog, table_object, geom_type, expr_filter):
 
     if type(table_object) is str:
         widget_name = f"tbl_{table_object}_x_{geom_type}"
-        widget = tools_qt.getWidget(dialog, widget_name)
+        widget = getWidget(dialog, widget_name)
         if not widget:
             message = "Widget not found"
             global_vars.controller.log_info(message, parameter=widget_name)
@@ -2372,3 +2382,36 @@ def get_expr_filter(geom_type, list_ids=None, layers=None):
     select_features_by_ids(geom_type, expr, layers=layers)
 
     return expr_filter
+
+
+def reload_qtable(dialog, geom_type):
+    """ Reload QtableView """
+
+    value = getWidgetText(dialog, dialog.psector_id)
+    expr = f"psector_id = '{value}'"
+    qtable = getWidget(dialog, f'tbl_psector_x_{geom_type}')
+    fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
+    set_table_columns(dialog, qtable, f"plan_psector_x_{geom_type}")
+    refresh_map_canvas()
+
+
+def fill_table_by_expr(qtable, table_name, expr):
+    """
+    :param qtable: QTableView to show
+    :param expr: expression to set model
+    """
+    if global_vars.schema_name not in table_name:
+        table_name = global_vars.schema_name + "." + table_name
+
+    model = QSqlTableModel()
+    model.setTable(table_name)
+    model.setFilter(expr)
+    model.setEditStrategy(QSqlTableModel.OnFieldChange)
+    qtable.setEditTriggers(QTableView.DoubleClicked)
+    model.select()
+    qtable.setModel(model)
+    qtable.show()
+
+    # Check for errors
+    if model.lastError().isValid():
+        global_vars.controller.show_warning(model.lastError().text())

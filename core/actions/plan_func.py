@@ -5,10 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import global_vars
+
 from qgis.PyQt.QtWidgets import QDateEdit, QLineEdit, QTableView, QAbstractItemView
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt
-
 from functools import partial
 
 from lib import tools_qt
@@ -16,8 +17,6 @@ from core.actions.psector import GwPsector
 from core.ui.ui_manager import PsectorManagerUi, PriceManagerUi
 from core.actions.psector_duplicate import GwPsectorDuplicate
 from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
-import global_vars
-
 from lib.tools_qt import fill_table, set_table_columns
 
 class GwPlan:

@@ -5,22 +5,22 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsPointXY
-from qgis.gui import QgsRubberBand
-from qgis.PyQt.QtCore import QStringListModel, Qt
-from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QHeaderView, \
-    QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
-
 import csv
 import operator
 import os
 import re
 import sys
+import global_vars
+
+from qgis.core import QgsPointXY, QgsGeometry
+from qgis.gui import QgsRubberBand
+from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QHeaderView, \
+    QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
 from functools import partial
 
-import global_vars
 from lib import tools_qt
 from core.actions.info import GwInfo
 from core.actions.document import GwDocument
@@ -28,9 +28,8 @@ from core.actions.psector import GwPsector
 from core.actions.visit_manager import GwVisitManager
 from core.ui.ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
 from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
-    draw, draw_point
-from actions.api_parent_functs import create_body, get_points, \
-    draw_polyline
+    draw, draw_point, create_body
+from lib.tools_qgis import get_points
 
 
 from lib.tools_qt import set_completer_object_api, set_completer_object, add_lineedit, populate_basic_info, set_icon, \

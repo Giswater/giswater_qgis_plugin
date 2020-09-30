@@ -5,9 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMessageLog, QgsCredentials, QgsProject, QgsDataSourceUri
+from qgis.core import QgsMessageLog, QgsCredentials, QgsProject, QgsDataSourceUri, QgsVectorLayer, QgsPointLocator, \
+    QgsSnappingConfig, QgsRectangle
 from qgis.PyQt.QtCore import QCoreApplication, QRegExp, QSettings, Qt, QTranslator
-from qgis.PyQt.QtGui import QTextCharFormat, QFont
+from qgis.PyQt.QtGui import QTextCharFormat, QFont, QColor
 from qgis.PyQt.QtSql import QSqlDatabase
 from qgis.PyQt.QtWidgets import QCheckBox, QGroupBox, QLabel, QMessageBox, QPushButton, QRadioButton, QTabWidget, \
     QToolBox
@@ -27,8 +28,11 @@ from .logger import Logger
 from lib import tools_os, tools_qt
 from core.ui.ui_manager import DialogTextUi, DockerUi
 from lib.tools_qgis import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
-    qgis_get_layer_primary_key, qgis_get_layers, resetRubberbands
-from core.utils.tools_giswater import get_parser_value, set_parser_value, manage_actions
+    qgis_get_layer_primary_key, qgis_get_layers, resetRubberbands, snap_to_layer, get_snapping_options, \
+    set_snapping_mode
+from core.utils.tools_giswater import get_parser_value, set_parser_value, manage_actions, draw, create_body
+from core.utils.layer_tools import delete_layer_from_toc, populate_vlayer, categoryze_layer, create_qml, \
+    from_postgres_to_toc
 
 
 class DaoController:
@@ -1851,7 +1855,7 @@ class DaoController:
             return
         srid = global_vars.srid
         try:
-            margin = 1
+            margin = None
             opacity = 100
 
             if 'zoom' in return_manager and 'margin' in return_manager['zoom']:

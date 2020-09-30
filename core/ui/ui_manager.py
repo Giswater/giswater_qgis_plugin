@@ -11,7 +11,6 @@ from qgis.PyQt.QtWidgets import QAction, QMainWindow, QDialog, QDockWidget, QWha
 import configparser
 import os
 import webbrowser
-import global_vars
 
 
 class GwDockWidget(QDockWidget):

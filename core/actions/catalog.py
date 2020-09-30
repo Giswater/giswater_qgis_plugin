@@ -13,11 +13,10 @@ from functools import partial
 from collections import OrderedDict
 
 from lib import tools_qt
-
-from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
-import global_vars
-from actions.api_parent_functs import create_body
+from core.utils.tools_giswater import close_dialog, load_settings, open_dialog, create_body
 from core.ui.ui_manager import InfoCatalogUi
+
+import global_vars
 
 
 class GwCatalog:

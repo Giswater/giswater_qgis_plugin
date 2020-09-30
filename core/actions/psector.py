@@ -5,35 +5,34 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.gui import QgsRubberBand
-from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence
-from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
-    QLineEdit, QTableView
-
 import csv
 import json
 import os
 import operator
 import sys
+
+from qgis.gui import QgsRubberBand
+from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
+from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
+    QLineEdit, QTableView
 from collections import OrderedDict
 from functools import partial
 
+from core.actions.document import GwDocument
 from lib import tools_qt
 from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
-    hide_generic_layers, tab_feature_changed
+    hide_generic_layers, tab_feature_changed, check_expression
 from core.ui.ui_manager import Plan_psector, PsectorRapportUi
 from core.actions.document import global_vars
-from actions.parent_manage_funct import check_expression
-
 from lib.tools_qgis import remove_selection, selection_init, selection_changed, disconnect_snapping, \
     zoom_to_selected_features, insert_feature, get_feature_by_id, disconnect_signal_selection_changed, \
     refresh_map_canvas
 from lib.tools_qt import delete_records, fill_table_object, set_selectionbehavior, get_folder_dialog, set_icon, \
     set_completer_lineedit, set_restriction, document_open, document_delete, set_completer_object, set_table_columns, \
-    set_completer_widget
+    set_completer_widget, reload_qtable
 from lib.tools_db import make_list_for_completer
 
 class GwPsector:
@@ -483,11 +482,11 @@ class GwPsector:
         psector_id = tools_qt.getWidgetText(self.dlg_plan_psector, "psector_id")
         sql = f"SELECT gw_fct_plan_psector_enableall({value}, '{psector_id}')"
         self.controller.execute_sql(sql)
-        self.reload_qtable(self.dlg_plan_psector, 'arc')
-        self.reload_qtable(self.dlg_plan_psector, 'node')
-        self.reload_qtable(self.dlg_plan_psector, 'connec')
+        reload_qtable(self.dlg_plan_psector, 'arc')
+        reload_qtable(self.dlg_plan_psector, 'node')
+        reload_qtable(self.dlg_plan_psector, 'connec')
         if self.project_type.upper() == 'UD':
-            self.reload_qtable(self.dlg_plan_psector, 'gully')
+            reload_qtable(self.dlg_plan_psector, 'gully')
 
         sql = (f"UPDATE plan_psector "
                f"SET enable_all = '{value}' "
@@ -1379,39 +1378,6 @@ class GwPsector:
               "according to the system variables plan_psector_statetype, " \
               "plan_statetype_planned and plan_statetype_ficticious, will be triggered."
         self.controller.show_details(msg, 'Message warning')
-
-
-    def reload_qtable(self, dialog, geom_type):
-        """ Reload QtableView """
-
-        value = tools_qt.getWidgetText(dialog, dialog.psector_id)
-        expr = f"psector_id = '{value}'"
-        qtable = tools_qt.getWidget(dialog, f'tbl_psector_x_{geom_type}')
-        self.fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
-        set_table_columns(dialog, qtable, f"plan_psector_x_{geom_type}")
-        refresh_map_canvas()
-
-
-    def fill_table_by_expr(self, qtable, table_name, expr):
-        """
-        :param qtable: QTableView to show
-        :param expr: expression to set model
-        """
-        if global_vars.schema_name not in table_name:
-            table_name = global_vars.schema_name + "." + table_name
-
-        model = QSqlTableModel()
-        model.setTable(table_name)
-        model.setFilter(expr)
-        model.setEditStrategy(QSqlTableModel.OnFieldChange)
-        qtable.setEditTriggers(QTableView.DoubleClicked)
-        model.select()
-        qtable.setModel(model)
-        qtable.show()
-
-        # Check for errors
-        if model.lastError().isValid():
-            global_vars.controller.show_warning(model.lastError().text())
 
 
     def hilight_feature_by_id(self, qtable, layer_name, field_id, rubber_band, width, index):

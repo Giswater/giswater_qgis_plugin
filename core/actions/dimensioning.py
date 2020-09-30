@@ -10,21 +10,21 @@ from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsMapTip, QgsRubberB
 from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, QGridLayout, QLabel,\
     QLineEdit, QPushButton, QSizePolicy, QSpacerItem, QSpinBox, QTextEdit, QWidget
-
 from functools import partial
+
 from core.utils.tools_giswater import create_body, close_dialog, load_settings, open_dialog, save_settings
 from core.ui.ui_manager import DimensioningUi
-import global_vars
-
 from lib.tools_qgis import set_snapping_mode, remove_marker, get_snapping_options, enable_snapping, snap_to_node, \
     snap_to_connec_gully, get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
     get_snapped_feature, get_snapped_feature_id, apply_snapping_options, restore_user_layer
 from lib.tools_qt import set_widget_size, add_button, add_textarea, add_lineedit, set_data_type, \
     manage_lineedit, add_tableview, set_headers, populate_table, set_columns_config, add_checkbox, add_combobox, \
     add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_spinbox, add_calendar, put_widgets, \
-    set_setStyleSheet, disable_all, enable_all
+    set_setStyleSheet, disable_all, enable_all, set_icon, setWidgetText, isChecked, get_item_data, setText, \
+    set_qtv_config, getWidgetText
 
-from lib.tools_qt import set_icon
+import global_vars
+
 
 class GwDimensioning:
 
@@ -108,7 +108,7 @@ class GwDimensioning:
             label, widget = self.set_widgets(self.dlg_dim, db_return, field)
 
             if widget.objectName() == 'id':
-                tools_qt.setWidgetText(self.dlg_dim, widget, self.fid)
+                setWidgetText(self.dlg_dim, widget, self.fid)
             layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
 
             # Profilactic issue to prevent missed layouts againts db response and form
@@ -166,7 +166,7 @@ class GwDimensioning:
         list_widgets = self.dlg_dim.findChildren(QLineEdit)
         for widget in list_widgets:
             widget_name = widget.property('columnname')
-            widget_value = tools_qt.getWidgetText(self.dlg_dim, widget)
+            widget_value = getWidgetText(self.dlg_dim, widget)
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":"{widget_value}", '
@@ -174,7 +174,7 @@ class GwDimensioning:
         list_widgets = self.dlg_dim.findChildren(QCheckBox)
         for widget in list_widgets:
             widget_name = widget.property('columnname')
-            widget_value = f'"{tools_qt.isChecked(self.dlg_dim, widget)}"'
+            widget_value = f'"{isChecked(self.dlg_dim, widget)}"'
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":{widget_value},'
@@ -183,7 +183,7 @@ class GwDimensioning:
         list_widgets = self.dlg_dim.findChildren(QComboBox)
         for widget in list_widgets:
             widget_name = widget.property('columnname')
-            widget_value = f'"{tools_qt.get_item_data(self.dlg_dim, widget)}"'
+            widget_value = f'"{get_item_data(self.dlg_dim, widget)}"'
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":{widget_value},'
@@ -309,11 +309,11 @@ class GwDimensioning:
 
             depth = snapped_feat.attribute(fieldname)
             if depth in ('', None, 0, '0', 'NULL'):
-                tools_qt.setText(self.dlg_dim, "depth", None)
+                setText(self.dlg_dim, "depth", None)
             else:
-                tools_qt.setText(self.dlg_dim, "depth", depth)
-            tools_qt.setText(self.dlg_dim, "feature_id", element_id)
-            tools_qt.setText(self.dlg_dim, "feature_type", feat_type.upper())
+                setText(self.dlg_dim, "depth", depth)
+            setText(self.dlg_dim, "feature_id", element_id)
+            setText(self.dlg_dim, "feature_type", feat_type.upper())
 
             apply_snapping_options(self.previous_snapping)
             self.deactivate_signals(action, emit_point)
@@ -455,7 +455,7 @@ class GwDimensioning:
             widget = set_headers(widget, field)
             widget = populate_table(widget, field)
             widget = set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
-            tools_qt.set_qtv_config(widget)
+            set_qtv_config(widget)
         widget.setObjectName(widget.property('columnname'))
 
         return label, widget

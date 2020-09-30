@@ -5,9 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
+import os
+
 from qgis.core import QgsApplication, QgsExpression, QgsFeatureRequest, QgsPrintLayout, QgsProject, \
     QgsReadWriteContext, QgsVectorLayer
-
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit
@@ -15,8 +17,6 @@ from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtXml import QDomDocument
 
-import json
-import os
 from datetime import datetime
 from collections import OrderedDict
 from functools import partial

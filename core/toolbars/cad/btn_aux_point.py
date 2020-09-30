@@ -5,15 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import global_vars
+
 from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator
-
 from functools import partial
 
 from lib import tools_qt
-import global_vars
 from core.toolbars.parent_maptool import GwParentMapTool
 from core.ui.ui_manager import AuxPoint
 from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
