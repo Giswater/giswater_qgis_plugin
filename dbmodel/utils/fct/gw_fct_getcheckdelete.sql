@@ -29,9 +29,6 @@ v_feature_id text;
 
 v_result text;
 v_result_info text;
-v_result_point text;
-v_result_line text;
-v_result_polygon text;
 v_error_context text;
 v_level integer;
 v_status text;
@@ -211,23 +208,17 @@ BEGIN
 	v_result_info := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
-	v_result_point = '{"geometryType":"", "features":[]}';
-	v_result_line = '{"geometryType":"", "features":[]}';
-	v_result_polygon = '{"geometryType":"", "features":[]}';
 
 	v_status = 'Accepted';
     v_level = 3;
     v_message = 'Process done successfully';
 
 	--  Return
-     RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
-		     ',"data":{ "info":'||v_result_info||','||
-				'"point":'||v_result_point||','||
-				'"line":'||v_result_line||','||
-				'"polygon":'||v_result_polygon||'}'||
-		       '}'||
-	    '}')::json;
+		     ',"data":{ "info":'||v_result_info||
+			'}}'||
+	    '}')::json, 2120);
 
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
