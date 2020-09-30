@@ -9,4 +9,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2020/09/30
-UPDATE sys_table SET sys_sequence = 'cat_mat_roughness_id_seq' where id = 'cat_mat_roughness';
+ALTER SEQUENCE inp_cat_mat_roughness_id_seq RENAME TO cat_mat_roughness_id_seq;
+ALTER TABLE cat_mat_roughness ALTER COLUMN id SET DEFAULT nextval('cat_mat_roughness_id_seq'); 
