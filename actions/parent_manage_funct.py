@@ -1112,9 +1112,10 @@ def disconnect_signal_selection_changed():
 
     try:
         global_vars.canvas.selectionChanged.disconnect()
-        global_vars.iface.actionPan().trigger()
     except Exception:
         pass
+    finally:
+        global_vars.iface.actionPan().trigger()
 
 
 def fill_widget_with_fields(dialog, data_object, field_names):
