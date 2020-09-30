@@ -115,7 +115,6 @@ INSERT INTO audit_cat_function VALUES (2422, 'gw_fct_audit_log_feature', 'utils'
 INSERT INTO audit_cat_function VALUES (1336, 'gw_trg_review_audit_arc', 'ws', 'trigger function', NULL, NULL, NULL, NULL, 'role_om', false, false, NULL, false);
 INSERT INTO audit_cat_function VALUES (1142, 'gw_trg_vnode_proximity', 'utils', 'trigger function', NULL, NULL, NULL, NULL, 'role_edit', false, false, NULL, false);
 INSERT INTO audit_cat_function VALUES (1144, 'gw_trg_vnode_update', 'utils', 'trigger function', NULL, NULL, NULL, NULL, 'role_edit', false, false, NULL, false);
-INSERT INTO audit_cat_function VALUES (2644, 'gw_api_setvisitmanagerend', 'utils', 'api function', NULL, NULL, NULL, 'To start visit manager', 'role_om', false, false, NULL, false);
 INSERT INTO audit_cat_function VALUES (2512, 'gw_fct_utils_csv2pg_import_omvisit', 'utils', 'function', NULL, NULL, NULL, 'Function imports visits from csv file into database', 'role_edit', false, false, NULL, false);
 INSERT INTO audit_cat_function VALUES (2514, 'gw_fct_utils_csv2pg_import_elements', 'utils', 'function', NULL, NULL, NULL, 'Function imports elements from csv file into database', 'role_edit', false, false, NULL, false);
 INSERT INTO audit_cat_function VALUES (2516, 'gw_fct_utils_csv2pg_import_addfields', 'utils', 'function', NULL, NULL, NULL, 'Function imports personalized fields from csv file into database', 'role_edit', false, false, NULL, false);
@@ -143,8 +142,6 @@ INSERT INTO audit_cat_function VALUES (1242, 'gw_trg_review_audit_node', 'ud', '
 INSERT INTO audit_cat_function VALUES (1232, 'gw_trg_edit_subcatchment', 'ud', 'trigger function', NULL, NULL, NULL, NULL, 'role_epa', false, false, NULL, false);
 INSERT INTO audit_cat_function VALUES (1222, 'gw_trg_edit_raingage', 'ud', 'trigger function', NULL, NULL, NULL, NULL, 'role_epa', false, false, NULL, false);
 INSERT INTO audit_cat_function VALUES (1220, 'gw_trg_edit_node', 'ud', 'trigger function', NULL, NULL, NULL, NULL, 'role_edit', false, false, NULL, false);
-INSERT INTO audit_cat_function VALUES (2642, 'gw_api_setvisitmanagerstart', 'utils', 'api function', NULL, NULL, NULL, 'To start visit manager', 'role_om', false, false, NULL, false);
-INSERT INTO audit_cat_function VALUES (2640, 'gw_api_getvisitmanager', 'utils', 'api function', NULL, NULL, NULL, 'To call visit from user', 'role_om', false, false, NULL, false);
 INSERT INTO audit_cat_function VALUES (2596, 'gw_api_getpermissions', 'utils', 'api function', NULL, NULL, NULL, 'Get information about permissions', 'role_basic', false, false, NULL, false);
 INSERT INTO audit_cat_function VALUES (2582, 'gw_api_getinfofromid', 'utils', 'api function', NULL, NULL, NULL, 'Get information by feature id', 'role_basic', false, false, NULL, false);
 INSERT INTO audit_cat_function VALUES (2576, 'gw_api_getgo2epa', 'utils', 'api function', NULL, NULL, NULL, 'Function called to get the epa forms', 'role_basic', false, false, NULL, false);
