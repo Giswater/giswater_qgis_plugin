@@ -23,16 +23,17 @@ from functools import partial
 
 from lib import tools_qt
 from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
-    hide_generic_layers
+    hide_generic_layers, tab_feature_changed
 from core.ui.ui_manager import Plan_psector, PsectorRapportUi
 from core.actions.document import global_vars
-from actions.parent_manage_funct import set_table_columns, check_expression, tab_feature_changed, \
-    set_completer_widget, refresh_map_canvas, set_completer_object
+from actions.parent_manage_funct import check_expression
 
 from lib.tools_qgis import remove_selection, selection_init, selection_changed, disconnect_snapping, \
-    zoom_to_selected_features, insert_feature, get_feature_by_id, disconnect_signal_selection_changed
+    zoom_to_selected_features, insert_feature, get_feature_by_id, disconnect_signal_selection_changed, \
+    refresh_map_canvas
 from lib.tools_qt import delete_records, fill_table_object, set_selectionbehavior, get_folder_dialog, set_icon, \
-    set_completer_lineedit, set_restriction, document_open, document_delete
+    set_completer_lineedit, set_restriction, document_open, document_delete, set_completer_object, set_table_columns, \
+    set_completer_widget
 from lib.tools_db import make_list_for_completer
 
 class GwPsector:

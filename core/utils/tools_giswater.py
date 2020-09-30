@@ -408,7 +408,61 @@ def enable_feature_type(dialog, widget_name='tbl_relation', ids=None):
             feature_type.setEnabled(True)
 
 
+def reset_lists(ids, list_ids):
+    """ Reset list of selected records """
 
+    ids = []
+    list_ids = {}
+    list_ids['arc'] = []
+    list_ids['node'] = []
+    list_ids['connec'] = []
+    list_ids['gully'] = []
+    list_ids['element'] = []
+
+    return ids, list_ids
+
+
+def reset_layers(layers):
+    """ Reset list of layers """
+
+    layers = {}
+    layers['arc'] = []
+    layers['node'] = []
+    layers['connec'] = []
+    layers['gully'] = []
+    layers['element'] = []
+
+    return layers
+
+
+def tab_feature_changed(dialog, table_object, excluded_layers=[]):
+    """ Set geom_type and layer depending selected tab
+        @table_object = ['doc' | 'element' | 'cat_work']
+    """
+
+    # parent_vars.get_values_from_form(dialog)
+    tab_position = dialog.tab_feature.currentIndex()
+    geom_type = "arc"
+    if tab_position == 0:
+        geom_type = "arc"
+    elif tab_position == 1:
+        geom_type = "node"
+    elif tab_position == 2:
+        geom_type = "connec"
+    elif tab_position == 3:
+        geom_type = "element"
+    elif tab_position == 4:
+        geom_type = "gully"
+
+    hide_generic_layers(excluded_layers=excluded_layers)
+    viewname = f"v_edit_{geom_type}"
+
+    # Adding auto-completion to a QLineEdit
+    set_completer_widget(viewname, dialog.feature_id, concat(str(geom_type),"_id" ))
+
+    global_vars.iface.actionPan().trigger()
+
+    return geom_type
 
 # Doesn't work because of hasattr and getattr
 '''

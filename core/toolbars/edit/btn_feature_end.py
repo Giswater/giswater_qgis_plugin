@@ -15,13 +15,12 @@ from datetime import datetime
 
 from lib import tools_qt
 from core.toolbars.parent_dialog import GwParentAction
-from core.utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers
+from core.utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers, tab_feature_changed
 from core.ui.ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
-from actions.parent_manage_funct import set_completer_object, tab_feature_changed, set_completer_widget
 
 from lib.tools_qgis import remove_selection, selection_init, disconnect_snapping, disconnect_signal_selection_changed, \
     insert_feature
-from lib.tools_qt import delete_records, set_selectionbehavior, set_icon
+from lib.tools_qt import delete_records, set_selectionbehavior, set_icon, set_completer_object, set_completer_widget
 
 
 class GwEndFeatureButton(GwParentAction):

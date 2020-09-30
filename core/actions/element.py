@@ -11,15 +11,14 @@ from qgis.gui import QgsVertexMarker
 from functools import partial
 
 from lib import tools_qt
-from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
+from core.utils.tools_giswater import close_dialog, load_settings, open_dialog, tab_feature_changed
 from core.ui.ui_manager import ElementUi, ElementManager
 import global_vars
-from actions.parent_manage_funct import set_completer_object, tab_feature_changed, \
-    set_completer_widget, set_table_columns
 
 from lib.tools_qgis import remove_selection, add_point, selection_init, insert_feature
 from lib.tools_qt import delete_records, manage_close, fill_table_object, filter_by_id, delete_selected_object, \
-    set_selectionbehavior, set_model_to_table, set_icon, exist_object
+    set_selectionbehavior, set_model_to_table, set_icon, exist_object, set_completer_object, set_table_columns, \
+    set_completer_widget
 
 class GwElement:
 

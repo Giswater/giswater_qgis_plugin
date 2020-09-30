@@ -655,6 +655,32 @@ def set_completer_object(dialog, table_object):
     completer.setModel(model)
 
 
+def set_completer_widget(tablename, widget, field_id):
+    """ Set autocomplete of widget @table_object + "_id"
+        getting id's from selected @table_object
+    """
+
+    if not widget:
+        return
+
+    # Set SQL
+    sql = (f"SELECT DISTINCT({field_id})"
+           f" FROM {tablename}"
+           f" ORDER BY {field_id}")
+    row = global_vars.controller.get_rows(sql)
+    for i in range(0, len(row)):
+        aux = row[i]
+        row[i] = str(aux[0])
+
+    # Set completer and model: add autocomplete in the widget
+    completer = QCompleter()
+    completer.setCaseSensitivity(Qt.CaseInsensitive)
+    widget.setCompleter(completer)
+    model = QStringListModel()
+    model.setStringList(row)
+    completer.setModel(model)
+
+
 def check_actions(action, enabled):
 
     try:
@@ -2205,3 +2231,144 @@ def reload_table(dialog, table_object, geom_type, expr_filter):
 
     expr = set_table_model(dialog, widget, geom_type, expr_filter)
     return expr
+
+
+def reset_model(dialog, table_object, geom_type):
+    """ Reset model of the widget """
+
+    table_relation = f"{table_object}_x_{geom_type}"
+    widget_name = f"tbl_{table_relation}"
+    widget = getWidget(dialog, widget_name)
+    if widget:
+        widget.setModel(None)
+
+
+def reset_widgets(dialog, table_object):
+    """ Clear contents of input widgets """
+
+    if table_object == "doc":
+        setWidgetText(dialog, "doc_type", "")
+        setWidgetText(dialog, "observ", "")
+        setWidgetText(dialog, "path", "")
+    elif table_object == "element":
+        setWidgetText(dialog, "elementcat_id", "")
+        setWidgetText(dialog, "state", "")
+        setWidgetText(dialog, "expl_id", "")
+        setWidgetText(dialog, "ownercat_id", "")
+        setWidgetText(dialog, "location_type", "")
+        setWidgetText(dialog, "buildercat_id", "")
+        setWidgetText(dialog, "workcat_id", "")
+        setWidgetText(dialog, "workcat_id_end", "")
+        setWidgetText(dialog, "comment", "")
+        setWidgetText(dialog, "observ", "")
+        setWidgetText(dialog, "path", "")
+        setWidgetText(dialog, "rotation", "")
+        setWidgetText(dialog, "verified", "")
+        setWidgetText(dialog, dialog.num_elements, "")
+
+
+def fill_widgets(dialog, table_object, row):
+    """ Fill input widgets with data int he @row """
+
+    if table_object == "doc":
+
+        setWidgetText(dialog, "doc_type", row["doc_type"])
+        setWidgetText(dialog, "observ", row["observ"])
+        setWidgetText(dialog, "path", row["path"])
+
+    elif table_object == "element":
+
+        state = ""
+        if row['state']:
+            sql = (f"SELECT name FROM value_state"
+                   f" WHERE id = '{row['state']}'")
+            row_aux = global_vars.controller.get_row(sql)
+            if row_aux:
+                state = row_aux[0]
+
+        expl_id = ""
+        if row['expl_id']:
+            sql = (f"SELECT name FROM exploitation"
+                   f" WHERE expl_id = '{row['expl_id']}'")
+            row_aux = global_vars.controller.get_row(sql)
+            if row_aux:
+                expl_id = row_aux[0]
+
+        setWidgetText(dialog, "code", row['code'])
+        sql = (f"SELECT elementtype_id FROM cat_element"
+               f" WHERE id = '{row['elementcat_id']}'")
+        row_type = global_vars.controller.get_row(sql)
+        if row_type:
+            setWidgetText(dialog, "element_type", row_type[0])
+
+        setWidgetText(dialog, "elementcat_id", row['elementcat_id'])
+        setWidgetText(dialog, "num_elements", row['num_elements'])
+        setWidgetText(dialog, "state", state)
+        set_combo_itemData(dialog.state_type, f"{row['state_type']}", 0)
+        setWidgetText(dialog, "expl_id", expl_id)
+        setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
+        setWidgetText(dialog, "location_type", row['location_type'])
+        setWidgetText(dialog, "buildercat_id", row['buildercat_id'])
+        setWidgetText(dialog, "builtdate", row['builtdate'])
+        setWidgetText(dialog, "workcat_id", row['workcat_id'])
+        setWidgetText(dialog, "workcat_id_end", row['workcat_id_end'])
+        setWidgetText(dialog, "comment", row['comment'])
+        setWidgetText(dialog, "observ", row['observ'])
+        setWidgetText(dialog, "link", row['link'])
+        setWidgetText(dialog, "verified", row['verified'])
+        setWidgetText(dialog, "rotation", row['rotation'])
+        if str(row['undelete']) == 'True':
+            dialog.undelete.setChecked(True)
+
+
+def set_combo(dialog, widget, table_name, parameter, field_id='id', field_name='id'):
+    """ Executes query and set combo box """
+
+    sql = (f"SELECT t1.{field_name} FROM {table_name} as t1"
+           f" INNER JOIN config_param_user as t2 ON t1.{field_id}::text = t2.value::text"
+           f" WHERE parameter = '{parameter}' AND cur_user = current_user")
+    row = global_vars.controller.get_row(sql)
+    if row:
+        setWidgetText(dialog, widget, row[0])
+
+
+def set_calendars(dialog, widget, table_name, value, parameter):
+    """ Executes query and set QDateEdit """
+
+    sql = (f"SELECT {value} FROM {table_name}"
+           f" WHERE parameter = '{parameter}' AND cur_user = current_user")
+    row = global_vars.controller.get_row(sql)
+    if row:
+        if row[0]:
+            row[0] = row[0].replace('/', '-')
+        date = QDate.fromString(row[0], 'yyyy-MM-dd')
+    else:
+        date = QDate.currentDate()
+    setCalendarDate(dialog, widget, date)
+
+
+def get_expr_filter(geom_type, list_ids=None, layers=None):
+    """ Set an expression filter with the contents of the list.
+        Set a model with selected filter. Attach that model to selected table
+    """
+
+    list_ids = list_ids[geom_type]
+    field_id = geom_type + "_id"
+    if len(list_ids) == 0:
+        return None
+
+    # Set expression filter with features in the list
+    expr_filter = field_id + " IN ("
+    for i in range(len(list_ids)):
+        expr_filter += f"'{list_ids[i]}', "
+    expr_filter = expr_filter[:-2] + ")"
+
+    # Check expression
+    (is_valid, expr) = check_expression(expr_filter)
+    if not is_valid:
+        return None
+
+    # Select features of layers applying @expr
+    select_features_by_ids(geom_type, expr, layers=layers)
+
+    return expr_filter
