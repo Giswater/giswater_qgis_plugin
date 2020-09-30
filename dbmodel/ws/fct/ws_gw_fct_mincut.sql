@@ -12,7 +12,7 @@ $BODY$
 
 /*EXAMPLE
 INSERT INTO SCHEMA_NAME.om_mincut VALUES (-1);
-SELECT SCHEMA_NAME.gw_fct_mincut('2001', 'arc', -1)
+SELECT SCHEMA_NAME.gw_fct_mincut('134706', 'arc', -1)
 
 --fid: 199
 
@@ -121,8 +121,8 @@ BEGIN
     -- save & reset psector selector
     IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
 		DELETE FROM selector_psector WHERE cur_user = current_user;
-		DELETE FROM temp_table WHERE fprocesscat_id=287 AND user_name=current_user;
-		INSERT INTO temp_table (fprocesscat_id, text_column)  
+		DELETE FROM temp_table WHERE fid=287 AND cur_user=current_user;
+		INSERT INTO temp_table (fid, text_column)  
 		SELECT 287, (array_agg(psector_id)) FROM selector_psector WHERE cur_user=current_user;
     END IF;
 	
@@ -339,7 +339,7 @@ BEGIN
 	-- restore psector selector
 	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
 		INSERT INTO selector_psector (psector_id, cur_user)
-		select unnest(text_column::integer[]), current_user from temp_table where fprocesscat_id=287 and user_name=current_user
+		select unnest(text_column::integer[]), current_user from temp_table where fid=287 and cur_user=current_user
 		ON CONFLICT (psector_id, cur_user) DO NOTHING;
 	END IF;
 
@@ -387,5 +387,5 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
-
+grant all on all functions in schema SCHEMA_NAME to role_basic;
 
