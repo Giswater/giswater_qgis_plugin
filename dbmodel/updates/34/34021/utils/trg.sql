@@ -13,3 +13,7 @@ DROP TRIGGER gw_trg_plan_psector_x_connec ON plan_psector_x_connec;
 
 CREATE TRIGGER gw_trg_plan_psector_x_connec BEFORE INSERT OR UPDATE OF connec_id, state ON plan_psector_x_connec
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_plan_psector_x_connec();
+
+
+CREATE TRIGGER gw_trg_notify AFTER INSERT OR UPDATE OF id OR DELETE ON cat_work
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_notify('cat_work');
