@@ -581,21 +581,16 @@ class ApiCF(ApiParent, QObject):
                 self.disable_all(self.dlg_cf, result, False)
 
         if action_edit.isEnabled():
-            # SIGNALS
             self.layer.editingStarted.connect(partial(self.start_edition_signal, action_edit, result))
             self.layer.editingStopped.connect(partial(self.stop_edition_signal, action_edit, result))
-            # self.layer.editingStarted.connect(partial(self.enable_all, self.dlg_cf, result))
-            # self.layer.editingStopped.connect(partial(self.disable_all, self.dlg_cf, result, False))
-            # Actions
             self.enable_actions(self.layer.isEditable())
-            # self.layer.editingStarted.connect(partial(self.enable_actions, True))
-            # self.layer.editingStopped.connect(partial(self.enable_actions, False))
-            # self.layer.editingStopped.connect(self.get_last_value)
-            # self.layer.editingStopped.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
 
         action_edit.setChecked(self.layer.isEditable())
 
-        # action_edit.triggered.connect(partial(self.start_editing, self.layer))
+        # Connect signal only if is not a new feature
+        if not is_new_feature:
+            action_edit.triggered.connect(partial(self.start_editing, self.layer))
+
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_arc_id, 'arc'))
@@ -631,6 +626,7 @@ class ApiCF(ApiParent, QObject):
         else:
             btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
             btn_cancel.clicked.connect(self.roll_back)
+            btn_accept.clicked.connect(self.disconect_signals)
             btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
             self.dlg_cf.dlg_closed.connect(self.roll_back)
             self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
@@ -638,7 +634,6 @@ class ApiCF(ApiParent, QObject):
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
             self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
-        action_edit.triggered.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
         self.dlg_cf.dlg_closed.connect(self.disconect_signals)
 
         # Set title
@@ -654,6 +649,13 @@ class ApiCF(ApiParent, QObject):
         self.dlg_cf.setWindowTitle(title)
 
         return self.complet_result, self.dlg_cf
+
+
+    def close_dialog(self, dlg=None):
+        """ Disconnect signals and call superclass to close dialog """
+
+        self.disconect_signals()
+        super(ApiCF, self).close_dialog(dlg)
 
 
     def start_edition_signal(self, action_edit, result):
@@ -675,8 +677,10 @@ class ApiCF(ApiParent, QObject):
     def disconect_signals(self):
 
         try:
+            self.layer.editingStarted.disconnect()
+            self.layer.editingStopped.disconnect()
             self.layer.editingStopped.disconnect(self.get_last_value)
-        except:
+        except Exception as e:
             pass
 
 
@@ -754,15 +758,13 @@ class ApiCF(ApiParent, QObject):
         self.iface.setActiveLayer(layer)
         self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
         action_is_checked = not self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked()
-        self.controller.log_info(f"start_editing - action_is_checked: {action_is_checked}")
 
         # If the json is empty, we simply activate/deactivate the editing
         # else if editing is active, deactivate edition and save changes
         if self.my_json == '' or str(self.my_json) == '{}':
-            self.controller.log_info("start_editing - return")
             return
-        elif action_is_checked:
-            self.controller.log_info("start_editing - accept")
+
+        if action_is_checked:
             self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').setChecked(action_is_checked)
 
@@ -1026,12 +1028,10 @@ class ApiCF(ApiParent, QObject):
         :return:
         """
 
-        self.controller.log_info(f"self.my_json: {self.my_json}")
         if _json == '' or str(_json) == '{}':
             if self.controller.dlg_docker:
                 self.controller.dlg_docker.setMinimumWidth(dialog.width())
                 self.controller.close_docker()
-            self.controller.log_info(f"accept: close_dialog")
             self.close_dialog(dialog)
             return
 
