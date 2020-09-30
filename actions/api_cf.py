@@ -307,7 +307,7 @@ class ApiCF(ApiParent, QObject):
         if template == 'info_generic':
             result, dialog = self.open_generic_form(self.complet_result)
             # Fill self.my_json for new qgis_feature
-            if feature_cat is not None:
+            if feature_cat:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
 
@@ -327,8 +327,11 @@ class ApiCF(ApiParent, QObject):
                 else:
                     sub_tag = 'node'
             feature_id = self.complet_result[0]['body']['feature']['id']
-            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker)
-            if feature_cat is not None:
+            is_new_feature = False
+            if feature_cat:
+                is_new_feature = True
+            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker, is_new_feature)
+            if feature_cat:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
 
@@ -404,7 +407,7 @@ class ApiCF(ApiParent, QObject):
         return result, self.hydro_info_dlg
 
 
-    def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True):
+    def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, is_new_feature=True):
 
         # Dialog
         self.dlg_cf = InfoFeatureUi(sub_tag)
