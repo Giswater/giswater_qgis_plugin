@@ -744,7 +744,17 @@ class ApiCF(ApiParent, QObject):
     def get_last_value(self):
 
         try:
+            # Widgets in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2')
+            other_widgets = []
+            for field in self.complet_result[0]['body']['data']['fields']:
+                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                    widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
+                    if widget:
+                        print(widget.objectName())
+                        other_widgets.append(widget)
+            # Widgets in tab_data
             widgets = self.dlg_cf.tab_data.findChildren(QWidget)
+            widgets.extend(other_widgets)
             for widget in widgets:
                 if widget.hasFocus():
                     value = utils_giswater.getWidgetText(self.dlg_cf, widget)
