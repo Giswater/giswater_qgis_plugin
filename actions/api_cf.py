@@ -630,8 +630,8 @@ class ApiCF(ApiParent, QObject):
             self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
             self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
+            btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
 
-        btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
         btn_cancel.clicked.connect(self.roll_back)
         btn_accept.clicked.connect(self.disconect_signals)
         btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
@@ -1029,11 +1029,9 @@ class ApiCF(ApiParent, QObject):
         :return:
         """
 
-        if _json == '' or str(_json) == '{}':
-            if self.controller.dlg_docker:
-                self.controller.dlg_docker.setMinimumWidth(dialog.width())
-                self.controller.close_docker()
-            self.close_dialog(dialog)
+            if _json == '' or str(_json) == '{}':
+            if not self.controller.dlg_docker:
+                self.close_dialog(dialog)
             return
 
         p_table_id = complet_result['body']['feature']['tableName']
@@ -1075,10 +1073,8 @@ class ApiCF(ApiParent, QObject):
 
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
-                if self.controller.dlg_docker:
-                    self.controller.dlg_docker.setMinimumWidth(dialog.width())
-                    self.controller.close_docker()
-                self.close_dialog(dialog)
+                if not self.controller.dlg_docker:
+                    self.close_dialog(dialog)
                 return
 
             feature = f'"id":"{self.new_feature.attribute(id_name)}", '
@@ -1113,10 +1109,8 @@ class ApiCF(ApiParent, QObject):
             return
 
         if close_dialog:
-            if self.controller.dlg_docker:
-                self.controller.dlg_docker.setMinimumWidth(dialog.width())
-                self.controller.close_docker()
-            self.close_dialog(dialog)
+            if not self.controller.dlg_docker:
+                self.close_dialog(dialog)
 
 
     def get_scale_zoom(self):
