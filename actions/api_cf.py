@@ -23,6 +23,7 @@ import sys
 import webbrowser
 from collections import OrderedDict
 from functools import partial
+from sip import isdeleted
 
 from .. import utils_giswater
 from .api_catalog import ApiCatalog
@@ -1028,6 +1029,10 @@ class ApiCF(ApiParent, QObject):
         :param close_dialog:
         :return:
         """
+
+        # Check if C++ object has been deleted
+        if isdeleted(self.dlg_cf):
+            return
 
         if _json == '' or str(_json) == '{}':
             if not self.controller.dlg_docker:
