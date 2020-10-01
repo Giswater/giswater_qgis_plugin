@@ -1029,7 +1029,7 @@ class ApiCF(ApiParent, QObject):
         :return:
         """
 
-            if _json == '' or str(_json) == '{}':
+        if _json == '' or str(_json) == '{}':
             if not self.controller.dlg_docker:
                 self.close_dialog(dialog)
             return
