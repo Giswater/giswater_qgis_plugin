@@ -155,10 +155,9 @@ class GwDocument:
 
     def activate_relations(self):
         """ Force user to set doc_id and doc_type """
-        doc_id = qt_tools.getWidgetText(self.dlg_add_doc, self.dlg_add_doc.doc_id, False, False)
         doc_type = qt_tools.getWidgetText(self.dlg_add_doc, self.dlg_add_doc.doc_type, False, False)
 
-        if doc_id in (None, '', 'null') or doc_type in (None, '', 'null'):
+        if doc_type in (None, '', 'null'):
             self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
         else:
             self.dlg_add_doc.tabWidget.setTabEnabled(1, True)
