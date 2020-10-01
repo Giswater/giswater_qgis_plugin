@@ -340,12 +340,14 @@ BEGIN
 			ELSE
 				EXECUTE 'SELECT '||quote_ident(v_field)||' FROM v_edit_node WHERE node_id = '||quote_literal(v_floodfromnode)
 				INTO v_nodemapzone;
-				v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
-				EXECUTE v_querytext;
-				v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
-				EXECUTE v_querytext;
-				v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
-				EXECUTE v_querytext;
+				IF v_nodemapzone IS NOT NULL THEN
+					v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
+					EXECUTE v_querytext;
+					v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
+					EXECUTE v_querytext;
+					v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = 0 WHERE '||quote_ident(v_field)||' = '||quote_literal(v_nodemapzone);
+					EXECUTE v_querytext;
+				END IF;
 			END IF;
 
 			-- fill the graf table
