@@ -328,10 +328,7 @@ class ApiCF(ApiParent, QObject):
                 else:
                     sub_tag = 'node'
             feature_id = self.complet_result[0]['body']['feature']['id']
-            is_new_feature = False
-            if feature_cat:
-                is_new_feature = True
-            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker, is_new_feature)
+            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker)
             if feature_cat:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
@@ -408,7 +405,7 @@ class ApiCF(ApiParent, QObject):
         return result, self.hydro_info_dlg
 
 
-    def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, is_new_feature=True):
+    def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True):
 
         # Dialog
         self.dlg_cf = InfoFeatureUi(sub_tag)
@@ -535,9 +532,9 @@ class ApiCF(ApiParent, QObject):
             else:
                 parent_layer = str(complet_result[0]['body']['feature']['tableParent'])
             sql = f"SELECT lower(feature_type) FROM cat_feature WHERE parent_layer = '{parent_layer}' LIMIT 1"
-            result = self.controller.get_row(sql)
-            if result:
-                self.geom_type = result[0]
+            row = self.controller.get_row(sql)
+            if row:
+                self.geom_type = row[0]
 
         result = complet_result[0]['body']['data']
         layout_list = []
@@ -584,16 +581,18 @@ class ApiCF(ApiParent, QObject):
             else:
                 self.disable_all(self.dlg_cf, result, False)
 
+        # We assign the function to a global variable,
+        # since as it receives parameters we will not be able to disconnect the signals
+        self.fct_start_editing = lambda: self.start_editing(action_edit, complet_result[0]['body']['data'], self.layer)
         if action_edit.isEnabled():
-            self.layer.editingStarted.connect(partial(self.start_edition_signal, action_edit, result))
-            self.layer.editingStopped.connect(partial(self.stop_edition_signal, action_edit, result))
+            self.layer.editingStarted.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_start_editing)
             self.enable_actions(self.layer.isEditable())
 
         action_edit.setChecked(self.layer.isEditable())
 
-        # Connect signal only if is not a new feature
-        if not is_new_feature:
-            action_edit.triggered.connect(partial(self.start_editing, self.layer))
+
+        action_edit.triggered.connect(self.fct_start_editing)
 
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
@@ -631,12 +630,11 @@ class ApiCF(ApiParent, QObject):
             self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
             self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
-            btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
-
+        btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
         btn_cancel.clicked.connect(self.roll_back)
-        btn_accept.clicked.connect(self.disconect_signals)
         btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
         self.dlg_cf.dlg_closed.connect(self.disconect_signals)
+
 
         # Set title
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
@@ -660,28 +658,10 @@ class ApiCF(ApiParent, QObject):
         super(ApiCF, self).close_dialog(dlg)
 
 
-    def start_edition_signal(self, action_edit, result):
-
-        self.check_actions(action_edit, True)
-        self.enable_all(self.dlg_cf, result)
-        self.enable_actions(True)
-
-
-    def stop_edition_signal(self, action_edit, result):
-
-        self.check_actions(action_edit, False)
-        self.disable_all(self.dlg_cf, result, False)
-        self.enable_actions(False)
-        self.get_last_value()
-        self.accept(self.dlg_cf, self.complet_result[0], self.my_json)
-
-
     def disconect_signals(self):
-
         try:
-            self.layer.editingStarted.disconnect()
-            self.layer.editingStopped.disconnect()
-            self.layer.editingStopped.disconnect(self.get_last_value)
+            self.layer.editingStarted.disconnect(self.fct_start_editing)
+            self.layer.editingStopped.disconnect(self.fct_start_editing)
         except Exception as e:
             pass
 
@@ -750,7 +730,6 @@ class ApiCF(ApiParent, QObject):
                 if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                     widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
                     if widget:
-                        print(widget.objectName())
                         other_widgets.append(widget)
             # Widgets in tab_data
             widgets = self.dlg_cf.tab_data.findChildren(QWidget)
@@ -764,21 +743,38 @@ class ApiCF(ApiParent, QObject):
             pass
 
 
-    def start_editing(self, layer):
+    def start_editing(self, action_edit, result, layer):
         """ start or stop the edition based on your current status """
-
         self.iface.setActiveLayer(layer)
-        self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
-        action_is_checked = not self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked()
+        layer_is_editable = layer.isEditable()
+        self.get_last_value()
 
+        print(f"layer_is_editable-->{layer_is_editable}")
+        if layer_is_editable is False:
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+            self.check_actions(action_edit, True)
+            self.enable_all(self.dlg_cf, result)
+            self.enable_actions(True)
+            return
         # If the json is empty, we simply activate/deactivate the editing
         # else if editing is active, deactivate edition and save changes
         if self.my_json == '' or str(self.my_json) == '{}':
             return
 
-        if action_is_checked:
-            self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
-            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').setChecked(action_is_checked)
+        if layer_is_editable is True:
+
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(True)
+
+            status = self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
+            print(f"status->{status}")
+            self.check_actions(action_edit, True)
+            if status is not False:
+                self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').setChecked(False)
+                self.check_actions(action_edit, False)
+                self.disable_all(self.dlg_cf, result, False)
+                self.enable_actions(False)
+
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(False)
 
 
     def roll_back(self):
@@ -1071,7 +1067,7 @@ class ApiCF(ApiParent, QObject):
         if list_mandatory:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             self.controller.show_warning(msg)
-            return
+            return False
 
         # If we create a new feature
         if self.new_feature_id is not None:
@@ -1079,13 +1075,15 @@ class ApiCF(ApiParent, QObject):
                 if k in parent_fields:
                     self.new_feature.setAttribute(k, v)
                     _json.pop(k, None)
+
             self.layer_new_feature.updateFeature(self.new_feature)
-
+            self.layer_new_feature.blockSignals(True)
             status = self.layer_new_feature.commitChanges()
-            self.new_feature_id = None
-            if status is False:
-                return
+            self.layer_new_feature.blockSignals(False)
 
+            if status is False:
+                return False
+            self.new_feature_id = None
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
                 if not self.controller.dlg_docker:
@@ -1105,7 +1103,7 @@ class ApiCF(ApiParent, QObject):
         body = self.create_body(feature=feature, extras=extras)
         json_result = self.controller.get_json('gw_fct_setfields', body)
         if not json_result:
-            return
+            return False
 
         if clear_json:
             _json = {}
