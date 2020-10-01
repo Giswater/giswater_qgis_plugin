@@ -200,7 +200,7 @@ class GwDocument:
         if row is None:
             if len(self.files_path) <= 1:
                 if doc_id in (None, ''):
-                    sql, doc_id = self.insert_doc_sql(doc_type, observ, date)
+                    sql, doc_id = self.insert_doc_sql(doc_type, observ, date, path)
                 else:
                     sql = (f"INSERT INTO doc (id, doc_type, path, observ, date)"
                            f" VALUES ('{doc_id}', '{doc_type}', '{path}', '{observ}', '{date}');")
@@ -212,7 +212,7 @@ class GwDocument:
                 answer = self.controller.ask_question(msg, self.controller.tr("Add document"))
                 if answer:
                     for file in self.files_path:
-                        sql, doc_id = self.insert_doc_sql(doc_type, observ, date)
+                        sql, doc_id = self.insert_doc_sql(doc_type, observ, date, file)
                         self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
         # If document exists perform an UPDATE
         else:
@@ -221,7 +221,7 @@ class GwDocument:
             if not answer:
                 return
             if len(self.files_path) <= 1:
-                sql = self.update_doc_sql(doc_type, observ, date, doc_id)
+                sql = self.update_doc_sql(doc_type, observ, date, doc_id, path)
                 self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
             else:
                 # If document have more than 1 file perform an INSERT
@@ -232,26 +232,25 @@ class GwDocument:
                 if answer:
                     for cont, file in enumerate(self.files_path):
                         if cont == 0:
-
-                            sql = self.update_doc_sql(doc_type, observ, date, doc_id)
+                            sql = self.update_doc_sql(doc_type, observ, date, doc_id, file)
                             self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
                         else:
-                            sql, doc_id = self.insert_doc_sql(doc_type, observ, date)
+                            sql, doc_id = self.insert_doc_sql(doc_type, observ, date, file)
                             self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
 
 
-    def insert_doc_sql(self, doc_type, observ, date):
+    def insert_doc_sql(self, doc_type, observ, date, path):
         sql = (f"INSERT INTO doc (doc_type, path, observ, date)"
-               f" VALUES ('{doc_type}', '{self.files_path[0]}', '{observ}', '{date}') RETURNING id;")
+               f" VALUES ('{doc_type}', '{path}', '{observ}', '{date}') RETURNING id;")
         new_doc_id = self.controller.execute_returning(sql)
         sql = ""
         doc_id = str(new_doc_id[0])
         return sql, doc_id
 
 
-    def update_doc_sql(self, doc_type, observ, date, doc_id):
+    def update_doc_sql(self, doc_type, observ, date, doc_id, path):
         sql = (f"UPDATE doc "
-               f" SET doc_type = '{doc_type}', observ = '{observ}', path = '{self.files_path[0]}', date = '{date}'"
+               f" SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}'"
                f" WHERE id = '{doc_id}';")
         return sql
 
