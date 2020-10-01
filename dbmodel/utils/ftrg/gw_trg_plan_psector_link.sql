@@ -45,14 +45,27 @@ BEGIN
 	IF NEW.arc_id IS NOT NULL THEN
 		v_arc_geom =  (SELECT the_geom FROM arc WHERE arc_id=NEW.arc_id);
 	ELSE
-		-- getting closest arc
-		SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, v_edit_connec c WHERE st_dwithin(a.the_geom, c.the_geom, 1000) AND connec_id = NEW.connec_id AND a.state = 2
-		ORDER BY st_distance (a.the_geom, c.the_geom) LIMIT 1;
+        IF v_table_name = 'connec' THEN
+            -- getting closest arc
+            SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, v_edit_connec c WHERE st_dwithin(a.the_geom, c.the_geom, 1000) AND connec_id = NEW.connec_id AND a.state = 2
+            ORDER BY st_distance (a.the_geom, c.the_geom) LIMIT 1;
 
-		-- this update makes a recall of self.trigger but in this case with NEW.arc_id IS NOT NULL recall will finish next one
-		UPDATE plan_psector_x_connec SET arc_id = v_arc_id WHERE id=NEW.id;
-        
-		RETURN NEW;
+            -- this update makes a recall of self.trigger but in this case with NEW.arc_id IS NOT NULL recall will finish next one
+            UPDATE plan_psector_x_connec SET arc_id = v_arc_id WHERE id=NEW.id;
+            
+            RETURN NEW;
+            
+        ELSIF v_table_name = 'gully' THEN
+            -- getting closest arc
+            SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, v_edit_gully g WHERE st_dwithin(a.the_geom, g.the_geom, 1000) AND gully_id = NEW.gully_id AND a.state = 2
+            ORDER BY st_distance (a.the_geom, g.the_geom) LIMIT 1;
+
+            -- this update makes a recall of self.trigger but in this case with NEW.arc_id IS NOT NULL recall will finish next one
+            UPDATE plan_psector_x_gully SET arc_id = v_arc_id WHERE id=NEW.id;
+            
+            RETURN NEW;
+            
+        END IF;
         
 	END IF;
 
