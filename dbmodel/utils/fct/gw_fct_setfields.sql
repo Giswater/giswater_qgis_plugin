@@ -211,7 +211,7 @@ BEGIN
 	v_message = '{"level": 3, "text": "Feature have been succesfully updated."}';
 
 	-- trigger automatic mapzones
-	IF v_projecttype = 'WS' THEN
+	IF v_projecttype = 'WS' AND TG_OP = 'UPDATE' THEN
 	
 		SELECT type INTO v_type FROM cat_feature JOIN cat_feature_node USING (id) WHERE child_layer = v_tablename AND graf_delimiter !='NONE';
 		IF v_type = 'VALVE' AND v_closedstatus IS NOT NULL THEN
