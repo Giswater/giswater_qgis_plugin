@@ -68,8 +68,6 @@ BEGIN
 
 	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')a' INTO v_count;
 
-	SELECT count(*) INTO v_count FROM om_visit_x_arc WHERE visit_id = v_visitid;
-
 	IF v_count > 1 THEN
 
 		-- getting values from visit
@@ -90,7 +88,7 @@ BEGIN
 
 			-- new elements on visit_x_node
 			INSERT INTO om_visit_x_node (visit_id, node_id, is_last)
-			SELECT v_idlast, node_id, is_last FROM om_visit_x_node WHERE visit_id = v_visitid;
+			VALUES (v_idlast, v_feature.node_id, v_feature.is_last);
 			
 			--looking for events relateds to visit
 			FOR v_event IN SELECT * FROM om_visit_event WHERE visit_id=v_visitid
@@ -123,12 +121,11 @@ BEGIN
 
 			-- new elements on visit_x_arc
 			INSERT INTO om_visit_x_arc (visit_id, arc_id, is_last)
-			SELECT v_idlast, arc_id, is_last FROM om_visit_x_arc WHERE visit_id = v_visitid;
+			VALUES (v_idlast, v_feature.arc_id, v_feature.is_last);
 			
 			--looking for events relateds to visit
 			FOR v_event IN SELECT * FROM om_visit_event WHERE visit_id=v_visitid
 			LOOP
-				raise notice 'gasdgasdgdas %', v_event;
 				INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, tstamp, text, index_val, is_last) 
 				VALUES (v_event.event_code, v_idlast, v_event.position_id, v_event.position_value, v_event.parameter_id, v_event.value, v_event.value1, 
 				v_event.value2, v_event.geom1, v_event.geom2, v_event.geom3, v_event.tstamp, v_event.text, v_event.index_val, v_event.is_last) ON CONFLICT DO NOTHING RETURNING id INTO v_eventlast;
@@ -157,7 +154,7 @@ BEGIN
 
 			-- new elements on visit_x_connec
 			INSERT INTO om_visit_x_connec (visit_id, connec_id, is_last)
-			SELECT v_idlast, connec_id, is_last FROM om_visit_x_connec WHERE visit_id = v_visitid;
+			VALUES (v_idlast, v_feature.connec_id, v_feature.is_last);
 		
 			--looking for events relateds to visit
 			FOR v_event IN SELECT * FROM om_visit_event WHERE visit_id=v_visitid
@@ -192,7 +189,7 @@ BEGIN
 
 				-- new elements on visit_x_gully
 				INSERT INTO om_visit_x_gully (visit_id, gully_id, is_last)
-				SELECT v_idlast, gully_id, is_last FROM om_visit_x_gully WHERE visit_id = v_visitid;
+				VALUES (v_idlast, v_feature.gully_id, v_feature.is_last);
 
 				--looking for events relateds to visit
 				FOR v_event IN SELECT * FROM om_visit_event WHERE visit_id=v_visitid
