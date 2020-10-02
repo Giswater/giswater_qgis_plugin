@@ -781,11 +781,14 @@ class ApiCF(ApiParent, QObject):
 
     def roll_back(self):
         """ Discard changes in current layer """
-
+        self.disconect_signals()
         try:
             self.iface.actionRollbackEdits().trigger()
         except TypeError:
             pass
+        self.layer.editingStarted.connect(self.fct_start_editing)
+        self.layer.editingStopped.connect(self.fct_start_editing)
+
 
 
     def set_widgets(self, dialog, complet_result, field):
