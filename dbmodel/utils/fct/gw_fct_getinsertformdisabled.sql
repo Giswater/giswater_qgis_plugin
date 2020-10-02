@@ -34,7 +34,7 @@ v_force_formrefresh text = 'FALSE';
 v_force_canvasrefresh text = 'FALSE';
 v_enable_editgeom text = 'TRUE';
 v_enable_delfeaeture text = 'TRUE';
-v_dv_querytext text;
+v_sql_text text;
 v_array text[];
     
 BEGIN
@@ -85,7 +85,7 @@ BEGIN
 
 	--    Get fields
     EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id, label, name, type, ''TRUE'' AS disabled, "dataType", placeholder, (ROW_NUMBER() OVER(ORDER BY orderby asc)) AS rownum, 
-        dv_table, dv_id_column, dv_name_column, dv_querytext FROM config_web_fields WHERE table_id = $1 order by 8) a'
+        dv_table, dv_id_column, dv_name_column, sql_text FROM config_web_fields WHERE table_id = $1 order by 8) a'
         INTO fields_array
         USING table_id;  
 
@@ -99,16 +99,16 @@ BEGIN
 
 		raise notice 'aux_json %', aux_json;
 
-		v_dv_querytext=(aux_json->>'dv_querytext');
+		v_sql_text=(aux_json->>'sql_text');
 
 		-- Get combo id's
-		EXECUTE 'SELECT (array_agg(id)) FROM ('||(v_dv_querytext)||')a'
+		EXECUTE 'SELECT (array_agg(id)) FROM ('||(v_sql_text)||')a'
 			INTO v_array;
 		combo_json = array_to_json(v_array);
 		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboIds', COALESCE(combo_json, '[]'));
 
 		-- Get combo values
-		EXECUTE 'SELECT (array_agg(idval)) FROM ('||(v_dv_querytext)||')a'
+		EXECUTE 'SELECT (array_agg(idval)) FROM ('||(v_sql_text)||')a'
 			INTO v_array;
 		combo_json = array_to_json(v_array);
 		fields_array[(aux_json->>'rownum')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'rownum')::INT], 'comboNames', COALESCE(combo_json, '[]'));
