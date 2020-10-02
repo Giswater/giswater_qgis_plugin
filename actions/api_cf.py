@@ -623,13 +623,15 @@ class ApiCF(ApiParent, QObject):
             self.controller.dock_dialog(self.dlg_cf)
             self.controller.dlg_docker.dlg_closed.connect(partial(self.manage_docker_close))
             self.controller.dlg_docker.setWindowTitle(title)
-
+            btn_cancel.clicked.connect(lambda: self.controller.dlg_docker.dlg_closed.emit())
         else:
             self.dlg_cf.dlg_closed.connect(self.roll_back)
             self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
             self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
             self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
+
+
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
         btn_cancel.clicked.connect(self.roll_back)
         btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
@@ -654,7 +656,6 @@ class ApiCF(ApiParent, QObject):
     def close_dialog(self, dlg=None):
         """ Disconnect signals and call superclass to close dialog """
 
-        self.disconect_signals()
         super(ApiCF, self).close_dialog(dlg)
 
 
@@ -663,6 +664,7 @@ class ApiCF(ApiParent, QObject):
             self.layer.editingStarted.disconnect(self.fct_start_editing)
             self.layer.editingStopped.disconnect(self.fct_start_editing)
         except Exception as e:
+            print(f"EXCEPTION: {type(e).__name__}, {e}")
             pass
 
 
@@ -671,6 +673,7 @@ class ApiCF(ApiParent, QObject):
         self.roll_back()
         self.resetRubberbands()
         self.set_vdefault_edition()
+        self.controller.close_docker()
 
 
     def get_feature(self, tab_type):
@@ -751,30 +754,47 @@ class ApiCF(ApiParent, QObject):
 
         print(f"layer_is_editable-->{layer_is_editable}")
         if layer_is_editable is False:
+            self.disconect_signals()
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+            self.layer.editingStarted.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_start_editing)
             self.check_actions(action_edit, True)
             self.enable_all(self.dlg_cf, result)
             self.enable_actions(True)
             return
-        # If the json is empty, we simply activate/deactivate the editing
-        # else if editing is active, deactivate edition and save changes
+        print(self.my_json)
         if self.my_json == '' or str(self.my_json) == '{}':
+            print("TEST")
+            self.disconect_signals()
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+            self.layer.editingStarted.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_start_editing)
+            self.check_actions(action_edit, False)
+            self.disable_all(self.dlg_cf, result, False)
+            self.enable_actions(False)
             return
 
+        # If the json is empty, we simply activate/deactivate the editing
+        # else if editing is active, deactivate edition and save changes
         if layer_is_editable is True:
-
-            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(True)
-
+            # self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(True)
+            # self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
             status = self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
+
+            # if status is True:
+            #     self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+            if status is not None:  # Dialog continue open
+                self.layer.editingStarted.connect(self.fct_start_editing)
+                self.layer.editingStopped.connect(self.fct_start_editing)
             print(f"status->{status}")
             self.check_actions(action_edit, True)
-            if status is not False:
-                self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').setChecked(False)
+            if status is not False:  # Commit succesfull
+                # self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').setChecked(False)
                 self.check_actions(action_edit, False)
                 self.disable_all(self.dlg_cf, result, False)
                 self.enable_actions(False)
 
-            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(False)
+            # self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(False)
 
 
     def roll_back(self):
@@ -1033,17 +1053,20 @@ class ApiCF(ApiParent, QObject):
         :param p_widget:
         :param clear_json:
         :param close_dialog:
-        :return:
+        :return: True if all ok, False if sommething fail, None if close dialog
+            (When it is true or false the signals are reconnected, if it is None, it is not necessary to reconnect them)
         """
 
+        self.disconect_signals()
         # Check if C++ object has been deleted
         if isdeleted(self.dlg_cf):
             return
 
         if _json == '' or str(_json) == '{}':
-            if not self.controller.dlg_docker:
-                self.close_dialog(dialog)
-            return
+            if self.controller.dlg_docker:
+                self.manage_docker_close()
+            self.close_dialog(dialog)
+            return None
 
         p_table_id = complet_result['body']['feature']['tableName']
         id_name = complet_result['body']['feature']['idName']
@@ -1070,6 +1093,7 @@ class ApiCF(ApiParent, QObject):
             return False
 
         # If we create a new feature
+        print(f"self.new_feature_id-->{self.new_feature_id}")
         if self.new_feature_id is not None:
             for k, v in list(_json.items()):
                 if k in parent_fields:
@@ -1077,18 +1101,21 @@ class ApiCF(ApiParent, QObject):
                     _json.pop(k, None)
 
             self.layer_new_feature.updateFeature(self.new_feature)
-            self.layer_new_feature.blockSignals(True)
             status = self.layer_new_feature.commitChanges()
-            self.layer_new_feature.blockSignals(False)
+
 
             if status is False:
+                error = self.layer_new_feature.commitErrors()
+                print(f"commitErrors: {error}")
                 return False
             self.new_feature_id = None
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
-                if not self.controller.dlg_docker:
-                    self.close_dialog(dialog)
-                return
+                print("TEST 10")
+                if self.controller.dlg_docker:
+                    self.manage_docker_close()
+                self.close_dialog(dialog)
+                return None
 
             feature = f'"id":"{self.new_feature.attribute(id_name)}", '
 
@@ -1103,6 +1130,7 @@ class ApiCF(ApiParent, QObject):
         body = self.create_body(feature=feature, extras=extras)
         json_result = self.controller.get_json('gw_fct_setfields', body)
         if not json_result:
+            print("TEST 20")
             return False
 
         if clear_json:
@@ -1110,20 +1138,25 @@ class ApiCF(ApiParent, QObject):
 
         if "Accepted" in json_result['status']:
             try:
+                print("TEST 25")
                 level = json_result['message']['level']
                 msg = json_result['message']['text']
                 self.controller.show_message(msg, message_level=level)
             except KeyError:
                 pass
             finally:
+                # self.layer_new_feature.commitChanges()
                 self.reload_fields(dialog, json_result, p_widget)
         elif "Failed" in json_result['status']:
+            print("TEST 30")
             # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
             return
 
         if close_dialog:
-            if not self.controller.dlg_docker:
-                self.close_dialog(dialog)
+            if self.controller.dlg_docker:
+                self.manage_docker_close()
+            self.close_dialog(dialog)
+            return None
 
 
     def get_scale_zoom(self):
