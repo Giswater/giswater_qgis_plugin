@@ -23,6 +23,7 @@ import sys
 import webbrowser
 from collections import OrderedDict
 from functools import partial
+from sip import isdeleted
 
 from .. import utils_giswater
 from .api_catalog import ApiCatalog
@@ -175,7 +176,6 @@ class ApiCF(ApiParent, QObject):
         """
         :param point: point where use clicked
         :param table_name: table where do sql query
-        :param feature_type: (arc, node, connec...)
         :param feature_id: id of feature to do info
         :return:
         """
@@ -308,7 +308,7 @@ class ApiCF(ApiParent, QObject):
         if template == 'info_generic':
             result, dialog = self.open_generic_form(self.complet_result)
             # Fill self.my_json for new qgis_feature
-            if feature_cat is not None:
+            if feature_cat:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
 
@@ -329,7 +329,7 @@ class ApiCF(ApiParent, QObject):
                     sub_tag = 'node'
             feature_id = self.complet_result[0]['body']['feature']['id']
             result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker)
-            if feature_cat is not None:
+            if feature_cat:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
 
@@ -384,8 +384,6 @@ class ApiCF(ApiParent, QObject):
 
             if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
                 self.my_json[str(widget.property('columnname'))] = str(value)
-
-        self.controller.log_info(str(self.my_json))
 
 
     def open_generic_form(self, complet_result):
@@ -481,7 +479,6 @@ class ApiCF(ApiParent, QObject):
         action_link = self.dlg_cf.findChild(QAction, "actionLink")
         action_help = self.dlg_cf.findChild(QAction, "actionHelp")
         action_interpolate = self.dlg_cf.findChild(QAction, "actionInterpolate")
-        # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
         action_section = self.dlg_cf.findChild(QAction, "actionSection")
 
         self.show_actions('tab_data')
@@ -506,7 +503,6 @@ class ApiCF(ApiParent, QObject):
         self.set_icon(action_section, "207")
         self.set_icon(action_help, "73")
         self.set_icon(action_interpolate, "194")
-        # self.set_icon(action_switch_arc_id, "141")
 
         # Set buttons icon
         # tab elements
@@ -536,9 +532,9 @@ class ApiCF(ApiParent, QObject):
             else:
                 parent_layer = str(complet_result[0]['body']['feature']['tableParent'])
             sql = f"SELECT lower(feature_type) FROM cat_feature WHERE parent_layer = '{parent_layer}' LIMIT 1"
-            result = self.controller.get_row(sql)
-            if result:
-                self.geom_type = result[0]
+            row = self.controller.get_row(sql)
+            if row:
+                self.geom_type = row[0]
 
         result = complet_result[0]['body']['data']
         layout_list = []
@@ -585,25 +581,22 @@ class ApiCF(ApiParent, QObject):
             else:
                 self.disable_all(self.dlg_cf, result, False)
 
+        # We assign the function to a global variable,
+        # since as it receives parameters we will not be able to disconnect the signals
+        self.fct_start_editing = lambda: self.start_editing(action_edit, complet_result[0]['body']['data'], self.layer)
         if action_edit.isEnabled():
-            # SIGNALS
-            self.layer.editingStarted.connect(partial(self.check_actions, action_edit, True))
-            self.layer.editingStopped.connect(partial(self.check_actions, action_edit, False))
-            self.layer.editingStarted.connect(partial(self.enable_all, self.dlg_cf, result))
-            self.layer.editingStopped.connect(partial(self.disable_all, self.dlg_cf, result, False))
-            # Actions
+            self.layer.editingStarted.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_start_editing)
             self.enable_actions(self.layer.isEditable())
-            self.layer.editingStarted.connect(partial(self.enable_actions, True))
-            self.layer.editingStopped.connect(partial(self.enable_actions, False))
-            self.layer.editingStopped.connect(self.get_last_value)
 
         action_edit.setChecked(self.layer.isEditable())
-        action_edit.triggered.connect(partial(self.start_editing, self.layer))
+
+        # Actions signals
+        action_edit.triggered.connect(self.fct_start_editing)
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_arc_id, 'arc'))
-        action_get_parent_id.triggered.connect(
-            partial(self.get_snapped_feature_id, self.dlg_cf, action_get_parent_id, 'node'))
+        action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_parent_id, 'node'))
         action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.canvas, self.layer))
         action_centered.triggered.connect(partial(self.api_action_centered, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, self.layer))
@@ -629,19 +622,17 @@ class ApiCF(ApiParent, QObject):
             self.controller.dock_dialog(self.dlg_cf)
             self.controller.dlg_docker.dlg_closed.connect(partial(self.manage_docker_close))
             self.controller.dlg_docker.setWindowTitle(title)
-            btn_accept.setVisible(False)
-            btn_cancel.setVisible(False)
-
+            btn_cancel.clicked.connect(lambda: self.controller.dlg_docker.dlg_closed.emit())
         else:
-            btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
-            btn_cancel.clicked.connect(self.roll_back)
-            btn_accept.clicked.connect(partial(
-                self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
             self.dlg_cf.dlg_closed.connect(self.roll_back)
             self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
             self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
             self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
+
+        btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
+        btn_cancel.clicked.connect(self.roll_back)
+        btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
         self.dlg_cf.dlg_closed.connect(self.disconect_signals)
 
         # Set title
@@ -659,10 +650,17 @@ class ApiCF(ApiParent, QObject):
         return self.complet_result, self.dlg_cf
 
 
+    def close_dialog(self, dlg=None):
+        """ Disconnect signals and call superclass to close dialog """
+
+        super(ApiCF, self).close_dialog(dlg)
+
+
     def disconect_signals(self):
         try:
-            self.layer.editingStopped.disconnect(self.get_last_value)
-        except:
+            self.layer.editingStarted.disconnect(self.fct_start_editing)
+            self.layer.editingStopped.disconnect(self.fct_start_editing)
+        except Exception as e:
             pass
 
 
@@ -671,6 +669,7 @@ class ApiCF(ApiParent, QObject):
         self.roll_back()
         self.resetRubberbands()
         self.set_vdefault_edition()
+        self.controller.close_docker()
 
 
     def get_feature(self, tab_type):
@@ -722,8 +721,18 @@ class ApiCF(ApiParent, QObject):
 
 
     def get_last_value(self):
+
         try:
+            # Widgets in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2')
+            other_widgets = []
+            for field in self.complet_result[0]['body']['data']['fields']:
+                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                    widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
+                    if widget:
+                        other_widgets.append(widget)
+            # Widgets in tab_data
             widgets = self.dlg_cf.tab_data.findChildren(QWidget)
+            widgets.extend(other_widgets)
             for widget in widgets:
                 if widget.hasFocus():
                     value = utils_giswater.getWidgetText(self.dlg_cf, widget)
@@ -733,19 +742,41 @@ class ApiCF(ApiParent, QObject):
             pass
 
 
-    def start_editing(self, layer):
+    def start_editing(self, action_edit, result, layer):
         """ start or stop the edition based on your current status """
-
         self.iface.setActiveLayer(layer)
-        self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
-        action_is_checked = not self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked()
+        layer_is_editable = layer.isEditable()
+        self.get_last_value()
+
+        if layer_is_editable is False:
+            self.disconect_signals()
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+            self.layer.editingStarted.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_start_editing)
+            self.check_actions(action_edit, True)
+            self.enable_all(self.dlg_cf, result)
+            self.enable_actions(True)
+            return
 
         # If the json is empty, we simply activate/deactivate the editing
         # else if editing is active, deactivate edition and save changes
         if self.my_json == '' or str(self.my_json) == '{}':
+            self.disconect_signals()
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+            self.layer.editingStarted.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_start_editing)
+            self.check_actions(action_edit, False)
+            self.disable_all(self.dlg_cf, result, False)
+            self.enable_actions(False)
             return
-        elif action_is_checked:
-            self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
+
+        elif layer_is_editable is True:
+            status = self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
+            self.check_actions(action_edit, True)
+            if status is not False:  # Commit succesfull
+                self.check_actions(action_edit, False)
+                self.disable_all(self.dlg_cf, result, False)
+                self.enable_actions(False)
 
 
     def roll_back(self):
@@ -1004,15 +1035,21 @@ class ApiCF(ApiParent, QObject):
         :param p_widget:
         :param clear_json:
         :param close_dialog:
-        :return:
+        :return: True if all ok, False if sommething fail, None if close dialog
+            (When it is true or false the signals are reconnected, if it is None, it is not necessary to reconnect them)
         """
+
+        self.disconect_signals()
+
+        # Check if C++ object has been deleted
+        if isdeleted(self.dlg_cf):
+            return False
 
         if _json == '' or str(_json) == '{}':
             if self.controller.dlg_docker:
-                self.controller.dlg_docker.setMinimumWidth(dialog.width())
-                self.controller.close_docker()
+                self.manage_docker_close()
             self.close_dialog(dialog)
-            return
+            return None
 
         p_table_id = complet_result['body']['feature']['tableName']
         id_name = complet_result['body']['feature']['idName']
@@ -1036,7 +1073,9 @@ class ApiCF(ApiParent, QObject):
         if list_mandatory:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             self.controller.show_warning(msg)
-            return
+            self.layer.editingStarted.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_start_editing)
+            return False
 
         # If we create a new feature
         if self.new_feature_id is not None:
@@ -1044,19 +1083,23 @@ class ApiCF(ApiParent, QObject):
                 if k in parent_fields:
                     self.new_feature.setAttribute(k, v)
                     _json.pop(k, None)
+
             self.layer_new_feature.updateFeature(self.new_feature)
-
             status = self.layer_new_feature.commitChanges()
-            if status is False:
-                return
 
+            if status is False:
+                error = self.layer_new_feature.commitErrors()
+                self.controller.show_warning(error)
+                self.layer.editingStarted.connect(self.fct_start_editing)
+                self.layer.editingStopped.connect(self.fct_start_editing)
+                return False
+            self.new_feature_id = None
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
                 if self.controller.dlg_docker:
-                    self.controller.dlg_docker.setMinimumWidth(dialog.width())
-                    self.controller.close_docker()
+                    self.manage_docker_close()
                 self.close_dialog(dialog)
-                return
+                return None
 
             feature = f'"id":"{self.new_feature.attribute(id_name)}", '
 
@@ -1071,7 +1114,9 @@ class ApiCF(ApiParent, QObject):
         body = self.create_body(feature=feature, extras=extras)
         json_result = self.controller.get_json('gw_fct_setfields', body)
         if not json_result:
-            return
+            self.layer.editingStarted.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_start_editing)
+            return False
 
         if clear_json:
             _json = {}
@@ -1087,13 +1132,15 @@ class ApiCF(ApiParent, QObject):
                 self.reload_fields(dialog, json_result, p_widget)
         elif "Failed" in json_result['status']:
             # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
-            return
+            self.layer.editingStarted.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_start_editing)
+            return False
 
         if close_dialog:
             if self.controller.dlg_docker:
-                self.controller.dlg_docker.setMinimumWidth(dialog.width())
-                self.controller.close_docker()
+                self.manage_docker_close()
             self.close_dialog(dialog)
+            return None
 
 
     def get_scale_zoom(self):
@@ -1125,8 +1172,6 @@ class ApiCF(ApiParent, QObject):
                                 widget.setEnabled(field['iseditable'])
         except RuntimeError:
             pass
-        finally:
-            self.new_feature_id = None
 
 
     def enable_all(self, dialog, result):
@@ -1266,6 +1311,7 @@ class ApiCF(ApiParent, QObject):
             widget.textChanged.connect(partial(self.check_min_max_value, dialog, widget, dialog.btn_accept))
 
         return widget
+
 
     def reload_fields(self, dialog, result, p_widget):
         """
@@ -1575,6 +1621,7 @@ class ApiCF(ApiParent, QObject):
             self.controller.execute_sql(sql, log_sql=False)
             widget.model().select()
 
+
     """ FUNCTIONS RELATED WITH TAB ELEMENT"""
 
     def manage_element(self, dialog, element_id=None, feature=None):
@@ -1832,7 +1879,7 @@ class ApiCF(ApiParent, QObject):
                " WHERE connec_id = '" + str(self.feature_id) + "' "
                " ORDER BY hydrometer_customer_code")
         rows_list = []
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         rows_list.append(['', ''])
         if rows:
             for row in rows:
@@ -2114,7 +2161,7 @@ class ApiCF(ApiParent, QObject):
         if event_type_value != 'null':
             sql += f" AND parameter_type ILIKE '%{event_type_value}%'"
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if rows:
             rows.append(['', ''])
             utils_giswater.set_item_data(self.dlg_cf.event_id, rows, 1)
