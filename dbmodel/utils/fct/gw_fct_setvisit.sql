@@ -129,21 +129,21 @@ BEGIN
 
 	-- setting users value default
 	-- om_visit_class_vdefault
-	IF (SELECT id FROM config_param_user WHERE parameter = 'om_visit_class_vdefault' AND cur_user=current_user) IS NOT NULL THEN
+	IF (SELECT parameter FROM config_param_user WHERE parameter = 'om_visit_class_vdefault' AND cur_user=current_user) IS NOT NULL THEN
 		UPDATE config_param_user SET value = v_class WHERE parameter = 'om_visit_class_vdefault' AND cur_user=current_user;
 	ELSE
 		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('om_visit_class_vdefault', v_class, current_user);
 	END IF;
 
 	-- om_visit_extcode_vdefault
-	IF (SELECT id FROM config_param_user WHERE parameter = 'om_visit_extcode_vdefault' AND cur_user=current_user) IS NOT NULL THEN
+	IF (SELECT parameter FROM config_param_user WHERE parameter = 'om_visit_extcode_vdefault' AND cur_user=current_user) IS NOT NULL THEN
 		UPDATE config_param_user SET value = v_visitextcode WHERE parameter = 'om_visit_extcode_vdefault' AND cur_user=current_user;
 	ELSE
 		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('om_visit_extcode_vdefault', v_visitextcode, current_user);
 	END IF;
 
 	-- om_visit_cat_vdefault
-	IF (SELECT id FROM config_param_user WHERE parameter = 'om_visit_cat_vdefault' AND cur_user=current_user) IS NOT NULL THEN
+	IF (SELECT parameter FROM config_param_user WHERE parameter = 'om_visit_cat_vdefault' AND cur_user=current_user) IS NOT NULL THEN
 		UPDATE config_param_user SET value = v_visitcat WHERE parameter = 'om_visit_cat_vdefault' AND cur_user=current_user;
 	ELSE
 		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('om_visit_cat_vdefault', v_visitcat, current_user);

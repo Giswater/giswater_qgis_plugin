@@ -119,5 +119,13 @@ UPDATE config_param_system SET value='{"table":"sector", "selector":"selector_se
 "manageAll":true, "query_filter":" AND sector_id > 0"}' WHERE parameter='basic_selector_tab_sector';
 
  INSERT INTO sys_message VALUES (3138, 'Before use connec on planified mode you need to create a related link', NULL, 2, TRUE, 'utils');
+ 
+UPDATE config_typevalue SET camelstyle='gwGetVisit' WHERE id='get_visit' AND typevalue='widgetfunction_typevalue';
+UPDATE config_typevalue SET camelstyle='gwSetVisit' WHERE id='set_visit' AND typevalue='widgetfunction_typevalue';
+UPDATE config_typevalue SET camelstyle='gwSetPrint' WHERE id='set_print' AND typevalue='widgetfunction_typevalue';
+UPDATE config_typevalue SET camelstyle='backButtonClicked' WHERE id='set_previous_form_back' AND typevalue='widgetfunction_typevalue';
 
+DELETE FROM config_typevalue WHERE id='get_lot' AND typevalue='widgetfunction_typevalue';
+DELETE FROM config_typevalue WHERE id='get_visit_manager' AND typevalue='widgetfunction_typevalue';
+DELETE FROM config_typevalue WHERE id='set_visit_manager' AND typevalue='widgetfunction_typevalue';
  
