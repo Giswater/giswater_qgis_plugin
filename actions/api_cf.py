@@ -772,10 +772,7 @@ class ApiCF(ApiParent, QObject):
             return
 
         elif layer_is_editable is True:
-            self.disconect_signals()
-            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
-            self.layer.editingStarted.connect(self.fct_start_editing)
-            self.layer.editingStopped.connect(self.fct_start_editing)
+
             status = self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
             self.check_actions(action_edit, True)
             if status is not False:  # Commit succesfull
@@ -1137,6 +1134,9 @@ class ApiCF(ApiParent, QObject):
             except KeyError:
                 pass
             finally:
+                self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+                self.layer.editingStarted.connect(self.fct_start_editing)
+                self.layer.editingStopped.connect(self.fct_start_editing)
                 self.reload_fields(dialog, json_result, p_widget)
         elif "Failed" in json_result['status']:
             # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
