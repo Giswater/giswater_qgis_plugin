@@ -591,9 +591,8 @@ class ApiCF(ApiParent, QObject):
 
         action_edit.setChecked(self.layer.isEditable())
 
-
+        # Actions signals
         action_edit.triggered.connect(self.fct_start_editing)
-
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_arc_id, 'arc'))
@@ -631,12 +630,10 @@ class ApiCF(ApiParent, QObject):
             self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
             self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
 
-
         btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
         btn_cancel.clicked.connect(self.roll_back)
         btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
         self.dlg_cf.dlg_closed.connect(self.disconect_signals)
-
 
         # Set title
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
@@ -664,7 +661,6 @@ class ApiCF(ApiParent, QObject):
             self.layer.editingStarted.disconnect(self.fct_start_editing)
             self.layer.editingStopped.disconnect(self.fct_start_editing)
         except Exception as e:
-            print(f"EXCEPTION: {type(e).__name__}, {e}")
             pass
 
 
@@ -752,7 +748,6 @@ class ApiCF(ApiParent, QObject):
         layer_is_editable = layer.isEditable()
         self.get_last_value()
 
-        print(f"layer_is_editable-->{layer_is_editable}")
         if layer_is_editable is False:
             self.disconect_signals()
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
@@ -762,9 +757,10 @@ class ApiCF(ApiParent, QObject):
             self.enable_all(self.dlg_cf, result)
             self.enable_actions(True)
             return
-        print(self.my_json)
+
+        # If the json is empty, we simply activate/deactivate the editing
+        # else if editing is active, deactivate edition and save changes
         if self.my_json == '' or str(self.my_json) == '{}':
-            print("TEST")
             self.disconect_signals()
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
             self.layer.editingStarted.connect(self.fct_start_editing)
@@ -774,27 +770,13 @@ class ApiCF(ApiParent, QObject):
             self.enable_actions(False)
             return
 
-        # If the json is empty, we simply activate/deactivate the editing
-        # else if editing is active, deactivate edition and save changes
-        if layer_is_editable is True:
-            # self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(True)
-            # self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+        elif layer_is_editable is True:
             status = self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
-
-            # if status is True:
-            #     self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
-            if status is not None:  # Dialog continue open
-                self.layer.editingStarted.connect(self.fct_start_editing)
-                self.layer.editingStopped.connect(self.fct_start_editing)
-            print(f"status->{status}")
             self.check_actions(action_edit, True)
             if status is not False:  # Commit succesfull
-                # self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').setChecked(False)
                 self.check_actions(action_edit, False)
                 self.disable_all(self.dlg_cf, result, False)
                 self.enable_actions(False)
-
-            # self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(False)
 
 
     def roll_back(self):
@@ -1058,9 +1040,10 @@ class ApiCF(ApiParent, QObject):
         """
 
         self.disconect_signals()
+
         # Check if C++ object has been deleted
         if isdeleted(self.dlg_cf):
-            return
+            return False
 
         if _json == '' or str(_json) == '{}':
             if self.controller.dlg_docker:
@@ -1090,10 +1073,11 @@ class ApiCF(ApiParent, QObject):
         if list_mandatory:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             self.controller.show_warning(msg)
+            self.layer.editingStarted.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_start_editing)
             return False
 
         # If we create a new feature
-        print(f"self.new_feature_id-->{self.new_feature_id}")
         if self.new_feature_id is not None:
             for k, v in list(_json.items()):
                 if k in parent_fields:
@@ -1103,15 +1087,15 @@ class ApiCF(ApiParent, QObject):
             self.layer_new_feature.updateFeature(self.new_feature)
             status = self.layer_new_feature.commitChanges()
 
-
             if status is False:
                 error = self.layer_new_feature.commitErrors()
-                print(f"commitErrors: {error}")
+                self.controller.show_warning(error)
+                self.layer.editingStarted.connect(self.fct_start_editing)
+                self.layer.editingStopped.connect(self.fct_start_editing)
                 return False
             self.new_feature_id = None
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
-                print("TEST 10")
                 if self.controller.dlg_docker:
                     self.manage_docker_close()
                 self.close_dialog(dialog)
@@ -1130,7 +1114,8 @@ class ApiCF(ApiParent, QObject):
         body = self.create_body(feature=feature, extras=extras)
         json_result = self.controller.get_json('gw_fct_setfields', body)
         if not json_result:
-            print("TEST 20")
+            self.layer.editingStarted.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_start_editing)
             return False
 
         if clear_json:
@@ -1138,19 +1123,18 @@ class ApiCF(ApiParent, QObject):
 
         if "Accepted" in json_result['status']:
             try:
-                print("TEST 25")
                 level = json_result['message']['level']
                 msg = json_result['message']['text']
                 self.controller.show_message(msg, message_level=level)
             except KeyError:
                 pass
             finally:
-                # self.layer_new_feature.commitChanges()
                 self.reload_fields(dialog, json_result, p_widget)
         elif "Failed" in json_result['status']:
-            print("TEST 30")
             # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
-            return
+            self.layer.editingStarted.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_start_editing)
+            return False
 
         if close_dialog:
             if self.controller.dlg_docker:
@@ -1895,7 +1879,7 @@ class ApiCF(ApiParent, QObject):
                " WHERE connec_id = '" + str(self.feature_id) + "' "
                " ORDER BY hydrometer_customer_code")
         rows_list = []
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         rows_list.append(['', ''])
         if rows:
             for row in rows:
@@ -2177,7 +2161,7 @@ class ApiCF(ApiParent, QObject):
         if event_type_value != 'null':
             sql += f" AND parameter_type ILIKE '%{event_type_value}%'"
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql, log_sql=True)
+        rows = self.controller.get_rows(sql)
         if rows:
             rows.append(['', ''])
             utils_giswater.set_item_data(self.dlg_cf.event_id, rows, 1)
