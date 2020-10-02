@@ -24,9 +24,9 @@ BEGIN
     visit_class:= TG_ARGV[0];
 
     visit_table=(SELECT lower(feature_type) FROM config_visit_class WHERE id=visit_class);
-
+    
     --INFO: v_visit_type=1 (planned) v_visit_type=2(unexpected/incidencia)	
-    v_visit_type=(SELECT visit_type FROM om_visit_class WHERE id=visit_class);
+    v_visit_type=(SELECT visit_type FROM config_visit_class WHERE id=visit_class);
 
 
     IF TG_OP = 'INSERT' THEN
