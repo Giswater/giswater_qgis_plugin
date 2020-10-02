@@ -264,7 +264,7 @@ BEGIN
 						END IF;
 
 						-- execute grafanalytics function from nodeheader				
-						IF v_nodeheader IS NOT NULL THEN
+						IF v_mapzone_id::integer > 0 THEN
 							v_querytext = '{"data":{"parameters":{"grafClass":"'||v_mapzone||'", "exploitation":['||v_expl||'], "floodFromNode":"'||v_nodeheader||'", "checkData":false, "updateFeature":true, 
 							"updateMapZone":'||v_updatemapzone||', "geomParamUpdate":'||v_geomparamupdate||',"debug":false, "usePlanPsector":'||v_useplanpsector||', "forceOpen":[], "forceClosed":[]}}}';
 						ELSE
