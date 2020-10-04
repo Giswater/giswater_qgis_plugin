@@ -1310,9 +1310,9 @@ class UpdateSQL(ApiParent):
         self.dlg_import_inp.progressBar.setVisible(False)
 
         if schema_type.lower() == 'ws':
-            extras = '"filterText":"Import inp epanet file"'
+            extras = '"function":"2522"'
         elif schema_type.lower() == 'ud':
-            extras = '"filterText":"Import inp swmm file"'
+            extras = '"function":"2524"'
         else:
             self.error_count = self.error_count + 1
             return
@@ -1600,8 +1600,8 @@ class UpdateSQL(ApiParent):
             if not is_test:
                 self.task1.setProgress(100)
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_import_data')
-            msg = ("The sql files have been correctly executed."
-                   "\nNow, a form will be opened to manage the import inp.")
+            msg = ("The base schema have been correctly executed."
+                   "\nNow, a form will be opened to manage the import inp file into it.")
             self.controller.show_info_box(msg, "Info")
             self.execute_import_data(schema_type=project_type)
             return
@@ -2517,7 +2517,7 @@ class UpdateSQL(ApiParent):
                 self.set_info_project()
 
 
-    def execute_import_inp(self, accepted=False, schema_type=''):
+    def execute_import_inp(self, accepted=False, schema_type='', is_test=False):
 
         if accepted:
 
