@@ -2512,7 +2512,7 @@ class GwAdmin:
                 self.set_info_project()
 
 
-    def execute_import_inp(self, accepted=False, schema_type=''):
+    def execute_import_inp(self, accepted=False, schema_type='', is_test=False):
 
         is_test = False
 
