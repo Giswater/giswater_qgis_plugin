@@ -27,6 +27,10 @@ v_statuspresszone text;
 v_statusdma text;
 v_statusdqa text;
 v_project_type text;
+v_colsector text;
+v_colpresszone text;
+v_coldma text;
+v_coldqa text;
 
 BEGIN
 
@@ -41,17 +45,23 @@ BEGIN
 
         IF v_project_type = 'WS' THEN
 
-		-- get status	
-		v_statussector := (SELECT value::json->>'SECTOR' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
-		v_statuspresszone := (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
-		v_statusdma := (SELECT value::json->>'DMA' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
-		v_statusdqa := (SELECT value::json->>'DQA' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		-- get mode	
+		v_statussector := (SELECT (value::json->>'SECTOR')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		v_statuspresszone := (SELECT (value::json->>'PRESSZONE')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		v_statusdma := (SELECT (value::json->>'DMA')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		v_statusdqa := (SELECT (value::json->>'DQA')::json->>'mode' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
 
-		-- get values
-		SELECT to_json(array_agg(row_to_json(row))) INTO v_sector FROM (SELECT sector_id as id, stylesheet::json FROM v_edit_sector) row;
-		SELECT to_json(array_agg(row_to_json(row))) INTO v_presszone FROM (SELECT presszone_id as id , stylesheet::json FROM v_edit_presszone) row;
-		SELECT to_json(array_agg(row_to_json(row))) INTO v_dma FROM (SELECT dma_id as id, stylesheet::json FROM v_edit_dma) row;
-		SELECT to_json(array_agg(row_to_json(row))) INTO v_dqa FROM (SELECT dqa_id as id, stylesheet::json FROM v_edit_dqa) row;
+		-- get column to simbolize
+		v_colsector := (SELECT (value::json->>'SECTOR')::json->>'column' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		v_colpresszone := (SELECT (value::json->>'PRESSZONE')::json->>'column' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		v_coldma := (SELECT (value::json->>'DMA')::json->>'column' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+		v_coldqa := (SELECT (value::json->>'DQA')::json->>'column' FROM config_param_system WHERE parameter = 'utils_grafanalytics_dynamic_symbology');
+
+		-- get mapzone values
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row)))FROM (SELECT '||v_colsector||' as id, stylesheet::json FROM v_edit_sector) row' INTO v_sector ;
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_colpresszone||' as id , stylesheet::json FROM v_edit_presszone) row' INTO v_presszone ;
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldma||' as id, stylesheet::json FROM v_edit_dma) row' INTO v_dma ;
+		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||v_coldqa||' as id, stylesheet::json FROM v_edit_dqa) row' INTO v_dqa ;
 
 	ELSE
 		-- control nulls
@@ -71,10 +81,10 @@ BEGIN
 	RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{}'||
 			',"data":{"mapzones":
-				[{"name":"sector", "status": "'||v_statussector||'", "idname": "sector_id", "layer":"v_edit_sector", "opacity":0.5, "values":' || v_sector ||'}'||
-				',{"name":"presszone", "status": "'||v_statuspresszone||'", "idname": "presszone_id",  "layer":"v_edit_presszone", "opacity":0.5,  "values":' || v_presszone ||'}'||
-				',{"name":"dma",  "status": "'||v_statusdma||'", "idname": "dma_id", "layer":"v_edit_dma", "opacity":0.5, "values":' || v_dma ||'}'||
-				',{"name":"dqa",  "status": "'||v_statusdqa||'", "idname": "dqa_id", "layer":"v_edit_dqa", "opacity":0.5, "values":' || v_dqa ||'}'||
+				[{"name":"sector", "status": "'||v_statussector||'", "idname": "'||v_colsector||'", "layer":"v_edit_sector", "opacity":0.5, "values":' || v_sector ||'}'||
+				',{"name":"presszone", "status": "'||v_statuspresszone||'", "'||v_colpresszone||'": "presszone_id",  "layer":"v_edit_presszone", "opacity":0.5,  "values":' || v_presszone ||'}'||
+				',{"name":"dma",  "status": "'||v_statusdma||'", "idname": "'||v_coldma||'", "layer":"v_edit_dma", "opacity":0.5, "values":' || v_dma ||'}'||
+				',{"name":"dqa",  "status": "'||v_statusdqa||'", "idname": "'||v_coldqa||'", "layer":"v_edit_dqa", "opacity":0.5, "values":' || v_dqa ||'}'||
 				']}}'||
 	    '}')::json;
       

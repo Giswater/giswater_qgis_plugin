@@ -705,6 +705,46 @@ BEGIN
 							*/
 
 					EXECUTE v_querytext;
+
+				ELSIF  v_updatemapzgeom = 4 THEN
+			
+					-- use plot and pipe buffer
+					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
+							(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
+							(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from v_edit_arc 
+							where '||quote_ident(v_field)||'::text != ''0'' AND v_edit_arc.'||quote_ident(v_field)||' IN
+							(SELECT DISTINCT '||quote_ident(v_field)||' FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
+							group by '||quote_ident(v_field)||'
+							UNION
+							SELECT c.'||quote_ident(v_field)||', (st_buffer(st_collect(v_edit_link.the_geom),'||v_geomparamupdate||'/2)) 
+							as geom FROM v_edit_connec c, v_edit_link
+							WHERE c.'||quote_ident(v_field)||'::text != ''0'' 
+							AND c.'||quote_ident(v_field)||' IN
+							(SELECT DISTINCT '||quote_ident(v_field)||' FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
+							AND v_edit_link.feature_id = connec_id and feature_type = ''CONNEC''
+							group by c.'||quote_ident(v_field)||'	
+							)a group by '||quote_ident(v_field)||')b 
+						WHERE b.'||quote_ident(v_field)||'='||quote_ident(v_table)||'.'||quote_ident(v_fieldmp);
+
+						/*
+						UPDATE arc set the_geom = geom FROM(
+							SELECT dma_id, st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
+							(SELECT dma_id, st_buffer(st_collect(the_geom), 10) as geom from v_edit_arc 
+							where dma_id::integer > 0 AND v_edit_arc.dma_id IN
+							(SELECT DISTINCT dma_id FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = 145 and cur_user = current_user)
+							group by dma_id
+							UNION
+							SELECT c.dma_id, (st_buffer(st_collect(v_edit_link.the_geom),5)) as geom FROM v_edit_connec c, v_edit_link
+							WHERE c.dma_id::integer > 0 
+							AND c.dma_id IN
+							(SELECT DISTINCT dma_id FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = 145 and cur_user = current_user)
+							AND v_edit_link.feature_id = connec_id and feature_type = 'CONNEC'
+							group by dma_id	
+							)a group by dma_id
+						)b WHERE b.dma_id=dma.dma_id;
+						*/
+
+					EXECUTE v_querytext;
 				END IF;
 
 				-- check for intercomunicated mapzones (select if at least one node header has different mazpones from what is configured)
