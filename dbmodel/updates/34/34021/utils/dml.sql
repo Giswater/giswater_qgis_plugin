@@ -132,6 +132,4 @@ DELETE FROM config_typevalue WHERE id='set_visit_manager' AND typevalue='widgetf
 
 UPDATE config_param_system SET value=
 '{"SECTOR":{"mode":"Disable", "column":"sector_id"}, "DMA":{"mode":"Styesheet", "column":"name"}, "PRESSZONE":{"mode":"Random", "column":"presszone_id"}, "DQA":{"mode":"Random", "column":"dqa_id"}, "MINSECTOR":{"mode":"Disable", "column":"minsector_id"}}'
-WHERE id = 'utils_grafanalytics_dynamic_symbology';
-
-INSERT INTO 'om
+WHERE parameter  = 'utils_grafanalytics_dynamic_symbology';
