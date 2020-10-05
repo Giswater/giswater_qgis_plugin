@@ -6,9 +6,9 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 
-from qgis.PyQt.QtWidgets import QTabWidget, QColor, QCompleter, QWidget, QFileDialog
+from qgis.PyQt.QtWidgets import QTabWidget, QCompleter, QWidget, QFileDialog
 from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel
-from qgis.PyQt.QtGui import QCursor, QPixmap
+from qgis.PyQt.QtGui import QCursor, QPixmap, QColor
 from qgis.core import QgsProject, QgsExpression, QgsPointXY, QgsGeometry, QgsVectorLayer
 
 import configparser
