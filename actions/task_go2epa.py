@@ -69,12 +69,12 @@ class TaskGo2Epa(QgsTask):
         if self.import_result:
             status = self.import_rpt()
 
-        self.controller.show_db_exception = True
-
         return status
 
 
     def finished(self, result):
+
+        self.controller.show_db_exception = True
 
         self.close_file()
 
@@ -121,6 +121,7 @@ class TaskGo2Epa(QgsTask):
 
     def cancel(self):
 
+        self.controller.show_db_exception = True
         self.controller.show_info(f"Task canceled: {self.description()}")
         self.close_file()
         super().cancel()
