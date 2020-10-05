@@ -12,10 +12,10 @@ import webbrowser
 import global_vars
 
 from qgis.gui import QgsVertexMarker
-from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal, QDateTime
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
-    QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit, QDateTime
+    QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit
 from datetime import datetime
 from functools import partial
 

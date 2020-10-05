@@ -8,13 +8,14 @@ or (at your option) any later version.
 import configparser
 import os.path
 import global_vars
-import partial
+from functools import partial
 
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsSnappingConfig, QgsVectorLayer, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsExpression, QgsRectangle
 from qgis.PyQt.QtWidgets import QDockWidget, QApplication
 from qgis.PyQt.QtCore import QPoint, Qt
-from qgis.PyQt.QtGui import QColor, QgsVertexMarker, QgsMapToolEmitPoint, QCursor, QPixmap
+from qgis.PyQt.QtGui import QColor, QCursor, QPixmap
+from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint
 
 from core.utils.tools_giswater import enable_feature_type, tab_feature_changed, check_expression
 from lib.tools_qt import apply_lazy_init, reload_table, reload_qtable, getWidgetText
