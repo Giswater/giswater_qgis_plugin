@@ -418,7 +418,7 @@ class ApiCF(ApiParent, QObject):
 
         # Get widget controls
         self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
-        self.tab_main.currentChanged.connect(self.tab_activation)
+        self.tab_main.currentChanged.connect(partial(self.tab_activation, self.dlg_cf))
         self.tbl_element = self.dlg_cf.findChild(QTableView, "tbl_element")
         utils_giswater.set_qtv_config(self.tbl_element)
         self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
@@ -481,7 +481,7 @@ class ApiCF(ApiParent, QObject):
         action_interpolate = self.dlg_cf.findChild(QAction, "actionInterpolate")
         action_section = self.dlg_cf.findChild(QAction, "actionSection")
 
-        self.show_actions('tab_data')
+        self.show_actions(self.dlg_cf, 'tab_data')
 
         try:
             action_edit.setEnabled(self.complet_result[0]['body']['feature']['permissions']['isEditable'])
@@ -583,16 +583,17 @@ class ApiCF(ApiParent, QObject):
 
         # We assign the function to a global variable,
         # since as it receives parameters we will not be able to disconnect the signals
-        self.fct_start_editing = lambda: self.start_editing(action_edit, complet_result[0]['body']['data'], self.layer)
-        if action_edit.isEnabled():
-            self.layer.editingStarted.connect(self.fct_start_editing)
-            self.layer.editingStopped.connect(self.fct_start_editing)
-            self.enable_actions(self.layer.isEditable())
+        self.fct_start_editing = lambda: self.start_editing(self.dlg_cf, action_edit, complet_result[0]['body']['data'], self.layer)
+        self.fct_stop_editing = lambda: self.stop_editing(self.dlg_cf, action_edit, complet_result[0]['body']['data'], self.layer)
+        self.layer.editingStarted.connect(self.fct_start_editing)
+        self.layer.editingStopped.connect(self.fct_stop_editing)
+        self.enable_actions(self.dlg_cf, self.layer.isEditable())
 
         action_edit.setChecked(self.layer.isEditable())
 
         # Actions signals
-        action_edit.triggered.connect(self.fct_start_editing)
+
+        action_edit.triggered.connect(partial(self.manage_edition, self.dlg_cf, action_edit, complet_result[0]['body']['data'], self.layer))
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_arc_id, 'arc'))
@@ -659,7 +660,11 @@ class ApiCF(ApiParent, QObject):
     def disconect_signals(self):
         try:
             self.layer.editingStarted.disconnect(self.fct_start_editing)
-            self.layer.editingStopped.disconnect(self.fct_start_editing)
+        except Exception as e:
+            pass
+
+        try:
+            self.layer.editingStopped.disconnect(self.fct_stop_editing)
         except Exception as e:
             pass
 
@@ -670,6 +675,7 @@ class ApiCF(ApiParent, QObject):
         self.resetRubberbands()
         self.set_vdefault_edition()
         self.controller.close_docker()
+        self.disconect_signals()
 
 
     def get_feature(self, tab_type):
@@ -742,17 +748,58 @@ class ApiCF(ApiParent, QObject):
             pass
 
 
-    def start_editing(self, action_edit, result, layer):
+    def manage_edition(self, dialog, action_edit, result, layer):
+        if layer.isEditable():
+            self.stop_editing(dialog, action_edit, result, layer)
+        else:
+            self.start_editing(dialog, action_edit, result, layer)
+
+
+    def stop_editing(self, dialog, action_edit, result, layer):
+        print(f"stop_editing")
+        self.get_last_value()
+        if self.my_json == '' or str(self.my_json) == '{}':
+            self.disconect_signals()
+            # Use commitChanges just for closse edition
+            layer.commitChanges()
+            layer.editingStarted.connect(self.fct_start_editing)
+            layer.editingStopped.connect(self.fct_stop_editing)
+            self.check_actions(action_edit, False)
+            self.disable_all(dialog, result, False)
+            self.enable_actions(dialog, False)
+        else:
+            status = self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
+            self.check_actions(action_edit, True)
+            if status is not False:  # Commit succesfull
+                self.check_actions(action_edit, False)
+                self.disable_all(dialog, result, False)
+                self.enable_actions(dialog, False)
+
+
+    def start_editing(self, dialog, action_edit, result, layer):
+        print(f"start_editing")
+        self.iface.setActiveLayer(layer)
+        self.check_actions(action_edit, True)
+        self.enable_all(dialog, result)
+        self.enable_actions(dialog, True)
+        self.disconect_signals()
+        layer.startEditing()
+        layer.editingStarted.connect(self.fct_start_editing)
+        layer.editingStopped.connect(self.fct_stop_editing)
+
+
+    def start_editing_2(self, action_edit, result, layer):
         """ start or stop the edition based on your current status """
         self.iface.setActiveLayer(layer)
         layer_is_editable = layer.isEditable()
         self.get_last_value()
 
         if layer_is_editable is False:
+            print(f"TEST 10")
             self.disconect_signals()
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
-            self.layer.editingStarted.connect(self.fct_start_editing)
-            self.layer.editingStopped.connect(self.fct_start_editing)
+            layer.editingStarted.connect(self.fct_start_editing)
+            layer.editingStopped.connect(self.fct_start_editing)
             self.check_actions(action_edit, True)
             self.enable_all(self.dlg_cf, result)
             self.enable_actions(True)
@@ -761,6 +808,7 @@ class ApiCF(ApiParent, QObject):
         # If the json is empty, we simply activate/deactivate the editing
         # else if editing is active, deactivate edition and save changes
         if self.my_json == '' or str(self.my_json) == '{}':
+            print(f"TEST 20")
             self.disconect_signals()
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
             self.layer.editingStarted.connect(self.fct_start_editing)
@@ -771,6 +819,7 @@ class ApiCF(ApiParent, QObject):
             return
 
         elif layer_is_editable is True:
+            print(f"TEST 30")
             status = self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
             self.check_actions(action_edit, True)
             if status is not False:  # Commit succesfull
@@ -781,11 +830,14 @@ class ApiCF(ApiParent, QObject):
 
     def roll_back(self):
         """ Discard changes in current layer """
-
+        self.disconect_signals()
         try:
             self.iface.actionRollbackEdits().trigger()
         except TypeError:
             pass
+        self.layer.editingStarted.connect(self.fct_start_editing)
+        self.layer.editingStopped.connect(self.fct_start_editing)
+
 
 
     def set_widgets(self, dialog, complet_result, field):
@@ -1027,6 +1079,7 @@ class ApiCF(ApiParent, QObject):
         self.open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
 
 
+
     def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dialog=True):
         """
         :param dialog:
@@ -1038,7 +1091,6 @@ class ApiCF(ApiParent, QObject):
         :return: True if all ok, False if sommething fail, None if close dialog
             (When it is true or false the signals are reconnected, if it is None, it is not necessary to reconnect them)
         """
-
         self.disconect_signals()
 
         # Check if C++ object has been deleted
@@ -1074,9 +1126,9 @@ class ApiCF(ApiParent, QObject):
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             self.controller.show_warning(msg)
             self.layer.editingStarted.connect(self.fct_start_editing)
-            self.layer.editingStopped.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_stop_editing)
             return False
-
+        print(f"self.new_feature_id-->{self.new_feature_id}<--")
         # If we create a new feature
         if self.new_feature_id is not None:
             for k, v in list(_json.items()):
@@ -1091,7 +1143,7 @@ class ApiCF(ApiParent, QObject):
                 error = self.layer_new_feature.commitErrors()
                 self.controller.show_warning(error)
                 self.layer.editingStarted.connect(self.fct_start_editing)
-                self.layer.editingStopped.connect(self.fct_start_editing)
+                self.layer.editingStopped.connect(self.fct_stop_editing)
                 return False
             self.new_feature_id = None
             my_json = json.dumps(_json)
@@ -1115,9 +1167,9 @@ class ApiCF(ApiParent, QObject):
         json_result = self.controller.get_json('gw_fct_setfields', body)
         if not json_result:
             self.layer.editingStarted.connect(self.fct_start_editing)
-            self.layer.editingStopped.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_stop_editing)
             return False
-
+        print("TEST 10")
         if clear_json:
             _json = {}
 
@@ -1129,11 +1181,18 @@ class ApiCF(ApiParent, QObject):
             except KeyError:
                 pass
             finally:
+                print("TEST 20")
+                self.disconect_signals()
                 self.reload_fields(dialog, json_result, p_widget)
+                self.layer.blockSignals(True)
+                self.layer.commitChanges()
+                self.layer.blockSignals(False)
+                self.layer.editingStarted.connect(self.fct_start_editing)
+                self.layer.editingStopped.connect(self.fct_stop_editing)
         elif "Failed" in json_result['status']:
             # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
             self.layer.editingStarted.connect(self.fct_start_editing)
-            self.layer.editingStopped.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_stop_editing)
             return False
 
         if close_dialog:
@@ -1204,11 +1263,11 @@ class ApiCF(ApiParent, QObject):
             pass
 
 
-    def enable_actions(self, enabled):
+    def enable_actions(self, dialog, enabled):
         """ Enable actions according if layer is editable or not """
 
         try:
-            actions_list = self.dlg_cf.findChildren(QAction)
+            actions_list = dialog.findChildren(QAction)
             static_actions = ('actionEdit', 'actionCentered', 'actionZoomOut', 'actionZoom', 'actionLink', 'actionHelp',
                               'actionSection')
             for action in actions_list:
@@ -1412,7 +1471,7 @@ class ApiCF(ApiParent, QObject):
         self.catalog.api_catalog(self.dlg_cf, widget, self.geom_type, feature_type)
 
 
-    def show_actions(self, tab_name):
+    def show_actions(self, dialog, tab_name):
         """ Hide all actions and show actions for the corresponding tab
         :param tab_name: corresponding tab
         """
@@ -1433,18 +1492,18 @@ class ApiCF(ApiParent, QObject):
                             action.setToolTip(act['actionTooltip'])
                             action.setVisible(True)
 
-        self.enable_actions(self.layer.isEditable())
+        self.enable_actions(dialog, self.layer.isEditable())
 
 
     """ MANAGE TABS """
 
-    def tab_activation(self):
+    def tab_activation(self, dialog, ):
         """ Call functions depend on tab selection """
 
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
-        self.show_actions(tab_name)
+        self.show_actions(dialog, tab_name)
 
         # Tab 'Elements'
         if self.tab_main.widget(index_tab).objectName() == 'tab_elements' and not self.tab_element_loaded:
