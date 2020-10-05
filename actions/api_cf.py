@@ -658,6 +658,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def disconect_signals(self):
+
         try:
             self.layer.editingStarted.disconnect(self.fct_start_editing)
         except Exception as e:
@@ -749,6 +750,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def manage_edition(self, dialog, action_edit, result, layer):
+
         if layer.isEditable():
             self.stop_editing(dialog, action_edit, result, layer)
         else:
@@ -756,6 +758,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def stop_editing(self, dialog, action_edit, result, layer):
+
         print(f"stop_editing")
         self.get_last_value()
         if self.my_json == '' or str(self.my_json) == '{}':
@@ -777,6 +780,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def start_editing(self, dialog, action_edit, result, layer):
+
         print(f"start_editing")
         self.iface.setActiveLayer(layer)
         self.check_actions(action_edit, True)
@@ -790,6 +794,7 @@ class ApiCF(ApiParent, QObject):
 
     def start_editing_2(self, action_edit, result, layer):
         """ start or stop the edition based on your current status """
+
         self.iface.setActiveLayer(layer)
         layer_is_editable = layer.isEditable()
         self.get_last_value()
@@ -799,7 +804,7 @@ class ApiCF(ApiParent, QObject):
             self.disconect_signals()
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
             layer.editingStarted.connect(self.fct_start_editing)
-            layer.editingStopped.connect(self.fct_start_editing)
+            layer.editingStopped.connect(self.fct_stop_editing)
             self.check_actions(action_edit, True)
             self.enable_all(self.dlg_cf, result)
             self.enable_actions(True)
@@ -812,7 +817,7 @@ class ApiCF(ApiParent, QObject):
             self.disconect_signals()
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
             self.layer.editingStarted.connect(self.fct_start_editing)
-            self.layer.editingStopped.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_stop_editing)
             self.check_actions(action_edit, False)
             self.disable_all(self.dlg_cf, result, False)
             self.enable_actions(False)
@@ -830,14 +835,14 @@ class ApiCF(ApiParent, QObject):
 
     def roll_back(self):
         """ Discard changes in current layer """
+
         self.disconect_signals()
         try:
             self.iface.actionRollbackEdits().trigger()
         except TypeError:
             pass
         self.layer.editingStarted.connect(self.fct_start_editing)
-        self.layer.editingStopped.connect(self.fct_start_editing)
-
+        self.layer.editingStopped.connect(self.fct_stop_editing)
 
 
     def set_widgets(self, dialog, complet_result, field):
@@ -1079,7 +1084,6 @@ class ApiCF(ApiParent, QObject):
         self.open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
 
 
-
     def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dialog=True):
         """
         :param dialog:
@@ -1091,6 +1095,7 @@ class ApiCF(ApiParent, QObject):
         :return: True if all ok, False if sommething fail, None if close dialog
             (When it is true or false the signals are reconnected, if it is None, it is not necessary to reconnect them)
         """
+
         self.disconect_signals()
 
         # Check if C++ object has been deleted
@@ -1128,6 +1133,7 @@ class ApiCF(ApiParent, QObject):
             self.layer.editingStarted.connect(self.fct_start_editing)
             self.layer.editingStopped.connect(self.fct_stop_editing)
             return False
+
         print(f"self.new_feature_id-->{self.new_feature_id}<--")
         # If we create a new feature
         if self.new_feature_id is not None:
