@@ -1429,12 +1429,13 @@ def get_values(dialog, widget, _json=None, layer=None):
     elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
         value = getCalendarDate(dialog, widget)
     # Only get values if layer is editable or if layer not exist(need for ApiManageComposer)
-    if layer is None or layer.isEditable():
-        # If widget.isEditable(False) return None, here control it.
-        if str(value) == '' or value is None:
-            _json[str(widget.property('columnname'))] = None
-        else:
-            _json[str(widget.property('columnname'))] = str(value)
+    if layer is not None:
+        if layer.isEditable():
+            # If widget.isEditable(False) return None, here control it.
+            if str(value) == '' or value is None:
+                _json[str(widget.property('columnname'))] = None
+            else:
+                _json[str(widget.property('columnname'))] = str(value)
 
 
 def set_setStyleSheet(field, widget, wtype='label'):

@@ -498,6 +498,7 @@ def gw_function_dxf(**kwargs):
 
     dialog = kwargs['dialog']
     widget = kwargs['widget']
+    temp_layers_added = kwargs['temp_layers_added']
     complet_result = manage_dxf(dialog, path, False, True)
 
     for layer in complet_result['temp_layers_added']:
@@ -725,11 +726,15 @@ def set_selector(dialog, widget, is_alone, controller):
 	json_result = controller.get_json('gw_fct_setselectors', body)
 	
 	if str(tab_name) == 'tab_exploitation':
-		# Reload layer, zoom to layer, style mapzones and refresh canvas
-		layer = controller.get_layer_by_tablename('v_edit_arc')
-		if layer:
-			self.iface.setActiveLayer(layer)
-			self.iface.zoomToActiveLayer()
+	    # Zoom to exploitation
+        x1 = json_result['body']['data']['geometry']['x1']
+        y1 = json_result['body']['data']['geometry']['y1']
+        x2 = json_result['body']['data']['geometry']['x2']
+        y2 = json_result['body']['data']['geometry']['y2']
+        if x1 is not None:
+            self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+                
+        # getting mapzones style
 		self.set_style_mapzones()
 	
 	# Refresh canvas

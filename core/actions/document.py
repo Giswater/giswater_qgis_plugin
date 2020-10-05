@@ -338,6 +338,7 @@ class GwDocument:
         file_dialog.setFileMode(QFileDialog.AnyFile)
         message = "Select file"
         files_path, filter_ = file_dialog.getOpenFileNames(parent=None, caption=global_vars.controller.tr(message))
+
         file_text = ""
         for file in files_path:
             file_text += f"{file}\n\n"
