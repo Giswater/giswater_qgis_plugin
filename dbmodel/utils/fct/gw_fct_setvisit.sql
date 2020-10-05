@@ -71,6 +71,7 @@ v_addphotos_array json[];
 v_list_photos text[];
 v_event_id bigint;
 v_error_context text;
+v_project_type text;
 
 BEGIN
 
@@ -82,7 +83,7 @@ BEGIN
 	INTO v_version;
 
 	EXECUTE 'SELECT project_type FROM sys_version'
-	INTO v_version;
+	INTO v_project_type;
 	
 	--  get input values
 	v_client = (p_data ->>'client')::json;
@@ -107,7 +108,7 @@ BEGIN
 	PERFORM setval('"SCHEMA_NAME".om_visit_x_node_id_seq', (SELECT max(id) FROM om_visit_x_node), true);
 	PERFORM setval('"SCHEMA_NAME".om_visit_x_connec_id_seq', (SELECT max(id) FROM om_visit_x_connec), true);
 
-	IF v_version ='UD' THEN
+	IF v_project_type ='UD' THEN
 		PERFORM setval('"SCHEMA_NAME".om_visit_x_gully_id_seq', (SELECT max(id) FROM om_visit_x_gully), true);
 	END IF;
 
@@ -285,7 +286,7 @@ BEGIN
 	IF v_status='4' THEN
 	    UPDATE om_visit SET enddate = current_timestamp::timestamp WHERE id = v_id;
 
-	    IF v_version='TM' THEN
+	    IF v_project_type='TM' THEN
 		SELECT row_to_json(a) FROM (SELECT gw_fct_om_visit_event_manager(v_id::integer) as "st_astext")a INTO return_event_manager_aux ;
     	END IF;
     	
