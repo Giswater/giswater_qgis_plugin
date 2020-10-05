@@ -1284,9 +1284,10 @@ class ParentAction(object):
                         symbol.changeSymbolLayer(0, symbol_layer)
                     category = QgsRendererCategory(id['id'], symbol, str(id['id']))
                     categories.append(category)
-
-                    # apply symbol to layer renderer
-                    lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
+					
+					# apply symbol to layer renderer
+                    if 'idname' in mapzone:
+                        lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
 
                     # repaint layer
                     lyr.triggerRepaint()
