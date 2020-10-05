@@ -165,7 +165,7 @@ class ManageDocument(ParentManage):
                f" FROM {table_object}"
                f" WHERE id = '{doc_id}'")
         row = self.controller.get_row(sql, log_info=False)
-
+        reset_models = False
         # If document not exists perform an INSERT
         if row is None:
             if len(self.files_path) <= 1:
@@ -181,9 +181,11 @@ class ManageDocument(ParentManage):
                        "all selected documents and your doc_id won't be used.")
                 answer = self.controller.ask_question(msg, self.controller.tr("Add document"))
                 if answer:
-                    for file in self.files_path:
+                    for cont, file in enumerate(self.files_path):
+                        if cont == len(self.files_path)-1:
+                            reset_models = True
                         sql, doc_id = self.insert_doc_sql(doc_type, observ, date, file)
-                        self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
+                        self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable, reset_models)
 
         # If document exists perform an UPDATE
         else:
@@ -202,12 +204,14 @@ class ManageDocument(ParentManage):
                 answer = self.controller.ask_question(msg, self.controller.tr("Add document"))
                 if answer:
                     for cont, file in enumerate(self.files_path):
+                        if cont == len(self.files_path)-1:
+                            reset_models = True
                         if cont == 0:
                             sql = self.update_doc_sql(doc_type, observ, date, doc_id, file)
-                            self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
+                            self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable, reset_models)
                         else:
                             sql, doc_id = self.insert_doc_sql(doc_type, observ, date, file)
-                            self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
+                            self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable, reset_models)
 
 
     def insert_doc_sql(self, doc_type, observ, date, path):
@@ -226,7 +230,7 @@ class ManageDocument(ParentManage):
         return sql
 
 
-    def update_doc_tables(self, sql, doc_id, table_object, tablename, item_id, qtable):
+    def update_doc_tables(self, sql, doc_id, table_object, tablename, item_id, qtable, reset_models=True):
         # Manage records in tables @table_object_x_@geom_type
         sql += (f"\nDELETE FROM doc_x_node"
                 f" WHERE doc_id = '{doc_id}';")
@@ -256,7 +260,7 @@ class ManageDocument(ParentManage):
                         f" VALUES ('{doc_id}', '{feature_id}');")
 
         status = self.controller.execute_sql(sql)
-        if status:
+        if status and reset_models is True:
             self.doc_id = doc_id
             self.manage_close(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"])
 
