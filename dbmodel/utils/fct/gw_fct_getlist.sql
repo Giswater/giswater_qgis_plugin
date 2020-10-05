@@ -197,7 +197,7 @@ BEGIN
 	
 		v_data = '{"client":{"device":4, "infoType":1, "lang":"ES"},"data":{"formName": "'||v_tablename||'"}}';
 		
-		SELECT gw_fct_getfeatureupsert(v_data) INTO v_filter_values;
+		SELECT gw_fct_getfiltervaluesvdef(v_data) INTO v_filter_values;
 
 		RAISE NOTICE 'gw_fct_getlist - Init Values setted by default %', v_filter_values;
 
