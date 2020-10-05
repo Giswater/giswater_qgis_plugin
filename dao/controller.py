@@ -57,6 +57,8 @@ class DaoController(object):
         self.docker_type = None
         self.show_docker = None
         self.prev_maptool = None
+        self.dlg_info = None
+        self.show_db_exception = True
 
         if create_logger:
             self.set_logger(logger_name)
@@ -1866,7 +1868,7 @@ class DaoController(object):
 
 
     def show_exceptions_msg(self, title=None, msg="", window_title="Information about exception"):
-        """ Show exception message in dialog """
+        """ Create dialog to show exception message """
 
         self.dlg_info = DialogTextUi()
         self.dlg_info.btn_accept.setVisible(False)
@@ -1877,7 +1879,16 @@ class DaoController(object):
         utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.set_text_bold(self.dlg_info.txt_infolog)
-        self.dlg_info.show()
+        # Show dialog only if we are not in a task process
+        if self.show_db_exception:
+            self.show_dlg_info()
+
+
+    def show_dlg_info(self):
+        """ Show dialog with exception message generated in function show_exceptions_msg """
+
+        if self.dlg_info:
+            self.dlg_info.show()
 
 
     def dock_dialog(self, dialog):
@@ -1952,6 +1963,7 @@ class DaoController(object):
         except AttributeError:
             self.docker_type = None
             self.dlg_docker = None
+
 
     def manage_docker_options(self):
         """ Check if user want dock the dialog or not """

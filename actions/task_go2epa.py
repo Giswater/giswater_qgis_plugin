@@ -54,6 +54,9 @@ class TaskGo2Epa(QgsTask):
 
     def run(self):
 
+        self.controller.show_db_exception = False
+        status = True
+
         if not self.exec_function_pg2epa():
             return False
 
@@ -64,9 +67,11 @@ class TaskGo2Epa(QgsTask):
             self.execute_epa()
 
         if self.import_result:
-            self.import_rpt()
+            status = self.import_rpt()
 
-        return True
+        self.controller.show_db_exception = True
+
+        return status
 
 
     def finished(self, result):
@@ -108,6 +113,10 @@ class TaskGo2Epa(QgsTask):
             self.controller.log_info(f"Task aborted: {self.description()}")
             self.controller.log_warning(f"Exception: {self.exception}")
             raise self.exception
+
+        # If Database exception, show dialog after task has finished
+        if self.controller.last_error:
+            self.controller.show_dlg_info()
 
 
     def cancel(self):
@@ -372,7 +381,7 @@ class TaskGo2Epa(QgsTask):
             extras += f', "file": {self.json_rpt}'
         body = self.create_body(extras=extras)
         function_name = 'gw_fct_rpt2pg_main'
-        json_result = self.controller.get_json(function_name, body, log_sql=False)
+        json_result = self.controller.get_json(function_name, body)
         if json_result is None:
             return False
 
