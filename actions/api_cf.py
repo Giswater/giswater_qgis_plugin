@@ -1497,7 +1497,7 @@ class ApiCF(ApiParent, QObject):
 
     """ MANAGE TABS """
 
-    def tab_activation(self, dialog, ):
+    def tab_activation(self, dialog):
         """ Call functions depend on tab selection """
 
         # Get index of selected tab
