@@ -258,13 +258,13 @@ BEGIN
 			INTO v_the_geom;
 
 		--  get querytext
-		EXECUTE concat('SELECT query_text, listtype FROM config_api_list WHERE tablename = $1 AND device = $2', v_attribute_filter)
+		EXECUTE concat('SELECT query_text, listtype FROM config_form_list WHERE tablename = $1 AND device = $2', v_attribute_filter)
 			INTO v_query_result, v_listtype
 			USING v_tablename, v_device;
 
 		-- if v_device is not configured on config_form_list table
 		IF v_query_result IS NULL THEN
-			EXECUTE concat('SELECT query_text, listtype FROM config_api_list WHERE tablename = $1 LIMIT 1', v_attribute_filter)
+			EXECUTE concat('SELECT query_text, listtype FROM config_form_list WHERE tablename = $1 LIMIT 1', v_attribute_filter)
 				INTO v_query_result, v_listtype
 				USING v_tablename;
 		END IF;	
@@ -276,13 +276,13 @@ BEGIN
 
 	ELSE
 		--  get querytext
-		EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_api_list WHERE tablename = $1 AND device = $2', v_attribute_filter)
+		EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_form_list WHERE tablename = $1 AND device = $2', v_attribute_filter)
 			INTO v_query_result, v_default, v_listtype
 			USING v_tablename, v_device;
 
 		-- if v_device is not configured on config_form_list table
 		IF v_query_result IS NULL THEN
-			EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_api_list WHERE tablename = $1 LIMIT 1', v_attribute_filter)
+			EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_form_list WHERE tablename = $1 LIMIT 1', v_attribute_filter)
 				INTO v_query_result, v_default, v_listtype
 				USING v_tablename;
 		END IF;	
