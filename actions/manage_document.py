@@ -182,7 +182,7 @@ class ManageDocument(ParentManage):
                 answer = self.controller.ask_question(msg, self.controller.tr("Add document"))
                 if answer:
                     for cont, file in enumerate(self.files_path):
-                        if cont == (len(self.files_path)):
+                        if cont == len(self.files_path)-1:
                             reset_models = True
                         sql, doc_id = self.insert_doc_sql(doc_type, observ, date, file)
                         self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable, reset_models)
@@ -204,7 +204,7 @@ class ManageDocument(ParentManage):
                 answer = self.controller.ask_question(msg, self.controller.tr("Add document"))
                 if answer:
                     for cont, file in enumerate(self.files_path):
-                        if cont == (len(self.files_path)):
+                        if cont == len(self.files_path)-1:
                             reset_models = True
                         if cont == 0:
                             sql = self.update_doc_sql(doc_type, observ, date, doc_id, file)
