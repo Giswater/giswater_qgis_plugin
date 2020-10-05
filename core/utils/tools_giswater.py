@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 
-from qgis.PyQt.QtWidgets import QTabWidget, QColor, QCompleter, QWidget
+from qgis.PyQt.QtWidgets import QTabWidget, QColor, QCompleter, QWidget, QFileDialog
 from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel
 from qgis.PyQt.QtGui import QCursor, QPixmap
 from qgis.core import QgsProject, QgsExpression, QgsPointXY, QgsGeometry, QgsVectorLayer
@@ -19,7 +19,7 @@ import re
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
-from lib.tools_qt import set_completer_widget, getWidgetText, setWidgetText, getWidget
+from lib.tools_qt import getWidgetText, setWidgetText, getWidget
 from core.ui.ui_manager import GwDialog, GwMainWindow
 from lib.tools_qgis import get_max_rectangle_from_coords, get_points, zoom_to_rectangle
 
@@ -508,6 +508,14 @@ def gw_function_dxf(**kwargs):
 
     dialog.btn_run.setEnabled(True)
     dialog.btn_cancel.setEnabled(True)
+
+
+def open_file_path(filter_="All (*.*)"):
+    """ Open QFileDialog """
+    msg = global_vars.controller.tr("Select DXF file")
+    path, filter_ = QFileDialog.getOpenFileName(None, msg, "", filter_)
+
+    return path, filter_
 
 
 def manage_dxf(self, dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=True):
