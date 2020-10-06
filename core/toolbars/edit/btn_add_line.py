@@ -5,16 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import global_vars
+
 from qgis.PyQt.QtWidgets import QAction, QMenu
 from qgis.PyQt.QtGui import QKeySequence
-
 from functools import partial
 
-from ..parent_action import GwParentAction
-from ...actions.edit.edit_func import GwEdit
-from ...utils.pg_man import PgMan
-from .... import global_vars
-
+from core.toolbars.parent_dialog import GwParentAction
+from core.actions.edit_func import GwEdit
+from core.utils.pg_man import PgMan
 
 class GwAddLineButton(GwParentAction):
 

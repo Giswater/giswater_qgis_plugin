@@ -11,11 +11,11 @@ from qgis.PyQt.QtWidgets import QDateEdit, QPushButton
 from datetime import datetime
 from functools import partial
 
-from lib import qt_tools
-from ..parent_action import GwParentAction
-from ...utils.giswater_tools import close_dialog, load_settings, open_dialog
-from ....ui_manager import SelectorDate
-from ....actions.parent_functs import refresh_map_canvas
+from lib import tools_qt
+from core.toolbars.parent_dialog import GwParentAction
+from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
+from core.ui.ui_manager import SelectorDate
+from lib.tools_qgis import refresh_map_canvas
 
 
 class GwDateSelectorButton(GwParentAction):
@@ -37,8 +37,8 @@ class GwDateSelectorButton(GwParentAction):
         self.widget_date_to.dateChanged.connect(partial(self.update_date_from))
 
         self.get_default_dates()
-        qt_tools.setCalendarDate(self.dlg_selector_date, self.widget_date_from, self.from_date)
-        qt_tools.setCalendarDate(self.dlg_selector_date, self.widget_date_to, self.to_date)
+        tools_qt.setCalendarDate(self.dlg_selector_date, self.widget_date_from, self.from_date)
+        tools_qt.setCalendarDate(self.dlg_selector_date, self.widget_date_to, self.to_date)
         open_dialog(self.dlg_selector_date, dlg_name="selector_date")
 
 
@@ -75,7 +75,7 @@ class GwDateSelectorButton(GwParentAction):
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if from_date >= to_date:
             to_date = self.widget_date_from.date().addDays(1).toString('yyyy-MM-dd')
-            qt_tools.setCalendarDate(self.dlg_selector_date, self.widget_date_to,
+            tools_qt.setCalendarDate(self.dlg_selector_date, self.widget_date_to,
                                      datetime.strptime(to_date, '%Y-%m-%d'))
 
 
@@ -86,7 +86,7 @@ class GwDateSelectorButton(GwParentAction):
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if to_date <= from_date:
             from_date = self.widget_date_to.date().addDays(-1).toString('yyyy-MM-dd')
-            qt_tools.setCalendarDate(self.dlg_selector_date, self.widget_date_from,
+            tools_qt.setCalendarDate(self.dlg_selector_date, self.widget_date_from,
                                      datetime.strptime(from_date, '%Y-%m-%d'))
 
 

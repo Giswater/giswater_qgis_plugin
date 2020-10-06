@@ -14,13 +14,12 @@ import json
 import operator
 from functools import partial
 
-from lib import qt_tools
-from ..parent_action import GwParentAction
-from ...utils.giswater_tools import load_settings, open_dialog, close_dialog
-from ....ui_manager import ConfigUi
-from ....actions.parent_functs import hide_void_groupbox
-from ....actions.api_parent_functs import create_body
+from lib import tools_qt
+from core.toolbars.parent_dialog import GwParentAction
+from core.utils.tools_giswater import load_settings, open_dialog, close_dialog, create_body
+from core.ui.ui_manager import ConfigUi
 
+from lib.tools_qt import hide_void_groupbox
 
 class GwConfigButton(GwParentAction):
 
@@ -204,7 +203,7 @@ class GwConfigButton(GwParentAction):
         # Check user/role and remove tabs
         role_admin = self.controller.check_role_user("role_admin", cur_user)
         if not role_admin and cur_user not in super_users:
-            qt_tools.remove_tab_by_tabName(self.dlg_config.tab_main, "tab_admin")
+            tools_qt.remove_tab_by_tabName(self.dlg_config.tab_main, "tab_admin")
 
         # Open form
         open_dialog(self.dlg_config, dlg_name='config')
@@ -447,7 +446,7 @@ class GwConfigButton(GwParentAction):
     def fill_child(self, widget):
 
         combo_parent = widget.objectName()
-        combo_id = qt_tools.get_item_data(self.dlg_config, widget)
+        combo_id = tools_qt.get_item_data(self.dlg_config, widget)
         # TODO cambiar por gw_fct_getchilds
         sql = f"SELECT gw_fct_getcombochilds('config' ,'' ,'' ,'{combo_parent}', '{combo_id}','')"
         row = self.controller.get_row(sql)
@@ -483,26 +482,26 @@ class GwConfigButton(GwParentAction):
                 widget.addItem(record[1], record)
         if 'value' in field:
             if str(field['value']) != 'None':
-                qt_tools.set_combo_itemData(widget, field['value'], 0)
+                tools_qt.set_combo_itemData(widget, field['value'], 0)
 
 
     def get_values_changed_param_user(self, chk, widget, field, value=None):
 
         elem = {}
         if type(widget) is QLineEdit:
-            value = qt_tools.getWidgetText(self.dlg_config, widget, return_string_null=False)
+            value = tools_qt.getWidgetText(self.dlg_config, widget, return_string_null=False)
         elif type(widget) is QComboBox:
-            value = qt_tools.get_item_data(self.dlg_config, widget, 0)
+            value = tools_qt.get_item_data(self.dlg_config, widget, 0)
         elif type(widget) is QCheckBox:
-            value = qt_tools.isChecked(self.dlg_config, chk)
+            value = tools_qt.isChecked(self.dlg_config, chk)
         elif type(widget) is QDateEdit:
-            value = qt_tools.getCalendarDate(self.dlg_config, widget)
+            value = tools_qt.getCalendarDate(self.dlg_config, widget)
         elif type(widget) is QgsDateTimeEdit:
-            value = qt_tools.getCalendarDate(self.dlg_config, widget)
+            value = tools_qt.getCalendarDate(self.dlg_config, widget)
         if chk.isChecked():
             elem['widget'] = str(widget.objectName())
             elem['chk'] = str(chk.objectName())
-            elem['isChecked'] = str(qt_tools.isChecked(self.dlg_config, chk))
+            elem['isChecked'] = str(tools_qt.isChecked(self.dlg_config, chk))
             elem['value'] = value
 
             self.list_update.append(elem)
@@ -516,22 +515,22 @@ class GwConfigButton(GwParentAction):
         elem['chk'] = str(chk.objectName())
 
         if type(widget) is QLineEdit:
-            value = qt_tools.getWidgetText(self.dlg_config, widget, return_string_null=False)
+            value = tools_qt.getWidgetText(self.dlg_config, widget, return_string_null=False)
             elem['widget_type'] = 'text'
         elif type(widget) is QComboBox:
-            value = qt_tools.get_item_data(self.dlg_config, widget, 0)
+            value = tools_qt.get_item_data(self.dlg_config, widget, 0)
             elem['widget_type'] = 'combo'
         elif type(widget) is QCheckBox:
-            value = qt_tools.isChecked(self.dlg_config, chk)
+            value = tools_qt.isChecked(self.dlg_config, chk)
             elem['widget_type'] = 'check'
         elif type(widget) is QDateEdit:
-            value = qt_tools.getCalendarDate(self.dlg_config, widget)
+            value = tools_qt.getCalendarDate(self.dlg_config, widget)
             elem['widget_type'] = 'datetime'
         elif type(widget) is QgsDateTimeEdit:
-            value = qt_tools.getCalendarDate(self.dlg_config, widget)
+            value = tools_qt.getCalendarDate(self.dlg_config, widget)
             elem['widget_type'] = 'datetime'
 
-        elem['isChecked'] = str(qt_tools.isChecked(self.dlg_config, chk))
+        elem['isChecked'] = str(tools_qt.isChecked(self.dlg_config, chk))
         elem['value'] = value
 
         self.list_update.append(elem)
@@ -542,13 +541,13 @@ class GwConfigButton(GwParentAction):
         elem = {}
 
         if type(widget) is QLineEdit:
-            value = qt_tools.getWidgetText(self.dlg_config, widget, return_string_null=False)
+            value = tools_qt.getWidgetText(self.dlg_config, widget, return_string_null=False)
         elif type(widget) is QComboBox:
-            value = qt_tools.get_item_data(self.dlg_config, widget, 0)
+            value = tools_qt.get_item_data(self.dlg_config, widget, 0)
         elif type(widget) is QCheckBox:
-            value = qt_tools.isChecked(self.dlg_config, widget)
+            value = tools_qt.isChecked(self.dlg_config, widget)
         elif type(widget) is QDateEdit:
-            value = qt_tools.getCalendarDate(self.dlg_config, widget)
+            value = tools_qt.getCalendarDate(self.dlg_config, widget)
 
         elem['widget'] = str(widget.objectName())
         elem['chk'] = str('')

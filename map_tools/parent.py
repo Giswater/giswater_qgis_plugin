@@ -1,20 +1,8 @@
 """
-/***************************************************************************
-        begin                : 2016-08-24
-        copyright            : (C) 2016 by BGEO SL
-        email                : derill@bgeo.es
-        git sha              : $Format:%H$
- ***************************************************************************/
-
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsDataSourceUri, QgsExpression, QgsProject, QgsVectorLayer, QgsWkbTypes
@@ -28,9 +16,9 @@ import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
-from lib import qt_tools
+from ..lib import tools_qt
 from .snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import GwDialog, GwMainWindow
+from ..core.ui.ui_manager import GwDialog, GwMainWindow
 
 
 class ParentMapTool(QgsMapTool):
@@ -420,7 +408,7 @@ class ParentMapTool(QgsMapTool):
     def populate_info_text(self, dialog, data, force_tab=True, reset_text=True, tab_idx=1):
 
         change_tab = False
-        text = qt_tools.getWidgetText(dialog, 'txt_infolog', return_string_null=False)
+        text = tools_qt.getWidgetText(dialog, 'txt_infolog', return_string_null=False)
         if reset_text:
             text = ""
         for item in data['info']['values']:
@@ -432,7 +420,7 @@ class ParentMapTool(QgsMapTool):
                 else:
                     text += "\n"
 
-        qt_tools.setWidgetText(dialog, 'txt_infolog', text + "\n")
+        tools_qt.setWidgetText(dialog, 'txt_infolog', text + "\n")
         qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
         if change_tab and qtabwidget is not None:
             qtabwidget.setCurrentIndex(tab_idx)

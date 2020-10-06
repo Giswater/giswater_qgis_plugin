@@ -1,30 +1,18 @@
 """
-/***************************************************************************
-        begin                : 2016-01-05
-        copyright            : (C) 2016 by BGEO SL
-        email                : vicente.medina@gits.ws
-        git sha              : $Format:%H$
- ***************************************************************************/
-
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt, QDate
 
-from lib import qt_tools
-from ..parent_maptool import GwParentMapTool
-from ....ui_manager import ArcFusionUi
+from lib import tools_qt
+from core.toolbars.parent_maptool import GwParentMapTool
+from core.ui.ui_manager import ArcFusionUi
 from functools import partial
-from ...utils.giswater_tools import load_settings, open_dialog, close_dialog, create_body, populate_info_text
-from ....lib.qgis_tools import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \
+from core.utils.tools_giswater import load_settings, open_dialog, close_dialog, create_body, populate_info_text
+from lib.tools_qgis import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \
     enable_snapping
 
 
@@ -68,11 +56,11 @@ class GwArcFusionButton(GwParentMapTool):
             # Fill ComboBox workcat_id_end
             sql = "SELECT id FROM cat_work ORDER BY id"
             rows = self.controller.get_rows(sql)
-            qt_tools.fillComboBox(self.dlg_fusion, "workcat_id_end", rows, False)
+            tools_qt.fillComboBox(self.dlg_fusion, "workcat_id_end", rows, False)
 
             # Set QDateEdit to current date
             current_date = QDate.currentDate()
-            qt_tools.setCalendarDate(self.dlg_fusion, "enddate", current_date)
+            tools_qt.setCalendarDate(self.dlg_fusion, "enddate", current_date)
 
             # Set signals
             self.dlg_fusion.btn_accept.clicked.connect(self.exec_fusion)

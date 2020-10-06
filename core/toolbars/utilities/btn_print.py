@@ -13,17 +13,19 @@ from qgis.PyQt.QtPrintSupport import QPrinter, QPrintDialog
 from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit
 
 import json
+import re
 from functools import partial
 
-from lib import qt_tools
-from ..parent_action import GwParentAction
-from ...utils.giswater_tools import load_settings, open_dialog, save_settings, close_dialog
-from ....ui_manager import FastPrintUi
-from .... import global_vars
-from ....actions.parent_functs import hide_void_groupbox, get_composers_list
-from ....actions.api_parent_functs import create_body, put_widgets, get_values, draw_rectangle, set_setStyleSheet, \
-    add_lineedit, set_widget_size, set_data_type, add_combobox
+from lib import tools_qt
+from core.toolbars.parent_dialog import GwParentAction
+from core.utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body, \
+    draw_polyline
+from core.ui.ui_manager import FastPrintUi
+import global_vars
 
+from lib.tools_qt import set_widget_size, add_lineedit, set_data_type, add_combobox, put_widgets, get_values, \
+    set_setStyleSheet, hide_void_groupbox
+from lib.tools_qgis import get_composers_list, get_points
 
 class GwPrintButton(GwParentAction):
 
@@ -71,14 +73,14 @@ class GwPrintButton(GwParentAction):
         w_rotation = self.dlg_composer.findChild(QLineEdit, "data_rotation")
         if w_rotation:
             w_rotation.editingFinished.connect(partial(self.set_rotation, w_rotation))
-            qt_tools.setWidgetText(self.dlg_composer, w_rotation, rotation)
+            tools_qt.setWidgetText(self.dlg_composer, w_rotation, rotation)
 
         w_scale = self.dlg_composer.findChild(QLineEdit, "data_scale")
         if w_scale:
             w_scale.editingFinished.connect(partial(self.set_scale, w_scale))
             reg_exp = QRegExp("\d{0,8}[\r]?")
             w_scale.setValidator(QRegExpValidator(reg_exp))
-            qt_tools.setWidgetText(self.dlg_composer, w_scale, scale)
+            tools_qt.setWidgetText(self.dlg_composer, w_scale, scale)
         self.my_json['rotation'] = rotation
         self.my_json['scale'] = scale
 
@@ -265,7 +267,7 @@ class GwPrintButton(GwParentAction):
             return False
 
         result = json_result['data']
-        draw_rectangle(result, self.rubber_band)
+        self.draw_rectangle(result, self.rubber_band)
         map_index = json_result['data']['mapIndex']
 
         maps = []
@@ -364,3 +366,14 @@ class GwPrintButton(GwParentAction):
         if my_json['composer'] != '-1':
             self.preview(dialog, False)
             self.accept(dialog, my_json)
+
+
+    def     draw_rectangle(self, result, rubber_band):
+        """ Draw lines based on geometry """
+
+        if result['geometry'] is None:
+            return
+
+        list_coord = re.search('\((.*)\)', str(result['geometry']['st_astext']))
+        points = get_points(list_coord)
+        draw_polyline(points, rubber_band)

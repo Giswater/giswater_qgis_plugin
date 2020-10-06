@@ -5,19 +5,19 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import global_vars
+
 from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator
-
 from functools import partial
 
-from lib import qt_tools
-from .... import global_vars
-from ..parent_maptool import GwParentMapTool
-from ....ui_manager import AuxPoint
-from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
-from ....lib.qgis_tools import get_event_point, snap_to_current_layer, snap_to_background_layers, add_marker, \
+from lib import tools_qt
+from core.toolbars.parent_maptool import GwParentMapTool
+from core.ui.ui_manager import AuxPoint
+from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
+from lib.tools_qgis import get_event_point, snap_to_current_layer, snap_to_background_layers, add_marker, \
     get_snapping_options, get_snapped_point
 
 
@@ -71,7 +71,7 @@ class GwAuxPointButton(GwParentMapTool):
         if not self.dist_y:
             self.dist_y = 0
 
-        self.delete_prev = qt_tools.isChecked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
+        self.delete_prev = tools_qt.isChecked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
         if self.layer_points:
             self.layer_points.startEditing()
             close_dialog(self.dlg_create_point)

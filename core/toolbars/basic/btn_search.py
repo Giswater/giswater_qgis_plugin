@@ -5,8 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ..parent_action import GwParentAction
-from ...actions.basic.search import GwSearch
+from core.toolbars.parent_dialog import GwParentAction
+from core.actions.search import GwSearch
 
 
 class GwSearchButton(GwParentAction):

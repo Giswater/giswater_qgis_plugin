@@ -1,33 +1,21 @@
 """
-/***************************************************************************
-        begin                : 2016-01-05
-        copyright            : (C) 2016 by BGEO SL
-        email                : vicente.medina@gits.ws
-        git sha              : $Format:%H$
- ***************************************************************************/
-
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import global_vars
+
 from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt
 
-from .... import global_vars
-from ..parent_maptool import GwParentMapTool
-from ....ui_manager import DialogTextUi
-from ...utils.giswater_tools import populate_info_text, create_body, refresh_legend
-from ....lib.qgis_tools import get_snapping_options, enable_snapping, get_event_point, snap_to_current_layer, \
+from core.toolbars.parent_maptool import GwParentMapTool
+from core.ui.ui_manager import DialogTextUi
+from core.utils.tools_giswater import populate_info_text, create_body, refresh_legend
+from lib.tools_qgis import get_snapping_options, enable_snapping, get_event_point, snap_to_current_layer, \
     add_marker, get_snapped_layer, get_snapped_point, get_snapped_feature, get_snapped_feature_id
-
 
 class GwArcDivideButton(GwParentMapTool):
     """ Button 16. Move node

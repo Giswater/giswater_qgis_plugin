@@ -5,8 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ..parent_action import GwParentAction
-from ...actions.om.mincut import GwMincut
+from core.toolbars.parent_dialog import GwParentAction
+from core.actions.mincut import GwMincut
 
 
 class GwMincutManagerButton(GwParentAction):

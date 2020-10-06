@@ -12,12 +12,11 @@ import subprocess
 
 from functools import partial
 
-from lib import qt_tools
-from ..ui_manager import MainQtDialogUi
-
 from .. import global_vars
-from ..actions.parent_functs import get_plugin_version
-from ..core.utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
+from ..lib import tools_qt
+from ..core.ui.ui_manager import MainQtDialogUi
+from ..core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
+    get_plugin_version
 
 
 class GwI18NGenerator:
@@ -47,16 +46,16 @@ class GwI18NGenerator:
         self.dlg_qm.cmb_language.clear()
         self.dlg_qm.lbl_info.clear()
         self.close_db()
-        host = qt_tools.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host)
-        port = qt_tools.getWidgetText(self.dlg_qm, self.dlg_qm.txt_port)
-        db = qt_tools.getWidgetText(self.dlg_qm, self.dlg_qm.txt_db)
-        user = qt_tools.getWidgetText(self.dlg_qm, self.dlg_qm.txt_user)
-        password = qt_tools.getWidgetText(self.dlg_qm, self.dlg_qm.txt_pass)
+        host = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host)
+        port = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_port)
+        db = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_db)
+        user = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_user)
+        password = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_pass)
         status = self.init_db(host, port, db, user, password)
 
         if not status:
             self.dlg_qm.btn_translate.setEnabled(False)
-            qt_tools.setWidgetText(self.dlg_qm, 'lbl_info', self.last_error)
+            tools_qt.setWidgetText(self.dlg_qm, 'lbl_info', self.last_error)
             return
         self.populate_cmb_language()
 
@@ -64,19 +63,19 @@ class GwI18NGenerator:
     def populate_cmb_language(self):
         """ Populate combo with languages values """
         self.dlg_qm.btn_translate.setEnabled(True)
-        host = qt_tools.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host)
-        qt_tools.setWidgetText(self.dlg_qm, 'lbl_info', f'Connected to {host}')
+        host = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host)
+        tools_qt.setWidgetText(self.dlg_qm, 'lbl_info', f'Connected to {host}')
         sql = "SELECT user_language, py_language, xml_language, py_file FROM i18n.cat_language"
         rows = self.get_rows(sql)
-        qt_tools.set_item_data(self.dlg_qm.cmb_language, rows, 0)
+        tools_qt.set_item_data(self.dlg_qm.cmb_language, rows, 0)
         cur_user = self.controller.get_current_user()
         language = self.controller.plugin_settings_value('qm_lang_language' + cur_user)
-        qt_tools.set_combo_itemData(self.dlg_qm.cmb_language, language, 0)
+        tools_qt.set_combo_itemData(self.dlg_qm.cmb_language, language, 0)
 
 
     def check_translate_options(self):
-        py_msg = qt_tools.isChecked(self.dlg_qm, self.dlg_qm.chk_py_msg)
-        db_msg = qt_tools.isChecked(self.dlg_qm, self.dlg_qm.chk_db_msg)
+        py_msg = tools_qt.isChecked(self.dlg_qm, self.dlg_qm.chk_py_msg)
+        db_msg = tools_qt.isChecked(self.dlg_qm, self.dlg_qm.chk_db_msg)
         self.dlg_qm.lbl_info.clear()
         msg = ''
 
@@ -107,7 +106,7 @@ class GwI18NGenerator:
                 msg += "Data base config translation canceled\n"
 
         if msg != '':
-            qt_tools.setWidgetText(self.dlg_qm, 'lbl_info', msg)
+            tools_qt.setWidgetText(self.dlg_qm, 'lbl_info', msg)
 
 
     def create_files_py_message(self):
@@ -115,9 +114,9 @@ class GwI18NGenerator:
         # In the database, the dialog_name column must match the name of the ui file (no extension).
         # Also, open_dialog function must be called, passed as parameter dlg_name = 'ui_file_name_without_extension'
 
-        py_language = qt_tools.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
-        xml_language = qt_tools.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 2)
-        py_file = qt_tools.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
+        py_language = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
+        xml_language = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 2)
+        py_file = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
         key_lbl = f'lb_{py_language}'
         key_tooltip = f'tt_{py_language}'
 
@@ -250,8 +249,8 @@ class GwI18NGenerator:
 
     def get_files_config_messages(self):
         """ Read the values of the database and update the i18n files """
-        db_lang = qt_tools.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
-        file_lng = qt_tools.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
+        db_lang = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
+        file_lng = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
 
         version_metadata = get_plugin_version()
         ver = version_metadata.split('.')
@@ -284,8 +283,8 @@ class GwI18NGenerator:
 
     def get_files_db_messages(self):
         """ Read the values of the database and update the i18n api files """
-        db_lang = qt_tools.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
-        file_lng = qt_tools.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
+        db_lang = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
+        file_lng = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
 
         version_metadata = get_plugin_version()
         ver = version_metadata.split('.')
@@ -325,7 +324,7 @@ class GwI18NGenerator:
         :return: (Boolean)
         """
         file = open(path, "w")
-        db_lang = qt_tools.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
+        db_lang = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
         header = (f'/*\n'
                   f'This file is part of Giswater 3\n'
                   f'The program is free software: you can redistribute it and/or modify it under the terms of the GNU '
@@ -388,13 +387,13 @@ class GwI18NGenerator:
     def save_user_values(self):
         """ Save selected user values """
 
-        host = qt_tools.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host, return_string_null=False)
-        port = qt_tools.getWidgetText(self.dlg_qm, self.dlg_qm.txt_port, return_string_null=False)
-        db = qt_tools.getWidgetText(self.dlg_qm, self.dlg_qm.txt_db, return_string_null=False)
-        user = qt_tools.getWidgetText(self.dlg_qm, self.dlg_qm.txt_user, return_string_null=False)
-        language = qt_tools.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 0)
-        py_msg = qt_tools.isChecked(self.dlg_qm, self.dlg_qm.chk_py_msg)
-        db_msg = qt_tools.isChecked(self.dlg_qm, self.dlg_qm.chk_db_msg)
+        host = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host, return_string_null=False)
+        port = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_port, return_string_null=False)
+        db = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_db, return_string_null=False)
+        user = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_user, return_string_null=False)
+        language = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 0)
+        py_msg = tools_qt.isChecked(self.dlg_qm, self.dlg_qm.chk_py_msg)
+        db_msg = tools_qt.isChecked(self.dlg_qm, self.dlg_qm.chk_db_msg)
         set_parser_value('i18n_generator', 'qm_lang_host', f"{host}")
         set_parser_value('i18n_generator', 'qm_lang_port', f"{port}")
         set_parser_value('i18n_generator', 'qm_lang_db', f"{db}")
@@ -415,12 +414,12 @@ class GwI18NGenerator:
         user = get_parser_value('i18n_generator', 'qm_lang_user')
         py_msg = get_parser_value('i18n_generator', 'qm_lang_py_msg')
         db_msg = get_parser_value('i18n_generator', 'qm_lang_db_msg')
-        qt_tools.setWidgetText(self.dlg_qm, 'txt_host', host)
-        qt_tools.setWidgetText(self.dlg_qm, 'txt_port', port)
-        qt_tools.setWidgetText(self.dlg_qm, 'txt_db', db)
-        qt_tools.setWidgetText(self.dlg_qm, 'txt_user', user)
-        qt_tools.setChecked(self.dlg_qm, self.dlg_qm.chk_py_msg, py_msg)
-        qt_tools.setChecked(self.dlg_qm, self.dlg_qm.chk_db_msg, db_msg)
+        tools_qt.setWidgetText(self.dlg_qm, 'txt_host', host)
+        tools_qt.setWidgetText(self.dlg_qm, 'txt_port', port)
+        tools_qt.setWidgetText(self.dlg_qm, 'txt_db', db)
+        tools_qt.setWidgetText(self.dlg_qm, 'txt_user', user)
+        tools_qt.setChecked(self.dlg_qm, self.dlg_qm.chk_py_msg, py_msg)
+        tools_qt.setChecked(self.dlg_qm, self.dlg_qm.chk_db_msg, db_msg)
 
 
     def init_db(self, host, port, db, user, password):

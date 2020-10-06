@@ -5,21 +5,22 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import re
+import os
+import global_vars
+
 from qgis.core import QgsGeometry, QgsMapToPixel, QgsPointXY
 from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu
-
 from functools import partial
-import re
-import os
-from .... import global_vars
-from ..parent_maptool import GwParentMapTool
-from ...actions.basic.info import GwInfo
-from ....actions.parent_functs import get_max_rectangle_from_coords, draw_point
-from ....actions.api_parent_functs import create_body, get_visible_layers, draw_polyline, get_points
 
+from core.toolbars.parent_maptool import GwParentMapTool
+from core.actions.info import GwInfo
+from core.utils.tools_giswater import create_body, draw_point, draw_polyline
+from lib.tools_db import get_visible_layers
+from lib.tools_qgis import get_max_rectangle_from_coords, get_points
 
 class GwInfoButton(GwParentMapTool):
 

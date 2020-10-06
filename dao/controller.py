@@ -5,9 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMessageLog, QgsCredentials, QgsProject, QgsDataSourceUri
+from qgis.core import QgsMessageLog, QgsCredentials, QgsProject, QgsDataSourceUri, QgsVectorLayer, QgsPointLocator, \
+    QgsSnappingConfig, QgsRectangle
 from qgis.PyQt.QtCore import QCoreApplication, QRegExp, QSettings, Qt, QTranslator
-from qgis.PyQt.QtGui import QTextCharFormat, QFont
+from qgis.PyQt.QtGui import QTextCharFormat, QFont, QColor
 from qgis.PyQt.QtSql import QSqlDatabase
 from qgis.PyQt.QtWidgets import QCheckBox, QGroupBox, QLabel, QMessageBox, QPushButton, QRadioButton, QTabWidget, \
     QToolBox
@@ -24,12 +25,14 @@ import sys
 from .. import global_vars
 from .pg_dao import PgDao
 from .logger import Logger
-from lib import os_tools, qt_tools
-from ..ui_manager import DialogTextUi, DockerUi
-from ..actions.parent_functs import manage_return_manager, manage_layer_manager, manage_actions
-from ..lib.qgis_tools import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
-    qgis_get_layer_primary_key, qgis_get_layers
-from ..core.utils.giswater_tools import get_parser_value, set_parser_value
+from ..lib import tools_os, tools_qt
+from ..core.ui.ui_manager import DialogTextUi, DockerUi
+from ..lib.tools_qgis import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
+    qgis_get_layer_primary_key, qgis_get_layers, resetRubberbands, snap_to_layer, get_snapping_options, \
+    set_snapping_mode
+from ..core.utils.tools_giswater import get_parser_value, set_parser_value, manage_actions, draw, create_body
+from ..core.utils.layer_tools import delete_layer_from_toc, populate_vlayer, categoryze_layer, create_qml, \
+    from_postgres_to_toc
 
 
 class DaoController:
@@ -524,7 +527,7 @@ class DaoController:
         widget = self.iface.messageBar().createMessage(self.tr(text, context_name), self.tr(inf_text))
         button = QPushButton(widget)
         button.setText(self.tr("Open file"))
-        button.clicked.connect(partial(os_tools.open_file, file_path))
+        button.clicked.connect(partial(tools_os.open_file, file_path))
         widget.layout().addWidget(button)
         self.iface.messageBar().pushWidget(widget, 1)
 
@@ -814,8 +817,8 @@ class DaoController:
 
         try:
             # Layer styles
-            manage_return_manager(json_result, sql, rubber_band)
-            manage_layer_manager(json_result, sql)
+            self.manage_return_manager(json_result, sql, rubber_band)
+            self.manage_layer_manager(json_result, sql)
             manage_actions(json_result, sql)
         except Exception:
             pass
@@ -1579,7 +1582,7 @@ class DaoController:
         try:
             stack_level += stack_level_increase
             module_path = inspect.stack()[stack_level][1]
-            file_name = os_tools.get_file_with_parents(module_path, 2)
+            file_name = tools_os.get_file_with_parents(module_path, 2)
             function_line = inspect.stack()[stack_level][2]
             function_name = inspect.stack()[stack_level][3]
 
@@ -1659,7 +1662,7 @@ class DaoController:
 
                 stack_level += stack_level_increase
                 module_path = inspect.stack()[stack_level][1]
-                file_name = os_tools.get_file_with_parents(module_path, 2)
+                file_name = tools_os.get_file_with_parents(module_path, 2)
                 function_line = inspect.stack()[stack_level][2]
                 function_name = inspect.stack()[stack_level][3]
 
@@ -1695,7 +1698,7 @@ class DaoController:
         self.dlg_info.setWindowTitle(window_title)
         if title:
             self.dlg_info.lbl_text.setText(title)
-        qt_tools.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
+        tools_qt.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.set_text_bold(self.dlg_info.txt_infolog)
         self.dlg_info.show()
@@ -1790,7 +1793,7 @@ class DaoController:
         # If user want to dock the dialog, we reset rubberbands for each info
         # For the first time, cf_info does not exist, therefore we cannot access it and reset rubberbands
         try:
-            self.info_cf.resetRubberbands()
+            resetRubberbands()
         except AttributeError:
             pass
 
@@ -1837,3 +1840,206 @@ class DaoController:
                     if prev_layer:
                         self.iface.setActiveLayer(prev_layer)
 
+
+    def manage_return_manager(self, json_result, sql, rubber_band=None):
+        """
+        Manage options for layers (active, visible, zoom and indexing)
+        :param json_result: Json result of a query (Json)
+        :param sql: query executed (String)
+        :return: None
+        """
+
+        try:
+            return_manager = json_result['body']['returnManager']
+        except KeyError:
+            return
+        srid = global_vars.srid
+        try:
+            margin = None
+            opacity = 100
+
+            if 'zoom' in return_manager and 'margin' in return_manager['zoom']:
+                margin = return_manager['zoom']['margin']
+
+            if 'style' in return_manager and 'ruberband' in return_manager['style']:
+                # Set default values
+                width = 3
+                color = QColor(255, 0, 0, 125)
+                if 'transparency' in return_manager['style']['ruberband']:
+                    opacity = return_manager['style']['ruberband']['transparency'] * 255
+                if 'color' in return_manager['style']['ruberband']:
+                    color = return_manager['style']['ruberband']['color']
+                    color = QColor(color[0], color[1], color[2], opacity)
+                if 'width' in return_manager['style']['ruberband']:
+                    width = return_manager['style']['ruberband']['width']
+                draw(json_result, rubber_band, margin, color=color, width=width)
+
+            else:
+
+                for key, value in list(json_result['body']['data'].items()):
+                    if key.lower() in ('point', 'line', 'polygon'):
+                        if key not in json_result['body']['data']:
+                            continue
+                        if 'features' not in json_result['body']['data'][key]:
+                            continue
+                        if len(json_result['body']['data'][key]['features']) == 0:
+                            continue
+
+                        layer_name = f'{key}'
+                        if 'layerName' in json_result['body']['data'][key]:
+                            if json_result['body']['data'][key]['layerName']:
+                                layer_name = json_result['body']['data'][key]['layerName']
+
+                        delete_layer_from_toc(layer_name)
+
+                        # Get values for create and populate layer
+                        counter = len(json_result['body']['data'][key]['features'])
+                        geometry_type = json_result['body']['data'][key]['geometryType']
+                        v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
+
+                        populate_vlayer(v_layer, json_result['body']['data'], key, counter)
+
+                        # Get values for set layer style
+                        opacity = 100
+                        style_type = json_result['body']['returnManager']['style']
+                        if 'style' in return_manager and 'transparency' in return_manager['style'][key]:
+                            opacity = return_manager['style'][key]['transparency'] * 255
+
+                        if style_type[key]['style'] == 'categorized':
+                            color_values = {}
+                            for item in json_result['body']['returnManager']['style'][key]['values']:
+                                color = QColor(item['color'][0], item['color'][1], item['color'][2], opacity * 255)
+                                color_values[item['id']] = color
+                            cat_field = str(style_type[key]['field'])
+                            size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
+                            categoryze_layer(v_layer, cat_field, size, color_values)
+
+                        elif style_type[key]['style'] == 'random':
+                            size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
+                            if geometry_type == 'Point':
+                                v_layer.renderer().symbol().setSize(size)
+                            else:
+                                v_layer.renderer().symbol().setWidth(size)
+                            v_layer.renderer().symbol().setOpacity(opacity)
+
+                        elif style_type[key]['style'] == 'qml':
+                            style_id = style_type[key]['id']
+                            extras = f'"style_id":"{style_id}"'
+                            body = create_body(extras=extras)
+                            style = global_vars.controller.get_json('gw_fct_getstyle', body)
+                            if 'styles' in style['body']:
+                                if 'style' in style['body']['styles']:
+                                    qml = style['body']['styles']['style']
+                                    create_qml(v_layer, qml)
+
+                        elif style_type[key]['style'] == 'unique':
+                            color = style_type[key]['values']['color']
+                            size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
+                            color = QColor(color[0], color[1], color[2])
+                            if key == 'point':
+                                v_layer.renderer().symbol().setSize(size)
+                            elif key in ('line', 'polygon'):
+                                v_layer.renderer().symbol().setWidth(size)
+                            v_layer.renderer().symbol().setColor(color)
+                            v_layer.renderer().symbol().setOpacity(opacity)
+
+                        global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
+                        self.set_margin(v_layer, margin)
+
+        except Exception as e:
+            global_vars.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
+
+
+    def manage_layer_manager(self, json_result, sql):
+        """
+        Manage options for layers (active, visible, zoom and indexing)
+        :param json_result: Json result of a query (Json)
+        :return: None
+        """
+
+        try:
+            layermanager = json_result['body']['layerManager']
+        except KeyError:
+            return
+
+        try:
+
+            # force visible and in case of does not exits, load it
+            if 'visible' in layermanager:
+                for lyr in layermanager['visible']:
+                    layer_name = [key for key in lyr][0]
+                    layer = global_vars.controller.get_layer_by_tablename(layer_name)
+                    if layer is None:
+                        the_geom = lyr[layer_name]['geom_field']
+                        field_id = lyr[layer_name]['pkey_field']
+                        if lyr[layer_name]['group_layer'] is not None:
+                            group = lyr[layer_name]['group_layer']
+                        else:
+                            group = "GW Layers"
+                        style_id = lyr[layer_name]['style_id']
+                        from_postgres_to_toc(layer_name, the_geom, field_id, group=group, style_id=style_id)
+                    global_vars.controller.set_layer_visible(layer)
+
+            # force reload dataProvider in order to reindex.
+            if 'index' in layermanager:
+                for lyr in layermanager['index']:
+                    layer_name = [key for key in lyr][0]
+                    layer = global_vars.controller.get_layer_by_tablename(layer_name)
+                    if layer:
+                        global_vars.controller.set_layer_index(layer)
+
+            # Set active
+            if 'active' in layermanager:
+                layer = global_vars.controller.get_layer_by_tablename(layermanager['active'])
+                if layer:
+                    global_vars.iface.setActiveLayer(layer)
+
+            # Set zoom to extent with a margin
+            if 'zoom' in layermanager:
+                layer = global_vars.controller.get_layer_by_tablename(layermanager['zoom']['layer'])
+                if layer:
+                    prev_layer = global_vars.iface.activeLayer()
+                    global_vars.iface.setActiveLayer(layer)
+                    global_vars.iface.zoomToActiveLayer()
+                    margin = layermanager['zoom']['margin']
+                    self.set_margin(layer, margin)
+                    if prev_layer:
+                        global_vars.iface.setActiveLayer(prev_layer)
+
+            # Set snnaping options
+            if 'snnaping' in layermanager:
+                for layer_name in layermanager['snnaping']:
+                    layer = global_vars.controller.get_layer_by_tablename(layer_name)
+                    if layer:
+                        QgsProject.instance().blockSignals(True)
+                        layer_settings = snap_to_layer(layer, QgsPointLocator.All, True)
+                        if layer_settings:
+                            layer_settings.setType(2)
+                            layer_settings.setTolerance(15)
+                            layer_settings.setEnabled(True)
+                        else:
+                            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
+                        snapping_config = get_snapping_options()
+                        snapping_config.setIndividualLayerSettings(layer, layer_settings)
+                        QgsProject.instance().blockSignals(False)
+                        QgsProject.instance().snappingConfigChanged.emit(
+                            snapping_config)
+                set_snapping_mode()
+
+
+        except Exception as e:
+            global_vars.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
+
+
+    def set_margin(self, layer, margin):
+
+        extent = QgsRectangle()
+        extent.setMinimal()
+        extent.combineExtentWith(layer.extent())
+        xmax = extent.xMaximum() + margin
+        xmin = extent.xMinimum() - margin
+        ymax = extent.yMaximum() + margin
+        ymin = extent.yMinimum() - margin
+        extent.set(xmin, ymin, xmax, ymax)
+        global_vars.iface.mapCanvas().setExtent(extent)
+        global_vars.iface.mapCanvas().refresh()

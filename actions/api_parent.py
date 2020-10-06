@@ -22,12 +22,11 @@ import sys
 import webbrowser
 from functools import partial
 
-from .. import global_vars
-from lib import qt_tools
-from .parent import ParentAction
-from ..core.utils.hyperlink_label import GwHyperLinkLabel
-from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import DialogTextUi
+from lib import tools_qt
+from actions.parent import ParentAction
+from core.utils.hyperlink_label import GwHyperLinkLabel
+from map_tools.snapping_utils_v3 import SnappingConfigManager
+from core.ui.ui_manager import DialogTextUi
 
 
 class ApiParent(ParentAction):
@@ -100,7 +99,7 @@ class ApiParent(ParentAction):
             getting id's from selected @table_object
         """
 
-        widget = qt_tools.getWidget(dialog, table_object + "_id")
+        widget = tools_qt.getWidget(dialog, table_object + "_id")
         if not widget:
             return
 
@@ -271,13 +270,13 @@ class ApiParent(ParentAction):
                f" WHERE node_id = '{self.feature_id}'")
         row = self.controller.get_row(sql)
         if row:
-            qt_tools.setWidgetText(dialog, "rotation", str(row[0]))
+            tools_qt.setWidgetText(dialog, "rotation", str(row[0]))
 
         sql = (f"SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}),"
                f" ST_Point({point.x()}, {point.y()})))")
         row = self.controller.get_row(sql)
         if row:
-            qt_tools.setWidgetText(dialog, "hemisphere", str(row[0]))
+            tools_qt.setWidgetText(dialog, "hemisphere", str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
             self.controller.show_info(message, parameter=str(row[0]))
         self.api_disable_rotation(dialog)
@@ -428,12 +427,12 @@ class ApiParent(ParentAction):
             # dialog.refreshFeature()
             for i in range(0, len(fields_aux)):
                 widget = dialog.findChild(QWidget, tab_type + "_" + fields_aux[i])
-                if qt_tools.getWidgetType(dialog, widget) is QLineEdit:
-                    qt_tools.setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
-                elif qt_tools.getWidgetType(dialog, widget) is QComboBox:
-                    qt_tools.set_combo_itemData(widget, str(snapped_feature_attr_aux[i]), 0)
-                elif qt_tools.getWidgetType(dialog, widget) is QgsDateTimeEdit:
-                    qt_tools.setCalendarDate(dialog, widget, snapped_feature_attr_aux[i])
+                if tools_qt.getWidgetType(dialog, widget) is QLineEdit:
+                    tools_qt.setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
+                elif tools_qt.getWidgetType(dialog, widget) is QComboBox:
+                    tools_qt.set_combo_itemData(widget, str(snapped_feature_attr_aux[i]), 0)
+                elif tools_qt.getWidgetType(dialog, widget) is QgsDateTimeEdit:
+                    tools_qt.setCalendarDate(dialog, widget, snapped_feature_attr_aux[i])
 
         self.api_disable_copy_paste(dialog)
 
@@ -573,8 +572,8 @@ class ApiParent(ParentAction):
         extras = f'"queryText":"{field["queryText"]}"'
         extras += f', "queryTextFilter":"{field["queryTextFilter"]}"'
         extras += f', "parentId":"{parent_id}"'
-        extras += f', "parentValue":"{qt_tools.getWidgetText(dialog, "data_" + str(field["parentId"]))}"'
-        extras += f', "textToSearch":"{qt_tools.getWidgetText(dialog, widget)}"'
+        extras += f', "parentValue":"{tools_qt.getWidgetText(dialog, "data_" + str(field["parentId"]))}"'
+        extras += f', "textToSearch":"{tools_qt.getWidgetText(dialog, widget)}"'
         body = self.create_body(extras=extras)
         complet_list = self.controller.get_json('gw_fct_gettypeahead', body)
         if not complet_list:
@@ -706,7 +705,7 @@ class ApiParent(ParentAction):
             widget.setProperty('columnname', field['columnname'])
         widget = self.populate_combo(widget, field)
         if 'selectedId' in field:
-            qt_tools.set_combo_itemData(widget, field['selectedId'], 0)
+            tools_qt.set_combo_itemData(widget, field['selectedId'], 0)
             widget.setProperty('selectedId', field['selectedId'])
         else:
             widget.setProperty('selectedId', None)
@@ -728,7 +727,7 @@ class ApiParent(ParentAction):
         """
 
         combo_parent = widget.property('columnname')
-        combo_id = qt_tools.get_item_data(dialog, widget)
+        combo_id = tools_qt.get_item_data(dialog, widget)
 
         feature = f'"featureType":"{feature_type}", '
         feature += f'"tableName":"{tablename}", '
@@ -754,8 +753,8 @@ class ApiParent(ParentAction):
                     'enableWhenParent' not in combo_child['widgetcontrols']:
                 return
             #
-            if (str(qt_tools.get_item_data(dialog, combo_parent, 0)) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
-                    and (qt_tools.get_item_data(dialog, combo_parent, 0) not in (None, '')):
+            if (str(tools_qt.get_item_data(dialog, combo_parent, 0)) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
+                    and (tools_qt.get_item_data(dialog, combo_parent, 0) not in (None, '')):
                 # The keepDisbled property is used to keep the edition enabled or disabled,
                 # when we activate the layer and call the "enable_all" function
                 child.setProperty('keepDisbled', False)
@@ -1013,7 +1012,7 @@ class ApiParent(ParentAction):
         widget.setDisplayFormat('dd/MM/yyyy')
         if 'value' in field and field['value'] not in ('', None, 'null'):
             date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
-            qt_tools.setCalendarDate(dialog, widget, date)
+            tools_qt.setCalendarDate(dialog, widget, date)
         else:
             widget.clear()
         btn_calendar = widget.findChild(QToolButton)
@@ -1044,7 +1043,7 @@ class ApiParent(ParentAction):
         self.dlg_dtext = DialogTextUi()
         self.load_settings(self.dlg_dtext)
 
-        qt_tools.setWidgetText(self.dlg_dtext, self.dlg_dtext.txt_infolog, 'Interpolate tool')
+        tools_qt.setWidgetText(self.dlg_dtext, self.dlg_dtext.txt_infolog, 'Interpolate tool')
         self.dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
                                         "interpolation\nNode1: \nNode2:")
 
@@ -1162,7 +1161,7 @@ class ApiParent(ParentAction):
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
             widget = self.dlg_cf.findChild(QWidget, k)
             if widget:
-                text = qt_tools.getWidgetText(self.dlg_cf, widget, False, False)
+                text = tools_qt.getWidgetText(self.dlg_cf, widget, False, False)
                 if text:
                     msg = "Do you want to overwrite custom values?"
                     answer = self.controller.ask_question(msg, "Overwrite values")
@@ -1180,7 +1179,7 @@ class ApiParent(ParentAction):
             widget = self.dlg_cf.findChild(QWidget, k)
             if widget:
                 widget.setStyleSheet(None)
-                qt_tools.setWidgetText(self.dlg_cf, widget, f'{v}')
+                tools_qt.setWidgetText(self.dlg_cf, widget, f'{v}')
                 widget.editingFinished.emit()
         self.close_dialog(self.dlg_dtext)
 
@@ -1317,13 +1316,13 @@ class ApiParent(ParentAction):
 
         elem = {}
         if type(widget) is QLineEdit:
-            value = qt_tools.getWidgetText(dialog, widget, return_string_null=False)
+            value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
         elif type(widget) is QComboBox:
-            value = qt_tools.get_item_data(dialog, widget, 0)
+            value = tools_qt.get_item_data(dialog, widget, 0)
         elif type(widget) is QCheckBox:
-            value = qt_tools.isChecked(dialog, widget)
+            value = tools_qt.isChecked(dialog, widget)
         elif type(widget) is QDateEdit:
-            value = qt_tools.getCalendarDate(dialog, widget)
+            value = tools_qt.getCalendarDate(dialog, widget)
         # if chk is None:
         #     elem[widget.objectName()] = value
         elem['widget'] = str(widget.objectName())
@@ -1332,7 +1331,7 @@ class ApiParent(ParentAction):
             if chk.isChecked():
                 # elem['widget'] = str(widget.objectName())
                 elem['chk'] = str(chk.objectName())
-                elem['isChecked'] = str(qt_tools.isChecked(dialog, chk))
+                elem['isChecked'] = str(tools_qt.isChecked(dialog, chk))
                 # elem['value'] = value
 
         if 'sys_role_id' in field:
@@ -1348,16 +1347,16 @@ class ApiParent(ParentAction):
         elem['chk'] = str(chk.objectName())
 
         if type(widget) is QLineEdit:
-            value = qt_tools.getWidgetText(dialog, widget, return_string_null=False)
+            value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
         elif type(widget) is QComboBox:
-            value = qt_tools.get_item_data(dialog, widget, 0)
+            value = tools_qt.get_item_data(dialog, widget, 0)
         elif type(widget) is QCheckBox:
-            value = qt_tools.isChecked(dialog, chk)
+            value = tools_qt.isChecked(dialog, chk)
         elif type(widget) is QDateEdit:
-            value = qt_tools.getCalendarDate(dialog, widget)
+            value = tools_qt.getCalendarDate(dialog, widget)
         elem['widget'] = str(widget.objectName())
         elem['chk'] = str(chk.objectName())
-        elem['isChecked'] = str(qt_tools.isChecked(dialog, chk))
+        elem['isChecked'] = str(tools_qt.isChecked(dialog, chk))
         elem['value'] = value
         if 'sys_role_id' in field:
             elem['sys_role_id'] = str(field['sys_role_id'])
@@ -1404,13 +1403,13 @@ class ApiParent(ParentAction):
 
         value = None
         if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit) and widget.isReadOnly() is False:
-            value = qt_tools.getWidgetText(dialog, widget, return_string_null=False)
+            value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
         elif type(widget) is QComboBox and widget.isEnabled():
-            value = qt_tools.get_item_data(dialog, widget, 0)
+            value = tools_qt.get_item_data(dialog, widget, 0)
         elif type(widget) is QCheckBox and widget.isEnabled():
-            value = qt_tools.isChecked(dialog, widget)
+            value = tools_qt.isChecked(dialog, widget)
         elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
-            value = qt_tools.getCalendarDate(dialog, widget)
+            value = tools_qt.getCalendarDate(dialog, widget)
         # Only get values if layer is editable or if layer not exist(need for ApiManageComposer)
         if not hasattr(self, 'layer') or self.layer.isEditable():
             # If widget.isEditable(False) return None, here control it.
@@ -1591,7 +1590,7 @@ class ApiParent(ParentAction):
         extras = "  "
         for widget in dialog.grb_parameters.findChildren(QWidget):
             widget_name = widget.property('columnname')
-            value = qt_tools.getWidgetText(dialog, widget, add_quote=False)
+            value = tools_qt.getWidgetText(dialog, widget, add_quote=False)
             extras += f'"{widget_name}":"{value}", '
         extras = extras[:-2]
         body = self.create_body(extras)
@@ -1605,7 +1604,7 @@ class ApiParent(ParentAction):
     def manage_all(self, dialog, widget_all):
 
         key_modifier = QApplication.keyboardModifiers()
-        status = qt_tools.isChecked(dialog, widget_all)
+        status = tools_qt.isChecked(dialog, widget_all)
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
         if key_modifier == Qt.ShiftModifier:
@@ -1616,7 +1615,7 @@ class ApiParent(ParentAction):
                 if widget == widget_all or widget.objectName() == widget_all.objectName():
                     continue
             widget.blockSignals(True)
-            qt_tools.setChecked(dialog, widget, status)
+            tools_qt.setChecked(dialog, widget, status)
             widget.blockSignals(False)
 
         self.set_selector(dialog, widget_all, False)
@@ -1635,7 +1634,7 @@ class ApiParent(ParentAction):
         # Set filter
         if filter is not False:
             main_tab = dialog.findChild(QTabWidget, 'main_tab')
-            text_filter = qt_tools.getWidgetText(dialog, widget)
+            text_filter = tools_qt.getWidgetText(dialog, widget)
             if text_filter in ('null', None):
                 text_filter = ''
 
@@ -1688,7 +1687,7 @@ class ApiParent(ParentAction):
                 label = QLabel()
                 label.setObjectName('lbl_filter')
                 label.setText('Filter:')
-                if qt_tools.getWidget(dialog, 'txt_filter_' + str(form_tab['tabName'])) is None:
+                if tools_qt.getWidget(dialog, 'txt_filter_' + str(form_tab['tabName'])) is None:
                     widget = QLineEdit()
                     widget.setObjectName('txt_filter_' + str(form_tab['tabName']))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -1698,7 +1697,7 @@ class ApiParent(ParentAction):
                     widget.setLayoutDirection(Qt.RightToLeft)
                     setattr(self, f"var_txt_filter_{form_tab['tabName']}", '')
                 else:
-                    widget = qt_tools.getWidget(dialog, 'txt_filter_' + str(form_tab['tabName']))
+                    widget = tools_qt.getWidget(dialog, 'txt_filter_' + str(form_tab['tabName']))
 
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = i
@@ -1708,21 +1707,21 @@ class ApiParent(ParentAction):
 
             if 'manageAll' in form_tab:
                 if (form_tab['manageAll']).lower() == 'true':
-                    if qt_tools.getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}") is None:
+                    if tools_qt.getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}") is None:
                         label = QLabel()
                         label.setObjectName(f"lbl_manage_all_{form_tab['tabName']}")
                         label.setText('Check all')
                     else:
-                        label = qt_tools.getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}")
+                        label = tools_qt.getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}")
 
-                    if qt_tools.getWidget(dialog, f"chk_all_{form_tab['tabName']}") is None:
+                    if tools_qt.getWidget(dialog, f"chk_all_{form_tab['tabName']}") is None:
                         widget = QCheckBox()
                         widget.setObjectName('chk_all_' + str(form_tab['tabName']))
                         widget.stateChanged.connect(partial(self.manage_all, dialog, widget))
                         widget.setLayoutDirection(Qt.RightToLeft)
 
                     else:
-                        widget = qt_tools.getWidget(dialog, f"chk_all_{form_tab['tabName']}")
+                        widget = tools_qt.getWidget(dialog, f"chk_all_{form_tab['tabName']}")
                     field['layoutname'] = gridlayout.objectName()
                     field['layoutorder'] = i
                     i = i + 1
@@ -1759,7 +1758,7 @@ class ApiParent(ParentAction):
                 index = dialog.main_tab.currentIndex()
                 tab_name = dialog.main_tab.widget(index).objectName()
                 value = getattr(self, f"var_txt_filter_{tab_name}")
-                qt_tools.setWidgetText(dialog, widget, f'{value}')
+                tools_qt.setWidgetText(dialog, widget, f'{value}')
                 widget.blockSignals(False)
 
 
@@ -1784,7 +1783,7 @@ class ApiParent(ParentAction):
             is_alone = True
             if widget_all is not None:
                 widget_all.blockSignals(True)
-                qt_tools.setChecked(dialog, widget_all, False)
+                tools_qt.setChecked(dialog, widget_all, False)
                 widget_all.blockSignals(False)
             self.remove_previuos(dialog, widget, widget_all, widget_list)
 
@@ -1806,12 +1805,12 @@ class ApiParent(ParentAction):
                     continue
                 elif checkbox.objectName() != widget.objectName():
                     checkbox.blockSignals(True)
-                    qt_tools.setChecked(dialog, checkbox, False)
+                    tools_qt.setChecked(dialog, checkbox, False)
                     checkbox.blockSignals(False)
 
             elif checkbox.objectName() != widget.objectName():
                 checkbox.blockSignals(True)
-                qt_tools.setChecked(dialog, checkbox, False)
+                tools_qt.setChecked(dialog, checkbox, False)
                 checkbox.blockSignals(False)
 
 
@@ -1834,7 +1833,7 @@ class ApiParent(ParentAction):
                       f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{widget.isChecked()}", '
                       f'"addSchema":"{qgis_project_add_schema}"')
         else:
-            check_all = qt_tools.isChecked(dialog, widget_all)
+            check_all = tools_qt.isChecked(dialog, widget_all)
             extras = f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "checkAll":"{check_all}",  ' \
                 f'"addSchema":"{qgis_project_add_schema}"'
 
@@ -1842,7 +1841,6 @@ class ApiParent(ParentAction):
         json_result = self.controller.get_json('gw_fct_setselectors', body)
 
         if str(tab_name) == 'tab_exploitation':
-
             # Zoom to exploitation
             x1 = json_result['body']['data']['geometry']['x1']
             y1 = json_result['body']['data']['geometry']['y1']
@@ -1850,7 +1848,7 @@ class ApiParent(ParentAction):
             y2 = json_result['body']['data']['geometry']['y2']
             if x1 is not None:
                 self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
-                
+
             # getting mapzones style
             self.set_style_mapzones()
 
@@ -1864,16 +1862,17 @@ class ApiParent(ParentAction):
 
         self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result)
 
-        widget_filter = qt_tools.getWidget(dialog, f"txt_filter_{tab_name}")
-        if widget_filter and qt_tools.getWidgetText(dialog, widget_filter, False, False) not in (None, ''):
+        widget_filter = tools_qt.getWidget(dialog, f"txt_filter_{tab_name}")
+        if widget_filter and tools_qt.getWidgetText(dialog, widget_filter, False, False) not in (None, ''):
             widget_filter.textChanged.emit(widget_filter.text())
 
 
     def manage_filter(self, dialog, widget, action):
+
         index = dialog.main_tab.currentIndex()
         tab_name = dialog.main_tab.widget(index).objectName()
         if action == 'save':
-            setattr(self, f"var_txt_filter_{tab_name}", qt_tools.getWidgetText(dialog, widget))
+            setattr(self, f"var_txt_filter_{tab_name}", tools_qt.getWidgetText(dialog, widget))
         else:
             setattr(self, f"var_txt_filter_{tab_name}", '')
 

@@ -16,7 +16,7 @@ from ..models.sys_feature_cat import SysFeatureCat
 class PgMan:
 
     def __init__(self, controller):
-        """ Class to manage layers. Refactor code from giswater.py """
+        """ Class to manage layers. Refactor code from main.py """
 
         self.controller = controller
 

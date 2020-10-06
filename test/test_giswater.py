@@ -11,9 +11,9 @@ import configparser
 import os.path
 import sys
 
-from giswater_qgis_plugin.dao.controller import DaoController
-from giswater_qgis_plugin.core.admin import GwAdmin
-from giswater_qgis_plugin.core.actions.om.visit_manager import GwVisitManager
+from dao.controller import DaoController
+from core.btn_admin import GwAdmin
+from core.actions.visit_manager import GwVisitManager
 
 
 class TestGiswater(QObject):

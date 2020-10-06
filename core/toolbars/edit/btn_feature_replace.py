@@ -13,15 +13,14 @@ from collections import OrderedDict
 from datetime import datetime
 from functools import partial
 
-from ....actions.api_parent_functs import create_body
-from ....ui_manager import FeatureReplace, InfoWorkcatUi
-from ...actions.basic.catalog import GwCatalog
-from ...utils.layer_tools import populate_info_text
-from ...utils.giswater_tools import close_dialog, load_settings, open_dialog, refresh_legend
-from ....lib import qt_tools
-from ....lib.qgis_tools import get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
+from core.ui.ui_manager import FeatureReplace, InfoWorkcatUi
+from core.actions.catalog import GwCatalog
+from core.utils.layer_tools import populate_info_text
+from core.utils.tools_giswater import close_dialog, load_settings, open_dialog, refresh_legend, create_body
+from lib import tools_qt
+from lib.tools_qgis import get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
     get_snapped_feature, get_snapping_options, enable_snapping, snap_to_node, snap_to_connec_gully, set_snapping_mode
-from ..parent_maptool import GwParentMapTool
+from core.toolbars.parent_maptool import GwParentMapTool
 
 
 class GwFeatureReplaceButton(GwParentMapTool):
@@ -63,8 +62,8 @@ class GwFeatureReplaceButton(GwParentMapTool):
         sql = "SELECT id FROM cat_work ORDER BY id"
         rows = self.controller.get_rows(sql)
         if rows:
-            qt_tools.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
-            qt_tools.set_autocompleter(self.dlg_replace.workcat_id_end)
+            tools_qt.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
+            tools_qt.set_autocompleter(self.dlg_replace.workcat_id_end)
 
         row = self.controller.get_config('edit_workcat_vdefault')
         if row:
@@ -76,7 +75,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
-            work_id = qt_tools.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
+            work_id = tools_qt.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
                    f"WHERE id = '{work_id}'")
             row = self.controller.get_row(sql)
@@ -101,11 +100,11 @@ class GwFeatureReplaceButton(GwParentMapTool):
             if self.geom_type in ('node', 'connec'):
                 sql = f"SELECT DISTINCT(id) FROM {self.cat_table} ORDER BY id"
                 rows = self.controller.get_rows(sql)
-                qt_tools.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
+                tools_qt.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
             elif self.geom_type in 'gully':
                 sql = f"SELECT DISTINCT(id) FROM cat_grate ORDER BY id"
                 rows = self.controller.get_rows(sql)
-                qt_tools.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
+                tools_qt.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
         self.dlg_replace.feature_type.setText(feature_type)
         self.dlg_replace.feature_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
@@ -117,7 +116,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                f"AND active is True "
                f"ORDER BY id")
         rows = self.controller.get_rows(sql)
-        qt_tools.fillComboBox(self.dlg_replace, "feature_type_new", rows)
+        tools_qt.fillComboBox(self.dlg_replace, "feature_type_new", rows)
 
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg_replace.btn_accept.clicked.connect(partial(self.get_values, self.dlg_replace))
@@ -130,7 +129,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
     def open_catalog(self):
 
         # Get feature_type
-        feature_type = qt_tools.getWidgetText(self.dlg_replace, self.dlg_replace.feature_type_new)
+        feature_type = tools_qt.getWidgetText(self.dlg_replace, self.dlg_replace.feature_type_new)
         if feature_type is 'null':
             msg = "New feature type is null. Please, select a valid value."
             self.controller.show_info_box(msg, "Info")
@@ -149,7 +148,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
-            work_id = qt_tools.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
+            work_id = tools_qt.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
                    f"WHERE id = '{work_id}'")
             row = self.controller.get_row(sql)
@@ -170,7 +169,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
         self.dlg_new_workcat = InfoWorkcatUi()
         load_settings(self.dlg_new_workcat)
-        qt_tools.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
+        tools_qt.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
 
         table_object = "cat_work"
         self.set_completer_object(table_object, self.dlg_new_workcat.cat_work_id, 'id')
@@ -189,23 +188,23 @@ class GwFeatureReplaceButton(GwParentMapTool):
         # Get values from dialog
         values = ""
         fields = ""
-        cat_work_id = qt_tools.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.cat_work_id)
+        cat_work_id = tools_qt.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
             values += ("'" + str(cat_work_id) + "', ")
-        descript = qt_tools.getWidgetText(self.dlg_new_workcat, "descript")
+        descript = tools_qt.getWidgetText(self.dlg_new_workcat, "descript")
         if descript != "null":
             fields += 'descript, '
             values += ("'" + str(descript) + "', ")
-        link = qt_tools.getWidgetText(self.dlg_new_workcat, "link")
+        link = tools_qt.getWidgetText(self.dlg_new_workcat, "link")
         if link != "null":
             fields += 'link, '
             values += ("'" + str(link) + "', ")
-        workid_key_1 = qt_tools.getWidgetText(self.dlg_new_workcat, "workid_key_1")
+        workid_key_1 = tools_qt.getWidgetText(self.dlg_new_workcat, "workid_key_1")
         if workid_key_1 != "null":
             fields += 'workid_key1, '
             values += ("'" + str(workid_key_1) + "', ")
-        workid_key_2 = qt_tools.getWidgetText(self.dlg_new_workcat, "workid_key_2")
+        workid_key_2 = tools_qt.getWidgetText(self.dlg_new_workcat, "workid_key_2")
         if workid_key_2 != "null":
             fields += 'workid_key2, '
             values += ("'" + str(workid_key_2) + "', ")
@@ -233,7 +232,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                     sql = "SELECT id FROM cat_work ORDER BY id"
                     rows = self.controller.get_rows(sql)
                     if rows:
-                        qt_tools.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
+                        tools_qt.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
                         current_index = self.dlg_replace.workcat_id_end.findText(str(cat_work_id))
                         self.dlg_replace.workcat_id_end.setCurrentIndex(current_index)
 
@@ -273,7 +272,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
     def get_values(self, dialog):
 
-        self.workcat_id_end_aux = qt_tools.getWidgetText(dialog, dialog.workcat_id_end)
+        self.workcat_id_end_aux = tools_qt.getWidgetText(dialog, dialog.workcat_id_end)
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
 
         # Check null values
@@ -282,8 +281,8 @@ class GwFeatureReplaceButton(GwParentMapTool):
             self.controller.show_warning(message, parameter='Workcat_id')
             return
 
-        feature_type_new = qt_tools.getWidgetText(dialog, dialog.feature_type_new)
-        featurecat_id = qt_tools.getWidgetText(dialog, dialog.featurecat_id)
+        feature_type_new = tools_qt.getWidgetText(dialog, dialog.feature_type_new)
+        featurecat_id = tools_qt.getWidgetText(dialog, dialog.featurecat_id)
 
         # Ask question before executing
         message = "Are you sure you want to replace selected feature with a new one?"
@@ -295,7 +294,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             extras = f'"old_feature_id":"{self.feature_id}"'
             extras += f', "workcat_id_end":"{self.workcat_id_end_aux}"'
             extras += f', "enddate":"{self.enddate_aux}"'
-            extras += f', "keep_elements":"{qt_tools.isChecked(dialog, "keep_elements")}"'
+            extras += f', "keep_elements":"{tools_qt.isChecked(dialog, "keep_elements")}"'
             body = create_body(feature=feature, extras=extras)
 
             # Execute SQL function and show result to the user
@@ -471,7 +470,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             return
 
         # Get selected value from 2nd combobox
-        feature_type_new = qt_tools.getWidgetText(self.dlg_replace, "feature_type_new")
+        feature_type_new = tools_qt.getWidgetText(self.dlg_replace, "feature_type_new")
 
         # When value is selected, enabled 3rd combo box
         if feature_type_new == 'null':
@@ -479,10 +478,10 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
         if self.project_type == 'ws':
             # Fill 3rd combo_box-catalog_id
-            qt_tools.setWidgetEnabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
+            tools_qt.setWidgetEnabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
                    f"WHERE {self.feature_type_ws} = '{feature_type_new}'")
             rows = self.controller.get_rows(sql)
-            qt_tools.fillComboBox(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
+            tools_qt.fillComboBox(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
 

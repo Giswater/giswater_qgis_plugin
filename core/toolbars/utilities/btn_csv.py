@@ -13,13 +13,13 @@ import os
 from encodings.aliases import aliases
 from functools import partial
 
-from lib import qt_tools
-from ..parent_action import GwParentAction
-from ...utils.giswater_tools import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
-from ....ui_manager import CsvUi
-from .... import global_vars
-from ....actions.parent_functs import create_body
-from ...utils.layer_tools import populate_info_text
+from lib import tools_qt
+from core.toolbars.parent_dialog import GwParentAction
+from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
+    create_body
+from core.ui.ui_manager import CsvUi
+import global_vars
+from core.utils.layer_tools import populate_info_text
 
 
 class GwCSVButton(GwParentAction):
@@ -42,7 +42,7 @@ class GwCSVButton(GwParentAction):
                              'alias, config_csv.descript, functionname, readheader, orderby', 'config_csv', roles)
 
         self.dlg_csv.lbl_info.setWordWrap(True)
-        qt_tools.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
+        tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
         self.dlg_csv.rb_comma.setChecked(False)
         self.dlg_csv.rb_semicolon.setChecked(True)
 
@@ -59,7 +59,7 @@ class GwCSVButton(GwParentAction):
         self.get_function_name()
         self.load_settings_values()
 
-        if str(qt_tools.getWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv)) != 'null':
+        if str(tools_qt.getWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv)) != 'null':
             self.preview_csv(self.dlg_csv)
         self.dlg_csv.progressBar.setVisible(False)
 
@@ -77,7 +77,7 @@ class GwCSVButton(GwParentAction):
             sorted_list = sorted(unicode_list, key=str.lower)
 
         if sorted_list:
-            qt_tools.set_autocompleter(combo, sorted_list)
+            tools_qt.set_autocompleter(combo, sorted_list)
 
 
     def populate_combos(self, combo, field_id, fields, table_name, roles):
@@ -107,7 +107,7 @@ class GwCSVButton(GwParentAction):
             return
 
 
-        qt_tools.set_item_data(combo, rows, 1, True, True, 1)
+        tools_qt.set_item_data(combo, rows, 1, True, True, 1)
         self.update_info(self.dlg_csv)
 
 
@@ -118,12 +118,12 @@ class GwCSVButton(GwParentAction):
         if not self.validate_params(dialog):
             return
 
-        fid_aux = qt_tools.get_item_data(dialog, dialog.cmb_import_type, 0)
+        fid_aux = tools_qt.get_item_data(dialog, dialog.cmb_import_type, 0)
         self.delete_table_csv(temp_tablename, fid_aux)
-        path = qt_tools.getWidgetText(dialog, dialog.txt_file_csv)
-        label_aux = qt_tools.getWidgetText(dialog, dialog.txt_import, return_string_null=False)
+        path = tools_qt.getWidgetText(dialog, dialog.txt_file_csv)
+        label_aux = tools_qt.getWidgetText(dialog, dialog.txt_import, return_string_null=False)
         delimiter = self.get_delimiter(dialog)
-        _unicode = qt_tools.getWidgetText(dialog, dialog.cmb_unicode_list)
+        _unicode = tools_qt.getWidgetText(dialog, dialog.cmb_unicode_list)
 
         try:
             with open(path, 'r', encoding=_unicode) as csvfile:
@@ -153,19 +153,19 @@ class GwCSVButton(GwParentAction):
     def update_info(self, dialog):
         """ Update the tag according to item selected from cmb_import_type """
 
-        dialog.lbl_info.setText(qt_tools.get_item_data(self.dlg_csv, self.dlg_csv.cmb_import_type, 2))
+        dialog.lbl_info.setText(tools_qt.get_item_data(self.dlg_csv, self.dlg_csv.cmb_import_type, 2))
 
 
     def get_function_name(self):
 
-        self.func_name = qt_tools.get_item_data(self.dlg_csv, self.dlg_csv.cmb_import_type, 3)
+        self.func_name = tools_qt.get_item_data(self.dlg_csv, self.dlg_csv.cmb_import_type, 3)
         self.controller.log_info(str(self.func_name))
 
 
     def select_file_csv(self):
         """ Select CSV file """
 
-        file_csv = qt_tools.getWidgetText(self.dlg_csv, 'txt_file_csv')
+        file_csv = tools_qt.getWidgetText(self.dlg_csv, 'txt_file_csv')
         # Set default value if necessary
         if file_csv is None or file_csv == '':
             file_csv = global_vars.plugin_dir
@@ -176,7 +176,7 @@ class GwCSVButton(GwParentAction):
         os.chdir(folder_path)
         message = self.controller.tr("Select CSV file")
         file_csv, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.csv')
-        qt_tools.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv, file_csv)
+        tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv, file_csv)
 
         self.save_settings_values()
         self.preview_csv(self.dlg_csv)
@@ -191,7 +191,7 @@ class GwCSVButton(GwParentAction):
 
         delimiter = self.get_delimiter(dialog)
         model = QStandardItemModel()
-        _unicode = qt_tools.getWidgetText(dialog, dialog.cmb_unicode_list)
+        _unicode = tools_qt.getWidgetText(dialog, dialog.cmb_unicode_list)
         dialog.tbl_csv.setModel(model)
         dialog.tbl_csv.horizontalHeader().setStretchLastSection(True)
 
@@ -207,12 +207,12 @@ class GwCSVButton(GwParentAction):
 
 
         value = get_parser_value('csv2Pg', 'txt_file_csv')
-        qt_tools.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv, value)
+        tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv, value)
 
         unicode = get_parser_value('csv2Pg', 'cmb_unicode_list')
         if not unicode:
             unicode = 'latin1'
-        qt_tools.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
+        tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
 
         if get_parser_value('csv2Pg', 'rb_semicolon') == 'True':
             self.dlg_csv.rb_semicolon.setChecked(True)
@@ -223,8 +223,8 @@ class GwCSVButton(GwParentAction):
     def save_settings_values(self):
         """ Save QGIS settings related with csv options """
 
-        set_parser_value('csv2Pg', 'txt_file_csv', qt_tools.getWidgetText(self.dlg_csv, 'txt_file_csv'))
-        set_parser_value('csv2Pg', 'cmb_unicode_list', qt_tools.getWidgetText(self.dlg_csv, 'cmb_unicode_list'))
+        set_parser_value('csv2Pg', 'txt_file_csv', tools_qt.getWidgetText(self.dlg_csv, 'txt_file_csv'))
+        set_parser_value('csv2Pg', 'cmb_unicode_list', tools_qt.getWidgetText(self.dlg_csv, 'cmb_unicode_list'))
         set_parser_value('csv2Pg', 'rb_semicolon', f"{self.dlg_csv.rb_semicolon.isChecked()}")
 
 
@@ -270,8 +270,8 @@ class GwCSVButton(GwParentAction):
         dialog.progressBar.setMaximum(row_count)  # -20 for see 100% complete progress
         csvfile.seek(0)  # Position the cursor at position 0 of the file
         reader = csv.reader(csvfile, delimiter=delimiter)
-        fid_aux = qt_tools.get_item_data(dialog, dialog.cmb_import_type, 0)
-        readheader = qt_tools.get_item_data(dialog, dialog.cmb_import_type, 4)
+        fid_aux = tools_qt.get_item_data(dialog, dialog.cmb_import_type, 0)
+        readheader = tools_qt.get_item_data(dialog, dialog.cmb_import_type, 4)
         for row in reader:
             if readheader is False:
                 readheader = True
@@ -306,7 +306,7 @@ class GwCSVButton(GwParentAction):
     def get_path(self, dialog):
         """ Take the file path if exist. AND if not exit ask it """
 
-        path = qt_tools.getWidgetText(dialog, dialog.txt_file_csv)
+        path = tools_qt.getWidgetText(dialog, dialog.txt_file_csv)
         if path is None or path == 'null' or not os.path.exists(path):
             message = "Please choose a valid path"
             self.controller.show_message(message, message_level=0)

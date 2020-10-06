@@ -7,9 +7,9 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt
 
-from ..parent_maptool import GwParentMapTool
-from ...utils.giswater_tools import create_body
-from ....lib.qgis_tools import get_event_point, snap_to_current_layer, add_marker, get_snapped_feature, \
+from core.toolbars.parent_maptool import GwParentMapTool
+from core.utils.tools_giswater import create_body
+from lib.tools_qgis import get_event_point, snap_to_current_layer, add_marker, get_snapped_feature, \
     get_snapping_options, snap_to_node, enable_snapping
 
 
