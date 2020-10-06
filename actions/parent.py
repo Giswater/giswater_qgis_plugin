@@ -160,12 +160,13 @@ class ParentAction(object):
             width = self.controller.plugin_settings_value(dialog.objectName() + "_width", dialog.property('width'))
             height = self.controller.plugin_settings_value(dialog.objectName() + "_height", dialog.property('height'))
 
-            if int(x) < 0 or int(y) < 0:
+            v_screens = ctypes.windll.user32
+            screen_x = v_screens.GetSystemMetrics(78)  # Width of virtual screen
+            screen_y = v_screens.GetSystemMetrics(79)  # Height of virtual screen
+            monitors = v_screens.GetSystemMetrics(80)  # Will return an integer of the num of display monitors present.
+            if (int(x) < 0 and monitors == 1) or (int(y) < 0 and monitors == 1):
                 dialog.resize(int(width), int(height))
             else:
-                screens = ctypes.windll.user32
-                screen_x = screens.GetSystemMetrics(78)
-                screen_y = screens.GetSystemMetrics(79)
                 if int(x) > screen_x:
                     x = int(screen_x) - int(width)
                 if int(y) > screen_y:

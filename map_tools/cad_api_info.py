@@ -71,13 +71,16 @@ class CadApiInfo(ParentMapTool):
             point = self.create_point(event)
             if point is False:
                 return
-            self.api_cf.open_form(point, tab_type=self.tab_type)
+            api_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, self.tab_type)
+            api_cf.signal_activate.connect(self.reactivate_map_tool)
+            api_cf.open_form(point, tab_type=self.tab_type)
 
         elif event.button() == Qt.RightButton:
             point = self.create_point(event)
             if point is False:
                 return
-            self.api_cf.hilight_feature(point, self.rubberband_list, self.tab_type)
+            api_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, self.tab_type)
+            api_cf.hilight_feature(point, self.rubberband_list, self.tab_type)
 
 
     def reactivate_map_tool(self):
@@ -102,8 +105,7 @@ class CadApiInfo(ParentMapTool):
         elif self.index_action == '199':
             self.tab_type = 'inp'
 
-        self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, self.tab_type)
-        self.api_cf.signal_activate.connect(self.reactivate_map_tool)
+
 
 
     def deactivate(self):
