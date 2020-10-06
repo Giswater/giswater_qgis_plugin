@@ -6,10 +6,10 @@ or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
 from qgis.core import QgsPointXY
-from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsMapTip, QgsRubberBand, QgsVertexMarker
+from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsRubberBand, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, QGridLayout, QLabel,\
-    QLineEdit, QPushButton, QSizePolicy, QSpacerItem, QSpinBox, QTextEdit, QWidget
+from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, \
+    QSizePolicy, QSpacerItem
 from functools import partial
 
 from core.utils.tools_giswater import create_body, close_dialog, load_settings, open_dialog, save_settings

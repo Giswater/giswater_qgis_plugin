@@ -22,7 +22,6 @@ import sys
 import webbrowser
 from functools import partial
 
-import global_vars
 from lib import tools_qt
 from actions.parent import ParentAction
 from core.utils.hyperlink_label import GwHyperLinkLabel
