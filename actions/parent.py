@@ -120,9 +120,13 @@ class ParentAction(object):
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.AnyFile)
         message = "Select file"
-        folder_path, filter_ = file_dialog.getOpenFileName(parent=None, caption=self.controller.tr(message))
-        if folder_path:
-            utils_giswater.setWidgetText(dialog, widget, str(folder_path))
+        files_path, filter_ = file_dialog.getOpenFileNames(parent=None, caption=self.controller.tr(message))
+        file_text = ""
+        for file in files_path:
+            file_text += f"{file}\n\n"
+        if files_path:
+            utils_giswater.setWidgetText(dialog, widget, str(file_text))
+        return files_path
 
 
     def get_folder_dialog(self, dialog, widget):
@@ -1281,9 +1285,10 @@ class ParentAction(object):
                         symbol.changeSymbolLayer(0, symbol_layer)
                     category = QgsRendererCategory(id['id'], symbol, str(id['id']))
                     categories.append(category)
-
-                    # apply symbol to layer renderer
-                    lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
+					
+					# apply symbol to layer renderer
+                    if 'idname' in mapzone:
+                        lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
 
                     # repaint layer
                     lyr.triggerRepaint()

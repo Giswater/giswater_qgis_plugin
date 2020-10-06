@@ -1159,9 +1159,10 @@ class ParentManage(ParentAction, object):
 
         try:
             self.canvas.selectionChanged.disconnect()
-            self.iface.actionPan().trigger()
         except Exception:
             pass
+        finally:
+            self.iface.actionPan().trigger()
 
 
     def fill_widget_with_fields(self, dialog, data_object, field_names):

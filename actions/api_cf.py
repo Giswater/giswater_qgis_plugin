@@ -326,7 +326,8 @@ class ApiCF(ApiParent, QObject):
                 else:
                     sub_tag = 'node'
             feature_id = self.complet_result[0]['body']['feature']['id']
-            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker, new_feature=new_feature)
+            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker, 
+                                                   new_feature=new_feature)
             if feature_cat:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
@@ -756,7 +757,7 @@ class ApiCF(ApiParent, QObject):
         else:
             self.start_editing(dialog, action_edit, result, layer)
 
-
+            
     def stop_editing(self, dialog, action_edit, result, layer, fid, my_json, new_feature=None):
 
         self.get_last_value()

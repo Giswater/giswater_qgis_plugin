@@ -24,7 +24,7 @@ class ManageDocument(ParentManage):
         # single tool or integrated in another tool
         self.single_tool_mode = single_tool
         self.previous_dialog = None
-
+        self.files_path = []
 
     def edit_add_file(self):
         self.manage_document()
@@ -37,6 +37,7 @@ class ManageDocument(ParentManage):
         self.dlg_add_doc = DocUi()
         self.load_settings(self.dlg_add_doc)
         self.doc_id = None
+        self.files_path = []
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
@@ -69,7 +70,7 @@ class ManageDocument(ParentManage):
         self.set_icon(self.dlg_add_doc.btn_insert, "111")
         self.set_icon(self.dlg_add_doc.btn_delete, "112")
         self.set_icon(self.dlg_add_doc.btn_snapping, "137")
-
+        self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
         # Fill combo boxes
         self.populate_combo(self.dlg_add_doc, "doc_type", "doc_type")
 
@@ -77,6 +78,7 @@ class ManageDocument(ParentManage):
         if row:
             utils_giswater.setCalendarDate(self.dlg_add_doc, 'date', row.value('date'))
             utils_giswater.setWidgetText(self.dlg_add_doc, 'path', row.value('path'))
+            self.files_path.append(row.value('path'))
         else:
             utils_giswater.setCalendarDate(self.dlg_add_doc, 'date', None)
 
@@ -91,8 +93,9 @@ class ManageDocument(ParentManage):
         self.set_completer_feature_id(self.dlg_add_doc.feature_id, geom_type, viewname)
 
         # Set signals
+        self.dlg_add_doc.doc_type.currentIndexChanged.connect(self.activate_relations)
         self.dlg_add_doc.btn_path_url.clicked.connect(partial(self.open_web_browser, self.dlg_add_doc, "path"))
-        self.dlg_add_doc.btn_path_doc.clicked.connect(partial(self.get_file_dialog, self.dlg_add_doc, "path"))
+        self.dlg_add_doc.btn_path_doc.clicked.connect(lambda: setattr(self, 'files_path', self.get_file_dialog(self.dlg_add_doc, "path")))
         self.dlg_add_doc.btn_accept.clicked.connect(
             partial(self.manage_document_accept, table_object, tablename, qtable, item_id))
         self.dlg_add_doc.btn_cancel.clicked.connect(
@@ -120,6 +123,16 @@ class ManageDocument(ParentManage):
         return self.dlg_add_doc
 
 
+    def activate_relations(self):
+        """ Force user to set doc_type """
+
+        doc_type = utils_giswater.getWidgetText(self.dlg_add_doc, self.dlg_add_doc.doc_type, False, False)
+        if doc_type in (None, '', 'null'):
+            self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
+        else:
+            self.dlg_add_doc.tabWidget.setTabEnabled(1, True)
+
+
     def fill_table_doc(self, dialog, geom_type, feature_id):
 
         widget = "tbl_doc_x_" + geom_type
@@ -136,13 +149,13 @@ class ManageDocument(ParentManage):
         """ Insert or update table 'document'. Add document to selected feature """
 
         # Get values from dialog
-        doc_id = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_id")
-        doc_type = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_type", return_string_null=True)
+        doc_id = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_id", False, False)
+        doc_type = utils_giswater.getWidgetText(self.dlg_add_doc, "doc_type", False, False)
         date = utils_giswater.getCalendarDate(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
-        observ = utils_giswater.getWidgetText(self.dlg_add_doc, "observ", return_string_null=False)
+        observ = utils_giswater.getWidgetText(self.dlg_add_doc, "observ", False, False)
         path = utils_giswater.getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
 
-        if doc_type == 'null':
+        if doc_type in (None, ''):
             message = "You need to insert doc_type"
             self.controller.show_warning(message)
             return
@@ -152,18 +165,27 @@ class ManageDocument(ParentManage):
                f" FROM {table_object}"
                f" WHERE id = '{doc_id}'")
         row = self.controller.get_row(sql, log_info=False)
-
+        reset_models = False
         # If document not exists perform an INSERT
         if row is None:
-            if doc_id == 'null':
-                sql = (f"INSERT INTO doc (doc_type, path, observ, date)"
-                       f" VALUES ('{doc_type}', '{path}', '{observ}', '{date}') RETURNING id;")
-                new_doc_id = self.controller.execute_returning(sql, log_sql=True)
-                sql = ""
-                doc_id = str(new_doc_id[0])
+            if len(self.files_path) <= 1:
+                if doc_id in (None, ''):
+                    sql, doc_id = self.insert_doc_sql(doc_type, observ, date, path)
+                else:
+                    sql = (f"INSERT INTO doc (id, doc_type, path, observ, date)"
+                           f" VALUES ('{doc_id}', '{doc_type}', '{path}', '{observ}', '{date}');")
+                self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
             else:
-                sql = (f"INSERT INTO doc (id, doc_type, path, observ, date)"
-                       f" VALUES ('{doc_id}', '{doc_type}', '{path}', '{observ}', '{date}');")
+                # Ask question before executing
+                msg = ("You have selected multiple documents. In this case, doc_id will be a sequencial number for "
+                       "all selected documents and your doc_id won't be used.")
+                answer = self.controller.ask_question(msg, self.controller.tr("Add document"))
+                if answer:
+                    for cont, file in enumerate(self.files_path):
+                        if cont == len(self.files_path)-1:
+                            reset_models = True
+                        sql, doc_id = self.insert_doc_sql(doc_type, observ, date, file)
+                        self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable, reset_models)
 
         # If document exists perform an UPDATE
         else:
@@ -171,10 +193,44 @@ class ManageDocument(ParentManage):
             answer = self.controller.ask_question(message)
             if not answer:
                 return
-            sql = (f"UPDATE doc "
-                   f" SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}'"
-                   f" WHERE id = '{doc_id}';")
+            if len(self.files_path) <= 1:
+                sql = self.update_doc_sql(doc_type, observ, date, doc_id, path)
+                self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
+            else:
+                # If document have more than 1 file perform an INSERT
+                # Ask question before executing
+                msg = ("You have selected multiple documents. In this case, doc_id will be a sequencial number for "
+                       "all selected documents and your doc_id won't be used.")
+                answer = self.controller.ask_question(msg, self.controller.tr("Add document"))
+                if answer:
+                    for cont, file in enumerate(self.files_path):
+                        if cont == len(self.files_path)-1:
+                            reset_models = True
+                        if cont == 0:
+                            sql = self.update_doc_sql(doc_type, observ, date, doc_id, file)
+                            self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable, reset_models)
+                        else:
+                            sql, doc_id = self.insert_doc_sql(doc_type, observ, date, file)
+                            self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable, reset_models)
 
+
+    def insert_doc_sql(self, doc_type, observ, date, path):
+        sql = (f"INSERT INTO doc (doc_type, path, observ, date)"
+               f" VALUES ('{doc_type}', '{path}', '{observ}', '{date}') RETURNING id;")
+        new_doc_id = self.controller.execute_returning(sql)
+        sql = ""
+        doc_id = str(new_doc_id[0])
+        return sql, doc_id
+
+
+    def update_doc_sql(self, doc_type, observ, date, doc_id, path):
+        sql = (f"UPDATE doc "
+               f" SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}'"
+               f" WHERE id = '{doc_id}';")
+        return sql
+
+
+    def update_doc_tables(self, sql, doc_id, table_object, tablename, item_id, qtable, reset_models=True):
         # Manage records in tables @table_object_x_@geom_type
         sql += (f"\nDELETE FROM doc_x_node"
                 f" WHERE doc_id = '{doc_id}';")
@@ -204,7 +260,7 @@ class ManageDocument(ParentManage):
                         f" VALUES ('{doc_id}', '{feature_id}');")
 
         status = self.controller.execute_sql(sql)
-        if status:
+        if status and reset_models is True:
             self.doc_id = doc_id
             self.manage_close(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"])
 
