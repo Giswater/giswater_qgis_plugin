@@ -45,12 +45,22 @@ BEGIN
 	END IF;
 
 	IF v_sys_statetopocontrol IS NOT TRUE OR v_user_statetopocontrol IS TRUE THEN
-		-- working without statetopocontrol
-		SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
-		ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 
-		SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
-		ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;      
+		-- working without statetopocontrol
+		SELECT node.* INTO nodeRecord1 FROM node
+		JOIN cat_node ON cat_node.id=node.nodecat_id
+		JOIN cat_feature_node ON cat_feature_node.id = nodetype_id
+		WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) ORDER BY
+		(case when isarcdivide is true then 1 else 2 end), 
+		ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) limit 1;
+
+		SELECT node.* INTO nodeRecord2 FROM node
+		JOIN cat_node ON cat_node.id=node.nodecat_id
+		JOIN cat_feature_node ON cat_feature_node.id = nodetype_id
+		WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) ORDER BY
+		(case when isarcdivide is true then 1 else 2 end), 
+		ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) limit 1;
+
 	ELSE
 		-- Looking for state control
 		PERFORM gw_fct_state_control('ARC', NEW.arc_id, NEW.state, TG_OP);
@@ -63,7 +73,10 @@ BEGIN
 		-- Starting process
 		IF TG_OP='INSERT' THEN  
 
-			SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
+			SELECT * INTO nodeRecord1 FROM node 
+			JOIN cat_node ON cat_node.id=node.nodecat_id
+			JOIN cat_feature_node ON cat_feature_node.id = nodetype_id
+			WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 			AND ((NEW.state=1 AND node.state=1)
 			
 						-- looking for existing nodes that not belongs on the same alternatives that arc
@@ -80,10 +93,13 @@ BEGIN
 								(SELECT value::integer FROM config_param_user 
 								WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"() LIMIT 1))))
 
-			ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
+			ORDER BY (case when isarcdivide is true then 1 else 2 end),  ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 
 		
-			SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) 
+			SELECT * INTO nodeRecord2 FROM node 
+			JOIN cat_node ON cat_node.id=node.nodecat_id
+			JOIN cat_feature_node ON cat_feature_node.id = nodetype_id
+			WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) 
 			AND ((NEW.state=1 AND node.state=1)
 
 						-- looking for existing nodes that not belongs on the same alternatives that arc
@@ -100,12 +116,15 @@ BEGIN
 								(SELECT value::integer FROM config_param_user 
 								WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"() LIMIT 1))))
 
-			ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
+			ORDER BY (case when isarcdivide is true then 1 else 2 end), ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 
 		ELSIF TG_OP='UPDATE' THEN
 
 
-			SELECT * INTO nodeRecord1 FROM node WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
+			SELECT * INTO nodeRecord1 FROM node 
+			JOIN cat_node ON cat_node.id=node.nodecat_id
+			JOIN cat_feature_node ON cat_feature_node.id = nodetype_id 
+			WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 			AND ((NEW.state=1 AND node.state=1)
 						-- looking for existing nodes that not belongs on the same alternatives that arc
 
@@ -121,10 +140,13 @@ BEGIN
 							 WHERE plan_psector_x_node.node_id=node.node_id AND state=1 AND psector_id IN
 								(SELECT psector_id FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id))))
 
-			ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
+			ORDER BY (case when isarcdivide is true then 1 else 2 end), ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 
 		
-			SELECT * INTO nodeRecord2 FROM node WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) 
+			SELECT * INTO nodeRecord2 FROM node 
+			JOIN cat_node ON cat_node.id=node.nodecat_id
+			JOIN cat_feature_node ON cat_feature_node.id = nodetype_id 
+			WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) 
 			AND ((NEW.state=1 AND node.state=1)
 
 						-- looking for existing nodes that not belongs on the same alternatives that arc
@@ -141,7 +163,7 @@ BEGIN
 							 WHERE plan_psector_x_node.node_id=node.node_id AND state=1 AND psector_id IN
 								(SELECT psector_id FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id))))
 
-			ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
+			ORDER BY (case when isarcdivide is true then 1 else 2 end), ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
 		END IF;
 	END IF;
 
