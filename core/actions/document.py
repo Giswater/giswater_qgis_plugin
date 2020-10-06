@@ -32,6 +32,7 @@ class GwDocument:
         self.iface = global_vars.iface
         self.controller = global_vars.controller
         self.schema_name = global_vars.schema_name
+        self.files_path = []
 
 
     def edit_add_file(self):
@@ -45,6 +46,7 @@ class GwDocument:
         self.dlg_add_doc = DocUi()
         load_settings(self.dlg_add_doc)
         self.doc_id = None
+        self.files_path = []
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
@@ -55,21 +57,10 @@ class GwDocument:
 
         # Setting lists
         self.ids = []
-        self.list_ids = {}
-        self.list_ids['arc'] = []
-        self.list_ids['node'] = []
-        self.list_ids['connec'] = []
-        self.list_ids['gully'] = []
-        self.list_ids['element'] = []
+        self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
 
         # Setting layers
-        self.layers = {}
-        self.layers['arc'] = []
-        self.layers['node'] = []
-        self.layers['connec'] = []
-        self.layers['gully'] = []
-        self.layers['element'] = []
-
+        self.layers = {'arc': [], 'node': [], 'connec': [], 'element': []}
         self.layers['arc'] = self.controller.get_group_layers('arc')
         self.layers['node'] = self.controller.get_group_layers('node')
         self.layers['connec'] = self.controller.get_group_layers('connec')
@@ -93,14 +84,15 @@ class GwDocument:
         set_icon(self.dlg_add_doc.btn_insert, "111")
         set_icon(self.dlg_add_doc.btn_delete, "112")
         set_icon(self.dlg_add_doc.btn_snapping, "137")
-
+        self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
         # Fill combo boxes
         populate_combo_with_query(self.dlg_add_doc, "doc_type", "doc_type")
 
         # Set current/selected date and link
         if row:
-            setCalendarDate(self.dlg_add_doc, 'date', row.value('date'))
-            setWidgetText(self.dlg_add_doc, 'path', row.value('path'))
+            qt_tools.setCalendarDate(self.dlg_add_doc, 'date', row.value('date'))
+            qt_tools.setWidgetText(self.dlg_add_doc, 'path', row.value('path'))
+            self.files_path.append(row.value('path'))
         else:
             setCalendarDate(self.dlg_add_doc, 'date', None)
 
@@ -115,8 +107,9 @@ class GwDocument:
         set_completer_widget(viewname, self.dlg_add_doc.feature_id, str(geom_type) + "_id")
 
         # Set signals
-        self.dlg_add_doc.btn_path_url.clicked.connect(partial(self.open_web_browser, self.dlg_add_doc, "path"))
-        self.dlg_add_doc.btn_path_doc.clicked.connect(partial(self.get_file_dialog, self.dlg_add_doc, "path"))
+        self.dlg_add_doc.doc_type.currentIndexChanged.connect(self.activate_relations)
+        self.dlg_add_doc.btn_path_url.clicked.connect(partial(open_web_browser, self.dlg_add_doc, "path"))
+        self.dlg_add_doc.btn_path_doc.clicked.connect(lambda: setattr(self, 'files_path', get_file_dialog(self.dlg_add_doc, "path")))
         self.dlg_add_doc.btn_accept.clicked.connect(
             partial(self.manage_document_accept, table_object, tablename, qtable, item_id))
         # TODO: Set variable  self.layers using return parameters
@@ -160,6 +153,16 @@ class GwDocument:
         return self.dlg_add_doc
 
 
+    def activate_relations(self):
+        """ Force user to set doc_id and doc_type """
+        doc_type = qt_tools.getWidgetText(self.dlg_add_doc, self.dlg_add_doc.doc_type, False, False)
+
+        if doc_type in (None, '', 'null'):
+            self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
+        else:
+            self.dlg_add_doc.tabWidget.setTabEnabled(1, True)
+
+
     def fill_table_doc(self, dialog, geom_type, feature_id):
 
         widget = "tbl_doc_x_" + geom_type
@@ -176,13 +179,13 @@ class GwDocument:
         """ Insert or update table 'document'. Add document to selected feature """
 
         # Get values from dialog
-        doc_id = getWidgetText(self.dlg_add_doc, "doc_id")
-        doc_type = getWidgetText(self.dlg_add_doc, "doc_type", return_string_null=True)
-        date = getCalendarDate(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
-        observ = getWidgetText(self.dlg_add_doc, "observ", return_string_null=False)
-        path = getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
+        doc_id = qt_tools.getWidgetText(self.dlg_add_doc, "doc_id", False, False)
+        doc_type = qt_tools.getWidgetText(self.dlg_add_doc, "doc_type", False, False)
+        date = qt_tools.getCalendarDate(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
+        path = qt_tools.getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
+        observ = qt_tools.getWidgetText(self.dlg_add_doc, "observ", False, False)
 
-        if doc_type == 'null':
+        if doc_type in (None, ''):
             message = "You need to insert doc_type"
             self.controller.show_warning(message)
             return
@@ -195,26 +198,64 @@ class GwDocument:
 
         # If document not exists perform an INSERT
         if row is None:
-            if doc_id == 'null':
-                sql = (f"INSERT INTO doc (doc_type, path, observ, date)"
-                       f" VALUES ('{doc_type}', '{path}', '{observ}', '{date}') RETURNING id;")
-                new_doc_id = self.controller.execute_returning(sql)
-                sql = ""
-                doc_id = str(new_doc_id[0])
+            if len(self.files_path) <= 1:
+                if doc_id in (None, ''):
+                    sql, doc_id = self.insert_doc_sql(doc_type, observ, date, path)
+                else:
+                    sql = (f"INSERT INTO doc (id, doc_type, path, observ, date)"
+                           f" VALUES ('{doc_id}', '{doc_type}', '{path}', '{observ}', '{date}');")
+                self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
             else:
-                sql = (f"INSERT INTO doc (id, doc_type, path, observ, date)"
-                       f" VALUES ('{doc_id}', '{doc_type}', '{path}', '{observ}', '{date}');")
-
+                # Ask question before executing
+                msg = ("You have selected multiple documents. In this case, doc_id will be a sequencial number for "
+                       "all selected documents and your doc_id won't be used.")
+                answer = self.controller.ask_question(msg, self.controller.tr("Add document"))
+                if answer:
+                    for file in self.files_path:
+                        sql, doc_id = self.insert_doc_sql(doc_type, observ, date, file)
+                        self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
         # If document exists perform an UPDATE
         else:
             message = "Are you sure you want to update the data?"
             answer = self.controller.ask_question(message)
             if not answer:
                 return
-            sql = (f"UPDATE doc "
-                   f" SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}'"
-                   f" WHERE id = '{doc_id}';")
+            if len(self.files_path) <= 1:
+                sql = self.update_doc_sql(doc_type, observ, date, doc_id, path)
+                self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
+            else:
+                # If document have more than 1 file perform an INSERT
+                # Ask question before executing
+                msg = ("You have selected multiple documents. In this case, doc_id will be a sequencial number for "
+                       "all selected documents and your doc_id won't be used.")
+                answer = self.controller.ask_question(msg, self.controller.tr("Add document"))
+                if answer:
+                    for cont, file in enumerate(self.files_path):
+                        if cont == 0:
+                            sql = self.update_doc_sql(doc_type, observ, date, doc_id, file)
+                            self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
+                        else:
+                            sql, doc_id = self.insert_doc_sql(doc_type, observ, date, file)
+                            self.update_doc_tables(sql, doc_id, table_object, tablename, item_id, qtable)
 
+
+    def insert_doc_sql(self, doc_type, observ, date, path):
+        sql = (f"INSERT INTO doc (doc_type, path, observ, date)"
+               f" VALUES ('{doc_type}', '{path}', '{observ}', '{date}') RETURNING id;")
+        new_doc_id = self.controller.execute_returning(sql)
+        sql = ""
+        doc_id = str(new_doc_id[0])
+        return sql, doc_id
+
+
+    def update_doc_sql(self, doc_type, observ, date, doc_id, path):
+        sql = (f"UPDATE doc "
+               f" SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}'"
+               f" WHERE id = '{doc_id}';")
+        return sql
+
+
+    def update_doc_tables(self, sql, doc_id, table_object, tablename, item_id, qtable):
         # Manage records in tables @table_object_x_@geom_type
         sql += (f"\nDELETE FROM doc_x_node"
                 f" WHERE doc_id = '{doc_id}';")

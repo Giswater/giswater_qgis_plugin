@@ -5,12 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import csv
-import json
-import os
-import operator
-import sys
-
 from qgis.gui import QgsRubberBand
 from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
 from qgis.PyQt.QtCore import Qt
@@ -18,22 +12,29 @@ from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColo
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView
+
+import csv
+import json
+import os
+import operator
+import sys
 from collections import OrderedDict
 from functools import partial
 
-from core.actions.document import GwDocument
-from lib import tools_qt
+from .document import GwDocument
 from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
     hide_generic_layers, tab_feature_changed, check_expression
-from core.ui.ui_manager import Plan_psector, PsectorRapportUi
-from core.actions.document import global_vars
-from lib.tools_qgis import remove_selection, selection_init, selection_changed, disconnect_snapping, \
+from ..ui.ui_manager import Plan_psector, PsectorRapportUi
+from .document import global_vars
+from ...lib.tools_qgis import remove_selection, selection_init, selection_changed, disconnect_snapping, \
     zoom_to_selected_features, insert_feature, get_feature_by_id, disconnect_signal_selection_changed, \
     refresh_map_canvas
-from lib.tools_qt import delete_records, fill_table_object, set_selectionbehavior, get_folder_dialog, set_icon, \
+from ...lib import tools_qt
+from ...lib.tools_qt import delete_records, fill_table_object, set_selectionbehavior, get_folder_dialog, set_icon, \
     set_completer_lineedit, set_restriction, document_open, document_delete, set_completer_object, set_table_columns, \
     set_completer_widget, reload_qtable
-from lib.tools_db import make_list_for_completer
+from ...lib.tools_db import make_list_for_completer
+
 
 class GwPsector:
 
@@ -1121,7 +1122,9 @@ class GwPsector:
 
 
     def set_plan(self):
-        body = self.create_body()
+
+        # TODO: Check this
+        body = create_body()
         self.controller.get_json('gw_fct_setplan', body, log_sql=True)
         
         

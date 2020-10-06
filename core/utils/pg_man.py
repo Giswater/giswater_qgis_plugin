@@ -94,7 +94,8 @@ class PgMan:
                     categories.append(category)
 
                     # apply symbol to layer renderer
-                    lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
+                    if 'idname' in mapzone:
+                        lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
 
                     # repaint layer
                     lyr.triggerRepaint()

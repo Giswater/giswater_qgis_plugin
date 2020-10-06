@@ -65,7 +65,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             tools_qt.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
             tools_qt.set_autocompleter(self.dlg_replace.workcat_id_end)
 
-        row = self.controller.get_config('edit_workcat_end_vdefault')
+        row = self.controller.get_config('edit_workcat_vdefault')
         if row:
             edit_workcat_vdefault = self.dlg_replace.workcat_id_end.findText(row[0])
             self.dlg_replace.workcat_id_end.setCurrentIndex(edit_workcat_vdefault)

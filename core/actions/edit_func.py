@@ -7,10 +7,10 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QSettings
 
-from core.actions.info import GwInfo
-from core.actions.element import GwElement
-from core.actions.document import GwDocument
-import global_vars
+from .info import GwInfo
+from .element import GwElement
+from .document import GwDocument
+from ... import global_vars
 
 
 class GwEdit:
@@ -27,9 +27,24 @@ class GwEdit:
         self.manage_element = GwElement()
         self.suppres_form = None
 
+        # Snapper
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager.set_controller(self.controller)
+        self.snapper = self.snapper_manager.get_snapper()
+        self.snapper_manager.set_snapping_layers()
+
 
     def edit_add_feature(self, feature_cat):
         """ Button 01, 02: Add 'node' or 'arc' """
+        # Store user snapping configuration
+        self.snapper_manager.store_snapping_options()
+
+        # Set snapping to 'node', 'connec' and 'gully'
+        self.snapper_manager.snap_to_arc()
+        self.snapper_manager.snap_to_node()
+        self.snapper_manager.snap_to_connec_gully()
+        self.snapper_manager.set_snapping_mode()
+        self.iface.actionAddFeature().toggled.connect(self.action_is_checked)
 
         self.feature_cat = feature_cat
         # self.info_layer must be global because apparently the disconnect signal is not disconnected correctly if
@@ -49,6 +64,12 @@ class GwEdit:
         else:
             message = "Layer not found"
             self.controller.show_warning(message, parameter=feature_cat.parent_layer)
+
+
+    def action_is_checked(self):
+        """ Recover snapping options when action add feature is un-checked """
+        if not self.iface.actionAddFeature().isChecked():
+            self.snapper_manager.recover_snapping_options()
 
 
     def open_new_feature(self, feature_id):

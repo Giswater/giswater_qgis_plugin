@@ -13,14 +13,13 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 from functools import partial
 from datetime import datetime
 
-from lib import tools_qt
-from core.toolbars.parent_dialog import GwParentAction
-from core.utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers, tab_feature_changed
-from core.ui.ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
-
-from lib.tools_qgis import remove_selection, selection_init, disconnect_snapping, disconnect_signal_selection_changed, \
+from ....lib import tools_qt
+from ...toolbars.parent_dialog import GwParentAction
+from ...utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers, tab_feature_changed
+from ...ui.ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
+from ....lib.tools_qgis import remove_selection, selection_init, disconnect_snapping, disconnect_signal_selection_changed, \
     insert_feature
-from lib.tools_qt import delete_records, set_selectionbehavior, set_icon, set_completer_object, set_completer_widget
+from ....lib.tools_qt import delete_records, set_selectionbehavior, set_icon, set_completer_object, set_completer_widget
 
 
 class GwEndFeatureButton(GwParentAction):
@@ -147,8 +146,7 @@ class GwEndFeatureButton(GwParentAction):
         sql = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0'
         rows = self.controller.get_rows(sql)
         tools_qt.set_item_data(self.dlg_work_end.cmb_statetype_end, rows, 1)
-        row = self.controller.get_config('statetype_end_vdefault')
-
+        row = self.controller.get_config('edit_statetype_0_vdefault')
         if row:
             tools_qt.set_combo_itemData(self.dlg_work_end.cmb_statetype_end, row[0], 0)
         row = self.controller.get_config('edit_enddate_vdefault')
@@ -164,7 +162,7 @@ class GwEndFeatureButton(GwParentAction):
         rows = self.controller.get_rows(sql)
         tools_qt.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         tools_qt.set_autocompleter(self.dlg_work_end.workcat_id_end)
-        row = self.controller.get_config('edit_workcat_end_vdefault')
+        row = self.controller.get_config('edit_workcat_vdefault')
         if row:
             tools_qt.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 
@@ -308,6 +306,11 @@ class GwEndFeatureButton(GwParentAction):
             status = self.controller.execute_sql(sql, log_sql=False)
             if status:
                 self.controller.show_info("Features updated successfully!")
+
+        # TODO: Check this
+        feature = f'"featureType":"{geom_type}", "featureId":"{ids_list}"'
+        body = create_body(feature=feature)        
+        self.controller.get_json('gw_fct_setendfeature', body)
 
 
     def fill_table(self, widget, table_name, filter_):

@@ -157,10 +157,12 @@ class GwConfigLayerTask(QgsTask):
                 if field['label']:
                     layer.setFieldAlias(fieldIndex, field['label'])
 
+                # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
+                if field['widgettype'] == 'text':
+                    self.set_column_multiline(layer, field, fieldIndex)
+
+                # widgetcontrols
                 if 'widgetcontrols' in field:
-                    # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
-                    if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
-                        self.set_column_multiline(layer, field, fieldIndex)
 
                     # Set field constraints
                     if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
@@ -246,10 +248,11 @@ class GwConfigLayerTask(QgsTask):
     def set_column_multiline(self, layer, field, fieldIndex):
         """ Set multiline selected fields according table config_api_form_fields.widgetcontrols['setQgisMultiline'] """
 
-        if field['widgettype'] == 'text':
-            if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
-                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
-                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+        if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
+            editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
+        else:
+            editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': False})
+        layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
 
     def create_body(self, form='', feature='', filter_fields='', extras=None):

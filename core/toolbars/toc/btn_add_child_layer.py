@@ -11,12 +11,12 @@ from qgis.PyQt.QtGui import QCursor
 
 from functools import partial
 
-from core.toolbars.parent_dialog import GwParentAction
-from core.load_project_check import GwProjectCheck
-from core.tasks.task_layer_config import GwConfigLayerTask
-from core.utils.layer_tools import from_postgres_to_toc
-from lib.tools_qgis import get_qgis_project_variables, get_cursor_multiple_selection
-from core.utils.tools_giswater import create_body
+from ..parent_dialog import GwParentAction
+from ...load_project_check import GwProjectCheck
+from ...tasks.task_layer_config import GwConfigLayerTask
+from ...utils.layer_tools import from_postgres_to_toc
+from ....lib.tools_qgis import get_qgis_project_variables, get_cursor_multiple_selection
+from ...utils.tools_giswater import create_body
 
 
 class GwAddChildLayerButton(GwParentAction):
@@ -192,6 +192,7 @@ class GwAddChildLayerButton(GwParentAction):
             self.layer_muni.triggerRepaint()
             self.iface.actionPan().trigger()
             self.iface.actionZoomIn().trigger()
+            set_style_mapzones()
 
 
 

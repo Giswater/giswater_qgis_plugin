@@ -1868,6 +1868,7 @@ class ApiParent(ParentAction):
 
 
     def manage_filter(self, dialog, widget, action):
+
         index = dialog.main_tab.currentIndex()
         tab_name = dialog.main_tab.widget(index).objectName()
         if action == 'save':
