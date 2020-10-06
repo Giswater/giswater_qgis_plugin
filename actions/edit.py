@@ -40,7 +40,11 @@ class Edit(ParentAction):
 
     def edit_add_feature(self, feature_cat):
         """ Button 01, 02: Add 'node' or 'arc' """
-
+        if self.controller.is_inserting:
+            msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
+            self.controller.show_message(msg)
+            return
+        self.controller.is_inserting = True
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 

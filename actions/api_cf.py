@@ -1114,6 +1114,7 @@ class ApiCF(ApiParent, QObject):
                 self.layer.editingStopped.connect(self.fct_stop_editing)
                 return False
             self.new_feature_id = None
+            self.controller.is_inserting = False
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
                 if self.controller.dlg_docker:

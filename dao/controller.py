@@ -59,7 +59,8 @@ class DaoController(object):
         self.prev_maptool = None
         self.dlg_info = None
         self.show_db_exception = True
-
+        self.is_inserting = False
+        
         if create_logger:
             self.set_logger(logger_name)
 
