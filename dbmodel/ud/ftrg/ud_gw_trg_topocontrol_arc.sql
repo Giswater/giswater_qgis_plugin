@@ -63,14 +63,14 @@ BEGIN
 	IF v_sys_statetopocontrol IS NOT TRUE OR v_user_dis_statetopocontrol IS TRUE THEN
 
 		SELECT * INTO nodeRecord1 FROM node 
-		JOIN cat_feature_node ON cat_feature_node.id = nodetype_id
+		JOIN cat_feature_node ON cat_feature_node.id = node_type
 		WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 		ORDER BY (case when isarcdivide is true then 1 else 2 end), 
 		ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 
 
 		SELECT * INTO nodeRecord2 FROM node 
-		JOIN cat_feature_node ON cat_feature_node.id = nodetype_id 
+		JOIN cat_feature_node ON cat_feature_node.id = node_type 
 		WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 		ORDER BY (case when isarcdivide is true then 1 else 2 end), 
 		ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
@@ -90,7 +90,7 @@ BEGIN
 		IF TG_OP='INSERT' THEN
 
 			SELECT * INTO nodeRecord1 FROM node 
-			JOIN cat_feature_node ON cat_feature_node.id = nodetype_id 
+			JOIN cat_feature_node ON cat_feature_node.id = node_type 
 			WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 			AND ((NEW.state=1 AND node.state=1)
 					-- looking for existing nodes that not belongs on the same alternatives that arc
@@ -110,7 +110,7 @@ BEGIN
 					ORDER BY (case when isarcdivide is true then 1 else 2 end),ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 	
 			SELECT * INTO nodeRecord2 FROM node 
-			JOIN cat_feature_node ON cat_feature_node.id = nodetype_id 
+			JOIN cat_feature_node ON cat_feature_node.id = node_type 
 			WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) 
 			AND ((NEW.state=1 AND node.state=1)
 
@@ -133,7 +133,7 @@ BEGIN
 		ELSIF TG_OP='UPDATE' THEN
 
 			SELECT * INTO nodeRecord1 FROM node 
-			JOIN cat_feature_node ON cat_feature_node.id = nodetype_id 
+			JOIN cat_feature_node ON cat_feature_node.id = node_type 
 			WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 			AND ((NEW.state=1 AND node.state=1)
 
@@ -153,7 +153,7 @@ BEGIN
 					ORDER BY (case when isarcdivide is true then 1 else 2 end), ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 	
 			SELECT * INTO nodeRecord2 FROM node 
-			JOIN cat_feature_node ON cat_feature_node.id = nodetype_id 
+			JOIN cat_feature_node ON cat_feature_node.id = node_type 
 			WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) 
 			AND ((NEW.state=1 AND node.state=1)
 
