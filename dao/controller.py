@@ -22,16 +22,16 @@ import inspect
 import traceback
 import sys
 
-import global_vars
+from .. import global_vars
 from .pg_dao import PgDao
 from .logger import Logger
-from lib import tools_os, tools_qt
-from core.ui.ui_manager import DialogTextUi, DockerUi
-from lib.tools_qgis import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
+from ..lib import tools_os, tools_qt
+from ..core.ui.ui_manager import DialogTextUi, DockerUi
+from ..lib.tools_qgis import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
     qgis_get_layer_primary_key, qgis_get_layers, resetRubberbands, snap_to_layer, get_snapping_options, \
     set_snapping_mode
-from core.utils.tools_giswater import get_parser_value, set_parser_value, manage_actions, draw, create_body
-from core.utils.layer_tools import delete_layer_from_toc, populate_vlayer, categoryze_layer, create_qml, \
+from ..core.utils.tools_giswater import get_parser_value, set_parser_value, manage_actions, draw, create_body
+from ..core.utils.layer_tools import delete_layer_from_toc, populate_vlayer, categoryze_layer, create_qml, \
     from_postgres_to_toc
 
 

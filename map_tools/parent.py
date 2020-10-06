@@ -16,9 +16,9 @@ import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
-from lib import tools_qt
+from ..lib import tools_qt
 from .snapping_utils_v3 import SnappingConfigManager
-from core.ui.ui_manager import GwDialog, GwMainWindow
+from ..core.ui.ui_manager import GwDialog, GwMainWindow
 
 
 class ParentMapTool(QgsMapTool):

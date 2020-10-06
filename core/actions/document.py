@@ -6,6 +6,9 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
+
+import webbrowser
+import os
 from functools import partial
 
 from core.utils.tools_giswater import load_settings, open_dialog, close_dialog, tab_feature_changed
@@ -15,9 +18,7 @@ from lib.tools_qt import populate_combo_with_query, delete_records, manage_close
     delete_selected_object, set_selectionbehavior, set_model_to_table, set_icon, exist_object, set_completer_object, \
     set_completer_widget, set_table_columns, setWidgetText, getWidgetText, getCalendarDate, setCalendarDate
 
-import global_vars
-import webbrowser
-import os
+from ... import global_vars
 
 
 class GwDocument:

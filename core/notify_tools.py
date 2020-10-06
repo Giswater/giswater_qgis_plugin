@@ -13,9 +13,9 @@ import json
 import threading
 from collections import OrderedDict
 
-import global_vars
+from .. import global_vars
 
-from core.utils.tools_giswater import create_body
+from .utils.tools_giswater import create_body
 
 
 class GwNotifyTools:

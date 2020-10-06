@@ -10,7 +10,7 @@ from qgis.core import QgsSymbol, QgsRendererCategory, QgsCategorizedSymbolRender
 import random
 from collections import OrderedDict
 
-from core.models.sys_feature_cat import SysFeatureCat
+from ..models.sys_feature_cat import SysFeatureCat
 
 
 class PgMan:

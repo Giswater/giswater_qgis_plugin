@@ -26,19 +26,18 @@ from collections import OrderedDict
 from functools import partial
 from time import sleep
 
-from lib import tools_qt
-from core.btn_admin_gis_project import GwAdminGisProject
-from core.tasks.parent_task import GwTask
-from i18n.i18n_generator import GwI18NGenerator
-from core.ui.ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjectInfoUi, \
+from .. import global_vars
+from ..lib import tools_qt
+from .btn_admin_gis_project import GwAdminGisProject
+from .tasks.parent_task import GwTask
+from ..i18n.i18n_generator import GwI18NGenerator
+from .ui.ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjectInfoUi, \
     MainGisProjectUi, ToolboxUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
-
-import global_vars
-from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
+from .utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
     create_body
-from core.utils.layer_tools import populate_info_text
+from .utils.layer_tools import populate_info_text
+from ..lib.tools_qt import construct_form_param_user, get_folder_dialog, set_table_columns
 
-from lib.tools_qt import construct_form_param_user, get_folder_dialog, set_table_columns
 
 class GwAdmin:
 

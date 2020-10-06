@@ -16,10 +16,8 @@ import os
 from random import randrange
 import sys
 
-from lib import tools_qt
-
-import global_vars
-
+from ...lib import tools_qt
+from ... import global_vars
 
 
 def get_uri():

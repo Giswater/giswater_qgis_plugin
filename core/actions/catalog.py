@@ -12,11 +12,11 @@ import operator
 from functools import partial
 from collections import OrderedDict
 
-from lib import tools_qt
-from core.utils.tools_giswater import close_dialog, load_settings, open_dialog, create_body
-from core.ui.ui_manager import InfoCatalogUi
+from ...lib import tools_qt
+from ..utils.tools_giswater import close_dialog, load_settings, open_dialog, create_body
+from ..ui.ui_manager import InfoCatalogUi
 
-import global_vars
+from ... import global_vars
 
 
 class GwCatalog:
