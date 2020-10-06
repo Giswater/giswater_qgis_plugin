@@ -18,9 +18,9 @@ import re
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
-#from ...lib.tools_qt import getWidgetText, setWidgetText, getWidget
+from ...lib.tools_qt import getWidgetText, setWidgetText, getWidget
 from ..ui.ui_manager import GwDialog, GwMainWindow
-#from ...lib.tools_qgis import get_max_rectangle_from_coords, get_points, zoom_to_rectangle
+from ...lib import tools_qgis
 
 
 def load_settings(dialog):
@@ -350,7 +350,7 @@ def draw(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(2
         return
 
     list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
-    max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
+    max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
 
     if reset_rb:
         rubber_band.reset()
@@ -358,10 +358,10 @@ def draw(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(2
         point = QgsPointXY(float(max_x), float(max_y))
         draw_point(point, rubber_band, color, width)
     else:
-        points = get_points(list_coord)
+        points = tools_qgis.get_points(list_coord)
         draw_polyline(points, rubber_band, color, width)
     if margin is not None:
-        zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
+        tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
 
 
 def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
@@ -641,7 +641,7 @@ def set_selector(dialog, widget, is_alone, controller):
         x2 = json_result['body']['data']['geometry']['x2']
         y2 = json_result['body']['data']['geometry']['y2']
         if x1 is not None:
-            self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+            self.tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
                 
         # getting mapzones style
 		self.set_style_mapzones()

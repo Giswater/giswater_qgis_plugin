@@ -13,10 +13,9 @@ from qgis.PyQt.QtCore import Qt
 from functools import partial
 
 from .. import global_vars
-from .tools_qt import getWidgetText, getWidget, put_widgets, manage_all, add_checkbox, setWidgetText, setChecked, \
-    isChecked
+from . import tools_qt
 from .tools_qgis import zoom_to_rectangle
-from ..core.utils.tools_giswater import create_body
+from ..core.utils import tools_giswater
 
 
 def get_visible_layers(as_list=False):
@@ -70,7 +69,7 @@ def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=N
     # Set filter
     if filter is not False:
         main_tab = dialog.findChild(QTabWidget, 'main_tab')
-        text_filter = getWidgetText(dialog, widget)
+        text_filter = tools_qt.getWidgetText(dialog, widget)
         if text_filter in ('null', None):
             text_filter = ''
 
@@ -85,7 +84,7 @@ def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=N
         # Built querytext
         form = f'"currentTab":"{current_tab}"'
         extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
-        body = create_body(form=form, extras=extras)
+        body = tools_giswater.create_body(form=form, extras=extras)
         json_result = global_vars.controller.get_json('gw_fct_getselectors', body)
     else:
         json_result = is_setselector
@@ -123,7 +122,7 @@ def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=N
             label = QLabel()
             label.setObjectName('lbl_filter')
             label.setText('Filter:')
-            if getWidget(dialog, 'txt_filter_' + str(form_tab['tabName'])) is None:
+            if tools_qt.getWidget(dialog, 'txt_filter_' + str(form_tab['tabName'])) is None:
                 widget = QLineEdit()
                 widget.setObjectName('txt_filter_' + str(form_tab['tabName']))
                 widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -134,49 +133,49 @@ def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=N
                 widget.setLayoutDirection(Qt.RightToLeft)
 
             else:
-                widget = getWidget(dialog, 'txt_filter_' + str(form_tab['tabName']))
+                widget = tools_qt.getWidget(dialog, 'txt_filter_' + str(form_tab['tabName']))
 
             field['layoutname'] = gridlayout.objectName()
             field['layoutorder'] = i
             i = i + 1
-            put_widgets(dialog, field, label, widget)
+            tools_qt.put_widgets(dialog, field, label, widget)
             widget.setFocus()
 
         if 'manageAll' in form_tab:
             if (form_tab['manageAll']).lower() == 'true':
-                if getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}") is None:
+                if tools_qt.getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}") is None:
                     label = QLabel()
                     label.setObjectName(f"lbl_manage_all_{form_tab['tabName']}")
                     label.setText('Check all')
                 else:
-                    label = getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}")
+                    label = tools_qt.getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}")
 
-                if getWidget(dialog, f"chk_all_{form_tab['tabName']}") is None:
+                if tools_qt.getWidget(dialog, f"chk_all_{form_tab['tabName']}") is None:
                     widget = QCheckBox()
                     widget.setObjectName('chk_all_' + str(form_tab['tabName']))
-                    widget.stateChanged.connect(partial(manage_all, dialog, widget, selector_vars))
+                    widget.stateChanged.connect(partial(tools_qt.manage_all, dialog, widget, selector_vars))
                     widget.setLayoutDirection(Qt.RightToLeft)
 
                 else:
-                    widget = getWidget(dialog, f"chk_all_{form_tab['tabName']}")
+                    widget = tools_qt.getWidget(dialog, f"chk_all_{form_tab['tabName']}")
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = i
                 i = i + 1
                 chk_all = widget
-                put_widgets(dialog, field, label, widget)
+                tools_qt.put_widgets(dialog, field, label, widget)
 
         for order, field in enumerate(form_tab['fields']):
             label = QLabel()
             label.setObjectName('lbl_' + field['label'])
             label.setText(field['label'])
 
-            widget = add_checkbox(field)
+            widget = tools_qt.add_checkbox(field)
             widget.stateChanged.connect(partial(set_selection_mode, dialog, widget, selection_mode, selector_vars))
             widget.setLayoutDirection(Qt.RightToLeft)
 
             field['layoutname'] = gridlayout.objectName()
             field['layoutorder'] = order + i
-            put_widgets(dialog, field, label, widget)
+            tools_qt.put_widgets(dialog, field, label, widget)
 
         vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         gridlayout.addItem(vertical_spacer1)
@@ -195,7 +194,7 @@ def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=N
             index = dialog.main_tab.currentIndex()
             tab_name = dialog.main_tab.widget(index).objectName()
             value = selector_vars[f"var_txt_filter_{tab_name}"]
-            setWidgetText(dialog, widget, f'{value}')
+            tools_qt.setWidgetText(dialog, widget, f'{value}')
             widget.blockSignals(False)
 
 
@@ -220,7 +219,7 @@ def set_selection_mode(dialog, widget, selection_mode, selector_vars):
         is_alone = True
         if widget_all is not None:
             widget_all.blockSignals(True)
-            setChecked(dialog, widget_all, False)
+            tools_qt.setChecked(dialog, widget_all, False)
             widget_all.blockSignals(False)
         remove_previuos(dialog, widget, widget_all, widget_list)
 
@@ -243,14 +242,14 @@ def set_selector(dialog, widget, is_alone, selector_vars):
 
     if widget_all is None or (widget_all is not None and widget.objectName() != widget_all.objectName()):
         extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", '
-                  f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{widget.isChecked()}", '
+                  f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{widget.tools_qt.isChecked()}", '
                   f'"addSchema":"{qgis_project_add_schema}"')
     else:
-        check_all = isChecked(dialog, widget_all)
+        check_all = tools_qt.isChecked(dialog, widget_all)
         extras = f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "checkAll":"{check_all}",  ' \
             f'"addSchema":"{qgis_project_add_schema}"'
 
-    body = create_body(extras=extras)
+    body = tools_giswater.create_body(extras=extras)
     json_result = global_vars.controller.get_json('gw_fct_setselectors', body)
 
     if str(tab_name) == 'tab_exploitation':
@@ -275,8 +274,8 @@ def set_selector(dialog, widget, is_alone, selector_vars):
 
     get_selector(dialog, f'"{selector_type}"', is_setselector=json_result, selector_vars=selector_vars)
 
-    widget_filter = getWidget(dialog, f"txt_filter_{tab_name}")
-    if widget_filter and getWidgetText(dialog, widget_filter, False, False) not in (None, ''):
+    widget_filter = tools_qt.getWidget(dialog, f"txt_filter_{tab_name}")
+    if widget_filter and tools_qt.getWidgetText(dialog, widget_filter, False, False) not in (None, ''):
         widget_filter.textChanged.emit(widget_filter.text())
 
 
@@ -295,12 +294,12 @@ def remove_previuos(dialog, widget, widget_all, widget_list):
                 continue
             elif checkbox.objectName() != widget.objectName():
                 checkbox.blockSignals(True)
-                setChecked(dialog, checkbox, False)
+                tools_qt.setChecked(dialog, checkbox, False)
                 checkbox.blockSignals(False)
 
         elif checkbox.objectName() != widget.objectName():
             checkbox.blockSignals(True)
-            setChecked(dialog, checkbox, False)
+            tools_qt.setChecked(dialog, checkbox, False)
             checkbox.blockSignals(False)
 
 
@@ -308,7 +307,7 @@ def manage_filter(dialog, widget, action, selector_vars):
     index = dialog.main_tab.currentIndex()
     tab_name = dialog.main_tab.widget(index).objectName()
     if action == 'save':
-        selector_vars[f"var_txt_filter_{tab_name}"] = getWidgetText(dialog, widget)
+        selector_vars[f"var_txt_filter_{tab_name}"] = tools_qt.getWidgetText(dialog, widget)
     else:
         selector_vars[f"var_txt_filter_{tab_name}"] = ''
 

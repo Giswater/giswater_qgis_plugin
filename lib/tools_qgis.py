@@ -17,8 +17,8 @@ import os.path
 from functools import partial
 
 from .. import global_vars
-from ..core.utils.tools_giswater import enable_feature_type, tab_feature_changed, check_expression
-from .tools_qt import apply_lazy_init, reload_table, reload_qtable, getWidgetText
+from ..core.utils import tools_giswater
+from . import tools_qt
 
 
 def get_value_from_metadata(parameter, default_value):
@@ -670,7 +670,7 @@ def selection_init(dialog, table_object, query=False, geom_type=None, layers=Non
     """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
     from actions.multiple_selection import MultipleSelection
-    geom_type = tab_feature_changed(dialog, table_object)
+    geom_type = tools_giswater.tab_feature_changed(dialog, table_object)
     if geom_type in ('all', None):
         geom_type = 'arc'
     multiple_selection = MultipleSelection(layers, geom_type, parent_manage=None,
@@ -724,7 +724,7 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
         expr_filter = expr_filter[:-2] + ")"
 
         # Check expression
-        (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = tools_giswater.check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
 
@@ -735,15 +735,15 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
         insert_feature_to_plan(dialog, geom_type, ids=ids)
         if plan_om == 'plan':
             layers = remove_selection()
-        reload_qtable(dialog, geom_type)
+        tools_qt.reload_qtable(dialog, geom_type)
     else:
-        reload_table(dialog, table_object, geom_type, expr_filter)
-        apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
+        tools_qt.reload_table(dialog, table_object, geom_type, expr_filter)
+        tools_qt.apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Remove selection in generic 'v_edit' layers
     if plan_om == 'plan':
         layers = remove_selection(False)
-    enable_feature_type(dialog, table_object, ids=ids)
+    tools_giswater.enable_feature_type(dialog, table_object, ids=ids)
     connect_signal_selection_changed(dialog, table_object, geom_type)
 
     return ids, layers, list_ids
@@ -778,18 +778,18 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
     disconnect_signal_selection_changed()
 
     if geom_type in ('all', None):
-        geom_type = tab_feature_changed(dialog, table_object)
+        geom_type = tools_giswater.tab_feature_changed(dialog, table_object)
 
     # Clear list of ids
     if remove_ids:
         ids = []
 
     field_id = f"{geom_type}_id"
-    feature_id = getWidgetText(dialog, "feature_id")
+    feature_id = tools_qt.getWidgetText(dialog, "feature_id")
     expr_filter = f"{field_id} = '{feature_id}'"
 
     # Check expression
-    (is_valid, expr) = check_expression(expr_filter)
+    (is_valid, expr) = tools_giswater.check_expression(expr_filter)
     if not is_valid:
         return None
 
@@ -822,7 +822,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
     expr_filter = expr_filter[:-2] + ")"
 
     # Check expression
-    (is_valid, expr) = check_expression(expr_filter)
+    (is_valid, expr) = tools_giswater.check_expression(expr_filter)
     if not is_valid:
         return
 
@@ -839,12 +839,12 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
         insert_feature_to_plan(dialog, geom_type, ids=ids)
         layers = remove_selection()
     else:
-        reload_table(dialog, table_object, geom_type, expr_filter)
-        apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
+        tools_qt.reload_table(dialog, table_object, geom_type, expr_filter)
+        tools_qt.apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Update list
     list_ids[geom_type] = ids
-    enable_feature_type(dialog, table_object, ids=ids)
+    tools_giswater.enable_feature_type(dialog, table_object, ids=ids)
     connect_signal_selection_changed(dialog, table_object, geom_type)
 
     global_vars.controller.log_info(list_ids[geom_type])
@@ -855,7 +855,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
 def insert_feature_to_plan(dialog, geom_type, ids=None):
     """ Insert features_id to table plan_@geom_type_x_psector """
 
-    value = getWidgetText(dialog, dialog.psector_id)
+    value = tools_qt.getWidgetText(dialog, dialog.psector_id)
     for i in range(len(ids)):
         sql = (f"SELECT {geom_type}_id "
                f"FROM plan_psector_x_{geom_type} "
@@ -865,7 +865,7 @@ def insert_feature_to_plan(dialog, geom_type, ids=None):
             sql = (f"INSERT INTO plan_psector_x_{geom_type}"
                    f"({geom_type}_id, psector_id) VALUES('{ids[i]}', '{value}')")
             global_vars.controller.execute_sql(sql)
-        reload_qtable(dialog, geom_type)
+        tools_qt.reload_qtable(dialog, geom_type)
 
 
 def disconnect_snapping():
