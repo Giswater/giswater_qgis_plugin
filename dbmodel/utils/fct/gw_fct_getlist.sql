@@ -455,7 +455,11 @@ BEGIN
 
 	FOREACH aux_json IN ARRAY v_footer_fields
 	LOOP
-		v_filter_fields[v_i+2] := json_build_object('type','button','label', aux_json->>'label' ,'widgetAction',  aux_json->>'widgetfunction', 'position','footer');
+		IF v_device IN (1,2,3) THEN
+			v_filter_fields[v_i+2] := json_build_object('type',aux_json->>'type','label', aux_json->>'label' ,'widgetAction',  aux_json->>'widgetAction', 'position',aux_json->>'position');
+		ELSE
+			v_filter_fields[v_i+2] := json_build_object('widgettype',aux_json->>'widgettype','label', aux_json->>'label' ,'widgetfunction',  aux_json->>'widgetfunction', 'layoutname',aux_json->>'layoutname', 'layoutorder',aux_json->>'layoutorder');
+		END IF;
 		v_i=v_i+1;
 
 	END LOOP;
