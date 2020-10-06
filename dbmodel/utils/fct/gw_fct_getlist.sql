@@ -444,7 +444,7 @@ BEGIN
 
 	-- setting new element
 	IF v_device = 4 THEN
-		v_filter_fields[v_i+1] := json_build_object('widgettype',v_listclass,'datatype','icon','columnname','fileList','orderby', v_i+3, 'position','body', 'value', SCHEMA_NAME);
+		v_filter_fields[v_i+1] := json_build_object('widgettype',v_listclass,'datatype','icon','columnname','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	ELSE
 		v_filter_fields[v_i+1] := json_build_object('type',v_listclass,'dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	END IF;
