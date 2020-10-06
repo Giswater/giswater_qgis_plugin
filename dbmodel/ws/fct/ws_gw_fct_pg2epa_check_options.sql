@@ -20,10 +20,8 @@ DECLARE
 
 v_fid integer;
 v_version text;
-v_record record;
 v_project_type text;
 v_count	integer;
-v_count_2 integer;
 v_result_id text;
 v_networkmode integer;
 v_patternmethod integer;
@@ -67,6 +65,33 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 3, 'Change the pattern method using some of the (NODE) method avaliable or change export network USING some of NOT TRIMED ARCS method avaliable.');
 			v_return = '{"status":"Failed", "message":{"level":1, "text":"Pattern method and network mode are incompatibles. The process is aborted...."},"body":{"data":{}}}'; 
+		END IF;
+	END IF;
+
+	-- check demand scenario compatibility
+	IF (SELECT count(*) FROM selector_inp_demand WHERE cur_user = current_user) > 0 THEN
+
+		-- check not allowed pattern method
+		IF v_patternmethod IN (32,34,42,44,52,54) THEN 
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, concat('ERROR: The pattern method used, it is incompatible with use demand scenario.'));
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, 'Unselect all your demand scenarios to work with this pattern method.');
+			v_return = '{"status":"Failed", "message":{"level":1, "text":"Pattern method is incompatible to work with demand scenarios. The process is aborted...."},"body":{"data":{}}}'; 
+		END IF;
+
+		-- check inconsistency on demand scenario: More than one connec with same link and different pattern on inp_demand table
+		IF v_patternmethod IN (21,22,23) THEN
+			v_count = (SELECT sum(count) FROM 
+			(SELECT count(*),exit_id FROM (SELECT exit_id, count(*) as times , pattern_id FROM vi_demands JOIN v_edit_link USING (feature_id) GROUP BY exit_id, pattern_id HAVING count(*) > 1 order by 1 desc) a GROUP by exit_id)b
+			WHERE count > 1);
+		
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				VALUES (v_fid, v_result_id, 2, concat('WARNING: There are ',v_count,' vnodes with more than one connec with same link and different pattern on inp_demand table'));
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				VALUES (v_fid, v_result_id, 2, 'Unselect all your demand scenarios to work with this pattern method.');
+			END IF;
 		END IF;
 	END IF;
 

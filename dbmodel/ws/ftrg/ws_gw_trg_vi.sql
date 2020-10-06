@@ -94,7 +94,7 @@ BEGIN
 	    INSERT INTO inp_tags(object, node_id, tag) VALUES (NEW.object, NEW.node_id, NEW.tag);
 	    
 	  ELSIF v_view='vi_demands' THEN 
-	    INSERT INTO inp_demand (node_id, demand, pattern_id, deman_type) VALUES (NEW.node_id, NEW.demand, NEW.pattern_id, NEW.deman_type);
+	    INSERT INTO inp_demand (feature_id, demand, pattern_id, demand_type) VALUES (NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.demand_type);
 	      
 	  ELSIF v_view='vi_status' THEN
 	    IF NEW.arc_id IN (SELECT arc_id FROM inp_pump_importinp) THEN

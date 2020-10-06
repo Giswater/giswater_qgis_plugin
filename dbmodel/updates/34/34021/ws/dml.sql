@@ -46,3 +46,12 @@ ON CONFLICT (parameter) DO NOTHING;
 
 UPDATE config_form_fields SET iseditable=FALSE WHERE columnname IN ('nodetype_1', 'nodetype_2', 'elevation1', 'elevation2', 'depth1', 'depth2') AND formname like 've_arc%';
 
+-- 2020/10/06
+UPDATE inp_demand SET feature_type = 'NODE';
+
+UPDATE inp_typevalue SET idval = 'ALWAYS OVERWRITE DEMAND & PATT' WHERE typevalue = 'inp_options_dscenario_priority' AND id = '1';
+UPDATE inp_typevalue SET idval = 'ONLY OVERWRITE NULL DEMANDS' WHERE typevalue = 'inp_options_dscenario_priority' AND id = '2';
+UPDATE inp_typevalue SET idval = 'JOIN DEMANDS & OVERWRITE PATT' WHERE typevalue = 'inp_options_dscenario_priority' AND id = '3';
+
+
+

@@ -112,3 +112,105 @@ CREATE OR REPLACE VIEW v_edit_vnode AS
              LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
           WHERE link.feature_id::text = v_state_connec.connec_id::text) a
   WHERE a.state > 0;
+  
+  
+-- 2020/10/06  
+DROP VIEW IF EXISTS vi_demands; 
+CREATE OR REPLACE VIEW vi_demands AS 
+SELECT inp_demand.feature_id,
+    inp_demand.demand,
+    inp_demand.pattern_id,
+    inp_demand.demand_type,
+    inp_demand.feature_type
+   FROM selector_inp_demand, inp_demand
+  WHERE  selector_inp_demand.dscenario_id::text = inp_demand.dscenario_id::text AND selector_inp_demand.cur_user = "current_user"()::text
+ORDER BY 1;
+
+
+CREATE OR REPLACE VIEW vi_curves AS 
+SELECT
+        CASE
+            WHEN a.x_value IS NULL THEN a.curve_type::character varying(16)
+            ELSE a.curve_id
+        END AS curve_id,
+    a.x_value::numeric(12,4) AS x_value,
+    a.y_value::numeric(12,4) AS y_value,
+    NULL::text AS other
+   FROM ( 
+
+   SELECT DISTINCT ON (inp_curve_value.curve_id) ( SELECT min(sub.id) AS min
+                   FROM inp_curve_value sub
+                  WHERE sub.curve_id::text = inp_curve_value.curve_id::text) AS id,
+            inp_curve_value.curve_id,
+            concat(';', inp_curve.curve_type, ':', inp_curve.descript) AS curve_type,
+            NULL::numeric AS x_value,
+            NULL::numeric AS y_value
+           FROM inp_curve
+             JOIN inp_curve_value ON inp_curve_value.curve_id::text = inp_curve.id::text
+        UNION
+         SELECT inp_curve_value.id,
+            inp_curve_value.curve_id,
+            inp_curve.curve_type,
+            inp_curve_value.x_value,
+            inp_curve_value.y_value
+           FROM inp_curve_value
+             JOIN inp_curve ON inp_curve_value.curve_id::text = inp_curve.id::text
+  ORDER BY 1, 4 DESC
+  ) a
+  WHERE (a.curve_id::text IN ( SELECT vi_tanks.curve_id FROM vi_tanks)) OR 
+        (concat('HEAD ', a.curve_id) IN ( SELECT vi_pumps.head FROM vi_pumps)) OR 
+        (a.curve_id::text IN ( SELECT vi_valves.setting FROM vi_valves)) OR 
+        (a.curve_id::text IN ( SELECT vi_energy.energyvalue FROM vi_energy  WHERE vi_energy.idval::text = 'EFFIC'::text)) OR 
+          ((( SELECT config_param_user.value FROM config_param_user WHERE config_param_user.parameter::text = 'inp_options_buildup_mode'::text AND config_param_user.cur_user::name = "current_user"()))::integer) = 1;
+
+
+
+CREATE OR REPLACE VIEW vi_pumps AS 
+SELECT * FROM (
+SELECT temp_arc.arc_id,
+    temp_arc.node_1,
+    temp_arc.node_2,
+        CASE
+            WHEN (temp_arc.addparam::json ->> 'power'::text) <> ''::text THEN ('POWER'::text || ' '::text) || (temp_arc.addparam::json ->> 'power'::text)
+            ELSE NULL::text
+        END AS power,
+        CASE
+            WHEN (temp_arc.addparam::json ->> 'curve_id'::text) <> ''::text THEN ('HEAD'::text || ' '::text) || (temp_arc.addparam::json ->> 'curve_id'::text)
+            ELSE NULL::text
+        END AS head,
+        CASE
+            WHEN (temp_arc.addparam::json ->> 'speed'::text) <> ''::text THEN ('SPEED'::text || ' '::text) || (temp_arc.addparam::json ->> 'speed'::text)
+            ELSE NULL::text
+        END AS speed,
+        CASE
+            WHEN (temp_arc.addparam::json ->> 'pattern'::text) <> ''::text THEN ('PATTERN'::text || ' '::text) || (temp_arc.addparam::json ->> 'pattern'::text)
+            ELSE NULL::text
+        END AS pattern
+   FROM selector_inp_result, temp_arc
+  WHERE temp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text)a
+WHERE power IS NOT NULL OR head IS NOT NULL OR speed IS NOT NULL or pattern IS NOT NULL;
+
+
+DROP VIEW IF EXISTS v_edit_inp_demand;
+CREATE OR REPLACE VIEW v_edit_inp_demand AS 
+ SELECT inp_demand.id,
+    inp_demand.feature_id,
+    inp_demand.demand,
+    inp_demand.pattern_id,
+    inp_demand.demand_type,
+    inp_demand.dscenario_id
+   FROM selector_sector, selector_inp_demand, inp_demand
+    JOIN v_node ON v_node.node_id::text = inp_demand.feature_id::text
+  WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_demand.dscenario_id = selector_inp_demand.dscenario_id AND selector_inp_demand.cur_user = "current_user"()::text
+
+  UNION
+ SELECT inp_demand.id,
+    inp_demand.feature_id,
+    inp_demand.demand,
+    inp_demand.pattern_id,
+    inp_demand.demand_type,
+    inp_demand.dscenario_id
+   FROM selector_sector, selector_inp_demand, inp_demand
+    JOIN v_connec ON v_connec.connec_id::text = inp_demand.feature_id::text
+  WHERE v_connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_demand.dscenario_id = selector_inp_demand.dscenario_id AND selector_inp_demand.cur_user = "current_user"()::text;
+
