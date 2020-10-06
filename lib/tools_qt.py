@@ -5,14 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import os
-import operator
-import global_vars
-import re
-import sys
-import subprocess
-import webbrowser
-
 from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, QSettings
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator, QFontMetrics, QStandardItemModel, \
@@ -21,13 +13,21 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, \
     QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, QPlainTextEdit, \
     QRadioButton, QFrame, QSizePolicy, QSpacerItem, QGridLayout, QToolButton, QApplication, QFileDialog, QGroupBox
+
+import os
+import operator
+import global_vars
+import re
+import sys
+import subprocess
+import webbrowser
 from functools import partial
 
-from core.utils.hyperlink_label import GwHyperLinkLabel
-from core.utils.tools_giswater import enable_feature_type, create_body, tab_feature_changed, check_expression, \
+from ..core.utils.hyperlink_label import GwHyperLinkLabel
+from ..core.utils.tools_giswater import enable_feature_type, create_body, tab_feature_changed, check_expression, \
     close_dialog, hide_generic_layers, reset_lists
-from lib.tools_db import set_selector
-from lib.tools_qgis import disconnect_signal_selection_changed, select_features_by_ids, remove_selection, \
+from .tools_db import set_selector
+from .tools_qgis import disconnect_signal_selection_changed, select_features_by_ids, remove_selection, \
     connect_signal_selection_changed, disconnect_snapping, refresh_map_canvas
 
 

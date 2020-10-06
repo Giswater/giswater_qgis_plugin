@@ -5,18 +5,19 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import global_vars
-from functools import partial
-
 from qgis.PyQt.QtWidgets import QTabWidget
 from qgis.PyQt.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QSizePolicy, QCheckBox, QSpacerItem, \
     QApplication
 from qgis.PyQt.QtCore import Qt
 
-from lib.tools_qt import getWidgetText, getWidget, put_widgets, manage_all, add_checkbox, setWidgetText, setChecked, \
+from functools import partial
+
+from .. import global_vars
+from .tools_qt import getWidgetText, getWidget, put_widgets, manage_all, add_checkbox, setWidgetText, setChecked, \
     isChecked
-from lib.tools_qgis import zoom_to_rectangle
-from core.utils.tools_giswater import create_body
+from .tools_qgis import zoom_to_rectangle
+from ..core.utils.tools_giswater import create_body
+
 
 def get_visible_layers(as_list=False):
     """ Return string as {...} or [...] with name of table in DB of all visible layer in TOC """

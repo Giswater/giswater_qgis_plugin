@@ -5,11 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import configparser
-import os.path
-import global_vars
-from functools import partial
-
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsSnappingConfig, QgsVectorLayer, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsExpression, QgsRectangle
 from qgis.PyQt.QtWidgets import QDockWidget, QApplication
@@ -17,8 +12,14 @@ from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QPixmap
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint
 
-from core.utils.tools_giswater import enable_feature_type, tab_feature_changed, check_expression
-from lib.tools_qt import apply_lazy_init, reload_table, reload_qtable, getWidgetText
+import configparser
+import os.path
+from functools import partial
+
+from .. import global_vars
+from ..core.utils.tools_giswater import enable_feature_type, tab_feature_changed, check_expression
+from .tools_qt import apply_lazy_init, reload_table, reload_qtable, getWidgetText
+
 
 def get_value_from_metadata(parameter, default_value):
     """ Get @parameter from metadata.txt file """
