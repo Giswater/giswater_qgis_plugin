@@ -288,19 +288,6 @@ class GwVisitManager:
             self.manage_visit(visit_id=selected_object_id)
 
 
-    def zoom_box(self, box):
-        # When it is a point, and only one, it must be converted into a rectangle to be able to zoom
-        if not box.isNull():
-            if box.xMinimum() == box.xMaximum() and box.yMinimum() == box.yMaximum():
-                box.setXMaximum(box.xMaximum() + 0.0001)
-                box.setYMaximum(box.yMaximum() + 0.0001)
-                box.setXMaximum(box.xMinimum() + 0.0001)
-                box.setYMaximum(box.yMinimum() + 0.0001)
-            box.set(box.xMinimum() - 10, box.yMinimum() - 10, box.xMaximum() + 10, box.yMaximum() + 10)
-            self.iface.mapCanvas().setExtent(box)
-            self.iface.mapCanvas().refresh()
-
-
     def set_signals(self):
 
         self.dlg_add_visit.rejected.connect(self.manage_rejected)

@@ -649,20 +649,6 @@ def mouse_move(vertex_marker, point):
         vertex_marker.hide()
 
 
-def mouse_move(vertex_marker, point):
-
-    # Hide marker and get coordinates
-    vertex_marker.hide()
-    event_point = get_event_point(point=point)
-
-    # Snapping
-    result = snap_to_background_layers(event_point)
-    if result.isValid():
-        add_marker(result, vertex_marker)
-    else:
-        vertex_marker.hide()
-
-
 def get_xy(vertex_marker, return_point, emit_point, point):
     """ Get coordinates of selected point """
 
