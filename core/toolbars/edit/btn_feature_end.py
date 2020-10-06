@@ -115,7 +115,7 @@ class GwEndFeatureButton(GwParentAction):
         self.fill_fields()
 
         # Adding auto-completion to a QLineEdit for default feature
-        set_completer_widget(viewname, self.dlg_work_end.feature_id, concat(str(geom_type), "_id"))
+        set_completer_widget(viewname, self.dlg_work_end.feature_id, str(geom_type) + "_id")
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)

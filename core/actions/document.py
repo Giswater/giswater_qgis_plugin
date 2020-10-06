@@ -112,7 +112,7 @@ class GwDocument:
         if geom_type is None:
             geom_type = "arc"
         viewname = f"v_edit_{geom_type}"
-        set_completer_widget(viewname, self.dlg_add_doc.feature_id, concat(str(geom_type), "_id"))
+        set_completer_widget(viewname, self.dlg_add_doc.feature_id, str(geom_type) + "_id")
 
         # Set signals
         self.dlg_add_doc.btn_path_url.clicked.connect(partial(self.open_web_browser, self.dlg_add_doc, "path"))

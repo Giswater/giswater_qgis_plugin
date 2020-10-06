@@ -462,7 +462,7 @@ class GwPsector:
 
         # Adding auto-completion to a QLineEdit for default feature
         viewname = "v_edit_" + self.geom_type
-        set_completer_widget(viewname, self.dlg_plan_psector.feature_id, concat(str(self.geom_type),"_id"))
+        set_completer_widget(viewname, self.dlg_plan_psector.feature_id, str(self.geom_type) + "_id")
 
         # Set default tab 'arc'
         self.dlg_plan_psector.tab_feature.setCurrentIndex(0)

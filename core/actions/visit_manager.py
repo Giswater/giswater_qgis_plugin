@@ -763,7 +763,7 @@ class GwVisitManager:
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
-        set_completer_widget(viewname, self.dlg_add_visit.feature_id, concat(str(self.geom_type),"_id"))
+        set_completer_widget(viewname, self.dlg_add_visit.feature_id, str(self.geom_type) + "_id")
 
 
     def config_relation_table(self, dialog):
@@ -807,7 +807,7 @@ class GwVisitManager:
             return
 
         viewname = f"v_edit_{geom_type}"
-        set_completer_widget(viewname, dialog.feature_id, concat(str(geom_type),"_id"))
+        set_completer_widget(viewname, dialog.feature_id, str(geom_type) + "_id")
 
         # set table model and completer
         # set a fake where expression to avoid to set model to None
@@ -1700,7 +1700,7 @@ class GwVisitManager:
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
-        set_completer_widget(viewname, dialog.feature_id, concat(str(self.geom_type), "_id"))
+        set_completer_widget(viewname, dialog.feature_id, str(self.geom_type) + "_id")
         self.ids, self.layers, self.list_ids = selection_changed(dialog, widget_table, self.geom_type, False,
                                                                  layers=self.layers, list_ids=self.list_ids,
                                                                  lazy_widget=self.lazy_widget,
