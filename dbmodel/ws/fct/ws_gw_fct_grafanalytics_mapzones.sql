@@ -537,13 +537,14 @@ BEGIN
 							(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id,
 							json_array_elements_text((json_array_elements_text((grafconfig->>''use'')::json)::json->>''toArc'')::json) as arc_id, dma_id FROM dma) b
 							USING (node_id, arc_id)
-							LIMIT 1';
+							LIMIT 1'
+							INTO v_floodfromnode;
 							
 						-- update results
 						UPDATE anl_arc SET descript = v_floodfromnode WHERE fid = v_fid;
 						UPDATE anl_node SET descript = v_floodfromnode WHERE fid = v_fid;
 
-					END IF;				
+					END IF;			
 
 					-- update arc table
 					v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' FROM anl_arc a JOIN 
