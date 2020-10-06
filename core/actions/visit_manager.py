@@ -35,6 +35,7 @@ from ...lib.tools_qgis import remove_selection, add_point, selection_init, selec
 from ...lib.tools_qt import delete_records, fill_table_object, delete_selected_object, set_selectionbehavior, set_icon, \
     set_dates_from_to, document_open, document_delete, set_table_model, set_completer_object, set_table_columns, \
     set_completer_widget
+from ...lib import tools_qt
 
 
 class GwVisitManager:

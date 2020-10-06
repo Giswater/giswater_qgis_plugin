@@ -15,7 +15,7 @@ from datetime import datetime
 
 from ....lib import tools_qt
 from ...toolbars.parent_dialog import GwParentAction
-from ...utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers, tab_feature_changed
+from ...utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers, tab_feature_changed, create_body
 from ...ui.ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
 from ....lib.tools_qgis import remove_selection, selection_init, disconnect_snapping, disconnect_signal_selection_changed, \
     insert_feature

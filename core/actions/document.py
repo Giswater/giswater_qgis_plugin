@@ -91,8 +91,8 @@ class GwDocument:
 
         # Set current/selected date and link
         if row:
-            qt_tools.setCalendarDate(self.dlg_add_doc, 'date', row.value('date'))
-            qt_tools.setWidgetText(self.dlg_add_doc, 'path', row.value('path'))
+            setCalendarDate(self.dlg_add_doc, 'date', row.value('date'))
+            setWidgetText(self.dlg_add_doc, 'path', row.value('path'))
             self.files_path.append(row.value('path'))
         else:
             setCalendarDate(self.dlg_add_doc, 'date', None)
@@ -156,7 +156,8 @@ class GwDocument:
 
     def activate_relations(self):
         """ Force user to set doc_id and doc_type """
-        doc_type = qt_tools.getWidgetText(self.dlg_add_doc, self.dlg_add_doc.doc_type, False, False)
+
+        doc_type = getWidgetText(self.dlg_add_doc, self.dlg_add_doc.doc_type, False, False)
 
         if doc_type in (None, '', 'null'):
             self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
@@ -180,11 +181,11 @@ class GwDocument:
         """ Insert or update table 'document'. Add document to selected feature """
 
         # Get values from dialog
-        doc_id = qt_tools.getWidgetText(self.dlg_add_doc, "doc_id", False, False)
-        doc_type = qt_tools.getWidgetText(self.dlg_add_doc, "doc_type", False, False)
-        date = qt_tools.getCalendarDate(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
-        path = qt_tools.getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
-        observ = qt_tools.getWidgetText(self.dlg_add_doc, "observ", False, False)
+        doc_id = getWidgetText(self.dlg_add_doc, "doc_id", False, False)
+        doc_type = getWidgetText(self.dlg_add_doc, "doc_type", False, False)
+        date = getCalendarDate(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
+        path = getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
+        observ = getWidgetText(self.dlg_add_doc, "observ", False, False)
 
         if doc_type in (None, ''):
             message = "You need to insert doc_type"

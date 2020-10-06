@@ -11,6 +11,7 @@ from .info import GwInfo
 from .element import GwElement
 from .document import GwDocument
 from ... import global_vars
+from ...map_tools.snapping_utils_v3 import SnappingConfigManager
 
 
 class GwEdit:
