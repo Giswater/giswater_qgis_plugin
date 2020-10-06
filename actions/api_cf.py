@@ -202,8 +202,6 @@ class ApiCF(ApiParent, QObject):
         qgis_project_infotype = self.controller.plugin_settings_value('gwInfoType')
         qgis_project_role = self.controller.plugin_settings_value('gwProjectRole')
 
-        self.new_feature = new_feature
-
         if self.iface.activeLayer() is None or type(self.iface.activeLayer()) != QgsVectorLayer:
             active_layer = ""
         else:
@@ -328,7 +326,7 @@ class ApiCF(ApiParent, QObject):
                 else:
                     sub_tag = 'node'
             feature_id = self.complet_result[0]['body']['feature']['id']
-            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker)
+            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker, new_feature=new_feature)
             if feature_cat:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
@@ -405,7 +403,7 @@ class ApiCF(ApiParent, QObject):
         return result, self.hydro_info_dlg
 
 
-    def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True):
+    def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None):
 
         # Dialog
         self.dlg_cf = InfoFeatureUi(sub_tag)
@@ -418,7 +416,7 @@ class ApiCF(ApiParent, QObject):
 
         # Get widget controls
         self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
-        self.tab_main.currentChanged.connect(partial(self.tab_activation, self.dlg_cf))
+        self.tab_main.currentChanged.connect(partial(self.tab_activation, self.dlg_cf, new_feature))
         self.tbl_element = self.dlg_cf.findChild(QTableView, "tbl_element")
         utils_giswater.set_qtv_config(self.tbl_element)
         self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
@@ -541,7 +539,7 @@ class ApiCF(ApiParent, QObject):
         for field in complet_result[0]['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
-            label, widget = self.set_widgets(self.dlg_cf, complet_result, field)
+            label, widget = self.set_widgets(self.dlg_cf, complet_result, field, new_feature)
             if widget is None:
                 continue
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
@@ -574,43 +572,45 @@ class ApiCF(ApiParent, QObject):
 
         # Set variables
         self.filter = str(complet_result[0]['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
-
-        if self.layer:
-            if self.layer.isEditable():
-                self.enable_all(self.dlg_cf, result)
+        dlg_cf = self.dlg_cf
+        layer = self.layer
+        fid = self.feature_id
+        my_json = self.my_json
+        if layer:
+            if layer.isEditable():
+                self.enable_all(dlg_cf, result)
             else:
-                self.disable_all(self.dlg_cf, result, False)
+                self.disable_all(dlg_cf, result, False)
 
         # We assign the function to a global variable,
         # since as it receives parameters we will not be able to disconnect the signals
-        self.fct_start_editing = lambda: self.start_editing(self.dlg_cf, action_edit, complet_result[0]['body']['data'], self.layer)
-        self.fct_stop_editing = lambda: self.stop_editing(self.dlg_cf, action_edit, complet_result[0]['body']['data'], self.layer)
-        self.layer.editingStarted.connect(self.fct_start_editing)
-        self.layer.editingStopped.connect(self.fct_stop_editing)
-        self.enable_actions(self.dlg_cf, self.layer.isEditable())
+        self.fct_start_editing = lambda: self.start_editing(dlg_cf, action_edit, complet_result[0]['body']['data'], layer)
+        self.fct_stop_editing = lambda: self.stop_editing(dlg_cf, action_edit, complet_result[0]['body']['data'], layer, fid, my_json, new_feature)
+        layer.editingStarted.connect(self.fct_start_editing)
+        layer.editingStopped.connect(self.fct_stop_editing)
+        self.enable_actions(dlg_cf, layer.isEditable())
 
-        action_edit.setChecked(self.layer.isEditable())
+        action_edit.setChecked(layer.isEditable())
 
         # Actions signals
-
-        action_edit.triggered.connect(partial(self.manage_edition, self.dlg_cf, action_edit, complet_result[0]['body']['data'], self.layer))
+        action_edit.triggered.connect(partial(self.manage_edition, dlg_cf, action_edit, complet_result[0]['body']['data'], layer, fid, my_json, new_feature))
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
-        action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_arc_id, 'arc'))
-        action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_parent_id, 'node'))
-        action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.canvas, self.layer))
-        action_centered.triggered.connect(partial(self.api_action_centered, self.canvas, self.layer))
-        action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, self.layer))
-        action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, self.dlg_cf, self.geom_type, tab_type))
-        action_rotation.triggered.connect(partial(self.action_rotation, self.dlg_cf))
-        action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
+        action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id, 'arc'))
+        action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_parent_id, 'node'))
+        action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.canvas, layer))
+        action_centered.triggered.connect(partial(self.api_action_centered, self.canvas, layer))
+        action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, layer))
+        action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, dlg_cf, self.geom_type, tab_type))
+        action_rotation.triggered.connect(partial(self.action_rotation, dlg_cf))
+        action_link.triggered.connect(partial(self.action_open_url, dlg_cf, result))
         action_section.triggered.connect(partial(self.open_section_form))
         action_help.triggered.connect(partial(self.api_action_help, self.geom_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
         action_interpolate.triggered.connect(partial(self.activate_snapping, complet_result, self.ep))
 
-        btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
-        btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
+        btn_cancel = dlg_cf.findChild(QPushButton, 'btn_cancel')
+        btn_accept = dlg_cf.findChild(QPushButton, 'btn_accept')
         title = f"{complet_result[0]['body']['feature']['childType']} - {self.feature_id}"
 
         if self.controller.dlg_docker and is_docker and self.controller.show_docker:
@@ -620,24 +620,24 @@ class ApiCF(ApiParent, QObject):
                 last_info.setParent(None)
                 del last_info
 
-            self.controller.dock_dialog(self.dlg_cf)
+            self.controller.dock_dialog(dlg_cf)
             self.controller.dlg_docker.dlg_closed.connect(partial(self.manage_docker_close))
             self.controller.dlg_docker.setWindowTitle(title)
             btn_cancel.clicked.connect(lambda: self.controller.dlg_docker.dlg_closed.emit())
         else:
-            self.dlg_cf.dlg_closed.connect(self.roll_back)
-            self.dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
-            self.dlg_cf.dlg_closed.connect(partial(self.save_settings, self.dlg_cf))
-            self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
-            self.dlg_cf.key_pressed.connect(partial(self.close_dialog, self.dlg_cf))
+            dlg_cf.dlg_closed.connect(self.roll_back)
+            dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
+            dlg_cf.dlg_closed.connect(partial(self.save_settings, dlg_cf))
+            dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
+            dlg_cf.key_pressed.connect(partial(self.close_dialog, dlg_cf))
 
-        btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_cf))
+        btn_cancel.clicked.connect(partial(self.close_dialog, dlg_cf))
         btn_cancel.clicked.connect(self.roll_back)
-        btn_accept.clicked.connect(partial(self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
-        self.dlg_cf.dlg_closed.connect(self.disconect_signals)
+        btn_accept.clicked.connect(partial(self.accept, dlg_cf, self.complet_result[0], my_json, new_feature=new_feature))
+        dlg_cf.dlg_closed.connect(self.disconect_signals)
 
         # Set title
-        toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
+        toolbox_cf = dlg_cf.findChild(QWidget, 'toolBox')
         row = self.controller.get_config('admin_customform_param', 'value', 'config_param_system')
         if row:
             results = json.loads(row[0], object_pairs_hook=OrderedDict)
@@ -645,10 +645,10 @@ class ApiCF(ApiParent, QObject):
                 toolbox_cf.setItemText(int(result['index']), result['text'])
 
         # Open dialog
-        self.open_dialog(self.dlg_cf, dlg_name='info_feature')
-        self.dlg_cf.setWindowTitle(title)
+        self.open_dialog(dlg_cf, dlg_name='info_feature')
+        dlg_cf.setWindowTitle(title)
 
-        return self.complet_result, self.dlg_cf
+        return self.complet_result, dlg_cf
 
 
     def close_dialog(self, dlg=None):
@@ -749,17 +749,16 @@ class ApiCF(ApiParent, QObject):
             pass
 
 
-    def manage_edition(self, dialog, action_edit, result, layer):
+    def manage_edition(self, dialog, action_edit, result, layer, fid, my_json, new_feature=None):
 
         if layer.isEditable():
-            self.stop_editing(dialog, action_edit, result, layer)
+            self.stop_editing(dialog, action_edit, result, layer, fid, my_json, new_feature)
         else:
             self.start_editing(dialog, action_edit, result, layer)
 
 
-    def stop_editing(self, dialog, action_edit, result, layer):
+    def stop_editing(self, dialog, action_edit, result, layer, fid, my_json, new_feature=None):
 
-        print(f"stop_editing")
         self.get_last_value()
         if self.my_json == '' or str(self.my_json) == '{}':
             self.disconect_signals()
@@ -771,9 +770,14 @@ class ApiCF(ApiParent, QObject):
             self.disable_all(dialog, result, False)
             self.enable_actions(dialog, False)
         else:
-            status = self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
+            msg = 'Are you sure to save this feature?'
+            answer = self.controller.ask_question(msg, "Save feature", None, parameter=fid)
+            if not answer:
+                self.check_actions(action_edit, True)
+                return
+            status = self.accept(dialog, self.complet_result[0], my_json, close_dialog=False, new_feature=new_feature)
             self.check_actions(action_edit, True)
-            if status is not False:  # Commit succesfull
+            if status is not False:  # Commit succesfull or dialog closed
                 self.check_actions(action_edit, False)
                 self.disable_all(dialog, result, False)
                 self.enable_actions(dialog, False)
@@ -781,7 +785,6 @@ class ApiCF(ApiParent, QObject):
 
     def start_editing(self, dialog, action_edit, result, layer):
 
-        print(f"start_editing")
         self.iface.setActiveLayer(layer)
         self.check_actions(action_edit, True)
         self.enable_all(dialog, result)
@@ -792,47 +795,6 @@ class ApiCF(ApiParent, QObject):
         layer.editingStopped.connect(self.fct_stop_editing)
 
 
-    def start_editing_2(self, action_edit, result, layer):
-        """ start or stop the edition based on your current status """
-
-        self.iface.setActiveLayer(layer)
-        layer_is_editable = layer.isEditable()
-        self.get_last_value()
-
-        if layer_is_editable is False:
-            print(f"TEST 10")
-            self.disconect_signals()
-            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
-            layer.editingStarted.connect(self.fct_start_editing)
-            layer.editingStopped.connect(self.fct_stop_editing)
-            self.check_actions(action_edit, True)
-            self.enable_all(self.dlg_cf, result)
-            self.enable_actions(True)
-            return
-
-        # If the json is empty, we simply activate/deactivate the editing
-        # else if editing is active, deactivate edition and save changes
-        if self.my_json == '' or str(self.my_json) == '{}':
-            print(f"TEST 20")
-            self.disconect_signals()
-            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
-            self.layer.editingStarted.connect(self.fct_start_editing)
-            self.layer.editingStopped.connect(self.fct_stop_editing)
-            self.check_actions(action_edit, False)
-            self.disable_all(self.dlg_cf, result, False)
-            self.enable_actions(False)
-            return
-
-        elif layer_is_editable is True:
-            print(f"TEST 30")
-            status = self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dialog=False)
-            self.check_actions(action_edit, True)
-            if status is not False:  # Commit succesfull
-                self.check_actions(action_edit, False)
-                self.disable_all(self.dlg_cf, result, False)
-                self.enable_actions(False)
-
-
     def roll_back(self):
         """ Discard changes in current layer """
 
@@ -841,11 +803,9 @@ class ApiCF(ApiParent, QObject):
             self.iface.actionRollbackEdits().trigger()
         except TypeError:
             pass
-        self.layer.editingStarted.connect(self.fct_start_editing)
-        self.layer.editingStopped.connect(self.fct_stop_editing)
 
 
-    def set_widgets(self, dialog, complet_result, field):
+    def set_widgets(self, dialog, complet_result, field, new_feature):
         """
         functions called in -> widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field):
             def manage_text(self, dialog, complet_result, field)
@@ -883,7 +843,7 @@ class ApiCF(ApiParent, QObject):
             return label, widget
 
         try:
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field, new_feature)
         except Exception as e:
             msg = f"{type(e).__name__}: {e}"
             self.controller.show_message(msg, 2)
@@ -892,7 +852,7 @@ class ApiCF(ApiParent, QObject):
         return label, widget
 
 
-    def manage_text(self, dialog, complet_result, field):
+    def manage_text(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
@@ -901,7 +861,7 @@ class ApiCF(ApiParent, QObject):
         widget = self.set_widget_size(widget, field)
         widget = self.set_min_max_values(widget, field)
         widget = self.set_reg_exp(widget, field)
-        widget = self.set_auto_update_lineedit(field, dialog, widget)
+        widget = self.set_auto_update_lineedit(field, dialog, widget, new_feature)
         widget = self.set_data_type(field, widget)
         widget = self.set_max_length(widget, field)
 
@@ -944,42 +904,42 @@ class ApiCF(ApiParent, QObject):
         return widget
 
 
-    def manage_typeahead(self, dialog, complet_result, field):
+    def manage_typeahead(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
         completer = QCompleter()
-        widget = self.manage_text(dialog, complet_result, field)
+        widget = self.manage_text(dialog, complet_result, field, new_feature)
         widget = self.manage_lineedit(field, dialog, widget, completer)
         return widget
 
 
-    def manage_combo(self, dialog, complet_result, field):
+    def manage_combo(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
         widget = self.add_combobox(field)
         widget = self.set_widget_size(widget, field)
-        widget = self.set_auto_update_combobox(field, dialog, widget)
+        widget = self.set_auto_update_combobox(field, dialog, widget, new_feature)
         return widget
 
 
-    def manage_check(self, dialog, complet_result, field):
+    def manage_check(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
         widget = self.add_checkbox(field)
         widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
-        widget = self.set_auto_update_checkbox(field, dialog, widget)
+        widget = self.set_auto_update_checkbox(field, dialog, widget, new_feature)
         return widget
 
 
-    def manage_datetime(self, dialog, complet_result, field):
+    def manage_datetime(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
         widget = self.add_calendar(dialog, field)
-        widget = self.set_auto_update_dateedit(field, dialog, widget)
+        widget = self.set_auto_update_dateedit(field, dialog, widget, new_feature)
         return widget
 
 
@@ -992,7 +952,7 @@ class ApiCF(ApiParent, QObject):
         return widget
 
 
-    def manage_hyperlink(self, dialog, complet_result, field):
+    def manage_hyperlink(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
@@ -1026,12 +986,12 @@ class ApiCF(ApiParent, QObject):
         return widget
 
 
-    def manage_spinbox(self, dialog, complet_result, field):
+    def manage_spinbox(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
         widget = self.add_spinbox(field)
-        widget = self.set_auto_update_spinbox(field, dialog, widget)
+        widget = self.set_auto_update_spinbox(field, dialog, widget, new_feature)
         return widget
 
 
@@ -1084,7 +1044,7 @@ class ApiCF(ApiParent, QObject):
         self.open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
 
 
-    def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dialog=True):
+    def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dialog=True, new_feature=None):
         """
         :param dialog:
         :param complet_result:
@@ -1099,7 +1059,7 @@ class ApiCF(ApiParent, QObject):
         self.disconect_signals()
 
         # Check if C++ object has been deleted
-        if isdeleted(self.dlg_cf):
+        if isdeleted(dialog):
             return False
 
         if _json == '' or str(_json) == '{}':
@@ -1120,9 +1080,9 @@ class ApiCF(ApiParent, QObject):
 
             if field['ismandatory']:
                 widget_name = 'data_' + field['columnname']
-                widget = self.dlg_cf.findChild(QWidget, widget_name)
+                widget = dialog.findChild(QWidget, widget_name)
                 widget.setStyleSheet(None)
-                value = utils_giswater.getWidgetText(self.dlg_cf, widget)
+                value = utils_giswater.getWidgetText(dialog, widget)
                 if value in ('null', None, ''):
                     widget.setStyleSheet("border: 1px solid red")
                     list_mandatory.append(widget_name)
@@ -1134,20 +1094,21 @@ class ApiCF(ApiParent, QObject):
             self.layer.editingStopped.connect(self.fct_stop_editing)
             return False
 
-        print(f"self.new_feature_id-->{self.new_feature_id}<--")
         # If we create a new feature
         if self.new_feature_id is not None:
             for k, v in list(_json.items()):
                 if k in parent_fields:
-                    self.new_feature.setAttribute(k, v)
+                    new_feature.setAttribute(k, v)
                     _json.pop(k, None)
+            if not self.layer_new_feature.isEditable():
+                self.layer_new_feature.startEditing()
+            self.layer_new_feature.updateFeature(new_feature)
 
-            self.layer_new_feature.updateFeature(self.new_feature)
             status = self.layer_new_feature.commitChanges()
-
+            self.layer_new_feature.startEditing()
             if status is False:
                 error = self.layer_new_feature.commitErrors()
-                self.controller.show_warning(error)
+                self.controller.show_warning(f"{error}")
                 self.layer.editingStarted.connect(self.fct_start_editing)
                 self.layer.editingStopped.connect(self.fct_stop_editing)
                 return False
@@ -1156,10 +1117,9 @@ class ApiCF(ApiParent, QObject):
             if my_json == '' or str(my_json) == '{}':
                 if self.controller.dlg_docker:
                     self.manage_docker_close()
-                self.close_dialog(dialog)
-                return None
+                return True
 
-            feature = f'"id":"{self.new_feature.attribute(id_name)}", '
+            feature = f'"id":"{new_feature.attribute(id_name)}", '
 
         # If we make an info
         else:
@@ -1175,7 +1135,6 @@ class ApiCF(ApiParent, QObject):
             self.layer.editingStarted.connect(self.fct_start_editing)
             self.layer.editingStopped.connect(self.fct_stop_editing)
             return False
-        print("TEST 10")
         if clear_json:
             _json = {}
 
@@ -1187,12 +1146,8 @@ class ApiCF(ApiParent, QObject):
             except KeyError:
                 pass
             finally:
-                print("TEST 20")
                 self.disconect_signals()
                 self.reload_fields(dialog, json_result, p_widget)
-                self.layer.blockSignals(True)
-                self.layer.commitChanges()
-                self.layer.blockSignals(False)
                 self.layer.editingStarted.connect(self.fct_start_editing)
                 self.layer.editingStopped.connect(self.fct_stop_editing)
         elif "Failed" in json_result['status']:
@@ -1340,7 +1295,7 @@ class ApiCF(ApiParent, QObject):
             pass
 
 
-    def set_auto_update_lineedit(self, field, dialog, widget):
+    def set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
 
         if self.check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
@@ -1348,7 +1303,7 @@ class ApiCF(ApiParent, QObject):
                 widget.editingFinished.connect(partial(self.clean_my_json, widget))
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, _json))
                 widget.editingFinished.connect(
-                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
+                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False, new_feature=new_feature))
             else:
                 widget.editingFinished.connect(partial(self.get_values, dialog, widget, self.my_json))
 
@@ -1406,7 +1361,7 @@ class ApiCF(ApiParent, QObject):
         dialog.btn_accept.setEnabled(True)
 
 
-    def set_auto_update_combobox(self, field, dialog, widget):
+    def set_auto_update_combobox(self, field, dialog, widget, new_feature):
 
         if self.check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
@@ -1414,14 +1369,14 @@ class ApiCF(ApiParent, QObject):
                 widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
                 widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.currentIndexChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature=new_feature))
             else:
                 widget.currentIndexChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
 
         return widget
 
 
-    def set_auto_update_dateedit(self, field, dialog, widget):
+    def set_auto_update_dateedit(self, field, dialog, widget, new_feature):
 
         if self.check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
@@ -1429,14 +1384,14 @@ class ApiCF(ApiParent, QObject):
                 widget.dateChanged.connect(partial(self.clean_my_json, widget))
                 widget.dateChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.dateChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature=new_feature))
             else:
                 widget.dateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
 
         return widget
 
 
-    def set_auto_update_spinbox(self, field, dialog, widget):
+    def set_auto_update_spinbox(self, field, dialog, widget, new_feature):
 
         if self.check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
@@ -1444,14 +1399,14 @@ class ApiCF(ApiParent, QObject):
                 widget.valueChanged.connect(partial(self.clean_my_json, widget))
                 widget.valueChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.valueChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature=new_feature))
             else:
                 widget.valueChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
 
         return widget
 
 
-    def set_auto_update_checkbox(self, field, dialog, widget):
+    def set_auto_update_checkbox(self, field, dialog, widget, new_feature):
 
         if self.check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
@@ -1459,7 +1414,7 @@ class ApiCF(ApiParent, QObject):
                 widget.stateChanged.connect(partial(self.clean_my_json, widget))
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, _json))
                 widget.stateChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature=new_feature))
             else:
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
         return widget
@@ -1503,7 +1458,7 @@ class ApiCF(ApiParent, QObject):
 
     """ MANAGE TABS """
 
-    def tab_activation(self, dialog):
+    def tab_activation(self, dialog, new_feature):
         """ Call functions depend on tab selection """
 
         # Get index of selected tab
@@ -1540,7 +1495,7 @@ class ApiCF(ApiParent, QObject):
             self.fill_tab_document()
             self.tab_document_loaded = True
         elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt' and not self.tab_rpt_loaded:
-            self.fill_tab_rpt(self.complet_result)
+            self.fill_tab_rpt(partial(self.complet_result, new_feature))
             self.tab_rpt_loaded = True
         # Tab 'Plan'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
@@ -2578,16 +2533,16 @@ class ApiCF(ApiParent, QObject):
 
     """ FUNCTIONS RELATED WITH TAB RPT """
 
-    def fill_tab_rpt(self, complet_result):
+    def fill_tab_rpt(self, complet_result, new_feature):
 
-        complet_list, widget_list = self.init_tbl_rpt(complet_result, self.dlg_cf)
+        complet_list, widget_list = self.init_tbl_rpt(complet_result, self.dlg_cf, new_feature)
         if complet_list is False:
             return False
         self.set_listeners(complet_result, self.dlg_cf, widget_list)
         return complet_list
 
 
-    def init_tbl_rpt(self, complet_result, dialog):
+    def init_tbl_rpt(self, complet_result, dialog, new_feature):
         """ Put filter widgets into layout and set headers into QTableView """
 
         rpt_layout1 = dialog.findChild(QGridLayout, "rpt_layout1")
@@ -2603,7 +2558,7 @@ class ApiCF(ApiParent, QObject):
         for field in complet_list[0]['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
-            label, widget = self.set_widgets(dialog, complet_list, field)
+            label, widget = self.set_widgets(dialog, complet_list, field, new_feature)
             if widget is not None:
                 if (type(widget)) == QSpacerItem:
                     rpt_layout1.addItem(widget, 1, field['layoutorder'])
