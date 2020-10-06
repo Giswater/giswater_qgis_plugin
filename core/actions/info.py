@@ -32,7 +32,7 @@ from core.actions.visit_gallery import GwVisitGallery
 from core.actions.visit_manager import GwVisitManager
 
 from core.utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body, draw, \
-    draw_point, accept
+    draw_point
 from core.utils.layer_tools import populate_info_text
 from core.ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
@@ -1301,6 +1301,103 @@ class GwInfo(QObject):
 
         dlg_sections.btn_close.clicked.connect(partial(close_dialog, dlg_sections))
         open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
+
+
+    def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True):
+        """
+        :param dialog:
+        :param complet_result:
+        :param _json:
+        :param p_widget:
+        :param clear_json:
+        :param close_dlg:
+        :return:
+        """
+
+        if _json == '' or str(_json) == '{}':
+            if self.controller.dlg_docker:
+                self.controller.dlg_docker.setMinimumWidth(dialog.width())
+                self.controller.close_docker()
+            close_dialog(dialog)
+            return
+
+        p_table_id = complet_result['body']['feature']['tableName']
+        id_name = complet_result['body']['feature']['idName']
+        parent_fields = complet_result['body']['data']['parentFields']
+        fields_reload = ""
+        list_mandatory = []
+        for field in complet_result['body']['data']['fields']:
+            if p_widget and (field['widgetname'] == p_widget.objectName()):
+                if field['widgetcontrols'] and 'autoupdateReloadFields' in field['widgetcontrols']:
+                    fields_reload = field['widgetcontrols']['autoupdateReloadFields']
+
+            if field['ismandatory']:
+                widget_name = 'data_' + field['columnname']
+                widget = self.dlg_cf.findChild(QWidget, widget_name)
+                widget.setStyleSheet(None)
+                value = getWidgetText(self.dlg_cf, widget)
+                if value in ('null', None, ''):
+                    widget.setStyleSheet("border: 1px solid red")
+                    list_mandatory.append(widget_name)
+
+        if list_mandatory:
+            msg = "Some mandatory values are missing. Please check the widgets marked in red."
+            self.controller.show_warning(msg)
+            return
+
+        # If we create a new feature
+        if self.new_feature_id is not None:
+            for k, v in list(_json.items()):
+                if k in parent_fields:
+                    self.new_feature.setAttribute(k, v)
+                    _json.pop(k, None)
+            self.layer_new_feature.updateFeature(self.new_feature)
+
+            status = self.layer_new_feature.commitChanges()
+            if status is False:
+                return
+
+            my_json = json.dumps(_json)
+            if my_json == '' or str(my_json) == '{}':
+                if self.controller.dlg_docker:
+                    self.controller.dlg_docker.setMinimumWidth(dialog.width())
+                    self.controller.close_docker()
+                close_dialog(dialog)
+                return
+            if self.new_feature.attribute(id_name) is not None:
+                feature = f'"id":"{self.new_feature.attribute(id_name)}", '
+            else:
+                feature = f'"id":"{self.feature_id}", '
+
+        # If we make an info
+        else:
+            my_json = json.dumps(_json)
+            feature = f'"id":"{self.feature_id}", '
+
+        feature += f'"featureType":"{self.feature_type}", '
+        feature += f'"tableName":"{p_table_id}"'
+        extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
+        body = create_body(feature=feature, extras=extras)
+        json_result = self.controller.get_json('gw_fct_setfields', body)
+        if not json_result:
+            return
+
+        if clear_json:
+            _json = {}
+
+        if "Accepted" in json_result['status']:
+            msg = "OK"
+            self.controller.show_message(msg, message_level=3)
+            self.reload_fields(dialog, json_result, p_widget)
+        elif "Failed" in json_result['status']:
+            # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
+            return
+
+        if close_dlg:
+            if self.controller.dlg_docker:
+                self.controller.dlg_docker.setMinimumWidth(dialog.width())
+                self.controller.close_docker()
+            close_dialog(dialog)
 
 
     def get_scale_zoom(self):

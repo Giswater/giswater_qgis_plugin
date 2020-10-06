@@ -24,7 +24,7 @@ from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, Q
 from functools import partial
 
 from core.utils.hyperlink_label import GwHyperLinkLabel
-from core.utils.tools_giswater import enable_feature_type, create_body, accept, tab_feature_changed, check_expression, \
+from core.utils.tools_giswater import enable_feature_type, create_body, tab_feature_changed, check_expression, \
     close_dialog, hide_generic_layers, reset_lists
 from lib.tools_db import set_selector
 from lib.tools_qgis import disconnect_signal_selection_changed, select_features_by_ids, remove_selection, \
@@ -1271,6 +1271,7 @@ def add_calendar(dialog, field, my_json=None, complet_result=None, new_feature_i
     if field['isautoupdate']:
         _json = {}
         btn_calendar.clicked.connect(partial(get_values, dialog, widget, _json, layer))
+        # TODO: Check this
         btn_calendar.clicked.connect(
             partial(accept, dialog, complet_result[0], _json, p_widget=feature_id, clear_json=True,
                     close_dlg=False, new_feature_id=new_feature_id, new_feature=new_feature,
