@@ -26,9 +26,9 @@ from functools import partial
 from ..core.utils.hyperlink_label import GwHyperLinkLabel
 from ..core.utils.tools_giswater import enable_feature_type, create_body, tab_feature_changed, check_expression, \
     close_dialog, hide_generic_layers, reset_lists
-from .tools_db import set_selector
-from .tools_qgis import disconnect_signal_selection_changed, select_features_by_ids, remove_selection, \
-    connect_signal_selection_changed, disconnect_snapping, refresh_map_canvas
+#from .tools_db import set_selector
+#from .tools_qgis import disconnect_signal_selection_changed, select_features_by_ids, remove_selection, \
+#    connect_signal_selection_changed, disconnect_snapping, refresh_map_canvas
 
 
 def fillComboBox(dialog, widget, rows, allow_nulls=True, clear_combo=True):

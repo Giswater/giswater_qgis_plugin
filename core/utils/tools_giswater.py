@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 from qgis.PyQt.QtWidgets import QTabWidget, QCompleter, QWidget, QFileDialog
 from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor
@@ -19,9 +18,9 @@ import re
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
-from lib.tools_qt import getWidgetText, setWidgetText, getWidget
-from core.ui.ui_manager import GwDialog, GwMainWindow
-from lib.tools_qgis import get_max_rectangle_from_coords, get_points, zoom_to_rectangle
+#from ...lib.tools_qt import getWidgetText, setWidgetText, getWidget
+from ..ui.ui_manager import GwDialog, GwMainWindow
+#from ...lib.tools_qgis import get_max_rectangle_from_coords, get_points, zoom_to_rectangle
 
 
 def load_settings(dialog):
