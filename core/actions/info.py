@@ -5,14 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-import json
-import os
-import subprocess
-import urllib.parse as parse
-import sys
-import webbrowser
-import global_vars
-
 from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY
 from qgis.gui import QgsDateTimeEdit, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand
 from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, QStringListModel, Qt
@@ -21,33 +13,41 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
+
+import json
+import os
+import subprocess
+import urllib.parse as parse
+import sys
+import webbrowser
 from collections import OrderedDict
 from functools import partial
 
-from core.actions.catalog import GwCatalog
-from core.actions.dimensioning import GwDimensioning
-from core.actions.document import GwDocument
-from core.actions.element import GwElement
-from core.actions.visit_gallery import GwVisitGallery
-from core.actions.visit_manager import GwVisitManager
-
-from core.utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body, draw, \
+from ... import global_vars
+from .catalog import GwCatalog
+from .dimensioning import GwDimensioning
+from .document import GwDocument
+from .element import GwElement
+from .visit_gallery import GwVisitGallery
+from .visit_manager import GwVisitManager
+from ..utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body, draw, \
     draw_point
-from core.utils.layer_tools import populate_info_text
-from core.ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
+from ..utils.layer_tools import populate_info_text
+from ..utils.hyperlink_label import GwHyperLinkLabel
+from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
-from lib.tools_qgis import get_snapping_options, get_event_point, snap_to_current_layer, get_snapped_layer, \
+from ...lib.tools_qgis import get_snapping_options, get_event_point, snap_to_current_layer, get_snapped_layer, \
     get_snapped_feature, add_marker, enable_snapping, snap_to_layer, apply_snapping_options, snap_to_arc, snap_to_node, \
     get_feature_by_expr
-from lib.tools_db import get_visible_layers
-from lib.tools_qt import set_completer_object_api, set_completer_object, check_actions, api_action_help, \
+from ...lib.tools_db import get_visible_layers
+from ...lib.tools_qt import set_completer_object_api, set_completer_object, check_actions, api_action_help, \
     set_widget_size, add_button, add_textarea, add_lineedit, set_data_type, manage_lineedit, add_tableview, \
     set_headers, populate_table, set_columns_config, add_checkbox, add_combobox, fill_child, add_frame, add_label, \
     add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_spinbox, fill_table, populate_basic_info, \
     add_calendar, put_widgets, get_values, set_setStyleSheet, disable_all, enable_all, clear_gridlayout, set_icon, \
     set_dates_from_to, getWidgetText, get_item_data, isChecked, getCalendarDate, set_qtv_config, remove_tab_by_tabName, \
     setWidgetText, getWidgetType, set_combo_itemData, setImage, get_col_index_by_col_name, set_item_data, setText
-from core.utils.hyperlink_label import GwHyperLinkLabel
+
 
 class GwInfo(QObject):
 

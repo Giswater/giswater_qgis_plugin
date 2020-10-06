@@ -18,9 +18,9 @@ import operator
 import os
 import re
 import sys
-import global_vars
 from functools import partial
 
+from ... import global_vars
 from ...lib import tools_qt
 from .info import GwInfo
 from .document import GwDocument
@@ -30,7 +30,6 @@ from ..ui.ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
 from ..utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
     draw, draw_point, create_body
 from ...lib.tools_qgis import get_points
-
 from ...lib.tools_qt import set_completer_object_api, set_completer_object, add_lineedit, populate_basic_info, set_icon, \
     set_table_columns, set_completer_lineedit, document_open, document_delete
 from ...lib.tools_qgis import refresh_map_canvas, get_max_rectangle_from_coords, zoom_to_rectangle

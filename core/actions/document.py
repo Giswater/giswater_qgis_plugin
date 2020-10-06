@@ -11,10 +11,10 @@ import webbrowser
 import os
 from functools import partial
 
-from core.utils.tools_giswater import load_settings, open_dialog, close_dialog, tab_feature_changed
-from core.ui.ui_manager import DocUi, DocManager
-from lib.tools_qgis import remove_selection, selection_init, insert_feature
-from lib.tools_qt import populate_combo_with_query, delete_records, manage_close, fill_table_object, filter_by_id, \
+from ..utils.tools_giswater import load_settings, open_dialog, close_dialog, tab_feature_changed
+from ..ui.ui_manager import DocUi, DocManager
+from ...lib.tools_qgis import remove_selection, selection_init, insert_feature
+from ...lib.tools_qt import populate_combo_with_query, delete_records, manage_close, fill_table_object, filter_by_id, \
     delete_selected_object, set_selectionbehavior, set_model_to_table, set_icon, exist_object, set_completer_object, \
     set_completer_widget, set_table_columns, setWidgetText, getWidgetText, getCalendarDate, setCalendarDate
 

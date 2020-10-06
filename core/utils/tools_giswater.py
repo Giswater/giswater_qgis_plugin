@@ -12,7 +12,7 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor
 from qgis.core import QgsProject, QgsExpression, QgsPointXY, QgsGeometry, QgsVectorLayer
 
 import configparser
-import global_vars
+from ... import global_vars
 import os
 import sys
 import re
