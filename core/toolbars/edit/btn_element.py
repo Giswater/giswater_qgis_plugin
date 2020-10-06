@@ -5,9 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from core.toolbars.parent_dialog import GwParentAction
-
-from core.actions.element import GwElement
+from ..parent_dialog import GwParentAction
+from ...actions.element import GwElement
 
 
 class GwAddElementButton(GwParentAction):

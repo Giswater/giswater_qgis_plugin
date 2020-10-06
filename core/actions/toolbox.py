@@ -17,10 +17,10 @@ from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QL
 from collections import OrderedDict
 from functools import partial
 
-from lib import tools_qt
-from core.actions.layer_tools import GwLayerTools
-from actions.api_parent import ApiParent
-from core.ui.ui_manager import ToolboxDockerUi, ToolboxUi
+from ...lib import tools_qt
+from .layer_tools import GwLayerTools
+from ..actions.api_parent import ApiParent
+from ..ui.ui_manager import ToolboxDockerUi, ToolboxUi
 
 
 class GwToolBox(ApiParent):

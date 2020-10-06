@@ -7,20 +7,22 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import re
 import os
-import global_vars
+from .... import global_vars
 
 from qgis.core import QgsGeometry, QgsMapToPixel, QgsPointXY
 from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu
+
 from functools import partial
 
-from core.toolbars.parent_maptool import GwParentMapTool
-from core.actions.info import GwInfo
-from core.utils.tools_giswater import create_body, draw_point, draw_polyline
-from lib.tools_db import get_visible_layers
-from lib.tools_qgis import get_max_rectangle_from_coords, get_points
+from ...toolbars.parent_maptool import GwParentMapTool
+from ...actions.info import GwInfo
+from ...utils.tools_giswater import create_body, draw_point, draw_polyline
+from ....lib.tools_db import get_visible_layers
+from ....lib.tools_qgis import get_max_rectangle_from_coords, get_points
+
 
 class GwInfoButton(GwParentMapTool):
 

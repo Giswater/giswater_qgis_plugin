@@ -14,12 +14,13 @@ import json
 import operator
 from functools import partial
 
-from lib import tools_qt
-from core.toolbars.parent_dialog import GwParentAction
-from core.utils.tools_giswater import load_settings, open_dialog, close_dialog, create_body
-from core.ui.ui_manager import ConfigUi
+from ....lib import tools_qt
+from ..parent_dialog import GwParentAction
+from ...utils.tools_giswater import load_settings, open_dialog, close_dialog, create_body
+from ...ui.ui_manager import ConfigUi
 
-from lib.tools_qt import hide_void_groupbox
+from ....lib.tools_qt import hide_void_groupbox
+
 
 class GwConfigButton(GwParentAction):
 

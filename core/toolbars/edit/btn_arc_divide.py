@@ -5,17 +5,18 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import global_vars
+from .... import global_vars
 
 from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt
 
-from core.toolbars.parent_maptool import GwParentMapTool
-from core.ui.ui_manager import DialogTextUi
-from core.utils.tools_giswater import populate_info_text, create_body, refresh_legend
-from lib.tools_qgis import get_snapping_options, enable_snapping, get_event_point, snap_to_current_layer, \
+from ..parent_maptool import GwParentMapTool
+from ...ui.ui_manager import DialogTextUi
+from ...utils.tools_giswater import populate_info_text, create_body, refresh_legend
+from ....lib.tools_qgis import get_snapping_options, enable_snapping, get_event_point, snap_to_current_layer, \
     add_marker, get_snapped_layer, get_snapped_point, get_snapped_feature, get_snapped_feature_id
+
 
 class GwArcDivideButton(GwParentMapTool):
     """ Button 16. Move node

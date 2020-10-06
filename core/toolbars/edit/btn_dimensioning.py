@@ -7,8 +7,8 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QSettings, Qt
 
-from core.actions.dimensioning import GwDimensioning
-from core.toolbars.parent_maptool import GwParentMapTool
+from ...actions.dimensioning import GwDimensioning
+from ..parent_maptool import GwParentMapTool
 
 
 class GwDimensioningButton(GwParentMapTool):

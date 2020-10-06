@@ -7,11 +7,11 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 
-import global_vars
-from lib import tools_qt
-from core.toolbars.parent_dialog import GwParentAction
-from core.ui.ui_manager import Go2EpaSelectorUi
-from core.utils.tools_giswater import close_dialog, load_settings, open_dialog
+from .... import global_vars
+from ....lib import tools_qt
+from ..parent_dialog import GwParentAction
+from ...ui.ui_manager import Go2EpaSelectorUi
+from ...utils.tools_giswater import close_dialog, load_settings, open_dialog
 
 
 class GwGo2EpaSelectorButton(GwParentAction):

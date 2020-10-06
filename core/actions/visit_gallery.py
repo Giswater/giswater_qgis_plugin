@@ -8,7 +8,7 @@ or (at your option) any later version.
 import urllib.request
 import urllib.error
 import urllib.parse
-import global_vars
+from ... import global_vars
 
 from qgis.PyQt.QtWidgets import QLabel, QPushButton, QLineEdit
 from qgis.PyQt.QtGui import QPixmap

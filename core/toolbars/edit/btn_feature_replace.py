@@ -13,14 +13,14 @@ from collections import OrderedDict
 from datetime import datetime
 from functools import partial
 
-from core.ui.ui_manager import FeatureReplace, InfoWorkcatUi
-from core.actions.catalog import GwCatalog
-from core.utils.layer_tools import populate_info_text
-from core.utils.tools_giswater import close_dialog, load_settings, open_dialog, refresh_legend, create_body
-from lib import tools_qt
-from lib.tools_qgis import get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
+from ...ui.ui_manager import FeatureReplace, InfoWorkcatUi
+from ...actions.catalog import GwCatalog
+from ...utils.layer_tools import populate_info_text
+from ...utils.tools_giswater import close_dialog, load_settings, open_dialog, refresh_legend, create_body
+from ....lib import tools_qt
+from ....lib.tools_qgis import get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
     get_snapped_feature, get_snapping_options, enable_snapping, snap_to_node, snap_to_connec_gully, set_snapping_mode
-from core.toolbars.parent_maptool import GwParentMapTool
+from ..parent_maptool import GwParentMapTool
 
 
 class GwFeatureReplaceButton(GwParentMapTool):

@@ -10,12 +10,12 @@ from qgis.PyQt.QtWidgets import QGroupBox, QSpacerItem, QSizePolicy, QGridLayout
 import json
 from functools import partial
 
-from lib import tools_qt
-from core.utils.tools_giswater import create_body, close_dialog, load_settings, open_dialog
-from core.ui.ui_manager import Go2EpaOptionsUi
-import global_vars
+from ...lib import tools_qt
+from ..utils.tools_giswater import create_body, close_dialog, load_settings, open_dialog
+from ..ui.ui_manager import Go2EpaOptionsUi
+from ... import global_vars
+from ...lib.tools_qt import manage_child, construct_form_param_user
 
-from lib.tools_qt import manage_child, construct_form_param_user
 
 class GwGo2EpaOptions:
 

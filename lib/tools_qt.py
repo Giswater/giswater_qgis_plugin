@@ -16,7 +16,7 @@ from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, Q
 
 import os
 import operator
-import global_vars
+from .. import global_vars
 import re
 import sys
 import subprocess

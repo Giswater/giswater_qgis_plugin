@@ -22,7 +22,7 @@ from .notify_tools import GwNotifyTools
 from .actions.search import GwSearch
 from .utils.tools_giswater import set_parser_value
 from ..lib.tools_qgis import qgis_get_layer_source, get_qgis_project_variables, qgis_manage_snapping_layer
-#from .toolbars import buttons
+from .toolbars import buttons
 
 
 class LoadProject(QObject):

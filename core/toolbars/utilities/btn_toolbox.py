@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import json
-import global_vars
+from .... import global_vars
 import random
 
 from qgis.core import QgsProject, QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer
@@ -19,13 +19,14 @@ from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QL
 from collections import OrderedDict
 from functools import partial
 
-from lib import tools_qt
-from core.toolbars.parent_dialog import GwParentAction
-from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
+from ....lib import tools_qt
+from ..parent_dialog import GwParentAction
+from ...utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
     create_body
-from core.utils.layer_tools import add_temp_layer, populate_info_text
-from core.ui.ui_manager import ToolboxDockerUi, ToolboxUi
-from lib.tools_qt import construct_form_param_user
+from ...utils.layer_tools import add_temp_layer, populate_info_text
+from ...ui.ui_manager import ToolboxDockerUi, ToolboxUi
+from ....lib.tools_qt import construct_form_param_user
+
 
 class GwToolBoxButton(GwParentAction):
 

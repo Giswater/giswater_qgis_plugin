@@ -19,15 +19,16 @@ import os
 import json
 import configparser
 
-from lib import tools_qt
-from core.toolbars.parent_maptool import GwParentMapTool
-from core.ui.ui_manager import Profile
-from core.ui.ui_manager import ProfilesList
-from core.utils.tools_giswater import close_dialog, create_body, get_parser_value, load_settings, open_dialog, \
+from ....lib import tools_qt
+from ..parent_maptool import GwParentMapTool
+from ...ui.ui_manager import Profile
+from ...ui.ui_manager import ProfilesList
+from ...utils.tools_giswater import close_dialog, create_body, get_parser_value, load_settings, open_dialog, \
     save_settings, set_parser_value
-from lib.tools_qgis import get_snapper, get_event_point, snap_to_current_layer, get_snapped_layer, add_marker, \
+from ....lib.tools_qgis import get_snapper, get_event_point, snap_to_current_layer, get_snapped_layer, add_marker, \
     get_snapped_feature
-from lib.tools_qt import set_icon
+from ....lib.tools_qt import set_icon
+
 
 class NodeData:
 

@@ -16,8 +16,8 @@ from qgis.PyQt.QtWidgets import QPushButton, QTabWidget
 
 from random import randrange
 
-from lib import tools_qt
-import global_vars
+from ...lib import tools_qt
+from ... import global_vars
 
 
 class GwLayerTools:

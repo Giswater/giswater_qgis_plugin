@@ -15,14 +15,15 @@ from qgis.PyQt.QtWidgets import QWidget, QCheckBox, QDateEdit, QTimeEdit, QCombo
 from qgis.PyQt.QtSql import QSqlQueryModel
 from functools import partial
 
-import global_vars
-from lib import tools_qt
-from core.actions.go2epa_options import GwGo2EpaOptions
-from core.tasks.task_go2epa import GwGo2EpaTask
-from core.btn_admin import GwAdmin
-from core.ui.ui_manager import Go2EpaUI, HydrologySelector, Multirow_selector
-from core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
-from lib.tools_qgis import refresh_map_canvas
+from ... import global_vars
+from ...lib import tools_qt
+from .go2epa_options import GwGo2EpaOptions
+from ..tasks.task_go2epa import GwGo2EpaTask
+from ..btn_admin import GwAdmin
+from ..ui.ui_manager import Go2EpaUI, HydrologySelector, Multirow_selector
+from ..utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
+from ...lib.tools_qgis import refresh_map_canvas
+
 
 class GwGo2Epa:
 
