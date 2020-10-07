@@ -945,7 +945,7 @@ class ApiCF(ApiParent, QObject):
         return widget
 
 
-    def manage_button(self, dialog, complet_result, field):
+    def manage_button(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
@@ -963,7 +963,7 @@ class ApiCF(ApiParent, QObject):
         return widget
 
 
-    def manage_hspacer(self, dialog, complet_result, field):
+    def manage_hspacer(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
@@ -971,7 +971,7 @@ class ApiCF(ApiParent, QObject):
         return widget
 
 
-    def manage_vspacer(self, dialog, complet_result, field):
+    def manage_vspacer(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
@@ -979,7 +979,7 @@ class ApiCF(ApiParent, QObject):
         return widget
 
 
-    def manage_textarea(self, dialog, complet_result, field):
+    def manage_textarea(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
@@ -997,15 +997,15 @@ class ApiCF(ApiParent, QObject):
         return widget
 
 
-    def manage_doubleSpinbox(self, dialog, complet_result, field):
+    def manage_doubleSpinbox(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.manage_spinbox(dialog, complet_result, field)
+        widget = self.manage_spinbox(dialog, complet_result, field, new_feature)
         return widget
 
 
-    def manage_tableView(self, dialog, complet_result, field):
+    def manage_tableView(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
