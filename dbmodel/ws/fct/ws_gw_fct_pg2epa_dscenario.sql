@@ -55,10 +55,9 @@ BEGIN
 		-- move patterns from inp_pattern_value to rpt_pattern_value
 		INSERT INTO rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
 			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
-		SELECT 1, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, 
+		SELECT result_id_var, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, 
 			factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
-			FROM inp_pattern_value WHERE pattern_id IN (SELECT DISTINCT pattern_id FROM temp_node) 
-			AND pattern_id NOT IN (SELECT DISTINCT pattern_id FROM rpt_inp_pattern_value)
+			FROM inp_pattern_value WHERE pattern_id IN (SELECT DISTINCT pattern_id FROM temp_node) AND pattern_id NOT IN (SELECT DISTINCT pattern_id FROM rpt_inp_pattern_value WHERE result_id = result_id_var );
 	END IF;
 
 	-- set cero where null in orther to prevent user's null values on demand table
