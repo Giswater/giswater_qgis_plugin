@@ -634,7 +634,7 @@ class ApiCF(ApiParent, QObject):
 
         btn_cancel.clicked.connect(partial(self.close_dialog, dlg_cf))
         btn_cancel.clicked.connect(self.roll_back)
-        btn_accept.clicked.connect(partial(self.manage_accept, dlg_cf, action_edit, result, fid, new_feature, self.my_json))
+        btn_accept.clicked.connect(partial(self.manage_accept, dlg_cf, action_edit, result, fid, new_feature, self.my_json, True))
         dlg_cf.dlg_closed.connect(self.disconect_signals)
 
         # Set title
@@ -750,13 +750,15 @@ class ApiCF(ApiParent, QObject):
         except RuntimeError:
             pass
 
-    def manage_accept(self, dialog, action_edit, result, fid, new_feature, my_json):
-        msg = 'Are you sure to save this feature?'
-        answer = self.controller.ask_question(msg, "Save feature", None, parameter=fid)
-        if not answer:
-            self.check_actions(action_edit, True)
-            return
-
+    def manage_accept(self, dialog, action_edit, result, fid, new_feature, my_json, ask=True):
+        # Only ask when the edition is closed from our form, since if it is closed from qgis, it will ask
+        if ask:
+            msg = 'Are you sure to save this feature?'
+            answer = self.controller.ask_question(msg, "Save feature", None, parameter=fid)
+            if not answer:
+                self.check_actions(action_edit, True)
+                return
+        self.get_last_value()
         status = self.accept(dialog, self.complet_result[0], my_json, close_dialog=False, new_feature=new_feature)
         self.check_actions(action_edit, True)
         if status is not False:  # Commit succesfull or dialog closed
@@ -768,7 +770,7 @@ class ApiCF(ApiParent, QObject):
     def manage_edition(self, dialog, action_edit, result, fid, new_feature=None, my_json=None):
 
         if not action_edit.isChecked():
-            self.manage_accept(dialog, action_edit, result, fid, new_feature, my_json)
+            self.manage_accept(dialog, action_edit, result, fid, new_feature, my_json, True)
         else:
             self.check_actions(action_edit, True)
             self.enable_all(dialog, result)
@@ -787,8 +789,7 @@ class ApiCF(ApiParent, QObject):
             self.disable_all(dialog, result, False)
             self.enable_actions(dialog, False)
         else:
-            self.manage_accept(dialog, action_edit, result, fid, new_feature, my_json)
-
+            self.manage_accept(dialog, action_edit, result, fid, new_feature, my_json, False)
 
     def start_editing(self, dialog, action_edit, result, layer):
 
@@ -1059,6 +1060,7 @@ class ApiCF(ApiParent, QObject):
         :param p_widget:
         :param clear_json:
         :param close_dialog:
+        :param new_feature:
         :return: True if all ok, False if sommething fail, None if close dialog
             (When it is true or false the signals are reconnected, if it is None, it is not necessary to reconnect them)
         """
