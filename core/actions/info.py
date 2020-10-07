@@ -560,7 +560,7 @@ class GwInfo(QObject):
             btn_cancel.clicked.connect(partial(close_dialog, self.dlg_cf))
             btn_cancel.clicked.connect(self.roll_back)
             btn_accept.clicked.connect(partial(
-                accept, self.dlg_cf, self.complet_result[0], self.my_json))
+                self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
             self.dlg_cf.dlg_closed.connect(self.roll_back)
             self.dlg_cf.dlg_closed.connect(self.rubber_band.reset)
             self.dlg_cf.dlg_closed.connect(partial(save_settings, self.dlg_cf))
@@ -1048,7 +1048,7 @@ class GwInfo(QObject):
         if self.my_json == '' or str(self.my_json) == '{}':
             return
         elif action_is_checked:
-            accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dlg=False)
+            self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dlg=False)
 
 
     def roll_back(self):
@@ -1484,7 +1484,7 @@ class GwInfo(QObject):
                 widget.editingFinished.connect(partial(self.clean_my_json, widget))
                 widget.editingFinished.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.editingFinished.connect(
-                    partial(accept, dialog, self.complet_result[0], _json, widget, True, False))
+                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
             else:
                 widget.editingFinished.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
 
@@ -1503,7 +1503,7 @@ class GwInfo(QObject):
                 widget.textChanged.connect(partial(self.clean_my_json, widget))
                 widget.textChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.textChanged.connect(
-                    partial(accept, dialog, self.complet_result[0], _json, widget, True, False))
+                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
             else:
                 widget.textChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
 
@@ -1550,7 +1550,7 @@ class GwInfo(QObject):
                 widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
                 widget.currentIndexChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.currentIndexChanged.connect(partial(
-                    accept, dialog, self.complet_result[0], _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
                 widget.currentIndexChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
 
@@ -1565,7 +1565,7 @@ class GwInfo(QObject):
                 widget.dateChanged.connect(partial(self.clean_my_json, widget))
                 widget.dateChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.dateChanged.connect(partial(
-                    accept, dialog, self.complet_result[0], _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
                 widget.dateChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
 
@@ -1580,7 +1580,7 @@ class GwInfo(QObject):
                 widget.valueChanged.connect(partial(self.clean_my_json, widget))
                 widget.valueChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.valueChanged.connect(partial(
-                    accept, dialog, self.complet_result[0], _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
                 widget.valueChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
 
@@ -1595,7 +1595,7 @@ class GwInfo(QObject):
                 widget.stateChanged.connect(partial(self.clean_my_json, widget))
                 widget.stateChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
                 widget.stateChanged.connect(partial(
-                    accept, dialog, self.complet_result[0], _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
             else:
                 widget.stateChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
         return widget
