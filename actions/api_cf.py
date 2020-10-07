@@ -669,6 +669,7 @@ class ApiCF(ApiParent, QObject):
             self.layer.editingStopped.disconnect(self.fct_stop_editing)
         except Exception as e:
             pass
+        self.controller.is_inserting = False
 
 
     def manage_docker_close(self):

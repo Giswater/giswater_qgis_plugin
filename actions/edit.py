@@ -44,7 +44,7 @@ class Edit(ParentAction):
             msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
             self.controller.show_message(msg)
             return
-        self.controller.is_inserting = True
+
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 
@@ -100,7 +100,7 @@ class Edit(ParentAction):
             self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
 
         self.controller.init_docker()
-
+        self.controller.is_inserting = True
         self.api_cf = ApiCF(self.iface, self.settings, self.controller, self.plugin_dir, 'data')
         result, dialog = self.api_cf.open_form(point=list_points, feature_cat=self.feature_cat,
                                                new_feature_id=feature_id, layer_new_feature=self.layer,
