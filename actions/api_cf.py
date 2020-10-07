@@ -586,7 +586,7 @@ class ApiCF(ApiParent, QObject):
         # We assign the function to a global variable,
         # since as it receives parameters we will not be able to disconnect the signals
         self.fct_start_editing = lambda: self.start_editing(dlg_cf, action_edit, complet_result[0]['body']['data'], layer)
-        self.fct_stop_editing = lambda: self.stop_editing(dlg_cf, action_edit, complet_result[0]['body']['data'], layer, fid, my_json, new_feature)
+        self.fct_stop_editing = lambda: self.stop_editing(dlg_cf, action_edit, complet_result[0]['body']['data'], layer, fid, self.my_json, new_feature)
         layer.editingStarted.connect(self.fct_start_editing)
         layer.editingStopped.connect(self.fct_stop_editing)
         self.enable_actions(dlg_cf, layer.isEditable())
@@ -594,7 +594,7 @@ class ApiCF(ApiParent, QObject):
         action_edit.setChecked(layer.isEditable())
 
         # Actions signals
-        action_edit.triggered.connect(partial(self.manage_edition, dlg_cf, action_edit, complet_result[0]['body']['data'], layer, fid, my_json, new_feature))
+        action_edit.triggered.connect(partial(self.manage_edition, dlg_cf, action_edit, complet_result[0]['body']['data'], fid, new_feature, self.my_json))
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id, 'arc'))
@@ -634,7 +634,7 @@ class ApiCF(ApiParent, QObject):
 
         btn_cancel.clicked.connect(partial(self.close_dialog, dlg_cf))
         btn_cancel.clicked.connect(self.roll_back)
-        btn_accept.clicked.connect(partial(self.accept, dlg_cf, self.complet_result[0], my_json, new_feature=new_feature))
+        btn_accept.clicked.connect(partial(self.manage_accept, dlg_cf, action_edit, result, fid, new_feature, self.my_json))
         dlg_cf.dlg_closed.connect(self.disconect_signals)
 
         # Set title
@@ -750,19 +750,34 @@ class ApiCF(ApiParent, QObject):
         except RuntimeError:
             pass
 
+    def manage_accept(self, dialog, action_edit, result, fid, new_feature, my_json):
+        msg = 'Are you sure to save this feature?'
+        answer = self.controller.ask_question(msg, "Save feature", None, parameter=fid)
+        if not answer:
+            self.check_actions(action_edit, True)
+            return
 
-    def manage_edition(self, dialog, action_edit, result, layer, fid, my_json, new_feature=None):
+        status = self.accept(dialog, self.complet_result[0], my_json, close_dialog=False, new_feature=new_feature)
+        self.check_actions(action_edit, True)
+        if status is not False:  # Commit succesfull or dialog closed
+            self.check_actions(action_edit, False)
+            self.disable_all(dialog, result, False)
+            self.enable_actions(dialog, False)
 
-        if layer.isEditable():
-            self.stop_editing(dialog, action_edit, result, layer, fid, my_json, new_feature)
+
+    def manage_edition(self, dialog, action_edit, result, fid, new_feature=None, my_json=None):
+
+        if not action_edit.isChecked():
+            self.manage_accept(dialog, action_edit, result, fid, new_feature, my_json)
         else:
-            self.start_editing(dialog, action_edit, result, layer)
+            self.check_actions(action_edit, True)
+            self.enable_all(dialog, result)
+            self.enable_actions(dialog, True)
 
             
     def stop_editing(self, dialog, action_edit, result, layer, fid, my_json, new_feature=None):
 
-        self.get_last_value()
-        if self.my_json == '' or str(self.my_json) == '{}':
+        if my_json == '' or str(my_json) == '{}':
             self.disconect_signals()
             # Use commitChanges just for closse edition
             layer.commitChanges()
@@ -772,17 +787,7 @@ class ApiCF(ApiParent, QObject):
             self.disable_all(dialog, result, False)
             self.enable_actions(dialog, False)
         else:
-            msg = 'Are you sure to save this feature?'
-            answer = self.controller.ask_question(msg, "Save feature", None, parameter=fid)
-            if not answer:
-                self.check_actions(action_edit, True)
-                return
-            status = self.accept(dialog, self.complet_result[0], my_json, close_dialog=False, new_feature=new_feature)
-            self.check_actions(action_edit, True)
-            if status is not False:  # Commit succesfull or dialog closed
-                self.check_actions(action_edit, False)
-                self.disable_all(dialog, result, False)
-                self.enable_actions(dialog, False)
+            self.manage_accept(dialog, action_edit, result, fid, new_feature, my_json)
 
 
     def start_editing(self, dialog, action_edit, result, layer):
