@@ -198,19 +198,23 @@ CREATE OR REPLACE VIEW v_edit_inp_demand AS
     inp_demand.demand,
     inp_demand.pattern_id,
     inp_demand.demand_type,
-    inp_demand.dscenario_id
-   FROM selector_sector, selector_inp_demand, inp_demand
-    JOIN v_node ON v_node.node_id::text = inp_demand.feature_id::text
+    inp_demand.dscenario_id,
+    inp_demand.feature_type
+   FROM selector_sector,
+    selector_inp_demand,
+    inp_demand
+     JOIN v_node ON v_node.node_id::text = inp_demand.feature_id::text
   WHERE v_node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_demand.dscenario_id = selector_inp_demand.dscenario_id AND selector_inp_demand.cur_user = "current_user"()::text
-
-  UNION
+UNION
  SELECT inp_demand.id,
     inp_demand.feature_id,
     inp_demand.demand,
     inp_demand.pattern_id,
     inp_demand.demand_type,
-    inp_demand.dscenario_id
-   FROM selector_sector, selector_inp_demand, inp_demand
-    JOIN v_connec ON v_connec.connec_id::text = inp_demand.feature_id::text
+    inp_demand.dscenario_id,
+    inp_demand.feature_type
+   FROM selector_sector,
+    selector_inp_demand,
+    inp_demand
+     JOIN v_connec ON v_connec.connec_id::text = inp_demand.feature_id::text
   WHERE v_connec.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_demand.dscenario_id = selector_inp_demand.dscenario_id AND selector_inp_demand.cur_user = "current_user"()::text;
-

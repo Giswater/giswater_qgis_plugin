@@ -23,8 +23,8 @@ BEGIN
 
 	RAISE NOTICE 'Starting pg2epa for filling demand scenario';
 
-	v_demandpriority = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_demandpriority' AND cur_user=current_user);
-	v_demandpriority = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_patternmethod' AND cur_user=current_user);
+	v_demandpriority = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_dscenario_priority' AND cur_user=current_user);
+	v_patternmethod = (SELECT value::integer FROM config_param_user WHERE parameter='inp_options_patternmethod' AND cur_user=current_user);
 
 	-- building query text for those cases used on inp_demand with connecs
 	v_querytext = '(SELECT exit_id, exit_type, pattern_id, sum(demand) as demand FROM inp_demand d JOIN v_edit_link USING (feature_id) WHERE feature_type  = ''CONNEC'' GROUP by 1,2,3)a';
@@ -51,6 +51,14 @@ BEGIN
 			union
 			SELECT feature_id, feature_type, pattern_id, demand FROM vi_demands d WHERE d.feature_type = 'NODE')a
 			WHERE a.node_id = temp_node.node_id AND a.pattern_id IS NOT NULL;
+
+		-- move patterns from inp_pattern_value to rpt_pattern_value
+		INSERT INTO rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, 
+			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
+		SELECT 1, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, 
+			factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
+			FROM inp_pattern_value WHERE pattern_id IN (SELECT DISTINCT pattern_id FROM temp_node) 
+			AND pattern_id NOT IN (SELECT DISTINCT pattern_id FROM rpt_inp_pattern_value)
 	END IF;
 
 	-- set cero where null in orther to prevent user's null values on demand table

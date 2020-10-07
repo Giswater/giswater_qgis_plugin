@@ -53,5 +53,5 @@ UPDATE inp_typevalue SET idval = 'ALWAYS OVERWRITE DEMAND & PATT' WHERE typevalu
 UPDATE inp_typevalue SET idval = 'ONLY OVERWRITE NULL DEMANDS' WHERE typevalue = 'inp_options_dscenario_priority' AND id = '2';
 UPDATE inp_typevalue SET idval = 'JOIN DEMANDS & OVERWRITE PATT' WHERE typevalue = 'inp_options_dscenario_priority' AND id = '3';
 
-
+UPDATE config_fprocess SET fid = 239 WHERE tablename = 'vi_demands';
 
