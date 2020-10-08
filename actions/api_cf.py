@@ -754,7 +754,6 @@ class ApiCF(ApiParent, QObject):
 
     def manage_edition(self, dialog, action_edit, result, fid, new_feature=None, my_json=None):
 
-        self.get_last_value()
         if not action_edit.isChecked():
             if str(my_json) == '{}':
                 self.check_actions(action_edit, False)
