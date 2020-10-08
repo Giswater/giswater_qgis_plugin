@@ -628,13 +628,13 @@ class ApiCF(ApiParent, QObject):
             if self.new_feature_id is None:
                 btn_cancel.setVisible(False)
                 btn_accept.setVisible(False)
-            else:
-                dlg_cf.dlg_closed.connect(self.roll_back)
-                dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
-                dlg_cf.dlg_closed.connect(partial(self.save_settings, dlg_cf))
-                dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
-                dlg_cf.key_pressed.connect(partial(self.close_dialog, dlg_cf))
-                btn_cancel.clicked.connect(partial(self.close_dialog, dlg_cf))
+        else:
+            dlg_cf.dlg_closed.connect(self.roll_back)
+            dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
+            dlg_cf.dlg_closed.connect(partial(self.save_settings, dlg_cf))
+            dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
+            dlg_cf.key_pressed.connect(partial(self.close_dialog, dlg_cf))
+            btn_cancel.clicked.connect(partial(self.close_dialog, dlg_cf))
         btn_accept.clicked.connect(partial(self.accept_from_btn, dlg_cf, action_edit, result, fid, new_feature, self.my_json))
         dlg_cf.dlg_closed.connect(self.disconect_signals)
 
