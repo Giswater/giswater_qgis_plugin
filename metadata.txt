@@ -13,8 +13,11 @@ version=3.4.021
 
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
 # End of mandatory metadata
-changelog=Version 3.4.021 (xx/xx/2020)
-   - 
+changelog=Version 3.4.021 (08/10/2020)
+   - Add multiple documents
+   - Bug fix on mincut snapping
+   - Enhance search workcat interaction with selectors
+   - Other bug fixes
 
 # Tags are comma separated with spaces allowed
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
