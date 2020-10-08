@@ -5,10 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
-DROP EXTENSION IF EXISTS unaccent;
 SET search_path = public;
-CREATE EXTENSION unaccent;
-SET search_path = SCHEMA_NAME, public,pg_catalog;
+
+CREATE EXTENSION IF NOT EXISTS unaccent;
