@@ -300,7 +300,7 @@ BEGIN
 			END IF;				
 							
 		-- existing visit
-		ELSIF v_load_visit THEN
+		ELSIF v_load_visit AND v_id IS NULL THEN
 				
 			EXECUTE ('SELECT class_id FROM om_visit WHERE id = '|| v_visit_id || ' ORDER BY id desc LIMIT 1') INTO v_visitclass;
 			v_id = v_visit_id;
