@@ -624,18 +624,18 @@ class ApiCF(ApiParent, QObject):
             self.controller.dock_dialog(dlg_cf)
             self.controller.dlg_docker.dlg_closed.connect(partial(self.manage_docker_close))
             self.controller.dlg_docker.setWindowTitle(title)
-            btn_cancel.clicked.connect(lambda: self.controller.dlg_docker.dlg_closed.emit())
-        else:
-            dlg_cf.dlg_closed.connect(self.roll_back)
-            dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
-            dlg_cf.dlg_closed.connect(partial(self.save_settings, dlg_cf))
-            dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
-            dlg_cf.key_pressed.connect(partial(self.close_dialog, dlg_cf))
-
-            btn_cancel.clicked.connect(partial(self.close_dialog, dlg_cf))
-            btn_cancel.clicked.connect(self.roll_back)
-            btn_accept.clicked.connect(partial(self.accept_from_btn, dlg_cf, action_edit, result, fid, new_feature, self.my_json))
-
+            btn_cancel.clicked.connect(partial(self.manage_docker_close))
+            if self.new_feature_id is None:
+                btn_cancel.setVisible(False)
+                btn_accept.setVisible(False)
+            else:
+                dlg_cf.dlg_closed.connect(self.roll_back)
+                dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
+                dlg_cf.dlg_closed.connect(partial(self.save_settings, dlg_cf))
+                dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
+                dlg_cf.key_pressed.connect(partial(self.close_dialog, dlg_cf))
+                btn_cancel.clicked.connect(partial(self.close_dialog, dlg_cf))
+        btn_accept.clicked.connect(partial(self.accept_from_btn, dlg_cf, action_edit, result, fid, new_feature, self.my_json))
         dlg_cf.dlg_closed.connect(self.disconect_signals)
 
         # Set title
@@ -748,25 +748,31 @@ class ApiCF(ApiParent, QObject):
                     value = utils_giswater.getWidgetText(self.dlg_cf, widget)
                     if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
                         self.my_json[str(widget.property('columnname'))] = str(value)
+                    widget.clearFocus()
         except RuntimeError:
             pass
 
 
-    def manage_edition(self, dialog, action_edit, result, fid, new_feature=None, my_json=None):
-
+    def manage_edition(self, dialog, action_edit, result, fid, new_feature=None):
+        # With the editing QAction we need to collect the last modified value (self.get_last_value()),
+        # since the "editingFinished" signals of the widgets are not detected.
+        # Therefore whenever the cursor enters a widget, it will ask if we want to save changes
         self.get_last_value()
         if not action_edit.isChecked():
-            if str(my_json) == '{}':
+            if str(self.my_json) == '{}':
                 self.check_actions(action_edit, False)
                 self.disable_all(dialog, result, False)
                 self.enable_actions(dialog, False)
                 return
             save = self.ask_for_save(action_edit, fid)
             if save:
-                self.manage_accept(dialog, action_edit, result, new_feature, my_json, False)
+                self.manage_accept(dialog, action_edit, result, new_feature, self.my_json, False)
+                self.my_json = {}
             elif self.new_feature_id is not None:
-                print(f"self.new_feature_id-->{self.new_feature_id}")
-                self.close_dialog(dialog)
+                if self.controller.dlg_docker and self.controller.show_docker:
+                    self.manage_docker_close()
+                else:
+                    self.close_dialog(dialog)
         else:
             self.check_actions(action_edit, True)
             self.enable_all(dialog, result)
@@ -774,7 +780,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def accept_from_btn(self, dialog, action_edit, result, fid, new_feature, my_json):
-        if str(my_json) == '{}' or not action_edit.isChecked():
+        if not action_edit.isChecked():
             self.close_dialog(dialog)
             return
         else:
@@ -784,7 +790,6 @@ class ApiCF(ApiParent, QObject):
 
 
     def manage_accept(self, dialog, action_edit, result, new_feature, my_json, close_dlg):
-        self.get_last_value()
         status = self.accept(dialog, self.complet_result[0], my_json, close_dialog=close_dlg, new_feature=new_feature)
         self.check_actions(action_edit, True)
         if status is not False:  # Commit succesfull or dialog closed
@@ -1153,8 +1158,10 @@ class ApiCF(ApiParent, QObject):
             self.controller.is_inserting = False
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
-                if self.controller.dlg_docker:
-                    self.manage_docker_close()
+                if close_dialog:
+                    if self.controller.dlg_docker:
+                        self.manage_docker_close()
+                    self.close_dialog(dialog)
                 return True
 
             feature = f'"id":"{new_feature.attribute(id_name)}", '
@@ -1169,6 +1176,7 @@ class ApiCF(ApiParent, QObject):
         extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
         body = self.create_body(feature=feature, extras=extras)
         json_result = self.controller.get_json('gw_fct_setfields', body)
+
         if not json_result:
             self.layer.editingStarted.connect(self.fct_start_editing)
             self.layer.editingStopped.connect(self.fct_stop_editing)
