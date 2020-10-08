@@ -594,7 +594,7 @@ class ApiCF(ApiParent, QObject):
         action_edit.setChecked(layer.isEditable())
 
         # Actions signals
-        action_edit.triggered.connect(partial(self.manage_edition, dlg_cf, action_edit, complet_result[0]['body']['data'], fid, new_feature, self.my_json))
+        action_edit.triggered.connect(partial(self.manage_edition, dlg_cf, action_edit, complet_result[0]['body']['data'], fid, new_feature))
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id, 'arc'))
