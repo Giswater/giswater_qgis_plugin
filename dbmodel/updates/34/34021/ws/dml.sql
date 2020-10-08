@@ -16,7 +16,7 @@ UPDATE config_toolbox SET  inputparams =
 {"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text","tooltip": "Choose exploitation to work with", "layoutname":"grl_option_parameters","layoutorder":2, 
 "dvQueryText":"select expl_id as id, name as idval from exploitation where active is not false order by name", "selectedId":"1"},
 
-{"widgetname":"floodFromNode", "label":"Flood from node parent: (*)","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Optative parameter to constraint algorithm to work only flooding from this header affecting only its mapzone", "placeholder":"1015", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
+{"widgetname":"floodFromNode", "label":"Flood from node: (*)","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Optative parameter to constraint algorithm to work only flooding from any node on network, used to define only the related mapzone", "placeholder":"1015", "layoutname":"grl_option_parameters","layoutorder":3, "value":""},
 
 {"widgetname":"forceOpen", "label":"Force open nodes: (*)","widgettype":"linetext","datatype":"text", "isMandatory":false, "tooltip":"Optative node id(s) to temporary open closed node(s) in order to force algorithm to continue there", "placeholder":"1015,2231,3123", "layoutname":"grl_option_parameters","layoutorder":4, "value":""},
 
@@ -27,7 +27,7 @@ UPDATE config_toolbox SET  inputparams =
 {"widgetname":"updateMapZone", "label":"Mapzone constructor method:","widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layoutorder":7,
 "comboIds":[0,1,2,3,4], "comboNames":["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER", "LINK & PIPE BUFFER"], "selectedId":"2"}, 
 
-{"widgetname":"geomParamUpdate", "label":"Pipe buffer","widgettype":"text","datatype":"float","tooltip":"Buffer from arcs to create mapzone geometry. Only works with PIPE BUFFER & PLOT&PIPE BUFFER", "layoutname":"grl_option_parameters","layoutorder":8, "isMandatory":false, "placeholder":"5-30", "value":""}]'
+{"widgetname":"geomParamUpdate", "label":"Pipe buffer","widgettype":"text","datatype":"float","tooltip":"Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.", "layoutname":"grl_option_parameters","layoutorder":8, "isMandatory":false, "placeholder":"5-30", "value":""}]'
 WHERE id = 2768;
 
 UPDATE config_toolbox SET  inputparams =
@@ -36,9 +36,12 @@ UPDATE config_toolbox SET  inputparams =
 WHERE id = 2826;
 
 UPDATE sys_function SET  descript =
-'Function to analyze graf of network. Multiple analysis is avaliable.  On advanced mode multi exploitation is avaliable and update mapzones geometry is enabled. Dynamic analisys to sectorize network using the flow traceability function. 
-Before work with this funcion it is mandatory to configurate field graf_delimiter on node_type and field grafconfig on [dma, sector, cat_presszone and dqa] tables.
-Widget witj (*) are optative. Standard value for Pipe buffer parameter maybe: 5-30 (mts)'
+'Function to analyze network as a graf. Multiple analysis is avaliable (SECTOR, DQA, PRESSZONE & DMA). Before start you need to configurate:
+- Field graf_delimiter on [node_type] table. 
+- Field grafconfig on [dma, sector, cat_presszone and dqa] tables.
+- Enable status for variable utils_grafanalytics_status on [config_param_system] table.
+Stop your mouse over label for more information about input parameters.
+This function could be automatic triggered by valve status (open or closed) by configuring utils_grafanalytics_automatic_trigger variable on [config_param_system] table.'
 WHERE id = 2768;
 
 INSERT INTO config_param_system (parameter, value, descript, label, isenabled, project_type) VALUES ('utils_grafanalytics_automatic_trigger', '{"status":"false", "parameters":{"updateMapZone":2, "geomParamUpdate":10, "usePlanPsector":false}}', 'Automatic trigger of graf analytics used when valve status is modified (open or close)', 'Automatic grafanalytics trigger', true, 'ws')
