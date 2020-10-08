@@ -43,19 +43,19 @@ BEGIN
 
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
-	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 
+	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
 	-- Reset values
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid = 104;
 	
 	-- Computing process
-	IF v_array != '()' THEN
+	IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_arc (arc_id, state, expl_id, fid, the_geom, arccat_id)
 				SELECT arc_id, state, expl_id, 104, the_geom, arccat_id
-				FROM '||v_worklayer||' WHERE node_1::text=node_2::text AND arc_id IN '||v_array||';';
+				FROM '||v_worklayer||' WHERE node_1::text=node_2::text AND arc_id IN ('||v_array||');';
 	ELSE
 		EXECUTE 'INSERT INTO anl_arc (arc_id, state, expl_id, fid, the_geom, arccat_id)
 				SELECT arc_id, state, expl_id, 104, the_geom, arccat_id
