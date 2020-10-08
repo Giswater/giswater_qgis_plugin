@@ -508,6 +508,9 @@ BEGIN
 			END LOOP;
 		END IF;		
 
+		-- inp connec insert
+		INSERT INTO inp_connec (connec_id) VALUES (NEW.connec_id);
+
 		RETURN NEW;
 
 	
