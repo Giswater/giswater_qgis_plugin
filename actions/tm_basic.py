@@ -309,7 +309,7 @@ class TmBasic(TmParentAction):
             extras += f'"cbx_campaigns":{cmb_campaign}, '
             extras += f'"chk_campaign":{bool_dic[chk_campaign]}}}'
             body = self.parent.create_body(extras=extras)
-            sql = ("SELECT tm_fct_copy_planning($${" + body + "}$$)::text")
+            sql = ("SELECT tm_fct_copy_planning(" + body + ")::text")
             row = self.controller.get_row(sql)
             self.tree_selector(update)
 
