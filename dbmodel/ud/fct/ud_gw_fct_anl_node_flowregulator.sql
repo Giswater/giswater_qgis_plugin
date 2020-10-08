@@ -47,16 +47,17 @@ BEGIN
     
     -- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
-	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 
+	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
+
 	-- Computing process
-	IF v_array != '()' THEN
+	IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_node (node_id, expl_id, fid, num_arcs, the_geom,nodecat_id, state)
 				SELECT node_1 as node_id, '||v_worklayer||'.expl_id, 112, count(node_1) as num_arcs, '||v_worklayer||'.the_geom,nodecat_id,'||v_worklayer||'.state
-				FROM arc JOIN '||v_worklayer||' ON node_id=node_1 AND node_id IN '||v_array||'
+				FROM arc JOIN '||v_worklayer||' ON node_id=node_1 AND node_id IN ('||v_array||')
 				WHERE arc.state=1 and '||v_worklayer||'.state=1
 				GROUP BY node_1, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom,'||v_worklayer||'.nodecat_id, '||v_worklayer||'.state
 				HAVING count(node_1)> 1 

@@ -55,14 +55,16 @@ BEGIN
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 
+	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
+
 	-- Computing process
-	IF v_array != '()' THEN
+	IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, num_arcs, expl_id, fid, the_geom)
 				SELECT node_id, nodecat_id, '||v_worklayer||'.state, COUNT(*), '||v_worklayer||'.expl_id, 108, '||v_worklayer||'.the_geom 
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
 				JOIN cat_feature_node ON nodetype_id=id 
-				WHERE num_arcs=4 AND node_id IN '||v_array ||'
+				WHERE num_arcs=4 AND node_id IN ('||v_array ||')
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 4
 				UNION
@@ -70,7 +72,7 @@ BEGIN
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
 				JOIN cat_feature_node ON nodetype_id=id 
-				WHERE num_arcs=3 AND node_id IN '||v_array ||'
+				WHERE num_arcs=3 AND node_id IN ('||v_array ||')
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 3
 				UNION
@@ -78,7 +80,7 @@ BEGIN
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
 				JOIN cat_feature_node ON nodetype_id=id 
-				WHERE num_arcs=2 AND node_id IN '||v_array ||'
+				WHERE num_arcs=2 AND node_id IN ('||v_array ||')
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 2
 				UNION
@@ -86,7 +88,7 @@ BEGIN
 				FROM '||v_worklayer||' 
 				JOIN v_edit_arc ON v_edit_arc.node_1 = '||v_worklayer||'.node_id OR v_edit_arc.node_2 = '||v_worklayer||'.node_id
 				JOIN cat_feature_node ON nodetype_id=id 
-				WHERE num_arcs=1 AND node_id IN '||v_array ||'
+				WHERE num_arcs=1 AND node_id IN ('||v_array ||')
 				GROUP BY '||v_worklayer||'.node_id, nodecat_id, '||v_worklayer||'.state, '||v_worklayer||'.expl_id, '||v_worklayer||'.the_geom 
 				HAVING COUNT(*) != 1;';
 	ELSE

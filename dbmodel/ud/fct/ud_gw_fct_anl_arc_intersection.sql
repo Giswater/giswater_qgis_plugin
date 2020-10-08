@@ -45,22 +45,23 @@ BEGIN
 
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
-	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
+
+	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
 
 	-- Reset values
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=109;
 	    
 	-- Computing process
-	IF v_array != '()' THEN
+	IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, arc_id_aux, the_geom_p, the_geom, arccat_id, state)
 		SELECT a.arc_id AS arc_id_1, a.expl_id, 109, b.arc_id AS arc_id_2, 
 		(ST_Dumppoints(ST_Multi(ST_Intersection(a.the_geom, b.the_geom)))).geom AS the_geom_p,a.the_geom, a.arccat_id, a.state
 		FROM '||v_worklayer||' AS a, '||v_worklayer||' AS b 
 		WHERE a.state=1 AND b.state=1 AND ST_Intersects(a.the_geom, b.the_geom) AND a.arc_id != b.arc_id AND NOT ST_Touches(a.the_geom, b.the_geom)
-		AND a.the_geom is not null and b.the_geom is not null AND a.arc_id IN '||v_array||';';
+		AND a.the_geom is not null and b.the_geom is not null AND a.arc_id IN ('||v_array||');';
 	ELSE
 		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, arc_id_aux, the_geom_p,the_geom, arccat_id, state)
 		SELECT a.arc_id AS arc_id_1, a.expl_id, 109, b.arc_id AS arc_id_2, 

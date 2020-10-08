@@ -56,15 +56,15 @@ BEGIN
 
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
-	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 
-
+	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
+	
 	-- Computing process
-	IF v_array != '()' THEN
+	IF v_selectionmode = 'previousSelection' THEN
 		v_sql:= 'SELECT * FROM '||v_worklayer||' where node_id in (select node_1 from v_edit_arc) 
-		and node_id in (select node_2 from v_edit_arc) and node_id IN '||v_array||';';
+		and node_id in (select node_2 from v_edit_arc) and node_id IN ('||v_array||');';
 	ELSE
 		v_sql:= ('SELECT * FROM '||v_worklayer||' where node_id in (select node_1 from v_edit_arc) 
 		and node_id in (select node_2 from v_edit_arc)');
