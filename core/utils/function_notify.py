@@ -15,7 +15,7 @@ from collections import OrderedDict
 
 from .. import global_vars
 
-from .utils.tools_giswater import create_body
+from core.utils.tools_giswater import create_body
 
 
 class GwNotifyTools:

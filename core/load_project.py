@@ -17,8 +17,8 @@ from .. import global_vars
 from .models.plugin_toolbar import PluginToolbar
 from .utils.pg_man import PgMan
 from .ui.ui_manager import DialogTextUi
-from .info_tools import GwInfoTools
-from .notify_tools import GwNotifyTools
+from core.utils.function_widget import GwInfoTools
+from core.utils.function_notify import GwNotifyTools
 from .actions.search import GwSearch
 from .utils.tools_giswater import set_parser_value
 from ..lib.tools_qgis import qgis_get_layer_source, get_qgis_project_variables, qgis_manage_snapping_layer
