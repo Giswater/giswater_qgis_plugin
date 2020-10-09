@@ -179,7 +179,7 @@ BEGIN
 		update temp_anlgraf n set water= 1, flag=n.flag+1 from v_anl_graf a where n.node_1 = a.node_1 and n.arc_id = a.arc_id;
 		GET DIAGNOSTICS v_affectedrows =row_count;
 		EXIT WHEN v_affectedrows = 0;
-		EXIT WHEN v_cont = 200;
+		EXIT WHEN v_cont = 2000;
 	END LOOP;
 
 	-- insert into result table disconnected arcs
@@ -254,7 +254,7 @@ BEGIN
 			update temp_anlgraf n set water= 1, flag=n.flag+1 from v_anl_graf a where n.node_1 = a.node_1 and n.arc_id = a.arc_id;
 			GET DIAGNOSTICS v_affectedrows =row_count;
 			EXIT WHEN v_affectedrows = 0;
-			EXIT WHEN v_cont = 200;
+			EXIT WHEN v_cont = 2000;
 		END LOOP;
 
 		-- insert into result table dry arcs (warning)

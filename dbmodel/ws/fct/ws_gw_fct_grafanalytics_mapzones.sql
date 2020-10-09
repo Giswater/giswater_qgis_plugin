@@ -492,7 +492,7 @@ BEGIN
 						
 						GET DIAGNOSTICS v_affectrows = row_count;
 						EXIT WHEN v_affectrows = 0;
-						EXIT WHEN v_count = 200;
+						EXIT WHEN v_count = 2000;
 
 					END LOOP;
 					
