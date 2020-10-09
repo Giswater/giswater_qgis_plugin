@@ -9,8 +9,8 @@ from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints
 
 import os
 
-from .. import global_vars
-from core.utils.tools_giswater import create_body
+from ... import global_vars
+from ..utils.tools_giswater import create_body
 
 
 class GwInfoTools:
