@@ -119,7 +119,6 @@ class GwToolBox(ApiParent):
         bool_dict = {"True": True, "true": True, "False": False, "false": False}
         self.dlg_functions.btn_run.setEnabled(bool_dict[enable_btn_run])
         self.dlg_functions.btn_cancel.setEnabled(bool_dict[enable_btn_run])
-        # TODO translate title
         self.open_dialog(self.dlg_functions, dlg_name='toolbox', title=self.alias_function)
 
 
