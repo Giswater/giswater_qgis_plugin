@@ -583,6 +583,7 @@ class ApiCF(ApiParent, QObject):
             else:
                 self.disable_all(dlg_cf, result, False)
 
+        self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').toggled.connect(partial(self.block_action_edit, dlg_cf, action_edit, result, layer, fid, my_json, new_feature))
         # We assign the function to a global variable,
         # since as it receives parameters we will not be able to disconnect the signals
         self.fct_start_editing = lambda: self.start_editing(dlg_cf, action_edit, complet_result[0]['body']['data'], layer)
@@ -625,17 +626,13 @@ class ApiCF(ApiParent, QObject):
             self.controller.dlg_docker.dlg_closed.connect(partial(self.manage_docker_close))
             self.controller.dlg_docker.setWindowTitle(title)
             btn_cancel.clicked.connect(partial(self.manage_docker_close))
-            if self.new_feature_id is None:
-                btn_cancel.setVisible(False)
-                btn_accept.setVisible(False)
         else:
             dlg_cf.dlg_closed.connect(self.roll_back)
             dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
             dlg_cf.dlg_closed.connect(partial(self.save_settings, dlg_cf))
-            dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
             dlg_cf.key_pressed.connect(partial(self.close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self.close_dialog, dlg_cf))
-        btn_accept.clicked.connect(partial(self.accept_from_btn, dlg_cf, action_edit, result, fid, new_feature, self.my_json))
+        btn_accept.clicked.connect(partial(self.accept_from_btn, dlg_cf, action_edit, result, new_feature, self.my_json))
         dlg_cf.dlg_closed.connect(self.disconect_signals)
 
         # Set title
@@ -651,6 +648,14 @@ class ApiCF(ApiParent, QObject):
         dlg_cf.setWindowTitle(title)
 
         return self.complet_result, dlg_cf
+
+
+    def block_action_edit(self, dialog, action_edit, result, layer, fid, my_json, new_feature):
+
+        if self.new_feature_id is not None:
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(True)
+            self.stop_editing(dialog, action_edit, result, layer, fid, my_json, new_feature)
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(False)
 
 
     def close_dialog(self, dlg=None):
@@ -677,7 +682,6 @@ class ApiCF(ApiParent, QObject):
 
         self.roll_back()
         self.resetRubberbands()
-        self.set_vdefault_edition()
         self.controller.close_docker()
         self.disconect_signals()
 
@@ -720,14 +724,6 @@ class ApiCF(ApiParent, QObject):
         expr_filter = f"{self.field_id} = '{self.feature_id}'"
         self.feature = self.get_feature_by_expr(self.layer, expr_filter)
         return self.feature
-
-
-    def set_vdefault_edition(self):
-
-        if 'toggledition' in self.complet_result[0]['body']:
-            force_open = self.complet_result[0]['body']['toggledition']
-            if not force_open and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
-                self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
 
 
     def get_last_value(self):
@@ -779,27 +775,25 @@ class ApiCF(ApiParent, QObject):
             self.enable_actions(dialog, True)
 
 
-    def accept_from_btn(self, dialog, action_edit, result, fid, new_feature, my_json):
+    def accept_from_btn(self, dialog, action_edit, result, new_feature, my_json):
         if not action_edit.isChecked():
             self.close_dialog(dialog)
             return
-        else:
-            save = self.ask_for_save(action_edit, fid)
-        if save:
-            self.manage_accept(dialog, action_edit, result, new_feature, my_json, True)
+
+        self.manage_accept(dialog, action_edit, result, new_feature, my_json, True)
 
 
     def manage_accept(self, dialog, action_edit, result, new_feature, my_json, close_dlg):
+        action_edit.blockSignals(True)
         status = self.accept(dialog, self.complet_result[0], my_json, close_dialog=close_dlg, new_feature=new_feature)
-        self.check_actions(action_edit, True)
-        if status is not False:  # Commit succesfull or dialog closed
+        if status is True:  # Commit succesfull and dialog keep opened
             self.check_actions(action_edit, False)
             self.disable_all(dialog, result, False)
             self.enable_actions(dialog, False)
+            action_edit.blockSignals(False)
 
 
     def stop_editing(self, dialog, action_edit, result, layer, fid, my_json, new_feature=None):
-
         if my_json == '' or str(my_json) == '{}':
             self.disconect_signals()
             # Use commitChanges just for closse edition
@@ -835,6 +829,7 @@ class ApiCF(ApiParent, QObject):
             self.check_actions(action_edit, True)
             return False
         return True
+
 
     def roll_back(self):
         """ Discard changes in current layer """
@@ -1142,12 +1137,12 @@ class ApiCF(ApiParent, QObject):
                 if k in parent_fields:
                     new_feature.setAttribute(k, v)
                     _json.pop(k, None)
+
             if not self.layer_new_feature.isEditable():
                 self.layer_new_feature.startEditing()
             self.layer_new_feature.updateFeature(new_feature)
 
             status = self.layer_new_feature.commitChanges()
-            self.layer_new_feature.startEditing()
             if status is False:
                 error = self.layer_new_feature.commitErrors()
                 self.controller.show_warning(f"{error}")
@@ -1207,6 +1202,7 @@ class ApiCF(ApiParent, QObject):
                 self.manage_docker_close()
             self.close_dialog(dialog)
             return None
+        return True
 
 
     def get_scale_zoom(self):
