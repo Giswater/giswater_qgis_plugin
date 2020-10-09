@@ -25,6 +25,7 @@ class CadApiInfo(ParentMapTool):
         self.tab_type = None
         # Used when the signal 'signal_activate' is emitted from the info, do not open another form
         self.block_signal = False
+        self.previous_api_cf = None
 
 
     def create_point(self, event):
@@ -74,7 +75,11 @@ class CadApiInfo(ParentMapTool):
             api_cf = ApiCF(self.iface, self.settings, self.controller, self.controller.plugin_dir, self.tab_type)
             api_cf.signal_activate.connect(self.reactivate_map_tool)
             api_cf.open_form(point, tab_type=self.tab_type)
-
+            # Remove previous rubberband when open new docker
+            if isinstance(self.previous_api_cf, ApiCF) and self.controller.dlg_docker is not None:
+                self.previous_api_cf.resetRubberbands()
+            self.previous_api_cf = api_cf
+            
         elif event.button() == Qt.RightButton:
             point = self.create_point(event)
             if point is False:
