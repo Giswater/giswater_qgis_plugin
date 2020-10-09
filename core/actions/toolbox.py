@@ -56,7 +56,7 @@ class GwToolBox(ApiParent):
         extras = '"isToolbox":true'
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_gettoolbox', body)
-        if not json_result:
+        if not json_result or json_result['status'] == 'Failed':
             return False
 
         self.populate_trv(self.dlg_toolbox_doc.trv, json_result['body']['data'])
@@ -70,7 +70,7 @@ class GwToolBox(ApiParent):
         extras = f'"filterText":"{text}"'
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_gettoolbox', body)
-        if not json_result:
+        if not json_result or json_result['status'] == 'Failed':
             return False
 
         self.populate_trv(self.dlg_toolbox_doc.trv, json_result['body']['data'], expand=True)
@@ -100,7 +100,7 @@ class GwToolBox(ApiParent):
         extras += ', "isToolbox":true'
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_gettoolbox', body)
-        if not json_result:
+        if not json_result or json_result['status'] == 'Failed':
             return False
 
         status = self.populate_functions_dlg(self.dlg_functions, json_result['body']['data'])
@@ -363,6 +363,7 @@ class GwToolBox(ApiParent):
 
         body = self.create_body(feature=feature_field, extras=extras)
         json_result = self.controller.get_json(function_name, body, log_sql=True)
+        if json_result['status'] == 'Failed': return
         self.add_layer.populate_info_text(dialog, json_result['body']['data'], True, True, 1, True)
 
         dialog.progressBar.setAlignment(Qt.AlignCenter)
@@ -709,7 +710,7 @@ class GwToolBox(ApiParent):
         extras = extras[:-2]
         body = self.create_body(extras)
         result = self.controller.get_json('gw_fct_check_importdxf', None)
-        if not result:
+        if not result or result['status'] == 'Failed':
             return False
 
         return {"path": dxf_path, "result": result, "temp_layers_added": temp_layers_added}

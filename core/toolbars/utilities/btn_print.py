@@ -56,7 +56,7 @@ class GwPrintButton(GwParentAction):
         extras = '"composers":' + str(composers_list)
         body = create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_getprint', body)
-        if not json_result:
+        if not json_result or json_result['status'] == 'Failed':
             return False
 
         if json_result['formTabs']:
@@ -264,7 +264,7 @@ class GwPrintButton(GwParentAction):
         data = '"data":' + str(my_json)
         body = "$${" + client + form + feature + data + "}$$"
         json_result = self.controller.get_json('gw_fct_setprint', body)
-        if not json_result:
+        if not json_result or json_result['status'] == 'Failed':
             return False
 
         result = json_result['data']

@@ -41,7 +41,7 @@ class GwArcDivideButton(GwParentMapTool):
             feature_id = f'"id":["{node_id}"]'
             body = create_body(feature=feature_id)
             result = self.controller.get_json('gw_fct_arc_divide', body)
-            if not result:
+            if not result or result['status'] == 'Failed':
                 return
             if 'hideForm' not in result['body']['actions'] or not result['body']['actions']['hideForm']:
                 self.dlg_dtext = DialogTextUi()

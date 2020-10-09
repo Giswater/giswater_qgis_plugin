@@ -857,7 +857,7 @@ def populate_lineedit(completer, model, field, dialog, widget):
     extras += f', "textToSearch":"{getWidgetText(dialog, widget)}"'
     body = tools_giswater.create_body(extras=extras)
     complet_list = global_vars.controller.get_json('gw_fct_gettypeahead', body)
-    if not complet_list:
+    if not complet_list or complet_list['status'] == 'Failed':
         return False
 
     list_items = []
@@ -1008,7 +1008,7 @@ def fill_child(dialog, widget, feature_type, tablename, field_id):
     extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
     body = tools_giswater.create_body(feature=feature, extras=extras)
     result = global_vars.controller.get_json('gw_fct_getchilds', body)
-    if not result:
+    if not result or result['status'] == 'Failed':
         return False
 
     for combo_child in result['body']['data']:

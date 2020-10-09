@@ -1927,6 +1927,7 @@ class DaoController:
                             extras = f'"style_id":"{style_id}"'
                             body = create_body(extras=extras)
                             style = global_vars.controller.get_json('gw_fct_getstyle', body)
+                            if style['status'] == 'Failed': return
                             if 'styles' in style['body']:
                                 if 'style' in style['body']['styles']:
                                     qml = style['body']['styles']['style']

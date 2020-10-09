@@ -41,7 +41,7 @@ class GwConfigButton(GwParentAction):
 
         body = create_body(form='"formName":"config"', extras=result)
         json_result = self.controller.get_json('gw_fct_getconfig', body)
-        if not json_result:
+        if not json_result or json_result['status'] == 'Failed':
             return False
 
         self.dlg_config = ConfigUi()
@@ -241,7 +241,7 @@ class GwConfigButton(GwParentAction):
         extras = f'"fields":{my_json}'
         body = create_body(form='"formName":"config"', extras=extras)
         json_result = self.controller.get_json('gw_fct_setconfig', body)
-        if not json_result:
+        if not json_result or json_result['status'] == 'Failed':
             return False
 
         message = "Values has been updated"

@@ -89,7 +89,7 @@ class GwSearch:
             body = create_body(form=form, extras=extras)
         function_name = "gw_fct_getsearch"
         complet_list = self.controller.get_json(function_name, body)
-        if not complet_list:
+        if not complet_list or complet_list['status'] == 'Failed':
             return False
 
         main_tab = self.dlg_search.findChild(QTabWidget, 'main_tab')
@@ -330,7 +330,7 @@ class GwSearch:
             extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
             body = create_body(form=form_search, extras=extras_search)
             result = self.controller.get_json('gw_fct_setsearch', body, rubber_band=self.rubber_band)
-            if not result:
+            if not result or result['status'] == 'Failed':
                 return False
 
             if result:
@@ -363,16 +363,15 @@ class GwSearch:
             extras_search_add += f', "{line_edit_add.property("columnname")}":{{"text":"{value}"}}'
             body = create_body(form=form_search_add, extras=extras_search_add)
             result = self.controller.get_json('gw_fct_setsearchadd', body, rubber_band=self.rubber_band)
-            if not result:
+            if not result or result['status'] == 'Failed':
                 return False
 
-            if result:
-                self.result_data = result
-                if result is not None:
-                    display_list = []
-                    for data in self.result_data['data']:
-                        display_list.append(data['display_name'])
-                    set_completer_object_api(completer, model, line_edit_add, display_list)
+            self.result_data = result
+            if result is not None:
+                display_list = []
+                for data in self.result_data['data']:
+                    display_list.append(data['display_name'])
+                set_completer_object_api(completer, model, line_edit_add, display_list)
 
 
     def clear_line_edit_add(self, line_list):
@@ -436,12 +435,9 @@ class GwSearch:
         body = create_body(feature=feature, extras=extras)
         function_name = 'gw_fct_getinfofromid'
         json_result = self.controller.get_json(function_name, body)
-        if json_result is None:
+        if json_result is None or json_result['status'] == 'Failed':
             return
-
         result = [json_result]
-        if not result:
-            return
 
         self.hydro_info_dlg = InfoGenericUi()
         load_settings(self.hydro_info_dlg)

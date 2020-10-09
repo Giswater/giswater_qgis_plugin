@@ -142,7 +142,7 @@ class GwInfoButton(GwParentMapTool):
         extras += f'"zoomScale":{scale_zoom} '
         body = create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_getlayersfromcoordinates', body, rubber_band=self.rubber_band)
-        if not json_result:
+        if not json_result  or json_result['status'] == 'Failed':
             return False
 
         # hide QMenu identify if no feature under mouse

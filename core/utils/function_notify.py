@@ -181,7 +181,7 @@ class GwNotifyTools:
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = create_body(feature=feature, extras=extras)
             result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True)
-            if not result:
+            if not result or json_result['status'] == 'Failed':
                 continue
             for field in result['body']['data']['fields']:
                 _values = {}

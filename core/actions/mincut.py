@@ -657,7 +657,7 @@ class GwMincut:
         extras += f'"result":"{result_mincut_id_text}"'
         body = create_body(extras=extras)
         result = self.controller.get_json('gw_fct_mincut_result_overlap', body)
-        if not result:
+        if not result or result['status'] == 'Failed':
             return
 
         if result['body']['actions']['overlap'] == 'Conflict':
@@ -1622,7 +1622,7 @@ class GwMincut:
         extras += f'"mincutId":"{real_mincut_id}", "arcId":"{elem_id}"'
         body = create_body(extras=extras)
         complet_result = self.controller.get_json('gw_fct_setmincut', body)
-        if complet_result in (False, None): return False
+        if complet_result in (False, None) or complet_result['status'] == 'Failed': return False
 
         if 'mincutOverlap' in complet_result:
             if complet_result['mincutOverlap'] != "":

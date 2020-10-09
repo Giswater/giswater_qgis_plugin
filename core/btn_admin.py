@@ -1324,7 +1324,7 @@ class GwAdmin:
         extras += ', "isToolbox":false'
         body = create_body(extras=extras)
         complet_result = self.controller.get_json('gw_fct_gettoolbox', body, schema_name=self.schema, commit=False)
-        if not complet_result:
+        if not complet_result or complet_result['status'] == 'Failed':
             return False
         self.populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data'])
 
@@ -1371,7 +1371,7 @@ class GwAdmin:
         body = "$${" + client + data + "}$$"
         status = self.controller.get_json('gw_fct_admin_schema_lastprocess', body,
                                           schema_name=self.schema_name, commit=False)
-        if status is False:
+        if status is False or status['status'] == 'Failed':
             self.error_count = self.error_count + 1
 
         return status
@@ -2472,7 +2472,7 @@ class GwAdmin:
         self.task1.setProgress(50)
         result = self.controller.get_json('gw_fct_admin_schema_clone', body,
                                           schema_name=schema, commit=False)
-        if not result:
+        if not result or result['status'] == 'Failed':
             return
         self.task1.setProgress(100)
 
@@ -2808,7 +2808,7 @@ class GwAdmin:
         body = body.replace('""', 'null')
 
         # Execute query
-        json_result = self.controller.get_json('gw_fct_admin_manage_child_views', body,
+        self.controller.get_json('gw_fct_admin_manage_child_views', body,
                                           schema_name=schema_name, commit=True)
         self.manage_json_message(json_result, title="Create child view")
 
@@ -3191,7 +3191,7 @@ class GwAdmin:
             json_result = self.controller.get_json('gw_fct_admin_manage_addfields', body,
                                               schema_name=schema_name, commit=True)
             self.manage_json_message(json_result, parameter="Field configured in 'config_form_fields'")
-            if not json_result:
+            if not json_result or json_result['status'] == 'Failed':
                 return
 
         elif action == 'update':
@@ -3233,7 +3233,7 @@ class GwAdmin:
             json_result = self.controller.get_json('gw_fct_admin_manage_addfields', body,
                                               schema_name=schema_name, commit=True)
             self.manage_json_message(json_result, parameter="Field update in 'config_form_fields'")
-            if not json_result:
+            if not json_result or json_result['status'] == 'Failed':
                 return
 
         elif action == 'delete':

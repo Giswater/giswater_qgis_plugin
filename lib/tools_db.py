@@ -91,7 +91,7 @@ def get_selector(dialog, selector_type, filter=False, widget=None, text_filter=N
         for x in range(dialog.main_tab.count() - 1, -1, -1):
             dialog.main_tab.widget(x).deleteLater()
 
-    if not json_result:
+    if not json_result or json_result['status'] == 'Failed':
         return False
 
     for form_tab in json_result['body']['form']['formTabs']:
@@ -251,7 +251,7 @@ def set_selector(dialog, widget, is_alone, selector_vars):
 
     body = tools_giswater.create_body(extras=extras)
     json_result = global_vars.controller.get_json('gw_fct_setselectors', body)
-
+    if json_result['status'] == 'Failed': return
     if str(tab_name) == 'tab_exploitation':
         try:
             # Zoom to exploitation

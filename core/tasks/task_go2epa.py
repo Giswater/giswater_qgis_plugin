@@ -142,7 +142,7 @@ class GwGo2EpaTask(QgsTask):
         body = self.create_body(extras=extras)
         function_name = 'gw_fct_pg2epa_main'
         json_result = self.controller.get_json(function_name, body)
-        if json_result is None:
+        if json_result is None  or json_result['status'] == 'Failed':
             return False
 
         self.complet_result = json_result
@@ -372,7 +372,7 @@ class GwGo2EpaTask(QgsTask):
         body = self.create_body(extras=extras)
         function_name = 'gw_fct_rpt2pg_main'
         json_result = self.controller.get_json(function_name, body, log_sql=False)
-        if json_result is None:
+        if json_result is None  or json_result['status'] == 'Failed':
             return False
 
         self.rpt_result = json_result

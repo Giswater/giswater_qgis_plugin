@@ -45,7 +45,7 @@ class PgMan:
 
         # self.controller.log_info(f"SELECT gw_fct_getstylemapzones ({body})")
         json_return = self.controller.get_json('gw_fct_getstylemapzones', body)
-        if not json_return:
+        if not json_return or json_return['status'] == 'Failed':
             return False
 
         for mapzone in json_return['body']['data']['mapzones']:

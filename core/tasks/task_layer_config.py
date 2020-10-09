@@ -131,7 +131,7 @@ class GwConfigLayerTask(QgsTask):
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = self.create_body(feature=feature, extras=extras)
             complet_result = self.controller.get_json('gw_fct_getinfofromid', body, log_sql=False)
-            if not complet_result:
+            if not complet_result  or complet_result['status'] == 'Failed':
                 continue
 
             # self.controller.log_info(str(complet_result))

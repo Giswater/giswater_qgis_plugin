@@ -55,7 +55,7 @@ class GwToolBoxButton(GwParentAction):
         extras = '"isToolbox":true'
         body = create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_gettoolbox', body)
-        if not json_result:
+        if not json_result or json_result['status'] == 'Failed':
             return False
 
         self.populate_trv(self.dlg_toolbox_doc.trv, json_result['body']['data'])
@@ -69,7 +69,7 @@ class GwToolBoxButton(GwParentAction):
         extras = f'"filterText":"{text}"'
         body = create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_gettoolbox', body)
-        if not json_result:
+        if not json_result or json_result['status'] == 'Failed':
             return False
 
         self.populate_trv(self.dlg_toolbox_doc.trv, json_result['body']['data'], expand=True)
@@ -99,7 +99,7 @@ class GwToolBoxButton(GwParentAction):
         extras += ', "isToolbox":true'
         body = create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_gettoolbox', body)
-        if not json_result:
+        if not json_result or json_result['status'] == 'Failed':
             return False
 
         status = self.populate_functions_dlg(self.dlg_functions, json_result['body']['data'])
@@ -358,6 +358,7 @@ class GwToolBoxButton(GwParentAction):
 
         body = create_body(feature=feature_field, extras=extras)
         json_result = self.controller.get_json(function_name, body)
+        if json_result['status'] == 'Failed': return
         populate_info_text(dialog, json_result['body']['data'], True, True, 1, True)
 
         dialog.progressBar.setAlignment(Qt.AlignCenter)
@@ -604,7 +605,7 @@ class GwToolBoxButton(GwParentAction):
         extras = f'"mapzones":""'
         body = create_body(extras=extras)
         json_return = global_vars.controller.get_json('gw_fct_getstylemapzones', body)
-        if not json_return:
+        if not json_return or json_result['status'] == 'Failed':
             return False
 
         for mapzone in json_return['body']['data']['mapzones']:

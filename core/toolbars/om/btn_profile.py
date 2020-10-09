@@ -155,7 +155,7 @@ class GwProfileButton(GwParentMapTool):
 
         # Execute query
         self.profile_json = self.controller.get_json('gw_fct_getprofilevalues', body)
-
+        if self.profile_json['status'] == 'Failed': return
         # Manage level and message from query result
         if self.profile_json['message']:
             level = int(self.profile_json['message']['level'])
@@ -208,7 +208,7 @@ class GwProfileButton(GwParentMapTool):
             f'"ev":1000}}, "title":"{title}", "date":"{date}"'
         body = create_body(extras=extras)
         result = self.controller.get_json('gw_fct_setprofile', body)
-        if result is None: return
+        if result is None or result['status'] == 'Failed': return
         message = f"{result['message']}"
         self.controller.show_info(message)
 
@@ -222,7 +222,7 @@ class GwProfileButton(GwParentMapTool):
         # Get profils on database
         body = create_body()
         result_profile = self.controller.get_json('gw_fct_getprofile', body)
-        if not result_profile:
+        if not result_profile or result_profile['status'] == 'Failed':
             return
         message = f"{result_profile['message']}"
         self.controller.show_info(message)
@@ -353,6 +353,7 @@ class GwProfileButton(GwParentMapTool):
                     extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
                     body = create_body(extras=extras)
                     result = self.controller.get_json('gw_fct_getprofilevalues', body)
+                    if result['status'] == 'Failed': return
                     self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
                     self.remove_selection()
                     list_arcs = []

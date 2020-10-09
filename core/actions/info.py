@@ -1285,7 +1285,7 @@ class GwInfo(QObject):
         feature = '"id":"' + self.feature_id + '"'
         body = create_body(feature=feature)
         json_result = self.controller.get_json('gw_fct_getinfocrossection', body)
-        if not json_result:
+        if not json_result or json_result['status'] == 'Failed':
             return False
 
         # Set image
@@ -2791,7 +2791,7 @@ class GwInfo(QObject):
         body = create_body(form, feature, filter_fields)
         function_name = 'gw_fct_getlist'
         json_result = self.controller.get_json(function_name, body)
-        if json_result is None:
+        if json_result is None or json_result['status'] == 'Failed':
             return False
         complet_list = [json_result]
         if not complet_list:
@@ -2883,7 +2883,7 @@ class GwInfo(QObject):
             feature += f'"id":"{self.feature_id}"'
             body = create_body(form, feature, filter_fields='')
             json_result = self.controller.get_json('gw_fct_getinfoplan', body)
-            if not json_result:
+            if not json_result or json_result['status'] == 'Failed':
                 return False
 
             result = json_result['body']['data']
@@ -2927,7 +2927,7 @@ class GwInfo(QObject):
         body += '"data":{}}$$'
         function_name = 'gw_fct_getcatalog'
         json_result = self.controller.get_json(function_name, body)
-        if json_result is None:
+        if json_result is None or json_result['status'] == 'Failed':
             return
         complet_list = [json_result]
         if not complet_list:

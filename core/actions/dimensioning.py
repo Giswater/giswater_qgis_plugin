@@ -66,7 +66,7 @@ class GwDimensioning:
             body = create_body()
             function_name = 'gw_fct_getdimensioning'
             json_result = self.controller.get_json(function_name, body)
-            if json_result is None:
+            if json_result is None or json_result['status'] == 'Failed':
                 return False
             db_return = [json_result]
 
@@ -195,7 +195,7 @@ class GwDimensioning:
         feature += f'"id":"{self.fid}"'
         extras = f'"fields":{{{fields}}}'
         body = create_body(feature=feature, extras=extras)
-        result = self.controller.get_json('gw_fct_setdimensioning', body)
+        self.controller.get_json('gw_fct_setdimensioning', body)
 
         # Close dialog
         close_dialog(self.dlg_dim)

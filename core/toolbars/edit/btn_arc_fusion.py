@@ -79,7 +79,7 @@ class GwArcFusionButton(GwParentMapTool):
         body = create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
         result = self.controller.get_json('gw_fct_arc_fusion', body)
-        if not result:
+        if not result or result['status'] == 'Failed':
             return
 
         text_result = populate_info_text(self.dlg_fusion, result['body']['data'], True, True, 1)

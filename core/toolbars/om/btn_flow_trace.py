@@ -51,7 +51,7 @@ class GwFlowTraceButton(GwParentMapTool):
             feature_id = f'"id":["{elem_id}"]'
             body = create_body(feature=feature_id)
             result = self.controller.get_json(function_name, body)
-            if not result:
+            if not result or result['status'] == 'Failed':
                 return
 
             # Refresh map canvas

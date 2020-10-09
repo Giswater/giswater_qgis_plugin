@@ -42,7 +42,7 @@ class GwGo2EpaOptions:
         form = '"formName":"epaoptions"'
         body = create_body(form=form)
         json_result = self.controller.get_json('gw_fct_getconfig', body)
-        if not json_result:
+        if not json_result or json_result['status'] == 'Failed':
             return False
 
         construct_form_param_user(
@@ -73,7 +73,7 @@ class GwGo2EpaOptions:
         extras = f'"fields":{my_json}'
         body = create_body(form=form, extras=extras)
         json_result = self.controller.get_json('gw_fct_setconfig', body)
-        if not json_result:
+        if not json_result or json_result['status'] == 'Failed':
             return False
 
         message = "Values has been updated"
@@ -96,7 +96,7 @@ class GwGo2EpaOptions:
         combo_parent = widget.objectName()
         combo_id = tools_qt.get_item_data(self.dlg_options, widget)
         json_result = self.controller.get_json('gw_fct_getcombochilds', f"'epaoptions', '', '', '{combo_parent}', '{combo_id}', ''")
-        if not json_result:
+        if not json_result or json_result['status'] == 'Failed':
             return False
 
         for combo_child in json_result['fields']:

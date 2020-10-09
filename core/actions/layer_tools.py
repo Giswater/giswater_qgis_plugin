@@ -120,6 +120,7 @@ class GwLayerTools:
                     if style_id is not None:
                         body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
                         style = self.controller.get_json('gw_fct_getstyle', body)
+                        if style['status'] == 'Failed': return
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']
@@ -134,6 +135,7 @@ class GwLayerTools:
             if style_id not in (None, "-1"):
                 body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
                 style = self.controller.get_json('gw_fct_getstyle', body)
+                if style['status'] == 'Failed': return
                 if 'styles' in style['body']:
                     if 'style' in style['body']['styles']:
                         qml = style['body']['styles']['style']
