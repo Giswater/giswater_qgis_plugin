@@ -129,7 +129,6 @@ v_parentfields text;
 v_status text ='Accepted';
 v_childtype text;
 v_errcontext text;
-v_toggledition boolean;
 v_islayer boolean;
 v_addschema text;
 v_return json;
@@ -567,8 +566,6 @@ BEGIN
 		'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent,
 		'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json, 'vdefaultValues',v_vdefault_array);
 
-	-- Get toggledition parameter
-	EXECUTE 'SELECT value::boolean FROM config_param_user WHERE parameter = ''qgis_toggledition_forceopen''' INTO v_toggledition;
 
 	v_tablename:= (to_json(v_tablename));
 	v_table_parent:= (to_json(v_table_parent));
@@ -592,13 +589,11 @@ BEGIN
 	v_parentfields := COALESCE(v_parentfields, '{}');
 	v_fields := COALESCE(v_fields, '{}');
 	v_message := COALESCE(v_message, '{}');
-	v_toggledition := COALESCE(v_toggledition, FALSE);
 
 	--    Return
 	-----------------------
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "apiVersion":' || v_version ||
 	      ',"body":{"form":' || v_forminfo ||
-		     ', "toggledition":'|| v_toggledition ||
 		     ', "feature":'|| v_featureinfo ||
 		      ',"data":{"linkPath":' || v_linkpath ||
 		      	      ',"editable":' || v_editable ||
