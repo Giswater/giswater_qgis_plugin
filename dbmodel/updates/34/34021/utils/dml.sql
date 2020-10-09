@@ -134,3 +134,7 @@ UPDATE config_param_system SET value=
 '{"SECTOR":{"mode":"Disable", "column":"sector_id"}, "DMA":{"mode":"Styesheet", "column":"name"}, "PRESSZONE":{"mode":"Random", "column":"presszone_id"}, "DQA":{"mode":"Random", "column":"dqa_id"}, "MINSECTOR":{"mode":"Disable", "column":"minsector_id"}}'
 WHERE parameter  = 'utils_grafanalytics_dynamic_symbology';
 
+DELETE FROM config_param_user WHERE parameter='qgis_toggledition_forceopen';
+DELETE FROM sys_param_user WHERE id='qgis_toggledition_forceopen';
+
+
