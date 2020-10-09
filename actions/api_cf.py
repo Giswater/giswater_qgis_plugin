@@ -583,13 +583,13 @@ class ApiCF(ApiParent, QObject):
             else:
                 self.disable_all(dlg_cf, result, False)
 
-        self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').toggled.connect(partial(self.block_action_edit, dlg_cf, action_edit, result, layer, fid, my_json, new_feature))
         # We assign the function to a global variable,
         # since as it receives parameters we will not be able to disconnect the signals
+        self.fct_block_action_edit = lambda: self.block_action_edit(dlg_cf, action_edit, result, layer, fid, my_json, new_feature)
         self.fct_start_editing = lambda: self.start_editing(dlg_cf, action_edit, complet_result[0]['body']['data'], layer)
         self.fct_stop_editing = lambda: self.stop_editing(dlg_cf, action_edit, complet_result[0]['body']['data'], layer, fid, self.my_json, new_feature)
-        layer.editingStarted.connect(self.fct_start_editing)
-        layer.editingStopped.connect(self.fct_stop_editing)
+        self.connect_signals()
+
         self.enable_actions(dlg_cf, layer.isEditable())
 
         action_edit.setChecked(layer.isEditable())
@@ -623,17 +623,17 @@ class ApiCF(ApiParent, QObject):
                 del last_info
 
             self.controller.dock_dialog(dlg_cf)
-            self.controller.dlg_docker.dlg_closed.connect(partial(self.manage_docker_close))
+            self.controller.dlg_docker.dlg_closed.connect(self.manage_docker_close)
             self.controller.dlg_docker.setWindowTitle(title)
-            btn_cancel.clicked.connect(partial(self.manage_docker_close))
+            btn_cancel.clicked.connect(self.manage_docker_close)
         else:
             dlg_cf.dlg_closed.connect(self.roll_back)
             dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
             dlg_cf.dlg_closed.connect(partial(self.save_settings, dlg_cf))
             dlg_cf.key_pressed.connect(partial(self.close_dialog, dlg_cf))
-            btn_cancel.clicked.connect(partial(self.close_dialog, dlg_cf))
+            btn_cancel.clicked.connect(partial(self.manage_info_close, dlg_cf))
         btn_accept.clicked.connect(partial(self.accept_from_btn, dlg_cf, action_edit, result, new_feature, self.my_json))
-        dlg_cf.dlg_closed.connect(self.disconect_signals)
+
 
         # Set title
         toolbox_cf = dlg_cf.findChild(QWidget, 'toolBox')
@@ -664,8 +664,13 @@ class ApiCF(ApiParent, QObject):
         super(ApiCF, self).close_dialog(dlg)
 
 
-    def disconect_signals(self):
+    def connect_signals(self):
+        self.layer.editingStarted.connect(self.fct_start_editing)
+        self.layer.editingStopped.connect(self.fct_stop_editing)
+        self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').toggled.connect(self.fct_block_action_edit)
 
+
+    def disconect_signals(self):
         try:
             self.layer.editingStarted.disconnect(self.fct_start_editing)
         except Exception as e:
@@ -675,15 +680,27 @@ class ApiCF(ApiParent, QObject):
             self.layer.editingStopped.disconnect(self.fct_stop_editing)
         except Exception as e:
             pass
+
+        try:
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').toggled.disconnect(self.fct_block_action_edit)
+        except Exception as e:
+            pass
+
         self.controller.is_inserting = False
 
 
     def manage_docker_close(self):
-
         self.roll_back()
         self.resetRubberbands()
         self.controller.close_docker()
-        self.disconect_signals()
+
+
+    def manage_info_close(self, dialog):
+
+        self.roll_back()
+        self.resetRubberbands()
+        self.save_settings(dialog)
+        self.close_dialog(dialog)
 
 
     def get_feature(self, tab_type):
@@ -784,25 +801,24 @@ class ApiCF(ApiParent, QObject):
 
 
     def manage_accept(self, dialog, action_edit, result, new_feature, my_json, close_dlg):
-        action_edit.blockSignals(True)
         status = self.accept(dialog, self.complet_result[0], my_json, close_dialog=close_dlg, new_feature=new_feature)
         if status is True:  # Commit succesfull and dialog keep opened
             self.check_actions(action_edit, False)
             self.disable_all(dialog, result, False)
             self.enable_actions(dialog, False)
-            action_edit.blockSignals(False)
 
 
     def stop_editing(self, dialog, action_edit, result, layer, fid, my_json, new_feature=None):
+        self.get_last_value()
         if my_json == '' or str(my_json) == '{}':
             self.disconect_signals()
             # Use commitChanges just for closse edition
             layer.commitChanges()
-            layer.editingStarted.connect(self.fct_start_editing)
-            layer.editingStopped.connect(self.fct_stop_editing)
+            self.connect_signals()
             self.check_actions(action_edit, False)
             self.disable_all(dialog, result, False)
             self.enable_actions(dialog, False)
+            self.connect_signals()
         else:
             save = self.ask_for_save(action_edit, fid)
             if save:
@@ -810,15 +826,13 @@ class ApiCF(ApiParent, QObject):
 
 
     def start_editing(self, dialog, action_edit, result, layer):
-
+        self.disconect_signals()
         self.iface.setActiveLayer(layer)
         self.check_actions(action_edit, True)
         self.enable_all(dialog, result)
         self.enable_actions(dialog, True)
-        self.disconect_signals()
         layer.startEditing()
-        layer.editingStarted.connect(self.fct_start_editing)
-        layer.editingStopped.connect(self.fct_stop_editing)
+        self.connect_signals()
 
 
     def ask_for_save(self, action_edit, fid):
@@ -1127,8 +1141,7 @@ class ApiCF(ApiParent, QObject):
         if list_mandatory:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             self.controller.show_warning(msg)
-            self.layer.editingStarted.connect(self.fct_start_editing)
-            self.layer.editingStopped.connect(self.fct_stop_editing)
+            self.connect_signals()
             return False
 
         # If we create a new feature
@@ -1146,8 +1159,7 @@ class ApiCF(ApiParent, QObject):
             if status is False:
                 error = self.layer_new_feature.commitErrors()
                 self.controller.show_warning(f"{error}")
-                self.layer.editingStarted.connect(self.fct_start_editing)
-                self.layer.editingStopped.connect(self.fct_stop_editing)
+                self.connect_signals()
                 return False
             self.new_feature_id = None
             self.controller.is_inserting = False
@@ -1173,8 +1185,7 @@ class ApiCF(ApiParent, QObject):
         json_result = self.controller.get_json('gw_fct_setfields', body)
 
         if not json_result:
-            self.layer.editingStarted.connect(self.fct_start_editing)
-            self.layer.editingStopped.connect(self.fct_stop_editing)
+            self.connect_signals()
             return False
         if clear_json:
             _json = {}
@@ -1187,14 +1198,11 @@ class ApiCF(ApiParent, QObject):
             except KeyError:
                 pass
             finally:
-                self.disconect_signals()
                 self.reload_fields(dialog, json_result, p_widget)
-                self.layer.editingStarted.connect(self.fct_start_editing)
-                self.layer.editingStopped.connect(self.fct_stop_editing)
+                self.connect_signals()
         elif "Failed" in json_result['status']:
             # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
-            self.layer.editingStarted.connect(self.fct_start_editing)
-            self.layer.editingStopped.connect(self.fct_stop_editing)
+            self.connect_signals()
             return False
 
         if close_dialog:
@@ -1202,6 +1210,7 @@ class ApiCF(ApiParent, QObject):
                 self.manage_docker_close()
             self.close_dialog(dialog)
             return None
+
         return True
 
 
