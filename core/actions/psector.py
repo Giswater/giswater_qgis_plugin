@@ -23,7 +23,7 @@ from functools import partial
 
 from .document import GwDocument
 from ..utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
-    hide_generic_layers, tab_feature_changed, check_expression
+    hide_generic_layers, tab_feature_changed, check_expression, create_body
 from ..ui.ui_manager import Plan_psector, PsectorRapportUi
 from .document import global_vars
 from ...lib.tools_qgis import remove_selection, selection_init, selection_changed, disconnect_snapping, \
