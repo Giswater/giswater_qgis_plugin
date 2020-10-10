@@ -79,7 +79,7 @@ BEGIN
 	
 	DELETE FROM temp_anlgraf;
 	DELETE FROM anl_arc where cur_user=current_user AND fid IN (232,231,139);
-	DELETE FROM anl_node where cur_user=current_user AND fid IN (233,228,139);
+	DELETE FROM anl_node where cur_user=current_user AND fid IN (233,228,139,290);
 	DELETE FROM audit_check_data where cur_user=current_user AND fid = 139;
 		
 	IF v_fid is null THEN
@@ -122,8 +122,25 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, 'INFO: No node(s) orphan found on this result.', v_count);
 	END IF;
 
+	RAISE NOTICE '2 - Check result duplicated nodes on rpt tables (fid:  290)';
+	v_querytext = '(SELECT DISTINCT ON(the_geom) n1.node_id as n1, n2.node_id as n2, n1.the_geom FROM temp_node n1, temp_node n2 
+			WHERE st_dwithin(n1.the_geom, n2.the_geom, 0.00001) AND n1.node_id != n2.node_id ) b';
+
 	
-	RAISE NOTICE '2 - Check result arcs without start/end node (fid:  231)';
+	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
+	IF v_count > 0  THEN
+		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, descript, the_geom)
+		SELECT 290, n1, concat(''Duplicated node with '', n2 ), the_geom FROM ', v_querytext);
+		INSERT INTO audit_check_data (fid, criticity, error_message)
+		VALUES (v_fid, 3, concat('ERROR: There is/are ',v_count,
+		' node''s duplicated on this result (state 1 & 2). It means maybe there is a inconsistency in terms of state-topology  (290).'));
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 1, 'INFO: No node(s) orphan found on this result.');
+	END IF;
+
+	
+	RAISE NOTICE '3 - Check result arcs without start/end node (fid:  231)';
 	v_querytext = '	SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc where result_id = '||quote_literal(v_result_id)||'
 			EXCEPT ( 
 			SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc JOIN 
@@ -146,7 +163,7 @@ BEGIN
 	END IF;
 	
 
-	RAISE NOTICE '3 - Check disconnected network';	
+	RAISE NOTICE '4 - Check disconnected network';	
 	
 	-- fill the graf table
 	INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
@@ -219,7 +236,7 @@ BEGIN
 
 	IF v_project_type = 'WS' THEN
 
-		RAISE NOTICE '4 - Check dry network';	
+		RAISE NOTICE '5 - Check dry network';	
 
 		DELETE FROM temp_anlgraf;
 								
@@ -305,7 +322,7 @@ BEGIN
 	END IF;
 
 
-	RAISE NOTICE '5 - Stats';
+	RAISE NOTICE '6 - Stats';
 	
 	IF v_project_type =  'WS' THEN
 		SELECT min(elevation), max(elevation) INTO v_min, v_max FROM temp_node WHERE result_id = v_result_id;
@@ -375,7 +392,7 @@ BEGIN
 		'properties', to_jsonb(row) - 'the_geom_p'
 		) AS feature
 		FROM (SELECT id, node_id, node_id, state, expl_id, descript, fid, the_geom
-			  FROM  anl_node WHERE cur_user="current_user"() AND (fid = 139 OR fid = 227 OR fid = 233)
+			  FROM  anl_node WHERE cur_user="current_user"() AND (fid = 139 OR fid = 227 OR fid = 233 OR fid = 290)
 		) row) features;
   	
 	v_result := COALESCE(v_result, '{}'); 

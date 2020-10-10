@@ -71,6 +71,10 @@ BEGIN
 	-- delete audit table
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
 	DELETE FROM audit_log_data WHERE fid = v_fid AND cur_user=current_user;
+
+	-- force only state 1 selector
+	DELETE FROM selector_state WHERE cur_user=current_user;
+	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 	
 	-- setting variables
 	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fid":227}}}')::json;

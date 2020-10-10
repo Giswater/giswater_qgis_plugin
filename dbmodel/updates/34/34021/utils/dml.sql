@@ -79,6 +79,9 @@ VALUES (288, 'Store psector values for specific user', 'utils') ON CONFLICT (fid
 INSERT INTO sys_fprocess VALUES (289, 'Store exploitation values for especific user', 'utils')
 ON CONFLICT (fid) DO NOTHING;
 
+INSERT INTO sys_fprocess VALUES (290, 'Duplicated node on temp_table', 'utils')
+ON CONFLICT (fid) DO NOTHING;
+
 -- 2020/17/09
 
 UPDATE sys_param_user SET dv_querytext = 'SELECT UNNEST(ARRAY (select (text_column::json->>''list_tables_name'')::text[] 

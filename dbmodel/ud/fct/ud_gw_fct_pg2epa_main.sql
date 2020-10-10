@@ -59,6 +59,10 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid = 227 AND cur_user=current_user;
 	DELETE FROM temp_table WHERE fid = 117 AND cur_user=current_user;
 
+	-- force only state 1 selector
+	DELETE FROM selector_state WHERE cur_user=current_user;
+	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
+
 	v_inpoptions = (SELECT (replace (replace (replace (array_to_json(array_agg(json_build_object((t.parameter),(t.value))))::text,'},{', ' , '),'[',''),']',''))::json 
 				FROM (SELECT parameter, value FROM config_param_user 
 				JOIN sys_param_user a ON a.id=parameter	WHERE cur_user=current_user AND formname='epaoptions')t);
