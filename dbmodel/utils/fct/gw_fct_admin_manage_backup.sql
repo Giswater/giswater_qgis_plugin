@@ -86,7 +86,7 @@ BEGIN
 
 		-- automatic backup creation
 		-- check if backup exists
-		IF (SELECT count(*) FROM temp_table WHERE text_column::json->>'name' = v_newbackupname ) > 0 THEN
+		IF (SELECT count(*) FROM temp_table WHERE text_column::json->>'name' = v_newbackupname AND fid=211 ) > 0 THEN
 			RAISE EXCEPTION 'The name for the new backup you are trying to do already exists. Try with other name or delete it before';
 		END IF;
 
