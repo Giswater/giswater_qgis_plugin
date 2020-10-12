@@ -552,6 +552,10 @@ BEGIN
 							quote_ident(v_table)||') b
 							 ON  nodeparent = descript WHERE fid='||v_fid||' AND a.arc_id=arc.arc_id AND cur_user=current_user';
 					EXECUTE v_querytext;
+	
+					-- update node table without graf nodes using v_edit_node because the exploitation filter. Rows before do not needed because table anl_* is filtered by process
+					v_querytext = 'UPDATE v_edit_node SET '||quote_ident(v_field)||' = arc.'||quote_ident(v_field)||' FROM arc WHERE arc.arc_id=v_edit_node.arc_id';
+					EXECUTE v_querytext;
 
 					-- update node table with graf nodes
 					v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' 
@@ -559,10 +563,6 @@ BEGIN
 							as nodeparent from '
 							||quote_ident(v_table)||') b ON  nodeparent = descript WHERE fid='||v_fid||' AND a.node_id=node.node_id
 							AND cur_user=current_user';
-					EXECUTE v_querytext;
-			
-					-- update node table without graf nodes using v_edit_node because the exploitation filter. Rows before do not needed because table anl_* is filtered by process
-					v_querytext = 'UPDATE v_edit_node SET '||quote_ident(v_field)||' = arc.'||quote_ident(v_field)||' FROM arc WHERE arc.arc_id=v_edit_node.arc_id';
 					EXECUTE v_querytext;
 
 					-- used v_edit_connec because the exploitation filter (same before)
@@ -749,7 +749,7 @@ BEGIN
 				-- check for intercomunicated mapzones (select if at least one node header has different mazpones from what is configured)
 				EXECUTE 'INSERT INTO audit_check_data (fid,  criticity, error_message)
 				SELECT '||v_fid||', 3, concat(''OVERLAPED '||v_class||'s: Node '', mpz.node_id ,'' is header of '||v_class||''',''-'', mpz.'||
-				v_field||', '' ('',mpz.name,'') but it is assigned to '||v_class||' '', ''-'', n.'||v_field||','' ('',mpz.name,'')'') FROM node n
+				v_field||', '' ('',mpz.name,'') but it is assigned to '||v_class||' '', ''-'', n.'||v_field||','' ('',mpz.name,'')'') FROM v_edit_node n
 				JOIN 
 				(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id, '||v_field||', name FROM '||v_table||') mpz
 				USING (node_id)
