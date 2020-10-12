@@ -133,7 +133,7 @@ BEGIN
 		SELECT 290, n1, concat(''Duplicated node with '', n2 ), the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (v_fid, 3, concat('ERROR: There is/are ',v_count,
-		' node''s duplicated on this result (state 1 & 2). It means maybe there is a inconsistency in terms of state-topology  (290).'));
+		' node''s duplicated on this result (state 1 & 2). It means there is a topological jump in terms of state-topology.'));
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, 'INFO: No node(s) orphan found on this result.');
