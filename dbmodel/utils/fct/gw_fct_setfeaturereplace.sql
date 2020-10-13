@@ -5,13 +5,13 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE: 2714
-
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_feature_replace(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_feature_replace(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setfeaturereplace (p_data json)
 RETURNS json AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_feature_replace($${
+SELECT SCHEMA_NAME.gw_fct_setfeaturereplace($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"type":"NODE"},
 "data":{"old_feature_id":"129","workcat_id_end":"work1", "enddate":"2019-05-17","keep_elements":true }}$$)

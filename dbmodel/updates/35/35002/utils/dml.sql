@@ -83,3 +83,9 @@ UPDATE config_function SET  function_name = 'gw_fct_setarcdivide' WHERE function
 
 UPDATE sys_function SET function_name = 'gw_fct_setarcfusion' WHERE function_name='gw_fct_arc_fusion';
 UPDATE config_function SET  function_name = 'gw_fct_setarcfusion' WHERE function_name='gw_fct_arc_fusion';
+
+UPDATE sys_function SET function_name = 'gw_fct_setfeaturereplace' WHERE function_name='gw_fct_feature_replace';
+UPDATE config_function SET  function_name = 'gw_fct_setfeaturereplace' WHERE function_name='gw_fct_feature_replace';
+
+UPDATE sys_function SET function_name = 'gw_fct_setfeaturedelete' WHERE function_name='gw_fct_feature_delete';
+UPDATE config_function SET  function_name = 'gw_fct_setfeaturedelete' WHERE function_name='gw_fct_feature_delete';

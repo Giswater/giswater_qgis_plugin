@@ -206,12 +206,12 @@ BEGIN
 									
 								ELSE
 								raise notice 'DELETE';
-									EXECUTE 'SELECT gw_fct_feature_delete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"type":"NODE"},
+									EXECUTE 'SELECT gw_fct_setfeaturedelete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"type":"NODE"},
 									"data":{"filterFields":{}, "pageInfo":{}, "feature_id":"'||v_feature_id||'"}}$$)::text;'
 									INTO v_query_result;
 										
 									INSERT INTO audit_check_data (fid, result_id, table_id, error_message)
-									VALUES (215, 'gw_fct_feature_delete',rec_role.id,v_query_result);
+									VALUES (215, 'gw_fct_setfeaturedelete',rec_role.id,v_query_result);
 
 								END IF;
 								
@@ -226,7 +226,7 @@ BEGIN
 					END IF;
 				END LOOP;
 
-			ELSIF rec_fct.function_name = 'gw_fct_feature_replace' THEN
+			ELSIF rec_fct.function_name = 'gw_fct_setfeaturereplace' THEN
 				SELECT node_id INTO v_feature_id FROM v_edit_node LIMIT 1;
 				-- replace 'node_id' for id of the feature calling arc divide function
 				select replace(concat(rec_fct.function_name,'($$',rec_fct.sample_query::json ->>v_project_type,'$$)')::TEXT,'node_id'::text,v_feature_id::text) 
