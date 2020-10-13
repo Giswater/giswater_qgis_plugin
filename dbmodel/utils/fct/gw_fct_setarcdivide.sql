@@ -7,12 +7,13 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2114
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_arc_divide(character varying);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_arc_divide(p_data json) RETURNS json AS
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_arc_divide(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setarcdivide(p_data json) RETURNS json AS
 $BODY$
 
 /*
 
-SELECT SCHEMA_NAME.gw_fct_arc_divide($${
+SELECT SCHEMA_NAME.gw_fct_setarcdivide($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"id":["269951"]},
 "data":{}}$$)
@@ -22,12 +23,12 @@ SELECT SCHEMA_NAME.gw_fct_arc_divide($${
 */
 
 DECLARE
-v_node_geom geometry;
+v_node_geom public.geometry;
 v_arc_id varchar;
 v_code varchar;
-v_arc_geom geometry;
-v_line1 geometry;
-v_line2 geometry;
+v_arc_geom public.geometry;
+v_line1 public.geometry;
+v_line2 public.geometry;
 v_intersect_loc	double precision;
 v_project_type text;
 v_state_arc integer;

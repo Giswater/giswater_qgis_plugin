@@ -81,7 +81,7 @@ BEGIN
 		FOR rec_fct IN (SELECT function_name, sample_query FROM sys_function WHERE sample_query IS NOT NULL
 		ORDER BY id) LOOP
 
-			IF rec_fct.function_name = 'gw_fct_arc_divide' THEN
+			IF rec_fct.function_name = 'gw_fct_arc_divide' OR rec_fct.function_name = 'gw_fct_setarcdivide' THEN
 
 				FOR rec_state IN 1..2 LOOP
 				--rec_state =1;
