@@ -297,12 +297,21 @@ class GwGo2EpaTask(QgsTask):
                     elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
                         if 'Version' not in dirty_list and 'VERSION' not in dirty_list:
                             self.controller.log_info(f"Error near line {line_number+1} -> {dirty_list}")
-                            message = ("The rpt file has a heavy inconsistency. "
-                                       "As a result it's not posible to import it. "
-                                       "Columns are overlaped one againts other, this is a not valid simulation. "
-                                       "Please ckeck and fix it before continue")
+                            message = (f"The rpt file is not valid to import. "
+                                       f"Because columns on rpt file are overlaped, it seems you need to improve your simulation. "
+                                       f"Please ckeck and fix it before continue. \n"
+                                       f"{error_near}")
                             self.controller.show_message(message, 1)
                             return False
+                    elif bool(re.search('>50', str(dirty_list[x]))):
+                        error_near = f"Error near line {line_number+1} -> {dirty_list}"
+                        self.controller.log_info(error_near)
+                        message = (f"The rpt file is not valid to import. "
+                                   f"Because velocity has not numeric value (>50), it seems you need to improve your simulation. "
+                                   f"Please ckeck and fix it before continue. \n"
+                                   f"{error_near}")
+                        self.controller.show_message(message, 1)
+                        return False
                     else:
                         sp_n.append(dirty_list[x])
 
