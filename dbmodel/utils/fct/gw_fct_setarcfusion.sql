@@ -13,7 +13,7 @@ RETURNS json AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_setarcfusion($${
+SELECT SCHEMA_NAME.gw_fct_arc_fusion($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"id":["1004"]},"data":{"workcat_id_end":"work1","enddate":"2020-02-05"}}$$)
 

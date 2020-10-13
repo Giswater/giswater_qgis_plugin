@@ -196,13 +196,13 @@ BEGIN
 								--fusion arcs or delete node if it's not connected to arcs (not arc divide)
 								IF rec_feature_node.isarcdivide is true AND rec_state = 1 then
 									raise notice 'FUSION';
-									EXECUTE 'SELECT gw_fct_arc_fusion ($${"client":{"device":4, "infoType":1, "lang":"ES"},
+									EXECUTE 'SELECT gw_fct_setarcfusion ($${"client":{"device":4, "infoType":1, "lang":"ES"},
 									"feature":{"id":["'||v_feature_id||'"]},"data":{"workcat_id_end":"work1",
 									"enddate":"2020-02-05"}}$$);'
 									INTO v_query_result;
 									
 									INSERT INTO audit_check_data (fid, result_id, table_id, error_message)
-									VALUES (215, 'gw_fct_arc_fusion',rec_role.id,v_query_result);
+									VALUES (215, 'gw_fct_setarcfusion',rec_role.id,v_query_result);
 									
 								ELSE
 								raise notice 'DELETE';

@@ -80,3 +80,6 @@ UPDATE sys_function SET function_name='gw_fct_getcheckdelete' WHERE function_nam
 --2020/10/13
 UPDATE sys_function SET function_name = 'gw_fct_setarcdivide' WHERE function_name='gw_fct_arc_divide';
 UPDATE config_function SET  function_name = 'gw_fct_setarcdivide' WHERE function_name='gw_fct_arc_divide';
+
+UPDATE sys_function SET function_name = 'gw_fct_setarcfusion' WHERE function_name='gw_fct_arc_fusion';
+UPDATE config_function SET  function_name = 'gw_fct_setarcfusion' WHERE function_name='gw_fct_arc_fusion';
