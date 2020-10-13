@@ -55,12 +55,12 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
-	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_feature_type := lower(((p_data ->>'feature')::json->>'featureType'))::text;
 	v_updatevalues :=  ((p_data ->>'data')::json->>'parameters')::json->>'updateValues'::text;
-	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 	v_exploitation := ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
+
+	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
 
 	DELETE FROM selector_expl WHERE cur_user = current_user;
 	INSERT INTO selector_expl VALUES (v_exploitation, current_user);

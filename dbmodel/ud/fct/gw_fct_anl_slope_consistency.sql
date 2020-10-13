@@ -51,11 +51,13 @@ BEGIN
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
-	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
+
+	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
 
 	IF v_array = '()' THEN
 		v_array  = null;
 	END IF;
+
 	-- Reset values
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=250;
 	DELETE FROM temp_arc WHERE  result_id = '250';

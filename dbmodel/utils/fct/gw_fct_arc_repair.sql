@@ -68,10 +68,10 @@ BEGIN
 
 	-- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
-	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 
+	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
     
 	-- Set config parameter
 	UPDATE config_param_system SET value=TRUE WHERE parameter='edit_topocontrol_disable_error' ;
