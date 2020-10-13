@@ -84,8 +84,8 @@ BEGIN
 			END IF;
 			
 			--Filter features if there are only some selected
-			IF v_array != '()'  THEN
-				v_query = CONCAT(v_query, ' AND '||v_feature_type||'_id in '||v_array||'');
+			IF v_array IS NOT NULL  THEN
+				v_query = CONCAT(v_query, ' AND '||v_feature_type||'_id in ('||v_array||')');
 			END IF;
 
 		ELSIF v_updatevalues = 'nullValues' THEN 
@@ -101,8 +101,8 @@ BEGIN
 			END IF;
 
 			--Filter features if there are only some selected
-			IF v_array != '()'  THEN
-				v_query = CONCAT(v_query, ' AND '||v_feature_type||'_id in '||v_array||'');
+			IF v_array IS NOT NULL  THEN
+				v_query = CONCAT(v_query, ' AND '||v_feature_type||'_id in ('||v_array||')');
 			END IF;
 
 			--check if there are nodes with null values 

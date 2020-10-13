@@ -77,7 +77,7 @@ BEGIN
 	UPDATE config_param_system SET value=TRUE WHERE parameter='edit_topocontrol_disable_error' ;
 
 	-- execute
-	IF v_array='()' OR v_array IS NULL THEN
+	IF v_selectionmode != 'previousSelection' THEN
 		INSERT INTO anl_arc(fid, arc_id, the_geom, descript) 
 		SELECT 103, arc_id, the_geom, 'b' FROM arc WHERE arc_id IN (SELECT arc_id FROM v_edit_arc WHERE state=1 AND (node_1 IS NULL OR node_2 IS NULL ));
 		
@@ -90,12 +90,12 @@ BEGIN
 		AND cur_user=current_user AND arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE fid=103 AND descript ='a' AND cur_user=current_user))a; 
 	ELSE
 		EXECUTE 'INSERT INTO anl_arc(fid, arc_id, the_geom, descript) 
-		SELECT 103, arc_id, the_geom, ''b'' FROM arc WHERE arc_id IN ' ||v_array || ' AND state=1 AND node_1 IS NULL OR node_2 IS NULL';
+		SELECT 103, arc_id, the_geom, ''b'' FROM arc WHERE arc_id IN (' ||v_array || ') AND state=1 AND node_1 IS NULL OR node_2 IS NULL';
 		
-		EXECUTE 'UPDATE arc SET the_geom=the_geom WHERE arc_id IN ' ||v_array || ' AND state=1';
+		EXECUTE 'UPDATE arc SET the_geom=the_geom WHERE arc_id IN (' ||v_array || ') AND state=1';
 
 		EXECUTE 'INSERT INTO anl_arc(fid, arc_id, the_geom, descript) 
-		SELECT 103, arc_id, the_geom, ''a'' FROM arc WHERE arc_id IN ' ||v_array || ' AND state=1 AND node_1 IS NULL OR node_2 IS NULL';
+		SELECT 103, arc_id, the_geom, ''a'' FROM arc WHERE arc_id IN (' ||v_array || ') AND state=1 AND node_1 IS NULL OR node_2 IS NULL';
 		
 		INSERT INTO anl_arc(fid, arc_id, the_geom) SELECT 118, arc_id, the_geom FROM (SELECT arc_id, the_geom FROM anl_arc WHERE fid=103 AND descript='b' 
 		AND cur_user=current_user AND arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE fid=103 AND descript ='a' AND cur_user=current_user))a; 
