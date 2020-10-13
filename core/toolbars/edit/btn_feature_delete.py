@@ -135,10 +135,10 @@ class GwDeleteFeatureButton(GwParentAction):
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = create_body(feature=feature, extras=extras)
-        complet_result = self.controller.get_json('gw_fct_feature_delete', body)
+        complet_result = self.controller.get_json('gw_fct_setfeaturedelete', body)
 
         if not complet_result:
-            self.controller.show_message("Function gw_fct_feature_delete executed with no result ", 3)
+            self.controller.show_message("Function gw_fct_setfeaturedelete executed with no result ", 3)
             return
 
         if 'status' in complet_result and complet_result['status'] == 'Failed':

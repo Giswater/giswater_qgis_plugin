@@ -24,7 +24,7 @@ from ..parent_maptool import GwParentMapTool
 
 
 class GwFeatureReplaceButton(GwParentMapTool):
-    """ Button 44: User select one feature. Execute SQL function: 'gw_fct_feature_replace' """
+    """ Button 44: User select one feature. Execute SQL function: 'gw_fct_setfeaturereplace' """
 
     def __init__(self, icon_path, text, toolbar, action_group):
         """ Class constructor """
@@ -298,7 +298,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             body = create_body(feature=feature, extras=extras)
 
             # Execute SQL function and show result to the user
-            function_name = "gw_fct_feature_replace"
+            function_name = "gw_fct_setfeaturereplace"
             sql = f"SELECT {function_name}({body})::text"
             row = self.controller.get_row(sql)
             if not row:
