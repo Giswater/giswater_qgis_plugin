@@ -140,4 +140,6 @@ WHERE parameter  = 'utils_grafanalytics_dynamic_symbology';
 DELETE FROM config_param_user WHERE parameter='qgis_toggledition_forceopen';
 DELETE FROM sys_param_user WHERE id='qgis_toggledition_forceopen';
 
+DELETE FROM config_param_user WHERE parameter='edit_connect_downgrade_link';
+DELETE FROM sys_param_user WHERE id='edit_connect_downgrade_link';
 

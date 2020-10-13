@@ -564,12 +564,10 @@ BEGIN
 				END IF;
 			END IF;
 			
-			-- Control of automatic downgrade of associated link/vnode
-			IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_connect_downgrade_link'
-			AND cur_user=current_user LIMIT 1) IS TRUE THEN	
-				UPDATE link SET state=0 WHERE feature_id=OLD.gully_id;
-				UPDATE vnode SET state=0 WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=OLD.gully_id LIMIT 1)::integer;
-			END IF;
+			-- Automatic downgrade of associated link/vnode
+			UPDATE link SET state=0 WHERE feature_id=OLD.gully_id;
+			UPDATE vnode SET state=0 WHERE vnode_id=(SELECT exit_id FROM link WHERE feature_id=OLD.gully_id LIMIT 1)::integer;
+
 		END IF;
 
 		-- Looking for state control and insert planified gully to default psector
