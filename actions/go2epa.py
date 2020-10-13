@@ -133,6 +133,16 @@ class Go2Epa(ApiParent):
         file_rpt = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
         result_name = utils_giswater.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
 
+        # Check if at least one process is selected
+        export_checked = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
+        exec_checked = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)
+        import_result_checked = utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)
+
+        if not export_checked and not exec_checked and not import_result_checked:
+            msg = "You need to select at least one process"
+            self.controller.show_info_box(msg, title="Go2Epa")
+            return False
+
         # Control export INP
         if utils_giswater.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
             if self.check_inp_chk(file_inp) is False:
