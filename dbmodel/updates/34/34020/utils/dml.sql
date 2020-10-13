@@ -33,12 +33,6 @@ UPDATE sys_param_user SET id ='basic_search_exploitation_vdefault' WHERE id = 'b
 UPDATE sys_param_user SET id ='basic_search_municipality_vdefault' WHERE id = 'basic_search_municipality_vdefaut';
 
 
-INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutorder, project_type, isparent, 
-isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable, isdeprecated, vdefault)
-VALUES ('edit_element_doublegeom', 'config', 'If value, overwrites trigger element value to create double geometry in case elementcat_id is defined with this attribute',
-'role_edit', 'Doublegeometry value for element:', TRUE, 11, 'utils', FALSE, FALSE, 'boolean', 'check', FALSE, 'lyt_inventory',
-TRUE, FALSE, 2) ON CONFLICT (id) DO NOTHING;
-
 UPDATE config_param_system SET value ='{"status":false}' WHERE parameter = 'edit_automatic_ccode_autofill';
 UPDATE sys_fprocess SET project_type = 'utils' WHERE fid = 118;
 
