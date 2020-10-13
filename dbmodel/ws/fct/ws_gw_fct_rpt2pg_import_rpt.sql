@@ -54,6 +54,7 @@ v_qtimestep text;
 v_qtolerance text;
 v_type_2 text;
 v_error_context text;
+v_ffactor text;
 
 BEGIN
 
@@ -85,6 +86,12 @@ BEGIN
 	
 	v_hour=null;
 
+	v_ffactor = (SELECT value FROM config_param_user WHERE parameter = 'inp_report_f_factor' AND cur_user = current_user);
+
+	IF v_ffactor = 'NO' THEN
+		UPDATE temp_csv SET csv10=csv9, csv9=0 WHERE source='rpt_arc' AND fid = 140;
+	END IF;
+	
 	-- rpt_node
 	DELETE FROM temp_csv WHERE source='rpt_node' AND (csv1='Node' or csv1='Elevation' or csv1='MINIMUM' or csv1='MAXIMUM' or csv1='DIFFERENTIAL' or csv1='AVERAGE');
 	UPDATE temp_csv SET csv6=null WHERE source='rpt_node' AND (csv6='Reservoir' OR csv6='Tank'); -- delete Reservoir AND tank word when quality is not enabled
