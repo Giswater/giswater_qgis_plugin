@@ -15,4 +15,10 @@ CREATE TRIGGER gw_trg_edit_inp_demand
   EXECUTE PROCEDURE gw_trg_edit_inp_demand();
   
   
+CREATE TRIGGER gw_trg_vi_demands
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON vi_demands
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_vi('vi_demands');
+
   
