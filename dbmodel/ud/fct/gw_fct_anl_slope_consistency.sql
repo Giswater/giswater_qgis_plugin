@@ -63,7 +63,7 @@ BEGIN
 	DELETE FROM temp_arc WHERE  result_id = '250';
 
 	-- Computing process
-	IF v_array IS NULL THEN
+	IF v_selectionmode !='previousSelection' THEN
 
 		EXECUTE 'INSERT INTO temp_arc (arc_id, arccat_id, state, expl_id, result_id, elevmax1, elevmax2, sector_id, the_geom)
 		SELECT arc_id,arccat_id,state, expl_id, ''250'', sys_elev1, sys_elev2, sector_id,
@@ -80,7 +80,7 @@ BEGIN
 		WHEN sys_elev2 > sys_elev1 AND inverted_slope = true THEN the_geom
 		WHEN sys_elev2 > sys_elev1 THEN St_reverse(the_geom)
 		END AS geom
-		FROM '||v_worklayer||' WHERE arc_id IN '||v_array||';';
+		FROM '||v_worklayer||' WHERE arc_id IN ('||v_array||');';
 	END IF;
 
 	FOR rec IN SELECT * FROM temp_arc WHERE result_id = '250' LOOP
