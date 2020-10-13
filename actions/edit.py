@@ -114,6 +114,7 @@ class Edit(ParentAction):
         if not result:
             self.layer.deleteFeature(feature.id())
             self.iface.actionRollbackEdits().trigger()
+            self.controller.is_inserting = False
 
 
     def get_feature_by_id(self, layer, id_):
