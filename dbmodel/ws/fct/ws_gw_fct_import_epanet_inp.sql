@@ -92,6 +92,10 @@ BEGIN
 
 	-- delete previous data on log table
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=239;
+	
+	-- create a header
+	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'IMPORT INP EPANET FILE');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (239, '--------------------------------');
 
 	v_delete_prev = true;
 
@@ -178,10 +182,10 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE 'step 1/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'Constraints of schema temporary disabled -> Done');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Constraints of schema temporary disabled -> Done');
 
 	RAISE NOTICE 'step 2/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'Inserting data from inp file to temp_csv table -> Done');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Inserting data from inp file to temp_csv table -> Done');
 	
 	--refactor options target
 	UPDATE temp_csv SET csv1='SPECIFIC GRAVITY', csv2=csv3, csv3=NULL WHERE source = '[OPTIONS]' AND lower(csv1)='specific';
@@ -217,7 +221,7 @@ BEGIN
 
 
 	RAISE NOTICE 'step 3/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'Creating map zones and catalogs -> Done');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Creating map zones and catalogs -> Done');
 	
 	-- MAPZONES
 	INSERT INTO macroexploitation(macroexpl_id,name) VALUES(0,'undefined') ON CONFLICT (macroexpl_id) DO NOTHING;
@@ -395,7 +399,7 @@ BEGIN
 	
 	RAISE NOTICE 'step 4/7';
 	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING: Values of options / times / report are not updated. Default values of Giswater are keeped');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'Inserting data into tables using vi_* views -> Done');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Inserting data into tables using vi_* views -> Done');
 	INSERT INTO audit_check_data (fid, error_message) VALUES
 	(239, 'WARNING: Rules will be stored on inp_rules_importinp table. This is a temporary table. Data need to be moved to inp_rules_x_arc, inp_rules_x_node and inp_rules_x_sector tables to be used later');
 	
@@ -499,11 +503,11 @@ BEGIN
 		DELETE FROM inp_valve_importinp;
 		DELETE FROM inp_pump_importinp;
 
-		INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'NOTICE: Link geometries from VALVES AND PUMPS have been transformed using reverse nod2arc strategy as nodes. Geometry from arcs and nodes are saved using state=0');
+		INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Link geometries from VALVES AND PUMPS have been transformed using reverse nod2arc strategy as nodes. Geometry from arcs and nodes are saved using state=0');
 	END IF;
 
 	RAISE NOTICE 'step 5/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'Creating arc geometry from extremal nodes and intermediate vertex -> Done');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Creating arc geometry from extremal nodes and intermediate vertex -> Done');
 	
 	
 	-- Create arc geom
@@ -554,7 +558,7 @@ BEGIN
 	INSERT INTO inp_pattern SELECT DISTINCT pattern_id FROM inp_pattern_value;
 
 	RAISE NOTICE 'step-6/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'Creating arc geometries -> Done');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Creating arc geometries -> Done');
 
 
 
@@ -582,8 +586,8 @@ BEGIN
 
 
 	RAISE NOTICE 'step-7/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'Enabling constraints -> Done');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'Process finished');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Enabling constraints -> Done');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Process finished');
 		
 	END IF;
 	
@@ -611,7 +615,8 @@ BEGIN
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	RETURN ('{"status":"Failed","body":{"data":{"info":"Import failed"}}, "NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' ||
+	to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
