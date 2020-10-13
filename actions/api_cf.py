@@ -579,9 +579,9 @@ class ApiCF(ApiParent, QObject):
         my_json = self.my_json
         if layer:
             if layer.isEditable():
-                self.enable_all(dlg_cf, result)
+                self.enable_all(dlg_cf, self.complet_result[0]['body']['data'])
             else:
-                self.disable_all(dlg_cf, result, False)
+                self.disable_all(dlg_cf, self.complet_result[0]['body']['data'], False)
 
         # We assign the function to a global variable,
         # since as it receives parameters we will not be able to disconnect the signals
@@ -670,7 +670,7 @@ class ApiCF(ApiParent, QObject):
         self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').toggled.connect(self.fct_block_action_edit)
 
 
-    def disconect_signals(self):
+    def disconnect_signals(self):
         try:
             self.layer.editingStarted.disconnect(self.fct_start_editing)
         except Exception as e:
@@ -774,7 +774,7 @@ class ApiCF(ApiParent, QObject):
         if not action_edit.isChecked():
             if str(self.my_json) == '{}':
                 self.check_actions(action_edit, False)
-                self.disable_all(dialog, result, False)
+                self.disable_all(dialog, self.complet_result[0]['body']['data'], False)
                 self.enable_actions(dialog, False)
                 return
             save = self.ask_for_save(action_edit, fid)
@@ -788,7 +788,7 @@ class ApiCF(ApiParent, QObject):
                     self.close_dialog(dialog)
         else:
             self.check_actions(action_edit, True)
-            self.enable_all(dialog, result)
+            self.enable_all(dialog, self.complet_result[0]['body']['data'])
             self.enable_actions(dialog, True)
 
 
@@ -804,19 +804,19 @@ class ApiCF(ApiParent, QObject):
         status = self.accept(dialog, self.complet_result[0], my_json, close_dialog=close_dlg, new_feature=new_feature)
         if status is True:  # Commit succesfull and dialog keep opened
             self.check_actions(action_edit, False)
-            self.disable_all(dialog, result, False)
+            self.disable_all(dialog, self.complet_result[0]['body']['data'], False)
             self.enable_actions(dialog, False)
 
 
     def stop_editing(self, dialog, action_edit, result, layer, fid, my_json, new_feature=None):
         self.get_last_value()
         if my_json == '' or str(my_json) == '{}':
-            self.disconect_signals()
+            self.disconnect_signals()
             # Use commitChanges just for closse edition
             layer.commitChanges()
             self.connect_signals()
             self.check_actions(action_edit, False)
-            self.disable_all(dialog, result, False)
+            self.disable_all(dialog, self.complet_result[0]['body']['data'], False)
             self.enable_actions(dialog, False)
             self.connect_signals()
         else:
@@ -826,10 +826,10 @@ class ApiCF(ApiParent, QObject):
 
 
     def start_editing(self, dialog, action_edit, result, layer):
-        self.disconect_signals()
+        self.disconnect_signals()
         self.iface.setActiveLayer(layer)
         self.check_actions(action_edit, True)
-        self.enable_all(dialog, result)
+        self.enable_all(dialog, self.complet_result[0]['body']['data'])
         self.enable_actions(dialog, True)
         layer.startEditing()
         self.connect_signals()
@@ -848,7 +848,7 @@ class ApiCF(ApiParent, QObject):
     def roll_back(self):
         """ Discard changes in current layer """
 
-        self.disconect_signals()
+        self.disconnect_signals()
         try:
             self.iface.actionRollbackEdits().trigger()
         except TypeError:
@@ -1107,7 +1107,7 @@ class ApiCF(ApiParent, QObject):
             (When it is true or false the signals are reconnected, if it is None, it is not necessary to reconnect them)
         """
 
-        self.disconect_signals()
+        self.disconnect_signals()
 
         # Check if C++ object has been deleted
         if isdeleted(dialog):
