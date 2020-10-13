@@ -2559,6 +2559,17 @@ class UpdateSQL(ApiParent):
             if row:
                 complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
                 self.set_log_text(self.dlg_import_inp, complet_result[0]['body']['data'])
+                if  complet_result[0]['status'] == 'Failed':
+                    msg = "The importation process have been failed"
+                    self.controller.show_info_box(msg, "Info")
+                    self.controller.dao.rollback()
+                    self.error_count = 0
+
+                    # Close dialog
+                    self.close_dialog(self.dlg_import_inp)
+                    self.close_dialog(self.dlg_readsql_create_project)
+                    return
+
             else:
                 self.error_count = self.error_count + 1
 
