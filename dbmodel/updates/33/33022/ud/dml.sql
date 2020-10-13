@@ -41,15 +41,15 @@ WHERE column_id='arccat_id ' and formtype='feature';
 
 UPDATE config_api_form_fields SET reload_field = '{"reload":["sys_top_elev", "sys_ymax", "sys_elev"]}', isautoupdate = TRUE
 WHERE (column_id='top_elev' or column_id='custom_top_elev' or column_id='ymax' or column_id='custom_ymax' or 
-column_id='elev' or column_id='custom_elev') and formtype='feature';
+column_id='elev' or column_id='custom_elev') and formtype='feature' and (formname like 've_node%' or formname like 've_arc%');
 
-UPDATE config_api_form_fields SET reload_field = '{"reload":["sys_y1", "sys_elev1", "z1", "r1", "slope"]}',
-isautoupdate = TRUE
-WHERE (column_id='y1' or column_id='custom_y1' or column_id='elev1' or column_id='custom_elev1') and formtype='feature';
+UPDATE config_api_form_fields SET reload_field = '{"reload":["sys_y1", "sys_elev1", "z1", "r1", "slope"]}', isautoupdate = TRUE
+WHERE (column_id='y1' or column_id='custom_y1' or column_id='elev1' or column_id='custom_elev1') 
+and formtype='feature' and (formname like 've_node%' or formname like 've_arc%');
 
-UPDATE config_api_form_fields SET reload_field = '{"reload":["sys_y2", "sys_elev2", "z2", "r2", "slope"]}',
-isautoupdate = TRUE
-WHERE (column_id='y2' or column_id='custom_y2' or column_id='elev2' or column_id='custom_elev2') and formtype='feature';
+UPDATE config_api_form_fields SET reload_field = '{"reload":["sys_y2", "sys_elev2", "z2", "r2", "slope"]}', isautoupdate = TRUE
+WHERE (column_id='y2' or column_id='custom_y2' or column_id='elev2' or column_id='custom_elev2') 
+and formtype='feature' and (formname like 've_node%' or formname like 've_arc%');
 
 
 --2020/01/09
