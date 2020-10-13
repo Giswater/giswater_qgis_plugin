@@ -576,7 +576,8 @@ BEGIN
 				
 						INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message)
 						SELECT 147, 'node', n.node_id, 
-						concat('{"staticpressure":',case when (pz.head - n.elevation::float) is null then 0 ELSE (pz.head - n.elevation::float) END, 
+						case when (pz.head - n.elevation::float + (case when n.depth is null then 0 else n.depth end)::float) is null 
+						then 0 ELSE (pz.head - n.elevation::float + (case when n.depth is null then 0 else n.depth end)) END,
 						', "nodeparent":"',anl_node.descript,'"}')
 						FROM node n 
 						JOIN anl_node USING (node_id)
@@ -595,8 +596,8 @@ BEGIN
 										and n.arc_id IS NOT NULL AND node.node_id=n.node_id;
 												
 						-- updat connec table
-						UPDATE v_edit_connec SET staticpressure = (a.head - a.elevation) FROM 
-							(SELECT connec_id, head, elevation FROM connec
+						UPDATE v_edit_connec SET staticpressure =(a.head - a.elevation + (case when a.depth is null then 0 else a.depth end)::float) FROM 
+							(SELECT connec_id, head, elevation, depth FROM connec
 							JOIN presszone USING (presszone_id)) a
 							WHERE v_edit_connec.connec_id=a.connec_id;
 					END IF;
