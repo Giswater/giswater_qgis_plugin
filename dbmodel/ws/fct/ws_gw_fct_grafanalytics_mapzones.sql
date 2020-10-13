@@ -576,7 +576,7 @@ BEGIN
 				
 						INSERT INTO audit_log_data (fid, feature_type, feature_id, log_message)
 						SELECT 147, 'node', n.node_id, 
-						case when (pz.head - n.elevation::float + (case when n.depth is null then 0 else n.depth end)::float) is null 
+						concat('{"staticpressure":',case when (pz.head - n.elevation::float + (case when n.depth is null then 0 else n.depth end)::float) is null 
 						then 0 ELSE (pz.head - n.elevation::float + (case when n.depth is null then 0 else n.depth end)) END,
 						', "nodeparent":"',anl_node.descript,'"}')
 						FROM node n 
