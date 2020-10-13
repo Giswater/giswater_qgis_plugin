@@ -587,7 +587,7 @@ class ApiCF(ApiParent, QObject):
         # since as it receives parameters we will not be able to disconnect the signals
         self.fct_block_action_edit = lambda: self.block_action_edit(dlg_cf, action_edit, result, layer, fid, my_json, new_feature)
         self.fct_start_editing = lambda: self.start_editing(dlg_cf, action_edit, complet_result[0]['body']['data'], layer)
-        self.fct_stop_editing = lambda: self.stop_editing(dlg_cf, action_edit, complet_result[0]['body']['data'], layer, fid, self.my_json, new_feature)
+        self.fct_stop_editing = lambda: self.stop_editing(dlg_cf, action_edit, layer, fid, self.my_json, new_feature)
         self.connect_signals()
 
         self.enable_actions(dlg_cf, layer.isEditable())
@@ -654,8 +654,10 @@ class ApiCF(ApiParent, QObject):
 
         if self.new_feature_id is not None:
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(True)
-            self.stop_editing(dialog, action_edit, result, layer, fid, my_json, new_feature)
+            self.stop_editing(dialog, action_edit, result, fid, my_json, new_feature)
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(False)
+            if not self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
+                self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
 
 
     def close_dialog(self, dlg=None):
@@ -779,7 +781,7 @@ class ApiCF(ApiParent, QObject):
                 return
             save = self.ask_for_save(action_edit, fid)
             if save:
-                self.manage_accept(dialog, action_edit, result, new_feature, self.my_json, False)
+                self.manage_accept(dialog, action_edit, new_feature, self.my_json, False)
                 self.my_json = {}
             elif self.new_feature_id is not None:
                 if self.controller.dlg_docker and self.controller.show_docker:
@@ -797,10 +799,10 @@ class ApiCF(ApiParent, QObject):
             self.close_dialog(dialog)
             return
 
-        self.manage_accept(dialog, action_edit, result, new_feature, my_json, True)
+        self.manage_accept(dialog, action_edit, new_feature, my_json, True)
 
 
-    def manage_accept(self, dialog, action_edit, result, new_feature, my_json, close_dlg):
+    def manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg):
         status = self.accept(dialog, self.complet_result[0], my_json, close_dialog=close_dlg, new_feature=new_feature)
         if status is True:  # Commit succesfull and dialog keep opened
             self.check_actions(action_edit, False)
@@ -808,7 +810,7 @@ class ApiCF(ApiParent, QObject):
             self.enable_actions(dialog, False)
 
 
-    def stop_editing(self, dialog, action_edit, result, layer, fid, my_json, new_feature=None):
+    def stop_editing(self, dialog, action_edit, layer, fid, my_json, new_feature=None):
         self.get_last_value()
         if my_json == '' or str(my_json) == '{}':
             self.disconnect_signals()
@@ -822,7 +824,7 @@ class ApiCF(ApiParent, QObject):
         else:
             save = self.ask_for_save(action_edit, fid)
             if save:
-                self.manage_accept(dialog, action_edit, result, new_feature, my_json, False)
+                self.manage_accept(dialog, action_edit, new_feature, my_json, False)
 
 
     def start_editing(self, dialog, action_edit, result, layer):
