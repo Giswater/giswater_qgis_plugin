@@ -89,7 +89,7 @@ BEGIN
 	v_ffactor = (SELECT value FROM config_param_user WHERE parameter = 'inp_report_f_factor' AND cur_user = current_user);
 
 	IF v_ffactor = 'NO' THEN
-		UPDATE temp_csv SET csv10=csv9, csv9=0 WHERE source='rpt_arc' AND fid = 140;
+		UPDATE temp_csv SET csv10=csv9, csv9=0 WHERE source='rpt_arc' AND fid = 140 AND cur_user=current_user;
 	END IF;
 	
 	-- rpt_node
