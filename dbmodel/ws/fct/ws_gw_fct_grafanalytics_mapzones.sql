@@ -489,8 +489,6 @@ BEGIN
 					-- inundation process
 					LOOP						
 						v_count = v_count+1;
-
-						raise notice ' count %', v_count;
 						
 						UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;
 						
