@@ -12,8 +12,8 @@ from functools import partial
 
 from ....lib import tools_qt
 from ...ui.ui_manager import NodeTypeChange
-from ...actions.catalog import GwCatalog
-from ...actions.info import GwInfo
+from ...shared.catalog import GwCatalog
+from ...shared.info import GwInfo
 from ..parent_maptool import GwParentMapTool
 from ...utils.tools_giswater import check_expression, close_dialog, load_settings, open_dialog
 from ....lib.tools_qgis import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \

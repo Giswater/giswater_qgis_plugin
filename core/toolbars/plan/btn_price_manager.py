@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from ..parent_dialog import GwParentAction
-from ...actions.plan_func import GwPlan
+from ...shared.plan_func import GwPlan
 
 
 class GwPriceManagerButton(GwParentAction):

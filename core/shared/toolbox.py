@@ -20,7 +20,7 @@ from functools import partial
 from ...lib import tools_qt
 from ..utils.tools_giswater import getWidgetText, open_file_path
 from .layer_tools import GwLayerTools
-from ..actions.api_parent import ApiParent
+from ..shared.api_parent import ApiParent
 from ..ui.ui_manager import ToolboxDockerUi, ToolboxUi
 
 

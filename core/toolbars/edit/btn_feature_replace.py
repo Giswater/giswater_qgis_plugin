@@ -14,7 +14,7 @@ from datetime import datetime
 from functools import partial
 
 from ...ui.ui_manager import FeatureReplace, InfoWorkcatUi
-from ...actions.catalog import GwCatalog
+from ...shared.catalog import GwCatalog
 from ...utils.layer_tools import populate_info_text
 from ...utils.tools_giswater import close_dialog, load_settings, open_dialog, refresh_legend, create_body
 from ....lib import tools_qt

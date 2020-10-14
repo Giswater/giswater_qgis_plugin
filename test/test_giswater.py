@@ -13,7 +13,7 @@ import sys
 
 from dao.controller import DaoController
 from core.btn_admin import GwAdmin
-from core.actions.visit_manager import GwVisitManager
+from core.shared.visit_manager import GwVisitManager
 
 
 class TestGiswater(QObject):

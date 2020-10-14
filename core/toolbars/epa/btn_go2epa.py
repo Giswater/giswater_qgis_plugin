@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from ..parent_dialog import GwParentAction
-from ...actions.go2epa import GwGo2Epa
+from ...shared.go2epa import GwGo2Epa
 
 
 class GwGo2EpaButton(GwParentAction):

@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from ..parent_dialog import GwParentAction
-from ...actions.search import GwSearch
+from ...shared.search import GwSearch
 
 
 class GwSearchButton(GwParentAction):

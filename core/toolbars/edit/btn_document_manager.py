@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from ..parent_dialog import GwParentAction
-from ...actions.document import GwDocument
+from ...shared.document import GwDocument
 
 
 class GwEditDocumentButton(GwParentAction):

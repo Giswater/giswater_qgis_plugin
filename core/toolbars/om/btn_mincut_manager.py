@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from ..parent_dialog import GwParentAction
-from ...actions.mincut import GwMincut
+from ...shared.mincut import GwMincut
 
 
 class GwMincutManagerButton(GwParentAction):

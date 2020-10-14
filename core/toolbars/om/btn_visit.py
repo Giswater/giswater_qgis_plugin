@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from ..parent_dialog import GwParentAction
-from ...actions.visit_manager import GwVisitManager
+from ...shared.visit_manager import GwVisitManager
 
 
 class GwAddVisitButton(GwParentAction):

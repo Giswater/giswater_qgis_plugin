@@ -12,7 +12,7 @@ from qgis.PyQt.QtGui import QKeySequence
 from functools import partial
 
 from ..parent_dialog import GwParentAction
-from ...actions.edit_func import GwEdit
+from ...shared.edit_func import GwEdit
 from ...utils.pg_man import PgMan
 
 
