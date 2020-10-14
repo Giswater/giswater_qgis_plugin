@@ -157,35 +157,23 @@ CREATE OR REPLACE VIEW v_arc_x_vnode AS
 
 CREATE OR REPLACE VIEW v_edit_vnode AS 
  SELECT a.vnode_id,
-    a.vnode_type,
     a.feature_type,
     a.top_elev,
-    a.sector_id,
-    a.dma_id,
     a.state,
-    a.annotation,
     a.the_geom,
-    a.expl_id,
-    a.rotation,
     a.ispsectorgeom,
     a.psector_rowid
    FROM ( SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
-            vnode.vnode_type,
             link.feature_type,
             vnode.top_elev,
-            vnode.sector_id,
-            vnode.dma_id,
                 CASE
                     WHEN plan_psector_x_connec.vnode_geom IS NULL THEN link.state
                     ELSE plan_psector_x_connec.state
                 END AS state,
-            vnode.annotation,
                 CASE
                     WHEN plan_psector_x_connec.vnode_geom IS NULL THEN vnode.the_geom
                     ELSE plan_psector_x_connec.vnode_geom
                 END AS the_geom,
-            vnode.expl_id,
-            vnode.rotation,
                 CASE
                     WHEN plan_psector_x_connec.link_geom IS NULL THEN false
                     ELSE true
@@ -201,22 +189,16 @@ CREATE OR REPLACE VIEW v_edit_vnode AS
           WHERE link.feature_id::text = v_state_connec.connec_id::text
         UNION
          SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
-            vnode.vnode_type,
             link.feature_type,
             vnode.top_elev,
-            vnode.sector_id,
-            vnode.dma_id,
                 CASE
                     WHEN plan_psector_x_gully.vnode_geom IS NULL THEN link.state
                     ELSE plan_psector_x_gully.state
                 END AS state,
-            vnode.annotation,
                 CASE
                     WHEN plan_psector_x_gully.vnode_geom IS NULL THEN vnode.the_geom
                     ELSE plan_psector_x_gully.vnode_geom
                 END AS the_geom,
-            vnode.expl_id,
-            vnode.rotation,
                 CASE
                     WHEN plan_psector_x_gully.link_geom IS NULL THEN false
                     ELSE true

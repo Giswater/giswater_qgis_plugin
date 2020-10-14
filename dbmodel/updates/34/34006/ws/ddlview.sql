@@ -113,35 +113,23 @@ CREATE OR REPLACE VIEW v_arc_x_vnode AS
 
 CREATE OR REPLACE VIEW v_edit_vnode AS 
  SELECT a.vnode_id,
-    a.vnode_type,
     a.feature_type,
     a.elev,
-    a.sector_id,
-    a.dma_id,
     a.state,
-    a.annotation,
     a.the_geom,
-    a.expl_id,
-    a.rotation,
     a.ispsectorgeom,
     a.psector_rowid
    FROM ( SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
-            vnode.vnode_type,
             link.feature_type,
             vnode.elev,
-            vnode.sector_id,
-            vnode.dma_id,
                 CASE
                     WHEN plan_psector_x_connec.vnode_geom IS NULL THEN link.state
                     ELSE plan_psector_x_connec.state
                 END AS state,
-            vnode.annotation,
                 CASE
                     WHEN plan_psector_x_connec.vnode_geom IS NULL THEN vnode.the_geom
                     ELSE plan_psector_x_connec.vnode_geom
                 END AS the_geom,
-            vnode.expl_id,
-            vnode.rotation,
                 CASE
                     WHEN plan_psector_x_connec.link_geom IS NULL THEN false
                     ELSE true
