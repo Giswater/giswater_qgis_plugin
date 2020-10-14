@@ -10,11 +10,12 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2020/05/25
 ALTER TABLE cat_presszone RENAME TO presszone;
 
-ALTER TABLE sector ADD COLUMN stylesheet json;
-ALTER TABLE dma ADD COLUMN stylesheet json;
-ALTER TABLE presszone ADD COLUMN head numeric(12,2);
-ALTER TABLE presszone ADD COLUMN stylesheet json;
-ALTER TABLE dqa ADD COLUMN stylesheet json;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"stylesheet", "dataType":"json"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"stylesheet", "dataType":"json"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"stylesheet", "dataType":"json"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"head", "dataType":"numeric(12,2)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"stylesheet", "dataType":"json"}}$$);
+
 
 ALTER TABLE presszone RENAME id TO presszone_id;
 

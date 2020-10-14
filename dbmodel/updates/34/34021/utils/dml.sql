@@ -128,13 +128,16 @@ UPDATE config_typevalue SET camelstyle='gwSetVisit' WHERE id='set_visit' AND typ
 UPDATE config_typevalue SET camelstyle='gwSetPrint' WHERE id='set_print' AND typevalue='widgetfunction_typevalue';
 UPDATE config_typevalue SET camelstyle='backButtonClicked' WHERE id='set_previous_form_back' AND typevalue='widgetfunction_typevalue';
 
+DELETE FROM config_form_fields WHERE formname IN ('lot', 'om_visit', 'om_visit_lot', 'visit_manager');
+UPDATE config_form_fields SET widgetfunction = NULL WHERE widgetfunction='get_visit_manager' AND formname like 'v_ui_om_visitman%';
+
 DELETE FROM config_typevalue WHERE id='get_lot' AND typevalue='widgetfunction_typevalue';
 DELETE FROM config_typevalue WHERE id='get_visit_manager' AND typevalue='widgetfunction_typevalue';
 DELETE FROM config_typevalue WHERE id='set_visit_manager' AND typevalue='widgetfunction_typevalue';
  
 
 UPDATE config_param_system SET value=
-'{"SECTOR":{"mode":"Disable", "column":"sector_id"}, "DMA":{"mode":"Styesheet", "column":"name"}, "PRESSZONE":{"mode":"Random", "column":"presszone_id"}, "DQA":{"mode":"Random", "column":"dqa_id"}, "MINSECTOR":{"mode":"Disable", "column":"minsector_id"}}'
+'{"SECTOR":{"mode":"Disable", "column":"sector_id"}, "DMA":{"mode":"Stylesheet", "column":"name"}, "PRESSZONE":{"mode":"Random", "column":"presszone_id"}, "DQA":{"mode":"Random", "column":"dqa_id"}, "MINSECTOR":{"mode":"Disable", "column":"minsector_id"}}'
 WHERE parameter  = 'utils_grafanalytics_dynamic_symbology';
 
 DELETE FROM config_param_user WHERE parameter='qgis_toggledition_forceopen';

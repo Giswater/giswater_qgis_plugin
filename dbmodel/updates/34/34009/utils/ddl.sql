@@ -191,6 +191,8 @@ DROP SEQUENCE IF EXISTS SCHEMA_NAME.config_api_visit_cat_multievent_id_seq;
 ALTER TABLE config_toolbox ADD CONSTRAINT config_toolbox_id_fkey FOREIGN KEY (id)
 REFERENCES sys_function (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
+ALTER TABLE plan_psector DROP CONSTRAINT plan_psector_priority_fkey;
+
 --2020/05/18
 ALTER TABLE value_verified RENAME TO _value_verified_;
 ALTER TABLE value_review_status RENAME TO _value_review_status_;
