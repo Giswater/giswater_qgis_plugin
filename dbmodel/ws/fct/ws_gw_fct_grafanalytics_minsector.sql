@@ -228,7 +228,7 @@ BEGIN
 		-- insert arc results into audit table
 		INSERT INTO anl_arc (fid, arccat_id, arc_id, the_geom, descript)
 		SELECT DISTINCT ON (arc_id) 134, arccat_id, a.arc_id, the_geom, v_arc::text
-		FROM (SELECT arc_id, max(water) as water FROM temp_anlgraf WHERE water=1 GROUP by arc_id) a JOIN v_edit_arc b ON a.arc_id=b.arc_id;
+		FROM (SELECT arc_id, max(water) as water FROM temp_anlgraf WHERE water=1 GROUP by arc_id) a JOIN arc b ON a.arc_id=b.arc_id;
 		GET DIAGNOSTICS v_affectedrow =row_count;
 
 		SELECT count(*) INTO v_row1 FROM anl_arc WHERE fid = 134 AND cur_user =current_user;
@@ -241,13 +241,13 @@ BEGIN
 	INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript)
 	SELECT DISTINCT ON (node_id) 134, nodecat_id, b.node_id, the_geom, arc_id FROM (SELECT node_1 as node_id FROM
 	(SELECT node_1,water FROM temp_anlgraf UNION SELECT node_2,water FROM temp_anlgraf)a
-	GROUP BY node_1, water HAVING water=1)b JOIN v_edit_node c ON c.node_id=b.node_id;
+	GROUP BY node_1, water HAVING water=1)b JOIN node c ON c.node_id=b.node_id;
 
 	-- insert node delimiters into audit table
 	INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript)
 	SELECT DISTINCT ON (node_id) 134, nodecat_id, b.node_id, the_geom, 0 FROM
 	(SELECT node_1 as node_id FROM (SELECT node_1,water FROM temp_anlgraf UNION ALL SELECT node_2,water FROM temp_anlgraf)a
-	GROUP BY node_1, water HAVING water=1 AND count(node_1)=2)b JOIN v_edit_node c ON c.node_id=b.node_id;
+	GROUP BY node_1, water HAVING water=1 AND count(node_1)=2)b JOIN node c ON c.node_id=b.node_id;
 	-- NOTE: node delimiter are inserted two times in table, as node from minsector trace and as node delimiter
 	
 	IF v_updatefeature THEN 
@@ -263,10 +263,10 @@ BEGIN
 		WHERE fid=134 AND a.node_id=node.node_id AND a.descript::integer =0 AND graf_delimiter!='NONE' AND cur_user=current_user;
 			
 		-- update non graf nodes (not connected) using arc_id parent on v_edit_node (not used node table because the exploitation filter).
-		UPDATE v_edit_node SET minsector_id = a.minsector_id FROM arc a WHERE a.arc_id=v_edit_node.arc_id;
+		UPDATE node SET minsector_id = a.minsector_id FROM v_edit_arc a WHERE a.arc_id=node.arc_id;
 	
 		-- used v_edit_connec to the exploitation filter. Row before is not neeeded because on table anl_* is data filtered by the process...
-		UPDATE v_edit_connec SET minsector_id = a.minsector_id FROM arc a WHERE a.arc_id=v_edit_connec.arc_id;
+		UPDATE connec SET minsector_id = a.minsector_id FROM v_edit_arc a WHERE a.arc_id=connec.arc_id;
 
 		-- insert into minsector table
 		DELETE FROM minsector WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
