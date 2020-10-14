@@ -334,7 +334,7 @@ BEGIN
 		IF upper(v_catfeature.feature_type) = 'NODE' THEN
 			SELECT value INTO v_sector_id FROM config_param_user WHERE parameter = 'edit_sector_vdefault' and cur_user = current_user;
 			SELECT value INTO v_dma_id FROM config_param_user WHERE parameter = 'edit_dma_vdefault' and cur_user = current_user;
-			SELECT value INTO v_expl_id FROM config_param_user WHERE parameter = 'edit_explitation_vdefault' and cur_user = current_user;
+			SELECT value INTO v_expl_id FROM config_param_user WHERE parameter = 'edit_exploitation_vdefault' and cur_user = current_user;
 			SELECT value INTO v_muni_id FROM config_param_user WHERE parameter = 'edit_municipality_vdefault' and cur_user = current_user;
 			SELECT value INTO v_presszone_id FROM config_param_user WHERE parameter = 'edit_presszone_vdefault' and cur_user = current_user;
 		END IF;
@@ -376,9 +376,9 @@ BEGIN
 		IF v_expl_id IS NULL THEN
 			SELECT count(*) into count_aux FROM exploitation WHERE ST_DWithin(p_reduced_geometry, exploitation.the_geom,0.001);
 			IF count_aux = 1 THEN
-				v_expl_id = (SELECT expl_id FROM exploitation WHERE ST_DWithin(p_reduced_geometry, exploitation.the_geom,0.001) LIMIT 1);
+				v_expl_id = (SELECT expl_id FROM exploitation WHERE ST_DWithin(p_reduced_geometry, exploitation.the_geom,0.001)  AND active=true LIMIT 1);
 			ELSE
-				v_expl_id =(SELECT expl_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer) 
+				v_expl_id =(SELECT expl_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer)  AND active=true
 				order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
