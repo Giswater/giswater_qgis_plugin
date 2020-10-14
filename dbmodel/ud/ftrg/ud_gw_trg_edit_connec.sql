@@ -48,6 +48,13 @@ BEGIN
 		IF (SELECT matcat_id FROM cat_connec WHERE id = NEW.connecat_id) IS NOT NULL THEN
 			v_matfromcat = true;
 		END IF;
+
+		IF NEW.arc_id IS NOT NULL AND NEW.expl_id IS NOT NULL THEN
+			IF (SELECT expl_id FROM arc WHERE arc_id = NEW.arc_id) != NEW.expl_id THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3144", "function":"1204","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
+			END IF;
+		END IF;
 		
 	END IF;
         

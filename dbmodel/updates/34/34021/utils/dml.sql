@@ -148,3 +148,7 @@ DELETE FROM sys_param_user WHERE id='edit_connect_downgrade_link';
 
 --2020/10/14
 UPDATE exploitation SET active = TRUE WHERE active IS NULL;
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
+VALUES (3144, 'Exploitation of the feature is different than the one of the related arc. Arc_id: ',
+'Both features should have the same exploitation.', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING;
