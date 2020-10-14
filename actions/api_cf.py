@@ -772,7 +772,6 @@ class ApiCF(ApiParent, QObject):
         # With the editing QAction we need to collect the last modified value (self.get_last_value()),
         # since the "editingFinished" signals of the widgets are not detected.
         # Therefore whenever the cursor enters a widget, it will ask if we want to save changes
-        self.get_last_value()
         if not action_edit.isChecked():
             if str(self.my_json) == '{}':
                 self.check_actions(action_edit, False)
@@ -803,6 +802,7 @@ class ApiCF(ApiParent, QObject):
 
 
     def manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg):
+        self.get_last_value()
         status = self.accept(dialog, self.complet_result[0], my_json, close_dialog=close_dlg, new_feature=new_feature)
         if status is True:  # Commit succesfull and dialog keep opened
             self.check_actions(action_edit, False)
@@ -811,7 +811,6 @@ class ApiCF(ApiParent, QObject):
 
 
     def stop_editing(self, dialog, action_edit, layer, fid, my_json, new_feature=None):
-        self.get_last_value()
         if my_json == '' or str(my_json) == '{}':
             self.disconnect_signals()
             # Use commitChanges just for closse edition
