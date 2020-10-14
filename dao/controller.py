@@ -667,7 +667,10 @@ class DaoController(object):
         sql_values = ""
         for value in values:
             if value != 'current_user':
-                sql_values += "'" + value + "', "
+                if value != '':
+                    sql_values += "'" + value + "', "
+                else:
+                    sql_values += "NULL, "
             else:
                 sql_values += value + ", "                
                 
@@ -732,7 +735,10 @@ class DaoController(object):
         sql_values = ""
         for value in values:
             if value != 'current_user':
-                sql_values += "$$" + value + "$$, "
+                if value != '':
+                    sql_values += "$$" + value + "$$, "
+                else:
+                    sql_values += "NULL, "
             else:
                 sql_values += value + ", "
         sql += unique_value + ", " + sql_values[:-2] + ")"         
