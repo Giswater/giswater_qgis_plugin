@@ -149,17 +149,18 @@ BEGIN
 		
 		-- Get combo id's
 		IF (v_aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_combovalue IS NOT NULL THEN
-			query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||((v_aux_json_child->>'dv_querytext'))||((v_aux_json_child->>'dv_querytext_filterc'))||'::text = '||(quote_literal(v_combovalue))||' ORDER BY '||v_orderby||') a';
+			query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||((v_aux_json_child->>'dv_querytext'))||((v_aux_json_child->>'dv_querytext_filterc'))||' '||(quote_literal(v_combovalue))||' ORDER BY '||v_orderby||') a';
 			execute query_text INTO combo_json_child;
 		ELSE 	
 			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||((v_aux_json_child->>'dv_querytext'))||' ORDER BY '||v_orderby||')a' INTO combo_json_child;
 		END IF;
+		
 		combo_json_child := COALESCE(combo_json_child, '[]');
 		v_combo_rows_child[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_combo_rows_child[(v_aux_json_child->>'orderby')::INT], 'comboIds', COALESCE(combo_json_child, '[]'));
 	
 		-- Get combo value's
 		IF (v_aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_combovalue IS NOT NULL THEN
-			query_text= 'SELECT array_to_json(array_agg(idval)) FROM ('||(v_aux_json_child->>'dv_querytext')||(v_aux_json_child->>'dv_querytext_filterc')||'::text = '||quote_literal(v_combovalue)||' ORDER BY '||v_orderby||') a';
+			query_text= 'SELECT array_to_json(array_agg(idval)) FROM ('||(v_aux_json_child->>'dv_querytext')||(v_aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_combovalue)||' ORDER BY '||v_orderby||') a';
 			execute query_text INTO combo_json_child;
 		ELSE 	
 			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||((v_aux_json_child->>'dv_querytext'))||' ORDER BY '||v_orderby||')a'
