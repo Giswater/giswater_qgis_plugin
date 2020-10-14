@@ -47,6 +47,10 @@ SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation":[1], "macroExploitation":[1], "checkData":false, 
 "updateFeature":true, "updateMapZone":2, "geomParamUpdate":15,"debug":false, "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":[2,3,4]}}}');
 
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation":[502],  "checkData":false, 
+"updateFeature":true, "updateMapZone":4, "geomParamUpdate":20,"debug":false}}}');
+
+
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "nodeHeader":"113952","exploitation":[1], "macroExploitation":[1], 
 "checkData":false, "updateFeature":true, "updateMapZone":2, "geomParamUpdate":15,"debug":false, "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":[2,3,4]}}}');
 ----------------
@@ -107,7 +111,7 @@ SELECT arc_id, node_1 FROM temp_anlgraf where flag=1 order by node_1
 
 DECLARE
 
-v_affectrows numeric;
+v_affectrow numeric;
 v_cont1 integer default 0;
 v_class text;
 v_feature record;
@@ -444,10 +448,10 @@ BEGIN
 
 				-- starting process
 				LOOP	
-				
+
 					EXIT WHEN v_cont1 = -1;
 					v_cont1 = v_cont1+1;
-					
+
 					IF v_floodfromnode IS NULL THEN
 						v_querytext = 'SELECT * FROM ('||v_text||' AND checkf=0 LIMIT 1)a';
 						IF v_querytext IS NOT NULL THEN
@@ -463,12 +467,10 @@ BEGIN
 						v_cont1 = -1;
 					END IF;
 
-					RAISE NOTICE 'v_featureid % v_cont1 %', v_featureid, v_cont1;
-
 					-- reset water flag
 					UPDATE temp_anlgraf SET water=0;
 
-					raise notice '------------ Feature_id % ', v_featureid;
+					raise notice '---------------- Feature_id % ', v_featureid;
 					
 					------------------
 					-- starting engine
@@ -487,11 +489,13 @@ BEGIN
 					-- inundation process
 					LOOP						
 						v_count = v_count+1;
+
+						raise notice ' count %', v_count;
 						
 						UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf=1 FROM v_anl_graf a where n.node_1::integer = a.node_1::integer AND n.arc_id = a.arc_id;
 						
-						GET DIAGNOSTICS v_affectrows = row_count;
-						EXIT WHEN v_affectrows = 0;
+						GET DIAGNOSTICS v_affectrow = row_count;
+						EXIT WHEN v_affectrow = 0;
 						EXIT WHEN v_count = 2000;
 
 					END LOOP;
@@ -500,19 +504,19 @@ BEGIN
 					----------------
 
 					IF v_error IS NOT TRUE THEN
-					
+
 						-- insert arc results into audit table	
 						EXECUTE 'INSERT INTO anl_arc (fid, arccat_id, arc_id, the_geom, descript)
 							SELECT  DISTINCT ON (arc_id) '||v_fid||', arccat_id, a.arc_id, the_geom, '||(v_featureid)||' FROM (SELECT arc_id FROM temp_anlgraf
 							WHERE water >0) a 
-							JOIN v_edit_arc b ON a.arc_id::integer=b.arc_id::integer';
+							JOIN arc b ON a.arc_id::integer=b.arc_id::integer';
 
 						-- insert node results into audit table
 						EXECUTE 'INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript)
 							SELECT DISTINCT ON (node_id) '||v_fid||', nodecat_id, b.node_id, the_geom, '||(v_featureid)||' FROM (SELECT node_1 as node_id
 							FROM temp_anlgraf WHERE water >0)a
-							JOIN v_edit_node b ON a.node_id::integer=b.node_id::integer';
-														
+							JOIN node b ON a.node_id::integer=b.node_id::integer';
+
 						-- message
 						SELECT count(*) INTO v_count1 FROM anl_arc WHERE fid=v_fid AND descript=v_featureid::text AND cur_user=current_user;
 						SELECT count(*) INTO v_count2 FROM anl_node WHERE fid=v_fid AND descript=v_featureid::text AND cur_user=current_user;
@@ -552,8 +556,8 @@ BEGIN
 							quote_ident(v_table)||') b
 							 ON  nodeparent = descript WHERE fid='||v_fid||' AND a.arc_id=arc.arc_id AND cur_user=current_user';
 					EXECUTE v_querytext;
-	
-					-- update node table without graf nodes using v_edit_node because the exploitation filter. Rows before do not needed because table anl_* is filtered by process
+
+					-- update node table without graf nodes using v_edit_node because the exploitation filter. Row before do not needed because table anl_* is filtered by process
 					v_querytext = 'UPDATE v_edit_node SET '||quote_ident(v_field)||' = arc.'||quote_ident(v_field)||' FROM arc WHERE arc.arc_id=v_edit_node.arc_id';
 					EXECUTE v_querytext;
 
