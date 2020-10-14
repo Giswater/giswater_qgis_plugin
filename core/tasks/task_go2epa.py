@@ -296,7 +296,8 @@ class GwGo2EpaTask(QgsTask):
 
                     elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
                         if 'Version' not in dirty_list and 'VERSION' not in dirty_list:
-                            self.controller.log_info(f"Error near line {line_number+1} -> {dirty_list}")
+                            error_near = f"Error near line {line_number+1} -> {dirty_list}"
+                            self.controller.log_info(error_near)
                             message = (f"The rpt file is not valid to import. "
                                        f"Because columns on rpt file are overlaped, it seems you need to improve your simulation. "
                                        f"Please ckeck and fix it before continue. \n"
