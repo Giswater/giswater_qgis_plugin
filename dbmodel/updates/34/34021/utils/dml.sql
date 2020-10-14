@@ -146,3 +146,5 @@ DELETE FROM sys_param_user WHERE id='qgis_toggledition_forceopen';
 DELETE FROM config_param_user WHERE parameter='edit_connect_downgrade_link';
 DELETE FROM sys_param_user WHERE id='edit_connect_downgrade_link';
 
+--2020/10/14
+UPDATE exploitation SET active = TRUE WHERE active IS NULL;
