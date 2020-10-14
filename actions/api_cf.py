@@ -778,6 +778,7 @@ class ApiCF(ApiParent, QObject):
         # since the "editingFinished" signals of the widgets are not detected.
         # Therefore whenever the cursor enters a widget, it will ask if we want to save changes
         if not action_edit.isChecked():
+            self.get_last_value()
             if str(self.my_json) == '{}':
                 self.check_actions(action_edit, False)
                 self.disable_all(dialog, self.complet_result[0]['body']['data'], False)
