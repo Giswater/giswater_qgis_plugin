@@ -54,6 +54,7 @@ class ApiCF(ApiParent, QObject):
         self.new_feature_id = None
         self.layer_new_feature = None
         self.tab_type = tab_type
+        self.connected = False
 
 
     def hilight_feature(self, point, rb_list, tab_type=None):
@@ -654,10 +655,13 @@ class ApiCF(ApiParent, QObject):
 
         if self.new_feature_id is not None:
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(True)
-            self.stop_editing(dialog, action_edit, result, fid, my_json, new_feature)
+            save = self.stop_editing(dialog, action_edit, result, fid, my_json, new_feature)
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(False)
-            if not self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
+            if save and not self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
                 self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+                
+        if self.connected is False:
+            self.connect_signals()
 
 
     def close_dialog(self, dlg=None):
@@ -667,10 +671,11 @@ class ApiCF(ApiParent, QObject):
 
 
     def connect_signals(self):
-        self.layer.editingStarted.connect(self.fct_start_editing)
-        self.layer.editingStopped.connect(self.fct_stop_editing)
-        self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').toggled.connect(self.fct_block_action_edit)
-
+        if not self.connected:
+            self.layer.editingStarted.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_stop_editing)
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').toggled.connect(self.fct_block_action_edit)
+            self.connected = True
 
     def disconnect_signals(self):
         try:
@@ -687,7 +692,7 @@ class ApiCF(ApiParent, QObject):
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').toggled.disconnect(self.fct_block_action_edit)
         except Exception as e:
             pass
-
+        self.connected = False
         self.controller.is_inserting = False
 
 
@@ -825,6 +830,7 @@ class ApiCF(ApiParent, QObject):
             if save:
                 self.manage_accept(dialog, action_edit, new_feature, my_json, False)
 
+            return save
 
     def start_editing(self, dialog, action_edit, result, layer):
         self.disconnect_signals()
