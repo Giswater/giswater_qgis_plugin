@@ -102,17 +102,12 @@ class Table(object):
         fields = [x for x in fields if (("__" not in x) and (x != self.pk()))]
         values = [getattr(self, field) for field in fields]
 
-        # remove all None elements
-        none_indexes = []
+        # Set '' for void values
         for index, value in enumerate(values):
             if value in (None, '', 'null', 'NULL'):
-                none_indexes.append(index)
-        for index in reversed(none_indexes):  # reversed to avoid change of index
-            if fields[index] not in ('event_code', 'value', 'text'):
-                del fields[index]
-                del values[index]
-        values = [str(x) for x in values]
+                values[index] = ''
 
+        values = [str(x) for x in values]
         current_pk = getattr(self, self.pk())
         status = self.controller().execute_upsert(
             self.table_name(), self.pk(), str(current_pk), fields, values, commit=commit)
