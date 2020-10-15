@@ -70,21 +70,21 @@ BEGIN
 				
 		ELSIF v_view='vi_subcatchments' THEN 
 
-			INSERT INTO subcatchment (subc_id, rg_id, outlet_id, area, imperv, width, slope, clength, snow_id, sector_id) 
+			INSERT INTO inp_subcatchment (subc_id, rg_id, outlet_id, area, imperv, width, slope, clength, snow_id, sector_id) 
 			VALUES (NEW.subc_id, NEW.rg_id, NEW.outlet_id, NEW.area, NEW.imperv, NEW.width, NEW.slope, NEW.clength, NEW.snow_id, 1);
 
 		ELSIF v_view='vi_subareas' THEN
-			UPDATE subcatchment SET nimp=NEW.nimp, nperv=NEW.nperv, simp=NEW.simp, sperv=NEW.sperv, zero=NEW.zero, routeto=NEW.routeto, rted=NEW.rted WHERE subc_id=NEW.subc_id;
+			UPDATE inp_subcatchment SET nimp=NEW.nimp, nperv=NEW.nperv, simp=NEW.simp, sperv=NEW.sperv, zero=NEW.zero, routeto=NEW.routeto, rted=NEW.rted WHERE subc_id=NEW.subc_id;
 			
 		ELSIF v_view='vi_infiltration' THEN 
 			IF (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_infiltration') like 'CURVE_NUMBER' THEN
-				UPDATE subcatchment SET curveno=NEW.other1::numeric, conduct_2=NEW.other2::numeric, drytime_2=NEW.other3::numeric 
+				UPDATE inp_subcatchment SET curveno=NEW.other1::numeric, conduct_2=NEW.other2::numeric, drytime_2=NEW.other3::numeric 
 				WHERE subc_id=NEW.subc_id;
 			ELSIF (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_infiltration') like 'GREEN_AMPT' THEN
-				UPDATE subcatchment SET suction=NEW.other1::numeric , conduct=NEW.other2::numeric  , initdef=NEW.other3::numeric
+				UPDATE inp_subcatchment SET suction=NEW.other1::numeric , conduct=NEW.other2::numeric  , initdef=NEW.other3::numeric
 				WHERE subc_id=NEW.subc_id;
 			ELSIF (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_infiltration') like '%HORTON' THEN
-				UPDATE subcatchment SET maxrate=NEW.other1::numeric, minrate=NEW.other2::numeric , decay=NEW.other3::numeric, drytime=NEW.other4::numeric, maxinfil=NEW.other5::numeric
+				UPDATE inp_subcatchment SET maxrate=NEW.other1::numeric, minrate=NEW.other2::numeric , decay=NEW.other3::numeric, drytime=NEW.other4::numeric, maxinfil=NEW.other5::numeric
 				WHERE subc_id=NEW.subc_id;
 			END IF;
 			
