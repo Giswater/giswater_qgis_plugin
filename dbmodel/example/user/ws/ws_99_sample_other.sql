@@ -431,7 +431,7 @@ UPDATE ext_rtc_dma_period SET minc = null, maxc = null, pattern_volume = 32;
 DELETE FROM selector_psector;
 
 -- deprecated on psector 1 and 2
-SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"id":"[3104, 3103, 3076, 3177]"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
+SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"id":"[3104, 3103, 3076, 3177]"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
 
 
 -- update demands and patterns for connec

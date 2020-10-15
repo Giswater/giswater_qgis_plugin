@@ -32,7 +32,7 @@ BEGIN
 		END LOOP;
 
 		IF array_connec_agg IS NOT NULL THEN
-			EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
+			EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 			"feature":{"id":'|| array_to_json(array_connec_agg)||'},"data":{"feature_type":"CONNEC"}}$$)';
 		END IF;
 
@@ -46,7 +46,7 @@ BEGIN
 			END LOOP;
 
 			IF array_gully_agg IS NOT NULL THEN
-				EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
+				EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{"id":'|| array_to_json(array_gully_agg)||'},"data":{"feature_type":"GULLY"}}$$)';		
 			END IF;
 		END IF;

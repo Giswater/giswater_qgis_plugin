@@ -7,7 +7,8 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2124
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_connect_to_network(character varying[], character varying);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_connect_to_network(p_data json)
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_connect_to_network(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setlinktonetwork(p_data json)
 RETURNS json AS
 $BODY$
 
@@ -22,12 +23,12 @@ MAIN CHANGES
 - It's forbidden to connec links on vnode without arcs.
 - Connect_to_network works also with node/connec/gully as endpoints (deprecated)
 
-SELECT SCHEMA_NAME.gw_fct_connect_to_network($${
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"id":["3201","3200"]},
 "data":{"feature_type":"CONNEC"}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_connect_to_network($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
+SELECT SCHEMA_NAME.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
 "SELECT array_to_json(array_agg(connec_id::text)) FROM v_edit_connec WHERE connec_id IS NOT NULL AND state=1"},
 "data":{"feature_type":"CONNEC"}}$$);
 
