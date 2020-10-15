@@ -480,7 +480,10 @@ class ApiCF(ApiParent, QObject):
         action_help = self.dlg_cf.findChild(QAction, "actionHelp")
         action_interpolate = self.dlg_cf.findChild(QAction, "actionInterpolate")
         action_section = self.dlg_cf.findChild(QAction, "actionSection")
-
+        if self.new_feature_id is not None:
+            self.enable_action(self.dlg_cf, "actionZoom", False)
+            self.enable_action(self.dlg_cf, "actionZoomOut", False)
+            self.enable_action(self.dlg_cf, "actionCentered", False)
         self.show_actions(self.dlg_cf, 'tab_data')
 
         try:
@@ -723,6 +726,7 @@ class ApiCF(ApiParent, QObject):
 
         if not self.feature:
             self.get_feature(self.tab_type)
+
         layer.selectByIds([self.feature.id()])
         canvas.zoomToSelected(layer)
         canvas.zoomIn()
@@ -864,12 +868,12 @@ class ApiCF(ApiParent, QObject):
 
         try:
             self.layer_new_feature.rollBack()
-        except TypeError:
+        except AttributeError:
             pass
 
         try:
             self.layer.rollBack()
-        except TypeError:
+        except AttributeError:
             pass
 
 
@@ -1180,6 +1184,9 @@ class ApiCF(ApiParent, QObject):
                 self.connect_signals()
                 return False
             self.new_feature_id = None
+            self.enable_action(dialog, "actionZoom", True)
+            self.enable_action(dialog, "actionZoomOut", True)
+            self.enable_action(dialog, "actionCentered", True)
             self.controller.is_inserting = False
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
@@ -1302,12 +1309,16 @@ class ApiCF(ApiParent, QObject):
                               'actionSection')
             for action in actions_list:
                 if action.objectName() not in static_actions:
-                    self.enable_action(action, enabled)
+                    self.enable_action(dialog, action, enabled)
         except RuntimeError:
             pass
 
 
-    def enable_action(self, action, enabled):
+    def enable_action(self, dialog, action, enabled):
+        if type(action) is str:
+            action = dialog.findChild(QAction, action)
+        if not action:
+            return
         action.setEnabled(enabled)
 
 
