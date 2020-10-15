@@ -21,7 +21,7 @@ from ....lib.tools_qgis import get_event_point, snap_to_background_layers, get_s
 
 class GwConnectLinkButton(GwParentMapTool):
     """ Button 20: User select connections from layer 'connec'
-    Execute SQL function: 'gw_fct_connect_to_network' """
+    Execute SQL function: 'gw_fct_setlinktonetwork ' """
 
     def __init__(self, icon_path, text, toolbar, action_group):
         """ Class constructor """
@@ -202,7 +202,7 @@ class GwConnectLinkButton(GwParentMapTool):
             extras = f'"feature_type":"{geom_type.upper()}"'
             body = create_body(feature=feature_id, extras=extras)
             # Execute SQL function and show result to the user
-            result = self.controller.get_json('gw_fct_connect_to_network', body)
+            result = self.controller.get_json('gw_fct_setlinktonetwork ', body)
             if result:
                 self.dlg_dtext = DialogTextUi()
                 load_settings(self.dlg_dtext)

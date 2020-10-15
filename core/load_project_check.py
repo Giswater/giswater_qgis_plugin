@@ -62,14 +62,14 @@ class GwProjectCheck:
                 fields += f'"table_user":"{table_user}"}}, '
         fields = fields[:-2] + ']'
         
-        # Execute function 'gw_fct_audit_check_project'
+        # Execute function 'gw_fct_setcheckproject'
         result = self.execute_audit_check_project(init_project, fields)
 
         return True, result
 
 
     def execute_audit_check_project(self, init_project, fields_to_insert):
-        """ Execute function 'gw_fct_audit_check_project' """
+        """ Execute function 'gw_fct_setcheckproject' """
 
         # get project variables
         add_schema = self.controller.plugin_settings_value('gwAddSchema')
@@ -89,7 +89,7 @@ class GwProjectCheck:
         extras += f', "osVersion":"{platform.system()} {platform.release()}"'
         extras += f', {fields_to_insert}'
         body = create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_audit_check_project', body)
+        result = self.controller.get_json('gw_fct_setcheckproject', body)
         try:
             if not result or (result['body']['variables']['hideForm'] == True):
                 return result
@@ -114,7 +114,7 @@ class GwProjectCheck:
         # Populate info_log and missing layers
         critical_level = 0
         text_result = add_temp_layer(self.dlg_audit_project, result['body']['data'],
-            'gw_fct_audit_check_project_result', True, False, 0, True, disable_tabs=False)
+            'gw_fct_setcheckproject_result', True, False, 0, True, disable_tabs=False)
 
         if 'missingLayers' in result['body']['data']:
             critical_level = self.get_missing_layers(self.dlg_audit_project,
