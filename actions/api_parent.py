@@ -1009,7 +1009,6 @@ class ApiParent(ParentAction):
                     self.feature_id = widget.text()
             elif field['widgettype'] == 'datetime':
                 widget = self.add_calendar(dialog, field)
-                widget = self.set_auto_update_dateedit(field, dialog, widget)
             elif field['widgettype'] == 'hyperlink':
                 widget = self.add_hyperlink(field)
             elif field['widgettype'] == 'textarea':
