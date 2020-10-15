@@ -599,8 +599,8 @@ class ApiCF(ApiParent, QObject):
         action_edit.triggered.connect(partial(self.manage_edition, dlg_cf, action_edit, complet_result[0]['body']['data'], fid, new_feature))
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
-        action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id, 'arc'))
-        action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_parent_id, 'node'))
+        action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id, 'arc', 'data_arc_id'))
+        action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_parent_id, 'node', 'data_parent_id'))
         action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.canvas, layer))
         action_centered.triggered.connect(partial(self.api_action_centered, self.canvas, layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, layer))
@@ -859,6 +859,16 @@ class ApiCF(ApiParent, QObject):
         self.disconnect_signals()
         try:
             self.iface.actionRollbackEdits().trigger()
+        except TypeError:
+            pass
+
+        try:
+            self.layer_new_feature.rollBack()
+        except TypeError:
+            pass
+
+        try:
+            self.layer.rollBack()
         except TypeError:
             pass
 
@@ -2913,12 +2923,11 @@ class ApiCF(ApiParent, QObject):
         dlg.open()
 
 
-    def get_snapped_feature_id(self, dialog, action, option):
+    def get_snapped_feature_id(self, dialog, action, option, widget_name):
         """ Snap feature and set a value into dialog """
 
         layer_name = 'v_edit_' + option
         layer = self.controller.get_layer_by_tablename(layer_name)
-        widget_name = f"data_{option}_id"
         widget = dialog.findChild(QWidget, widget_name)
         if not layer or not widget:
             action.setChecked(False)
@@ -2964,7 +2973,9 @@ class ApiCF(ApiParent, QObject):
         """ Mouse motion detection """
 
         # Set active layer
+        self.disconnect_signals()
         self.iface.setActiveLayer(layer)
+        self.connect_signals()
         layer_name = self.controller.get_layer_source_table_name(layer)
 
         # Get clicked point
