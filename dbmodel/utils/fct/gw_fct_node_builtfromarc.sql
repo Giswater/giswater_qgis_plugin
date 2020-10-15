@@ -8,12 +8,13 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_built_nodefromarc();
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_built_nodefromarc(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_node_builtfromarc(p_data json) RETURNS json AS
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_node_builtfromarc(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setnodefromarc(p_data json) RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 
-SELECT SCHEMA_NAME.gw_fct_node_builtfromarc($${"client":{"device":4, "infoType":1, "lang":"ES"},
+SELECT SCHEMA_NAME.gw_fct_setnodefromarc (2118)($${"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
 "parameters":{"exploitation":"1", "inserIntoNode":"true", "nodeTolerance":"0.01", "saveOnDatabase":"true"}}}$$)::text

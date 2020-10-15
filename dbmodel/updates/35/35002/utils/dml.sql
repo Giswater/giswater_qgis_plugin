@@ -101,3 +101,6 @@ UPDATE config_function SET  function_name = 'gw_fct_setlinktonetwork' WHERE func
 
 UPDATE sys_function SET function_name = 'gw_fct_setelevfromdem ' WHERE function_name='gw_fct_connect_to_network';
 UPDATE config_function SET  function_name = 'gw_fct_setelevfromdem ' WHERE function_name='gw_fct_connect_to_network';
+
+UPDATE sys_function SET function_name = 'gw_fct_setnodefromarc ' WHERE function_name='gw_fct_node_builtfromarc';
+UPDATE config_function SET  function_name = 'gw_fct_setnodefromarc ' WHERE function_name='gw_fct_node_builtfromarc';
