@@ -45,7 +45,7 @@ class GwFlowExitButton(GwParentMapTool):
         if event.button() == Qt.LeftButton and self.current_layer:
 
             # Execute SQL function
-            function_name = "gw_fct_flow_exit"
+            function_name = "gw_fct_grafanalytics_downstream"
 
             elem_id = self.snapped_feat.attribute('node_id')
             feature_id = f'"id":["{elem_id}"]'
