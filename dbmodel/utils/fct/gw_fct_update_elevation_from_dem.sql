@@ -6,15 +6,16 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2760
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_update_elevation_from_dem(p_data json)
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_update_elevation_from_dem(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setelevfromdem(p_data json)
   RETURNS json AS
 $BODY$
 /*
-SELECT gw_fct_update_elevation_from_dem($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+SELECT gw_fct_setelevfromdem($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "feature":{"tableName":"v_edit_connec", "featureType":"CONNEC", "id":["3235", "3239", "3197"]}, 
 "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"exploitation":"1", "updateValues":"allValues"}}}$$)::text
 
-SELECT SCHEMA_NAME.gw_fct_update_elevation_from_dem($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+SELECT SCHEMA_NAME.gw_fct_setelevfromdem($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "feature":{"tableName":"node", "featureType":"NODE"}, 
 "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"exploitation":"524", "updateValues":"allValues"}}}$$)::text
 

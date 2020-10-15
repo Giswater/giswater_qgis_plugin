@@ -92,3 +92,12 @@ UPDATE config_function SET  function_name = 'gw_fct_setfeaturedelete' WHERE func
 
 UPDATE sys_function SET function_name = 'gw_fct_setmincutoverlap' WHERE function_name='gw_fct_mincut_result_overlap';
 UPDATE config_function SET  function_name = 'gw_fct_setmincutoverlap' WHERE function_name='gw_fct_mincut_result_overlap';
+
+UPDATE sys_function SET function_name = 'gw_fct_setcheckproject' WHERE function_name='gw_fct_audit_check_project';
+UPDATE config_function SET  function_name = 'gw_fct_setcheckproject' WHERE function_name='gw_fct_audit_check_project';
+
+UPDATE sys_function SET function_name = 'gw_fct_setlinktonetwork' WHERE function_name='gw_fct_connect_to_network';
+UPDATE config_function SET  function_name = 'gw_fct_setlinktonetwork' WHERE function_name='gw_fct_connect_to_network';
+
+UPDATE sys_function SET function_name = 'gw_fct_setelevfromdem ' WHERE function_name='gw_fct_connect_to_network';
+UPDATE config_function SET  function_name = 'gw_fct_setelevfromdem ' WHERE function_name='gw_fct_connect_to_network';
