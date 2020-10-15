@@ -31,8 +31,7 @@ from .element import GwElement
 from .visit_gallery import GwVisitGallery
 from .visit_manager import GwVisitManager
 from ..utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body, draw, \
-    draw_point
-from ..utils.layer_tools import populate_info_text
+    draw_point, populate_info_text_ as populate_info_text
 from ..utils.hyperlink_label import GwHyperLinkLabel
 from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi

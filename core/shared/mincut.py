@@ -24,7 +24,8 @@ from functools import partial
 from ..tasks.parent_task import GwTask
 from ...lib import tools_qt
 from .search import GwSearch
-from ..utils.tools_giswater import close_dialog, load_settings, open_dialog, save_settings, create_body
+from ..utils.tools_giswater import close_dialog, load_settings, open_dialog, save_settings, create_body, \
+    populate_info_text_ as populate_info_text, delete_layer_from_toc
 from .mincut_manager import GwMincutManager
 from ...actions.multiple_selection import MultipleSelection
 from ..ui.ui_manager import DialogTextUi
@@ -34,14 +35,12 @@ from ..ui.ui_manager import MincutHydrometer
 from ..ui.ui_manager import MincutConnec
 from ..ui.ui_manager import MincutComposer
 from ... import global_vars
-from ..utils.layer_tools import delete_layer_from_toc, populate_info_text
-from ...lib.tools_qgis import get_event_point, snap_to_current_layer, get_snapped_layer, get_snapped_feature, \
-    get_snapped_feature_id, get_snapped_point, snap_to_background_layers, add_marker, get_snapping_options, \
-    apply_snapping_options
 from ...lib.tools_qt import fill_table, set_icon, set_table_columns
 from ...lib.tools_qgis import refresh_map_canvas, set_cursor_wait, set_cursor_restore, get_cursor_multiple_selection, \
     disconnect_signal_selection_changed, zoom_to_rectangle, get_composers_list, get_composer_index, resetRubberbands, \
-    restore_user_layer
+    restore_user_layer, get_event_point, snap_to_current_layer, get_snapped_layer, get_snapped_feature, \
+    get_snapped_feature_id, get_snapped_point, snap_to_background_layers, add_marker, get_snapping_options, \
+    apply_snapping_options
 
 
 class GwMincut:

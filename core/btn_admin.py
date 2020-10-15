@@ -34,8 +34,7 @@ from ..i18n.i18n_generator import GwI18NGenerator
 from .ui.ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjectInfoUi, \
     MainGisProjectUi, ToolboxUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
 from .utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
-    create_body
-from .utils.layer_tools import populate_info_text
+    create_body, populate_info_text_ as populate_info_text
 from ..lib.tools_qt import construct_form_param_user, get_folder_dialog, set_table_columns
 
 
@@ -2819,7 +2818,7 @@ class GwAdmin:
         body = body.replace('""', 'null')
 
         # Execute query
-        self.controller.get_json('gw_fct_admin_manage_child_views', body,
+        json_result = self.controller.get_json('gw_fct_admin_manage_child_views', body,
                                           schema_name=schema_name, commit=True)
         self.manage_json_message(json_result, title="Create child view")
 

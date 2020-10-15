@@ -20,7 +20,7 @@ from collections import OrderedDict
 from functools import partial
 
 from ...lib import tools_qt
-from ..utils.tools_giswater import getWidgetText, open_file_path
+from ..utils.tools_giswater import getWidgetText, open_file_path, set_style_mapzones
 from ..shared.api_parent import ApiParent
 from ..ui.ui_manager import ToolboxDockerUi, ToolboxUi
 
@@ -389,7 +389,7 @@ class GwToolBox(ApiParent):
                 set_sytle = json_result['body']['data']['setStyle']
                 if set_sytle == "Mapzones":
                     # call function to simbolize mapzones
-                    self.set_style_mapzones()
+                    set_style_mapzones()
 
         except KeyError as e:
             msg = f"<b>Key: </b>{e}<br>"
@@ -925,17 +925,6 @@ class GwToolBox(ApiParent):
         return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
 
 
-    def set_layers_visible(self, layers):
-        """ Set layers visibles in the canvas
-        :param layers: list of layer names
-        :return:
-        """
-        for layer in layers:
-            lyr = self.controller.get_layer_by_tablename(layer)
-            if lyr:
-                self.controller.set_layer_visible(lyr)
-
-
     def categoryze_layer(self, layer, cat_field, size, color_values, unique_values=None):
         """
         :param layer: QgsVectorLayer to be categorized (QgsVectorLayer)
@@ -977,32 +966,6 @@ class GwToolBox(ApiParent):
         # assign the created renderer to the layer
         if renderer is not None:
             layer.setRenderer(renderer)
-
-        layer.triggerRepaint()
-        self.iface.layerTreeView().refreshLayerSymbology(layer.id())
-
-
-    def set_layer_symbology(self, layer, properties=None):
-        """ Set the received symbology in the corresponding layer
-        :param layer: (QgsVectorLayer)
-        :param properties: Properties that we want to put on the layer (dictionary)
-                example: {'capstyle': 'round', 'customdash': '5;2', 'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
-                'customdash_unit': 'MM', 'draw_inside_polygon': '0', 'joinstyle': 'round',
-                'line_color': '76,119,220,255', 'line_style': 'solid', 'line_width': '1.6',
-                'line_width_unit': 'MM', 'offset': '0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
-                'offset_unit': 'MM', 'ring_filter': '0', 'use_custom_dash': '0',
-                'width_map_unit_scale': '3x:0,0,0,0,0,0'}
-        :return:
-        """
-        renderer = layer.renderer()
-        symbol = renderer.symbol()
-
-        if type(symbol) == QgsLineSymbol:
-            layer.renderer().setSymbol(QgsLineSymbol.createSimple(properties))
-        elif type(symbol) == QgsMarkerSymbol:
-            layer.renderer().setSymbol(QgsMarkerSymbol.createSimple(properties))
-        elif type(symbol) == QgsFillSymbol:
-            layer.renderer().setSymbol(QgsFillSymbol.createSimple(properties))
 
         layer.triggerRepaint()
         self.iface.layerTreeView().refreshLayerSymbology(layer.id())
@@ -1315,32 +1278,3 @@ class GwToolBox(ApiParent):
         layer.triggerRepaint()
 
         return True
-
-
-    def zoom_to_group(self, group_name, buffer=10):
-        """ Make zoom to extent of the received group
-        :param group_name: Group name where to zoom
-        :param buffer: Space left between the group zoom and the canvas (integer)
-        :return: False if don't find the group
-        """
-
-        extent = QgsRectangle()
-        extent.setMinimal()
-
-        # Iterate through layers from certain group and combine their extent
-        root = QgsProject.instance().layerTreeRoot()
-        group = root.findGroup(group_name)  # Adjust this to fit your group's name
-        if not group:
-            return False
-        for child in group.children():
-            if isinstance(child, QgsLayerTreeLayer):
-                extent.combineExtentWith(child.layer().extent())
-
-        xmax = extent.xMaximum() + buffer
-        xmin = extent.xMinimum() - buffer
-        ymax = extent.yMaximum() + buffer
-        ymin = extent.yMinimum() - buffer
-        extent.set(xmin, ymin, xmax, ymax)
-        self.iface.mapCanvas().setExtent(extent)
-        self.iface.mapCanvas().refresh()
-

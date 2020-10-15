@@ -11,8 +11,8 @@ from qgis.PyQt.QtCore import pyqtSignal, QObject
 from functools import partial
 
 from ...lib import tools_qt
-from ..utils.tools_giswater import close_dialog, load_settings, open_dialog, create_body
-from ..utils.layer_tools import populate_info_text
+from ..utils.tools_giswater import close_dialog, load_settings, open_dialog, create_body, \
+    populate_info_text_ as populate_info_text
 from ..ui.ui_manager import PsectorDuplicate
 
 

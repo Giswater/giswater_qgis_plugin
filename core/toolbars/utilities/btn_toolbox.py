@@ -7,8 +7,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import json
-from .... import global_vars
-import random
 
 from qgis.core import QgsProject, QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer
 from qgis.gui import QgsDateTimeEdit
@@ -22,8 +20,7 @@ from functools import partial
 from ....lib import tools_qt
 from ..parent_dialog import GwParentAction
 from ...utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
-    create_body
-from ...utils.layer_tools import add_temp_layer, populate_info_text
+    create_body, add_temp_layer, populate_info_text_ as populate_info_text, set_style_mapzones
 from ...ui.ui_manager import ToolboxDockerUi, ToolboxUi
 from ....lib.tools_qt import construct_form_param_user
 
@@ -381,7 +378,7 @@ class GwToolBoxButton(GwParentAction):
                 set_sytle = json_result['body']['data']['setStyle']
                 if set_sytle == "Mapzones":
                     # call function to simbolize mapzones
-                    self.set_style_mapzones()
+                    set_style_mapzones()
 
         except KeyError as e:
             msg = f"<b>Key: </b>{e}<br>"
@@ -600,60 +597,3 @@ class GwToolBoxButton(GwParentAction):
             return 0
 
 
-    def set_style_mapzones(self):
-
-        extras = f'"mapzones":""'
-        body = create_body(extras=extras)
-        json_return = global_vars.controller.get_json('gw_fct_getstylemapzones', body)
-        if not json_return or json_result['status'] == 'Failed':
-            return False
-
-        for mapzone in json_return['body']['data']['mapzones']:
-
-            # Loop for each mapzone returned on json
-            lyr = global_vars.controller.get_layer_by_tablename(mapzone['layer'])
-            categories = []
-            status = mapzone['status']
-            if status == 'Disable':
-                pass
-
-            if lyr:
-                # Loop for each id returned on json
-                for id in mapzone['values']:
-                    # initialize the default symbol for this geometry type
-                    symbol = QgsSymbol.defaultSymbol(lyr.geometryType())
-                    symbol.setOpacity(float(mapzone['opacity']))
-
-                    # Setting simp
-                    R = random.randint(0, 255)
-                    G = random.randint(0, 255)
-                    B = random.randint(0, 255)
-                    if status == 'Stylesheet':
-                        try:
-                            R = id['stylesheet']['color'][0]
-                            G = id['stylesheet']['color'][1]
-                            B = id['stylesheet']['color'][2]
-                        except TypeError:
-                            R = random.randint(0, 255)
-                            G = random.randint(0, 255)
-                            B = random.randint(0, 255)
-
-                    elif status == 'Random':
-                        R = random.randint(0, 255)
-                        G = random.randint(0, 255)
-                        B = random.randint(0, 255)
-
-                    # Setting sytle
-                    layer_style = {'color': '{}, {}, {}'.format(int(R), int(G), int(B))}
-                    symbol_layer = QgsSimpleFillSymbolLayer.create(layer_style)
-
-                    if symbol_layer is not None:
-                        symbol.changeSymbolLayer(0, symbol_layer)
-                    category = QgsRendererCategory(id['id'], symbol, str(id['id']))
-                    categories.append(category)
-
-                    # apply symbol to layer renderer
-                    lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
-
-                    # repaint layer
-                    lyr.triggerRepaint()

@@ -6,7 +6,8 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsSnappingConfig, QgsVectorLayer, QgsPointLocator, \
-    QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsExpression, QgsRectangle
+    QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsExpression, QgsRectangle, QgsSymbol, \
+    QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer
 from qgis.PyQt.QtWidgets import QDockWidget, QApplication
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QPixmap
@@ -19,6 +20,7 @@ from functools import partial
 from .. import global_vars
 from ..core.utils import tools_giswater
 from . import tools_qt
+from random import randrange
 
 
 def get_value_from_metadata(parameter, default_value):
@@ -1065,3 +1067,49 @@ def restore_user_layer(user_current_layer=None):
         layer = global_vars.controller.get_layer_by_tablename('v_edit_node')
         if layer:
             global_vars.iface.setActiveLayer(layer)
+
+
+def categoryze_layer(layer, cat_field, size, color_values, unique_values=None):
+    """
+    :param layer: QgsVectorLayer to be categorized (QgsVectorLayer)
+    :param cat_field: Field to categorize (string)
+    :param size: Size of feature (integer)
+    """
+
+    # get unique values
+    fields = layer.fields()
+    fni = fields.indexOf(cat_field)
+    if not unique_values:
+        unique_values = layer.dataProvider().uniqueValues(fni)
+    categories = []
+
+    for unique_value in unique_values:
+        # initialize the default symbol for this geometry type
+        symbol = QgsSymbol.defaultSymbol(layer.geometryType())
+        if type(symbol) in (QgsLineSymbol, ):
+            symbol.setWidth(size)
+        else:
+            symbol.setSize(size)
+
+        # configure a symbol layer
+        try:
+            color = color_values.get(str(unique_value))
+            symbol.setColor(color)
+        except Exception:
+            color = QColor(randrange(0, 256), randrange(0, 256), randrange(0, 256))
+            symbol.setColor(color)
+
+        # create renderer object
+        category = QgsRendererCategory(unique_value, symbol, str(unique_value))
+        # entry for the list of category items
+        categories.append(category)
+
+        # create renderer object
+    renderer = QgsCategorizedSymbolRenderer(cat_field, categories)
+
+    # assign the created renderer to the layer
+    if renderer is not None:
+        layer.setRenderer(renderer)
+
+    layer.triggerRepaint()
+    global_vars.iface.layerTreeView().refreshLayerSymbology(layer.id())
