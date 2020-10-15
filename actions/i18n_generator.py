@@ -164,10 +164,9 @@ class I18NGenerator(ParentAction):
             line += f"\t\t</message>\n"
             line = line.replace("&", "")
             ts_file.write(line)
-            line = line.replace("&", "")
-        ts_file.write(line)
-
-        line = '\t<!-- PYTHON MESSAGES -->\n'
+        line = '\t</context>\n\n'
+        line += '\t<!-- PYTHON MESSAGES -->\n'
+        line += '\t<context>\n'
         ts_file.write(line)
 
         # Create children for message
@@ -178,10 +177,10 @@ class I18NGenerator(ParentAction):
                 py_msg[py_language] = py_msg['source']
             line += f"\t\t\t<translation>{py_msg[py_language]}</translation>\n"
             line += f"\t\t</message>\n"
+            line = line.replace("&", "")
             ts_file.write(line)
         line = '\t</context>\n\n'
         line += '\t<!-- UI TRANSLATION -->\n'
-        line = line.replace("&", "")
         ts_file.write(line)
 
         # Create children for ui
