@@ -656,7 +656,7 @@ class GwMincut:
         extras = f'"step":"check", '  # check
         extras += f'"result":"{result_mincut_id_text}"'
         body = create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_mincut_result_overlap', body)
+        result = self.controller.get_json('gw_fct_setmincutoverlap', body)
         if not result or result['status'] == 'Failed':
             return
 
@@ -686,7 +686,7 @@ class GwMincut:
         extras = f'"step":"continue", '
         extras += f'"result":"{result_mincut_id_text}"'
         body = create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_mincut_result_overlap', body)
+        result = self.controller.get_json('gw_fct_setmincutoverlap', body)
         self.mincut_ok(result)
 
 
