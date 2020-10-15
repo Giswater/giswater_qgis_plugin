@@ -7,15 +7,16 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2794
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_audit_check_project(INTEGER);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_check_project(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_audit_check_project(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setcheckproject (p_data json)
   RETURNS json AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+SELECT SCHEMA_NAME.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "feature":{}, "data":{"filterFields":{}, "addSchema":"ud_sample", "qgisVersion":"3.10.003.1", "initProject":"false", "pageInfo":{}, "version":"3.3.019", "fid":1}}$$);
 
- SELECT SCHEMA_NAME.gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"3.4.019", "fid":101, "initProject":true, "addSchema":"ud", "mainSchema":"ws", "projecRole":"", "infoType":"None", "qgisVersion":"3.10.4-A Coruña", "osVersion":"Windows 10"}}$$);
+ SELECT SCHEMA_NAME.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"3.4.019", "fid":101, "initProject":true, "addSchema":"ud", "mainSchema":"ws", "projecRole":"", "infoType":"None", "qgisVersion":"3.10.4-A Coruña", "osVersion":"Windows 10"}}$$);
 
 -- fid: main: 101
 	om: 125
@@ -125,7 +126,7 @@ BEGIN
 	IF v_qgis_init_guide_map IS NULL THEN v_qgis_init_guide_map = FALSE; END IF;
 	IF v_qgis_layers_setpropierties IS NULL THEN v_qgis_layers_setpropierties = FALSE; END IF;
 
-	-- when funcion gw_fct_audit_check_project is called by click on utils button, force to show user dialog and user control
+	-- when funcion gw_fct_setcheckproject is called by click on utils button, force to show user dialog and user control
 	IF v_init_project IS FALSE THEN
 		v_user_control = TRUE;
 		v_hidden_form = FALSE;

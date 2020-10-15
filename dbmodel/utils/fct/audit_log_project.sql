@@ -65,7 +65,7 @@ BEGIN
 	{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 	"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Stats"}}}$$)::text;
 
-	EXECUTE 'SELECT gw_fct_audit_check_project($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+	EXECUTE 'SELECT gw_fct_setcheckproject($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 	"feature":{}, "data":{"filterFields":{}, "addSchema":"ud_sample", "qgisVersion":"3.10.003.1", 
 	"initProject":"false", "pageInfo":{}, "version":"'||v_version||'", "fid":1}}$$)';
 
