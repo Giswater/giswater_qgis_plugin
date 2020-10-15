@@ -104,3 +104,15 @@ UPDATE config_function SET  function_name = 'gw_fct_setelevfromdem ' WHERE funct
 
 UPDATE sys_function SET function_name = 'gw_fct_setnodefromarc ' WHERE function_name='gw_fct_node_builtfromarc';
 UPDATE config_function SET  function_name = 'gw_fct_setnodefromarc ' WHERE function_name='gw_fct_node_builtfromarc';
+
+UPDATE sys_function SET function_name = 'gw_fct_grafanalytics_downstream_recursive' WHERE function_name='gw_fct_flow_exit_recursive';
+UPDATE config_function SET  function_name = 'gw_fct_grafanalytics_downstream_recursive' WHERE function_name='gw_fct_flow_exit_recursive';
+
+UPDATE sys_function SET function_name = 'gw_fct_grafanalytics_downstream' WHERE function_name='gw_fct_flow_exit';
+UPDATE config_function SET  function_name = 'gw_fct_grafanalytics_downstream' WHERE function_name='gw_fct_flow_exit';
+
+UPDATE sys_function SET function_name = 'gw_fct_grafanalytics_upstream_recursive' WHERE function_name='gw_fct_flow_trace_recursive';
+UPDATE config_function SET  function_name = 'gw_fct_grafanalytics_upstream_recursive' WHERE function_name='gw_fct_flow_trace_recursive';
+
+UPDATE sys_function SET function_name = 'gw_fct_grafanalytics_upstream' WHERE function_name='gw_fct_flow_trace';
+UPDATE config_function SET  function_name = 'gw_fct_grafanalytics_upstream' WHERE function_name='gw_fct_flow_trace';

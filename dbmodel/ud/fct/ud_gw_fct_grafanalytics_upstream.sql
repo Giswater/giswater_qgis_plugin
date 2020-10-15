@@ -7,14 +7,15 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2218
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_flow_trace(character varying);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_flow_trace(p_data json)  
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_flow_trace(json);
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_grafanalytics_upstream(p_data json)  
 RETURNS json AS 
 
 $BODY$
 
 /*
 example:
-SELECT SCHEMA_NAME.gw_fct_flow_trace($${
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_upstream($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"id":["20607"]},
 "data":{}}$$)
@@ -51,7 +52,7 @@ BEGIN
 	SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
 
 	-- Compute the tributary area using recursive function
-	EXECUTE 'SELECT gw_fct_flow_trace_recursive($$'||p_data||'$$);'
+	EXECUTE 'SELECT gw_fct_grafanalytics_upstream_recursive($$'||p_data||'$$);'
 	INTO v_result_json;
 
 	IF (v_result_json->>'status')::TEXT = 'Accepted' THEN
