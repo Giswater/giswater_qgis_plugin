@@ -529,9 +529,8 @@ class GwInfo(QObject):
         action_edit.triggered.connect(partial(self.start_editing, self.layer))
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
-        action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_arc_id, 'arc'))
-        action_get_parent_id.triggered.connect(
-            partial(self.get_snapped_feature_id, self.dlg_cf, action_get_parent_id, 'node'))
+        action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_arc_id, 'arc', 'data_arc_id'))
+        action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_parent_id, 'node', 'data_parent_id'))
         action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.canvas, self.layer))
         action_centered.triggered.connect(partial(self.api_action_centered, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, self.layer))
@@ -1061,6 +1060,16 @@ class GwInfo(QObject):
         try:
             self.iface.actionRollbackEdits().trigger()
         except TypeError:
+            pass
+
+        try:
+            self.layer_new_feature.rollBack()
+        except AttributeError:
+            pass
+
+        try:
+            self.layer.rollBack()
+        except AttributeError:
             pass
 
 
@@ -3054,12 +3063,11 @@ class GwInfo(QObject):
         dlg.open()
 
 
-    def get_snapped_feature_id(self, dialog, action, option):
+    def get_snapped_feature_id(self, dialog, action, option, widget_name):
         """ Snap feature and set a value into dialog """
 
         layer_name = 'v_edit_' + option
         layer = self.controller.get_layer_by_tablename(layer_name)
-        widget_name = f"data_{option}_id"
         widget = dialog.findChild(QWidget, widget_name)
         if not layer or not widget:
             action.setChecked(False)
