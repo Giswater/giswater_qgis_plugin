@@ -162,7 +162,9 @@ class I18NGenerator(ParentAction):
 
             line += f"\t\t\t<translation>{py_tlb[py_language]}</translation>\n"
             line += f"\t\t</message>\n"
+            line = line.replace("&", "")
             ts_file.write(line)
+            line = line.replace("&", "")
         ts_file.write(line)
 
         line = '\t<!-- PYTHON MESSAGES -->\n'
@@ -179,6 +181,7 @@ class I18NGenerator(ParentAction):
             ts_file.write(line)
         line = '\t</context>\n\n'
         line += '\t<!-- UI TRANSLATION -->\n'
+        line = line.replace("&", "")
         ts_file.write(line)
 
         # Create children for ui
@@ -220,7 +223,7 @@ class I18NGenerator(ParentAction):
         # Close last context and TS
         line += '\t</context>\n'
         line += '</TS>\n\n'
-
+        line = line.replace("&", "")
         ts_file.write(line)
         ts_file.close()
         del ts_file
@@ -275,7 +278,6 @@ class I18NGenerator(ParentAction):
 
         status = self.write_values(rows, cfg_path + file_name)
         return status
-
 
 
     def get_files_db_messages(self):
