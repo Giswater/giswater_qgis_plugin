@@ -1166,7 +1166,7 @@ class ApiCF(ApiParent, QObject):
             status = self.layer_new_feature.commitChanges()
             if status is False:
                 error = self.layer_new_feature.commitErrors()
-                self.controller.show_warning(f"{error}")
+                self.controller.log_warning(f"{error}")
                 self.connect_signals()
                 return False
             self.new_feature_id = None
