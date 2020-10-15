@@ -405,6 +405,10 @@ class GwInfo(QObject):
         # action_switch_arc_id = self.dlg_cf.findChild(QAction, "actionSwicthArcid")
         action_section = self.dlg_cf.findChild(QAction, "actionSection")
 
+        if self.new_feature_id is not None:
+            self.enable_action(self.dlg_cf, "actionZoom", False)
+            self.enable_action(self.dlg_cf, "actionZoomOut", False)
+            self.enable_action(self.dlg_cf, "actionCentered", False)
         self.show_actions('tab_data')
 
         try:
@@ -516,9 +520,9 @@ class GwInfo(QObject):
             self.layer.editingStopped.connect(lambda: setattr(self, 'new_feature_id', None))
 
             # Actions
-            self.enable_actions(self.layer.isEditable())
-            self.layer.editingStarted.connect(partial(self.enable_actions, True))
-            self.layer.editingStopped.connect(partial(self.enable_actions, False))
+            self.enable_actions(self.dlg_cf, self.layer.isEditable())
+            self.layer.editingStarted.connect(partial(self.enable_actions, self.dlg_cf, True))
+            self.layer.editingStopped.connect(partial(self.enable_actions, self.dlg_cf, False))
             self.layer.editingStopped.connect(self.get_last_value)
 
         action_edit.setChecked(self.layer.isEditable())
@@ -1356,7 +1360,11 @@ class GwInfo(QObject):
             status = self.layer_new_feature.commitChanges()
             if status is False:
                 return
-
+            
+            self.new_feature_id = None
+            self.enable_action(dialog, "actionZoom", True)
+            self.enable_action(dialog, "actionZoomOut", True)
+            self.enable_action(dialog, "actionCentered", True)
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
                 if self.controller.dlg_docker:
@@ -1406,21 +1414,25 @@ class GwInfo(QObject):
         return scale_zoom
 
 
-    def enable_actions(self, enabled):
+    def enable_actions(self, dialog, enabled):
         """ Enable actions according if layer is editable or not """
 
         try:
-            actions_list = self.dlg_cf.findChildren(QAction)
+            actions_list = dialog.findChildren(QAction)
             static_actions = ('actionEdit', 'actionCentered', 'actionZoomOut', 'actionZoom', 'actionLink', 'actionHelp',
                               'actionSection')
             for action in actions_list:
                 if action.objectName() not in static_actions:
-                    self.enable_action(action, enabled)
+                    self.enable_action(dialog, action, enabled)
         except RuntimeError:
             pass
 
 
-    def enable_action(self, action, enabled):
+    def enable_action(self, dialog, action, enabled):
+        if type(action) is str:
+            action = dialog.findChild(QAction, action)
+        if not action:
+            return
         action.setEnabled(enabled)
 
 
@@ -1634,7 +1646,7 @@ class GwInfo(QObject):
                             action.setToolTip(act['actionTooltip'])
                             action.setVisible(True)
 
-        self.enable_actions(self.layer.isEditable())
+        self.enable_actions(self.dlg_cf, self.layer.isEditable())
 
 
     """ MANAGE TABS """
