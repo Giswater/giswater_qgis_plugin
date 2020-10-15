@@ -6,16 +6,17 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2914
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_anl_node_proximity(p_table json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_anl_node_proximity(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_anl_node_proximity(p_data json)
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_anl_node_duplicated($${
+SELECT SCHEMA_NAME.gw_fct_anl_node_proximity($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"tableName":"v_edit_man_junction", "id":["1004","1005"]},
+"feature":{"tableName":"ve_node_junction", "id":["1004","1005"]},
 "data":{"selectionMode":"previousSelection",
-  "parameters":{"nodeProximity":300, "saveOnDatabase":true}}}$$)
+  "parameters":{"nodeProximity":3, "saveOnDatabase":true}}}$$)
 
 -- fid: 132
 
@@ -33,11 +34,16 @@ v_result_info json;
 v_result_point json;
 v_array text;
 v_error_context text;
- 
+ v_version text;
+
 BEGIN
 
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
+
+
+  -- select version
+  SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
 
     -- getting input data   
     v_id :=  ((p_data ->>'feature')::json->>'id')::json;
@@ -56,14 +62,14 @@ BEGIN
   IF v_selectionmode = 'previousSelection' THEN
     EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom)
         SELECT * FROM (
-        SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, t2.node_id, t2.nodecat_id, t2.state as state2, t1.expl_id, 6, t1.the_geom
-        FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
+        SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, t2.node_id, t2.nodecat_id, t2.state as state2, t1.expl_id, 132, t1.the_geom
+        FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodeproximity||')) 
         WHERE t1.node_id != t2.node_id AND t1.node_id IN ('||v_array||') ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
   ELSE
     EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom)
         SELECT * FROM (
-        SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, t2.node_id, t2.nodecat_id, t2.state as state2, t1.expl_id, 6, t1.the_geom
-        FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodetolerance||')) 
+        SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, t2.node_id, t2.nodecat_id, t2.state as state2, t1.expl_id, 132, t1.the_geom
+        FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom,('||v_nodeproximity||')) 
         WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
   END IF;
 
