@@ -116,3 +116,11 @@ UPDATE config_function SET  function_name = 'gw_fct_grafanalytics_upstream_recur
 
 UPDATE sys_function SET function_name = 'gw_fct_grafanalytics_upstream' WHERE function_name='gw_fct_flow_trace';
 UPDATE config_function SET  function_name = 'gw_fct_grafanalytics_upstream' WHERE function_name='gw_fct_flow_trace';
+
+--2020/10/16
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
+VALUES (3006, 'gw_fct_setmapzonestrigger', 'ws', 'function','json', 'json', 
+'Function that executes mapzone calculation if valve is being closed or opened', 'role_edit', NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_function(id, function_name,  actions)
+VALUES (3006, 'gw_fct_setmapzonestrigger', '[{"funcName": "set_layer_index", "params": {"tableName": ["v_edit_dma", "v_edit_sector", "v_edit_dqa", "v_edit_presszone"]}}]');
