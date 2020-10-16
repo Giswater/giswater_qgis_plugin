@@ -49,7 +49,7 @@ BEGIN
 	raise notice ' % % % %',v_nullbuffer,v_cerobuffer,v_diameter,v_statsmethod;
 
 	RAISE NOTICE 'setting roughness for null values';
-	EXECUTE 'SELECT '||v_statsmethod||'(roughness) FROM temp_node '
+	EXECUTE 'SELECT '||v_statsmethod||'(roughness) FROM temp_arc '
 	INTO v_roughness;
 	UPDATE temp_arc SET roughness = v_roughness WHERE roughness IS NULL;
 

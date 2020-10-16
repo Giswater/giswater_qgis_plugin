@@ -325,45 +325,45 @@ BEGIN
 	RAISE NOTICE '6 - Stats';
 	
 	IF v_project_type =  'WS' THEN
-		SELECT min(elevation), max(elevation) INTO v_min, v_max FROM temp_node WHERE result_id = v_result_id;
+		SELECT min(elevation), max(elevation) INTO v_min, v_max FROM temp_node;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
-		SELECT min(length), max(length) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE' AND result_id = v_result_id;
+		SELECT min(length), max(length) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE';
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for pipe length. Minimun and maximum values are: (',v_min,' - ',v_max,' ).'));
 		
-		SELECT min(diameter), max(diameter) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE' AND result_id = v_result_id;
+		SELECT min(diameter), max(diameter) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE';
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for pipe diameter. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
-		SELECT min(roughness), max(roughness) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE' AND result_id = v_result_id;
+		SELECT min(roughness), max(roughness) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'PIPE';
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for pipe roughness. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
 	ELSIF v_project_type  ='UD' THEN
 		
-		SELECT min(length), max(length) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT' AND result_id = v_result_id;
+		SELECT min(length), max(length) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit length. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
-		SELECT min(n), max(n) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT' AND result_id = v_result_id;
+		SELECT min(n), max(n) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit manning roughness coeficient. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
-		SELECT min(elevmax1), max(elevmax1) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT' AND result_id = v_result_id;
+		SELECT min(elevmax1), max(elevmax1) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit z1. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
-		SELECT min(elevmax2), max(elevmax2) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT' AND result_id = v_result_id;
+		SELECT min(elevmax2), max(elevmax2) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit z2. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 	
-		SELECT min(slope), max(slope) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT' AND result_id = v_result_id;
+		SELECT min(slope), max(slope) INTO v_min, v_max FROM temp_arc WHERE epa_type = 'CONDUIT';
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for conduit slope. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 		
-		SELECT min(elev), max(elev) INTO v_min, v_max FROM temp_node WHERE result_id = v_result_id;
+		SELECT min(elev), max(elev) INTO v_min, v_max FROM temp_node;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));	
 	END IF;

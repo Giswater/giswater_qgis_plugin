@@ -340,14 +340,13 @@ BEGIN
 			END IF;
 
 			-- check connec - hydrometer relation
-			SELECT count(*) INTO v_count FROM v_edit_connec JOIN vi_parent_arc USING (arc_id) WHERE connec_id NOT IN (SELECT connec_id FROM v_rtc_hydrometer);
+			SELECT count(*) INTO v_count FROM v_edit_connec c JOIN vi_parent_arc USING (arc_id) LEFT JOIN v_rtc_hydrometer h USING (connec_id) WHERE h.connec_id is null;
 
 			IF v_count > 0 THEN
 
 				DELETE FROM anl_connec WHERE fid = 160 and cur_user=current_user;
 				INSERT INTO anl_connec (fid, connec_id, connecat_id, the_geom)
-				SELECT 160, connec_id, connecat_id, the_geom FROM v_edit_connec WHERE connec_id NOT IN (SELECT connec_id FROM v_rtc_hydrometer);
-
+				SELECT 160, connec_id, connecat_id, the_geom FROM v_edit_connec LEFT JOIN v_rtc_hydrometer h USING (connec_id) WHERE h.connec_id is null;
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' connec(s) without hydrometers. It means that vnode is generated but pattern is null and demand is null for that vnode.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -408,9 +407,27 @@ BEGIN
 				VALUES (v_fid, v_result_id, 1, concat('INFO: All pattern_volume values on ext_rtc_dma_period are filled.'));
 			END IF;
 		END IF;
-		
 
-		RAISE NOTICE '9 - Check for pattern method';
+		RAISE NOTICE '9 - Check for NOT DEFINED elements on temp table';
+		SELECT count(*) INTO v_count FROM temp_node WHERE epa_type = 'NOT DEFINED';
+		IF  v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, concat('ERROR: There are nodes with epa_type NOT DEFINED on this exportation. Please check it before continue.'));
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 1, concat('INFO: All nodes have epa_type defined.'));
+		END IF;
+		SELECT count(*) INTO v_count FROM temp_arc WHERE epa_type = 'NOT DEFINED';
+		IF  v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 3, concat('ERROR: There are arcss with epa_type NOT DEFINED on this exportation. Please check it before continue.'));
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 1, concat('INFO: All arcs have epa_type defined.'));
+		END IF;
+
+
+		RAISE NOTICE '10 - Check for pattern method';
 		IF v_patternmethod IN (41,43,51,53) THEN -- dma needs pattern
 			
 			-- check mandatory values for ext_rtc_dma_period table

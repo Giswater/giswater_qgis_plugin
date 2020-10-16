@@ -103,7 +103,7 @@ BEGIN
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-				   FROM vi_pjointpattern JOIN vnode ON pattern_id=concat('VN',vnode_id::text)
+				   FROM vi_pjointpattern JOIN vnode ON pattern_id=concat('VN',vnode_id::text) JOIN v_edit_link ON exit_id::integer = vnode_id
 			UNION
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
@@ -129,7 +129,7 @@ BEGIN
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-				   FROM v_rtc_period_nodepattern JOIN vnode ON pattern_id=concat('VN',vnode_id::text)
+				   FROM v_rtc_period_nodepattern JOIN vnode ON pattern_id=concat('VN',vnode_id::text) JOIN v_edit_link ON exit_id::integer = vnode_id
 			UNION
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
@@ -152,7 +152,7 @@ BEGIN
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-				   FROM v_rtc_period_pjointpattern JOIN vnode ON pattern_id=concat('VN',vnode_id::text)
+				   FROM v_rtc_period_pjointpattern JOIN vnode ON pattern_id=concat('VN',vnode_id::text) JOIN v_edit_link ON exit_id::integer = vnode_id
 			UNION
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
@@ -196,7 +196,7 @@ BEGIN
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-				   FROM v_rtc_period_pjointpattern JOIN vnode ON pattern_id=concat('VN',vnode_id::text)
+				   FROM v_rtc_period_pjointpattern JOIN vnode ON pattern_id=concat('VN',vnode_id::text) JOIN v_edit_link ON exit_id::integer = vnode_id
 			UNION
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
@@ -273,7 +273,7 @@ BEGIN
 			INSERT INTO rpt_inp_pattern_value (
 				   result_id, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
-			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
+			SELECT 1, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
 				   FROM v_rtc_period_pjointpattern JOIN vnode ON pattern_id=concat('VN',vnode_id::text) JOIN link ON exit_id::integer = vnode_id AND exit_type = 'VNODE' JOIN connec ON link.feature_id = connec_id
 			UNION

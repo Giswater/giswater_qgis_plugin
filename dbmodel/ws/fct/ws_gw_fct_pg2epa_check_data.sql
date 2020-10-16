@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":227}}}$$)-- when is called from go2epa_main
-SELECT gw_fct_pg2epa_check_data('{"parameters":{}}')-- when is called from toolbox or from checkproject
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data('{"parameters":{}}')-- when is called from toolbox or from checkproject
 
 -- fid: main: 225
 		other: 107,164,165,166,167,169,170,171,188,198,227,229,230 
@@ -493,6 +493,54 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id , 1,  '198','INFO: Tanks checked. No mandatory values missed.',v_count);
 	END IF;		
+
+	RAISE NOTICE '21 - pumps with more than two arcs (291)';
+	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
+	select 291, b.node_id, nodecat_id, the_geom, 'EPA pump with more than two arcs'
+	FROM(
+	SELECT node_id, count(*) FROM(
+	SELECT node_id FROM arc JOIN v_edit_inp_pump ON node_1 = node_id 
+	UNION ALL
+	SELECT node_id FROM arc JOIN v_edit_inp_pump ON node_2 = node_id ) a
+	JOIN node USING (node_id)
+	GROUP BY node_id
+	HAVING count(*)>2)b
+	JOIN node USING (node_id);
+	
+	SELECT count(*) FROM anl_node INTO v_count WHERE fid=291 AND cur_user=current_user;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '291',concat(
+		'ERROR: There is/are ',v_count,' pumps(s) with more than two arcs .Take a look on temporal table to details'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '291','INFO: EPA pumps checked. No pumps with more than two arcs detected.',v_count);
+	END IF;		
+
+
+	RAISE NOTICE '22 - valves with more than two arcs (292)';
+	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
+	select 292, b.node_id, nodecat_id, the_geom, 'EPA valve with more than two arcs'
+	FROM(
+	SELECT node_id, count(*) FROM(
+	SELECT node_id FROM arc JOIN v_edit_inp_valve ON node_1 = node_id 
+	UNION ALL
+	SELECT node_id FROM arc JOIN v_edit_inp_valve ON node_2 = node_id ) a
+	GROUP BY node_id
+	HAVING count(*)>2)b
+	JOIN node USING (node_id);
+	
+	SELECT count(*) FROM anl_node INTO v_count WHERE fid=292 AND cur_user=current_user;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '292',concat(
+		'ERROR: There is/are ',v_count,' valve(s) with more than two arcs .Take a look on temporal table to details'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id , 1,  '292','INFO: EPA valves checked. No valves with more than two arcs detected.',v_count);
+	END IF;	
 	
 	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');

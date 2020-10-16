@@ -233,18 +233,24 @@ BEGIN
 	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 
 	RAISE NOTICE '23 - Profilactic last control';
+	
 	-- arcs without nodes
-	INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, arc_id, arc_type, '23 - Profilactic last delete'
-	FROM temp_arc WHERE node_1 NOT IN (SELECT node_id FROM temp_node);
-	INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, arc_id, arc_type, '23 - Profilactic last delete'
-	FROM temp_arc WHERE node_2 NOT IN (SELECT node_id FROM temp_node);
-	DELETE FROM temp_arc WHERE node_1 NOT IN (SELECT node_id FROM temp_node);
-	DELETE FROM temp_arc WHERE node_2 NOT IN (SELECT node_id FROM temp_node);
-
+	INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) 
+	SELECT v_fid, arc_id, arc_type, '23 - Profilactic last delete' FROM temp_arc JOIN temp_node ON node_1=node_id WHERE temp_node.node_id is null;
+	INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) 
+	SELECT v_fid, arc_id, arc_type, '23 - Profilactic last delete' FROM temp_arc JOIN temp_node ON node_2=node_id WHERE temp_node.node_id is null;
+	
+	DELETE FROM temp_arc WHERE id IN (SELECT a.id FROM temp_arc a JOIN temp_node ON node_1=node_id WHERE temp_node.node_id is null);
+	DELETE FROM temp_arc WHERE id IN (SELECT a.id FROM temp_arc a JOIN temp_node ON node_2=node_id WHERE temp_node.node_id is null);
+	
 	-- nodes without arcs
-	INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, node_id, node_type, '23 - Profilactic last delete'
-	FROM temp_node WHERE node_id NOT IN (SELECT node_1 FROM temp_arc UNION SELECT node_2 FROM temp_arc);
-	DELETE FROM temp_node WHERE node_id NOT IN (SELECT node_1 FROM temp_arc UNION SELECT node_2 FROM temp_arc);
+	INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) 
+	SELECT v_fid, node_id, node_type, '23 - Profilactic last delete' FROM temp_node 
+	WHERE id IN (SELECT id FROM temp_node LEFT JOIN (SELECT node_1 as node_id FROM temp_arc UNION SELECT node_2 FROM temp_arc) a USING (node_id) WHERE a.node_id is null);
+	
+	DELETE FROM temp_node 
+	WHERE id IN (SELECT id FROM temp_node LEFT JOIN (SELECT node_1 as node_id FROM temp_arc UNION SELECT node_2 FROM temp_arc) a USING (node_id) WHERE a.node_id is null);
+
 
 	-- values without value
 	UPDATE temp_arc SET minorloss = 0 WHERE minorloss IS NULL;
