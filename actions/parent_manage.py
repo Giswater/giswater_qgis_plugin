@@ -401,15 +401,14 @@ class ParentManage(ParentAction, object):
             self.geom_type = "node"
         elif tab_position == 2:
             self.geom_type = "connec"
-        # This function is used for multiple forms, in some the tab 3 is for elements, in the plan_psector form it is
-        # for gully, in the forms that have elements, they do not have gully, therefore the tab element will also be 3
-        elif tab_position == 3 and dialog.objectName() == 'plan_psector':
-            self.geom_type = "gully"
-        elif tab_position == 3:
+        # This function is used for multiple forms
+        # In most forms, tab 3 is for gully, except in the form dlg_feature_end, here element is 3 and gully is 4
+        elif tab_position == 3 and dialog.objectName() == 'dlg_feature_end':
             self.geom_type = "element"
+        elif tab_position == 3:
+            self.geom_type = "gully"
         elif tab_position == 4:
             self.geom_type = "gully"
-
         self.hide_generic_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_{table_object}_x_{self.geom_type}"
         viewname = f"v_edit_{self.geom_type}"
