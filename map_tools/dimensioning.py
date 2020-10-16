@@ -29,7 +29,9 @@ class Dimensioning(ParentMapTool):
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
-
+        config = self.layer.editFormConfig()
+        config.setSuppress(self.conf_supp)
+        self.layer.setEditFormConfig(config)
         self.recover_previus_maptool()
 
         self.api_dim = ApiDimensioning(self.iface, self.settings, self.controller, self.plugin_dir)
@@ -73,6 +75,10 @@ class Dimensioning(ParentMapTool):
             # and set True
             self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
             QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
+            config = self.layer.editFormConfig()
+            self.conf_supp = config.suppress()
+            config.setSuppress(0)
+            self.layer.setEditFormConfig(config)
             self.iface.setActiveLayer(self.layer)
             self.controller.set_layer_visible(self.layer)
             self.layer.startEditing()
