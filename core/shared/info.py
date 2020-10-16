@@ -1325,7 +1325,7 @@ class GwInfo(QObject):
         :param close_dlg:
         :return:
         """
-
+        after_insert = False
         if _json == '' or str(_json) == '{}':
             if self.controller.dlg_docker:
                 self.controller.dlg_docker.setMinimumWidth(dialog.width())
@@ -1359,6 +1359,7 @@ class GwInfo(QObject):
 
         # If we create a new feature
         if self.new_feature_id is not None:
+            after_insert = True
             for k, v in list(_json.items()):
                 if k in parent_fields:
                     self.new_feature.setAttribute(k, v)
@@ -1392,7 +1393,7 @@ class GwInfo(QObject):
 
         feature += f'"featureType":"{self.feature_type}", '
         feature += f'"tableName":"{p_table_id}"'
-        extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
+        extras = f'"fields":{my_json}, "reload":"{fields_reload}", "afterInsert":{after_insert}'
         body = create_body(feature=feature, extras=extras)
         json_result = self.controller.get_json('gw_fct_setfields', body)
         if not json_result:
