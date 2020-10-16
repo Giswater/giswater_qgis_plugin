@@ -452,12 +452,12 @@ def tab_feature_changed(dialog, table_object, excluded_layers=[]):
         geom_type = "node"
     elif tab_position == 2:
         geom_type = "connec"
-    # This function is used for multiple forms, in some the tab 3 is for elements, in the plan_psector form it is
-    # for gully(or 4), in the forms that have elements, they do not have gully, therefore the tab element will also be 3
-    elif tab_position == 3 and dialog.objectName() == 'plan_psector':
-        geom_type = "gully"
-    elif tab_position == 3:
+    # This function is used for multiple forms
+    # In most forms, tab 3 is for gully, except in the form dlg_feature_end, here element is 3 and gully is 4
+    elif tab_position == 3 and dialog.objectName() == 'dlg_feature_end':
         geom_type = "element"
+    elif tab_position == 3:
+        geom_type = "gully"
     elif tab_position == 4:
         geom_type = "gully"
     hide_generic_layers(excluded_layers=excluded_layers)
