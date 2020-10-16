@@ -39,6 +39,12 @@ INSERT INTO plan_psector_x_arc VALUES (9, '2086', 1, 0, false, NULL);
 
 INSERT INTO plan_psector_x_node VALUES (2, '1076', 1, 0, false, NULL);
 
+SELECT gw_fct_setlinktonetwork($${
+"client":{"device":4, "infoType":1, "lang":"ES"},
+"feature":{"id":["3103","3104","3014","114461","114462","114463"]},
+"data":{"feature_type":"CONNEC"}}$$);
+
+
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3103', NULL, 1, 0, false, NULL, NULL, NULL);
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3104', NULL, 1, 0, false, NULL, NULL, NULL);
 INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3014', NULL, 2, 0, false, NULL, NULL, NULL);
