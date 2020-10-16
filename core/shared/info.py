@@ -122,9 +122,6 @@ class GwInfo(QObject):
         else:
             active_layer = self.controller.get_layer_source_table_name(self.iface.activeLayer())
 
-        if active_layer is None or type(active_layer != 'test'):
-            active_layer = ""
-
         # Used by action_interpolate
         last_click = self.canvas.mouseLastXY()
         self.last_point = QgsMapToPixel.toMapCoordinates(
