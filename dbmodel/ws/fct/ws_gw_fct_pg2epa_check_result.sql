@@ -195,7 +195,7 @@ BEGIN
 		END IF;
 
 
-		RAISE NOTICE '2 - Check pumps with 3-point curves (because of bug of EPANET this kind of curves are forbidden on the exportation)';
+		RAISE NOTICE '1 - Check pumps with 3-point curves (because of bug of EPANET this kind of curves are forbidden on the exportation)';
 		SELECT count(*) INTO v_count FROM (select curve_id, count(*) as ct from (select * from inp_curve_value join (select distinct curve_id FROM vi_curves JOIN v_edit_inp_pump
 				USING (curve_id))a using (curve_id)) b group by curve_id having count(*)=3)c;
 		IF v_count > 0 THEN

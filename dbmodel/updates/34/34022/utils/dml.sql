@@ -9,8 +9,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2020/10/16
-INSERT INTO sys_fprocess VALUES (291, 'EPANET pumps with more than two acs', 'ws')
+INSERT INTO sys_fprocess VALUES (292, 'EPANET pumps with more than two acs', 'ws')
 ON CONFLICT (fid) DO NOTHING;
 
-INSERT INTO sys_fprocess VALUES (292, 'EPANET valves with more than two acs', 'ws')
+INSERT INTO sys_fprocess VALUES (293, 'EPANET valves with more than two acs', 'ws')
 ON CONFLICT (fid) DO NOTHING;

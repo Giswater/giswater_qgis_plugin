@@ -145,7 +145,7 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE '5 - Check for missed features on inp tables';
-	v_querytext = 'SELECT arc_id, ''arc'' FROM arc LEFT JOIN 
+	v_querytext = '(SELECT arc_id, ''arc'' FROM arc LEFT JOIN 
 			(SELECT arc_id from inp_pipe UNION SELECT arc_id FROM inp_virtualvalve) b using (arc_id)
 			WHERE b.arc_id IS NULL AND state > 0 AND epa_type !=''NOT DEFINED''
 			UNION 
@@ -182,7 +182,8 @@ BEGIN
 	END IF;
 
 	
-	RAISE NOTICE '107 - Elevation control with zero values (fid: 165)';
+
+	RAISE NOTICE '7 - Elevation control with cero values (fid: 165)';
 	SELECT count(*) INTO v_count FROM v_edit_node JOIN selector_sector USING (sector_id) WHERE elevation = 0 AND cur_user = current_user;
 
 	IF v_count > 0 THEN
@@ -437,7 +438,7 @@ BEGIN
 
 	IF v_count > 0 THEN
 		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, descript)
-		SELECT 230, arc_id, arcccat_id , the_geom, concat('Length: ', (st_length(the_geom))::numeric (12,3)) FROM v_edit_inp_pipe where st_length(the_geom) < 0.05;
+		SELECT 230, arc_id, arccat_id , the_geom, concat('Length: ', (st_length(the_geom))::numeric (12,3)) FROM v_edit_inp_pipe where st_length(the_geom) < 0.05;
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '230',concat('WARNING: There is/are ',v_count,
 		' pipe(s) with length less than 0.05 meters. Check it before continue.'),v_count);
@@ -494,9 +495,9 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '198','INFO: Tanks checked. No mandatory values missed.',v_count);
 	END IF;		
 
-	RAISE NOTICE '21 - pumps with more than two arcs (291)';
+	RAISE NOTICE '21 - pumps with more than two arcs (292)';
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-	select 291, b.node_id, nodecat_id, the_geom, 'EPA pump with more than two arcs'
+	select 292, b.node_id, nodecat_id, the_geom, 'EPA pump with more than two arcs'
 	FROM(
 	SELECT node_id, count(*) FROM(
 	SELECT node_id FROM arc JOIN v_edit_inp_pump ON node_1 = node_id 
@@ -507,21 +508,21 @@ BEGIN
 	HAVING count(*)>2)b
 	JOIN node USING (node_id);
 	
-	SELECT count(*) FROM anl_node INTO v_count WHERE fid=291 AND cur_user=current_user;
+	SELECT count(*) FROM anl_node INTO v_count WHERE fid=292 AND cur_user=current_user;
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '291',concat(
-		'ERROR: There is/are ',v_count,' pumps(s) with more than two arcs .Take a look on temporal table to details'),v_count);
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id, 3, '292',concat(
+		'ERROR: There is/are ',v_count,' pumps(s) with more than two arcs .Take a look on temporal table to details'));
 		v_count=0;
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id , 1,  '291','INFO: EPA pumps checked. No pumps with more than two arcs detected.',v_count);
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id , 1,  '292','INFO: EPA pumps checked. No pumps with more than two arcs detected.');
 	END IF;		
 
 
-	RAISE NOTICE '22 - valves with more than two arcs (292)';
+	RAISE NOTICE '22 - valves with more than two arcs (293)';
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-	select 292, b.node_id, nodecat_id, the_geom, 'EPA valve with more than two arcs'
+	select 293, b.node_id, nodecat_id, the_geom, 'EPA valve with more than two arcs'
 	FROM(
 	SELECT node_id, count(*) FROM(
 	SELECT node_id FROM arc JOIN v_edit_inp_valve ON node_1 = node_id 
@@ -531,15 +532,15 @@ BEGIN
 	HAVING count(*)>2)b
 	JOIN node USING (node_id);
 	
-	SELECT count(*) FROM anl_node INTO v_count WHERE fid=292 AND cur_user=current_user;
+	SELECT count(*) FROM anl_node INTO v_count WHERE fid=293 AND cur_user=current_user;
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '292',concat(
-		'ERROR: There is/are ',v_count,' valve(s) with more than two arcs .Take a look on temporal table to details'),v_count);
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id, 3, '293',concat(
+		'ERROR: There is/are ',v_count,' valve(s) with more than two arcs .Take a look on temporal table to details'));
 		v_count=0;
 	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id , 1,  '292','INFO: EPA valves checked. No valves with more than two arcs detected.',v_count);
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id , 1,  '293','INFO: EPA valves checked. No valves with more than two arcs detected.');
 	END IF;	
 	
 	
