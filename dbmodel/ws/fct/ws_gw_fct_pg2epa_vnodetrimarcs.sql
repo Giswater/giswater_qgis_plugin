@@ -44,8 +44,8 @@ BEGIN
 		SELECT distinct on (vnode_id) concat('VN',vnode_id) as vnode_id, 
 		arc_id, 
 		case 	
-			when st_linelocatepoint (temp_arc.the_geom , vnode.the_geom) > 0.999 then 0.999
-			when st_linelocatepoint (temp_arc.the_geom , vnode.the_geom) < 0.001 then 0.001
+			when st_linelocatepoint (temp_arc.the_geom , vnode.the_geom) > 0.9999 then 0.9999
+			when st_linelocatepoint (temp_arc.the_geom , vnode.the_geom) < 0.0001 then 0.0001
 			else (st_linelocatepoint (temp_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate
 		FROM temp_arc , v_edit_vnode AS vnode
 		JOIN link a ON vnode_id=exit_id::integer

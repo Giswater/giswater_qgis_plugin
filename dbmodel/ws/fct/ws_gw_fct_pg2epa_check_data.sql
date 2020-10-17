@@ -16,7 +16,7 @@ SELECT gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":227}}}$$)-- when 
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data('{"parameters":{}}')-- when is called from toolbox or from checkproject
 
 -- fid: main: 225
-		other: 107,164,165,166,167,169,170,171,188,198,227,229,230 
+		other: 107,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295
 
 */
 
@@ -58,8 +58,8 @@ BEGIN
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid = 225 AND cur_user=current_user;
-	DELETE FROM anl_node WHERE fid IN (107, 187, 164, 165, 166, 167, 169, 170, 171, 198) AND cur_user=current_user;
-	DELETE FROM anl_arc WHERE fid IN (188, 229, 230) AND cur_user=current_user;
+	DELETE FROM anl_node WHERE fid IN (107, 187, 164, 165, 166, 167, 169, 170, 171, 198, 292, 293, 294) AND cur_user=current_user;
+	DELETE FROM anl_arc WHERE fid IN (188, 229, 230, 295) AND cur_user=current_user;
 	
 
 	-- Header
@@ -542,7 +542,51 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
 		VALUES (v_fid, v_result_id , 1,  '293','INFO: EPA valves checked. No valves with more than two arcs detected.');
 	END IF;	
+
 	
+    RAISE NOTICE '23 - Inconsistency on inp node tables (294)';
+	INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom)
+		SELECT 294, n.node_id, n.nodecat_id, concat(epa_type, ' using inp_junction table') AS epa_table, n.the_geom FROM v_edit_inp_junction JOIN node n USING (node_id) WHERE epa_type !='JUNCTION'
+		UNION
+		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_tank table') AS epa_table, n.the_geom FROM v_edit_inp_tank JOIN node n USING (node_id) WHERE epa_type !='TANK'
+		UNION
+		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_reservoir table') AS epa_table, n.the_geom FROM v_edit_inp_reservoir JOIN node n USING (node_id) WHERE epa_type !='RESERVOIR'
+		UNION
+		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_valve table') AS epa_table, n.the_geom FROM v_edit_inp_valve JOIN node n USING (node_id) WHERE epa_type !='VALVE'
+		UNION
+		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_pump table') AS epa_table, n.the_geom FROM v_edit_inp_pump JOIN node n USING (node_id) WHERE epa_type !='PUMP'
+		UNION
+		SELECT 294, n.node_id, n.nodecat_id,  concat(epa_type, ' using inp_shortpipe table') AS epa_table, n.the_geom FROM v_edit_inp_shortpipe JOIN node n USING (node_id) WHERE epa_type !='SHORTPIPE';
+
+		
+	SELECT count(*) FROM anl_node INTO v_count WHERE fid=294 AND cur_user=current_user;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id, 3, '294',concat(
+		'ERROR: There is/are ',v_count,' node features with epa_type not according with epa table. Check your data before continue'));
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id , 1,  '294','INFO: Epa type for node features checked. No inconsistencies aganints epa table found.');
+	END IF;	
+
+	RAISE NOTICE '24 - Inconsistency on inp arc tables (295)';
+	INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom)
+		SELECT 295, a.arc_id, a.arccat_id, concat(epa_type, ' using inp_pipe table') AS epa_table, a.the_geom FROM v_edit_inp_virtualvalve JOIN arc a USING (arc_id) WHERE epa_type !='VIRTUAL'
+		UNION
+		SELECT 295, a.arc_id, a.arccat_id,  concat(epa_type, ' using inp_virtualvalve table') AS epa_table, a.the_geom FROM v_edit_inp_pipe JOIN arc a USING (arc_id) WHERE epa_type !='PIPE';
+
+		
+	SELECT count(*) FROM anl_node INTO v_count WHERE fid=295 AND cur_user=current_user;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id, 3, '295',concat(
+		'ERROR: There is/are ',v_count,' arc features with epa_type not according with epa table. Check your data before continue'));
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id , 1,  '295','INFO: Epa type for arc features checked. No inconsistencies aganints epa table found.');
+	END IF;	
 	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');
@@ -573,7 +617,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
-	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 164, 165, 166, 167, 170, 171, 187, 198)) row) features;
+	FROM  anl_node WHERE cur_user="current_user"() AND fid IN (107, 164, 165, 166, 167, 170, 171, 187, 198, 292, 293, 294)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point",  "features":',v_result, '}'); 
@@ -588,7 +632,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
 	) AS feature
 	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom, fid
-	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 229, 230)) row) features;
+	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (188, 229, 230, 295)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString",  "features":',v_result,'}'); 

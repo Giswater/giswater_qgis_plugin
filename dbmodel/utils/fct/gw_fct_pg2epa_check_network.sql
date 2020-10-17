@@ -16,7 +16,7 @@ $BODY$
 /*
 --EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId":"z1","fid":227}}}')::json; -- when is called from go2epa
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{}}}')::json; -- when is called from toolbox
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_network('{"data":{"parameters":{"resultId":"test_20201016"}}}')::json; -- when is called from toolbox
 
 --RESULTS
 SELECT node_id FROM anl_node WHERE fid = 233 AND cur_user=current_user
@@ -133,7 +133,7 @@ BEGIN
 		SELECT 290, n1, concat(''Duplicated node with '', n2 ), the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (v_fid, 3, concat('ERROR: There is/are ',v_count,
-		' node''s duplicated on this result (state 1 & 2). It means there is a topological jump in terms of state-topology.'));
+		' node(s) duplicated on this result. It means that there is a topological jump on that point (state 0-1-2). Please check your network'));
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, 'INFO: No node(s) orphan found on this result.');
@@ -240,7 +240,8 @@ BEGIN
 		RAISE NOTICE '5 - Check dry network';	
 
 		TRUNCATE temp_anlgraf;
-								
+		v_cont = 0;
+									
 		-- fill the graf table
 		INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
 		select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
@@ -260,7 +261,6 @@ BEGIN
 			SET flag=1, water=1 
 			WHERE node_2 IN (SELECT node_id FROM temp_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET' OR epa_type='TANK'));
 
-				
 		-- inundation process
 		LOOP
 			v_cont = v_cont+1;
