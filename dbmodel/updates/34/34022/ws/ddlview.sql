@@ -1,4 +1,14 @@
-CREATE OR REPLACE VIEW ws.vi_pumps AS 
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+
+CREATE OR REPLACE VIEW vi_pumps AS 
  SELECT rpt_inp_arc.arc_id,
     rpt_inp_arc.node_1,
     rpt_inp_arc.node_2,
@@ -18,7 +28,7 @@ CREATE OR REPLACE VIEW ws.vi_pumps AS
             WHEN (rpt_inp_arc.addparam::json ->> 'pattern'::text) <> ''::text THEN ('PATTERN'::text || ' '::text) || (rpt_inp_arc.addparam::json ->> 'pattern'::text)
             ELSE NULL::text
         END AS pattern
-   FROM ws.selector_inp_result,
-    ws.rpt_inp_arc
+   FROM selector_inp_result,
+    rpt_inp_arc
   WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND rpt_inp_arc.epa_type::text = 'PUMP'::text
-AND arc_id NOT IN (SELECT arc_id FROM ws.vi_valves);
+AND arc_id NOT IN (SELECT arc_id FROM vi_valves);
