@@ -14,3 +14,25 @@ ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_fprocess VALUES (293, 'EPANET valves with more than two acs', 'ws')
 ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess VALUES (294, 'Check for inp_node tables and epa_type consistency', 'utils')
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess VALUES (295, 'Check for inp_arc tables and epa_type consistency', 'utils')
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess VALUES (296, 'Repair vnodes', 'utils')
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess VALUES (297, 'EPA TYPE not defined', 'utils')
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess VALUES (298, 'Check duplicated vnodes', 'utils')
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess VALUES (299, 'Check vnodes over nodes', 'utils')
+ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_function VALUES (2998, 'gw_fct_setvnodefusion', 'utils', 'function', 'json', 'json', 'Function used to fusion vnodes', 'role_edit')
+ON CONFLICT (id) DO NOTHING;
+
