@@ -27,21 +27,19 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 
-		-- State
-		IF (NEW.state != OLD.state) THEN
-			UPDATE arc SET state=NEW.state WHERE arc_id = OLD.arc_id;
-		END IF;
+	-- State
+	IF (NEW.state::text != OLD.state::text) THEN
+		UPDATE arc SET state=NEW.state WHERE arc_id = OLD.arc_id;
+	END IF;
 			
-		-- The geom
-		IF st_equals(NEW.the_geom, OLD.the_geom) IS FALSE  THEN
-			UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
-		END IF;
+	-- The geom
+	IF st_equals(NEW.the_geom, OLD.the_geom) IS FALSE  THEN
+		UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
+	END IF;
 	
-	
-        UPDATE arc 
-        SET arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, "state"=NEW."state", annotation= NEW.annotation, 
-            custom_length=NEW.custom_length, "state_type"=NEW."state_type"
-        WHERE arc_id = OLD.arc_id;
+	UPDATE arc 
+	SET arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, annotation= NEW.annotation, custom_length=NEW.custom_length, "state_type"=NEW."state_type"
+	WHERE arc_id = OLD.arc_id;
 
         IF v_arc_table = 'inp_pipe' THEN   
             UPDATE inp_pipe SET minorloss=NEW.minorloss, status=NEW.status, custom_roughness=NEW.custom_roughness, custom_dint=NEW.custom_dint WHERE arc_id=OLD.arc_id;
@@ -49,14 +47,15 @@ BEGIN
         ELSIF v_arc_table = 'inp_virtualvalve' THEN   
             UPDATE inp_virtualvalve SET valv_type=NEW.valv_type, pressure=NEW.pressure, flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id,
             minorloss=NEW.minorloss, to_arc=NEW.to_arc, status=NEW.status WHERE arc_id=OLD.arc_id;
-
         END IF;
 
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
+    
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         "data":{"message":"1028", "function":"1306","debug_msg":null}}$$);';
+        
         RETURN NEW;
     
     END IF;

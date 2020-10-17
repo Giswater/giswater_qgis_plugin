@@ -34,10 +34,10 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 	
-		-- State
-		IF (NEW.state != OLD.state) THEN
-			UPDATE node SET state=NEW.state WHERE node_id = OLD.node_id;
-		END IF;
+	-- State
+	IF (NEW.state::text != OLD.state::text) THEN
+		UPDATE node SET state=NEW.state WHERE node_id = OLD.node_id;
+	END IF;
 
 		-- The geom
 		IF st_equals( NEW.the_geom, OLD.the_geom) IS FALSE THEN
@@ -66,6 +66,7 @@ BEGIN
 					ST_UpperLeftX(rast) + ST_ScaleX(rast)*ST_width(rast),	
 					ST_UpperLeftY(rast) + ST_ScaleY(rast)*ST_height(rast), st_srid(rast)), NEW.the_geom, 1) LIMIT 1));
 			END IF;
+
 		END IF;
 		
 		-- catalog
@@ -97,10 +98,10 @@ BEGIN
 			pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;
 		END IF;
 
-		UPDATE node 
-		SET elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, "state"=NEW."state", 
-			annotation=NEW.annotation
-		WHERE node_id=OLD.node_id;
+        UPDATE node 
+        SET elevation=NEW.elevation, "depth"=NEW."depth", sector_id=NEW.sector_id, annotation=NEW.annotation
+        WHERE node_id=OLD.node_id;
+
 
 		RETURN NEW;
         

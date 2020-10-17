@@ -22,39 +22,39 @@ BEGIN
     v_epa_table:= TG_ARGV[0];
     
     IF TG_OP = 'INSERT' THEN
- 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"1026", "function":"1208","debug_msg":null}}$$);'; 
+ 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	"data":{"message":"1026", "function":"1208","debug_msg":null}}$$);'; 
+		
     ELSIF TG_OP = 'UPDATE' THEN
 	
-		-- State
-		IF (NEW.state != OLD.state) THEN
-			UPDATE arc SET state=NEW.state WHERE arc_id = OLD.arc_id;
-		END IF;
+	-- State
+	IF (NEW.state != OLD.state) THEN
+		UPDATE arc SET state=NEW.state WHERE arc_id = OLD.arc_id;
+	END IF;
 			
-		-- The geom
-		IF st_equals(NEW.the_geom, OLD.the_geom) IS FALSE  THEN
-			UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
-		END IF;
+	-- The geom
+	IF st_equals(NEW.the_geom, OLD.the_geom) IS FALSE  THEN
+		UPDATE arc SET the_geom=NEW.the_geom WHERE arc_id = OLD.arc_id;
+	END IF;
 		
-	
-		IF (v_epa_table != 'inp_virtual') THEN 
-			-- depth fields
-			IF (NEW.y1 <> OLD.y1) OR (NEW.y2 <> OLD.y2) THEN
-				UPDATE arc SET y1=NEW.y1, y2=NEW.y2 WHERE arc_id=NEW.arc_id;
-			END IF;
-		
-			IF (NEW.elev1 <> OLD.elev1) OR (NEW.elev2 <> OLD.elev2) THEN
-				UPDATE arc SET elev1=NEW.elev1, elev2=NEW.elev2 WHERE arc_id=NEW.arc_id;
-			END IF;
+	IF (v_epa_table != 'inp_virtual') THEN 
 
-			IF (NEW.custom_y1 <> OLD.custom_y1) OR (NEW.custom_y2 <> OLD.custom_y2) THEN
-				UPDATE arc SET custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2 WHERE arc_id=NEW.arc_id;
-			END IF;	
-		
-			UPDATE arc SET 	arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, annotation= NEW.annotation, 
-			custom_length=NEW.custom_length, inverted_slope=NEW.inverted_slope
-			WHERE arc_id = OLD.arc_id;
+		-- depth fields
+		IF (NEW.y1 <> OLD.y1) OR (NEW.y2 <> OLD.y2) THEN
+			UPDATE arc SET y1=NEW.y1, y2=NEW.y2 WHERE arc_id=NEW.arc_id;
 		END IF;
+		
+		IF (NEW.elev1 <> OLD.elev1) OR (NEW.elev2 <> OLD.elev2) THEN
+			UPDATE arc SET elev1=NEW.elev1, elev2=NEW.elev2 WHERE arc_id=NEW.arc_id;
+		END IF;
+
+		IF (NEW.custom_y1 <> OLD.custom_y1) OR (NEW.custom_y2 <> OLD.custom_y2) THEN
+			UPDATE arc SET custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2 WHERE arc_id=NEW.arc_id;
+		END IF;	
+		
+		UPDATE arc SET 	arccat_id=NEW.arccat_id, sector_id=NEW.sector_id, annotation= NEW.annotation, custom_length=NEW.custom_length, inverted_slope=NEW.inverted_slope
+		WHERE arc_id = OLD.arc_id;
+	END IF;
 
         IF (v_epa_table = 'inp_conduit') THEN 
             UPDATE inp_conduit 
