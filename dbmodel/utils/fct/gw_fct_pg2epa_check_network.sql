@@ -77,7 +77,7 @@ BEGIN
 		v_boundaryelem = 'outfall';
 	END IF;
 	
-	DELETE FROM temp_anlgraf;
+	TRUNCATE temp_anlgraf;
 	DELETE FROM anl_arc where cur_user=current_user AND fid IN (232,231,139);
 	DELETE FROM anl_node where cur_user=current_user AND fid IN (233,228,139,290);
 	DELETE FROM audit_check_data where cur_user=current_user AND fid = 139;
@@ -197,6 +197,7 @@ BEGIN
 		GET DIAGNOSTICS v_affectedrows =row_count;
 		EXIT WHEN v_affectedrows = 0;
 		EXIT WHEN v_cont = 2000;
+			RAISE NOTICE '% - %', v_cont, v_affectedrows;
 	END LOOP;
 
 	-- insert into result table disconnected arcs
@@ -238,7 +239,7 @@ BEGIN
 
 		RAISE NOTICE '5 - Check dry network';	
 
-		DELETE FROM temp_anlgraf;
+		TRUNCATE temp_anlgraf;
 								
 		-- fill the graf table
 		INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
@@ -248,23 +249,18 @@ BEGIN
 		select  a.arc_id, case when node_2 is null then '00000' else node_2 end, case when node_1 is null then '00000' else node_1 end, 0, 0, 0
 		from temp_arc a where result_id = v_result_id
 		ON CONFLICT (arc_id, node_1) DO NOTHING;
-		
-		-- Delete from the graf table all that rows that only exists one time (it means that arc don't have the correct topology)
-		DELETE FROM temp_anlgraf WHERE arc_id IN 
-		(SELECT a.arc_id FROM (SELECT count(*) AS count, arc_id FROM temp_anlgraf GROUP BY 2 HAVING count(*)=1 ORDER BY 2)a);
 
+		-- set boundary conditions of graf table
 		UPDATE temp_anlgraf
-		SET flag=1, water=1 
-		WHERE node_1 IN (SELECT node_id FROM temp_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET' OR epa_type='TANK'));
+			SET flag =1 WHERE arc_id IN (SELECT arc_id FROM temp_arc WHERE status = 'CLOSED');
+		UPDATE temp_anlgraf
+			SET flag=1, water=1 
+			WHERE node_1 IN (SELECT node_id FROM temp_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET' OR epa_type='TANK'));
+		UPDATE temp_anlgraf
+			SET flag=1, water=1 
+			WHERE node_2 IN (SELECT node_id FROM temp_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET' OR epa_type='TANK'));
 
-		UPDATE temp_anlgraf
-		SET flag=1, water=1 
-		WHERE node_2 IN (SELECT node_id FROM temp_node WHERE (epa_type='RESERVOIR' OR epa_type='INLET' OR epa_type='TANK'));
-		
-		UPDATE temp_anlgraf
-		SET flag=1, water=0
-		WHERE arc_id IN (SELECT arc_id FROM temp_arc WHERE status = 'CLOSED');
-		
+				
 		-- inundation process
 		LOOP
 			v_cont = v_cont+1;
@@ -272,18 +268,18 @@ BEGIN
 			GET DIAGNOSTICS v_affectedrows =row_count;
 			EXIT WHEN v_affectedrows = 0;
 			EXIT WHEN v_cont = 2000;
+			RAISE NOTICE '% - %', v_cont, v_affectedrows;
 		END LOOP;
 
-		-- insert into result table dry arcs (warning)
-		INSERT INTO anl_arc (fid, arc_id, the_geom, descript)
-		SELECT DISTINCT ON (a.arc_id) 232, a.arc_id, the_geom, concat('Arc without water from any inlet')  
+		-- insert into result table disconnected arcs
+		INSERT INTO anl_arc (fid, result_id, arc_id, the_geom, descript)
+		SELECT DISTINCT ON (a.arc_id) 232, v_result, a.arc_id, the_geom, concat('Arc dry from any', v_boundaryelem)  
 			FROM temp_anlgraf a
-			JOIN arc b ON a.arc_id=b.arc_id
+			JOIN temp_arc b ON a.arc_id=b.arc_id
 			GROUP BY a.arc_id,the_geom
-			having max(water) = 0
-		EXCEPT
-		SELECT 232, arc_id, the_geom, 'Arc from fproccesscat ' FROM anl_arc WHERE fid  = 139 AND cur_user = current_user;
+			having max(water) = 0;
 
+			
 		SELECT count(*) FROM anl_arc INTO v_count WHERE fid = 232 AND cur_user=current_user;
 
 		--raise exception 'count %', v_count;
