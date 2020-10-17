@@ -307,9 +307,6 @@ BEGIN
 				v_end_point = v_gully2.the_geom;
 				v_end_state = v_gully2.state;
 			END IF;
-		ELSE 
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 		END IF;
 		
 		-- control of null exit_type

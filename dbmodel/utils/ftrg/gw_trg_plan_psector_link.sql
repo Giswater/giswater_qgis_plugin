@@ -23,6 +23,7 @@ v_idvnode text;
 v_channel text;
 v_schemaname text;
 v_arc_id text;
+v_projecttype text;
 	
 BEGIN 
 
@@ -40,39 +41,38 @@ BEGIN
 		SELECT the_geom INTO v_feature_geom FROM gully WHERE gully_id=NEW.gully_id;
 	END IF;
 
+	v_projecttype = (SELECT project_type FROM sys_version LIMIT 1);
+
 
 	-- getting arc_geom
 	IF NEW.arc_id IS NOT NULL THEN
 		v_arc_geom =  (SELECT the_geom FROM arc WHERE arc_id=NEW.arc_id);
 	ELSE
-        IF v_table_name = 'connec' THEN
-            -- getting closest arc
-            SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, v_edit_connec c WHERE st_dwithin(a.the_geom, c.the_geom, 1000) AND connec_id = NEW.connec_id AND a.state = 2
-            ORDER BY st_distance (a.the_geom, c.the_geom) LIMIT 1;
+	
+		IF v_table_name = 'connec' THEN
+			-- getting closest arc
+			SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, v_edit_connec c WHERE st_dwithin(a.the_geom, c.the_geom, 1000) AND connec_id = NEW.connec_id AND a.state = 2
+			ORDER BY st_distance (a.the_geom, c.the_geom) LIMIT 1;
 
-            -- this update makes a recall of self.trigger but in this case with NEW.arc_id IS NOT NULL recall will finish next one
-            UPDATE plan_psector_x_connec SET arc_id = v_arc_id WHERE id=NEW.id;
-            
-            RETURN NEW;
-            
-        ELSIF v_table_name = 'gully' THEN
-            -- getting closest arc
-            SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, v_edit_gully g WHERE st_dwithin(a.the_geom, g.the_geom, 1000) AND gully_id = NEW.gully_id AND a.state = 2
-            ORDER BY st_distance (a.the_geom, g.the_geom) LIMIT 1;
+			-- this update makes a recall of self.trigger but in this case with NEW.arc_id IS NOT NULL recall will finish next one
+			UPDATE plan_psector_x_connec SET arc_id = v_arc_id WHERE id=NEW.id;
 
-            -- this update makes a recall of self.trigger but in this case with NEW.arc_id IS NOT NULL recall will finish next one
-            UPDATE plan_psector_x_gully SET arc_id = v_arc_id WHERE id=NEW.id;
-            
-            RETURN NEW;
-            
-        END IF;
-        
+			RETURN NEW;
+			
+		ELSIF v_table_name = 'gully' THEN
+			-- getting closest arc
+			SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, v_edit_gully g WHERE st_dwithin(a.the_geom, g.the_geom, 1000) AND gully_id = NEW.gully_id AND a.state = 2
+			ORDER BY st_distance (a.the_geom, g.the_geom) LIMIT 1;
+
+			-- this update makes a recall of self.trigger but in this case with NEW.arc_id IS NOT NULL recall will finish next one
+			UPDATE plan_psector_x_gully SET arc_id = v_arc_id WHERE id=NEW.id;
+
+			RETURN NEW;
+		END IF;	
 	END IF;
 
-
 	IF v_arc_geom IS NOT NULL THEN
-
-    
+   
 		-- update values on plan psector table
 		IF NEW.userdefined_geom IS NOT TRUE THEN
 			v_link_geom := ST_ShortestLine(v_feature_geom, v_arc_geom);
@@ -88,12 +88,13 @@ BEGIN
 		-- update plan_psector tables
 		IF v_table_name = 'connec' THEN
 			UPDATE plan_psector_x_connec SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
+			IF (SELECT exit_type FROM link WHERE feature_id = NEW.connec_id AND feature_type ='CONNEC') ='NODE' AND v_projecttype ='WS' THEN -- this is because enable the export to inp model using pjoint
+				RAISE EXCEPTION 'Error: It is not possible to add this connec to psector because it is related to node. Hint: First move endpoint of link more than 0.01 mts. to relate it to parent arc';
+			END IF;
 
 		ELSIF v_table_name = 'gully' THEN
 			UPDATE plan_psector_x_gully SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
-
 		END IF;	
-
 	ELSE
 		IF v_table_name = 'connec' THEN
 			UPDATE plan_psector_x_connec SET link_geom=NULL, vnode_geom=NULL, userdefined_geom=NULL WHERE id=NEW.id;
@@ -102,12 +103,8 @@ BEGIN
 			UPDATE plan_psector_x_gully SET link_geom=NULL, vnode_geom=NULL, userdefined_geom=NULL WHERE id=NEW.id;
 
 		END IF;	
-	
 	END IF;
-
-
-
-    
+   
 	-- notify to qgis in order to reindex geometries for snapping
 	v_channel := replace (current_user::text,'.','_');
 	PERFORM pg_notify (v_channel, '{"functionAction":{"functions":[{"name":"set_layer_index","parameters":{"tableName":"v_edit_link"}}],"user":"'
