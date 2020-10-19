@@ -31,3 +31,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_functi
 DROP FUNCTION IF EXISTS gw_fct_edit_check_data(json);
 DROP FUNCTION IF EXISTS gw_fct_getinsertfeature(json);
 DROP FUNCTION IF EXISTS gw_fct_admin_schema_copy(json);
+
+--2020/10/19
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_fprocess", "column":"fid2"}}$$);

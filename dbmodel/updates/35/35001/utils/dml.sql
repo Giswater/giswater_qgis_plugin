@@ -258,3 +258,7 @@ UPDATE sys_foreignkey SET active = TRUE;
 INSERT INTO config_csv(fid, alias, descript, functionname, active)
 VALUES (141, 'Export inp', 'The csv file generated is according standard INP file of EPA software','role_epa', TRUE)
 on conflict (fid) do nothing;
+
+--2020/10/19
+INSERT INTO config_fprocess(fid, tablename, target, querytext, orderby, addparam)
+SELECT 239, tablename, target, querytext,orderby, addparam FROM config_fprocess WHERE fid2 = 239 ON CONFLICT (fid, tablename, target) DO NOTHING;
