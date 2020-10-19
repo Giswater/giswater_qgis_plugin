@@ -1375,6 +1375,8 @@ class ApiCF(ApiParent, QObject):
     def set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
 
         if self.check_tab_data(dialog):
+            # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
+            # does not jump, making it lose focus, which will cause the accept function to jump sent invalid parameters
             if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
                 _json = {}
                 widget.editingFinished.connect(partial(self.clean_my_json, widget))
@@ -1394,6 +1396,8 @@ class ApiCF(ApiParent, QObject):
     def set_auto_update_textarea(self, field, dialog, widget):
 
         if self.check_tab_data(dialog):
+            # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
+            # does not jump, making it lose focus, which will cause the accept function to jump sent invalid parameters
             if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
                 _json = {}
                 widget.textChanged.connect(partial(self.clean_my_json, widget))
