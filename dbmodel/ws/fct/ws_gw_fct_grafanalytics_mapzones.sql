@@ -47,7 +47,7 @@ SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"SECTOR
 SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation":[1], "macroExploitation":[1], "checkData":false, 
 "updateFeature":true, "updateMapZone":2, "geomParamUpdate":15,"debug":false, "usePlanPsector":false, "forceOpen":[1,2,3], "forceClosed":[2,3,4]}}}');
 
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation":[502],  "checkData":false, 
+SELECT gw_fct_grafanalytics_mapzones('{"data":{"parameters":{"grafClass":"DMA", "exploitation":[502],  "checkData":false, 
 "updateFeature":true, "updateMapZone":4, "geomParamUpdate":20,"debug":false}}}');
 
 
@@ -555,8 +555,8 @@ BEGIN
 							 ON  nodeparent = descript WHERE fid='||v_fid||' AND a.arc_id=arc.arc_id AND cur_user=current_user';
 					EXECUTE v_querytext;
 
-					-- update node table without graf nodes using v_edit_node because the exploitation filter. Row before do not needed because table anl_* is filtered by process
-					v_querytext = 'UPDATE v_edit_node SET '||quote_ident(v_field)||' = arc.'||quote_ident(v_field)||' FROM arc WHERE arc.arc_id=v_edit_node.arc_id';
+					-- update node table without graf nodes using node with from v_edit_arc because the exploitation filter. Row before do not needed because table anl_* is filtered by process
+					v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM v_edit_arc a WHERE a.arc_id=node.arc_id';
 					EXECUTE v_querytext;
 
 					-- update node table with graf nodes
@@ -567,8 +567,8 @@ BEGIN
 							AND cur_user=current_user';
 					EXECUTE v_querytext;
 
-					-- used v_edit_connec because the exploitation filter (same before)
-					v_querytext = 'UPDATE v_edit_connec SET '||quote_ident(v_field)||' = arc.'||quote_ident(v_field)||' FROM arc WHERE arc.arc_id=v_edit_connec.arc_id';
+					-- used connec using v_edit_arc because the exploitation filter (same before)
+					v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM v_edit_arc a WHERE a.arc_id=connec.arc_id';
 					EXECUTE v_querytext;
 				
 					-- recalculate staticpressure (fid=147)
