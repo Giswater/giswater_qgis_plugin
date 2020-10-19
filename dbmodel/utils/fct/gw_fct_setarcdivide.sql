@@ -650,7 +650,7 @@ BEGIN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3042", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 				ELSE  
-					RAISE EXCEPTION 'AHS';
+
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3044", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 

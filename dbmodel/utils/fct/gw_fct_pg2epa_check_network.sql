@@ -282,7 +282,6 @@ BEGIN
 			
 		SELECT count(*) FROM anl_arc INTO v_count WHERE fid = 232 AND cur_user=current_user;
 
-		--raise exception 'count %', v_count;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, count)
 			VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' Dry arc(s) because closed elements'), v_count);
