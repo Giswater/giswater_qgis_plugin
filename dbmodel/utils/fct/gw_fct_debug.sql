@@ -68,8 +68,7 @@ BEGIN
 			--INSERT INTO notify (channel, cur_user, message) VALUES (replace(current_user,'.','_'), current_user, v_message);
 			
 			INSERT INTO audit (fid, log_message) VALUES (998, v_message);
-			--raise exception 'adshadsfhadfhbdasfhdfh';
-				
+
 		ELSE 
 			-- using normal notify with personal channel
 			PERFORM pg_notify(replace(current_user,'.','_'), '{"functionAction":{"functions":[{"name":"debug", "parameters":{"message":'||v_fullmessage||

@@ -71,8 +71,6 @@ BEGIN
 
 	IF v_action = 'MULTI-DELETE' THEN
 
-		--raise exception 'schemas_array %', schemas_array;
-
 		FOR v_childview IN SELECT child_layer FROM cat_feature WHERE child_layer IS NOT NULL
 		LOOP
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
