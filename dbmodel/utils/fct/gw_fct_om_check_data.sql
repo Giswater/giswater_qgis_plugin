@@ -607,23 +607,8 @@ BEGIN
 		END IF;
 	END IF;
 
-	RAISE NOTICE '21 - Check vnode inconsistency (link without vnode) (258)';
-	v_querytext = 'SELECT * FROM v_edit_link LEFT JOIN vnode ON vnode_id = exit_id::integer where exit_type =''VNODE'' AND vnode_id IS NULL';
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, fcount)
-		VALUES (125, 2, '258',concat('WARNING: There is/are ',v_count,' vnode links without vnode. This will be automatically repaired.'), v_count);
-		
-		PERFORM gw_fct_vnode_repair();	
-		
-	ELSE
-		INSERT INTO audit_check_data (fid, criticity, result_id,error_message, fcount)
-		VALUES (125, 1, '258', 'INFO: All vnode links have vnode.',v_count);
-
-	END IF;
-	
-	RAISE NOTICE '22 - Check vnode inconsistency (vnode without link) (259)';
+	RAISE NOTICE '21 - Check vnode inconsistency (vnode without link) (259)';
 	v_querytext = 'SELECT vnode_id FROM vnode LEFT JOIN link ON vnode_id = exit_id::integer where link_id IS NULL';
 	
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -642,7 +627,7 @@ BEGIN
 	END IF;
 	
 
-	RAISE NOTICE '23 - links without feature_id (260)';
+	RAISE NOTICE '22 - links without feature_id (260)';
 	v_querytext = 'SELECT link_id, the_geom FROM link where feature_id is null and state > 0';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -655,7 +640,7 @@ BEGIN
 		VALUES (125, 1, '260', 'INFO: All links state > 0 have feature_id.', v_count);
 	END IF;
 
-	RAISE NOTICE '24 - links without exit_id (261)';
+	RAISE NOTICE '23 - links without exit_id (261)';
 	v_querytext = 'SELECT link_id, the_geom FROM link where exit_id is null and state > 0';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -671,7 +656,7 @@ BEGIN
 	END IF;
 
 
-	RAISE NOTICE '25 - Chained connecs/gullies which has different arc_id than the final connec/gully. (205)';
+	RAISE NOTICE '24 - Chained connecs/gullies which has different arc_id than the final connec/gully. (205)';
 	IF v_project_type = 'WS' THEN 
 		v_querytext = 'with c as (
 					Select '||v_edit||'connec.connec_id as id, arc_id as arc, '||v_edit||'connec.connecat_id as 
@@ -725,7 +710,7 @@ BEGIN
 		END IF;
 	END IF;
 
-	RAISE NOTICE '26 - features with state 1 and end date (262)';
+	RAISE NOTICE '25 - features with state 1 and end date (262)';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where state = 1 and enddate is not null
 					UNION SELECT node_id from '||v_edit||'node where state = 1 and enddate is not null
@@ -769,7 +754,7 @@ BEGIN
 		VALUES (125, 1, '263','INFO: No features with state 0 are missing the end date',v_count);
 	END IF;
 
-	RAISE NOTICE '27 - features with state 1 and end date before start date (264)';
+	RAISE NOTICE '26 - features with state 1 and end date before start date (264)';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT arc_id as feature_id  from '||v_edit||'arc where enddate < builtdate
 					UNION SELECT node_id from '||v_edit||'node where enddate < builtdate
@@ -791,7 +776,7 @@ BEGIN
 		VALUES (125, 1, '264','INFO: No features with end date earlier than built date',v_count);
 	END IF;
 
-	RAISE NOTICE '28 - Automatic links with more than 100 mts (longitude out-of-range) (265)';
+	RAISE NOTICE '27 - Automatic links with more than 100 mts (longitude out-of-range) (265)';
 	EXECUTE 'SELECT count(*) FROM v_edit_link where userdefined_geom  = false AND st_length(the_geom) > 100'
 	INTO v_count;
 
@@ -807,7 +792,7 @@ BEGIN
 		VALUES (125, 1,'265', 'INFO: No automatic links with out-of-range Longitude found.',v_count);
 	END IF;
 
-    RAISE NOTICE '29 - Duplicated ID values between arc, node, connec, gully (266)';
+    RAISE NOTICE '28 - Duplicated ID values between arc, node, connec, gully (266)';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT node_id AS feature_id FROM node JOIN arc ON arc.arc_id=node.node_id
 					UNION SELECT node_id FROM node JOIN connec ON connec.connec_id=node.node_id
@@ -834,7 +819,7 @@ BEGIN
 		VALUES (125, 1, '266','INFO: All features have a diferent ID to be correctly identified',v_count);
 	END IF;
 
-	RAISE NOTICE '30 - Check planned connects without reference link';
+	RAISE NOTICE '29 - Check planned connects without reference link';
 
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT count(*) FROM plan_psector_x_connec LEFT JOIN link ON feature_id = connec_id WHERE link_id IS NULL';
@@ -858,7 +843,7 @@ BEGIN
 	END IF;
 
 
-	RAISE NOTICE '31 - Connecs and gullies with different expl_id than arc';
+	RAISE NOTICE '30 - Connecs and gullies with different expl_id than arc';
 
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT DISTINCT connec_id, connecat_id, c.the_geom FROM connec c JOIN arc b using (arc_id) WHERE b.expl_id::text != c.expl_id::text';
@@ -884,35 +869,8 @@ BEGIN
 		VALUES (125, 1, 'INFO: All connecs or gullys have the same exploitation as the related arc');
 	END IF;
 
-
-	RAISE NOTICE '32 - Check duplicated vnodes (298)';
-	v_querytext = 'SELECT DISTINCT ON(the_geom) n1.vnode_id as n1, n2.vnode_id as n2, n1.the_geom FROM vnode n1, vnode n2 WHERE st_dwithin(n1.the_geom, n2.the_geom, 0.009) AND n1.vnode_id != n2.vnode_id';
-
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, descript, the_geom) SELECT 298, n1, concat(''Overlapped vnodes '',n1,''-'',n2), the_geom FROM (', v_querytext,')a');
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (125, 3, concat('ERROR: There is/are ',v_count,' overlapped vnodes, with less than 0.01 meters distance. Use gw_fct_setvnoderepair function to fix it'));
-	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (125, 1, 'INFO: There are no overlapped vnodes');
-	END IF;
-
-	RAISE NOTICE '33 - Check vnodes over nodes (299)';
-	v_querytext = 'SELECT DISTINCT ON(the_geom) n1.vnode_id as n1, n2.node_id as n2, n1.the_geom FROM vnode n1, node n2 WHERE st_dwithin(n1.the_geom, n2.the_geom, 0.009)';
-
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
-	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, descript, the_geom) SELECT 299, n1, concat(''Vnodes ('',n1,'') over node ('',n2,'')''), the_geom FROM (', v_querytext,')a');
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' vnode(s) over node, with less than 0.01 meters distance. Maybe you can make bigger this moving link endpoint or use gw_fct_setvnoderepair to fusion it'));
-	ELSE
-		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (125, 1, 'INFO: There are no vnodes over node');
-	END IF;
-
 	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_crm_schema') IS TRUE THEN 
-		RAISE NOTICE '34 - Control null values on crm.hydrometer.code(299)';
+		RAISE NOTICE '31 - Control null values on crm.hydrometer.code(299)';
 		v_querytext = 'SELECT id FROM crm.hydrometer WHERE code IS NULL';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
@@ -924,8 +882,7 @@ BEGIN
 			VALUES (125, 1, '300','INFO: All hydrometers on crm schema have code',v_count);
 		END IF;
 	END IF;
-
-	--	
+	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 3, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 2, '');

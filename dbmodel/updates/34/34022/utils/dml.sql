@@ -27,12 +27,14 @@ ON CONFLICT (fid) DO NOTHING;
 INSERT INTO sys_fprocess VALUES (297, 'EPA TYPE not defined', 'utils')
 ON CONFLICT (fid) DO NOTHING;
 
-INSERT INTO sys_fprocess VALUES (298, 'Check duplicated vnodes', 'utils')
+INSERT INTO sys_fprocess VALUES (298, 'Create vnodes on orphan links', 'utils')
 ON CONFLICT (fid) DO NOTHING;
 
-INSERT INTO sys_fprocess VALUES (299, 'Check vnodes over nodes', 'utils')
+INSERT INTO sys_fprocess VALUES (299, 'Delete orphan nodes', 'utils')
 ON CONFLICT (fid) DO NOTHING;
 
-INSERT INTO sys_function VALUES (2998, 'gw_fct_setvnodefusion', 'utils', 'function', 'json', 'json', 'Function used to fusion vnodes', 'role_edit')
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_fprocess VALUES (300, 'Remove duplicated vnodes', 'utils')
+ON CONFLICT (fid) DO NOTHING;
 
+INSERT INTO sys_fprocess VALUES (301, 'Reconnect link to node', 'utils')
+ON CONFLICT (fid) DO NOTHING;

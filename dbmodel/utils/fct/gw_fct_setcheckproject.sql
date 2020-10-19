@@ -249,11 +249,6 @@ BEGIN
 		END IF;
 	END LOOP;
 
-
-	-- arrange vnode
-	UPDATE vnode set state=0 FROM link WHERE link.exit_type ='VNODE' and exit_id = vnode_id::text AND link.state=0;
-	UPDATE vnode set state=1 FROM link WHERE link.exit_type ='VNODE' and exit_id = vnode_id::text AND link.state=1;
-
 	-- manage mandatory values of config_param_user where feature is deprecated
 	IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 	
@@ -357,6 +352,19 @@ BEGIN
 				WHERE fid=211 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6 ;
 			END IF;
 		END IF;
+
+		IF 'role_edit' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
+
+			-- arrange vnode
+			EXECUTE 'SELECT gw_fct_setvnoderepair($${
+			"client":{"device":4, "infoType":1, "lang":"ES"},
+			"feature":{},"data":{"parameters":{}}}$$)';
+			-- insert results 
+			INSERT INTO audit_check_data  (fid, criticity, error_message)
+			SELECT 101, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
+			WHERE fid=296 AND criticity = 1 AND error_message !='';
+		END IF;
+		
 
 		IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
