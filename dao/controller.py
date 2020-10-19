@@ -63,6 +63,9 @@ class DaoController:
         self.show_docker = None
         self.prev_maptool = None
         self.gw_infotools = None
+        self.dlg_info = None
+        self.show_db_exception = True
+        self.is_inserting = False
 
         if create_logger:
             self.set_logger(logger_name)
@@ -1573,6 +1576,13 @@ class DaoController:
         self.show_exceptions_msg(title, msg)
         self.log_warning(msg)
 
+        # Log exception message
+        self.log_warning(msg)
+
+        # Show exception message only if we are not in a task process
+        if self.show_db_exception:
+            self.show_exceptions_msg(title, msg)
+
 
     def manage_exception_db(self, exception=None, sql=None, stack_level=2, stack_level_increase=0, filepath=None):
         """ Manage exception in database queries and show information to the user """
@@ -1660,7 +1670,8 @@ class DaoController:
                     msg = "Key on returned json from ddbb is missed"
                 if is_notify is True:
                     self.log_info(msg, parameter=parameter, level=level)
-                else:
+                elif not is_notify and self.show_db_exception:
+                    # Show exception message only if we are not in a task process
                     self.show_message(msg, level, parameter=parameter)
 
             else:
@@ -1686,9 +1697,10 @@ class DaoController:
                 if sql:
                     msg += f"SQL: {sql}"
 
-                # Show exception message in dialog and log it
-                self.show_exceptions_msg(title, msg)
                 self.log_warning(msg, stack_level_increase=2)
+                # Show exception message only if we are not in a task process
+                if self.show_db_exception:
+                    self.show_exceptions_msg(title, msg)
 
         except Exception:
             self.manage_exception("Unhandled Error")
@@ -1706,7 +1718,17 @@ class DaoController:
         tools_qt.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.set_text_bold(self.dlg_info.txt_infolog)
-        self.dlg_info.show()
+
+        # Show dialog only if we are not in a task process
+        if self.show_db_exception:
+            self.show_dlg_info()
+
+
+    def show_dlg_info(self):
+        """ Show dialog with exception message generated in function show_exceptions_msg """
+
+        if self.dlg_info:
+            self.dlg_info.show()
 
 
     def dock_dialog(self, dialog):

@@ -24,16 +24,17 @@ class GwGo2EpaTask(QgsTask):
     def __init__(self, description, go2epa):
 
         super().__init__(description, QgsTask.CanCancel)
-        self.exception = None
         self.controller = global_vars.controller
         self.go2epa = go2epa
+        self.exception = None
         self.error_msg = None
         self.message = None
         self.common_msg = ""
-        self._file = None
+        self.function_failed = False
+        self.complet_result = None
+        self.file_rpt = None
         self.fid = 140
         self.set_variables_from_go2epa()
-        # self.progressChanged.connect(self.progress_changed)
 
 
     def set_variables_from_go2epa(self):
@@ -54,22 +55,35 @@ class GwGo2EpaTask(QgsTask):
 
     def run(self):
 
+        # Initialize instance variables
+        self.exception = None
+        self.error_msg = None
+        self.message = None
+        self.common_msg = ""
+        self.function_failed = False
+        self.complet_result = None
+
+        self.controller.show_db_exception = False
+        status = True
+
         if not self.exec_function_pg2epa():
             return False
 
         if self.export_inp:
-            self.export_to_inp()
+            status = self.export_to_inp()
 
-        if self.exec_epa:
-            self.execute_epa()
+        if status and self.exec_epa:
+            status = self.execute_epa()
 
-        if self.import_result:
-            self.import_rpt()
+        if status and self.import_result:
+            status = self.import_rpt()
 
-        return True
+        return status
 
 
     def finished(self, result):
+
+        self.controller.show_db_exception = True
 
         self.close_file()
 
@@ -99,20 +113,28 @@ class GwGo2EpaTask(QgsTask):
             self.go2epa.check_result_id()
             return
 
+        if self.function_failed:
+            self.controller.manage_exception_api(self.complet_result)
+
         if self.error_msg:
-            self.controller.log_info(f"Task aborted: {self.description()}")
-            self.controller.log_warning(f"Exception description: {self.error_msg}")
+            title = f"Task aborted - {self.description()}"
+            self.controller.show_info_box(self.error_msg, title=title)
             return
 
         if self.exception:
-            self.controller.log_info(f"Task aborted: {self.description()}")
-            self.controller.log_warning(f"Exception: {self.exception}")
+            title = f"Task aborted - {self.description()}"
+            self.controller.show_info_box(self.exception, title=title)
             raise self.exception
+
+        # If Database exception, show dialog after task has finished
+        if self.controller.last_error:
+            self.controller.show_dlg_info()
 
 
     def cancel(self):
 
-        self.controller.show_info(f"Task canceled: {self.description()}")
+        self.controller.show_db_exception = True
+        self.controller.show_info(f"Task canceled - {self.description()}")
         self.close_file()
         super().cancel()
 
@@ -125,28 +147,32 @@ class GwGo2EpaTask(QgsTask):
     def close_file(self, file=None):
 
         if file is None:
-            file = self._file
+            file = self.file_rpt
 
-        if file:
-            file.close()
-            del file
+        try:
+            if file:
+                file.close()
+                del file
+        except Exception:
+            pass
 
 
     def exec_function_pg2epa(self):
 
-        self.complet_result = None
         self.setProgress(0)
         extras = f'"resultId":"{self.result_name}"'
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         body = self.create_body(extras=extras)
-        function_name = 'gw_fct_pg2epa_main'
-        json_result = self.controller.get_json(function_name, body)
-        if json_result is None  or json_result['status'] == 'Failed':
+        json_result = self.controller.get_json('gw_fct_pg2epa_main', body, log_sql=True)
+        self.complet_result = json_result
+        if json_result is None or not json_result:
+            self.function_failed = True
             return False
 
-        self.complet_result = json_result
-        if not self.complet_result:
+        if 'status' in json_result and json_result['status'] == 'Failed':
+            self.controller.log_warning(json_result)
+            self.function_failed = True
             return False
 
         return True
@@ -155,17 +181,19 @@ class GwGo2EpaTask(QgsTask):
     def export_to_inp(self):
 
         if self.isCanceled():
-            return
+            return False
 
         self.controller.log_info(f"Create inp file into POSTGRESQL")
 
         # Get values from complet_result['body']['file'] and insert into INP file
         if 'file' not in self.complet_result['body']:
-            return
+            return False
 
         self.fill_inp_file(self.file_inp, self.complet_result['body']['file'])
         self.message = self.complet_result['message']['text']
         self.common_msg += "Export INP finished. "
+
+        return True
 
 
     def fill_inp_file(self, folder_path=None, all_rows=None):
@@ -184,23 +212,23 @@ class GwGo2EpaTask(QgsTask):
     def execute_epa(self):
 
         if self.isCanceled():
-            return
+            return False
 
         self.controller.log_info(f"Execute EPA software")
 
         if self.file_rpt == "null":
             message = "You have to set this parameter"
-            self.controller.show_warning(message, parameter="RPT file")
-            return
+            self.error_msg = f"{message}: RPT file"
+            return False
 
         msg = "INP file not found"
         if self.file_inp is not None:
             if not os.path.exists(self.file_inp):
-                self.controller.show_warning(msg, parameter=str(self.file_inp))
-                return
+                self.error_msg = f"{msg}: {self.file_inp}"
+                return False
         else:
-            self.controller.show_warning(msg, parameter=str(self.file_inp))
-            return
+            self.error_msg = f"{msg}: {self.file_inp}"
+            return False
 
         # Set file to execute
         opener = None
@@ -210,14 +238,16 @@ class GwGo2EpaTask(QgsTask):
             opener = f"{self.plugin_dir}/epa/ud_swmm50022.exe"
 
         if opener is None:
-            return
+            return False
 
-        if os.path.exists(opener):
-            subprocess.call([opener, self.file_inp, self.file_rpt], shell=False)
-            self.common_msg += "EPA model finished. "
-        else:
-            msg = "File not found"
-            self.controller.show_warning(msg, parameter=opener)
+        if not os.path.exists(opener):
+            self.error_msg = f"File not found: {opener}"
+            return False
+
+        subprocess.call([opener, self.file_inp, self.file_rpt], shell=False)
+        self.common_msg += "EPA model finished. "
+
+        return True
 
 
     def import_rpt(self):
@@ -240,10 +270,10 @@ class GwGo2EpaTask(QgsTask):
             return status
 
 
-    def read_rpt_file(self, folder_path=None):
+    def read_rpt_file(self, file_path=None):
 
-        self._file = open(folder_path, "r+")
-        full_file = self._file.readlines()
+        self.file_rpt = open(file_path, "r+")
+        full_file = self.file_rpt.readlines()
         progress = 0
 
         # Create dict with sources
@@ -260,7 +290,7 @@ class GwGo2EpaTask(QgsTask):
         target = "null"
         col40 = "null"
         json_rpt = ""
-        row_count = sum(1 for rows in full_file)
+        row_count = sum(1 for rows in full_file)  # @UnusedVariable
 
         for line_number, row in enumerate(full_file):
 
@@ -284,7 +314,6 @@ class GwGo2EpaTask(QgsTask):
                 for x in range(0, len(dirty_list)):
                     if bool(re.search('[0-9][-]\d{1,2}[.]]*', str(dirty_list[x]))):
                         last_index = 0
-                        i = 0
                         for i, c in enumerate(dirty_list[x]):
                             if "-" == c:
                                 json_elem = dirty_list[x][last_index:i]
@@ -302,7 +331,7 @@ class GwGo2EpaTask(QgsTask):
                                        f"Because columns on rpt file are overlaped, it seems you need to improve your simulation. "
                                        f"Please ckeck and fix it before continue. \n"
                                        f"{error_near}")
-                            self.controller.show_message(message, 1)
+                            self.error_msg = message
                             return False
                     elif bool(re.search('>50', str(dirty_list[x]))):
                         error_near = f"Error near line {line_number+1} -> {dirty_list}"
@@ -311,7 +340,7 @@ class GwGo2EpaTask(QgsTask):
                                    f"Because velocity has not numeric value (>50), it seems you need to improve your simulation. "
                                    f"Please ckeck and fix it before continue. \n"
                                    f"{error_near}")
-                        self.controller.show_message(message, 1)
+                        self.error_msg = message
                         return False
                     else:
                         sp_n.append(dirty_list[x])
@@ -381,8 +410,8 @@ class GwGo2EpaTask(QgsTask):
             extras += f', "file": {self.json_rpt}'
         body = self.create_body(extras=extras)
         function_name = 'gw_fct_rpt2pg_main'
-        json_result = self.controller.get_json(function_name, body, log_sql=False)
-        if json_result is None  or json_result['status'] == 'Failed':
+        json_result = self.controller.get_json(function_name, body)
+        if json_result is None:
             return False
 
         self.rpt_result = json_result
@@ -393,3 +422,4 @@ class GwGo2EpaTask(QgsTask):
         self.common_msg += "Import RPT file finished."
 
         return True
+
