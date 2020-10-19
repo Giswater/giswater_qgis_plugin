@@ -791,7 +791,7 @@ class DaoController(object):
                  log_result=False, json_loads=False, is_notify=False):
         """ Manage execution API function
         :param function_name: Name of function to call (text)
-        :param body: Parameter for function (json)
+        :param parameters: Parameters for function (json)
         :param commit: Commit sql (bool)
         :param log_sql: Show query in qgis log (bool)
         :return: Response of the function executed (json)
@@ -1404,7 +1404,7 @@ class DaoController(object):
                     return None
 
         schemaname = schemaname.replace('"', '')
-        sql = ("SELECT * FROM pg_tables WHERE schemaname = %s AND tablename = %s ")
+        sql = "SELECT * FROM pg_tables WHERE schemaname = %s AND tablename = %s "
         params = [schemaname, tablename]
         row = self.get_row(sql, log_info=False, params=params)
         return row
@@ -1752,7 +1752,7 @@ class DaoController(object):
         self.log_warning(msg)
 
         # Show exception message only if we are not in a task process
-        if self.controller.show_db_exception:
+        if self.show_db_exception:
             self.show_exceptions_msg(title, msg)
 
 
@@ -1760,6 +1760,7 @@ class DaoController(object):
         """ Manage exception in database queries and show information to the user """
 
         show_exception_msg = True
+        description = ""
         if exception:
             description = str(exception)
             if 'unknown error' in description:
@@ -1989,13 +1990,6 @@ class DaoController(object):
         self.dlg_docker.position = 2
         if type(pos) is int and pos in (1, 2, 4, 8):
             self.dlg_docker.position = pos
-
-        # If user want to dock the dialog, we reset rubberbands for each info
-        # For the first time, cf_info does not exist, therefore we cannot access it and reset rubberbands
-        try:
-            self.info_cf.resetRubberbands()
-        except AttributeError:
-            pass
 
 
     def layer_manager(self, json_result):
