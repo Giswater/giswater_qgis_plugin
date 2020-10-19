@@ -1280,7 +1280,7 @@ class ApiCF(ApiParent, QObject):
                             widget.setReadOnly(not field['iseditable'])
                             if not field['iseditable']:
                                 widget.setFocusPolicy(Qt.NoFocus)
-                                widget.setStyleSheet(None)
+                                widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
                             else:
                                 widget.setFocusPolicy(Qt.StrongFocus)
                                 widget.setStyleSheet(None)
