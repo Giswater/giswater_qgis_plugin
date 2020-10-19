@@ -48,7 +48,6 @@ BEGIN
 		NEW.link_id:= (SELECT nextval('link_link_id_seq'));
 	END IF;			
 	
-
 		-- State
         IF (NEW.state IS NULL) THEN
             NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"());
@@ -56,18 +55,6 @@ BEGIN
                 NEW.state := 1;
             END IF;
         END IF;
-	
-		-- Exploitation
-		IF (NEW.expl_id IS NULL) THEN
-			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_exploitation_vdefault' AND "cur_user"="current_user"());
-			IF (NEW.expl_id IS NULL) THEN
-				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
-				IF (NEW.expl_id IS NULL) THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"2012", "function":"1116","debug_msg":"'||NEW.link_id::text||'"}}$$);';
-				END IF;		
-			END IF;
-		END IF;	
 	END IF;	
         
     -- topology control
@@ -344,7 +331,7 @@ BEGIN
 
 		INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, 
 		state, the_geom, vnode_topelev)	
-		VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, NEW.expl_id, NEW.exit_id, NEW.exit_type, TRUE,
+		VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, v_arc.expl_id, NEW.exit_id, NEW.exit_type, TRUE,
 		NEW.state, NEW.the_geom, NEW.vnode_topelev );
 		
 		RETURN NEW;
