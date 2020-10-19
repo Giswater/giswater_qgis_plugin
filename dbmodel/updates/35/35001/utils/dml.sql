@@ -260,5 +260,5 @@ VALUES (141, 'Export inp', 'The csv file generated is according standard INP fil
 on conflict (fid) do nothing;
 
 --2020/10/19
-INSERT INTO config_fprocess(fid, tablename, target, querytext, orderby, addparam)
-SELECT 239, tablename, target, querytext,orderby, addparam FROM config_fprocess WHERE fid2 = 239 ON CONFLICT (fid, tablename, target) DO NOTHING;
+INSERT INTO config_fprocess(fid, tablename, target, fields, orderby, addparam)
+SELECT 239, tablename, target, fields,orderby, addparam FROM config_fprocess WHERE fid2 = 239 ON CONFLICT (fid, tablename, target) DO NOTHING;
