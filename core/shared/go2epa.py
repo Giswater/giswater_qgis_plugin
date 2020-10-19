@@ -130,6 +130,16 @@ class GwGo2Epa:
         file_rpt = tools_qt.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
         result_name = tools_qt.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
 
+        # Check if at least one process is selected
+        export_checked = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
+        exec_checked = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)
+        import_result_checked = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)
+
+        if not export_checked and not exec_checked and not import_result_checked:
+            msg = "You need to select at least one process"
+            self.controller.show_info_box(msg, title="Go2Epa")
+            return False
+
         # Control export INP
         if tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
             if self.check_inp_chk(file_inp) is False:
