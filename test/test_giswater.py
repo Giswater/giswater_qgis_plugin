@@ -11,9 +11,9 @@ import configparser
 import os.path
 import sys
 
-from dao.controller import DaoController
-from core.btn_admin import GwAdmin
-from core.shared.visit_manager import GwVisitManager
+from ..dao.controller import DaoController
+from ..core.btn_admin import GwAdmin
+from ..core.shared.visit_manager import GwVisitManager
 
 
 class TestGiswater(QObject):

@@ -8,8 +8,8 @@ or (at your option) any later version.
 from qgis.core import QgsApplication, QgsProviderRegistry
 from qgis.PyQt.QtWidgets import QDialog
 
-from test.test_giswater import TestGiswater
-from core.btn_admin_gis_project import GwAdminGisProject
+from .test_giswater import TestGiswater
+from ..core.btn_admin_gis_project import GwAdminGisProject
 
 
 # dummy instance to replace qgis.utils.iface
