@@ -645,7 +645,7 @@ def set_completer_object(dialog, table_object, field_object_id="id"):
         field_object_id = table_object + "_id"
     sql = (f"SELECT DISTINCT({field_object_id})"
            f" FROM {table_object}"
-           f"ORDER BY {field_object_id}")
+           f" ORDER BY {field_object_id}")
 
     rows = global_vars.controller.get_rows(sql)
     if rows is None:
