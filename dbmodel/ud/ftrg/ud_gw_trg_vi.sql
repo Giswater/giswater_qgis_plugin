@@ -73,6 +73,9 @@ BEGIN
 			INSERT INTO inp_subcatchment (subc_id, rg_id, outlet_id, area, imperv, width, slope, clength, snow_id, sector_id) 
 			VALUES (NEW.subc_id, NEW.rg_id, NEW.outlet_id, NEW.area, NEW.imperv, NEW.width, NEW.slope, NEW.clength, NEW.snow_id, 1);
 
+			INSERT INTO cat_hydrology (hydrology_id, infiltration)
+			SELECT 1, value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_infiltration' ON CONFLICT (hydrology_id) DO NOTHING;
+
 		ELSIF v_view='vi_subareas' THEN
 			UPDATE inp_subcatchment SET nimp=NEW.nimp, nperv=NEW.nperv, simp=NEW.simp, sperv=NEW.sperv, zero=NEW.zero, routeto=NEW.routeto, rted=NEW.rted WHERE subc_id=NEW.subc_id;
 			

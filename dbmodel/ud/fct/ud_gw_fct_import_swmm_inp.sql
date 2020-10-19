@@ -111,6 +111,7 @@ BEGIN
 		DELETE FROM cat_arc;
 		DELETE FROM cat_node;
 		DELETE FROM cat_dwf_scenario;
+		DELETE FROM cat_hydrology;
 	
 		-- Delete data
 		DELETE FROM node;
@@ -221,16 +222,16 @@ BEGIN
 	
 	--arc_type
 	--arc
-	INSERT INTO arc_type VALUES ('EPACOND', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit', TRUE,TRUE);
-	INSERT INTO arc_type VALUES ('EPAWEIR', 'VARC', 'WEIR', 'man_varc', 'inp_weir', TRUE,TRUE);
-	INSERT INTO arc_type VALUES ('EPAORIF', 'VARC', 'ORIFICE', 'man_varc', 'inp_orifice', TRUE,TRUE);
-	INSERT INTO arc_type VALUES ('EPAPUMP', 'VARC', 'PUMP', 'man_varc', 'inp_pump', TRUE,TRUE);
-	INSERT INTO arc_type VALUES ('EPAOUTL', 'VARC', 'OUTLET', 'man_varc', 'inp_outlet', TRUE,TRUE);
+	INSERT INTO cat_feature_arc VALUES ('EPACOND', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit');
+	INSERT INTO cat_feature_arc VALUES ('EPAWEIR', 'VARC', 'WEIR', 'man_varc', 'inp_weir');
+	INSERT INTO cat_feature_arc VALUES ('EPAORIF', 'VARC', 'ORIFICE', 'man_varc', 'inp_orifice');
+	INSERT INTO cat_feature_arc VALUES ('EPAPUMP', 'VARC', 'PUMP', 'man_varc', 'inp_pump');
+	INSERT INTO cat_feature_arc VALUES ('EPAOUTL', 'VARC', 'OUTLET', 'man_varc', 'inp_outlet');
 
 	--node_type
-	INSERT INTO node_type VALUES ('EPAMANH', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', TRUE,TRUE,2,FALSE);
-	INSERT INTO node_type VALUES ('EPAOUTF', 'OUTFALL', 'OUTFALL', 'man_outfall', 'inp_outfall', TRUE,TRUE,2,FALSE);
-	INSERT INTO node_type VALUES ('EPASTOR', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage', TRUE,TRUE,2,FALSE);
+	INSERT INTO cat_feature_node VALUES ('EPAMANH', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', 2, TRUE,TRUE);
+	INSERT INTO cat_feature_node VALUES ('EPAOUTF', 'OUTFALL', 'OUTFALL', 'man_outfall', 'inp_outfall', 2, TRUE,TRUE);
+	INSERT INTO cat_feature_node VALUES ('EPASTOR', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage', 2, TRUE,TRUE);
 	
 	ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
 	--cat_mat_node 
@@ -275,7 +276,7 @@ BEGIN
 	FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-	FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename NOT IN ('vi_conduits', 'vi_junction') order by id
+	FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename NOT IN ('vi_conduits', 'vi_junction') order by orderby
 	LOOP
 		--identifing the humber of fields of the editable view
 		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
