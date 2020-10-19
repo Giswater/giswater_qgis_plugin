@@ -671,7 +671,7 @@ def get_xy(vertex_marker, return_point, emit_point, point):
 def selection_init(dialog, table_object, query=False, geom_type=None, layers=None):
     """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
-    from actions.multiple_selection import MultipleSelection
+    from ..actions.multiple_selection import MultipleSelection
     geom_type = tools_giswater.tab_feature_changed(dialog, table_object)
     if geom_type in ('all', None):
         geom_type = 'arc'
