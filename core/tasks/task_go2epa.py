@@ -320,6 +320,7 @@ class GwGo2EpaTask(QgsTask):
                                 last_index = i
                                 sp_n.append(json_elem)
 
+                        # noinspection PyUnboundLocalVariable
                         json_elem = dirty_list[x][last_index:i]
                         sp_n.append(json_elem)
 
@@ -411,11 +412,14 @@ class GwGo2EpaTask(QgsTask):
         body = self.create_body(extras=extras)
         function_name = 'gw_fct_rpt2pg_main'
         json_result = self.controller.get_json(function_name, body)
-        if json_result is None:
+        self.rpt_result = json_result
+        if json_result is None or not json_result:
+            self.function_failed = True
             return False
 
-        self.rpt_result = json_result
-        if not self.rpt_result:
+        if 'status' in json_result and json_result['status'] == 'Failed':
+            self.controller.log_warning(json_result)
+            self.function_failed = True
             return False
 
         # final message
