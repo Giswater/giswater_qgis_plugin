@@ -890,12 +890,12 @@ BEGIN
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, descript, the_geom) SELECT 298, n1, concat(''Overlaped vnodes '',n1,''-'',n2), the_geom FROM (', v_querytext,')a');
+		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, descript, the_geom) SELECT 298, n1, concat(''Overlapped vnodes '',n1,''-'',n2), the_geom FROM (', v_querytext,')a');
 		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (125, 3, concat('ERROR: There is/are ',v_count,' overlaped vnodes, with less than 0.01 meters distance. Use gw_fct_setvnoderepair function to fix it'));
+		VALUES (125, 3, concat('ERROR: There is/are ',v_count,' overlapped vnodes, with less than 0.01 meters distance. Use gw_fct_setvnoderepair function to fix it'));
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (125, 1, 'INFO: There is no overlaped vnodes');
+		VALUES (125, 1, 'INFO: There are no overlapped vnodes');
 	END IF;
 
 	RAISE NOTICE '33 - Check vnodes over nodes (299)';
@@ -908,7 +908,21 @@ BEGIN
 		VALUES (125, 2, concat('WARNING: There is/are ',v_count,' vnode(s) over node, with less than 0.01 meters distance. Maybe you can make bigger this moving link endpoint or use gw_fct_setvnoderepair to fusion it'));
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (125, 1, 'INFO: There is no vnodes over node');
+		VALUES (125, 1, 'INFO: There are no vnodes over node');
+	END IF;
+
+	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_crm_schema') IS TRUE THEN 
+		RAISE NOTICE '34 - Control null values on crm.hydrometer.code(299)';
+		v_querytext = 'SELECT id FROM crm.hydrometer WHERE code IS NULL';
+
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+		IF v_count > 0 THEN
+			INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
+			VALUES (125, 3, '300', concat('ERROR: There is/are ',v_count,' hydrometers in crm schema without code.'),v_count);
+		ELSE
+			INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
+			VALUES (125, 1, '300','INFO: All hydrometers on crm schema have code',v_count);
+		END IF;
 	END IF;
 
 	--	

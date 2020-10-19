@@ -124,3 +124,7 @@ VALUES (3006, 'gw_fct_setmapzonestrigger', 'ws', 'function','json', 'json',
 
 INSERT INTO config_function(id, function_name,  actions)
 VALUES (3006, 'gw_fct_setmapzonestrigger', '[{"funcName": "set_layer_index", "params": {"tableName": ["v_edit_dma", "v_edit_sector", "v_edit_dqa", "v_edit_presszone"]}}]');
+
+--2020/10/19
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (300, 'Null values on crm.hydrometer field code', 'utils') ON CONFLICT (fid) DO NOTHING;
