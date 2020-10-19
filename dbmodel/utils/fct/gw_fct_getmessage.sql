@@ -59,7 +59,7 @@ BEGIN
 	IF v_txid = (SELECT value FROM config_param_user WHERE parameter = 'utils_cur_trans' AND cur_user = current_user) THEN
 		
 		IF rec_cat_error IS NULL THEN 
-			v_return_text = 'The process has returned and error code, but this error code is not present on the sys_message table. Please contact with your system administrator in order to update your sys_message table';
+			v_return_text = 'The process has returned an error code, but this error code is not present on the sys_message table. Please contact with your system administrator in order to update your sys_message table';
 			v_level = 2;
 			v_status = 'Failed';
 

@@ -47,12 +47,19 @@ v_columntype text;
 v_addmessage text;
 v_tablename_check text;
 v_newbackupname text;
-		
+v_version text;
+v_audit_result text;
+v_status text;
+v_level text;
+v_error_context text;
+
 BEGIN 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
 
+	 -- select project type
+    SELECT giswater INTO  v_version FROM sys_version LIMIT 1;
 
 	-- get input parameters
 	v_action := (p_data ->> 'data')::json->> 'action';
@@ -60,109 +67,135 @@ BEGIN
 	v_newbackupname:= (p_data ->> 'data')::json->> 'newBackupName';
 	v_tablename:= (p_data ->> 'data')::json->> 'table';
 
-	IF v_backupname IS NULL OR v_backupname IS NULL OR v_backupname IS NULL THEN
-		RAISE EXCEPTION 'Some mandatory key is missing, action %, backupName %, table %', v_action, v_backupname, v_tablename;
-	END IF;
+	IF v_backupname IS NULL OR length(v_backupname) < 1 THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3146", "function":"2792","debug_msg":null}}$$);' INTO v_audit_result;
 
-	IF v_action ='CREATE' THEN
+	ELSE
 
-		IF (SELECT count(*) FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fid = 211) > 0 THEN
-			RAISE EXCEPTION 'The backup name exists. Try with other name or delete it before';
-		END IF;
+		IF v_action ='CREATE' THEN
 
-		v_querytext = 'INSERT INTO temp_table (fid, text_column, addparam) SELECT 211, ''{"name":"'||v_backupname||'", "table":"'||v_tablename||'"}'', row_to_json(row) FROM (SELECT * FROM '||v_tablename||') row';
+			IF (SELECT count(*) FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fid = 211) > 0 THEN
+				
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3148", "function":"2792","debug_msg":"'||v_backupname||'"}}$$);' INTO v_audit_result;
+			END IF;
 
-		EXECUTE 'SELECT count(*) FROM '||v_tablename
-			INTO v_count;
+			v_querytext = 'INSERT INTO temp_table (fid, text_column, addparam) SELECT 211, ''{"name":"'||v_backupname||'", "table":"'||v_tablename||'"}'', row_to_json(row) FROM (SELECT * FROM '||v_tablename||') row';
 
-		EXECUTE v_querytext;
+			EXECUTE 'SELECT count(*) FROM '||v_tablename
+				INTO v_count;
+
+			EXECUTE v_querytext;
+			
+		ELSIF v_action ='RESTORE' THEN
+			SELECT text_column::json->>'table' INTO v_tablename_check FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fid=211 LIMIT 1;
+
+			-- check consistency on tablename
+			IF v_tablename != v_tablename_check THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3150", "function":"2792","debug_msg":"'||v_tablename||'}}$$);' INTO v_audit_result;
+			END IF;
+
+			-- automatic backup creation
+			-- check if backup exists
+			IF (SELECT count(*) FROM temp_table WHERE text_column::json->>'name' = v_newbackupname AND fid=211 ) > 0 THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3148", "function":"2792","debug_msg":"'||v_newbackupname||'"}}$$);' INTO v_audit_result;
+			END IF;
+
+			v_querytext = 'INSERT INTO temp_table (fid, text_column, addparam) SELECT 211, ''{"name":"'||v_newbackupname||'", "table":"'||v_tablename||'"}'', row_to_json(row) FROM (SELECT * FROM '||v_tablename||') row';
+
+			EXECUTE 'SELECT count(*) FROM '||v_tablename
+				INTO v_count;
+
+			EXECUTE v_querytext;
+
+			-- restore		
+			-- get table from backup
+			
+			-- delete table
+			v_querytext = 'DELETE FROM '||v_tablename;
+			EXECUTE v_querytext;
+				
+			-- get fields from table
+			select array_agg(json_keys) into v_fields from ( select json_object_keys(addparam) as json_keys FROM 
+			(SELECT addparam FROM temp_table WHERE fid =211 AND text_column::json->>'name' = v_backupname limit 1)a)b;
+
+			-- build querytext (init)
+			v_querytext = 'INSERT INTO '||v_tablename||' SELECT';
+
+			-- build querytext
+			FOREACH v_field IN ARRAY v_fields 
+			LOOP
+				-- Get column type
+				EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(v_tablename) || ' AND column_name = $2'
+				USING v_schemaname, v_field
+				INTO v_columntype;
+				
+				v_querytext = concat (v_querytext, ' (addparam->>''', v_field, ''')::',v_columntype, ',');
+
+			END LOOP;
+
+			-- delete last ','
+			v_querytext = reverse (v_querytext);
+			v_querytext = substring (v_querytext, 2);
+			v_querytext = reverse (v_querytext);
+
+			-- build querytext (end)
+			v_querytext = concat (v_querytext, ' FROM temp_table WHERE fid=211 AND text_column::json->>''name'' = ',quote_literal(v_backupname));
+
+			EXECUTE 'SELECT count(*) FROM temp_table WHERE fid=211 AND text_column::json->>''name'' = '||quote_literal(v_backupname)
+				INTO v_count;
 		
-	ELSIF v_action ='RESTORE' THEN
+			EXECUTE v_querytext;
 
-		-- check consistency on tablename
-		IF v_tablename != v_tablename_check THEN
-			RAISE EXCEPTION 'Backup % has no data related to % table. Please check it before continue', v_backupname, v_tablename;
-		END IF;
+			v_addmessage = 'Previous data from table before retore have been saved on temp_table <<'||v_newbackupname||'>>';
 
-		-- automatic backup creation
-		-- check if backup exists
-		IF (SELECT count(*) FROM temp_table WHERE text_column::json->>'name' = v_newbackupname AND fid=211 ) > 0 THEN
-			RAISE EXCEPTION 'The name for the new backup you are trying to do already exists. Try with other name or delete it before';
-		END IF;
 
-		v_querytext = 'INSERT INTO temp_table (fid, text_column, addparam) SELECT 211, ''{"name":"'||v_newbackupname||'", "table":"'||v_tablename||'"}'', row_to_json(row) FROM (SELECT * FROM '||v_tablename||') row';
+		ELSIF v_action= 'DELETE' THEN
 
-		EXECUTE 'SELECT count(*) FROM '||v_tablename
+			-- get table from backup
+			SELECT text_column::json->>'table' INTO v_tablename FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fid=211 LIMIT 1;
+
+			EXECUTE 'SELECT count(*) FROM temp_table WHERE text_column::json->>''name'' = '|| quote_literal(v_backupname) ||' AND fid=211'
 			INTO v_count;
 
-		EXECUTE v_querytext;
+			DELETE FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fid=211;
 
-		-- restore		
-		-- get table from backup
-		SELECT text_column::json->>'table' INTO v_tablename_check FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fid=211 LIMIT 1;
-
-		-- delete table
-		v_querytext = 'DELETE FROM '||v_tablename;
-		EXECUTE v_querytext;
-			
-		-- get fields from table
-		select array_agg(json_keys) into v_fields from ( select json_object_keys(addparam) as json_keys FROM 
-		(SELECT addparam FROM temp_table WHERE fid =211 AND text_column::json->>'name' = v_backupname limit 1)a)b;
-
-		-- build querytext (init)
-		v_querytext = 'INSERT INTO '||v_tablename||' SELECT';
-
-		-- build querytext
-		FOREACH v_field IN ARRAY v_fields 
-		LOOP
-			-- Get column type
-			EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(v_tablename) || ' AND column_name = $2'
-			USING v_schemaname, v_field
-			INTO v_columntype;
-			
-			v_querytext = concat (v_querytext, ' (addparam->>''', v_field, ''')::',v_columntype, ',');
-
-		END LOOP;
-
-		-- delete last ','
-		v_querytext = reverse (v_querytext);
-		v_querytext = substring (v_querytext, 2);
-		v_querytext = reverse (v_querytext);
-
-		-- build querytext (end)
-		v_querytext = concat (v_querytext, ' FROM temp_table WHERE fid=211 AND text_column::json->>''name'' = ',quote_literal(v_backupname));
-
-		EXECUTE 'SELECT count(*) FROM temp_table WHERE fid=211 AND text_column::json->>''name'' = '||quote_literal(v_backupname)
-			INTO v_count;
-	
-		EXECUTE v_querytext;
-
-		RAISE NOTICE 'v_querytext %', v_querytext;
-
-		v_addmessage = 'Previous data from table before retore have been saved on temp_table <<'||v_newbackupname||'>>';
-
-		RAISE NOTICE 'v_addmessage %', v_addmessage;
-
-	ELSIF v_action= 'DELETE' THEN
-
-		-- get table from backup
-		SELECT text_column::json->>'table' INTO v_tablename FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fid=211 LIMIT 1;
-
-		EXECUTE 'SELECT count(*) FROM temp_table WHERE text_column::json->>''name'' = '|| quote_literal(v_backupname) ||' AND fid=211'
-		INTO v_count;
-
-		DELETE FROM temp_table WHERE text_column::json->>'name' = v_backupname AND fid=211;
+		END IF;
 
 	END IF;
 
-	-- message
-	v_message =  concat ('BACKUP <<',v_backupname,'>> for ',v_tablename,' table sucessfully ',v_action,'D. Rows affected: ',v_count, '.', v_addmessage);
+	IF v_audit_result is null THEN
+        v_status = 'Accepted';
+        v_level = 3;
+        v_message =  concat ('BACKUP <<',v_backupname,'>> for ',v_tablename,' table sucessfully ',v_action,'D. Rows affected: ',v_count, '.', v_addmessage);
+
+    ELSE
+
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+
+    END IF;
+
+
 
 	--    Control NULL's
 	v_message := COALESCE(v_message, '');
 	
 	-- Return
-	RETURN ('{"message":{"level":"'||v_priority||'", "text":"'||v_message||'"}}');	
+	--  Return
+     RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{}}'||
+	    '}')::json;
+
+    EXCEPTION WHEN OTHERS THEN
+	GETT STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

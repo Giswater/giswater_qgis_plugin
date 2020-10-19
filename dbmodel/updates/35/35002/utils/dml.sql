@@ -128,3 +128,12 @@ VALUES (3006, 'gw_fct_setmapzonestrigger', '[{"funcName": "set_layer_index", "pa
 --2020/10/19
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
 VALUES (300, 'Null values on crm.hydrometer field code', 'utils') ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
+VALUES (3146, 'Backup name is missing', 'Insert value in key backupName', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING ;
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
+VALUES (3148, 'Backup name already exists', 'Try with other name or delete the existing one before', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING ;
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
+VALUES (3150, 'Backup has no data related to table', 'Please check it before continue', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING ;
