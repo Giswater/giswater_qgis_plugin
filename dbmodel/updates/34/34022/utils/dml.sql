@@ -38,3 +38,12 @@ ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_fprocess VALUES (301, 'Reconnect link to node', 'utils')
 ON CONFLICT (fid) DO NOTHING;
+
+
+-- delete references to visit_cat_status typevalue. Only use visit_status
+UPDATE config_form_fields SET dv_querytext=replace(dv_querytext, 'visit_cat_status', 'visit_status') where dv_querytext like '%visit_cat_status%';
+
+ALTER TABLE om_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+DELETE FROM om_typevalue WHERE typevalue='visit_cat_status';
+UPDATE sys_typevalue SET typevalue_name='visit_status' WHERE typevalue_name='visit_cat_status';
+ALTER TABLE om_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
