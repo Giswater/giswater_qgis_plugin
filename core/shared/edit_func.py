@@ -13,6 +13,8 @@ from .document import GwDocument
 from ... import global_vars
 from ...map_tools.snapping_utils_v3 import SnappingConfigManager
 
+from ...lib.tools_qgis import get_feature_by_id
+
 
 class GwEdit:
 
@@ -79,7 +81,7 @@ class GwEdit:
         :return:
         """
         self.info_layer.featureAdded.disconnect(self.open_new_feature)
-        feature = self.get_feature_by_id(self.info_layer, feature_id)
+        feature = get_feature_by_id(self.info_layer, feature_id)
         geom = feature.geometry()
         list_points = None
         if self.info_layer.geometryType() == 0:
@@ -109,13 +111,3 @@ class GwEdit:
         if not result:
             self.info_layer.deleteFeature(feature.id())
             self.iface.actionRollbackEdits().trigger()
-
-
-    def get_feature_by_id(self, layer, id_):
-
-        features = layer.getFeatures()
-        for feature in features:
-            if feature.id() == id_:
-                return feature
-        return False
-

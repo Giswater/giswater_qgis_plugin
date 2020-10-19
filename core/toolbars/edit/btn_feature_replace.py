@@ -171,8 +171,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         load_settings(self.dlg_new_workcat)
         tools_qt.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
 
-        table_object = "cat_work"
-        self.set_completer_object(table_object, self.dlg_new_workcat.cat_work_id, 'id')
+        tools_qt.set_completer_object(self.dlg_new_workcat, "cat_work")
 
         # Set signals
         self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
@@ -240,34 +239,6 @@ class GwFeatureReplaceButton(GwParentMapTool):
                 else:
                     msg = "This Workcat is already exist"
                     self.controller.show_info_box(msg, "Warning")
-
-
-    def set_completer_object(self, tablename, widget, field_id):
-        """ Set autocomplete of widget @table_object + "_id"
-            getting id's from selected @table_object
-        """
-
-        if not widget:
-            return
-
-        sql = (f"SELECT DISTINCT({field_id}) "
-               f"FROM {tablename} "
-               f"ORDER BY {field_id}")
-        rows = self.controller.get_rows(sql)
-        if rows is None:
-            return
-
-        for i in range(0, len(rows)):
-            aux = rows[i]
-            rows[i] = str(aux[0])
-
-        # Set completer and model: add autocomplete in the widget
-        self.completer = QCompleter()
-        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
-        widget.setCompleter(self.completer)
-        model = QStringListModel()
-        model.setStringList(rows)
-        self.completer.setModel(model)
 
 
     def get_values(self, dialog):

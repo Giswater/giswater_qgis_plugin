@@ -544,13 +544,16 @@ def select_snapped_feature(result, feature_id):
     layer.select([feature_id])
 
 
-def get_feature_by_id(layer, id, field_id):
+def get_feature_by_id(layer, id, field_id=None):
 
     features = layer.getFeatures()
     for feature in features:
-        if feature[field_id] == id:
-            return feature
-
+        if field_id is None:
+            if feature.id() == id:
+                return feature
+        else:
+            if feature[field_id] == id:
+                return feature
     return False
 
 
@@ -966,7 +969,7 @@ def zoom_to_selected_features(layer, geom_type=None, zoom=None):
         global_vars.iface.mapCanvas().zoomScale(float(scale))
 
 
-def select_features_by_expr( layer, expr):
+def select_features_by_expr(layer, expr):
     """ Select features of @layer applying @expr """
 
     if not layer:

@@ -28,7 +28,7 @@ from ..ui.ui_manager import Plan_psector, PsectorRapportUi
 from .document import global_vars
 from ...lib.tools_qgis import remove_selection, selection_init, selection_changed, disconnect_snapping, \
     zoom_to_selected_features, insert_feature, get_feature_by_id, disconnect_signal_selection_changed, \
-    refresh_map_canvas
+    refresh_map_canvas, select_features_by_expr
 from ...lib import tools_qt
 from ...lib.tools_qt import delete_records, fill_table_object, set_selectionbehavior, get_folder_dialog, set_icon, \
     set_completer_lineedit, set_restriction, document_open, document_delete, set_completer_object, set_table_columns, \
@@ -333,7 +333,7 @@ class GwPsector:
                 if not is_valid:
                     return
 
-                self.select_features_by_expr(layer, expr)
+                select_features_by_expr(layer, expr)
 
                 # Get canvas extend in order to create a QgsRectangle
                 ext = self.canvas.extent()

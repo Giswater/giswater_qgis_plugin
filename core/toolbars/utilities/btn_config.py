@@ -454,14 +454,7 @@ class GwConfigButton(GwParentAction):
         # TODO::Refactor input and output for function "gw_fct_getcombochilds" and refactor "row[0]['fields']"
         for combo_child in row[0]['fields']:
             if combo_child is not None:
-                self.populate_child(combo_child)
-
-
-    def populate_child(self, combo_child):
-
-        child = self.dlg_config.findChild(QComboBox, str(combo_child['widgetname']))
-        if child:
-            self.populate_combo(child, combo_child)
+                tools_qt.populate_child(self.dlg_config, combo_child)
 
 
     def populate_combo(self, widget, field):

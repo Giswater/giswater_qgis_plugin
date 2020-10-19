@@ -25,7 +25,7 @@ from ..tasks.parent_task import GwTask
 from ...lib import tools_qt
 from .search import GwSearch
 from ..utils.tools_giswater import close_dialog, load_settings, open_dialog, save_settings, create_body, \
-    populate_info_text_ as populate_info_text, delete_layer_from_toc
+    populate_info_text_ as populate_info_text, delete_layer_from_toc, check_expression
 from .mincut_manager import GwMincutManager
 from ...actions.multiple_selection import MultipleSelection
 from ..ui.ui_manager import DialogTextUi
@@ -900,7 +900,7 @@ class GwMincut:
         if len(self.connec_list) == 0:
             expr_filter = "\"connec_id\" =''"
         # Check expression
-        (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
 
@@ -933,7 +933,7 @@ class GwMincut:
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
-            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+            (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
             if not is_valid:
                 return
 
@@ -1100,7 +1100,7 @@ class GwMincut:
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
-            (is_valid, expr) = self.check_expression(expr_filter)
+            (is_valid, expr) = check_expression(expr_filter)
             if not is_valid:
                 return
 
@@ -1130,7 +1130,7 @@ class GwMincut:
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
-            (is_valid, expr) = self.check_expression(expr_filter)
+            (is_valid, expr) = check_expression(expr_filter)
             if not is_valid:
                 return
 
@@ -1210,7 +1210,7 @@ class GwMincut:
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
-            (is_valid, expr) = self.check_expression(expr_filter)
+            (is_valid, expr) = check_expression(expr_filter)
             if not is_valid:
                 return
 
@@ -1241,26 +1241,13 @@ class GwMincut:
             return str(row[0])
 
 
-    def check_expression(self, expr_filter, log_info=False):
-        """ Check if expression filter @expr is valid """
-
-        if log_info:
-            self.controller.log_info(expr_filter)
-        expr = QgsExpression(expr_filter)
-        if expr.hasParserError():
-            message = "Expression Error"
-            self.controller.log_warning(message, parameter=expr_filter)
-            return False, expr
-        return True, expr
-
-
     def set_table_model(self, widget, table_name, expr_filter):
         """ Sets a TableModel to @widget attached to @table_name and filter @expr_filter """
 
         expr = None
         if expr_filter:
             # Check expression
-            (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+            (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
             if not is_valid:
                 return expr
 

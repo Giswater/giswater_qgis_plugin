@@ -10,6 +10,8 @@ from qgis.PyQt.QtCore import QSettings, Qt
 from ...shared.dimensioning import GwDimensioning
 from ..parent_maptool import GwParentMapTool
 
+from ....lib.tools_qgis import get_feature_by_id
+
 
 class GwDimensioningButton(GwParentMapTool):
     """ Button 39: Dimensioning """
@@ -24,7 +26,7 @@ class GwDimensioningButton(GwParentMapTool):
     def open_new_dimensioning(self, feature_id):
 
         self.layer.featureAdded.disconnect(self.open_new_dimensioning)
-        feature = self.get_feature_by_id(self.layer, feature_id)
+        feature = get_feature_by_id(self.layer, feature_id)
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
@@ -36,15 +38,6 @@ class GwDimensioningButton(GwParentMapTool):
 
         self.api_dim = GwDimensioning()
         self.api_dim.open_dimensioning_form(qgis_feature=feature, layer=self.layer)
-
-
-    def get_feature_by_id(self, layer, id_):
-
-        features = layer.getFeatures()
-        for feature in features:
-            if feature.id() == id_:
-                return feature
-        return False
 
 
     """ QgsMapTools inherited event functions """

@@ -170,7 +170,7 @@ class GwCatalog:
         row = self.controller.get_row(sql)
         for combo_child in row[0]['fields']:
             if combo_child is not None:
-                self.populate_child(combo_child, row)
+                tools_qt.populate_child(self.dlg_catalog, combo_child)
 
 
     def populate_catalog_id(self, geom_type):
@@ -191,13 +191,6 @@ class GwCatalog:
             sql = f"SELECT gw_api_get_catalog_id('{metcat_value}', '{pn_value}', '{dn_value}', '{geom_type}', 9)"
             row = self.controller.get_row(sql)
             self.populate_combo(widget_id, row[0]['catalog_id'][0])
-
-
-    def populate_child(self, combo_child, result):
-
-        child = self.dlg_catalog.findChild(QComboBox, str(combo_child['widgetname']))
-        if child:
-            self.populate_combo(child, combo_child)
 
 
     def add_combobox(self, dialog, field):
