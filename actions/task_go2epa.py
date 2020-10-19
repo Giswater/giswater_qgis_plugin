@@ -23,12 +23,14 @@ class TaskGo2Epa(QgsTask):
     def __init__(self, description, controller, go2epa):
 
         super().__init__(description, QgsTask.CanCancel)
-        self.exception = None
         self.controller = controller
         self.go2epa = go2epa
+        self.exception = None
         self.error_msg = None
         self.message = None
         self.common_msg = ""
+        self.function_failed = False
+        self.complet_result = None
         self.file_rpt = None
         self.fid = 140
         self.set_variables_from_go2epa()
@@ -52,6 +54,14 @@ class TaskGo2Epa(QgsTask):
 
 
     def run(self):
+
+        # Initialize instance variables
+        self.exception = None
+        self.error_msg = None
+        self.message = None
+        self.common_msg = ""
+        self.function_failed = False
+        self.complet_result = None
 
         self.controller.show_db_exception = False
         status = True
@@ -103,6 +113,9 @@ class TaskGo2Epa(QgsTask):
             self.go2epa.check_result_id()
             return
 
+        if self.function_failed:
+            self.controller.manage_exception_api(self.complet_result)
+
         if self.error_msg:
             title = f"Task aborted - {self.description()}"
             self.controller.show_info_box(self.error_msg, title=title)
@@ -146,18 +159,20 @@ class TaskGo2Epa(QgsTask):
 
     def exec_function_pg2epa(self):
 
-        self.complet_result = None
         self.setProgress(0)
         extras = f'"resultId":"{self.result_name}"'
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         body = self.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_pg2epa_main', body, log_sql=True)
-        if json_result is None:
+        self.complet_result = json_result
+        if json_result is None or not json_result:
+            self.function_failed = True
             return False
 
-        self.complet_result = json_result
-        if not self.complet_result:
+        if 'status' in json_result and json_result['status'] == 'Failed':
+            self.controller.log_warning(json_result)
+            self.function_failed = True
             return False
 
         return True

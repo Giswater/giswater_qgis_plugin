@@ -1748,9 +1748,12 @@ class DaoController(object):
             msg += f"SQL:\n {sql}\n\n"
         msg += f"Schema name: {self.schema_name}"
 
-        # Show exception message in dialog and log it
-        self.show_exceptions_msg(title, msg)
+        # Log exception message
         self.log_warning(msg)
+
+        # Show exception message only if we are not in a task process
+        if self.controller.show_db_exception:
+            self.show_exceptions_msg(title, msg)
 
 
     def manage_exception_db(self, exception=None, sql=None, stack_level=2, stack_level_increase=0, filepath=None):
@@ -1840,7 +1843,8 @@ class DaoController(object):
                     msg = "Key on returned json from ddbb is missed"
                 if is_notify is True:
                     self.log_info(msg, parameter=parameter, level=level)
-                else:
+                elif not is_notify and self.show_db_exception:
+                    # Show exception message only if we are not in a task process
                     self.show_message(msg, level, parameter=parameter)
 
             else:
@@ -1866,9 +1870,10 @@ class DaoController(object):
                 if sql:
                     msg += f"SQL: {sql}"
 
-                # Show exception message in dialog and log it
-                self.show_exceptions_msg(title, msg)
                 self.log_warning(msg, stack_level_increase=2)
+                # Show exception message only if we are not in a task process
+                if self.show_db_exception:
+                    self.show_exceptions_msg(title, msg)
 
         except Exception:
             self.manage_exception("Unhandled Error")
@@ -1886,6 +1891,7 @@ class DaoController(object):
         utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.set_text_bold(self.dlg_info.txt_infolog)
+
         # Show dialog only if we are not in a task process
         if self.show_db_exception:
             self.show_dlg_info()
