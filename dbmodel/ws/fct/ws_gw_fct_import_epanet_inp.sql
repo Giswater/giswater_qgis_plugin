@@ -27,34 +27,18 @@ DECLARE
 rpt_rec record;
 v_epsg integer;
 v_point_geom public.geometry;
-v_value text;
-v_config_fields record;
-v_query_text text;
-v_table_pkey text;
-v_column_type text;
-v_pkey_column_type text;
-v_pkey_value text;
 v_mantablename text;
 v_epatablename text;
-v_fields record;
-v_target text;
 v_count integer=0;
 v_projecttype varchar;
-v_xcoord numeric;
-v_ycoord numeric;
 geom_array public.geometry array;
 geom_array_vertex public.geometry array;
 v_data record;
-id_last text;
-v_typevalue text;
 v_extend_val public.geometry;
 v_rec_table record;
 v_query_fields text;
-v_num_column integer;
 v_rec_view record;
 v_sql text;
-v_split text;
-v_newproject boolean=TRUE;
 v_fid integer = 239;
 v_thegeom public.geometry;
 v_node_id text;
@@ -67,7 +51,6 @@ v_querytext text;
 v_nodecat text;
 i integer=1;
 v_arc_id text;
-v_rules_aux text;
 v_curvetype text;
 v_result json;
 v_result_info json;
@@ -383,8 +366,6 @@ BEGIN
 		END LOOP;
 		
 		--inserting values on editable view
-
-		raise notice 'v_query_fields %,%', v_query_fields,v_rec_table.fields;
 		
 		v_sql = 'INSERT INTO '||v_rec_table.tablename||' SELECT '||v_query_fields||' FROM temp_csv where source='||quote_literal(v_rec_table.target)||'
 		AND fid = '||v_fid||'  AND (csv1 NOT LIKE ''[%'' AND csv1 NOT LIKE '';%'') AND cur_user='||quote_literal(current_user)||' ORDER BY id';
