@@ -78,6 +78,7 @@ v_infotype text;
 v_insert_fields json;
 field json;
 query_text text;
+v_qgis_project_type text;
 
 BEGIN 
 
@@ -95,14 +96,16 @@ BEGIN
 	v_osversion := (p_data ->> 'data')::json->> 'osVersion';
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 	v_mainschema := (p_data ->> 'data')::json->> 'mainSchema';
-	v_projectrole := (p_data ->> 'data')::json->> 'projecRole';
+	v_projectrole := (p_data ->> 'data')::json->> 'projectRole';
 	v_infotype := (p_data ->> 'data')::json->> 'infoType';
     v_insert_fields := (p_data ->> 'data')::json->> 'fields';
+	v_qgis_project_type := (p_data ->> 'data')::json->> 'projectType';
 
 	-- profilactic control of qgis variables
 	IF lower(v_mainschema) = 'none' OR v_mainschema = '' OR lower(v_mainschema) ='null' THEN v_mainschema = null; END IF;
 	IF lower(v_projectrole) = 'none' OR v_projectrole = '' OR lower(v_projectrole) ='null' THEN v_projectrole = null; END IF;
 	IF lower(v_infotype) = 'none' OR v_infotype = '' OR lower(v_infotype) ='null' THEN v_infotype = null; END IF;
+	IF lower(v_qgis_project_type) = 'none' OR v_qgis_project_type = '' OR lower(v_qgis_project_type) ='null' THEN v_qgis_project_type = null; END IF;
 
 	-- profilactic control of schema name
 	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null'
@@ -177,8 +180,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('PostGIS versión: ',(SELECT postgis_version())));
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS versión: ', v_qgisversion));
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('O/S versión: ', v_osversion));
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS variables:  gwAddSchema:',quote_nullable(v_addschema),
-		',  gwMainSchema:',quote_nullable(v_mainschema),',  gwProjectRole:', quote_nullable(v_projectrole), ',  gwInfoType:',quote_nullable(v_infotype)));
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS variables: gwProjectType:',quote_nullable(v_qgis_project_type),', gwInfoType:',quote_nullable(v_infotype),', gwProjectRole:',quote_nullable(v_projectrole),', gwMainSchema:',quote_nullable(v_mainschema),', gwAddSchema:',quote_nullable(v_addschema)));
 		
 	
 	-- Reset urn sequence
