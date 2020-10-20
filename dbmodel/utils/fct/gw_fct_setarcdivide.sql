@@ -561,20 +561,19 @@ BEGIN
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1,'Reconnect disconnected nodes on this alternative');
-						
-						-- reconnect nodes (update arc_id of disconnected nodes linked to old arc)
-						FOR rec_node IN SELECT node_id, the_geom FROM v_edit_node WHERE arc_id=v_arc_id AND state = 2
-						LOOP					
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (212, 1, concat('Update arc_id on disconnected node: ',rec_node.node_id));
-							
-							UPDATE node SET arc_id=(SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(rec_node.the_geom, 
-							v_edit_arc.the_geom,0.001) AND arc_id != v_arc_id LIMIT 1) 
-							WHERE node_id=rec_node.node_id;
 
-							INSERT INTO audit_check_data (fid,  criticity, error_message)
-							VALUES (212, 1,concat('Update arc_id for disconnected node: ',rec_node.node_id,'.'));
-						END LOOP;
+						IF v_project_type='WS' THEN
+							-- reconnect nodes (update arc_id of disconnected nodes linked to old arc)
+							FOR rec_node IN SELECT node_id, the_geom FROM v_edit_node WHERE arc_id=v_arc_id AND state = 2
+							LOOP												
+								UPDATE node SET arc_id=(SELECT arc_id FROM v_edit_arc WHERE ST_DWithin(rec_node.the_geom, 
+								v_edit_arc.the_geom,0.001) AND arc_id != v_arc_id LIMIT 1) 
+								WHERE node_id=rec_node.node_id;
+
+								INSERT INTO audit_check_data (fid,  criticity, error_message)
+								VALUES (212, 1,concat('Update arc_id for disconnected node: ',rec_node.node_id,'.'));
+							END LOOP;
+						END IF;
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1,'Update psector''s arc_id value for connec and gully setting null value to force trigger to get new arc_id as closest as possible');		
