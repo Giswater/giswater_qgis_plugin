@@ -193,8 +193,9 @@ class ApiParent(ParentAction):
         return False
 
 
-    def check_actions(self, action, enabled):
-
+    def check_actions(self, action, enabled, dialog=None):
+        if type(action) is str and dialog is not None:
+            action = dialog.findChild(QAction, action)
         try:
             action.setChecked(enabled)
         except RuntimeError:
