@@ -108,7 +108,7 @@ BEGIN
    
 	-- notify to qgis in order to reindex geometries for snapping
 	v_channel := replace (current_user::text,'.','_');
-	PERFORM pg_notify (v_channel, '{"functionAction":{"functions":[{"name":"set_layer_index","parameters":{"tableName":"v_edit_link"}}],"user":"'
+	PERFORM pg_notify (v_channel, '{"functionAction":{"functions":[{"name":"set_layer_index","parameters":{"tableName":"v_edit_link"}}, {"name":"refresh_canvas","parameters":{"tableName":"v_edit_connec"}}],"user":"'
 	||current_user||'","schema":"'||v_schemaname||'"}}');
 
 	RETURN NEW;
