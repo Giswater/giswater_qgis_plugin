@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3006
 
-CREATE OR REPLACE FUNCTION ws_sample35.gw_fct_setmapzonestrigger(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setmapzonestrigger(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -14,7 +14,7 @@ $BODY$
 
 	
 -- MAPZONES
-SELECT ws_sample35.gw_fct_setmapzonestrigger($${
+SELECT SCHEMA_NAME.gw_fct_setmapzonestrigger($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"node", "tableName":"ve_node_shutoff_valve", "id":"1110"},"data":{"fields":{"closed":"TRUE"}}}$$)
@@ -46,7 +46,7 @@ v_oppositenode text;
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "ws_sample35", public;
+	SET search_path = "SCHEMA_NAME", public;
 	
 	-- get project type
     SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version LIMIT 1;
