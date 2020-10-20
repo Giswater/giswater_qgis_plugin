@@ -89,7 +89,8 @@ BEGIN
 		IF v_table_name = 'connec' THEN
 			UPDATE plan_psector_x_connec SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
 			IF (SELECT exit_type FROM link WHERE feature_id = NEW.connec_id AND feature_type ='CONNEC') ='NODE' AND v_projecttype ='WS' THEN -- this is because enable the export to inp model using pjoint
-				RAISE EXCEPTION 'Error: It is not possible to add this connec to psector because it is related to node. Hint: First move endpoint of link more than 0.01 mts. to relate it to parent arc';
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3154", "function":"2938","debug_msg":"'||NEW.connec_id::text||'"}}$$);';
 			END IF;
 
 		ELSIF v_table_name = 'gully' THEN

@@ -137,3 +137,12 @@ VALUES (3148, 'Backup name already exists', 'Try with other name or delete the e
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
 VALUES (3150, 'Backup has no data related to table', 'Please check it before continue', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING ;
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
+VALUES (3152, 'Null values on geom1 or geom2 fields on element catalog', 'Please check it before continue', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING ;
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
+VALUES (3154, 'It is not possible to add this connec to psector because it is related to node', 'Move endpoint of link closer than 0.01m to relate it to parent arc', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING ;
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
+VALUES (3156, 'Input parameter has null value', 'Please check it before continue', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING ;

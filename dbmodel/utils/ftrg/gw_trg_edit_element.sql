@@ -163,8 +163,8 @@ BEGIN
 
 			IF v_length*v_width IS NULL THEN
 			
-				RAISE EXCEPTION 'Null values on geom1 or geom2 fields. Check your catalog before continue';
-				
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3152", "function":"1114","debug_msg":"'||NEW.elementcat_id::text||'"}}$$);';
 			ELSIF v_length*v_width != 0 THEN
  
 				-- get element dimensions
@@ -244,8 +244,8 @@ BEGIN
 			v_width = (SELECT geom2 FROM cat_element WHERE id=NEW.elementcat_id);
 
 			IF v_length*v_width IS NULL THEN
-					RAISE EXCEPTION 'Null values on geom1 or geom2 fields. Check your catalog before continue';
-				
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3152", "function":"1114","debug_msg":"'||NEW.elementcat_id::text||'"}}$$);';
 			ELSIF v_length*v_width != 0 THEN
 
 				-- get grate dimensions
