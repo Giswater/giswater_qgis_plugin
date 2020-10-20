@@ -1196,7 +1196,7 @@ class ApiCF(ApiParent, QObject):
 
             feature = f'"id":"{new_feature.attribute(id_name)}", '
             extras = '"addSchema":""'
-            feature = f'{feature} "tableName":"{p_table_id}""'
+            feature = f'{feature} "tableName":"{p_table_id}"'
             body = self.create_body(feature=feature, extras=extras)
             function_name = 'gw_fct_getinfofromid'
             json_result = self.controller.get_json(function_name, body)
