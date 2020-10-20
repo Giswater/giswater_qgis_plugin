@@ -74,6 +74,8 @@ class CheckProjectResult(ApiParent):
         main_schema = self.controller.plugin_settings_value('gwMainSchema')
         project_role = self.controller.plugin_settings_value('gwProjecRole')
         info_type = self.controller.plugin_settings_value('gwInfoType')
+        project_type = self.controller.plugin_settings_value('gwProjectType')
+
 
         version = self.get_plugin_version()
         extras = f'"version":"{version}"'
@@ -83,6 +85,7 @@ class CheckProjectResult(ApiParent):
         extras += f', "mainSchema":"{main_schema}"'
         extras += f', "projecRole":"{project_role}"'
         extras += f', "infoType":"{info_type}"'
+        extras += f', "projectType":"{project_type}"'
         extras += f', "qgisVersion":"{Qgis.QGIS_VERSION}"'
         extras += f', "osVersion":"{platform.system()} {platform.release()}"'
         body = self.create_body(extras=extras)

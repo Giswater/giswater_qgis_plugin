@@ -1469,10 +1469,12 @@ class Giswater(QObject):
         """ Manage qgis project variables """
 
         self.qgis_project_infotype = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwInfoType')
+        self.qgis_project_projecttype = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwProjectType')
         self.qgis_project_add_schema = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwAddSchema')
         self.qgis_project_main_schema = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwMainSchema')
         self.qgis_project_role = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwProjectRole')
         self.controller.plugin_settings_set_value("gwInfoType", self.qgis_project_infotype)
+        self.controller.plugin_settings_set_value("gwProjectType", self.qgis_project_projecttype)
         self.controller.plugin_settings_set_value("gwAddSchema", self.qgis_project_add_schema)
         self.controller.plugin_settings_set_value("gwMainSchema", self.qgis_project_main_schema)
         self.controller.plugin_settings_set_value("gwProjectRole", self.qgis_project_role)
