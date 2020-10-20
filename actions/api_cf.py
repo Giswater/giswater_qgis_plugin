@@ -1204,7 +1204,8 @@ class ApiCF(ApiParent, QObject):
         # If we make an info
         else:
             my_json = json.dumps(_json)
-            feature = f'"id":"{self.feature_id}" '
+            feature = f'"id":"{self.feature_id}", '
+            feature += f'"tableName":"{p_table_id}" '
 
         feature += f', "featureType":"{self.feature_type}"'
         extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
