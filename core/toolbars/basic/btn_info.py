@@ -33,6 +33,7 @@ class GwInfoButton(GwParentMapTool):
         self.tab_type = None
         # Used when the signal 'signal_activate' is emitted from the info, do not open another form
         self.block_signal = False
+        self.previous_api_cf = None
 
 
 
@@ -80,7 +81,14 @@ class GwInfoButton(GwParentMapTool):
             point = self.create_point(event)
             if point is False:
                 return
-            self.api_cf.get_info_from_coordinates(point, tab_type=self.tab_type)
+
+            api_cf = GwInfo(self.tab_type)
+            api_cf.signal_activate.connect(self.reactivate_map_tool)
+            api_cf.get_info_from_coordinates(point, tab_type=self.tab_type)
+            # Remove previous rubberband when open new docker
+            if isinstance(self.previous_api_cf, GwInfo) and self.controller.dlg_docker is not None:
+                self.previous_api_cf.resetRubberbands()
+            self.previous_api_cf = api_cf
 
         elif event.button() == Qt.RightButton:
             point = self.create_point(event)
@@ -91,7 +99,6 @@ class GwInfoButton(GwParentMapTool):
 
     def reactivate_map_tool(self):
         """ Reactivate tool """
-
         self.block_signal = True
         info_action = self.iface.mainWindow().findChild(QAction, 'map_tool_api_info_data')
         info_action.trigger()
@@ -106,14 +113,7 @@ class GwInfoButton(GwParentMapTool):
         self.cursor.setShape(Qt.WhatsThisCursor)
         self.canvas.setCursor(self.cursor)
         self.rubberband_list = []
-        # if self.index_action == '37':
         self.tab_type = 'data'
-        # elif self.index_action == '199':
-        # 	self.tab_type = 'inp'
-
-        self.api_cf = GwInfo(self.tab_type)
-
-        self.api_cf.signal_activate.connect(self.reactivate_map_tool)
 
 
     def deactivate(self):
@@ -142,7 +142,7 @@ class GwInfoButton(GwParentMapTool):
         extras += f'"zoomScale":{scale_zoom} '
         body = create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_getlayersfromcoordinates', body, rubber_band=self.rubber_band)
-        if not json_result  or json_result['status'] == 'Failed':
+        if not json_result or json_result['status'] == 'Failed':
             return False
 
         # hide QMenu identify if no feature under mouse

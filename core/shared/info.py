@@ -22,6 +22,7 @@ import sys
 import webbrowser
 from collections import OrderedDict
 from functools import partial
+from sip import isdeleted
 
 from ... import global_vars
 from .catalog import GwCatalog
@@ -68,6 +69,7 @@ class GwInfo(QObject):
         self.new_feature_id = None
         self.layer_new_feature = None
         self.tab_type = tab_type
+        self.connected = False
         self.rubber_band = QgsRubberBand(self.canvas, 0)
 
 
@@ -178,7 +180,7 @@ class GwInfo(QObject):
         if function_name is None:
             return False, None
 
-        json_result = self.controller.get_json(function_name, body, rubber_band=self.rubber_band)
+        json_result = self.controller.get_json(function_name, body, rubber_band=self.rubber_band, log_sql=True)
         if json_result is None:
             return False, None
 
@@ -238,7 +240,7 @@ class GwInfo(QObject):
                 else:
                     sub_tag = 'node'
             feature_id = self.complet_result[0]['body']['feature']['id']
-            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker)
+            result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker, new_feature=new_feature)
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
@@ -319,7 +321,7 @@ class GwInfo(QObject):
         return result, self.hydro_info_dlg
 
 
-    def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True):
+    def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None):
 
         # Dialog
         self.dlg_cf = InfoFeatureUi(sub_tag)
@@ -338,7 +340,7 @@ class GwInfo(QObject):
 
         # Get widget controls
         self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
-        self.tab_main.currentChanged.connect(self.tab_activation)
+        self.tab_main.currentChanged.connect(partial(self.tab_activation, self.dlg_cf, new_feature))
         self.tbl_element = self.dlg_cf.findChild(QTableView, "tbl_element")
         set_qtv_config(self.tbl_element)
         self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
@@ -405,7 +407,7 @@ class GwInfo(QObject):
             self.enable_action(self.dlg_cf, "actionZoom", False)
             self.enable_action(self.dlg_cf, "actionZoomOut", False)
             self.enable_action(self.dlg_cf, "actionCentered", False)
-        self.show_actions('tab_data')
+        self.show_actions(self.dlg_cf, 'tab_data')
 
         try:
             action_edit.setEnabled(self.complet_result[0]['body']['feature']['permissions']['isEditable'])
@@ -466,7 +468,7 @@ class GwInfo(QObject):
         for field in complet_result[0]['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
-            label, widget = self.set_widgets(self.dlg_cf, complet_result, field)
+            label, widget = self.set_widgets(self.dlg_cf, complet_result, field, new_feature)
             if widget is None:
                 continue
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
@@ -499,30 +501,29 @@ class GwInfo(QObject):
 
         # Set variables
         self.filter = str(complet_result[0]['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
-
-        if self.layer:
-            if self.layer.isEditable():
-                enable_all(self.dlg_cf, result)
+        dlg_cf = self.dlg_cf
+        layer = self.layer
+        fid = self.feature_id
+        my_json = self.my_json
+        if layer:
+            if layer.isEditable():
+                enable_all(dlg_cf, self.complet_result[0]['body']['data'])
             else:
-                disable_all(self.dlg_cf, result, False)
-                self.new_feature_id = None
+                disable_all(dlg_cf, self.complet_result[0]['body']['data'], False)
 
-        if action_edit.isEnabled():
-            # SIGNALS
-            self.layer.editingStarted.connect(partial(check_actions, action_edit, True))
-            self.layer.editingStopped.connect(partial(check_actions, action_edit, False))
-            self.layer.editingStarted.connect(partial(enable_all, self.dlg_cf, result))
-            self.layer.editingStopped.connect(partial(disable_all, self.dlg_cf, result, False))
-            self.layer.editingStopped.connect(lambda: setattr(self, 'new_feature_id', None))
 
-            # Actions
-            self.enable_actions(self.dlg_cf, self.layer.isEditable())
-            self.layer.editingStarted.connect(partial(self.enable_actions, self.dlg_cf, True))
-            self.layer.editingStopped.connect(partial(self.enable_actions, self.dlg_cf, False))
-            self.layer.editingStopped.connect(self.get_last_value)
+        # We assign the function to a global variable,
+        # since as it receives parameters we will not be able to disconnect the signals
+        self.fct_block_action_edit = lambda: self.block_action_edit(dlg_cf, action_edit, result, layer, fid, my_json, new_feature)
+        self.fct_start_editing = lambda: self.start_editing(dlg_cf, action_edit, complet_result[0]['body']['data'], layer)
+        self.fct_stop_editing = lambda: self.stop_editing(dlg_cf, action_edit, layer, fid, self.my_json, new_feature)
+        self.connect_signals()
 
-        action_edit.setChecked(self.layer.isEditable())
-        action_edit.triggered.connect(partial(self.start_editing, self.layer))
+        self.enable_actions(dlg_cf, layer.isEditable())
+
+        action_edit.setChecked(layer.isEditable())
+        # Actions signals
+        action_edit.triggered.connect(partial(self.manage_edition, dlg_cf, action_edit, fid, new_feature))
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
         action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_arc_id, 'arc', 'data_arc_id'))
@@ -549,23 +550,19 @@ class GwInfo(QObject):
                 last_info.setParent(None)
                 del last_info
 
-            self.controller.dock_dialog(self.dlg_cf)
-            self.controller.dlg_docker.dlg_closed.connect(partial(self.manage_docker_close))
+            self.controller.dock_dialog(dlg_cf)
+            self.controller.dlg_docker.dlg_closed.connect(self.manage_docker_close)
             self.controller.dlg_docker.setWindowTitle(title)
-            btn_accept.setVisible(False)
-            btn_cancel.setVisible(False)
+            btn_cancel.clicked.connect(self.manage_docker_close)
 
         else:
-            btn_cancel.clicked.connect(partial(close_dialog, self.dlg_cf))
-            btn_cancel.clicked.connect(self.roll_back)
-            btn_accept.clicked.connect(partial(
-                self.accept, self.dlg_cf, self.complet_result[0], self.my_json))
-            self.dlg_cf.dlg_closed.connect(self.roll_back)
-            self.dlg_cf.dlg_closed.connect(self.rubber_band.reset)
-            self.dlg_cf.dlg_closed.connect(partial(save_settings, self.dlg_cf))
-            self.dlg_cf.dlg_closed.connect(partial(self.set_vdefault_edition))
-            self.dlg_cf.key_pressed.connect(partial(close_dialog, self.dlg_cf))
-        self.dlg_cf.dlg_closed.connect(self.disconect_signals)
+            dlg_cf.dlg_closed.connect(self.roll_back)
+            dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
+            dlg_cf.dlg_closed.connect(partial(save_settings, dlg_cf))
+            dlg_cf.key_pressed.connect(partial(close_dialog, dlg_cf))
+            btn_cancel.clicked.connect(partial(self.manage_info_close, dlg_cf))
+        btn_accept.clicked.connect(partial(self.accept_from_btn, dlg_cf, action_edit, new_feature, self.my_json))
+
         # Set title
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
         row = self.controller.get_config('admin_customform_param', 'value', 'config_param_system')
@@ -581,11 +578,44 @@ class GwInfo(QObject):
         return self.complet_result, self.dlg_cf
 
 
-    def disconect_signals(self):
+    def block_action_edit(self, dialog, action_edit, result, layer, fid, my_json, new_feature):
+
+        if self.new_feature_id is not None:
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(True)
+            save = self.stop_editing(dialog, action_edit, result, fid, my_json, new_feature)
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(False)
+            if save and not self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
+                self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
+
+        if self.connected is False:
+            self.connect_signals()
+
+
+    def connect_signals(self):
+        if not self.connected:
+            self.layer.editingStarted.connect(self.fct_start_editing)
+            self.layer.editingStopped.connect(self.fct_stop_editing)
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').toggled.connect(self.fct_block_action_edit)
+            self.connected = True
+
+
+    def disconnect_signals(self):
         try:
-            self.layer.editingStopped.disconnect(self.get_last_value)
-        except:
+            self.layer.editingStarted.disconnect(self.fct_start_editing)
+        except Exception as e:
             pass
+
+        try:
+            self.layer.editingStopped.disconnect(self.fct_stop_editing)
+        except Exception as e:
+            pass
+
+        try:
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').toggled.disconnect(self.fct_block_action_edit)
+        except Exception as e:
+            pass
+        self.connected = False
+        self.controller.is_inserting = False
 
 
     def activate_snapping(self, complet_result, ep):
@@ -761,8 +791,6 @@ class GwInfo(QObject):
 
 
     def action_rotation_canvas_clicked(self, dialog, emit_point, point, btn):
-
-        print(point)
 
         if btn == Qt.RightButton:
             global_vars.canvas.setMapTool(self.previous_map_tool)
@@ -972,7 +1000,15 @@ class GwInfo(QObject):
 
         self.roll_back()
         self.rubber_band.reset()
-        self.set_vdefault_edition()
+        self.controller.close_docker()
+
+
+    def manage_info_close(self, dialog):
+
+        self.roll_back()
+        self.rubber_band.reset()
+        save_settings(dialog)
+        close_dialog(dialog)
 
 
     def get_feature(self, tab_type):
@@ -1015,44 +1051,115 @@ class GwInfo(QObject):
         return self.feature
 
 
-    def set_vdefault_edition(self):
-
-        if 'toggledition' in self.complet_result[0]['body']:
-            force_open = self.complet_result[0]['body']['toggledition']
-            if not force_open and self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
-                self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
-
-
     def get_last_value(self):
+
         try:
+            # Widgets in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2')
+            other_widgets = []
+            for field in self.complet_result[0]['body']['data']['fields']:
+                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                    widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
+                    if widget:
+                        other_widgets.append(widget)
+            # Widgets in tab_data
             widgets = self.dlg_cf.tab_data.findChildren(QWidget)
+            widgets.extend(other_widgets)
             for widget in widgets:
                 if widget.hasFocus():
                     value = getWidgetText(self.dlg_cf, widget)
                     if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
                         self.my_json[str(widget.property('columnname'))] = str(value)
-        except RuntimeError as e:
+                    widget.clearFocus()
+        except RuntimeError:
             pass
 
 
-    def start_editing(self, layer):
-        """ start or stop the edition based on your current status """
+    def manage_edition(self, dialog, action_edit, fid, new_feature=None):
+        # With the editing QAction we need to collect the last modified value (self.get_last_value()),
+        # since the "editingFinished" signals of the widgets are not detected.
+        # Therefore whenever the cursor enters a widget, it will ask if we want to save changes
+        if not action_edit.isChecked():
+            self.get_last_value()
+            if str(self.my_json) == '{}':
+                check_actions(action_edit, False)
+                disable_all(dialog, self.complet_result[0]['body']['data'], False)
+                self.enable_actions(dialog, False)
+                return
+            save = self.ask_for_save(action_edit, fid)
+            if save:
+                self.manage_accept(dialog, action_edit, new_feature, self.my_json, False)
+                self.my_json = {}
+            elif self.new_feature_id is not None:
+                if self.controller.dlg_docker and self.controller.show_docker:
+                    self.manage_docker_close()
+                else:
+                    close_dialog(dialog)
+        else:
+            check_actions(action_edit, True)
+            enable_all(dialog, self.complet_result[0]['body']['data'])
+            self.enable_actions(dialog, True)
 
-        self.iface.setActiveLayer(layer)
-        self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
-        action_is_checked = not self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked()
 
-        # If the json is empty, we simply activate/deactivate the editing
-        # else if editing is active, deactivate edition and save changes
-        if self.my_json == '' or str(self.my_json) == '{}':
+    def accept_from_btn(self, dialog, action_edit, new_feature, my_json):
+
+        if not action_edit.isChecked():
+            close_dialog(dialog)
             return
-        elif action_is_checked:
-            self.accept(self.dlg_cf, self.complet_result[0], self.my_json, close_dlg=False)
+
+        self.manage_accept(dialog, action_edit, new_feature, my_json, True)
+
+
+    def manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg):
+        self.get_last_value()
+        status = self.accept(dialog, self.complet_result[0], my_json, close_dlg=close_dlg, new_feature=new_feature)
+        if status is True:  # Commit succesfull and dialog keep opened
+            check_actions(action_edit, False)
+            disable_all(dialog, self.complet_result[0]['body']['data'], False)
+            self.enable_actions(dialog, False)
+
+
+    def stop_editing(self, dialog, action_edit, layer, fid, my_json, new_feature=None):
+        if my_json == '' or str(my_json) == '{}':
+            self.disconnect_signals()
+            # Use commitChanges just for closse edition
+            layer.commitChanges()
+            self.connect_signals()
+            check_actions(action_edit, False)
+            disable_all(dialog, self.complet_result[0]['body']['data'], False)
+            self.enable_actions(dialog, False)
+            self.connect_signals()
+        else:
+            save = self.ask_for_save(action_edit, fid)
+            if save:
+                self.manage_accept(dialog, action_edit, new_feature, my_json, False)
+
+            return save
+
+
+    def start_editing(self, dialog, action_edit, result, layer):
+        self.disconnect_signals()
+        self.iface.setActiveLayer(layer)
+        check_actions(action_edit, True)
+        enable_all(dialog, self.complet_result[0]['body']['data'])
+        self.enable_actions(dialog, True)
+        layer.startEditing()
+        self.connect_signals()
+
+
+    def ask_for_save(self, action_edit, fid):
+
+        msg = 'Are you sure to save this feature?'
+        answer = self.controller.ask_question(msg, "Save feature", None, parameter=fid)
+        if not answer:
+            check_actions(action_edit, True)
+            return False
+        return True
 
 
     def roll_back(self):
         """ Discard changes in current layer """
 
+        self.disconnect_signals()
         try:
             self.iface.actionRollbackEdits().trigger()
         except TypeError:
@@ -1069,7 +1176,7 @@ class GwInfo(QObject):
             pass
 
 
-    def set_widgets(self, dialog, complet_result, field):
+    def set_widgets(self, dialog, complet_result, field, new_feature):
         """
         functions called in -> widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field):
             def manage_text(self, dialog, complet_result, field)
@@ -1107,7 +1214,7 @@ class GwInfo(QObject):
             return label, widget
 
         try:
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field, new_feature)
         except Exception as e:
             msg = f"{type(e).__name__}: {e}"
             self.controller.show_message(msg, 2)
@@ -1116,7 +1223,7 @@ class GwInfo(QObject):
         return label, widget
 
 
-    def manage_text(self, dialog, complet_result, field):
+    def manage_text(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
@@ -1125,7 +1232,7 @@ class GwInfo(QObject):
         widget = set_widget_size(widget, field)
         widget = self.set_min_max_values(widget, field)
         widget = self.set_reg_exp(widget, field)
-        widget = self.set_auto_update_lineedit(field, dialog, widget)
+        widget = self.set_auto_update_lineedit(field, dialog, widget, new_feature)
         widget = set_data_type(field, widget)
         widget = self.set_max_length(widget, field)
 
@@ -1168,37 +1275,37 @@ class GwInfo(QObject):
         return widget
 
 
-    def manage_typeahead(self, dialog, complet_result, field):
+    def manage_typeahead(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
         completer = QCompleter()
-        widget = self.manage_text(dialog, complet_result, field)
+        widget = self.manage_text(dialog, complet_result, field, new_feature)
         widget = manage_lineedit(field, dialog, widget, completer)
         return widget
 
 
-    def manage_combo(self, dialog, complet_result, field):
+    def manage_combo(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
         widget = add_combobox(field)
         widget = set_widget_size(widget, field)
-        widget = self.set_auto_update_combobox(field, dialog, widget)
+        widget = self.set_auto_update_combobox(field, dialog, widget, new_feature)
         return widget
 
 
-    def manage_check(self, dialog, complet_result, field):
+    def manage_check(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
         widget = add_checkbox(field)
-        widget.stateChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
-        widget = self.set_auto_update_checkbox(field, dialog, widget)
+        widget.stateChanged.connect(partial(get_values, dialog, widget, self.my_json))
+        widget = self.set_auto_update_checkbox(field, dialog, widget, new_feature)
         return widget
 
 
-    def manage_datetime(self, dialog, complet_result, field):
+    def manage_datetime(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
@@ -1206,11 +1313,11 @@ class GwInfo(QObject):
                               new_feature_id=self.new_feature_id, new_feature=self.new_feature,
                               layer_new_feature=self.layer_new_feature,
                               feature_id=self.feature_id, feature_type=self.feature_type, layer=self.layer)
-        widget = self.set_auto_update_dateedit(field, dialog, widget)
+        widget = self.set_auto_update_dateedit(field, dialog, widget, new_feature)
         return widget
 
 
-    def manage_button(self, dialog, complet_result, field):
+    def manage_button(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
@@ -1219,7 +1326,7 @@ class GwInfo(QObject):
         return widget
 
 
-    def manage_hyperlink(self, dialog, complet_result, field):
+    def manage_hyperlink(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
@@ -1228,7 +1335,7 @@ class GwInfo(QObject):
         return widget
 
 
-    def manage_hspacer(self, dialog, complet_result, field):
+    def manage_hspacer(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
@@ -1236,7 +1343,7 @@ class GwInfo(QObject):
         return widget
 
 
-    def manage_vspacer(self, dialog, complet_result, field):
+    def manage_vspacer(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
@@ -1244,34 +1351,34 @@ class GwInfo(QObject):
         return widget
 
 
-    def manage_textarea(self, dialog, complet_result, field):
+    def manage_textarea(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
 
         widget = add_textarea(field)
-        widget = self.set_auto_update_textarea(field, dialog, widget)
+        widget = self.set_auto_update_textarea(field, dialog, widget, new_feature)
         return widget
 
 
-    def manage_spinbox(self, dialog, complet_result, field):
+    def manage_spinbox(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
         widget = add_spinbox(field)
-        widget = self.set_auto_update_spinbox(field, dialog, widget)
+        widget = self.set_auto_update_spinbox(field, dialog, widget, new_feature)
         return widget
 
 
-    def manage_doubleSpinbox(self, dialog, complet_result, field):
+    def manage_doubleSpinbox(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.manage_spinbox(dialog, complet_result, field)
+        widget = self.manage_spinbox(dialog, complet_result, field, new_feature)
         return widget
 
 
-    def manage_tableView(self, dialog, complet_result, field):
+    def manage_tableView(self, dialog, complet_result, field, new_feature):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
@@ -1312,7 +1419,7 @@ class GwInfo(QObject):
         open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
 
 
-    def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True):
+    def accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None):
         """
         :param dialog:
         :param complet_result:
@@ -1322,13 +1429,20 @@ class GwInfo(QObject):
         :param close_dlg:
         :return:
         """
+        self.disconnect_signals()
+
+        # Check if C++ object has been deleted
+        if isdeleted(dialog):
+            return False
+
         after_insert = False
+
         if _json == '' or str(_json) == '{}':
             if self.controller.dlg_docker:
                 self.controller.dlg_docker.setMinimumWidth(dialog.width())
                 self.controller.close_docker()
             close_dialog(dialog)
-            return
+            return None
 
         p_table_id = complet_result['body']['feature']['tableName']
         id_name = complet_result['body']['feature']['idName']
@@ -1342,9 +1456,9 @@ class GwInfo(QObject):
 
             if field['ismandatory']:
                 widget_name = 'data_' + field['columnname']
-                widget = self.dlg_cf.findChild(QWidget, widget_name)
+                widget = dialog.findChild(QWidget, widget_name)
                 widget.setStyleSheet(None)
-                value = getWidgetText(self.dlg_cf, widget)
+                value = getWidgetText(dialog, widget)
                 if value in ('null', None, ''):
                     widget.setStyleSheet("border: 1px solid red")
                     list_mandatory.append(widget_name)
@@ -1352,32 +1466,41 @@ class GwInfo(QObject):
         if list_mandatory:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             self.controller.show_warning(msg)
-            return
+            self.connect_signals()
+            return False
 
         # If we create a new feature
         if self.new_feature_id is not None:
             after_insert = True
             for k, v in list(_json.items()):
                 if k in parent_fields:
-                    self.new_feature.setAttribute(k, v)
+                    new_feature.setAttribute(k, v)
                     _json.pop(k, None)
-            self.layer_new_feature.updateFeature(self.new_feature)
+
+            if not self.layer_new_feature.isEditable():
+                self.layer_new_feature.startEditing()
+            self.layer_new_feature.updateFeature(new_feature)
 
             status = self.layer_new_feature.commitChanges()
             if status is False:
-                return
+                error = self.layer_new_feature.commitErrors()
+                self.controller.log_warning(f"{error}")
+                self.connect_signals()
+                return False
             
             self.new_feature_id = None
             self.enable_action(dialog, "actionZoom", True)
             self.enable_action(dialog, "actionZoomOut", True)
             self.enable_action(dialog, "actionCentered", True)
+            self.controller.is_inserting = False
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
-                if self.controller.dlg_docker:
-                    self.controller.dlg_docker.setMinimumWidth(dialog.width())
-                    self.controller.close_docker()
-                close_dialog(dialog)
-                return
+                if close_dlg:
+                    if self.controller.dlg_docker:
+                        self.controller.close_docker()
+                    close_dialog(dialog)
+                return True
+
             if self.new_feature.attribute(id_name) is not None:
                 feature = f'"id":"{self.new_feature.attribute(id_name)}", '
             else:
@@ -1394,7 +1517,8 @@ class GwInfo(QObject):
         body = create_body(feature=feature, extras=extras)
         json_result = self.controller.get_json('gw_fct_setfields', body)
         if not json_result:
-            return
+            self.connect_signals()
+            return False
 
         if clear_json:
             _json = {}
@@ -1405,13 +1529,16 @@ class GwInfo(QObject):
             self.reload_fields(dialog, json_result, p_widget)
         elif "Failed" in json_result['status']:
             # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
-            return
+            self.connect_signals()
+            return False
 
         if close_dlg:
             if self.controller.dlg_docker:
-                self.controller.dlg_docker.setMinimumWidth(dialog.width())
-                self.controller.close_docker()
+                self.manage_docker_close()
             close_dialog(dialog)
+            return None
+
+        return True
 
 
     def get_scale_zoom(self):
@@ -1494,7 +1621,7 @@ class GwInfo(QObject):
             pass
 
 
-    def set_auto_update_lineedit(self, field, dialog, widget):
+    def set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
 
         if self.check_tab_data(dialog):
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
@@ -1502,11 +1629,11 @@ class GwInfo(QObject):
             if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
                 _json = {}
                 widget.editingFinished.connect(partial(self.clean_my_json, widget))
-                widget.editingFinished.connect(partial(get_values, dialog, widget, _json, self.layer))
+                widget.editingFinished.connect(partial(get_values, dialog, widget, _json))
                 widget.editingFinished.connect(
-                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
+                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False, new_feature=new_feature))
             else:
-                widget.editingFinished.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
+                widget.editingFinished.connect(partial(get_values, dialog, widget, self.my_json))
 
             widget.textChanged.connect(partial(self.enabled_accept, dialog))
             widget.textChanged.connect(partial(self.check_datatype_validator, dialog, widget, dialog.btn_accept))
@@ -1515,7 +1642,7 @@ class GwInfo(QObject):
         return widget
 
 
-    def set_auto_update_textarea(self, field, dialog, widget):
+    def set_auto_update_textarea(self, field, dialog, widget, new_feature):
 
         if self.check_tab_data(dialog):
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
@@ -1523,11 +1650,11 @@ class GwInfo(QObject):
             if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
                 _json = {}
                 widget.textChanged.connect(partial(self.clean_my_json, widget))
-                widget.textChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
+                widget.textChanged.connect(partial(get_values, dialog, widget, _json))
                 widget.textChanged.connect(
-                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False))
+                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False, new_feature))
             else:
-                widget.textChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
+                widget.textChanged.connect(partial(get_values, dialog, widget, self.my_json))
 
             widget.textChanged.connect(partial(self.enabled_accept, dialog))
             widget.textChanged.connect(partial(self.check_datatype_validator, dialog, widget, dialog.btn_accept))
@@ -1564,62 +1691,62 @@ class GwInfo(QObject):
         dialog.btn_accept.setEnabled(True)
 
 
-    def set_auto_update_combobox(self, field, dialog, widget):
+    def set_auto_update_combobox(self, field, dialog, widget, new_feature):
 
         if self.check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
-                widget.currentIndexChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
+                widget.currentIndexChanged.connect(partial(get_values, dialog, widget, _json))
                 widget.currentIndexChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature))
             else:
-                widget.currentIndexChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
+                widget.currentIndexChanged.connect(partial(get_values, dialog, widget, self.my_json))
 
         return widget
 
 
-    def set_auto_update_dateedit(self, field, dialog, widget):
+    def set_auto_update_dateedit(self, field, dialog, widget, new_feature):
 
         if self.check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.dateChanged.connect(partial(self.clean_my_json, widget))
-                widget.dateChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
+                widget.dateChanged.connect(partial(get_values, dialog, widget, _json))
                 widget.dateChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature))
             else:
-                widget.dateChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
+                widget.dateChanged.connect(partial(get_values, dialog, widget, self.my_json))
 
         return widget
 
 
-    def set_auto_update_spinbox(self, field, dialog, widget):
+    def set_auto_update_spinbox(self, field, dialog, widget, new_feature):
 
         if self.check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.valueChanged.connect(partial(self.clean_my_json, widget))
-                widget.valueChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
+                widget.valueChanged.connect(partial(get_values, dialog, widget, _json))
                 widget.valueChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature))
             else:
-                widget.valueChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
+                widget.valueChanged.connect(partial(get_values, dialog, widget, self.my_json))
 
         return widget
 
 
-    def set_auto_update_checkbox(self, field, dialog, widget):
+    def set_auto_update_checkbox(self, field, dialog, widget, new_feature):
 
         if self.check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.stateChanged.connect(partial(self.clean_my_json, widget))
-                widget.stateChanged.connect(partial(get_values, dialog, widget, _json, self.layer))
+                widget.stateChanged.connect(partial(get_values, dialog, widget, _json))
                 widget.stateChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False))
+                    self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature))
             else:
-                widget.stateChanged.connect(partial(get_values, dialog, widget, self.my_json, self.layer))
+                widget.stateChanged.connect(partial(get_values, dialog, widget, self.my_json))
         return widget
 
 
@@ -1635,12 +1762,12 @@ class GwInfo(QObject):
         self.catalog.api_catalog(self.dlg_cf, widget, self.geom_type, feature_type)
 
 
-    def show_actions(self, tab_name):
+    def show_actions(self, dialog, tab_name):
         """ Hide all actions and show actions for the corresponding tab
         :param tab_name: corresponding tab
         """
 
-        actions_list = self.dlg_cf.findChildren(QAction)
+        actions_list = dialog.findChildren(QAction)
         for action in actions_list:
             action.setVisible(False)
 
@@ -1651,23 +1778,23 @@ class GwInfo(QObject):
             if tab['tabName'] == tab_name:
                 if tab['tabactions'] is not None:
                     for act in tab['tabactions']:
-                        action = self.dlg_cf.findChild(QAction, act['actionName'])
+                        action = dialog.findChild(QAction, act['actionName'])
                         if action is not None:
                             action.setToolTip(act['actionTooltip'])
                             action.setVisible(True)
 
-        self.enable_actions(self.dlg_cf, self.layer.isEditable())
+        self.enable_actions(dialog, self.layer.isEditable())
 
 
     """ MANAGE TABS """
 
-    def tab_activation(self):
+    def tab_activation(self, dialog, new_feature):
         """ Call functions depend on tab selection """
 
         # Get index of selected tab
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
-        self.show_actions(tab_name)
+        self.show_actions(dialog, tab_name)
 
         # Tab 'Elements'
         if self.tab_main.widget(index_tab).objectName() == 'tab_elements' and not self.tab_element_loaded:
@@ -1698,7 +1825,7 @@ class GwInfo(QObject):
             self.fill_tab_document()
             self.tab_document_loaded = True
         elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt' and not self.tab_rpt_loaded:
-            self.fill_tab_rpt(self.complet_result)
+            self.fill_tab_rpt(self.complet_result, new_feature)
             self.tab_rpt_loaded = True
         # Tab 'Plan'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
@@ -2740,16 +2867,16 @@ class GwInfo(QObject):
 
     """ FUNCTIONS RELATED WITH TAB RPT """
 
-    def fill_tab_rpt(self, complet_result):
+    def fill_tab_rpt(self, complet_result, new_feature):
 
-        complet_list, widget_list = self.init_tbl_rpt(complet_result, self.dlg_cf)
+        complet_list, widget_list = self.init_tbl_rpt(complet_result, self.dlg_cf, new_feature)
         if complet_list is False:
             return False
         self.set_listeners(complet_result, self.dlg_cf, widget_list)
         return complet_list
 
 
-    def init_tbl_rpt(self, complet_result, dialog):
+    def init_tbl_rpt(self, complet_result, dialog, new_feature):
         """ Put filter widgets into layout and set headers into QTableView """
 
         rpt_layout1 = dialog.findChild(QGridLayout, "rpt_layout1")
@@ -2765,7 +2892,7 @@ class GwInfo(QObject):
         for field in complet_list[0]['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
-            label, widget = self.set_widgets(dialog, complet_list, field)
+            label, widget = self.set_widgets(dialog, complet_list, field, new_feature)
             if widget is not None:
                 if (type(widget)) == QSpacerItem:
                     rpt_layout1.addItem(widget, 1, field['layoutorder'])

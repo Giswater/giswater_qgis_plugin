@@ -39,6 +39,11 @@ class GwEdit:
 
     def edit_add_feature(self, feature_cat):
         """ Button 01, 02: Add 'node' or 'arc' """
+        if self.controller.is_inserting:
+            msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
+            self.controller.show_message(msg)
+            return
+
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 
@@ -73,6 +78,7 @@ class GwEdit:
         """ Recover snapping options when action add feature is un-checked """
         if not self.iface.actionAddFeature().isChecked():
             self.snapper_manager.recover_snapping_options()
+            self.iface.actionAddFeature().toggled.disconnect(self.action_is_checked)
 
 
     def open_new_feature(self, feature_id):
@@ -80,6 +86,7 @@ class GwEdit:
         :param feature_id: Parameter sent by the featureAdded method itself
         :return:
         """
+        self.snapper_manager.recover_snapping_options()
         self.info_layer.featureAdded.disconnect(self.open_new_feature)
         feature = get_feature_by_id(self.info_layer, feature_id)
         geom = feature.geometry()
@@ -97,6 +104,7 @@ class GwEdit:
             self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
 
         self.controller.init_docker()
+        self.controller.is_inserting = True
 
         self.api_cf = GwInfo('data')
         result, dialog = self.api_cf.get_feature_insert(point=list_points, feature_cat=self.feature_cat,
@@ -111,3 +119,7 @@ class GwEdit:
         if not result:
             self.info_layer.deleteFeature(feature.id())
             self.iface.actionRollbackEdits().trigger()
+            self.controller.is_inserting = False
+
+
+

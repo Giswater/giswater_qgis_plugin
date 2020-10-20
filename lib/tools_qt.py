@@ -1227,7 +1227,7 @@ def populate_basic_info(dialog, result, field_id, my_json=None, new_feature_id=N
             widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         elif field['widgettype'] in ('check', 'checkbox'):
             widget = add_checkbox(field)
-            widget.stateChanged.connect(partial(get_values, dialog, widget, my_json, layer))
+            widget.stateChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] == 'button':
             widget = add_button(dialog, field)
 
@@ -1267,16 +1267,6 @@ def add_calendar(dialog, field, my_json=None, complet_result=None, new_feature_i
         widget.clear()
     btn_calendar = widget.findChild(QToolButton)
 
-    if field['isautoupdate']:
-        _json = {}
-        btn_calendar.clicked.connect(partial(get_values, dialog, widget, _json, layer))
-        # TODO: Check this
-        btn_calendar.clicked.connect(
-            partial(accept, dialog, complet_result[0], _json, p_widget=feature_id, clear_json=True,
-                    close_dlg=False, new_feature_id=new_feature_id, new_feature=new_feature,
-                    layer_new_feature=layer_new_feature, feature_id=feature_id, feature_type=feature_type))
-    else:
-        btn_calendar.clicked.connect(partial(get_values, dialog, widget, my_json, layer))
     btn_calendar.clicked.connect(partial(set_calendar_empty, widget))
 
     return widget
@@ -1417,7 +1407,7 @@ def get_values_changed_param_user(dialog, chk, widget, field, list, value=None):
     global_vars.controller.log_info(str(list))
 
 
-def get_values(dialog, widget, _json=None, layer=None):
+def get_values(dialog, widget, _json=None):
 
     value = None
     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit) and widget.isReadOnly() is False:
@@ -1428,14 +1418,11 @@ def get_values(dialog, widget, _json=None, layer=None):
         value = isChecked(dialog, widget)
     elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
         value = getCalendarDate(dialog, widget)
-    # Only get values if layer is editable or if layer not exist(need for ApiManageComposer)
-    if layer is not None:
-        if layer.isEditable():
-            # If widget.isEditable(False) return None, here control it.
-            if str(value) == '' or value is None:
-                _json[str(widget.property('columnname'))] = None
-            else:
-                _json[str(widget.property('columnname'))] = str(value)
+
+    if str(value) == '' or value is None:
+        _json[str(widget.property('columnname'))] = None
+    else:
+        _json[str(widget.property('columnname'))] = str(value)
 
 
 def set_setStyleSheet(field, widget, wtype='label'):
@@ -1492,14 +1479,13 @@ def disable_all(dialog, result, enable):
 
 
 def enable_all(dialog, result):
-
     try:
         widget_list = dialog.findChildren(QWidget)
         for widget in widget_list:
             if widget.property('keepDisbled'):
                 continue
             for field in result['fields']:
-                if widget.property('columnname') == field['columnname']:
+                if widget.objectName() == field['widgetname']:
                     if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
                         widget.setReadOnly(not field['iseditable'])
                         if not field['iseditable']:
@@ -1508,14 +1494,15 @@ def enable_all(dialog, result):
                         else:
                             widget.setFocusPolicy(Qt.StrongFocus)
                             widget.setStyleSheet(None)
-                    elif type(widget) in (QComboBox, QCheckBox, QPushButton, QgsDateTimeEdit):
+                    elif type(widget) in (QComboBox, QgsDateTimeEdit):
                         widget.setEnabled(field['iseditable'])
-                        if not field['iseditable']:
-                            widget.setFocusPolicy(Qt.NoFocus)
-                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                        else:
-                            widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
-                                field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
+                        widget.setStyleSheet(None)
+                        widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
+                            field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
+                    elif type(widget) in (QCheckBox, QPushButton):
+                        widget.setEnabled(field['iseditable'])
+                        widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
+                            field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
     except RuntimeError:
         pass
 
