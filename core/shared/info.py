@@ -1466,6 +1466,7 @@ class GwInfo(QObject):
         if list_mandatory:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             self.controller.show_warning(msg)
+            check_actions("actionEdit", True, dialog)
             self.connect_signals()
             return False
 

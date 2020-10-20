@@ -10,7 +10,7 @@ from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringLis
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator, QFontMetrics, QStandardItemModel, \
     QStandardItem, QIcon
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, \
+from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, \
     QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, QPlainTextEdit, \
     QRadioButton, QFrame, QSizePolicy, QSpacerItem, QGridLayout, QToolButton, QApplication, QFileDialog, QGroupBox
 
@@ -690,8 +690,9 @@ def set_completer_widget(tablename, widget, field_id):
     completer.setModel(model)
 
 
-def check_actions(action, enabled):
-
+def check_actions(action, enabled, dialog=None):
+    if type(action) is str:
+        action = dialog.findChild(QAction, action)
     try:
         action.setChecked(enabled)
     except RuntimeError:
