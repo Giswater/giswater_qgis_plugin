@@ -95,7 +95,7 @@ class GwPsector:
         if self.project_type.upper() == 'UD':
             self.layers['gully'] = self.controller.get_group_layers('gully')
         else:
-            tools_qt.remove_tab_by_tabName(self.dlg_plan_psector.tab_feature, 'Gully')
+            tools_qt.remove_tab_by_tabName(self.dlg_plan_psector.tab_feature, 'tab_gully')
 
         self.update = False  # if false: insert; if true: update
 

@@ -659,7 +659,7 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <widget class="QWidget" name="Arc">
+         <widget class="QWidget" name="tab_arc">
           <attribute name="title">
            <string>Arc</string>
           </attribute>
@@ -669,7 +669,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="Node">
+         <widget class="QWidget" name="tab_node">
           <attribute name="title">
            <string>Node</string>
           </attribute>
@@ -679,7 +679,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="Connec">
+         <widget class="QWidget" name="tab_connec">
           <attribute name="title">
            <string>Connec</string>
           </attribute>
@@ -689,7 +689,7 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="Gully">
+         <widget class="QWidget" name="tab_gully">
           <attribute name="title">
            <string>Gully</string>
           </attribute>

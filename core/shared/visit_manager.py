@@ -1661,16 +1661,15 @@ class GwVisitManager:
         """ Set geom_type and layer depending selected tab """
 
         # Get selected tab to set geometry type
-        tab_position = dialog.tab_feature.currentIndex()
-        if tab_position == 0:
+        tab_idx = dialog.tab_feature.currentIndex()
+        if dialog.tab_feature.widget(tab_idx).objectName() == 'tab_arc':
             self.geom_type = "arc"
-        elif tab_position == 1:
+        elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_node':
             self.geom_type = "node"
-        elif tab_position == 2:
+        elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_connec':
             self.geom_type = "connec"
-        elif tab_position == 3:
+        elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_gully':
             self.geom_type = "gully"
-
         if self.geom_type == '':
             return
 

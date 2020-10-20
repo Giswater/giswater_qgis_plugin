@@ -443,23 +443,20 @@ def tab_feature_changed(dialog, table_object, excluded_layers=[]):
     """ Set geom_type and layer depending selected tab
         @table_object = ['doc' | 'element' | 'cat_work']
     """
-    # parent_vars.get_values_from_form(dialog)
-    tab_position = dialog.tab_feature.currentIndex()
+
+    tab_idx = dialog.tab_feature.currentIndex()
     geom_type = "arc"
-    if tab_position == 0:
+
+    if dialog.tab_feature.widget(tab_idx).objectName() == 'tab_arc':
         geom_type = "arc"
-    elif tab_position == 1:
+    elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_node':
         geom_type = "node"
-    elif tab_position == 2:
+    elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_connec':
         geom_type = "connec"
-    # This function is used for multiple forms
-    # In most forms, tab 3 is for gully, except in the form dlg_feature_end, here element is 3 and gully is 4
-    elif tab_position == 3 and dialog.objectName() == 'dlg_feature_end':
+    elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_gully':
+        geom_type = "gully"
+    elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_elem':
         geom_type = "element"
-    elif tab_position == 3:
-        geom_type = "gully"
-    elif tab_position == 4:
-        geom_type = "gully"
     hide_generic_layers(excluded_layers=excluded_layers)
     viewname = f"v_edit_{geom_type}"
     # Adding auto-completion to a QLineEdit
