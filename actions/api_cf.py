@@ -1196,7 +1196,7 @@ class ApiCF(ApiParent, QObject):
 
             feature = f'"id":"{new_feature.attribute(id_name)}", '
             extras = '"addSchema":""'
-            feature = f'{feature} "tableName":"{p_table_id}"'
+            feature = f'{feature} "tableName":"{p_table_id}", '
             body = self.create_body(feature=feature, extras=extras)
             function_name = 'gw_fct_getinfofromid'
             json_result = self.controller.get_json(function_name, body)
@@ -1206,8 +1206,7 @@ class ApiCF(ApiParent, QObject):
             my_json = json.dumps(_json)
             feature = f'"id":"{self.feature_id}", '
 
-        feature += f'"featureType":"{self.feature_type}", '
-        feature += f'"tableName":"{p_table_id}"'
+        feature += f'"featureType":"{self.feature_type}"'
         extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
         body = self.create_body(feature=feature, extras=extras)
         json_result = self.controller.get_json('gw_fct_setfields', body)
