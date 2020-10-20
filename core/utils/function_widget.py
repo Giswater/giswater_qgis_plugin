@@ -5,7 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints
+from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsProject
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QMessageBox
 
 import os
 
@@ -54,10 +56,10 @@ class GwInfoTools:
                 self.controller.log_info(msg)
                 continue
 
-            # get sys variale
+            # Get sys variale
             self.qgis_project_infotype = self.controller.plugin_settings_value('infoType')
 
-            feature = '"tableName":"' + str(layer_name) + '", "id":""'
+            feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = create_body(feature=feature, extras=extras)
             result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True)
@@ -67,6 +69,7 @@ class GwInfoTools:
                 _values = {}
                 # Get column index
                 field_idx = layer.fields().indexFromName(field['columnname'])
+
                 # Hide selected fields according table config_api_form_fields.hidden
                 if 'hidden' in field:
                     kwargs = {"layer": layer, "field": field['columnname'], "hidden": field['hidden']}
@@ -100,16 +103,45 @@ class GwInfoTools:
                     # Set values into valueMap
                     editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': _values})
                     layer.setEditorWidgetSetup(field_idx, editor_widget_setup)
+                elif field['widgettype'] == 'text':
+                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                    layer.setEditorWidgetSetup(field_idx, editor_widget_setup)
+                elif field['widgettype'] == 'check':
+                    config = {'CheckedState': 'true', 'UncheckedState': 'false'}
+                    editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
+                    layer.setEditorWidgetSetup(field_idx, editor_widget_setup)
+                elif field['widgettype'] == 'datetime':
+                    config = {'allow_null': True,
+                              'calendar_popup': True,
+                              'display_format': 'yyyy-MM-dd',
+                              'field_format': 'yyyy-MM-dd',
+                              'field_iso_format': False}
+                    editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
+                    layer.setEditorWidgetSetup(field_idx, editor_widget_setup)
+                else:
+                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                    layer.setEditorWidgetSetup(field_idx, editor_widget_setup)
 
 
     def refresh_canvas(self, **kwargs):
         """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
-
         # Note: canvas.refreshAllLayers() mysteriously that leaves the layers broken
         # self.canvas.refreshAllLayers()
-        all_layers = self.controller.get_layers()
-        for layer in all_layers:
-            layer.triggerRepaint()
+        # Get list of layer names
+        try:
+            layers_name_list = kwargs['tableName']
+            if not layers_name_list:
+                return
+            if type(layers_name_list) == str:
+                layer = self.controller.get_layer_by_tablename(layers_name_list)
+                layer.triggerRepaint()
+            elif type(layers_name_list) == list:
+                for layer_name in layers_name_list:
+                    self.controller.set_layer_index(layer_name)
+        except:
+            all_layers = self.controller.get_layers()
+            for layer in all_layers:
+                layer.triggerRepaint()
 
 
     def set_column_visibility(self, **kwargs):
@@ -208,3 +240,100 @@ class GwInfoTools:
         layer.triggerRepaint()
 
         return True
+
+
+    #  TODO unused functions atm
+    def show_message(self, **kwargs):
+        """
+        PERFORM pg_notify(current_user,
+                  '{"functionAction":{"functions":[{"name":"show_message","parameters":
+                  {"message":"line 1 \n line 2","tabName":"Notify channel",
+                  "styleSheet":{"level":1,"color":"red","bold":true}}}]},"user":"postgres","schema":"api_ws_sample"}');
+
+        functions called in -> getattr(self, function_name)(**params):
+        Show message in console log,
+        :param kwargs: dict with all needed
+        :param kwargs['message']: message to show
+        :param kwargs['tabName']: tab where the info will be displayed
+        :param kwargs['styleSheet']:  define text format (message type, color, and bold), 0 = Info(black), 1 = Warning(orange), 2 = Critical(red), 3 = Success(blue), 4 = None(black)
+        :param kwargs['styleSheet']['level']: 0 = Info(black), 1 = Warning(orange), 2 = Critical(red), 3 = Success(blue), 4 = None(black)
+        :param kwargs['styleSheet']['color']: can be like "red", "green", "orange", "pink"...typical html colors
+        :param kwargs['styleSheet']['bold']: if is true, then print as bold
+        :return:
+        """
+
+        # Set default styleSheet
+        color = "black"
+        level = 0
+        bold = ''
+
+        msg = kwargs['message'] if 'message' in kwargs else 'No message found'
+        tab_name = kwargs['tabName'] if 'tabName' in kwargs else 'Notify channel'
+        if 'styleSheet' in kwargs:
+            color = kwargs['styleSheet']['color'] if 'color' in kwargs['styleSheet'] else "black"
+            level = kwargs['styleSheet']['level'] if 'level' in kwargs['styleSheet'] else 0
+            if 'bold' in kwargs['styleSheet']:
+                bold = 'b' if kwargs['styleSheet']['bold'] else ''
+            else:
+                bold = ''
+
+        msg = f'<font color="{color}"><{bold}>{msg}</font>'
+        QgsMessageLog.logMessage(msg, tab_name, level)
+
+
+    def show_messagebox(self, **kwargs):
+        """ Shows a message box with detail information """
+
+        msg = kwargs['message'] if 'message' in kwargs else 'No message found'
+        title = kwargs['title'] if 'title' in kwargs else 'New message'
+        inf_text = kwargs['inf_text'] if 'inf_text' in kwargs else 'Info text'
+        # color = "black"
+        # bold = ''
+        # if 'styleSheet' in kwargs:
+        #     color = kwargs['styleSheet']['color'] if 'color' in kwargs['styleSheet'] else "black"
+        #     if 'bold' in kwargs['styleSheet']:
+        #         bold = 'b' if kwargs['styleSheet']['bold'] else ''
+        #     else:
+        #         bold = ''
+        # msg = f'<font color="{color}"><{bold}>{msg}</font>'
+        msg_box = QMessageBox()
+        msg_box.setText(msg)
+        if title:
+            title = self.controller.tr(title)
+            msg_box.setWindowTitle(title)
+        if inf_text:
+            inf_text = self.controller.tr(inf_text)
+            msg_box.setInformativeText(inf_text)
+        msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
+        msg_box.setStandardButtons(QMessageBox.Ok)
+        msg_box.setDefaultButton(QMessageBox.Ok)
+        msg_box.open()
+
+    def raise_notice(self, **kwargs):
+        """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params)
+            Used to show raise notices sent by postgresql
+        """
+
+        msg_list = kwargs['msg']
+        for msg in msg_list:
+            self.controller.log_info(f"{msg}")
+
+
+    def refreshCanvas(self, **kwargs):
+
+        self.all_layers = []
+        root = QgsProject.instance().layerTreeRoot()
+        self.get_all_layers(root)
+        for layer_name in self.all_layers:
+            layer = self.controller.get_layer_by_tablename(layer_name)
+            layer.triggerRepaint()
+
+
+    def get_all_layers(self, group):
+
+        for child in group.children():
+            if isinstance(child, QgsLayerTreeLayer):
+                self.all_layers.append(child.layer().name())
+                child.layer().name()
+            else:
+                self.get_all_layers(child)
