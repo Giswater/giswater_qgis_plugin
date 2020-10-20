@@ -72,7 +72,7 @@ class CheckProjectResult(ApiParent):
         # get project variables
         add_schema = self.controller.plugin_settings_value('gwAddSchema')
         main_schema = self.controller.plugin_settings_value('gwMainSchema')
-        project_role = self.controller.plugin_settings_value('gwProjecRole')
+        project_role = self.controller.plugin_settings_value('gwProjectRole')
         info_type = self.controller.plugin_settings_value('gwInfoType')
         project_type = self.controller.plugin_settings_value('gwProjectType')
 
@@ -83,7 +83,7 @@ class CheckProjectResult(ApiParent):
         extras += f', "initProject":{init_project}'
         extras += f', "addSchema":"{add_schema}"'
         extras += f', "mainSchema":"{main_schema}"'
-        extras += f', "projecRole":"{project_role}"'
+        extras += f', "projectRole":"{project_role}"'
         extras += f', "infoType":"{info_type}"'
         extras += f', "projectType":"{project_type}"'
         extras += f', "qgisVersion":"{Qgis.QGIS_VERSION}"'
