@@ -1507,7 +1507,7 @@ class GwInfo(QObject):
             else:
                 feature = f'"id":"{self.feature_id}", '
             extras = '"addSchema":""'
-            feature = f'{feature} "tableName":"{p_table_id}""'
+            feature = f'{feature} "tableName":"{p_table_id}"'
             body = create_body(feature=feature, extras=extras)
             function_name = 'gw_fct_getinfofromid'
             json_result = self.controller.get_json(function_name, body, rubber_band=self.rubber_band, log_sql=True)
