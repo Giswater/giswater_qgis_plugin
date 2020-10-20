@@ -54,6 +54,8 @@ def get_qgis_project_variables():
     project_vars['add_schema'] = get_project_variable('gwAddSchema')
     project_vars['main_schema'] = get_project_variable('gwMainSchema')
     project_vars['role'] = get_project_variable('gwProjectRole')
+    project_vars['projecttype'] = get_project_variable('gwProjectType')
+
     return project_vars
 
 
