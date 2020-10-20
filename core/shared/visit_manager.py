@@ -34,7 +34,7 @@ from ...lib.tools_qgis import remove_selection, add_point, selection_init, selec
     insert_feature, disconnect_signal_selection_changed, connect_signal_selection_changed, refresh_map_canvas
 from ...lib.tools_qt import delete_records, fill_table_object, delete_selected_object, set_selectionbehavior, set_icon, \
     set_dates_from_to, document_open, document_delete, set_table_model, set_completer_object, set_table_columns, \
-    set_completer_widget
+    set_completer_widget, remove_tab_by_tabName
 from ...lib import tools_qt
 
 
@@ -117,7 +117,7 @@ class GwVisitManager:
 
         # Remove 'gully' for 'WS'
         if self.controller.get_project_type() == 'ws':
-            self.dlg_add_visit.tab_feature.removeTab(3)
+            remove_tab_by_tabName(self.dlg_add_visit.tab_feature, 'tab_gully')
 
         # Feature type of selected parameter
         self.feature_type_parameter = None

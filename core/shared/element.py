@@ -17,7 +17,7 @@ from ... import global_vars
 from ...lib.tools_qgis import remove_selection, add_point, selection_init, insert_feature
 from ...lib.tools_qt import delete_records, manage_close, fill_table_object, filter_by_id, delete_selected_object, \
     set_selectionbehavior, set_model_to_table, set_icon, exist_object, set_completer_object, set_table_columns, \
-    set_completer_widget
+    set_completer_widget, remove_tab_by_tabName
 
 
 class GwElement:
@@ -74,7 +74,7 @@ class GwElement:
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
-            self.dlg_add_element.tab_feature.removeTab(3)
+            remove_tab_by_tabName(self.dlg_add_element.tab_feature, 'tab_gully')
         else:
             self.layers['gully'] = self.controller.get_group_layers('gully')
 

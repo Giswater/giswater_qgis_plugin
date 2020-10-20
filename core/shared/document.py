@@ -16,7 +16,8 @@ from ..ui.ui_manager import DocUi, DocManager
 from ...lib.tools_qgis import remove_selection, selection_init, insert_feature
 from ...lib.tools_qt import populate_combo_with_query, delete_records, manage_close, fill_table_object, filter_by_id, \
     delete_selected_object, set_selectionbehavior, set_model_to_table, set_icon, exist_object, set_completer_object, \
-    set_completer_widget, set_table_columns, setWidgetText, getWidgetText, getCalendarDate, setCalendarDate
+    set_completer_widget, set_table_columns, setWidgetText, getWidgetText, getCalendarDate, setCalendarDate, \
+    remove_tab_by_tabName
 
 from ... import global_vars
 
@@ -70,7 +71,8 @@ class GwDocument:
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
-            self.dlg_add_doc.tab_feature.removeTab(3)
+            remove_tab_by_tabName(self.dlg_add_doc.tab_feature, 'tab_gully')
+
         else:
             self.layers['gully'] = self.controller.get_group_layers('gully')
 

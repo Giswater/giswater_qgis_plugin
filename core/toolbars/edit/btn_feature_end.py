@@ -72,7 +72,7 @@ class GwEndFeatureButton(GwParentAction):
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
-            self.dlg_work_end.tab_feature.removeTab(4)
+            tools_qt.remove_tab_by_tabName(self.dlg_work_end.tab_feature, 'tab_gully')
         else:
             self.layers['gully'] = self.controller.get_group_layers('gully')
 
