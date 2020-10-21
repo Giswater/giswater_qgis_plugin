@@ -54,13 +54,12 @@ class ApiSearch(ApiParent):
         self.dlg_search.dlg_closed.connect(self.close_search)
 
 
-    def api_search(self, dlg_mincut=None):
+    def api_search(self, dlg_mincut=None, load_project=False):
 
         # If search is open, dont let user open another one
         open_search = self.controller.get_user_setting_value('open_search', 'false')
-        if open_search in ("True", "true", True) and dlg_mincut is None:
+        if open_search in ("True", "true", True) and dlg_mincut is None and load_project is False:
             return
-
         form = ""
         if self.dlg_search is None and dlg_mincut is None:
             self.init_dialog()

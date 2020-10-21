@@ -66,5 +66,5 @@ class Basic(ApiParent):
         if self.api_search is None:
             self.api_search = ApiSearch(self.iface, self.settings, self.controller, self.plugin_dir)
 
-        self.api_search.api_search()
+        self.api_search.api_search(load_project=True)
 
