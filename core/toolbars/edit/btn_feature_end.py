@@ -15,10 +15,11 @@ from datetime import datetime
 
 from ....lib import tools_qt
 from ...toolbars.parent_dialog import GwParentAction
-from ...utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers, tab_feature_changed, create_body
+from ...utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers, tab_feature_changed, \
+    create_body
 from ...ui.ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
-from ....lib.tools_qgis import remove_selection, selection_init, disconnect_snapping, disconnect_signal_selection_changed, \
-    insert_feature
+from ....lib.tools_qgis import remove_selection, selection_init, disconnect_snapping, \
+    disconnect_signal_selection_changed, insert_feature
 from ....lib.tools_qt import delete_records, set_selectionbehavior, set_icon, set_completer_object, set_completer_widget
 
 
@@ -108,7 +109,7 @@ class GwEndFeatureButton(GwParentAction):
             partial(selection_init, self.dlg_work_end, self.table_object, geom_type=geom_type, layers=self.layers))
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(
-            partial(tab_feature_changed, self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"]))
+            partial(tab_feature_changed, self.dlg_work_end, excluded_layers=["v_edit_element"]))
 
         # Set values
         self.fill_fields()
@@ -118,7 +119,7 @@ class GwEndFeatureButton(GwParentAction):
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
-        tab_feature_changed(self.dlg_work_end, self.table_object, excluded_layers=["v_edit_element"])
+        tab_feature_changed(self.dlg_work_end, excluded_layers=["v_edit_element"])
 
         # Open dialog
         open_dialog(self.dlg_work_end, dlg_name='feature_end', maximize_button=False)

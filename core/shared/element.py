@@ -115,7 +115,7 @@ class GwElement:
         self.dlg_add_element.rejected.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
-            partial(tab_feature_changed, self.dlg_add_element, table_object, []))
+            partial(tab_feature_changed, self.dlg_add_element, []))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.element_id.textChanged.connect(
             partial(exist_object, self.dlg_add_element, table_object, layers=self.layers,
@@ -200,7 +200,7 @@ class GwElement:
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        tab_feature_changed(self.dlg_add_element, table_object)
+        tab_feature_changed(self.dlg_add_element)
 
         # Force layer v_edit_element set active True
         if layer_element:

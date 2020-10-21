@@ -439,7 +439,7 @@ def reset_layers(layers):
     return layers
 
 
-def tab_feature_changed(dialog, table_object, excluded_layers=[]):
+def tab_feature_changed(dialog, excluded_layers=[]):
     """ Set geom_type and layer depending selected tab
         @table_object = ['doc' | 'element' | 'cat_work']
     """

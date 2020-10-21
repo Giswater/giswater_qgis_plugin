@@ -677,7 +677,7 @@ def selection_init(dialog, table_object, query=False, geom_type=None, layers=Non
     """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
     from ..actions.multiple_selection import MultipleSelection
-    geom_type = tools_giswater.tab_feature_changed(dialog, table_object)
+    geom_type = tools_giswater.tab_feature_changed(dialog)
     if geom_type in ('all', None):
         geom_type = 'arc'
     multiple_selection = MultipleSelection(layers, geom_type, parent_manage=None,
@@ -785,7 +785,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
     disconnect_signal_selection_changed()
 
     if geom_type in ('all', None):
-        geom_type = tools_giswater.tab_feature_changed(dialog, table_object)
+        geom_type = tools_giswater.tab_feature_changed(dialog)
 
     # Clear list of ids
     if remove_ids:

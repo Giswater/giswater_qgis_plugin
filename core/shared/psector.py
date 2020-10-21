@@ -407,7 +407,7 @@ class GwPsector:
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(partial(tab_feature_changed,
-            self.dlg_plan_psector, table_object, excluded_layers=["v_edit_element"]))
+            self.dlg_plan_psector, excluded_layers=["v_edit_element"]))
         self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
         viewname = 'v_edit_plan_psector_x_other'
         self.dlg_plan_psector.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg_plan_psector,
@@ -467,7 +467,7 @@ class GwPsector:
 
         # Set default tab 'arc'
         self.dlg_plan_psector.tab_feature.setCurrentIndex(0)
-        tab_feature_changed(self.dlg_plan_psector, table_object, excluded_layers=["v_edit_element"])
+        tab_feature_changed(self.dlg_plan_psector, excluded_layers=["v_edit_element"])
 
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
