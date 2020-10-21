@@ -115,14 +115,12 @@ class GwDocument:
         self.dlg_add_doc.btn_path_doc.clicked.connect(lambda: setattr(self, 'files_path', self.get_file_dialog(self.dlg_add_doc, "path")))
         self.dlg_add_doc.btn_accept.clicked.connect(
             partial(self.manage_document_accept, table_object, tablename, qtable, item_id))
-        # TODO: Set variable  self.layers using return parameters
-        self.dlg_add_doc.btn_cancel.clicked.connect(
-            partial(manage_close, self.dlg_add_doc, table_object, cur_active_layer, excluded_layers=["v_edit_element"],
-                    single_tool_mode=self.single_tool_mode, layers=self.layers))
-        # TODO: Set variable  self.layers using return parameters
-        self.dlg_add_doc.rejected.connect(
-            partial(manage_close, self.dlg_add_doc, table_object, cur_active_layer, excluded_layers=["v_edit_element"],
-                    single_tool_mode=self.single_tool_mode, layers=self.layers))
+        self.dlg_add_doc.btn_cancel.clicked.connect(lambda: setattr(self, 'layers', manage_close(self.dlg_add_doc,
+                    table_object, cur_active_layer, excluded_layers=["v_edit_element"],
+                    single_tool_mode=self.single_tool_mode, layers=self.layers)))
+        self.dlg_add_doc.rejected.connect(lambda: setattr(self, 'layers', manage_close(self.dlg_add_doc, table_object,
+                    cur_active_layer, excluded_layers=["v_edit_element"],single_tool_mode=self.single_tool_mode,
+                    layers=self.layers)))
         self.dlg_add_doc.tab_feature.currentChanged.connect(
             partial(tab_feature_changed, self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"]))
 

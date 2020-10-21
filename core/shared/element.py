@@ -106,16 +106,12 @@ class GwElement:
         self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
         self.dlg_add_element.btn_accept.clicked.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
-        # TODO: Set variable  self.layers using return parameters
-        self.dlg_add_element.btn_cancel.clicked.connect(
-            partial(manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[],
-                    layers=self.layers))
+        self.dlg_add_element.btn_cancel.clicked.connect(lambda: setattr(self, 'layers',
+            manage_close(self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[],layers=self.layers)))
         self.dlg_add_element.btn_cancel.clicked.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
-        # TODO: Set variable  self.layers using return parameters
-        self.dlg_add_element.rejected.connect(
-            partial(manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[],
-                    layers=self.layers))
+        self.dlg_add_element.rejected.connect(lambda: setattr(self, 'layers', manage_close(self.dlg_add_element,
+            table_object, cur_active_layer, excluded_layers=[],layers=self.layers)))
         self.dlg_add_element.rejected.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
