@@ -146,3 +146,6 @@ VALUES (3154, 'It is not possible to add this connec to psector because it is re
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
 VALUES (3156, 'Input parameter has null value', 'Please check it before continue', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING ;
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
+VALUES (3158, 'Value of the function variable is null', 'Please check it before continue', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING ;

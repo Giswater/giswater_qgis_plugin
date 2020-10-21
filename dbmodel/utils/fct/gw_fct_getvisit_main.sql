@@ -155,7 +155,10 @@ v_check_code text;
 v_filter_lot_null text = '';
 v_visit_id integer;
 v_load_visit boolean;
-	
+v_audit_result text;
+v_error_context text;
+v_level integer;
+
 BEGIN
 	
 	-- Set search path to local schema
@@ -507,7 +510,8 @@ BEGIN
 			IF isnewvisit THEN
 
 				IF v_formname IS NULL THEN
-					RAISE EXCEPTION 'Api is bad configured. There is no form related to tablename';
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3158", "function":"2740","debug_msg":"v_formname"}}$$);' INTO v_audit_result;
 				END IF;
 				
 				RAISE NOTICE ' --- GETTING tabData DEFAULT VALUES ON NEW VISIT ---';
@@ -795,13 +799,31 @@ BEGIN
 	IF v_offline THEN
 		v_id = '""';
 	END IF;
-  
+
+	IF v_audit_result is null THEN
+        v_status = 'Accepted';
+        v_level = 3;
+        v_message = 'Process done successfully';
+    ELSE
+
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+
+    END IF;
+
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'||v_version||
+	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "apiVersion":'||v_version||
              ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idName":"visit_id", "id":'||v_id||'}'||
 		    ', "form":'||v_forminfo||
 		    ', "data":{"geometry":'|| v_geometry ||'}}'||
-		    '}')::json;
+		    '}')::json;   
+
+	EXCEPTION WHEN OTHERS THEN
+    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
+ 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
