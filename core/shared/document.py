@@ -146,7 +146,7 @@ class GwDocument:
         # Set default tab 'arc'
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        tab_feature_changed(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"])
+        tab_feature_changed(self.dlg_add_doc, excluded_layers=["v_edit_element"])
 
         # Open the dialog
         open_dialog(self.dlg_add_doc, dlg_name='doc', maximize_button=False)
