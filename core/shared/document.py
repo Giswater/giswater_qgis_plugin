@@ -111,8 +111,8 @@ class GwDocument:
 
         # Set signals
         self.dlg_add_doc.doc_type.currentIndexChanged.connect(self.activate_relations)
-        self.dlg_add_doc.btn_path_url.clicked.connect(partial(open_web_browser, self.dlg_add_doc, "path"))
-        self.dlg_add_doc.btn_path_doc.clicked.connect(lambda: setattr(self, 'files_path', get_file_dialog(self.dlg_add_doc, "path")))
+        self.dlg_add_doc.btn_path_url.clicked.connect(partial(self.open_web_browser, self.dlg_add_doc, "path"))
+        self.dlg_add_doc.btn_path_doc.clicked.connect(lambda: setattr(self, 'files_path', self.get_file_dialog(self.dlg_add_doc, "path")))
         self.dlg_add_doc.btn_accept.clicked.connect(
             partial(self.manage_document_accept, table_object, tablename, qtable, item_id))
         # TODO: Set variable  self.layers using return parameters
