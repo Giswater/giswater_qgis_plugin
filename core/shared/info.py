@@ -1506,12 +1506,6 @@ class GwInfo(QObject):
                 feature = f'"id":"{self.new_feature.attribute(id_name)}", '
             else:
                 feature = f'"id":"{self.feature_id}", '
-            extras = '"addSchema":""'
-            feature = f'{feature} "tableName":"{p_table_id}"'
-            body = create_body(feature=feature, extras=extras)
-            function_name = 'gw_fct_getinfofromid'
-            json_result = self.controller.get_json(function_name, body, rubber_band=self.rubber_band, log_sql=True)
-            self.reload_fields(dialog, json_result, True)
 
         # If we make an info
         else:
@@ -1544,13 +1538,6 @@ class GwInfo(QObject):
                 self.manage_docker_close()
             close_dialog(dialog)
             return None
-
-        extras = '"addSchema":""'
-        feature = f'"tableName":"{p_table_id}", "id":"{self.feature_id}"'
-        body = create_body(feature=feature, extras=extras)
-        function_name = 'gw_fct_getinfofromid'
-        json_result = self.controller.get_json(function_name, body, rubber_band=self.rubber_band, log_sql=True)
-        self.reload_fields(dialog, json_result, True)
 
         return True
 
