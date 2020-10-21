@@ -246,7 +246,7 @@ class Credentials(GwDialog, FORM_CLASS):
 
         super().__init__()
         self.txt_pass.setClearButtonEnabled(True)
-        icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
+        icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'eye_open.png'
         self.action = QAction("show")
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -261,11 +261,11 @@ class Credentials(GwDialog, FORM_CLASS):
         text = ""
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.Password)
-            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
+            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'eye_open.png'
             text = "Show password"
         elif self.txt_pass.echoMode() == 2:
             self.txt_pass.setEchoMode(QLineEdit.Normal)
-            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_close.png'
+            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'eye_close.png'
             text = "Hide password"
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -475,7 +475,7 @@ class MainQtDialogUi(GwDialog, FORM_CLASS):
 
         super().__init__()
         self.txt_pass.setClearButtonEnabled(True)
-        icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
+        icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'eye_open.png'
         self.action = QAction("show")
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -490,11 +490,11 @@ class MainQtDialogUi(GwDialog, FORM_CLASS):
         text = ""
         if self.txt_pass.echoMode() == 0:
             self.txt_pass.setEchoMode(QLineEdit.Password)
-            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_open.png'
+            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'eye_open.png'
             text = "Show password"
         elif self.txt_pass.echoMode() == 2:
             self.txt_pass.setEchoMode(QLineEdit.Normal)
-            icon_path = os.path.dirname(__file__) + os.sep + 'icons' + os.sep + 'eye_close.png'
+            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'eye_close.png'
             text = "Hide password"
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
