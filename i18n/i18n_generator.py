@@ -165,10 +165,11 @@ class GwI18NGenerator:
 
             line += f"\t\t\t<translation>{py_tlb[py_language]}</translation>\n"
             line += f"\t\t</message>\n"
+            line = line.replace("&", "")
             ts_file.write(line)
-        ts_file.write(line)
-
-        line = '\t<!-- PYTHON MESSAGES -->\n'
+        line = '\t</context>\n\n'
+        line += '\t<!-- PYTHON MESSAGES -->\n'
+        line += '\t<context>\n'
         ts_file.write(line)
 
         # Create children for message
@@ -179,6 +180,7 @@ class GwI18NGenerator:
                 py_msg[py_language] = py_msg['source']
             line += f"\t\t\t<translation>{py_msg[py_language]}</translation>\n"
             line += f"\t\t</message>\n"
+            line = line.replace("&", "")
             ts_file.write(line)
         line = '\t</context>\n\n'
         line += '\t<!-- UI TRANSLATION -->\n'
@@ -223,17 +225,16 @@ class GwI18NGenerator:
         # Close last context and TS
         line += '\t</context>\n'
         line += '</TS>\n\n'
-
+        line = line.replace("&", "")
         ts_file.write(line)
         ts_file.close()
         del ts_file
         lrelease_path = self.plugin_dir + os.sep + 'resources' + os.sep + 'lrelease.exe'
         status = subprocess.call([lrelease_path, ts_path], shell=False)
-        if status == 1:
+        if status == 0:
             return True
         else:
             return False
-
 
 
     def get_title(self, py_dialogs, name, key_lbl):

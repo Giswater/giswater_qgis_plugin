@@ -45,12 +45,12 @@
         <widget class="QLineEdit" name="project_title"/>
        </item>
        <item row="5" column="0">
-        <widget class="QLabel" name="lbl_project_title">
+        <widget class="QLabel" name="lbl_descript">
          <property name="layoutDirection">
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="text">
-          <string>Project title:</string>
+          <string>Description:</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignJustify|Qt::AlignVCenter</set>
@@ -227,7 +227,7 @@
       <zorder>tbl_srid</zorder>
       <zorder>project_name</zorder>
       <zorder>cmb_locale</zorder>
-      <zorder>lbl_project_title</zorder>
+      <zorder>lbl_descript</zorder>
       <zorder>srid_id</zorder>
       <zorder>lbl_locale</zorder>
       <zorder>lbl_project_name</zorder>
