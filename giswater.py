@@ -1004,7 +1004,7 @@ class Giswater(QObject):
         # Open automatically 'search docker' depending its value in user settings
         open_search = self.controller.get_user_setting_value('open_search', 'true')
         if open_search == 'true':
-            self.basic.basic_api_search()
+            self.basic.basic_api_search(load_project=True)
 
         # call dynamic mapzones repaint
         self.parent.set_style_mapzones()
