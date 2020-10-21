@@ -210,8 +210,8 @@ class GwVisitManager:
         self.event_feature_type_selected(self.dlg_add_visit, "connec")
         self.event_feature_type_selected(self.dlg_add_visit, "arc")
 
-        # Force tab_feature_changed
-        self.tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"], layers=self.layers)
+        # Force visit_tab_feature_changed
+        self.visit_tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"], layers=self.layers)
 
         # Manage relation locking
         if self.locked_geom_type:
@@ -688,7 +688,7 @@ class GwVisitManager:
             widget_name = f"tbl_visit_x_{self.geom_type}"
             if connect:
                 self.dlg_add_visit.tab_feature.currentChanged.connect(partial(
-                    self.tab_feature_changed, self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"]))
+                    self.visit_tab_feature_changed, self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"]))
             else:
                 self.dlg_add_visit.tab_feature.currentChanged.disconnect()
         except Exception as e:
@@ -1657,7 +1657,7 @@ class GwVisitManager:
         tools_qt.set_item_data(self.dlg_event.position_id, node_list, 1, True, False)
 
 
-    def tab_feature_changed(self, dialog, table_object='visit', excluded_layers=[], layers=None):
+    def visit_tab_feature_changed(self, dialog, table_object='visit', excluded_layers=[], layers=None):
         """ Set geom_type and layer depending selected tab """
 
         # Get selected tab to set geometry type
@@ -1683,7 +1683,7 @@ class GwVisitManager:
             self.dlg_add_visit.btn_feature_delete.clicked.disconnect()
             self.dlg_add_visit.btn_feature_snapping.clicked.disconnect()
         except Exception as e:
-            self.controller.log_info(f"tab_feature_changed exception: {e}")
+            self.controller.log_info(f"visit_tab_feature_changed exception: {e}")
         finally:
             # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
