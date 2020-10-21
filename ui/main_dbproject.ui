@@ -42,7 +42,7 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="5" column="1">
-        <widget class="QLineEdit" name="project_title"/>
+        <widget class="QLineEdit" name="project_descript"/>
        </item>
        <item row="5" column="0">
         <widget class="QLabel" name="lbl_descript">
@@ -231,7 +231,7 @@
       <zorder>srid_id</zorder>
       <zorder>lbl_locale</zorder>
       <zorder>lbl_project_name</zorder>
-      <zorder>project_title</zorder>
+      <zorder>project_descript</zorder>
       <zorder>lbl_filter</zorder>
       <zorder>lbl_project_type</zorder>
       <zorder>cmb_create_project_type</zorder>
@@ -262,7 +262,7 @@
   <tabstop>cmb_create_project_type</tabstop>
   <tabstop>cmb_locale</tabstop>
   <tabstop>project_name</tabstop>
-  <tabstop>project_title</tabstop>
+  <tabstop>project_descript</tabstop>
   <tabstop>srid_id</tabstop>
   <tabstop>tbl_srid</tabstop>
   <tabstop>rdb_data</tabstop>

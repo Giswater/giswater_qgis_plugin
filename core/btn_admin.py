@@ -1350,8 +1350,9 @@ class GwAdmin:
             srid = self.project_epsg
         extras += '"epsg":' + str(srid).replace('"', '')
         if new_project is True:
-            if str(self.title) != 'null':
-                extras += ', ' + '"title":"' + str(self.title) + '"'
+            if str(self.descript) != 'null':
+                extras += ', ' + '"name":"' + str(schema_name) + '"'
+                extras += ', ' + '"title":"' + str(self.descript) + '"'
             extras += ', ' + '"author":"' + str(self.username) + '"'
             current_date = QDate.currentDate().toString('dd-MM-yyyy')
             extras += ', ' + '"date":"' + str(current_date) + '"'
@@ -1368,12 +1369,12 @@ class GwAdmin:
         client = '"client":{"device":4, "lang":"' + str(locale) + '"}, '
         data = '"data":{' + extras + '}'
         body = "$${" + client + data + "}$$"
-        status = self.controller.get_json('gw_fct_admin_schema_lastprocess', body,
-                                          schema_name=self.schema_name, commit=False)
-        if status is False or status['status'] == 'Failed':
+        result = self.controller.get_json('gw_fct_admin_schema_lastprocess', body,
+                                          schema_name=self.schema_name, commit=False, log_sql=True)
+        if result is None or ('status' in result and result['status'] == 'Failed'):
             self.error_count = self.error_count + 1
 
-        return status
+        return result
 
 
     def task_started(self, task, wait_time):
@@ -1439,8 +1440,8 @@ class GwAdmin:
         QgsApplication.taskManager().addTask(task1)
 
 
-    def check_project_name(self, project_name, project_title):
-        """ Check if @project_name and @project_title are is valid """
+    def check_project_name(self, project_name, project_descript):
+        """ Check if @project_name and @project_descript are is valid """
 
         # Check if project name is valid
         if project_name == 'null':
@@ -1455,8 +1456,8 @@ class GwAdmin:
             msg = "The 'Project_name' field have invalid character"
             self.controller.show_info_box(msg, "Info")
             return False
-        if project_title == 'null':
-            msg = "The 'Title' field is required."
+        if project_descript == 'null':
+            msg = "The 'Description' field is required."
             self.controller.show_info_box(msg, "Info")
             return False
 
@@ -1489,14 +1490,14 @@ class GwAdmin:
         return True
 
 
-    def create_project_data_schema(self, project_name_schema=None, project_title_schema=None, project_type=None,
+    def create_project_data_schema(self, project_name_schema=None, project_descript=None, project_type=None,
             project_srid=None, project_locale=None, is_test=False, exec_last_process=True, example_data=True):
 
         # Get project parameters
         if project_name_schema is None or not project_name_schema:
             project_name_schema = tools_qt.getWidgetText(self.dlg_readsql_create_project, 'project_name')
-        if project_title_schema is None or not project_title_schema:
-            project_title_schema = tools_qt.getWidgetText(self.dlg_readsql_create_project, 'project_title')
+        if project_descript is None or not project_descript:
+            project_descript = tools_qt.getWidgetText(self.dlg_readsql_create_project, 'project_descript')
         if project_type is None:
             project_type = tools_qt.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
         if project_srid is None:
@@ -1506,7 +1507,7 @@ class GwAdmin:
 
         # Set class variables
         self.schema = project_name_schema
-        self.title = project_title_schema
+        self.descript = project_descript
         self.schema_type = project_type
         self.project_epsg = project_srid
         self.locale = project_locale
@@ -1514,12 +1515,12 @@ class GwAdmin:
 
         # Save in settings
         set_parser_value('admin', 'project_name_schema', f'{project_name_schema}')
-        set_parser_value('admin', 'project_title_schema', f'{project_title_schema}')
+        set_parser_value('admin', 'project_descript', f'{project_descript}')
         inp_file_path = tools_qt.getWidgetText(self.dlg_readsql_create_project, 'data_file')
         set_parser_value('admin', 'inp_file_path', f'{inp_file_path}')
 
         # Check if project name is valid
-        if not self.check_project_name(project_name_schema, project_title_schema):
+        if not self.check_project_name(project_name_schema, project_descript):
             return
 
         self.controller.log_info(f"Create schema of type '{project_type}': '{project_name_schema}'")
@@ -2227,7 +2228,7 @@ class GwAdmin:
 
         # Find Widgets in form
         self.project_name = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_name')
-        self.project_title = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_title')
+        self.project_descript = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_descript')
         self.rdb_sample = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample')
         self.rdb_sample_dev = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample_dev')
         self.rdb_data = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_data')
@@ -2236,7 +2237,7 @@ class GwAdmin:
 
         # Load user values
         self.project_name.setText(get_parser_value('admin', 'project_name_schema'))
-        self.project_title.setText(get_parser_value('admin', 'project_title_schema'))
+        self.project_descript.setText(get_parser_value('admin', 'project_descript'))
         create_schema_type = get_parser_value('admin', 'create_schema_type')
         if create_schema_type == 'True':
             tools_qt.setChecked(self.dlg_readsql_create_project, str(create_schema_type))
