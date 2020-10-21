@@ -1338,10 +1338,11 @@ def construct_form_param_user(dialog, row, pos, _json, temp_layers_added=None):
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'spinbox':
                 widget = QDoubleSpinBox()
-                if 'value' in field and field['value'] not in(None, ""):
+                if field['widgetname'] in ('inp_options_checkfreq', 'inp_options_damplimit'):
+                    widget.setDecimals(4)
+                if 'value' in field and field['value'] not in (None, ""):
                     value = float(str(field['value']))
                     widget.setValue(value)
-                # noinspection PyUnresolvedReferences
                 widget.valueChanged.connect(partial(get_values_changed_param_user,
                                             dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -1391,6 +1392,12 @@ def get_values_changed_param_user(dialog, chk, widget, field, list, value=None):
         value = isChecked(dialog, widget)
     elif type(widget) is QDateEdit:
         value = getCalendarDate(dialog, widget)
+
+    # When the QDoubleSpinbox contains decimals, for example 2,0001 when collecting the value, the spinbox itself sends
+    # 2.0000999999, as in reality we only want, maximum 4 decimal places, we round up, thus fixing this small failure
+    # of the widget
+    if type(widget) in (QSpinBox, QDoubleSpinBox):
+        value = round(value, 4)
     # if chk is None:
     #     elem[widget.objectName()] = value
     elem['widget'] = str(widget.objectName())
