@@ -49,10 +49,11 @@ class Edit(ParentAction):
         self.snapper_manager.store_snapping_options()
 
         # Set snapping to 'node', 'connec' and 'gully'
-        self.snapper_manager.set_snapping_mode()
         self.snapper_manager.snap_to_arc()
         self.snapper_manager.snap_to_node()
         self.snapper_manager.snap_to_connec_gully()
+        self.snapper_manager.set_snapping_mode()
+
         self.iface.actionAddFeature().toggled.connect(self.action_is_checked)
 
         self.feature_cat = feature_cat
