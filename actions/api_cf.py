@@ -1195,12 +1195,7 @@ class ApiCF(ApiParent, QObject):
                 return True
 
             feature = f'"id":"{new_feature.attribute(id_name)}", '
-            extras = '"addSchema":""'
-            feature = f'{feature} "tableName":"{p_table_id}""'
-            body = self.create_body(feature=feature, extras=extras)
-            function_name = 'gw_fct_getinfofromid'
-            json_result = self.controller.get_json(function_name, body)
-            self.reload_fields(dialog, json_result, True)
+
         # If we make an info
         else:
             my_json = json.dumps(_json)
@@ -1238,12 +1233,7 @@ class ApiCF(ApiParent, QObject):
                 self.manage_docker_close()
             self.close_dialog(dialog)
             return None
-        extras = '"addSchema":""'
-        feature = f'"tableName":"{p_table_id}", "id":"{self.feature_id}"'
-        body = self.create_body(feature=feature, extras=extras)
-        function_name = 'gw_fct_getinfofromid'
-        json_result = self.controller.get_json(function_name, body)
-        self.reload_fields(dialog, json_result, True)
+
         return True
 
 
