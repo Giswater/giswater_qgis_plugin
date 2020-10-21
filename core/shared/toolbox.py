@@ -20,9 +20,10 @@ from collections import OrderedDict
 from functools import partial
 
 from ...lib import tools_qt
-from ..utils.tools_giswater import getWidgetText, open_file_path, set_style_mapzones
+from ..utils.tools_giswater import set_style_mapzones, delete_layer_from_toc
 from ..shared.api_parent import ApiParent
 from ..ui.ui_manager import ToolboxDockerUi, ToolboxUi
+from ..utils.function_toolbox import set_uri
 
 from random import randrange
 from ... import global_vars
@@ -608,175 +609,6 @@ class GwToolBox(ApiParent):
             return 0
 
 
-    def gw_function_dxf(self, **kwargs):
-        """ Function called in def add_button(self, dialog, field): -->
-                widget.clicked.connect(partial(getattr(self, function_name), dialog, widget)) """
-
-        path, filter_ = open_file_path(filter_="DXF Files (*.dxf)")
-        if not path:
-            return
-
-        dialog = kwargs['dialog']
-        widget = kwargs['widget']
-        temp_layers_added = kwargs['temp_layers_added']
-        complet_result = self.manage_dxf(dialog, path, False, True)
-
-        for layer in complet_result['temp_layers_added']:
-            temp_layers_added.append(layer)
-        if complet_result is not False:
-            widget.setText(complet_result['path'])
-
-        dialog.btn_run.setEnabled(True)
-        dialog.btn_cancel.setEnabled(True)
-
-
-    def manage_dxf(self, dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=True):
-        """ Select a dxf file and add layers into toc
-        :param dxf_path: path of dxf file
-        :param export_to_db: Export layers to database
-        :param toc: insert layers into TOC
-        :param del_old_layers: look for a layer with the same name as the one to be inserted and delete it
-        :return:
-        """
-
-        srid = self.controller.plugin_settings_value('srid')
-        # Block the signals so that the window does not appear asking for crs / srid and / or alert message
-        self.iface.mainWindow().blockSignals(True)
-        dialog.txt_infolog.clear()
-
-        sql = "DELETE FROM temp_table WHERE fid = 206;\n"
-        self.controller.execute_sql(sql)
-        temp_layers_added = []
-        for type_ in ['LineString', 'Point', 'Polygon']:
-
-            # Get file name without extension
-            dxf_output_filename = os.path.splitext(os.path.basename(dxf_path))[0]
-
-            # Create layer
-            uri = f"{dxf_path}|layername=entities|geometrytype={type_}"
-            dxf_layer = QgsVectorLayer(uri, f"{dxf_output_filename}_{type_}", 'ogr')
-
-            # Set crs to layer
-            crs = dxf_layer.crs()
-            crs.createFromId(srid)
-            dxf_layer.setCrs(crs)
-
-            if not dxf_layer.hasFeatures():
-                continue
-
-            # Get the name of the columns
-            field_names = [field.name() for field in dxf_layer.fields()]
-
-            sql = ""
-            geom_types = {0: 'geom_point', 1: 'geom_line', 2: 'geom_polygon'}
-            for count, feature in enumerate(dxf_layer.getFeatures()):
-                geom_type = feature.geometry().type()
-                sql += (f"INSERT INTO temp_table (fid, text_column, {geom_types[int(geom_type)]})"
-                        f" VALUES (206, '{{")
-                for att in field_names:
-                    if feature[att] in (None, 'NULL', ''):
-                        sql += f'"{att}":null , '
-                    else:
-                        sql += f'"{att}":"{feature[att]}" , '
-                geometry = self.manage_geometry(feature.geometry())
-                sql = sql[:-2] + f"}}', (SELECT ST_GeomFromText('{geometry}', {srid})));\n"
-                if count != 0 and count % 500 == 0:
-                    status = self.controller.execute_sql(sql)
-                    if not status:
-                        return False
-                    sql = ""
-
-            if sql != "":
-                status = self.controller.execute_sql(sql)
-                if not status:
-                    return False
-
-            if export_to_db:
-                self.export_layer_to_db(dxf_layer, crs)
-
-            if del_old_layers:
-                self.delete_layer_from_toc(dxf_layer.name())
-
-            if toc:
-                if dxf_layer.isValid():
-                    self.from_dxf_to_toc(dxf_layer, dxf_output_filename)
-                    temp_layers_added.append(dxf_layer)
-
-        # Unlock signals
-        self.iface.mainWindow().blockSignals(False)
-
-        extras = "  "
-        for widget in dialog.grb_parameters.findChildren(QWidget):
-            widget_name = widget.property('columnname')
-            value = getWidgetText(dialog, widget, add_quote=False)
-            extras += f'"{widget_name}":"{value}", '
-        extras = extras[:-2]
-        body = self.create_body(extras)
-        result = self.controller.get_json('gw_fct_check_importdxf', None)
-        if not result or result['status'] == 'Failed':
-            return False
-
-        return {"path": dxf_path, "result": result, "temp_layers_added": temp_layers_added}
-
-
-    def set_uri(self):
-        """ Set the component parts of a RDBMS data source URI
-        :return: QgsDataSourceUri() with the connection established according to the parameters of the controller.
-        """
-
-        self.uri = QgsDataSourceUri()
-        self.uri.setConnection(self.controller.credentials['host'], self.controller.credentials['port'],
-                               self.controller.credentials['db'], self.controller.credentials['user'],
-                               self.controller.credentials['password'])
-        return self.uri
-
-
-    def manage_geometry(self, geometry):
-        """ Get QgsGeometry and return as text
-         :param geometry: (QgsGeometry)
-         :return: (String)
-        """
-        geometry = geometry.asWkt().replace('Z (', ' (')
-        geometry = geometry.replace(' 0)', ')')
-        return geometry
-
-
-    def from_dxf_to_toc(self, dxf_layer, dxf_output_filename):
-        """  Read a dxf file and put result into TOC
-        :param dxf_layer: (QgsVectorLayer)
-        :param dxf_output_filename: Name of layer into TOC (string)
-        :return: dxf_layer (QgsVectorLayer)
-        """
-
-        QgsProject.instance().addMapLayer(dxf_layer, False)
-        root = QgsProject.instance().layerTreeRoot()
-        my_group = root.findGroup(dxf_output_filename)
-        if my_group is None:
-            my_group = root.insertGroup(0, dxf_output_filename)
-        my_group.insertLayer(0, dxf_layer)
-        global_vars.canvas.refreshAllLayers()
-        return dxf_layer
-
-
-    def export_layer_to_db(self, layer, crs):
-        """ Export layer to postgres database
-        :param layer: (QgsVectorLayer)
-        :param crs: QgsVectorLayer.crs() (crs)
-        """
-
-        sql = f'DROP TABLE "{layer.name()}";'
-        self.controller.execute_sql(sql)
-
-        schema_name = self.controller.credentials['schema'].replace('"', '')
-        self.set_uri()
-        self.uri.setDataSource(schema_name, layer.name(), None, "", layer.name())
-
-        error = QgsVectorLayerExporter.exportLayer(
-            layer, self.uri.uri(), self.controller.credentials['user'], crs, False)
-        if error[0] != 0:
-            self.controller.log_info(F"ERROR --> {error[1]}")
-
-
     def from_postgres_to_toc(self, tablename=None, the_geom="the_geom", field_id="id", child_layers=None,
         group="GW Layers", style_id="-1"):
         """ Put selected layer into TOC
@@ -788,13 +620,13 @@ class GwToolBox(ApiParent):
         :param style_id: Id of the style we want to load (integer or String)
         """
 
-        self.set_uri()
+        uri = set_uri()
         schema_name = self.controller.credentials['schema'].replace('"', '')
         if child_layers is not None:
             for layer in child_layers:
                 if layer[0] != 'Load all':
-                    self.uri.setDataSource(schema_name, f'{layer[0]}', the_geom, None, layer[1] + "_id")
-                    vlayer = QgsVectorLayer(self.uri.uri(), f'{layer[0]}', "postgres")
+                    uri.setDataSource(schema_name, f'{layer[0]}', the_geom, None, layer[1] + "_id")
+                    vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
                     group = layer[4] if layer[4] is not None else group
                     group = group if group is not None else 'GW Layers'
                     self.check_for_group(vlayer, group)
@@ -808,8 +640,8 @@ class GwToolBox(ApiParent):
                                 qml = style['body']['styles']['style']
                                 self.create_qml(vlayer, qml)
         else:
-            self.uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
-            vlayer = QgsVectorLayer(self.uri.uri(), f'{tablename}', 'postgres')
+            uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
+            vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
             self.check_for_group(vlayer, group)
             # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
             # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
@@ -894,7 +726,7 @@ class GwToolBox(ApiParent):
                     except KeyError:
                         layer_name = 'Temporal layer'
                     if del_old_layers:
-                        self.delete_layer_from_toc(layer_name)
+                        delete_layer_from_toc(layer_name)
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
                     layer_name = None
                     # TODO This if controls if the function already works with GeoJson or is still to be refactored
@@ -1230,30 +1062,6 @@ class GwToolBox(ApiParent):
             my_group = root.insertGroup(0, group)
 
         my_group.insertLayer(0, virtual_layer)
-
-
-    def delete_layer_from_toc(self, layer_name):
-        """ Delete layer from toc if exist
-         :param layer_name: Name's layer (string)
-        """
-
-        layer = None
-        for lyr in list(QgsProject.instance().mapLayers().values()):
-            if lyr.name() == layer_name:
-                layer = lyr
-                break
-        if layer is not None:
-            # Remove layer
-            QgsProject.instance().removeMapLayer(layer)
-
-            # Remove group if is void
-            root = QgsProject.instance().layerTreeRoot()
-            group = root.findGroup('GW Temporal Layers')
-            if group:
-                layers = group.findLayers()
-                if not layers:
-                    root.removeChildNode(group)
-            self.delete_layer_from_toc(layer_name)
 
 
     def load_qml(self, layer, qml_path):
