@@ -26,7 +26,7 @@ from ..models.om_visit_x_connec import OmVisitXConnec
 from ..models.om_visit_x_node import OmVisitXNode
 from ..models.om_visit_x_gully import OmVisitXGully
 from ..models.om_visit_parameter import OmVisitParameter
-from ..ui.ui_manager import VisitUi, VisitEvent, VisitEventRehab, LotVisitManagerUi
+from ..ui.ui_manager import VisitUi, VisitEvent, VisitEventRehab, VisitManagerUi
 from .document import GwDocument
 from ..utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers, create_body, \
     enable_feature_type, check_expression
@@ -872,7 +872,7 @@ class GwVisitManager:
         """ Button 65: Edit visit """
 
         # Create the dialog
-        self.dlg_man = LotVisitManagerUi()
+        self.dlg_man = VisitManagerUi()
         load_settings(self.dlg_man)
         self.dlg_man.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
 

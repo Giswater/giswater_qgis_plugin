@@ -32,7 +32,7 @@ from .btn_admin_gis_project import GwAdminGisProject
 from .tasks.parent_task import GwTask
 from ..i18n.i18n_generator import GwI18NGenerator
 from .ui.ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjectInfoUi, \
-    MainGisProjectUi, ToolboxUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
+    MainGisProjectUi, MainImportUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
 from .utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
     create_body, populate_info_text_ as populate_info_text
 from ..lib.tools_qt import construct_form_param_user, get_folder_dialog, set_table_columns
@@ -1303,7 +1303,7 @@ class GwAdmin:
     def execute_import_data(self, schema_type=''):
 
         # Create dialog
-        self.dlg_import_inp = ToolboxUi()
+        self.dlg_import_inp = MainImportUi()
         load_settings(self.dlg_import_inp)
 
         # Hide widgets
