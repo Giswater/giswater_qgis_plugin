@@ -13,6 +13,7 @@ from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QPixmap
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint
 
+import shlex
 import configparser
 import os.path
 from functools import partial
@@ -100,7 +101,7 @@ def qgis_get_layer_source(layer):
     """ Get database connection paramaters of @layer """
 
     # Initialize variables
-    layer_source = {'db': None, 'schema': None, 'table': None, 'service': None,
+    layer_source = {'db': None, 'schema': None, 'table': None,
                     'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
 
     if layer is None:
@@ -108,46 +109,20 @@ def qgis_get_layer_source(layer):
 
     # Get dbname, host, port, user and password
     uri = layer.dataProvider().dataSourceUri()
-    pos_db = uri.find('dbname=')
-    pos_host = uri.find(' host=')
-    pos_port = uri.find(' port=')
-    pos_user = uri.find(' user=')
-    pos_password = uri.find(' password=')
-    pos_sslmode = uri.find(' sslmode=')
-    pos_key = uri.find(' key=')
-    if pos_db != -1 and pos_host != -1:
-        uri_db = uri[pos_db + 8:pos_host - 1]
-        layer_source['db'] = uri_db
-    if pos_host != -1 and pos_port != -1:
-        uri_host = uri[pos_host + 6:pos_port]
-        layer_source['host'] = uri_host
-    if pos_port != -1:
-        if pos_user != -1:
-            pos_end = pos_user
-        elif pos_sslmode != -1:
-            pos_end = pos_sslmode
-        elif pos_key != -1:
-            pos_end = pos_key
-        else:
-            pos_end = pos_port + 10
-        uri_port = uri[pos_port + 6:pos_end]
-        layer_source['port'] = uri_port
-    if pos_user != -1 and pos_password != -1:
-        uri_user = uri[pos_user + 7:pos_password - 1]
-        layer_source['user'] = uri_user
-    if pos_password != -1 and pos_sslmode != -1:
-        uri_password = uri[pos_password + 11:pos_sslmode - 1]
-        layer_source['password'] = uri_password
 
-        # Get schema and table or view name
-    pos_table = uri.find('table=')
-    pos_end_schema = uri.rfind('.')
-    pos_fi = uri.find('" ')
-    if pos_table != -1 and pos_fi != -1:
-        uri_schema = uri[pos_table + 6:pos_end_schema]
-        uri_table = uri[pos_end_schema + 2:pos_fi]
-        layer_source['schema'] = uri_schema
-        layer_source['table'] = uri_table
+    # Initialize variables
+    layer_source = {'db': None, 'schema': None, 'table': None,
+                    'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
+
+    # split with quoted substrings preservation
+    splt = shlex.split(uri)
+
+    splt_dct = dict([tuple(v.split('=')) for v in splt if '=' in v])
+    splt_dct['db'] = splt_dct['dbname']
+    splt_dct['schema'], splt_dct['table'] = splt_dct['table'].split('.')
+
+    for key in layer_source.keys():
+        layer_source[key] = splt_dct.get(key)
 
     return layer_source
 
