@@ -1374,7 +1374,10 @@ class GwInfo(QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = self.manage_spinbox(dialog, complet_result, field, new_feature)
+        widget = add_spinbox(field)
+        if 'widgetcontrols' in field and field['widgetcontrols'] and 'spinboxDecimals' in field['widgetcontrols']:
+            widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
+        widget = self.set_auto_update_spinbox(field, dialog, widget, new_feature)
         return widget
 
 

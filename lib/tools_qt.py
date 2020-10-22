@@ -1338,7 +1338,7 @@ def construct_form_param_user(dialog, row, pos, _json, temp_layers_added=None):
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'spinbox':
                 widget = QDoubleSpinBox()
-                if 'widgetcontrols' in field and 'spinboxDecimals' in field['widgetcontrols']:
+                if 'widgetcontrols' in field and field['widgetcontrols'] and 'spinboxDecimals' in field['widgetcontrols']:
                     widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
                 if 'value' in field and field['value'] not in (None, ""):
                     value = float(str(field['value']))
