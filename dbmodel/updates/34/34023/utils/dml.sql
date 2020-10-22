@@ -18,3 +18,9 @@ widgetfunction, linkedaction, stylesheet, listfilterparam, layoutname, widgetcon
 FROM config_form_fields WHERE columnname in ('state_type') AND formname like 'v_edit_inp_junction%';
 
 UPDATE sys_param_user SET datatype = 'float', widgettype = 'spinbox' where id = 'edit_element_doublegeom';
+
+-- 2020/10/21
+UPDATE sys_param_user SET label = 'QGIS initproject set layer propierties' WHERE id = 'qgis_layers_set_propierties';
+UPDATE sys_param_user SET label = 'QGIS initproject show guidemap' WHERE id = 'qgis_init_guide_map';
+UPDATE sys_param_user SET label = 'QGIS initproject hide check form' WHERE id = 'qgis_form_initproject_hidden';
+UPDATE sys_param_user SET label = 'QGIS initproject check database' WHERE id = 'utils_checkproject_database';

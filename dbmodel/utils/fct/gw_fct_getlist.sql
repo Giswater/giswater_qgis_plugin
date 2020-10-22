@@ -19,13 +19,13 @@ TOC
 SELECT SCHEMA_NAME.gw_fct_getlist($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
-"data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},"filterFeatureField":{"arc_id":"2001},
+"data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},"filterFeatureField":{"arc_id":"2001"},
         "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "currentPage":3}}}$$)
 
 -- attribute table using canvas filter
 SELECT SCHEMA_NAME.gw_fct_getlist($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"tableName":"ve_arc_pipe", "idName":"arc_id"},"filterFeatureField":{"arc_id":"2001},
+"feature":{"tableName":"ve_arc_pipe", "idName":"arc_id"},"filterFeatureField":{"arc_id":"2001"},
 "data":{"canvasExtend":{"canvascheck":true, "x1coord":12131313,"y1coord":12131313,"x2coord":12131313,"y2coord":12131313},
         "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "currentPage":1}}}$$)
 
@@ -35,7 +35,7 @@ VISIT
 SELECT SCHEMA_NAME.gw_fct_getlist($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"om_visit_x_arc" ,"idName":"id"},
-"data":{"filterFields":{"arc_id":2001, "limit":10},"filterFeatureField":{"arc_id":"2001},
+"data":{"filterFields":{"arc_id":2001, "limit":10},"filterFeatureField":{"arc_id":"2001"},
     "pageInfo":{"orderBy":"visit_id", "orderType":"DESC", "offsset":"10", "currentPage":null}}}$$)
 
 
@@ -43,7 +43,7 @@ SELECT SCHEMA_NAME.gw_fct_getlist($${
 SELECT SCHEMA_NAME.gw_fct_getlist($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"v_ui_om_event" ,"idName":"id"},
-"data":{"filterFields":{"visit_id":232, "limit":10},"filterFeatureField":{"arc_id":"2001},
+"data":{"filterFields":{"visit_id":232, "limit":10},"filterFeatureField":{"arc_id":"2001"},
     "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}$$)
 
 -- Visit -> files
@@ -58,7 +58,7 @@ SELECT SCHEMA_NAME.gw_fct_getlist($${
 SELECT SCHEMA_NAME.gw_fct_getlist($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"om_visit_file"},
-"data":{"filterFields":{"filetype":"jpg","limit":15, "visit_id":1135},"filterFeatureField":{"arc_id":"2001},
+"data":{"filterFields":{"filetype":"jpg","limit":15, "visit_id":1135},"filterFeatureField":{"arc_id":"2001"},
 	"pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_getlist($$
@@ -144,6 +144,10 @@ v_default json;
 v_listtype text;
 v_isattribute boolean;
 v_attribute_filter text;
+v_audit_result text;
+v_status text;
+v_level integer;
+v_message text;
 
 BEGIN
 
@@ -186,7 +190,8 @@ BEGIN
 	
 	-- control nulls
 	IF v_tablename IS NULL THEN
-		RAISE EXCEPTION 'The config table is bad configured. v_tablename is null';
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3156", "function":"2592","debug_msg":"tableName"}}$$);'INTO v_audit_result;
 	END IF;
 
 	RAISE NOTICE 'gw_fct_getlist - Init Values: v_tablename %  v_filter_values  % v_filter_feature %', v_tablename, v_filter_values, v_filter_feature;
@@ -475,8 +480,21 @@ BEGIN
 	v_fields_json := COALESCE(v_fields_json, '{}');
 	v_pageinfo := COALESCE(v_pageinfo, '{}');
 
+
+	IF v_audit_result is null THEN
+        v_status = 'Accepted';
+        v_level = 3;
+        v_message = 'Process done successfully';
+    ELSE
+
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+
+    END IF;
+
 	-- Return
-    RETURN ('{"status":"Accepted", "message":{"level":1, "text":"This is a test message"}, "version":'||v_version||
+    RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":'||v_version||
              ',"body":{"form":{}'||
 		     ',"feature":{"featureType":"' || v_featuretype || '","tableName":"' || v_tablename ||'","idName":"'|| v_idname ||'"}'||
 		     ',"data":{"fields":' || v_fields_json ||

@@ -260,7 +260,7 @@ BEGIN
 					END LOOP;
 				END IF;			    
 			END IF;	
-			
+				
 			--removing the not used fields
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
 			'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc', 'sys_role', 'project_type');

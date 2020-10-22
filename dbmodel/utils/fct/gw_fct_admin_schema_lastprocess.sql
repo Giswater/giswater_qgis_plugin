@@ -34,7 +34,8 @@ v_gwversion text;
 v_language text;
 v_epsg integer;
 v_isnew boolean;
-v_title text;
+v_descript text;
+v_name text;
 v_author text;
 v_date text;
 v_schema_info json;
@@ -57,7 +58,8 @@ BEGIN
 	v_epsg := (p_data ->> 'data')::json->> 'epsg';
 	v_isnew := (p_data ->> 'data')::json->> 'isNewProject';
 	v_issample := (p_data ->> 'data')::json->> 'isSample';
-	v_title := (p_data ->> 'data')::json->> 'title';
+	v_descript := (p_data ->> 'data')::json->> 'descript';
+    v_name := (p_data ->> 'data')::json->> 'name';
 	v_author := (p_data ->> 'data')::json->> 'author';
 	v_date := (p_data ->> 'data')::json->> 'date';
 	v_superusers := (p_data ->> 'data')::json->> 'superUsers';
@@ -93,11 +95,12 @@ BEGIN
 		v_message='Project sucessfully created';
 		
 		-- create json info_schema
-		v_title := COALESCE(v_title, '');
+		v_descript := COALESCE(v_descript, '');
+        v_name := COALESCE(v_name, '');
 		v_author := COALESCE(v_author, '');
 		v_date := COALESCE(v_date, '');
 
-		v_schema_info = '{"title":"'||v_title||'","author":"'||v_author||'","date":"'||v_date||'"}';
+		v_schema_info = '{"name":"'||v_name||'","descript":"'||v_descript||'","author":"'||v_author||'","date":"'||v_date||'"}';
 		
 		-- drop deprecated tables
 		FOR v_tablename IN SELECT table_name FROM information_schema.tables WHERE table_schema=v_schemaname and substring(table_name,1 , 1) = '_' 

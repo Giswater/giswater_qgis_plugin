@@ -55,13 +55,8 @@ BEGIN
 
 			SELECT arc_id INTO arc_id_aux FROM arc JOIN v_edit_arc USING (arc_id) WHERE st_dwithin((NEW.the_geom), arc.the_geom, v_node_proximity) LIMIT 1;
 			IF arc_id_aux IS NOT NULL THEN
-<<<<<<< HEAD
 				EXECUTE 'SELECT gw_fct_setarcdivide($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["'||NEW.node_id||'"]},"data":{}}$$)';
 			END IF;	
-=======
-				EXECUTE 'SELECT gw_fct_arc_divide($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["'||NEW.node_id||'"]},"data":{}}$$)';
-			END IF;
->>>>>>> 5f8b382c6... Enhance performance on insert nodes (20x faster') because trigger of arc_divide
 		END IF;
 
    	END IF;
