@@ -43,19 +43,25 @@ BEGIN
 	END IF;
 	
 
---  Only enabled on insert
+	--  Only enabled on insert
 	IF TG_OP = 'INSERT' AND edit_arc_division_dsbl_aux IS NOT TRUE THEN
 
 		SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='edit_node_proximity';
 
 		-- get if another node exists
-		SELECT node_id INTO node_id_aux FROM v_edit_node WHERE ST_intersects((NEW.the_geom), St_buffer(v_edit_node.the_geom,v_node_proximity)) AND NEW.state>0 AND NEW.node_id != node_id LIMIT 1;
+		SELECT node_id INTO node_id_aux FROM node JOIN v_edit_node USING (node_id) WHERE st_dwithin((NEW.the_geom), node.the_geom, v_node_proximity) AND NEW.node_id != node_id LIMIT 1;
 		
 		IF node_id_aux IS NULL THEN
-			SELECT arc_id INTO arc_id_aux FROM v_edit_arc WHERE ST_intersects((NEW.the_geom), St_buffer(v_edit_arc.the_geom,v_node_proximity)) AND NEW.state>0 LIMIT 1;
+
+			SELECT arc_id INTO arc_id_aux FROM arc JOIN v_edit_arc USING (arc_id) WHERE st_dwithin((NEW.the_geom), arc.the_geom, v_node_proximity) LIMIT 1;
 			IF arc_id_aux IS NOT NULL THEN
+<<<<<<< HEAD
 				EXECUTE 'SELECT gw_fct_setarcdivide($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["'||NEW.node_id||'"]},"data":{}}$$)';
 			END IF;	
+=======
+				EXECUTE 'SELECT gw_fct_arc_divide($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["'||NEW.node_id||'"]},"data":{}}$$)';
+			END IF;
+>>>>>>> 5f8b382c6... Enhance performance on insert nodes (20x faster') because trigger of arc_divide
 		END IF;
 
    	END IF;
