@@ -6,9 +6,10 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.gui import QgsDateTimeEdit
-from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, QSettings
+from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, QSettings, \
+    pyqtSignal
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator, QFontMetrics, QStandardItemModel, \
-    QStandardItem, QIcon, pyqtSignal
+    QStandardItem, QIcon
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, \
     QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, QPlainTextEdit, \
