@@ -27,7 +27,6 @@ from .search import GwSearch
 from ..utils.tools_giswater import close_dialog, load_settings, open_dialog, save_settings, create_body, \
     populate_info_text_ as populate_info_text, delete_layer_from_toc, check_expression
 from .mincut_manager import GwMincutManager
-from ...actions.multiple_selection import MultipleSelection
 from ..ui.ui_manager import DialogTextUi
 from ..ui.ui_manager import Mincut
 from ..ui.ui_manager import MincutEndUi
@@ -40,7 +39,7 @@ from ...lib.tools_qgis import refresh_map_canvas, set_cursor_wait, set_cursor_re
     disconnect_signal_selection_changed, zoom_to_rectangle, get_composers_list, get_composer_index, resetRubberbands, \
     restore_user_layer, get_event_point, snap_to_current_layer, get_snapped_layer, get_snapped_feature, \
     get_snapped_feature_id, get_snapped_point, snap_to_background_layers, add_marker, get_snapping_options, \
-    apply_snapping_options
+    apply_snapping_options, MultipleSelection
 
 
 class GwMincut:
