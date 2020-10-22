@@ -111,7 +111,7 @@ def qgis_get_layer_source(layer):
     uri = layer.dataProvider().dataSourceUri()
 
     # Initialize variables
-    layer_source = {'db': None, 'schema': None, 'table': None,
+    layer_source = {'db': None, 'schema': None, 'table': None, 'service': None,
                     'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
 
     # split with quoted substrings preservation
