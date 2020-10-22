@@ -37,42 +37,42 @@ BEGIN
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
 		
-		-- Scale_vdefault
-			IF (NEW.scale IS NULL) THEN
-				NEW.scale := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_scale_vdefault' AND "cur_user"="current_user"())::numeric (8,2);
-			END IF;
-			
-		-- Rotation_vdefault
-			IF (NEW.rotation IS NULL) THEN
-				NEW.rotation := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_rotation_vdefault' AND "cur_user"="current_user"())::numeric (8,4);
-			END IF;
-			
-		-- Gexpenses_vdefault
-			IF (NEW.gexpenses IS NULL) THEN
-				NEW.gexpenses := (SELECT "value" FROM config_param_user WHERE "parameter"='plan_psector_gexpenses_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
-			END IF;
-			
-		-- Vat_vdefault
-			IF (NEW.vat IS NULL) THEN
-				NEW.vat := (SELECT "value" FROM config_param_user WHERE "parameter"='plan_psector_vat_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
-			END IF;
-			
-		-- Other_vdefault
-			IF (NEW.other IS NULL) THEN
-				NEW.other := (SELECT "value" FROM config_param_user WHERE "parameter"='plan_psector_other_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
-			END IF;
+	-- Scale_vdefault
+	IF (NEW.scale IS NULL) THEN
+		NEW.scale := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_scale_vdefault' AND "cur_user"="current_user"())::numeric (8,2);
+	END IF;
 		
-		-- Type_vdefault
-			IF (NEW.psector_type IS NULL) THEN
-				NEW.psector_type := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_type_vdefault' AND "cur_user"="current_user"())::integer;
-			END IF;
-			
-		-- Control insertions ID
-			IF (NEW.psector_id IS NULL and om_aux='om') THEN
-				NEW.psector_id:= (SELECT nextval('om_psector_id_seq'));
-			ELSIF (NEW.psector_id IS NULL and om_aux='plan') THEN
-				NEW.psector_id:= (SELECT nextval('plan_psector_id_seq'));
-			END IF;   
+	-- Rotation_vdefault
+	IF (NEW.rotation IS NULL) THEN
+		NEW.rotation := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_rotation_vdefault' AND "cur_user"="current_user"())::numeric (8,4);
+	END IF;
+		
+	-- Gexpenses_vdefault
+	IF (NEW.gexpenses IS NULL) THEN
+		NEW.gexpenses := (SELECT "value" FROM config_param_user WHERE "parameter"='plan_psector_gexpenses_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
+	END IF;
+		
+	-- Vat_vdefault
+	IF (NEW.vat IS NULL) THEN
+		NEW.vat := (SELECT "value" FROM config_param_user WHERE "parameter"='plan_psector_vat_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
+	END IF;
+		
+	-- Other_vdefault
+	IF (NEW.other IS NULL) THEN
+		NEW.other := (SELECT "value" FROM config_param_user WHERE "parameter"='plan_psector_other_vdefault' AND "cur_user"="current_user"())::numeric(4,2);
+	END IF;
+	
+	-- Type_vdefault
+	IF (NEW.psector_type IS NULL) THEN
+		NEW.psector_type := (SELECT "value" FROM config_param_user WHERE "parameter"='psector_type_vdefault' AND "cur_user"="current_user"())::integer;
+	END IF;
+		
+	-- Control insertions ID
+	IF (NEW.psector_id IS NULL and om_aux='om') THEN
+		NEW.psector_id:= (SELECT nextval('om_psector_id_seq'));
+	ELSIF (NEW.psector_id IS NULL and om_aux='plan') THEN
+		NEW.psector_id:= (SELECT nextval('plan_psector_id_seq'));
+	END IF;   
 	
 	IF om_aux='plan' THEN
 
@@ -80,7 +80,7 @@ BEGIN
 		 atlas_id, gexpenses, vat, other, the_geom, expl_id, active, ext_code, status)
 		VALUES  (NEW.psector_id, NEW.name, NEW.psector_type, NEW.descript, NEW.priority, NEW.text1, NEW.text2, NEW.observ, NEW.rotation, 
 		NEW.scale, NEW.sector_id, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, NEW.active,
-		NEW.ext_code, NEW.status);
+		NEW.ext_code, NEW.status, NEW.text3, NEW.text4, NEW.text5, NEW.text6);
 	END IF;
 
 		
@@ -93,7 +93,8 @@ BEGIN
 		UPDATE plan_psector 
 		SET psector_id=NEW.psector_id, name=NEW.name, psector_type=NEW.psector_type, descript=NEW.descript, priority=NEW.priority, text1=NEW.text1, 
 		text2=NEW.text2, observ=NEW.observ, rotation=NEW.rotation, scale=NEW.scale, sector_id=NEW.sector_id, atlas_id=NEW.atlas_id, 
-		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, expl_id=NEW.expl_id, active=NEW.active, ext_code=NEW.ext_code, status=NEW.status
+		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, expl_id=NEW.expl_id, active=NEW.active, ext_code=NEW.ext_code, status=NEW.status,
+		text3=NEW.text3, text4=NEW.text4, text5=NEW.text5, text6=NEW.text6
 		WHERE psector_id=OLD.psector_id;
 
 		--if the status of a psector had changed to 3 or 0 proceed with changes of feature states
@@ -162,13 +163,10 @@ BEGIN
 				--show information about performed state update
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       			"data":{"message":"3034", "function":"2446","debug_msg":null}}$$);';
+				"data":{"message":"3034", "function":"2446","debug_msg":null}}$$);';
 			END LOOP;
-			
 		END IF;
-
 	END IF;
-
                
         RETURN NEW;
 
@@ -176,14 +174,14 @@ BEGIN
     
 	IF om_aux='plan' THEN
 
-			DELETE FROM plan_psector WHERE psector_id = OLD.psector_id;
-			DELETE FROM arc WHERE state = 2 AND arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE psector_id = OLD.psector_id) ;	
-			DELETE FROM node WHERE state = 2 AND node_id IN (SELECT node_id FROM plan_psector_x_node WHERE psector_id = OLD.psector_id);	
-			DELETE FROM connec WHERE state = 2 AND connec_id IN (SELECT connec_id FROM plan_psector_x_connec WHERE psector_id = OLD.psector_id);
-			IF (select project_type FROM sys_version LIMIT 1)='UD' THEN	
-				DELETE FROM gully WHERE state = 2 AND gully_id IN (SELECT gully_id FROM plan_psector_x_gully WHERE psector_id = OLD.psector_id);
-			END IF;
-			RETURN NULL;
+		DELETE FROM plan_psector WHERE psector_id = OLD.psector_id;
+		DELETE FROM arc WHERE state = 2 AND arc_id IN (SELECT arc_id FROM plan_psector_x_arc WHERE psector_id = OLD.psector_id) ;	
+		DELETE FROM node WHERE state = 2 AND node_id IN (SELECT node_id FROM plan_psector_x_node WHERE psector_id = OLD.psector_id);	
+		DELETE FROM connec WHERE state = 2 AND connec_id IN (SELECT connec_id FROM plan_psector_x_connec WHERE psector_id = OLD.psector_id);
+		IF (select project_type FROM sys_version LIMIT 1)='UD' THEN	
+			DELETE FROM gully WHERE state = 2 AND gully_id IN (SELECT gully_id FROM plan_psector_x_gully WHERE psector_id = OLD.psector_id);
+		END IF;
+		RETURN NULL;
 	END IF;
 
         RETURN NULL;

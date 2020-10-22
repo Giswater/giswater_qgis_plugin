@@ -1,0 +1,3 @@
+3.4.024
+*************
+- Enhance plan psector, adding text3,text4,text5,text6,pem, pec, pec_vat, pca on v_edit_plan_psector
