@@ -150,6 +150,7 @@ VALUES (3156, 'Input parameter has null value', 'Please check it before continue
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
 VALUES (3158, 'Value of the function variable is null', 'Please check it before continue', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING ;
 
---2020/10/22
-UPDATE sys_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols, 'spinboxDecimals', 4) WHERE id = 'inp_options_checkfreq';
-UPDATE sys_param_user SET widgetcontrols = gw_fct_json_object_set_key(widgetcontrols, 'spinboxDecimals', 4) WHERE id = 'inp_options_damplimit';
+--2020/10/21
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES ('301', 'Planned connecs without reference link', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
