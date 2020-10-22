@@ -89,21 +89,13 @@ class GwI18NGenerator:
                 msg += "Python translation canceled\n"
 
         if db_msg:
-            status_db_msg = self.get_files_db_messages()
-            if status_db_msg is True:
-                msg += "Data base translation successful\n"
-            elif status_db_msg is False:
-                msg += "Data base translation failed\n"
-            elif status_db_msg is None:
-                msg += "Data base translation canceled\n"
-
             status_cfg_msg = self.get_files_config_messages()
             if status_cfg_msg is True:
-                msg += "Data base config translation successful\n"
+                msg += "Data base translation successful\n"
             elif status_cfg_msg is False:
-                msg += "Data base config translation failed\n"
+                msg += "Data base translation failed\n"
             elif status_cfg_msg is None:
-                msg += "Data base config translation canceled\n"
+                msg += "Data base translation canceled\n"
 
         if msg != '':
             tools_qt.setWidgetText(self.dlg_qm, 'lbl_info', msg)
@@ -257,64 +249,27 @@ class GwI18NGenerator:
         ver = version_metadata.split('.')
         plugin_version = f'{ver[0]}{ver[1]}'
         plugin_release = version_metadata.replace('.', '')
-        # Get db messages values
-        sql = (f"SELECT source, project_type, context, formname, formtype, lb_enen, lb_{db_lang}, tt_enen, tt_{db_lang} "
-               f" FROM i18n.dbdialog "
-               f" WHERE context in ('config_param_system', 'sys_param_user')"
-               f" ORDER BY formname;")
-        rows = self.get_rows(sql)
-        if not rows:
-            return False
+
         cfg_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'updates' + os.sep + f'{plugin_version}' + ''
                     + os.sep + f"{plugin_release}" + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
         file_name = f'dml.sql'
         # Check if file exist
         if os.path.exists(cfg_path + file_name):
             msg = "Are you sure you want to overwrite this file?"
-            answer = self.controller.ask_question(msg, "Overwrite", parameter=f"\n\n{cfg_path}{os.sep}{file_name}")
+            answer = self.controller.ask_question(msg, "Overwrite", parameter=f"\n\n{cfg_path}{file_name}")
             if not answer:
                 return
         else:
             os.makedirs(cfg_path, exist_ok=True)
 
-        status = self.write_values(rows, cfg_path + file_name)
-        return status
-
-
-
-    def get_files_db_messages(self):
-        """ Read the values of the database and update the i18n api files """
-        db_lang = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
-        file_lng = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
-
-        version_metadata = get_plugin_version()
-        ver = version_metadata.split('.')
-        plugin_version = f'{ver[0]}{ver[1]}'
-        plugin_release = version_metadata.replace('.', '')
-
         # Get db messages values
         sql = (f"SELECT source, project_type, context, formname, formtype, lb_enen, lb_{db_lang}, tt_enen, tt_{db_lang} "
                f" FROM i18n.dbdialog "
-               f" WHERE context not in ('config_param_system', 'sys_param_user')"
-               f" ORDER BY formname;")
+               f" ORDER BY context, formname;")
         rows = self.get_rows(sql)
         if not rows:
-            return
-
-        db_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'api' + os.sep + 'updates' + os.sep + f'{plugin_version}' + ''
-                + os.sep + f"{plugin_release}" + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
-        file_name = f'dml.sql'
-
-        # Check if file exist
-        if os.path.exists(db_path + file_name):
-            msg = "Are you sure you want to overwrite this file?"
-            answer = self.controller.ask_question(msg, "Overwrite", parameter=f"\n\n{db_path}{os.sep}{file_name}")
-            if not answer:
-                return False
-        else:
-            os.makedirs(db_path, exist_ok=True)
-
-        status = self.write_values(rows, db_path + file_name)
+            return False
+        status = self.write_values(rows, cfg_path + file_name)
         return status
 
 
@@ -324,8 +279,8 @@ class GwI18NGenerator:
         :param path: Full destination path (String)
         :return: (Boolean)
         """
+
         file = open(path, "w")
-        db_lang = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
         header = (f'/*\n'
                   f'This file is part of Giswater 3\n'
                   f'The program is free software: you can redistribute it and/or modify it under the terms of the GNU '
@@ -335,27 +290,34 @@ class GwI18NGenerator:
                   f'*/\n\n\n'
                   f'SET search_path = SCHEMA_NAME, public, pg_catalog;\n\n')
         file.write(header)
-        for row in rows:
-            table = row['context']
-            form_name = row['formname']
-            form_type = row['formtype']
-            source = row['source']
-            lbl_value = row[f'lb_{db_lang}'] if row[f'lb_{db_lang}'] is not None else row['lb_enen']
+        file.close()
+        del file
 
+
+        file = open(path, "a")
+        db_lang = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
+
+        for row in rows:
+            table = row['context'] if row['context'] is not None else ""
+            form_name = row['formname']if row['formname'] is not None else ""
+            form_type = row['formtype']if row['formtype'] is not None else ""
+            source = row['source']if row['source'] is not None else ""
+            lbl_value = row[f'lb_{db_lang}'] if row[f'lb_{db_lang}'] is not None else row['lb_enen']
+            lbl_value = lbl_value if lbl_value is not None else ""
             if row[f'tt_{db_lang}'] is not None:
                 tt_value = row[f'tt_{db_lang}']
             elif row[f'tt_enen'] is not None:
                 tt_value = row[f'tt_enen']
             else:
                 tt_value = row['lb_enen']
-
+            tt_value = tt_value if tt_value is not None else ""
             line = f'SELECT gw_fct_admin_schema_i18n($$'
             if row['context'] in ('config_param_system', 'sys_param_user'):
                 line += (f'{{"data":'
-                        f'{{"table":"{table}", '
-                        f'"formname":"{form_name}", '
-                        f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
-                        f'"tooltip":{{"column":"descript", "value":"{tt_value}"}}')
+                         f'{{"table":"{table}", '
+                         f'"formname":"{form_name}", '
+                         f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
+                         f'"tooltip":{{"column":"descript", "value":"{tt_value}"}}')
             elif row['context'] not in ('config_param_system', 'sys_param_user'):
                 line += (f'{{"data":'
                          f'{{"table":"{table}", '
@@ -375,8 +337,10 @@ class GwI18NGenerator:
                          f'AND layout_id  = \'{source}\'"')
             elif row['context'] == 'config_api_form_actions':
                 line += f', "clause":"WHERE actioname  = \'{source}\''
-            elif row['context'] in ('config_param_system', 'sys_param_user'):
+            elif row['context'] == 'config_param_system':
                 line += f', "clause":"WHERE parameter = \'{source}\'"'
+            elif row['context'] == 'sys_param_user':
+                line += f', "clause":"WHERE id = \'{source}\'"'
 
             line += f'}}}}$$);\n'
             file.write(line)
