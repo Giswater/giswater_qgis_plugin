@@ -43,8 +43,10 @@ BEGIN
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	-- get system parameters
-	SELECT value INTO v_mode FROM config_param_system WHERE parameter = 'admin_i18n_update_mode';
+	IF v_table = 'config_form_fields' THEN
+		-- get system parameters
+		SELECT value INTO v_mode FROM config_param_system WHERE parameter = 'admin_i18n_update_mode';
+	END IF;
 
 	-- get input parameters
 	v_table := (p_data ->> 'data')::json->> 'table';
@@ -88,12 +90,16 @@ BEGIN
 
 
 	IF  v_mode < 2 THEN
-		-- querytext
-		v_querytext = 'UPDATE '|| v_table ||' SET '|| v_label_col ||' = '|| quote_literal(v_label_val) ||' '|| v_clause ||' '|| v_modelabel;
-		EXECUTE v_querytext;
+		IF v_label_val IS NOT NULL and v_label_val !='' THEN
+			-- querytext
+			v_querytext = 'UPDATE '|| v_table ||' SET '|| v_label_col ||' = '|| quote_literal(v_label_val) ||' '|| v_clause ||' '|| v_modelabel;
+			EXECUTE v_querytext;
+		END IF;
 
-		v_querytext = 'UPDATE '|| v_table ||' SET '|| v_tooltip_col ||' = '|| quote_literal(v_tooltip_val) ||' '|| v_clause ||' '|| v_modetooltip;
-		EXECUTE v_querytext;
+		IF v_tooltip_val IS NOT NULL and v_tooltip_val !='' THEN
+			v_querytext = 'UPDATE '|| v_table ||' SET '|| v_tooltip_col ||' = '|| quote_literal(v_tooltip_val) ||' '|| v_clause ||' '|| v_modetooltip;
+			EXECUTE v_querytext;
+		END IF;
 
 		--update values for child layers
 		IF v_parent_layer IS NOT NULL THEN
