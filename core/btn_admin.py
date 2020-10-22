@@ -1351,8 +1351,8 @@ class GwAdmin:
         extras += '"epsg":' + str(srid).replace('"', '')
         if new_project is True:
             if str(self.descript) != 'null':
-                extras += ', ' + '"name":"' + str(schema_name) + '"'
-                extras += ', ' + '"title":"' + str(self.descript) + '"'
+                extras += ', ' + '"descript":"' + str(self.descript) + '"'
+            extras += ', ' + '"name":"' + str(schema_name) + '"'
             extras += ', ' + '"author":"' + str(self.username) + '"'
             current_date = QDate.currentDate().toString('dd-MM-yyyy')
             extras += ', ' + '"date":"' + str(current_date) + '"'
