@@ -242,7 +242,7 @@ def set_selector(dialog, widget, is_alone, selector_vars):
 
     if widget_all is None or (widget_all is not None and widget.objectName() != widget_all.objectName()):
         extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", '
-                  f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{widget.tools_qt.isChecked()}", '
+                  f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{tools_qt.isChecked(dialog, widget)}", '
                   f'"addSchema":"{qgis_project_add_schema}"')
     else:
         check_all = tools_qt.isChecked(dialog, widget_all)
