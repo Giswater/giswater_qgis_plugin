@@ -202,20 +202,6 @@ BEGIN
 		WHERE r.rolcanlogin AND r.rolname = ''' || current_user || '''
 		ORDER BY 1;'
         INTO v_userrole;
-
-	--v_offline = 'true';
-
-	-- Check if exists some open visit on related feature with the class configured as vdefault for user  (0 for finished visits and 4 for suspended visit)
-	IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
-		EXECUTE ('SELECT v.id FROM om_visit_x_'|| (v_featuretype) ||' a JOIN om_visit v ON v.id=a.visit_id '||
-			' WHERE ' || (v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text AND (status > 0) ' ||
-			' AND status != 4 AND user_name = current_user ORDER BY startdate DESC LIMIT 1')
-			INTO v_existvisit_id;
-	END IF;
-
-	IF v_existvisit_id IS NOT NULL THEN
-		v_id = v_existvisit_id;
-	END IF;
 	
 
 	--  get visitclass
@@ -238,8 +224,14 @@ BEGIN
 				-- Compare current lot_id with old visits for only show existing visits for current lot
 				v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id=current_user);
 
-				-- getting visit class in function of visit type and tablename (when tablename IS NULL then noinfra)
-				v_visitclass := (SELECT id FROM config_visit_class WHERE visit_type=p_visittype AND feature_type = upper(v_featuretype) AND param_options->>'offlineDefault' = 'true' LIMIT 1)::integer;
+				-- getting visit class in function: 1st v_lot, 2nd feature_type
+				IF v_lot IS NOT NULL THEN
+					v_visitclass := (SELECT visitclass_id FROM om_visit_lot WHERE id=v_lot);
+				END IF;
+				
+				IF v_visitclass IS NULL THEN
+					v_visitclass := (SELECT id FROM config_visit_class WHERE visit_type=p_visittype AND feature_type = upper(v_featuretype) AND param_options->>'offlineDefault' = 'true' LIMIT 1)::integer;
+				END IF;
 				
 				IF v_visitclass IS NULL THEN
 					v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=1 LIMIT 1);
@@ -249,6 +241,7 @@ BEGIN
 					v_filter_lot_null = concat(' AND om_visit.lot_id = ', v_lot);
 				END IF;
 
+				-- get if visit already exists
 				EXECUTE ('SELECT visit_id FROM om_visit_x_'|| (v_featuretype) ||' 
 				JOIN om_visit ON om_visit.id = om_visit_x_'|| (v_featuretype) ||'.visit_id 
 				WHERE ' || (v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text ' || v_filter_lot_null || ' AND om_visit.class_id = '|| v_visitclass || '
@@ -257,7 +250,9 @@ BEGIN
 				
 			END IF;
 
+			-- if visit exists, get v_id and control if we have to load its form according to days interval
 			IF v_visit_id IS NOT NULL THEN
+				v_id = v_visit_id;
 				EXECUTE ('SELECT true FROM om_visit WHERE enddate > now() - ''7 days''::interval AND id = '|| v_visit_id || ' ORDER BY id desc LIMIT 1') INTO v_load_visit;
 			END IF;
 		
