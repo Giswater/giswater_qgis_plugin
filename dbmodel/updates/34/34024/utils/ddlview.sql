@@ -8,27 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2020/10/22
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"text3", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"text4", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"text5", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"text6", "dataType":"text", "isUtils":"False"}}$$);
-
-INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden)
-SELECT formname, formtype, 'text3', layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
-WHERE formname = 'v_edit_plan_psector' and columnname = 'text2';
-
-INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden)
-SELECT formname, formtype, 'text4', layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
-WHERE formname = 'v_edit_plan_psector' and columnname = 'text2';
-
-INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden)
-SELECT formname, formtype, 'text5', layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
-WHERE formname = 'v_edit_plan_psector' and columnname = 'text2';
-
-INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden)
-SELECT formname, formtype, 'text6', layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
-WHERE formname = 'v_edit_plan_psector' and columnname = 'text2';
-
 CREATE OR REPLACE VIEW v_plan_psector_x_arc AS 
  SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
     plan_psector_x_arc.psector_id,

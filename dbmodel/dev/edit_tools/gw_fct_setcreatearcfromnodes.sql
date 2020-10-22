@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_setcreatearcfromnodes(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setcreatearcfromnodes(p_data json)
+DROP FUNCTION IF EXISTS moliba.gw_fct_setcreatearcfromnodes(json);
+CREATE OR REPLACE FUNCTION moliba.gw_fct_setcreatearcfromnodes(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_setcreatearcfromnodes($${
+SELECT moliba.gw_fct_setcreatearcfromnodes($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{"parameters":{}}}$$)
 
@@ -25,13 +25,15 @@ v_epsg integer;
 v_data record;
 v_querytext text;
 v_nodecat text;
+geom_array public.geometry array;
+geom_array_vertex public.geometry array;
 
 BEGIN
 	-- Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "moliba", public;
 
 	-- Create arc geom
-	v_querytext = 'SELECT * FROM arc ';
+	v_querytext = 'SELECT * FROM arc WHERE the_geom IS NULL ';
 		
 	FOR v_data IN EXECUTE v_querytext
 	LOOP
@@ -39,9 +41,10 @@ BEGIN
 		--raise notice '4th loop %', v_data;
 		--Insert start point, add vertices if exist, add end point
 		SELECT array_agg(the_geom) INTO geom_array FROM node WHERE v_data.node_1=node_id;
-	
-		SELECT array_agg(ST_SetSrid(ST_MakePoint(csv2::numeric,csv3::numeric),v_epsg)order by id) INTO  geom_array_vertex FROM temp_csv 
-		WHERE cur_user=current_user AND fid =v_fid and source='[VERTICES]' and csv1=v_data.arc_id;
+
+		-- make intermediate points (pending in function where vertices data comes)
+		--SELECT array_agg(ST_SetSrid(ST_MakePoint(csv2::numeric,csv3::numeric),v_epsg)order by id) INTO  geom_array_vertex FROM temp_csv 
+		--WHERE cur_user=current_user AND fid =v_fid and source='[VERTICES]' and csv1=v_data.arc_id;
 		
 		IF geom_array_vertex IS NOT NULL THEN
 			geom_array=array_cat(geom_array, geom_array_vertex);

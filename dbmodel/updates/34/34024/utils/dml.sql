@@ -14,3 +14,21 @@ UPDATE sys_param_user SET label = 'QGIS hide buttons on toolbox' WHERE id = 'qgi
 UPDATE sys_param_user SET label = 'Name of polygon virtual layer' WHERE id = 'virtual_polygon_vdefault';
 UPDATE sys_param_user SET label = 'Name of point virtual layer' WHERE id = 'virtual_point_vdefault';
 UPDATE sys_param_user SET label = 'Name of line virtual layer' WHERE id = 'virtual_line_vdefault';
+
+
+INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden)
+SELECT formname, formtype, 'text3', layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
+WHERE formname = 'v_edit_plan_psector' and columnname = 'text2';
+
+INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden)
+SELECT formname, formtype, 'text4', layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
+WHERE formname = 'v_edit_plan_psector' and columnname = 'text2';
+
+INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden)
+SELECT formname, formtype, 'text5', layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
+WHERE formname = 'v_edit_plan_psector' and columnname = 'text2';
+
+INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden)
+SELECT formname, formtype, 'text6', layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
+WHERE formname = 'v_edit_plan_psector' and columnname = 'text2';
+
