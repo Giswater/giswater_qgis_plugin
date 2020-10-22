@@ -8,7 +8,7 @@ or (at your option) any later version.
 from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, QSettings
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator, QFontMetrics, QStandardItemModel, \
-    QStandardItem, QIcon
+    QStandardItem, QIcon, pyqtSignal
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, \
     QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, QPlainTextEdit, \
@@ -23,7 +23,6 @@ import subprocess
 import webbrowser
 from functools import partial
 
-from ..core.utils.hyperlink_label import GwHyperLinkLabel
 from ..core.utils import tools_giswater
 from . import tools_db
 from .tools_qgis import disconnect_signal_selection_changed, select_features_by_ids, remove_selection, \
@@ -2426,3 +2425,25 @@ def set_open_url(widget):
             subprocess.call([opener, path])
     else:
         webbrowser.open(path)
+
+
+class GwExtendedQLabel(QLabel):
+    clicked = pyqtSignal()
+
+    def __init(self, parent):
+        QLabel.__init__(self, parent)
+
+    def mouseReleaseEvent(self, ev):
+        self.clicked.emit()
+
+
+class GwHyperLinkLabel(QLabel):
+    clicked = pyqtSignal()
+
+    def __init__(self):
+        QLabel.__init__(self)
+        self.setStyleSheet("QLabel{color:blue; text-decoration: underline;}")
+
+    def mouseReleaseEvent(self, ev):
+        self.clicked.emit()
+        self.setStyleSheet("QLabel{color:purple; text-decoration: underline;}")

@@ -33,7 +33,6 @@ from .visit_gallery import GwVisitGallery
 from .visit_manager import GwVisitManager
 from ..utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body, draw, \
     draw_point, populate_info_text_ as populate_info_text
-from ..utils.hyperlink_label import GwHyperLinkLabel
 from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
 from ...lib.tools_qgis import get_snapping_options, get_event_point, snap_to_current_layer, get_snapped_layer, \
@@ -46,7 +45,8 @@ from ...lib.tools_qt import set_completer_object_api, set_completer_object, chec
     add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_spinbox, fill_table, populate_basic_info, \
     add_calendar, put_widgets, get_values, set_setStyleSheet, disable_all, enable_all, clear_gridlayout, set_icon, \
     set_dates_from_to, getWidgetText, get_item_data, isChecked, getCalendarDate, set_qtv_config, remove_tab_by_tabName, \
-    setWidgetText, getWidgetType, set_combo_itemData, setImage, get_col_index_by_col_name, set_item_data, setText
+    setWidgetText, getWidgetType, set_combo_itemData, setImage, get_col_index_by_col_name, set_item_data, setText, \
+    GwHyperLinkLabel
 
 
 class GwInfo(QObject):
