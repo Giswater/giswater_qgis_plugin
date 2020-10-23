@@ -157,3 +157,63 @@ VALUES (301, 'Planned connecs without reference link', 'utils') ON CONFLICT (fid
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
 VALUES (302, 'Check values of system variables', 'utils') ON CONFLICT (fid) DO NOTHING ;
 
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (303, 'Check cat_feature field active', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (304, 'Check cat_feature field code_autofill', 'utils') ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (305, 'Check cat_feature_node field num_arcs', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (306, 'Check cat_feature_node field isarcdivide', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (307, 'Check cat_feature_node field graf_delimiter', 'ws') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (308, 'Check cat_feature_node field isexitupperintro', 'ud') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (309, 'Check cat_feature_node field choose_hemisphere', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (310, 'Check cat_feature_node field isprofilesurface', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (311, 'Check child view man table definition', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (312, 'Check child view addfields', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (313, 'Find not existing child views', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (314, 'Find active features without child views', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (315, 'Check definition on config_info_layer_x_type', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (316, 'Check definition on config_form_fields', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (317, 'Find ve_* views not defined in cat_feature', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (318, 'Check config_form_fields field datatype', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (319, 'Check config_form_fields field widgettype', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (320, 'Check config_form_fields field dv_querytext', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (321, 'Check config_form_fields for addfields definition', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (322, 'Check config_form_fields layoutorder duplicated', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
