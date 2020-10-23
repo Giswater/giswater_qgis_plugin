@@ -387,5 +387,3 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
-grant all on all functions in schema SCHEMA_NAME to role_basic;
-
