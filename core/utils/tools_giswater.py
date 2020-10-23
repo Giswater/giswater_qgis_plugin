@@ -5,11 +5,13 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QTabWidget, QCompleter, QWidget, QFileDialog, QPushButton
-from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant
+from qgis.PyQt.QtWidgets import QTabWidget, QCompleter, QWidget, QFileDialog, QPushButton, QTableView, \
+    QAbstractItemView, QLineEdit, QDateEdit
+from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QSettings
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor
 from qgis.core import QgsProject, QgsExpression, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
     QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer
+from qgis.PyQt.QtSql import QSqlTableModel
 
 import configparser
 from ... import global_vars
@@ -17,11 +19,12 @@ import os
 import sys
 import re
 import random
+from functools import partial
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
-from ...lib.tools_qt import getWidgetText, setWidgetText, getWidget
-from ..ui.ui_manager import GwDialog, GwMainWindow
+from ...lib.tools_qt import getWidgetText, setWidgetText, getWidget, fill_table, set_table_columns, set_qtv_config
+from ..ui.ui_manager import GwDialog, GwMainWindow, PsectorManagerUi, PriceManagerUi
 from ...lib import tools_qgis
 from ...lib.tools_pgdao import get_uri
 
@@ -1009,6 +1012,411 @@ def set_style_mapzones():
 
                 # repaint layer
                 lyr.triggerRepaint()
+
+
+class GwEdit:
+
+    def __init__(self):
+        """ Class to control toolbar 'edit' """
+
+        from ..shared.document import GwDocument
+        from ..shared.element import GwElement
+        from ...map_tools.snapping_utils_v3 import SnappingConfigManager
+
+        self.controller = global_vars.controller
+        self.iface = global_vars.iface
+        self.plugin_dir = global_vars.plugin_dir
+        self.settings = global_vars.settings
+
+        self.manage_document = GwDocument()
+        self.manage_element = GwElement()
+        self.suppres_form = None
+
+        # Snapper
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager.set_controller(self.controller)
+        self.snapper = self.snapper_manager.get_snapper()
+        self.snapper_manager.set_snapping_layers()
+
+
+    def edit_add_feature(self, feature_cat):
+        """ Button 01, 02: Add 'node' or 'arc' """
+        if self.controller.is_inserting:
+            msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
+            self.controller.show_message(msg)
+            return
+
+        # Store user snapping configuration
+        self.snapper_manager.store_snapping_options()
+
+        # Set snapping to 'node', 'connec' and 'gully'
+        self.snapper_manager.snap_to_arc()
+        self.snapper_manager.snap_to_node()
+        self.snapper_manager.snap_to_connec_gully()
+        self.snapper_manager.set_snapping_mode()
+        self.iface.actionAddFeature().toggled.connect(self.action_is_checked)
+
+        self.feature_cat = feature_cat
+        # self.info_layer must be global because apparently the disconnect signal is not disconnected correctly if
+        # parameters are passed to it
+        self.info_layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
+        if self.info_layer:
+            self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
+            QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
+            config = self.info_layer.editFormConfig()
+            self.conf_supp = config.suppress()
+            config.setSuppress(0)
+            self.info_layer.setEditFormConfig(config)
+            self.iface.setActiveLayer(self.info_layer)
+            self.info_layer.startEditing()
+            self.iface.actionAddFeature().trigger()
+            self.info_layer.featureAdded.connect(self.open_new_feature)
+        else:
+            message = "Layer not found"
+            self.controller.show_warning(message, parameter=feature_cat.parent_layer)
+
+
+    def action_is_checked(self):
+        """ Recover snapping options when action add feature is un-checked """
+        if not self.iface.actionAddFeature().isChecked():
+            self.snapper_manager.recover_snapping_options()
+            self.iface.actionAddFeature().toggled.disconnect(self.action_is_checked)
+
+
+    def open_new_feature(self, feature_id):
+        """
+        :param feature_id: Parameter sent by the featureAdded method itself
+        :return:
+        """
+        from ..shared.info import GwInfo
+        self.snapper_manager.recover_snapping_options()
+        self.info_layer.featureAdded.disconnect(self.open_new_feature)
+        feature = tools_qgis.get_feature_by_id(self.info_layer, feature_id)
+        geom = feature.geometry()
+        list_points = None
+        if self.info_layer.geometryType() == 0:
+            points = geom.asPoint()
+            list_points = f'"x1":{points.x()}, "y1":{points.y()}'
+        elif self.info_layer.geometryType() in (1, 2):
+            points = geom.asPolyline()
+            init_point = points[0]
+            last_point = points[-1]
+            list_points = f'"x1":{init_point.x()}, "y1":{init_point.y()}'
+            list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
+        else:
+            self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
+
+        self.controller.init_docker()
+        self.controller.is_inserting = True
+
+        self.api_cf = GwInfo('data')
+        result, dialog = self.api_cf.get_feature_insert(point=list_points, feature_cat=self.feature_cat,
+                                                        new_feature_id=feature_id, layer_new_feature=self.info_layer,
+                                                        tab_type='data', new_feature=feature)
+
+        # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
+        QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
+        config = self.info_layer.editFormConfig()
+        config.setSuppress(self.conf_supp)
+        self.info_layer.setEditFormConfig(config)
+        if not result:
+            self.info_layer.deleteFeature(feature.id())
+            self.iface.actionRollbackEdits().trigger()
+            self.controller.is_inserting = False
+
+
+class GwPlan:
+
+    def __init__(self):
+        """ Class to control toolbar 'master' """
+        from ..shared.psector import GwPsector
+
+        self.config_dict = {}
+        self.manage_new_psector = GwPsector()
+
+        self.project_type = global_vars.project_type
+        self.controller = global_vars.controller
+        self.iface = global_vars.iface
+        self.settings = global_vars.settings
+        self.plugin_dir = global_vars.plugin_dir
+
+
+    def master_new_psector(self, psector_id=None):
+        """ Button 45: New psector """
+        self.manage_new_psector.new_psector(psector_id, 'plan')
+
+
+    def master_psector_mangement(self):
+        """ Button 46: Psector management """
+
+        # Create the dialog and signals
+        self.dlg_psector_mng = PsectorManagerUi()
+
+        load_settings(self.dlg_psector_mng)
+        table_name = "v_ui_plan_psector"
+        column_id = "psector_id"
+
+        # Tables
+        self.qtbl_psm = self.dlg_psector_mng.findChild(QTableView, "tbl_psm")
+        self.qtbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+
+        # Set signals
+        self.dlg_psector_mng.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_psector_mng))
+        self.dlg_psector_mng.rejected.connect(partial(close_dialog, self.dlg_psector_mng))
+        self.dlg_psector_mng.btn_delete.clicked.connect(partial(
+            self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id, 'lbl_vdefault_psector',
+            'plan_psector_vdefault'))
+        self.dlg_psector_mng.btn_update_psector.clicked.connect(
+            partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
+        self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
+        self.dlg_psector_mng.txt_name.textChanged.connect(
+            partial(self.filter_by_text, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
+        self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
+        fill_table(self.qtbl_psm, table_name)
+        set_table_columns(self.dlg_psector_mng, self.qtbl_psm, table_name)
+        self.set_label_current_psector(self.dlg_psector_mng)
+
+        # Open form
+        self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
+        open_dialog(self.dlg_psector_mng, dlg_name="psector_manager")
+
+
+    def update_current_psector(self, dialog, qtbl_psm):
+
+        selected_list = qtbl_psm.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        row = selected_list[0].row()
+        psector_id = qtbl_psm.model().record(row).value("psector_id")
+        aux_widget = QLineEdit()
+        aux_widget.setText(str(psector_id))
+        self.upsert_config_param_user(dialog, aux_widget, "plan_psector_vdefault")
+
+        message = "Values has been updated"
+        self.controller.show_info(message)
+
+        fill_table(qtbl_psm, "v_ui_plan_psector")
+        set_table_columns(dialog, qtbl_psm, "v_ui_plan_psector")
+        self.set_label_current_psector(dialog)
+        open_dialog(dialog)
+
+
+    def upsert_config_param_user(self, dialog, widget, parameter):
+        """ Insert or update values in tables with current_user control """
+
+        tablename = "config_param_user"
+        sql = (f"SELECT * FROM {tablename}"
+               f" WHERE cur_user = current_user")
+        rows = self.controller.get_rows(sql)
+        exist_param = False
+        if type(widget) != QDateEdit:
+            if getWidgetText(dialog, widget) != "":
+                for row in rows:
+                    if row[0] == parameter:
+                        exist_param = True
+                if exist_param:
+                    sql = f"UPDATE {tablename} SET value = "
+                    if widget.objectName() != 'edit_state_vdefault':
+                        sql += (f"'{getWidgetText(dialog, widget)}'"
+                                f" WHERE cur_user = current_user AND parameter = '{parameter}'")
+                    else:
+                        sql += (f"(SELECT id FROM value_state"
+                                f" WHERE name = '{getWidgetText(dialog, widget)}')"
+                                f" WHERE cur_user = current_user AND parameter = 'edit_state_vdefault'")
+                else:
+                    sql = f'INSERT INTO {tablename} (parameter, value, cur_user)'
+                    if widget.objectName() != 'edit_state_vdefault':
+                        sql += f" VALUES ('{parameter}', '{getWidgetText(dialog, widget)}', current_user)"
+                    else:
+                        sql += (f" VALUES ('{parameter}',"
+                                f" (SELECT id FROM value_state"
+                                f" WHERE name = '{getWidgetText(dialog, widget)}'), current_user)")
+        else:
+            for row in rows:
+                if row[0] == parameter:
+                    exist_param = True
+            _date = widget.dateTime().toString('yyyy-MM-dd')
+            if exist_param:
+                sql = (f"UPDATE {tablename}"
+                       f" SET value = '{_date}'"
+                       f" WHERE cur_user = current_user AND parameter = '{parameter}'")
+            else:
+                sql = (f"INSERT INTO {tablename} (parameter, value, cur_user)"
+                       f" VALUES ('{parameter}', '{_date}', current_user);")
+        self.controller.execute_sql(sql)
+
+
+    def filter_by_text(self, dialog, table, widget_txt, tablename):
+
+        result_select = getWidgetText(dialog, widget_txt)
+        if result_select != 'null':
+            expr = f" name ILIKE '%{result_select}%'"
+            # Refresh model with selected filter
+            table.model().setFilter(expr)
+            table.model().select()
+        else:
+            fill_table(table, tablename)
+
+
+    def charge_psector(self, qtbl_psm):
+
+        selected_list = qtbl_psm.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        row = selected_list[0].row()
+        psector_id = qtbl_psm.model().record(row).value("psector_id")
+        close_dialog(self.dlg_psector_mng)
+        self.master_new_psector(psector_id)
+
+
+    def multi_rows_delete(self, dialog, widget, table_name, column_id, label, config_param, is_price=False):
+        """ Delete selected elements of the table
+        :param QTableView widget: origin
+        :param table_name: table origin
+        :param column_id: Refers to the id of the source table
+        """
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        cur_psector = self.controller.get_config('plan_psector_vdefault')
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = widget.model().record(row).value(str(column_id))
+            if cur_psector is not None and (str(id_) == str(cur_psector[0])):
+                message = ("You are trying to delete your current psector. "
+                           "Please, change your current psector before delete.")
+                self.controller.show_exceptions_msg('Current psector', self.controller.tr(message))
+                return
+
+            list_id += f"'{id_}', "
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        message = "Are you sure you want to delete these records?"
+        answer = self.controller.ask_question(message, "Delete records", inf_text)
+
+        if answer:
+            if is_price is True:
+                sql = "DELETE FROM selector_plan_result WHERE result_id in ("
+                if list_id != '':
+                    sql += f"{list_id}) AND cur_user = current_user;"
+                    self.controller.execute_sql(sql)
+                    setWidgetText(dialog, label, '')
+            sql = (f"DELETE FROM {table_name}"
+                   f" WHERE {column_id} IN ({list_id});")
+            self.controller.execute_sql(sql)
+            widget.model().select()
+
+
+    def master_estimate_result_manager(self):
+        """ Button 50: Plan estimate result manager """
+
+        # Create the dialog and signals
+        self.dlg_merm = PriceManagerUi()
+        load_settings(self.dlg_merm)
+
+        # Set current value
+        sql = (f"SELECT name FROM plan_result_cat WHERE result_id IN (SELECT result_id FROM selector_plan_result "
+               f"WHERE cur_user = current_user)")
+        row = self.controller.get_row(sql)
+        if row:
+            setWidgetText(self.dlg_merm, 'lbl_vdefault_price', str(row[0]))
+
+        # Tables
+        tablename = 'plan_result_cat'
+        self.tbl_om_result_cat = self.dlg_merm.findChild(QTableView, "tbl_om_result_cat")
+        set_qtv_config(self.tbl_om_result_cat)
+
+        # Set signals
+        self.dlg_merm.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_merm))
+        self.dlg_merm.rejected.connect(partial(close_dialog, self.dlg_merm))
+        self.dlg_merm.btn_delete.clicked.connect(partial(self.delete_merm, self.dlg_merm))
+        self.dlg_merm.btn_update_result.clicked.connect(partial(self.update_price_vdefault))
+        self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm, tablename))
+
+        set_edit_strategy = QSqlTableModel.OnManualSubmit
+        fill_table(self.tbl_om_result_cat, tablename, set_edit_strategy=set_edit_strategy)
+        set_table_columns(self.tbl_om_result_cat, self.dlg_merm.tbl_om_result_cat, tablename)
+
+        # Open form
+        self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)
+        open_dialog(self.dlg_merm, dlg_name="price_manager")
+
+
+    def update_price_vdefault(self):
+        selected_list = self.dlg_merm.tbl_om_result_cat.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        row = selected_list[0].row()
+        price_name = self.dlg_merm.tbl_om_result_cat.model().record(row).value("name")
+        result_id = self.dlg_merm.tbl_om_result_cat.model().record(row).value("result_id")
+        setWidgetText(self.dlg_merm, 'lbl_vdefault_price', price_name)
+        sql = (f"DELETE FROM selector_plan_result WHERE current_user = cur_user;"
+               f"\nINSERT INTO selector_plan_result (result_id, cur_user)"
+               f" VALUES({result_id}, current_user);")
+        status = self.controller.execute_sql(sql)
+        if status:
+            message = "Values has been updated"
+            self.controller.show_info(message)
+
+        # Refresh canvas
+        self.iface.mapCanvas().refreshAllLayers()
+
+
+    def delete_merm(self, dialog):
+        """ Delete selected row from 'master_estimate_result_manager' dialog from selected tab """
+
+        self.multi_rows_delete(dialog, dialog.tbl_om_result_cat, 'plan_result_cat',
+                               'result_id', 'lbl_vdefault_price', '', is_price=True)
+
+
+    def filter_merm(self, dialog, tablename):
+        """ Filter rows from 'master_estimate_result_manager' dialog from selected tab """
+        self.filter_by_text(dialog, dialog.tbl_om_result_cat, dialog.txt_name, tablename)
+
+
+    def psector_duplicate(self):
+        """" Button 51: Duplicate psector """
+        from ..shared.psector_duplicate import GwPsectorDuplicate
+        
+        selected_list = self.qtbl_psm.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        row = selected_list[0].row()
+        psector_id = self.qtbl_psm.model().record(row).value("psector_id")
+        self.duplicate_psector = GwPsectorDuplicate()
+        self.duplicate_psector.is_duplicated.connect(partial(fill_table, self.qtbl_psm, 'v_ui_plan_psector'))
+        self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng))
+        self.duplicate_psector.manage_duplicate_psector(psector_id)
+
+
+    def set_label_current_psector(self, dialog):
+
+        sql = ("SELECT t1.name FROM plan_psector AS t1 "
+               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
+               " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
+        row = global_vars.controller.get_row(sql)
+        if not row:
+            return
+        setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
+
+
+
+
 
 
 # Doesn't work because of hasattr and getattr
