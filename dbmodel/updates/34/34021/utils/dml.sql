@@ -152,3 +152,6 @@ UPDATE exploitation SET active = TRUE WHERE active IS NULL;
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
 VALUES (3144, 'Exploitation of the feature is different than the one of the related arc. Arc_id: ',
 'Both features should have the same exploitation.', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (291, 'Connec or gully with different expl_id than arc', 'utils') ON CONFLICT (fid) DO NOTHING;

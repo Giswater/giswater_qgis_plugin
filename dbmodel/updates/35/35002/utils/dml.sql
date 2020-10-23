@@ -152,5 +152,8 @@ VALUES (3158, 'Value of the function variable is null', 'Please check it before 
 
 --2020/10/21
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
-VALUES ('301', 'Planned connecs without reference link', 'utils') ON CONFLICT (fid) DO NOTHING ;
+VALUES (301, 'Planned connecs without reference link', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (302, 'Check values of system variables', 'utils') ON CONFLICT (fid) DO NOTHING ;
 
