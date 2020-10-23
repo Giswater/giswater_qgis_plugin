@@ -30,7 +30,8 @@ $BODY$
 DECLARE
 
 v_schemaname text;
-v_count text;
+v_count integer;
+v_countquery text;
 v_project_type text;
 v_version text;
 v_criticity integer;
@@ -98,7 +99,7 @@ BEGIN
 
 		IF v_groupby IS NULL THEN
 			EXECUTE rec.querytext
-			INTO v_count;
+			INTO v_countquery;
 
 		ELSE 	
 			EXECUTE 'SELECT array_agg(features.feature) FROM (
@@ -110,7 +111,7 @@ BEGIN
 					raise notice 'json_result,%',json_result;
 		END IF;
 
-
+		v_count = round(v_countquery::float);
 		
 		IF rec.target = 'ERROR' THEN
 			IF v_count::integer < v_warning_val THEN
@@ -118,10 +119,10 @@ BEGIN
 				v_infotext = 'INFO: ';
 			ELSIF  v_count::integer >= v_warning_val AND  v_count::integer < v_error_val THEN
 				v_criticity = 2;
-				v_infotext = 'WARNING: ';
+				v_infotext = concat('WARNING-',rec.fid,':');
 			ELSE
 				v_criticity = 3;
-				v_infotext = 'ERROR: ';
+				v_infotext = concat('ERROR-',rec.fid,':');
 			END IF;
 		ELSE
 			v_criticity = 0;
