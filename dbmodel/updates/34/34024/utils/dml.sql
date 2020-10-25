@@ -32,3 +32,21 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, dat
 SELECT formname, formtype, 'text6', layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
 WHERE formname = 'v_edit_plan_psector' and columnname = 'text2';
 
+DELETE FROM config_csv WHERE fid IN (246, 247, 245, 237, 244);
+
+DELETE FROM config_param_system WHERE parameter = 'utils_import_visit_parameters';
+
+DELETE FROM sys_function WHERE id IN (2884, 2512, 2738);
+
+--2738
+DROP FUNCTION IF EXISTS gw_fct_utils_csv2pg_import_timeseries();
+DROP FUNCTION IF EXISTS gw_fct_import_timeseries(json)
+
+--2512
+DROP FUNCTION IF EXISTS gw_fct_utils_csv2pg_import_omvisit(boolean, boolean, text);
+DROP FUNCTION IF EXISTS gw_fct_utils_csv2pg_import_omvisit(json);
+DROP FUNCTION IF EXISTS gw_fct_import_omvisit(json)
+
+--2884
+DROP FUNCTION IF EXISTS gw_fct_utils_csv2pg_import_omvisitlot(json);
+DROP FUNCTION IF EXISTS  gw_fct_import_omvisitlot(json);
