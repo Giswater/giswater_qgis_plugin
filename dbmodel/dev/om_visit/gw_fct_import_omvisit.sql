@@ -21,6 +21,7 @@ SELECT SCHEMA_NAME.gw_fct_import_omvisit($${
 "feature":{},
 "data":{"csv2pgCat":13, "importParam":"Test"}}$$)
 
+fid = 237
 
 INSTRUCTIONS
 ------------
@@ -122,10 +123,10 @@ BEGIN
 	
 	RAISE NOTICE 'v_isvisitexists % v_visittablename % v_visitcolumnname  % v_featuretablename %', v_isvisitexists, v_visittablename, v_visitcolumnname, v_featuretablename;
 
-	-- manage log (fprocesscat 42)
-	DELETE FROM audit_check_data WHERE fid=42 AND cur_user=current_user;
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('LOG IMPORTACIO DE FITXER DE VISITES DE LA CONTRATA DE SANEJAMENT'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('--------------------------------------------------------------------------------------'));
+	-- manage log (fid 237)
+	DELETE FROM audit_check_data WHERE fid=237 AND cur_user=current_user;
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (237, v_result_id, concat('LOG IMPORTACIO DE FITXER DE VISITES DE LA CONTRATA DE SANEJAMENT'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (237, v_result_id, concat('--------------------------------------------------------------------------------------'));
    
  	-- starting process
 	FOR v_visit IN SELECT * FROM temp_csv WHERE fid = v_fid AND cur_user=current_user
@@ -239,20 +240,17 @@ BEGIN
 	-- Delete values on temporal table
 	DELETE FROM temp_csv WHERE cur_user=current_user AND fid=v_fid;
 
-	
+	-- manage log (fid 237)
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (237, v_result_id, concat('Reading values from temp_csv2pg table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (237, v_result_id, concat('Inserting values on om_visit table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (237, v_result_id, concat('Inserting values on ',v_featuretable,' table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (237, v_result_id, concat('Inserting values on om_visit_event table -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (237, v_result_id, concat('Deleting values from temp_csv2pg -> Done'));
+	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (237, v_result_id, concat('Process finished'));
 
-	-- manage log (fprocesscat 42)
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Reading values from temp_csv table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on om_visit table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on ',v_featuretable,' table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Inserting values on om_visit_event table -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Deleting values from temp_csv -> Done'));
-	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (42, v_result_id, concat('Process finished'));
-
-
-	-- get log (fprocesscat 42)
+	-- get log (fid 237)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=42) row;
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=237) row;
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 			
@@ -267,8 +265,8 @@ BEGIN
 	    '}')::json;
  
 	-- Exception handling
-	--EXCEPTION WHEN OTHERS THEN 
---	RETURN ('{"status":"Failed","message":{"level":2, "text":' || to_json(SQLERRM) || '}, "version":"'|| v_version ||'","SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","message":{"level":2, "text":' || to_json(SQLERRM) || '}, "version":"'|| v_version ||'","SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 	
 	
 END;

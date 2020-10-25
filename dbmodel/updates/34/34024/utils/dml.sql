@@ -40,13 +40,11 @@ DELETE FROM sys_function WHERE id IN (2884, 2512, 2738);
 
 --2738
 DROP FUNCTION IF EXISTS gw_fct_utils_csv2pg_import_timeseries();
-DROP FUNCTION IF EXISTS gw_fct_import_timeseries(json)
+DROP FUNCTION IF EXISTS gw_fct_import_timeseries(json);
 
 --2512
-DROP FUNCTION IF EXISTS gw_fct_utils_csv2pg_import_omvisit(boolean, boolean, text);
-DROP FUNCTION IF EXISTS gw_fct_utils_csv2pg_import_omvisit(json);
-DROP FUNCTION IF EXISTS gw_fct_import_omvisit(json)
+DROP FUNCTION IF EXISTS gw_fct_import_omvisit(json);
 
 --2884
 DROP FUNCTION IF EXISTS gw_fct_utils_csv2pg_import_omvisitlot(json);
-DROP FUNCTION IF EXISTS  gw_fct_import_omvisitlot(json);
+DROP FUNCTION IF EXISTS gw_fct_import_omvisitlot(json);
