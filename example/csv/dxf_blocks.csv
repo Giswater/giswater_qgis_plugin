@@ -1,0 +1,34 @@
+Example file to import dxf blocks into giswater (temp table)
+------------------------------------------------------------------------------
+-- file must be cleaned from all other cad features. Only blocks are avaliable
+-- block items imported will be:
+-- 1: value
+-- 7: layer
+-- 10: xcoord
+-- 20: ycoord
+-- 50: rotation
+---------------
+ 66
+test1 
+  1
+124.4  
+  7
+capa_cero
+ 10
+419255.7
+ 20
+4576467.8
+ 50
+234.45 
+ 66
+test2
+  1
+134.4  
+  7
+capa_cero
+ 10
+419215.7
+ 20
+4576447.8
+ 50
+144.45
