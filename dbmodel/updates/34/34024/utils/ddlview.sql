@@ -23,7 +23,8 @@ CREATE OR REPLACE VIEW v_plan_psector_x_arc AS
     v_plan_arc.state,
     plan_psector.expl_id,
     plan_psector.atlas_id,
-    v_plan_arc.the_geom
+    v_plan_arc.the_geom,
+	doable
    FROM v_plan_arc
      JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
      JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_arc.psector_id
@@ -42,7 +43,8 @@ CREATE OR REPLACE VIEW v_plan_psector_x_node AS
     v_plan_node.state,
     v_plan_node.expl_id,
     plan_psector.atlas_id,
-    v_plan_node.the_geom
+    v_plan_node.the_geom,
+	doable
    FROM v_plan_node
      JOIN plan_psector_x_node ON plan_psector_x_node.node_id::text = v_plan_node.node_id::text
      JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_node.psector_id
@@ -122,11 +124,11 @@ SELECT plan_psector.psector_id,
    FROM  plan_psector
      LEFT JOIN ( SELECT sum(v_plan_psector_x_arc.total_budget) AS suma,
             v_plan_psector_x_arc.psector_id
-           FROM v_plan_psector_x_arc
+           FROM v_plan_psector_x_arc  WHERE doable is true
           GROUP BY v_plan_psector_x_arc.psector_id) a ON a.psector_id = plan_psector.psector_id
      LEFT JOIN ( SELECT sum(v_plan_psector_x_node.total_budget) AS suma,
             v_plan_psector_x_node.psector_id
-           FROM v_plan_psector_x_node
+           FROM v_plan_psector_x_node  WHERE doable is true
           GROUP BY v_plan_psector_x_node.psector_id) b ON b.psector_id = plan_psector.psector_id
      LEFT JOIN ( SELECT sum(v_plan_psector_x_other.total_budget) AS suma,
             v_plan_psector_x_other.psector_id
