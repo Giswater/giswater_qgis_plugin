@@ -27,7 +27,19 @@ class GwDimensioningButton(GwParentMapTool):
 
         self.layer.featureAdded.disconnect(self.open_new_dimensioning)
         feature = get_feature_by_id(self.layer, feature_id)
-
+        geom = feature.geometry()
+        list_points = None
+        if self.layer.geometryType() == 0:
+            points = geom.asPoint()
+            list_points = f'"x1":{points.x()}, "y1":{points.y()}'
+        elif self.layer.geometryType() in (1, 2):
+            points = geom.asPolyline()
+            init_point = points[0]
+            last_point = points[-1]
+            list_points = f'"x1":{init_point.x()}, "y1":{init_point.y()}'
+            list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
+        else:
+            self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
         config = self.layer.editFormConfig()
@@ -37,6 +49,7 @@ class GwDimensioningButton(GwParentMapTool):
         self.recover_previus_maptool()
 
         self.api_dim = GwDimensioning()
+        self.api_dim.points = list_points
         self.api_dim.open_dimensioning_form(qgis_feature=feature, layer=self.layer)
 
 

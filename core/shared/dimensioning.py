@@ -36,7 +36,7 @@ class GwDimensioning:
         self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
         self.canvas = global_vars.canvas
-
+        self.points = None
         self.vertex_marker = QgsVertexMarker(self.canvas)
 
 
@@ -63,7 +63,8 @@ class GwDimensioning:
         # when funcion is called from new feature
         if db_return is None:
             rubber_band = QgsRubberBand(self.canvas, 0)
-            body = create_body()
+            extras = f'"coordinates":{{{self.points}}}'
+            body = create_body(extras=extras)
             function_name = 'gw_fct_getdimensioning'
             json_result = self.controller.get_json(function_name, body)
             if json_result is None or json_result['status'] == 'Failed':
