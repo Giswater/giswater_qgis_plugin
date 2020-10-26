@@ -135,6 +135,7 @@ v_isdqaborder boolean = false; -- For those arcs that are on the border of mapzo
 v_isdmaborder boolean = false; -- For those arcs that are on the border of mapzones againts two dma (one each node)
 v_issectorborder boolean = false; -- For those arcs that are on the border of mapzones againts two sectors (one each node)
 v_dqa_id integer;
+v_arc_insert_automatic_endpoint boolean;
 
 BEGIN
 
@@ -170,6 +171,7 @@ BEGIN
 
 	-- get user parameters
 	SELECT (value)::boolean INTO v_edit_insert_elevation_from_dem FROM config_param_user WHERE parameter='edit_insert_elevation_from_dem' AND cur_user = current_user;
+	SELECT (value)::boolean INTO v_arc_insert_automatic_endpoint FROM config_param_user WHERE parameter='edit_arc_insert_automatic_endpoint' AND cur_user = current_user;
 
 	-- get tablename and formname
 	-- Common
@@ -306,9 +308,15 @@ BEGIN
 					
 				--Error, no existing nodes
 				ELSIF ((v_noderecord1.node_id IS NULL) OR (v_noderecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
-					v_message = (SELECT concat('Error[1042]:',error_message, '[node_1]:',v_noderecord1.node_id,'[node_2]:',v_noderecord2.node_id,'. ',hint_message) 
-					FROM sys_message WHERE id=1042);
-					v_status = false;
+
+					-- if only dosenot exits node 2 and insert_automatic_endpoint
+					IF ((v_noderecord1.node_id IS NOT NULL) AND (v_noderecord2.node_id IS NULL)) AND v_arc_insert_automatic_endpoint THEN
+
+					ELSE
+						v_message = (SELECT concat('Error[1042]:',error_message, '[node_1]:',v_noderecord1.node_id,'[node_2]:',v_noderecord2.node_id,'. ',hint_message) 
+						FROM sys_message WHERE id=1042);
+						v_status = false;
+					END IF;
 				END IF;
 	
 				--getting 1st approach of gis length

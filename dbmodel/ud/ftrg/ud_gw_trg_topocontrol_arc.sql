@@ -42,6 +42,8 @@ v_node_proximity double precision;
 v_arc_searchnodes_control boolean;
 v_arc_searchnodes double precision;
 v_user_dis_statetopocontrol boolean;
+v_node2 text;
+v_nodecat text;
 
 BEGIN 
 
@@ -53,12 +55,12 @@ BEGIN
 	SELECT value::boolean INTO geom_slp_direction_bool FROM config_param_system WHERE parameter='edit_slope_direction' ;
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
    	SELECT value::boolean INTO v_samenode_init_end_control FROM config_param_system WHERE parameter='edit_arc_samenode_control' ;
-	SELECT value::boolean INTO v_nodeinsert_arcendpoint  FROM config_param_system WHERE parameter='edit_arc_insert_automatic_endpoint';
 	SELECT ((value::json)->>'activated') INTO v_arc_searchnodes_control FROM config_param_system WHERE parameter='edit_arc_searchnodes';
 	SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='edit_arc_searchnodes';
 	
 	-- Get user variables
 	SELECT value::boolean INTO v_user_dis_statetopocontrol FROM config_param_user WHERE parameter='edit_disable_statetopocontrol' AND cur_user = current_user;
+	SELECT value::boolean INTO v_nodeinsert_arcendpoint FROM config_param_user WHERE parameter='edit_arc_insert_automatic_endpoint' AND cur_user = current_user;
 	
 	IF v_sys_statetopocontrol IS NOT TRUE OR v_user_dis_statetopocontrol IS TRUE THEN
 
@@ -313,23 +315,24 @@ BEGIN
 	-- Check auto insert end nodes
 	ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL) AND v_nodeinsert_arcendpoint THEN
 		IF TG_OP = 'INSERT' THEN
-			INSERT INTO node (node_id, sector_id, epa_type, nodecat_id, dma_id, the_geom) 
-			VALUES (
-			(SELECT nextval('urn_id_seq')),
-			(SELECT sector_id FROM sector WHERE (ST_endpoint(NEW.the_geom) @ sector.the_geom) LIMIT 1),
-			'JUNCTION'::text,
-			(SELECT "value" FROM config_param_user WHERE "parameter"='edit_nodecat_vdefault' AND "cur_user"="current_user"()),
-			(SELECT dma_id FROM dma WHERE (ST_endpoint(NEW.the_geom) @ dma.the_geom) LIMIT 1), 
-			ST_endpoint(NEW.the_geom)
-			);
 
-			INSERT INTO inp_junction (node_id) VALUES ((SELECT currval('urn_id_seq')));
-			INSERT INTO man_junction (node_id) VALUES ((SELECT currval('urn_id_seq')));
+			-- getting nodecat user's value
+			v_nodecat:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_nodecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			-- get first value (last chance)
+			IF (v_nodecat IS NULL) THEN
+				v_nodecat := (SELECT * FROM cat_node WHERE active IS TRUE LIMIT 1);
+			END IF;
 
-			-- Update coordinates
-			NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
+			-- Inserting new node
+			INSERT INTO v_edit_node (sector_id, state, state_type, dma_id, soilcat_id, workcat_id, buildercat_id, builtdate, nodecat_id, ownercat_id, muni_id,
+			postcode, district_id, expl_id, the_geom)
+			VALUES (NEW.sector_id, NEW.state, NEW.state_type, NEW.dma_id, NEW.soilcat_id, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, v_nodecat,
+			NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, NEW.expl_id, st_endpoint(NEW.the_geom))
+			RETURNING node_id INTO v_node2;
+					
+			-- Update arc
 			NEW.node_1:= nodeRecord1.node_id; 
-			NEW.node_2:= (SELECT currval('urn_id_seq'));  			
+			NEW.node_2:= v_node2;
 		END IF;
 
 	-- Error, no existing nodes
