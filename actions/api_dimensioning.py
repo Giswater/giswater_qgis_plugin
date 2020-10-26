@@ -30,6 +30,7 @@ class ApiDimensioning(ApiParent):
         self.controller = controller
         self.plugin_dir = plugin_dir
         self.canvas = self.iface.mapCanvas()
+        self.points = None
 
         # Snapper
         self.snapper_manager = SnappingConfigManager(self.iface)
@@ -71,12 +72,12 @@ class ApiDimensioning(ApiParent):
         self.dlg_dim.dlg_closed.connect(partial(self.save_settings, self.dlg_dim))
 
         self.create_map_tips()
-
         # when funcion is called from new feature
         if db_return is None:
-            body = self.create_body()
+            extras = f'"coordinates":{{{self.points}}}'
+            body = self.create_body(extras=extras)
             function_name = 'gw_fct_getdimensioning'
-            json_result = self.controller.get_json(function_name, body, log_sql=True)
+            json_result = self.controller.get_json(function_name, body)
             if json_result is None:
                 return False
             db_return = [json_result]
