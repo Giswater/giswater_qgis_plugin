@@ -23,7 +23,7 @@ from ...lib import tools_qt
 from ..utils.tools_giswater import set_style_mapzones, delete_layer_from_toc
 from ..shared.api_parent import ApiParent
 from ..ui.ui_manager import ToolboxDockerUi, ToolboxUi
-from ..utils.function_toolbox import set_uri
+from ..utils.function_dynamic import set_uri
 
 from random import randrange
 from ... import global_vars
