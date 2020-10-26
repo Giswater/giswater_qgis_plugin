@@ -524,10 +524,10 @@ class AddNewLot(ParentManage):
         utils_giswater.setWidgetText(self.dlg_lot, self.dlg_lot.txt_observ, item[6])
 
         # Enable/Disable visit class combo according selected OT
-        if utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.cmb_ot) == 'null':
-            self.dlg_lot.cmb_visit_class.setEnabled(True)
-        else:
-            self.dlg_lot.cmb_visit_class.setEnabled(False)
+        # if utils_giswater.getWidgetText(self.dlg_lot, self.dlg_lot.cmb_ot) == 'null':
+        #     self.dlg_lot.cmb_visit_class.setEnabled(True)
+        # else:
+        #     self.dlg_lot.cmb_visit_class.setEnabled(False)
 
 
     def disbale_actions(self, value):
