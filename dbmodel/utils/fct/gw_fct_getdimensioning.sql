@@ -13,10 +13,10 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_getdimensioning($${
-		"client":{"device":4, "infoType":1, "lang":"ES"},
-		"form":{},
-		"feature":{},
-		"data":{}}$$)
+    "client":{"device":4, "infoType":1, "lang":"ES"}, 
+    "form":{}, "feature":{}, 
+    "data":{"filterFields":{}, "pageInfo":{}, 
+        "coordinates":{"x1":418482.9909557662, "y1":4577973.008625593, "x2":418513.4491390207, "y2":4577971.030821485}}}$$)
 */
 
 DECLARE
