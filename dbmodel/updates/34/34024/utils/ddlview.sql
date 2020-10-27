@@ -162,12 +162,8 @@ CREATE OR REPLACE VIEW v_edit_plan_psector AS
     text4,
     text5,
     text6,
-    pem,
-    pec,
-    pec_vat,
-    pca
+    num_value
    FROM selector_expl,plan_psector
-   LEFT JOIN v_plan_psector_all p USING (psector_id)
   WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
   
 
