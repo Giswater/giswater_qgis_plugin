@@ -61,3 +61,6 @@ TRUE, FALSE, 'FALSE') ON CONFLICT (id) DO NOTHING;
 -- 2020/10/27
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
 VALUES (3160, 'This feature with state = 2 is only attached to psector' , 'It''s necessary to remove feature completaly using end feature tool', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
+VALUES (3162, 'This feature is a final node for planned arc ' , 'It''s necessary to remove arcs first, then nodes', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING;

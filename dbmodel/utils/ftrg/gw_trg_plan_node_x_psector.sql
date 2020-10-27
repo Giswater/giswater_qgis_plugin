@@ -12,7 +12,8 @@ $BODY$
 DECLARE 
 
 
-    v_stateaux smallint;
+v_stateaux smallint;
+v_final_arc text;
 
 BEGIN 
 
@@ -36,6 +37,16 @@ BEGIN
 	         "data":{"message":"3160", "function":"1130","debug_msg":'||OLD.psector_id||'}}$$);';
 	    END IF;
 
+	    SELECT string_agg(DISTINCT a.arc_id,',') INTO v_final_arc FROM(
+		(SELECT node_1 as node_id, arc_id FROM arc JOIN plan_psector_x_arc pa1 USING (arc_id) WHERE psector_id = OLD.psector_id UNION
+		SELECT node_2,arc_id FROM arc JOIN plan_psector_x_arc pa2 USING (arc_id) WHERE psector_id = OLD.psector_id))a WHERE node_id =OLD.node_id;
+
+	    IF v_final_arc IS NOT NULL THEN
+
+	    	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+	         "data":{"message":"3162", "function":"1130","debug_msg":"'||v_final_arc||'"}}$$);';
+
+	   	END IF;
 	    RETURN OLD;
 	END IF;
 
