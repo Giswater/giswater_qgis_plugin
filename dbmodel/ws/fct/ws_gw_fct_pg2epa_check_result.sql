@@ -500,6 +500,34 @@ BEGIN
 		
 	END IF;
 	
+	RAISE NOTICE '11 - Check if there are features with sector_id = 0';
+
+	v_querytext = 'SELECT a.feature , count(*)  FROM  (
+				SELECT arc_id, ''ARC'' as feature FROM v_edit_arc WHERE sector_id = 0 UNION
+				SELECT node_id, ''NODE'' FROM v_edit_node WHERE sector_id = 0)a GROUP BY feature ';
+	
+	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')b'
+	INTO v_count; 
+
+		IF v_count > 0 THEN
+			EXECUTE 'SELECT count FROM ('||v_querytext||')b WHERE feature = ''ARC'';'
+			INTO v_count; 
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ', v_count, ' arcs with sector_id = 0 that didn''t take part in the simulation'));
+			END IF;
+			EXECUTE 'SELECT count FROM ('||v_querytext||')b WHERE feature = ''NODE'';'
+			INTO v_count; 
+			IF v_count > 0 THEN
+				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+				VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ', v_count, ' nodes with sector_id = 0 that didn''t take part in the simulation'));
+			END IF;
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 1, concat('INFO: All features have sector_id different than 0.'));			
+			v_count=0;
+		END IF;
+
 	-- insert spacers for log
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 3, '');
