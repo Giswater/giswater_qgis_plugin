@@ -294,4 +294,4 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
 VALUES (347, 'Check plan_arc_x_pavement field pavcat_id', 'utils') ON CONFLICT (fid) DO NOTHING ;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
-VALUES (348, 'Check if arc state=2 have on service nodes in psector', 'utils') ON CONFLICT (fid) DO NOTHING ;
+VALUES (348, 'Check final nodes of arc state=2 in psector', 'utils') ON CONFLICT (fid) DO NOTHING ;
