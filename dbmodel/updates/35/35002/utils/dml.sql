@@ -123,7 +123,8 @@ VALUES (3006, 'gw_fct_setmapzonestrigger', 'ws', 'function','json', 'json',
 'Function that executes mapzone calculation if valve is being closed or opened', 'role_edit', NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function(id, function_name,  actions)
-VALUES (3006, 'gw_fct_setmapzonestrigger', '[{"funcName": "set_layer_index", "params": {"tableName": ["v_edit_dma", "v_edit_sector", "v_edit_dqa", "v_edit_presszone"]}}]');
+VALUES (3006, 'gw_fct_setmapzonestrigger', '[{"funcName": "set_layer_index", "params": {"tableName": ["v_edit_dma", "v_edit_sector", "v_edit_dqa", "v_edit_presszone"]}}]')
+ON CONFLICT (id) DO NOTHING;
 
 --2020/10/19
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
@@ -217,3 +218,80 @@ VALUES (321, 'Check config_form_fields for addfields definition', 'utils') ON CO
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
 VALUES (322, 'Check config_form_fields layoutorder duplicated', 'utils') ON CONFLICT (fid) DO NOTHING ;
 
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (323, 'Check cat_arc field active', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (324, 'Check cat_arc field cost', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (325, 'Check cat_arc field m2bottom_cost', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (326, 'Check cat_arc field m3protec_cost', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (327, 'Check cat_node field active', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (328, 'Check cat_node field cost', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (329, 'Check cat_node field cost_column', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (330, 'Check cat_node field estimated_depth', 'ws') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (331, 'Check cat_node field estimated_y', 'ud') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (332, 'Check cat_connec field active', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (333, 'Check cat_connec field cost_ut', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (334, 'Check cat_connec field cost_ml', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (335, 'Check cat_connec field cost_m3', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (336, 'Check cat_pavement field thickness', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (337, 'Check cat_pavement field m2cost', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (338, 'Check cat_soil field y_param', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (339, 'Check cat_soil field b', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (340, 'Check cat_soil field m3exc_cost', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (341, 'Check cat_soil field m3fill_cost', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (342, 'Check cat_soil field m3excess_cost', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (343, 'Check cat_soil field m2trenchl_cost', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (344, 'Check cat_grate field active', 'ud') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (345, 'Check cat_grate field cost_ut', 'ud') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (346, 'Check plan_arc_x_pavement rows number', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (347, 'Check plan_arc_x_pavement field pavcat_id', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (348, 'Check if arc state=2 have on service nodes in psector', 'utils') ON CONFLICT (fid) DO NOTHING ;
