@@ -33,7 +33,7 @@ class ApiDimensioning(ApiParent):
         self.settings = settings
         self.controller = controller
         self.plugin_dir = plugin_dir
-
+        self.points = None
         self.canvas = self.iface.mapCanvas()
 
         # Snapper
@@ -67,7 +67,8 @@ class ApiDimensioning(ApiParent):
 
         self.create_map_tips()
         if info_json is None:
-            body = self.create_body()
+            extras = f'"coordinates":{{{self.points}}}'
+            body = self.create_body(extras=extras)
             # Get layers under mouse clicked
             sql = f"SELECT gw_api_getdimensioning($${{{body}}}$$)::text"
             row = self.controller.get_row(sql, log_sql=True, commit=True)
