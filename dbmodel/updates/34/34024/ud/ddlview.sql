@@ -248,3 +248,45 @@ UNION
                   WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
              JOIN v_node ON v_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text
   WHERE cat_hydrology.infiltration::text = ANY (ARRAY['MODIFIED_HORTON'::text, 'HORTON'::text]);
+  
+  
+  
+CREATE OR REPLACE VIEW v_ui_om_visit_x_gully AS 
+ SELECT om_visit_event.id AS event_id,
+    om_visit.id AS visit_id,
+    om_visit.ext_code,
+    om_visit.visitcat_id,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    date_trunc('second'::text, om_visit_event.tstamp) AS tstamp,
+    om_visit_x_gully.gully_id,
+    om_visit_event.parameter_id,
+    config_visit_parameter.parameter_type,
+    config_visit_parameter.feature_type,
+    config_visit_parameter.form_type,
+    config_visit_parameter.descript,
+    om_visit_event.value,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.event_code,
+        CASE
+            WHEN a.event_id IS NULL THEN false
+            ELSE true
+        END AS gallery,
+        CASE
+            WHEN b.visit_id IS NULL THEN false
+            ELSE true
+        END AS document,
+    om_visit.class_id
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_gully ON om_visit_x_gully.visit_id = om_visit.id
+     LEFT JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
+     LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
+           FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
+     LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
+           FROM doc_x_visit) b ON b.visit_id = om_visit.id
+  ORDER BY om_visit_x_gully.gully_id;
