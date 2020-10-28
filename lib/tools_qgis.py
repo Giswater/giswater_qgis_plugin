@@ -250,10 +250,6 @@ def qgis_manage_snapping_layer(layername, snapping_type=0, tolerance=15.0):
     QgsSnappingUtils.LayerConfig(layer, snapping_type, tolerance, QgsTolerance.Pixels)
 
 
-def init_snapping_config():
-    pass
-
-
 # Snapping utilities
 # TODO: Maybe find a better solution
 def get_layer(tablename):
