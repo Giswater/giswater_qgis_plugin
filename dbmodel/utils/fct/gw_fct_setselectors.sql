@@ -132,17 +132,19 @@ BEGIN
 	FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
 	FROM (SELECT st_collect(the_geom) as the_geom FROM v_edit_arc) b) a;
 
-	--set expl as vdefault
-	IF v_checkall IS NULL THEN
-		INSERT INTO config_param_user(parameter, value, cur_user)
-		VALUES ('edit_exploitation_vdefault', v_id, current_user) ON CONFLICT (parameter, cur_user) 
-		DO UPDATE SET value = v_id WHERE config_param_user.parameter = 'edit_exploitation_vdefault' AND config_param_user.cur_user = current_user;
-	END IF;
+	/*set expl as vdefault if only one value on selector. In spite expl_vdefault is a hidden value, user can enable this variable if he needs it when working on more than
+	one exploitation in order to choose what is the default (remember default value has priority over spatial intersection)*/ 
+	IF (SELECT count (*) FROM selector_expl WHERE cur_user = current_user) = 1 THEN
 	
-	IF upper(v_value) = 'FALSE' THEN
-		UPDATE config_param_user SET value = expl_id FROM selector_expl WHERE selector_expl.cur_user = current_user AND 
-		config_param_user.cur_user = current_user AND config_param_user.parameter = 'edit_exploitation_vdefault' AND expl_id != 0;
+		v_expl = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
+		
+		INSERT INTO config_param_user(parameter, value, cur_user)
+		VALUES ('edit_exploitation_vdefault', v_expl, current_user) ON CONFLICT (parameter, cur_user) 
+		DO UPDATE SET value = v_id WHERE config_param_user.parameter = 'edit_exploitation_vdefault' AND config_param_user.cur_user = current_user;
+	ELSE -- delete if more than one value on selector
+		DELETE FROM config_param_user WHERE parameter = 'edit_exploitation_vdefault' AND cur_user = current_user;
 	END IF;
+
 
 
 	-- Return

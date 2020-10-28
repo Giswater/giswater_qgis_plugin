@@ -399,14 +399,6 @@ BEGIN
 	
 		-- Municipality 
 		v_muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(p_reduced_geometry, ext_municipality.the_geom,0.001) LIMIT 1); 
-		
-		-- upsert parent expl_id values for user
-		DELETE FROM config_param_user WHERE parameter = 'edit_exploitation_vdefault' AND cur_user = current_user;
-		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_exploitation_vdefault', v_expl_id, current_user);
-	
-		-- upsert parent muni_id values for user
-		DELETE FROM config_param_user WHERE parameter = 'edit_municipality_vdefault' AND cur_user = current_user;
-		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_municipality_vdefault', v_muni_id, current_user);
 
 	ELSIF p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN
 
