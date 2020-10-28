@@ -138,6 +138,11 @@ BEGIN
 		VALUES ('edit_exploitation_vdefault', v_id, current_user) ON CONFLICT (parameter, cur_user) 
 		DO UPDATE SET value = v_id WHERE config_param_user.parameter = 'edit_exploitation_vdefault' AND config_param_user.cur_user = current_user;
 	END IF;
+	
+	IF upper(v_value) = 'FALSE' THEN
+		UPDATE config_param_user SET value = expl_id FROM selector_expl WHERE selector_expl.cur_user = current_user AND 
+		config_param_user.cur_user = current_user AND config_param_user.parameter = 'edit_exploitation_vdefault' AND expl_id != 0;
+	END IF;
 
 
 	-- Return
