@@ -863,14 +863,9 @@ def insert_feature_to_plan(dialog, geom_type, ids=None):
 
     value = tools_qt.getWidgetText(dialog, dialog.psector_id)
     for i in range(len(ids)):
-        sql = (f"SELECT {geom_type}_id "
-               f"FROM plan_psector_x_{geom_type} "
-               f"WHERE {geom_type}_id = '{ids[i]}' AND psector_id = '{value}'")
-        row = global_vars.controller.get_row(sql)
-        if not row:
-            sql = (f"INSERT INTO plan_psector_x_{geom_type}"
-                   f"({geom_type}_id, psector_id) VALUES('{ids[i]}', '{value}')")
-            global_vars.controller.execute_sql(sql)
+        sql = f"INSERT INTO plan_psector_x_{geom_type} ({geom_type}_id, psector_id) "
+        sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT ({geom_type}_id) DO NOTHING;"
+        global_vars.controller.execute_sql(sql)
         tools_qt.reload_qtable(dialog, geom_type)
 
 
