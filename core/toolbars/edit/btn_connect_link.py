@@ -15,7 +15,7 @@ from ..parent_maptool import GwParentMapTool
 from ...utils.tools_giswater import get_cursor_multiple_selection, load_settings, close_dialog, open_dialog, \
     populate_info_text, create_body, snap_to_connec, snap_to_gully
 from ....lib.tools_qgis import get_event_point, snap_to_background_layers, get_snapped_layer, \
-    get_snapped_feature_id, get_snapping_options, get_layer, check_connec_group, check_gully_group, enable_snapping
+    get_snapped_feature_id, get_snapping_options, get_layer, enable_snapping
 
 
 class GwConnectLinkButton(GwParentMapTool):
@@ -74,9 +74,9 @@ class GwConnectLinkButton(GwParentMapTool):
                 # Check if it belongs to 'connec' or 'gully' group
                 layer = get_snapped_layer(result)
                 feature_id = get_snapped_feature_id(result)
-                exist_connec = check_connec_group(layer)
-                exist_gully = check_gully_group(layer)
-                if exist_connec or exist_gully:
+                layer_connec = get_layer(layer)
+                layer_gully = get_layer(layer)
+                if layer_connec or layer_gully:
                     key = QApplication.keyboardModifiers()
                     # If Ctrl+Shift is clicked: deselect snapped feature
                     if key == (Qt.ControlModifier | Qt.ShiftModifier):

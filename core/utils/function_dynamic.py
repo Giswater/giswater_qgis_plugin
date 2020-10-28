@@ -173,6 +173,7 @@ def export_layer_to_db(layer, crs):
     if error[0] != 0:
         global_vars.controller.log_info(F"ERROR --> {error[1]}")
 
+
 def set_uri():
     """ Set the component parts of a RDBMS data source URI
     :return: QgsDataSourceUri() with the connection established according to the parameters of the controller.
@@ -186,7 +187,7 @@ def set_uri():
 
 
 class GwInfoTools:
-
+    """ Class with functions usually called from the database, either via notify or by executing a get_json """
     def __init__(self):
         """ Class to control functions called from data base """
 

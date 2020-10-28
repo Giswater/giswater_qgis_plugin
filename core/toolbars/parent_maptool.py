@@ -40,7 +40,6 @@ class GwParentMapTool(QgsMapTool):
 
         super().__init__(self.canvas)
 
-
         icon = None
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)

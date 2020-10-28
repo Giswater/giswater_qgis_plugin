@@ -308,30 +308,6 @@ def apply_snapping_options(snappings_options):
     QgsProject.instance().snappingConfigChanged.emit(snapping_config)
 
 
-def check_arc_group(snapped_layer):
-    """ Check if snapped layer is in the arc group """
-
-    return snapped_layer == get_layer('v_edit_arc')
-
-
-def check_node_group(snapped_layer):
-    """ Check if snapped layer is in the node group """
-
-    return snapped_layer == get_layer('v_edit_node')
-
-
-def check_connec_group(snapped_layer):
-    """ Check if snapped layer is in the connec group """
-
-    return snapped_layer == get_layer('v_edit_connec')
-
-
-def check_gully_group(snapped_layer):
-    """ Check if snapped layer is in the gully group """
-
-    return snapped_layer == get_layer('v_edit_gully')
-
-
 def get_snapper():
     """ Return snapper """
 

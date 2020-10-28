@@ -191,30 +191,6 @@ class SnappingConfigManager(object):
         self.apply_snapping_options(self.previous_snapping)
 
 
-    def check_arc_group(self, snapped_layer):
-        """ Check if snapped layer is in the arc group """
-
-        return snapped_layer == self.layer_arc
-
-
-    def check_node_group(self, snapped_layer):
-        """ Check if snapped layer is in the node group """
-
-        return snapped_layer == self.layer_node
-
-
-    def check_connec_group(self, snapped_layer):
-        """ Check if snapped layer is in the connec group """
-
-        return snapped_layer == self.layer_connec
-
-
-    def check_gully_group(self, snapped_layer):
-        """ Check if snapped layer is in the gully group """
-
-        return snapped_layer == self.layer_gully
-
-
     def get_snapper(self):
         """ Return snapper """
 
