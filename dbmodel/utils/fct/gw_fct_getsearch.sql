@@ -257,7 +257,7 @@ BEGIN
 
 		-- Get Ids for type combo
 		EXECUTE 'SELECT array_to_json(array_agg(id)) FROM (SELECT '||quote_ident(v_search_muni_id_field)||' AS id FROM '||quote_ident(v_search_muni_table) ||
-		' ORDER BY '||quote_ident(v_search_muni_search_field)||') a' INTO combo_json;
+		' WHERE active IS TRUE ORDER BY '||quote_ident(v_search_muni_search_field)||') a' INTO combo_json;
 		
 		comboType := gw_fct_json_object_set_key(comboType, 'comboIds', combo_json);
 
@@ -270,12 +270,12 @@ BEGIN
 
 		-- Get name for type combo
 		EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM (SELECT '||quote_ident(v_search_muni_search_field)||' AS idval FROM '||quote_ident(v_search_muni_table) ||
-		' ORDER BY '||quote_ident(v_search_muni_search_field)||') a' INTO combo_json;
+		' WHERE active IS TRUE ORDER BY '||quote_ident(v_search_muni_search_field)||') a' INTO combo_json;
 		comboType := gw_fct_json_object_set_key(comboType, 'comboNames', combo_json);
 
 		-- Get geom for combo
 		EXECUTE 'SELECT array_to_json(array_agg(st_astext(st_envelope(geom)))) FROM (SELECT '||quote_ident(v_search_muni_geom_field)||' AS geom FROM '||
-		quote_ident(v_search_muni_table) ||' ORDER BY '||quote_ident(v_search_muni_search_field)||') a' INTO combo_json;
+		quote_ident(v_search_muni_table) ||' WHERE active IS TRUE ORDER BY '||quote_ident(v_search_muni_search_field)||') a' INTO combo_json;
 		comboType := gw_fct_json_object_set_key(comboType, 'comboGeometry', combo_json);
 
 		-- Create street search field
