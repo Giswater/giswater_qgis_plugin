@@ -21,9 +21,8 @@ from ...lib import tools_qt
 from ..utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, save_current_tab,\
     save_settings
 from ..ui.ui_manager import SelectorUi, MincutManagerUi
-from ...lib.tools_db import get_selector
 from ...lib.tools_qt import set_icon, set_table_columns, set_dates_from_to
-
+from ..shared.selector import Selector
 
 class GwMincutManager:
 
@@ -243,16 +242,18 @@ class GwMincutManager:
             self.controller.show_message(msg)
             return
         selector_values = f'"selector_mincut", "ids":{selected_mincuts}'
+        mincut_selector = Selector()
+
+
         self.dlg_selector = SelectorUi()
         load_settings(self.dlg_selector)
         current_tab = get_parser_value('last_tabs', f"{self.dlg_selector.objectName()}_mincut")
         self.dlg_selector.btn_close.clicked.connect(partial(close_dialog, self.dlg_selector))
         self.dlg_selector.rejected.connect(partial(save_settings, self.dlg_selector))
-        self.dlg_selector.rejected.connect(partial(
-            save_current_tab, self.dlg_selector, self.dlg_selector.main_tab, 'mincut'))
+        self.dlg_selector.rejected.connect(partial(save_current_tab, self.dlg_selector, self.dlg_selector.main_tab, 'mincut'))
 
         selector_vars = {}
-        get_selector(self.dlg_selector, selector_values, current_tab=current_tab, selector_vars=selector_vars)
+        mincut_selector.get_selector(self.dlg_selector, selector_values, current_tab=current_tab, selector_vars=selector_vars)
 
         open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
 

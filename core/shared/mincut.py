@@ -41,7 +41,7 @@ from ...lib.tools_qgis import refresh_map_canvas, set_cursor_wait, set_cursor_re
     get_snapped_feature_id, get_snapped_point, snap_to_background_layers, add_marker, get_snapping_options, \
     apply_snapping_options, MultipleSelection
 
-
+from ...map_tools.snapping_utils_v3 import SnappingConfigManager
 class GwMincut:
 
     def __init__(self):
@@ -91,7 +91,6 @@ class GwMincut:
 
     def init_mincut_canvas(self):
 
-        # Create the appropriate map tool and connect the gotPoint() signal.
         self.connec_list = []
         self.hydro_list = []
         self.deleted_list = []
@@ -1451,6 +1450,10 @@ class GwMincut:
 
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
+        # Snapper
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager.set_controller(self.controller)
+        self.snapper = self.snapper_manager.get_snapper()
 
         self.init_mincut_canvas()
         self.dlg_mincut.closeMainWin = True
@@ -1473,6 +1476,28 @@ class GwMincut:
         # Set signals
         self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)
         self.emit_point.canvasClicked.connect(self.auto_mincut_snapping)
+
+
+    def mouse_move_node_arc(self, point):
+
+        if not self.layer_arc:
+            return
+
+        # Set active layer
+        self.iface.setActiveLayer(self.layer_arc)
+
+        # Get clicked point
+        self.vertex_marker.hide()
+        event_point = self.snapper_manager.get_event_point(point=point)
+
+        # Snapping
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if self.snapper_manager.result_is_valid():
+            layer = self.snapper_manager.get_snapped_layer(result)
+            # Check feature
+            viewname = self.controller.get_layer_source_table_name(layer)
+            if viewname == 'v_edit_arc':
+                self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def auto_mincut_snapping(self, point, btn):  # @UnusedVariable
@@ -1607,7 +1632,7 @@ class GwMincut:
         extras += f'"mincutId":"{real_mincut_id}", "arcId":"{elem_id}"'
         body = create_body(extras=extras)
         complet_result = self.controller.get_json('gw_fct_setmincut', body)
-        if complet_result in (False, None) or complet_result['status'] == 'Failed': return False
+        if complet_result in (False, None) or ('status' in complet_result and complet_result['status'] == 'Failed'): return False
 
         if 'mincutOverlap' in complet_result:
             if complet_result['mincutOverlap'] != "":
