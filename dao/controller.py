@@ -28,10 +28,10 @@ from .logger import Logger
 from ..lib import tools_os, tools_qt
 from ..core.ui.ui_manager import DialogTextUi, DockerUi
 from ..lib.tools_qgis import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
-    qgis_get_layer_primary_key, qgis_get_layers, snap_to_layer, get_snapping_options, \
+    qgis_get_layer_primary_key, qgis_get_layers, get_snapping_options, \
     set_snapping_mode, categoryze_layer
 from ..core.utils.tools_giswater import get_parser_value, set_parser_value, manage_actions, draw, create_body, \
-    from_postgres_to_toc, create_qml, populate_vlayer, delete_layer_from_toc
+    from_postgres_to_toc, create_qml, populate_vlayer, delete_layer_from_toc, snap_to_layer
 
 
 class DaoController:

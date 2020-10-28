@@ -32,12 +32,11 @@ from .element import GwElement
 from .visit_gallery import GwVisitGallery
 from .visit_manager import GwVisitManager
 from ..utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body, draw, \
-    draw_point, populate_info_text_ as populate_info_text
+    draw_point, populate_info_text_ as populate_info_text, snap_to_layer, snap_to_arc, snap_to_node
 from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
 from ...lib.tools_qgis import get_snapping_options, get_event_point, snap_to_current_layer, get_snapped_layer, \
-    get_snapped_feature, add_marker, enable_snapping, snap_to_layer, apply_snapping_options, snap_to_arc, snap_to_node, \
-    get_feature_by_expr, get_visible_layers
+    get_snapped_feature, add_marker, enable_snapping, apply_snapping_options, get_feature_by_expr, get_visible_layers
 from ...lib.tools_qt import set_completer_object_api, set_completer_object, check_actions, api_action_help, \
     set_widget_size, add_button, add_textarea, add_lineedit, set_data_type, manage_lineedit, add_tableview, \
     set_headers, populate_table, set_columns_config, add_checkbox, add_combobox, fill_child, add_frame, add_label, \

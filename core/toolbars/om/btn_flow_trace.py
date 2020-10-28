@@ -8,9 +8,9 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import Qt
 
 from ..parent_maptool import GwParentMapTool
-from ...utils.tools_giswater import create_body
+from ...utils.tools_giswater import create_body, snap_to_node
 from ....lib.tools_qgis import get_event_point, snap_to_current_layer, add_marker, get_snapped_feature, \
-    get_snapping_options, snap_to_node, enable_snapping
+    get_snapping_options, enable_snapping
 
 
 class GwFlowTraceButton(GwParentMapTool):

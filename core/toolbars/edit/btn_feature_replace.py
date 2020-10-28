@@ -16,10 +16,10 @@ from functools import partial
 from ...ui.ui_manager import FeatureReplace, InfoWorkcatUi
 from ...shared.catalog import GwCatalog
 from ...utils.tools_giswater import close_dialog, load_settings, open_dialog, refresh_legend, create_body, \
-    populate_info_text_ as populate_info_text
+    populate_info_text_ as populate_info_text, snap_to_node, snap_to_connec_gully
 from ....lib import tools_qt
 from ....lib.tools_qgis import get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
-    get_snapped_feature, get_snapping_options, enable_snapping, snap_to_node, snap_to_connec_gully, set_snapping_mode
+    get_snapped_feature, get_snapping_options, enable_snapping, set_snapping_mode
 from ..parent_maptool import GwParentMapTool
 
 

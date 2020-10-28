@@ -5,28 +5,32 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QTabWidget, QCompleter, QWidget, QFileDialog, QPushButton, QTableView, \
-    QAbstractItemView, QLineEdit, QDateEdit
+from qgis.core import QgsProject, QgsExpression, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
+    QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
+    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance
+
 from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QSettings
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor
-from qgis.core import QgsProject, QgsExpression, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
-    QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer
 from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtWidgets import QTabWidget, QCompleter, QFileDialog, QPushButton, QTableView, \
+    QAbstractItemView, QLineEdit, QDateEdit
 
 import configparser
-from ... import global_vars
 import os
-import sys
-import re
 import random
-from functools import partial
+import re
+import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
 
-from ...lib.tools_qt import getWidgetText, setWidgetText, getWidget, fill_table, set_table_columns, set_qtv_config
+from functools import partial
+
 from ..ui.ui_manager import GwDialog, GwMainWindow, PsectorManagerUi, PriceManagerUi
-from ...lib import tools_qgis
+from ... import global_vars
+from ...lib.tools_qt import getWidgetText, setWidgetText, getWidget, fill_table, set_table_columns, set_qtv_config
 from ...lib.tools_pgdao import get_uri
+from ...lib.tools_qgis import categoryze_layer, get_feature_by_id, get_max_rectangle_from_coords, get_layer, \
+    get_points, get_snapping_options, zoom_to_rectangle
 
 
 def load_settings(dialog):
@@ -356,7 +360,7 @@ def draw(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(2
         return
 
     list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
-    max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
+    max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
 
     if reset_rb:
         rubber_band.reset()
@@ -364,10 +368,10 @@ def draw(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(2
         point = QgsPointXY(float(max_x), float(max_y))
         draw_point(point, rubber_band, color, width)
     else:
-        points = tools_qgis.get_points(list_coord)
+        points = get_points(list_coord)
         draw_polyline(points, rubber_band, color, width)
     if margin is not None:
-        tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
+        zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
 
 
 def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
@@ -656,7 +660,7 @@ def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                     size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
                     color_values = {'NEW': QColor(0, 255, 0), 'DUPLICATED': QColor(255, 0, 0),
                                     'EXISTS': QColor(240, 150, 0)}
-                    tools_qgis.categoryze_layer(v_layer, cat_field, size, color_values)
+                    categoryze_layer(v_layer, cat_field, size, color_values)
                 else:
                     if geometry_type == 'Point':
                         v_layer.renderer().symbol().setSize(3.5)
@@ -1014,6 +1018,84 @@ def set_style_mapzones():
                 lyr.triggerRepaint()
 
 
+def snap_to_arc():
+    """ Set snapping to 'arc' """
+
+    QgsProject.instance().blockSignals(True)
+    snapping_config = get_snapping_options()
+    layer_settings = snap_to_layer(get_layer('v_edit_arc'), QgsPointLocator.All, True)
+    if layer_settings:
+        layer_settings.setType(2)
+        layer_settings.setTolerance(15)
+        layer_settings.setEnabled(True)
+    else:
+        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
+    snapping_config.setIndividualLayerSettings(get_layer('v_edit_arc'), layer_settings)
+    QgsProject.instance().blockSignals(False)
+    QgsProject.instance().snappingConfigChanged.emit(snapping_config)
+
+
+def snap_to_node():
+    """ Set snapping to 'node' """
+
+    QgsProject.instance().blockSignals(True)
+    snapping_config = get_snapping_options()
+    layer_settings = snap_to_layer(get_layer('v_edit_node'), QgsPointLocator.Vertex, True)
+    if layer_settings:
+        layer_settings.setType(1)
+        layer_settings.setTolerance(15)
+        layer_settings.setEnabled(True)
+    else:
+        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
+    snapping_config.setIndividualLayerSettings(get_layer('v_edit_node'), layer_settings)
+    QgsProject.instance().blockSignals(False)
+    QgsProject.instance().snappingConfigChanged.emit(snapping_config)
+
+
+def snap_to_connec_gully():
+    """ Set snapping to 'connec' and 'gully' """
+
+    QgsProject.instance().blockSignals(True)
+    snapping_config = get_snapping_options()
+    layer_settings = snap_to_layer(get_layer('v_edit_connec'), QgsPointLocator.Vertex, True)
+    if layer_settings:
+        layer_settings.setType(1)
+        layer_settings.setTolerance(15)
+        layer_settings.setEnabled(True)
+    else:
+        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
+    snapping_config.setIndividualLayerSettings(get_layer('v_edit_connec'), layer_settings)
+
+    layer_settings = snap_to_layer(get_layer('v_edit_gully'), QgsPointLocator.Vertex, True)
+    if layer_settings:
+        layer_settings.setType(1)
+        layer_settings.setTolerance(15)
+        layer_settings.setEnabled(True)
+    else:
+        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
+
+    snapping_config.setIndividualLayerSettings(get_layer('v_edit_gully'), layer_settings)
+
+    QgsProject.instance().blockSignals(False)
+    QgsProject.instance().snappingConfigChanged.emit(snapping_config)
+
+
+def snap_to_layer(layer, point_locator=QgsPointLocator.All, set_settings=False):
+    """ Set snapping to @layer """
+
+    if layer is None:
+        return
+
+    snapping_config = get_snapping_options()
+    QgsSnappingUtils.LayerConfig(layer, point_locator, 15, QgsTolerance.Pixels)
+    if set_settings:
+        layer_settings = snapping_config.individualLayerSettings(layer)
+        layer_settings.setEnabled(True)
+        snapping_config.setIndividualLayerSettings(layer, layer_settings)
+        return layer_settings
+
+
+
 class GwEdit:
 
     def __init__(self):
@@ -1091,7 +1173,7 @@ class GwEdit:
         from ..shared.info import GwInfo
         self.snapper_manager.recover_snapping_options()
         self.info_layer.featureAdded.disconnect(self.open_new_feature)
-        feature = tools_qgis.get_feature_by_id(self.info_layer, feature_id)
+        feature = get_feature_by_id(self.info_layer, feature_id)
         geom = feature.geometry()
         list_points = None
         if self.info_layer.geometryType() == 0:
