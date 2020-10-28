@@ -10,7 +10,8 @@ from qgis.PyQt.QtCore import QSettings, Qt
 from ...shared.dimensioning import GwDimensioning
 from ..parent_maptool import GwParentMapTool
 
-from ....lib.tools_qgis import get_feature_by_id
+from ....lib.tools_qgis import set_snapping_mode, get_feature_by_id
+from ...utils.tools_giswater import snap_to_arc, snap_to_connec, snap_to_gully, snap_to_node
 
 
 class GwDimensioningButton(GwParentMapTool):
@@ -51,7 +52,7 @@ class GwDimensioningButton(GwParentMapTool):
         self.api_dim = GwDimensioning()
         self.api_dim.points = list_points
         self.api_dim.open_dimensioning_form(qgis_feature=feature, layer=self.layer)
-
+        super().deactivate()
 
     """ QgsMapTools inherited event functions """
 
@@ -71,7 +72,6 @@ class GwDimensioningButton(GwParentMapTool):
 
 
     def activate(self):
-
         # Check button
         self.action.setChecked(True)
 
@@ -89,8 +89,16 @@ class GwDimensioningButton(GwParentMapTool):
             self.iface.setActiveLayer(self.layer)
             self.controller.set_layer_visible(self.layer)
             self.layer.startEditing()
+
             # Implement the Add Feature button
             self.iface.actionAddFeature().trigger()
+
+            snap_to_arc()
+            snap_to_connec()
+            snap_to_gully()
+            snap_to_node()
+            set_snapping_mode()
+
             # Manage new api tool
             self.layer.featureAdded.connect(self.open_new_dimensioning)
 

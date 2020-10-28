@@ -13,7 +13,7 @@ from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGrid
 from functools import partial
 
 from ..utils.tools_giswater import create_body, close_dialog, load_settings, open_dialog, save_settings, snap_to_node,\
-    snap_to_connec_gully
+    snap_to_connec, snap_to_gully
 from ..ui.ui_manager import DimensioningUi
 from ...lib.tools_qgis import set_snapping_mode, remove_marker, get_snapping_options, enable_snapping, \
     get_event_point, snap_to_background_layers, get_snapped_layer, add_marker, \
@@ -234,7 +234,8 @@ class GwDimensioning:
         self.previous_snapping = get_snapping_options()
         enable_snapping()
         snap_to_node()
-        snap_to_connec_gully()
+        snap_to_connec()
+        snap_to_gully()
         set_snapping_mode()
 
         self.dlg_dim.actionOrientation.setChecked(False)
@@ -333,7 +334,8 @@ class GwDimensioning:
         self.previous_snapping = get_snapping_options()
         enable_snapping()
         snap_to_node()
-        snap_to_connec_gully()
+        snap_to_connec()
+        snap_to_gully()
         set_snapping_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)

@@ -1052,7 +1052,7 @@ def snap_to_node():
     QgsProject.instance().snappingConfigChanged.emit(snapping_config)
 
 
-def snap_to_connec_gully():
+def snap_to_connec():
     """ Set snapping to 'connec' and 'gully' """
 
     QgsProject.instance().blockSignals(True)
@@ -1065,7 +1065,14 @@ def snap_to_connec_gully():
     else:
         layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
     snapping_config.setIndividualLayerSettings(get_layer('v_edit_connec'), layer_settings)
+    QgsProject.instance().blockSignals(False)
+    QgsProject.instance().snappingConfigChanged.emit(snapping_config)
 
+
+def snap_to_gully():
+
+    QgsProject.instance().blockSignals(True)
+    snapping_config = get_snapping_options()
     layer_settings = snap_to_layer(get_layer('v_edit_gully'), QgsPointLocator.Vertex, True)
     if layer_settings:
         layer_settings.setType(1)
@@ -1073,9 +1080,7 @@ def snap_to_connec_gully():
         layer_settings.setEnabled(True)
     else:
         layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
-
     snapping_config.setIndividualLayerSettings(get_layer('v_edit_gully'), layer_settings)
-
     QgsProject.instance().blockSignals(False)
     QgsProject.instance().snappingConfigChanged.emit(snapping_config)
 
