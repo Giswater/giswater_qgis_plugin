@@ -295,3 +295,21 @@ VALUES (347, 'Check plan_arc_x_pavement field pavcat_id', 'utils') ON CONFLICT (
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
 VALUES (348, 'Check final nodes of arc state=2 in psector', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (349, 'Check compatibility of DB and plugin version', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (350, 'Check host of QGIS layers', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (351, 'Check DB name of QGIS layers', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (352, 'Check schema name of QGIS layers', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (353, 'Check user name of QGIS layers', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+
+

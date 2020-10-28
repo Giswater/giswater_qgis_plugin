@@ -165,15 +165,15 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 1, '-------');
 
-
+	--check plugin and db version (349)
 	IF v_qgis_version = v_version THEN
 		v_errortext=concat('Giswater version: ',v_version,'.');
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (101, 4, v_errortext);
 	ELSE
-		v_errortext=concat('ERROR: Version of plugin is different than the database version. DB: ',v_version,', plugin: ',v_qgis_version,'.');
-		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (101, 3, v_errortext);
+		v_errortext=concat('ERROR-349: Version of plugin is different than the database version. DB: ',v_version,', plugin: ',v_qgis_version,'.');
+		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message)
+		VALUES (101, 3, '349',v_errortext);
 	END IF;
 
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('PostgreSQL versión: ',(SELECT version())));
@@ -339,8 +339,11 @@ BEGIN
 			"client":{"device":4, "infoType":1, "lang":"ES"},
 			"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem"}}}$$)';
 			-- insert results 
+			UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB OM):', split_part(error_message,': ',2))
+			WHERE fid=125 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
+
 			INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
-			SELECT 101, criticity, result_id, replace(error_message,':', ' (DB OM):'), fcount FROM audit_check_data 
+			SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
 			WHERE fid=125 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6 ;
 
 			IF v_project_type = 'WS' THEN
@@ -349,8 +352,11 @@ BEGIN
 				"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{},"data":{"parameters":{"selectionMode":"wholeSystem", "grafClass":"ALL"}}}$$)';
 				-- insert results 
+				UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB GRAF):', split_part(error_message,': ',2))
+				WHERE fid=211 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
+
 				INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
-				SELECT 101, criticity, result_id, replace(error_message,':', ' (DB GRAF):'), fcount FROM audit_check_data 
+				SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
 				WHERE fid=211 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6 ;
 			END IF;
 		END IF;
@@ -362,8 +368,11 @@ BEGIN
 			"client":{"device":4, "infoType":1, "lang":"ES"},
 			"feature":{},"data":{"parameters":{}}}$$)';
 			-- insert results 
+			UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB OM):', split_part(error_message,': ',2))
+			WHERE fid=296 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
+
 			INSERT INTO audit_check_data  (fid, criticity, error_message)
-			SELECT 101, criticity, replace(error_message,':', ' (DB OM):') FROM audit_check_data 
+			SELECT 101, criticity, error_message FROM audit_check_data 
 			WHERE fid=296 AND criticity = 1 AND error_message !='';
 		END IF;
 		
@@ -373,8 +382,11 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_pg2epa_check_data($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{}}$$)';
 				-- insert results 
+				UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB EPA):', split_part(error_message,': ',2))
+				WHERE fid=225 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
+
 				INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
-				SELECT 101, criticity, result_id, replace(error_message,':', ' (DB EPA):'), fcount FROM audit_check_data 
+				SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
 				WHERE fid=225 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
 		END IF;
 
@@ -383,8 +395,11 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_plan_check_data($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{}}$$)';
 				-- insert results 
+				UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB PLAN):', split_part(error_message,': ',2))
+				WHERE fid=115 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
+
 				INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
-				SELECT 101, criticity, result_id, replace(error_message,':', ' (DB PLAN):'), fcount FROM audit_check_data 
+				SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
 				WHERE fid=115 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
 		END IF;
 
@@ -393,8 +408,11 @@ BEGIN
 			{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 			"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}$$)::text';
 			-- insert results 
+			UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB ADMIN):', split_part(error_message,': ',2))
+			WHERE fid=195 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
+
 			INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
-			SELECT 101, criticity, result_id, replace(error_message,':', ' (DB ADMIN):'), fcount FROM audit_check_data 
+			SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
 			WHERE fid=195 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
 			
 		END IF;
@@ -404,10 +422,11 @@ BEGIN
 		"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Project"}}}$$)::text';
 		
 		-- insert results 
+		UPDATE audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB USER):', split_part(error_message,': ',2))
+		WHERE fid=251 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
+
 		INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
-		SELECT 101, criticity, result_id, 
-		replace(replace(replace(error_message,'WARNING:', 'WARNING (DB USER):'),'ERROR:', 'ERROR (DB USER):'),'INFO:', 'INFO (DB USER):'),
-		 fcount FROM audit_check_data 
+		SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
 		WHERE fid=251 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
 			
 	END IF;
@@ -425,60 +444,60 @@ BEGIN
 		SELECT table_host, table_dbname, table_schema INTO v_table_host, v_table_dbname, v_table_schema 
 		FROM audit_check_project where table_id = 'v_edit_node' and cur_user=current_user;
 			
-		--check layers host
+		--check layers host (350)
 		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
 		FROM audit_check_project WHERE table_host != v_table_host AND cur_user=current_user;
 			
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR( QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
+			v_errortext = concat('ERROR-350 (QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
 			
-			INSERT INTO audit_check_data (fid,  criticity, error_message)
-			VALUES (101, 3,v_errortext );
+			INSERT INTO audit_check_data (fid,  criticity, result_id,error_message)
+			VALUES (101, 3,'350',v_errortext );
 		ELSE
-			INSERT INTO audit_check_data (fid,  criticity, error_message)
-			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current host');
+			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message)
+			VALUES (101, 1, '350', 'INFO (QGIS PROJ): All layers come from current host');
 		END IF;
 		
-		--check layers database
+		--check layers database (351)
 		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
 		FROM audit_check_project WHERE table_dbname != v_table_dbname AND cur_user=current_user;
 		
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
+			v_errortext = concat('ERROR-351 (QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
 		
-			INSERT INTO audit_check_data (fid,  criticity, error_message)
-			VALUES (101, 3,v_errortext );
+			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message)
+			VALUES (101, 3, '351', v_errortext );
 		ELSE
-			INSERT INTO audit_check_data (fid,  criticity, error_message)
-			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current database');
+			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message)
+			VALUES (101, 1, '351', 'INFO (QGIS PROJ): All layers come from current database');
 		END IF;
 
-		--check layers database
+		--check layers database(352)
 		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
 		FROM audit_check_project WHERE table_schema != v_table_schema AND cur_user=current_user;
 		
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
+			v_errortext = concat('ERROR-352 (QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
 		
-			INSERT INTO audit_check_data (fid,  criticity, error_message)
-			VALUES (101, 3,v_errortext );
+			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message)
+			VALUES (101, 3, '352', v_errortext );
 		ELSE
-			INSERT INTO audit_check_data (fid,  criticity, error_message)
-			VALUES (101, 1, 'INFO (QGIS PROJ): All layers come from current schema');
+			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message)
+			VALUES (101, 1, '352', 'INFO (QGIS PROJ): All layers come from current schema');
 		END IF;
 
-		--check layers user
+		--check layers user (353)
 		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
 		FROM audit_check_project WHERE cur_user != table_user AND table_user != 'None' AND cur_user=current_user;
 		
 		IF v_count>0 THEN
-			v_errortext = concat('ERROR (QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
+			v_errortext = concat('ERROR-353 (QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
 		
-			INSERT INTO audit_check_data (fid,  criticity, error_message)
-			VALUES (101, 3,v_errortext );
+			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message)
+			VALUES (101, 3,'353',v_errortext );
 		ELSE
-			INSERT INTO audit_check_data (fid,  criticity, error_message)
-			VALUES (101, 1, 'INFO (QGIS PROJ): All layers have been added by current user');
+			INSERT INTO audit_check_data (fid,  criticity, result_id, error_message)
+			VALUES (101, 1, '353','INFO (QGIS PROJ): All layers have been added by current user');
 		END IF;
 
 		-- start process
