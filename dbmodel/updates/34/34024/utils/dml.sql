@@ -16,20 +16,22 @@ UPDATE sys_param_user SET label = 'Name of point virtual layer' WHERE id = 'virt
 UPDATE sys_param_user SET label = 'Name of line virtual layer' WHERE id = 'virtual_line_vdefault';
 
 
+select * from config_form_fields WHERE formname = 'v_edit_plan_psector'
+
 INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden)
-SELECT formname, formtype, 'text3', layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
+SELECT formname, formtype, 'text3', layoutorder, datatype, widgettype, 'text3', widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
 WHERE formname = 'v_edit_plan_psector' and columnname = 'text2';
 
 INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden)
-SELECT formname, formtype, 'text4', layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
+SELECT formname, formtype, 'text4', layoutorder, datatype, widgettype, 'text4', widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
 WHERE formname = 'v_edit_plan_psector' and columnname = 'text2';
 
 INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden)
-SELECT formname, formtype, 'text5', layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
+SELECT formname, formtype, 'text5', layoutorder, datatype, widgettype, 'text5', widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
 WHERE formname = 'v_edit_plan_psector' and columnname = 'text2';
 
 INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden)
-SELECT formname, formtype, 'text6', layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
+SELECT formname, formtype, 'text6', layoutorder, datatype, widgettype, 'text6', widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
 WHERE formname = 'v_edit_plan_psector' and columnname = 'text2';
 
 DELETE FROM config_csv WHERE fid IN (246, 247, 245, 237, 244);
