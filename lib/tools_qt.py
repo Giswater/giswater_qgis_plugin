@@ -1441,26 +1441,6 @@ def set_setStyleSheet(field, widget, wtype='label'):
     return widget
 
 
-def manage_all(dialog, widget_all, selector_vars):
-
-    key_modifier = QApplication.keyboardModifiers()
-    status = isChecked(dialog, widget_all)
-    index = dialog.main_tab.currentIndex()
-    widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
-    if key_modifier == Qt.ShiftModifier:
-        return
-
-    for widget in widget_list:
-        if widget_all is not None:
-            if widget == widget_all or widget.objectName() == widget_all.objectName():
-                continue
-        widget.blockSignals(True)
-        setChecked(dialog, widget, status)
-        widget.blockSignals(False)
-
-    tools_db.set_selector(dialog, widget_all, False, selector_vars)
-
-
 def disable_all(dialog, result, enable):
 
     try:

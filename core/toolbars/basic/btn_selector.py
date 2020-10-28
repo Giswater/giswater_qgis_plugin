@@ -5,15 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from .... import global_vars
-
 from ..parent_dialog import GwParentAction
-from functools import partial
-
-from ...utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, save_current_tab, \
-    save_settings
-from ...ui.ui_manager import SelectorUi
-from ....lib.tools_db import get_selector
+from .... import global_vars
+from ...shared.selector import Selector
 
 
 class GwSelectorButton(GwParentAction):
@@ -23,27 +17,9 @@ class GwSelectorButton(GwParentAction):
 
     def clicked_event(self):
 
-        selector_values = '"selector_basic"'
+        selector_type = '"selector_basic"'
 
         # Show form in docker?
         global_vars.controller.init_docker('qgis_form_docker')
-
-        dlg_selector = SelectorUi()
-        load_settings(dlg_selector)
-
-        # Get the name of the last tab used by the user
-        selector_vars = {}
-        current_tab = get_parser_value('last_tabs', f"{dlg_selector.objectName()}_basic")
-        get_selector(dlg_selector, selector_values, current_tab=current_tab, selector_vars=selector_vars)
-
-        if global_vars.controller.dlg_docker:
-            global_vars.controller.dock_dialog(dlg_selector)
-            dlg_selector.btn_close.clicked.connect(global_vars.controller.close_docker)
-        else:
-            dlg_selector.btn_close.clicked.connect(partial(close_dialog, dlg_selector))
-            dlg_selector.rejected.connect(partial(save_settings, dlg_selector))
-            open_dialog(dlg_selector, dlg_name='selector', maximize_button=False)
-
-        # Save the name of current tab used by the user
-        dlg_selector.rejected.connect(partial(
-            save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
+        selector = Selector()
+        selector.open_selector(selector_type)

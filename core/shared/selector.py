@@ -1,0 +1,326 @@
+"""
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+"""
+# -*- coding: utf-8 -*-
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTabWidget,\
+    QWidget, QApplication
+
+from functools import partial
+
+from ..ui.ui_manager import SelectorUi
+from ..utils.tools_giswater import create_body, close_dialog, get_parser_value, load_settings, open_dialog, save_current_tab, \
+    save_settings
+from ... import global_vars
+from ...lib.tools_qgis import refresh_map_canvas, zoom_to_rectangle
+from ...lib.tools_qt import add_checkbox, getWidget, getWidgetText, isChecked, put_widgets, setChecked, setWidgetText
+
+
+class Selector:
+    def __init__(self):
+        """ Class constructor """
+        pass
+
+
+    def open_selector(self, selector_type='"selector_basic"'):
+        """
+        :param selector_type:This parameter must be a string between double quotes. Example: '"selector_basic"'
+        """
+        dlg_selector = SelectorUi()
+        load_settings(dlg_selector)
+
+        # Get the name of the last tab used by the user
+        selector_vars = {}
+        current_tab = get_parser_value('last_tabs', f"{dlg_selector.objectName()}_basic")
+        self.get_selector(dlg_selector, selector_type, current_tab=current_tab, selector_vars=selector_vars)
+
+        if global_vars.controller.dlg_docker:
+            global_vars.controller.dock_dialog(dlg_selector)
+            dlg_selector.btn_close.clicked.connect(global_vars.controller.close_docker)
+        else:
+            dlg_selector.btn_close.clicked.connect(partial(close_dialog, dlg_selector))
+            dlg_selector.rejected.connect(partial(save_settings, dlg_selector))
+            open_dialog(dlg_selector, dlg_name='selector', maximize_button=False)
+
+        # Save the name of current tab used by the user
+        dlg_selector.rejected.connect(partial(
+            save_current_tab, dlg_selector, dlg_selector.main_tab, 'basic'))
+
+
+    def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None,
+                     is_setselector=None, selector_vars={}):
+        """ Ask to DB for selectors and make dialog
+        :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
+        :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
+        """
+
+        index = 0
+        main_tab = dialog.findChild(QTabWidget, 'main_tab')
+
+        # Set filter
+        if filter is not False:
+            main_tab = dialog.findChild(QTabWidget, 'main_tab')
+            text_filter = getWidgetText(dialog, widget)
+            if text_filter in ('null', None):
+                text_filter = ''
+
+            # Set current_tab
+            index = dialog.main_tab.currentIndex()
+            current_tab = dialog.main_tab.widget(index).objectName()
+
+        # Profilactic control of nones
+        if text_filter is None:
+            text_filter = ''
+        if is_setselector is None:
+            # Built querytext
+            form = f'"currentTab":"{current_tab}"'
+            extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
+            body = create_body(form=form, extras=extras)
+            json_result = global_vars.controller.get_json('gw_fct_getselectors', body)
+        else:
+            json_result = is_setselector
+            for x in range(dialog.main_tab.count() - 1, -1, -1):
+                dialog.main_tab.widget(x).deleteLater()
+
+        if not json_result or json_result['status'] == 'Failed':
+            return False
+
+        for form_tab in json_result['body']['form']['formTabs']:
+
+            if filter and form_tab['tabName'] != str(current_tab):
+                continue
+
+            selection_mode = form_tab['selectionMode']
+
+            # Create one tab for each form_tab and add to QTabWidget
+            tab_widget = QWidget(main_tab)
+            tab_widget.setObjectName(form_tab['tabName'])
+            tab_widget.setProperty('selector_type', form_tab['selectorType'])
+            if filter:
+                main_tab.removeTab(index)
+                main_tab.insertTab(index, tab_widget, form_tab['tabLabel'])
+            else:
+                main_tab.addTab(tab_widget, form_tab['tabLabel'])
+
+            # Create a new QGridLayout and put it into tab
+            gridlayout = QGridLayout()
+            gridlayout.setObjectName("grl_" + form_tab['tabName'])
+            tab_widget.setLayout(gridlayout)
+            field = {}
+            i = 0
+
+            if 'typeaheadFilter' in form_tab:
+                label = QLabel()
+                label.setObjectName('lbl_filter')
+                label.setText('Filter:')
+                if getWidget(dialog, 'txt_filter_' + str(form_tab['tabName'])) is None:
+                    widget = QLineEdit()
+                    widget.setObjectName('txt_filter_' + str(form_tab['tabName']))
+                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                    selector_vars[f"var_txt_filter_{form_tab['tabName']}"] = ''
+                    widget.textChanged.connect(partial(self.get_selector, dialog, selector_type, filter=True,
+                                                       widget=widget, current_tab=current_tab,
+                                                       selector_vars=selector_vars))
+                    widget.textChanged.connect(partial(self.manage_filter, dialog, widget, 'save', selector_vars))
+                    widget.setLayoutDirection(Qt.RightToLeft)
+
+                else:
+                    widget = getWidget(dialog, 'txt_filter_' + str(form_tab['tabName']))
+
+                field['layoutname'] = gridlayout.objectName()
+                field['layoutorder'] = i
+                i = i + 1
+                put_widgets(dialog, field, label, widget)
+                widget.setFocus()
+
+            if 'manageAll' in form_tab:
+                if (form_tab['manageAll']).lower() == 'true':
+                    if getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}") is None:
+                        label = QLabel()
+                        label.setObjectName(f"lbl_manage_all_{form_tab['tabName']}")
+                        label.setText('Check all')
+                    else:
+                        label = getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}")
+
+                    if getWidget(dialog, f"chk_all_{form_tab['tabName']}") is None:
+                        widget = QCheckBox()
+                        widget.setObjectName('chk_all_' + str(form_tab['tabName']))
+                        widget.stateChanged.connect(partial(self.manage_all, dialog, widget, selector_vars))
+                        widget.setLayoutDirection(Qt.RightToLeft)
+
+                    else:
+                        widget = getWidget(dialog, f"chk_all_{form_tab['tabName']}")
+                    field['layoutname'] = gridlayout.objectName()
+                    field['layoutorder'] = i
+                    i = i + 1
+                    chk_all = widget
+                    put_widgets(dialog, field, label, widget)
+
+            for order, field in enumerate(form_tab['fields']):
+                label = QLabel()
+                label.setObjectName('lbl_' + field['label'])
+                label.setText(field['label'])
+
+                widget = add_checkbox(field)
+                widget.stateChanged.connect(partial(self.set_selection_mode, dialog, widget, selection_mode, selector_vars))
+                widget.setLayoutDirection(Qt.RightToLeft)
+
+                field['layoutname'] = gridlayout.objectName()
+                field['layoutorder'] = order + i
+                put_widgets(dialog, field, label, widget)
+
+            vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            gridlayout.addItem(vertical_spacer1)
+
+        # Set last tab used by user as current tab
+        tabname = json_result['body']['form']['currentTab']
+        tab = main_tab.findChild(QWidget, tabname)
+
+        if tab:
+            main_tab.setCurrentWidget(tab)
+
+        if is_setselector is not None:
+            widget = dialog.main_tab.findChild(QLineEdit, f'txt_filter_{tabname}')
+            if widget:
+                widget.blockSignals(True)
+                index = dialog.main_tab.currentIndex()
+                tab_name = dialog.main_tab.widget(index).objectName()
+                value = selector_vars[f"var_txt_filter_{tab_name}"]
+                setWidgetText(dialog, widget, f'{value}')
+                widget.blockSignals(False)
+
+    def set_selection_mode(self, dialog, widget, selection_mode, selector_vars):
+        """ Manage selection mode
+        :param dialog: QDialog where search all checkbox
+        :param widget: QCheckBox that has changed status (QCheckBox)
+        :param selection_mode: "keepPrevious", "keepPreviousUsingShift", "removePrevious" (String)
+        """
+
+        # Get QCheckBox check all
+        index = dialog.main_tab.currentIndex()
+        widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
+        tab_name = dialog.main_tab.widget(index).objectName()
+        widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
+
+        is_alone = False
+        key_modifier = QApplication.keyboardModifiers()
+
+        if selection_mode == 'removePrevious' or \
+                (selection_mode == 'keepPreviousUsingShift' and key_modifier != Qt.ShiftModifier):
+            is_alone = True
+            if widget_all is not None:
+                widget_all.blockSignals(True)
+                setChecked(dialog, widget_all, False)
+                widget_all.blockSignals(False)
+            self.remove_previuos(dialog, widget, widget_all, widget_list)
+
+        self.set_selector(dialog, widget, is_alone, selector_vars)
+
+
+    def set_selector(self, dialog, widget, is_alone, selector_vars):
+        """  Send values to DB and reload selectors
+        :param dialog: QDialog
+        :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
+        :param is_alone: Defines if the selector is unique (True) or multiple (False) (Boolean)
+        """
+
+        # Get current tab name
+        index = dialog.main_tab.currentIndex()
+        tab_name = dialog.main_tab.widget(index).objectName()
+        selector_type = dialog.main_tab.widget(index).property("selector_type")
+        qgis_project_add_schema = global_vars.controller.plugin_settings_value('gwAddSchema')
+        widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
+
+        if widget_all is None or (widget_all is not None and widget.objectName() != widget_all.objectName()):
+            extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", '
+                      f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{isChecked(dialog, widget)}", '
+                      f'"addSchema":"{qgis_project_add_schema}"')
+        else:
+            check_all = isChecked(dialog, widget_all)
+            extras = f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "checkAll":"{check_all}",  ' \
+                     f'"addSchema":"{qgis_project_add_schema}"'
+
+        body = create_body(extras=extras)
+        json_result = global_vars.controller.get_json('gw_fct_setselectors', body)
+        if json_result['status'] == 'Failed': return
+        if str(tab_name) == 'tab_exploitation':
+            try:
+                # Zoom to exploitation
+                x1 = json_result['body']['data']['geometry']['x1']
+                y1 = json_result['body']['data']['geometry']['y1']
+                x2 = json_result['body']['data']['geometry']['x2']
+                y2 = json_result['body']['data']['geometry']['y2']
+                if x1 is not None:
+                    zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+            except KeyError:
+                pass
+
+        # Refresh canvas
+        global_vars.controller.set_layer_index('v_edit_arc')
+        global_vars.controller.set_layer_index('v_edit_node')
+        global_vars.controller.set_layer_index('v_edit_connec')
+        global_vars.controller.set_layer_index('v_edit_gully')
+        global_vars.controller.set_layer_index('v_edit_link')
+        global_vars.controller.set_layer_index('v_edit_plan_psector')
+        refresh_map_canvas()
+        self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result, selector_vars=selector_vars)
+
+        widget_filter = getWidget(dialog, f"txt_filter_{tab_name}")
+        if widget_filter and getWidgetText(dialog, widget_filter, False, False) not in (None, ''):
+            widget_filter.textChanged.emit(widget_filter.text())
+
+
+    def remove_previuos(self, dialog, widget, widget_all, widget_list):
+        """ Remove checks of not selected QCheckBox
+        :param dialog: QDialog
+        :param widget: QCheckBox that has changed status (QCheckBox)
+        :param widget_all: QCheckBox that handles global selection (QCheckBox)
+        :param widget_list: List of all QCheckBox in the current tab ([QCheckBox, QCheckBox, ...])
+        """
+
+        for checkbox in widget_list:
+            # Some selectors.ui dont have widget_all
+            if widget_all is not None:
+                if checkbox == widget_all or checkbox.objectName() == widget_all.objectName():
+                    continue
+                elif checkbox.objectName() != widget.objectName():
+                    checkbox.blockSignals(True)
+                    setChecked(dialog, checkbox, False)
+                    checkbox.blockSignals(False)
+
+            elif checkbox.objectName() != widget.objectName():
+                checkbox.blockSignals(True)
+                setChecked(dialog, checkbox, False)
+                checkbox.blockSignals(False)
+
+
+    def manage_filter(self, dialog, widget, action, selector_vars):
+        index = dialog.main_tab.currentIndex()
+        tab_name = dialog.main_tab.widget(index).objectName()
+        if action == 'save':
+            selector_vars[f"var_txt_filter_{tab_name}"] = getWidgetText(dialog, widget)
+        else:
+            selector_vars[f"var_txt_filter_{tab_name}"] = ''
+
+
+    def manage_all(self, dialog, widget_all, selector_vars):
+
+        key_modifier = QApplication.keyboardModifiers()
+        status = isChecked(dialog, widget_all)
+        index = dialog.main_tab.currentIndex()
+        widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
+        if key_modifier == Qt.ShiftModifier:
+            return
+
+        for widget in widget_list:
+            if widget_all is not None:
+                if widget == widget_all or widget.objectName() == widget_all.objectName():
+                    continue
+            widget.blockSignals(True)
+            setChecked(dialog, widget, status)
+            widget.blockSignals(False)
+
+        self.set_selector(dialog, widget_all, False, selector_vars)

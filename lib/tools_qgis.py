@@ -24,6 +24,31 @@ from . import tools_qt
 from random import randrange
 
 
+def get_visible_layers(as_list=False):
+    """ Return string as {...} or [...] with name of table in DB of all visible layer in TOC """
+
+    visible_layer = '{'
+    if as_list is True:
+        visible_layer = '['
+    layers = global_vars.controller.get_layers()
+    for layer in layers:
+        if global_vars.controller.is_layer_visible(layer):
+            table_name = global_vars.controller.get_layer_source_table_name(layer)
+            table = layer.dataProvider().dataSourceUri()
+            # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
+            if 'SELECT row_number() over ()' in str(table) or 'srid' not in str(table):
+                continue
+
+            visible_layer += f'"{table_name}", '
+    visible_layer = visible_layer[:-2]
+
+    if as_list is True:
+        visible_layer += ']'
+    else:
+        visible_layer += '}'
+    return visible_layer
+
+
 def get_value_from_metadata(parameter, default_value):
     """ Get @parameter from metadata.txt file """
 
