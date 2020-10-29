@@ -72,54 +72,6 @@ def fillComboBoxList(dialog, widget, list_object, allow_nulls=True, clear_combo=
         widget.addItem(str(elem))
 
 
-def getText(dialog, widget, return_string_null=True):
-
-    text = ""
-    if type(widget) is str or type(widget) is str:
-        widget = dialog.findChild(QWidget, widget)
-    if widget:
-        if type(widget) is QLineEdit or type(widget) is QPushButton or type(widget) is QLabel \
-                or type(widget) is GwHyperLinkLabel:
-            text = widget.text()
-        elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
-            text = widget.value()
-        elif type(widget) is QTextEdit or type(widget) is QPlainTextEdit:
-            text = widget.toPlainText()
-        if text:
-            elem_text = text
-        elif return_string_null:
-            elem_text = "null"
-        else:
-            elem_text = ""
-    else:
-        if return_string_null:
-            elem_text = "null"
-        else:
-            elem_text = ""
-
-    return elem_text
-
-
-def setText(dialog, widget, text):
-
-    if type(widget) is str or type(widget) is str:
-        widget = dialog.findChild(QWidget, widget)
-    if not widget:
-        return
-
-    value = str(text)
-    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QLabel:
-        if value == 'None':
-            value = ""
-        widget.setText(value)
-    elif type(widget) is QPlainTextEdit:
-        if value == 'None':
-            value = ""
-        widget.insertPlainText(value)
-    elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
-        if value == 'None' or value == 'null':
-            value = 0
-        widget.setValue(float(value))
 
 
 def getCalendarDate(dialog, widget, date_format="yyyy/MM/dd", datetime_format="yyyy/MM/dd hh:mm:ss"):
@@ -194,20 +146,31 @@ def getWidgetType(dialog, widget):
 
 def getWidgetText(dialog, widget, add_quote=False, return_string_null=True):
 
-    if type(widget) is str or type(widget) is str:
+    if type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
-    if not widget:
-        return None
-
     text = None
-    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QLabel or type(widget) is GwHyperLinkLabel \
-            or type(widget) is QSpinBox or type(widget) is QDoubleSpinBox or type(widget) is QPushButton \
-            or type(widget) is QPlainTextEdit:
-        text = getText(dialog, widget, return_string_null)
-    elif type(widget) is QComboBox:
-        text = getSelectedItem(dialog, widget, return_string_null)
-    if add_quote and text != "null":
-        text = "'" + text + "'"
+    if widget:
+        if type(widget) in (QLineEdit, QPushButton, QLabel, GwHyperLinkLabel):
+            text = widget.text()
+        elif type(widget) in (QDoubleSpinBox, QSpinBox):
+            text = widget.value()
+        elif type(widget) in (QTextEdit, QPlainTextEdit):
+            text = widget.toPlainText()
+        elif type(widget) is QComboBox:
+            text = widget.currentText()
+
+        if not text and return_string_null:
+            text = "null"
+        elif not text:
+            text = ""
+        if add_quote and text != "null":
+            text = "'" + text + "'"
+    else:
+        if return_string_null:
+            text = "null"
+        else:
+            text = ""
+
     return text
 
 
@@ -217,13 +180,23 @@ def setWidgetText(dialog, widget, text):
         widget = dialog.findChild(QWidget, widget)
     if not widget:
         return
-    if type(widget) is QLineEdit or type(widget) is QTextEdit or type(widget) is QTimeEdit or type(widget) is QLabel \
-            or type(widget) is QPlainTextEdit:
-        setText(dialog, widget, text)
+
+    if type(widget) in (QLabel, QLineEdit, QTextEdit):
+        if str(text) == 'None':
+            text = ""
+        widget.setText(text)
+    elif type(widget) is QPlainTextEdit:
+        if str(text) == 'None':
+            text = ""
+        widget.insertPlainText(text)
     elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
-        setText(dialog, widget, text)
+        if text == 'None' or text == 'null':
+            text = 0
+        widget.setValue(float(text))
     elif type(widget) is QComboBox:
         setSelectedItem(dialog, widget, text)
+    elif type(widget) is QTimeEdit:
+        setTimeEdit(dialog, widget, text)
     elif type(widget) is QCheckBox:
         setChecked(dialog, widget, text)
 
@@ -439,7 +412,6 @@ def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=Tru
     except:
         pass
     finally:
-
         if add_empty:
             records_sorted.insert(0, ['', ''])
 

@@ -21,7 +21,7 @@ from ...lib.tools_qgis import set_snapping_mode, remove_marker, get_snapping_opt
 from ...lib.tools_qt import set_widget_size, add_button, add_textarea, add_lineedit, set_data_type, \
     manage_lineedit, add_tableview, set_headers, populate_table, set_columns_config, add_checkbox, add_combobox, \
     add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_spinbox, add_calendar, put_widgets, \
-    set_setStyleSheet, disable_all, enable_all, set_icon, setWidgetText, isChecked, get_item_data, setText, \
+    set_setStyleSheet, disable_all, enable_all, set_icon, setWidgetText, isChecked, get_item_data, \
     set_qtv_config, getWidgetText
 
 from ... import global_vars
@@ -312,11 +312,11 @@ class GwDimensioning:
 
             depth = snapped_feat.attribute(fieldname)
             if depth in ('', None, 0, '0', 'NULL'):
-                setText(self.dlg_dim, "depth", None)
+                setWidgetText(self.dlg_dim, "depth", None)
             else:
-                setText(self.dlg_dim, "depth", depth)
-            setText(self.dlg_dim, "feature_id", element_id)
-            setText(self.dlg_dim, "feature_type", feat_type.upper())
+                setWidgetText(self.dlg_dim, "depth", depth)
+            setWidgetText(self.dlg_dim, "feature_id", element_id)
+            setWidgetText(self.dlg_dim, "feature_type", feat_type.upper())
 
             apply_snapping_options(self.previous_snapping)
             self.deactivate_signals(action, emit_point)

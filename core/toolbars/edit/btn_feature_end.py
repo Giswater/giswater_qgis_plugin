@@ -20,7 +20,7 @@ from ...utils.tools_giswater import close_dialog, load_settings, open_dialog, hi
 from ...ui.ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
 from ....lib.tools_qgis import remove_selection, selection_init, disconnect_snapping, \
     disconnect_signal_selection_changed, insert_feature
-from ....lib.tools_qt import delete_records, set_selectionbehavior, set_icon, set_completer_object, set_completer_widget
+from ....lib.tools_qt import delete_records, set_selectionbehavior, set_icon, set_completer_object, set_completer_widget, setWidgetText
 
 
 class GwEndFeatureButton(GwParentAction):
@@ -193,10 +193,10 @@ class GwEndFeatureButton(GwParentAction):
                f"WHERE id = '{workcat_id}'")
         row = self.controller.get_row(sql)
         if row:
-            tools_qt.setText(self.dlg_work_end, self.dlg_work_end.descript, row['descript'])
+            setWidgetText(self.dlg_work_end, self.dlg_work_end.descript, row['descript'])
             tools_qt.setCalendarDate(self.dlg_work_end, self.dlg_work_end.builtdate, row['builtdate'], False)
         else:
-            tools_qt.setText(self.dlg_work_end, self.dlg_work_end.descript, '')
+            setWidgetText(self.dlg_work_end, self.dlg_work_end.descript, '')
             tools_qt.setCalendarDate(self.dlg_work_end, self.dlg_work_end.builtdate, None, False)
 
 

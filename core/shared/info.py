@@ -42,8 +42,8 @@ from ...lib.tools_qt import set_completer_object_api, set_completer_object, chec
     set_headers, populate_table, set_columns_config, add_checkbox, add_combobox, fill_child, add_frame, add_label, \
     add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_spinbox, fill_table, populate_basic_info, \
     add_calendar, put_widgets, get_values, set_setStyleSheet, disable_all, enable_all, clear_gridlayout, set_icon, \
-    set_dates_from_to, getWidgetText, get_item_data, isChecked, getCalendarDate, set_qtv_config, remove_tab_by_tabName, \
-    setWidgetText, getWidgetType, set_combo_itemData, setImage, get_col_index_by_col_name, set_item_data, setText, \
+    set_dates_from_to, getWidgetText, get_item_data, isChecked, getCalendarDate, set_qtv_config, remove_tab_by_tabName,\
+    setWidgetText, getWidgetType, set_combo_itemData, setImage, get_col_index_by_col_name, set_item_data, \
     GwHyperLinkLabel
 
 
@@ -1679,7 +1679,7 @@ class GwInfo(QObject):
             widget = dialog.findChild(QLineEdit, f'{field["widgetname"]}')
             if widget:
                 value = field["value"]
-                setText(dialog, widget, value)
+                setWidgetText(dialog, widget, value)
                 if not field['iseditable']:
                     widget.setStyleSheet("QLineEdit { background: rgb(0, 255, 0); color: rgb(0, 0, 0)}")
                 else:

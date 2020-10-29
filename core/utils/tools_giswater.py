@@ -270,9 +270,6 @@ def get_cursor_multiple_selection():
     path_folder = os.path.join(os.path.dirname(__file__), os.pardir)
     path_cursor = os.path.join(path_folder, 'icons', '201.png')
 
-    print(path_folder)
-    print(path_cursor)
-
     if os.path.exists(path_cursor):
         cursor = QCursor(QPixmap(path_cursor))
     else:
