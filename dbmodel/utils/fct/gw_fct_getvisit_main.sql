@@ -202,6 +202,28 @@ BEGIN
 		WHERE r.rolcanlogin AND r.rolname = ''' || current_user || '''
 		ORDER BY 1;'
         INTO v_userrole;
+
+        -- get v_featuretype if is null or 'visit'(when open it from visit_manager)
+	IF v_featuretype IS NULL OR v_featuretype='visit' THEN
+		IF v_projecttype='WS' THEN
+			SELECT feature_type, feature_id INTO v_featuretype, v_featureid FROM 
+				(SELECT 'node' AS feature_type, node_id AS feature_id FROM om_visit v JOIN om_visit_x_node n on n.visit_id=v.id WHERE v.id=v_id::integer
+				UNION 
+				SELECT 'arc' AS feature_type, arc_id AS feature_id FROM om_visit v JOIN om_visit_x_arc a on a.visit_id=v.id WHERE v.id=v_id::integer
+				UNION 
+				SELECT 'connec' AS feature_type, connec_id AS feature_id FROM om_visit v JOIN om_visit_x_connec c on c.visit_id=v.id WHERE v.id=v_id::integer)a;
+		ELSE
+			SELECT feature_type, feature_id INTO v_featuretype, v_featureid FROM 
+				(SELECT 'node' AS feature_type, node_id AS feature_id FROM om_visit v JOIN om_visit_x_node n on n.visit_id=v.id WHERE v.id=v_id::integer
+				UNION 
+				SELECT 'arc' AS feature_type, arc_id AS feature_id FROM om_visit v JOIN om_visit_x_arc a on a.visit_id=v.id WHERE v.id=v_id::integer
+				UNION 
+				SELECT 'gully' AS feature_type, gully_id AS feature_id FROM om_visit v JOIN om_visit_x_gully g on g.visit_id=v.id WHERE v.id=v_id::integer
+				UNION 
+				SELECT 'connec' AS feature_type, connec_id AS feature_id FROM om_visit v JOIN om_visit_x_connec c on c.visit_id=v.id WHERE v.id=v_id::integer)a;
+		END IF;
+		
+	END IF;
 	
 
 	--  get visitclass
