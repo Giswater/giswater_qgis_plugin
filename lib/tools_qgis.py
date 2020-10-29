@@ -5,23 +5,22 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import configparser
+import os.path
+import shlex
+import console
+from functools import partial
+from random import randrange
+
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsVectorLayer, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsExpression, QgsRectangle, QgsSymbol, \
     QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsMapTool, QgsRubberBand
-
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QPixmap
 from qgis.PyQt.QtWidgets import QDockWidget, QApplication
 
-import configparser
-import os.path
-import shlex
-
-from functools import partial
-from random import randrange
-
-from .tools_qt import reload_qtable, reload_table, apply_lazy_init, getWidgetText
+from . import tools_qt
 from .. import global_vars
 from ..core.utils import tools_giswater
 
@@ -95,7 +94,6 @@ def enable_python_console():
     if python_console:
         python_console.setVisible(True)
     else:
-        import console
         console.show_console()
 
     # Manage Log Messages panel
@@ -638,10 +636,10 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
         insert_feature_to_plan(dialog, geom_type, ids=ids)
         if plan_om == 'plan':
             layers = remove_selection()
-        reload_qtable(dialog, geom_type)
+        tools_qt.reload_qtable(dialog, geom_type)
     else:
-        reload_table(dialog, table_object, geom_type, expr_filter)
-        apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
+        tools_qt.reload_table(dialog, table_object, geom_type, expr_filter)
+        tools_qt.apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Remove selection in generic 'v_edit' layers
     if plan_om == 'plan':
@@ -688,7 +686,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
         ids = []
 
     field_id = f"{geom_type}_id"
-    feature_id = getWidgetText(dialog, "feature_id")
+    feature_id = tools_qt.getWidgetText(dialog, "feature_id")
     expr_filter = f"{field_id} = '{feature_id}'"
 
     # Check expression
@@ -742,8 +740,8 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
         insert_feature_to_plan(dialog, geom_type, ids=ids)
         layers = remove_selection()
     else:
-        reload_table(dialog, table_object, geom_type, expr_filter)
-        apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
+        tools_qt.reload_table(dialog, table_object, geom_type, expr_filter)
+        tools_qt.apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Update list
     list_ids[geom_type] = ids
@@ -758,12 +756,12 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
 def insert_feature_to_plan(dialog, geom_type, ids=None):
     """ Insert features_id to table plan_@geom_type_x_psector """
 
-    value = getWidgetText(dialog, dialog.psector_id)
+    value = tools_qt.getWidgetText(dialog, dialog.psector_id)
     for i in range(len(ids)):
         sql = f"INSERT INTO plan_psector_x_{geom_type} ({geom_type}_id, psector_id) "
         sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT ({geom_type}_id) DO NOTHING;"
         global_vars.controller.execute_sql(sql)
-        reload_qtable(dialog, geom_type)
+        tools_qt.reload_qtable(dialog, geom_type)
 
 
 def disconnect_snapping():
