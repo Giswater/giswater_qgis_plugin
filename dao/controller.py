@@ -954,7 +954,7 @@ class DaoController(object):
         return layer
 
 
-    def get_layer_by_tablename(self, tablename, show_warning=False, log_info=False):
+    def get_layer_by_tablename(self, tablename, show_warning=False, log_info=False, schema_name = None):
         """ Iterate over all layers and get the one with selected @tablename """
 
         # Check if we have any layer loaded
@@ -964,12 +964,13 @@ class DaoController(object):
 
         # Iterate over all layers
         layer = None
-        main_schema = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwMainSchema')
+        if schema_name is None:
+            schema_name = QgsExpressionContextUtils.projectScope(QgsProject.instance()).variable('gwMainSchema')
 
         for cur_layer in layers:
             uri_table = self.get_layer_source_table_name(cur_layer)
             table_schema = self.get_layer_schema(cur_layer)
-            if (uri_table is not None and uri_table == tablename) and main_schema in ('', None, table_schema):
+            if (uri_table is not None and uri_table == tablename) and schema_name in ('', None, table_schema):
                 layer = cur_layer
                 break
 
