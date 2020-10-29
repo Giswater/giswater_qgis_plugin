@@ -393,7 +393,8 @@ class GwSearch:
         widget = QComboBox()
         widget.setObjectName(field['widgetname'])
         widget.setProperty('columnname', field['columnname'])
-        self.populate_combo(widget, field)
+        list_items = self.get_list_items(widget, field)
+        tools_qt.set_item_data(widget, list_items, 1)
         if 'selectedId' in field:
             tools_qt.set_combo_itemData(widget, field['selectedId'], 0)
         # noinspection PyUnresolvedReferences
@@ -409,25 +410,21 @@ class GwSearch:
             tools_qt.setWidgetText(self.dlg_search, widget, '')
 
 
-    def populate_combo(self, widget, field, allow_blank=True):
+    def get_list_items(self, widget, field):
 
         # Generate list of items to add into combo
         widget.blockSignals(True)
         widget.clear()
         widget.blockSignals(False)
-        combolist = []
+        list_items = []
         if 'comboIds' in field:
             for i in range(0, len(field['comboIds'])):
                 if 'comboFeature' in field:
                     elem = [field['comboIds'][i], field['comboNames'][i], field['comboFeature'][i]]
                 else:
                     elem = [field['comboIds'][i], field['comboNames'][i]]
-                combolist.append(elem)
-        records_sorted = sorted(combolist, key=operator.itemgetter(1))
-
-        # Populate combo
-        for record in records_sorted:
-            widget.addItem(record[1], record)
+                list_items.append(elem)
+        return list_items
 
 
     def open_hydrometer_dialog(self, table_name=None, feature_id=None):
