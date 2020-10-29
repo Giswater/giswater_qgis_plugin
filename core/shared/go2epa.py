@@ -316,8 +316,8 @@ class GwGo2Epa:
                f" WHERE name = '{self.dlg_hydrology_selector.hydrology.currentText()}'")
         row = self.controller.get_row(sql)
         if row is not None:
-            tools_qt.setText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.infiltration, row[0])
-            tools_qt.setText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.descript, row[1])
+            tools_qt.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.infiltration, row[0])
+            tools_qt.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.descript, row[1])
 
 
     def filter_cbx_by_text(self, tablename, widgettxt, widgetcbx):
@@ -491,7 +491,7 @@ class GwGo2Epa:
                     seconds = int(timeparts[2])
                     time = QTime(hours, minuts, seconds)
                     tools_qt.setTimeEdit(dialog, widget, time)
-                    tools_qt.setText(dialog, column_name + "_day", days)
+                    tools_qt.setWidgetText(dialog, column_name + "_day", days)
                 else:
                     tools_qt.setWidgetText(dialog, widget, str(row[column_name]))
 
