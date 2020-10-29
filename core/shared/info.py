@@ -364,7 +364,8 @@ class GwInfo(QObject):
 
         # Get tableParent and select layer
         self.table_parent = str(complet_result[0]['body']['feature']['tableParent'])
-        self.layer = self.controller.get_layer_by_tablename(self.table_parent)
+        schema_name = str(complet_result[0]['body']['feature']['schemaName'])
+        self.layer = self.controller.get_layer_by_tablename(self.table_parent, False, False, schema_name)
         if self.layer is None:
             self.controller.show_message("Layer not found: " + self.table_parent, 2)
             return False, self.dlg_cf

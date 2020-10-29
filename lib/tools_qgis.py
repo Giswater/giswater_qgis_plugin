@@ -204,7 +204,7 @@ def qgis_get_layer_primary_key(layer=None):
     return uri_pk
 
 
-def qgis_get_layer_by_tablename(tablename, show_warning=False, log_info=False):
+def qgis_get_layer_by_tablename(tablename, show_warning=False, log_info=False, schema_name=None):
     """ Iterate over all layers and get the one with selected @tablename """
 
     # Check if we have any layer loaded
@@ -215,11 +215,12 @@ def qgis_get_layer_by_tablename(tablename, show_warning=False, log_info=False):
     # Iterate over all layers
     layer = None
     project_vars = get_qgis_project_variables()
-    main_schema = project_vars['main_schema']
+    if schema_name is None:
+        schema_name = project_vars['main_schema']
     for cur_layer in layers:
         uri_table = qgis_get_layer_source_table_name(cur_layer)
         table_schema = qgis_get_layer_schema(cur_layer)
-        if (uri_table is not None and uri_table == tablename) and main_schema in ('', None, table_schema):
+        if (uri_table is not None and uri_table == tablename) and schema_name in ('', None, table_schema):
             layer = cur_layer
             break
 
