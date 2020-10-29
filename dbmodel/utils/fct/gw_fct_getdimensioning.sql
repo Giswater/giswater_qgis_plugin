@@ -81,15 +81,22 @@ BEGIN
 	USING 'v_edit_dimensions', 'form_feature', '', NULL, NULL, NULL, NULL, 'SELECT', null, 3, null::json;
 
 	-- USE reduced geometry to intersect with expl mapzone in order to enhance the selectedId expl
-	SELECT count(*) into count_aux FROM exploitation WHERE ST_DWithin(v_input_geometry, exploitation.the_geom,0.001);
-	IF count_aux = 1 THEN
+
+	SELECT "value" INTO v_expl FROM config_param_user WHERE "parameter"='edit_exploitation_vdefault' AND "cur_user"="current_user"();
+	
+	IF v_expl IS NULL THEN
 		v_expl = (SELECT expl_id FROM exploitation WHERE ST_DWithin(v_input_geometry, exploitation.the_geom,0.001)  AND active=true LIMIT 1);
-	ELSE
-		SELECT expl_id INTO v_expl FROM selector_expl WHERE cur_user = current_user LIMIT 1;
+		IF v_expl IS NULL THEN
+			SELECT expl_id INTO v_expl FROM selector_expl WHERE cur_user = current_user LIMIT 1;
+		END IF;
 	END IF;
 
 	-- get user's values
-	SELECT state_id INTO v_state FROM selector_state WHERE cur_user = current_user ORDER BY 1 ASC LIMIT 1;
+	SELECT "value" INTO v_state FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"();
+
+	IF v_state IS NULL THEN
+		v_state = (SELECT state_id FROM selector_state WHERE cur_user = current_user ORDER BY 1 ASC LIMIT 1);
+	END IF;
 
 	-- Set widget_name without tabname for widgets
 	FOREACH field IN ARRAY v_fields_array
