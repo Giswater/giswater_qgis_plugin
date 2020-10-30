@@ -56,7 +56,7 @@ INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, l
 isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable, isdeprecated, vdefault)
 VALUES ('edit_arc_insert_automatic_endpoint', 'config', 'If value, enables to digitize new arcs without node_2. Node2 it is automatic triggered using default nodecat value from user and common values from arc',
 'role_edit', 'Automatic node insert as arc endpoint', TRUE, 7, 'utils', FALSE, FALSE, 'boolean', 'check', TRUE, 'lyt_other',
-TRUE, FALSE, 'FALSE') ON CONFLICT (id) DO NOTHING;
+TRUE, FALSE, 'false') ON CONFLICT (id) DO NOTHING;
 
 -- 2020/10/27
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
