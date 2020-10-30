@@ -58,9 +58,12 @@ VALUES ('edit_arc_insert_automatic_endpoint', 'config', 'If value, enables to di
 'role_edit', 'Automatic node insert as arc endpoint', TRUE, 7, 'utils', FALSE, FALSE, 'boolean', 'check', TRUE, 'lyt_other',
 TRUE, FALSE, 'false') ON CONFLICT (id) DO NOTHING;
 
--- 2020/10/27
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
 VALUES (3160, 'This feature with state = 2 is only attached to psector' , 'It''s necessary to remove feature completaly using end feature tool', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
 VALUES (3162, 'This feature is a final node for planned arc ' , 'It''s necessary to remove arcs first, then nodes', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING;
+
+-- 2020/10/28
+DELETE FROM sys_param_user where id = 'inp_options_skipdemandpattern';
+UPDATE sys_param_user SET vdefault = lower(vdefault) WHERE id = 'qgis_form_initproject_hidden';
