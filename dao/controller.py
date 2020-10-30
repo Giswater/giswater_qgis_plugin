@@ -428,6 +428,7 @@ class DaoController(object):
         """ Check database connection. Reconnect if needed """
 
         opened = True
+        return opened
         try:
             opened = self.db.isOpen()
             if not opened:

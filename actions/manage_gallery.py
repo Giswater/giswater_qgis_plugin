@@ -43,6 +43,8 @@ class ManageGallery(ParentManage):
         sql = (f"SELECT value FROM om_visit_event_photo"
                f" WHERE event_id = '{event_id}' AND visit_id = '{visit_id}'")
         rows = self.controller.get_rows(sql, commit=True)
+
+        if rows is None: return
         num = len(rows)
         for m in range(0, num):
             self.img_path_list1D.append(rows[m][0])
@@ -97,6 +99,7 @@ class ManageGallery(ParentManage):
                     data = urllib.request.urlopen(url).read()
                     pixmap = QPixmap()
                     pixmap.loadFromData(data)
+
                 else:
                     pixmap = QPixmap(str(self.img_path_list[0][i]))
 
