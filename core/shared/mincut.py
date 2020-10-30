@@ -1691,8 +1691,15 @@ class GwMincut:
         self.disconnect_snapping(False)
         self.task1.setProgress(100)
 
-    def custom_mincut(self):
+
+    def custom_mincut(self, is_checked):
         """ B2-123: Custom mincut analysis. Working just with valve layer """
+        if is_checked is False:
+            # Disconnect snapping and related signals
+            self.disconnect_snapping(False)
+            # Recover snapping options, refresh canvas & set visible layers
+            self.snapper_manager.recover_snapping_options()
+            return
 
         # initialize map tool
         self.init_map_tool()
