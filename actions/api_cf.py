@@ -634,10 +634,10 @@ class ApiCF(ApiParent, QObject):
             dlg_cf.dlg_closed.connect(self.roll_back)
             dlg_cf.dlg_closed.connect(partial(self.resetRubberbands))
             dlg_cf.dlg_closed.connect(partial(self.save_settings, dlg_cf))
-            dlg_cf.key_pressed.connect(partial(self.close_dialog, dlg_cf))
+            dlg_cf.key_escape.connect(partial(self.close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self.manage_info_close, dlg_cf))
         btn_accept.clicked.connect(partial(self.accept_from_btn, dlg_cf, action_edit, result, new_feature, self.my_json))
-
+        dlg_cf.key_enter.connect(partial(self.accept_from_btn, dlg_cf, action_edit, result, new_feature, self.my_json))
 
         # Set title
         toolbox_cf = dlg_cf.findChild(QWidget, 'toolBox')
