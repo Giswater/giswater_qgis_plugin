@@ -376,7 +376,7 @@ class ReplaceFeatureMapTool(ParentMapTool):
 
     def canvasMoveEvent(self, event):
 
-        # Hide marker and get coordinates
+        # Hide marker and clicked point
         self.vertex_marker.hide()
         event_point = self.snapper_manager.get_event_point(event)
 

@@ -1722,8 +1722,14 @@ class MincutParent(ParentAction):
         self.task1.setProgress(100)
 
 
-    def custom_mincut(self):
+    def custom_mincut(self, is_checked):
         """ B2-123: Custom mincut analysis. Working just with valve layer """
+        if is_checked is False:
+            # Disconnect snapping and related signals
+            self.disconnect_snapping(False)
+            # Recover snapping options, refresh canvas & set visible layers
+            self.snapper_manager.recover_snapping_options()
+            return
 
         # initialize map tool
         self.init_map_tool()
@@ -1743,8 +1749,13 @@ class MincutParent(ParentAction):
 
         # Set active and current layer
         self.layer = self.controller.get_layer_by_tablename("v_om_mincut_valve")
+        if not self.layer:
+            return
+        self.layer.dataProvider().forceReload()
         self.iface.setActiveLayer(self.layer)
         self.current_layer = self.layer
+
+        self.controller.set_layer_index('v_om_mincut_valve')
 
         # Waiting for signals
         self.canvas.xyCoordinates.connect(self.mouse_move_valve)
@@ -1754,7 +1765,8 @@ class MincutParent(ParentAction):
     def mouse_move_valve(self, point):
         """ Waiting for valves when mouse is moved"""
 
-        # Get clicked point
+        # Hide marker and clicked point
+        self.vertex_marker.hide()
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
@@ -1776,7 +1788,7 @@ class MincutParent(ParentAction):
         # Set active layer
         self.iface.setActiveLayer(self.layer_arc)
 
-        # Get clicked point
+        # Hide marker and clicked point
         self.vertex_marker.hide()
         event_point = self.snapper_manager.get_event_point(point=point)
 
@@ -1804,12 +1816,9 @@ class MincutParent(ParentAction):
         # Check feature
         layer = self.snapper_manager.get_snapped_layer(result)
 
-        print("feature_type")
-
         snapped_feature = self.snapper_manager.get_snapped_feature(result)
         feature_id = self.snapper_manager.get_snapped_feature_id(result)
         element_id = snapped_feature.attribute('node_id')
-        print(element_id)
         layer.select([feature_id])
 
         # call custom mincut function
