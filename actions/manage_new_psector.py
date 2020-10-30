@@ -97,6 +97,8 @@ class ManageNewPsector(ParentManage):
         rotation.setValidator(QDoubleValidator())
         atlas_id = self.dlg_plan_psector.findChild(QLineEdit, "atlas_id")
         atlas_id.setValidator(QIntValidator())
+        num_value = self.dlg_plan_psector.findChild(QLineEdit, "num_value")
+        num_value.setValidator(QIntValidator())
         where = " WHERE typevalue = 'psector_type' "
         self.populate_combos(self.dlg_plan_psector.psector_type, 'idval', 'id', 'plan_typevalue', where)
 
