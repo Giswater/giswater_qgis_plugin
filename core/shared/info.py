@@ -36,7 +36,8 @@ from ..utils.tools_giswater import load_settings, open_dialog, save_settings, cl
 from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
 from ...lib.tools_qgis import get_snapping_options, get_event_point, snap_to_current_layer, get_snapped_layer, \
-    get_snapped_feature, add_marker, enable_snapping, apply_snapping_options, get_feature_by_expr, get_visible_layers
+    get_snapped_feature, add_marker, enable_snapping, apply_snapping_options, get_feature_by_expr, get_visible_layers, \
+    qgis_get_layer_by_tablename
 from ...lib.tools_qt import set_completer_object_api, set_completer_object, check_actions, api_action_help, \
     set_widget_size, add_button, add_textarea, add_lineedit, set_data_type, manage_lineedit, add_tableview, \
     set_headers, populate_table, set_columns_config, add_checkbox, add_combobox, fill_child, add_frame, add_label, \
@@ -223,7 +224,7 @@ class GwInfo(QObject):
             return result, dialog
 
         elif template == 'dimensioning':
-            self.lyr_dim = self.controller.get_layer_by_tablename("v_edit_dimensions", show_warning=True)
+            self.lyr_dim = get_layer_by_tablename("v_edit_dimensions", show_warning=True)
             if self.lyr_dim:
                 self.api_dim = GwDimensioning()
                 feature_id = self.complet_result[0]['body']['feature']['id']
@@ -558,9 +559,10 @@ class GwInfo(QObject):
             dlg_cf.dlg_closed.connect(self.roll_back)
             dlg_cf.dlg_closed.connect(lambda: self.rubber_band.reset())
             dlg_cf.dlg_closed.connect(partial(save_settings, dlg_cf))
-            dlg_cf.key_pressed.connect(partial(close_dialog, dlg_cf))
+            dlg_cf.key_escape.connect(partial(close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self.manage_info_close, dlg_cf))
         btn_accept.clicked.connect(partial(self.accept_from_btn, dlg_cf, action_edit, new_feature, self.my_json))
+        dlg_cf.key_enter.connect(partial(self.accept_from_btn, dlg_cf, action_edit, new_feature, self.my_json))
 
         # Set title
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')

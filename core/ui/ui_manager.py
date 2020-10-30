@@ -133,11 +133,15 @@ class InfoCrossectUi(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('info_feature.ui', 'basic')
 class InfoFeatureUi(GwMainWindow, FORM_CLASS):
-    key_pressed = QtCore.pyqtSignal()
+    key_escape = QtCore.pyqtSignal()
+    key_enter = QtCore.pyqtSignal()
 
     def keyPressEvent(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
-            self.key_pressed.emit()
+            self.key_escape.emit()
+            return super(InfoFeatureUi, self).keyPressEvent(event)
+        elif event.key() == QtCore.Qt.Key_Enter:
+            self.key_enter.emit()
             return super(InfoFeatureUi, self).keyPressEvent(event)
 
 FORM_CLASS = get_ui_class('search.ui', 'basic')
