@@ -196,6 +196,7 @@ class ManageNewPsector(ParentManage):
                                 set_edit_triggers=QTableView.DoubleClicked)
                 self.set_table_columns(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully")
             sql = (f"SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, "
+                   f"text3, text4, text5, text6, num_value, "
                    f"observ, atlas_id, scale, rotation, active, ext_code, status "
                    f"FROM plan_psector "
                    f"WHERE psector_id = {psector_id}")
@@ -235,13 +236,17 @@ class ManageNewPsector(ParentManage):
             result = self.controller.get_row(sql)
             utils_giswater.set_combo_itemData(self.cmb_sector_id, str(result['name']), 1)
             utils_giswater.set_combo_itemData(self.cmb_status, str(row['status']), 0)
-
             utils_giswater.setChecked(self.dlg_plan_psector, "active", row['active'])
             utils_giswater.fillWidget(self.dlg_plan_psector, "name", row)
             utils_giswater.fillWidget(self.dlg_plan_psector, "descript", row)
             utils_giswater.set_combo_itemData(self.dlg_plan_psector.priority, str(row["priority"]), 0)
             utils_giswater.fillWidget(self.dlg_plan_psector, "text1", row)
             utils_giswater.fillWidget(self.dlg_plan_psector, "text2", row)
+            utils_giswater.fillWidget(self.dlg_plan_psector, "text3", row)
+            utils_giswater.fillWidget(self.dlg_plan_psector, "text4", row)
+            utils_giswater.fillWidget(self.dlg_plan_psector, "text5", row)
+            utils_giswater.fillWidget(self.dlg_plan_psector, "text6", row)
+            utils_giswater.fillWidget(self.dlg_plan_psector, "num_value", row)
             utils_giswater.fillWidget(self.dlg_plan_psector, "observ", row)
             utils_giswater.fillWidget(self.dlg_plan_psector, "atlas_id", row)
             utils_giswater.fillWidget(self.dlg_plan_psector, "scale", row)
@@ -777,6 +782,7 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.tabWidget.setTabEnabled(2, enabled)
         self.dlg_plan_psector.tabWidget.setTabEnabled(3, enabled)
         self.dlg_plan_psector.tabWidget.setTabEnabled(4, enabled)
+        self.dlg_plan_psector.tabWidget.setTabEnabled(5, enabled)
 
 
     def enable_buttons(self, enabled):
