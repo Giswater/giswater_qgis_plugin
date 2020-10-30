@@ -16,8 +16,6 @@ UPDATE sys_param_user SET label = 'Name of point virtual layer' WHERE id = 'virt
 UPDATE sys_param_user SET label = 'Name of line virtual layer' WHERE id = 'virtual_line_vdefault';
 
 
-select * from config_form_fields WHERE formname = 'v_edit_plan_psector'
-
 INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden)
 SELECT formname, formtype, 'text3', layoutorder, datatype, widgettype, 'text3', widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
 WHERE formname = 'v_edit_plan_psector' and columnname = 'text2';
