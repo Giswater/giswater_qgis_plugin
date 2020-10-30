@@ -442,7 +442,9 @@ class ApiCF(ApiParent, QObject):
 
         # Get tableParent and select layer
         self.table_parent = str(complet_result[0]['body']['feature']['tableParent'])
-        schema_name = str(complet_result[0]['body']['feature']['schemaName'])
+        schema_name = None
+        if 'schemaName' in complet_result[0]['body']['feature']:
+            schema_name = str(complet_result[0]['body']['feature']['schemaName'])
         self.layer = self.controller.get_layer_by_tablename(self.table_parent, False, False, schema_name)
         if self.layer is None:
             self.controller.show_message("Layer not found: " + self.table_parent, 2)
