@@ -184,11 +184,11 @@ def setWidgetText(dialog, widget, text):
     if type(widget) in (QLabel, QLineEdit, QTextEdit):
         if str(text) == 'None':
             text = ""
-        widget.setText(text)
+        widget.setText(f"{text}")
     elif type(widget) is QPlainTextEdit:
         if str(text) == 'None':
             text = ""
-        widget.insertPlainText(text)
+        widget.insertPlainText(f"{text}")
     elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
         if text == 'None' or text == 'null':
             text = 0
