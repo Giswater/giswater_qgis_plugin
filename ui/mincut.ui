@@ -380,7 +380,7 @@
                   </widget>
                  </item>
                  <item row="6" column="1" colspan="2">
-                  <widget class="QTextEdit" name="textEdit">
+                  <widget class="QTextEdit" name="output_details">
                    <property name="font">
                     <font>
                      <pointsize>7</pointsize>
