@@ -689,7 +689,7 @@ class GwGo2Epa:
         """
 
         model = QSqlQueryModel()
-        model.setQuery(query)
+        model.setQuery(query, db=self.controller.db)
         qtable.setModel(model)
         qtable.show()
 

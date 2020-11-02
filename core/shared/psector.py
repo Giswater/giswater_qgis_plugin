@@ -1272,7 +1272,7 @@ class GwPsector:
         """
 
         model = QSqlQueryModel()
-        model.setQuery(query)
+        model.setQuery(query, db=self.controller.db)
         qtable.setModel(model)
         qtable.show()
 
@@ -1293,7 +1293,7 @@ class GwPsector:
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel()
+        model = QSqlTableModel(db=self.controller.db)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)

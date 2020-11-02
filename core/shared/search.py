@@ -777,7 +777,7 @@ class GwSearch:
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel()
+        model = QSqlTableModel(db=self.controller.db)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
