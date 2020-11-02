@@ -25,15 +25,15 @@ from ....lib.tools_qgis import get_max_rectangle_from_coords, get_points, get_vi
 
 class GwInfoButton(GwParentMapTool):
 
-    def __init__(self, icon_path, text, toolbar, action_group):
-        super().__init__(icon_path, text, toolbar, action_group)
+    def __init__(self, icon_path, action_name, text, toolbar, action_group):
+        super().__init__(icon_path, action_name, text, toolbar, action_group)
 
         self.rubber_band = QgsRubberBand(global_vars.canvas)
         self.tab_type = None
         # Used when the signal 'signal_activate' is emitted from the info, do not open another form
         self.block_signal = False
         self.previous_api_cf = None
-
+        self.action_name = action_name
 
 
     def create_point(self, event):
@@ -99,7 +99,7 @@ class GwInfoButton(GwParentMapTool):
     def reactivate_map_tool(self):
         """ Reactivate tool """
         self.block_signal = True
-        info_action = self.iface.mainWindow().findChild(QAction, 'map_tool_api_info_data')
+        info_action = self.iface.mainWindow().findChild(QAction, self.action_name)
         info_action.trigger()
 
 

@@ -19,9 +19,9 @@ from ....lib.tools_qgis import get_event_point, snap_to_current_layer, get_snapp
 class GwArcFusionButton(GwParentMapTool):
     """ Button 17: User select one node. Execute SQL function: 'gw_fct_delete_node' """
 
-    def __init__(self, icon_path, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group):
         """ Class constructor """
-        super().__init__(icon_path, text, toolbar, action_group)
+        super().__init__(icon_path, action_name, text, toolbar, action_group)
 
 
     """ QgsMapTools inherited event functions """

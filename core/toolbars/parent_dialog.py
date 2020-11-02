@@ -15,7 +15,7 @@ from ... import global_vars
 
 class GwParentAction:
 
-    def __init__(self, icon_path, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
@@ -35,7 +35,7 @@ class GwParentAction:
         else:
             self.action = QAction(icon, text, action_group)
 
-        self.action.setObjectName(text)
+        self.action.setObjectName(action_name)
         self.action.setCheckable(False)
         self.action.triggered.connect(self.clicked_event)
 

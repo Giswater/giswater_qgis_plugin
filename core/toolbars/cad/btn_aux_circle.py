@@ -23,10 +23,10 @@ from ....lib.tools_qgis import get_event_point, snap_to_current_layer, snap_to_b
 class GwAuxCircleButton(GwParentMapTool):
     """ Button 71: Add circle """
 
-    def __init__(self, icon_path, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group):
         """ Class constructor """
 
-        super().__init__(icon_path, text, toolbar, action_group)
+        super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_circle = False
         self.layer_circle = None

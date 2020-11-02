@@ -270,9 +270,8 @@ class LoadProject(QObject):
 
                 if button_def:
                     text = self.translate(f'{index_action}_text')
-
                     icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
-                    button = getattr(buttons, button_def)(icon_path, text, plugin_toolbar.toolbar, ag)
+                    button = getattr(buttons, button_def)(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
 
                     self.buttons[index_action] = button
 

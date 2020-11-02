@@ -26,10 +26,10 @@ from ..parent_maptool import GwParentMapTool
 class GwFeatureReplaceButton(GwParentMapTool):
     """ Button 44: User select one feature. Execute SQL function: 'gw_fct_setfeaturereplace' """
 
-    def __init__(self, icon_path, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group):
         """ Class constructor """
 
-        super().__init__(icon_path, text, toolbar, action_group)
+        super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.current_date = QDate.currentDate().toString('yyyy-MM-dd')
         self.project_type = None
         self.geom_type = None

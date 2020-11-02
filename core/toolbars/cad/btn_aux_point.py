@@ -24,10 +24,10 @@ from ....lib.tools_qgis import get_event_point, snap_to_current_layer, snap_to_b
 class GwAuxPointButton(GwParentMapTool):
     """ Button 72: Add point """
 
-    def __init__(self, icon_path, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group):
         """ Class constructor """
 
-        super().__init__(icon_path, text, toolbar, action_group)
+        super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
         self.cancel_point = False
         self.layer_points = None

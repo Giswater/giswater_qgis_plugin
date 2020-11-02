@@ -20,9 +20,9 @@ from ...utils.tools_giswater import create_body, from_postgres_to_toc, set_style
 
 class GwAddChildLayerButton(GwParentAction):
 
-    def __init__(self, icon_path, text, toolbar, action_group):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
-        super().__init__(icon_path, text, toolbar, action_group)
+        super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.project_vars = get_qgis_project_variables()
         self.qgis_project_infotype = self.project_vars['infotype']
         self.qgis_project_add_schema = self.project_vars['add_schema']
