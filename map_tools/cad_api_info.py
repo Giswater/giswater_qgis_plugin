@@ -48,7 +48,7 @@ class CadApiInfo(ParentMapTool):
         if event.key() == Qt.Key_Escape:
             for rb in self.rubberband_list:
                 rb.reset()
-            self.api_cf.resetRubberbands()
+
             self.action().trigger()
             return
 
