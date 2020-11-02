@@ -204,6 +204,11 @@ class GwCSVButton(GwParentAction):
     def load_settings_values(self):
         """ Load QGIS settings related with csv options """
 
+        value = get_parser_value('csv2Pg', 'cmb_import_type')
+        tools_qt.set_combo_itemData(self.dlg_csv.cmb_import_type, value, 0)
+
+        value = get_parser_value('csv2Pg', 'txt_import')
+        tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.txt_import, value)
 
         value = get_parser_value('csv2Pg', 'txt_file_csv')
         tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv, value)
@@ -221,7 +226,8 @@ class GwCSVButton(GwParentAction):
 
     def save_settings_values(self):
         """ Save QGIS settings related with csv options """
-
+        set_parser_value('csv2Pg', 'cmb_import_type', f"{tools_qt.get_item_data(self.dlg_csv, 'cmb_import_type', 0)}")
+        set_parser_value('csv2Pg', 'txt_import', tools_qt.getWidgetText(self.dlg_csv, 'txt_import'))
         set_parser_value('csv2Pg', 'txt_file_csv', tools_qt.getWidgetText(self.dlg_csv, 'txt_file_csv'))
         set_parser_value('csv2Pg', 'cmb_unicode_list', tools_qt.getWidgetText(self.dlg_csv, 'cmb_unicode_list'))
         set_parser_value('csv2Pg', 'rb_semicolon', f"{self.dlg_csv.rb_semicolon.isChecked()}")
