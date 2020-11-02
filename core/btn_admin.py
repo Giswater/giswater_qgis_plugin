@@ -2062,7 +2062,7 @@ class GwAdmin:
 
         # Get filter
         filter_ = tools_qt.getWidgetText(self.dlg_readsql, widget)
-        if filter_ is None and self.schema_type:
+        if filter_ in (None, 'null') and self.schema_type:
             filter_ = self.schema_type
         if filter_ is None:
             return
