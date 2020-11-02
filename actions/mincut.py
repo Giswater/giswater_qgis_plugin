@@ -1308,7 +1308,7 @@ class MincutParent(ParentAction):
             table_name = self.schema_name + "." + table_name
 
         # Set a model with selected filter expression
-        model = QSqlTableModel()
+        model = QSqlTableModel(db=self.controller.db)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.select()

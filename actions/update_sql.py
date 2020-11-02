@@ -2134,7 +2134,7 @@ class UpdateSQL(ApiParent):
 
         # Populate Table
         self.model_srid = QSqlQueryModel()
-        self.model_srid.setQuery(sql)
+        self.model_srid.setQuery(sql, db=self.controller.db)
         self.tbl_srid.setModel(self.model_srid)
         self.tbl_srid.show()
 
@@ -3040,7 +3040,7 @@ class UpdateSQL(ApiParent):
 
         # Populate table update
         qtable = self.dlg_manage_sys_fields.findChild(QTableView, "tbl_update")
-        self.model_update_table = QSqlTableModel()
+        self.model_update_table = QSqlTableModel(db=self.controller.db)
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
         expr_filter = "cat_feature_id = '" + form_name + "'"
         self.fill_table(qtable, 've_config_sysfields', self.model_update_table, expr_filter)
@@ -3059,7 +3059,7 @@ class UpdateSQL(ApiParent):
 
         # Populate table update
         qtable = self.dlg_manage_fields.findChild(QTableView, "tbl_update")
-        self.model_update_table = QSqlTableModel()
+        self.model_update_table = QSqlTableModel(db=self.controller.db)
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         if self.chk_multi_insert:

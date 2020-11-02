@@ -454,7 +454,7 @@ class ParentAction(object):
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        self.model = QSqlTableModel()
+        self.model = QSqlTableModel(db=self.controller.db)
         self.model.setTable(table_name)
         self.model.setEditStrategy(set_edit_strategy)
         self.model.setSort(0, 0)
@@ -477,7 +477,7 @@ class ParentAction(object):
         """
 
         model = QSqlQueryModel()
-        model.setQuery(query)
+        model.setQuery(query, db=self.controller.db)
         qtable.setModel(model)
         qtable.show()
 

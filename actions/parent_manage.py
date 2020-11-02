@@ -570,7 +570,7 @@ class ParentManage(ParentAction, object):
             table_name = self.schema_name + "." + table_name
 
         # Set the model
-        model = QSqlTableModel()
+        model = QSqlTableModel(db=self.controller.db)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.select()
@@ -977,7 +977,7 @@ class ParentManage(ParentAction, object):
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
-        model = QSqlTableModel()
+        model = QSqlTableModel(db=self.controller.db)
         model.setTable(table_name)
         model.setFilter(expr)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
@@ -1009,7 +1009,7 @@ class ParentManage(ParentAction, object):
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel()
+        model = QSqlTableModel(db=self.controller.db)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.sort(0, 1)
@@ -1208,7 +1208,7 @@ class ParentManage(ParentAction, object):
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel()
+        model = QSqlTableModel(db=self.controller.db)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.setFilter(expr_filter)

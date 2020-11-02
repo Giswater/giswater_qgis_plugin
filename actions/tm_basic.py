@@ -196,7 +196,7 @@ class TmBasic(TmParentAction):
             table_view = self.schema_name + "." + table_view
 
         # Set model
-        model = QSqlTableModel()
+        model = QSqlTableModel(db=self.controller.db)
         model.setTable(table_view)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(2, 0)
@@ -402,7 +402,7 @@ class TmBasic(TmParentAction):
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel()
+        model = QSqlTableModel(db=self.controller.db)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
 
@@ -447,7 +447,7 @@ class TmBasic(TmParentAction):
             table_view = self.schema_name + "." + table_view
 
         # Set model
-        model = QSqlTableModel()
+        model = QSqlTableModel(db=self.controller.db)
         model.setTable(table_view)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.setSort(2, 0)
@@ -859,7 +859,7 @@ class TmBasic(TmParentAction):
             tableright = f"{self.schema_name}.{tableright}"
 
         # Set model
-        model = QSqlTableModel()
+        model = QSqlTableModel(db=self.controller.db)
         model.setTable(tableright)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.setSort(2, 0)
@@ -1045,7 +1045,7 @@ class TmBasic(TmParentAction):
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel()
+        model = QSqlTableModel(db=self.controller.db)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
