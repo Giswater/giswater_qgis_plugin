@@ -38,6 +38,9 @@
           <layout class="QGridLayout" name="gridLayout_3">
            <item row="3" column="0">
             <widget class="QLabel" name="label_2">
+             <property name="toolTip">
+              <string>Profile title to be displayed</string>
+             </property>
              <property name="text">
               <string>Title:</string>
              </property>
@@ -55,6 +58,9 @@
            </item>
            <item row="6" column="0">
             <widget class="QLabel" name="label_4">
+             <property name="toolTip">
+              <string>Date to be displayed</string>
+             </property>
              <property name="text">
               <string>Date:</string>
              </property>
@@ -72,8 +78,11 @@
            </item>
            <item row="0" column="0">
             <widget class="QLabel" name="lbl_min_distance">
+             <property name="toolTip">
+              <string>Minimum distance between vnodes to be displayed</string>
+             </property>
              <property name="text">
-              <string>Min Dist:</string>
+              <string>Vnode Min Dist:</string>
              </property>
             </widget>
            </item>
@@ -94,7 +103,11 @@
             </widget>
            </item>
            <item row="0" column="0" colspan="2">
-            <widget class="QLineEdit" name="txt_profile_id"/>
+            <widget class="QLineEdit" name="txt_profile_id">
+             <property name="toolTip">
+              <string>Optional profile ID</string>
+             </property>
+            </widget>
            </item>
            <item row="3" column="0" colspan="2">
             <widget class="QPushButton" name="btn_save_profile">
@@ -166,10 +179,22 @@
     <string>actionProfile</string>
    </property>
    <property name="toolTip">
-    <string>Profile</string>
+    <string>Set nodes</string>
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>txt_profile_id</tabstop>
+  <tabstop>tbl_list_arc</tabstop>
+  <tabstop>btn_load_profile</tabstop>
+  <tabstop>btn_save_profile</tabstop>
+  <tabstop>btn_clear_profile</tabstop>
+  <tabstop>txt_min_distance</tabstop>
+  <tabstop>txt_title</tabstop>
+  <tabstop>date</tabstop>
+  <tabstop>btn_draw_profile</tabstop>
+  <tabstop>scrollArea</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
