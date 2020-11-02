@@ -608,7 +608,7 @@ class ApiCF(ApiParent, QObject):
         action_centered.triggered.connect(partial(self.api_action_centered, self.canvas, layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, layer))
         action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, dlg_cf, self.geom_type, tab_type))
-        action_rotation.triggered.connect(partial(self.action_rotation, dlg_cf))
+        action_rotation.triggered.connect(partial(self.action_rotation, dlg_cf, action_rotation))
         action_link.triggered.connect(partial(self.action_open_url, dlg_cf, result))
         action_section.triggered.connect(partial(self.open_section_form))
         action_help.triggered.connect(partial(self.api_action_help, self.geom_type))
@@ -652,6 +652,58 @@ class ApiCF(ApiParent, QObject):
         dlg_cf.setWindowTitle(title)
 
         return self.complet_result, dlg_cf
+
+
+    def action_rotation(self, dialog, action):
+        # Set map tool emit point and signals
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.previous_map_tool = self.canvas.mapTool()
+        self.canvas.setMapTool(self.emit_point)
+        self.emit_point.canvasClicked.connect(partial(self.action_rotation_canvas_clicked, dialog, action))
+
+
+    def action_rotation_canvas_clicked(self, dialog, action, point, btn):
+
+        if btn == Qt.RightButton:
+            self.canvas.setMapTool(self.previous_map_tool)
+            return
+
+        existing_point_x = None
+        existing_point_y = None
+        viewname = self.controller.get_layer_source_table_name(self.layer)
+        sql = (f"SELECT ST_X(the_geom), ST_Y(the_geom)"
+               f" FROM {viewname}"
+               f" WHERE node_id = '{self.feature_id}'")
+        row = self.controller.get_row(sql)
+        if row:
+            existing_point_x = row[0]
+            existing_point_y = row[1]
+
+        if existing_point_x:
+            sql = (f"UPDATE node"
+                   f" SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}), "
+                   f" ST_Point({point.x()}, {point.y()}))))"
+                   f" WHERE node_id = '{self.feature_id}'")
+            status = self.controller.execute_sql(sql)
+            if not status:
+                self.canvas.setMapTool(self.previous_map_tool)
+                return
+
+        sql = (f"SELECT rotation FROM node "
+               f" WHERE node_id = '{self.feature_id}'")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(dialog, "data_rotation", str(row[0]))
+
+        sql = (f"SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}),"
+               f" ST_Point({point.x()}, {point.y()})))")
+        row = self.controller.get_row(sql)
+        if row:
+            utils_giswater.setWidgetText(dialog, "data_hemisphere", str(row[0]))
+            message = "Hemisphere of the node has been updated. Value is"
+            self.controller.show_info(message, parameter=str(row[0]))
+        self.api_disable_rotation(dialog)
+        self.cancel_snapping_tool(dialog, action)
 
 
     def block_action_edit(self, dialog, action_edit, result, layer, fid, my_json, new_feature):

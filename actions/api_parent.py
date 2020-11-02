@@ -231,58 +231,6 @@ class ApiParent(ParentAction):
                 self.controller.show_warning(message, parameter=pdf_path)
 
 
-    def action_rotation(self, dialog):
-
-        # Set map tool emit point and signals
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.previous_map_tool = self.canvas.mapTool()
-        self.canvas.setMapTool(self.emit_point)
-        self.emit_point.canvasClicked.connect(partial(self.action_rotation_canvas_clicked, dialog))
-
-
-    def action_rotation_canvas_clicked(self, dialog, point, btn):
-
-        if btn == Qt.RightButton:
-            self.canvas.setMapTool(self.previous_map_tool)
-            return
-
-        existing_point_x = None
-        existing_point_y = None
-        viewname = self.controller.get_layer_source_table_name(self.layer)
-        sql = (f"SELECT ST_X(the_geom), ST_Y(the_geom)"
-               f" FROM {viewname}"
-               f" WHERE node_id = '{self.feature_id}'")
-        row = self.controller.get_row(sql)
-        if row:
-            existing_point_x = row[0]
-            existing_point_y = row[1]
-
-        if existing_point_x:
-            sql = (f"UPDATE node"
-                   f" SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}), "
-                   f" ST_Point({point.x()}, {point.y()}))))"
-                   f" WHERE node_id = '{self.feature_id}'")
-            status = self.controller.execute_sql(sql)
-            if not status:
-                self.canvas.setMapTool(self.previous_map_tool)
-                return
-
-        sql = (f"SELECT rotation FROM node "
-               f" WHERE node_id = '{self.feature_id}'")
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText(dialog, "rotation", str(row[0]))
-
-        sql = (f"SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}),"
-               f" ST_Point({point.x()}, {point.y()})))")
-        row = self.controller.get_row(sql)
-        if row:
-            utils_giswater.setWidgetText(dialog, "hemisphere", str(row[0]))
-            message = "Hemisphere of the node has been updated. Value is"
-            self.controller.show_info(message, parameter=str(row[0]))
-        self.api_disable_rotation(dialog)
-
-
     def api_disable_rotation(self, dialog):
         """ Disable actionRotation and set action 'Identify' """
 
@@ -291,7 +239,6 @@ class ApiParent(ParentAction):
             action_widget.setChecked(False)
         try:
             self.emit_point.canvasClicked.disconnect()
-            self.canvas.setMapTool(self.previous_map_tool)
         except Exception as e:
             self.controller.log_info(type(e).__name__)
 
