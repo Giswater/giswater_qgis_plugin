@@ -351,7 +351,7 @@ class DaoController:
         self.current_user = user
 
         # We need to create this connections for Table Views
-        self.db = QSqlDatabase.addDatabase("QPSQL")
+        self.db = QSqlDatabase.addDatabase("QPSQL", self.plugin_name)
         self.db.setHostName(host)
         if port != '':
             self.db.setPort(int(port))
@@ -390,7 +390,7 @@ class DaoController:
         self.log_info(f"connect_to_database_service: {conn_string}")
 
         # We need to create this connections for Table Views
-        self.db = QSqlDatabase.addDatabase("QPSQL")
+        self.db = QSqlDatabase.addDatabase("QPSQL", self.plugin_name)
         self.db.setConnectOptions(conn_string)
         status = self.db.open()
         if not status:
@@ -420,9 +420,12 @@ class DaoController:
         try:
             opened = self.db.isOpen()
             if not opened:
-                self.db.open()
-        except Exception:
-            pass
+                opened = self.db.open()
+                if not opened:
+                    details = self.db.lastError().databaseText()
+                    self.log_warning(f"check_db_connection not opened: {details}")
+        except Exception as e:
+            self.log_warning(f"check_db_connection Exception: {e}")
         finally:
             return opened
 
