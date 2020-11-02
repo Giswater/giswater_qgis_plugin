@@ -24,7 +24,7 @@ SELECT "SCHEMA_NAME".gw_fct_getprofile($${
 	
 --    Variables
     schemas_array name[];
-    v_apiversion json;
+    v_version json;
     v_device integer;
     v_profile integer;
     v_message text;
@@ -46,27 +46,27 @@ BEGIN
 	v_device := ((p_data ->>'client')::json->>'device')::text;	
 
 	-- Get api version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''ApiVersion'') row'
-	INTO v_apiversion;
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+        INTO v_version;
 
 	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT profile_id ,values FROM om_profile ORDER BY profile_id)a' INTO v_load_result_array;
 	v_message := 'Load profiles successfully';
 	
 	-- Check null
-	v_apiversion := COALESCE(v_apiversion, '[]');    
+	v_version := COALESCE(v_version, '[]');    
 	v_load_result_array := COALESCE(v_load_result_array, '{}'); 
 	v_load_result := array_to_json(v_load_result_array);
 	
 
 	--    Return
-	RETURN ('{"status":"Accepted", "message":"'||v_message||'", "apiVersion":' || v_apiversion ||
+	RETURN ('{"status":"Accepted", "message":"'||v_message||'", "version":' || v_version ||
 	      ',"body":{"data":'||v_load_result||''||
 			'}'||
 		'}')::json;
 
 	--    Exception handling
 	--EXCEPTION WHEN OTHERS THEN 
-	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| api_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;

@@ -145,6 +145,11 @@ BEGIN
   	SELECT (value::json->>'arc')::json->>'cat_geom1' INTO v_arc_geom1 FROM config_param_system WHERE parameter = 'om_profile_vdefault';
   	SELECT (value::json->>'node')::json->>'cat_geom1' INTO v_node_geom1 FROM config_param_system WHERE parameter = 'om_profile_vdefault';
 
+  	-- set value to v_linksdistance if null
+    IF v_linksdistance IS NULL THEN
+        v_linksdistance = 0.5;
+    END IF;
+
 	-- define variables in function of the project type
 	IF v_project_type = 'UD' THEN
 		v_fcatgeom = 'cat_geom1'; 

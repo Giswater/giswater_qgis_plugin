@@ -311,5 +311,8 @@ VALUES (352, 'Check schema name of QGIS layers', 'utils') ON CONFLICT (fid) DO N
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
 VALUES (353, 'Check user name of QGIS layers', 'utils') ON CONFLICT (fid) DO NOTHING ;
 
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (354, 'Check if arc state=2 have final nodes in psector', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
 
 
