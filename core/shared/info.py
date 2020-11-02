@@ -532,7 +532,7 @@ class GwInfo(QObject):
         action_centered.triggered.connect(partial(self.api_action_centered, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, self.layer))
         action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, self.dlg_cf, self.geom_type, tab_type))
-        action_rotation.triggered.connect(partial(self.change_hemisphere, self.dlg_cf))
+        action_rotation.triggered.connect(partial(self.change_hemisphere, self.dlg_cf, action_rotation))
         action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
         action_section.triggered.connect(partial(self.open_section_form))
         action_help.triggered.connect(partial(api_action_help, self.geom_type))
@@ -782,16 +782,16 @@ class GwInfo(QObject):
             self.vertex_marker.hide()
 
 
-    def change_hemisphere(self, dialog):
+    def change_hemisphere(self, dialog, action):
 
         # Set map tool emit point and signals
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
         self.previous_map_tool = global_vars.canvas.mapTool()
         global_vars.canvas.setMapTool(emit_point)
-        emit_point.canvasClicked.connect(partial(self.action_rotation_canvas_clicked, dialog, emit_point))
+        emit_point.canvasClicked.connect(partial(self.action_rotation_canvas_clicked, dialog, action, emit_point))
 
 
-    def action_rotation_canvas_clicked(self, dialog, emit_point, point, btn):
+    def action_rotation_canvas_clicked(self, dialog, action, emit_point, point, btn):
 
         if btn == Qt.RightButton:
             global_vars.canvas.setMapTool(self.previous_map_tool)
@@ -823,13 +823,13 @@ class GwInfo(QObject):
                f" WHERE node_id = '{self.feature_id}'")
         row = global_vars.controller.get_row(sql)
         if row:
-            setWidgetText(dialog, "rotation", str(row[0]))
+            setWidgetText(dialog, "data_rotation", str(row[0]))
 
         sql = (f"SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}),"
                f" ST_Point({point.x()}, {point.y()})))")
         row = global_vars.controller.get_row(sql)
         if row:
-            setWidgetText(dialog, "hemisphere", str(row[0]))
+            setWidgetText(dialog, "data_hemisphere", str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
             global_vars.controller.show_info(message, parameter=str(row[0]))
 
@@ -839,10 +839,9 @@ class GwInfo(QObject):
             action_widget.setChecked(False)
         try:
             emit_point.canvasClicked.disconnect()
-            global_vars.canvas.setMapTool(self.previous_map_tool)
         except Exception as e:
-            global_vars.controller.log_info(type(e).__name__)
-
+            global_vars.controller.log_info(f"{type(e).__name__} --> {e}")
+        self.cancel_snapping_tool(dialog, action)
 
     def api_action_copy_paste(self, dialog, geom_type, tab_type=None):
         """ Copy some fields from snapped feature to current feature """
@@ -3291,10 +3290,9 @@ class GwInfo(QObject):
         self.signal_activate.emit()
 
 
-    def disconnect_snapping(self, action_pan=True, emit_point=None):
+    def disconnect_snapping(self, action_pan=True):
         """ Select 'Pan' as current map tool and disconnect snapping """
 
-        emit_point.canvasClicked.disconnect()
         try:
             self.canvas.xyCoordinates.disconnect()
             if action_pan:
