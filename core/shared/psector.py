@@ -234,9 +234,8 @@ class GwPsector:
                                 set_edit_triggers=QTableView.DoubleClicked)
                 set_table_columns(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully")
             sql = (f"SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, "
-                   f"observ, atlas_id, scale, rotation, active, ext_code, status "
-                   f"text3, text4, text5, text6, num_value, "
-                   f"FROM plan_psector "
+                   f"text3, text4, text5, text6, num_value, observ, atlas_id, scale, rotation, active, ext_code, status"
+                   f" FROM plan_psector "
                    f"WHERE psector_id = {psector_id}")
             row = self.controller.get_row(sql)
 
