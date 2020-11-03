@@ -1142,7 +1142,7 @@ def fill_table(widget, table_name, expr_filter=None, set_edit_strategy=QSqlTable
         table_name = global_vars.schema_name + "." + table_name
 
     # Set model
-    model = QSqlTableModel(db=self.controller.db)
+    model = QSqlTableModel(db=global_vars.controller.db)
     model.setTable(table_name)
     model.setEditStrategy(set_edit_strategy)
     model.setSort(0, 0)
@@ -1631,7 +1631,7 @@ def fill_table_object(widget, table_name, expr_filter=None):
         table_name = global_vars.schema_name + "." + table_name
 
     # Set model
-    model = QSqlTableModel(db=self.controller.db)
+    model = QSqlTableModel(db=global_vars.controller.db)
     model.setTable(table_name)
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
     model.sort(0, 1)
@@ -1714,7 +1714,7 @@ def set_model_to_table(widget, table_name, expr_filter):
         table_name = global_vars.schema_name + "." + table_name
 
     # Set model
-    model = QSqlTableModel(db=self.controller.db)
+    model = QSqlTableModel(db=global_vars.controller.db)
     model.setTable(table_name)
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
     model.setFilter(expr_filter)
@@ -2137,7 +2137,7 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
         table_name = global_vars.schema_name + "." + table_name
 
     # Set the model
-    model = QSqlTableModel(db=self.controller.db)
+    model = QSqlTableModel(db=global_vars.controller.db)
     model.setTable(table_name)
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
     model.select()
@@ -2351,7 +2351,7 @@ def fill_table_by_expr(qtable, table_name, expr):
     if global_vars.schema_name not in table_name:
         table_name = global_vars.schema_name + "." + table_name
 
-    model = QSqlTableModel(db=self.controller.db)
+    model = QSqlTableModel(db=global_vars.controller.db)
     model.setTable(table_name)
     model.setFilter(expr)
     model.setEditStrategy(QSqlTableModel.OnFieldChange)
