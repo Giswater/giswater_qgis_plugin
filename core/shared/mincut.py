@@ -22,7 +22,7 @@ from collections import OrderedDict
 from functools import partial
 
 from ..tasks.parent_task import GwTask
-from ...lib import tools_qt
+
 from .search import GwSearch
 from ..utils.tools_giswater import close_dialog, load_settings, open_dialog, save_settings, create_body, \
     populate_info_text_ as populate_info_text, delete_layer_from_toc, check_expression
@@ -34,12 +34,12 @@ from ..ui.ui_manager import MincutHydrometer
 from ..ui.ui_manager import MincutConnec
 from ..ui.ui_manager import MincutComposer
 from ... import global_vars
-from ...lib.tools_qt import fill_table, set_icon, set_table_columns
 from ...lib.tools_qgis import refresh_map_canvas, set_cursor_wait, set_cursor_restore, get_cursor_multiple_selection, \
     disconnect_signal_selection_changed, zoom_to_rectangle, get_composers_list, get_composer_index, resetRubberbands, \
     restore_user_layer, get_event_point, snap_to_current_layer, get_snapped_layer, get_snapped_feature, \
     get_snapped_feature_id, get_snapped_point, snap_to_background_layers, add_marker, get_snapping_options, \
     apply_snapping_options, MultipleSelection
+from ...lib import tools_qt
 
 from ...map_tools.snapping_utils_v3 import SnappingConfigManager
 class GwMincut:
@@ -168,27 +168,27 @@ class GwMincut:
         # Toolbar actions
         action = self.dlg_mincut.findChild(QAction, "actionMincut")
         action.triggered.connect(self.auto_mincut)
-        set_icon(action, "126")
+        tools_qt.set_icon(action, "126")
         self.action_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionCustomMincut")
         action.triggered.connect(self.custom_mincut)
-        set_icon(action, "123")
+        tools_qt.set_icon(action, "123")
         self.action_custom_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionAddConnec")
         action.triggered.connect(self.add_connec)
-        set_icon(action, "121")
+        tools_qt.set_icon(action, "121")
         self.action_add_connec = action
 
         action = self.dlg_mincut.findChild(QAction, "actionAddHydrometer")
         action.triggered.connect(self.add_hydrometer)
-        set_icon(action, "122")
+        tools_qt.set_icon(action, "122")
         self.action_add_hydrometer = action
 
         action = self.dlg_mincut.findChild(QAction, "actionComposer")
         action.triggered.connect(self.mincut_composer)
-        set_icon(action, "181")
+        tools_qt.set_icon(action, "181")
         self.action_mincut_composer = action
 
         action = self.dlg_mincut.findChild(QAction, "actionShowNotified")
@@ -250,8 +250,8 @@ class GwMincut:
         result_mincut_id = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         expr_filter = f"result_id={result_mincut_id}"
         tools_qt.set_qtv_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
-        fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
-        set_table_columns(self.dlg_mincut, self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer')
+        tools_qt.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
+        tools_qt.set_table_columns(self.dlg_mincut, self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer')
 
 
     def check_dates_coherence(self, date_from, date_to, time_from, time_to):
@@ -802,9 +802,9 @@ class GwMincut:
         load_settings(self.dlg_connec)
         self.dlg_connec.tbl_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
         # Set icons
-        set_icon(self.dlg_connec.btn_insert, "111")
-        set_icon(self.dlg_connec.btn_delete, "112")
-        set_icon(self.dlg_connec.btn_snapping, "137")
+        tools_qt.set_icon(self.dlg_connec.btn_insert, "111")
+        tools_qt.set_icon(self.dlg_connec.btn_delete, "112")
+        tools_qt.set_icon(self.dlg_connec.btn_snapping, "137")
 
         # Set signals
         self.dlg_connec.btn_insert.clicked.connect(partial(self.insert_connec))
@@ -967,8 +967,8 @@ class GwMincut:
         # self.dlg_hydro.btn_snapping.setEnabled(False)
 
         # Set icons
-        set_icon(self.dlg_hydro.btn_insert, "111")
-        set_icon(self.dlg_hydro.btn_delete, "112")
+        tools_qt.set_icon(self.dlg_hydro.btn_insert, "111")
+        tools_qt.set_icon(self.dlg_hydro.btn_delete, "112")
 
         # Set dignals
         self.dlg_hydro.btn_insert.clicked.connect(partial(self.insert_hydro))
@@ -1277,7 +1277,7 @@ class GwMincut:
         table_name = self.schema_name + ".v_edit_connec"
         widget = self.dlg_connec.tbl_mincut_connec
         expr = self.set_table_model(widget, table_name, expr_filter)
-        set_table_columns(self.dlg_connec, widget, 'v_edit_connec')
+        tools_qt.set_table_columns(self.dlg_connec, widget, 'v_edit_connec')
         return expr
 
 
@@ -1287,7 +1287,7 @@ class GwMincut:
         table_name = self.schema_name + ".v_rtc_hydrometer"
         widget = self.dlg_hydro.tbl_hydro
         expr = self.set_table_model(widget, table_name, expr_filter)
-        set_table_columns(self.dlg_hydro, widget, 'v_rtc_hydrometer')
+        tools_qt.set_table_columns(self.dlg_hydro, widget, 'v_rtc_hydrometer')
         return expr
 
 
@@ -1852,7 +1852,11 @@ class GwMincut:
         tools_qt.set_combo_itemData(self.dlg_mincut.type, row['mincut_type'], 0)
         tools_qt.set_combo_itemData(self.dlg_mincut.cause, row['anl_cause'], 0)
         tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, mincut_state_name)
-        tools_qt.setWidgetText(self.dlg_mincut, "output_details", row['output'])
+        if 'output' in row and row['output']:
+            self.dlg_mincut.txt_infolog.setEnabled(False)
+            text = tools_qt.getWidgetText(self.dlg_mincut, 'txt_infolog', return_string_null=False)
+            text += json.dumps(row['output'], indent=2, sort_keys=True)
+            tools_qt.setWidgetText(self.dlg_mincut, "txt_infolog", text)
 
         # Manage location
         tools_qt.set_combo_itemData(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
@@ -1883,7 +1887,7 @@ class GwMincut:
 
         expr_filter = f"result_id={result_mincut_id}"
         tools_qt.set_qtv_config(self.dlg_mincut.tbl_hydro)
-        fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
+        tools_qt.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
 
         # Depend of mincut_state and mincut_clase desable/enable widgets
         # Current_state == '0': Planified

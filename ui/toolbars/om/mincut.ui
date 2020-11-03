@@ -31,8 +31,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>339</width>
-         <height>555</height>
+         <width>356</width>
+         <height>546</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_5">
@@ -210,36 +210,6 @@
               <layout class="QGridLayout" name="gridLayout_10">
                <item row="1" column="0">
                 <layout class="QGridLayout" name="gridLayout_9">
-                 <item row="4" column="0">
-                  <widget class="QLabel" name="lbl_received_date">
-                   <property name="font">
-                    <font>
-                     <pointsize>8</pointsize>
-                    </font>
-                   </property>
-                   <property name="frameShape">
-                    <enum>QFrame::NoFrame</enum>
-                   </property>
-                   <property name="frameShadow">
-                    <enum>QFrame::Plain</enum>
-                   </property>
-                   <property name="text">
-                    <string>Received date:</string>
-                   </property>
-                   <property name="textFormat">
-                    <enum>Qt::AutoText</enum>
-                   </property>
-                   <property name="scaledContents">
-                    <bool>false</bool>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                   </property>
-                   <property name="margin">
-                    <number>3</number>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="8" column="0">
                   <widget class="QLabel" name="lbl_descript_pd">
                    <property name="font">
@@ -284,9 +254,6 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="8" column="1" colspan="2">
-                  <widget class="QLineEdit" name="pred_description"/>
-                 </item>
                  <item row="3" column="0">
                   <widget class="QLabel" name="lbl_cause">
                    <property name="sizePolicy">
@@ -308,6 +275,36 @@
                    </property>
                    <property name="text">
                     <string>Cause:</string>
+                   </property>
+                   <property name="textFormat">
+                    <enum>Qt::AutoText</enum>
+                   </property>
+                   <property name="scaledContents">
+                    <bool>false</bool>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                   </property>
+                   <property name="margin">
+                    <number>3</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="0">
+                  <widget class="QLabel" name="lbl_received_date">
+                   <property name="font">
+                    <font>
+                     <pointsize>8</pointsize>
+                    </font>
+                   </property>
+                   <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
+                   </property>
+                   <property name="frameShadow">
+                    <enum>QFrame::Plain</enum>
+                   </property>
+                   <property name="text">
+                    <string>Received date:</string>
                    </property>
                    <property name="textFormat">
                     <enum>Qt::AutoText</enum>
@@ -379,19 +376,12 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="6" column="1" colspan="2">
-                  <widget class="QTextEdit" name="textEdit">
+                 <item row="8" column="1" colspan="2">
+                  <widget class="QTextEdit" name="pred_description">
                    <property name="font">
                     <font>
                      <pointsize>7</pointsize>
                     </font>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="6" column="0">
-                  <widget class="QLabel" name="lbl_output_details">
-                   <property name="text">
-                    <string>Output details:</string>
                    </property>
                   </widget>
                  </item>
