@@ -801,7 +801,7 @@ BEGIN
 		VALUES (125, 1, '266','INFO: All features have a diferent ID to be correctly identified',v_count);
 	END IF;
 
-	RAISE NOTICE '29 - Check planned connects without reference link (301)';
+	RAISE NOTICE '29 - Check planned connects without reference link (356)';
 
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT count(*) FROM plan_psector_x_connec LEFT JOIN link ON feature_id = connec_id WHERE link_id IS NULL';
@@ -815,13 +815,13 @@ BEGIN
 
 	IF v_count = 1 THEN
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 3, '301', concat('ERROR-301: There is ',v_count,' planned connec or gully without reference link'), v_count);
+		VALUES (125, 3, '356', concat('ERROR-356: There is ',v_count,' planned connec or gully without reference link'), v_count);
 	ELSIF v_count > 1 THEN
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 3, '301', concat('ERROR-301: There are ',v_count,' planned connecs or gullys without reference link'), v_count);
+		VALUES (125, 3, '356', concat('ERROR-356: There are ',v_count,' planned connecs or gullys without reference link'), v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (125, 1, '301', 'INFO: All planned connecs or gullys have a reference link', v_count);
+		VALUES (125, 1, '356', 'INFO: All planned connecs or gullys have a reference link', v_count);
 	END IF;
 
 
