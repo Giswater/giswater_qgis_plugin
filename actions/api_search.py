@@ -63,6 +63,7 @@ class ApiSearch(ApiParent):
         form = ""
         if self.dlg_search is None and dlg_mincut is None:
             self.init_dialog()
+            self.controller.set_user_settings_value('open_search', 'true')
         if dlg_mincut:
             self.dlg_search = dlg_mincut
             self.is_mincut = True
@@ -71,8 +72,6 @@ class ApiSearch(ApiParent):
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)
         qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
-
-        self.controller.set_user_settings_value('open_search', 'true')
 
         if qgis_project_add_schema is None:
             body = self.create_body(form=form)
