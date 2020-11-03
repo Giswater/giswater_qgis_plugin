@@ -8,7 +8,7 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import Qt
 
 from ..parent_maptool import GwParentMapTool
-from ...utils.tools_giswater import create_body, snap_to_node
+from ...utils.tools_giswater import create_body
 
 
 class GwFlowExitButton(GwParentMapTool):
@@ -76,7 +76,7 @@ class GwFlowExitButton(GwParentMapTool):
         self.snapper_manager.enable_snapping()
 
         # Set snapping to node
-        snap_to_node()
+        self.snapper_manager.snap_to_node()
 
         # Change cursor
         self.canvas.setCursor(self.cursor)

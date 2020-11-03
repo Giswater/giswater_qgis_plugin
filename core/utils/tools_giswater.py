@@ -1018,89 +1018,6 @@ def set_style_mapzones():
                 lyr.triggerRepaint()
 
 
-def snap_to_arc():
-    """ Set snapping to 'arc' """
-
-    QgsProject.instance().blockSignals(True)
-    snapping_config = get_snapping_options()
-    layer_settings = snap_to_layer(get_layer('v_edit_arc'), QgsPointLocator.All, True)
-    if layer_settings:
-        layer_settings.setType(2)
-        layer_settings.setTolerance(15)
-        layer_settings.setEnabled(True)
-    else:
-        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
-    snapping_config.setIndividualLayerSettings(get_layer('v_edit_arc'), layer_settings)
-    QgsProject.instance().blockSignals(False)
-    QgsProject.instance().snappingConfigChanged.emit(snapping_config)
-
-
-def snap_to_node():
-    """ Set snapping to 'node' """
-
-    QgsProject.instance().blockSignals(True)
-    snapping_config = get_snapping_options()
-    layer_settings = snap_to_layer(get_layer('v_edit_node'), QgsPointLocator.Vertex, True)
-    if layer_settings:
-        layer_settings.setType(1)
-        layer_settings.setTolerance(15)
-        layer_settings.setEnabled(True)
-    else:
-        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
-    snapping_config.setIndividualLayerSettings(get_layer('v_edit_node'), layer_settings)
-    QgsProject.instance().blockSignals(False)
-    QgsProject.instance().snappingConfigChanged.emit(snapping_config)
-
-
-def snap_to_connec():
-    """ Set snapping to 'connec' and 'gully' """
-
-    QgsProject.instance().blockSignals(True)
-    snapping_config = get_snapping_options()
-    layer_settings = snap_to_layer(get_layer('v_edit_connec'), QgsPointLocator.Vertex, True)
-    if layer_settings:
-        layer_settings.setType(1)
-        layer_settings.setTolerance(15)
-        layer_settings.setEnabled(True)
-    else:
-        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
-    snapping_config.setIndividualLayerSettings(get_layer('v_edit_connec'), layer_settings)
-    QgsProject.instance().blockSignals(False)
-    QgsProject.instance().snappingConfigChanged.emit(snapping_config)
-
-
-def snap_to_gully():
-
-    QgsProject.instance().blockSignals(True)
-    snapping_config = get_snapping_options()
-    layer_settings = snap_to_layer(get_layer('v_edit_gully'), QgsPointLocator.Vertex, True)
-    if layer_settings:
-        layer_settings.setType(1)
-        layer_settings.setTolerance(15)
-        layer_settings.setEnabled(True)
-    else:
-        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
-    snapping_config.setIndividualLayerSettings(get_layer('v_edit_gully'), layer_settings)
-    QgsProject.instance().blockSignals(False)
-    QgsProject.instance().snappingConfigChanged.emit(snapping_config)
-
-
-def snap_to_layer(layer, point_locator=QgsPointLocator.All, set_settings=False):
-    """ Set snapping to @layer """
-
-    if layer is None:
-        return
-
-    snapping_config = get_snapping_options()
-    QgsSnappingUtils.LayerConfig(layer, point_locator, 15, QgsTolerance.Pixels)
-    if set_settings:
-        layer_settings = snapping_config.individualLayerSettings(layer)
-        layer_settings.setEnabled(True)
-        snapping_config.setIndividualLayerSettings(layer, layer_settings)
-        return layer_settings
-
-
-
 class GwEdit:
 
     def __init__(self):
@@ -1139,7 +1056,8 @@ class GwEdit:
         # Set snapping to 'node', 'connec' and 'gully'
         self.snapper_manager.snap_to_arc()
         self.snapper_manager.snap_to_node()
-        self.snapper_manager.snap_to_connec_gully()
+        self.snapper_manager.snap_to_connec()
+        self.snapper_manager.snap_to_gully()
         self.snapper_manager.set_snapping_mode()
         self.iface.actionAddFeature().toggled.connect(self.action_is_checked)
 
@@ -1628,31 +1546,37 @@ class SnappingConfigManager(object):
         QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
 
 
-    def snap_to_connec_gully(self):
+    def snap_to_connec(self):
         """ Set snapping to 'connec' and 'gully' """
 
         QgsProject.instance().blockSignals(True)
-        layer_settings = self.snap_to_layer(self.layer_connec, QgsPointLocator.Vertex, True)
+        snapping_config = self.get_snapping_options()
+        layer_settings = self.snap_to_layer(get_layer('v_edit_connec'), QgsPointLocator.Vertex, True)
         if layer_settings:
             layer_settings.setType(1)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
             layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
-        self.snapping_config.setIndividualLayerSettings(self.layer_connec, layer_settings)
-
-        layer_settings = self.snap_to_layer(self.layer_gully, QgsPointLocator.Vertex, True)
-        if layer_settings:
-            layer_settings.setType(1)
-            layer_settings.setTolerance(15)
-            layer_settings.setEnabled(True)
-        else:
-            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
-
-        self.snapping_config.setIndividualLayerSettings(self.layer_gully, layer_settings)
-
+        snapping_config.setIndividualLayerSettings(get_layer('v_edit_connec'), layer_settings)
         QgsProject.instance().blockSignals(False)
-        QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
+        QgsProject.instance().snappingConfigChanged.emit(snapping_config)
+
+
+    def snap_to_gully(self):
+
+        QgsProject.instance().blockSignals(True)
+        snapping_config = self.get_snapping_options()
+        layer_settings = self.snap_to_layer(get_layer('v_edit_gully'), QgsPointLocator.Vertex, True)
+        if layer_settings:
+            layer_settings.setType(1)
+            layer_settings.setTolerance(15)
+            layer_settings.setEnabled(True)
+        else:
+            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
+        snapping_config.setIndividualLayerSettings(get_layer('v_edit_gully'), layer_settings)
+        QgsProject.instance().blockSignals(False)
+        QgsProject.instance().snappingConfigChanged.emit(snapping_config)
 
 
     def snap_to_layer(self, layer, point_locator=QgsPointLocator.All, set_settings=False):

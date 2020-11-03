@@ -13,7 +13,7 @@ from functools import partial
 from ...ui.ui_manager import DialogTextUi
 from ..parent_maptool import GwParentMapTool
 from ...utils.tools_giswater import get_cursor_multiple_selection, load_settings, close_dialog, open_dialog, \
-    populate_info_text, create_body, snap_to_connec, snap_to_gully
+    populate_info_text, create_body, snap_to_gully
 from ....lib.tools_qgis import get_layer
 
 
@@ -159,8 +159,8 @@ class GwConnectLinkButton(GwParentMapTool):
         self.snapper_manager.enable_snapping()
 
         # Set snapping to 'connec' and 'gully'
-        snap_to_connec()
-        snap_to_gully()
+        self.snapper_manager.snap_to_connec()
+        self.snapper_manager.snap_to_gully()
 
         # Change cursor
         cursor = get_cursor_multiple_selection()

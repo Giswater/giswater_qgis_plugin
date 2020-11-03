@@ -32,7 +32,7 @@ from .element import GwElement
 from .visit_gallery import GwVisitGallery
 from .visit_manager import GwVisitManager
 from ..utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body, draw, \
-    draw_point, populate_info_text_ as populate_info_text, snap_to_layer, snap_to_arc, snap_to_node
+    draw_point, populate_info_text_ as populate_info_text
 from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
 from ...lib.tools_qgis import get_visible_layers
@@ -864,7 +864,7 @@ class GwInfo(QObject):
 
         # Set snapping
         layer = global_vars.iface.activeLayer()
-        snap_to_layer(layer)
+        self.snapper_manager.snap_to_layer(layer)
 
         # Set marker
         color = QColor(255, 100, 255)
@@ -3225,9 +3225,9 @@ class GwInfo(QObject):
 
         # if we are doing info over connec or over node
         if option == 'arc':
-            snap_to_arc()
+            self.snapper_manager.snap_to_arc()
         elif option == 'node':
-            snap_to_node()
+            self.snapper_manager.snap_to_node()
 
         # Set signals
         self.canvas.xyCoordinates.connect(partial(self.mouse_moved, layer))

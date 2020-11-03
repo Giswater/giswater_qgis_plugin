@@ -16,7 +16,7 @@ from functools import partial
 from ...ui.ui_manager import FeatureReplace, InfoWorkcatUi
 from ...shared.catalog import GwCatalog
 from ...utils.tools_giswater import close_dialog, load_settings, open_dialog, refresh_legend, create_body, \
-    populate_info_text_ as populate_info_text, snap_to_node, snap_to_connec, snap_to_gully
+    populate_info_text_ as populate_info_text
 from ....lib import tools_qt
 from ..parent_maptool import GwParentMapTool
 
@@ -412,9 +412,9 @@ class GwFeatureReplaceButton(GwParentMapTool):
         self.snapper_manager.enable_snapping()
 
         # Set snapping to 'node', 'connec' and 'gully'
-        snap_to_node()
-        snap_to_connec()
-        snap_to_gully()
+        self.snapper_manager.snap_to_node()
+        self.snapper_manager.snap_to_connec()
+        self.snapper_manager.snap_to_gully()
 
         self.snapper_manager.set_snapping_mode()
 

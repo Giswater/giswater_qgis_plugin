@@ -12,8 +12,7 @@ from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGrid
     QSizePolicy, QSpacerItem
 from functools import partial
 
-from ..utils.tools_giswater import create_body, close_dialog, load_settings, open_dialog, save_settings, snap_to_node,\
-    snap_to_connec, snap_to_gully
+from ..utils.tools_giswater import create_body, close_dialog, load_settings, open_dialog, save_settings
 from ..ui.ui_manager import DimensioningUi
 from ...lib.tools_qgis import restore_user_layer
 from ...lib.tools_qt import set_widget_size, add_button, add_textarea, add_lineedit, set_data_type, \
@@ -234,9 +233,9 @@ class GwDimensioning:
         self.snapper_manager.remove_marker(self.vertex_marker)
         self.previous_snapping = self.snapper_manager.get_snapping_options()
         self.snapper_manager.enable_snapping()
-        snap_to_node()
-        snap_to_connec()
-        snap_to_gully()
+        self.snapper_manager.snap_to_node()
+        self.snapper_manager.snap_to_connec()
+        self.snapper_manager.snap_to_gully()
         self.snapper_manager.set_snapping_mode()
 
         self.dlg_dim.actionOrientation.setChecked(False)
@@ -334,9 +333,9 @@ class GwDimensioning:
         self.snapper_manager.remove_marker(self.vertex_marker)
         self.previous_snapping = self.snapper_manager.get_snapping_options()
         self.snapper_manager.enable_snapping()
-        snap_to_node()
-        snap_to_connec()
-        snap_to_gully()
+        self.snapper_manager.snap_to_node()
+        self.snapper_manager.snap_to_connec()
+        self.snapper_manager.snap_to_gully()
         self.snapper_manager.set_snapping_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)

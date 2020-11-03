@@ -10,8 +10,6 @@ from qgis.PyQt.QtCore import QSettings, Qt
 from ...shared.dimensioning import GwDimensioning
 from ..parent_maptool import GwParentMapTool
 
-from ...utils.tools_giswater import snap_to_arc, snap_to_connec, snap_to_gully, snap_to_node
-
 
 class GwDimensioningButton(GwParentMapTool):
     """ Button 39: Dimensioning """
@@ -92,10 +90,10 @@ class GwDimensioningButton(GwParentMapTool):
             # Implement the Add Feature button
             self.iface.actionAddFeature().trigger()
 
-            snap_to_arc()
-            snap_to_connec()
-            snap_to_gully()
-            snap_to_node()
+            self.snapper_manager.snap_to_arc()
+            self.snapper_manager.snap_to_connec()
+            self.snapper_manager.snap_to_gully()
+            self.snapper_manager.snap_to_node()
             self.snapper_manager.set_snapping_mode()
 
             # Manage new api tool

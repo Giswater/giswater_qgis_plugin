@@ -30,7 +30,7 @@ from ..core.ui.ui_manager import DialogTextUi, DockerUi
 from ..lib.tools_qgis import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
     qgis_get_layer_primary_key, qgis_get_layers, categoryze_layer
 from ..core.utils.tools_giswater import get_parser_value, set_parser_value, manage_actions, draw, create_body, \
-    from_postgres_to_toc, create_qml, populate_vlayer, delete_layer_from_toc, snap_to_layer
+    from_postgres_to_toc, create_qml, populate_vlayer, delete_layer_from_toc
 
 from ..core.utils.tools_giswater import SnappingConfigManager
 class DaoController:
@@ -2037,7 +2037,7 @@ class DaoController:
                     layer = global_vars.controller.get_layer_by_tablename(layer_name)
                     if layer:
                         QgsProject.instance().blockSignals(True)
-                        layer_settings = snap_to_layer(layer, QgsPointLocator.All, True)
+                        layer_settings = self.snapper_manager.snap_to_layer(layer, QgsPointLocator.All, True)
                         if layer_settings:
                             layer_settings.setType(2)
                             layer_settings.setTolerance(15)
