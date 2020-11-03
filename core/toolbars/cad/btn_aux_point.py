@@ -17,8 +17,6 @@ from ....lib import tools_qt
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import AuxPoint
 from ...utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
-from ....lib.tools_qgis import get_event_point, snap_to_current_layer, snap_to_background_layers, add_marker, \
-    get_snapping_options, get_snapped_point
 
 
 class GwAuxPointButton(GwParentMapTool):
@@ -129,17 +127,17 @@ class GwAuxPointButton(GwParentMapTool):
 
         # Hide highlight and get coordinates
         self.vertex_marker.hide()
-        event_point = get_event_point(event)
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
         if self.snap_to_selected_layer:
-            result = snap_to_current_layer(event_point)
+            result = self.snapper_manager.snap_to_current_layer(event_point)
         else:
-            result = snap_to_background_layers(event_point)
+            result = self.snapper_manager.snap_to_background_layers(event_point)
 
         if result.isValid():
             # Get the point and add marker on it
-            add_marker(result, self.vertex_marker)
+            self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def canvasReleaseEvent(self, event):
@@ -149,13 +147,13 @@ class GwAuxPointButton(GwParentMapTool):
             # Get coordinates
             x = event.pos().x()
             y = event.pos().y()
-            event_point = get_event_point(event)
+            event_point = self.snapper_manager.get_event_point(event)
 
             # Create point with snap reference
-            result = snap_to_background_layers(event_point)
+            result = self.snapper_manager.snap_to_background_layers(event_point)
             point = None
             if result.isValid():
-                point = get_snapped_point(result)
+                point = self.snapper_manager.get_snapped_point(result)
 
             # Create point with mouse cursor reference
             if point is None:
@@ -195,7 +193,7 @@ class GwAuxPointButton(GwParentMapTool):
             self.controller.show_info(message)
 
         # Store user snapping configuration
-        self.previous_snapping = get_snapping_options()
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Get current layer
         self.current_layer = self.iface.activeLayer()

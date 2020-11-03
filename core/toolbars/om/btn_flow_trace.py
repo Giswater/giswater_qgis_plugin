@@ -9,8 +9,6 @@ from qgis.PyQt.QtCore import Qt
 
 from ..parent_maptool import GwParentMapTool
 from ...utils.tools_giswater import create_body, snap_to_node
-from ....lib.tools_qgis import get_event_point, snap_to_current_layer, add_marker, get_snapped_feature, \
-    get_snapping_options, enable_snapping
 
 
 class GwFlowTraceButton(GwParentMapTool):
@@ -29,14 +27,14 @@ class GwFlowTraceButton(GwParentMapTool):
 
         # Hide marker and get coordinates
         self.vertex_marker.hide()
-        event_point = get_event_point(event)
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
-        result = snap_to_current_layer(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if result.isValid():
-            add_marker(result, self.vertex_marker)
+            self.snapper_manager.add_marker(result, self.vertex_marker)
             # Data for function
-            self.snapped_feat = get_snapped_feature(result)
+            self.snapped_feat = self.snapper_manager.get_snapped_feature(result)
 
 
     def canvasReleaseEvent(self, event):
@@ -72,10 +70,10 @@ class GwFlowTraceButton(GwParentMapTool):
         self.action.setChecked(True)
 
         # Store user snapping configuration
-        self.previous_snapping = get_snapping_options()
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Clear snapping
-        enable_snapping()
+        self.snapper_manager.enable_snapping()
 
         # Set snapping to node
         snap_to_node()

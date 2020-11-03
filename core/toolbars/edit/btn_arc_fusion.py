@@ -12,8 +12,6 @@ from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import ArcFusionUi
 from functools import partial
 from ...utils.tools_giswater import load_settings, open_dialog, close_dialog, create_body, populate_info_text
-from ....lib.tools_qgis import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \
-    enable_snapping
 
 
 class GwArcFusionButton(GwParentMapTool):
@@ -40,13 +38,13 @@ class GwArcFusionButton(GwParentMapTool):
             return
 
         # Get coordinates
-        event_point = get_event_point(event)
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
         snapped_feat = None
-        result = snap_to_current_layer(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if result.isValid():
-            snapped_feat = get_snapped_feature(result)
+            snapped_feat = self.snapper_manager.get_snapped_feature(result)
 
         if snapped_feat:
             self.node_id = snapped_feat.attribute('node_id')
@@ -101,10 +99,10 @@ class GwArcFusionButton(GwParentMapTool):
         self.action.setChecked(True)
 
         # Store user snapping configuration
-        self.previous_snapping = get_snapping_options()
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Clear snapping
-        enable_snapping()
+        self.snapper_manager.enable_snapping()
 
         # Set active layer to 'v_edit_node'
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")

@@ -16,9 +16,7 @@ from ...shared.catalog import GwCatalog
 from ...shared.info import GwInfo
 from ..parent_maptool import GwParentMapTool
 from ...utils.tools_giswater import check_expression, close_dialog, load_settings, open_dialog
-from ....lib.tools_qgis import get_event_point, snap_to_current_layer, get_snapped_feature, get_snapping_options, \
-    enable_snapping, restore_user_layer
-
+from ....lib.tools_qgis import  restore_user_layer
 
 class GwNodeTypeChangeButton(GwParentMapTool):
     """ Button 28: User select one node. A form is opened showing current node_type.type
@@ -178,13 +176,13 @@ class GwNodeTypeChangeButton(GwParentMapTool):
             return
 
         # Get the click
-        event_point = get_event_point(event)
+        event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
-        result = snap_to_current_layer(event_point)
+        result = self.snapper_manager.snap_to_current_layer(event_point)
         if result.isValid():
             # Get the point
-            snapped_feat = get_snapped_feature(result)
+            snapped_feat = self.snapper_manager.get_snapped_feature(result)
             if snapped_feat:
                 self.node_id = snapped_feat.attribute('node_id')
                 # Change node type
@@ -197,10 +195,10 @@ class GwNodeTypeChangeButton(GwParentMapTool):
         self.action.setChecked(True)
 
         # Store user snapping configuration
-        self.previous_snapping = get_snapping_options()
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Clear snapping
-        enable_snapping()
+        self.snapper_manager.enable_snapping()
         self.current_layer = self.iface.activeLayer()
         # Set active layer to 'v_edit_node'
         self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")

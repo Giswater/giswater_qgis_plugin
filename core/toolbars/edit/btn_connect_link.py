@@ -14,8 +14,7 @@ from ...ui.ui_manager import DialogTextUi
 from ..parent_maptool import GwParentMapTool
 from ...utils.tools_giswater import get_cursor_multiple_selection, load_settings, close_dialog, open_dialog, \
     populate_info_text, create_body, snap_to_connec, snap_to_gully
-from ....lib.tools_qgis import get_event_point, snap_to_background_layers, get_snapped_layer, \
-    get_snapped_feature_id, get_snapping_options, get_layer, enable_snapping
+from ....lib.tools_qgis import get_layer
 
 
 class GwConnectLinkButton(GwParentMapTool):
@@ -61,19 +60,19 @@ class GwConnectLinkButton(GwParentMapTool):
         if event.button() == Qt.LeftButton:
 
             # Get coordinates
-            event_point = get_event_point(event)
+            event_point = self.snapper_manager.get_event_point(event)
 
             # Simple selection
             if not self.dragging:
 
                 # Snap to connec or gully
-                result = snap_to_background_layers(event_point)
+                result = self.snapper_manager.snap_to_background_layers(event_point)
                 if not result.isValid():
                     return
 
                 # Check if it belongs to 'connec' or 'gully' group
-                layer = get_snapped_layer(result)
-                feature_id = get_snapped_feature_id(result)
+                layer = self.snapper_manager.get_snapped_layer(result)
+                feature_id = self.snapper_manager.get_snapped_feature_id(result)
                 layer_connec = get_layer(layer)
                 layer_gully = get_layer(layer)
                 if layer_connec or layer_gully:
@@ -154,10 +153,10 @@ class GwConnectLinkButton(GwParentMapTool):
 
 
         # Store user snapping configuration
-        self.previous_snapping = get_snapping_options()
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Clear snapping
-        enable_snapping()
+        self.snapper_manager.enable_snapping()
 
         # Set snapping to 'connec' and 'gully'
         snap_to_connec()

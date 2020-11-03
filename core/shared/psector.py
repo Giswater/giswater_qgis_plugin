@@ -27,7 +27,7 @@ from ..utils.tools_giswater import close_dialog, get_parser_value, load_settings
     hide_generic_layers, tab_feature_changed, check_expression, create_body
 from ...lib.tools_db import make_list_for_completer
 from ...lib.tools_qgis import remove_selection, selection_init, selection_changed, disconnect_snapping, \
-    zoom_to_selected_features, insert_feature, get_feature_by_id, disconnect_signal_selection_changed, \
+    zoom_to_selected_features, insert_feature, disconnect_signal_selection_changed, \
     refresh_map_canvas, select_features_by_expr
 from ...lib.tools_qt import delete_records, fill_table_object, set_selectionbehavior, set_combo_itemData, \
     get_folder_dialog, set_icon, set_completer_lineedit, set_restriction, get_col_index_by_col_name, document_open, \
@@ -1403,7 +1403,7 @@ class GwPsector:
         row = index.row()
         column_index = get_col_index_by_col_name(qtable, field_id)
         _id = index.sibling(row, column_index).data()
-        feature = get_feature_by_id(layer, _id, field_id)
+        feature = self.snapper_manager.get_feature_by_id(layer, _id, field_id)
         try:
             geometry = feature.geometry()
             rubber_band.setToGeometry(geometry, None)

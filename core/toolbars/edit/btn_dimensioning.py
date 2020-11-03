@@ -10,7 +10,6 @@ from qgis.PyQt.QtCore import QSettings, Qt
 from ...shared.dimensioning import GwDimensioning
 from ..parent_maptool import GwParentMapTool
 
-from ....lib.tools_qgis import set_snapping_mode, get_feature_by_id
 from ...utils.tools_giswater import snap_to_arc, snap_to_connec, snap_to_gully, snap_to_node
 
 
@@ -27,7 +26,7 @@ class GwDimensioningButton(GwParentMapTool):
     def open_new_dimensioning(self, feature_id):
 
         self.layer.featureAdded.disconnect(self.open_new_dimensioning)
-        feature = get_feature_by_id(self.layer, feature_id)
+        feature = self.snapper_manager.get_feature_by_id(self.layer, feature_id)
         geom = feature.geometry()
         list_points = None
         if self.layer.geometryType() == 0:
@@ -97,7 +96,7 @@ class GwDimensioningButton(GwParentMapTool):
             snap_to_connec()
             snap_to_gully()
             snap_to_node()
-            set_snapping_mode()
+            self.snapper_manager.set_snapping_mode()
 
             # Manage new api tool
             self.layer.featureAdded.connect(self.open_new_dimensioning)
