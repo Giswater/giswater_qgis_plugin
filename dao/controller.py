@@ -1967,7 +1967,8 @@ class DaoController:
                             v_layer.renderer().symbol().setOpacity(opacity)
 
                         global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
-                        self.set_margin(v_layer, margin)
+                        if margin:
+                            self.set_margin(v_layer, margin)
 
         except Exception as e:
             global_vars.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
