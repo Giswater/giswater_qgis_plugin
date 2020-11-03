@@ -227,10 +227,10 @@ INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
 VALUES (353, 'Check user name of QGIS layers', 'utils') ON CONFLICT (fid) DO NOTHING ;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
-VALUES (354, 'Check if arc state=2 have final nodes in psector', 'utils') ON CONFLICT (fid) DO NOTHING ;
+VALUES (354, 'Check arc state=2 with final nodes in psector', 'utils') ON CONFLICT (fid) DO NOTHING ;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
-VALUES (355, 'Check if arc state=2 have operative nodes in psector', 'utils') ON CONFLICT (fid) DO NOTHING ;
+VALUES (355, 'Check arc state=2 with operative nodes in psector', 'utils') ON CONFLICT (fid) DO NOTHING ;
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
 VALUES (356, 'Planned connecs without reference link', 'utils') ON CONFLICT (fid) DO NOTHING ;
