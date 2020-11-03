@@ -75,6 +75,7 @@ class GwSearch:
         form = ""
         if self.dlg_search is None and dlg_mincut is None:
             self.init_dialog()
+            self.controller.set_user_settings_value('open_search', 'true')
 
         if dlg_mincut:
             self.dlg_search = dlg_mincut
@@ -85,7 +86,6 @@ class GwSearch:
         self.dlg_search.lbl_msg.setVisible(False)
         project_vars = global_vars.project_vars
         qgis_project_add_schema = project_vars['add_schema']
-        self.controller.set_user_settings_value('open_search', 'true')
 
         if qgis_project_add_schema is None:
             body = create_body(form=form)
