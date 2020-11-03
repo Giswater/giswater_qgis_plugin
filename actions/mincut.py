@@ -1896,9 +1896,14 @@ class MincutParent(ParentAction):
         utils_giswater.set_combo_itemData(self.dlg_mincut.type, row['mincut_type'], 0)
         utils_giswater.set_combo_itemData(self.dlg_mincut.cause, row['anl_cause'], 0)
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, mincut_state_name)
-        utils_giswater.setWidgetText(self.dlg_mincut, "output_details", row['output'])
 
-        # Manage location
+        if 'output' in row and row['output']:
+            self.dlg_mincut.txt_infolog.setEnabled(False)
+            text = utils_giswater.getWidgetText(self.dlg_mincut, 'txt_infolog', return_string_null=False)
+            text += json.dumps(row['output'], indent=2, sort_keys=True)
+            utils_giswater.setWidgetText(self.dlg_mincut, "txt_infolog", text)
+
+         # Manage location
         utils_giswater.set_combo_itemData(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, str(row['streetaxis_id']))
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, str(row['postnumber']))
