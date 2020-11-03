@@ -20,7 +20,7 @@
       <string>test1</string>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="General">
       <attribute name="title">
@@ -603,6 +603,76 @@
           </item>
          </layout>
         </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="additional_info">
+      <attribute name="title">
+       <string>Additional info</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="1" column="1">
+        <widget class="QTextEdit" name="text3"/>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="lbl_text4">
+         <property name="text">
+          <string>Text 4:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" rowspan="2">
+        <widget class="QLabel" name="lbl_text6">
+         <property name="text">
+          <string>Text 6:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="lbl_num_value">
+         <property name="text">
+          <string>Num value:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="lbl_text3">
+         <property name="text">
+          <string>Text 3:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="num_value"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="lbl_text5">
+         <property name="text">
+          <string>Text 5:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QTextEdit" name="text6"/>
+       </item>
+       <item row="2" column="1">
+        <widget class="QTextEdit" name="text4"/>
+       </item>
+       <item row="3" column="1">
+        <widget class="QTextEdit" name="text5"/>
+       </item>
+       <item row="6" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>

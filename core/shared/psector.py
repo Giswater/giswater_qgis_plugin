@@ -132,6 +132,8 @@ class GwPsector:
         rotation.setValidator(QDoubleValidator())
         atlas_id = self.dlg_plan_psector.findChild(QLineEdit, "atlas_id")
         atlas_id.setValidator(QIntValidator())
+        num_value = self.dlg_plan_psector.findChild(QLineEdit, "num_value")
+        num_value.setValidator(QIntValidator())
         where = " WHERE typevalue = 'psector_type' "
         self.populate_combos(self.dlg_plan_psector.psector_type, 'idval', 'id', 'plan_typevalue', where)
 
@@ -233,6 +235,7 @@ class GwPsector:
                 set_table_columns(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully")
             sql = (f"SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, "
                    f"observ, atlas_id, scale, rotation, active, ext_code, status "
+                   f"text3, text4, text5, text6, num_value, "
                    f"FROM plan_psector "
                    f"WHERE psector_id = {psector_id}")
             row = self.controller.get_row(sql)
@@ -278,6 +281,11 @@ class GwPsector:
             set_combo_itemData(self.dlg_plan_psector.priority, str(row["priority"]), 1)
             fillWidget(self.dlg_plan_psector, "text1", row)
             fillWidget(self.dlg_plan_psector, "text2", row)
+            fillWidget(self.dlg_plan_psector, "text3", row)
+            fillWidget(self.dlg_plan_psector, "text4", row)
+            fillWidget(self.dlg_plan_psector, "text5", row)
+            fillWidget(self.dlg_plan_psector, "text6", row)
+            fillWidget(self.dlg_plan_psector, "num_value", row)
             fillWidget(self.dlg_plan_psector, "observ", row)
             fillWidget(self.dlg_plan_psector, "atlas_id", row)
             fillWidget(self.dlg_plan_psector, "scale", row)
@@ -820,6 +828,7 @@ class GwPsector:
         self.dlg_plan_psector.tabWidget.setTabEnabled(2, enabled)
         self.dlg_plan_psector.tabWidget.setTabEnabled(3, enabled)
         self.dlg_plan_psector.tabWidget.setTabEnabled(4, enabled)
+        self.dlg_plan_psector.tabWidget.setTabEnabled(5, enabled)
 
 
     def enable_buttons(self, enabled):
