@@ -58,7 +58,7 @@ VALUES (2980, 'gw_fct_setmincut', 'utils', 'function', 'json', 'json', NULL, 'ro
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2244,'gw_fct_mincut_result_overlap',
 '{"style":{"point":{"style":"qml", "id":"106"},  "line":{"style":"qml", "id":"105"}, "polygon":{"style":"qml", "id":"107"}}}',
-'{"visible": ["v_om_mincut_arc", "v_om_mincut_node", "v_om_mincut_connec", "v_anl_mincut_init_point"]}',NULL) 
+'{"visible": ["v_om_mincut_arc", "v_om_mincut_node", "v_om_mincut_connec", "v_om_mincut_initpoint"]}',NULL) 
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
