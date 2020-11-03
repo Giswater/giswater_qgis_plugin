@@ -6,14 +6,14 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from ..parent_dialog import GwParentAction
-from ...utils.tools_giswater import GwPlan
+from ...shared.psector import GwPsector
 
 
 class GwPriceManagerButton(GwParentAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.plan = GwPlan()
+        self.plan = GwPsector()
 
 
     def clicked_event(self):

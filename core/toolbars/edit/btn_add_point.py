@@ -12,8 +12,7 @@ from qgis.PyQt.QtGui import QKeySequence
 from functools import partial
 
 from ..parent_dialog import GwParentAction
-# from ...shared.edit_func import GwEdit
-from ...utils.tools_giswater import GwEdit
+from ...shared.info import GwInfo
 from ...utils.pg_man import PgMan
 
 
@@ -30,7 +29,7 @@ class GwAddPointButton(GwParentAction):
 
         project_type = self.controller.get_project_type()
 
-        self.edit = GwEdit()
+        self.api_cf = GwInfo('data')
 
         # Get list of different node and arc types
         menu = QMenu()
@@ -45,7 +44,7 @@ class GwAddPointButton(GwParentAction):
                 except:
                     pass
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
+                obj_action.triggered.connect(partial(self.api_cf.edit_add_feature, feature_cat))
         menu.addSeparator()
 
         list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
@@ -58,7 +57,7 @@ class GwAddPointButton(GwParentAction):
                 except:
                     pass
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
+                obj_action.triggered.connect(partial(self.api_cf.edit_add_feature, feature_cat))
         menu.addSeparator()
 
         list_feature_cat = self.controller.get_values_from_dictionary(self.feature_cat)
@@ -71,7 +70,7 @@ class GwAddPointButton(GwParentAction):
                 except:
                     pass
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
+                obj_action.triggered.connect(partial(self.api_cf.edit_add_feature, feature_cat))
         menu.addSeparator()
 
 

@@ -2384,6 +2384,19 @@ def set_open_url(widget):
         webbrowser.open(path)
 
 
+def get_feature_by_id(layer, id, field_id=None):
+
+    features = layer.getFeatures()
+    for feature in features:
+        if field_id is None:
+            if feature.id() == id:
+                return feature
+        else:
+            if feature[field_id] == id:
+                return feature
+    return False
+
+
 class GwExtendedQLabel(QLabel):
     clicked = pyqtSignal()
 

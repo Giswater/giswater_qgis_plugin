@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import QSettings, Qt
 
 from ...shared.dimensioning import GwDimensioning
 from ..parent_maptool import GwParentMapTool
-
+from ....lib import tools_qt
 
 class GwDimensioningButton(GwParentMapTool):
     """ Button 39: Dimensioning """
@@ -24,7 +24,7 @@ class GwDimensioningButton(GwParentMapTool):
     def open_new_dimensioning(self, feature_id):
 
         self.layer.featureAdded.disconnect(self.open_new_dimensioning)
-        feature = self.snapper_manager.get_feature_by_id(self.layer, feature_id)
+        feature = tools_qt.get_feature_by_id(self.layer, feature_id)
         geom = feature.geometry()
         list_points = None
         if self.layer.geometryType() == 0:

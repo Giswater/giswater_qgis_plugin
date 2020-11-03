@@ -12,7 +12,7 @@ from qgis.PyQt.QtGui import QKeySequence
 from functools import partial
 
 from ..parent_dialog import GwParentAction
-from ...utils.tools_giswater import GwEdit
+from ...shared.info import GwInfo
 from ...utils.pg_man import PgMan
 
 
@@ -27,7 +27,7 @@ class GwAddLineButton(GwParentAction):
         pg_man = PgMan(global_vars.controller)
         self.feature_cat = pg_man.manage_feature_cat()
 
-        self.edit = GwEdit()
+        self.api_cf = GwInfo('data')
 
         # Get list of different node and arc types
         menu = QMenu()
@@ -42,7 +42,7 @@ class GwAddLineButton(GwParentAction):
                 except:
                     pass
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.edit.edit_add_feature, feature_cat))
+                obj_action.triggered.connect(partial(self.api_cf.edit_add_feature, feature_cat))
 
         self.action.setMenu(menu)
         toolbar.addAction(self.action)

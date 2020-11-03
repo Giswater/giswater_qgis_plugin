@@ -13,7 +13,7 @@ from functools import partial
 from ...ui.ui_manager import DialogTextUi
 from ..parent_maptool import GwParentMapTool
 from ...utils.tools_giswater import get_cursor_multiple_selection, load_settings, close_dialog, open_dialog, \
-    populate_info_text, create_body, snap_to_gully
+    populate_info_text, create_body
 from ....lib.tools_qgis import get_layer
 
 
