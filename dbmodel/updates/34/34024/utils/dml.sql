@@ -234,3 +234,8 @@ VALUES (355, 'Check arc state=2 with operative nodes in psector', 'utils') ON CO
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
 VALUES (356, 'Planned connecs without reference link', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+--2020/11/03
+UPDATE config_form_tabs
+SET tabactions=tabactions::jsonb || '{"actionName":"actionRotation", "actionTooltip":"Rotation",  "disabled":false}'::jsonb
+WHERE formname ='v_edit_node';
