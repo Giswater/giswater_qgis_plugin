@@ -1841,7 +1841,11 @@ def multi_rows_delete(widget, table_name, column_id):
 
 
 def hide_void_groupbox(dialog):
-    """ Hide empty groupbox """
+    """ Rceives a dialog, searches it all the QGroupBox, looks 1 to 1 if the grb have widgets, if it does not have
+     (if it is empty), hides the QGroupBox
+    :param dialog: QDialog or QMainWindow
+    :return:
+    """
 
     grb_list = {}
     grbox_list = dialog.findChildren(QGroupBox)
