@@ -460,6 +460,30 @@ BEGIN
 		VALUES (115, '354', 1,'INFO: There are no arcs with state=2 with planned final nodes not defined psector.',v_count);
 	END IF;
 
+	--check if arcs with state = 2 have final nodes state = 1 or 2 operative in psector (355)
+	v_query =  'SELECT * FROM (
+	SELECT pa.arc_id, arc.arccat_id, pa.psector_id , node_1 as node, arc.the_geom FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
+	JOIN plan_psector_x_node pn1 ON pn1.node_id = arc.node_1
+	WHERE pa.psector_id = pn1.psector_id AND pa.state = 1 AND pn1.state = 0
+	UNION
+	SELECT pa.arc_id, arc.arccat_id, pa.psector_id, node_2, arc.the_geom FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
+	JOIN plan_psector_x_node pn2 ON pn2.node_id = arc.node_2
+	WHERE pa.psector_id = pn2.psector_id AND pa.state = 1 AND pn2.state = 0) b';
+
+	EXECUTE 'SELECT count(*) FROM ('||v_query||')c'
+	INTO v_count; 
+
+	IF v_count > 0 THEN
+
+		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
+		SELECT 355, c.arc_id, c.arccat_id, concat(''Arcs state = 2 final nodes obsolete in psector '',c.psector_id), c.the_geom, 2 FROM (', v_query,')c ');
+		INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
+		VALUES (115, '355', 3, FALSE, concat('ERROR-355: There are ',v_count,' arcs with final nodes defined as obsolete in psector.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (115, '355', 1,'INFO: There are no arcs with state=2 with final nodes obsolete in psector.',v_count);
+	END IF;
+
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
