@@ -606,7 +606,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="additional_info">
       <attribute name="title">
        <string>Additional info</string>
       </attribute>
@@ -790,8 +790,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>620</width>
-              <height>539</height>
+              <width>146</width>
+              <height>122</height>
              </rect>
             </property>
             <attribute name="label">
