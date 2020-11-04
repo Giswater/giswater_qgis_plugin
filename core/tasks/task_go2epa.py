@@ -13,7 +13,7 @@ import os
 import subprocess
 
 from ... import global_vars
-from ..utils.tools_giswater import add_temp_layer
+from ..utils.tools_gw import add_temp_layer
 
 
 class GwGo2EpaTask(QgsTask):

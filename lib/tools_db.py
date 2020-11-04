@@ -15,7 +15,7 @@ from functools import partial
 from .. import global_vars
 from . import tools_qt
 from .tools_qgis import zoom_to_rectangle
-from ..core.utils import tools_giswater
+from ..core.utils import tools_gw
 
 
 def make_list_for_completer(sql):

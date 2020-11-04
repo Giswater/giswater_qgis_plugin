@@ -13,7 +13,7 @@ from functools import partial
 
 from ....lib import tools_qt
 from ..parent_dialog import GwParentAction
-from ...utils.tools_giswater import close_dialog, load_settings, open_dialog
+from ...utils.tools_gw import close_dialog, load_settings, open_dialog
 from ...ui.ui_manager import SelectorDate
 from ....lib.tools_qgis import refresh_map_canvas
 

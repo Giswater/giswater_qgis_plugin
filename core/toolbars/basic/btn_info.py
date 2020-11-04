@@ -19,7 +19,7 @@ from functools import partial
 
 from ...toolbars.parent_maptool import GwParentMapTool
 from ...shared.info import GwInfo
-from ...utils.tools_giswater import create_body, draw_point, draw_polyline
+from ...utils.tools_gw import create_body, draw_point, draw_polyline
 from ....lib.tools_qgis import get_max_rectangle_from_coords, get_points, get_visible_layers
 
 

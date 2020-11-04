@@ -12,7 +12,7 @@ from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSize
 from functools import partial
 
 from ..ui.ui_manager import SelectorUi
-from ..utils.tools_giswater import create_body, close_dialog, get_parser_value, load_settings, open_dialog, save_current_tab, \
+from ..utils.tools_gw import create_body, close_dialog, get_parser_value, load_settings, open_dialog, save_current_tab, \
     save_settings
 from ... import global_vars
 from ...lib.tools_qgis import refresh_map_canvas, zoom_to_rectangle

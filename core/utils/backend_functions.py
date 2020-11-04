@@ -13,7 +13,7 @@ from qgis.PyQt.QtWidgets import QMessageBox, QWidget
 import os
 
 from ... import global_vars
-from ..utils.tools_giswater import getWidgetText, open_file_path, create_body, delete_layer_from_toc
+from ..utils.tools_gw import getWidgetText, open_file_path, create_body, delete_layer_from_toc
 
 
 def gw_function_dxf(**kwargs):

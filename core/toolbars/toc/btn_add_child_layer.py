@@ -15,7 +15,7 @@ from ..parent_dialog import GwParentAction
 from ...load_project_check import GwProjectCheck
 from ...tasks.task_layer_config import GwConfigLayerTask
 from ....lib.tools_qgis import get_qgis_project_variables, get_cursor_multiple_selection
-from ...utils.tools_giswater import create_body, from_postgres_to_toc, set_style_mapzones
+from ...utils.tools_gw import create_body, from_postgres_to_toc, set_style_mapzones
 
 
 class GwAddChildLayerButton(GwParentAction):

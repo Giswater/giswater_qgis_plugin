@@ -8,7 +8,7 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import Qt
 
 from ..parent_maptool import GwParentMapTool
-from ...utils.tools_giswater import create_body
+from ...utils.tools_gw import create_body
 
 
 class GwFlowExitButton(GwParentMapTool):

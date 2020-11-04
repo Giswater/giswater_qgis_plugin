@@ -15,7 +15,7 @@ import os
 
 from ... import global_vars
 
-from ..utils.tools_giswater import SnappingConfigManager
+from ..utils.tools_gw import SnappingConfigManager
 
 
 class GwParentMapTool(QgsMapTool):

@@ -18,7 +18,7 @@ from collections import OrderedDict
 from functools import partial
 
 from ...lib import tools_qt
-from ..utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, save_current_tab,\
+from ..utils.tools_gw import close_dialog, get_parser_value, load_settings, open_dialog, save_current_tab,\
     save_settings
 from ..ui.ui_manager import SelectorUi, MincutManagerUi
 from ...lib.tools_qt import set_icon, set_table_columns, set_dates_from_to

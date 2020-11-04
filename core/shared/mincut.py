@@ -24,7 +24,7 @@ from functools import partial
 from ..tasks.parent_task import GwTask
 
 from .search import GwSearch
-from ..utils.tools_giswater import close_dialog, load_settings, open_dialog, save_settings, create_body, \
+from ..utils.tools_gw import close_dialog, load_settings, open_dialog, save_settings, create_body, \
     populate_info_text_ as populate_info_text, delete_layer_from_toc, check_expression
 from .mincut_manager import GwMincutManager
 from ..ui.ui_manager import DialogTextUi
@@ -39,7 +39,7 @@ from ...lib.tools_qgis import refresh_map_canvas, set_cursor_restore, get_cursor
     disconnect_signal_selection_changed, zoom_to_rectangle, get_composers_list, get_composer_index, resetRubberbands, \
     restore_user_layer, MultipleSelection
 
-from ..utils.tools_giswater import SnappingConfigManager
+from ..utils.tools_gw import SnappingConfigManager
 
 class GwMincut:
 

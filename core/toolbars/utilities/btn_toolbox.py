@@ -20,7 +20,7 @@ from functools import partial
 
 from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import ToolboxDockerUi, ToolboxUi
-from ...utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
+from ...utils.tools_gw import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
     create_body, add_temp_layer, populate_info_text_ as populate_info_text, set_style_mapzones
 from ....lib.tools_qt import construct_form_param_user, getCalendarDate, getWidgetText, get_item_data, isChecked, \
     setChecked, setWidgetText, set_combo_itemData, set_item_data

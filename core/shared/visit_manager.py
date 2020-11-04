@@ -28,7 +28,7 @@ from ..models.om_visit_x_gully import OmVisitXGully
 from ..models.om_visit_parameter import OmVisitParameter
 from ..ui.ui_manager import VisitUi, VisitEvent, VisitEventRehab, VisitManagerUi
 from .document import GwDocument
-from ..utils.tools_giswater import close_dialog, load_settings, open_dialog, hide_generic_layers, create_body, \
+from ..utils.tools_gw import close_dialog, load_settings, open_dialog, hide_generic_layers, create_body, \
     enable_feature_type, check_expression
 from ...lib.tools_qgis import remove_selection, add_point, selection_init, selection_changed, select_features_by_ids, \
     insert_feature, disconnect_signal_selection_changed, connect_signal_selection_changed, refresh_map_canvas

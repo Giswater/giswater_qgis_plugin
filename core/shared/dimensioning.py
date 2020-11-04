@@ -5,15 +5,18 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-from qgis.core import QgsPointXY
-from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsRubberBand, QgsVertexMarker
+from functools import partial
+
 from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, \
     QSizePolicy, QSpacerItem
-from functools import partial
+from qgis.core import QgsPointXY
+from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsRubberBand, QgsVertexMarker
 
-from ..utils.tools_giswater import create_body, close_dialog, load_settings, open_dialog, save_settings
 from ..ui.ui_manager import DimensioningUi
+from ..utils import tools_gw
+from ..utils.tools_gw import SnappingConfigManager
+from ... import global_vars
 from ...lib.tools_qgis import restore_user_layer
 from ...lib.tools_qt import set_widget_size, add_button, add_textarea, add_lineedit, set_data_type, \
     manage_lineedit, add_tableview, set_headers, populate_table, set_columns_config, add_checkbox, add_combobox, \
@@ -21,8 +24,6 @@ from ...lib.tools_qt import set_widget_size, add_button, add_textarea, add_linee
     set_setStyleSheet, disable_all, enable_all, set_icon, setWidgetText, isChecked, get_item_data, \
     set_qtv_config, getWidgetText
 
-from ... import global_vars
-from ..utils.tools_giswater import SnappingConfigManager
 
 class GwDimensioning:
 
@@ -43,7 +44,7 @@ class GwDimensioning:
 
     def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None, rubber_band=None):
         self.dlg_dim = DimensioningUi()
-        load_settings(self.dlg_dim)
+        tools_gw.load_settings(self.dlg_dim)
 
         self.user_current_layer = self.iface.activeLayer()
         # Set layers dimensions, node and connec
@@ -65,7 +66,7 @@ class GwDimensioning:
         if db_return is None:
             rubber_band = QgsRubberBand(self.canvas, 0)
             extras = f'"coordinates":{{{self.points}}}'
-            body = create_body(extras=extras)
+            body = tools_gw.create_body(extras=extras)
             function_name = 'gw_fct_getdimensioning'
             json_result = self.controller.get_json(function_name, body)
             if json_result is None or json_result['status'] == 'Failed':
@@ -97,7 +98,7 @@ class GwDimensioning:
         self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, qgis_feature, layer))
         self.dlg_dim.btn_cancel.clicked.connect(partial(self.cancel_dimensioning))
         self.dlg_dim.dlg_closed.connect(partial(self.cancel_dimensioning))
-        self.dlg_dim.dlg_closed.connect(partial(save_settings, self.dlg_dim))
+        self.dlg_dim.dlg_closed.connect(partial(tools_gw.save_settings, self.dlg_dim))
         self.dlg_dim.dlg_closed.connect(rubber_band.reset)
 
         self.create_map_tips()
@@ -146,14 +147,14 @@ class GwDimensioning:
                 disable_all(self.dlg_dim, db_return[0]['body']['data'], False)
 
         title = f"DIMENSIONING - {self.fid}"
-        open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
+        tools_gw.open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
         return False, False
 
 
     def cancel_dimensioning(self):
 
         self.iface.actionRollbackEdits().trigger()
-        close_dialog(self.dlg_dim)
+        tools_gw.close_dialog(self.dlg_dim)
         restore_user_layer(self.user_current_layer)
 
 
@@ -196,11 +197,11 @@ class GwDimensioning:
         feature = '"tableName":"v_edit_dimensions", '
         feature += f'"id":"{self.fid}"'
         extras = f'"fields":{{{fields}}}'
-        body = create_body(feature=feature, extras=extras)
+        body = tools_gw.create_body(feature=feature, extras=extras)
         self.controller.get_json('gw_fct_setdimensioning', body)
 
         # Close dialog
-        close_dialog(self.dlg_dim)
+        tools_gw.close_dialog(self.dlg_dim)
 
 
     def deactivate_signals(self, action, emit_point=None):

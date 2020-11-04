@@ -11,7 +11,7 @@ from .... import global_vars
 from ....lib import tools_qt
 from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import Go2EpaSelectorUi
-from ...utils.tools_giswater import close_dialog, load_settings, open_dialog
+from ...utils.tools_gw import close_dialog, load_settings, open_dialog
 
 
 class GwGo2EpaSelectorButton(GwParentAction):

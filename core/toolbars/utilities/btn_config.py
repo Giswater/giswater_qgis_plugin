@@ -16,7 +16,7 @@ from functools import partial
 
 from ....lib import tools_qt
 from ..parent_dialog import GwParentAction
-from ...utils.tools_giswater import load_settings, open_dialog, close_dialog, create_body
+from ...utils.tools_gw import load_settings, open_dialog, close_dialog, create_body
 from ...ui.ui_manager import ConfigUi
 
 from ....lib.tools_qt import hide_void_groupbox

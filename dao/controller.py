@@ -29,10 +29,10 @@ from ..lib import tools_os, tools_qt
 from ..core.ui.ui_manager import DialogTextUi, DockerUi
 from ..lib.tools_qgis import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
     qgis_get_layer_primary_key, qgis_get_layers, categoryze_layer
-from ..core.utils.tools_giswater import get_parser_value, set_parser_value, manage_actions, draw, create_body, \
+from ..core.utils.tools_gw import get_parser_value, set_parser_value, manage_actions, draw, create_body, \
     from_postgres_to_toc, create_qml, populate_vlayer, delete_layer_from_toc
 
-from ..core.utils.tools_giswater import SnappingConfigManager
+from ..core.utils.tools_gw import SnappingConfigManager
 class DaoController:
 
     def __init__(self, plugin_name, iface, logger_name='plugin', create_logger=True):

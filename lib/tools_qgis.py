@@ -22,7 +22,7 @@ from qgis.PyQt.QtWidgets import QDockWidget, QApplication
 
 from . import tools_qt
 from .. import global_vars
-from ..core.utils import tools_giswater
+from ..core.utils import tools_gw
 
 
 class MultipleSelection(QgsMapTool):
@@ -521,7 +521,7 @@ def get_xy(vertex_marker, return_point, emit_point, point):
 def selection_init(dialog, table_object, query=False, geom_type=None, layers=None):
     """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
-    geom_type = tools_giswater.tab_feature_changed(dialog)
+    geom_type = tools_gw.tab_feature_changed(dialog)
     if geom_type in ('all', None):
         geom_type = 'arc'
     multiple_selection = MultipleSelection(layers, geom_type, parent_manage=None,
@@ -575,7 +575,7 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
         expr_filter = expr_filter[:-2] + ")"
 
         # Check expression
-        (is_valid, expr) = tools_giswater.check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
 
@@ -594,7 +594,7 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
     # Remove selection in generic 'v_edit' layers
     if plan_om == 'plan':
         layers = remove_selection(False)
-    tools_giswater.enable_feature_type(dialog, table_object, ids=ids)
+    tools_gw.enable_feature_type(dialog, table_object, ids=ids)
     connect_signal_selection_changed(dialog, table_object, geom_type)
 
     return ids, layers, list_ids
@@ -629,7 +629,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
     disconnect_signal_selection_changed()
 
     if geom_type in ('all', None):
-        geom_type = tools_giswater.tab_feature_changed(dialog)
+        geom_type = tools_gw.tab_feature_changed(dialog)
 
     # Clear list of ids
     if remove_ids:
@@ -640,7 +640,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
     expr_filter = f"{field_id} = '{feature_id}'"
 
     # Check expression
-    (is_valid, expr) = tools_giswater.check_expression(expr_filter)
+    (is_valid, expr) = tools_gw.check_expression(expr_filter)
     if not is_valid:
         return None
 
@@ -673,7 +673,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
     expr_filter = expr_filter[:-2] + ")"
 
     # Check expression
-    (is_valid, expr) = tools_giswater.check_expression(expr_filter)
+    (is_valid, expr) = tools_gw.check_expression(expr_filter)
     if not is_valid:
         return
 
@@ -695,7 +695,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
 
     # Update list
     list_ids[geom_type] = ids
-    tools_giswater.enable_feature_type(dialog, table_object, ids=ids)
+    tools_gw.enable_feature_type(dialog, table_object, ids=ids)
     connect_signal_selection_changed(dialog, table_object, geom_type)
 
     global_vars.controller.log_info(list_ids[geom_type])

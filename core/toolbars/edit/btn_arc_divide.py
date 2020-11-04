@@ -13,7 +13,7 @@ from qgis.PyQt.QtCore import Qt
 
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import DialogTextUi
-from ...utils.tools_giswater import populate_info_text, create_body, refresh_legend
+from ...utils.tools_gw import populate_info_text, create_body, refresh_legend
 
 
 class GwArcDivideButton(GwParentMapTool):

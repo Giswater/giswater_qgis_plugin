@@ -7,22 +7,21 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import sys
-
-from qgis.core import QgsApplication
-from qgis.PyQt.QtCore import QDate, QStringListModel, QTime, Qt
-from qgis.PyQt.QtWidgets import QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, QFileDialog, \
-    QTableView, QAbstractItemView
-from qgis.PyQt.QtSql import QSqlQueryModel
 from functools import partial
 
-from ... import global_vars
-from ...lib import tools_qt
+from qgis.PyQt.QtCore import QDate, QStringListModel, QTime, Qt
+from qgis.PyQt.QtSql import QSqlQueryModel
+from qgis.PyQt.QtWidgets import QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, QFileDialog, \
+    QTableView, QAbstractItemView
+from qgis.core import QgsApplication
+
 from .go2epa_options import GwGo2EpaOptions
-from ..tasks.task_go2epa import GwGo2EpaTask
 from ..btn_admin import GwAdmin
+from ..tasks.task_go2epa import GwGo2EpaTask
 from ..ui.ui_manager import Go2EpaUI, HydrologySelector, Multirow_selector
-from ..utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
-from ...lib.tools_qgis import refresh_map_canvas
+from ..utils import tools_gw
+from ... import global_vars
+from ...lib import tools_qgis, tools_qt
 
 
 class GwGo2Epa:
@@ -45,7 +44,7 @@ class GwGo2Epa:
 
         # Create dialog
         self.dlg_go2epa = Go2EpaUI()
-        load_settings(self.dlg_go2epa)
+        tools_gw.load_settings(self.dlg_go2epa)
         self.load_user_values()
         if self.project_type in 'ws':
             self.dlg_go2epa.chk_export_subcatch.setVisible(False)
@@ -80,7 +79,7 @@ class GwGo2Epa:
             self.dlg_go2epa.btn_cancel.clicked.disconnect()
             self.dlg_go2epa.btn_cancel.clicked.connect(self.controller.close_docker)
         else:
-            open_dialog(self.dlg_go2epa, dlg_name='go2epa')
+            tools_gw.open_dialog(self.dlg_go2epa, dlg_name='go2epa')
 
 
     def set_signals(self):
@@ -89,8 +88,8 @@ class GwGo2Epa:
         self.dlg_go2epa.btn_file_inp.clicked.connect(self.go2epa_select_file_inp)
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self.go2epa_select_file_rpt)
         self.dlg_go2epa.btn_accept.clicked.connect(self.go2epa_accept)
-        self.dlg_go2epa.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_go2epa))
-        self.dlg_go2epa.rejected.connect(partial(close_dialog, self.dlg_go2epa))
+        self.dlg_go2epa.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa))
+        self.dlg_go2epa.rejected.connect(partial(tools_gw.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.btn_options.clicked.connect(self.epa_options)
 
 
@@ -187,43 +186,43 @@ class GwGo2Epa:
         """ Load QGIS settings related with file_manager """
 
         self.dlg_go2epa.txt_result_name.setMaxLength(16)
-        self.result_name = get_parser_value('go2epa', 'go2epa_RESULT_NAME')
+        self.result_name = tools_gw.get_parser_value('go2epa', 'go2epa_RESULT_NAME')
         self.dlg_go2epa.txt_result_name.setText(self.result_name)
-        self.file_inp = get_parser_value('go2epa', 'go2epa_FILE_INP')
+        self.file_inp = tools_gw.get_parser_value('go2epa', 'go2epa_FILE_INP')
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
-        self.file_rpt = get_parser_value('go2epa', 'go2epa_FILE_RPT')
+        self.file_rpt = tools_gw.get_parser_value('go2epa', 'go2epa_FILE_RPT')
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
 
-        value = get_parser_value('go2epa', 'go2epa_chk_NETWORK_GEOM')
+        value = tools_gw.get_parser_value('go2epa', 'go2epa_chk_NETWORK_GEOM')
         tools_qt.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, value)
-        value = get_parser_value('go2epa', 'go2epa_chk_INP')
+        value = tools_gw.get_parser_value('go2epa', 'go2epa_chk_INP')
         tools_qt.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, value)
-        value = get_parser_value('go2epa', 'go2epa_chk_UD')
+        value = tools_gw.get_parser_value('go2epa', 'go2epa_chk_UD')
         tools_qt.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, value)
-        value = get_parser_value('go2epa', 'go2epa_chk_EPA')
+        value = tools_gw.get_parser_value('go2epa', 'go2epa_chk_EPA')
         tools_qt.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, value)
-        value = get_parser_value('go2epa', 'go2epa_chk_RPT')
+        value = tools_gw.get_parser_value('go2epa', 'go2epa_chk_RPT')
         tools_qt.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, value)
 
 
     def save_user_values(self):
         """ Save QGIS settings related with file_manager """
 
-        set_parser_value('go2epa', 'go2epa_RESULT_NAME',
+        tools_gw.set_parser_value('go2epa', 'go2epa_RESULT_NAME',
                          f"{tools_qt.getWidgetText(self.dlg_go2epa, 'txt_result_name', return_string_null=False)}")
-        set_parser_value('go2epa', 'go2epa_FILE_INP',
+        tools_gw.set_parser_value('go2epa', 'go2epa_FILE_INP',
                          f"{tools_qt.getWidgetText(self.dlg_go2epa, 'txt_file_inp', return_string_null=False)}")
-        set_parser_value('go2epa', 'go2epa_FILE_RPT',
+        tools_gw.set_parser_value('go2epa', 'go2epa_FILE_RPT',
                          f"{tools_qt.getWidgetText(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False)}")
-        set_parser_value('go2epa', 'go2epa_chk_NETWORK_GEOM',
+        tools_gw.set_parser_value('go2epa', 'go2epa_chk_NETWORK_GEOM',
                          f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)}")
-        set_parser_value('go2epa', 'go2epa_chk_INP',
+        tools_gw.set_parser_value('go2epa', 'go2epa_chk_INP',
                          f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)}")
-        set_parser_value('go2epa', 'go2epa_chk_UD',
+        tools_gw.set_parser_value('go2epa', 'go2epa_chk_UD',
                          f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)}")
-        set_parser_value('go2epa', 'go2epa_chk_EPA',
+        tools_gw.set_parser_value('go2epa', 'go2epa_chk_EPA',
                          f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)}")
-        set_parser_value('go2epa', 'go2epa_chk_RPT',
+        tools_gw.set_parser_value('go2epa', 'go2epa_chk_RPT',
                          f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)}")
 
 
@@ -231,7 +230,7 @@ class GwGo2Epa:
         """ Load the tables in the selection form """
 
         dlg_psector_sel = Multirow_selector('dscenario')
-        load_settings(dlg_psector_sel)
+        tools_gw.load_settings(dlg_psector_sel)
         dlg_psector_sel.btn_ok.clicked.connect(dlg_psector_sel.close)
 
         if tableleft == 'cat_dscenario':
@@ -245,7 +244,7 @@ class GwGo2Epa:
 
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
 
-        open_dialog(dlg_psector_sel)
+        tools_gw.open_dialog(dlg_psector_sel)
 
 
     def epa_options(self):
@@ -259,7 +258,7 @@ class GwGo2Epa:
         """ Dialog hydrology_selector.ui """
 
         self.dlg_hydrology_selector = HydrologySelector()
-        load_settings(self.dlg_hydrology_selector)
+        tools_gw.load_settings(self.dlg_hydrology_selector)
 
         self.dlg_hydrology_selector.btn_accept.clicked.connect(self.save_hydrology)
         self.dlg_hydrology_selector.hydrology.currentIndexChanged.connect(self.update_labels)
@@ -286,7 +285,7 @@ class GwGo2Epa:
             tools_qt.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 0)
 
         self.update_labels()
-        open_dialog(self.dlg_hydrology_selector)
+        tools_gw.open_dialog(self.dlg_hydrology_selector)
 
 
     def save_hydrology(self):
@@ -306,7 +305,7 @@ class GwGo2Epa:
 
         message = "Values has been update"
         self.controller.show_info(message)
-        close_dialog(self.dlg_hydrology_selector)
+        tools_gw.close_dialog(self.dlg_hydrology_selector)
 
 
     def update_labels(self):
@@ -584,7 +583,7 @@ class GwGo2Epa:
         col_to_sort = qtable.model().headerData(idx, Qt.Horizontal)
         query += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable, query)
-        refresh_map_canvas()
+        tools_qgis.refresh_map_canvas()
 
 
     def hide_colums(self, widget, comuns_to_hide):
@@ -620,7 +619,7 @@ class GwGo2Epa:
         col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
         query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_right, query_right)
-        refresh_map_canvas()
+        tools_qgis.refresh_map_canvas()
 
 
     def multi_rows_selector(self, qtable_left, qtable_right, id_ori,
@@ -679,7 +678,7 @@ class GwGo2Epa:
         col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
         query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_left, query_left)
-        refresh_map_canvas()
+        tools_qgis.refresh_map_canvas()
 
 
     def fill_table_by_query(self, qtable, query):

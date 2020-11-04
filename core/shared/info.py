@@ -5,33 +5,37 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY
-from qgis.gui import QgsDateTimeEdit, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand
+import json
+import os
+import subprocess
+import sys
+import urllib.parse as parse
+import webbrowser
+from collections import OrderedDict
+from functools import partial
+from sip import isdeleted
+
 from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, QStringListModel, Qt, QSettings
 from qgis.PyQt.QtGui import QColor, QRegExpValidator, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
+from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY
+from qgis.gui import QgsDateTimeEdit, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand
 
-import json
-import os
-import subprocess
-import urllib.parse as parse
-import sys
-import webbrowser
-from collections import OrderedDict
-from functools import partial
-from sip import isdeleted
 
-from ... import global_vars
+
 from .catalog import GwCatalog
 from .dimensioning import GwDimensioning
 from .document import GwDocument
 from .element import GwElement
 from .visit_gallery import GwVisitGallery
 from .visit_manager import GwVisitManager
-from ..utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body, draw, \
+
+from ... import global_vars
+
+from ..utils.tools_gw import load_settings, open_dialog, save_settings, close_dialog, create_body, draw, \
     draw_point, populate_info_text_ as populate_info_text
 from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
@@ -46,7 +50,7 @@ from ...lib.tools_qt import set_completer_object_api, set_completer_object, chec
     setWidgetText, getWidgetType, set_combo_itemData, setImage, get_col_index_by_col_name, set_item_data, \
     GwHyperLinkLabel, get_feature_by_id
 
-from ..utils.tools_giswater import SnappingConfigManager
+from ..utils.tools_gw import SnappingConfigManager
 
 
 class GwInfo(QObject):
@@ -231,7 +235,7 @@ class GwInfo(QObject):
             return result, dialog
 
         elif template == 'dimensioning':
-            self.lyr_dim = get_layer_by_tablename("v_edit_dimensions", show_warning=True)
+            self.lyr_dim = self.controller.get_layer_by_tablename("v_edit_dimensions", show_warning=True)
             if self.lyr_dim:
                 self.api_dim = GwDimensioning()
                 feature_id = self.complet_result[0]['body']['feature']['id']

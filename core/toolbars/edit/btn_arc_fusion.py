@@ -11,7 +11,7 @@ from ....lib import tools_qt
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import ArcFusionUi
 from functools import partial
-from ...utils.tools_giswater import load_settings, open_dialog, close_dialog, create_body, populate_info_text
+from ...utils.tools_gw import load_settings, open_dialog, close_dialog, create_body, populate_info_text
 
 
 class GwArcFusionButton(GwParentMapTool):

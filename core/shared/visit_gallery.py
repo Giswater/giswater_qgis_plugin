@@ -15,7 +15,7 @@ from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtCore import Qt
 from functools import partial
 
-from ..utils.tools_giswater import close_dialog, load_settings, open_dialog
+from ..utils.tools_gw import close_dialog, load_settings, open_dialog
 from ..ui.ui_manager import Gallery, GalleryZoom
 from ...lib.tools_qt import set_icon, GwExtendedQLabel
 

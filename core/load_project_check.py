@@ -12,7 +12,7 @@ import platform
 from functools import partial
 
 from .. import global_vars
-from .utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, get_plugin_version, \
+from .utils.tools_gw import load_settings, open_dialog, save_settings, close_dialog, get_plugin_version, \
     create_body, from_postgres_to_toc, create_qml, add_temp_layer
 from .ui.ui_manager import ProjectCheckUi
 from ..lib.tools_qt import hide_void_groupbox

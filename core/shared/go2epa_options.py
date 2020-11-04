@@ -5,16 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QWidget, QComboBox
-
 import json
 from functools import partial
 
-from ...lib import tools_qt
-from ..utils.tools_giswater import create_body, close_dialog, load_settings, open_dialog
+from qgis.PyQt.QtWidgets import QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QWidget, QComboBox
+
 from ..ui.ui_manager import Go2EpaOptionsUi
+from ..utils import tools_gw
 from ... import global_vars
-from ...lib.tools_qt import manage_child, construct_form_param_user
+from ...lib import tools_qt
 
 
 class GwGo2EpaOptions:
@@ -37,15 +36,15 @@ class GwGo2EpaOptions:
 
         # Create dialog
         self.dlg_options = Go2EpaOptionsUi()
-        load_settings(self.dlg_options)
+        tools_gw.load_settings(self.dlg_options)
 
         form = '"formName":"epaoptions"'
-        body = create_body(form=form)
+        body = tools_gw.create_body(form=form)
         json_result = self.controller.get_json('gw_fct_getconfig', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
-        construct_form_param_user(
+        tools_qt.construct_form_param_user(
             self.dlg_options, json_result['body']['form']['formTabs'], 0, self.epa_options_list)
         grbox_list = self.dlg_options.findChildren(QGroupBox)
         for grbox in grbox_list:
@@ -61,9 +60,9 @@ class GwGo2EpaOptions:
         # Event on change from combo parent
         self.get_event_combo_parent(json_result)
         self.dlg_options.btn_accept.clicked.connect(partial(self.update_values, self.epa_options_list))
-        self.dlg_options.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_options))
+        self.dlg_options.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_options))
 
-        open_dialog(self.dlg_options, dlg_name='go2epa_options')
+        tools_gw.open_dialog(self.dlg_options, dlg_name='go2epa_options')
 
 
     def update_values(self, _json):
@@ -71,7 +70,7 @@ class GwGo2EpaOptions:
         my_json = json.dumps(_json)
         form = '"formName":"epaoptions"'
         extras = f'"fields":{my_json}'
-        body = create_body(form=form, extras=extras)
+        body = tools_gw.create_body(form=form, extras=extras)
         json_result = self.controller.get_json('gw_fct_setconfig', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
@@ -79,7 +78,7 @@ class GwGo2EpaOptions:
         message = "Values has been updated"
         self.controller.show_info(message)
         # Close dialog
-        close_dialog(self.dlg_options)
+        tools_gw.close_dialog(self.dlg_options)
 
 
     def get_event_combo_parent(self, complet_result):
@@ -101,5 +100,4 @@ class GwGo2EpaOptions:
 
         for combo_child in json_result['fields']:
             if combo_child is not None:
-                manage_child(dialog, widget, combo_child)
-
+                tools_qt.manage_child(dialog, widget, combo_child)

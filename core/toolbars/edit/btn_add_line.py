@@ -13,7 +13,7 @@ from functools import partial
 
 from ..parent_dialog import GwParentAction
 from ...shared.info import GwInfo
-from ...utils import tools_giswater
+from ...utils import tools_gw
 
 
 class GwAddLineButton(GwParentAction):
@@ -24,7 +24,7 @@ class GwAddLineButton(GwParentAction):
         # First add the menu before adding it to the toolbar
         toolbar.removeAction(self.action)
 
-        self.feature_cat = tools_giswater.manage_feature_cat()
+        self.feature_cat = tools_gw.manage_feature_cat()
 
         self.api_cf = GwInfo('data')
 

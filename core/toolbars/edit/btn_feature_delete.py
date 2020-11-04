@@ -12,7 +12,7 @@ from functools import partial
 
 from ....lib import tools_qt
 from ..parent_dialog import GwParentAction
-from ...utils.tools_giswater import load_settings, open_dialog, save_settings, close_dialog, create_body, \
+from ...utils.tools_gw import load_settings, open_dialog, save_settings, close_dialog, create_body, \
     populate_info_text_ as populate_info_text
 from ...ui.ui_manager import FeatureDelete
 

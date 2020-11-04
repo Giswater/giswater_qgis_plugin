@@ -5,18 +5,17 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGroupBox, QSpacerItem, QSizePolicy, QWidget
-
 import json
 import operator
 from functools import partial
 from collections import OrderedDict
 
-from ...lib import tools_qt
-from ..utils.tools_giswater import close_dialog, load_settings, open_dialog, create_body
-from ..ui.ui_manager import InfoCatalogUi
+from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGroupBox, QSpacerItem, QSizePolicy, QWidget
 
+from ..ui.ui_manager import InfoCatalogUi
+from ..utils import tools_gw
 from ... import global_vars
+from ...lib import tools_qt
 
 
 class GwCatalog:
@@ -36,7 +35,7 @@ class GwCatalog:
         form_name = 'upsert_catalog_' + geom_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
-        body = create_body(form, feature)
+        body = tools_gw.create_body(form, feature)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
         row = self.controller.get_row(sql)
         if not row:
@@ -48,8 +47,8 @@ class GwCatalog:
         self.filter_form = QGridLayout()
 
         self.dlg_catalog = InfoCatalogUi()
-        load_settings(self.dlg_catalog)
-        self.dlg_catalog.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_catalog))
+        tools_gw.load_settings(self.dlg_catalog)
+        self.dlg_catalog.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_catalog))
         self.dlg_catalog.btn_accept.clicked.connect(partial(self.fill_geomcat_id, previous_dialog, widget_name))
 
         main_layout = self.dlg_catalog.widget.findChild(QGridLayout, 'main_layout')
@@ -95,7 +94,7 @@ class GwCatalog:
                                          pnom, dnom, id, feature_type, geom_type))
 
         # Open form
-        open_dialog(self.dlg_catalog, dlg_name='info_catalog')
+        tools_gw.open_dialog(self.dlg_catalog, dlg_name='info_catalog')
 
 
     def get_api_catalog(self, matcat_id, pnom, dnom, id, feature_type, geom_type):
@@ -113,7 +112,7 @@ class GwCatalog:
         elif self.controller.get_project_type() == 'ud':
             extras = f'"fields":{{"matcat_id":"{matcat_id_value}", "shape":"{pn_value}", "geom1":"{dn_value}"}}'
 
-        body = create_body(form=form, feature=feature, extras=extras)
+        body = tools_gw.create_body(form=form, feature=feature, extras=extras)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
         row = self.controller.get_row(sql)
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -135,7 +134,7 @@ class GwCatalog:
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
         extras = f'"fields":{{"matcat_id":"{matcat_id_value}"}}'
-        body = create_body(form=form, feature=feature, extras=extras)
+        body = tools_gw.create_body(form=form, feature=feature, extras=extras)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
         row = self.controller.get_row(sql)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -242,5 +241,5 @@ class GwCatalog:
             message = "Widget not found"
             self.controller.show_message(message, 2, parameter=str(widget_name))
 
-        close_dialog(self.dlg_catalog)
+        tools_gw.close_dialog(self.dlg_catalog)
 

@@ -5,21 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
-
-import webbrowser
 import os
+import webbrowser
 from functools import partial
 
-from ..utils.tools_giswater import load_settings, open_dialog, close_dialog, tab_feature_changed
-from ..ui.ui_manager import DocUi, DocManager
-from ...lib.tools_qgis import remove_selection, selection_init, insert_feature
-from ...lib.tools_qt import populate_combo_with_query, delete_records, manage_close, fill_table_object, filter_by_id, \
-    delete_selected_object, set_selectionbehavior, set_model_to_table, set_icon, exist_object, set_completer_object, \
-    set_completer_widget, set_table_columns, setWidgetText, getWidgetText, getCalendarDate, setCalendarDate, \
-    remove_tab_by_tabName
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
 
+from ..ui.ui_manager import DocUi, DocManager
+from ..utils import tools_gw
 from ... import global_vars
+from ...lib import tools_qgis, tools_qt
 
 
 class GwDocument:
@@ -46,14 +41,14 @@ class GwDocument:
 
         # Create the dialog and signals
         self.dlg_add_doc = DocUi()
-        load_settings(self.dlg_add_doc)
+        tools_gw.load_settings(self.dlg_add_doc)
         self.doc_id = None
         self.files_path = []
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
 
-        set_selectionbehavior(self.dlg_add_doc)
+        tools_qt.set_selectionbehavior(self.dlg_add_doc)
 
         # Get layers of every geom_type
 
@@ -71,43 +66,43 @@ class GwDocument:
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
-            remove_tab_by_tabName(self.dlg_add_doc.tab_feature, 'tab_gully')
+            tools_qt.remove_tab_by_tabName(self.dlg_add_doc.tab_feature, 'tab_gully')
 
         else:
             self.layers['gully'] = self.controller.get_group_layers('gully')
 
         # Remove all previous selections
         if self.single_tool_mode:
-            self.layers = remove_selection(True, layers=self.layers)
+            self.layers = tools_qgis.remove_selection(True, layers=self.layers)
         if feature is not None:
             layer = self.iface.activeLayer()
             layer.selectByIds([feature.id()])
 
         # Set icons
-        set_icon(self.dlg_add_doc.btn_insert, "111")
-        set_icon(self.dlg_add_doc.btn_delete, "112")
-        set_icon(self.dlg_add_doc.btn_snapping, "137")
+        tools_qt.set_icon(self.dlg_add_doc.btn_insert, "111")
+        tools_qt.set_icon(self.dlg_add_doc.btn_delete, "112")
+        tools_qt.set_icon(self.dlg_add_doc.btn_snapping, "137")
         self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
         # Fill combo boxes
-        populate_combo_with_query(self.dlg_add_doc, "doc_type", "doc_type")
+        tools_qt.populate_combo_with_query(self.dlg_add_doc, "doc_type", "doc_type")
 
         # Set current/selected date and link
         if row:
-            setCalendarDate(self.dlg_add_doc, 'date', row.value('date'))
-            setWidgetText(self.dlg_add_doc, 'path', row.value('path'))
+            tools_qt.setCalendarDate(self.dlg_add_doc, 'date', row.value('date'))
+            tools_qt.setWidgetText(self.dlg_add_doc, 'path', row.value('path'))
             self.files_path.append(row.value('path'))
         else:
-            setCalendarDate(self.dlg_add_doc, 'date', None)
+            tools_qt.setCalendarDate(self.dlg_add_doc, 'date', None)
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"
-        set_completer_object(self.dlg_add_doc, table_object)
+        tools_qt.set_completer_object(self.dlg_add_doc, table_object)
 
         # Adding auto-completion to a QLineEdit for default feature
         if geom_type is None:
             geom_type = "arc"
         viewname = f"v_edit_{geom_type}"
-        set_completer_widget(viewname, self.dlg_add_doc.feature_id, str(geom_type) + "_id")
+        tools_qt.set_completer_widget(viewname, self.dlg_add_doc.feature_id, str(geom_type) + "_id")
 
         # Set signals
         self.dlg_add_doc.doc_type.currentIndexChanged.connect(self.activate_relations)
@@ -115,29 +110,29 @@ class GwDocument:
         self.dlg_add_doc.btn_path_doc.clicked.connect(lambda: setattr(self, 'files_path', self.get_file_dialog(self.dlg_add_doc, "path")))
         self.dlg_add_doc.btn_accept.clicked.connect(
             partial(self.manage_document_accept, table_object, tablename, qtable, item_id))
-        self.dlg_add_doc.btn_cancel.clicked.connect(lambda: setattr(self, 'layers', manage_close(self.dlg_add_doc,
+        self.dlg_add_doc.btn_cancel.clicked.connect(lambda: setattr(self, 'layers', tools_qt.manage_close(self.dlg_add_doc,
                     table_object, cur_active_layer, excluded_layers=["v_edit_element"],
                     single_tool_mode=self.single_tool_mode, layers=self.layers)))
-        self.dlg_add_doc.rejected.connect(lambda: setattr(self, 'layers', manage_close(self.dlg_add_doc, table_object,
+        self.dlg_add_doc.rejected.connect(lambda: setattr(self, 'layers', tools_qt.manage_close(self.dlg_add_doc, table_object,
                     cur_active_layer, excluded_layers=["v_edit_element"],single_tool_mode=self.single_tool_mode,
                     layers=self.layers)))
         self.dlg_add_doc.tab_feature.currentChanged.connect(
-            partial(tab_feature_changed, self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"]))
+            partial(tools_gw.tab_feature_changed, self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"]))
 
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_add_doc.doc_id.textChanged.connect(partial(exist_object, self.dlg_add_doc, table_object,
+        self.dlg_add_doc.doc_id.textChanged.connect(partial(tools_qt.exist_object, self.dlg_add_doc, table_object,
                                                             self.single_tool_mode, layers=self.layers, ids=self.ids,
                                                             list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_add_doc.btn_insert.clicked.connect(partial(insert_feature, self.dlg_add_doc, table_object,
+        self.dlg_add_doc.btn_insert.clicked.connect(partial(tools_qgis.insert_feature, self.dlg_add_doc, table_object,
                                                             geom_type=geom_type, ids=self.ids, layers=self.layers,
                                                             list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_add_doc.btn_delete.clicked.connect(partial(delete_records, self.dlg_add_doc, table_object,
+        self.dlg_add_doc.btn_delete.clicked.connect(partial(tools_qt.delete_records, self.dlg_add_doc, table_object,
                                                             geom_type=geom_type, layers=self.layers, ids=self.ids,
                                                             list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_add_doc.btn_snapping.clicked.connect(partial(selection_init, self.dlg_add_doc, table_object,
+        self.dlg_add_doc.btn_snapping.clicked.connect(partial(tools_qgis.selection_init, self.dlg_add_doc, table_object,
                                                               geom_type=geom_type, layers=self.layers))
         if feature:
             self.dlg_add_doc.tabWidget.currentChanged.connect(
@@ -146,10 +141,10 @@ class GwDocument:
         # Set default tab 'arc'
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        tab_feature_changed(self.dlg_add_doc, excluded_layers=["v_edit_element"])
+        tools_gw.tab_feature_changed(self.dlg_add_doc, excluded_layers=["v_edit_element"])
 
         # Open the dialog
-        open_dialog(self.dlg_add_doc, dlg_name='doc', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_add_doc, dlg_name='doc', maximize_button=False)
 
         return self.dlg_add_doc
 
@@ -157,7 +152,7 @@ class GwDocument:
     def activate_relations(self):
         """ Force user to set doc_id and doc_type """
 
-        doc_type = getWidgetText(self.dlg_add_doc, self.dlg_add_doc.doc_type, False, False)
+        doc_type = tools_qt.getWidgetText(self.dlg_add_doc, self.dlg_add_doc.doc_type, False, False)
 
         if doc_type in (None, '', 'null'):
             self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
@@ -174,18 +169,18 @@ class GwDocument:
 
         # Set model of selected widget
         table_name = f"{self.schema_name}.v_edit_{geom_type}"
-        set_model_to_table(widget, table_name, expr_filter)
+        tools_qt.set_model_to_table(widget, table_name, expr_filter)
 
 
     def manage_document_accept(self, table_object, tablename=None, qtable=None, item_id=None):
         """ Insert or update table 'document'. Add document to selected feature """
 
         # Get values from dialog
-        doc_id = getWidgetText(self.dlg_add_doc, "doc_id", False, False)
-        doc_type = getWidgetText(self.dlg_add_doc, "doc_type", False, False)
-        date = getCalendarDate(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
-        path = getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
-        observ = getWidgetText(self.dlg_add_doc, "observ", False, False)
+        doc_id = tools_qt.getWidgetText(self.dlg_add_doc, "doc_id", False, False)
+        doc_type = tools_qt.getWidgetText(self.dlg_add_doc, "doc_type", False, False)
+        date = tools_qt.getCalendarDate(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
+        path = tools_qt.getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
+        observ = tools_qt.getWidgetText(self.dlg_add_doc, "observ", False, False)
 
         if doc_type in (None, ''):
             message = "You need to insert doc_type"
@@ -289,7 +284,7 @@ class GwDocument:
         status = self.controller.execute_sql(sql)
         if status:
             self.doc_id = doc_id
-            manage_close(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"],
+            tools_qt.manage_close(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"],
                          single_tool_mode=self.single_tool_mode, layers=self.layers)
 
         if tablename is None:
@@ -299,7 +294,7 @@ class GwDocument:
                    f" VALUES('{doc_id}', '{item_id}')")
             self.controller.execute_sql(sql)
             expr = f"{tablename}_id = '{item_id}'"
-            fill_table_object(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr_filter=expr)
+            tools_qt.fill_table_object(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr_filter=expr)
 
 
     def edit_document(self):
@@ -307,29 +302,29 @@ class GwDocument:
 
         # Create the dialog
         self.dlg_man = DocManager()
-        load_settings(self.dlg_man)
+        tools_gw.load_settings(self.dlg_man)
         self.dlg_man.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"
-        set_completer_object(self.dlg_man, table_object)
+        tools_qt.set_completer_object(self.dlg_man, table_object)
 
         # Set a model with selected filter. Attach that model to selected table
-        fill_table_object(self.dlg_man.tbl_document, self.schema_name + "." + table_object)
-        set_table_columns(self.dlg_man, self.dlg_man.tbl_document, table_object)
+        tools_qt.fill_table_object(self.dlg_man.tbl_document, self.schema_name + "." + table_object)
+        tools_qt.set_table_columns(self.dlg_man, self.dlg_man.tbl_document, table_object)
 
         # Set dignals
         self.dlg_man.doc_id.textChanged.connect(
-            partial(filter_by_id, self.dlg_man, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object))
+            partial(tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_document, self.dlg_man.doc_id, table_object))
         self.dlg_man.tbl_document.doubleClicked.connect(
             partial(self.open_selected_object_document, self.dlg_man, self.dlg_man.tbl_document, table_object))
-        self.dlg_man.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_man))
-        self.dlg_man.rejected.connect(partial(close_dialog, self.dlg_man))
+        self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))
+        self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(
-            partial(delete_selected_object, self.dlg_man.tbl_document, table_object))
+            partial(tools_qt.delete_selected_object, self.dlg_man.tbl_document, table_object))
 
         # Open form
-        open_dialog(self.dlg_man, dlg_name='doc_manager')
+        tools_gw.open_dialog(self.dlg_man, dlg_name='doc_manager')
 
 
     def open_selected_object_document(self, dialog, widget, table_object):
@@ -351,14 +346,14 @@ class GwDocument:
         dialog.close()
 
         self.manage_document(row=widget.model().record(row))
-        setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
+        tools_qt.setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
 
 
     def open_web_browser(self, dialog, widget=None):
         """ Display url using the default browser """
 
         if widget is not None:
-            url = getWidgetText(dialog, widget)
+            url = tools_qt.getWidgetText(dialog, widget)
             if url == 'null':
                 url = 'http://www.giswater.org'
         else:
@@ -370,7 +365,7 @@ class GwDocument:
     def get_file_dialog(self, dialog, widget):
         """ Get file dialog """
         # Check if selected file exists. Set default value if necessary
-        file_path = getWidgetText(dialog, widget)
+        file_path = tools_qt.getWidgetText(dialog, widget)
         if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
             folder_path = global_vars.plugin_dir
         else:
@@ -386,5 +381,5 @@ class GwDocument:
         for file in files_path:
             file_text += f"{file}\n\n"
         if files_path:
-            setWidgetText(dialog, widget, str(file_text))
+            tools_qt.setWidgetText(dialog, widget, str(file_text))
         return files_path

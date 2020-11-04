@@ -15,7 +15,7 @@ from ...ui.ui_manager import NodeTypeChange
 from ...shared.catalog import GwCatalog
 from ...shared.info import GwInfo
 from ..parent_maptool import GwParentMapTool
-from ...utils.tools_giswater import check_expression, close_dialog, load_settings, open_dialog
+from ...utils.tools_gw import check_expression, close_dialog, load_settings, open_dialog
 from ....lib.tools_qgis import  restore_user_layer
 
 class GwNodeTypeChangeButton(GwParentMapTool):

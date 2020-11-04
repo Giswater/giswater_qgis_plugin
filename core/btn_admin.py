@@ -33,7 +33,7 @@ from .tasks.parent_task import GwTask
 from ..i18n.i18n_generator import GwI18NGenerator
 from .ui.ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjectInfoUi, \
     MainGisProjectUi, MainImportUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
-from .utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
+from .utils.tools_gw import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
     create_body, populate_info_text_ as populate_info_text
 from ..lib.tools_qt import construct_form_param_user, get_folder_dialog, set_table_columns
 

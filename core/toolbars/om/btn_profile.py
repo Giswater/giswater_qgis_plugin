@@ -23,7 +23,7 @@ from ....lib import tools_qt
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import Profile
 from ...ui.ui_manager import ProfilesList
-from ...utils.tools_giswater import close_dialog, create_body, get_parser_value, load_settings, open_dialog, \
+from ...utils.tools_gw import close_dialog, create_body, get_parser_value, load_settings, open_dialog, \
     save_settings, set_parser_value
 from ....lib.tools_qt import set_icon
 

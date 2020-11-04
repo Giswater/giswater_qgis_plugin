@@ -27,7 +27,7 @@ from .document import GwDocument
 from .psector import GwPsector
 from .visit_manager import GwVisitManager
 from ..ui.ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
-from ..utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
+from ..utils.tools_gw import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
     draw, draw_point, create_body
 from ...lib.tools_qgis import get_points
 from ...lib.tools_qt import set_completer_object_api, set_completer_object, add_lineedit, populate_basic_info, set_icon, \

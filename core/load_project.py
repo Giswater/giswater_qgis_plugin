@@ -19,7 +19,7 @@ from .ui.ui_manager import DialogTextUi
 from .utils.backend_functions import GwInfoTools
 from .utils.notify import GwNotifyTools
 from .shared.search import GwSearch
-from .utils.tools_giswater import set_parser_value, manage_feature_cat, set_style_mapzones
+from .utils.tools_gw import set_parser_value, manage_feature_cat, set_style_mapzones
 from ..lib.tools_qgis import qgis_get_layer_source, get_qgis_project_variables, qgis_manage_snapping_layer
 from .toolbars import buttons
 

@@ -24,7 +24,7 @@ import subprocess
 import webbrowser
 from functools import partial
 
-from ..core.utils import tools_giswater
+from ..core.utils import tools_gw
 from . import tools_db
 from .tools_qgis import disconnect_signal_selection_changed, select_features_by_ids, remove_selection, \
     connect_signal_selection_changed, disconnect_snapping, refresh_map_canvas
@@ -850,7 +850,7 @@ def populate_lineedit(completer, model, field, dialog, widget):
     extras += f', "parentId":"{parent_id}"'
     extras += f', "parentValue":"{getWidgetText(dialog, "data_" + str(field["parentId"]))}"'
     extras += f', "textToSearch":"{getWidgetText(dialog, widget)}"'
-    body = tools_giswater.create_body(extras=extras)
+    body = tools_gw.create_body(extras=extras)
     complet_list = global_vars.controller.get_json('gw_fct_gettypeahead', body)
     if not complet_list or complet_list['status'] == 'Failed':
         return False
@@ -1001,7 +1001,7 @@ def fill_child(dialog, widget, feature_type, tablename, field_id):
     feature += f'"tableName":"{tablename}", '
     feature += f'"idName":"{field_id}"'
     extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
-    body = tools_giswater.create_body(feature=feature, extras=extras)
+    body = tools_gw.create_body(feature=feature, extras=extras)
     result = global_vars.controller.get_json('gw_fct_getchilds', body)
     if not result or result['status'] == 'Failed':
         return False
@@ -1506,7 +1506,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
     """ Delete selected elements of the table """
 
     disconnect_signal_selection_changed()
-    geom_type = tools_giswater.tab_feature_changed(dialog, table_object)
+    geom_type = tools_gw.tab_feature_changed(dialog, table_object)
     if type(table_object) is str:
         widget_name = f"tbl_{table_object}_x_{geom_type}"
         widget = getWidget(dialog, widget_name)
@@ -1573,7 +1573,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
         expr_filter = expr_filter[:-2] + ")"
 
         # Check expression
-        (is_valid, expr) = tools_giswater.check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
 
@@ -1594,7 +1594,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
 
     # Update list
     list_ids[geom_type] = ids
-    tools_giswater.enable_feature_type(dialog, table_object, ids=ids)
+    tools_gw.enable_feature_type(dialog, table_object, ids=ids)
     connect_signal_selection_changed(dialog, table_object, geom_type)
 
     return ids, layers, list_ids
@@ -1629,8 +1629,8 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
     reset_model(dialog, table_object, "element")
     if global_vars.project_type == 'ud':
         reset_model(dialog, table_object, "gully")
-    tools_giswater.close_dialog(dialog)
-    tools_giswater.hide_generic_layers(excluded_layers=excluded_layers)
+    tools_gw.close_dialog(dialog)
+    tools_gw.hide_generic_layers(excluded_layers=excluded_layers)
     disconnect_snapping()
     disconnect_signal_selection_changed()
 
@@ -2059,7 +2059,7 @@ def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=N
     """ Check if selected object (document or element) already exists """
 
     # Reset list of selected records
-    tools_giswater.reset_lists(ids, list_ids)
+    tools_gw.reset_lists(ids, list_ids)
 
     field_object_id = "id"
     if table_object == "element":
@@ -2153,7 +2153,7 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
     expr = None
     if expr_filter:
         # Check expression
-        (is_valid, expr) = tools_giswater.check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             return expr
 
@@ -2348,7 +2348,7 @@ def get_expr_filter(geom_type, list_ids=None, layers=None):
     expr_filter = expr_filter[:-2] + ")"
 
     # Check expression
-    (is_valid, expr) = tools_giswater.check_expression(expr_filter)
+    (is_valid, expr) = tools_gw.check_expression(expr_filter)
     if not is_valid:
         return None
 

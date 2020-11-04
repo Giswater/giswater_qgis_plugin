@@ -15,7 +15,7 @@ from functools import partial
 from .. import global_vars
 from ..lib import tools_qt
 from ..core.ui.ui_manager import MainQtDialogUi
-from ..core.utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
+from ..core.utils.tools_gw import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
     get_plugin_version
 
 

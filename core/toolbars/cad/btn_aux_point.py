@@ -16,7 +16,7 @@ from functools import partial
 from ....lib import tools_qt
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import AuxPoint
-from ...utils.tools_giswater import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
+from ...utils.tools_gw import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
 
 
 class GwAuxPointButton(GwParentMapTool):

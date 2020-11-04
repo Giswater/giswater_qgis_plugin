@@ -5,19 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from functools import partial
+
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
 from qgis.gui import QgsVertexMarker
 
-from functools import partial
-
-from ...lib import tools_qt
-from ..utils.tools_giswater import close_dialog, load_settings, open_dialog, tab_feature_changed
+from ..utils import tools_gw
 from ..ui.ui_manager import ElementUi, ElementManager
 from ... import global_vars
-from ...lib.tools_qgis import remove_selection, add_point, selection_init, insert_feature
-from ...lib.tools_qt import delete_records, manage_close, fill_table_object, filter_by_id, delete_selected_object, \
-    set_selectionbehavior, set_model_to_table, set_icon, exist_object, set_completer_object, set_table_columns, \
-    set_completer_widget, remove_tab_by_tabName
+from ...lib import tools_qgis, tools_qt
+
 
 
 class GwElement:
@@ -39,13 +36,13 @@ class GwElement:
 
         # Create the dialog and signals
         self.dlg_add_element = ElementUi()
-        load_settings(self.dlg_add_element)
+        tools_gw.load_settings(self.dlg_add_element)
         self.element_id = None
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
 
-        set_selectionbehavior(self.dlg_add_element)
+        tools_qt.set_selectionbehavior(self.dlg_add_element)
 
         # Get layers of every geom_type
 
@@ -74,18 +71,18 @@ class GwElement:
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
         if self.project_type == 'ws':
-            remove_tab_by_tabName(self.dlg_add_element.tab_feature, 'tab_gully')
+            tools_qt.remove_tab_by_tabName(self.dlg_add_element.tab_feature, 'tab_gully')
         else:
             self.layers['gully'] = self.controller.get_group_layers('gully')
 
         # Set icons
-        set_icon(self.dlg_add_element.btn_add_geom, "133")
-        set_icon(self.dlg_add_element.btn_insert, "111")
-        set_icon(self.dlg_add_element.btn_delete, "112")
-        set_icon(self.dlg_add_element.btn_snapping, "137")
+        tools_qt.set_icon(self.dlg_add_element.btn_add_geom, "133")
+        tools_qt.set_icon(self.dlg_add_element.btn_insert, "111")
+        tools_qt.set_icon(self.dlg_add_element.btn_delete, "112")
+        tools_qt.set_icon(self.dlg_add_element.btn_snapping, "137")
 
         # Remove all previous selections
-        self.layers = remove_selection(True, layers=self.layers)
+        self.layers = tools_qgis.remove_selection(True, layers=self.layers)
         if feature:
             layer = self.iface.activeLayer()
             layer.selectByIds([feature.id()])
@@ -100,38 +97,38 @@ class GwElement:
 
         # Adding auto-completion to a QLineEdit
         table_object = "element"
-        set_completer_object(self.dlg_add_element, table_object)
+        tools_qt.set_completer_object(self.dlg_add_element, table_object)
 
         # Set signals
         self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
         self.dlg_add_element.btn_accept.clicked.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.btn_cancel.clicked.connect(lambda: setattr(self, 'layers',
-            manage_close(self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[],layers=self.layers)))
+            tools_qt.manage_close(self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[],layers=self.layers)))
         self.dlg_add_element.btn_cancel.clicked.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
-        self.dlg_add_element.rejected.connect(lambda: setattr(self, 'layers', manage_close(self.dlg_add_element,
+        self.dlg_add_element.rejected.connect(lambda: setattr(self, 'layers', tools_qt.manage_close(self.dlg_add_element,
             table_object, cur_active_layer, excluded_layers=[],layers=self.layers)))
         self.dlg_add_element.rejected.connect(
             partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
-            partial(tab_feature_changed, self.dlg_add_element, []))
+            partial(tools_gw.tab_feature_changed, self.dlg_add_element, []))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.element_id.textChanged.connect(
-            partial(exist_object, self.dlg_add_element, table_object, layers=self.layers,
+            partial(tools_qt.exist_object, self.dlg_add_element, table_object, layers=self.layers,
                     ids=self.ids, list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_insert.clicked.connect(
-            partial(insert_feature, self.dlg_add_element, table_object, geom_type=geom_type, ids=self.ids,
+            partial(tools_qgis.insert_feature, self.dlg_add_element, table_object, geom_type=geom_type, ids=self.ids,
                     layers=self.layers, list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_delete.clicked.connect(
-            partial(delete_records, self.dlg_add_element, table_object, geom_type=geom_type, layers=self.layers,
+            partial(tools_qt.delete_records, self.dlg_add_element, table_object, geom_type=geom_type, layers=self.layers,
                     ids=self.ids, list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_snapping.clicked.connect(
-            partial(selection_init, self.dlg_add_element, table_object, geom_type=geom_type, layers=self.layers))
-        self.point_xy = self.dlg_add_element.btn_add_geom.clicked.connect(partial(add_point, self.vertex_marker))
+            partial(tools_qgis.selection_init, self.dlg_add_element, table_object, geom_type=geom_type, layers=self.layers))
+        self.point_xy = self.dlg_add_element.btn_add_geom.clicked.connect(partial(tools_qgis.add_point, self.vertex_marker))
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
 
         # Fill combo boxes of the form and related events
@@ -191,7 +188,7 @@ class GwElement:
             self.set_default_values()
 
         # Adding auto-completion to a QLineEdit for default feature
-        set_completer_widget("v_edit_arc", self.dlg_add_element.feature_id, "arc_id", )
+        tools_qt.set_completer_widget("v_edit_arc", self.dlg_add_element.feature_id, "arc_id", )
 
         if feature:
             self.dlg_add_element.tabWidget.currentChanged.connect(partial(self.fill_tbl_new_element,
@@ -200,7 +197,7 @@ class GwElement:
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        tab_feature_changed(self.dlg_add_element)
+        tools_gw.tab_feature_changed(self.dlg_add_element)
 
         # Force layer v_edit_element set active True
         if layer_element:
@@ -212,11 +209,11 @@ class GwElement:
 
         self.update_location_cmb()
         if not self.new_element_id:
-            self.ids, self.layers, self.list_ids = exist_object(self.dlg_add_element, 'element', layers=self.layers,
+            self.ids, self.layers, self.list_ids = tools_qt.exist_object(self.dlg_add_element, 'element', layers=self.layers,
                                                                 ids=self.ids, list_ids=self.list_ids)
 
         # Open the dialog
-        open_dialog(self.dlg_add_element, dlg_name='element', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_add_element, dlg_name='element', maximize_button=False)
         return self.dlg_add_element
 
 
@@ -276,11 +273,11 @@ class GwElement:
 
         # Set model of selected widget
         table_name = f"{self.schema_name}.v_edit_{geom_type}"
-        set_model_to_table(widget, table_name, expr_filter)
+        tools_qt.set_model_to_table(widget, table_name, expr_filter)
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "element"
-        set_completer_object(dialog, self.table_object)
+        tools_qt.set_completer_object(dialog, self.table_object)
 
 
     def manage_element_accept(self, table_object):
@@ -470,7 +467,7 @@ class GwElement:
         status = self.controller.execute_sql(sql)
         if status:
             self.element_id = element_id
-            self.layers = manage_close(self.dlg_add_element, table_object, excluded_layers=[], layers=self.layers)
+            self.layers = tools_qt.manage_close(self.dlg_add_element, table_object, excluded_layers=[], layers=self.layers)
 
 
     def filter_elementcat_id(self):
@@ -489,29 +486,29 @@ class GwElement:
 
         # Create the dialog
         self.dlg_man = ElementManager()
-        load_settings(self.dlg_man)
+        tools_gw.load_settings(self.dlg_man)
         self.dlg_man.tbl_element.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Adding auto-completion to a QLineEdit
         table_object = "element"
-        set_completer_object(self.dlg_man, table_object)
+        tools_qt.set_completer_object(self.dlg_man, table_object)
 
         # Set a model with selected filter. Attach that model to selected table
-        fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)
-        set_table_columns(self.dlg_man, self.dlg_man.tbl_element, table_object)
+        tools_qt.fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)
+        tools_qt.set_table_columns(self.dlg_man, self.dlg_man.tbl_element, table_object)
 
         # Set signals
-        self.dlg_man.element_id.textChanged.connect(partial(filter_by_id, self.dlg_man, self.dlg_man.tbl_element,
+        self.dlg_man.element_id.textChanged.connect(partial(tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_element,
             self.dlg_man.element_id, table_object))
         self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object_element, self.dlg_man,
             self.dlg_man.tbl_element, table_object))
-        self.dlg_man.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_man))
-        self.dlg_man.rejected.connect(partial(close_dialog, self.dlg_man))
-        self.dlg_man.btn_delete.clicked.connect(partial(delete_selected_object, self.dlg_man.tbl_element,
+        self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))
+        self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))
+        self.dlg_man.btn_delete.clicked.connect(partial(tools_qt.delete_selected_object, self.dlg_man.tbl_element,
             table_object))
 
         # Open form
-        open_dialog(self.dlg_man, dlg_name='element_manager')
+        tools_gw.open_dialog(self.dlg_man, dlg_name='element_manager')
 
 
     def open_selected_object_element(self, dialog, widget, table_object):
