@@ -82,7 +82,7 @@ BEGIN
              ',"body":{"message":{}'||
 			',"data":{"mapzones":
 				[{"name":"sector", "status": "'||v_statussector||'", "idname": "'||v_colsector||'", "layer":"v_edit_sector", "opacity":0.5, "values":' || v_sector ||'}'||
-				',{"name":"presszone", "status": "'||v_statuspresszone||'", "'||v_colpresszone||'": "presszone_id",  "layer":"v_edit_presszone", "opacity":0.5,  "values":' || v_presszone ||'}'||
+				',{"name":"presszone", "status": "'||v_statuspresszone||'", "idname":"'||v_colpresszone||'",  "layer":"v_edit_presszone", "opacity":0.5,  "values":' || v_presszone ||'}'||
 				',{"name":"dma",  "status": "'||v_statusdma||'", "idname": "'||v_coldma||'", "layer":"v_edit_dma", "opacity":0.5, "values":' || v_dma ||'}'||
 				',{"name":"dqa",  "status": "'||v_statusdqa||'", "idname": "'||v_coldqa||'", "layer":"v_edit_dqa", "opacity":0.5, "values":' || v_dqa ||'}'||
 				']}}'||
