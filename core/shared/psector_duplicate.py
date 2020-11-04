@@ -12,7 +12,7 @@ from functools import partial
 
 from ...lib import tools_qt
 from ..utils.tools_gw import close_dialog, load_settings, open_dialog, create_body, \
-    populate_info_text_ as populate_info_text
+    populate_info_text
 from ..ui.ui_manager import PsectorDuplicate
 
 
@@ -72,7 +72,7 @@ class GwPsectorDuplicate(QObject):
         data = complet_result['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
-                change_tab = populate_info_text(self.dlg_duplicate_psector, data)
+                text, change_tab = populate_info_text(self.dlg_duplicate_psector, data)
 
         # Close dialog
         if not change_tab:

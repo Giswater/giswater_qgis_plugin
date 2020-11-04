@@ -80,7 +80,7 @@ class GwArcFusionButton(GwParentMapTool):
         if not result or result['status'] == 'Failed':
             return
 
-        text_result = populate_info_text(self.dlg_fusion, result['body']['data'], True, True, 1)
+        text_result, change_tab = populate_info_text(self.dlg_fusion, result['body']['data'], True, True, 1)
 
         if not text_result:
             self.dlg_fusion.close()

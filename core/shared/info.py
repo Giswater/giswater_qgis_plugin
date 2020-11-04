@@ -24,8 +24,6 @@ from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox
 from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY
 from qgis.gui import QgsDateTimeEdit, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand
 
-
-
 from .catalog import GwCatalog
 from .dimensioning import GwDimensioning
 from .document import GwDocument
@@ -36,7 +34,7 @@ from .visit_manager import GwVisitManager
 from ... import global_vars
 
 from ..utils.tools_gw import load_settings, open_dialog, save_settings, close_dialog, create_body, draw, \
-    draw_point, populate_info_text_ as populate_info_text
+    draw_point, populate_info_text
 from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
 

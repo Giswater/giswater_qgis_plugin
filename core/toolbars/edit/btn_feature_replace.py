@@ -16,7 +16,7 @@ from functools import partial
 from ...ui.ui_manager import FeatureReplace, InfoWorkcatUi
 from ...shared.catalog import GwCatalog
 from ...utils.tools_gw import close_dialog, load_settings, open_dialog, refresh_legend, create_body, \
-    populate_info_text_ as populate_info_text
+    populate_info_text
 from ....lib import tools_qt
 from ..parent_maptool import GwParentMapTool
 
