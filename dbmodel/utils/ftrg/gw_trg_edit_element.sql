@@ -161,10 +161,18 @@ BEGIN
 			v_length = (SELECT geom1 FROM cat_element WHERE id=NEW.elementcat_id);
 			v_width = (SELECT geom2 FROM cat_element WHERE id=NEW.elementcat_id);
 
-			IF v_length*v_width IS NULL THEN
+			IF v_length IS NULL OR v_length = 0 THEN
 			
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3152", "function":"1114","debug_msg":"'||NEW.elementcat_id::text||'"}}$$);';
+
+			ELSIF v_length IS NOT NULL AND (v_width IS NULL OR v_width = 0) THEN
+
+				-- get element dimensions to generate CIRCULARE geometry
+				PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
+				INSERT INTO polygon(sys_type, the_geom, pol_id) VALUES ('ELEMENT', St_Multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_new_pol_id);
+
 			ELSIF v_length*v_width != 0 THEN
  
 				-- get element dimensions
@@ -234,18 +242,50 @@ BEGIN
 		lastupdate=now(), lastupdate_user=current_user
 		WHERE element_id=OLD.element_id;
 
+		--set rotation field
+		WITH index_query AS(
+		SELECT ST_Distance(the_geom, NEW.the_geom) as distance, the_geom FROM arc WHERE state=1 ORDER BY the_geom <-> NEW.the_geom LIMIT 10)
+		SELECT St_linelocatepoint(the_geom, St_closestpoint(the_geom, NEW.the_geom)), the_geom INTO v_linelocatepoint, v_thegeom FROM index_query ORDER BY distance LIMIT 1;
+		IF v_linelocatepoint < 0.01 THEN
+			v_rotation = st_azimuth (st_startpoint(v_thegeom), st_lineinterpolatepoint(v_thegeom,0.01));
+		ELSIF v_linelocatepoint > 0.99 THEN
+			v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,0.98), st_lineinterpolatepoint(v_thegeom,0.99));
+		ELSE
+			v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,v_linelocatepoint), st_lineinterpolatepoint(v_thegeom,v_linelocatepoint+0.01));
+		END IF;
+
+		NEW.rotation = v_rotation*180/pi();
+		v_rotation = -(v_rotation - pi()/2);
+
 
 		v_doublegeometry = (SELECT isdoublegeom FROM cat_element WHERE id = NEW.elementcat_id);
 
 		-- double geometry catalog update
-		IF v_doublegeometry AND NEW.elementcat_id != OLD.elementcat_id THEN
+		IF v_doublegeometry AND (NEW.elementcat_id != OLD.elementcat_id OR NEW.the_geom::text <> OLD.the_geom::text) THEN
 
 			v_length = (SELECT geom1 FROM cat_element WHERE id=NEW.elementcat_id);
 			v_width = (SELECT geom2 FROM cat_element WHERE id=NEW.elementcat_id);
 
-			IF v_length*v_width IS NULL THEN
+
+			IF v_length IS NULL OR v_length = 0 THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3152", "function":"1114","debug_msg":"'||NEW.elementcat_id::text||'"}}$$);';
+
+			ELSIF v_length IS NOT NULL AND (v_width IS NULL OR v_width = 0) THEN
+
+				PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
+
+				-- get element dimensions to generate CIRCULARE geometry
+				IF (SELECT pol_id FROM element WHERE element_id = NEW.element_id) IS NULL THEN
+					INSERT INTO polygon(sys_type, the_geom, pol_id) VALUES 
+					('ELEMENT', St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_new_pol_id);
+					UPDATE element SET pol_id=v_new_pol_id WHERE element_id = NEW.element_id;
+				ELSE									
+					UPDATE polygon SET the_geom = St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)) 
+					WHERE pol_id = (SELECT pol_id FROM element WHERE element_id = NEW.element_id);
+				END IF;
+
 			ELSIF v_length*v_width != 0 THEN
 
 				-- get grate dimensions
@@ -282,7 +322,7 @@ BEGIN
 				PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 				v_new_pol_id:= (SELECT nextval('urn_id_seq'));
 
-				IF (SELECT pol_id FROM gully WHERE gully_id = NEW.gully_id) IS NULL THEN
+				IF (SELECT pol_id FROM element WHERE element_id = NEW.element_id) IS NULL THEN
 					INSERT INTO polygon(sys_type, the_geom,pol_id) VALUES ('ELEMENT', v_the_geom_pol,v_new_pol_id);
 					UPDATE element SET pol_id=v_new_pol_id WHERE element_id = NEW.element_id;
 

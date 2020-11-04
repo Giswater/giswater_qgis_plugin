@@ -9,17 +9,11 @@ The program is free software: you can redistribute it and/or modify it under the
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_element_pol() RETURNS trigger AS
 $BODY$
 
-DECLARE 
-man_table varchar;
-rec record;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	man_table:= TG_ARGV[0];
-		
-	--Get data from config table
-	SELECT * INTO rec FROM config;	
+			
 	
 	-- INSERT
 	IF TG_OP = 'INSERT' THEN
