@@ -9,6 +9,7 @@ from qgis.PyQt.QtCore import Qt, QDate, QObject, QStringListModel, pyqtSignal
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
     QTextEdit, QPushButton, QComboBox, QTabWidget
+from qgis.PyQt.QtSql import QSqlTableModel
 
 import os
 import sys
@@ -49,7 +50,7 @@ class ManageVisit(ParentManage, QObject):
 
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
-                     open_dialog=True):
+                     open_dialog=True, refresh_table=None):
         """ Button 64. Add visit.
         if visit_id => load record related to the visit_id
         if geom_type => lock geom_type in relations tab
@@ -157,7 +158,7 @@ class ManageVisit(ParentManage, QObject):
         self.tabs.setCurrentIndex(self.current_tab_index)
 
         # Set signals
-        self.set_signals()
+        self.set_signals(refresh_table=refresh_table)
 
         # Set autocompleters of the form
         self.set_completers()
@@ -227,12 +228,12 @@ class ManageVisit(ParentManage, QObject):
             self.iface.mapCanvas().refresh()
 
 
-    def set_signals(self):
+    def set_signals(self, refresh_table=None):
 
         self.dlg_add_visit.rejected.connect(self.manage_rejected)
         self.dlg_add_visit.rejected.connect(partial(self.close_dialog, self.dlg_add_visit))
         self.dlg_add_visit.accepted.connect(partial(self.update_relations, self.dlg_add_visit))
-        self.dlg_add_visit.accepted.connect(self.manage_accepted)
+        self.dlg_add_visit.accepted.connect(partial(self.manage_accepted, refresh_table))
         self.dlg_add_visit.btn_event_insert.clicked.connect(self.event_insert)
         self.dlg_add_visit.btn_event_delete.clicked.connect(self.event_delete)
         self.dlg_add_visit.btn_event_update.clicked.connect(self.event_update)
@@ -289,7 +290,7 @@ class ManageVisit(ParentManage, QObject):
             self.disconnect_signal_selection_changed()
 
 
-    def manage_accepted(self):
+    def manage_accepted(self, refresh_table=None):
         """Do all action when closed the dialog with Ok.
         e.g. all necessary commits and cleanings.
         A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
@@ -298,8 +299,6 @@ class ManageVisit(ParentManage, QObject):
         # tab Visit
         if self.current_tab_index == self.tab_index('tab_visit'):
             self.manage_leave_visit_tab()
-
-
 
         # Remove all previous selections
         self.disconnect_signal_selection_changed()
@@ -321,6 +320,54 @@ class ManageVisit(ParentManage, QObject):
         self.visit_added.emit(self.current_visit.id)
         
         self.refresh_map_canvas()
+
+        if refresh_table is not None:
+            table_name = self.controller.plugin_settings_value('om_visit_table_name')
+            self.update_table_visit(refresh_table[0], table_name, refresh_table[2], refresh_table[3], refresh_table[4])
+
+
+    def update_table_visit(self, widget, table_name, expr_filter=None, cmb_visitclass=None, id=None):
+
+        """ Set a model with selected filter.
+                Attach that model to selected table """
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
+        # Set model
+        model = QSqlTableModel()
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        if expr_filter is not None:
+            model.setFilter(expr_filter)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+            # Attach model to table view
+        if widget:
+            widget.setModel(model)
+        else:
+            self.controller.log_info("set_model_to_table: widget not found")
+        current_visit_class = utils_giswater.get_item_data(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)
+        feature_key = self.controller.get_layer_primary_key()
+        if feature_key == 'node_id':
+            feature_type = 'NODE'
+        if feature_key == 'connec_id':
+            feature_type = 'CONNEC'
+        if feature_key == 'arc_id':
+            feature_type = 'ARC'
+        if feature_key == 'gully_id':
+            feature_type = 'GULLY'
+        # Fill ComboBox cmb_visit_class
+        sql = ("SELECT DISTINCT(class_id), om_visit_class.idval"
+               " FROM " + self.schema_name + ".v_ui_om_visit_x_" + feature_type.lower() + ""
+               " JOIN " + self.schema_name + ".om_visit_class ON om_visit_class.id = v_ui_om_visit_x_" + feature_type.lower() + ".class_id"
+               " WHERE " + str(feature_key) + " IS NOT NULL AND " + str(feature_key) + " = '" + str(id) + "'")
+        rows = self.controller.get_rows(sql)
+        utils_giswater.set_item_data(cmb_visitclass, rows, 1)
+        utils_giswater.set_combo_itemData(cmb_visitclass, str(current_visit_class), 0)
 
 
     def execute_pgfunction(self):
@@ -780,7 +827,7 @@ class ManageVisit(ParentManage, QObject):
         self.disconnect_signal_selection_changed()
 
 
-    def edit_visit(self, geom_type=None, feature_id=None):
+    def edit_visit(self, geom_type=None, feature_id=None, refresh_table=None):
         """ Button 65: Edit visit """
 
         # Create the dialog
@@ -821,6 +868,10 @@ class ManageVisit(ParentManage, QObject):
             partial(self.open_selected_object, self.dlg_man, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_delete.clicked.connect(
             partial(self.delete_selected_object, self.dlg_man.tbl_visit, table_object))
+        if refresh_table:
+            table_name = self.controller.plugin_settings_value('om_visit_table_name')
+            self.dlg_man.btn_delete.clicked.connect(
+                partial(self.update_table_visit, refresh_table[0], table_name, refresh_table[2]))
         self.dlg_man.txt_filter.textChanged.connect(partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit,
             self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
 
