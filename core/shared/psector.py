@@ -388,7 +388,6 @@ class GwPsector:
         # Set signals
         self.dlg_plan_psector.btn_accept.clicked.connect(partial(self.insert_or_update_new_psector,
                                                                  'v_edit_plan_psector', True))
-        self.dlg_plan_psector.btn_accept.clicked.connect(partial(self.set_plan))
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
         self.dlg_plan_psector.psector_type.currentIndexChanged.connect(partial(self.populate_result_id,
@@ -1128,16 +1127,19 @@ class GwPsector:
                                      getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id))
                 
         if close_dlg:
-            self.reload_states_selector()
-            close_dialog(self.dlg_plan_psector)
+            json_result = self.set_plan()
+            if 'status' in json_result and json_result['status'] == 'Accepted':
+                self.reload_states_selector()
+                close_dialog(self.dlg_plan_psector)
 
-
+            
     def set_plan(self):
 
         # TODO: Check this
         extras = f'"psectorId":"{getWidgetText(self.dlg_plan_psector, self.psector_id)}"'
         body = create_body(extras=extras)
-        self.controller.get_json('gw_fct_setplan', body, log_sql=True)
+        json_result = self.controller.get_json('gw_fct_setplan', body, log_sql=True)
+        return json_result
         
         
     def price_selector(self, dialog, tableleft, tableright, field_id_right):

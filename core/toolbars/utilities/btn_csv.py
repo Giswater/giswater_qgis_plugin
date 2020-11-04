@@ -16,7 +16,7 @@ from functools import partial
 from ....lib import tools_qt
 from ..parent_dialog import GwParentAction
 from ...utils.tools_gw import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
-    create_body, populate_info_text_ as populate_info_text
+    create_body, populate_info_text
 from ...ui.ui_manager import CsvUi
 from .... import global_vars
 
