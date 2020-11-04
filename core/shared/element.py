@@ -14,6 +14,7 @@ from ..utils import tools_gw
 from ..ui.ui_manager import ElementUi, ElementManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt
+from ..utils.tools_gw import SnappingConfigManager
 
 
 
@@ -27,6 +28,10 @@ class GwElement:
         self.schema_name = global_vars.schema_name
 
         self.vertex_marker = QgsVertexMarker(global_vars.canvas)
+
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager.set_controller(self.controller)
+
 
 
     def manage_element(self, new_element_id=True, feature=None, geom_type=None):
@@ -128,7 +133,7 @@ class GwElement:
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_snapping.clicked.connect(
             partial(tools_qgis.selection_init, self.dlg_add_element, table_object, geom_type=geom_type, layers=self.layers))
-        self.point_xy = self.dlg_add_element.btn_add_geom.clicked.connect(partial(tools_qgis.add_point, self.vertex_marker))
+        self.point_xy = self.dlg_add_element.btn_add_geom.clicked.connect(partial(self.snapper_manager.add_point, self.vertex_marker))
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
 
         # Fill combo boxes of the form and related events

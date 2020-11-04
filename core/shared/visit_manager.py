@@ -31,6 +31,7 @@ from ..ui.ui_manager import VisitUi, VisitEvent, VisitEventRehab, VisitManagerUi
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt
+from ..utils.tools_gw import SnappingConfigManager
 
 
 class GwVisitManager:
@@ -54,6 +55,9 @@ class GwVisitManager:
 
         self.lazy_widget = None
         self.lazy_init_function = None
+
+        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager.set_controller(self.controller)
 
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
@@ -311,7 +315,7 @@ class GwVisitManager:
 
     def add_feature_clicked(self):
         self.previous_map_tool = global_vars.canvas.mapTool()
-        self.point_xy = tools_qgis.add_point(self.vertex_marker)
+        self.point_xy = self.snapper_manager.add_point(self.vertex_marker)
 
 
     def set_locked_relation(self):

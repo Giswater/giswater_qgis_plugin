@@ -8,7 +8,7 @@ or (at your option) any later version.
 from qgis.core import QgsProject, QgsExpression, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
     QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
     QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest
-from qgis.gui import QgsVertexMarker, QgsMapCanvas
+from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint
 
 from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QSettings, QPoint
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor
@@ -370,6 +370,61 @@ class SnappingConfigManager(object):
 
     def result_is_valid(self):
         return self.is_valid
+
+
+    def add_point(self, vertex_marker):
+        """ Create the appropriate map tool and connect to the corresponding signal """
+
+        # Declare return variable
+        return_point = {}
+
+        active_layer = global_vars.iface.activeLayer()
+        if active_layer is None:
+            active_layer = global_vars.controller.get_layer_by_tablename('version')
+            global_vars.iface.setActiveLayer(active_layer)
+
+        # Vertex marker
+        vertex_marker.setColor(QColor(255, 100, 255))
+        vertex_marker.setIconSize(15)
+        vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
+        vertex_marker.setPenWidth(3)
+
+        # Snapper
+        emit_point = QgsMapToolEmitPoint(global_vars.canvas)
+        global_vars.canvas.setMapTool(emit_point)
+        global_vars.canvas.xyCoordinates.connect(partial(self.mouse_move, vertex_marker))
+        emit_point.canvasClicked.connect(partial(self.get_xy, vertex_marker, return_point, emit_point))
+
+        return return_point
+
+
+    def mouse_move(self, vertex_marker, point):
+
+        # Hide marker and get coordinates
+        vertex_marker.hide()
+        event_point = self.get_event_point(point=point)
+
+        # Snapping
+        result = self.snap_to_background_layers(event_point)
+        if result.isValid():
+            self.add_marker(result, vertex_marker)
+        else:
+            vertex_marker.hide()
+
+
+    def get_xy(self, vertex_marker, return_point, emit_point, point):
+        """ Get coordinates of selected point """
+
+        # Setting x, y coordinates from point
+        return_point['x'] = point.x()
+        return_point['y'] = point.y()
+
+        message = "Geometry has been added!"
+        global_vars.controller.show_info(message)
+        emit_point.canvasClicked.disconnect()
+        global_vars.canvas.xyCoordinates.disconnect()
+        global_vars.iface.mapCanvas().refreshAllLayers()
+        vertex_marker.hide()
 
 
 def load_settings(dialog):
