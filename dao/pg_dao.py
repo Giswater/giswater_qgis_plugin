@@ -51,12 +51,9 @@ class PgDao(object):
     def reset_db(self):
         """ Reset database connection """
 
-        self.init_db()
-        if self.set_search_path:
-            print(f"reset_db: {self.set_search_path}")
-            self.execute_sql(self.set_search_path)
-        else:
-            print(f"reset_db: self.set_search_path is None")
+        if self.init_db():
+            if self.set_search_path:
+                self.execute_sql(self.set_search_path)
 
 
     def check_cursor(self):
