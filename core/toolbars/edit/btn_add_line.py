@@ -5,11 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from .... import global_vars
-
-from qgis.PyQt.QtWidgets import QAction, QMenu
-from qgis.PyQt.QtGui import QKeySequence
 from functools import partial
+
+from qgis.PyQt.QtGui import QKeySequence
+from qgis.PyQt.QtWidgets import QAction, QMenu
 
 from ..parent_dialog import GwParentAction
 from ...shared.info import GwInfo

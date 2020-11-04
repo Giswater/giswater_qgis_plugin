@@ -6,8 +6,8 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from ..parent_dialog import GwParentAction
-from .... import global_vars
 from ...shared.selector import Selector
+from .... import global_vars
 
 
 class GwSelectorButton(GwParentAction):

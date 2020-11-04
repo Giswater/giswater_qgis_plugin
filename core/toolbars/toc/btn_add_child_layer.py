@@ -5,17 +5,17 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from functools import partial
+
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtWidgets import QAction, QApplication, QMenu
 from qgis.PyQt.QtGui import QCursor
 
-from functools import partial
-
 from ..parent_dialog import GwParentAction
 from ...load_project_check import GwProjectCheck
 from ...tasks.task_layer_config import GwConfigLayerTask
-from ....lib.tools_qgis import get_qgis_project_variables, get_cursor_multiple_selection
-from ...utils.tools_gw import create_body, from_postgres_to_toc, set_style_mapzones
+from ...utils import tools_gw
+from ....lib import tools_qgis
 
 
 class GwAddChildLayerButton(GwParentAction):
@@ -23,7 +23,7 @@ class GwAddChildLayerButton(GwParentAction):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.project_vars = get_qgis_project_variables()
+        self.project_vars = tools_qgis.get_qgis_project_variables()
         self.qgis_project_infotype = self.project_vars['infotype']
         self.qgis_project_add_schema = self.project_vars['add_schema']
         self.available_layers = None
@@ -80,7 +80,7 @@ class GwAddChildLayerButton(GwParentAction):
 
                 sub_menu.addAction(action)
                 if child_layer[0] == 'Load all':
-                    action.triggered.connect(partial(from_postgres_to_toc, child_layers=child_layers))
+                    action.triggered.connect(partial(tools_gw.from_postgres_to_toc, child_layers=child_layers))
 
                 else:
                     layer_name = child_layer[0]
@@ -88,7 +88,7 @@ class GwAddChildLayerButton(GwParentAction):
                     geom_field = child_layer[1] + "_id"
                     style_id = child_layer[3]
                     group = child_layer[4] if child_layer[4] is not None else 'GW Layers'
-                    action.triggered.connect(partial(from_postgres_to_toc, layer_name, the_geom,
+                    action.triggered.connect(partial(tools_gw.from_postgres_to_toc, layer_name, the_geom,
                                                      geom_field, None, group, style_id))
 
         main_menu.exec_(click_point)
@@ -159,7 +159,7 @@ class GwAddChildLayerButton(GwParentAction):
         self.layer_muni.removeSelection()
         self.iface.actionSelect().trigger()
         self.iface.mapCanvas().selectionChanged.connect(self.selection_changed)
-        cursor = get_cursor_multiple_selection()
+        cursor = tools_qgis.get_cursor_multiple_selection()
         if cursor:
             self.iface.mapCanvas().setCursor(cursor)
 
@@ -183,7 +183,7 @@ class GwAddChildLayerButton(GwParentAction):
 
         extras = f'"selectorType":"explfrommuni", "id":{muni_id}, "value":true, "isAlone":true, '
         extras += f'"addSchema":"{self.qgis_project_add_schema}"'
-        body = create_body(extras=extras)
+        body = tools_gw.create_body(extras=extras)
         sql = f"SELECT gw_fct_setselectors({body})::text"
         row = self.controller.get_row(sql, commit=True)
         if row:
@@ -191,8 +191,4 @@ class GwAddChildLayerButton(GwParentAction):
             self.layer_muni.triggerRepaint()
             self.iface.actionPan().trigger()
             self.iface.actionZoomIn().trigger()
-            set_style_mapzones()
-
-
-
-
+            tools_gw.set_style_mapzones()

@@ -7,11 +7,11 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 
-from .... import global_vars
-from ....lib import tools_qt
 from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import Go2EpaSelectorUi
-from ...utils.tools_gw import close_dialog, load_settings, open_dialog
+from ...utils import tools_gw
+from .... import global_vars
+from ....lib import tools_qt
 
 
 class GwGo2EpaSelectorButton(GwParentAction):
@@ -27,14 +27,14 @@ class GwGo2EpaSelectorButton(GwParentAction):
 
         # Create the dialog and signals
         self.dlg_go2epa_result = Go2EpaSelectorUi()
-        load_settings(self.dlg_go2epa_result)
+        tools_gw.load_settings(self.dlg_go2epa_result)
         if self.project_type == 'ud':
             tools_qt.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_time")
         if self.project_type == 'ws':
             tools_qt.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_datetime")
         self.dlg_go2epa_result.btn_accept.clicked.connect(self.result_selector_accept)
-        self.dlg_go2epa_result.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_go2epa_result))
-        self.dlg_go2epa_result.rejected.connect(partial(close_dialog, self.dlg_go2epa_result))
+        self.dlg_go2epa_result.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_result))
+        self.dlg_go2epa_result.rejected.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_result))
 
         # Set values from widgets of type QComboBox
         sql = ("SELECT DISTINCT(result_id), result_id "
@@ -115,7 +115,7 @@ class GwGo2EpaSelectorButton(GwParentAction):
             tools_qt.set_combo_itemData(self.dlg_go2epa_result.rpt_selector_compare_id, row["result_id"], 0)
 
         # Open the dialog
-        open_dialog(self.dlg_go2epa_result, dlg_name='go2epa_selector')
+        tools_gw.open_dialog(self.dlg_go2epa_result, dlg_name='go2epa_selector')
 
 
     def result_selector_accept(self):
@@ -175,7 +175,7 @@ class GwGo2EpaSelectorButton(GwParentAction):
         # Show message to user
         message = "Values has been updated"
         self.controller.show_info(message)
-        close_dialog(self.dlg_go2epa_result)
+        tools_gw.close_dialog(self.dlg_go2epa_result)
 
 
     def populate_time(self, combo_result, combo_time):
@@ -204,4 +204,3 @@ class GwGo2EpaSelectorButton(GwParentAction):
                f"ORDER BY resultdate")
         rows = self.controller.get_rows(sql)
         tools_qt.set_item_data(combo_date, rows)
-

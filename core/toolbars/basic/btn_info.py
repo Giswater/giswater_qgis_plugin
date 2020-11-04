@@ -5,22 +5,22 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import re
-import os
-from .... import global_vars
 
-from qgis.core import QgsGeometry, QgsMapToPixel, QgsPointXY
-from qgis.gui import QgsRubberBand
+import os
+import re
+from functools import partial
+
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu
+from qgis.core import QgsGeometry, QgsMapToPixel, QgsPointXY
+from qgis.gui import QgsRubberBand
 
-from functools import partial
-
-from ...toolbars.parent_maptool import GwParentMapTool
 from ...shared.info import GwInfo
-from ...utils.tools_gw import create_body, draw_point, draw_polyline
-from ....lib.tools_qgis import get_max_rectangle_from_coords, get_points, get_visible_layers
+from ...toolbars.parent_maptool import GwParentMapTool
+from ...utils import tools_gw
+from .... import global_vars
+from ....lib import tools_qgis
 
 
 class GwInfoButton(GwParentMapTool):
@@ -132,14 +132,14 @@ class GwInfoButton(GwParentMapTool):
         y = cursor.pos().y()
         click_point = QPoint(x + 5, y + 5)
 
-        visible_layers = get_visible_layers(as_list=True)
+        visible_layers = tools_qgis.get_visible_layers(as_list=True)
         scale_zoom = self.iface.mapCanvas().scale()
 
         # Get layers under mouse clicked
         extras = f'"pointClickCoords":{{"xcoord":{point.x()}, "ycoord":{point.y()}}}, '
         extras += f'"visibleLayers":{visible_layers}, '
         extras += f'"zoomScale":{scale_zoom} '
-        body = create_body(extras=extras)
+        body = tools_gw.create_body(extras=extras)
         json_result = self.controller.get_json('gw_fct_getlayersfromcoordinates', body, rubber_band=self.rubber_band)
         if not json_result or json_result['status'] == 'Failed':
             return False
@@ -216,15 +216,15 @@ class GwInfoButton(GwParentMapTool):
             return
 
         list_coord = re.search('\((.*)\)', str(feature['geometry']))
-        max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
+        max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
         if reset_rb is True:
             self.rubber_band.reset()
         if str(max_x) == str(min_x) and str(max_y) == str(min_y):
             point = QgsPointXY(float(max_x), float(max_y))
-            draw_point(point, self.rubber_band)
+            tools_gw.draw_point(point, self.rubber_band)
         else:
-            points = get_points(list_coord)
-            draw_polyline(points, self.rubber_band)
+            points = tools_qgis.get_points(list_coord)
+            tools_gw.draw_polyline(points, self.rubber_band)
 
 
     def get_info_from_selected_id(self, action, tab_type):

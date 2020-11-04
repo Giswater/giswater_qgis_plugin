@@ -5,19 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from functools import partial
+
 from qgis.PyQt.QtCore import QStringListModel
 from qgis.PyQt.QtWidgets import QCompleter
 
-from functools import partial
-
-from ....lib import tools_qt
 from ..parent_dialog import GwParentAction
-from ...utils.tools_gw import load_settings, open_dialog, save_settings, close_dialog, create_body, \
-    populate_info_text
 from ...ui.ui_manager import FeatureDelete
-
-from ....lib.tools_qt import set_completer_object_api, set_icon
-from ....lib.tools_qgis import disconnect_signal_selection_changed
+from ...utils import tools_gw
+from ....lib import tools_qgis, tools_qt
 
 
 class GwDeleteFeatureButton(GwParentAction):
@@ -31,7 +27,7 @@ class GwDeleteFeatureButton(GwParentAction):
 
         # Create the dialog and signals
         self.dlg_feature_delete = FeatureDelete()
-        load_settings(self.dlg_feature_delete)
+        tools_gw.load_settings(self.dlg_feature_delete)
 
         # Populate combo feature type
         sql = 'SELECT DISTINCT(feature_type) AS id, feature_type AS idval FROM cat_feature'
@@ -59,19 +55,19 @@ class GwDeleteFeatureButton(GwParentAction):
         # Set button snapping
         self.dlg_feature_delete.btn_snapping.clicked.connect(partial(self.set_active_layer))
         self.dlg_feature_delete.btn_snapping.clicked.connect(partial(self.selection_init))
-        set_icon(self.dlg_feature_delete.btn_snapping, "137")
+        tools_qt.set_icon(self.dlg_feature_delete.btn_snapping, "137")
 
         # Set listeners
-        self.dlg_feature_delete.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_feature_delete))
-        self.dlg_feature_delete.rejected.connect(disconnect_signal_selection_changed)
-        self.dlg_feature_delete.rejected.connect(partial(save_settings, self.dlg_feature_delete))
+        self.dlg_feature_delete.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_feature_delete))
+        self.dlg_feature_delete.rejected.connect(tools_qgis.disconnect_signal_selection_changed)
+        self.dlg_feature_delete.rejected.connect(partial(tools_gw.save_settings, self.dlg_feature_delete))
 
         self.dlg_feature_delete.btn_relations.clicked.connect(partial(self.show_feature_relation))
         self.dlg_feature_delete.btn_delete.clicked.connect(partial(self.delete_feature_relation))
         self.dlg_feature_delete.feature_type.currentIndexChanged.connect(partial(self.set_active_layer))
 
         # Open dialog
-        open_dialog(self.dlg_feature_delete, dlg_name='feature_delete')
+        tools_gw.open_dialog(self.dlg_feature_delete, dlg_name='feature_delete')
 
 
     def filter_typeahead(self, widget, completer, model):
@@ -90,7 +86,7 @@ class GwDeleteFeatureButton(GwParentAction):
             model.setStringList([''])
             return
 
-        set_completer_object_api(completer, model, widget, rows_typeahead)
+        tools_qt.set_completer_object_api(completer, model, widget, rows_typeahead)
         self.dlg_feature_delete.feature_id.setStyleSheet(None)
 
 
@@ -105,7 +101,7 @@ class GwDeleteFeatureButton(GwParentAction):
             return
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
-        body = create_body(feature=feature, extras=extras)
+        body = tools_gw.create_body(feature=feature, extras=extras)
         result = self.controller.get_json('gw_fct_getfeaturerelation', body)
         if not result or ('status' in result and result['status'] == 'Failed'):
             return False
@@ -134,7 +130,7 @@ class GwDeleteFeatureButton(GwParentAction):
 
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
-        body = create_body(feature=feature, extras=extras)
+        body = tools_gw.create_body(feature=feature, extras=extras)
         complet_result = self.controller.get_json('gw_fct_setfeaturedelete', body)
 
         if not complet_result:
@@ -149,19 +145,19 @@ class GwDeleteFeatureButton(GwParentAction):
         data = complet_result['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
-                change_tab = populate_info_text(self.dlg_feature_delete, data)
+                change_tab = tools_gw.populate_info_text(self.dlg_feature_delete, data)
 
         self.dlg_feature_delete.btn_cancel.setText('Accept')
 
         # Close dialog
         if not change_tab:
-            close_dialog(self.dlg_feature_delete)
+            tools_gw.close_dialog(self.dlg_feature_delete)
 
 
     def selection_init(self):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
-        disconnect_signal_selection_changed()
+        tools_qgis.disconnect_signal_selection_changed()
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed()
 

@@ -5,20 +5,18 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QCompleter
-from qgis.PyQt.QtCore import QDate, QStringListModel, Qt
-
 import json
 from collections import OrderedDict
 from datetime import datetime
 from functools import partial
 
+from qgis.PyQt.QtCore import QDate, Qt
+
+from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import FeatureReplace, InfoWorkcatUi
 from ...shared.catalog import GwCatalog
-from ...utils.tools_gw import close_dialog, load_settings, open_dialog, refresh_legend, create_body, \
-    populate_info_text
+from ...utils import tools_gw
 from ....lib import tools_qt
-from ..parent_maptool import GwParentMapTool
 
 
 class GwFeatureReplaceButton(GwParentMapTool):
@@ -55,7 +53,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
         # Create the dialog and signals
         self.dlg_replace = FeatureReplace()
-        load_settings(self.dlg_replace)
+        tools_gw.load_settings(self.dlg_replace)
 
         sql = "SELECT id FROM cat_work ORDER BY id"
         rows = self.controller.get_rows(sql)
@@ -118,10 +116,10 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg_replace.btn_accept.clicked.connect(partial(self.get_values, self.dlg_replace))
-        self.dlg_replace.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_replace))
+        self.dlg_replace.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_replace))
         self.dlg_replace.rejected.connect(self.cancel_map_tool)
         # Open dialog
-        open_dialog(self.dlg_replace, maximize_button=False)
+        tools_gw.open_dialog(self.dlg_replace, maximize_button=False)
 
 
     def open_catalog(self):
@@ -166,18 +164,18 @@ class GwFeatureReplaceButton(GwParentMapTool):
     def new_workcat(self):
 
         self.dlg_new_workcat = InfoWorkcatUi()
-        load_settings(self.dlg_new_workcat)
 
+        tools_gw.load_settings(self.dlg_new_workcat)
         tools_qt.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
         table_object = "cat_work"
         tools_qt.set_completer_object(self.dlg_new_workcat, "cat_work")
 
         # Set signals
         self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
-        self.dlg_new_workcat.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_new_workcat))
+        self.dlg_new_workcat.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_new_workcat))
 
         # Open dialog
-        open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
+        tools_gw.open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
 
 
     def manage_new_workcat_accept(self, table_object):
@@ -234,7 +232,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                         current_index = self.dlg_replace.workcat_id_end.findText(str(cat_work_id))
                         self.dlg_replace.workcat_id_end.setCurrentIndex(current_index)
 
-                    close_dialog(self.dlg_new_workcat, self.controller.plugin_name)
+                    tools_gw.close_dialog(self.dlg_new_workcat)
                 else:
                     msg = "This Workcat is already exist"
                     self.controller.show_info_box(msg, "Warning")
@@ -265,7 +263,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             extras += f', "workcat_id_end":"{self.workcat_id_end_aux}"'
             extras += f', "enddate":"{self.enddate_aux}"'
             extras += f', "keep_elements":"{tools_qt.isChecked(dialog, "keep_elements")}"'
-            body = create_body(feature=feature, extras=extras)
+            body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute SQL function and show result to the user
             function_name = "gw_fct_setfeaturereplace"
@@ -276,7 +274,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                 self.controller.show_warning(message)
                 self.deactivate()
                 self.set_action_pan()
-                close_dialog(dialog, self.controller.plugin_name)
+                tools_gw.close_dialog(dialog, self.controller.plugin_name)
                 return
 
             complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -318,7 +316,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
             # Fill tab 'Info log'
             if complet_result and complet_result[0]['status'] == "Accepted":
-                populate_info_text(self.dlg_replace, complet_result[0]['body']['data'])
+                tools_gw.populate_info_text(self.dlg_replace, complet_result[0]['body']['data'])
 
             # Refresh canvas
             self.refresh_map_canvas()
@@ -326,7 +324,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             self.controller.set_layer_index('v_edit_connec')
             self.controller.set_layer_index('v_edit_gully')
             self.controller.set_layer_index('v_edit_node')
-            refresh_legend(self.controller)
+            tools_gw.refresh_legend(self.controller)
 
             # Deactivate map tool
             self.deactivate()

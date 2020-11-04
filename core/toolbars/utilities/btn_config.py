@@ -5,21 +5,19 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.gui import QgsDateTimeEdit
-from qgis.PyQt.QtCore import QDate
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QSpinBox, QGroupBox, QSpacerItem, \
-    QSizePolicy, QGridLayout, QWidget, QLabel, QTextEdit, QLineEdit
-
 import json
 import operator
 from functools import partial
 
-from ....lib import tools_qt
-from ..parent_dialog import GwParentAction
-from ...utils.tools_gw import load_settings, open_dialog, close_dialog, create_body
-from ...ui.ui_manager import ConfigUi
+from qgis.PyQt.QtCore import QDate
+from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QSpinBox, QGroupBox, QSpacerItem, \
+    QSizePolicy, QGridLayout, QWidget, QLabel, QTextEdit, QLineEdit
+from qgis.gui import QgsDateTimeEdit
 
-from ....lib.tools_qt import hide_void_groupbox
+from ..parent_dialog import GwParentAction
+from ...ui.ui_manager import ConfigUi
+from ...utils import tools_gw
+from ....lib import tools_qt
 
 
 class GwConfigButton(GwParentAction):
@@ -39,14 +37,14 @@ class GwConfigButton(GwParentAction):
         # Get visible layers name from TOC
         result = self.get_layers_name()
 
-        body = create_body(form='"formName":"config"', extras=result)
+        body = tools_gw.create_body(form='"formName":"config"', extras=result)
         json_result = self.controller.get_json('gw_fct_getconfig', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
         self.dlg_config = ConfigUi()
-        load_settings(self.dlg_config)
-        self.dlg_config.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_config))
+        tools_gw.load_settings(self.dlg_config)
+        self.dlg_config.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_config))
         self.dlg_config.btn_accept.clicked.connect(partial(self.update_values))
 
         page1_layout1 = self.dlg_config.tab_main.findChild(QGridLayout, 'page1_layout1')
@@ -200,14 +198,14 @@ class GwConfigButton(GwParentAction):
         if chk_dma and chk_expl:
             chk_dma.stateChanged.connect(partial(self.check_child_to_parent, chk_dma, chk_expl))
             chk_expl.stateChanged.connect(partial(self.check_parent_to_child, chk_expl, chk_dma))
-        hide_void_groupbox(self.dlg_config)
+        tools_qt.hide_void_groupbox(self.dlg_config)
         # Check user/role and remove tabs
         role_admin = self.controller.check_role_user("role_admin", cur_user)
         if not role_admin and cur_user not in super_users:
             tools_qt.remove_tab_by_tabName(self.dlg_config.tab_main, "tab_admin")
 
         # Open form
-        open_dialog(self.dlg_config, dlg_name='config')
+        tools_gw.open_dialog(self.dlg_config, dlg_name='config')
 
 
 
@@ -239,7 +237,7 @@ class GwConfigButton(GwParentAction):
 
         my_json = json.dumps(self.list_update)
         extras = f'"fields":{my_json}'
-        body = create_body(form='"formName":"config"', extras=extras)
+        body = tools_gw.create_body(form='"formName":"config"', extras=extras)
         json_result = self.controller.get_json('gw_fct_setconfig', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
@@ -247,7 +245,7 @@ class GwConfigButton(GwParentAction):
         message = "Values has been updated"
         self.controller.show_info(message)
         # Close dialog
-        close_dialog(self.dlg_config)
+        tools_gw.close_dialog(self.dlg_config)
 
 
     # noinspection PyUnresolvedReferences

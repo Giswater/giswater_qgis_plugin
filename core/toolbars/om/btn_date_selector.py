@@ -5,17 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QDate
-from qgis.PyQt.QtWidgets import QDateEdit, QPushButton
-
 from datetime import datetime
 from functools import partial
 
-from ....lib import tools_qt
+from qgis.PyQt.QtCore import QDate
+from qgis.PyQt.QtWidgets import QDateEdit, QPushButton
+
 from ..parent_dialog import GwParentAction
-from ...utils.tools_gw import close_dialog, load_settings, open_dialog
 from ...ui.ui_manager import SelectorDate
-from ....lib.tools_qgis import refresh_map_canvas
+from ...utils import tools_gw
+from ....lib import tools_qgis, tools_qt
 
 
 class GwDateSelectorButton(GwParentAction):
@@ -27,19 +26,19 @@ class GwDateSelectorButton(GwParentAction):
     def clicked_event(self):
 
         self.dlg_selector_date = SelectorDate()
-        load_settings(self.dlg_selector_date)
+        tools_gw.load_settings(self.dlg_selector_date)
         self.widget_date_from = self.dlg_selector_date.findChild(QDateEdit, "date_from")
         self.widget_date_to = self.dlg_selector_date.findChild(QDateEdit, "date_to")
         self.dlg_selector_date.findChild(QPushButton, "btn_accept").clicked.connect(self.update_dates_into_db)
-        self.dlg_selector_date.btn_close.clicked.connect(partial(close_dialog, self.dlg_selector_date))
-        self.dlg_selector_date.rejected.connect(partial(close_dialog, self.dlg_selector_date))
+        self.dlg_selector_date.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_selector_date))
+        self.dlg_selector_date.rejected.connect(partial(tools_gw.close_dialog, self.dlg_selector_date))
         self.widget_date_from.dateChanged.connect(partial(self.update_date_to))
         self.widget_date_to.dateChanged.connect(partial(self.update_date_from))
 
         self.get_default_dates()
         tools_qt.setCalendarDate(self.dlg_selector_date, self.widget_date_from, self.from_date)
         tools_qt.setCalendarDate(self.dlg_selector_date, self.widget_date_to, self.to_date)
-        open_dialog(self.dlg_selector_date, dlg_name="selector_date")
+        tools_gw.open_dialog(self.dlg_selector_date, dlg_name="selector_date")
 
 
     def update_dates_into_db(self):
@@ -64,8 +63,8 @@ class GwDateSelectorButton(GwParentAction):
 
         self.controller.execute_sql(sql)
 
-        close_dialog(self.dlg_selector_date)
-        refresh_map_canvas()
+        tools_gw.close_dialog(self.dlg_selector_date)
+        tools_qgis.refresh_map_canvas()
 
 
     def update_date_to(self):
@@ -109,4 +108,3 @@ class GwDateSelectorButton(GwParentAction):
         except:
             self.from_date = QDate.currentDate()
             self.to_date = QDate.currentDate().addDays(1)
-

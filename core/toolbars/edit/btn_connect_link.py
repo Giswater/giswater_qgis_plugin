@@ -5,16 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsVectorLayer, QgsRectangle
-from qgis.PyQt.QtCore import QRect, Qt
-from qgis.PyQt.QtWidgets import QApplication
 from functools import partial
 
-from ...ui.ui_manager import DialogTextUi
+from qgis.PyQt.QtCore import QRect, Qt
+from qgis.PyQt.QtWidgets import QApplication
+from qgis.core import QgsVectorLayer, QgsRectangle
+
 from ..parent_maptool import GwParentMapTool
-from ...utils.tools_gw import get_cursor_multiple_selection, load_settings, close_dialog, open_dialog, \
-    populate_info_text, create_body
-from ....lib.tools_qgis import get_layer
+from ...ui.ui_manager import DialogTextUi
+from ...utils import tools_gw
+from ....lib import tools_qgis
 
 
 class GwConnectLinkButton(GwParentMapTool):
@@ -73,8 +73,8 @@ class GwConnectLinkButton(GwParentMapTool):
                 # Check if it belongs to 'connec' or 'gully' group
                 layer = self.snapper_manager.get_snapped_layer(result)
                 feature_id = self.snapper_manager.get_snapped_feature_id(result)
-                layer_connec = get_layer(layer)
-                layer_gully = get_layer(layer)
+                layer_connec = tools_qgis.get_layer(layer)
+                layer_gully = tools_qgis.get_layer(layer)
                 if layer_connec or layer_gully:
                     key = QApplication.keyboardModifiers()
                     # If Ctrl+Shift is clicked: deselect snapped feature
@@ -110,7 +110,7 @@ class GwConnectLinkButton(GwParentMapTool):
 
             # Check selected records
             number_features = 0
-            layer = get_layer('v_edit_connec')
+            layer = tools_qgis.get_layer('v_edit_connec')
             if layer:
                 number_features += layer.selectedFeatureCount()
 
@@ -123,7 +123,7 @@ class GwConnectLinkButton(GwParentMapTool):
                     self.link_selected_features('connec', layer)
                     self.cancel_map_tool()
 
-            layer = get_layer('v_edit_gully')
+            layer = tools_qgis.get_layer('v_edit_gully')
             if layer:
                 # Check selected records
                 number_features = 0
@@ -163,7 +163,7 @@ class GwConnectLinkButton(GwParentMapTool):
         self.snapper_manager.snap_to_gully()
 
         # Change cursor
-        cursor = get_cursor_multiple_selection()
+        cursor = tools_gw.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)
 
         # Show help message when action is activated
@@ -199,18 +199,18 @@ class GwConnectLinkButton(GwParentMapTool):
             list_feature_id = aux[:-2] + "]"
             feature_id = f'"id":"{list_feature_id}"'
             extras = f'"feature_type":"{geom_type.upper()}"'
-            body = create_body(feature=feature_id, extras=extras)
+            body = tools_gw.create_body(feature=feature_id, extras=extras)
             # Execute SQL function and show result to the user
             result = self.controller.get_json('gw_fct_setlinktonetwork ', body)
             if result:
                 self.dlg_dtext = DialogTextUi()
-                load_settings(self.dlg_dtext)
+                tools_gw.load_settings(self.dlg_dtext)
                 self.dlg_dtext.btn_accept.hide()
                 self.dlg_dtext.setWindowTitle('Connect to network')
-                self.dlg_dtext.btn_close.clicked.connect(partial(close_dialog, self.dlg_dtext))
-                self.dlg_dtext.rejected.connect(partial(close_dialog, self.dlg_dtext))
-                populate_info_text(self.dlg_dtext, result['body']['data'], False)
-                open_dialog(self.dlg_dtext, dlg_name='dialog_text')
+                self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
+                self.dlg_dtext.rejected.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
+                tools_gw.populate_info_text(self.dlg_dtext, result['body']['data'], False)
+                tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 
             layer.removeSelection()
 
@@ -257,11 +257,11 @@ class GwConnectLinkButton(GwParentMapTool):
             behaviour = QgsVectorLayer.AddToSelection
 
         # Selection for all connec and gully layers
-        layer = get_layer('v_edit_connec')
+        layer = tools_qgis.get_layer('v_edit_connec')
         if layer:
             layer.selectByRect(selectGeometry, behaviour)
 
-        layer = get_layer('v_edit_gully')
+        layer = tools_qgis.get_layer('v_edit_gully')
         if layer:
             layer.selectByRect(selectGeometry, behaviour)
 

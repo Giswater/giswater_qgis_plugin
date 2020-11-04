@@ -5,20 +5,19 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
-from qgis.PyQt.QtWidgets import QFileDialog
-
 import csv
 import os
 from encodings.aliases import aliases
 from functools import partial
 
-from ....lib import tools_qt
+from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
+from qgis.PyQt.QtWidgets import QFileDialog
+
 from ..parent_dialog import GwParentAction
-from ...utils.tools_gw import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
-    create_body, populate_info_text
 from ...ui.ui_manager import CsvUi
+from ...utils import tools_gw
 from .... import global_vars
+from ....lib import tools_qt
 
 
 class GwCSVButton(GwParentAction):
@@ -31,7 +30,7 @@ class GwCSVButton(GwParentAction):
 
         self.func_name = None
         self.dlg_csv = CsvUi()
-        load_settings(self.dlg_csv)
+        tools_gw.load_settings(self.dlg_csv)
 
         # Get roles from BD
         roles = self.controller.get_rolenames()
@@ -46,8 +45,8 @@ class GwCSVButton(GwParentAction):
         self.dlg_csv.rb_semicolon.setChecked(True)
 
         # Signals
-        self.dlg_csv.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_csv))
-        self.dlg_csv.rejected.connect(partial(close_dialog, self.dlg_csv))
+        self.dlg_csv.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_csv))
+        self.dlg_csv.rejected.connect(partial(tools_gw.close_dialog, self.dlg_csv))
         self.dlg_csv.btn_accept.clicked.connect(partial(self.write_csv, self.dlg_csv, temp_tablename))
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
         self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.get_function_name))
@@ -63,7 +62,7 @@ class GwCSVButton(GwParentAction):
         self.dlg_csv.progressBar.setVisible(False)
 
         # Open dialog
-        open_dialog(self.dlg_csv, dlg_name='csv')
+        tools_gw.open_dialog(self.dlg_csv, dlg_name='csv')
 
 
     def populate_cmb_unicodes(self, combo):
@@ -137,14 +136,14 @@ class GwCSVButton(GwParentAction):
 
         extras = f'"importParam":"{label_aux}"'
         extras += f', "fid":"{fid_aux}"'
-        body = create_body(extras=extras)
+        body = tools_gw.create_body(extras=extras)
 
         result = self.controller.get_json(self.func_name, body)
         if not result:
             return
         else:
             if result['status'] == "Accepted":
-                populate_info_text(dialog, result['body']['data'])
+                tools_gw.populate_info_text(dialog, result['body']['data'])
             msg = result['message']['text']
             self.controller.show_info_box(msg)
 
@@ -204,21 +203,21 @@ class GwCSVButton(GwParentAction):
     def load_settings_values(self):
         """ Load QGIS settings related with csv options """
 
-        value = get_parser_value('csv2Pg', 'cmb_import_type')
+        value = tools_gw.get_parser_value('csv2Pg', 'cmb_import_type')
         tools_qt.set_combo_itemData(self.dlg_csv.cmb_import_type, value, 0)
 
-        value = get_parser_value('csv2Pg', 'txt_import')
+        value = tools_gw.get_parser_value('csv2Pg', 'txt_import')
         tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.txt_import, value)
 
-        value = get_parser_value('csv2Pg', 'txt_file_csv')
+        value = tools_gw.get_parser_value('csv2Pg', 'txt_file_csv')
         tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv, value)
 
-        unicode = get_parser_value('csv2Pg', 'cmb_unicode_list')
+        unicode = tools_gw.get_parser_value('csv2Pg', 'cmb_unicode_list')
         if not unicode:
             unicode = 'latin1'
         tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
 
-        if get_parser_value('csv2Pg', 'rb_semicolon') == 'True':
+        if tools_gw.get_parser_value('csv2Pg', 'rb_semicolon') == 'True':
             self.dlg_csv.rb_semicolon.setChecked(True)
         else:
             self.dlg_csv.rb_comma.setChecked(True)
@@ -226,11 +225,11 @@ class GwCSVButton(GwParentAction):
 
     def save_settings_values(self):
         """ Save QGIS settings related with csv options """
-        set_parser_value('csv2Pg', 'cmb_import_type', f"{tools_qt.get_item_data(self.dlg_csv, 'cmb_import_type', 0)}")
-        set_parser_value('csv2Pg', 'txt_import', tools_qt.getWidgetText(self.dlg_csv, 'txt_import'))
-        set_parser_value('csv2Pg', 'txt_file_csv', tools_qt.getWidgetText(self.dlg_csv, 'txt_file_csv'))
-        set_parser_value('csv2Pg', 'cmb_unicode_list', tools_qt.getWidgetText(self.dlg_csv, 'cmb_unicode_list'))
-        set_parser_value('csv2Pg', 'rb_semicolon', f"{self.dlg_csv.rb_semicolon.isChecked()}")
+        tools_gw.set_parser_value('csv2Pg', 'cmb_import_type', f"{tools_qt.get_item_data(self.dlg_csv, 'cmb_import_type', 0)}")
+        tools_gw.set_parser_value('csv2Pg', 'txt_import', tools_qt.getWidgetText(self.dlg_csv, 'txt_import'))
+        tools_gw.set_parser_value('csv2Pg', 'txt_file_csv', tools_qt.getWidgetText(self.dlg_csv, 'txt_file_csv'))
+        tools_gw.set_parser_value('csv2Pg', 'cmb_unicode_list', tools_qt.getWidgetText(self.dlg_csv, 'cmb_unicode_list'))
+        tools_gw.set_parser_value('csv2Pg', 'rb_semicolon', f"{self.dlg_csv.rb_semicolon.isChecked()}")
 
 
     def validate_params(self, dialog):

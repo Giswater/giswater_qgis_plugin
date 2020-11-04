@@ -5,13 +5,14 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from functools import partial
+
 from qgis.PyQt.QtCore import Qt, QDate
 
-from ....lib import tools_qt
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import ArcFusionUi
-from functools import partial
-from ...utils.tools_gw import load_settings, open_dialog, close_dialog, create_body, populate_info_text
+from ...utils import tools_gw
+from ....lib import tools_qt
 
 
 class GwArcFusionButton(GwParentMapTool):
@@ -49,7 +50,7 @@ class GwArcFusionButton(GwParentMapTool):
         if snapped_feat:
             self.node_id = snapped_feat.attribute('node_id')
             self.dlg_fusion = ArcFusionUi()
-            load_settings(self.dlg_fusion)
+            tools_gw.load_settings(self.dlg_fusion)
 
             # Fill ComboBox workcat_id_end
             sql = "SELECT id FROM cat_work ORDER BY id"
@@ -62,9 +63,9 @@ class GwArcFusionButton(GwParentMapTool):
 
             # Set signals
             self.dlg_fusion.btn_accept.clicked.connect(self.exec_fusion)
-            self.dlg_fusion.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_fusion))
+            self.dlg_fusion.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
 
-            open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
+            tools_gw.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
 
 
     def exec_fusion(self):
@@ -74,13 +75,13 @@ class GwArcFusionButton(GwParentMapTool):
         enddate_str = enddate.toString('yyyy-MM-dd')
         feature_id = f'"id":["{self.node_id}"]'
         extras = f'"workcat_id_end":"{workcat_id_end}", "enddate":"{enddate_str}"'
-        body = create_body(feature=feature_id, extras=extras)
+        body = tools_gw.create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
         result = self.controller.get_json('gw_fct_setarcfusion', body)
         if not result or result['status'] == 'Failed':
             return
 
-        text_result, change_tab = populate_info_text(self.dlg_fusion, result['body']['data'], True, True, 1)
+        text_result, change_tab = tools_gw.populate_info_text(self.dlg_fusion, result['body']['data'], True, True, 1)
 
         if not text_result:
             self.dlg_fusion.close()

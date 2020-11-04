@@ -5,17 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QAction
-from qgis.PyQt.QtGui import QCursor, QColor, QIcon
-from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
-from qgis.core import QgsWkbTypes
-from qgis.PyQt.QtCore import Qt
-
 import os
 
-from ... import global_vars
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QCursor, QColor, QIcon
+from qgis.PyQt.QtWidgets import QAction
+from qgis.core import QgsWkbTypes
+from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
 
 from ..utils.tools_gw import SnappingConfigManager
+from ... import global_vars
 
 
 class GwParentMapTool(QgsMapTool):
@@ -198,4 +197,3 @@ class GwParentMapTool(QgsMapTool):
         self.canvas.refreshAllLayers()
         for layer_refresh in self.canvas.layers():
             layer_refresh.triggerRepaint()
-

@@ -5,10 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsTask
-from qgis.PyQt.QtCore import pyqtSignal, QObject
-
 from time import sleep
+
+from qgis.PyQt.QtCore import pyqtSignal, QObject
+from qgis.core import QgsTask
 
 
 class GwTask(QgsTask, QObject):

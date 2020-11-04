@@ -5,18 +5,20 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeatureRequest
-from qgis.PyQt.QtCore import Qt
-
 from functools import partial
 
-from ....lib import tools_qt
+from qgis.PyQt.QtCore import Qt
+from qgis.core import QgsFeatureRequest
+
+from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import NodeTypeChange
+from ...utils import tools_gw
+
+
+from ....lib import tools_qgis, tools_qt
 from ...shared.catalog import GwCatalog
 from ...shared.info import GwInfo
-from ..parent_maptool import GwParentMapTool
-from ...utils.tools_gw import check_expression, close_dialog, load_settings, open_dialog
-from ....lib.tools_qgis import  restore_user_layer
+
 
 class GwNodeTypeChangeButton(GwParentMapTool):
     """ Button 28: User select one node. A form is opened showing current node_type.type
@@ -81,14 +83,14 @@ class GwNodeTypeChangeButton(GwParentMapTool):
             self.controller.show_warning(message)
 
         # Close form
-        close_dialog(self.dlg_chg_node_type)
+        tools_gw.close_dialog(self.dlg_chg_node_type)
 
         # Refresh map canvas
         self.refresh_map_canvas()
 
         # Check if the expression is valid
         expr_filter = f"node_id = '{self.node_id}'"
-        (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
         if layer:
@@ -108,14 +110,14 @@ class GwNodeTypeChangeButton(GwParentMapTool):
             if not complet_result:
                 return
 
-            dialog.dlg_closed.connect(restore_user_layer)
+            dialog.dlg_closed.connect(tools_qgis.restore_user_layer)
 
 
     def change_elem_type(self, feature):
 
         # Create the dialog, fill node_type and define its signals
         self.dlg_chg_node_type = NodeTypeChange()
-        load_settings(self.dlg_chg_node_type)
+        tools_gw.load_settings(self.dlg_chg_node_type)
 
         # Get nodetype_id from current node
         node_type = ""
@@ -132,7 +134,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
         self.dlg_chg_node_type.node_node_type.setText(node_type)
         self.dlg_chg_node_type.btn_catalog.clicked.connect(partial(self.open_catalog))
         self.dlg_chg_node_type.btn_accept.clicked.connect(self.edit_change_elem_type_accept)
-        self.dlg_chg_node_type.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_chg_node_type))
+        self.dlg_chg_node_type.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_chg_node_type))
 
         # Fill 1st combo boxes-new system node type
         sql = ("SELECT DISTINCT(id) FROM cat_feature WHERE active is True "
@@ -141,7 +143,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
         tools_qt.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
 
         # Open dialog
-        open_dialog(self.dlg_chg_node_type, dlg_name='nodetype_change', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_chg_node_type, dlg_name='nodetype_change', maximize_button=False)
 
 
     def filter_catalog(self):
@@ -216,4 +218,3 @@ class GwNodeTypeChangeButton(GwParentMapTool):
     def deactivate(self):
         # Call parent method
         super().deactivate()
-

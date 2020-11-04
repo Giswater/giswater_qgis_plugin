@@ -5,27 +5,24 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsExpression
-from qgis.gui import QgsMapToolEmitPoint
-from qgis.PyQt.QtCore import Qt, QDate
-from qgis.PyQt.QtWidgets import QListWidgetItem, QLineEdit, QAction
-
-from functools import partial
-from decimal import Decimal
-from collections import OrderedDict
-import matplotlib.pyplot as plt
 import math
 import os
 import json
 import configparser
+from collections import OrderedDict
+from decimal import Decimal
+from functools import partial
+import matplotlib.pyplot as plt
 
-from ....lib import tools_qt
+from qgis.PyQt.QtCore import Qt, QDate
+from qgis.PyQt.QtWidgets import QListWidgetItem, QLineEdit, QAction
+from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsExpression
+from qgis.gui import QgsMapToolEmitPoint
+
 from ..parent_maptool import GwParentMapTool
-from ...ui.ui_manager import Profile
-from ...ui.ui_manager import ProfilesList
-from ...utils.tools_gw import close_dialog, create_body, get_parser_value, load_settings, open_dialog, \
-    save_settings, set_parser_value
-from ....lib.tools_qt import set_icon
+from ...ui.ui_manager import Profile, ProfilesList
+from ...utils import tools_gw
+from ....lib import tools_qt
 
 
 class NodeData:
@@ -78,7 +75,7 @@ class GwProfileButton(GwParentMapTool):
 
         # Set dialog
         self.dlg_draw_profile = Profile()
-        load_settings(self.dlg_draw_profile)
+        tools_gw.load_settings(self.dlg_draw_profile)
         self.dlg_draw_profile.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         # Declare composer path widget
@@ -89,7 +86,7 @@ class GwProfileButton(GwParentMapTool):
 
         # Toolbar actions
         action = self.dlg_draw_profile.findChild(QAction, "actionProfile")
-        set_icon(action, "131")
+        tools_qt.set_icon(action, "131")
         action.triggered.connect(partial(self.activate_snapping_node))
         self.action_profile = action
 
@@ -101,7 +98,7 @@ class GwProfileButton(GwParentMapTool):
         self.dlg_draw_profile.btn_save_profile.clicked.connect(self.save_profile)
         self.dlg_draw_profile.btn_load_profile.clicked.connect(self.open_profile)
         self.dlg_draw_profile.btn_clear_profile.clicked.connect(self.clear_profile)
-        self.dlg_draw_profile.dlg_closed.connect(partial(save_settings, self.dlg_draw_profile))
+        self.dlg_draw_profile.dlg_closed.connect(partial(tools_gw.save_settings, self.dlg_draw_profile))
         self.dlg_draw_profile.dlg_closed.connect(partial(self.remove_selection, actionpan=True))
 
         # Set calendar date as today
@@ -109,9 +106,9 @@ class GwProfileButton(GwParentMapTool):
 
         # Set last parameters
         tools_qt.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance,
-                               get_parser_value('btn_profile', 'minDistanceProfile'))
+                               tools_gw.get_parser_value('btn_profile', 'minDistanceProfile'))
         tools_qt.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title,
-                               get_parser_value('btn_profile', 'titleProfile'))
+                               tools_gw.get_parser_value('btn_profile', 'titleProfile'))
 
         # Show form in docker
         self.controller.init_docker('qgis_form_docker')
@@ -119,7 +116,7 @@ class GwProfileButton(GwParentMapTool):
             # self.controller.manage_translation('draw_profile', self.dlg_draw_profile)
             self.controller.dock_dialog(self.dlg_draw_profile)
         else:
-            open_dialog(self.dlg_draw_profile)
+            tools_gw.open_dialog(self.dlg_draw_profile)
 
 
     def deactivate(self):
@@ -149,7 +146,7 @@ class GwProfileButton(GwParentMapTool):
             f'"linksDistance":{links_distance}, ' \
             f'"scale":{{ "eh":1000, "ev":1000}}'
 
-        body = create_body(extras=extras)
+        body = tools_gw.create_body(extras=extras)
 
         # Execute query
         self.profile_json = self.controller.get_json('gw_fct_getprofilevalues', body)
@@ -169,8 +166,8 @@ class GwProfileButton(GwParentMapTool):
                          self.profile_json['body']['data']['terrain'])
 
         # Save profile values
-        set_parser_value('btn_profile', 'minDistanceProfile', f'{links_distance}')
-        set_parser_value('btn_profile', 'titleProfile',
+        tools_gw.set_parser_value('btn_profile', 'minDistanceProfile', f'{links_distance}')
+        tools_gw.set_parser_value('btn_profile', 'titleProfile',
                          f'{tools_qt.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)}')
 
         # Maximize window (after drawing)
@@ -204,7 +201,7 @@ class GwProfileButton(GwParentMapTool):
             f'"endNode":"{self.endNode}", ' \
             f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, ' \
             f'"ev":1000}}, "title":"{title}", "date":"{date}"'
-        body = create_body(extras=extras)
+        body = tools_gw.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_setprofile', body)
         if result is None or result['status'] == 'Failed': return
         message = f"{result['message']}"
@@ -215,17 +212,17 @@ class GwProfileButton(GwParentMapTool):
         """ Open dialog profile_list.ui """
 
         self.dlg_load = ProfilesList()
-        load_settings(self.dlg_load)
+        tools_gw.load_settings(self.dlg_load)
 
         # Get profils on database
-        body = create_body()
+        body = tools_gw.create_body()
         result_profile = self.controller.get_json('gw_fct_getprofile', body)
         if not result_profile or result_profile['status'] == 'Failed':
             return
         message = f"{result_profile['message']}"
         self.controller.show_info(message)
 
-        self.dlg_load.rejected.connect(partial(close_dialog, self.dlg_load.rejected))
+        self.dlg_load.rejected.connect(partial(tools_gw.close_dialog, self.dlg_load.rejected))
         self.dlg_load.btn_open.clicked.connect(partial(self.load_profile, result_profile))
         self.dlg_load.btn_delete_profile.clicked.connect(partial(self.delete_profile))
 
@@ -234,7 +231,7 @@ class GwProfileButton(GwParentMapTool):
             item_arc = QListWidgetItem(str(profile['profile_id']))
             self.dlg_load.tbl_profiles.addItem(item_arc)
 
-        open_dialog(self.dlg_load)
+        tools_gw.open_dialog(self.dlg_load)
         self.deactivate()
 
 
@@ -247,7 +244,7 @@ class GwProfileButton(GwParentMapTool):
             self.controller.show_warning(message)
             return
 
-        close_dialog(self.dlg_load)
+        tools_gw.close_dialog(self.dlg_load)
 
         profile_id = self.dlg_load.tbl_profiles.currentItem().text()
 
@@ -349,7 +346,7 @@ class GwProfileButton(GwParentMapTool):
 
                     # Populate list arcs
                     extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
-                    body = create_body(extras=extras)
+                    body = tools_gw.create_body(extras=extras)
                     result = self.controller.get_json('gw_fct_getprofilevalues', body)
                     if result['status'] == 'Failed': return
                     self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
@@ -1286,7 +1283,7 @@ class GwProfileButton(GwParentMapTool):
         profile_id = self.dlg_load.tbl_profiles.currentItem().text()
 
         extras = f'"profile_id":"{profile_id}", "action":"delete"'
-        body = create_body(extras=extras)
+        body = tools_gw.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_setprofile', body)
         message = f"{result['message']}"
         self.controller.show_info(message)
@@ -1327,4 +1324,3 @@ class GwProfileButton(GwParentMapTool):
             value = default_value
         finally:
             return value
-

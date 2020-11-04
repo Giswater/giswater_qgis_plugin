@@ -11,6 +11,7 @@ from ...shared.dimensioning import GwDimensioning
 from ..parent_maptool import GwParentMapTool
 from ....lib import tools_qt
 
+
 class GwDimensioningButton(GwParentMapTool):
     """ Button 39: Dimensioning """
 

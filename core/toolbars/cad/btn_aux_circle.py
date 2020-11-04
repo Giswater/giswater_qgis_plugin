@@ -5,17 +5,17 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel
-from qgis.gui import QgsVertexMarker
+from functools import partial
+
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator
-
-from functools import partial
+from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel
+from qgis.gui import QgsVertexMarker
 
 from ....lib import tools_qt
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import AuxCircle
-from ...utils.tools_gw import load_settings, open_dialog, close_dialog
+from ...utils import tools_gw
 
 
 class GwAuxCircleButton(GwParentMapTool):
@@ -35,7 +35,7 @@ class GwAuxCircleButton(GwParentMapTool):
 
         # Create the dialog and signals
         self.dlg_create_circle = AuxCircle()
-        load_settings(self.dlg_create_circle)
+        tools_gw.load_settings(self.dlg_create_circle)
         self.cancel_circle = False
         validator = QDoubleValidator(0.00, 999.00, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
@@ -45,7 +45,7 @@ class GwAuxCircleButton(GwParentMapTool):
         self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
         self.dlg_create_circle.radius.setFocus()
 
-        open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
+        tools_gw.open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
 
 
     def get_radius(self, point):
@@ -57,7 +57,7 @@ class GwAuxCircleButton(GwParentMapTool):
 
         if self.layer_circle:
             self.layer_circle.startEditing()
-            close_dialog(self.dlg_create_circle)
+            tools_gw.close_dialog(self.dlg_create_circle)
             if self.delete_prev:
                 selection = self.layer_circle.getFeatures()
                 self.layer_circle.selectByIds([f.id() for f in selection])
@@ -86,7 +86,7 @@ class GwAuxCircleButton(GwParentMapTool):
 
     def cancel(self):
 
-        close_dialog(self.dlg_create_circle)
+        tools_gw.close_dialog(self.dlg_create_circle)
         self.cancel_map_tool()
         if self.layer_circle:
             if self.layer_circle.isEditable():

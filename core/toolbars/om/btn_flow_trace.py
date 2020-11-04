@@ -8,7 +8,7 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import Qt
 
 from ..parent_maptool import GwParentMapTool
-from ...utils.tools_gw import create_body
+from ...utils import tools_gw
 
 
 class GwFlowTraceButton(GwParentMapTool):
@@ -47,7 +47,7 @@ class GwFlowTraceButton(GwParentMapTool):
 
             elem_id = self.snapped_feat.attribute('node_id')
             feature_id = f'"id":["{elem_id}"]'
-            body = create_body(feature=feature_id)
+            body = tools_gw.create_body(feature=feature_id)
             result = self.controller.get_json(function_name, body)
             if not result or result['status'] == 'Failed':
                 return

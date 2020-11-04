@@ -5,15 +5,14 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from .... import global_vars
-
+from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
-from qgis.PyQt.QtCore import Qt
 
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import DialogTextUi
-from ...utils.tools_gw import populate_info_text, create_body, refresh_legend
+from ...utils import tools_gw
+from .... import global_vars
 
 
 class GwArcDivideButton(GwParentMapTool):
@@ -37,7 +36,7 @@ class GwArcDivideButton(GwParentMapTool):
         status = self.controller.execute_sql(sql)
         if status:
             feature_id = f'"id":["{node_id}"]'
-            body = create_body(feature=feature_id)
+            body = tools_gw.create_body(feature=feature_id)
             result = self.controller.get_json('gw_fct_setarcdivide', body)
             if not result or result['status'] == 'Failed':
                 return
@@ -45,7 +44,7 @@ class GwArcDivideButton(GwParentMapTool):
                 self.dlg_dtext = DialogTextUi()
                 self.dlg_dtext.btn_accept.hide()
                 self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
-                populate_info_text(self.dlg_dtext, result['body']['data'], False, True, 1)
+                tools_gw.populate_info_text(self.dlg_dtext, result['body']['data'], False, True, 1)
                 self.dlg_dtext.exec()
 
         else:
@@ -230,7 +229,7 @@ class GwArcDivideButton(GwParentMapTool):
                     self.controller.set_layer_index('v_edit_connec')
                     self.controller.set_layer_index('v_edit_gully')
                     self.controller.set_layer_index('v_edit_node')
-                    refresh_legend(self.controller)
+                    tools_gw.refresh_legend(self.controller)
 
 
         elif event.button() == Qt.RightButton:

@@ -5,18 +5,18 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from .... import global_vars
-
-from qgis.core import QgsMapToPixel
-from qgis.gui import QgsVertexMarker
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QDoubleValidator
 from functools import partial
 
-from ....lib import tools_qt
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QDoubleValidator
+from qgis.core import QgsMapToPixel
+from qgis.gui import QgsVertexMarker
+
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import AuxPoint
-from ...utils.tools_gw import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value
+from ...utils import tools_gw
+from .... import global_vars
+from ....lib import tools_qt
 
 
 class GwAuxPointButton(GwParentMapTool):
@@ -38,7 +38,7 @@ class GwAuxPointButton(GwParentMapTool):
 
         # Create the dialog and signals
         self.dlg_create_point = AuxPoint()
-        load_settings(self.dlg_create_point)
+        tools_gw.load_settings(self.dlg_create_point)
 
         validator = QDoubleValidator(-99999.99, 99999.999, 3)
         validator.setNotation(QDoubleValidator().StandardNotation)
@@ -50,16 +50,16 @@ class GwAuxPointButton(GwParentMapTool):
         self.dlg_create_point.btn_accept.clicked.connect(partial(self.get_values, point_1, point_2))
         self.dlg_create_point.btn_cancel.clicked.connect(self.cancel)
 
-        if get_parser_value('cadtools', f"{self.dlg_create_point.rb_left.objectName()}") == 'True':
+        if tools_gw.get_parser_value('cadtools', f"{self.dlg_create_point.rb_left.objectName()}") == 'True':
             self.dlg_create_point.rb_left.setChecked(True)
         else:
             self.dlg_create_point.rb_right.setChecked(True)
 
-        open_dialog(self.dlg_create_point, dlg_name='auxpoint', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_create_point, dlg_name='auxpoint', maximize_button=False)
 
 
     def get_values(self, point_1, point_2):
-        set_parser_value('cadtools', f"{self.dlg_create_point.rb_left.objectName()}",
+        tools_gw.set_parser_value('cadtools', f"{self.dlg_create_point.rb_left.objectName()}",
                          f"{self.dlg_create_point.rb_left.isChecked()}")
 
         self.dist_x = self.dlg_create_point.dist_x.text()
@@ -72,7 +72,7 @@ class GwAuxPointButton(GwParentMapTool):
         self.delete_prev = tools_qt.isChecked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
         if self.layer_points:
             self.layer_points.startEditing()
-            close_dialog(self.dlg_create_point)
+            tools_gw.close_dialog(self.dlg_create_point)
             if self.dlg_create_point.rb_left.isChecked():
                 self.direction = 1
             else:
@@ -101,10 +101,10 @@ class GwAuxPointButton(GwParentMapTool):
 
     def cancel(self):
 
-        set_parser_value('cadtools', f"{self.dlg_create_point.rb_left.objectName()}",
+        tools_gw.set_parser_value('cadtools', f"{self.dlg_create_point.rb_left.objectName()}",
                          f"{self.dlg_create_point.rb_left.isChecked()}")
 
-        close_dialog(self.dlg_create_point)
+        tools_gw.close_dialog(self.dlg_create_point)
         self.iface.setActiveLayer(self.current_layer)
         if self.layer_points:
             if self.layer_points.isEditable():

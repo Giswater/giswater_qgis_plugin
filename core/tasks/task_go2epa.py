@@ -5,15 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSignal
-from qgis.core import QgsTask
-
 import re
 import os
 import subprocess
 
+from qgis.PyQt.QtCore import pyqtSignal
+from qgis.core import QgsTask
+
+from ..utils import tools_gw
 from ... import global_vars
-from ..utils.tools_gw import add_temp_layer
 
 
 class GwGo2EpaTask(QgsTask):
@@ -94,7 +94,7 @@ class GwGo2EpaTask(QgsTask):
                     if self.complet_result['status'] == "Accepted":
                         if 'body' in self.complet_result:
                             if 'data' in self.complet_result['body']:
-                                add_temp_layer(self.dlg_go2epa, self.complet_result['body']['data'],
+                                tools_gw.add_temp_layer(self.dlg_go2epa, self.complet_result['body']['data'],
                                     'INP results', True, True, 1, False, disable_tabs=False)
 
             if self.import_result and self.rpt_result:
@@ -102,7 +102,7 @@ class GwGo2EpaTask(QgsTask):
                     if self.rpt_result['status'] == "Accepted":
                         if 'body' in self.rpt_result:
                             if 'data' in self.rpt_result['body']:
-                                add_temp_layer(self.dlg_go2epa, self.rpt_result['body']['data'],
+                                tools_gw.add_temp_layer(self.dlg_go2epa, self.rpt_result['body']['data'],
                                     'RPT results', True, True, 1, False, disable_tabs=False)
                         self.message = self.rpt_result['message']['text']
 

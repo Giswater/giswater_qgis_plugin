@@ -5,22 +5,18 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsExpression, QgsFeatureRequest
+from datetime import datetime
+from functools import partial
+
 from qgis.PyQt.QtCore import QDate, QStringListModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
+from qgis.core import QgsExpression, QgsFeatureRequest
 
-from functools import partial
-from datetime import datetime
-
-from ....lib import tools_qt
 from ...toolbars.parent_dialog import GwParentAction
-from ...utils.tools_gw import close_dialog, load_settings, open_dialog, hide_generic_layers, tab_feature_changed, \
-    create_body
 from ...ui.ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
-from ....lib.tools_qgis import remove_selection, selection_init, disconnect_snapping, \
-    disconnect_signal_selection_changed, insert_feature
-from ....lib.tools_qt import delete_records, set_selectionbehavior, set_icon, set_completer_object, set_completer_widget, setWidgetText
+from ...utils import tools_gw
+from ....lib import tools_qgis, tools_qt
 
 
 class GwEndFeatureButton(GwParentAction):
@@ -54,11 +50,11 @@ class GwEndFeatureButton(GwParentAction):
         self.layers['connec'] = self.controller.get_group_layers('connec')
         self.layers['element'] = [self.controller.get_layer_by_tablename('v_edit_element')]
 
-        self.layers = remove_selection(True, layers=self.layers)
+        self.layers = tools_qgis.remove_selection(True, layers=self.layers)
 
         # Create the dialog and signals
         self.dlg_work_end = FeatureEndUi()
-        load_settings(self.dlg_work_end)
+        tools_gw.load_settings(self.dlg_work_end)
         self.set_edit_arc_downgrade_force('True')
 
         # Set default geom_type and viewname
@@ -68,7 +64,7 @@ class GwEndFeatureButton(GwParentAction):
         # Capture the current layer to return it at the end of the operation
         self.cur_active_layer = self.iface.activeLayer()
 
-        set_selectionbehavior(self.dlg_work_end)
+        tools_qt.set_selectionbehavior(self.dlg_work_end)
 
         # Remove 'gully' for 'WS'
         self.project_type = self.controller.get_project_type()
@@ -78,15 +74,15 @@ class GwEndFeatureButton(GwParentAction):
             self.layers['gully'] = self.controller.get_group_layers('gully')
 
         # Set icons
-        set_icon(self.dlg_work_end.btn_insert, "111")
-        set_icon(self.dlg_work_end.btn_delete, "112")
-        set_icon(self.dlg_work_end.btn_snapping, "137")
-        set_icon(self.dlg_work_end.btn_new_workcat, "193")
+        tools_qt.set_icon(self.dlg_work_end.btn_insert, "111")
+        tools_qt.set_icon(self.dlg_work_end.btn_delete, "112")
+        tools_qt.set_icon(self.dlg_work_end.btn_snapping, "137")
+        tools_qt.set_icon(self.dlg_work_end.btn_new_workcat, "193")
 
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "cat_work"
-        set_completer_object(self.dlg_work_end, self.table_object)
+        tools_qt.set_completer_object(self.dlg_work_end, self.table_object)
 
         # Set signals
         self.dlg_work_end.btn_accept.clicked.connect(partial(self.manage_workcat_end_accept))
@@ -97,32 +93,32 @@ class GwEndFeatureButton(GwParentAction):
         self.dlg_work_end.workcat_id_end.editTextChanged.connect(partial(self.fill_workids))
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_work_end.btn_insert.clicked.connect(partial(insert_feature, self.dlg_work_end, self.table_object,
+        self.dlg_work_end.btn_insert.clicked.connect(partial(tools_qgis.insert_feature, self.dlg_work_end, self.table_object,
                                                              geom_type=geom_type, ids=self.ids, layers=self.layers,
                                                              list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_work_end.btn_delete.clicked.connect(partial(delete_records, self.dlg_work_end, self.table_object,
+        self.dlg_work_end.btn_delete.clicked.connect(partial(tools_qt.delete_records, self.dlg_work_end, self.table_object,
                                                              geom_type=geom_type, layers=self.layers, ids=self.ids,
                                                              list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_work_end.btn_snapping.clicked.connect(
-            partial(selection_init, self.dlg_work_end, self.table_object, geom_type=geom_type, layers=self.layers))
+            partial(tools_qgis.selection_init, self.dlg_work_end, self.table_object, geom_type=geom_type, layers=self.layers))
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(
-            partial(tab_feature_changed, self.dlg_work_end, excluded_layers=["v_edit_element"]))
+            partial(tools_gw.tab_feature_changed, self.dlg_work_end, excluded_layers=["v_edit_element"]))
 
         # Set values
         self.fill_fields()
 
         # Adding auto-completion to a QLineEdit for default feature
-        set_completer_widget(viewname, self.dlg_work_end.feature_id, str(geom_type) + "_id")
+        tools_qt.set_completer_widget(viewname, self.dlg_work_end.feature_id, str(geom_type) + "_id")
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
-        tab_feature_changed(self.dlg_work_end, excluded_layers=["v_edit_element"])
+        tools_gw.tab_feature_changed(self.dlg_work_end, excluded_layers=["v_edit_element"])
 
         # Open dialog
-        open_dialog(self.dlg_work_end, dlg_name='feature_end', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end', maximize_button=False)
 
 
 
@@ -193,10 +189,10 @@ class GwEndFeatureButton(GwParentAction):
                f"WHERE id = '{workcat_id}'")
         row = self.controller.get_row(sql)
         if row:
-            setWidgetText(self.dlg_work_end, self.dlg_work_end.descript, row['descript'])
+            tools_qt.setWidgetText(self.dlg_work_end, self.dlg_work_end.descript, row['descript'])
             tools_qt.setCalendarDate(self.dlg_work_end, self.dlg_work_end.builtdate, row['builtdate'], False)
         else:
-            setWidgetText(self.dlg_work_end, self.dlg_work_end.descript, '')
+            tools_qt.setWidgetText(self.dlg_work_end, self.dlg_work_end.descript, '')
             tools_qt.setCalendarDate(self.dlg_work_end, self.dlg_work_end.builtdate, None, False)
 
 
@@ -241,7 +237,7 @@ class GwEndFeatureButton(GwParentAction):
 
         if row:
             self.dlg_work = FeatureEndConnecUi()
-            load_settings(self.dlg_work)
+            tools_gw.load_settings(self.dlg_work)
 
             self.dlg_work.btn_cancel.clicked.connect(partial(self.close_dialog_workcat_list, self.dlg_work))
             self.dlg_work.btn_accept.clicked.connect(self.exec_downgrade)
@@ -264,7 +260,7 @@ class GwEndFeatureButton(GwParentAction):
             self.tbl_arc_x_relations.doubleClicked.connect(
                 partial(self.open_selected_object, self.tbl_arc_x_relations))
 
-            open_dialog(self.dlg_work, dlg_name='feature_end_connec')
+            tools_gw.open_dialog(self.dlg_work, dlg_name='feature_end_connec')
 
         # TODO: Function update_geom_type() don't use parameter ids_list
         else:
@@ -310,7 +306,7 @@ class GwEndFeatureButton(GwParentAction):
 
         # TODO: Check this
         feature = f'"featureType":"{geom_type}", "featureId":"{ids_list}"'
-        body = create_body(feature=feature)        
+        body = tools_gw.create_body(feature=feature)
         self.controller.get_json('gw_fct_setendfeature', body)
 
 
@@ -463,17 +459,17 @@ class GwEndFeatureButton(GwParentAction):
 
     def close_dialog_workcat_list(self, dlg=None):
         """ Close dialog """
-        close_dialog(dlg)
-        open_dialog(self.dlg_work_end)
+        tools_gw.close_dialog(dlg)
+        tools_gw.open_dialog(self.dlg_work_end)
 
 
     def manage_close(self, dialog, table_object, cur_active_layer=None, force_downgrade=False, show_warning=False):
         """ Close dialog and disconnect snapping """
 
-        close_dialog(dialog)
-        hide_generic_layers(excluded_layers=["v_edit_element"])
-        disconnect_snapping()
-        disconnect_signal_selection_changed()
+        tools_gw.close_dialog(dialog)
+        tools_gw.hide_generic_layers(excluded_layers=["v_edit_element"])
+        tools_qgis.disconnect_snapping()
+        tools_qgis.disconnect_signal_selection_changed()
         if force_downgrade:
             sql = ("SELECT feature_type, feature_id, log_message "
                    "FROM audit_log_data "
@@ -503,18 +499,18 @@ class GwEndFeatureButton(GwParentAction):
     def new_workcat(self):
 
         self.dlg_new_workcat = InfoWorkcatUi()
-        load_settings(self.dlg_new_workcat)
+        tools_gw.load_settings(self.dlg_new_workcat)
 
         tools_qt.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
         table_object = "cat_work"
-        set_completer_widget(table_object, self.dlg_new_workcat.cat_work_id, 'id')
+        tools_qt.set_completer_widget(table_object, self.dlg_new_workcat.cat_work_id, 'id')
 
         # Set signals
         self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
-        self.dlg_new_workcat.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_new_workcat))
+        self.dlg_new_workcat.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_new_workcat))
 
         # Open dialog
-        open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
+        tools_gw.open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
 
 
     def manage_new_workcat_accept(self, table_object):
@@ -574,7 +570,7 @@ class GwEndFeatureButton(GwParentAction):
                     aux = self.dlg_work_end.workcat_id_end.findText(str(cat_work_id))
                     self.dlg_work_end.workcat_id_end.setCurrentIndex(aux)
 
-                close_dialog(self.dlg_new_workcat)
+                tools_gw.close_dialog(self.dlg_new_workcat)
 
             else:
                 msg = "This Workcat already exist"
