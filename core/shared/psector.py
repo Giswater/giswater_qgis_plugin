@@ -1135,7 +1135,7 @@ class GwPsector:
     def set_plan(self):
 
         # TODO: Check this
-        extras = f'"psector_id":"{getWidgetText(self.dlg_plan_psector, self.psector_id)}"'
+        extras = f'"psectorId":"{getWidgetText(self.dlg_plan_psector, self.psector_id)}"'
         body = create_body(extras=extras)
         self.controller.get_json('gw_fct_setplan', body, log_sql=True)
         
