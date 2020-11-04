@@ -247,3 +247,8 @@ VALUES (3164, 'Arc have incorrectly defined final nodes in this plan alternative
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
 VALUES ('3002', 'gw_fct_setplan', 'utils', 'function','json', 'json', 
 'Function that returns qgis layer configuration for masterplan', 'role_master', NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_typevalue VALUES ('tabname_typevalue', 'tab_event', 'tab_event', 'tabEvent') ON CONFLICT (typevalue, id) DO NOTHING;
+UPDATE config_form_tabs SET tabname='tab_event' WHERE tabname='tab_om';
+DELETE FROM config_typevalue WHERE typevalue='tabname_typevalue' AND id='tab_om';
+
