@@ -27,7 +27,6 @@ from .actions.edit import Edit
 from .actions.go2epa import Go2Epa
 from .actions.master import Master
 from .actions.mincut import MincutParent
-from .actions.notify_functions import NotifyFunctions
 from .actions.om import Om
 from .actions.parent import ParentAction
 from .actions.tm_basic import TmBasic
@@ -711,8 +710,7 @@ class Giswater(QObject):
         try:
             # Unlisten notify channel and stop thread
             if self.settings.value('system_variables/use_notify').upper() == 'TRUE' and hasattr(self, 'notify'):
-                list_channels = ['desktop', self.controller.current_user]
-                self.notify.stop_listening(list_channels)
+                self.controller.stop_notify()
 
             for action in list(self.actions.values()):
                 self.iface.removePluginMenu(self.plugin_name, action)
@@ -983,10 +981,8 @@ class Giswater(QObject):
 
         # Create a thread to listen selected database channels
         if self.settings.value('system_variables/use_notify').upper() == 'TRUE':
-            self.notify = NotifyFunctions(self.iface, self.settings, self.controller, self.plugin_dir)
-            self.notify.set_controller(self.controller)
-            list_channels = ['desktop', self.controller.current_user]
-            self.notify.start_listening(list_channels)
+            self.controller.use_notify = True
+            self.controller.log_info("Notify enabled")
 
         # Save toolbar position after save project
         self.iface.actionSaveProject().triggered.connect(self.save_toolbars_position)

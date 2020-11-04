@@ -34,12 +34,17 @@ class NotifyFunctions(ParentAction):
         self.settings = settings
         self.controller = controller
         self.plugin_dir = plugin_dir
+        self.thread = None
 
 
-    def start_listening(self, list_channels):
+    def start_listening(self, list_channels=None):
         """
         :param list_channels: List of channels to be listened
         """
+
+        if list_channels is None:
+            list_channels = ['desktop', self.controller.current_user]
+
         self.list_channels = list_channels
         for channel_name in list_channels:
             self.controller.execute_sql(f'LISTEN "{channel_name}";')
@@ -74,13 +79,31 @@ class NotifyFunctions(ParentAction):
             raise exception
 
 
-    def stop_listening(self, list_channels):
+    def stop_listening(self, list_channels=None):
         """
         :param list_channels: List of channels to be unlistened
         """
 
+        if list_channels is None:
+            list_channels = ['desktop', self.controller.current_user]
+
         for channel_name in list_channels:
             self.controller.execute_sql(f'UNLISTEN "{channel_name}";')
+
+
+    def start_thread(self):
+
+        self.controller.notify_is_listening = True
+        self.thread = threading.Timer(interval=1, function=self.wait_notifications)
+        self.thread.start()
+
+
+    def stop_thread(self):
+
+        if self.thread:
+            self.controller.log_info("Notify canceled")
+            self.thread.cancel()
+            self.controller.notify_is_listening = False
 
 
     def wait_notifications(self):
@@ -92,13 +115,15 @@ class NotifyFunctions(ParentAction):
 
                 self.conn_failed = False
 
-            # Initialize thread
-            thread = threading.Timer(interval=1, function=self.wait_notifications)
-            thread.start()
-
             # Check if any notification to process
             dao = self.controller.dao
-            dao.get_poll()
+            status = dao.get_poll()
+            if status:
+                self.start_thread()
+            else:
+                self.conn_failed = True
+                self.stop_thread()
+                return
 
             last_paiload = None
             while dao.conn.notifies:

@@ -28,6 +28,7 @@ from .logger import Logger
 from .. import utils_giswater
 from .. import sys_manager
 from ..ui_manager import DialogTextUi, DockerUi
+from ..actions.notify_functions import NotifyFunctions
 
 
 class DaoController(object):
@@ -61,15 +62,60 @@ class DaoController(object):
         self.dlg_info = None
         self.show_db_exception = True
         self.is_inserting = False
-        
+        self.use_notify = False
+        self.notify = None
+        self.notify_is_listening = False
+
         if create_logger:
             self.set_logger(logger_name)
+
+
+    def manage_connection(self):
+        """ Manage DB connection. If is opened manages notify. If not shows exception to the user """
+
+        status = self.dao.check_cursor()
+        if status:
+            self.start_notify()
+        else:
+            if self.dao.last_error:
+                self.manage_exception_db(self.dao.last_error)
+
+        return status
+
+
+    def start_notify(self):
+        """ Start notify """
+
+        if not self.use_notify:
+            return
+
+        if self.notify is None:
+            self.notify_is_listening = True
+            self.notify = NotifyFunctions(self.iface, self.settings, self, self.plugin_dir)
+            self.notify.start_listening()
+
+        if not self.notify_is_listening:
+            self.log_info("Notify started")
+            self.notify.start_thread()
+
+
+    def stop_notify(self):
+        """ Stop notify """
+
+        if not self.use_notify:
+            return
+
+        if self.notify:
+            if self.notify_is_listening:
+                self.notify.stop_listening()
+                self.notify_is_listening = False
 
 
     def close_db(self):
         """ Close database connection """
 
         if self.dao:
+            self.stop_notify()
             if not self.dao.close_db():
                 self.log_info(str(self.last_error))
             del self.dao
@@ -614,6 +660,9 @@ class DaoController(object):
     def get_row(self, sql, log_info=True, log_sql=False, commit=True, params=None):
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
+        if not self.manage_connection():
+            return None
+
         sql = self.get_sql(sql, log_sql, params)
         row = self.dao.get_row(sql, commit)
         self.last_error = self.dao.last_error
@@ -629,6 +678,9 @@ class DaoController(object):
 
     def get_rows(self, sql, log_info=True, log_sql=False, commit=True, params=None, add_empty_row=False):
         """ Execute SQL. Check its result in log tables, and show it to the user """
+
+        if not self.manage_connection():
+            return None
 
         sql = self.get_sql(sql, log_sql, params)
         rows = None
@@ -653,6 +705,9 @@ class DaoController(object):
     def execute_sql(self, sql, log_sql=False, log_error=False, commit=True, filepath=None):
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
+        if not self.manage_connection():
+            return None
+
         if log_sql:
             self.log_info(sql, stack_level_increase=1)
         result = self.dao.execute_sql(sql, commit)
@@ -669,6 +724,9 @@ class DaoController(object):
     def execute_returning(self, sql, log_sql=False, log_error=False, commit=True):
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
+        if not self.manage_connection():
+            return None
+
         if log_sql:
             self.log_info(sql, stack_level_increase=1)
         value = self.dao.execute_returning(sql, commit)
@@ -684,6 +742,9 @@ class DaoController(object):
 
     def execute_insert_or_update(self, tablename, unique_field, unique_value, fields, values, commit=True):
         """ Execute INSERT or UPDATE sentence. Used for PostgreSQL database versions <9.5 """
+
+        if not self.manage_connection():
+            return None
 
         # Check if we have to perform an INSERT or an UPDATE
         if unique_value != 'current_user':
@@ -741,6 +802,9 @@ class DaoController(object):
 
     def execute_upsert(self, tablename, unique_field, unique_value, fields, values, commit=True):
         """ Execute UPSERT sentence """
+
+        if not self.manage_connection():
+            return None
 
         # Check PostgreSQL version
         if not self.postgresql_version:
@@ -801,6 +865,9 @@ class DaoController(object):
         :param log_sql: Show query in qgis log (bool)
         :return: Response of the function executed (json)
         """
+
+        if not self.manage_connection():
+            return None
 
         # Check if function exists
         row = self.check_function(function_name, schema_name, commit)
@@ -872,6 +939,7 @@ class DaoController(object):
 
     def translate_form(self, dialog, context_name):
         """ Translate widgets of the form to current language """
+
         type_widget_list = [QCheckBox, QGroupBox, QLabel, QPushButton, QRadioButton, QTabWidget]
         for widget_type in type_widget_list:
             widget_list = dialog.findChildren(widget_type)
