@@ -436,7 +436,6 @@ class GwInfo(QObject):
         set_icon(action_section, "207")
         set_icon(action_help, "73")
         set_icon(action_interpolate, "194")
-        # self.set_icon(action_switch_arc_id, "141")
 
         # Set buttons icon
         # tab elements

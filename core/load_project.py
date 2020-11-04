@@ -15,12 +15,11 @@ from collections import OrderedDict, Counter
 
 from .. import global_vars
 from .models.plugin_toolbar import PluginToolbar
-from .utils.pg_man import PgMan
 from .ui.ui_manager import DialogTextUi
-from .utils.function_dynamic import GwInfoTools
+from .utils.backend_functions import GwInfoTools
 from .utils.notify import GwNotifyTools
 from .shared.search import GwSearch
-from .utils.tools_giswater import set_parser_value
+from .utils.tools_giswater import set_parser_value, manage_feature_cat, set_style_mapzones
 from ..lib.tools_qgis import qgis_get_layer_source, get_qgis_project_variables, qgis_manage_snapping_layer
 from .toolbars import buttons
 
@@ -36,7 +35,6 @@ class LoadProject(QObject):
         self.settings = global_vars.settings
         self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
-        self.pg_man = PgMan(global_vars.controller)
         self.plugin_toolbars = {}
         self.buttons_to_hide = []
         self.plugin_name = global_vars.plugin_dir
@@ -103,7 +101,7 @@ class LoadProject(QObject):
         self.get_buttons_to_hide()
 
         # Manage records from table 'cat_feature'
-        self.feature_cat = self.pg_man.manage_feature_cat()
+        self.feature_cat = manage_feature_cat()
 
         # Manage snapping layers
         self.manage_snapping_layers()
@@ -126,7 +124,7 @@ class LoadProject(QObject):
             GwSearch().api_search(load_project=True)
 
         # call dynamic mapzones repaint
-        self.pg_man.set_style_mapzones()
+        set_style_mapzones()
 
         # Log it
         message = "Project read successfully"

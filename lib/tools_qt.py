@@ -30,6 +30,28 @@ from .tools_qgis import disconnect_signal_selection_changed, select_features_by_
     connect_signal_selection_changed, disconnect_snapping, refresh_map_canvas
 
 
+class GwExtendedQLabel(QLabel):
+    clicked = pyqtSignal()
+
+    def __init(self, parent):
+        QLabel.__init__(self, parent)
+
+    def mouseReleaseEvent(self, ev):
+        self.clicked.emit()
+
+
+class GwHyperLinkLabel(QLabel):
+    clicked = pyqtSignal()
+
+    def __init__(self):
+        QLabel.__init__(self)
+        self.setStyleSheet("QLabel{color:blue; text-decoration: underline;}")
+
+    def mouseReleaseEvent(self, ev):
+        self.clicked.emit()
+        self.setStyleSheet("QLabel{color:purple; text-decoration: underline;}")
+
+
 def fillComboBox(dialog, widget, rows, allow_nulls=True, clear_combo=True):
 
     if rows is None:
@@ -1754,7 +1776,7 @@ def set_icon(widget, icon):
     """ Set @icon to selected @widget """
 
     # Get icons folder
-    icons_folder = os.path.join(global_vars.plugin_dir, 'icons')
+    icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}shared")
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
     if os.path.exists(icon_path):
         widget.setIcon(QIcon(icon_path))
@@ -2395,25 +2417,3 @@ def get_feature_by_id(layer, id, field_id=None):
             if feature[field_id] == id:
                 return feature
     return False
-
-
-class GwExtendedQLabel(QLabel):
-    clicked = pyqtSignal()
-
-    def __init(self, parent):
-        QLabel.__init__(self, parent)
-
-    def mouseReleaseEvent(self, ev):
-        self.clicked.emit()
-
-
-class GwHyperLinkLabel(QLabel):
-    clicked = pyqtSignal()
-
-    def __init__(self):
-        QLabel.__init__(self)
-        self.setStyleSheet("QLabel{color:blue; text-decoration: underline;}")
-
-    def mouseReleaseEvent(self, ev):
-        self.clicked.emit()
-        self.setStyleSheet("QLabel{color:purple; text-decoration: underline;}")

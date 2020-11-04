@@ -22,6 +22,6 @@ homepage=https://www.giswater.org
 repository=https://github.com/giswater/giswater_qgis_plugin
 tracker=https://github.com/giswater/giswater_qgis_plugin/issues
 category=Plugins
-icon=icons/giswater.png
+icon=icons/shared/giswater.png
 experimental=False
 deprecated=False
