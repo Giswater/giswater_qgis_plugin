@@ -13,14 +13,14 @@ from qgis.PyQt.QtWidgets import QMessageBox, QWidget
 import os
 
 from ... import global_vars
-from ..utils.tools_gw import getWidgetText, open_file_path, create_body, delete_layer_from_toc
+from ..utils import tools_gw
 
 
 def gw_function_dxf(**kwargs):
     """ Function called in def add_button(self, dialog, field): -->
             widget.clicked.connect(partial(getattr(self, function_name), dialog, widget)) """
 
-    path, filter_ = open_file_path(filter_="DXF Files (*.dxf)")
+    path, filter_ = tools_gw.open_file_path(filter_="DXF Files (*.dxf)")
     if not path:
         return
 
@@ -103,7 +103,7 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
             export_layer_to_db(dxf_layer, crs)
 
         if del_old_layers:
-            delete_layer_from_toc(dxf_layer.name())
+            tools_gw.delete_layer_from_toc(dxf_layer.name())
 
         if toc:
             if dxf_layer.isValid():
@@ -116,10 +116,10 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
     extras = "  "
     for widget in dialog.grb_parameters.findChildren(QWidget):
         widget_name = widget.property('columnname')
-        value = getWidgetText(dialog, widget, add_quote=False)
+        value = tools_gw.getWidgetText(dialog, widget, add_quote=False)
         extras += f'"{widget_name}":"{value}", '
     extras = extras[:-2]
-    body = create_body(extras)
+    body = tools_gw.create_body(extras)
     result = global_vars.controller.get_json('gw_fct_check_importdxf', None)
     if not result or result['status'] == 'Failed':
         return False
@@ -232,7 +232,7 @@ class GwInfoTools:
 
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
-            body = create_body(feature=feature, extras=extras)
+            body = tools_gw.create_body(feature=feature, extras=extras)
             result = self.controller.get_json('gw_fct_getinfofromid', body, is_notify=True)
             if not result:
                 continue

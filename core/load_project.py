@@ -19,8 +19,8 @@ from .ui.ui_manager import DialogTextUi
 from .utils.backend_functions import GwInfoTools
 from .utils.notify import GwNotifyTools
 from .shared.search import GwSearch
-from .utils.tools_gw import set_parser_value, manage_feature_cat, set_style_mapzones
-from ..lib.tools_qgis import qgis_get_layer_source, get_qgis_project_variables, qgis_manage_snapping_layer
+from .utils import tools_gw
+from ..lib import tools_qgis
 from .toolbars import buttons
 
 
@@ -56,10 +56,10 @@ class LoadProject(QObject):
 
         # Manage schema name
         self.controller.get_current_user()
-        layer_source = qgis_get_layer_source(self.layer_node)
+        layer_source = tools_qgis.qgis_get_layer_source(self.layer_node)
         self.schema_name = layer_source['schema']
         self.schema_name = self.schema_name.replace('"', '')
-        set_parser_value('load_project', 'schema_name', f'{self.schema_name}')
+        tools_gw.set_parser_value('load_project', 'schema_name', f'{self.schema_name}')
         self.controller.set_schema_name(self.schema_name)
 
         # TEMP
@@ -82,7 +82,7 @@ class LoadProject(QObject):
         global_vars.srid = srid
 
         # Get variables from qgis project
-        self.project_vars = get_qgis_project_variables()
+        self.project_vars = tools_qgis.get_qgis_project_variables()
         global_vars.project_vars = self.project_vars
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
@@ -101,7 +101,7 @@ class LoadProject(QObject):
         self.get_buttons_to_hide()
 
         # Manage records from table 'cat_feature'
-        self.feature_cat = manage_feature_cat()
+        self.feature_cat = tools_gw.manage_feature_cat()
 
         # Manage snapping layers
         self.manage_snapping_layers()
@@ -124,7 +124,7 @@ class LoadProject(QObject):
             GwSearch().api_search(load_project=True)
 
         # call dynamic mapzones repaint
-        set_style_mapzones()
+        tools_gw.set_style_mapzones()
 
         # Log it
         message = "Project read successfully"
@@ -323,10 +323,10 @@ class LoadProject(QObject):
     def manage_snapping_layers(self):
         """ Manage snapping of layers """
 
-        qgis_manage_snapping_layer('v_edit_arc', snapping_type=2)
-        qgis_manage_snapping_layer('v_edit_connec', snapping_type=0)
-        qgis_manage_snapping_layer('v_edit_node', snapping_type=0)
-        qgis_manage_snapping_layer('v_edit_gully', snapping_type=0)
+        tools_qgis.qgis_manage_snapping_layer('v_edit_arc', snapping_type=2)
+        tools_qgis.qgis_manage_snapping_layer('v_edit_connec', snapping_type=0)
+        tools_qgis.qgis_manage_snapping_layer('v_edit_node', snapping_type=0)
+        tools_qgis.qgis_manage_snapping_layer('v_edit_gully', snapping_type=0)
 
 
     def check_user_roles(self):

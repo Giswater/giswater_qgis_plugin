@@ -33,10 +33,8 @@ from .tasks.parent_task import GwTask
 from ..i18n.i18n_generator import GwI18NGenerator
 from .ui.ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjectInfoUi, \
     MainGisProjectUi, MainImportUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
-from .utils.tools_gw import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
-    create_body, populate_info_text
-from ..lib.tools_qt import construct_form_param_user, get_folder_dialog, set_table_columns
-
+from .utils import tools_gw
+from ..lib import tools_qt
 
 class GwAdmin:
 
@@ -165,7 +163,7 @@ class GwAdmin:
 
         # Create dialog object
         self.dlg_readsql = MainUi()
-        load_settings(self.dlg_readsql)
+        tools_gw.load_settings(self.dlg_readsql)
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
         if self.dev_user != 'TRUE':
@@ -221,7 +219,7 @@ class GwAdmin:
         self.cmb_project_type.currentIndexChanged.connect(partial(self.set_info_project))
         self.cmb_project_type.currentIndexChanged.connect(partial(self.update_manage_ui))
         self.dlg_readsql.btn_custom_select_file.clicked.connect(
-            partial(get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
+            partial(tools_qt.get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
         self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
         self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
@@ -287,7 +285,7 @@ class GwAdmin:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.setWidgetText(self.dlg_readsql, 'lbl_status_text', msg)
             tools_qt.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
-            open_dialog(self.dlg_readsql, dlg_name='main_ui')
+            tools_gw.open_dialog(self.dlg_readsql, dlg_name='main_ui')
             return
 
         # Create extension postgis if not exist
@@ -332,12 +330,12 @@ class GwAdmin:
             tools_qt.dis_enable_dialog(self.dlg_readsql, True)
 
         # Load last schema name selected and project type
-        if get_parser_value('admin', 'last_project_type_selected') not in ('', None):
+        if tools_gw.get_parser_value('admin', 'last_project_type_selected') not in ('', None):
             tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
-                                   get_parser_value('admin', 'last_project_type_selected'))
-        if get_parser_value('admin', 'last_schema_name_selected') not in ('', None):
+                                   tools_gw.get_parser_value('admin', 'last_project_type_selected'))
+        if tools_gw.get_parser_value('admin', 'last_schema_name_selected') not in ('', None):
             tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name,
-                                   get_parser_value('admin', 'last_schema_name_selected'))
+                                   tools_gw.get_parser_value('admin', 'last_schema_name_selected'))
 
         if show_dialog:
             self.manage_docker()
@@ -351,7 +349,7 @@ class GwAdmin:
                 self.controller.dock_dialog(self.dlg_readsql)
                 self.dlg_readsql.dlg_closed.connect(self.controller.close_docker)
             else:
-                open_dialog(self.dlg_readsql, dlg_name='main_ui')
+                tools_gw.open_dialog(self.dlg_readsql, dlg_name='main_ui')
         except RuntimeError as e:
             self.controller.log_info(str(e))
 
@@ -441,7 +439,7 @@ class GwAdmin:
 
         # Create GIS project dialog
         self.dlg_create_gis_project = MainGisProjectUi()
-        load_settings(self.dlg_create_gis_project)
+        tools_gw.load_settings(self.dlg_create_gis_project)
 
         # Set default values
         schema_name = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -459,13 +457,13 @@ class GwAdmin:
 
         # Set listeners
         self.dlg_create_gis_project.btn_gis_folder.clicked.connect(
-            partial(get_folder_dialog, self.dlg_create_gis_project, "txt_gis_folder"))
+            partial(tools_qt.get_folder_dialog, self.dlg_create_gis_project, "txt_gis_folder"))
         self.dlg_create_gis_project.btn_accept.clicked.connect(partial(self.gis_create_project))
         self.dlg_create_gis_project.btn_close.clicked.connect(partial(self.close_dialog_admin, self.dlg_create_gis_project))
         self.dlg_create_gis_project.chk_is_sample.stateChanged.connect(partial(self.sample_state_changed))
 
         # Open MainWindow
-        open_dialog(self.dlg_create_gis_project, dlg_name='main_gisproject')
+        tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='main_gisproject')
 
 
     def sample_state_changed(self):
@@ -1304,7 +1302,7 @@ class GwAdmin:
 
         # Create dialog
         self.dlg_import_inp = MainImportUi()
-        load_settings(self.dlg_import_inp)
+        tools_gw.load_settings(self.dlg_import_inp)
 
         # Hide widgets
         self.dlg_import_inp.grb_input_layer.setVisible(False)
@@ -1321,7 +1319,7 @@ class GwAdmin:
             return
 
         extras += ', "isToolbox":false'
-        body = create_body(extras=extras)
+        body = tools_gw.create_body(extras=extras)
         complet_result = self.controller.get_json('gw_fct_gettoolbox', body, schema_name=self.schema, commit=False)
         if not complet_result or complet_result['status'] == 'Failed':
             return False
@@ -1333,7 +1331,7 @@ class GwAdmin:
         self.dlg_import_inp.btn_close.clicked.connect(partial(self.execute_import_inp, accepted=False))
 
         # Open dialog
-        open_dialog(self.dlg_import_inp, dlg_name='main_importinp')
+        tools_gw.open_dialog(self.dlg_import_inp, dlg_name='main_importinp')
 
 
     def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False, srid=None):
@@ -1514,10 +1512,10 @@ class GwAdmin:
         self.project_issample = example_data
 
         # Save in settings
-        set_parser_value('admin', 'project_name_schema', f'{project_name_schema}')
-        set_parser_value('admin', 'project_descript', f'{project_descript}')
+        tools_gw.set_parser_value('admin', 'project_name_schema', f'{project_name_schema}')
+        tools_gw.set_parser_value('admin', 'project_descript', f'{project_descript}')
         inp_file_path = tools_qt.getWidgetText(self.dlg_readsql_create_project, 'data_file')
-        set_parser_value('admin', 'inp_file_path', f'{inp_file_path}')
+        tools_gw.set_parser_value('admin', 'inp_file_path', f'{inp_file_path}')
 
         # Check if project name is valid
         if not self.check_project_name(project_name_schema, project_descript):
@@ -1603,25 +1601,25 @@ class GwAdmin:
             # TODO:
             if not is_test:
                 self.task1.setProgress(100)
-            set_parser_value('admin', 'create_schema_type', 'rdb_import_data')
+            tools_gw.set_parser_value('admin', 'create_schema_type', 'rdb_import_data')
             msg = ("The sql files have been correctly executed."
                    "\nNow, a form will be opened to manage the import inp.")
             self.controller.show_info_box(msg, "Info")
             self.execute_import_data(schema_type=project_type)
             return
         elif self.rdb_sample.isChecked() and example_data:
-            set_parser_value('admin', 'create_schema_type', 'rdb_sample')
+            tools_gw.set_parser_value('admin', 'create_schema_type', 'rdb_sample')
             self.load_sample_data(project_type=project_type)
             if not is_test:
                 self.task1.setProgress(80)
         elif self.rdb_sample_dev.isChecked():
-            set_parser_value('admin', 'create_schema_type', 'rdb_sample_dev')
+            tools_gw.set_parser_value('admin', 'create_schema_type', 'rdb_sample_dev')
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
             if not is_test:
                 self.task1.setProgress(80)
         elif self.rdb_data.isChecked():
-            set_parser_value('admin', 'create_schema_type', 'rdb_data')
+            tools_gw.set_parser_value('admin', 'create_schema_type', 'rdb_data')
 
         self.manage_process_result(project_name_schema, is_test)
 
@@ -1932,7 +1930,7 @@ class GwAdmin:
 
         # Create the dialog and signals
         self.dlg_manage_visit_class = MainVisitClass()
-        load_settings(self.dlg_manage_visit_class)
+        tools_gw.load_settings(self.dlg_manage_visit_class)
 
         # Manage widgets
         sql = "SELECT id, id as idval FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2"
@@ -1946,7 +1944,7 @@ class GwAdmin:
         # Set listeners
 
         # Open dialog
-        open_dialog(self.dlg_manage_visit_class, dlg_name='main_visitclass')
+        tools_gw.open_dialog(self.dlg_manage_visit_class, dlg_name='main_visitclass')
         return
 
 
@@ -1954,7 +1952,7 @@ class GwAdmin:
         return
         # Create the dialog and signals
         self.dlg_manage_visit_param = MainVisitParam()
-        load_settings(self.dlg_manage_visit_param)
+        tools_gw.load_settings(self.dlg_manage_visit_param)
 
         # Manage widgets
         sql = "SELECT id, id as idval FROM om_visit_parameter_type"
@@ -1976,7 +1974,7 @@ class GwAdmin:
         # Set listeners
 
         # Open dialog
-        open_dialog(self.dlg_manage_visit_param, dlg_name='main_visitparam')
+        tools_gw.open_dialog(self.dlg_manage_visit_param, dlg_name='main_visitparam')
         return
 
 
@@ -1993,7 +1991,7 @@ class GwAdmin:
 
         # Create dialog
         self.dlg_readsql_show_info = MainProjectInfoUi()
-        load_settings(self.dlg_readsql_show_info)
+        tools_gw.load_settings(self.dlg_readsql_show_info)
 
         info_updates = self.dlg_readsql_show_info.findChild(QTextEdit, 'info_updates')
         self.message_update = ''
@@ -2010,7 +2008,7 @@ class GwAdmin:
         self.dlg_readsql_show_info.btn_update.clicked.connect(partial(self.update, self.project_type_selected))
 
         # Open dialog
-        open_dialog(self.dlg_readsql_show_info, dlg_name='main_projectinfo')
+        tools_gw.open_dialog(self.dlg_readsql_show_info, dlg_name='main_projectinfo')
 
 
     def read_info_version(self):
@@ -2037,7 +2035,7 @@ class GwAdmin:
 
     def close_dialog_admin(self, dlg):
         """ Close dialog """
-        close_dialog(dlg)
+        tools_gw.close_dialog(dlg)
         self.schema = None
 
 
@@ -2224,7 +2222,7 @@ class GwAdmin:
         """ Initialize dialog (only once) """
 
         self.dlg_readsql_create_project = MainDbProjectUi()
-        load_settings(self.dlg_readsql_create_project)
+        tools_gw.load_settings(self.dlg_readsql_create_project)
 
         # Find Widgets in form
         self.project_name = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_name')
@@ -2236,13 +2234,13 @@ class GwAdmin:
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
 
         # Load user values
-        self.project_name.setText(get_parser_value('admin', 'project_name_schema'))
-        self.project_descript.setText(get_parser_value('admin', 'project_descript'))
-        create_schema_type = get_parser_value('admin', 'create_schema_type')
+        self.project_name.setText(tools_gw.get_parser_value('admin', 'project_name_schema'))
+        self.project_descript.setText(tools_gw.get_parser_value('admin', 'project_descript'))
+        create_schema_type = tools_gw.get_parser_value('admin', 'create_schema_type')
         if create_schema_type == 'True':
             tools_qt.setChecked(self.dlg_readsql_create_project, str(create_schema_type))
-        if get_parser_value('admin', 'inp_file_path') not in ('null', None):
-            self.data_file.setText(get_parser_value('admin', 'inp_file_path'))
+        if tools_gw.get_parser_value('admin', 'inp_file_path') not in ('null', None):
+            self.data_file.setText(tools_gw.get_parser_value('admin', 'inp_file_path'))
 
         # TODO: do and call listener for buton + table -> temp_csv
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
@@ -2311,7 +2309,7 @@ class GwAdmin:
 
         # Open dialog
         self.dlg_readsql_create_project.setWindowTitle(f"Create Project - {self.connection_name}")
-        open_dialog(self.dlg_readsql_create_project, dlg_name='main_dbproject')
+        tools_gw.open_dialog(self.dlg_readsql_create_project, dlg_name='main_dbproject')
 
 
     def open_rename(self):
@@ -2324,7 +2322,7 @@ class GwAdmin:
 
         # Create dialog
         self.dlg_readsql_rename = MainRenameProjUi()
-        load_settings(self.dlg_readsql_rename)
+        tools_gw.load_settings(self.dlg_readsql_rename)
 
         schema = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
@@ -2334,7 +2332,7 @@ class GwAdmin:
 
         # Open dialog
         self.dlg_readsql_rename.setWindowTitle(f'Rename project - {schema}')
-        open_dialog(self.dlg_readsql_rename, dlg_name='main_renameproj')
+        tools_gw.open_dialog(self.dlg_readsql_rename, dlg_name='main_renameproj')
 
 
     def executeFiles(self, filedir, i18n=False, no_ct=False, log_folder=True, log_files=False):
@@ -2437,7 +2435,7 @@ class GwAdmin:
 
         # Create dialog
         self.dlg_readsql_copy = MainRenameProjUi()
-        load_settings(self.dlg_readsql_copy)
+        tools_gw.load_settings(self.dlg_readsql_copy)
 
         schema = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
@@ -2447,7 +2445,7 @@ class GwAdmin:
 
         # Open dialog
         self.dlg_readsql_copy.setWindowTitle('Copy project - ' + schema)
-        open_dialog(self.dlg_readsql_copy, dlg_name='main_renameproj')
+        tools_gw.open_dialog(self.dlg_readsql_copy, dlg_name='main_renameproj')
 
 
     def copy_project_data_schema(self, schema):
@@ -2468,7 +2466,7 @@ class GwAdmin:
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(0)
         extras = f'"parameters":{{"source_schema":"{schema}", "dest_schema":"{new_schema_name}"}}'
-        body = create_body(extras=extras)
+        body = tools_gw.create_body(extras=extras)
         self.task1.setProgress(50)
         result = self.controller.get_json('gw_fct_admin_schema_clone', body,
                                           schema_name=schema, commit=False)
@@ -2546,7 +2544,7 @@ class GwAdmin:
             self.dlg_import_inp.progressBar.setAlignment(Qt.AlignCenter)
             self.dlg_import_inp.progressBar.setFormat("")
 
-            body = create_body(extras=extras)
+            body = tools_gw.create_body(extras=extras)
             sql = ("SELECT " + str(function_name) + "(" + body + ")::text")
             row = self.controller.get_row(sql, commit=False)
             self.task1 = GwTask('Manage schema')
@@ -2815,7 +2813,7 @@ class GwAdmin:
         feature = '"catFeature":"' + form_name + '"'
         extras = '"multi_create":' + str(
             tools_qt.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_create)).lower() + ''
-        body = create_body(feature=feature, extras=extras)
+        body = tools_gw.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
 
         # Execute query
@@ -2828,7 +2826,7 @@ class GwAdmin:
 
         # Create the dialog and signals
         self.dlg_manage_sys_fields = MainSysFields()
-        load_settings(self.dlg_manage_sys_fields)
+        tools_gw.load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
         self.chk_multi_insert = None
 
@@ -2854,14 +2852,14 @@ class GwAdmin:
         self.dlg_manage_sys_fields.setWindowTitle(window_title)
         self.manage_update_sys_field(form_name_fields)
 
-        open_dialog(self.dlg_manage_sys_fields)
+        tools_gw.open_dialog(self.dlg_manage_sys_fields)
 
 
     def open_manage_field(self, action):
 
         # Create the dialog and signals
         self.dlg_manage_fields = MainFields()
-        load_settings(self.dlg_manage_fields)
+        tools_gw.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
         # Remove unused tabs
@@ -2893,7 +2891,7 @@ class GwAdmin:
         self.dlg_manage_fields.btn_open.clicked.connect(
             partial(self.update_selected_addfild, self.dlg_manage_fields.tbl_update))
 
-        open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
+        tools_gw.open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
         self.dlg_manage_fields.setWindowTitle(window_title)
 
 
@@ -2912,7 +2910,7 @@ class GwAdmin:
         # Create the dialog and signals
         self.close_dialog_admin(self.dlg_manage_sys_fields)
         self.dlg_manage_sys_fields = MainSysFields()
-        load_settings(self.dlg_manage_sys_fields)
+        tools_gw.load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
 
         form_name_fields = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
@@ -2948,7 +2946,7 @@ class GwAdmin:
                 value = None
             tools_qt.setWidgetText(self.dlg_manage_sys_fields, result, value)
 
-        open_dialog(self.dlg_manage_sys_fields)
+        tools_gw.open_dialog(self.dlg_manage_sys_fields)
 
 
     def update_selected_addfild(self, widget):
@@ -2962,7 +2960,7 @@ class GwAdmin:
         # Create the dialog and signals
         self.close_dialog_admin(self.dlg_manage_fields)
         self.dlg_manage_fields = MainFields()
-        load_settings(self.dlg_manage_fields)
+        tools_gw.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
         form_name_fields = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
@@ -2998,7 +2996,7 @@ class GwAdmin:
                 value = None
             tools_qt.setWidgetText(self.dlg_manage_fields, result, value)
 
-        open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
+        tools_gw.open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
 
 
     def manage_create_field(self, form_name):
@@ -3039,7 +3037,7 @@ class GwAdmin:
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
         expr_filter = "cat_feature_id = '" + form_name + "'"
         self.fill_table(qtable, 've_config_sysfields', self.model_update_table, expr_filter)
-        set_table_columns(self.dlg_manage_sys_fields, qtable, 've_config_sysfields', schema_name=schema_name)
+        tools_qt.set_table_columns(self.dlg_manage_sys_fields, qtable, 've_config_sysfields', schema_name=schema_name)
 
 
     def manage_update_field(self, dialog, form_name, tableview):
@@ -3065,7 +3063,7 @@ class GwAdmin:
             expr_filter = "cat_feature_id = '" + form_name + "'"
 
         self.fill_table(qtable, tableview, self.model_update_table, expr_filter)
-        set_table_columns(dialog, qtable, tableview, schema_name=schema_name)
+        tools_qt.set_table_columns(dialog, qtable, tableview, schema_name=schema_name)
 
 
     def manage_delete_field(self, form_name):
@@ -3195,7 +3193,7 @@ class GwAdmin:
             feature = '"catFeature":"' + form_name + '"'
             extras = '"action":"CREATE", "multi_create":' + \
                 str(self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
-            body = create_body(feature=feature, extras=extras)
+            body = tools_gw.create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
@@ -3237,7 +3235,7 @@ class GwAdmin:
             feature = '"catFeature":"' + form_name + '"'
             extras = '"action":"UPDATE"'
             extras += ', "multi_create":' + str(self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
-            body = create_body(feature=feature, extras=extras)
+            body = tools_gw.create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
@@ -3255,7 +3253,7 @@ class GwAdmin:
             feature = '"catFeature":"' + form_name + '"'
             extras = '"action":"DELETE", "multi_create":' + str(
                 self.chk_multi_insert).lower() + ',"parameters":{"columnname":"' + field_value + '"}'
-            body = create_body(feature=feature, extras=extras)
+            body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
             json_result = self.controller.get_json('gw_fct_admin_manage_addfields', body,
@@ -3387,7 +3385,7 @@ class GwAdmin:
                 dialog.setWindowTitle(function[0]['alias'])
                 dialog.txt_info.setText(str(function[0]['descript']))
                 self.function_list = []
-                construct_form_param_user(dialog, function, 0, self.function_list)
+                tools_qt.construct_form_param_user(dialog, function, 0, self.function_list)
                 status = True
                 break
 
@@ -3398,7 +3396,7 @@ class GwAdmin:
 
         for k, v in list(data.items()):
             if str(k) == "info":
-                populate_info_text(dialog, data)
+                tools_gw.populate_info_text(dialog, data)
 
 
     def manage_result_message(self, status, msg_ok=None, msg_error=None, parameter=None):
@@ -3435,8 +3433,8 @@ class GwAdmin:
         # Save last Project schema name and type selected
         schema_name = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         project_type = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-        set_parser_value('admin', 'last_project_type_selected', f'{project_type}')
-        set_parser_value('admin', 'last_schema_name_selected', f'{schema_name}')
+        tools_gw.set_parser_value('admin', 'last_project_type_selected', f'{project_type}')
+        tools_gw.set_parser_value('admin', 'last_schema_name_selected', f'{schema_name}')
 
 
     def create_credentials_form(self, set_connection):
@@ -3455,7 +3453,7 @@ class GwAdmin:
         self.dlg_credentials.btn_accept.clicked.connect(partial(self.set_credentials, self.dlg_credentials))
         self.dlg_credentials.cmb_connection.currentIndexChanged.connect(
             partial(self.set_credentials, self.dlg_credentials, new_connection=True))
-        open_dialog(self.dlg_credentials, dlg_name='main_credentials', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_credentials, dlg_name='main_credentials', maximize_button=False)
 
 
     def manage_user_params(self):

@@ -25,9 +25,7 @@ import webbrowser
 from functools import partial
 
 from ..core.utils import tools_gw
-from . import tools_db
-from .tools_qgis import disconnect_signal_selection_changed, select_features_by_ids, remove_selection, \
-    connect_signal_selection_changed, disconnect_snapping, refresh_map_canvas
+from . import tools_qgis
 
 
 class GwExtendedQLabel(QLabel):
@@ -1505,7 +1503,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
                    lazy_widget=None, lazy_init_function=None):
     """ Delete selected elements of the table """
 
-    disconnect_signal_selection_changed()
+    tools_qgis.disconnect_signal_selection_changed()
     geom_type = tools_gw.tab_feature_changed(dialog, table_object)
     if type(table_object) is str:
         widget_name = f"tbl_{table_object}_x_{geom_type}"
@@ -1587,15 +1585,15 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
 
     # Select features with previous filter
     # Build a list of feature id's and select them
-    select_features_by_ids(geom_type, expr, layers=layers)
+    tools_qgis.select_features_by_ids(geom_type, expr, layers=layers)
 
     if query:
-        layers = remove_selection(layers=layers)
+        layers = tools_qgis.remove_selection(layers=layers)
 
     # Update list
     list_ids[geom_type] = ids
     tools_gw.enable_feature_type(dialog, table_object, ids=ids)
-    connect_signal_selection_changed(dialog, table_object, geom_type)
+    tools_qgis.connect_signal_selection_changed(dialog, table_object, geom_type)
 
     return ids, layers, list_ids
 
@@ -1619,9 +1617,9 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
     # some tools can work differently if standalone or integrated in
     # another tool
     if single_tool_mode is not None:
-        layers = remove_selection(single_tool_mode, layers=layers)
+        layers = tools_qgis.remove_selection(single_tool_mode, layers=layers)
     else:
-        layers = remove_selection(True, layers=layers)
+        layers = tools_qgis.remove_selection(True, layers=layers)
 
     reset_model(dialog, table_object, "arc")
     reset_model(dialog, table_object, "node")
@@ -1631,8 +1629,8 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
         reset_model(dialog, table_object, "gully")
     tools_gw.close_dialog(dialog)
     tools_gw.hide_generic_layers(excluded_layers=excluded_layers)
-    disconnect_snapping()
-    disconnect_signal_selection_changed()
+    tools_qgis.disconnect_snapping()
+    tools_qgis.disconnect_signal_selection_changed()
 
     return layers
 
@@ -2084,9 +2082,9 @@ def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=N
                       'edit_workcat_vdefault', field_id='id', field_name='id')
 
         if single_tool_mode is not None:
-            layers = remove_selection(single_tool_mode, layers=layers)
+            layers = tools_qgis.remove_selection(single_tool_mode, layers=layers)
         else:
-            layers = remove_selection(True, layers=layers)
+            layers = tools_qgis.remove_selection(True, layers=layers)
         reset_model(dialog, table_object, "arc")
         reset_model(dialog, table_object, "node")
         reset_model(dialog, table_object, "connec")
@@ -2353,7 +2351,7 @@ def get_expr_filter(geom_type, list_ids=None, layers=None):
         return None
 
     # Select features of layers applying @expr
-    select_features_by_ids(geom_type, expr, layers=layers)
+    tools_qgis.select_features_by_ids(geom_type, expr, layers=layers)
 
     return expr_filter
 
@@ -2366,7 +2364,7 @@ def reload_qtable(dialog, geom_type):
     qtable = getWidget(dialog, f'tbl_psector_x_{geom_type}')
     fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
     set_table_columns(dialog, qtable, f"plan_psector_x_{geom_type}")
-    refresh_map_canvas()
+    tools_qgis.refresh_map_canvas()
 
 
 def fill_table_by_expr(qtable, table_name, expr):

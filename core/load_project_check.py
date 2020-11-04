@@ -12,8 +12,8 @@ import platform
 from functools import partial
 
 from .. import global_vars
-from .utils.tools_gw import load_settings, open_dialog, save_settings, close_dialog, get_plugin_version, \
-    create_body, from_postgres_to_toc, create_qml, add_temp_layer
+
+from .utils import tools_gw
 from .ui.ui_manager import ProjectCheckUi
 from ..lib.tools_qt import hide_void_groupbox
 
@@ -77,7 +77,7 @@ class GwProjectCheck:
         info_type = self.controller.plugin_settings_value('gwInfoType')
         project_type = self.controller.plugin_settings_value('gwProjectType')
 
-        version = get_plugin_version()
+        version = tools_gw.get_plugin_version()
         extras = f'"version":"{version}"'
         extras += f', "fid":101'
         extras += f', "initProject":{init_project}'
@@ -89,7 +89,7 @@ class GwProjectCheck:
         extras += f', "qgisVersion":"{Qgis.QGIS_VERSION}"'
         extras += f', "osVersion":"{platform.system()} {platform.release()}"'
         extras += f', {fields_to_insert}'
-        body = create_body(extras=extras)
+        body = tools_gw.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_setcheckproject', body)
         try:
             if not result or (result['body']['variables']['hideForm'] == True):
@@ -109,12 +109,12 @@ class GwProjectCheck:
 
         # Create dialog
         self.dlg_audit_project = ProjectCheckUi()
-        load_settings(self.dlg_audit_project)
-        self.dlg_audit_project.rejected.connect(partial(save_settings, self.dlg_audit_project))
+        tools_gw.load_settings(self.dlg_audit_project)
+        self.dlg_audit_project.rejected.connect(partial(tools_gw.save_settings, self.dlg_audit_project))
 
         # Populate info_log and missing layers
         critical_level = 0
-        text_result = add_temp_layer(self.dlg_audit_project, result['body']['data'],
+        text_result = tools_gw.add_temp_layer(self.dlg_audit_project, result['body']['data'],
             'gw_fct_setcheckproject_result', True, False, 0, True, disable_tabs=False)
 
         if 'missingLayers' in result['body']['data']:
@@ -127,7 +127,7 @@ class GwProjectCheck:
             self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers, self.dlg_audit_project,
                                                                       result['body']['data']['missingLayers']))
             self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
-            open_dialog(self.dlg_audit_project, dlg_name='project_check')
+            tools_gw.open_dialog(self.dlg_audit_project, dlg_name='project_check')
 
 
     def update_config(self, state):
@@ -195,21 +195,21 @@ class GwProjectCheck:
                 group = layer_info['group_layer'] if layer_info['group_layer'] is not None else 'GW Layers'
                 style_id = layer_info['style_id']
 
-                from_postgres_to_toc(layer_info['layer'], geom_field, pkey_field, None, group=group)
+                tools_gw.from_postgres_to_toc(layer_info['layer'], geom_field, pkey_field, None, group=group)
                 layer = None
                 qml = None
                 if style_id is not None:
                     layer = self.controller.get_layer_by_tablename(layer_info['layer'])
                     if layer:
                         extras = f'"style_id":"{style_id}"'
-                        body = create_body(extras=extras)
+                        body = tools_gw.create_body(extras=extras)
                         style = self.controller.get_json('gw_fct_getstyle', body)
                         if style['status'] == 'Failed': return
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']
-                            create_qml(layer, qml)
+                            tools_gw.create_qml(layer, qml)
                 self.controller.set_layer_visible(layer)
 
-        close_dialog(self.dlg_audit_project)
+        tools_gw.close_dialog(self.dlg_audit_project)
 

@@ -12,11 +12,8 @@ from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint
 
 from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QSettings, QPoint
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor
-from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QTabWidget, QCompleter, QFileDialog, QPushButton, QTableView, \
     QAbstractItemView, QLineEdit, QDateEdit
-
-
 
 import configparser
 import os
@@ -32,11 +29,9 @@ from collections import OrderedDict
 from ..models.sys_feature_cat import SysFeatureCat
 from ..ui.ui_manager import GwDialog, GwMainWindow
 from ... import global_vars
-from ...lib.tools_qt import getWidgetText, setWidgetText, getWidget, fill_table, set_table_columns, set_qtv_config, \
-    get_feature_by_id
+from ...lib import tools_qt
 from ...lib.tools_pgdao import get_uri
-from ...lib.tools_qgis import categoryze_layer, get_max_rectangle_from_coords, get_layer, \
-    get_points, zoom_to_rectangle
+from ...lib import tools_qgis
 
 
 class SnappingConfigManager(object):
@@ -166,14 +161,14 @@ class SnappingConfigManager(object):
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
-        layer_settings = self.snap_to_layer(get_layer('v_edit_connec'), QgsPointLocator.Vertex, True)
+        layer_settings = self.snap_to_layer(tools_qgis.get_layer('v_edit_connec'), QgsPointLocator.Vertex, True)
         if layer_settings:
             layer_settings.setType(1)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
             layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
-        snapping_config.setIndividualLayerSettings(get_layer('v_edit_connec'), layer_settings)
+        snapping_config.setIndividualLayerSettings(tools_qgis.get_layer('v_edit_connec'), layer_settings)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snappingConfigChanged.emit(snapping_config)
 
@@ -182,14 +177,14 @@ class SnappingConfigManager(object):
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
-        layer_settings = self.snap_to_layer(get_layer('v_edit_gully'), QgsPointLocator.Vertex, True)
+        layer_settings = self.snap_to_layer(tools_qgis.get_layer('v_edit_gully'), QgsPointLocator.Vertex, True)
         if layer_settings:
             layer_settings.setType(1)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
             layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
-        snapping_config.setIndividualLayerSettings(get_layer('v_edit_gully'), layer_settings)
+        snapping_config.setIndividualLayerSettings(tools_qgis.get_layer('v_edit_gully'), layer_settings)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snappingConfigChanged.emit(snapping_config)
 
@@ -728,7 +723,7 @@ def draw(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(2
         return
 
     list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
-    max_x, max_y, min_x, min_y = get_max_rectangle_from_coords(list_coord)
+    max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
 
     if reset_rb:
         rubber_band.reset()
@@ -736,10 +731,10 @@ def draw(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(2
         point = QgsPointXY(float(max_x), float(max_y))
         draw_point(point, rubber_band, color, width)
     else:
-        points = get_points(list_coord)
+        points = tools_qgis.get_points(list_coord)
         draw_polyline(points, rubber_band, color, width)
     if margin is not None:
-        zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
+        tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
 
 
 def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
@@ -778,8 +773,8 @@ def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, du
 
 def enable_feature_type(dialog, widget_name='tbl_relation', ids=None):
 
-    feature_type = getWidget(dialog, 'feature_type')
-    widget_table = getWidget(dialog, widget_name)
+    feature_type = tools_qt.getWidget(dialog, 'feature_type')
+    widget_table = tools_qt.getWidget(dialog, widget_name)
     if feature_type is not None and widget_table is not None:
         if len(ids) > 0:
             feature_type.setEnabled(False)
@@ -1028,7 +1023,7 @@ def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                     size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
                     color_values = {'NEW': QColor(0, 255, 0), 'DUPLICATED': QColor(255, 0, 0),
                                     'EXISTS': QColor(240, 150, 0)}
-                    categoryze_layer(v_layer, cat_field, size, color_values)
+                    tools_qgis.categoryze_layer(v_layer, cat_field, size, color_values)
                 else:
                     if geometry_type == 'Point':
                         v_layer.renderer().symbol().setSize(3.5)
@@ -1054,7 +1049,7 @@ def populate_info_text(dialog, data, force_tab=True, reset_text=True, tab_idx=1,
     """
 
     change_tab = False
-    text = getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
+    text = tools_qt.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
 
     if reset_text:
         text = ""
@@ -1067,7 +1062,7 @@ def populate_info_text(dialog, data, force_tab=True, reset_text=True, tab_idx=1,
             else:
                 text += "\n"
 
-    setWidgetText(dialog, 'txt_infolog', text + "\n")
+    tools_qt.setWidgetText(dialog, 'txt_infolog', text + "\n")
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
     if qtabwidget is not None:
         if change_tab and qtabwidget is not None:
@@ -1324,7 +1319,7 @@ def disable_tabs(dialog):
 
     btn_cancel = dialog.findChild(QPushButton, 'btn_cancel')
     if btn_cancel:
-        setWidgetText(dialog, btn_accept, 'Close')
+        tools_qt.setWidgetText(dialog, btn_accept, 'Close')
 
 
 def set_style_mapzones():

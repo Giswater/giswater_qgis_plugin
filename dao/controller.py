@@ -27,10 +27,8 @@ from .pg_dao import PgDao
 from .logger import Logger
 from ..lib import tools_os, tools_qt
 from ..core.ui.ui_manager import DialogTextUi, DockerUi
-from ..lib.tools_qgis import qgis_get_layer_by_tablename, qgis_get_layer_source, qgis_get_layer_source_table_name, \
-    qgis_get_layer_primary_key, qgis_get_layers, categoryze_layer
-from ..core.utils.tools_gw import get_parser_value, set_parser_value, manage_actions, draw, create_body, \
-    from_postgres_to_toc, create_qml, populate_vlayer, delete_layer_from_toc
+from ..lib import tools_qgis
+from ..core.utils import tools_gw
 
 from ..core.utils.tools_gw import SnappingConfigManager
 class DaoController:
@@ -831,7 +829,7 @@ class DaoController:
             # Layer styles
             self.manage_return_manager(json_result, sql, rubber_band)
             self.manage_layer_manager(json_result, sql)
-            manage_actions(json_result, sql)
+            tools_gw.manage_actions(json_result, sql)
         except Exception:
             pass
 
@@ -954,25 +952,25 @@ class DaoController:
     def get_layer_by_tablename(self, tablename, show_warning=False, log_info=False, schema_name=None):
         """ Iterate over all layers and get the one with selected @tablename """
 
-        return qgis_get_layer_by_tablename(tablename, show_warning, log_info, schema_name)
+        return tools_qgis.qgis_get_layer_by_tablename(tablename, show_warning, log_info, schema_name)
 
 
     def get_layer_source(self, layer):
         """ Get database connection paramaters of @layer """
 
-        return qgis_get_layer_source(layer)
+        return tools_qgis.qgis_get_layer_source(layer)
 
 
     def get_layer_source_table_name(self, layer):
         """ Get table or view name of selected layer """
 
-        return qgis_get_layer_source_table_name(layer)
+        return tools_qgis.qgis_get_layer_source_table_name(layer)
 
 
     def get_layer_primary_key(self, layer=None):
         """ Get primary key of selected layer """
 
-        return qgis_get_layer_primary_key(layer)
+        return tools_qgis.qgis_get_layer_primary_key(layer)
 
 
     def get_project_user(self):
@@ -1464,7 +1462,7 @@ class DaoController:
     def get_layers(self):
         """ Return layers in the same order as listed in TOC """
 
-        return qgis_get_layers()
+        return tools_qgis.qgis_get_layers()
 
 
     def set_search_path(self, schema_name):
@@ -1803,7 +1801,7 @@ class DaoController:
                         del widget
                         self.dlg_docker.setWidget(None)
                         self.docker_type = None
-                        set_parser_value('docker_info', 'position', f'{docker_pos}')
+                        tools_gw.set_parser_value('docker_info', 'position', f'{docker_pos}')
                     self.iface.removeDockWidget(self.dlg_docker)
                     self.dlg_docker = None
         except AttributeError:
@@ -1817,7 +1815,7 @@ class DaoController:
         # Load last docker position
         try:
             # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
-            pos = int(get_parser_value('docker_info', 'position'))
+            pos = int(tools_gw.get_parser_value('docker_info', 'position'))
             if pos in (1, 2, 4, 8):
                 self.dlg_docker.position = pos
         except:
@@ -1898,7 +1896,7 @@ class DaoController:
                     color = QColor(color[0], color[1], color[2], opacity)
                 if 'width' in return_manager['style']['ruberband']:
                     width = return_manager['style']['ruberband']['width']
-                draw(json_result, rubber_band, margin, color=color, width=width)
+                tools_gw.draw(json_result, rubber_band, margin, color=color, width=width)
 
             else:
 
@@ -1916,14 +1914,14 @@ class DaoController:
                             if json_result['body']['data'][key]['layerName']:
                                 layer_name = json_result['body']['data'][key]['layerName']
 
-                        delete_layer_from_toc(layer_name)
+                        tools_gw.delete_layer_from_toc(layer_name)
 
                         # Get values for create and populate layer
                         counter = len(json_result['body']['data'][key]['features'])
                         geometry_type = json_result['body']['data'][key]['geometryType']
                         v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
 
-                        populate_vlayer(v_layer, json_result['body']['data'], key, counter)
+                        tools_gw.populate_vlayer(v_layer, json_result['body']['data'], key, counter)
 
                         # Get values for set layer style
                         opacity = 100
@@ -1938,7 +1936,7 @@ class DaoController:
                                 color_values[item['id']] = color
                             cat_field = str(style_type[key]['field'])
                             size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
-                            categoryze_layer(v_layer, cat_field, size, color_values)
+                            tools_qgis.categoryze_layer(v_layer, cat_field, size, color_values)
 
                         elif style_type[key]['style'] == 'random':
                             size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
@@ -1951,13 +1949,13 @@ class DaoController:
                         elif style_type[key]['style'] == 'qml':
                             style_id = style_type[key]['id']
                             extras = f'"style_id":"{style_id}"'
-                            body = create_body(extras=extras)
+                            body = tools_gw.create_body(extras=extras)
                             style = global_vars.controller.get_json('gw_fct_getstyle', body)
                             if style['status'] == 'Failed': return
                             if 'styles' in style['body']:
                                 if 'style' in style['body']['styles']:
                                     qml = style['body']['styles']['style']
-                                    create_qml(v_layer, qml)
+                                    tools_gw.create_qml(v_layer, qml)
 
                         elif style_type[key]['style'] == 'unique':
                             color = style_type[key]['values']['color']
@@ -2005,7 +2003,7 @@ class DaoController:
                         else:
                             group = "GW Layers"
                         style_id = lyr[layer_name]['style_id']
-                        from_postgres_to_toc(layer_name, the_geom, field_id, group=group, style_id=style_id)
+                        tools_gw.from_postgres_to_toc(layer_name, the_geom, field_id, group=group, style_id=style_id)
                     global_vars.controller.set_layer_visible(layer)
 
             # force reload dataProvider in order to reindex.

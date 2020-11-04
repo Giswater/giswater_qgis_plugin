@@ -5,17 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QTabWidget
-from qgis.PyQt.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QSizePolicy, QCheckBox, QSpacerItem, \
-    QApplication
-from qgis.PyQt.QtCore import Qt
-
-from functools import partial
 
 from .. import global_vars
-from . import tools_qt
-from .tools_qgis import zoom_to_rectangle
-from ..core.utils import tools_gw
 
 
 def make_list_for_completer(sql):
