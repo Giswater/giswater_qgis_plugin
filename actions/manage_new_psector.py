@@ -1095,8 +1095,19 @@ class ManageNewPsector(ParentManage):
             utils_giswater.getWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id))
 
         if close_dlg:
-            self.reload_states_selector()
-            self.close_dialog(self.dlg_plan_psector)
+            json_result = self.set_plan()
+            if 'status' in json_result and json_result['status'] == 'Accepted':
+                self.reload_states_selector()
+                self.close_dialog(self.dlg_plan_psector)
+
+
+    def set_plan(self):
+
+        extras = f'"psectorId":"{utils_giswater.getWidgetText(self.dlg_plan_psector, self.psector_id)}"'
+        body = self.create_body(extras=extras)
+        self.controller.get_json('gw_fct_setplan', body, log_sql=True)
+        json_result = self.controller.get_json('gw_fct_setplan', body, log_sql=True)
+        return json_result
 
 
     def price_selector(self, dialog, tableleft, tableright, field_id_right):
