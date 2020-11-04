@@ -19,7 +19,7 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-    IF TG_OP = 'INSERT' OR  TG_OP = 'UPDATE ' THEN
+    IF TG_OP = 'INSERT' OR  TG_OP = 'UPDATE' THEN
 		SELECT node.state INTO v_stateaux FROM node WHERE node_id=NEW.node_id;
 			IF v_stateaux=1	THEN 
 				NEW.state=0;

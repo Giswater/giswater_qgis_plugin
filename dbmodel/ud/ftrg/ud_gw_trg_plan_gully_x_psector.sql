@@ -23,7 +23,7 @@ BEGIN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
          "data":{"message":"3138", "function":"2936","debug_msg":null}}$$);';
 	END IF;
-    IF TG_OP = 'INSERT' OR  TG_OP = 'UPDATE ' THEN
+    IF TG_OP = 'INSERT' OR  TG_OP = 'UPDATE' THEN
 
 		SELECT gully.state, gully.arc_id INTO v_stateaux, v_arcaux FROM gully WHERE gully_id=NEW.gully_id;
 		

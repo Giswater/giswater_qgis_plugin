@@ -24,7 +24,7 @@ BEGIN
          "data":{"message":"3138", "function":"2936","debug_msg":null}}$$);';
 	END IF;
 
-	IF TG_OP = 'INSERT' OR  TG_OP = 'UPDATE ' THEN
+	IF TG_OP = 'INSERT' OR  TG_OP = 'UPDATE' THEN
 		SELECT connec.state, connec.arc_id INTO v_stateaux, v_arcaux FROM connec WHERE connec_id=NEW.connec_id;
 			
 		IF NEW.state IS NULL THEN

@@ -17,7 +17,7 @@ BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-    IF TG_OP = 'INSERT' OR  TG_OP = 'UPDATE ' THEN
+    IF TG_OP = 'INSERT' OR  TG_OP = 'UPDATE' THEN
 		SELECT arc.state INTO v_stateaux FROM arc WHERE arc_id=NEW.arc_id;
 			IF v_stateaux=1	THEN 
 				NEW.state=0;
