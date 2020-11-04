@@ -15,6 +15,7 @@ class PgDao(object):
 
         self.last_error = None
         self.set_search_path = None
+        self.conn = None
 
 
     def init_db(self):
@@ -27,6 +28,7 @@ class PgDao(object):
         except psycopg2.DatabaseError as e:
             self.last_error = e
             status = False
+
         return status
 
 
@@ -59,25 +61,36 @@ class PgDao(object):
     def check_cursor(self):
         """ Check if cursor is closed """
 
+        status = True
         if self.cursor.closed:
             self.reset_db()
+            status = not self.cursor.closed
+
+        return status
 
 
     def cursor_execute(self, sql):
         """ Check if cursor is closed before execution """
 
-        self.check_cursor()
-        self.cursor.execute(sql)
+        if self.check_cursor():
+            self.cursor.execute(sql)
 
 
     def get_poll(self):
 
+        status = True
         try:
-            self.conn.poll()
+            if self.check_cursor():
+                self.conn.poll()
+            else:
+                status = False
         except psycopg2.InterfaceError:
             self.reset_db()
         except psycopg2.OperationalError:
             self.reset_db()
+        finally:
+            status = not self.cursor.closed
+            return status
 
 
     def get_conn_encoding(self):
