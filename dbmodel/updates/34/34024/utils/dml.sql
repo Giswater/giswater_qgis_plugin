@@ -244,3 +244,6 @@ WHERE formname ='v_edit_node';
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
 VALUES (3164, 'Arc have incorrectly defined final nodes in this plan alternative', 'Make sure that arcs finales are on service', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING ;
 
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
+VALUES ('3002', 'gw_fct_setplan', 'utils', 'function','json', 'json', 
+'Function that returns qgis layer configuration for masterplan', 'role_master', NULL) ON CONFLICT (id) DO NOTHING;

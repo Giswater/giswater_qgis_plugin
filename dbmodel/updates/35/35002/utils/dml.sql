@@ -46,9 +46,6 @@ null, TRUE) ON CONFLICT (id) DO NOTHING;
 --2020/09/17
 DELETE FROM sys_param_user WHERE id IN ('qgis_qml_linelayer_path', 'qgis_qml_pointlayer_path','qgis_qml_polygonlayer_path');
 
-INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
-VALUES ('3002', 'gw_fct_setplan', 'utils', 'function','json', 'json', 
-'Function that returns qgis layer configuration for masterplan', 'role_master', NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function(id, function_name, returnmanager, layermanager, actions)
 VALUES ('3002', 'gw_fct_setplan','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
