@@ -5,19 +5,20 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import urllib.request
 import urllib.error
 import urllib.parse
-from ... import global_vars
-
-from qgis.PyQt.QtWidgets import QLabel, QPushButton, QLineEdit
-from qgis.PyQt.QtGui import QPixmap
-from qgis.PyQt.QtCore import Qt
+import urllib.request
 from functools import partial
 
-from ..utils.tools_gw import close_dialog, load_settings, open_dialog
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QPixmap
+from qgis.PyQt.QtWidgets import QLabel, QPushButton, QLineEdit
+
 from ..ui.ui_manager import Gallery, GalleryZoom
-from ...lib.tools_qt import set_icon, GwExtendedQLabel
+from ..utils import tools_gw
+from ... import global_vars
+from ...lib import tools_qt
+from ...lib.tools_qt import GwExtendedQLabel
 
 
 class GwVisitGallery:
@@ -32,7 +33,7 @@ class GwVisitGallery:
 
         # Create the dialog and signals
         self.dlg_gallery = Gallery()
-        load_settings(self.dlg_gallery)
+        tools_gw.load_settings(self.dlg_gallery)
 
 
     def fill_gallery(self, visit_id, event_id):
@@ -118,17 +119,17 @@ class GwVisitGallery:
         self.btn_next.clicked.connect(self.next_gallery)
         self.btn_previous = self.dlg_gallery.findChild(QPushButton, "btn_previous")
         self.btn_previous.clicked.connect(self.previous_gallery)
-        set_icon(self.btn_previous, "109")
-        set_icon(self.btn_next, "108")
+        tools_qt.set_icon(self.btn_previous, "109")
+        tools_qt.set_icon(self.btn_next, "108")
         self.btn_close = self.dlg_gallery.findChild(QPushButton, "btn_close")
-        self.btn_close.clicked.connect(partial(close_dialog, self.dlg_gallery))
+        self.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_gallery))
 
         # If all images set in one page, disable button next
         if num <= 9:
             self.btn_next.setDisabled(True)
 
         # Open dialog
-        open_dialog(self.dlg_gallery, dlg_name='visit_gallery', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_gallery, dlg_name='visit_gallery', maximize_button=False)
 
 
     def next_gallery(self):
@@ -208,7 +209,7 @@ class GwVisitGallery:
         handeler_index = i
 
         self.dlg_gallery_zoom = GalleryZoom()
-        load_settings(self.dlg_gallery_zoom)
+        tools_gw.load_settings(self.dlg_gallery_zoom)
         self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom")
 
         # Parse a URL into components
@@ -234,17 +235,17 @@ class GwVisitGallery:
 
         self.btn_slidePrevious = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slidePrevious")
         self.btn_slideNext = self.dlg_gallery_zoom.findChild(QPushButton, "btn_slideNext")
-        set_icon(self.btn_slidePrevious, "109")
-        set_icon(self.btn_slideNext, "108")
+        tools_qt.set_icon(self.btn_slidePrevious, "109")
+        tools_qt.set_icon(self.btn_slideNext, "108")
 
-        self.dlg_gallery_zoom.rejected.connect(partial(close_dialog, self.dlg_gallery_zoom))
+        self.dlg_gallery_zoom.rejected.connect(partial(tools_gw.close_dialog, self.dlg_gallery_zoom))
 
         self.i = i
         self.btn_slidePrevious.clicked.connect(self.slide_previous)
         self.btn_slideNext.clicked.connect(self.slide_next)
 
         # Open dialog
-        open_dialog(self.dlg_gallery_zoom, dlg_name='visit_gallery_zoom', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_gallery_zoom, dlg_name='visit_gallery_zoom', maximize_button=False)
 
         # Controling start index
         if handeler_index != i:

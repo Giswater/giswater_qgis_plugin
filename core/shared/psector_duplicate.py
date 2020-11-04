@@ -5,15 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ... import global_vars
 
-from qgis.PyQt.QtCore import pyqtSignal, QObject
 from functools import partial
 
-from ...lib import tools_qt
-from ..utils.tools_gw import close_dialog, load_settings, open_dialog, create_body, \
-    populate_info_text
+from qgis.PyQt.QtCore import pyqtSignal, QObject
+
 from ..ui.ui_manager import PsectorDuplicate
+from ..utils import tools_gw
+from ... import global_vars
+from ...lib import tools_qt
 
 
 class GwPsectorDuplicate(QObject):
@@ -32,7 +32,7 @@ class GwPsectorDuplicate(QObject):
 
         # Create the dialog and signals
         self.dlg_duplicate_psector = PsectorDuplicate()
-        load_settings(self.dlg_duplicate_psector)
+        tools_gw.load_settings(self.dlg_duplicate_psector)
 
         # Populate combo duplicate psector
         sql = "SELECT psector_id, name FROM plan_psector"
@@ -43,11 +43,11 @@ class GwPsectorDuplicate(QObject):
         tools_qt.set_combo_itemData(self.dlg_duplicate_psector.duplicate_psector, str(psector_id), 0)
 
         # Set listeners
-        self.dlg_duplicate_psector.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_duplicate_psector))
+        self.dlg_duplicate_psector.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_duplicate_psector))
         self.dlg_duplicate_psector.btn_accept.clicked.connect(partial(self.duplicate_psector))
 
         # Open dialog
-        open_dialog(self.dlg_duplicate_psector, dlg_name='psector_duplicate')
+        tools_gw.open_dialog(self.dlg_duplicate_psector, dlg_name='psector_duplicate')
 
 
     def duplicate_psector(self):
@@ -59,7 +59,7 @@ class GwPsectorDuplicate(QObject):
         # Create body
         feature = '"type":"PSECTOR"'
         extras = f'"psector_id":"{id_psector}", "new_psector_name":"{new_psector_name}"'
-        body = create_body(feature=feature, extras=extras)
+        body = tools_gw.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
         complet_result = self.controller.get_json('gw_fct_psector_duplicate', body)
         if not complet_result or complet_result['status'] == 'Failed':
@@ -72,11 +72,11 @@ class GwPsectorDuplicate(QObject):
         data = complet_result['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
-                text, change_tab = populate_info_text(self.dlg_duplicate_psector, data)
+                text, change_tab = tools_gw.populate_info_text(self.dlg_duplicate_psector, data)
 
         # Close dialog
         if not change_tab:
-            close_dialog(self.dlg_duplicate_psector)
+            tools_gw.close_dialog(self.dlg_duplicate_psector)
         else:
             tools_qt.getWidget(self.dlg_duplicate_psector, self.dlg_duplicate_psector.btn_accept).setEnabled(False)
             self.dlg_duplicate_psector.setWindowTitle(f'SUCCESS IN DUPLICATING PSECTOR')

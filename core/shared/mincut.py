@@ -7,39 +7,29 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import json
 import os
+from collections import OrderedDict
+from datetime import datetime
+from functools import partial
 
-from qgis.core import QgsApplication, QgsExpression, QgsFeatureRequest, QgsPrintLayout, QgsProject, \
-    QgsReadWriteContext, QgsVectorLayer
-from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtXml import QDomDocument
+from qgis.core import QgsApplication,  QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext,\
+    QgsVectorLayer
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 
-from datetime import datetime
-from collections import OrderedDict
-from functools import partial
-
-from ..tasks.parent_task import GwTask
-
-from .search import GwSearch
-from ..utils.tools_gw import close_dialog, load_settings, open_dialog, save_settings, create_body, \
-    populate_info_text, delete_layer_from_toc, check_expression
 from .mincut_manager import GwMincutManager
-from ..ui.ui_manager import DialogTextUi
-from ..ui.ui_manager import Mincut
-from ..ui.ui_manager import MincutEndUi
-from ..ui.ui_manager import MincutHydrometer
-from ..ui.ui_manager import MincutConnec
-from ..ui.ui_manager import MincutComposer
-from ... import global_vars
-from ...lib import tools_qt
-from ...lib.tools_qgis import refresh_map_canvas, set_cursor_restore, get_cursor_multiple_selection, \
-    disconnect_signal_selection_changed, zoom_to_rectangle, get_composers_list, get_composer_index, resetRubberbands, \
-    restore_user_layer, MultipleSelection
-
+from .search import GwSearch
+from ..tasks.parent_task import GwTask
+from ..utils import tools_gw
 from ..utils.tools_gw import SnappingConfigManager
+from ..ui.ui_manager import DialogTextUi, Mincut, MincutComposer, MincutConnec, MincutEndUi, MincutHydrometer
+from ... import global_vars
+from ...lib import tools_qt, tools_qgis
+from ...lib.tools_qgis import MultipleSelection
+
 
 class GwMincut:
 
@@ -113,12 +103,12 @@ class GwMincut:
 
         self.user_current_layer = self.iface.activeLayer()
         self.init_mincut_canvas()
-        delete_layer_from_toc('Overlap affected arcs')
-        delete_layer_from_toc('Other mincuts which overlaps')
-        delete_layer_from_toc('Overlap affected connecs')
+        tools_gw.delete_layer_from_toc('Overlap affected arcs')
+        tools_gw.delete_layer_from_toc('Other mincuts which overlaps')
+        tools_gw.delete_layer_from_toc('Overlap affected connecs')
 
         self.dlg_mincut = Mincut()
-        load_settings(self.dlg_mincut)
+        tools_gw.load_settings(self.dlg_mincut)
         self.dlg_mincut.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         self.api_search = GwSearch()
@@ -336,20 +326,20 @@ class GwMincut:
         if self.controller.dlg_docker:
             self.controller.dock_dialog(self.dlg_mincut)
         else:
-            open_dialog(self.dlg_mincut, dlg_name='mincut')
+            tools_gw.open_dialog(self.dlg_mincut, dlg_name='mincut')
 
         self.set_signals()
 
 
     def mincut_close(self):
 
-        restore_user_layer(self.user_current_layer)
+        tools_qgis.restore_user_layer(self.user_current_layer)
         self.remove_selection()
-        resetRubberbands(self.api_search.rubber_band)
+        tools_qgis.resetRubberbands(self.api_search.rubber_band)
 
         # If client don't touch nothing just rejected dialog or press cancel
         if not self.dlg_mincut.closeMainWin and self.dlg_mincut.mincutCanceled:
-            close_dialog(self.dlg_mincut)
+            tools_gw.close_dialog(self.dlg_mincut)
             return
 
         self.dlg_mincut.closeMainWin = True
@@ -372,10 +362,10 @@ class GwMincut:
             self.controller.dao.rollback()
 
         # Close dialog, save dialog position, and disconnect snapping
-        close_dialog(self.dlg_mincut)
+        tools_gw.close_dialog(self.dlg_mincut)
         self.disconnect_snapping()
         self.remove_selection()
-        refresh_map_canvas()
+        tools_qgis.refresh_map_canvas()
 
 
     def disconnect_snapping(self, action_pan=True):
@@ -428,7 +418,7 @@ class GwMincut:
 
         # Create the dialog and signals
         self.dlg_fin = MincutEndUi()
-        load_settings(self.dlg_fin)
+        tools_gw.load_settings(self.dlg_fin)
 
         api_search = GwSearch()
         api_search.api_search(self.dlg_fin)
@@ -485,7 +475,7 @@ class GwMincut:
         self.dlg_fin.btn_set_real_location.clicked.connect(self.set_real_location)
 
         # Open the dialog
-        open_dialog(self.dlg_fin, dlg_name='mincut_end')
+        tools_gw.open_dialog(self.dlg_fin, dlg_name='mincut_end')
 
 
     def set_real_location(self):
@@ -505,7 +495,7 @@ class GwMincut:
     def accept_save_data(self):
         """ Slot function button 'Accept' """
 
-        save_settings(self.dlg_mincut)
+        tools_gw.save_settings(self.dlg_mincut)
         mincut_result_state = self.current_state
 
         # Manage 'address'
@@ -651,24 +641,24 @@ class GwMincut:
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         extras = f'"step":"check", '  # check
         extras += f'"result":"{result_mincut_id_text}"'
-        body = create_body(extras=extras)
+        body = tools_gw.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_setmincutoverlap', body)
         if not result or result['status'] == 'Failed':
             return
 
         if result['body']['actions']['overlap'] == 'Conflict':
             self.dlg_dtext = DialogTextUi()
-            load_settings(self.dlg_dtext)
+            tools_gw.load_settings(self.dlg_dtext)
             self.dlg_dtext.btn_close.setText('Cancel')
             self.dlg_dtext.btn_accept.setText('Continue')
             self.dlg_dtext.setWindowTitle('Mincut conflict')
             self.dlg_dtext.btn_accept.clicked.connect(partial(self.force_mincut_overlap))
-            self.dlg_dtext.btn_accept.clicked.connect(partial(close_dialog, self.dlg_dtext))
-            self.dlg_dtext.btn_close.clicked.connect(partial(close_dialog, self.dlg_dtext))
+            self.dlg_dtext.btn_accept.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
+            self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
 
-            populate_info_text(self.dlg_dtext, result['body']['data'], False)
+            tools_gw.populate_info_text(self.dlg_dtext, result['body']['data'], False)
 
-            open_dialog(self.dlg_dtext, dlg_name='dialog_text')
+            tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 
         elif result['body']['actions']['overlap'] == 'Ok':
             self.mincut_ok(result)
@@ -681,7 +671,7 @@ class GwMincut:
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         extras = f'"step":"continue", '
         extras += f'"result":"{result_mincut_id_text}"'
-        body = create_body(extras=extras)
+        body = tools_gw.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_setmincutoverlap', body)
         self.mincut_ok(result)
 
@@ -707,21 +697,21 @@ class GwMincut:
         if polygon[0] == '':
             message = "Error on create auto mincut, you need to review data"
             self.controller.show_warning(message)
-            set_cursor_restore()
+            tools_qgis.set_cursor_restore()
             self.task1.setProgress(100)
             return
         x1, y1 = polygon[0].split(' ')
         x2, y2 = polygon[2].split(' ')
-        zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+        tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
 
         self.dlg_mincut.btn_accept.hide()
         self.dlg_mincut.btn_cancel.setText('Close')
         self.dlg_mincut.btn_cancel.disconnect()
-        self.dlg_mincut.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_mincut))
-        self.dlg_mincut.btn_cancel.clicked.connect(partial(restore_user_layer, self.user_current_layer))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_mincut))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.restore_user_layer, self.user_current_layer))
         self.dlg_mincut.btn_cancel.clicked.connect(partial(self.remove_selection))
         # TODO: Check this class doesn't have rubber_band
-        self.dlg_mincut.btn_cancel.clicked.connect(partial(resetRubberbands, self.api_search.rubber_band))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.resetRubberbands, self.api_search.rubber_band))
         self.refresh_tab_hydro()
 
         self.action_mincut.setEnabled(False)
@@ -798,7 +788,7 @@ class GwMincut:
         # Set dialog add_connec
         self.dlg_connec = MincutConnec()
         self.dlg_connec.setWindowTitle("Connec management")
-        load_settings(self.dlg_connec)
+        tools_gw.load_settings(self.dlg_connec)
         self.dlg_connec.tbl_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
         # Set icons
         tools_qt.set_icon(self.dlg_connec.btn_insert, "111")
@@ -810,7 +800,7 @@ class GwMincut:
         self.dlg_connec.btn_delete.clicked.connect(partial(self.delete_records_connec))
         self.dlg_connec.btn_snapping.clicked.connect(self.snapping_init_connec)
         self.dlg_connec.btn_accept.clicked.connect(partial(self.accept_connec, self.dlg_connec, "connec"))
-        self.dlg_connec.rejected.connect(partial(close_dialog, self.dlg_connec))
+        self.dlg_connec.rejected.connect(partial(tools_gw.close_dialog, self.dlg_connec))
 
         # Set autocompleter for 'customer_code'
         self.set_completer_customer_code(self.dlg_connec.connec_id)
@@ -822,7 +812,7 @@ class GwMincut:
             self.select_features_connec()
         self.snapping_selection_connec()
 
-        open_dialog(self.dlg_connec, dlg_name='mincut_connec')
+        tools_gw.open_dialog(self.dlg_connec, dlg_name='mincut_connec')
 
 
     def set_completer_customer_code(self, widget, set_signal=False):
@@ -854,7 +844,7 @@ class GwMincut:
         multiple_snapping = MultipleSelection(self.layers, 'connec', mincut=self)
         self.canvas.setMapTool(multiple_snapping)
         self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))
-        cursor = get_cursor_multiple_selection()
+        cursor = tools_qgis.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)
 
 
@@ -865,7 +855,7 @@ class GwMincut:
         self.canvas.setMapTool(multiple_snapping)
         self.canvas.selectionChanged.connect(
             partial(self.snapping_selection_hydro))
-        cursor = get_cursor_multiple_selection()
+        cursor = tools_qgis.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)
 
 
@@ -897,7 +887,7 @@ class GwMincut:
         if len(self.connec_list) == 0:
             expr_filter = "\"connec_id\" =''"
         # Check expression
-        (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
 
@@ -930,7 +920,7 @@ class GwMincut:
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
-            (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
+            (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
             if not is_valid:
                 return
 
@@ -960,7 +950,7 @@ class GwMincut:
 
         # Set dialog MincutHydrometer
         self.dlg_hydro = MincutHydrometer()
-        load_settings(self.dlg_hydro)
+        tools_gw.load_settings(self.dlg_hydro)
         self.dlg_hydro.setWindowTitle("Hydrometer management")
         self.dlg_hydro.tbl_hydro.setSelectionBehavior(QAbstractItemView.SelectRows)
         # self.dlg_hydro.btn_snapping.setEnabled(False)
@@ -982,7 +972,7 @@ class GwMincut:
             # Read selection and reload table
             self.select_features_hydro()
 
-        open_dialog(self.dlg_hydro, dlg_name='mincut_hydrometer')
+        tools_gw.open_dialog(self.dlg_hydro, dlg_name='mincut_hydrometer')
 
 
     def auto_fill_hydro_id(self):
@@ -1097,7 +1087,7 @@ class GwMincut:
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
-            (is_valid, expr) = check_expression(expr_filter)
+            (is_valid, expr) = tools_gw.check_expression(expr_filter)
             if not is_valid:
                 return
 
@@ -1127,7 +1117,7 @@ class GwMincut:
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
-            (is_valid, expr) = check_expression(expr_filter)
+            (is_valid, expr) = tools_gw.check_expression(expr_filter)
             if not is_valid:
                 return
 
@@ -1163,7 +1153,7 @@ class GwMincut:
             Attach that model to selected table 
         """
 
-        disconnect_signal_selection_changed()
+        tools_qgis.disconnect_signal_selection_changed()
 
         # Get 'connec_id' from selected 'customer_code'
         customer_code = tools_qt.getWidgetText(self.dlg_connec, self.dlg_connec.connec_id)
@@ -1207,7 +1197,7 @@ class GwMincut:
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
-            (is_valid, expr) = check_expression(expr_filter)
+            (is_valid, expr) = tools_gw.check_expression(expr_filter)
             if not is_valid:
                 return
 
@@ -1244,7 +1234,7 @@ class GwMincut:
         expr = None
         if expr_filter:
             # Check expression
-            (is_valid, expr) = check_expression(expr_filter)  # @UnusedVariable
+            (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
             if not is_valid:
                 return expr
 
@@ -1293,7 +1283,7 @@ class GwMincut:
     def delete_records_connec(self):
         """ Delete selected rows of the table """
 
-        disconnect_signal_selection_changed()
+        tools_qgis.disconnect_signal_selection_changed()
 
         # Get selected rows
         widget = self.dlg_connec.tbl_mincut_connec
@@ -1420,7 +1410,7 @@ class GwMincut:
 
         self.sql_connec = sql
         self.dlg_mincut.btn_start.setDisabled(False)
-        close_dialog(self.dlg_connec)
+        tools_gw.close_dialog(self.dlg_connec)
 
 
     def accept_hydro(self, dlg, element):
@@ -1441,7 +1431,7 @@ class GwMincut:
 
         self.sql_hydro = sql
         self.dlg_mincut.btn_start.setDisabled(False)
-        close_dialog(self.dlg_hydro)
+        tools_gw.close_dialog(self.dlg_hydro)
 
 
     def auto_mincut(self):
@@ -1629,7 +1619,7 @@ class GwMincut:
 
         extras = f'"valveUnaccess":{{"status":"false"}}, '
         extras += f'"mincutId":"{real_mincut_id}", "arcId":"{elem_id}"'
-        body = create_body(extras=extras)
+        body = tools_gw.create_body(extras=extras)
         complet_result = self.controller.get_json('gw_fct_setmincut', body)
         if complet_result in (False, None) or ('status' in complet_result and complet_result['status'] == 'Failed'): return False
 
@@ -1648,12 +1638,12 @@ class GwMincut:
             if polygon[0] == '':
                 message = "Error on create auto mincut, you need to review data"
                 self.controller.show_warning(message)
-                set_cursor_restore()
+                tools_qgis.set_cursor_restore()
                 self.task1.setProgress(100)
                 return
             x1, y1 = polygon[0].split(' ')
             x2, y2 = polygon[2].split(' ')
-            zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+            tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
             sql = (f"UPDATE om_mincut"
                    f" SET mincut_class = 1, "
                    f" anl_the_geom = ST_SetSRID(ST_Point({snapping_x}, "
@@ -1666,7 +1656,7 @@ class GwMincut:
             if not status:
                 message = "Error updating element in table, you need to review data"
                 self.controller.show_warning(message)
-                set_cursor_restore()
+                tools_qgis.set_cursor_restore()
                 self.task1.setProgress(100)
                 return
 
@@ -1684,7 +1674,7 @@ class GwMincut:
             self.controller.execute_sql(sql, log_error=True)
             self.task1.setProgress(75)
             # Refresh map canvas
-            refresh_map_canvas()
+            tools_qgis.refresh_map_canvas()
 
         # Disconnect snapping and related signals
         self.disconnect_snapping(False)
@@ -1873,7 +1863,7 @@ class GwMincut:
 
         # Update table 'selector_mincut_result'
         self.update_result_selector(result_mincut_id)
-        refresh_map_canvas()
+        tools_qgis.refresh_map_canvas()
         self.current_state = str(row['mincut_state'])
         sql = (f"SELECT mincut_class FROM om_mincut"
                f" WHERE id = '{result_mincut_id}'")
@@ -2073,7 +2063,7 @@ class GwMincut:
 
         # Set dialog add_connec
         self.dlg_comp = MincutComposer()
-        load_settings(self.dlg_comp)
+        tools_gw.load_settings(self.dlg_comp)
 
         # Fill ComboBox cbx_template with templates *.qpt
         self.files_qpt = [i for i in template_files if i.endswith('.qpt')]
@@ -2084,12 +2074,12 @@ class GwMincut:
 
         # Set signals
         self.dlg_comp.btn_ok.clicked.connect(self.open_composer)
-        self.dlg_comp.btn_cancel.clicked.connect(partial(close_dialog, self.dlg_comp))
-        self.dlg_comp.rejected.connect(partial(close_dialog, self.dlg_comp))
+        self.dlg_comp.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_comp))
+        self.dlg_comp.rejected.connect(partial(tools_gw.close_dialog, self.dlg_comp))
         self.dlg_comp.cbx_template.currentIndexChanged.connect(self.set_template)
 
         # Open dialog
-        open_dialog(self.dlg_comp, dlg_name='mincut_composer')
+        tools_gw.open_dialog(self.dlg_comp, dlg_name='mincut_composer')
 
 
     def set_template(self):
@@ -2118,8 +2108,8 @@ class GwMincut:
             return
 
         # Check if composer exist
-        composers = get_composers_list()
-        index = get_composer_index(str(self.template))
+        composers = tools_qgis.get_composers_list()
+        index = tools_qgis.get_composer_index(str(self.template))
 
         # Composer not found
         if index == len(composers):
