@@ -1472,6 +1472,7 @@ class DaoController:
 
         sql = f"SET search_path = {schema_name}, public;"
         self.execute_sql(sql)
+        self.dao.set_search_path = sql
 
 
     def set_path_from_qfiledialog(self, qtextedit, path):
@@ -1574,7 +1575,8 @@ class DaoController:
         if description:
             msg += f"Description: {description}\n"
         if sql:
-            msg += f"SQL:\n {sql}\n"
+            msg += f"SQL:\n {sql}\n\n"
+        msg += f"Schema name: {self.schema_name}"
 
         # Show exception message in dialog and log it
         self.show_exceptions_msg(title, msg)
@@ -1615,7 +1617,8 @@ class DaoController:
             if filepath:
                 msg += f"SQL file:\n{filepath}\n\n"
             if sql:
-                msg += f"SQL:\n{sql}\n"
+                msg += f"SQL:\n {sql}\n\n"
+            msg += f"Schema name: {self.schema_name}"
 
             # Show exception message in dialog and log it
             if show_exception_msg:
@@ -1637,7 +1640,7 @@ class DaoController:
         """
 
         if not pattern:
-            pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:|Description"
+            pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:|Description|Schema name"
         cursor = widget.textCursor()
         format = QTextCharFormat()
         format.setFontWeight(QFont.Bold)
