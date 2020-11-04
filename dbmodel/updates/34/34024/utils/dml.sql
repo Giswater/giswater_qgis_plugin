@@ -59,7 +59,7 @@ VALUES ('edit_arc_insert_automatic_endpoint', 'config', 'If value, enables to di
 TRUE, FALSE, 'false') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
-VALUES (3160, 'This feature with state = 2 is only attached to psector' , 'It''s necessary to remove feature completaly using end feature tool', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING;
+VALUES (3160, 'This feature with state = 2 is only attached to one psector' , 'It''s necessary to remove feature completaly using end feature tool', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
 VALUES (3162, 'This feature is a final node for planned arc ' , 'It''s necessary to remove arcs first, then nodes', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING;
@@ -239,3 +239,8 @@ VALUES (356, 'Planned connecs without reference link', 'utils') ON CONFLICT (fid
 UPDATE config_form_tabs
 SET tabactions=tabactions::jsonb || '{"actionName":"actionRotation", "actionTooltip":"Rotation",  "disabled":false}'::jsonb
 WHERE formname ='v_edit_node';
+
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
+VALUES (3164, 'Arc have incorrectly defined final nodes in this plan alternative', 'Make sure that arcs finales are on service', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING ;
+
