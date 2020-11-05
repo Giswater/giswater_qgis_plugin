@@ -13,6 +13,10 @@ $BODY$
 
 DECLARE
 
+v_numarcs integer;
+v_length double precision;
+v_numconnecs integer;
+v_numhydrometer integer;
 v_volume float;
 v_priority json;
 v_count int2;

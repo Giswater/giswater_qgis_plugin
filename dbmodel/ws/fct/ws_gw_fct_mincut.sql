@@ -35,10 +35,6 @@ v_return json;
 cont1 integer default 0;
 v_publish_user text;
 v_muni_id integer;
-v_numarcs integer;
-v_length double precision;
-v_numconnecs integer;
-v_numhydrometer integer;
 v_debug Boolean;
 v_overlap text;  -- not used variable. Pending to refactor
 v_geometry text;
