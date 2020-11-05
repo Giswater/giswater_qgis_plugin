@@ -811,6 +811,8 @@ class GwMincut:
             # Read selection and reload table
             self.select_features_connec()
         self.snapping_selection_connec()
+        for layer in self.layers_connec:
+            layer.dataProvider().forceReload()
 
         tools_gw.open_dialog(self.dlg_connec, dlg_name='mincut_connec')
 
@@ -1527,6 +1529,7 @@ class GwMincut:
     def set_visible_mincut_layers(self, zoom=False):
         """ Set visible mincut result layers """
 
+        layer_zoomed = None
         layer = self.controller.get_layer_by_tablename("v_om_mincut_valve")
         if layer:
             self.controller.set_layer_visible(layer)
@@ -1538,17 +1541,22 @@ class GwMincut:
         layer = self.controller.get_layer_by_tablename("v_om_mincut_connec")
         if layer:
             self.controller.set_layer_visible(layer)
+            if layer.featureCount() > 0:
+                layer_zoomed = layer
 
-        # Refresh extension of layer
+
         layer = self.controller.get_layer_by_tablename("v_om_mincut_node")
         if layer:
             self.controller.set_layer_visible(layer)
-            if zoom:
-                # Refresh extension of layer
-                layer.updateExtents()
-                # Zoom to executed mincut
-                self.iface.setActiveLayer(layer)
-                self.iface.zoomToActiveLayer()
+            if layer.featureCount() > 0:
+                layer_zoomed = layer
+
+        if zoom and layer_zoomed is not None:
+            # Refresh extension of layer
+            layer_zoomed.updateExtents()
+            # Zoom to executed mincut
+            self.iface.setActiveLayer(layer_zoomed)
+            self.iface.zoomToActiveLayer()
 
 
     def snapping_node_arc_real_location(self, point, btn):  # @UnusedVariable
@@ -1871,8 +1879,6 @@ class GwMincut:
         mincut_class_status = None
         if row[0]:
             mincut_class_status = str(row[0])
-
-        self.set_visible_mincut_layers(True)
 
         expr_filter = f"result_id={result_mincut_id}"
         tools_qt.set_qtv_config(self.dlg_mincut.tbl_hydro)
