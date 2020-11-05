@@ -290,6 +290,7 @@ class MincutConfig(ParentAction):
         self.mincut.init_mincut_form()
         self.mincut.load_mincut(result_mincut_id)
         self.mincut.manage_docker()
+        self.mincut.set_visible_mincut_layers(True)
 
 
     def filter_by_days(self):
