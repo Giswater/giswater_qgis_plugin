@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_output(integer);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_output(result_id_arg integer)
-RETURNS integer AS
+RETURNS text AS
 $BODY$
 
 DECLARE
@@ -22,11 +22,17 @@ v_priority json;
 v_count int2;
 v_mincutdetails text;
 v_output json;
+v_element_id integer;
+v_mincut_class integer;
 
 BEGIN
 
     -- Search path
     SET search_path = "SCHEMA_NAME", public;
+
+	-- get parameters
+	SELECT anl_feature_id, mincut_class INTO v_element_id, v_mincut_class FROM om_mincut WHERE id=result_id_arg;
+	
 
 	-- count arcs
 	SELECT count(arc_id), sum(st_length(arc.the_geom))::numeric(12,2) INTO v_numarcs, v_length 
@@ -36,7 +42,7 @@ BEGIN
 	WHERE result_id=result_id_arg group by result_id, arccat_id;
 
 	-- count connec
-	SELECT count(connec_id) INTO v_numconnecs FROM om_mincut_connec WHERE result_id=result_id_arg AND state=1;
+	SELECT count(connec_id) INTO v_numconnecs FROM om_mincut_connec WHERE result_id=result_id_arg;
 
 	-- count hydrometers
 	SELECT count (rtc_hydrometer_x_connec.hydrometer_id) INTO v_numhydrometer 
@@ -54,8 +60,14 @@ BEGIN
 				
 	IF v_priority IS NULL THEN v_priority='{}'; END IF;
 	
-	v_mincutdetails = (concat('"minsector_id":"',element_id_arg,'","arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"', 
-	v_volume, '"}, "connecs":{"number":"',v_numconnecs,'","hydrometers":{"total":"',v_numhydrometer,'","classified":',v_priority,'}}'));
+	IF v_mincut_class=1 THEN
+		v_mincutdetails = (concat('"minsector_id":"',v_element_id,'","arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"', 
+		v_volume, '"}, "connecs":{"number":"',v_numconnecs,'","hydrometers":{"total":"',v_numhydrometer,'","classified":',v_priority,'}}'));
+	ELSIF v_mincut_class=2 THEN
+		v_mincutdetails = (concat('"connecs":{"number":"',v_numconnecs,'","hydrometers":{"total":"',v_numhydrometer,'","classified":',v_priority,'}}'));
+	ELSIF v_mincut_class=3 THEN
+		v_mincutdetails = (concat('","hydrometers":{"total":"',v_numhydrometer,'","classified":',v_priority,'}'));
+	END IF;
 
 	v_output = concat ('{', v_mincutdetails , '}');
 			
