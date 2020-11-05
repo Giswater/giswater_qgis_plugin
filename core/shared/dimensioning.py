@@ -17,12 +17,7 @@ from ..ui.ui_manager import DimensioningUi
 from ..utils import tools_gw
 from ..utils.tools_gw import SnappingConfigManager
 from ... import global_vars
-from ...lib.tools_qgis import restore_user_layer
-from ...lib.tools_qt import set_widget_size, add_button, add_textarea, add_lineedit, set_data_type, \
-    manage_lineedit, add_tableview, set_headers, populate_table, set_columns_config, add_checkbox, add_combobox, \
-    add_hyperlink, add_horizontal_spacer, add_vertical_spacer, add_spinbox, add_calendar, put_widgets, \
-    set_setStyleSheet, disable_all, enable_all, set_icon, setWidgetText, isChecked, get_item_data, \
-    set_qtv_config, getWidgetText
+from ...lib import tools_qgis, tools_qt
 
 
 class GwDimensioning:
@@ -79,11 +74,11 @@ class GwDimensioning:
         # ACTION SIGNALS
         actionSnapping = self.dlg_dim.findChild(QAction, "actionSnapping")
         actionSnapping.triggered.connect(partial(self.snapping, actionSnapping))
-        set_icon(actionSnapping, "103")
+        tools_qt.set_icon(actionSnapping, "103")
 
         actionOrientation = self.dlg_dim.findChild(QAction, "actionOrientation")
         actionOrientation.triggered.connect(partial(self.orientation, actionOrientation))
-        set_icon(actionOrientation, "133")
+        tools_qt.set_icon(actionOrientation, "133")
 
 
         # LAYER SIGNALS
@@ -91,8 +86,8 @@ class GwDimensioning:
         self.layer_dimensions.editingStopped.connect(lambda: actionSnapping.setEnabled(False))
         self.layer_dimensions.editingStarted.connect(lambda: actionOrientation.setEnabled(True))
         self.layer_dimensions.editingStopped.connect(lambda: actionOrientation.setEnabled(False))
-        self.layer_dimensions.editingStarted.connect(partial(enable_all, self.dlg_dim, db_return[0]['body']['data']))
-        self.layer_dimensions.editingStopped.connect(partial(disable_all, self.dlg_dim, db_return[0]['body']['data'], False))
+        self.layer_dimensions.editingStarted.connect(partial(tools_qt.enable_all, self.dlg_dim, db_return[0]['body']['data']))
+        self.layer_dimensions.editingStopped.connect(partial(tools_qt.disable_all, self.dlg_dim, db_return[0]['body']['data'], False))
 
         # WIDGETS SIGNALS
         self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, qgis_feature, layer))
@@ -111,7 +106,7 @@ class GwDimensioning:
             label, widget = self.set_widgets(self.dlg_dim, db_return, field)
 
             if widget.objectName() == 'id':
-                setWidgetText(self.dlg_dim, widget, self.fid)
+                tools_qt.setWidgetText(self.dlg_dim, widget, self.fid)
             layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
 
             # Profilactic issue to prevent missed layouts againts db response and form
@@ -128,7 +123,7 @@ class GwDimensioning:
                     layout.addWidget(label, 0, field['layoutorder'])
                     layout.addWidget(widget, 1, field['layoutorder'])
                 else:
-                    put_widgets(self.dlg_dim, field, label, widget)
+                    tools_qt.put_widgets(self.dlg_dim, field, label, widget)
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
@@ -140,11 +135,11 @@ class GwDimensioning:
             if self.layer_dimensions.isEditable():
                 actionSnapping.setEnabled(True)
                 actionOrientation.setEnabled(True)
-                enable_all(self.dlg_dim, db_return[0]['body']['data'])
+                tools_qt.enable_all(self.dlg_dim, db_return[0]['body']['data'])
             else:
                 actionSnapping.setEnabled(False)
                 actionOrientation.setEnabled(False)
-                disable_all(self.dlg_dim, db_return[0]['body']['data'], False)
+                tools_qt.disable_all(self.dlg_dim, db_return[0]['body']['data'], False)
 
         title = f"DIMENSIONING - {self.fid}"
         tools_gw.open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
@@ -155,7 +150,7 @@ class GwDimensioning:
 
         self.iface.actionRollbackEdits().trigger()
         tools_gw.close_dialog(self.dlg_dim)
-        restore_user_layer(self.user_current_layer)
+        tools_qgis.restore_user_layer(self.user_current_layer)
 
 
     def save_dimensioning(self, qgis_feature, layer):
@@ -169,7 +164,7 @@ class GwDimensioning:
         list_widgets = self.dlg_dim.findChildren(QLineEdit)
         for widget in list_widgets:
             widget_name = widget.property('columnname')
-            widget_value = getWidgetText(self.dlg_dim, widget)
+            widget_value = tools_qt.getWidgetText(self.dlg_dim, widget)
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":"{widget_value}", '
@@ -177,7 +172,7 @@ class GwDimensioning:
         list_widgets = self.dlg_dim.findChildren(QCheckBox)
         for widget in list_widgets:
             widget_name = widget.property('columnname')
-            widget_value = f'"{isChecked(self.dlg_dim, widget)}"'
+            widget_value = f'"{tools_qt.isChecked(self.dlg_dim, widget)}"'
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":{widget_value},'
@@ -186,7 +181,7 @@ class GwDimensioning:
         list_widgets = self.dlg_dim.findChildren(QComboBox)
         for widget in list_widgets:
             widget_name = widget.property('columnname')
-            widget_value = f'"{get_item_data(self.dlg_dim, widget)}"'
+            widget_value = f'"{tools_qt.get_item_data(self.dlg_dim, widget)}"'
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":{widget_value},'
@@ -313,11 +308,11 @@ class GwDimensioning:
 
             depth = snapped_feat.attribute(fieldname)
             if depth in ('', None, 0, '0', 'NULL'):
-                setWidgetText(self.dlg_dim, "depth", None)
+                tools_qt.setWidgetText(self.dlg_dim, "depth", None)
             else:
-                setWidgetText(self.dlg_dim, "depth", depth)
-            setWidgetText(self.dlg_dim, "feature_id", element_id)
-            setWidgetText(self.dlg_dim, "feature_type", feat_type.upper())
+                tools_qt.setWidgetText(self.dlg_dim, "depth", depth)
+            tools_qt.setWidgetText(self.dlg_dim, "feature_id", element_id)
+            tools_qt.setWidgetText(self.dlg_dim, "feature_type", feat_type.upper())
 
             self.snapper_manager.apply_snapping_options(self.previous_snapping)
             self.deactivate_signals(action, emit_point)
@@ -422,45 +417,45 @@ class GwDimensioning:
             label.setObjectName('lbl_' + field['widgetname'])
             label.setText(field['label'].capitalize())
             if field['stylesheet'] is not None and 'label' in field['stylesheet']:
-                label = set_setStyleSheet(field, label)
+                label = tools_qt.set_setStyleSheet(field, label)
             if 'tooltip' in field:
                 label.setToolTip(field['tooltip'])
             else:
                 label.setToolTip(field['label'].capitalize())
         if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
             completer = QCompleter()
-            widget = add_lineedit(field)
-            widget = set_widget_size(widget, field)
-            widget = set_data_type(field, widget)
+            widget = tools_qt.add_lineedit(field)
+            widget = tools_qt.set_widget_size(widget, field)
+            widget = tools_qt.set_data_type(field, widget)
             if field['widgettype'] == 'typeahead':
-                widget = manage_lineedit(field, dialog, widget, completer)
+                widget = tools_qt.manage_lineedit(field, dialog, widget, completer)
         elif field['widgettype'] == 'combo':
-            widget = add_combobox(field)
-            widget = set_widget_size(widget, field)
+            widget = tools_qt.add_combobox(field)
+            widget = tools_qt.set_widget_size(widget, field)
         elif field['widgettype'] == 'check':
-            widget = add_checkbox(field)
+            widget = tools_qt.add_checkbox(field)
         elif field['widgettype'] == 'datetime':
-            widget = add_calendar(dialog, field)
+            widget = tools_qt.add_calendar(dialog, field)
         elif field['widgettype'] == 'button':
-            widget = add_button(dialog, field)
-            widget = set_widget_size(widget, field)
+            widget = tools_qt.add_button(dialog, field)
+            widget = tools_qt.set_widget_size(widget, field)
         elif field['widgettype'] == 'hyperlink':
-            widget = add_hyperlink(field)
-            widget = set_widget_size(widget, field)
+            widget = tools_qt.add_hyperlink(field)
+            widget = tools_qt.set_widget_size(widget, field)
         elif field['widgettype'] == 'hspacer':
-            widget = add_horizontal_spacer()
+            widget = tools_qt.add_horizontal_spacer()
         elif field['widgettype'] == 'vspacer':
-            widget = add_vertical_spacer()
+            widget = tools_qt.add_vertical_spacer()
         elif field['widgettype'] == 'textarea':
-            widget = add_textarea(field)
+            widget = tools_qt.add_textarea(field)
         elif field['widgettype'] in 'spinbox':
-            widget = add_spinbox(field)
+            widget = tools_qt.add_spinbox(field)
         elif field['widgettype'] == 'tableview':
-            widget = add_tableview(db_return, field)
-            widget = set_headers(widget, field)
-            widget = populate_table(widget, field)
-            widget = set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
-            set_qtv_config(widget)
+            widget = tools_gw.add_tableview(db_return, field)
+            widget = tools_qt.set_headers(widget, field)
+            widget = tools_qt.populate_table(widget, field)
+            widget = tools_qt.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
+            tools_qt.set_qtv_config(widget)
         widget.setObjectName(widget.property('columnname'))
 
         return label, widget

@@ -530,7 +530,7 @@ class GwInfo(QObject):
         action_rotation.triggered.connect(partial(self.change_hemisphere, self.dlg_cf, action_rotation))
         action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
         action_section.triggered.connect(partial(self.open_section_form))
-        action_help.triggered.connect(partial(tools_qt.api_action_help, self.geom_type))
+        action_help.triggered.connect(partial(tools_qt.open_help, self.geom_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
         action_interpolate.triggered.connect(partial(self.activate_snapping, complet_result, self.ep))
 
@@ -1397,7 +1397,7 @@ class GwInfo(QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = tools_qt.add_tableview(complet_result, field)
+        widget = tools_gw.add_tableview(complet_result, field)
         widget = tools_qt.set_headers(widget, field)
         widget = tools_qt.populate_table(widget, field)
         widget = tools_qt.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)

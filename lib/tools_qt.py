@@ -691,7 +691,7 @@ def check_actions(action, enabled, dialog=None):
         pass
 
 
-def api_action_help(geom_type):
+def open_help(geom_type):
     """ Open PDF file with selected @project_type and @geom_type """
 
     # Get locale of QGIS application
@@ -857,31 +857,6 @@ def populate_lineedit(completer, model, field, dialog, widget):
     for field in complet_list['body']['data']:
         list_items.append(field['idval'])
     set_completer_object_api(completer, model, widget, list_items)
-
-
-def add_tableview(complet_result, field):
-    """ Add widgets QTableView type """
-
-    widget = QTableView()
-    widget.setObjectName(field['widgetname'])
-    if 'columnname' in field:
-        widget.setProperty('columnname', field['columnname'])
-    function_name = 'no_function_asociated'
-    real_name = widget.objectName()[5:len(widget.objectName())]
-    if 'widgetfunction' in field:
-        if field['widgetfunction'] is not None:
-            function_name = field['widgetfunction']
-            exist = global_vars.controller.check_python_function(sys.modules[__name__], function_name)
-            if not exist:
-                msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
-                global_vars.controller.show_message(msg, 2)
-                return widget
-
-    # Call def gw_api_open_rpt_result(self, widget, complet_result) of class ApiCf
-    # noinspection PyUnresolvedReferences
-    widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), widget, complet_result))
-
-    return widget
 
 
 def set_headers(widget, field):

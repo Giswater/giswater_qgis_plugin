@@ -5,16 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsProject, QgsExpression, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
-    QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
-    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest
-from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint
-
-from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QSettings, QPoint
-from qgis.PyQt.QtGui import QCursor, QPixmap, QColor
-from qgis.PyQt.QtWidgets import QTabWidget, QCompleter, QFileDialog, QPushButton, QTableView, \
-    QAbstractItemView, QLineEdit, QDateEdit
-
 import configparser
 import os
 import random
@@ -22,16 +12,22 @@ import re
 import sys
 if 'nt' in sys.builtin_module_names:
     import ctypes
-
 from functools import partial
 from collections import OrderedDict
+
+from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint
+from qgis.PyQt.QtGui import QCursor, QPixmap, QColor
+from qgis.PyQt.QtWidgets import QTabWidget, QCompleter, QFileDialog, QPushButton, QTableView
+from qgis.core import QgsProject, QgsExpression, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
+    QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
+    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest
+from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint
 
 from ..models.sys_feature_cat import SysFeatureCat
 from ..ui.ui_manager import GwDialog, GwMainWindow
 from ... import global_vars
-from ...lib import tools_qt
-from ...lib.tools_pgdao import get_uri
-from ...lib import tools_qgis
+from ...lib import tools_qgis, tools_pgdao, tools_qt
+
 
 
 class SnappingConfigManager(object):
@@ -876,7 +872,7 @@ def from_postgres_to_toc(tablename=None, the_geom="the_geom", field_id="id", chi
     :param style_id: Id of the style we want to load (integer or String)
     """
 
-    uri = get_uri()
+    uri = tools_pgdao.get_uri()
     schema_name = global_vars.controller.credentials['schema'].replace('"', '')
     if child_layers is not None:
         for layer in child_layers:
@@ -971,14 +967,14 @@ def check_for_group(layer, group=None):
 def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
                    group='GW Temporal Layers', disable_tabs=True):
     """ Add QgsVectorLayer into TOC
-    :param dialog:
-    :param data:
-    :param layer_name:
-    :param force_tab:
-    :param reset_text:
-    :param tab_idx:
-    :param del_old_layers:
-    :param group:
+    :param dialog: Dialog where to find the tab to be displayed and the textedit to be filled (QDialog or QMainWindow)
+    :param data: Json with information
+    :param layer_name: Name that will be given to the layer (String)
+    :param force_tab: Boolean that tells us if we want to show the tab or not (Boolean)
+    :param reset_text:It allows us to delete the text from the Qtexedit log, or add text below (Boolean)
+    :param tab_idx: Log tab index (Integer)
+    :param del_old_layers:Delete layers added in previous operations (Boolean)
+    :param group: Name of the group to which we want to add the layer (String)
     :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean).
     :return: Dictionary with text as result of previuos data (String), and list of layers added (QgsVectorLayer).
     """
@@ -1414,3 +1410,28 @@ def manage_feature_cat():
         global_vars.controller.show_warning(msg + "is not defined in table cat_feature")
 
     return feature_cat
+
+
+def add_tableview(complet_result, field):
+    """ Add widgets QTableView type """
+
+    widget = QTableView()
+    widget.setObjectName(field['widgetname'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    function_name = 'no_function_asociated'
+    real_name = widget.objectName()[5:len(widget.objectName())]
+    if 'widgetfunction' in field:
+        if field['widgetfunction'] is not None:
+            function_name = field['widgetfunction']
+            exist = global_vars.controller.check_python_function(sys.modules[__name__], function_name)
+            if not exist:
+                msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
+                global_vars.controller.show_message(msg, 2)
+                return widget
+
+    # Call def gw_api_open_rpt_result(self, widget, complet_result) of class ApiCf
+    # noinspection PyUnresolvedReferences
+    widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), widget, complet_result))
+
+    return widget
