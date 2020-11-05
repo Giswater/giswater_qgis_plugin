@@ -1066,6 +1066,9 @@ class DaoController(object):
         if layer is None:
             return layer_source
 
+        if layer.providerType() != 'postgres':
+            return layer_source
+        
         # Get dbname, host, port, user and password
         uri = layer.dataProvider().dataSourceUri()
 
