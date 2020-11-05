@@ -3461,7 +3461,7 @@ class GwAdmin:
         # Update variable composer_path on config_param_user
         folder_name = os.path.dirname(os.path.abspath(__file__))
         composers_path_vdef = os.path.normpath(os.path.normpath(folder_name + os.sep + os.pardir)) + os.sep + \
-            'templates' + os.sep + 'qgiscomposer' + os.sep + 'en'
+            'resources' + os.sep + 'templates' + os.sep + 'qgiscomposer' + os.sep + 'en'
         sql = (f"UPDATE {self.schema_name}.config_param_user "
                f"SET value = '{composers_path_vdef}' "
                f"WHERE parameter = 'qgis_composers_folderpath' AND cur_user = current_user")

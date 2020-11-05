@@ -309,7 +309,7 @@ def setImage(dialog, widget, cat_shape):
         return
     if type(widget) is QLabel:
         plugin_dir = os.path.dirname(__file__)
-        pic_file = os.path.join(plugin_dir, 'png', '' + element + '')
+        pic_file = os.path.join(plugin_dir, f'resources{os.sep}png', '' + element + '')
         pixmap = QPixmap(pic_file)
         widget.setPixmap(pixmap)
         widget.show()
@@ -704,7 +704,7 @@ def open_help(geom_type):
         locale = 'en'
     project_type = global_vars.controller.get_project_type()
     # Get PDF file
-    pdf_folder = os.path.join(global_vars.plugin_dir, 'png')
+    pdf_folder = os.path.join(global_vars.plugin_dir, f'resources{os.sep}png')
     pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
 
     # Open PDF if exists. If not open Spanish version

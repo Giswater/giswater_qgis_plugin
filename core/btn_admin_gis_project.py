@@ -46,7 +46,7 @@ class GwAdminGisProject:
 
         # Get folder with QGS templates
         gis_extension = "qgs"
-        gis_folder = self.plugin_dir + os.sep + "templates" + os.sep + "qgisproject"
+        gis_folder = self.plugin_dir + os.sep + "resources" + + os.sep + "templates" + os.sep + "qgisproject"
         gis_locale_path = gis_folder + os.sep + locale
 
         # If QGIS template locale folder not found, use English one
