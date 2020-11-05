@@ -821,7 +821,8 @@ class MincutParent(ParentAction):
 
     def add_connec(self):
         """ B3-121: Connec selector """
-
+        self.dlg_mincut.closeMainWin = True
+        self.dlg_mincut.canceled = False
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
         # Check if id exist in om_mincut
@@ -985,7 +986,8 @@ class MincutParent(ParentAction):
 
     def add_hydrometer(self):
         """ B4-122: Hydrometer selector """
-
+        self.dlg_mincut.closeMainWin = True
+        self.dlg_mincut.canceled = False
         self.connec_list = []
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
