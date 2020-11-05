@@ -109,7 +109,7 @@ BEGIN
 
 	ELSIF v_action = 'mincutAccept' THEN
 
-		PERFORM gw_fct_json_create_return(gw_fct_setmincutoverlap(p_data), 2980);
+		RETURN gw_fct_json_create_return(gw_fct_setmincutoverlap(p_data), 2980);
 		
 	END IF;
 END;
