@@ -23,14 +23,14 @@ import traceback
 import sys
 
 from .. import global_vars
-from .pg_dao import PgDao
-from .logger import Logger
-from ..lib import tools_os, tools_qt
 from ..core.ui.ui_manager import DialogTextUi, DockerUi
-from ..lib import tools_qgis
+from ..lib import tools_os, tools_qt, tools_qgis
 from ..core.utils import tools_gw
-
+from ..lib.tools_pgdao import PgDao
+from ..lib.tools_log import Logger
 from ..core.utils.tools_gw import SnappingConfigManager
+
+
 class DaoController:
 
     def __init__(self, plugin_name, iface, logger_name='plugin', create_logger=True):
