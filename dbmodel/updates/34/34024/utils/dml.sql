@@ -69,7 +69,6 @@ DELETE FROM sys_param_user where id = 'inp_options_skipdemandpattern';
 UPDATE sys_param_user SET vdefault = lower(vdefault) WHERE id = 'qgis_form_initproject_hidden';
 
 --2020/10/21
-
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
 VALUES (302, 'Check values of system variables', 'utils') ON CONFLICT (fid) DO NOTHING ;
 
@@ -245,10 +244,15 @@ INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, p
 VALUES (3164, 'Arc have incorrectly defined final nodes in this plan alternative', 'Make sure that arcs finales are on service', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING ;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
-VALUES ('3002', 'gw_fct_setplan', 'utils', 'function','json', 'json', 
+VALUES (3002, 'gw_fct_setplan', 'utils', 'function','json', 'json', 
 'Function that returns qgis layer configuration for masterplan', 'role_master', NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_typevalue VALUES ('tabname_typevalue', 'tab_event', 'tab_event', 'tabEvent') ON CONFLICT (typevalue, id) DO NOTHING;
 UPDATE config_form_tabs SET tabname='tab_event' WHERE tabname='tab_om';
 DELETE FROM config_typevalue WHERE typevalue='tabname_typevalue' AND id='tab_om';
+
+--2020/11/05
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
+VALUES (3004, 'gw_fct_mincut_output', 'ws', 'function', 'integer', 'integer', 'Details of mincut', 'role_om') 
+ON CONFLICT (id) DO NOTHING;
 

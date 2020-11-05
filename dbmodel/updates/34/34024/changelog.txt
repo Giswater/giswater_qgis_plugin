@@ -4,3 +4,4 @@
 - Drop deprecated column _parent_id ON inp_subcatchments
 - Recover edit_arc_insert_automatic_endpoint variable
 - Drop _node_id and _to_arc deprecated fields on ud flowregulators features
+- Enhance mincut log when mincut_class in (2,3)

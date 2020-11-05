@@ -43,12 +43,8 @@ v_debug Boolean;
 v_overlap text;  -- not used variable. Pending to refactor
 v_geometry text;
 v_data json;
-v_volume float;
-v_priority json;
-v_count int2;
 v_mincutversion integer;
 v_mincutdetails	text;
-v_output json;
 
 v_result text;
 v_result_info text;
@@ -295,42 +291,14 @@ BEGIN
 	LEFT JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 	WHERE result_id=result_id_arg;
 
-	-- Insert hazard values on audit_log_data table
-	-- count arcs
-	SELECT count(arc_id), sum(st_length(arc.the_geom))::numeric(12,2) INTO v_numarcs, v_length FROM om_mincut_arc JOIN arc USING (arc_id) WHERE result_id=result_id_arg group by result_id;
-	SELECT sum(area*st_length(arc.the_geom))::numeric(12,2) INTO v_volume FROM om_mincut_arc JOIN arc USING (arc_id) JOIN cat_arc ON arccat_id=cat_arc.id WHERE result_id=result_id_arg group by result_id, arccat_id;
-
-	-- count connec
-	SELECT count(connec_id) INTO v_numconnecs FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state=1;
-
-	-- count hydrometers
-	SELECT count (rtc_hydrometer_x_connec.hydrometer_id) INTO v_numhydrometer FROM rtc_hydrometer_x_connec JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
-	JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
-	JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=result_id_arg;
-
-	-- priority hydrometers
-	v_priority = 	(SELECT (array_to_json(array_agg((b)))) FROM (SELECT concat('{"category":"',category_id,'","number":"', count(rtc_hydrometer_x_connec.hydrometer_id), '"}')::json as b FROM rtc_hydrometer_x_connec 
-			JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
-			JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
-			JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=result_id_arg GROUP BY category_id ORDER BY category_id)a);
-				
-	IF v_priority IS NULL THEN v_priority='{}'; END IF;
-	
-	v_mincutdetails = (concat('"minsector_id":"',element_id_arg,'","arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"', 
-	v_volume, '"}, "connecs":{"number":"',v_numconnecs,'","hydrometers":{"total":"',v_numhydrometer,'","classified":',v_priority,'}}'));
-
-	v_output = concat ('{', v_mincutdetails , '}');
-			
-	--update output results
-	UPDATE om_mincut SET output = v_output WHERE id = result_id_arg;
+	-- fill connnec & hydrometer details on om_mincut.output
+	SELECT gw_fct_mincut_output(result_id_arg) INTO v_mincutdetails;
 
 	-- calculate the boundary of mincut using arcs and valves
 	EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM om_mincut_arc WHERE result_id='||result_id_arg||
 		' UNION SELECT the_geom FROM om_mincut_valve WHERE result_id='||result_id_arg||') a'    
 	        INTO v_geometry;
-
-	RAISE NOTICE 'v_output %', v_output;
-			
+	
 	-- restore state selector
 	INSERT INTO selector_state (state_id, cur_user)
 	select unnest(text_column::integer[]), current_user from temp_table where fid=199 and cur_user=current_user
@@ -347,7 +315,7 @@ BEGIN
 	IF v_audit_result is null THEN
         v_status = 'Accepted';
         v_level = 3;
-        v_message = 'Arc divide done successfully';
+        v_message = 'Mincut done successfully';
         v_return = concat('{"mincutOverlap":"',v_overlap,'", "geometry":"',v_geometry,'",', v_mincutdetails, '}');
     ELSE
 
