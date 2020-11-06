@@ -256,3 +256,6 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, input_p
 VALUES (3004, 'gw_fct_mincut_output', 'ws', 'function', 'integer', 'integer', 'Details of mincut', 'role_om') 
 ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
+VALUES (3006, 'gw_fct_settoarc', 'ws', 'function','json', 'json', 
+'Function that sets flow direction in inp and mapzone tables', 'role_edit', NULL) ON CONFLICT (id) DO NOTHING;
