@@ -971,6 +971,8 @@
    <addaction name="actionRotation"/>
    <addaction name="actionCatalog"/>
    <addaction name="actionWorkcat"/>
+   <addaction name="actionMapZone"/>
+   <addaction name="actionSetToArc"/>
    <addaction name="actionGetArcId"/>
    <addaction name="actionGetParentId"/>
    <addaction name="separator"/>
@@ -1166,6 +1168,16 @@
    </property>
    <property name="text">
     <string>Get new parent id</string>
+   </property>
+  </action>
+  <action name="actionSetToArc">
+   <property name="text">
+    <string>Set to arc</string>
+   </property>
+  </action>
+  <action name="actionMapZone">
+   <property name="text">
+    <string>MapZone</string>
    </property>
   </action>
  </widget>
