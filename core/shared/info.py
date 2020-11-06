@@ -388,6 +388,8 @@ class GwInfo(QObject):
         action_rotation = self.dlg_cf.findChild(QAction, "actionRotation")
         action_catalog = self.dlg_cf.findChild(QAction, "actionCatalog")
         action_workcat = self.dlg_cf.findChild(QAction, "actionWorkcat")
+        action_mapzone = self.dlg_cf.findChild(QAction, "actionMapZone")
+        action_set_to_arc = self.dlg_cf.findChild(QAction, "actionSetToArc")
         action_get_arc_id = self.dlg_cf.findChild(QAction, "actionGetArcId")
         action_get_parent_id = self.dlg_cf.findChild(QAction, "actionGetParentId")
         action_zoom_in = self.dlg_cf.findChild(QAction, "actionZoom")
@@ -416,6 +418,8 @@ class GwInfo(QObject):
         tools_qt.set_icon(action_rotation, "107c")
         tools_qt.set_icon(action_catalog, "195")
         tools_qt.set_icon(action_workcat, "193")
+        tools_qt.set_icon(action_mapzone, "213")
+        tools_qt.set_icon(action_set_to_arc, "212")
         tools_qt.set_icon(action_get_arc_id, "209")
         tools_qt.set_icon(action_get_parent_id, "210")
         tools_qt.set_icon(action_zoom_in, "103")
@@ -520,9 +524,11 @@ class GwInfo(QObject):
         # Actions signals
         action_edit.triggered.connect(partial(self.manage_edition, dlg_cf, action_edit, fid, new_feature))
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
-        action_workcat.triggered.connect(partial(self.cf_new_workcat, tab_type))
-        action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_arc_id, 'arc', 'data_arc_id'))
-        action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, self.dlg_cf, action_get_parent_id, 'node', 'data_parent_id'))
+        action_workcat.triggered.connect(partial(self.call_action_function, 'gw_fct_getcatalog', 'cf_manage_new_workcat_accept', 'new_workcat'))
+        action_mapzone.triggered.connect(partial(self.call_action_function, 'gw_fct_getcatalog', 'manage_mapzone', 'new_mapzone'))
+        action_set_to_arc.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_set_to_arc, 'v_edit_arc', 'set_to_arc', None))
+        action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id,  'v_edit_arc', 'arc', 'data_arc_id'))
+        action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_parent_id, 'v_edit_node', 'node', 'data_parent_id'))
         action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.canvas, self.layer))
         action_centered.triggered.connect(partial(self.api_action_centered, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, self.layer))
@@ -3082,71 +3088,64 @@ class GwInfo(QObject):
                 plan_layout.addItem(plan_vertical_spacer)
 
 
-    """ NEW WORKCAT"""
+    def call_action_function(self, sql_function_name, py_function_name, form_name):
+        if sql_function_name is not None:
+            body = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
+            body += f'"form":{{"formName":"{form_name}", "tabName":"data", "editable":"TRUE"}}, '
+            body += f'"feature":{{}}, '
+            body += f'"data":{{}}}}$$'
+            json_result = self.controller.get_json(sql_function_name, body)
+            if json_result is None:
+                return
 
-    def cf_new_workcat(self, tab_type):
-
-        body = '$${"client":{"device":4, "infoType":1, "lang":"ES"}, '
-        body += '"form":{"formName":"new_workcat", "tabName":"data", "editable":"TRUE"}, '
-        body += '"feature":{}, '
-        body += '"data":{}}$$'
-        function_name = 'gw_fct_getcatalog'
-        json_result = self.controller.get_json(function_name, body)
-        if json_result is None or json_result['status'] == 'Failed':
-            return
-        complet_list = [json_result]
-        if not complet_list:
+        if py_function_name is None:
             return
 
-        self.dlg_new_workcat = InfoGenericUi()
-        tools_gw.load_settings(self.dlg_new_workcat)
-
+        dlg_generic = InfoGenericUi()
+        tools_gw.load_settings(dlg_generic)
         # Set signals
-        self.dlg_new_workcat.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_new_workcat))
-        self.dlg_new_workcat.rejected.connect(partial(tools_gw.close_dialog, self.dlg_new_workcat))
-        self.dlg_new_workcat.btn_accept.clicked.connect(
-            partial(self.cf_manage_new_workcat_accept, 'cat_work', tab_type))
+        dlg_generic.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_generic))
+        dlg_generic.rejected.connect(partial(tools_gw.close_dialog, dlg_generic))
+        dlg_generic.btn_accept.clicked.connect(lambda: getattr(self, py_function_name)(dlg_generic))
 
-        tools_qt.populate_basic_info(self.dlg_new_workcat, complet_list, self.field_id, self.my_json,
-                 new_feature_id=self.new_feature_id, new_feature=self.new_feature, layer_new_feature=self.layer_new_feature,
-                 feature_id=self.feature_id, feature_type=self.feature_type, layer=self.layer)
+        tools_qt.populate_basic_info(dlg_generic, [json_result], self.field_id)
 
         # Open dialog
-        self.dlg_new_workcat.setWindowTitle("Create workcat")
-        tools_gw.open_dialog(self.dlg_new_workcat, dlg_name='info_generic')
+        dlg_generic.setWindowTitle(f"{(form_name.lower()).capitalize().replace('_', ' ')}")
+        tools_gw.open_dialog(dlg_generic)
 
 
-    def cf_manage_new_workcat_accept(self, table_object, tab_type):
+    def cf_manage_new_workcat_accept(self, dialog):
         """ Insert table 'cat_work'. Add cat_work """
 
         # Take widgets
-        cat_work_id = self.dlg_new_workcat.findChild(QLineEdit, "data_cat_work_id")
-        descript = self.dlg_new_workcat.findChild(QLineEdit, "data_descript")
-        link = self.dlg_new_workcat.findChild(QLineEdit, "data_link")
-        workid_key_1 = self.dlg_new_workcat.findChild(QLineEdit, "data_workid_key_1")
-        workid_key_2 = self.dlg_new_workcat.findChild(QLineEdit, "data_workid_key_2")
-        builtdate = self.dlg_new_workcat.findChild(QgsDateTimeEdit, "data_builtdate")
+        cat_work_id = dialog.findChild(QLineEdit, "data_cat_work_id")
+        descript = dialog.findChild(QLineEdit, "data_descript")
+        link = dialog.findChild(QLineEdit, "data_link")
+        workid_key_1 = dialog.findChild(QLineEdit, "data_workid_key_1")
+        workid_key_2 = dialog.findChild(QLineEdit, "data_workid_key_2")
+        builtdate = dialog.findChild(QgsDateTimeEdit, "data_builtdate")
 
         # Get values from dialog
         values = ""
         fields = ""
-        cat_work_id = tools_qt.getWidgetText(self.dlg_new_workcat, cat_work_id)
+        cat_work_id = tools_qt.getWidgetText(dialog, cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
             values += f"'{cat_work_id}', "
-        descript = tools_qt.getWidgetText(self.dlg_new_workcat, descript)
+        descript = tools_qt.getWidgetText(dialog, descript)
         if descript != "null":
             fields += 'descript, '
             values += f"'{descript}', "
-        link = tools_qt.getWidgetText(self.dlg_new_workcat, link)
+        link = tools_qt.getWidgetText(dialog, link)
         if link != "null":
             fields += 'link, '
             values += f"'{link}', "
-        workid_key_1 = tools_qt.getWidgetText(self.dlg_new_workcat, workid_key_1)
+        workid_key_1 = tools_qt.getWidgetText(dialog, workid_key_1)
         if workid_key_1 != "null":
             fields += 'workid_key1, '
             values += f"'{workid_key_1}', "
-        workid_key_2 = tools_qt.getWidgetText(self.dlg_new_workcat, workid_key_2)
+        workid_key_2 = tools_qt.getWidgetText(dialog, workid_key_2)
         if workid_key_2 != "null":
             fields += 'workid_key2, '
             values += f"'{workid_key_2}', "
@@ -3164,7 +3163,7 @@ class GwInfo(QObject):
             else:
                 # Check if this element already exists
                 sql = (f"SELECT DISTINCT(id)"
-                       f"FROM {table_object} "
+                       f"FROM cat_work "
                        f"WHERE id = '{cat_work_id}' ")
                 row = self.controller.get_row(sql, log_info=False)
                 if row is None:
@@ -3173,13 +3172,13 @@ class GwInfo(QObject):
                     sql = "SELECT id, id FROM cat_work ORDER BY id"
                     rows = self.controller.get_rows(sql)
                     if rows:
-                        cmb_workcat_id = self.dlg_cf.findChild(QWidget, tab_type + "_workcat_id")
+                        cmb_workcat_id = self.dlg_cf.findChild(QWidget, "data_workcat_id")
                         model = QStringListModel()
                         completer = QCompleter()
                         tools_qt.set_completer_object_api(completer, model, cmb_workcat_id, rows[0])
                         tools_qt.setWidgetText(self.dlg_cf, cmb_workcat_id, cat_work_id)
                         self.my_json[str(cmb_workcat_id.property('columnname'))] = str(cat_work_id)
-                    tools_gw.close_dialog(self.dlg_new_workcat)
+                    tools_gw.close_dialog(dialog)
                 else:
                     msg = "This workcat already exists"
                     self.controller.show_info_box(msg, "Warning")
@@ -3207,16 +3206,18 @@ class GwInfo(QObject):
         dlg.open()
 
 
-    def get_snapped_feature_id(self, dialog, action, option, widget_name):
+    def get_snapped_feature_id(self, dialog, action, layer_name, option, widget_name):
         """ Snap feature and set a value into dialog """
 
-        layer_name = 'v_edit_' + option
         layer = self.controller.get_layer_by_tablename(layer_name)
-        widget = dialog.findChild(QWidget, widget_name)
-        if not layer or not widget:
+        if not layer:
             action.setChecked(False)
             return
-
+        if widget_name is not None:
+            widget = dialog.findChild(QWidget, widget_name)
+            if widget is None:
+                action.setChecked(False)
+                return
         # Block the signals of de dialog so that the key ESC does not close it
         dialog.blockSignals(True)
 
@@ -3233,16 +3234,15 @@ class GwInfo(QObject):
         self.snapper_manager.enable_snapping()
 
         # if we are doing info over connec or over node
-        if option == 'arc':
+        if option in ('arc', 'set_to_arc'):
             self.snapper_manager.snap_to_arc()
         elif option == 'node':
             self.snapper_manager.snap_to_node()
-
         # Set signals
         self.canvas.xyCoordinates.connect(partial(self.mouse_moved, layer))
         emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(emit_point)
-        emit_point.canvasClicked.connect(partial(self.get_id, dialog, action, option))
+        emit_point.canvasClicked.connect(partial(self.get_id, dialog, action, option, emit_point))
 
 
     def mouse_moved(self, layer, point):
@@ -3266,11 +3266,11 @@ class GwInfo(QObject):
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
-    def get_id(self, dialog, action, option, point, event):
-        """ Get selected attribute from snapped feature """
+    def get_id(self, dialog, action, option, emit_point, point, event):
 
+        """ Get selected attribute from snapped feature """
         # @options{'key':['att to get from snapped feature', 'widget name destination']}
-        options = {'arc': ['arc_id', 'data_arc_id'], 'node': ['node_id', 'data_parent_id']}
+        options = {'arc': ['arc_id', 'data_arc_id'], 'node': ['node_id', 'data_parent_id'], 'set_to_arc': ['arc_id', 'set_to_arc']}
 
         if event == Qt.RightButton:
             self.disconnect_snapping(False)
@@ -3279,7 +3279,6 @@ class GwInfo(QObject):
 
         # Get coordinates
         event_point = self.snapper_manager.get_event_point(point=point)
-
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if not result.isValid():
@@ -3287,11 +3286,43 @@ class GwInfo(QObject):
         # Get the point. Leave selection
         snapped_feat = self.snapper_manager.get_snapped_feature(result)
         feat_id = snapped_feat.attribute(f'{options[option][0]}')
-        widget = dialog.findChild(QWidget, f"{options[option][1]}")
-        widget.setFocus()
-        tools_qt.setWidgetText(dialog, widget, str(feat_id))
+        if option in ('arc', 'node'):
+            widget = dialog.findChild(QWidget, f"{options[option][1]}")
+            widget.setFocus()
+            tools_qt.setWidgetText(dialog, widget, str(feat_id))
+        elif option == 'set_to_arc':
+            # functions called in -> getattr(self, options[option][0])(feat_id) --> def set_to_arc(self, feat_id)
+            getattr(self, options[option][1])(feat_id)
         self.snapper_manager.apply_snapping_options(self.previous_snapping)
         self.cancel_snapping_tool(dialog, action)
+
+
+    def set_to_arc(self, feat_id):
+        """  Function called in def get_id(self, dialog, action, option, point, event):
+                getattr(self, options[option][1])(feat_id)
+        :param feat_id: Id of the snapped feature
+        :return:
+        """
+        w_dma_id = self.dlg_cf.findChild(QComboBox, 'data_dma_id')
+        dma_id = tools_qt.get_item_data(self.dlg_cf, w_dma_id)
+        w_presszone_id = self.dlg_cf.findChild(QComboBox, 'data_presszone_id')
+        presszone_id = tools_qt.get_item_data(self.dlg_cf, w_presszone_id)
+        w_sector_id = self.dlg_cf.findChild(QComboBox, 'data_sector_id')
+        sector_id = tools_qt.get_item_data(self.dlg_cf, w_sector_id)
+        w_dqa_id = self.dlg_cf.findChild(QComboBox, 'data_dqa_id')
+        dqa_id = tools_qt.get_item_data(self.dlg_cf, w_dqa_id)
+
+        feature = f'"featureType":"{self.feature_type}", "id":"{self.feature_id}"'
+        extras = (f'"arcId":"{feat_id}", "dmaId":"{dma_id}", "presszoneId":"{presszone_id}", "sectorId":"{sector_id}", '
+                  f'"dqaId":"{dqa_id}"')
+        body = tools_gw.create_body(feature=feature, extras=extras)
+        json_result = self.controller.get_json('gw_fct_settoarc', body, log_sql=True)
+        if 'status' in json_result and json_result['status'] == 'Accepted':
+            if json_result['message']:
+                level = 1
+                if 'level' in json_result['message']:
+                    level = int(json_result['message']['level'])
+                self.controller.show_message(json_result['message']['text'], level)
 
 
     def cancel_snapping_tool(self, dialog, action):
