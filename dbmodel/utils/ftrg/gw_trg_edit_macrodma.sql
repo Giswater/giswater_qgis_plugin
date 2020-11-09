@@ -38,7 +38,7 @@ BEGIN
         
         -- FEATURE INSERT
 	INSERT INTO macrodma (macrodma_id, name, descript, the_geom, undelete, expl_id)
-	VALUES (NEW.macrodma_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, expl_id_int);
+	VALUES (NEW.macrodma_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, NEW.expl_id);
 				
 	RETURN NEW;
 		
