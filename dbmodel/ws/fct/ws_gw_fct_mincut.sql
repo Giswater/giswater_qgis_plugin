@@ -54,6 +54,15 @@ v_status text;
 v_message text;
 v_version text;
 
+v_numarcs integer;
+v_length double precision;
+v_numconnecs integer;
+v_numhydrometer integer;
+v_volume float;
+v_priority json;
+v_output json;
+
+
 BEGIN
 
     -- Search path
