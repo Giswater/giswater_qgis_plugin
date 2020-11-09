@@ -67,8 +67,6 @@ class DaoController:
         if create_logger:
             self.set_logger(logger_name)
 
-        self.snapper_manager = SnappingConfigManager(self.iface)
-
 
     def close_db(self):
         """ Close database connection """
@@ -2034,6 +2032,7 @@ class DaoController:
 
             # Set snnaping options
             if 'snnaping' in layermanager:
+                self.snapper_manager = SnappingConfigManager(self.iface)
                 for layer_name in layermanager['snnaping']:
                     layer = global_vars.controller.get_layer_by_tablename(layer_name)
                     if layer:
@@ -2048,9 +2047,9 @@ class DaoController:
                         snapping_config = self.snapper_manager.get_snapping_options()
                         snapping_config.setIndividualLayerSettings(layer, layer_settings)
                         QgsProject.instance().blockSignals(False)
-                        QgsProject.instance().snappingConfigChanged.emit(
-                            snapping_config)
+                        QgsProject.instance().snappingConfigChanged.emit(snapping_config)
                 self.snapper_manager.set_snapping_mode()
+                del self.snapper_manager
 
 
         except Exception as e:
