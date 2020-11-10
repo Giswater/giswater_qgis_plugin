@@ -642,10 +642,9 @@ class MincutParent(ParentAction):
             return
 
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-        extras = f'"step":"check", '  # check
-        extras += f'"result":"{result_mincut_id_text}"'
+        extras = f'"action":"mincutAccept", "status":"check", "mincutId":"{result_mincut_id_text}"'
         body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_mincut_result_overlap', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
         if not result:
             return
 
@@ -724,10 +723,9 @@ class MincutParent(ParentAction):
     def force_mincut_overlap(self):
 
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-        extras = f'"step":"continue", '
-        extras += f'"result":"{result_mincut_id_text}"'
+        extras = f'"action":"mincutAccept", "status":"continue", "mincutId":"{result_mincut_id_text}"'
         body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_mincut_result_overlap', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
         self.mincut_ok(result)
 
 
@@ -1663,17 +1661,11 @@ class MincutParent(ParentAction):
 
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, real_mincut_id)
         self.task1.setProgress(25)
-        # Execute gw_fct_mincut ('feature_id', 'feature_type', 'result_id')
-        # feature_id: id of snapped arc/node
-        # feature_type: type of snapped element (arc/node)
-        # result_mincut_id: result_mincut_id from form
-        sql = f"SELECT gw_fct_mincut('{elem_id}', '{elem_type}', '{real_mincut_id}');"
-        row = self.controller.get_row(sql)
-        if not row or not row[0]:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
-            return False
 
-        complet_result = row[0]
+        extras = f'"action":"mincutNetwork", '
+        extras += f'"mincutId":"{real_mincut_id}", "arcId":"{elem_id}"'
+        body = self.create_body(extras=extras)
+        complet_result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
         if 'mincutOverlap' in complet_result:
             if complet_result['mincutOverlap'] != "":
                 message = "Mincut done, but has conflict and overlaps with"
