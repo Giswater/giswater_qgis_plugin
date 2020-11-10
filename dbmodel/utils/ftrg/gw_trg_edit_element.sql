@@ -16,6 +16,7 @@ DECLARE
 
 v_code_autofill_bool boolean;
 v_doublegeometry boolean;
+v_insert_double_geom boolean;
 v_length float;
 v_width float;
 v_rotation float;
@@ -47,7 +48,9 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	-- get values
-	v_unitsfactor = (SELECT value::float FROM config_param_user WHERE "parameter"='edit_element_doublegeom' AND cur_user=current_user);
+	SELECT ((value::json)->>'activated')::boolean INTO v_insert_double_geom FROM config_param_system WHERE parameter='edit_element_doublegeom';
+	SELECT ((value::json)->>'value')::float INTO v_unitsfactor FROM config_param_system WHERE parameter='edit_element_doublegeom';
+
 	IF v_unitsfactor IS NULL THEN
 		v_unitsfactor = 1;
 	END IF;
@@ -156,7 +159,7 @@ BEGIN
 		v_doublegeometry = (SELECT isdoublegeom FROM cat_element WHERE id = NEW.elementcat_id);
 
 		-- double geometry
-		IF v_doublegeometry AND NEW.elementcat_id IS NOT NULL THEN
+		IF v_insert_double_geom AND v_doublegeometry AND NEW.elementcat_id IS NOT NULL THEN
 
 			v_length = (SELECT geom1 FROM cat_element WHERE id=NEW.elementcat_id);
 			v_width = (SELECT geom2 FROM cat_element WHERE id=NEW.elementcat_id);
@@ -261,7 +264,7 @@ BEGIN
 		v_doublegeometry = (SELECT isdoublegeom FROM cat_element WHERE id = NEW.elementcat_id);
 
 		-- double geometry catalog update
-		IF v_doublegeometry AND (NEW.elementcat_id != OLD.elementcat_id OR NEW.the_geom::text <> OLD.the_geom::text) THEN
+		IF v_insert_double_geom AND v_doublegeometry AND (NEW.elementcat_id != OLD.elementcat_id OR NEW.the_geom::text <> OLD.the_geom::text) THEN
 
 			v_length = (SELECT geom1 FROM cat_element WHERE id=NEW.elementcat_id);
 			v_width = (SELECT geom2 FROM cat_element WHERE id=NEW.elementcat_id);

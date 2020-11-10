@@ -258,8 +258,19 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
 VALUES (3006, 'gw_fct_settoarc', 'ws', 'function','json', 'json', 
-'Function that sets flow direction in inp and mapzone tables', 'role_edit', NULL) ON CONFLICT (id) DO NOTHING;'Function that sets flow direction in inp and mapzone tables', 'role_edit', NULL) ON CONFLICT (id) DO NOTHING;
+'Function that sets flow direction in inp and mapzone tables', 'role_edit', NULL) ON CONFLICT (id) DO NOTHING;
 
 --2020/11/09
 UPDATE config_form_fields SET widgettype='combo', iseditable=TRUE WHERE columnname='macrodma_id' AND formname='v_edit_dma';
 UPDATE config_form_fields SET iseditable=TRUE WHERE columnname='macrosector_id' AND formname='v_edit_sector';
+
+INSERT INTO config_param_system (parameter, value, descript, label, isenabled, layoutorder, project_type, datatype, widgettype, ismandatory, iseditable, layoutname) VALUES
+('edit_element_doublegeom', '{"activated":true,"value":1}', 'Enable/disable inserting double geometry elements', 'Element double geometry enabled:', true, 17,  'utils', 'string', 'linetext', TRUE, TRUE, 'lyt_topology')
+ON CONFLICT (parameter) DO NOTHING;
+
+UPDATE config_param_system s SET value=concat('{"activated":true,"value":',u.value,'}') FROM config_param_user u WHERE s.parameter='edit_element_doublegeom'
+AND u.parameter='edit_element_doublegeom';
+
+DELETE FROM config_param_user WHERE parameter='edit_element_doublegeom';
+
+DELETE FROM sys_param_user WHERE id='edit_element_doublegeom';
