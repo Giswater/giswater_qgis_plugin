@@ -42,7 +42,7 @@ class FlowTraceFlowExitMapTool(ParentMapTool):
                 self.layers_added.append(layer)
                 self.add_layer.categoryze_layer(layer, values['field_cat'], values['size'], values['color_values'], [
                                                 'Flow exit', 'Flow trace'])
-                self.controller.set_layer_visible(layer, False)
+                self.controller.set_layer_visible(layer, False, False)
 
 
     """ QgsMapTools inherited event functions """

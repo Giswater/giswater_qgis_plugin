@@ -1655,11 +1655,11 @@ class DaoController(object):
         return visible
 
 
-    def set_layer_visible(self, layer, visible=True):
+    def set_layer_visible(self, layer, recursive=True, visible=True):
         """ Set layer visible """
-
+        print(f"{layer.name()}-->{recursive}->{visible}")
         if layer:
-            if visible:
+            if recursive:
                 QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityCheckedParentRecursive(visible)
             else:
                 QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(visible)

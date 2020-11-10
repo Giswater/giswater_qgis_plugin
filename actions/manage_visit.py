@@ -712,7 +712,6 @@ class ManageVisit(ParentManage, QObject):
 
         self.connect_signal_tab_feature_signal(True)
 
-        # self.hide_generic_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_visit_x_{self.geom_type}"
         viewname = f"v_edit_{self.geom_type}"
         widget_table = utils_giswater.getWidget(self.dlg_add_visit, widget_name)
@@ -1622,7 +1621,6 @@ class ManageVisit(ParentManage, QObject):
             return
 
         self.hide_generic_layers(excluded_layers=excluded_layers)
-        widget_name = f"tbl_visit_x_{self.geom_type}"
         widget_name = f"tbl_{table_object}_x_{self.geom_type}"
         viewname = f"v_edit_{self.geom_type}"
         widget_table = utils_giswater.getWidget(dialog, widget_name)

@@ -1123,24 +1123,32 @@ class ParentManage(ParentAction, object):
 
     def hide_generic_layers(self, excluded_layers=[]):
         """ Hide generic layers """
-
+        layers_changed = {}
         layer = self.controller.get_layer_by_tablename("v_edit_arc")
+
         if layer and "v_edit_arc" not in excluded_layers:
-            self.controller.set_layer_visible(layer)
+            layers_changed[layer] = self.controller.is_layer_visible(layer)
+            self.controller.set_layer_visible(layer, True, True)
         layer = self.controller.get_layer_by_tablename("v_edit_node")
         if layer and "v_edit_node" not in excluded_layers:
-            self.controller.set_layer_visible(layer)
+            layers_changed[layer] = self.controller.is_layer_visible(layer)
+            self.controller.set_layer_visible(layer, True, True)
         layer = self.controller.get_layer_by_tablename("v_edit_connec")
         if layer and "v_edit_connec" not in excluded_layers:
-            self.controller.set_layer_visible(layer)
+            layers_changed[layer] = self.controller.is_layer_visible(layer)
+            self.controller.set_layer_visible(layer, True, True)
         layer = self.controller.get_layer_by_tablename("v_edit_element")
         if layer and "v_edit_element" not in excluded_layers:
-            self.controller.set_layer_visible(layer)
+            layers_changed[layer] = self.controller.is_layer_visible(layer)
+            self.controller.set_layer_visible(layer, True, True)
 
         if self.project_type == 'ud':
             layer = self.controller.get_layer_by_tablename("v_edit_gully")
             if layer and "v_edit_gully" not in excluded_layers:
-                self.controller.set_layer_visible(layer)
+                layers_changed[layer] = self.controller.is_layer_visible(layer)
+                self.controller.set_layer_visible(layer, True, True)
+
+        return layers_changed
 
 
     def connect_signal_selection_changed(self, dialog, table_object, query=False):
