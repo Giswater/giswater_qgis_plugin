@@ -336,9 +336,7 @@ class ApiCF(ApiParent, QObject):
         elif template == 'visit':
             visit_id = self.complet_result[0]['body']['feature']['id']
             manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
-            layers_visibility = manage_visit.hide_generic_layers(['v_edit_element'])
             manage_visit.manage_visit(visit_id=visit_id, tag='info')
-            manage_visit.dlg_add_visit.rejected.connect(partial(self.restore_layers_visibility, layers_visibility))
         else:
             self.controller.log_warning(f"template not managed: {template}")
             return False, None
@@ -352,11 +350,6 @@ class ApiCF(ApiParent, QObject):
 
             layers_visibility[layer] = self.controller.is_layer_visible(layer)
         return layers_visibility
-
-
-    def restore_layers_visibility(self, layers):
-        for layer, visibility in layers.items():
-            self.controller.set_layer_visible(layer, False, visibility)
 
 
     def manage_new_feature(self, complet_result, dialog):

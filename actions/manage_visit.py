@@ -72,7 +72,9 @@ class ManageVisit(ParentManage, QObject):
         self.current_visit = OmVisit(self.controller)
         self.dlg_add_visit = VisitUi(tag)
         self.load_settings(self.dlg_add_visit)
-
+        layers_visibility = self.hide_generic_layers(['v_edit_element'])
+        self.dlg_add_visit.rejected.connect(partial(self.restore_layers_visibility, layers_visibility))
+        self.dlg_add_visit.accepted.connect(partial(self.restore_layers_visibility, layers_visibility))
         # Get expl_id from previus dialog
         self.expl_id = expl_id
 
@@ -210,6 +212,11 @@ class ManageVisit(ParentManage, QObject):
             if self.locked_geom_type is None:
                 self.feature_type.currentIndexChanged.emit(0)
             self.open_dialog(self.dlg_add_visit, dlg_name="visit")
+
+
+    def restore_layers_visibility(self, layers):
+        for layer, visibility in layers.items():
+            self.controller.set_layer_visible(layer, False, visibility)
 
 
     def zoom_box(self, box):
