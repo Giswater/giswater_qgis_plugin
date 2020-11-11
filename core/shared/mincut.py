@@ -162,7 +162,7 @@ class GwMincut:
         self.action_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionCustomMincut")
-        action.triggered.connect(self.custom_mincut)
+        action.triggered.connect(partial(self.custom_mincut, action))
         tools_qt.set_icon(action, "123")
         self.action_custom_mincut = action
 
@@ -1686,7 +1686,7 @@ class GwMincut:
         self.task1.setProgress(100)
 
 
-    def custom_mincut(self, is_checked):
+    def custom_mincut(self, action, is_checked):
         """ B2-123: Custom mincut analysis. Working just with valve layer """
         if is_checked is False:
             # Disconnect snapping and related signals
@@ -1715,7 +1715,7 @@ class GwMincut:
 
         # Waiting for signals
         self.canvas.xyCoordinates.connect(self.mouse_move_valve)
-        self.emit_point.canvasClicked.connect(self.custom_mincut_snapping)
+        self.emit_point.canvasClicked.connect(partial(self.custom_mincut_snapping, action))
 
 
     def mouse_move_valve(self, point):
@@ -1757,7 +1757,7 @@ class GwMincut:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
-    def custom_mincut_snapping(self, point, btn):
+    def custom_mincut_snapping(self, action, point, btn):
         """ Custom mincut snapping function """
 
         # Get clicked point
@@ -1778,6 +1778,7 @@ class GwMincut:
                 tools_qgis.refresh_map_canvas(True)
                 self.set_visible_mincut_layers()
                 self.remove_selection()
+                action.setChecked(False)
 
 
     def custom_mincut_execute(self, elem_id):
