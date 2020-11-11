@@ -1695,9 +1695,6 @@ class GwMincut:
             self.snapper_manager.recover_snapping_options()
             return
 
-        # initialize map tool
-        self.init_map_tool()
-
         # Disconnect other snapping and signals in case wrong user clicks
         self.disconnect_snapping(False)
 
@@ -1777,6 +1774,7 @@ class GwMincut:
                 snapped_feat = self.snapper_manager.get_snapped_feature(result, True)
                 element_id = snapped_feat.attribute('node_id')
                 self.custom_mincut_execute(element_id)
+                tools_qgis.refresh_map_canvas(True)
                 self.set_visible_mincut_layers()
                 self.remove_selection()
 
@@ -1785,7 +1783,7 @@ class GwMincut:
         """ Custom mincut. Execute function 'gw_fct_mincut_valve_unaccess' """
 
         # Change cursor to 'WaitCursor'
-        self.set_cursor_wait()
+        tools_qgis.set_cursor_wait()
 
         result_mincut_id = tools_qt.getWidgetText(self.dlg_mincut, "result_mincut_id")
         cur_user = self.controller.get_project_user()
