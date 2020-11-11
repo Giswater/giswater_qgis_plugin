@@ -1490,7 +1490,7 @@ class ApiCF(ApiParent, QObject):
                 value = field["value"]
                 utils_giswater.setText(dialog, widget, value)
                 if not field['iseditable']:
-                    widget.setStyleSheet("QLineEdit {background: rgb(244, 244, 244); color: rgb(0, 0, 0)}")
+                    widget.setStyleSheet("QLineEdit {background: rgb(244, 244, 244); color: rgb(100, 100, 100)}")
                 else:
                     widget.setStyleSheet(None)
             elif "message" in field:
