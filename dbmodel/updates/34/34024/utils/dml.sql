@@ -274,3 +274,5 @@ AND u.parameter='edit_element_doublegeom';
 DELETE FROM config_param_user WHERE parameter='edit_element_doublegeom';
 
 DELETE FROM sys_param_user WHERE id='edit_element_doublegeom';
+
+UPDATE sys_param_user SET formname ='hidden' WHERE formname = 'hidden_value';
