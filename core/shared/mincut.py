@@ -1774,6 +1774,7 @@ class GwMincut:
                 snapped_feat = self.snapper_manager.get_snapped_feature(result, True)
                 element_id = snapped_feat.attribute('node_id')
                 self.custom_mincut_execute(element_id)
+                self.snapper_manager.recover_snapping_options()
                 tools_qgis.refresh_map_canvas(True)
                 self.set_visible_mincut_layers()
                 self.remove_selection()
