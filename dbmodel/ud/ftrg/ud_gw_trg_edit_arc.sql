@@ -569,9 +569,11 @@ BEGIN
 		   (NEW.elev1 != OLD.elev1) OR (NEW.elev1 IS NULL AND OLD.elev1 IS NOT NULL) OR (NEW.elev1 IS NOT NULL AND OLD.elev1 IS NULL) OR
 		   (NEW.elev2 != OLD.elev2) OR (NEW.elev2 IS NULL AND OLD.elev2 IS NOT NULL) OR (NEW.elev2 IS NOT NULL AND OLD.elev2 IS NULL) OR
 		   (NEW.custom_elev1 != OLD.custom_elev1) OR (NEW.custom_elev1 IS NULL AND OLD.custom_elev1 IS NOT NULL) OR (NEW.custom_elev1 IS NOT NULL AND OLD.custom_elev1 IS NULL) OR
-		   (NEW.custom_elev2 != OLD.custom_elev2) OR (NEW.custom_elev2 IS NULL AND OLD.custom_elev2 IS NOT NULL) OR (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NULL) THEN  
+		   (NEW.custom_elev2 != OLD.custom_elev2) OR (NEW.custom_elev2 IS NULL AND OLD.custom_elev2 IS NOT NULL) OR (NEW.custom_elev2 IS NOT NULL AND OLD.custom_elev2 IS NULL) OR
+		   (NEW.inverted_slope::text != OLD.inverted_slope::text)
+		   THEN  
 			UPDATE arc SET y1=NEW.y1, y2=NEW.y2, custom_y1=NEW.custom_y1, custom_y2=NEW.custom_y2, elev1=NEW.elev1, elev2=NEW.elev2,
-					custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2
+					custom_elev1=NEW.custom_elev1, custom_elev2=NEW.custom_elev2, inverted_slope=NEW.inverted_slope
 					WHERE arc_id=NEW.arc_id;
 		END IF;
 
@@ -581,23 +583,23 @@ BEGIN
 				
 			UPDATE arc 
 			SET arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
-			annotation= NEW.annotation, "observ"=NEW.observ,"comment"=NEW.comment, inverted_slope=NEW.inverted_slope, custom_length=NEW.custom_length, dma_id=NEW.dma_id, 
+			annotation= NEW.annotation, "observ"=NEW.observ,"comment"=NEW.comment, custom_length=NEW.custom_length, dma_id=NEW.dma_id, 
 			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type, 
 			workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis,  
 			postcode=NEW.postcode, district_id = NEW.district_id, streetaxis2_id=v_streetaxis2, postcomplement=NEW.postcomplement, 
 			postcomplement2=NEW.postcomplement2, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, 
-			verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete,label_x=NEW.label_x,
+			verified=NEW.verified, undelete=NEW.undelete,label_x=NEW.label_x,
 			label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end, code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, 
 			enddate=NEW.enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id, num_value = NEW.num_value,lastupdate=now(), lastupdate_user=current_user
 			WHERE arc_id=OLD.arc_id;	
 		ELSE
 			UPDATE arc
 			SET arc_type=NEW.arc_type, arccat_id=NEW.arccat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, state_type=NEW.state_type,
-			annotation= NEW.annotation, "observ"=NEW.observ,"comment"=NEW.comment, inverted_slope=NEW.inverted_slope, custom_length=NEW.custom_length, dma_id=NEW.dma_id, 
+			annotation= NEW.annotation, "observ"=NEW.observ,"comment"=NEW.comment, custom_length=NEW.custom_length, dma_id=NEW.dma_id, 
 			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type, 
 			workcat_id=NEW.workcat_id, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis,  
 			postcode=NEW.postcode, district_id=NEW.district_id, streetaxis2_id=v_streetaxis2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, postnumber=NEW.postnumber, 
-			postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, verified=NEW.verified, the_geom=NEW.the_geom, undelete=NEW.undelete,label_x=NEW.label_x,
+			postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete,label_x=NEW.label_x,
 			label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end, code=NEW.code, publish=NEW.publish, inventory=NEW.inventory, 
 			enddate=NEW.enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id, num_value = NEW.num_value,lastupdate=now(), lastupdate_user=current_user, matcat_id=NEW.matcat_id
 			WHERE arc_id=OLD.arc_id;	

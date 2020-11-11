@@ -259,15 +259,14 @@ BEGIN
 			-- Update coordinates
 			NEW.the_geom := ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
 			NEW.the_geom := ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
- 
-			IF (((sys_elev1_aux >= sys_elev2_aux) AND (NEW.inverted_slope IS NOT TRUE)) OR ((sys_elev1_aux < sys_elev2_aux) AND (NEW.inverted_slope IS TRUE)) 
-			OR (geom_slp_direction_bool IS FALSE)) THEN
-				NEW.node_1 := nodeRecord1.node_id; 
-				NEW.node_2 := nodeRecord2.node_id;
-				NEW.sys_elev1 := sys_elev1_aux;
-				NEW.sys_elev2 := sys_elev2_aux;
 
-			ELSE 
+			NEW.node_1 := nodeRecord1.node_id; 
+			NEW.node_2 := nodeRecord2.node_id;
+			NEW.sys_elev1 := sys_elev1_aux;
+			NEW.sys_elev2 := sys_elev2_aux;
+ 
+			IF (sys_elev1_aux < sys_elev2_aux) AND (NEW.inverted_slope IS NOT TRUE) AND (geom_slp_direction_bool IS TRUE) THEN
+				
 				-- Update conduit direction
 				-- Geometry
 				NEW.the_geom := ST_reverse(NEW.the_geom);
@@ -276,7 +275,7 @@ BEGIN
 				NEW.node_1 := nodeRecord2.node_id;
 				NEW.node_2 := nodeRecord1.node_id;                             
 		
-				-- Node values
+				-- Depth values for arc
 				y_aux := NEW.y1;
 				NEW.y1 := NEW.y2;
 				NEW.y2 := y_aux;
@@ -292,12 +291,13 @@ BEGIN
 				y_aux := NEW.custom_elev1;
 				NEW.custom_elev1 := NEW.custom_elev2;
 				NEW.custom_elev2 := y_aux;
-	
-				NEW.sys_elev1 := sys_elev2_aux;
-				NEW.sys_elev2 := sys_elev1_aux;
-				is_reversed = TRUE;	
+
+				y_aux := NEW.sys_elev1;	
+				NEW.sys_elev1 := NEW.sys_elev2;
+				NEW.sys_elev2 := y_aux;
+
 			END IF;
-	
+
 			sys_length_aux:= ST_length(NEW.the_geom);
 		
 			
