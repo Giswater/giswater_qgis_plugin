@@ -455,12 +455,18 @@ class DaoController:
         """ Show message to the user with selected message level
         message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)} """
 
+        # Check duration message for developers
+        dev_duration = tools_gw.get_parser_value('developers', 'show_message_durations')
+        if dev_duration is not None:
+            duration = int(duration)
+
         msg = None
         if text:
             msg = self.tr(text, context_name)
             if parameter:
                 msg += ": " + str(parameter)
         try:
+
             self.iface.messageBar().pushMessage(title, msg, message_level, duration)
         except AttributeError:
             pass
@@ -800,6 +806,11 @@ class DaoController:
         if parameters:
             sql += f"{parameters}"
         sql += f");"
+
+        # Check log_sql for developers
+        dev_log_sql = tools_gw.get_parser_value('developers', 'log_sql')
+        if dev_log_sql is not None:
+            log_sql = tools_gw.cast_boolean(dev_log_sql)
 
         row = self.get_row(sql, commit=commit, log_sql=log_sql)
         if not row or not row[0]:

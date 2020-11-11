@@ -175,7 +175,7 @@ class GwInfo(QObject):
         if function_name is None:
             return False, None
 
-        json_result = self.controller.get_json(function_name, body, rubber_band=self.rubber_band, log_sql=True)
+        json_result = self.controller.get_json(function_name, body, rubber_band=self.rubber_band, log_sql=False)
         if json_result is None:
             return False, None
 
