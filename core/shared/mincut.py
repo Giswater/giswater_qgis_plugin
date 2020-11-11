@@ -101,6 +101,7 @@ class GwMincut:
     def init_mincut_form(self):
         """ Custom form initial configuration """
 
+        self.mincut_class = 1
         self.user_current_layer = self.iface.activeLayer()
         self.init_mincut_canvas()
         tools_gw.delete_layer_from_toc('Overlap affected arcs')
@@ -631,22 +632,19 @@ class GwMincut:
         sql = (f"SELECT mincut_state, mincut_class FROM om_mincut "
                f" WHERE id = '{result_mincut_id}'")
         row = self.controller.get_row(sql)
-        if not row or (str(row[0]) != '0' or str(row[1]) != '1'):
-            self.dlg_mincut.closeMainWin = False
-            self.dlg_mincut.mincutCanceled = True
-            self.dlg_mincut.close()
-            self.remove_selection()
+        if not row:
             return
 
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-        extras = f'"step":"check", '  # check
-        extras += f'"result":"{result_mincut_id_text}"'
+        extras = f'"action":"mincutAccept", "mincutClass":{self.mincut_class}, "status":"check", '
+        extras += f'"mincutId":"{result_mincut_id_text}"'
         body = tools_gw.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_setmincutoverlap', body)
+        result = self.controller.get_json('gw_fct_setmincut', body)
         if not result or result['status'] == 'Failed':
             return
-
-        if result['body']['actions']['overlap'] == 'Conflict':
+        if self.mincut_class in (2, 3) or result['body']['actions']['overlap'] == 'Ok':
+            self.mincut_ok(result)
+        elif result['body']['actions']['overlap'] == 'Conflict':
             self.dlg_dtext = DialogTextUi()
             tools_gw.load_settings(self.dlg_dtext)
             self.dlg_dtext.btn_close.setText('Cancel')
@@ -657,11 +655,8 @@ class GwMincut:
             self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
 
             tools_gw.populate_info_text(self.dlg_dtext, result['body']['data'], False)
-
             tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 
-        elif result['body']['actions']['overlap'] == 'Ok':
-            self.mincut_ok(result)
         self.iface.actionPan().trigger()
         self.remove_selection()
 
@@ -669,10 +664,10 @@ class GwMincut:
     def force_mincut_overlap(self):
 
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-        extras = f'"step":"continue", '
-        extras += f'"result":"{result_mincut_id_text}"'
+        extras = f'"action":"mincutAccept", "mincutClass":{self.mincut_class}, "status":"continue", '
+        extras += f'"mincutId":"{result_mincut_id_text}"'
         body = tools_gw.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_setmincutoverlap', body)
+        result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
         self.mincut_ok(result)
 
 
@@ -690,19 +685,19 @@ class GwMincut:
 
         self.dlg_mincut.closeMainWin = False
         self.dlg_mincut.mincutCanceled = True
-
-        polygon = result['body']['data']['geometry']
-        polygon = polygon[9:len(polygon) - 2]
-        polygon = polygon.split(',')
-        if polygon[0] == '':
-            message = "Error on create auto mincut, you need to review data"
-            self.controller.show_warning(message)
-            tools_qgis.set_cursor_restore()
-            self.task1.setProgress(100)
-            return
-        x1, y1 = polygon[0].split(' ')
-        x2, y2 = polygon[2].split(' ')
-        tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+        if self.mincut_class == 1:
+            polygon = result['body']['data']['geometry']
+            polygon = polygon[9:len(polygon) - 2]
+            polygon = polygon.split(',')
+            if polygon[0] == '':
+                message = "Error on create auto mincut, you need to review data"
+                self.controller.show_warning(message)
+                tools_qgis.set_cursor_restore()
+                self.task1.setProgress(100)
+                return
+            x1, y1 = polygon[0].split(' ')
+            x2, y2 = polygon[2].split(' ')
+            tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
 
         self.dlg_mincut.btn_accept.hide()
         self.dlg_mincut.btn_cancel.setText('Close')
@@ -768,6 +763,7 @@ class GwMincut:
     def add_connec(self):
         """ B3-121: Connec selector """
 
+        self.mincut_class = 2
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.canceled = False
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
@@ -934,6 +930,7 @@ class GwMincut:
     def add_hydrometer(self):
         """ B4-122: Hydrometer selector """
 
+        self.mincut_class = 3
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.canceled = False
         self.connec_list = []
@@ -1624,15 +1621,11 @@ class GwMincut:
 
         tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, real_mincut_id)
         self.task1.setProgress(25)
-        # Execute gw_fct_mincut ('feature_id', 'feature_type', 'result_id')
-        # feature_id: id of snapped arc/node
-        # feature_type: type of snapped element (arc/node)
-        # result_mincut_id: result_mincut_id from form
 
-        extras = f'"valveUnaccess":{{"status":"false"}}, '
+        extras = f'"action":"mincutNetwork", '
         extras += f'"mincutId":"{real_mincut_id}", "arcId":"{elem_id}"'
         body = tools_gw.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_fct_setmincut', body)
+        complet_result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
         if complet_result in (False, None) or ('status' in complet_result and complet_result['status'] == 'Failed'): return False
 
         if 'mincutOverlap' in complet_result:
