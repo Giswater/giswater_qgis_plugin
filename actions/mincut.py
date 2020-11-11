@@ -104,7 +104,7 @@ class MincutParent(ParentAction):
 
     def init_mincut_form(self):
         """ Custom form initial configuration """
-
+        self.mincut_class = 1
         self.user_current_layer = self.iface.activeLayer()
         self.init_map_tool()
         self.add_layer.delete_layer_from_toc('Overlap affected arcs')
@@ -634,25 +634,22 @@ class MincutParent(ParentAction):
         sql = (f"SELECT mincut_state, mincut_class FROM om_mincut "
                f" WHERE id = '{result_mincut_id}'")
         row = self.controller.get_row(sql, log_sql=True)
-        if not row or (str(row[0]) != '0' or str(row[1]) != '1'):
-            self.dlg_mincut.closeMainWin = False
-            self.dlg_mincut.mincutCanceled = True
-            self.dlg_mincut.close()
-            self.remove_selection()
+        if not row:
             return
-
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-        extras = f'"action":"mincutAccept", "status":"check", "mincutId":"{result_mincut_id_text}"'
+        extras = f'"action":"mincutAccept", "mincutClass":{self.mincut_class}, "status":"check", '
+        extras += f'"mincutId":"{result_mincut_id_text}"'
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
         if not result:
             return
 
-        if result['body']['actions']['overlap'] == 'Conflict':
+        if self.mincut_class in (2, 3) or result['body']['actions']['overlap'] == 'Ok':
+            self.mincut_ok(result)
+        elif result['body']['actions']['overlap'] == 'Conflict':
             result_layer = self.add_layer.add_temp_layer(
                 self.dlg_mincut, result['body']['data'], None, False, tab_idx=2)
             for layer in result_layer['temp_layers_added']:
-
                 symbol = QgsSymbol.defaultSymbol(layer.geometryType())
                 if type(symbol) == QgsLineSymbol:
                     props = {'capstyle': 'round', 'customdash': '5;2', 'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
@@ -714,8 +711,6 @@ class MincutParent(ParentAction):
 
             self.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 
-        elif result['body']['actions']['overlap'] == 'Ok':
-            self.mincut_ok(result)
         self.iface.actionPan().trigger()
         self.remove_selection()
 
@@ -723,7 +718,8 @@ class MincutParent(ParentAction):
     def force_mincut_overlap(self):
 
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
-        extras = f'"action":"mincutAccept", "status":"continue", "mincutId":"{result_mincut_id_text}"'
+        extras = f'"action":"mincutAccept", "mincutClass":{self.mincut_class}, "status":"continue", '
+        extras += f'"mincutId":"{result_mincut_id_text}"'
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
         self.mincut_ok(result)
@@ -743,19 +739,19 @@ class MincutParent(ParentAction):
 
         self.dlg_mincut.closeMainWin = False
         self.dlg_mincut.mincutCanceled = True
+        if self.mincut_class == 1:
+            polygon = result['body']['data']['geometry']
+            polygon = polygon[9:len(polygon) - 2]
+            polygon = polygon.split(',')
+            if polygon[0] == '':
+                message = "Error on create auto mincut, you need to review data"
+                self.controller.show_warning(message)
+                self.set_cursor_restore()
+                return
 
-        polygon = result['body']['data']['geometry']
-        polygon = polygon[9:len(polygon) - 2]
-        polygon = polygon.split(',')
-        if polygon[0] == '':
-            message = "Error on create auto mincut, you need to review data"
-            self.controller.show_warning(message)
-            self.set_cursor_restore()
-            self.task1.setProgress(100)
-            return
-        x1, y1 = polygon[0].split(' ')
-        x2, y2 = polygon[2].split(' ')
-        self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+            x1, y1 = polygon[0].split(' ')
+            x2, y2 = polygon[2].split(' ')
+            self.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
 
         self.dlg_mincut.btn_accept.hide()
         self.dlg_mincut.btn_cancel.setText('Close')
@@ -821,6 +817,7 @@ class MincutParent(ParentAction):
         """ B3-121: Connec selector """
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.canceled = False
+        self.mincut_class = 2
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
 
         # Check if id exist in om_mincut
@@ -984,6 +981,7 @@ class MincutParent(ParentAction):
 
     def add_hydrometer(self):
         """ B4-122: Hydrometer selector """
+        self.mincut_class = 3
         self.dlg_mincut.closeMainWin = True
         self.dlg_mincut.canceled = False
         self.connec_list = []
