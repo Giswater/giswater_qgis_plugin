@@ -305,7 +305,7 @@ BEGIN
 	WHERE result_id=result_id_arg group by result_id, arccat_id;
 
 	-- count connec
-	SELECT count(connec_id) INTO v_numconnecs FROM om_mincut_connec WHERE result_id=result_id_arg AND state=1;
+	SELECT count(connec_id) INTO v_numconnecs FROM om_mincut_connec WHERE result_id=result_id_arg;
 
 	-- count hydrometers
 	SELECT count (rtc_hydrometer_x_connec.hydrometer_id) INTO v_numhydrometer 
