@@ -1442,3 +1442,12 @@ def add_tableview(complet_result, field):
     widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), widget, complet_result))
 
     return widget
+
+
+def cast_boolean(param):
+    """ Receives a string and returns a bool """
+    bool_dict = {"True": True, "true": True, "False": False, "false": False}
+    try:
+        return bool_dict[param]
+    except KeyError:
+        return True
