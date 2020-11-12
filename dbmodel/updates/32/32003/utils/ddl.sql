@@ -48,4 +48,4 @@ CREATE INDEX anl_polygon_index
   (the_geom);
 
 -- 2019/04/03
-ALTER TABLE audit_cat_param_user ADD COLUMN isdeprecated boolean;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_cat_param_user", "column":"isdeprecated", "dataType":"boolean"}}$$);

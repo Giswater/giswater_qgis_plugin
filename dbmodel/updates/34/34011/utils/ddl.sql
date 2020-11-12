@@ -118,7 +118,7 @@ UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = '
 
 
 -- config groupbox
-ALTER TABLE config_form_groupbox DROP CONSTRAINT config_api_form_groupbox_pkey;
+ALTER TABLE config_form_groupbox DROP CONSTRAINT IF EXISTS config_api_form_groupbox_pkey;
 ALTER TABLE config_form_groupbox ADD CONSTRAINT config_groupbox_pkey PRIMARY KEY(formname,layoutname);
 ALTER TABLE config_form_groupbox DROP COLUMN id;
 UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_form_groupbox';
@@ -167,7 +167,7 @@ UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = '
 
 
 -- config_info_layer_x_type
-ALTER TABLE config_info_layer_x_type DROP CONSTRAINT config_api_tableinfo_x_inforole_pkey;
+ALTER TABLE config_info_layer_x_type DROP CONSTRAINT IF EXISTS config_api_tableinfo_x_inforole_pkey;
 ALTER TABLE config_info_layer_x_type ADD CONSTRAINT config_info_layer_x_type_pkey PRIMARY KEY(tableinfo_id, infotype_id);
 ALTER TABLE config_info_layer_x_type DROP COLUMN id;
 UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_info_layer_x_type';

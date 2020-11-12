@@ -9,6 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 ALTER TABLE sys_csv2pg_config ADD COLUMN csvversion json;
-ALTER TABLE audit_cat_param_user ADD COLUMN epaversion text;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_cat_param_user", "column":"epaversion", "dataType":"text"}}$$);
+
 
 

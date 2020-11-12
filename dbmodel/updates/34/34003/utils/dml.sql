@@ -141,7 +141,7 @@ update config_api_form_fields SET dv_parent_id = 'arccat_id' WHERE formname = 'u
 update config_api_form_fields SET dv_parent_id = 'nodecat_id' WHERE formname = 'upsert_catalog_node' and formtype = 'catalog' and column_id ='matcat_id';
 update config_api_form_fields SET dv_parent_id = 'connecat_id' WHERE formname = 'upsert_catalog_connec' and formtype = 'catalog' and column_id ='matcat_id';
 
-INSERT INTO audit_cat_error (id, log_level, error_message, hint_message, message_type) SELECT * FROM config_api_message;
+INSERT INTO audit_cat_error (id, log_level, error_message, hint_message, message_type) SELECT * FROM config_api_message ON CONFLICT (id) DO NOTHING;
 
 ALTER TABLE config_api_message RENAME TO _config_api_message_;
 

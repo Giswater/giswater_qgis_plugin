@@ -7,6 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+ALTER TABLE om_visit_lot_x_gully DROP CONSTRAINT IF EXISTS om_visit_lot_x_gully_lot_id_fkey;
 ALTER TABLE om_visit_lot_x_gully ADD CONSTRAINT om_visit_lot_x_gully_lot_id_fkey FOREIGN KEY (lot_id)
 REFERENCES om_visit_lot (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 

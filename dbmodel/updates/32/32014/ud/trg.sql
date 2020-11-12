@@ -9,6 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 
-DROP TRIGGER IF EXISTS gw_trg_om_visit ON "SCHEMA_NAME".gully;
+DROP TRIGGER IF EXISTS gw_trg_om_visit ON "SCHEMA_NAME".om_visit_x_gully;
 CREATE TRIGGER gw_trg_om_visit AFTER INSERT ON "SCHEMA_NAME".om_visit_x_gully
 FOR EACH ROW EXECUTE PROCEDURE "SCHEMA_NAME".gw_trg_om_visit('gully');

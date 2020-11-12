@@ -12,8 +12,8 @@ INSERT INTO config_param_system (parameter, value, data_type, context, descript)
 VALUES ('om_visit_duration_vdefault','{"class1":"1 hours","class2":"1 hours","class3":"1 hours","class4":"1 hours","class5":"1 hours","class6":"1 hours","class7":"1 hours","class8":"1 hours","class9":"1 hours","class10":"1 hours"}','json', 'om_visit', 'Parameters used for visits');
 
 
-INSERT INTO om_visit_type VALUES (1, 'planned');
-INSERT INTO om_visit_type VALUES (2, 'unspected');
+INSERT INTO om_visit_type VALUES (1, 'planned') ON CONFLICT (id) DO NOTHING;
+INSERT INTO om_visit_type VALUES (2, 'unspected') ON CONFLICT (id) DO NOTHING;
 
 
 
