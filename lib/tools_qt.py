@@ -1685,9 +1685,9 @@ def set_table_columns(dialog, widget, table_name, sort_order=0, isQStandardItemM
 
     # Set order
     if isQStandardItemModel:
-        widget.model().sort(sort_order, Qt.AscendingOrder)
+        widget.model().sort(0, sort_order)
     else:
-        widget.model().setSort(sort_order, Qt.AscendingOrder)
+        widget.model().setSort(0, sort_order)
         widget.model().select()
     # Delete columns
     for column in columns_to_delete:

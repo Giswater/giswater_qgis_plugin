@@ -100,7 +100,7 @@ class GwMincutManager:
 
         # Set a model with selected filter. Attach that model to selected table
         self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
-        tools_qt.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut")
+        tools_qt.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut", sort_order=1)
 
         #self.mincut.tools_qt.set_table_columns(self.tbl_mincut_edit, "v_ui_mincut")
 
@@ -197,7 +197,7 @@ class GwMincutManager:
 
             # Set a model with selected filter. Attach that model to selected table
             self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
-            tools_qt.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut")
+            tools_qt.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut", sort_order=1)
 
 
     def set_state_cancel_mincut(self):
