@@ -53,7 +53,6 @@ class GwGo2Epa:
         self.set_signals()
 
         if self.project_type == 'ws':
-            self.dlg_go2epa.btn_hs_ds.setText("Dscenario Selector")
             tableleft = "cat_dscenario"
             tableright = "selector_inp_demand"
             field_id_left = "dscenario_id"
@@ -62,7 +61,6 @@ class GwGo2Epa:
                 partial(self.sector_selection, tableleft, tableright, field_id_left, field_id_right, aql=""))
 
         elif self.project_type == 'ud':
-            self.dlg_go2epa.btn_hs_ds.setText("Hydrology selector")
             self.dlg_go2epa.btn_hs_ds.clicked.connect(self.ud_hydrology_selector)
 
         # Check OS and enable/disable checkbox execute EPA software
