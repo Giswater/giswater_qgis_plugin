@@ -19,6 +19,7 @@ v_flag boolean = false;
 v_node_id character varying;
 v_result_id integer;
 v_cur_user text;
+v_error_context text;
 
 BEGIN 
 	-- set search_path
@@ -66,6 +67,10 @@ BEGIN
 		',"body":{"form":{}'||
 		',"data":{}'||
 		'}}')::json;
+	--  Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
+	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_error_context) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
     
 END;  
 $BODY$
