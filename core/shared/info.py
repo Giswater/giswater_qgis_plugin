@@ -1687,15 +1687,31 @@ class GwInfo(QObject):
         if not p_widget:
             return
 
+        # Restore QLineEdit stylesheet
+        widget_list = dialog.tab_data.findChildren(QLineEdit)
+        for widget in widget_list:
+            is_readonly = widget.isReadOnly()
+            if is_readonly:
+                widget.setStyleSheet("QLineEdit {background: rgb(244, 244, 244); color: rgb(100, 100, 100)}")
+            else:
+                widget.setStyleSheet(None)
+
+        # Restore QPushButton stylesheet
+        widget_list = dialog.tab_data.findChildren(QPushButton)
+        for widget in widget_list:
+            widget.setStyleSheet(None)
+
+        # Restore QPushButton stylesheet
         for field in result['body']['data']['fields']:
             widget = dialog.findChild(QLineEdit, f'{field["widgetname"]}')
+            if widget is None:
+                widget = dialog.findChild(QPushButton, f'{field["widgetname"]}')
             if widget:
+                cur_value = tools_qt.getWidgetText(dialog, widget)
                 value = field["value"]
-                tools_qt.setWidgetText(dialog, widget, value)
-                if not field['iseditable']:
-                    widget.setStyleSheet("QLineEdit { background: rgb(0, 255, 0); color: rgb(0, 0, 0)}")
-                else:
-                    widget.setStyleSheet(None)
+                if str(cur_value) != str(value):
+                    tools_qt.setText(dialog, widget, value)
+                    widget.setStyleSheet("border: 2px solid #3ED396")
             elif "message" in field:
                 level = field['message']['level'] if 'level' in field['message'] else 0
                 self.controller.show_message(field['message']['text'], level)
