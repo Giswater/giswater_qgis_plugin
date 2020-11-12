@@ -1838,15 +1838,11 @@ class MincutParent(ParentAction):
         # Change cursor to 'WaitCursor'
         self.set_cursor_wait()
 
-        cur_user = self.controller.get_project_user()
         result_mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
-            sql = f"SELECT gw_fct_mincut_valve_unaccess('{elem_id}', '{result_mincut_id}', '{cur_user}');"
-            status = self.controller.execute_sql(sql, log_sql=False)
-            if status:
-                message = "Custom mincut executed successfully"
-                self.controller.show_info(message)
-
+            extras = f'"action":"mincutValveUnaccess", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}"'
+            body = self.create_body(extras=extras)
+            self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
         # Disconnect snapping and related signals
         self.disconnect_snapping(False)
 
