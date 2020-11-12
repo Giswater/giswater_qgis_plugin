@@ -13,7 +13,7 @@ from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator, QFontMe
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, \
     QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, QPlainTextEdit, \
-    QRadioButton, QFrame, QSizePolicy, QSpacerItem, QGridLayout, QToolButton, QApplication, QFileDialog, QGroupBox
+    QRadioButton, QSizePolicy, QSpacerItem, QGridLayout, QToolButton, QApplication, QFileDialog, QGroupBox
 
 import os
 import operator
@@ -936,18 +936,6 @@ def add_checkbox(field):
             widget.setChecked(True)
     if 'iseditable' in field:
         widget.setEnabled(field['iseditable'])
-    return widget
-
-
-def add_frame(field, x=None):
-
-    widget = QFrame()
-    widget.setObjectName(f"{field['widgetname']}_{x}")
-    if 'columnname' in field:
-        widget.setProperty('columnname', field['columnname'])
-    widget.setFrameShape(QFrame.HLine)
-    widget.setFrameShadow(QFrame.Sunken)
-
     return widget
 
 

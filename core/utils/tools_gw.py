@@ -17,7 +17,7 @@ from collections import OrderedDict
 
 from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor
-from qgis.PyQt.QtWidgets import QComboBox, QTabWidget, QCompleter, QFileDialog, QPushButton, QTableView
+from qgis.PyQt.QtWidgets import QComboBox, QTabWidget, QCompleter, QFileDialog, QPushButton, QTableView, QFrame
 from qgis.core import QgsProject, QgsExpression, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
     QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
     QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest
@@ -1442,6 +1442,19 @@ def add_tableview(complet_result, field):
     widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), widget, complet_result))
 
     return widget
+
+
+def add_frame(field, x=None):
+
+    widget = QFrame()
+    widget.setObjectName(f"{field['widgetname']}_{x}")
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    widget.setFrameShape(QFrame.HLine)
+    widget.setFrameShadow(QFrame.Sunken)
+
+    return widget
+
 
 
 def add_combo(field):

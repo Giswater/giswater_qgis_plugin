@@ -3073,7 +3073,7 @@ class GwInfo(QObject):
                     label = QLabel()
                     if field['widgettype'] == 'divider':
                         for x in range(0, 2):
-                            line = tools_qt.add_frame(field, x)
+                            line = tools_gw.add_frame(field, x)
                             plan_layout.addWidget(line, field['layoutorder'], x)
                     else:
                         label = QLabel()
