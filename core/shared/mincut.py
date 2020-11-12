@@ -1788,13 +1788,13 @@ class GwMincut:
         tools_qgis.set_cursor_wait()
 
         result_mincut_id = tools_qt.getWidgetText(self.dlg_mincut, "result_mincut_id")
-        cur_user = self.controller.get_project_user()
         if result_mincut_id != 'null':
-            sql = f"SELECT gw_fct_mincut_valve_unaccess('{elem_id}', '{result_mincut_id}', '{cur_user}');"
-            status = self.controller.execute_sql(sql, log_sql=False)
-            if status:
-                message = "Custom mincut executed successfully"
-                self.controller.show_info(message)
+            extras = f'"action":"mincutValveUnaccess", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}"'
+            body = tools_gw.create_body(extras=extras)
+            result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
+            if result['status'] == 'Accepted' and result['message']:
+                level = int(result['message']['level']) if 'level' in result['message'] else 1
+                self.controller.show_message(result['message']['text'], level)
 
         # Disconnect snapping and related signals
         self.disconnect_snapping(False)
