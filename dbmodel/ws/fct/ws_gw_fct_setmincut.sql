@@ -50,6 +50,8 @@ v_element_id integer;
 v_mincut_class integer;
 v_version text;
 v_error_context text;
+v_expl integer;
+v_macroexpl integer;
 
 BEGIN
 
@@ -74,9 +76,21 @@ BEGIN
 	ELSIF v_action = 'mincutAccept' THEN
         IF v_mincut_class = 1 THEN
             RETURN gw_fct_json_create_return(gw_fct_setmincutoverlap(p_data), 2980);
-        ELSIF v_mincut_class IN (2, 3) THEN
 
+        ELSIF v_mincut_class IN (2, 3) THEN
             -- TODO: use json to get feature's list using input parameters (connecs or hydro)
+            
+            -- update om_mincut table
+			IF v_mincut_class=2 THEN
+				v_expl = (SELECT expl_id FROM om_mincut_connec JOIN connec USING (connec_id) WHERE result_id=v_mincut LIMIT 1);
+			ELSIF v_mincut_class=3 THEN
+				v_expl = (SELECT expl_id FROM om_mincut_hydrometer JOIN rtc_hydrometer_x_connec USING (hydrometer_id)
+				JOIN connec USING (connec_id) WHERE result_id=v_mincut LIMIT 1);
+			END IF;
+			
+			v_macroexpl = (SELECT macroexpl_id FROM exploitation WHERE expl_id=v_expl);
+			
+			UPDATE om_mincut SET expl_id=v_expl, macroexpl_id=v_macroexpl, anl_user=current_user WHERE om_mincut.id=v_mincut;
         
             -- count connec
             SELECT count(connec_id) INTO v_numconnecs FROM om_mincut_connec WHERE result_id=v_mincut;
