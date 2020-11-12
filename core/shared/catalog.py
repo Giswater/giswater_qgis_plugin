@@ -123,7 +123,7 @@ class GwCatalog:
             result = complet_result[0]['body']['data']
             for field in result['fields']:
                 if field['columnname'] == 'id':
-                    self.populate_combo(id, field)
+                    self.fill_combo(id, field)
 
 
     def populate_pn_dn(self, matcat_id, pnom, dnom, feature_type, geom_type):
@@ -141,13 +141,13 @@ class GwCatalog:
         result = complet_list[0]['body']['data']
         for field in result['fields']:
             if field['columnname'] == 'pnom':
-                self.populate_combo(pnom, field)
+                self.fill_combo(pnom, field)
             elif field['columnname'] == 'dnom':
-                self.populate_combo(dnom, field)
+                self.fill_combo(dnom, field)
             elif field['columnname'] == 'shape':
-                self.populate_combo(pnom, field)
+                self.fill_combo(pnom, field)
             elif field['columnname'] == 'geom1':
-                self.populate_combo(dnom, field)
+                self.fill_combo(dnom, field)
 
 
     def get_event_combo_parent(self, fields, row, geom_type):
@@ -156,20 +156,8 @@ class GwCatalog:
             for field in row["fields"]:
                 if field['isparent'] is True:
                     widget = self.dlg_catalog.findChild(QComboBox, field['columnname'])
-                    widget.currentIndexChanged.connect(partial(self.fill_child, widget, geom_type))
+                    widget.currentIndexChanged.connect(partial(tools_gw.fill_child, self.dlg_catalog, widget, 'catalog', geom_type))
                     widget.currentIndexChanged.connect(partial(self.populate_catalog_id, geom_type))
-
-
-    def fill_child(self, widget, geom_type):
-
-        combo_parent = widget.objectName()
-        combo_id = tools_qt.get_item_data(self.dlg_catalog, widget)
-        # TODO cambiar por gw_fct_getchilds
-        sql = f"SELECT gw_fct_getcombochilds('catalog' ,'' ,'' ,'{combo_parent}', '{combo_id}','{geom_type}')"
-        row = self.controller.get_row(sql)
-        for combo_child in row[0]['fields']:
-            if combo_child is not None:
-                tools_qt.populate_child(self.dlg_catalog, combo_child)
 
 
     def populate_catalog_id(self, geom_type):
@@ -189,7 +177,7 @@ class GwCatalog:
         if exists:
             sql = f"SELECT gw_api_get_catalog_id('{metcat_value}', '{pn_value}', '{dn_value}', '{geom_type}', 9)"
             row = self.controller.get_row(sql)
-            self.populate_combo(widget_id, row[0]['catalog_id'][0])
+            self.fill_combo(widget_id, row[0]['catalog_id'][0])
 
 
     def add_combobox(self, dialog, field):
@@ -197,14 +185,14 @@ class GwCatalog:
         widget = QComboBox()
         widget.setObjectName(field['columnname'])
         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        self.populate_combo(widget, field)
+        self.fill_combo(widget, field)
         if 'selectedId' in field:
             tools_qt.set_combo_itemData(widget, field['selectedId'], 0)
 
         return widget
 
 
-    def populate_combo(self, widget, field):
+    def fill_combo(self, widget, field):
 
         # Generate list of items to add into combo
         widget.blockSignals(True)

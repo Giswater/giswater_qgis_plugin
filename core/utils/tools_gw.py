@@ -17,7 +17,7 @@ from collections import OrderedDict
 
 from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor
-from qgis.PyQt.QtWidgets import QTabWidget, QCompleter, QFileDialog, QPushButton, QTableView
+from qgis.PyQt.QtWidgets import QComboBox, QTabWidget, QCompleter, QFileDialog, QPushButton, QTableView
 from qgis.core import QgsProject, QgsExpression, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
     QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
     QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest
@@ -1126,12 +1126,12 @@ def get_geometry(feature):
     """ Get coordinates from GeoJson and return QGsGeometry
     :param feature: feature to get geometry type and coordinates (GeoJson)
     :return: Geometry of the feature (QgsGeometry)
-    functions  called in -> getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
-        def get_point(self, feature)
-        get_linestring(self, feature)
-        get_multilinestring(self, feature)
-        get_polygon(self, feature)
-        get_multipolygon(self, feature)
+    functions  called in -> getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
+        def get_point(feature)
+        get_linestring(feature)
+        get_multilinestring(feature)
+        get_polygon(feature)
+        get_multipolygon(feature)
     """
 
     try:
@@ -1148,8 +1148,8 @@ def get_point(feature):
     """ Manage feature geometry when is Point
     :param feature: feature to get geometry type and coordinates (GeoJson)
     :return: Coordinates of the feature (String)
-    This function is called in def get_geometry(self, feature)
-          geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+    This function is called in def get_geometry(feature)
+          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
     """
     return f"({feature['geometry']['coordinates'][0]} {feature['geometry']['coordinates'][1]})"
 
@@ -1158,8 +1158,8 @@ def get_linestring(feature):
     """ Manage feature geometry when is LineString
     :param feature: feature to get geometry type and coordinates (GeoJson)
     :return: Coordinates of the feature (String)
-    This function is called in def get_geometry(self, feature)
-          geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+    This function is called in def get_geometry(feature)
+          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
     """
     return get_coordinates(feature)
 
@@ -1168,8 +1168,8 @@ def get_multilinestring(feature):
     """ Manage feature geometry when is MultiLineString
     :param feature: feature to get geometry type and coordinates (GeoJson)
     :return: Coordinates of the feature (String)
-    This function is called in def get_geometry(self, feature)
-          geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+    This function is called in def get_geometry(feature)
+          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
     """
     return get_multi_coordinates(feature)
 
@@ -1178,8 +1178,8 @@ def get_polygon(feature):
     """ Manage feature geometry when is Polygon
     :param feature: feature to get geometry type and coordinates (GeoJson)
     :return: Coordinates of the feature (String)
-    This function is called in def get_geometry(self, feature)
-          geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+    This function is called in def get_geometry(feature)
+          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
     """
     return get_multi_coordinates(feature)
 
@@ -1188,8 +1188,8 @@ def get_multipolygon(feature):
     """ Manage feature geometry when is MultiPolygon
     :param feature: feature to get geometry type and coordinates (GeoJson)
     :return: Coordinates of the feature (String)
-    This function is called in def get_geometry(self, feature)
-          geometry = getattr(self, f"get_{feature['geometry']['type'].lower()}")(feature)
+    This function is called in def get_geometry(feature)
+          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
     """
 
     coordinates = "("
@@ -1437,11 +1437,116 @@ def add_tableview(complet_result, field):
                 global_vars.controller.show_message(msg, 2)
                 return widget
 
-    # Call def gw_api_open_rpt_result(self, widget, complet_result) of class ApiCf
+    # Call def gw_api_open_rpt_result(widget, complet_result) of class ApiCf
     # noinspection PyUnresolvedReferences
     widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), widget, complet_result))
 
     return widget
+
+
+def add_combo(field):
+
+    widget = QComboBox()
+    widget.setObjectName(field['widgetname'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    widget = fill_combo(widget, field)
+    if 'selectedId' in field:
+        tools_qt.set_combo_itemData(widget, field['selectedId'], 0)
+        widget.setProperty('selectedId', field['selectedId'])
+    else:
+        widget.setProperty('selectedId', None)
+    if 'iseditable' in field:
+        widget.setEnabled(bool(field['iseditable']))
+        if not field['iseditable']:
+            widget.setStyleSheet("QComboBox { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+    return widget
+
+
+def fill_combo(widget, field):
+    # Generate list of items to add into combo
+
+    widget.blockSignals(True)
+    widget.clear()
+    widget.blockSignals(False)
+    combolist = []
+    if 'comboIds' in field:
+        if 'isNullValue' in field and field['isNullValue']:
+            combolist.append(['', ''])
+        for i in range(0, len(field['comboIds'])):
+            elem = [field['comboIds'][i], field['comboNames'][i]]
+            combolist.append(elem)
+
+    # Populate combo
+    for record in combolist:
+        widget.addItem(record[1], record)
+
+    return widget
+
+
+def fill_combo_child(dialog, combo_child):
+
+    child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
+    if child:
+        fill_combo(child, combo_child)
+
+
+def manage_child(dialog, combo_parent, combo_child):
+    child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
+    if child:
+        child.setEnabled(True)
+
+        fill_combo_child(dialog, combo_child)
+        if 'widgetcontrols' not in combo_child or not combo_child['widgetcontrols'] or \
+                'enableWhenParent' not in combo_child['widgetcontrols']:
+            return
+        #
+        if (str(tools_qt.get_item_data(dialog, combo_parent, 0)) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
+                and (tools_qt.get_item_data(dialog, combo_parent, 0) not in (None, '')):
+            # The keepDisbled property is used to keep the edition enabled or disabled,
+            # when we activate the layer and call the "enable_all" function
+            child.setProperty('keepDisbled', False)
+            child.setEnabled(True)
+        else:
+            child.setProperty('keepDisbled', True)
+            child.setEnabled(False)
+
+
+def get_child(dialog, widget, feature_type, tablename, field_id):
+    """ Find QComboBox child and populate it
+    :param dialog: QDialog
+    :param widget: QComboBox parent
+    :param feature_type: PIPE, ARC, JUNCTION, VALVE...
+    :param tablename: view of DB
+    :param field_id: Field id of tablename
+    """
+
+    combo_parent = widget.property('columnname')
+    combo_id = tools_qt.get_item_data(dialog, widget)
+
+    feature = f'"featureType":"{feature_type}", '
+    feature += f'"tableName":"{tablename}", '
+    feature += f'"idName":"{field_id}"'
+    extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
+    body = create_body(feature=feature, extras=extras)
+    result = global_vars.controller.get_json('gw_fct_getchilds', body)
+    if not result or result['status'] == 'Failed':
+        return False
+
+    for combo_child in result['body']['data']:
+        if combo_child is not None:
+            manage_child(dialog, widget, combo_child)
+
+
+def fill_child(dialog, widget, action, geom_type=''):
+
+    combo_parent = widget.objectName()
+    combo_id = tools_qt.get_item_data(dialog, widget)
+    # TODO cambiar por gw_fct_getchilds then unified with get_child if posible
+    json_result = global_vars.controller.get_json('gw_fct_getcombochilds', f"'{action}' ,'' ,'' ,'{combo_parent}', '{combo_id}','{geom_type}'")
+    for combo_child in json_result['fields']:
+        if combo_child is not None:
+            fill_combo_child(dialog, combo_child)
 
 
 def cast_boolean(param):

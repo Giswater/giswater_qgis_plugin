@@ -430,7 +430,7 @@ class GwDimensioning:
             if field['widgettype'] == 'typeahead':
                 widget = tools_qt.manage_lineedit(field, dialog, widget, completer)
         elif field['widgettype'] == 'combo':
-            widget = tools_qt.add_combobox(field)
+            widget = tools_gw.add_combo(field)
             widget = tools_qt.set_widget_size(widget, field)
         elif field['widgettype'] == 'check':
             widget = tools_qt.add_checkbox(field)

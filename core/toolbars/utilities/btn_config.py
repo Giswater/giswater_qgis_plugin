@@ -230,7 +230,7 @@ class GwConfigButton(GwParentAction):
             if field['isparent']:
                 widget = self.dlg_config.findChild(QComboBox, field['widgetname'])
                 if widget:
-                    widget.currentIndexChanged.connect(partial(self.fill_child, widget))
+                    widget.currentIndexChanged.connect(partial(tools_gw.fill_child, self.dlg_config, widget, 'config'))
 
 
     def update_values(self):
@@ -281,7 +281,7 @@ class GwConfigButton(GwParentAction):
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = QComboBox()
-                    self.populate_combo(widget, field)
+                    self.fill_combo(widget, field)
                     widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'check':
@@ -381,7 +381,7 @@ class GwConfigButton(GwParentAction):
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = QComboBox()
-                    self.populate_combo(widget, field)
+                    self.fill_combo(widget, field)
                     widget.currentIndexChanged.connect(partial(self.get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'checkbox' or field['widgettype'] == 'check':
@@ -442,20 +442,7 @@ class GwConfigButton(GwParentAction):
             widget_child.setChecked(False)
 
 
-    def fill_child(self, widget):
-
-        combo_parent = widget.objectName()
-        combo_id = tools_qt.get_item_data(self.dlg_config, widget)
-        # TODO cambiar por gw_fct_getchilds
-        sql = f"SELECT gw_fct_getcombochilds('config' ,'' ,'' ,'{combo_parent}', '{combo_id}','')"
-        row = self.controller.get_row(sql)
-        # TODO::Refactor input and output for function "gw_fct_getcombochilds" and refactor "row[0]['fields']"
-        for combo_child in row[0]['fields']:
-            if combo_child is not None:
-                tools_qt.populate_child(self.dlg_config, combo_child)
-
-
-    def populate_combo(self, widget, field):
+    def fill_combo(self, widget, field):
 
         # Generate list of items to add into combo
         widget.blockSignals(True)

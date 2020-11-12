@@ -939,100 +939,6 @@ def add_checkbox(field):
     return widget
 
 
-def add_combobox(field):
-
-    widget = QComboBox()
-    widget.setObjectName(field['widgetname'])
-    if 'columnname' in field:
-        widget.setProperty('columnname', field['columnname'])
-    widget = populate_combo(widget, field)
-    if 'selectedId' in field:
-        set_combo_itemData(widget, field['selectedId'], 0)
-        widget.setProperty('selectedId', field['selectedId'])
-    else:
-        widget.setProperty('selectedId', None)
-    if 'iseditable' in field:
-        widget.setEnabled(bool(field['iseditable']))
-        if not field['iseditable']:
-            widget.setStyleSheet("QComboBox { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
-    return widget
-
-
-def fill_child(dialog, widget, feature_type, tablename, field_id):
-    """ Find QComboBox child and populate it
-    :param dialog: QDialog
-    :param widget: QComboBox parent
-    :param feature_type: PIPE, ARC, JUNCTION, VALVE...
-    :param tablename: view of DB
-    :param field_id: Field id of tablename
-    """
-
-    combo_parent = widget.property('columnname')
-    combo_id = get_item_data(dialog, widget)
-
-    feature = f'"featureType":"{feature_type}", '
-    feature += f'"tableName":"{tablename}", '
-    feature += f'"idName":"{field_id}"'
-    extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
-    body = tools_gw.create_body(feature=feature, extras=extras)
-    result = global_vars.controller.get_json('gw_fct_getchilds', body)
-    if not result or result['status'] == 'Failed':
-        return False
-
-    for combo_child in result['body']['data']:
-        if combo_child is not None:
-            manage_child(dialog, widget, combo_child)
-
-
-def manage_child(dialog, combo_parent, combo_child):
-    child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
-    if child:
-        child.setEnabled(True)
-
-        populate_child(dialog, combo_child)
-        if 'widgetcontrols' not in combo_child or not combo_child['widgetcontrols'] or \
-                'enableWhenParent' not in combo_child['widgetcontrols']:
-            return
-        #
-        if (str(get_item_data(dialog, combo_parent, 0)) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
-                and (get_item_data(dialog, combo_parent, 0) not in (None, '')):
-            # The keepDisbled property is used to keep the edition enabled or disabled,
-            # when we activate the layer and call the "enable_all" function
-            child.setProperty('keepDisbled', False)
-            child.setEnabled(True)
-        else:
-            child.setProperty('keepDisbled', True)
-            child.setEnabled(False)
-
-
-def populate_child(dialog, combo_child):
-
-    child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
-    if child:
-        populate_combo(child, combo_child)
-
-
-def populate_combo(widget, field):
-    # Generate list of items to add into combo
-
-    widget.blockSignals(True)
-    widget.clear()
-    widget.blockSignals(False)
-    combolist = []
-    if 'comboIds' in field:
-        if 'isNullValue' in field and field['isNullValue']:
-            combolist.append(['', ''])
-        for i in range(0, len(field['comboIds'])):
-            elem = [field['comboIds'][i], field['comboNames'][i]]
-            combolist.append(elem)
-
-    # Populate combo
-    for record in combolist:
-        widget.addItem(record[1], record)
-
-    return widget
-
-
 def add_frame(field, x=None):
 
     widget = QFrame()
@@ -1191,7 +1097,7 @@ def populate_basic_info(dialog, result, field_id, my_json=None, new_feature_id=N
             widget = add_textarea(field)
         elif field['widgettype'] in ('combo', 'combobox'):
             widget = QComboBox()
-            populate_combo(widget, field)
+            tools_gw.fill_combo(widget, field)
             widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         elif field['widgettype'] in ('check', 'checkbox'):
             widget = add_checkbox(field)
@@ -1278,7 +1184,7 @@ def construct_form_param_user(dialog, row, pos, _json, temp_layers_added=None):
                     partial(get_values_changed_param_user, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'combo':
-                widget = add_combobox(field)
+                widget = tools_gw.add_combo(field)
                 widget.currentIndexChanged.connect(
                     partial(get_values_changed_param_user, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

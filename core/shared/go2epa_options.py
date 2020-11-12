@@ -93,11 +93,12 @@ class GwGo2EpaOptions:
     def fill_child(self, dialog, widget):
 
         combo_parent = widget.objectName()
-        combo_id = tools_qt.get_item_data(self.dlg_options, widget)
+        combo_id = tools_qt.get_item_data(dialog, widget)
+        # TODO cambiar por gw_fct_getchilds then unified with tools_gw.get_child if posible
         json_result = self.controller.get_json('gw_fct_getcombochilds', f"'epaoptions', '', '', '{combo_parent}', '{combo_id}', ''")
         if not json_result or json_result['status'] == 'Failed':
             return False
 
         for combo_child in json_result['fields']:
             if combo_child is not None:
-                tools_qt.manage_child(dialog, widget, combo_child)
+                tools_gw.manage_child(dialog, widget, combo_child)

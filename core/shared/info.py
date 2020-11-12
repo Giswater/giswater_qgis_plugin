@@ -487,7 +487,7 @@ class GwInfo(QObject):
                 if field['widgettype'] == 'combo':
                     widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
                     if widget is not None:
-                        widget.currentIndexChanged.connect(partial(tools_qt.fill_child, self.dlg_cf, widget,
+                        widget.currentIndexChanged.connect(partial(tools_gw.get_child, self.dlg_cf, widget,
                             self.feature_type, self.tablename, self.field_id))
 
         # Set variables
@@ -1299,7 +1299,7 @@ class GwInfo(QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = tools_qt.add_combobox(field)
+        widget = tools_gw.add_combo(field)
         widget = tools_qt.set_widget_size(widget, field)
         widget = self.set_auto_update_combobox(field, dialog, widget, new_feature)
         return widget
@@ -2942,8 +2942,8 @@ class GwInfo(QObject):
                 if 'isparent' in field:
                     if field['isparent']:
                         widget = dialog.findChild(QComboBox, field['widgetname'])
-                        widget.currentIndexChanged.connect(partial(tools_qt.fill_child, dialog, widget, self.feature_type,
-                            self.tablename, self.field_id))
+                        widget.currentIndexChanged.connect(partial(tools_gw.get_child, dialog, widget,
+                                                           self.feature_type, self.tablename, self.field_id))
 
         return complet_list, widget_list
 
