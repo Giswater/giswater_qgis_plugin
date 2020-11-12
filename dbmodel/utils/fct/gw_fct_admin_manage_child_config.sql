@@ -72,15 +72,15 @@ BEGIN
 	END IF;
 
 	--select list of fields different than id from config_form_fields
-	EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
+	EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'') FROM (SELECT column_name
 	FROM information_schema.columns WHERE table_name=''config_form_fields'' and table_schema='''||v_schemaname||'''
-	AND column_name!=''id'';'
+	AND column_name!=''id'' ORDER BY ordinal_position)a;'
 	INTO v_config_fields;
 	
 	--select list of fields different than id and formname from config_form_fields
-	EXECUTE 'SELECT DISTINCT string_agg(concat(column_name)::text,'' ,'')
+	EXECUTE 'SELECT DISTINCT string_agg(concat(column_name)::text,'' ,'') FROM (SELECT column_name
 	FROM information_schema.columns WHERE table_name=''config_form_fields'' and table_schema='''||v_schemaname||'''
-	AND column_name!=''id'' AND column_name!=''formname'';'
+	AND column_name!=''id'' AND column_name!=''formname'' ORDER BY ordinal_position)a;'
 	INTO v_insert_fields;
 
 	--insert configuration copied from the parent view config
