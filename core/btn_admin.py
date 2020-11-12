@@ -3385,7 +3385,7 @@ class GwAdmin:
                 dialog.setWindowTitle(function[0]['alias'])
                 dialog.txt_info.setText(str(function[0]['descript']))
                 self.function_list = []
-                tools_qt.construct_form_param_user(dialog, function, 0, self.function_list)
+                tools_gw.construct_form_param_user(dialog, function, 0, self.function_list)
                 status = True
                 break
 

@@ -123,7 +123,7 @@ class GwDimensioning:
                     layout.addWidget(label, 0, field['layoutorder'])
                     layout.addWidget(widget, 1, field['layoutorder'])
                 else:
-                    tools_qt.put_widgets(self.dlg_dim, field, label, widget)
+                    tools_gw.put_widgets(self.dlg_dim, field, label, widget)
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
@@ -424,30 +424,30 @@ class GwDimensioning:
                 label.setToolTip(field['label'].capitalize())
         if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
             completer = QCompleter()
-            widget = tools_qt.add_lineedit(field)
-            widget = tools_qt.set_widget_size(widget, field)
-            widget = tools_qt.set_data_type(field, widget)
+            widget = tools_gw.add_lineedit(field)
+            widget = tools_gw.set_widget_size(widget, field)
+            widget = tools_gw.set_data_type(field, widget)
             if field['widgettype'] == 'typeahead':
-                widget = tools_qt.manage_lineedit(field, dialog, widget, completer)
+                widget = tools_gw.manage_lineedit(field, dialog, widget, completer)
         elif field['widgettype'] == 'combo':
             widget = tools_gw.add_combo(field)
-            widget = tools_qt.set_widget_size(widget, field)
+            widget = tools_gw.set_widget_size(widget, field)
         elif field['widgettype'] == 'check':
-            widget = tools_qt.add_checkbox(field)
+            widget = tools_gw.add_checkbox(field)
         elif field['widgettype'] == 'datetime':
-            widget = tools_qt.add_calendar(dialog, field)
+            widget = tools_gw.add_calendar(dialog, field)
         elif field['widgettype'] == 'button':
-            widget = tools_qt.add_button(dialog, field)
-            widget = tools_qt.set_widget_size(widget, field)
+            widget = tools_gw.add_button(dialog, field)
+            widget = tools_gw.set_widget_size(widget, field)
         elif field['widgettype'] == 'hyperlink':
-            widget = tools_qt.add_hyperlink(field)
-            widget = tools_qt.set_widget_size(widget, field)
+            widget = tools_gw.add_hyperlink(field)
+            widget = tools_gw.set_widget_size(widget, field)
         elif field['widgettype'] == 'hspacer':
             widget = tools_qt.add_horizontal_spacer()
         elif field['widgettype'] == 'vspacer':
             widget = tools_qt.add_vertical_spacer()
         elif field['widgettype'] == 'textarea':
-            widget = tools_qt.add_textarea(field)
+            widget = tools_gw.add_textarea(field)
         elif field['widgettype'] in 'spinbox':
             widget = tools_qt.add_spinbox(field)
         elif field['widgettype'] == 'tableview':

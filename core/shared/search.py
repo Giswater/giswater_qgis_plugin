@@ -116,7 +116,7 @@ class GwSearch:
                 widget = None
                 if field['widgettype'] == 'typeahead':
                     completer = QCompleter()
-                    widget = tools_qt.add_lineedit(field)
+                    widget = tools_gw.add_lineedit(field)
                     widget = self.set_typeahead_completer(widget, completer)
                     self.lineedit_list.append(widget)
                 elif field['widgettype'] == 'combo':
@@ -441,7 +441,7 @@ class GwSearch:
         self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(self.rubber_band.reset)
         field_id = str(result[0]['body']['feature']['idName'])
-        tools_qt.populate_basic_info(self.hydro_info_dlg, result, field_id)
+        tools_gw.populate_basic_info(self.hydro_info_dlg, result, field_id)
 
         tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 

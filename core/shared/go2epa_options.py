@@ -44,7 +44,7 @@ class GwGo2EpaOptions:
         if not json_result or json_result['status'] == 'Failed':
             return False
 
-        tools_qt.construct_form_param_user(
+        tools_gw.construct_form_param_user(
             self.dlg_options, json_result['body']['form']['formTabs'], 0, self.epa_options_list)
         grbox_list = self.dlg_options.findChildren(QGroupBox)
         for grbox in grbox_list:

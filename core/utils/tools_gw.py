@@ -15,19 +15,21 @@ if 'nt' in sys.builtin_module_names:
 from functools import partial
 from collections import OrderedDict
 
-from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint
-from qgis.PyQt.QtGui import QCursor, QPixmap, QColor
-from qgis.PyQt.QtWidgets import QComboBox, QTabWidget, QCompleter, QFileDialog, QPushButton, QTableView, QFrame
+from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint, QDate
+from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics
+from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
+    QCompleter, QFileDialog, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit,\
+    QTextEdit, QToolButton
 from qgis.core import QgsProject, QgsExpression, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
     QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
     QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest
-from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint
+from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint, QgsDateTimeEdit
 
 from ..models.sys_feature_cat import SysFeatureCat
 from ..ui.ui_manager import GwDialog, GwMainWindow
 from ... import global_vars
 from ...lib import tools_qgis, tools_pgdao, tools_qt
-
+from ...lib.tools_qt import GwHyperLinkLabel
 
 
 class SnappingConfigManager(object):
@@ -1417,6 +1419,425 @@ def manage_feature_cat():
         global_vars.controller.show_warning(msg + "is not defined in table cat_feature")
 
     return feature_cat
+
+
+def populate_basic_info(dialog, result, field_id, my_json=None, new_feature_id=None, new_feature=None,
+                        layer_new_feature=None, feature_id=None, feature_type=None, layer=None):
+
+    fields = result[0]['body']['data']
+    if 'fields' not in fields:
+        return
+    grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
+
+    for x, field in enumerate(fields["fields"]):
+
+        label = QLabel()
+        label.setObjectName('lbl_' + field['label'])
+        label.setText(field['label'].capitalize())
+
+        if 'tooltip' in field:
+            label.setToolTip(field['tooltip'])
+        else:
+            label.setToolTip(field['label'].capitalize())
+
+        widget = None
+        if field['widgettype'] in ('text', 'textline') or field['widgettype'] == 'typeahead':
+            completer = QCompleter()
+            widget = add_lineedit(field)
+            widget = set_widget_size(widget, field)
+            widget = set_data_type(field, widget)
+            if field['widgettype'] == 'typeahead':
+                widget = manage_lineedit(field, dialog, widget, completer)
+
+        elif field['widgettype'] == 'datetime':
+            widget = add_calendar(dialog, field)
+        elif field['widgettype'] == 'hyperlink':
+            widget = add_hyperlink(field)
+        elif field['widgettype'] == 'textarea':
+            widget = add_textarea(field)
+        elif field['widgettype'] in ('combo', 'combobox'):
+            widget = QComboBox()
+            fill_combo(widget, field)
+            widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        elif field['widgettype'] in ('check', 'checkbox'):
+            widget = add_checkbox(field)
+            widget.stateChanged.connect(partial(get_values, dialog, widget, my_json))
+        elif field['widgettype'] == 'button':
+            widget = add_button(dialog, field)
+
+        grid_layout.addWidget(label, x, 0)
+        grid_layout.addWidget(widget, x, 1)
+
+    verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+    grid_layout.addItem(verticalSpacer1)
+
+    return result
+
+
+def construct_form_param_user(dialog, row, pos, _json, temp_layers_added=None):
+
+    field_id = ''
+    if 'fields' in row[pos]:
+        field_id = 'fields'
+    elif 'return_type' in row[pos]:
+        if row[pos]['return_type'] not in ('', None):
+            field_id = 'return_type'
+
+    if field_id == '':
+        return
+
+    for field in row[pos][field_id]:
+        if field['label']:
+            lbl = QLabel()
+            lbl.setObjectName('lbl' + field['widgetname'])
+            lbl.setText(field['label'])
+            lbl.setMinimumSize(160, 0)
+            lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+            if 'tooltip' in field:
+                lbl.setToolTip(field['tooltip'])
+
+            widget = None
+            if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
+                widget = QLineEdit()
+                if 'isMandatory' in field:
+                    widget.setProperty('is_mandatory', field['isMandatory'])
+                else:
+                    widget.setProperty('is_mandatory', True)
+                widget.setText(field['value'])
+                if 'widgetcontrols' in field and field['widgetcontrols']:
+                    if 'regexpControl' in field['widgetcontrols']:
+                        if field['widgetcontrols']['regexpControl'] is not None:
+                            pass
+                widget.editingFinished.connect(
+                    partial(get_values_changed_param_user, dialog, None, widget, field, _json))
+                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            elif field['widgettype'] == 'combo':
+                widget = add_combo(field)
+                widget.currentIndexChanged.connect(
+                    partial(get_values_changed_param_user, dialog, None, widget, field, _json))
+                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            elif field['widgettype'] == 'check':
+                widget = QCheckBox()
+                if field['value'] is not None and field['value'].lower() == "true":
+                    widget.setChecked(True)
+                else:
+                    widget.setChecked(False)
+                widget.stateChanged.connect(partial(get_values_changed_param_user,
+                                            dialog, None, widget, field, _json))
+                widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            elif field['widgettype'] == 'datetime':
+                widget = QgsDateTimeEdit()
+                widget.setAllowNull(True)
+                widget.setCalendarPopup(True)
+                widget.setDisplayFormat('yyyy/MM/dd')
+                date = QDate.currentDate()
+                if 'value' in field and field['value'] not in ('', None, 'null'):
+                    date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
+                widget.setDate(date)
+                widget.dateChanged.connect(partial(get_values_changed_param_user,
+                                           dialog, None, widget, field, _json))
+                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            elif field['widgettype'] == 'spinbox':
+                widget = QDoubleSpinBox()
+                if 'widgetcontrols' in field and field['widgetcontrols'] and 'spinboxDecimals' in field['widgetcontrols']:
+                    widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
+                if 'value' in field and field['value'] not in (None, ""):
+                    value = float(str(field['value']))
+                    widget.setValue(value)
+                widget.valueChanged.connect(partial(get_values_changed_param_user,
+                                            dialog, None, widget, field, _json))
+                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            elif field['widgettype'] == 'button':
+                widget = add_button(dialog, field, temp_layers_added)
+                widget = set_widget_size(widget, field)
+
+            # Set editable/readonly
+            if type(widget) in (QLineEdit, QDoubleSpinBox):
+                if 'iseditable' in field:
+                    if str(field['iseditable']) == "False":
+                        widget.setReadOnly(True)
+                        widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+                if type(widget) == QLineEdit:
+                    if 'placeholder' in field:
+                        widget.setPlaceholderText(field['placeholder'])
+            elif type(widget) in (QComboBox, QCheckBox):
+                if 'iseditable' in field:
+                    if str(field['iseditable']) == "False":
+                        widget.setEnabled(False)
+            widget.setObjectName(field['widgetname'])
+            if 'iseditable' in field:
+                widget.setEnabled(bool(field['iseditable']))
+
+            put_widgets(dialog, field, lbl, widget)
+
+
+def put_widgets(dialog, field, lbl, widget):
+    """ Insert widget into layout """
+
+    layout = dialog.findChild(QGridLayout, field['layoutname'])
+    if layout in (None, 'null', 'NULL', 'Null'):
+        return
+    layout.addWidget(lbl, int(field['layoutorder']), 0)
+    layout.addWidget(widget, int(field['layoutorder']), 2)
+    layout.setColumnStretch(2, 1)
+
+
+def get_values_changed_param_user(dialog, chk, widget, field, list, value=None):
+
+    elem = {}
+    if type(widget) is QLineEdit:
+        value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
+    elif type(widget) is QComboBox:
+        value = tools_qt.get_item_data(dialog, widget, 0)
+    elif type(widget) is QCheckBox:
+        value = tools_qt.isChecked(dialog, widget)
+    elif type(widget) is QDateEdit:
+        value = tools_qt.getCalendarDate(dialog, widget)
+
+    # When the QDoubleSpinbox contains decimals, for example 2,0001 when collecting the value, the spinbox itself sends
+    # 2.0000999999, as in reality we only want, maximum 4 decimal places, we round up, thus fixing this small failure
+    # of the widget
+    if type(widget) in (QSpinBox, QDoubleSpinBox):
+        value = round(value, 4)
+    # if chk is None:
+    #     elem[widget.objectName()] = value
+    elem['widget'] = str(widget.objectName())
+    elem['value'] = value
+    if chk is not None:
+        if chk.isChecked():
+            # elem['widget'] = str(widget.objectName())
+            elem['chk'] = str(chk.objectName())
+            elem['isChecked'] = str(tools_qt.isChecked(dialog, chk))
+            # elem['value'] = value
+
+    if 'sys_role_id' in field:
+        elem['sys_role_id'] = str(field['sys_role_id'])
+    list.append(elem)
+    global_vars.controller.log_info(str(list))
+
+
+def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name__]):
+    """
+    :param dialog: (QDialog)
+    :param field: Part of json where find info (Json)
+    :param temp_layers_added: List of layers added to the toc
+    :param module: Module where find 'function_name', if 'function_name' is not in this module
+    :return: (QWidget)
+    """
+    widget = QPushButton()
+    widget.setObjectName(field['widgetname'])
+
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    if 'value' in field:
+        widget.setText(field['value'])
+    widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
+    function_name = 'no_function_associated'
+    real_name = widget.objectName()[5:len(widget.objectName())]
+    if 'widgetfunction' in field:
+        if field['widgetfunction'] is not None:
+            function_name = field['widgetfunction']
+            exist = global_vars.controller.check_python_function(module, function_name)
+            if not exist:
+                msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
+                global_vars.controller.show_message(msg, 2)
+                return widget
+        else:
+            message = "Parameter button_function is null for button"
+            global_vars.controller.show_message(message, 2, parameter=widget.objectName())
+
+    kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name, 'temp_layers_added': temp_layers_added}
+    widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
+
+    return widget
+
+
+def get_values(dialog, widget, _json=None):
+
+    value = None
+    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit) and widget.isReadOnly() is False:
+        value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
+    elif type(widget) is QComboBox and widget.isEnabled():
+        value = tools_qt.get_item_data(dialog, widget, 0)
+    elif type(widget) is QCheckBox and widget.isEnabled():
+        value = tools_qt.isChecked(dialog, widget)
+    elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
+        value = tools_qt.getCalendarDate(dialog, widget)
+
+    if str(value) == '' or value is None:
+        _json[str(widget.property('columnname'))] = None
+    else:
+        _json[str(widget.property('columnname'))] = str(value)
+
+
+
+def add_checkbox(field):
+
+    widget = QCheckBox()
+    widget.setObjectName(field['widgetname'])
+    widget.setProperty('columnname', field['columnname'])
+    if 'value' in field:
+        if field['value'] in ("t", "true", True):
+            widget.setChecked(True)
+    if 'iseditable' in field:
+        widget.setEnabled(field['iseditable'])
+    return widget
+
+
+def add_textarea(field):
+    """ Add widgets QTextEdit type """
+
+    widget = QTextEdit()
+    widget.setObjectName(field['widgetname'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    if 'value' in field:
+        widget.setText(field['value'])
+
+    # Set height as a function of text lines
+    font = widget.document().defaultFont()
+    fm = QFontMetrics(font)
+    text_size = fm.size(0, widget.toPlainText())
+    if text_size.height() < 26:
+        widget.setMinimumHeight(36)
+        widget.setMaximumHeight(36)
+    else:
+        # Need to modify to avoid scroll
+        widget.setMaximumHeight(text_size.height() + 10)
+
+    if 'iseditable' in field:
+        widget.setReadOnly(not field['iseditable'])
+        if not field['iseditable']:
+            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+
+    return widget
+
+
+def add_hyperlink(field):
+
+    widget = GwHyperLinkLabel()
+    widget.setObjectName(field['widgetname'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    if 'value' in field:
+        widget.setText(field['value'])
+    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+    widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
+    func_name = 'no_function_associated'
+    real_name = widget.objectName()[5:len(widget.objectName())]
+    if 'widgetfunction' in field:
+        if field['widgetfunction'] is not None:
+            func_name = field['widgetfunction']
+            exist = global_vars.controller.check_python_function(tools_qt, func_name)
+            if not exist:
+                msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
+                global_vars.controller.show_message(msg, 2)
+                return widget
+        else:
+            message = "Parameter widgetfunction is null for widget"
+            global_vars.controller.show_message(message, 2, parameter=real_name)
+    else:
+        message = "Parameter not found"
+        global_vars.controller.show_message(message, 2, parameter='widgetfunction')
+    # Call function (self, widget) or def no_function_associated(self, widget=None, message_level=1)
+    widget.clicked.connect(partial(getattr(tools_qt, func_name), widget))
+
+    return widget
+
+
+def add_calendar(dialog, field):
+
+    widget = QgsDateTimeEdit()
+    widget.setObjectName(field['widgetname'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    widget.setAllowNull(True)
+    widget.setCalendarPopup(True)
+    widget.setDisplayFormat('dd/MM/yyyy')
+    if 'value' in field and field['value'] not in ('', None, 'null'):
+        date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
+        tools_qt.setCalendarDate(dialog, widget, date)
+    else:
+        widget.clear()
+    btn_calendar = widget.findChild(QToolButton)
+
+    btn_calendar.clicked.connect(partial(tools_qt.set_calendar_empty, widget))
+
+    return widget
+
+
+def manage_lineedit(field, dialog, widget, completer):
+
+    if field['widgettype'] == 'typeahead':
+        if 'queryText' not in field or 'queryTextFilter' not in field:
+            return widget
+        model = QStringListModel()
+        widget.textChanged.connect(partial(populate_lineedit, completer, model, field, dialog, widget))
+
+    return widget
+
+
+def populate_lineedit(completer, model, field, dialog, widget):
+    """ Set autocomplete of widget @table_object + "_id"
+        getting id's from selected @table_object.
+        WARNING: Each QLineEdit needs their own QCompleter and their own QStringListModel!!!
+    """
+
+    if not widget:
+        return
+    parent_id = ""
+    if 'parentId' in field:
+        parent_id = field["parentId"]
+
+    extras = f'"queryText":"{field["queryText"]}"'
+    extras += f', "queryTextFilter":"{field["queryTextFilter"]}"'
+    extras += f', "parentId":"{parent_id}"'
+    extras += f', "parentValue":"{tools_qt.getWidgetText(dialog, "data_" + str(field["parentId"]))}"'
+    extras += f', "textToSearch":"{tools_qt.getWidgetText(dialog, widget)}"'
+    body = create_body(extras=extras)
+    complet_list = global_vars.controller.get_json('gw_fct_gettypeahead', body)
+    if not complet_list or complet_list['status'] == 'Failed':
+        return False
+
+    list_items = []
+    for field in complet_list['body']['data']:
+        list_items.append(field['idval'])
+    tools_qt.set_completer_object_api(completer, model, widget, list_items)
+
+
+def set_data_type(field, widget):
+
+    widget.setProperty('datatype', field['datatype'])
+    return widget
+
+
+def set_widget_size(widget, field):
+
+    if 'widgetdim' in field:
+        if field['widgetdim']:
+            widget.setMaximumWidth(field['widgetdim'])
+            widget.setMinimumWidth(field['widgetdim'])
+
+    return widget
+
+
+def add_lineedit(field):
+    """ Add widgets QLineEdit type """
+
+    widget = QLineEdit()
+    widget.setObjectName(field['widgetname'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    if 'placeholder' in field:
+        widget.setPlaceholderText(field['placeholder'])
+    if 'value' in field:
+        widget.setText(field['value'])
+    if 'iseditable' in field:
+        widget.setReadOnly(not field['iseditable'])
+        if not field['iseditable']:
+            widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
+
+    return widget
 
 
 def add_tableview(complet_result, field):

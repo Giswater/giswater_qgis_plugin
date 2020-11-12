@@ -439,7 +439,7 @@ class GwToolBoxButton(GwParentAction):
                     self.populate_cmb_type(feature_types)
                     self.dlg_functions.cmb_geom_type.currentIndexChanged.connect(partial(self.populate_layer_combo))
                     self.populate_layer_combo()
-                tools_qt.construct_form_param_user(dialog, function, 0, self.function_list, self.temp_layers_added)
+                tools_gw.construct_form_param_user(dialog, function, 0, self.function_list, self.temp_layers_added)
                 self.load_settings_values(dialog, function)
                 self.load_parametric_values(dialog, function)
                 status = True

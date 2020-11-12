@@ -36,6 +36,8 @@ from ..utils import tools_gw
 from ..utils.tools_gw import SnappingConfigManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt
+from ...lib.tools_qt import GwHyperLinkLabel
+
 
 
 class GwInfo(QObject):
@@ -295,7 +297,7 @@ class GwInfo(QObject):
         self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         field_id = str(self.complet_result[0]['body']['feature']['idName'])
-        result = tools_qt.populate_basic_info(self.hydro_info_dlg, complet_result, field_id, self.my_json,
+        result = tools_gw.populate_basic_info(self.hydro_info_dlg, complet_result, field_id, self.my_json,
                  new_feature_id=self.new_feature_id, new_feature=self.new_feature, layer_new_feature=self.layer_new_feature,
                  feature_id=self.feature_id, feature_type=self.feature_type, layer=self.layer)
 
@@ -474,7 +476,7 @@ class GwInfo(QObject):
                     layout.addWidget(label, 0, field['layoutorder'])
                     layout.addWidget(widget, 1, field['layoutorder'])
                 else:
-                    tools_qt.put_widgets(self.dlg_cf, field, label, widget)
+                    tools_gw.put_widgets(self.dlg_cf, field, label, widget)
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
@@ -1238,12 +1240,12 @@ class GwInfo(QObject):
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
 
-        widget = tools_qt.add_lineedit(field)
-        widget = tools_qt.set_widget_size(widget, field)
+        widget = tools_gw.add_lineedit(field)
+        widget = tools_gw.set_widget_size(widget, field)
         widget = self.set_min_max_values(widget, field)
         widget = self.set_reg_exp(widget, field)
         widget = self.set_auto_update_lineedit(field, dialog, widget, new_feature)
-        widget = tools_qt.set_data_type(field, widget)
+        widget = tools_gw.set_data_type(field, widget)
         widget = self.set_max_length(widget, field)
 
         return widget
@@ -1291,7 +1293,7 @@ class GwInfo(QObject):
         """
         completer = QCompleter()
         widget = self.manage_text(dialog, complet_result, field, new_feature)
-        widget = tools_qt.manage_lineedit(field, dialog, widget, completer)
+        widget = tools_gw.manage_lineedit(field, dialog, widget, completer)
         return widget
 
 
@@ -1300,7 +1302,7 @@ class GwInfo(QObject):
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
         widget = tools_gw.add_combo(field)
-        widget = tools_qt.set_widget_size(widget, field)
+        widget = tools_gw.set_widget_size(widget, field)
         widget = self.set_auto_update_combobox(field, dialog, widget, new_feature)
         return widget
 
@@ -1309,8 +1311,8 @@ class GwInfo(QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = tools_qt.add_checkbox(field)
-        widget.stateChanged.connect(partial(tools_qt.get_values, dialog, widget, self.my_json))
+        widget = tools_gw.add_checkbox(field)
+        widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
         widget = self.set_auto_update_checkbox(field, dialog, widget, new_feature)
         return widget
 
@@ -1319,10 +1321,7 @@ class GwInfo(QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = tools_qt.add_calendar(dialog, field, my_json=self.my_json, complet_result=self.complet_result,
-                              new_feature_id=self.new_feature_id, new_feature=self.new_feature,
-                              layer_new_feature=self.layer_new_feature,
-                              feature_id=self.feature_id, feature_type=self.feature_type, layer=self.layer)
+        widget = tools_gw.add_calendar(dialog, field)
         widget = self.set_auto_update_dateedit(field, dialog, widget, new_feature)
         return widget
 
@@ -1331,8 +1330,8 @@ class GwInfo(QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = tools_qt.add_button(dialog, field, module=self)
-        widget = tools_qt.set_widget_size(widget, field)
+        widget = tools_gw.add_button(dialog, field, module=self)
+        widget = tools_gw.set_widget_size(widget, field)
         return widget
 
 
@@ -1340,8 +1339,8 @@ class GwInfo(QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = tools_qt.add_hyperlink(field)
-        widget = tools_qt.set_widget_size(widget, field)
+        widget = tools_gw.add_hyperlink(field)
+        widget = tools_gw.set_widget_size(widget, field)
         return widget
 
 
@@ -1366,7 +1365,7 @@ class GwInfo(QObject):
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
 
-        widget = tools_qt.add_textarea(field)
+        widget = tools_gw.add_textarea(field)
         widget = self.set_auto_update_textarea(field, dialog, widget, new_feature)
         return widget
 
@@ -1643,11 +1642,11 @@ class GwInfo(QObject):
             if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
                 _json = {}
                 widget.editingFinished.connect(partial(self.clean_my_json, widget))
-                widget.editingFinished.connect(partial(tools_qt.get_values, dialog, widget, _json))
+                widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.editingFinished.connect(
                     partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False, new_feature=new_feature))
             else:
-                widget.editingFinished.connect(partial(tools_qt.get_values, dialog, widget, self.my_json))
+                widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
 
             widget.textChanged.connect(partial(self.enabled_accept, dialog))
             widget.textChanged.connect(partial(self.check_datatype_validator, dialog, widget, dialog.btn_accept))
@@ -1664,11 +1663,11 @@ class GwInfo(QObject):
             if field['isautoupdate'] and self.new_feature_id is None and field['widgettype'] != 'typeahead':
                 _json = {}
                 widget.textChanged.connect(partial(self.clean_my_json, widget))
-                widget.textChanged.connect(partial(tools_qt.get_values, dialog, widget, _json))
+                widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.textChanged.connect(
                     partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False, new_feature))
             else:
-                widget.textChanged.connect(partial(tools_qt.get_values, dialog, widget, self.my_json))
+                widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
 
             widget.textChanged.connect(partial(self.enabled_accept, dialog))
             widget.textChanged.connect(partial(self.check_datatype_validator, dialog, widget, dialog.btn_accept))
@@ -1727,11 +1726,11 @@ class GwInfo(QObject):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
-                widget.currentIndexChanged.connect(partial(tools_qt.get_values, dialog, widget, _json))
+                widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.currentIndexChanged.connect(partial(
                     self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature))
             else:
-                widget.currentIndexChanged.connect(partial(tools_qt.get_values, dialog, widget, self.my_json))
+                widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
 
         return widget
 
@@ -1742,11 +1741,11 @@ class GwInfo(QObject):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.dateChanged.connect(partial(self.clean_my_json, widget))
-                widget.dateChanged.connect(partial(tools_qt.get_values, dialog, widget, _json))
+                widget.dateChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.dateChanged.connect(partial(
                     self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature))
             else:
-                widget.dateChanged.connect(partial(tools_qt.get_values, dialog, widget, self.my_json))
+                widget.dateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
 
         return widget
 
@@ -1757,11 +1756,11 @@ class GwInfo(QObject):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.valueChanged.connect(partial(self.clean_my_json, widget))
-                widget.valueChanged.connect(partial(tools_qt.get_values, dialog, widget, _json))
+                widget.valueChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.valueChanged.connect(partial(
                     self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature))
             else:
-                widget.valueChanged.connect(partial(tools_qt.get_values, dialog, widget, self.my_json))
+                widget.valueChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
 
         return widget
 
@@ -1772,11 +1771,11 @@ class GwInfo(QObject):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
                 widget.stateChanged.connect(partial(self.clean_my_json, widget))
-                widget.stateChanged.connect(partial(tools_qt.get_values, dialog, widget, _json))
+                widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.stateChanged.connect(partial(
                     self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature))
             else:
-                widget.stateChanged.connect(partial(tools_qt.get_values, dialog, widget, self.my_json))
+                widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
         return widget
 
 
@@ -3116,7 +3115,7 @@ class GwInfo(QObject):
         dlg_generic.rejected.connect(partial(tools_gw.close_dialog, dlg_generic))
         dlg_generic.btn_accept.clicked.connect(lambda: getattr(self, py_function_name)(dlg_generic))
 
-        tools_qt.populate_basic_info(dlg_generic, [json_result], self.field_id)
+        tools_gw.populate_basic_info(dlg_generic, [json_result], self.field_id)
 
         # Open dialog
         dlg_generic.setWindowTitle(f"{(form_name.lower()).capitalize().replace('_', ' ')}")
@@ -3385,7 +3384,7 @@ class GwInfo(QObject):
         for field in result['fields']:
             if field['linkedaction'] == 'action_link':
                 function_name = field['widgetfunction']
-                widget = dialog.findChild(tools_qt.GwHyperLinkLabel, field['widgetname'])
+                widget = dialog.findChild(GwHyperLinkLabel, field['widgetname'])
                 break
 
         if widget:

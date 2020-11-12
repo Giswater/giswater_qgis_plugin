@@ -125,8 +125,8 @@ class GwPrintButton(GwParentAction):
 
         for field in fields['fields']:
             label, widget = self.set_widgets_into_composer(dialog, field, self.my_json)
-            tools_qt.put_widgets(dialog, field, label, widget)
-            tools_qt.get_values(dialog, widget, self.my_json)
+            tools_gw.put_widgets(dialog, field, label, widget)
+            tools_gw.get_values(dialog, widget, self.my_json)
 
 
     def set_rotation(self, widget):
@@ -304,15 +304,15 @@ class GwPrintButton(GwParentAction):
             else:
                 label.setToolTip(field['label'].capitalize())
         if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
-            widget = tools_qt.add_lineedit(field)
-            widget = tools_qt.set_widget_size(widget, field)
-            widget = tools_qt.set_data_type(field, widget)
-            widget.editingFinished.connect(partial(tools_qt.get_values, dialog, widget, my_json))
-            widget.returnPressed.connect(partial(tools_qt.get_values, dialog, widget, my_json))
+            widget = tools_gw.add_lineedit(field)
+            widget = tools_gw.set_widget_size(widget, field)
+            widget = tools_gw.set_data_type(field, widget)
+            widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, my_json))
+            widget.returnPressed.connect(partial(tools_gw.get_values, dialog, widget, my_json))
         elif field['widgettype'] == 'combo':
             widget = tools_gw.add_combo(field)
-            widget = tools_qt.set_widget_size(widget, field)
-            widget.currentIndexChanged.connect(partial(tools_qt.get_values, dialog, widget, my_json))
+            widget = tools_gw.set_widget_size(widget, field)
+            widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, my_json))
             if 'widgetfunction' in field:
                 if field['widgetfunction'] is not None:
                     function_name = field['widgetfunction']
