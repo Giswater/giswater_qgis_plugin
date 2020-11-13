@@ -1447,7 +1447,7 @@ def populate_basic_info(dialog, result, field_id, my_json=None, new_feature_id=N
             widget = set_widget_size(widget, field)
             widget = set_data_type(field, widget)
             if field['widgettype'] == 'typeahead':
-                widget = manage_lineedit(field, dialog, widget, completer)
+                widget = set_typeahead(field, dialog, widget, completer)
 
         elif field['widgettype'] == 'datetime':
             widget = add_calendar(dialog, field)
@@ -1766,7 +1766,7 @@ def add_calendar(dialog, field):
     return widget
 
 
-def manage_lineedit(field, dialog, widget, completer):
+def set_typeahead(field, dialog, widget, completer):
 
     if field['widgettype'] == 'typeahead':
         if 'queryText' not in field or 'queryTextFilter' not in field:

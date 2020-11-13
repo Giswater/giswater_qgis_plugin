@@ -1293,7 +1293,7 @@ class GwInfo(QObject):
         """
         completer = QCompleter()
         widget = self.manage_text(dialog, complet_result, field, new_feature)
-        widget = tools_gw.manage_lineedit(field, dialog, widget, completer)
+        widget = tools_gw.set_typeahead(field, dialog, widget, completer)
         return widget
 
 

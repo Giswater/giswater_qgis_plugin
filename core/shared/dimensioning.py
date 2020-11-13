@@ -428,7 +428,7 @@ class GwDimensioning:
             widget = tools_gw.set_widget_size(widget, field)
             widget = tools_gw.set_data_type(field, widget)
             if field['widgettype'] == 'typeahead':
-                widget = tools_gw.manage_lineedit(field, dialog, widget, completer)
+                widget = tools_gw.set_typeahead(field, dialog, widget, completer)
         elif field['widgettype'] == 'combo':
             widget = tools_gw.add_combo(field)
             widget = tools_gw.set_widget_size(widget, field)
