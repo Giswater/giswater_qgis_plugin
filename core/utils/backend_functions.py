@@ -12,8 +12,9 @@ from qgis.PyQt.QtWidgets import QMessageBox, QWidget
 
 import os
 
-from ... import global_vars
 from ..utils import tools_gw
+from ... import global_vars
+from ...lib import tools_qgis
 
 
 def gw_function_dxf(**kwargs):
@@ -103,7 +104,7 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
             export_layer_to_db(dxf_layer, crs)
 
         if del_old_layers:
-            tools_gw.remove_layer_from_toc(dxf_layer.name())
+            tools_qgis.remove_layer_from_toc(dxf_layer.name(), 'GW Temporal Layers')
 
         if toc:
             if dxf_layer.isValid():

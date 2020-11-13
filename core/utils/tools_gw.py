@@ -822,7 +822,7 @@ def open_file_path(filter_="All (*.*)"):
 
 
 def from_postgres_to_toc(tablename=None, the_geom="the_geom", field_id="id", child_layers=None,
-    group="GW Layers", style_id="-1"):
+                         group="GW Layers", style_id="-1"):
     """ Put selected layer into TOC
     :param tablename: Postgres table name (String)
     :param the_geom: Geometry field of the table (String)
@@ -837,6 +837,8 @@ def from_postgres_to_toc(tablename=None, the_geom="the_geom", field_id="id", chi
     if child_layers is not None:
         for layer in child_layers:
             if layer[0] != 'Load all':
+                vlayer = global_vars.controller.get_layer_by_tablename(layer[0])
+                if vlayer: continue
                 uri.setDataSource(schema_name, f"{layer[0]}", the_geom, None, layer[1] + "_id")
                 vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
                 group = layer[4] if layer[4] is not None else group
@@ -945,7 +947,7 @@ def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                 except KeyError:
                     layer_name = 'Temporal layer'
                 if del_old_layers:
-                    remove_layer_from_toc(layer_name)
+                    tools_qgis.remove_layer_from_toc(layer_name, group)
                 v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
                 layer_name = None
                 # TODO This if controls if the function already works with GeoJson or is still to be refactored
@@ -1216,30 +1218,6 @@ def populate_vlayer_old(virtual_layer, data, layer_type, counter, group='GW Temp
         my_group = root.insertGroup(0, group)
 
     my_group.insertLayer(0, virtual_layer)
-
-
-def remove_layer_from_toc(layer_name):
-    """ Delete layer from toc if exist
-     :param layer_name: Name's layer (string)
-    """
-
-    layer = None
-    for lyr in list(QgsProject.instance().mapLayers().values()):
-        if lyr.name() == layer_name:
-            layer = lyr
-            break
-    if layer is not None:
-        # Remove layer
-        QgsProject.instance().removeMapLayer(layer)
-
-        # Remove group if is void
-        root = QgsProject.instance().layerTreeRoot()
-        group = root.findGroup('GW Temporal Layers')
-        if group:
-            layers = group.findLayers()
-            if not layers:
-                root.removeChildNode(group)
-        remove_layer_from_toc(layer_name)
 
 
 def disable_tabs(dialog):

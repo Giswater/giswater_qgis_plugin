@@ -74,24 +74,44 @@ class GwAddChildLayerButton(GwParentAction):
                 layers = self.iface.mapCanvas().layers()
                 for layer in layers:
                     layers_list.append(str(layer.name()))
-
                 if str(child_layer[0]) in layers_list:
                     action.setChecked(True)
 
                 sub_menu.addAction(action)
                 if child_layer[0] == 'Load all':
-                    action.triggered.connect(partial(tools_gw.from_postgres_to_toc, child_layers=child_layers))
-
+                    action.triggered.connect(partial(self.check_action_ischecked, None, "the_geom", "id", child_layers,
+                                                     "GW Layers", "-1"))
                 else:
                     layer_name = child_layer[0]
                     the_geom = "the_geom"
                     geom_field = child_layer[1] + "_id"
                     style_id = child_layer[3]
                     group = child_layer[4] if child_layer[4] is not None else 'GW Layers'
-                    action.triggered.connect(partial(tools_gw.from_postgres_to_toc, layer_name, the_geom,
-                                                     geom_field, None, group, style_id))
+                    action.triggered.connect(partial(self.check_action_ischecked, layer_name, the_geom, geom_field,
+                                                     None, group, style_id))
 
         main_menu.exec_(click_point)
+
+
+    def check_action_ischecked(self, tablename, the_geom, field_id, child_layers, group, style_id, is_checked):
+        """ Control if user check or uncheck action menu, then add or remove layer from toc
+        :param tablename: Postgres table name (String)
+        :param the_geom: Geometry field of the table (String)
+        :param field_id: Field id of the table (String)
+        :param child_layers: List of layers (StringList)
+        :param group: Name of the group that will be created in the toc (String)
+        :param style_id: Id of the style we want to load (integer or String)
+        :param is_checked: This parameter is sent by the action itself with the trigger (Bool)
+        """
+
+        if is_checked is True:
+            layer = self.controller.get_layer_by_tablename(tablename)
+            if layer is None:
+                tools_gw.from_postgres_to_toc(tablename, the_geom, field_id, child_layers, group, style_id)
+        elif is_checked is False:
+            layer = self.controller.get_layer_by_tablename(tablename)
+            if layer is not None:
+                tools_qgis.remove_layer_from_toc(tablename, group)
 
 
     def config_layers(self):

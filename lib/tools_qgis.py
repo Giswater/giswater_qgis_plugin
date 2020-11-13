@@ -904,3 +904,29 @@ def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=Non
 
     layer.triggerRepaint()
     global_vars.iface.layerTreeView().refreshLayerSymbology(layer.id())
+
+
+def remove_layer_from_toc(layer_name, group_name):
+    """ Delete layer from toc if exist
+
+     :param layer_name: Name's layer (string)
+     :param group_name: Name's group (string)
+    """
+
+    layer = None
+    for lyr in list(QgsProject.instance().mapLayers().values()):
+        if lyr.name() == layer_name:
+            layer = lyr
+            break
+    if layer is not None:
+        # Remove layer
+        QgsProject.instance().removeMapLayer(layer)
+
+        # Remove group if is void
+        root = QgsProject.instance().layerTreeRoot()
+        group = root.findGroup(group_name)
+        if group:
+            layers = group.findLayers()
+            if not layers:
+                root.removeChildNode(group)
+        remove_layer_from_toc(layer_name, group_name)

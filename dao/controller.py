@@ -1950,7 +1950,7 @@ class DaoController:
                             if json_result['body']['data'][key]['layerName']:
                                 layer_name = json_result['body']['data'][key]['layerName']
 
-                        tools_gw.remove_layer_from_toc(layer_name)
+                        tools_qgis.remove_layer_from_toc(layer_name, 'GW Temporal Layers')
 
                         # Get values for create and populate layer
                         counter = len(json_result['body']['data'][key]['features'])
