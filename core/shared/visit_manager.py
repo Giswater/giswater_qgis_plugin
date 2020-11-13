@@ -1095,7 +1095,7 @@ class GwVisitManager:
     def manage_document(self, qtable):
         """Access GUI to manage documents e.g Execute action of button 34 """
 
-        visit_id = tools_qt.getText(self.dlg_add_visit, self.dlg_add_visit.visit_id)
+        visit_id = tools_qt.getWidgetText(self.dlg_add_visit, self.dlg_add_visit.visit_id)
         manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.manage_document(
             tablename='visit', qtable=self.dlg_add_visit.tbl_document, item_id=visit_id)

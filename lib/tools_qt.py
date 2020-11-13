@@ -7,24 +7,23 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.core import QgsExpression, QgsProject
 from qgis.gui import QgsDateTimeEdit
-from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, QSettings, \
-    pyqtSignal
+from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator, QStandardItemModel, \
     QStandardItem, QIcon
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, \
     QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, QPlainTextEdit, \
-    QRadioButton, QSizePolicy, QSpacerItem, QGridLayout, QToolButton, QApplication, QFileDialog, QGroupBox
+    QRadioButton, QSizePolicy, QSpacerItem, QFileDialog, QGroupBox
 
 import os
 import operator
-from .. import global_vars
 import re
 import sys
 import subprocess
 import webbrowser
 from functools import partial
 
+from .. import global_vars
 from ..core.utils import tools_gw
 from . import tools_qgis
 
@@ -91,8 +90,6 @@ def fillComboBoxList(dialog, widget, list_object, allow_nulls=True, clear_combo=
         widget.addItem('')
     for elem in list_object:
         widget.addItem(str(elem))
-
-
 
 
 def getCalendarDate(dialog, widget, date_format="yyyy/MM/dd", datetime_format="yyyy/MM/dd hh:mm:ss"):
@@ -1455,7 +1452,7 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
     expr = None
     if expr_filter:
         # Check expression
-        (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = check_expression_filter(expr_filter)  # @UnusedVariable
         if not is_valid:
             return expr
 
@@ -1650,7 +1647,7 @@ def get_expr_filter(geom_type, list_ids=None, layers=None):
     expr_filter = expr_filter[:-2] + ")"
 
     # Check expression
-    (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
+    (is_valid, expr) = check_expression_filter(expr_filter)
     if not is_valid:
         return None
 

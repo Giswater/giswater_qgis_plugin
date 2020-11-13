@@ -1738,7 +1738,7 @@ class GwInfo(QObject):
                 cur_value = tools_qt.getWidgetText(dialog, widget)
                 value = field["value"]
                 if str(cur_value) != str(value):
-                    tools_qt.setText(dialog, widget, value)
+                    tools_qt.setWidgetText(dialog, widget, value)
                     widget.setStyleSheet("border: 2px solid #3ED396")
             elif "message" in field:
                 level = field['message']['level'] if 'level' in field['message'] else 0
@@ -3134,7 +3134,7 @@ class GwInfo(QObject):
                 plan_layout.addItem(plan_vertical_spacer)
 
 
-    def add_label(field):
+    def add_label(self, field):
         """ Add widgets QLineEdit type """
 
         widget = QLabel()
@@ -3149,6 +3149,8 @@ class GwInfo(QObject):
 
 
     def call_action_function(self, sql_function_name, py_function_name, form_name):
+
+        json_result = None
         if sql_function_name is not None:
             body = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
             body += f'"form":{{"formName":"{form_name}", "tabName":"data", "editable":"TRUE"}}, '
@@ -3163,6 +3165,7 @@ class GwInfo(QObject):
 
         dlg_generic = InfoGenericUi()
         tools_gw.load_settings(dlg_generic)
+
         # Set signals
         dlg_generic.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_generic))
         dlg_generic.rejected.connect(partial(tools_gw.close_dialog, dlg_generic))

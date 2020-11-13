@@ -34,7 +34,7 @@ from ..i18n.i18n_generator import GwI18NGenerator
 from .ui.ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjectInfoUi, \
     MainGisProjectUi, MainImportUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
 from .utils import tools_gw
-from ..lib import tools_qt
+
 
 class GwAdmin:
 
@@ -1921,9 +1921,9 @@ class GwAdmin:
         # qt_tools.set_item_data(self.dlg_readsql.cmb_visit_class, rows, 1)
 
         # Set listeners
-        self.dlg_readsql.btn_visit_create.clicked.connect(partial(self.create_visit_param))
-        self.dlg_readsql.btn_visit_update.clicked.connect(partial(self.update_visit))
-        self.dlg_readsql.btn_visit_delete.clicked.connect(partial(self.delete_visit))
+        # self.dlg_readsql.btn_visit_create.clicked.connect(partial(self.create_visit_param))
+        # self.dlg_readsql.btn_visit_update.clicked.connect(partial(self.update_visit))
+        # self.dlg_readsql.btn_visit_delete.clicked.connect(partial(self.delete_visit))
 
 
     def create_visit_class(self):
@@ -1949,7 +1949,8 @@ class GwAdmin:
 
 
     def create_visit_param(self):
-        return
+
+        """
         # Create the dialog and signals
         self.dlg_manage_visit_param = MainVisitParam()
         tools_gw.load_settings(self.dlg_manage_visit_param)
@@ -1975,6 +1976,8 @@ class GwAdmin:
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_manage_visit_param, dlg_name='main_visitparam')
+        """
+
         return
 
 
@@ -1986,6 +1989,7 @@ class GwAdmin:
     def delete_visit(self):
 
         return
+
 
     def show_info(self):
 

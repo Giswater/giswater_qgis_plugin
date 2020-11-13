@@ -15,6 +15,7 @@ import os
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_qgis
+from ...lib import tools_qt
 
 
 def gw_function_dxf(**kwargs):
@@ -117,7 +118,7 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
     extras = "  "
     for widget in dialog.grb_parameters.findChildren(QWidget):
         widget_name = widget.property('columnname')
-        value = tools_gw.getWidgetText(dialog, widget, add_quote=False)
+        value = tools_qt.getWidgetText(dialog, widget, add_quote=False)
         extras += f'"{widget_name}":"{value}", '
     extras = extras[:-2]
     body = tools_gw.create_body(extras)
@@ -126,7 +127,6 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
         return False
 
     return {"path": dxf_path, "result": result, "temp_layers_added": temp_layers_added}
-
 
 
 def from_dxf_to_toc(dxf_layer, dxf_output_filename):
