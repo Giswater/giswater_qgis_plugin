@@ -500,9 +500,9 @@ class GwInfo(QObject):
         my_json = self.my_json
         if layer:
             if layer.isEditable():
-                tools_qt.enable_all(dlg_cf, self.complet_result[0]['body']['data'])
+                tools_gw.enable_all(dlg_cf, self.complet_result[0]['body']['data'])
             else:
-                tools_qt.disable_all(dlg_cf, self.complet_result[0]['body']['data'], False)
+                tools_gw.disable_widgets(dlg_cf, self.complet_result[0]['body']['data'], False)
 
 
         # We assign the function to a global variable,
@@ -1123,7 +1123,7 @@ class GwInfo(QObject):
             self.get_last_value()
             if str(self.my_json) == '{}':
                 tools_qt.check_actions(action_edit, False)
-                tools_qt.disable_all(dialog, self.complet_result[0]['body']['data'], False)
+                tools_gw.disable_widgets(dialog, self.complet_result[0]['body']['data'], False)
                 self.enable_actions(dialog, False)
                 return
             save = self.ask_for_save(action_edit, fid)
@@ -1137,7 +1137,7 @@ class GwInfo(QObject):
                     tools_gw.close_dialog(dialog)
         else:
             tools_qt.check_actions(action_edit, True)
-            tools_qt.enable_all(dialog, self.complet_result[0]['body']['data'])
+            tools_gw.enable_all(dialog, self.complet_result[0]['body']['data'])
             self.enable_actions(dialog, True)
 
 
@@ -1155,7 +1155,7 @@ class GwInfo(QObject):
         status = self.accept(dialog, self.complet_result[0], my_json, close_dlg=close_dlg, new_feature=new_feature)
         if status is True:  # Commit succesfull and dialog keep opened
             tools_qt.check_actions(action_edit, False)
-            tools_qt.disable_all(dialog, self.complet_result[0]['body']['data'], False)
+            tools_gw.disable_widgets(dialog, self.complet_result[0]['body']['data'], False)
             self.enable_actions(dialog, False)
 
 
@@ -1166,7 +1166,7 @@ class GwInfo(QObject):
             layer.commitChanges()
             self.connect_signals()
             tools_qt.check_actions(action_edit, False)
-            tools_qt.disable_all(dialog, self.complet_result[0]['body']['data'], False)
+            tools_gw.disable_widgets(dialog, self.complet_result[0]['body']['data'], False)
             self.enable_actions(dialog, False)
             self.connect_signals()
         else:
@@ -1181,7 +1181,7 @@ class GwInfo(QObject):
         self.disconnect_signals()
         self.iface.setActiveLayer(layer)
         tools_qt.check_actions(action_edit, True)
-        tools_qt.enable_all(dialog, self.complet_result[0]['body']['data'])
+        tools_gw.enable_all(dialog, self.complet_result[0]['body']['data'])
         self.enable_actions(dialog, True)
         layer.startEditing()
         self.connect_signals()
@@ -1615,12 +1615,12 @@ class GwInfo(QObject):
         """
         functions called in ->  widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn):
             def integer_validator(self, value, widget, btn_accept)
-            def double_validator(self, value, widget, btn_accept)
+            def double_validator(tools_qt, value, widget, btn_accept)
         """
 
         value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
         try:
-            getattr(self, f"{widget.property('datatype')}_validator")(value, widget, btn)
+            getattr(tools_qt, f"{widget.property('datatype')}_validator")(value, widget, btn)
         except AttributeError:
             """ If the function called by getattr don't exist raise this exception """
 

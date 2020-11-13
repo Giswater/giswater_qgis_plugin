@@ -912,7 +912,7 @@ class GwVisitManager:
         self.dlg_man.btn_open.clicked.connect(
             partial(self.open_selected_object_visit, self.dlg_man, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.btn_delete.clicked.connect(
-            partial(tools_qt.delete_selected_object, self.dlg_man.tbl_visit, table_object))
+            partial(tools_gw.delete_selected_rows, self.dlg_man.tbl_visit, table_object))
         self.dlg_man.txt_filter.textChanged.connect(partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit,
             self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
 

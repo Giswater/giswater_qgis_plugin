@@ -19,7 +19,7 @@ from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint, QDa
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
     QCompleter, QFileDialog, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit,\
-    QTextEdit, QToolButton
+    QTextEdit, QToolButton, QWidget
 from qgis.core import QgsProject, QgsExpression, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
     QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
     QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest
@@ -1218,6 +1218,96 @@ def populate_vlayer_old(virtual_layer, data, layer_type, counter, group='GW Temp
         my_group = root.insertGroup(0, group)
 
     my_group.insertLayer(0, virtual_layer)
+
+
+def disable_widgets(dialog, result, enable):
+
+    try:
+        widget_list = dialog.findChildren(QWidget)
+        for widget in widget_list:
+            for field in result['fields']:
+                if widget.property('columnname') == field['columnname']:
+                    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
+                        widget.setReadOnly(not enable)
+                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                    elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
+                        widget.setEnabled(enable)
+                        widget.setStyleSheet("QWidget {color: rgb(0, 0, 0)}")
+                    elif type(widget) is QPushButton:
+                        # Manage the clickability of the buttons according to the configuration
+                        # in the table config_api_form_fields simultaneously with the edition,
+                        # but giving preference to the configuration when iseditable is True
+                        if not field['iseditable']:
+                            widget.setEnabled(field['iseditable'])
+                    break
+
+    except RuntimeError as e:
+        pass
+
+
+def enable_all(dialog, result):
+    try:
+        widget_list = dialog.findChildren(QWidget)
+        for widget in widget_list:
+            if widget.property('keepDisbled'):
+                continue
+            for field in result['fields']:
+                if widget.objectName() == field['widgetname']:
+                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
+                        widget.setReadOnly(not field['iseditable'])
+                        if not field['iseditable']:
+                            widget.setFocusPolicy(Qt.NoFocus)
+                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
+                        else:
+                            widget.setFocusPolicy(Qt.StrongFocus)
+                            widget.setStyleSheet(None)
+                    elif type(widget) in (QComboBox, QgsDateTimeEdit):
+                        widget.setEnabled(field['iseditable'])
+                        widget.setStyleSheet(None)
+                        widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
+                            field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
+                    elif type(widget) in (QCheckBox, QPushButton):
+                        widget.setEnabled(field['iseditable'])
+                        widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
+                            field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
+    except RuntimeError:
+        pass
+
+
+def delete_selected_rows(widget, table_object):
+    """ Delete selected objects of the table (by object_id) """
+
+    # Get selected rows
+    selected_list = widget.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        global_vars.controller.show_warning(message)
+        return
+
+    inf_text = ""
+    list_id = ""
+    field_object_id = "id"
+
+    if table_object == "element":
+        field_object_id = table_object + "_id"
+    elif "v_ui_om_visitman_x_" in table_object:
+        field_object_id = "visit_id"
+
+    for i in range(0, len(selected_list)):
+        row = selected_list[i].row()
+        id_ = widget.model().record(row).value(str(field_object_id))
+        inf_text += f"{id_}, "
+        list_id += f"'{id_}', "
+    inf_text = inf_text[:-2]
+    list_id = list_id[:-2]
+    message = "Are you sure you want to delete these records?"
+    title = "Delete records"
+    answer = global_vars.controller.ask_question(message, title, inf_text)
+    if answer:
+        sql = (f"DELETE FROM {table_object} "
+               f"WHERE {field_object_id} IN ({list_id})")
+        global_vars.controller.execute_sql(sql)
+        widget.model().select()
 
 
 def disable_tabs(dialog):

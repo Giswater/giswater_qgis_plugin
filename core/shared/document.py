@@ -333,7 +333,7 @@ class GwDocument:
         self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))
         self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))
         self.dlg_man.btn_delete.clicked.connect(
-            partial(tools_qt.delete_selected_object, self.dlg_man.tbl_document, table_object))
+            partial(tools_gw.delete_selected_rows, self.dlg_man.tbl_document, table_object))
 
         # Open form
         tools_gw.open_dialog(self.dlg_man, dlg_name='doc_manager')

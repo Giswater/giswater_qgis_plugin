@@ -490,7 +490,7 @@ def enable_disable_tab_by_tabName(tab_widget, tab_name, action):
             break
 
 
-def double_validator(widget, min_=0, max_=999999, decimals=3, notation=QDoubleValidator().StandardNotation):
+def double_validator(widget, min_=-9999999, max_=9999999, decimals=2, notation=QDoubleValidator().StandardNotation):
 
     validator = QDoubleValidator(min_, max_, decimals)
     validator.setNotation(notation)
@@ -822,60 +822,6 @@ def set_setStyleSheet(field, widget, wtype='label'):
     return widget
 
 
-def disable_all(dialog, result, enable):
-
-    try:
-        widget_list = dialog.findChildren(QWidget)
-        for widget in widget_list:
-            for field in result['fields']:
-                if widget.property('columnname') == field['columnname']:
-                    if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
-                        widget.setReadOnly(not enable)
-                        widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                    elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
-                        widget.setEnabled(enable)
-                        widget.setStyleSheet("QWidget {color: rgb(0, 0, 0)}")
-                    elif type(widget) is QPushButton:
-                        # Manage the clickability of the buttons according to the configuration
-                        # in the table config_api_form_fields simultaneously with the edition,
-                        # but giving preference to the configuration when iseditable is True
-                        if not field['iseditable']:
-                            widget.setEnabled(field['iseditable'])
-                    break
-
-    except RuntimeError as e:
-        pass
-
-
-def enable_all(dialog, result):
-    try:
-        widget_list = dialog.findChildren(QWidget)
-        for widget in widget_list:
-            if widget.property('keepDisbled'):
-                continue
-            for field in result['fields']:
-                if widget.objectName() == field['widgetname']:
-                    if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
-                        widget.setReadOnly(not field['iseditable'])
-                        if not field['iseditable']:
-                            widget.setFocusPolicy(Qt.NoFocus)
-                            widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
-                        else:
-                            widget.setFocusPolicy(Qt.StrongFocus)
-                            widget.setStyleSheet(None)
-                    elif type(widget) in (QComboBox, QgsDateTimeEdit):
-                        widget.setEnabled(field['iseditable'])
-                        widget.setStyleSheet(None)
-                        widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
-                            field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
-                    elif type(widget) in (QCheckBox, QPushButton):
-                        widget.setEnabled(field['iseditable'])
-                        widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
-                            field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
-    except RuntimeError:
-        pass
-
-
 def add_layer_to_toc(layer, group=None):
     """ If the function receives a group name, check if it exists or not and put the layer in this group
     :param layer: (QgsVectorLayer)
@@ -1074,42 +1020,6 @@ def filter_by_id(dialog, widget_table, widget_txt, table_object):
         widget_table.model().select()
     else:
         fill_table_object(widget_table, global_vars.schema_name + "." + table_object)
-
-
-def delete_selected_object(widget, table_object):
-    """ Delete selected objects of the table (by object_id) """
-
-    # Get selected rows
-    selected_list = widget.selectionModel().selectedRows()
-    if len(selected_list) == 0:
-        message = "Any record selected"
-        global_vars.controller.show_warning(message)
-        return
-
-    inf_text = ""
-    list_id = ""
-    field_object_id = "id"
-
-    if table_object == "element":
-        field_object_id = table_object + "_id"
-    elif "v_ui_om_visitman_x_" in table_object:
-        field_object_id = "visit_id"
-
-    for i in range(0, len(selected_list)):
-        row = selected_list[i].row()
-        id_ = widget.model().record(row).value(str(field_object_id))
-        inf_text += f"{id_}, "
-        list_id += f"'{id_}', "
-    inf_text = inf_text[:-2]
-    list_id = list_id[:-2]
-    message = "Are you sure you want to delete these records?"
-    title = "Delete records"
-    answer = global_vars.controller.ask_question(message, title, inf_text)
-    if answer:
-        sql = (f"DELETE FROM {table_object} "
-               f"WHERE {field_object_id} IN ({list_id})")
-        global_vars.controller.execute_sql(sql)
-        widget.model().select()
 
 
 def set_selectionbehavior(dialog):

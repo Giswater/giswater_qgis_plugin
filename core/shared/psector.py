@@ -163,11 +163,11 @@ class GwPsector:
 
         # tab Bugdet
         gexpenses = self.dlg_plan_psector.findChild(QLineEdit, "gexpenses")
-        self.double_validator(gexpenses)
+        tools_qt.double_validator(gexpenses)
         vat = self.dlg_plan_psector.findChild(QLineEdit, "vat")
-        self.double_validator(vat)
+        tools_qt.double_validator(vat)
         other = self.dlg_plan_psector.findChild(QLineEdit, "other")
-        self.double_validator(other)
+        tools_qt.double_validator(other)
 
         self.enable_tabs(False)
         self.enable_buttons(False)
@@ -805,12 +805,6 @@ class GwPsector:
             row = selected_list[i].row()
             des = self.dlg_plan_psector.all_rows.model().record(row).value('descript')
         tools_qt.setWidgetText(self.dlg_plan_psector, self.lbl_descript, des)
-
-
-    def double_validator(self, widget):
-        validator = QDoubleValidator(-9999999, 99, 2)
-        validator.setNotation(QDoubleValidator().StandardNotation)
-        widget.setValidator(validator)
 
 
     def enable_tabs(self, enabled):
