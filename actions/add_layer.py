@@ -106,6 +106,8 @@ class AddLayer(object):
         if child_layers is not None:
             for layer in child_layers:
                 if layer[0] != 'Load all':
+                    vlayer = self.controller.get_layer_by_tablename(layer[0])
+                    if vlayer: continue
                     self.uri.setDataSource(schema_name, f'{layer[0]}', the_geom, None, layer[1] + "_id")
                     vlayer = QgsVectorLayer(self.uri.uri(), f'{layer[0]}', "postgres")
                     self.check_for_group(vlayer, group)
@@ -547,7 +549,7 @@ class AddLayer(object):
         my_group.insertLayer(0, virtual_layer)
 
 
-    def delete_layer_from_toc(self, layer_name):
+    def delete_layer_from_toc(self, layer_name, group_name='GW Temporal Layers'):
         """ Delete layer from toc if exist
          :param layer_name: Name's layer (string)
         """
@@ -563,7 +565,7 @@ class AddLayer(object):
 
             # Remove group if is void
             root = QgsProject.instance().layerTreeRoot()
-            group = root.findGroup('GW Temporal Layers')
+            group = root.findGroup(group_name)
             if group:
                 layers = group.findLayers()
                 if not layers:

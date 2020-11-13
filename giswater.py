@@ -1095,13 +1095,34 @@ class Giswater(QObject):
 
                 sub_menu.addAction(action)
                 if child_layer[0] == 'Load all':
-                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc,
-                        child_layers=child_layers, group=None))
+                    action.triggered.connect(partial(self.check_action_ischecked, None, "the_geom", "id", child_layers,
+                                                     "GW Layers"))
                 else:
-                    action.triggered.connect(partial(self.add_layer.from_postgres_to_toc,
-                        child_layer[0], "the_geom", child_layer[1] + "_id", None, None))
+                    action.triggered.connect(partial(self.check_action_ischecked, child_layer[0], "the_geom", child_layer[1] + "_id",
+                                                     None, "GW Layers"))
 
         main_menu.exec_(click_point)
+
+
+    def check_action_ischecked(self, tablename, the_geom, field_id, child_layers, group, is_checked):
+
+        """ Control if user check or uncheck action menu, then add or remove layer from toc
+        :param tablename: Postgres table name (String)
+        :param the_geom: Geometry field of the table (String)
+        :param field_id: Field id of the table (String)
+        :param child_layers: List of layers (StringList)
+        :param group: Name of the group that will be created in the toc (String)
+        :param is_checked: This parameter is sent by the action itself with the trigger (Bool)
+        """
+
+        if is_checked is True:
+            layer = self.controller.get_layer_by_tablename(tablename)
+            if layer is None:
+                self.add_layer.from_postgres_to_toc(tablename, the_geom, field_id, child_layers, group)
+        elif is_checked is False:
+            layer = self.controller.get_layer_by_tablename(tablename)
+            if layer is not None:
+                self.add_layer.delete_layer_from_toc(tablename, group)
 
 
     def get_new_layers_name(self, layers_list):
