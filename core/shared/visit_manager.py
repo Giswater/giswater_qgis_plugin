@@ -349,7 +349,7 @@ class GwVisitManager:
         # Set 'expr_filter' with features that are in the list
         if self.locked_feature_id:
             expr_filter = f'"{self.geom_type}_id" IN (\'{self.locked_feature_id}\')'
-            (is_valid, expr) = tools_gw.check_expression(expr_filter)
+            (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
             if not is_valid:
                 return
 
@@ -667,7 +667,6 @@ class GwVisitManager:
             sql += f"AND UPPER(feature_type) = '{self.feature_type.currentText().upper()}' "
         sql += f"ORDER BY id"
         rows = self.controller.get_rows(sql)
-        print(rows)
         if rows:
             tools_qt.set_item_data(dialog.parameter_id, rows, 1)
 
@@ -861,7 +860,7 @@ class GwVisitManager:
         # Select list of related features
         # Set 'expr_filter' with features that are in the list
         expr_filter = f"{geom_type}_id IN ({','.join(ids)})"
-        (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
 

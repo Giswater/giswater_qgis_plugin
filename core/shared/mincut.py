@@ -104,9 +104,9 @@ class GwMincut:
         self.mincut_class = 1
         self.user_current_layer = self.iface.activeLayer()
         self.init_mincut_canvas()
-        tools_gw.delete_layer_from_toc('Overlap affected arcs')
-        tools_gw.delete_layer_from_toc('Other mincuts which overlaps')
-        tools_gw.delete_layer_from_toc('Overlap affected connecs')
+        tools_gw.remove_layer_from_toc('Overlap affected arcs')
+        tools_gw.remove_layer_from_toc('Other mincuts which overlaps')
+        tools_gw.remove_layer_from_toc('Overlap affected connecs')
 
         self.dlg_mincut = Mincut()
         tools_gw.load_settings(self.dlg_mincut)
@@ -887,7 +887,7 @@ class GwMincut:
         if len(self.connec_list) == 0:
             expr_filter = "\"connec_id\" =''"
         # Check expression
-        (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
 
@@ -920,7 +920,7 @@ class GwMincut:
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
-            (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
+            (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
             if not is_valid:
                 return
 
@@ -1090,7 +1090,7 @@ class GwMincut:
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
-            (is_valid, expr) = tools_gw.check_expression(expr_filter)
+            (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
             if not is_valid:
                 return
 
@@ -1120,7 +1120,7 @@ class GwMincut:
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
-            (is_valid, expr) = tools_gw.check_expression(expr_filter)
+            (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
             if not is_valid:
                 return
 
@@ -1200,7 +1200,7 @@ class GwMincut:
             if len(self.connec_list) == 0:
                 expr_filter = "\"connec_id\" =''"
             # Check expression
-            (is_valid, expr) = tools_gw.check_expression(expr_filter)
+            (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
             if not is_valid:
                 return
 
@@ -1237,7 +1237,7 @@ class GwMincut:
         expr = None
         if expr_filter:
             # Check expression
-            (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
+            (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
             if not is_valid:
                 return expr
 
@@ -1523,7 +1523,7 @@ class GwMincut:
             layer.select([feature_id])
             self.auto_mincut_execute(element_id, elem_type, snapped_point.x(), snapped_point.y())
             self.set_visible_mincut_layers()
-            self.snapper_manager.apply_snapping_options(self.previous_snapping)
+            self.snapper_manager.restore_snap_options(self.previous_snapping)
             self.remove_selection()
 
 

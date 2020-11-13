@@ -100,7 +100,7 @@ class GwParentMapTool(QgsMapTool):
         self.action.setChecked(False)
 
         # Restore previous snapping
-        self.snapper_manager.apply_snapping_options(self.previous_snapping)
+        self.snapper_manager.restore_snap_options(self.previous_snapping)
 
         # Enable snapping
         self.snapper_manager.enable_snapping(True)

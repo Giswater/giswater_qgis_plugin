@@ -530,7 +530,7 @@ class GwInfo(QObject):
         action_rotation.triggered.connect(partial(self.change_hemisphere, self.dlg_cf, action_rotation))
         action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
         action_section.triggered.connect(partial(self.open_section_form))
-        action_help.triggered.connect(partial(tools_qt.open_help, self.geom_type))
+        action_help.triggered.connect(partial(self.open_help, self.geom_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
         action_interpolate.triggered.connect(partial(self.activate_snapping, complet_result, self.ep))
 
@@ -572,6 +572,35 @@ class GwInfo(QObject):
         self.dlg_cf.setWindowTitle(title)
 
         return self.complet_result, self.dlg_cf
+
+
+    def open_help(self, geom_type):
+        """ Open PDF file with selected @project_type and @geom_type """
+
+        # Get locale of QGIS application
+        locale = QSettings().value('locale/userLocale').lower()
+        if locale == 'es_es':
+            locale = 'es'
+        elif locale == 'es_ca':
+            locale = 'ca'
+        elif locale == 'en_us':
+            locale = 'en'
+        project_type = global_vars.controller.get_project_type()
+        # Get PDF file
+        pdf_folder = os.path.join(global_vars.plugin_dir, f'resources{os.sep}png')
+        pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
+
+        # Open PDF if exists. If not open Spanish version
+        if os.path.exists(pdf_path):
+            os.system(pdf_path)
+        else:
+            locale = "es"
+            pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
+            if os.path.exists(pdf_path):
+                os.system(pdf_path)
+            else:
+                message = "File not found"
+                global_vars.controller.show_warning(message, parameter=pdf_path)
 
 
     def block_action_edit(self, dialog, action_edit, result, layer, fid, my_json, new_feature):
@@ -983,7 +1012,7 @@ class GwInfo(QObject):
             action_widget.setChecked(False)
 
         try:
-            self.snapper_manager.apply_snapping_options(self.previous_snapping)
+            self.snapper_manager.restore_snap_options(self.previous_snapping)
             self.vertex_marker.hide()
             global_vars.canvas.xyCoordinates.disconnect()
             emit_point.canvasClicked.disconnect()
@@ -1356,7 +1385,7 @@ class GwInfo(QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = tools_qt.add_vertical_spacer()
+        widget = tools_qt.add_verticalspacer()
         return widget
 
 
@@ -1374,7 +1403,7 @@ class GwInfo(QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = tools_qt.add_spinbox(field)
+        widget = tools_gw.add_spinbox(field)
         widget = self.set_auto_update_spinbox(field, dialog, widget, new_feature)
         return widget
 
@@ -1383,7 +1412,7 @@ class GwInfo(QObject):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
             widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
         """
-        widget = tools_qt.add_spinbox(field)
+        widget = tools_gw.add_spinbox(field)
         if 'widgetcontrols' in field and field['widgetcontrols'] and 'spinboxDecimals' in field['widgetcontrols']:
             widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
         widget = self.set_auto_update_spinbox(field, dialog, widget, new_feature)
@@ -2909,7 +2938,7 @@ class GwInfo(QObject):
         """ Put filter widgets into layout and set headers into QTableView """
 
         rpt_layout1 = dialog.findChild(QGridLayout, "rpt_layout1")
-        tools_qt.clear_gridlayout(rpt_layout1)
+        self.reset_grid_layout(rpt_layout1)
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
         complet_list = self.get_list(complet_result, tab_name=tab_name)
@@ -2945,6 +2974,16 @@ class GwInfo(QObject):
                                                            self.feature_type, self.tablename, self.field_id))
 
         return complet_list, widget_list
+
+
+    def reset_grid_layout(self, layout):
+        """  Remove all widgets of layout """
+
+        while layout.count() > 0:
+            child = layout.takeAt(0).widget()
+            if child:
+                child.setParent(None)
+                child.deleteLater()
 
 
     def set_listeners(self, complet_result, dialog, widget_list):
@@ -3085,7 +3124,7 @@ class GwInfo(QObject):
                             label.setToolTip(field['label'].capitalize())
 
                     if field['widgettype'] == 'label':
-                        widget = tools_qt.add_label(field)
+                        widget = self.add_label(field)
                         widget.setAlignment(Qt.AlignRight)
                         label.setWordWrap(True)
                         plan_layout.addWidget(label, field['layoutorder'], 0)
@@ -3093,6 +3132,20 @@ class GwInfo(QObject):
 
                 plan_vertical_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
                 plan_layout.addItem(plan_vertical_spacer)
+
+
+    def add_label(field):
+        """ Add widgets QLineEdit type """
+
+        widget = QLabel()
+        widget.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        widget.setObjectName(field['widgetname'])
+        if 'columnname' in field:
+            widget.setProperty('columnname', field['columnname'])
+        if 'value' in field:
+            widget.setText(field['value'])
+
+        return widget
 
 
     def call_action_function(self, sql_function_name, py_function_name, form_name):
@@ -3300,7 +3353,7 @@ class GwInfo(QObject):
         elif option == 'set_to_arc':
             # functions called in -> getattr(self, options[option][0])(feat_id) --> def set_to_arc(self, feat_id)
             getattr(self, options[option][1])(feat_id)
-        self.snapper_manager.apply_snapping_options(self.previous_snapping)
+        self.snapper_manager.restore_snap_options(self.previous_snapping)
         self.cancel_snapping_tool(dialog, action)
 
 

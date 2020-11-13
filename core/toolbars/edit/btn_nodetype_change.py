@@ -90,7 +90,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 
         # Check if the expression is valid
         expr_filter = f"node_id = '{self.node_id}'"
-        (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
         if layer:

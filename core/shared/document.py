@@ -84,7 +84,7 @@ class GwDocument:
         tools_qt.set_icon(self.dlg_add_doc.btn_snapping, "137")
         self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
         # Fill combo boxes
-        tools_qt.populate_combo_with_query(self.dlg_add_doc, "doc_type", "doc_type")
+        self.fill_combo_by_query(self.dlg_add_doc, "doc_type", "doc_type")
 
         # Set current/selected date and link
         if row:
@@ -147,6 +147,18 @@ class GwDocument:
         tools_gw.open_dialog(self.dlg_add_doc, dlg_name='doc', maximize_button=False)
 
         return self.dlg_add_doc
+
+
+    def fill_combo_by_query(self, dialog, widget, table_name, field_name="id"):
+        """ Executes query and fill combo box """
+
+        sql = (f"SELECT {field_name}"
+               f" FROM {table_name}"
+               f" ORDER BY {field_name}")
+        rows = global_vars.controller.get_rows(sql)
+        tools_qt.fillComboBox(dialog, widget, rows)
+        if rows:
+            tools_qt.setCurrentIndex(dialog, widget, 0)
 
 
     def activate_relations(self):

@@ -201,7 +201,7 @@ class SnappingConfigManager(object):
             return layer_settings
 
 
-    def apply_snapping_options(self, snappings_options):
+    def restore_snap_options(self, snappings_options):
         """ Function that applies selected snapping configuration """
 
         QgsProject.instance().blockSignals(True)
@@ -214,7 +214,7 @@ class SnappingConfigManager(object):
     def recover_snapping_options(self):
         """ Function to restore the previous snapping configuration """
 
-        self.apply_snapping_options(self.previous_snapping)
+        self.restore_snap_options(self.previous_snapping)
 
 
     def get_snapper(self):
@@ -614,20 +614,6 @@ def refresh_legend(controller):
                 ln.setData(current_state, Qt.CheckStateRole)
 
 
-def check_expression(expr_filter, log_info=False):
-    """ Check if expression filter @expr is valid """
-
-    if log_info:
-        global_vars.controller.log_info(expr_filter)
-    expr = QgsExpression(expr_filter)
-    if expr.hasParserError():
-        message = "Expression Error"
-        global_vars.controller.log_warning(message, parameter=expr_filter)
-        return False, expr
-
-    return True, expr
-
-
 def get_cursor_multiple_selection():
     """ Set cursor for multiple selection """
 
@@ -689,32 +675,6 @@ def get_plugin_version():
         global_vars.controller.show_warning(message)
 
     return plugin_version
-
-
-def manage_actions(json_result, sql):
-    """
-    Manage options for layers (active, visible, zoom and indexing)
-    :param json_result: Json result of a query (Json)
-    :return: None
-    """
-
-    try:
-        actions = json_result['body']['python_actions']
-    except KeyError:
-        return
-    try:
-        for action in actions:
-            try:
-                function_name = action['funcName']
-                params = action['params']
-                getattr(global_vars.controller.gw_infotools, f"{function_name}")(**params)
-            except AttributeError as e:
-                # If function_name not exist as python function
-                global_vars.controller.log_warning(f"Exception error: {e}")
-            except Exception as e:
-                global_vars.controller.log_debug(f"{type(e).__name__}: {e}")
-    except Exception as e:
-        global_vars.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
 
 
 def draw(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
@@ -791,12 +751,7 @@ def reset_lists(ids, list_ids):
     """ Reset list of selected records """
 
     ids = []
-    list_ids = {}
-    list_ids['arc'] = []
-    list_ids['node'] = []
-    list_ids['connec'] = []
-    list_ids['gully'] = []
-    list_ids['element'] = []
+    list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
 
     return ids, list_ids
 
@@ -804,12 +759,7 @@ def reset_lists(ids, list_ids):
 def reset_layers(layers):
     """ Reset list of layers """
 
-    layers = {}
-    layers['arc'] = []
-    layers['node'] = []
-    layers['connec'] = []
-    layers['gully'] = []
-    layers['element'] = []
+    layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
 
     return layers
 
@@ -834,6 +784,7 @@ def tab_feature_changed(dialog, excluded_layers=[]):
         geom_type = "element"
     hide_generic_layers(excluded_layers=excluded_layers)
     viewname = f"v_edit_{geom_type}"
+
     # Adding auto-completion to a QLineEdit
     set_completer_feature_id(dialog.feature_id, geom_type, viewname)
     global_vars.iface.actionPan().trigger()
@@ -890,7 +841,7 @@ def from_postgres_to_toc(tablename=None, the_geom="the_geom", field_id="id", chi
                 vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
                 group = layer[4] if layer[4] is not None else group
                 group = group if group is not None else 'GW Layers'
-                check_for_group(vlayer, group)
+                tools_qt.add_layer_to_toc(vlayer, group)
                 style_id = layer[3]
                 if style_id is not None:
                     body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
@@ -903,7 +854,7 @@ def from_postgres_to_toc(tablename=None, the_geom="the_geom", field_id="id", chi
     else:
         uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
         vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
-        check_for_group(vlayer, group)
+        tools_qt.add_layer_to_toc(vlayer, group)
         # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
         # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
         # therefore, we define it with "-1"
@@ -956,23 +907,6 @@ def load_qml(layer, qml_path):
     return True
 
 
-def check_for_group(layer, group=None):
-    """ If the function receives a group name, check if it exists or not and put the layer in this group
-    :param layer: (QgsVectorLayer)
-    :param group: Name of the group that will be created in the toc (string)
-    """
-
-    if group is None:
-        QgsProject.instance().addMapLayer(layer)
-    else:
-        QgsProject.instance().addMapLayer(layer, False)
-        root = QgsProject.instance().layerTreeRoot()
-        my_group = root.findGroup(group)
-        if my_group is None:
-            my_group = root.insertGroup(0, group)
-        my_group.insertLayer(0, layer)
-
-
 def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
                    group='GW Temporal Layers', disable_tabs=True):
     """ Add QgsVectorLayer into TOC
@@ -1011,7 +945,7 @@ def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                 except KeyError:
                     layer_name = 'Temporal layer'
                 if del_old_layers:
-                    delete_layer_from_toc(layer_name)
+                    remove_layer_from_toc(layer_name)
                 v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
                 layer_name = None
                 # TODO This if controls if the function already works with GeoJson or is still to be refactored
@@ -1028,7 +962,7 @@ def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                     size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
                     color_values = {'NEW': QColor(0, 255, 0), 'DUPLICATED': QColor(255, 0, 0),
                                     'EXISTS': QColor(240, 150, 0)}
-                    tools_qgis.categoryze_layer(v_layer, cat_field, size, color_values)
+                    tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values)
                 else:
                     if geometry_type == 'Point':
                         v_layer.renderer().symbol().setSize(3.5)
@@ -1284,7 +1218,7 @@ def populate_vlayer_old(virtual_layer, data, layer_type, counter, group='GW Temp
     my_group.insertLayer(0, virtual_layer)
 
 
-def delete_layer_from_toc(layer_name):
+def remove_layer_from_toc(layer_name):
     """ Delete layer from toc if exist
      :param layer_name: Name's layer (string)
     """
@@ -1305,7 +1239,7 @@ def delete_layer_from_toc(layer_name):
             layers = group.findLayers()
             if not layers:
                 root.removeChildNode(group)
-        delete_layer_from_toc(layer_name)
+        remove_layer_from_toc(layer_name)
 
 
 def disable_tabs(dialog):
@@ -1652,6 +1586,26 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
     return widget
 
 
+def add_spinbox(field):
+
+    widget = None
+    if 'value' in field:
+        if field['widgettype'] == 'spinbox':
+            widget = QSpinBox()
+    widget.setObjectName(field['widgetname'])
+    if 'columnname' in field:
+        widget.setProperty('columnname', field['columnname'])
+    if 'value' in field:
+        if field['widgettype'] == 'spinbox' and field['value'] != "":
+            widget.setValue(int(field['value']))
+    if 'iseditable' in field:
+        widget.setReadOnly(not field['iseditable'])
+        if not field['iseditable']:
+            widget.setStyleSheet("QDoubleSpinBox { background: rgb(0, 250, 0); color: rgb(100, 100, 100)}")
+
+    return widget
+
+
 def get_values(dialog, widget, _json=None):
 
     value = None
@@ -1668,7 +1622,6 @@ def get_values(dialog, widget, _json=None):
         _json[str(widget.property('columnname'))] = None
     else:
         _json[str(widget.property('columnname'))] = str(value)
-
 
 
 def add_checkbox(field):

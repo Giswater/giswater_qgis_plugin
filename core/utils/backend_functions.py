@@ -103,7 +103,7 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
             export_layer_to_db(dxf_layer, crs)
 
         if del_old_layers:
-            tools_gw.delete_layer_from_toc(dxf_layer.name())
+            tools_gw.remove_layer_from_toc(dxf_layer.name())
 
         if toc:
             if dxf_layer.isValid():

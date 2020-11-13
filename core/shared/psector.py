@@ -329,7 +329,7 @@ class GwPsector:
             if layer:
 
                 expr_filter = f"psector_id = '{psector_id}'"
-                (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
+                (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
                 if not is_valid:
                     return
 

@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from qgis.core import QgsExpression, QgsProject
 from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, QSettings, \
     pyqtSignal
@@ -691,35 +692,6 @@ def check_actions(action, enabled, dialog=None):
         pass
 
 
-def open_help(geom_type):
-    """ Open PDF file with selected @project_type and @geom_type """
-
-    # Get locale of QGIS application
-    locale = QSettings().value('locale/userLocale').lower()
-    if locale == 'es_es':
-        locale = 'es'
-    elif locale == 'es_ca':
-        locale = 'ca'
-    elif locale == 'en_us':
-        locale = 'en'
-    project_type = global_vars.controller.get_project_type()
-    # Get PDF file
-    pdf_folder = os.path.join(global_vars.plugin_dir, f'resources{os.sep}png')
-    pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
-
-    # Open PDF if exists. If not open Spanish version
-    if os.path.exists(pdf_path):
-        os.system(pdf_path)
-    else:
-        locale = "es"
-        pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
-        if os.path.exists(pdf_path):
-            os.system(pdf_path)
-        else:
-            message = "File not found"
-            global_vars.controller.show_warning(message, parameter=pdf_path)
-
-
 def set_headers(widget, field):
 
     standar_model = widget.model()
@@ -787,26 +759,9 @@ def set_columns_config(widget, table_name, sort_order=0, isQStandardItemModel=Fa
     return widget
 
 
-def add_label(field):
-    """ Add widgets QLineEdit type """
-
-    widget = QLabel()
-    widget.setTextInteractionFlags(Qt.TextSelectableByMouse)
-    widget.setObjectName(field['widgetname'])
-    if 'columnname' in field:
-        widget.setProperty('columnname', field['columnname'])
-    if 'value' in field:
-        widget.setText(field['value'])
-
-    return widget
-
-
 def set_calendar_empty(widget):
     """ Set calendar empty when click inner button of QgsDateTimeEdit because aesthetically it looks better"""
     widget.setEmpty()
-
-
-
 
 
 def add_horizontal_spacer():
@@ -815,30 +770,24 @@ def add_horizontal_spacer():
     return widget
 
 
-def add_vertical_spacer():
+def add_verticalspacer():
 
     widget = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
     return widget
 
 
-def add_spinbox(field):
+def check_expression_filter(expr_filter, log_info=False):
+    """ Check if expression filter @expr is valid """
 
-    widget = None
-    if 'value' in field:
-        if field['widgettype'] == 'spinbox':
-            widget = QSpinBox()
-    widget.setObjectName(field['widgetname'])
-    if 'columnname' in field:
-        widget.setProperty('columnname', field['columnname'])
-    if 'value' in field:
-        if field['widgettype'] == 'spinbox' and field['value'] != "":
-            widget.setValue(int(field['value']))
-    if 'iseditable' in field:
-        widget.setReadOnly(not field['iseditable'])
-        if not field['iseditable']:
-            widget.setStyleSheet("QDoubleSpinBox { background: rgb(0, 250, 0); color: rgb(100, 100, 100)}")
+    if log_info:
+        global_vars.controller.log_info(expr_filter)
+    expr = QgsExpression(expr_filter)
+    if expr.hasParserError():
+        message = "Expression Error"
+        global_vars.controller.log_warning(message, parameter=expr_filter)
+        return False, expr
 
-    return widget
+    return True, expr
 
 
 def fill_table(widget, table_name, expr_filter=None, set_edit_strategy=QSqlTableModel.OnManualSubmit):
@@ -863,16 +812,6 @@ def fill_table(widget, table_name, expr_filter=None, set_edit_strategy=QSqlTable
     widget.setModel(model)
     if expr_filter:
         widget.model().setFilter(expr_filter)
-
-
-def clear_gridlayout(layout):
-    """  Remove all widgets of layout """
-
-    while layout.count() > 0:
-        child = layout.takeAt(0).widget()
-        if child:
-            child.setParent(None)
-            child.deleteLater()
 
 
 def set_setStyleSheet(field, widget, wtype='label'):
@@ -937,16 +876,21 @@ def enable_all(dialog, result):
         pass
 
 
-def populate_combo_with_query(dialog, widget, table_name, field_name="id"):
-    """ Executes query and fill combo box """
+def add_layer_to_toc(layer, group=None):
+    """ If the function receives a group name, check if it exists or not and put the layer in this group
+    :param layer: (QgsVectorLayer)
+    :param group: Name of the group that will be created in the toc (string)
+    """
 
-    sql = (f"SELECT {field_name}"
-           f" FROM {table_name}"
-           f" ORDER BY {field_name}")
-    rows = global_vars.controller.get_rows(sql)
-    fillComboBox(dialog, widget, rows)
-    if rows:
-        setCurrentIndex(dialog, widget, 0)
+    if group is None:
+        QgsProject.instance().addMapLayer(layer)
+    else:
+        QgsProject.instance().addMapLayer(layer, False)
+        root = QgsProject.instance().layerTreeRoot()
+        my_group = root.findGroup(group)
+        if my_group is None:
+            my_group = root.insertGroup(0, group)
+        my_group.insertLayer(0, layer)
 
 
 def delete_records(dialog, table_object, query=False, geom_type=None, layers=None, ids=None, list_ids=None,
@@ -1021,7 +965,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
         expr_filter = expr_filter[:-2] + ")"
 
         # Check expression
-        (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = check_expression_filter(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
 
@@ -1031,7 +975,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
         reload_qtable(dialog, geom_type)
     else:
         reload_table(dialog, table_object, geom_type, expr_filter)
-        apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
+        set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Select features with previous filter
     # Build a list of feature id's and select them
@@ -1048,7 +992,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
     return ids, layers, list_ids
 
 
-def apply_lazy_init(widget, lazy_widget=None, lazy_init_function=None):
+def set_lazy_init(widget, lazy_widget=None, lazy_init_function=None):
     """Apply the init function related to the model. It's necessary
     a lazy init because model is changed everytime is loaded."""
 
@@ -1601,7 +1545,7 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
     expr = None
     if expr_filter:
         # Check expression
-        (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
         if not is_valid:
             return expr
 
@@ -1796,7 +1740,7 @@ def get_expr_filter(geom_type, list_ids=None, layers=None):
     expr_filter = expr_filter[:-2] + ")"
 
     # Check expression
-    (is_valid, expr) = tools_gw.check_expression(expr_filter)
+    (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
     if not is_valid:
         return None
 

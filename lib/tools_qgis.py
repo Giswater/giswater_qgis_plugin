@@ -522,7 +522,7 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
         expr_filter = expr_filter[:-2] + ")"
 
         # Check expression
-        (is_valid, expr) = tools_gw.check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
 
@@ -536,7 +536,7 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
         tools_qt.reload_qtable(dialog, geom_type)
     else:
         tools_qt.reload_table(dialog, table_object, geom_type, expr_filter)
-        tools_qt.apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
+        tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Remove selection in generic 'v_edit' layers
     if plan_om == 'plan':
@@ -587,7 +587,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
     expr_filter = f"{field_id} = '{feature_id}'"
 
     # Check expression
-    (is_valid, expr) = tools_gw.check_expression(expr_filter)
+    (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
     if not is_valid:
         return None
 
@@ -620,7 +620,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
     expr_filter = expr_filter[:-2] + ")"
 
     # Check expression
-    (is_valid, expr) = tools_gw.check_expression(expr_filter)
+    (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
     if not is_valid:
         return
 
@@ -638,7 +638,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
         layers = remove_selection()
     else:
         tools_qt.reload_table(dialog, table_object, geom_type, expr_filter)
-        tools_qt.apply_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
+        tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Update list
     list_ids[geom_type] = ids
@@ -860,7 +860,7 @@ def restore_user_layer(user_current_layer=None):
             global_vars.iface.setActiveLayer(layer)
 
 
-def categoryze_layer(layer, cat_field, size, color_values, unique_values=None):
+def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=None):
     """
     :param layer: QgsVectorLayer to be categorized (QgsVectorLayer)
     :param cat_field: Field to categorize (string)

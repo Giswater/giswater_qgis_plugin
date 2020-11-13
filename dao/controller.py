@@ -457,7 +457,7 @@ class DaoController:
 
         # Check duration message for developers
         dev_duration = tools_gw.get_parser_value('developers', 'show_message_durations')
-        if dev_duration is not None:
+        if dev_duration not in (None, "None"):
             duration = int(duration)
 
         msg = None
@@ -809,7 +809,7 @@ class DaoController:
 
         # Check log_sql for developers
         dev_log_sql = tools_gw.get_parser_value('developers', 'log_sql')
-        if dev_log_sql is not None:
+        if dev_log_sql not in (None, "None", "none"):
             log_sql = tools_gw.cast_boolean(dev_log_sql)
 
         row = self.get_row(sql, commit=commit, log_sql=log_sql)
@@ -838,11 +838,38 @@ class DaoController:
             # Layer styles
             self.manage_return_manager(json_result, sql, rubber_band)
             self.manage_layer_manager(json_result, sql)
-            tools_gw.manage_actions(json_result, sql)
+            self.get_actions_from_json(json_result, sql)
         except Exception:
             pass
 
         return json_result
+
+
+    def get_actions_from_json(self, json_result, sql):
+        """
+        Manage options for layers (active, visible, zoom and indexing)
+        :param json_result: Json result of a query (Json)
+        :return: None
+        """
+
+        try:
+            actions = json_result['body']['python_actions']
+        except KeyError:
+            return
+        try:
+            for action in actions:
+                try:
+                    function_name = action['funcName']
+                    params = action['params']
+                    getattr(self.gw_infotools, f"{function_name}")(**params)
+                except AttributeError as e:
+                    # If function_name not exist as python function
+                    self.log_warning(f"Exception error: {e}")
+                except Exception as e:
+                    self.log_debug(f"{type(e).__name__}: {e}")
+        except Exception as e:
+            self.manage_exception(None, f"{type(e).__name__}: {e}", sql)
+
 
 
     def translate_tooltip(self, context_name, widget, idx=None):
@@ -1923,7 +1950,7 @@ class DaoController:
                             if json_result['body']['data'][key]['layerName']:
                                 layer_name = json_result['body']['data'][key]['layerName']
 
-                        tools_gw.delete_layer_from_toc(layer_name)
+                        tools_gw.remove_layer_from_toc(layer_name)
 
                         # Get values for create and populate layer
                         counter = len(json_result['body']['data'][key]['features'])
@@ -1945,7 +1972,7 @@ class DaoController:
                                 color_values[item['id']] = color
                             cat_field = str(style_type[key]['field'])
                             size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
-                            tools_qgis.categoryze_layer(v_layer, cat_field, size, color_values)
+                            tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values)
 
                         elif style_type[key]['style'] == 'random':
                             size = style_type['width'] if 'width' in style_type and style_type['width'] else 2

@@ -314,7 +314,7 @@ class GwDimensioning:
             tools_qt.setWidgetText(self.dlg_dim, "feature_id", element_id)
             tools_qt.setWidgetText(self.dlg_dim, "feature_type", feat_type.upper())
 
-            self.snapper_manager.apply_snapping_options(self.previous_snapping)
+            self.snapper_manager.restore_snap_options(self.previous_snapping)
             self.deactivate_signals(action, emit_point)
             action.setChecked(False)
 
@@ -355,7 +355,7 @@ class GwDimensioning:
         self.y_symbol = self.dlg_dim.findChild(QLineEdit, "y_symbol")
         self.y_symbol.setText(str(int(point.y())))
 
-        self.snapper_manager.apply_snapping_options(self.previous_snapping)
+        self.snapper_manager.restore_snap_options(self.previous_snapping)
         self.deactivate_signals(action, emit_point)
         action.setChecked(False)
 
@@ -445,11 +445,11 @@ class GwDimensioning:
         elif field['widgettype'] == 'hspacer':
             widget = tools_qt.add_horizontal_spacer()
         elif field['widgettype'] == 'vspacer':
-            widget = tools_qt.add_vertical_spacer()
+            widget = tools_qt.add_verticalspacer()
         elif field['widgettype'] == 'textarea':
             widget = tools_gw.add_textarea(field)
         elif field['widgettype'] in 'spinbox':
-            widget = tools_qt.add_spinbox(field)
+            widget = tools_gw.add_spinbox(field)
         elif field['widgettype'] == 'tableview':
             widget = tools_gw.add_tableview(db_return, field)
             widget = tools_qt.set_headers(widget, field)
