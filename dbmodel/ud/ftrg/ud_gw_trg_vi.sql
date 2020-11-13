@@ -224,13 +224,15 @@ BEGIN
 				v_catalog = concat(NEW.shape::varchar(9),'-',NEW.other1::varchar(12));
 				UPDATE arc SET arccat_id=v_catalog WHERE arc_id=NEW.arc_id;
 				INSERT INTO inp_conduit (arc_id) VALUES (NEW.arc_id);
-				INSERT INTO cat_arc (id, shape, tsect_id) VALUES (v_catalog, NEW.shape::varchar(16), NEW.other1::varchar(16)) ON CONFLICT (id) DO nothing;
+				INSERT INTO cat_arc (id, shape, tsect_id) 
+				VALUES (v_catalog, NEW.shape::varchar(16), NEW.other1::varchar(16)) ON CONFLICT (id) DO nothing;
 								
 			ELSIF NEW.shape='CUSTOM' THEN
 				v_catalog = concat(NEW.shape::varchar(9),'-',NEW.other1::varchar(5),'-', NEW.other2::varchar(12));
 				UPDATE arc SET arccat_id=v_catalog WHERE arc_id=NEW.arc_id;
 				UPDATE inp_conduit SET barrels=NEW.other5::smallint WHERE arc_id=NEW.arc_id;
-				INSERT INTO cat_arc (id, shape, geom1, curve_id) VALUES (v_catalog, NEW.shape::varchar(16), NEW.other1::float, NEW.other1::varchar(16)) ON CONFLICT (id) DO nothing;				
+				INSERT INTO cat_arc (id, shape, geom1, curve_id) 
+				VALUES (v_catalog, NEW.shape::varchar(16), NEW.other1::float, NEW.other2::varchar(16)) ON CONFLICT (id) DO nothing;				
 			ELSE
 				v_epatype= (SELECT epa_type FROM arc WHERE arc_id=NEW.arc_id);
 				IF v_epatype='CONDUIT' THEN
