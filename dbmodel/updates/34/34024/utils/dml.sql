@@ -276,3 +276,33 @@ DELETE FROM config_param_user WHERE parameter='edit_element_doublegeom';
 DELETE FROM sys_param_user WHERE id='edit_element_doublegeom';
 
 UPDATE sys_param_user SET formname ='hidden' WHERE formname = 'hidden_value';
+
+-- 2020/11/14
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
+VALUES (3008, 'gw_fct_setarcreverse', 'utils', 'function','json', 'json', 
+'Function that reverse arc', 'role_edit', NULL) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_param_user(id, formname, 
+descript, 
+sys_role, project_type, isdeprecated)
+VALUES ('edit_arc_keepdepthval_when_reverse_geom', 'hidden', 
+'If value, when arc is reversed only id values from node_1 and node_2 will be exchanged, keeping depth values on same node (y1, y2, custom_y1, custom_y2, elev_1, elev_2, custom_elev_1, custom_elev_2, sys_elev_1, sys_elev_2) will remain on same node', 
+'role_edit', 'ud', 'false') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (357, 'Arc reverse', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (358, 'Reset user profile', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO config_toolbox
+VALUES (2922, 'Reset user profile', TRUE, '{"featureType":[]}', 
+'[{"widgetname":"user", "label":"User name:","widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,"value":"", "tooltip": "User name"},
+  {"widgetname":"fromUser", "label":"Copy from user (same role):","widgettype":"text","datatype":"text","layoutname":"grl_option_parameters","layoutorder":2,"value":"", "tooltip": "Optative user name to copy all values from it"}]',
+null, TRUE)
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_toolbox SET alias = 'Check backend configuration' WHERE alias = 'Check API configuration';
+
+UPDATE sys_function SET descript ='Function to reset user values. 
+Two options are enabled: 1-reset from default values; 2-reset from values of another user' WHERE id = 2922;

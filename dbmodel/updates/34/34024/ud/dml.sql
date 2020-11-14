@@ -22,9 +22,9 @@ update config_form_fields SET
 widgetcontrols= '{"autoupdateReloadFields":["node_1", "y1", "custom_y1", "custom_elev1", "sys_y1", "sys_elev1", "z1", "r1", "node_2", "y2", "custom_y2", "custom_elev2", "sys_y2", "sys_elev2", "z2", "r2","slope"]}'
 WHERE widgetcontrols::text like '%slope%';
 
-INSERT INTO sys_param_user(id, formname, 
-descript, 
-sys_role, project_type, isdeprecated)
-VALUES ('edit_arc_keepdepthval_when_reverse_geom', 'hidden', 
-'If value, when arc is reversed only id values from node_1 and node_2 will be exchanged, keeping depth values on same node (y1, y2, custom_y1, custom_y2, elev_1, elev_2, custom_elev_1, custom_elev_2, sys_elev_1, sys_elev_2) will remain on same node', 
-'role_edit', 'ud', 'false') ON CONFLICT (id) DO NOTHING;
+-- 2020/11/14
+INSERT INTO config_toolbox
+VALUES (3008, 'Arc reverse', TRUE, '{"featureType":["arc"]}',null, null, TRUE)
+ON CONFLICT (id) DO NOTHING;
+
+UPDATE config_toolbox SET alias = 'Linear Reference System' WHERE alias = 'LRS';
