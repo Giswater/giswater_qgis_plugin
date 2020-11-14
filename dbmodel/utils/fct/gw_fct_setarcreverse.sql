@@ -38,6 +38,7 @@ v_result_info json;
 v_result_point json;
 v_result_line json;
 v_selectionmode text;
+v_error_context text;
 
 BEGIN 
 
@@ -55,25 +56,26 @@ BEGIN
 	v_selectionmode := (p_data ->>'data')::json->>'selectionMode';
 	v_array :=  replace(replace(replace (v_id::text, ']', ')'),'"', ''''), '[', '(');
 
+	-- starting function
+	INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat('ARC REVERSE FUNCTION'));
+	INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat('------------------------------'));
+
 	IF v_selectionmode = 'previousSelection' THEN
 
-		-- execute
-		EXECUTE 'INSERT INTO anl_arc(fid, arc_id, the_geom, descript) 
-		SELECT 357, arc_id, the_geom, ''Arc reversed before reverse'' FROM arc WHERE arc_id IN ' ||v_array || ' ORDER BY arc_id';
-			
-		EXECUTE 'UPDATE arc SET the_geom=st_reverse(the_geom) WHERE arc_id IN ' ||v_array;
+		IF v_array ='()' THEN
+			INSERT INTO audit_check_data (fid, error_message) VALUES (357, 'ERROR: No arcs have been selected');
+		ELSE
+			-- execute
+			EXECUTE 'INSERT INTO anl_arc(fid, arc_id, the_geom, descript) 
+			SELECT 357, arc_id, the_geom, ''Arc reversed before reverse'' FROM arc WHERE arc_id IN ' ||v_array || ' ORDER BY arc_id';
+				
+			EXECUTE 'UPDATE arc SET the_geom=st_reverse(the_geom) WHERE arc_id IN ' ||v_array;
 
-		INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat('ARC REVERSE FUNCTION'));
-		INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat('-----------------------------'));
-		INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat ('Reversed arcs: arc_id --> ', 
-		(SELECT array_agg(arc_id) FROM (SELECT arc_id FROM anl_arc WHERE fid=357 AND cur_user=current_user)a )));
-
+			INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat ('Reversed arcs: arc_id --> ', 
+			(SELECT array_agg(arc_id) FROM (SELECT arc_id FROM anl_arc WHERE fid=357 AND cur_user=current_user)a )));
+		END IF;
 	ELSE 
-	
-		INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat('ARC REVERSE FUNCTION'));
-		INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat('-----------------------------'));
-		INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat ('Selection mode ''Whole selection'' is not enabled in this function.', 
-		(SELECT array_agg(arc_id) FROM (SELECT arc_id FROM anl_arc WHERE fid=357 AND cur_user=current_user)a )));
+		INSERT INTO audit_check_data (fid, error_message) VALUES (357, concat ('Selection mode ''Whole selection'' is not enabled in this function'));
 	END IF;
 		
 	-- get results
@@ -82,36 +84,22 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
-	-- lines
-	v_result = null;
-
-	SELECT jsonb_agg(features.feature) INTO v_result
-	FROM (
-  	SELECT jsonb_build_object(
-     'type',       'Feature',
-    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-    'properties', to_jsonb(row) - 'the_geom'
-  	) AS feature
-  	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript,fid, the_geom
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fid = 357) row) features;
-
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 
 
 	-- control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 
 	
 	-- return
-    RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
+	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||
-				'"point":'||v_result_point||','||
-				'"line":'||v_result_line||','||
 				'"setVisibleLayers":[]'||
 		       '}}'||
-	    '}')::json;
+	'}')::json;
+
+	--EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
     
 END;  
 $BODY$

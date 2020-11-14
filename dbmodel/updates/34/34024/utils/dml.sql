@@ -303,6 +303,7 @@ null, TRUE)
 ON CONFLICT (id) DO NOTHING;
 
 UPDATE config_toolbox SET alias = 'Check backend configuration' WHERE alias = 'Check API configuration';
+UPDATE config_toolbox SET alias = 'Import dxf file' WHERE alias = 'Manage dxf files';
 
 UPDATE sys_function SET descript ='Function to reset user values. 
 Two options are enabled: 1-reset from default values; 2-reset from values of another user' WHERE id = 2922;
