@@ -1506,9 +1506,10 @@ class ApiCF(ApiParent, QObject):
             if widget:
                 cur_value = utils_giswater.getWidgetText(dialog, widget)
                 value = field["value"]
-                if str(cur_value) != str(value):
-                    utils_giswater.setText(dialog, widget, value)
+                if str(cur_value) != str(value) and str(value) != '':
+                    widget.setText(value)
                     widget.setStyleSheet("border: 2px solid #3ED396")
+
             elif "message" in field:
                 level = field['message']['level'] if 'level' in field['message'] else 0
                 self.controller.show_message(field['message']['text'], level)
