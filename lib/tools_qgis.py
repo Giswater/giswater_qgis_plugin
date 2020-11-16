@@ -28,7 +28,7 @@ from ..core.utils import tools_gw
 class MultipleSelection(QgsMapTool):
 
     def __init__(self, layers, geom_type,
-                 mincut=None, parent_manage=None, manage_new_psector=None, table_object=None, dialog=None):
+                 mincut=None, parent_manage=None, manage_new_psector=None, table_object=None, dialog=None, query=None):
         """
         Class constructor
         :param layers: dict of list of layers {'arc': [v_edit_node, ...]}
@@ -38,6 +38,7 @@ class MultipleSelection(QgsMapTool):
         :param manage_new_psector:
         :param table_object:
         :param dialog:
+        :param query:
         """
 
 
@@ -50,6 +51,7 @@ class MultipleSelection(QgsMapTool):
         self.manage_new_psector = manage_new_psector
         self.table_object = table_object
         self.dialog = dialog
+        self.query = query
 
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
@@ -94,22 +96,27 @@ class MultipleSelection(QgsMapTool):
         # We will reconnect it when processing last layer of the group
         disconnect_signal_selection_changed()
 
-        if self.manage_new_psector:
-            self.manage_new_psector.disconnect_signal_selection_changed()
+        #TODO:: Refactor manage_new_psector and mincut call
+
+        # if self.manage_new_psector:
+        #     self.manage_new_psector.disconnect_signal_selection_changed()
 
         for i, layer in enumerate(self.layers[self.geom_type]):
             if i == len(self.layers[self.geom_type]) - 1:
-                if self.mincut:
-                    self.mincut.connect_signal_selection_changed("mincut_connec")
+                # if self.mincut:
+                #     self.mincut.connect_signal_selection_changed("mincut_connec")
+                #
+                # if self.parent_manage:
+                #     connect_signal_selection_changed(self.dialog, self.table_object, layers=self.layers)
 
-                if self.parent_manage:
-                    connect_signal_selection_changed(self.dialog, self.table_object, layers=self.layers)
+                # if self.manage_new_psector:
+                #     self.manage_new_psector.connect_signal_selection_changed(
+                #         self.manage_new_psector.dlg_plan_psector, self.table_object)
+                connect_signal_selection_changed(self.dialog, self.table_object, query=self.query,
+                                                 geom_type = self.geom_type, layers = self.layers)
 
-                if self.manage_new_psector:
-                    self.manage_new_psector.connect_signal_selection_changed(
-                        self.manage_new_psector.dlg_plan_psector, self.table_object)
 
-            # Selection by rectangle
+                # Selection by rectangle
             if rectangle:
                 if selected_rectangle is None:
                     selected_rectangle = self.canvas.mapSettings().mapToLayerCoordinates(layer, rectangle)
@@ -472,23 +479,21 @@ def selection_init(dialog, table_object, query=False, geom_type=None, layers=Non
     if geom_type in ('all', None):
         geom_type = 'arc'
     multiple_selection = MultipleSelection(layers, geom_type, parent_manage=None,
-                                           table_object=table_object, dialog=dialog)
-    disconnect_signal_selection_changed()
+                                           table_object=table_object, dialog=dialog, query=query)
     global_vars.canvas.setMapTool(multiple_selection)
-    connect_signal_selection_changed(dialog, table_object, query, geom_type)
+
     cursor = get_cursor_multiple_selection()
     global_vars.canvas.setCursor(cursor)
 
 
-def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None, layers=None, list_ids=None,
-                      lazy_widget=None, lazy_init_function=None):
+def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None, layers=None,
+                      list_ids={"arc":[], "node":[], "connec":[], "gully":[], "element":[]}, lazy_widget=None,
+                      lazy_init_function=None):
     """ Slot function for signal 'canvas.selectionChanged' """
-
     disconnect_signal_selection_changed()
     field_id = f"{geom_type}_id"
 
     ids = []
-
     if layers is None: return
 
     # Iterate over all layers of the group
@@ -502,16 +507,8 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
                 if selected_id not in ids:
                     ids.append(selected_id)
 
-    if geom_type == 'arc':
-        list_ids['arc'] = ids
-    elif geom_type == 'node':
-        list_ids['node'] = ids
-    elif geom_type == 'connec':
-        list_ids['connec'] = ids
-    elif geom_type == 'gully':
-        list_ids['gully'] = ids
-    elif geom_type == 'element':
-        list_ids['element'] = ids
+    for id in ids:
+        list_ids[geom_type].append(int(id))
 
     expr_filter = None
     if len(ids) > 0:
@@ -541,8 +538,8 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
     # Remove selection in generic 'v_edit' layers
     if plan_om == 'plan':
         layers = remove_selection(False)
+
     tools_gw.enable_feature_type(dialog, table_object, ids=ids)
-    connect_signal_selection_changed(dialog, table_object, geom_type)
 
     return ids, layers, list_ids
 
@@ -656,7 +653,7 @@ def insert_feature_to_plan(dialog, geom_type, ids=None):
     value = tools_qt.getWidgetText(dialog, dialog.psector_id)
     for i in range(len(ids)):
         sql = f"INSERT INTO plan_psector_x_{geom_type} ({geom_type}_id, psector_id) "
-        sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT ({geom_type}_id) DO NOTHING;"
+        sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"
         global_vars.controller.execute_sql(sql)
         tools_qt.reload_qtable(dialog, geom_type)
 
@@ -710,20 +707,26 @@ def disconnect_signal_selection_changed():
 
     try:
         global_vars.canvas.selectionChanged.disconnect()
-    except Exception:
+    except Exception as e:
         pass
     finally:
         global_vars.iface.actionPan().trigger()
 
 
-def connect_signal_selection_changed(dialog, table_object, query=False, geom_type=None, layers=None):
+def connect_signal_selection_changed(dialog, table_object, query=False, geom_type=None, layers=None, form=None,
+                                    list_ids=None):
     """ Connect signal selectionChanged """
 
     try:
         if geom_type in ('all', None):
             geom_type = 'arc'
-        global_vars.canvas.selectionChanged.connect(
-            partial(selection_changed, dialog, table_object, geom_type, query, layers=layers))
+        if form == "psector":
+            global_vars.canvas.selectionChanged.connect(
+                partial(selection_changed, dialog, table_object, geom_type, query, plan_om='plan',
+                        layers=layers, list_ids=list_ids))
+        else:
+            global_vars.canvas.selectionChanged.connect(
+                partial(selection_changed, dialog, table_object, geom_type, query, layers=layers))
     except Exception as e:
         global_vars.controller.log_info(f"connect_signal_selection_changed: {e}")
 
