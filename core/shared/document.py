@@ -78,6 +78,7 @@ class GwDocument:
             layer = self.iface.activeLayer()
             layer.selectByIds([feature.id()])
 
+
         # Set icons
         tools_qt.set_icon(self.dlg_add_doc.btn_insert, "111")
         tools_qt.set_icon(self.dlg_add_doc.btn_delete, "112")
@@ -117,7 +118,9 @@ class GwDocument:
                     cur_active_layer, excluded_layers=["v_edit_element"],single_tool_mode=self.single_tool_mode,
                     layers=self.layers)))
         self.dlg_add_doc.tab_feature.currentChanged.connect(
-            partial(tools_gw.tab_feature_changed, self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"]))
+
+        partial(tools_gw.tab_feature_changed, self.dlg_add_doc, excluded_layers=["v_edit_element"]))
+
 
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_doc.doc_id.textChanged.connect(partial(tools_qt.exist_object, self.dlg_add_doc, table_object,
@@ -357,7 +360,7 @@ class GwDocument:
         # Close this dialog and open selected object
         dialog.close()
 
-        self.manage_document(row=widget.model().record(row))
+        self.manage_document(row=widget.model().record(row), feature=widget.model().record(row))
         tools_qt.setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
 
 
