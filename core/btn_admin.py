@@ -47,7 +47,7 @@ class GwAdmin:
         self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
         self.schema_name = global_vars.schema_name
-        self.plugin_version = global_vars.plugin_version
+        self.plugin_version = tools_gw.get_plugin_version()
         self.canvas = global_vars.canvas
         self.project_type = None
         self.dlg_readsql = None

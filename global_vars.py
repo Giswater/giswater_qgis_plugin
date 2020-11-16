@@ -17,7 +17,6 @@ plugin_name = None
 # TODO: Proper initialization
 schema_name = None
 project_type = None
-plugin_version = None
 
 controller = None
 settings = None
