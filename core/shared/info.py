@@ -1729,7 +1729,7 @@ class GwInfo(QObject):
         for widget in widget_list:
             widget.setStyleSheet(None)
 
-        # Restore QPushButton stylesheet
+        # Restore widget stylesheet
         for field in result['body']['data']['fields']:
             widget = dialog.findChild(QLineEdit, f'{field["widgetname"]}')
             if widget is None:
@@ -1737,8 +1737,8 @@ class GwInfo(QObject):
             if widget:
                 cur_value = tools_qt.getWidgetText(dialog, widget)
                 value = field["value"]
-                if str(cur_value) != str(value):
-                    tools_qt.setWidgetText(dialog, widget, value)
+                if str(cur_value) != str(value) and str(value) != '':
+                    widget.setText(value)
                     widget.setStyleSheet("border: 2px solid #3ED396")
             elif "message" in field:
                 level = field['message']['level'] if 'level' in field['message'] else 0
