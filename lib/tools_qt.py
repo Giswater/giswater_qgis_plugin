@@ -528,84 +528,6 @@ def get_col_index_by_col_name(qtable, column_name):
     return column_index
 
 
-def set_regexp_date_validator(widget, button=None, regex_type=1):
-    """ Set QRegExpression in order to validate QLineEdit(widget) field type date.
-    Also allow to enable or disable a QPushButton(button), like typical accept button
-    @Type=1 (yyy-mm-dd), @Type=2 (dd-mm-yyyy)
-    """
-
-    reg_exp = ""
-    placeholder = "yyyy-mm-dd"
-    if regex_type == 1:
-        widget.setPlaceholderText("yyyy-mm-dd")
-        placeholder = "yyyy-mm-dd"
-        reg_exp = QRegExp("(((\d{4})([-])(0[13578]|10|12)([-])(0[1-9]|[12][0-9]|3[01]))|"
-                          "((\d{4})([-])(0[469]|11)([-])([0][1-9]|[12][0-9]|30))|"
-                          "((\d{4})([-])(02)([-])(0[1-9]|1[0-9]|2[0-8]))|"
-                          "(([02468][048]00)([-])(02)([-])(29))|"
-                          "(([13579][26]00)([-])(02)([-])(29))|"
-                          "(([0-9][0-9][0][48])([-])(02)([-])(29))|"
-                          "(([0-9][0-9][2468][048])([-])(02)([-])(29))|"
-                          "(([0-9][0-9][13579][26])([-])(02)([-])(29)))")
-    elif regex_type == 2:
-        widget.setPlaceholderText("dd-mm-yyyy")
-        placeholder = "dd-mm-yyyy"
-        reg_exp = QRegExp("(((0[1-9]|[12][0-9]|3[01])([-])(0[13578]|10|12)([-])(\d{4}))|"
-                          "(([0][1-9]|[12][0-9]|30)([-])(0[469]|11)([-])(\d{4}))|"
-                          "((0[1-9]|1[0-9]|2[0-8])([-])(02)([-])(\d{4}))|"
-                          "((29)(-)(02)([-])([02468][048]00))|"
-                          "((29)([-])(02)([-])([13579][26]00))|"
-                          "((29)([-])(02)([-])([0-9][0-9][0][48]))|"
-                          "((29)([-])(02)([-])([0-9][0-9][2468][048]))|"
-                          "((29)([-])(02)([-])([0-9][0-9][13579][26])))")
-    elif regex_type == 3:
-        widget.setPlaceholderText("yyyy/mm/dd")
-        placeholder = "yyyy/mm/dd"
-        reg_exp = QRegExp("(((\d{4})([/])(0[13578]|10|12)([/])(0[1-9]|[12][0-9]|3[01]))|"
-                          "((\d{4})([/])(0[469]|11)([/])([0][1-9]|[12][0-9]|30))|"
-                          "((\d{4})([/])(02)([/])(0[1-9]|1[0-9]|2[0-8]))|"
-                          "(([02468][048]00)([/])(02)([/])(29))|"
-                          "(([13579][26]00)([/])(02)([/])(29))|"
-                          "(([0-9][0-9][0][48])([/])(02)([/])(29))|"
-                          "(([0-9][0-9][2468][048])([/])(02)([/])(29))|"
-                          "(([0-9][0-9][13579][26])([/])(02)([/])(29)))")
-    elif regex_type == 4:
-        widget.setPlaceholderText("dd/mm/yyyy")
-        placeholder = "dd/mm/yyyy"
-        reg_exp = QRegExp("(((0[1-9]|[12][0-9]|3[01])([/])(0[13578]|10|12)([/])(\d{4}))|"
-                          "(([0][1-9]|[12][0-9]|30)([/])(0[469]|11)([/])(\d{4}))|"
-                          "((0[1-9]|1[0-9]|2[0-8])([/])(02)([/])(\d{4}))|"
-                          "((29)(-)(02)([/])([02468][048]00))|"
-                          "((29)([/])(02)([/])([13579][26]00))|"
-                          "((29)([/])(02)([/])([0-9][0-9][0][48]))|"
-                          "((29)([/])(02)([/])([0-9][0-9][2468][048]))|"
-                          "((29)([/])(02)([/])([0-9][0-9][13579][26])))")
-
-    widget.setValidator(QRegExpValidator(reg_exp))
-    widget.textChanged.connect(partial(eval_regex, widget, reg_exp, button, placeholder))
-
-
-def eval_regex(widget, reg_exp, button, placeholder, text):
-
-    is_valid = False
-    if reg_exp.exactMatch(text) is True:
-        widget.setStyleSheet(None)
-        is_valid = True
-    elif str(text) == '':
-        widget.setStyleSheet(None)
-        widget.setPlaceholderText(placeholder)
-        is_valid = True
-    elif reg_exp.exactMatch(text) is False:
-        widget.setStyleSheet("border: 1px solid red")
-        is_valid = False
-
-    if button is not None and type(button) == QPushButton:
-        if is_valid is False:
-            button.setEnabled(False)
-        else:
-            button.setEnabled(True)
-
-
 def set_completer_object_api(completer, model, widget, list_items, max_visible=10):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object.
@@ -809,14 +731,6 @@ def fill_table(widget, table_name, expr_filter=None, set_edit_strategy=QSqlTable
     widget.setModel(model)
     if expr_filter:
         widget.model().setFilter(expr_filter)
-
-
-def set_setStyleSheet(field, widget, wtype='label'):
-
-    if field['stylesheet'] is not None:
-        if wtype in field['stylesheet']:
-            widget.setStyleSheet("QWidget{" + field['stylesheet'][wtype] + "}")
-    return widget
 
 
 def add_layer_to_toc(layer, group=None):
@@ -1197,30 +1111,6 @@ def set_completer_lineedit(qlineedit, list_items):
     model.setStringList(list_items)
     completer.setModel(model)
 
-
-def set_restriction(dialog, widget_to_ignore, restriction):
-    """
-    Set all widget enabled(False) or readOnly(True) except those on the tuple
-    :param dialog:
-    :param widget_to_ignore: tuple = ('widgetname1', 'widgetname2', 'widgetname3', ...)
-    :param restriction: roles that do not have access. tuple = ('role1', 'role1', 'role1', ...)
-    :return:
-    """
-
-    project_vars = global_vars.project_vars
-    role = project_vars['role']
-    role = global_vars.controller.get_restriction(role)
-    if role in restriction:
-        widget_list = dialog.findChildren(QWidget)
-        for widget in widget_list:
-            if widget.objectName() in widget_to_ignore:
-                continue
-            # Set editable/readonly
-            if type(widget) in (QLineEdit, QDoubleSpinBox, QTextEdit):
-                widget.setReadOnly(True)
-                widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
-            elif type(widget) in (QComboBox, QCheckBox, QTableView, QPushButton):
-                widget.setEnabled(False)
 
 
 def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):

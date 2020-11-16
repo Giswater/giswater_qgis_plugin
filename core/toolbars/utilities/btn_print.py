@@ -298,7 +298,7 @@ class GwPrintButton(GwParentAction):
             label.setObjectName('lbl_' + field['widgetname'])
             label.setText(field['label'].capitalize())
             if field['stylesheet'] is not None and 'label' in field['stylesheet']:
-                label = tools_qt.set_setStyleSheet(field, label)
+                label = tools_gw.set_stylesheet(field, label)
             if 'tooltip' in field:
                 label.setToolTip(field['tooltip'])
             else:

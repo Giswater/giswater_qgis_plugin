@@ -677,7 +677,7 @@ def get_plugin_version():
     return plugin_version
 
 
-def draw(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
+def draw_by_json(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
 
     try:
         if complet_result['body']['feature']['geometry'] is None:
@@ -1272,6 +1272,14 @@ def enable_all(dialog, result):
                             field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
     except RuntimeError:
         pass
+
+
+def set_stylesheet(field, widget, wtype='label'):
+
+    if field['stylesheet'] is not None:
+        if wtype in field['stylesheet']:
+            widget.setStyleSheet("QWidget{" + field['stylesheet'][wtype] + "}")
+    return widget
 
 
 def delete_selected_rows(widget, table_object):

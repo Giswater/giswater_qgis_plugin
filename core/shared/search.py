@@ -203,7 +203,7 @@ class GwSearch:
             # line on the feature but not zoom. Here, with draw we redraw simply to zoom and so that there are not two
             # ruberbands (the one from self.open_custom_form (...) and this one) we delete these
             margin = float(complet_result[0]['body']['feature']['zoomCanvasMargin']['mts'])
-            tools_gw.draw(complet_result[0], self.rubber_band, margin)
+            tools_gw.draw_by_json(complet_result[0], self.rubber_band, margin)
             self.rubber_band.reset()
 
         # Tab 'address' (streets)

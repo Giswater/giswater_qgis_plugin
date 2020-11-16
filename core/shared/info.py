@@ -291,7 +291,7 @@ class GwInfo(QObject):
 
     def open_generic_form(self, complet_result):
 
-        tools_gw.draw(complet_result, self.rubber_band, zoom=False)
+        tools_gw.draw_by_json(complet_result, self.rubber_band, zoom=False)
         self.hydro_info_dlg = InfoGenericUi()
         tools_gw.load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
@@ -321,7 +321,7 @@ class GwInfo(QObject):
         try:
             exist_rb = complet_result[0]['body']['returnManager']['style']['ruberband']
         except KeyError:
-            tools_gw.draw(complet_result[0], self.rubber_band)
+            tools_gw.draw_by_json(complet_result[0], self.rubber_band)
 
         if feature_id:
             self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 25, self.dlg_cf.pos().y() + 25, self.dlg_cf.width(),
@@ -675,7 +675,7 @@ class GwInfo(QObject):
 
         global_vars.canvas.setMapTool(ep)
         # We redraw the selected feature because self.canvas.setMapTool(emit_point) erases it
-        tools_gw.draw(complet_result[0], self.rubber_band, None, False)
+        tools_gw.draw_by_json(complet_result[0], self.rubber_band, None, False)
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options
@@ -1242,7 +1242,7 @@ class GwInfo(QObject):
             label.setObjectName('lbl_' + field['widgetname'])
             label.setText(field['label'].capitalize())
             if field['stylesheet'] is not None and 'label' in field['stylesheet']:
-                label = tools_qt.set_setStyleSheet(field, label)
+                label = tools_gw.set_stylesheet(field, label)
             if 'tooltip' in field:
                 label.setToolTip(field['tooltip'])
             else:
@@ -2157,7 +2157,7 @@ class GwInfo(QObject):
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        tools_gw.draw(complet_result[0], self.rubber_band, margin)
+        tools_gw.draw_by_json(complet_result[0], self.rubber_band, margin)
 
 
     """ FUNCTIONS RELATED WITH TAB CONNECTIONS """
@@ -2195,7 +2195,7 @@ class GwInfo(QObject):
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        tools_gw.draw(complet_result[0], self.rubber_band, margin)
+        tools_gw.draw_by_json(complet_result[0], self.rubber_band, margin)
 
 
     """ FUNCTIONS RELATED WITH TAB HYDROMETER"""
@@ -3081,7 +3081,7 @@ class GwInfo(QObject):
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        tools_gw.draw(complet_result[0], self.rubber_band, margin)
+        tools_gw.draw_by_json(complet_result[0], self.rubber_band, margin)
 
 
     """ FUNCTIONS RELATED WITH TAB PLAN """

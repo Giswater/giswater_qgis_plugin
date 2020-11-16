@@ -1932,7 +1932,7 @@ class DaoController:
                     color = QColor(color[0], color[1], color[2], opacity)
                 if 'width' in return_manager['style']['ruberband']:
                     width = return_manager['style']['ruberband']['width']
-                tools_gw.draw(json_result, rubber_band, margin, color=color, width=width)
+                tools_gw.draw_by_json(json_result, rubber_band, margin, color=color, width=width)
 
             else:
 

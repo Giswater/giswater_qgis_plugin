@@ -17,7 +17,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
-    QLineEdit, QTableView
+    QLineEdit, QTableView, QWidget,  QDoubleSpinBox, QTextEdit, QPushButton
 from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
 from qgis.gui import QgsRubberBand
 
@@ -470,7 +470,7 @@ class GwPsector:
 
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
-        tools_qt.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
+        self.set_restriction_by_role(self.dlg_plan_psector, widget_to_ignore, restriction)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector', maximize_button=False)
@@ -821,7 +821,7 @@ class GwPsector:
         self.dlg_plan_psector.btn_snapping.setEnabled(enabled)
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
-        tools_qt.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
+        self.set_restriction_by_role(self.dlg_plan_psector, widget_to_ignore, restriction)
 
 
     def connect_signal_selection_changed(self, dialog, table_object, query=True):
@@ -895,7 +895,32 @@ class GwPsector:
 
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
-        tools_qt.set_restriction(self.dlg_plan_psector, widget_to_ignore, restriction)
+        self.set_restriction_by_role(self.dlg_plan_psector, widget_to_ignore, restriction)
+
+
+    def set_restriction_by_role(self, dialog, widget_to_ignore, restriction):
+        """
+        Set all widget enabled(False) or readOnly(True) except those on the tuple
+        :param dialog:
+        :param widget_to_ignore: tuple = ('widgetname1', 'widgetname2', 'widgetname3', ...)
+        :param restriction: roles that do not have access. tuple = ('role1', 'role1', 'role1', ...)
+        :return:
+        """
+
+        project_vars = global_vars.project_vars
+        role = project_vars['role']
+        role = global_vars.controller.get_restriction(role)
+        if role in restriction:
+            widget_list = dialog.findChildren(QWidget)
+            for widget in widget_list:
+                if widget.objectName() in widget_to_ignore:
+                    continue
+                # Set editable/readonly
+                if type(widget) in (QLineEdit, QDoubleSpinBox, QTextEdit):
+                    widget.setReadOnly(True)
+                    widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
+                elif type(widget) in (QComboBox, QCheckBox, QTableView, QPushButton):
+                    widget.setEnabled(False)
 
 
     def populate_result_id(self, combo, table_name):
