@@ -264,12 +264,12 @@ class GwMincutManager:
                "FROM om_typevalue WHERE typevalue = 'mincut_state' "
                "ORDER BY id")
         rows = self.controller.get_rows(sql, add_empty_row=True)
-        tools_qt.set_item_data(self.dlg_min_edit.state_edit, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_min_edit.state_edit, rows, 1)
 
         # Fill ComboBox exploitation
         sql = "SELECT expl_id, name FROM exploitation WHERE expl_id > 0 ORDER BY name"
         rows = self.controller.get_rows(sql, add_empty_row=True)
-        tools_qt.set_item_data(self.dlg_min_edit.cmb_expl, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_min_edit.cmb_expl, rows, 1)
 
 
     def open_mincut(self):
@@ -321,9 +321,9 @@ class GwMincutManager:
 
         expr = ""
         id_ = tools_qt.getWidgetText(self.dlg_min_edit, self.dlg_min_edit.txt_mincut_id, False, False)
-        state_id = tools_qt.get_item_data(self.dlg_min_edit, self.dlg_min_edit.state_edit, 0)
-        state_text = tools_qt.get_item_data(self.dlg_min_edit, self.dlg_min_edit.state_edit, 1)
-        expl = tools_qt.get_item_data(self.dlg_min_edit, self.dlg_min_edit.cmb_expl, 1)
+        state_id = tools_qt.get_combo_value(self.dlg_min_edit, self.dlg_min_edit.state_edit, 0)
+        state_text = tools_qt.get_combo_value(self.dlg_min_edit, self.dlg_min_edit.state_edit, 1)
+        expl = tools_qt.get_combo_value(self.dlg_min_edit, self.dlg_min_edit.cmb_expl, 1)
         dates_filter = ""
         if state_id == '':
             self.dlg_min_edit.date_from.setEnabled(False)

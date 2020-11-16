@@ -133,7 +133,7 @@ class GwPsector:
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'value_priority'"
         rows = self.controller.get_rows(sql)
         
-        tools_qt.set_item_data(self.dlg_plan_psector.priority, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_plan_psector.priority, rows, 1)
 
         # Set visible FALSE for cmb_sector
         self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector')
@@ -145,12 +145,12 @@ class GwPsector:
                " JOIN selector_expl USING (expl_id) "
                " WHERE exploitation.expl_id != 0 and cur_user = current_user")
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.cmb_expl_id, rows, 1)
+        tools_qt.fill_combo_values(self.cmb_expl_id, rows, 1)
 
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status'"
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.cmb_status, rows, 1)
+        tools_qt.fill_combo_values(self.cmb_status, rows, 1)
 
         if self.plan_om == 'om':
             self.populate_result_id(self.dlg_plan_psector.result_id, 'om_result_cat')
@@ -241,11 +241,11 @@ class GwPsector:
             sql = (f"SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_type' AND "
                    f"id = '{row['psector_type']}'")
             result = self.controller.get_row(sql)
-            tools_qt.set_combo_itemData(self.cmb_psector_type, str(result['idval']), 1)
+            tools_qt.set_combo_value(self.cmb_psector_type, str(result['idval']), 1)
             sql = (f"SELECT name FROM exploitation "
                    f"WHERE expl_id = {row['expl_id']}")
             result = self.controller.get_row(sql)
-            tools_qt.set_combo_itemData(self.cmb_expl_id, str(result['name']), 1)
+            tools_qt.set_combo_value(self.cmb_expl_id, str(result['name']), 1)
 
             # Check if expl_id already exists in expl_selector
             sql = ("SELECT DISTINCT(expl_id, cur_user)"
@@ -263,24 +263,24 @@ class GwPsector:
             sql = (f"SELECT name FROM sector "
                    f"WHERE sector_id = {row['sector_id']}")
             result = self.controller.get_row(sql)
-            tools_qt.set_combo_itemData(self.cmb_sector_id, str(result['name']), 1)
-            tools_qt.set_combo_itemData(self.cmb_status, str(row['status']), 0)
+            tools_qt.set_combo_value(self.cmb_sector_id, str(result['name']), 1)
+            tools_qt.set_combo_value(self.cmb_status, str(row['status']), 0)
 
             tools_qt.setChecked(self.dlg_plan_psector, "active", row['active'])
-            tools_qt.fillWidget(self.dlg_plan_psector, "name", row)
-            tools_qt.fillWidget(self.dlg_plan_psector, "descript", row)
-            tools_qt.set_combo_itemData(self.dlg_plan_psector.priority, str(row["priority"]), 1)
-            tools_qt.fillWidget(self.dlg_plan_psector, "text1", row)
-            tools_qt.fillWidget(self.dlg_plan_psector, "text2", row)
-            tools_qt.fillWidget(self.dlg_plan_psector, "text3", row)
-            tools_qt.fillWidget(self.dlg_plan_psector, "text4", row)
-            tools_qt.fillWidget(self.dlg_plan_psector, "text5", row)
-            tools_qt.fillWidget(self.dlg_plan_psector, "text6", row)
-            tools_qt.fillWidget(self.dlg_plan_psector, "num_value", row)
-            tools_qt.fillWidget(self.dlg_plan_psector, "observ", row)
-            tools_qt.fillWidget(self.dlg_plan_psector, "atlas_id", row)
-            tools_qt.fillWidget(self.dlg_plan_psector, "scale", row)
-            tools_qt.fillWidget(self.dlg_plan_psector, "rotation", row)
+            self.fill_widget(self.dlg_plan_psector, "name", row)
+            self.fill_widget(self.dlg_plan_psector, "descript", row)
+            tools_qt.set_combo_value(self.dlg_plan_psector.priority, str(row["priority"]), 1)
+            self.fill_widget(self.dlg_plan_psector, "text1", row)
+            self.fill_widget(self.dlg_plan_psector, "text2", row)
+            self.fill_widget(self.dlg_plan_psector, "text3", row)
+            self.fill_widget(self.dlg_plan_psector, "text4", row)
+            self.fill_widget(self.dlg_plan_psector, "text5", row)
+            self.fill_widget(self.dlg_plan_psector, "text6", row)
+            self.fill_widget(self.dlg_plan_psector, "num_value", row)
+            self.fill_widget(self.dlg_plan_psector, "observ", row)
+            self.fill_widget(self.dlg_plan_psector, "atlas_id", row)
+            self.fill_widget(self.dlg_plan_psector, "scale", row)
+            self.fill_widget(self.dlg_plan_psector, "rotation", row)
 
             # Fill tables tbl_arc_plan, tbl_node_plan, tbl_v_plan/om_other_x_psector with selected filter
             expr = " psector_id = " + str(psector_id)
@@ -367,7 +367,7 @@ class GwPsector:
             # Set psector_status vdefault
             sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status' and id = '2'"
             result = self.controller.get_row(sql)
-            tools_qt.set_combo_itemData(self.cmb_status, str(result[1]), 1)
+            tools_qt.set_combo_value(self.cmb_status, str(result[1]), 1)
 
         sql = "SELECT state_id FROM selector_state WHERE cur_user = current_user"
         rows = self.controller.get_rows(sql)
@@ -476,6 +476,26 @@ class GwPsector:
         tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector', maximize_button=False)
 
 
+    def fill_widget(self, dialog, widget, row):
+
+        if type(widget) is str or type(widget) is str:
+            widget = dialog.findChild(QWidget, widget)
+        if not widget:
+            return
+        key = widget.objectName()
+        if key in row:
+            if row[key] is not None:
+                value = str(row[key])
+                if type(widget) is QLineEdit or type(widget) is QTextEdit:
+                    if value == 'None':
+                        value = ""
+                    widget.setText(value)
+            else:
+                widget.setText("")
+        else:
+            widget.setText("")
+
+
     def enable_all(self):
 
         value = tools_qt.isChecked(self.dlg_plan_psector, "chk_enable_all")
@@ -527,7 +547,7 @@ class GwPsector:
 
         self.dlg_psector_rapport.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_psector_rapport))
         self.dlg_psector_rapport.btn_ok.clicked.connect(partial(self.generate_rapports))
-        self.dlg_psector_rapport.btn_path.clicked.connect(partial(tools_qt.get_folder_dialog, self.dlg_psector_rapport,
+        self.dlg_psector_rapport.btn_path.clicked.connect(partial(tools_qt.get_folder_path, self.dlg_psector_rapport,
             self.dlg_psector_rapport.txt_path))
 
         value = tools_gw.get_parser_value('psector_rapport', 'psector_rapport_path')
@@ -577,11 +597,11 @@ class GwPsector:
             self.dlg_psector_rapport.cmb_templates.setEnabled(True)
             self.dlg_psector_rapport.txt_composer_path.setEnabled(True)
             self.dlg_psector_rapport.lbl_composer_disabled.setText('')
-            tools_qt.set_item_data(self.dlg_psector_rapport.cmb_templates, records, 1)
+            tools_qt.fill_combo_values(self.dlg_psector_rapport.cmb_templates, records, 1)
 
         row = self.controller.get_config(f'composer_plan_vdefault')
         if row:
-            tools_qt.set_combo_itemData(self.dlg_psector_rapport.cmb_templates, row[0], 1)
+            tools_qt.set_combo_value(self.dlg_psector_rapport.cmb_templates, row[0], 1)
 
 
     def generate_rapports(self):
@@ -596,7 +616,7 @@ class GwPsector:
 
         folder_path = tools_qt.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
-            tools_qt.get_folder_dialog(self.dlg_psector_rapport.txt_path)
+            tools_qt.get_folder_path(self.dlg_psector_rapport.txt_path)
             folder_path = tools_qt.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
 
         # Generate Composer
@@ -1068,7 +1088,7 @@ class GwPsector:
                             value = date.dateTime().toString('yyyy-MM-dd HH:mm:ss')
                         elif widget_type is QComboBox:
                             combo = tools_qt.getWidget(self.dlg_plan_psector, column_name)
-                            value = str(tools_qt.get_item_data(self.dlg_plan_psector, combo))
+                            value = str(tools_qt.get_combo_value(self.dlg_plan_psector, combo))
                         else:
                             value = tools_qt.getWidgetText(self.dlg_plan_psector, column_name)
                         if value is None or value == 'null':
@@ -1097,7 +1117,7 @@ class GwPsector:
                                 values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss') + ", "
                             elif widget_type is QComboBox:
                                 combo = tools_qt.getWidget(self.dlg_plan_psector, column_name)
-                                value = str(tools_qt.get_item_data(self.dlg_plan_psector, combo))
+                                value = str(tools_qt.get_combo_value(self.dlg_plan_psector, combo))
                             else:
                                 value = tools_qt.getWidgetText(self.dlg_plan_psector, column_name)
 

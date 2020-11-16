@@ -99,9 +99,9 @@ class GwCatalog:
 
     def get_api_catalog(self, matcat_id, pnom, dnom, id, feature_type, geom_type):
 
-        matcat_id_value = tools_qt.get_item_data(self.dlg_catalog, matcat_id)
-        pn_value = tools_qt.get_item_data(self.dlg_catalog, pnom)
-        dn_value = tools_qt.get_item_data(self.dlg_catalog, dnom)
+        matcat_id_value = tools_qt.get_combo_value(self.dlg_catalog, matcat_id)
+        pn_value = tools_qt.get_combo_value(self.dlg_catalog, pnom)
+        dn_value = tools_qt.get_combo_value(self.dlg_catalog, dnom)
 
         form_name = 'upsert_catalog_' + geom_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
@@ -128,7 +128,7 @@ class GwCatalog:
 
     def populate_pn_dn(self, matcat_id, pnom, dnom, feature_type, geom_type):
 
-        matcat_id_value = tools_qt.get_item_data(self.dlg_catalog, matcat_id)
+        matcat_id_value = tools_qt.get_combo_value(self.dlg_catalog, matcat_id)
 
         form_name = f'upsert_catalog_' + geom_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
@@ -187,7 +187,7 @@ class GwCatalog:
         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.fill_combo(widget, field)
         if 'selectedId' in field:
-            tools_qt.set_combo_itemData(widget, field['selectedId'], 0)
+            tools_qt.set_combo_value(widget, field['selectedId'], 0)
 
         return widget
 

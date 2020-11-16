@@ -181,7 +181,7 @@ class GwDimensioning:
         list_widgets = self.dlg_dim.findChildren(QComboBox)
         for widget in list_widgets:
             widget_name = widget.property('columnname')
-            widget_value = f'"{tools_qt.get_item_data(self.dlg_dim, widget)}"'
+            widget_value = f'"{tools_qt.get_combo_value(self.dlg_dim, widget)}"'
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":{widget_value},'

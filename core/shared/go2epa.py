@@ -271,7 +271,7 @@ class GwGo2Epa:
             self.controller.show_warning(message, parameter='cat_hydrology')
             return False
 
-        tools_qt.set_item_data(self.dlg_hydrology_selector.hydrology, rows)
+        tools_qt.fill_combo_values(self.dlg_hydrology_selector.hydrology, rows)
 
         sql = ("SELECT DISTINCT(t1.name) FROM cat_hydrology AS t1 "
                "INNER JOIN selector_inp_hydrology AS t2 ON t1.hydrology_id = t2.hydrology_id "
@@ -288,7 +288,7 @@ class GwGo2Epa:
 
     def save_hydrology(self):
 
-        hydrology_id = tools_qt.get_item_data(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1)
+        hydrology_id = tools_qt.get_combo_value(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1)
         sql = ("SELECT cur_user FROM selector_inp_hydrology "
                "WHERE cur_user = current_user")
         row = self.controller.get_row(sql)
@@ -327,7 +327,7 @@ class GwGo2Epa:
             message = "Check the table 'cat_hydrology' "
             self.controller.show_warning(message)
             return False
-        tools_qt.set_item_data(widgetcbx, rows)
+        tools_qt.fill_combo_values(widgetcbx, rows)
         self.update_labels()
 
 
@@ -473,7 +473,7 @@ class GwGo2Epa:
                 if widget_type is QCheckBox:
                     tools_qt.setChecked(dialog, widget, row[column_name])
                 elif widget_type is QComboBox:
-                    tools_qt.set_combo_itemData(widget, row[column_name], 0)
+                    tools_qt.set_combo_value(widget, row[column_name], 0)
                 elif widget_type is QDateEdit:
                     dateaux = row[column_name].replace('/', '-')
                     date = QDate.fromString(dateaux, 'dd-MM-yyyy')

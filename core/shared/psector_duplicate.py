@@ -37,10 +37,10 @@ class GwPsectorDuplicate(QObject):
         # Populate combo duplicate psector
         sql = "SELECT psector_id, name FROM plan_psector"
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_duplicate_psector.duplicate_psector, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_duplicate_psector.duplicate_psector, rows, 1)
 
         # Set QComboBox with selected psector
-        tools_qt.set_combo_itemData(self.dlg_duplicate_psector.duplicate_psector, str(psector_id), 0)
+        tools_qt.set_combo_value(self.dlg_duplicate_psector.duplicate_psector, str(psector_id), 0)
 
         # Set listeners
         self.dlg_duplicate_psector.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_duplicate_psector))
@@ -52,7 +52,7 @@ class GwPsectorDuplicate(QObject):
 
     def duplicate_psector(self):
 
-        id_psector = tools_qt.get_item_data(self.dlg_duplicate_psector, self.dlg_duplicate_psector.duplicate_psector, 0)
+        id_psector = tools_qt.get_combo_value(self.dlg_duplicate_psector, self.dlg_duplicate_psector.duplicate_psector, 0)
         new_psector_name = tools_qt.getWidgetText(self.dlg_duplicate_psector,
                                                   self.dlg_duplicate_psector.new_psector_name)
 

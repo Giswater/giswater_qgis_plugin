@@ -105,7 +105,7 @@ class GwCSVButton(GwParentAction):
             return
 
 
-        tools_qt.set_item_data(combo, rows, 1, True, True, 1)
+        tools_qt.fill_combo_values(combo, rows, 1, True, True, 1)
         self.update_info(self.dlg_csv)
 
 
@@ -116,7 +116,7 @@ class GwCSVButton(GwParentAction):
         if not self.validate_params(dialog):
             return
 
-        fid_aux = tools_qt.get_item_data(dialog, dialog.cmb_import_type, 0)
+        fid_aux = tools_qt.get_combo_value(dialog, dialog.cmb_import_type, 0)
         self.delete_table_csv(temp_tablename, fid_aux)
         path = tools_qt.getWidgetText(dialog, dialog.txt_file_csv)
         label_aux = tools_qt.getWidgetText(dialog, dialog.txt_import, return_string_null=False)
@@ -151,12 +151,12 @@ class GwCSVButton(GwParentAction):
     def update_info(self, dialog):
         """ Update the tag according to item selected from cmb_import_type """
 
-        dialog.lbl_info.setText(tools_qt.get_item_data(self.dlg_csv, self.dlg_csv.cmb_import_type, 2))
+        dialog.lbl_info.setText(tools_qt.get_combo_value(self.dlg_csv, self.dlg_csv.cmb_import_type, 2))
 
 
     def get_function_name(self):
 
-        self.func_name = tools_qt.get_item_data(self.dlg_csv, self.dlg_csv.cmb_import_type, 3)
+        self.func_name = tools_qt.get_combo_value(self.dlg_csv, self.dlg_csv.cmb_import_type, 3)
         self.controller.log_info(str(self.func_name))
 
 
@@ -204,7 +204,7 @@ class GwCSVButton(GwParentAction):
         """ Load QGIS settings related with csv options """
 
         value = tools_gw.get_parser_value('csv2Pg', 'cmb_import_type')
-        tools_qt.set_combo_itemData(self.dlg_csv.cmb_import_type, value, 0)
+        tools_qt.set_combo_value(self.dlg_csv.cmb_import_type, value, 0)
 
         value = tools_gw.get_parser_value('csv2Pg', 'txt_import')
         tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.txt_import, value)
@@ -225,7 +225,7 @@ class GwCSVButton(GwParentAction):
 
     def save_settings_values(self):
         """ Save QGIS settings related with csv options """
-        tools_gw.set_parser_value('csv2Pg', 'cmb_import_type', f"{tools_qt.get_item_data(self.dlg_csv, 'cmb_import_type', 0)}")
+        tools_gw.set_parser_value('csv2Pg', 'cmb_import_type', f"{tools_qt.get_combo_value(self.dlg_csv, 'cmb_import_type', 0)}")
         tools_gw.set_parser_value('csv2Pg', 'txt_import', tools_qt.getWidgetText(self.dlg_csv, 'txt_import'))
         tools_gw.set_parser_value('csv2Pg', 'txt_file_csv', tools_qt.getWidgetText(self.dlg_csv, 'txt_file_csv'))
         tools_gw.set_parser_value('csv2Pg', 'cmb_unicode_list', tools_qt.getWidgetText(self.dlg_csv, 'cmb_unicode_list'))
@@ -274,8 +274,8 @@ class GwCSVButton(GwParentAction):
         dialog.progressBar.setMaximum(row_count)  # -20 for see 100% complete progress
         csvfile.seek(0)  # Position the cursor at position 0 of the file
         reader = csv.reader(csvfile, delimiter=delimiter)
-        fid_aux = tools_qt.get_item_data(dialog, dialog.cmb_import_type, 0)
-        readheader = tools_qt.get_item_data(dialog, dialog.cmb_import_type, 4)
+        fid_aux = tools_qt.get_combo_value(dialog, dialog.cmb_import_type, 0)
+        readheader = tools_qt.get_combo_value(dialog, dialog.cmb_import_type, 4)
         for row in reader:
             if readheader is False:
                 readheader = True

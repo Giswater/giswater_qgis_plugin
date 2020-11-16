@@ -142,10 +142,10 @@ class GwEndFeatureButton(GwParentAction):
 
         sql = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0'
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_work_end.cmb_statetype_end, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_work_end.cmb_statetype_end, rows, 1)
         row = self.controller.get_config('edit_statetype_0_vdefault')
         if row:
-            tools_qt.set_combo_itemData(self.dlg_work_end.cmb_statetype_end, row[0], 0)
+            tools_qt.set_combo_value(self.dlg_work_end.cmb_statetype_end, row[0], 0)
         row = self.controller.get_config('edit_enddate_vdefault')
 
         if row:
@@ -221,7 +221,7 @@ class GwEndFeatureButton(GwParentAction):
         # Setting values
         self.workcat_id_end = tools_qt.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
         self.enddate = tools_qt.getCalendarDate(self.dlg_work_end, self.dlg_work_end.enddate)
-        self.statetype_id_end = tools_qt.get_item_data(self.dlg_work_end, self.dlg_work_end.cmb_statetype_end, 0)
+        self.statetype_id_end = tools_qt.get_combo_value(self.dlg_work_end, self.dlg_work_end.cmb_statetype_end, 0)
 
         if self.workcat_id_end in ('null', None):
             message = "Please select a workcat id end"

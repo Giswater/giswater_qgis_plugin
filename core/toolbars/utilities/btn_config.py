@@ -461,7 +461,7 @@ class GwConfigButton(GwParentAction):
                 widget.addItem(record[1], record)
         if 'value' in field:
             if str(field['value']) != 'None':
-                tools_qt.set_combo_itemData(widget, field['value'], 0)
+                tools_qt.set_combo_value(widget, field['value'], 0)
 
 
     def get_values_changed_param_user(self, chk, widget, field, value=None):
@@ -470,7 +470,7 @@ class GwConfigButton(GwParentAction):
         if type(widget) is QLineEdit:
             value = tools_qt.getWidgetText(self.dlg_config, widget, return_string_null=False)
         elif type(widget) is QComboBox:
-            value = tools_qt.get_item_data(self.dlg_config, widget, 0)
+            value = tools_qt.get_combo_value(self.dlg_config, widget, 0)
         elif type(widget) is QCheckBox:
             value = tools_qt.isChecked(self.dlg_config, chk)
         elif type(widget) is QDateEdit:
@@ -497,7 +497,7 @@ class GwConfigButton(GwParentAction):
             value = tools_qt.getWidgetText(self.dlg_config, widget, return_string_null=False)
             elem['widget_type'] = 'text'
         elif type(widget) is QComboBox:
-            value = tools_qt.get_item_data(self.dlg_config, widget, 0)
+            value = tools_qt.get_combo_value(self.dlg_config, widget, 0)
             elem['widget_type'] = 'combo'
         elif type(widget) is QCheckBox:
             value = tools_qt.isChecked(self.dlg_config, chk)
@@ -522,7 +522,7 @@ class GwConfigButton(GwParentAction):
         if type(widget) is QLineEdit:
             value = tools_qt.getWidgetText(self.dlg_config, widget, return_string_null=False)
         elif type(widget) is QComboBox:
-            value = tools_qt.get_item_data(self.dlg_config, widget, 0)
+            value = tools_qt.get_combo_value(self.dlg_config, widget, 0)
         elif type(widget) is QCheckBox:
             value = tools_qt.isChecked(self.dlg_config, widget)
         elif type(widget) is QDateEdit:

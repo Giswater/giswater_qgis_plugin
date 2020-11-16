@@ -139,21 +139,21 @@ class GwMincut:
                "FROM om_mincut_cat_type "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_mincut.type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_mincut.type, rows, 1)
 
         # Fill ComboBox cause
         sql = ("SELECT id, idval "
                "FROM om_typevalue WHERE typevalue = 'mincut_cause' "
                "ORDER BY id")
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_mincut.cause, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_mincut.cause, rows, 1)
 
         # Fill ComboBox assigned_to
         sql = ("SELECT id, name "
                "FROM cat_users "
                "ORDER BY name")
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_mincut.assigned_to, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_mincut.assigned_to, rows, 1)
 
         # Toolbar actions
         action = self.dlg_mincut.findChild(QAction, "actionMincut")
@@ -438,8 +438,8 @@ class GwMincut:
             tools_qt.setWidgetText(self.dlg_fin, self.dlg_fin.work_order, work_order)
 
         # Manage address
-        municipality_current = tools_qt.get_item_data(self.dlg_mincut, self.dlg_mincut.address_add_muni, 1)
-        tools_qt.set_combo_itemData(self.dlg_fin.address_add_muni, municipality_current, 1)
+        municipality_current = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.address_add_muni, 1)
+        tools_qt.set_combo_value(self.dlg_fin.address_add_muni, municipality_current, 1)
         address_street_current = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
         tools_qt.setWidgetText(self.dlg_fin, self.dlg_fin.address_add_street, address_street_current)
         address_number_current = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
@@ -451,7 +451,7 @@ class GwMincut:
                "ORDER BY name")
         rows = self.controller.get_rows(sql)
         tools_qt.fillComboBox(self.dlg_fin, "exec_user", rows, False)
-        assigned_to = tools_qt.get_item_data(self.dlg_mincut, self.dlg_mincut.assigned_to, 1)
+        assigned_to = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.assigned_to, 1)
         tools_qt.setWidgetText(self.dlg_fin, "exec_user", str(assigned_to))
 
         date_start = self.dlg_mincut.cbx_date_start.date()
@@ -500,12 +500,12 @@ class GwMincut:
         mincut_result_state = self.current_state
 
         # Manage 'address'
-        address_exploitation_id = tools_qt.get_item_data(self.dlg_mincut, self.dlg_mincut.address_add_muni)
+        address_exploitation_id = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.address_add_muni)
         address_street = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
         address_number = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
 
-        mincut_result_type = tools_qt.get_item_data(self.dlg_mincut, self.dlg_mincut.type, 0)
-        anl_cause = tools_qt.get_item_data(self.dlg_mincut, self.dlg_mincut.cause, 0)
+        mincut_result_type = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.type, 0)
+        anl_cause = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.cause, 0)
         work_order = self.dlg_mincut.work_order.text()
 
         anl_descript = tools_qt.getWidgetText(self.dlg_mincut, "pred_description", return_string_null=False)
@@ -540,7 +540,7 @@ class GwMincut:
         received_time = self.dlg_mincut.cbx_recieved_time.time()
         received_date = received_day.toString('yyyy-MM-dd') + " " + received_time.toString('HH:mm:ss')
 
-        assigned_to = tools_qt.get_item_data(self.dlg_mincut, self.dlg_mincut.assigned_to, 0)
+        assigned_to = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.assigned_to, 0)
         cur_user = self.controller.get_project_user()
         appropiate_status = tools_qt.isChecked(self.dlg_mincut, "appropiate")
 
@@ -740,13 +740,13 @@ class GwMincut:
         self.dlg_mincut.cbx_hours_end.setTime(exec_end_time)
         tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, str(self.dlg_fin.work_order.text()))
         municipality = self.dlg_fin.address_add_muni.currentText()
-        tools_qt.set_combo_itemData(self.dlg_mincut.address_add_muni, municipality, 1)
+        tools_qt.set_combo_value(self.dlg_mincut.address_add_muni, municipality, 1)
         street = tools_qt.getWidgetText(self.dlg_fin, self.dlg_fin.address_add_street, return_string_null=False)
         tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, street)
         number = tools_qt.getWidgetText(self.dlg_fin, self.dlg_fin.address_add_postnumber, return_string_null=False)
         tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, number)
         exec_user = tools_qt.getWidgetText(self.dlg_fin, self.dlg_fin.exec_user)
-        tools_qt.set_combo_itemData(self.dlg_mincut.assigned_to, exec_user, 1)
+        tools_qt.set_combo_value(self.dlg_mincut.assigned_to, exec_user, 1)
 
         self.dlg_fin.close()
 
@@ -1843,8 +1843,8 @@ class GwMincut:
             mincut_state_name = self.states[row['mincut_state']]
 
         tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, row['work_order'])
-        tools_qt.set_combo_itemData(self.dlg_mincut.type, row['mincut_type'], 0)
-        tools_qt.set_combo_itemData(self.dlg_mincut.cause, row['anl_cause'], 0)
+        tools_qt.set_combo_value(self.dlg_mincut.type, row['mincut_type'], 0)
+        tools_qt.set_combo_value(self.dlg_mincut.cause, row['anl_cause'], 0)
         tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, mincut_state_name)
         if 'output' in row and row['output']:
             self.dlg_mincut.txt_infolog.setEnabled(False)
@@ -1853,7 +1853,7 @@ class GwMincut:
             tools_qt.setWidgetText(self.dlg_mincut, "txt_infolog", text)
 
         # Manage location
-        tools_qt.set_combo_itemData(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
+        tools_qt.set_combo_value(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
         tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, str(row['streetaxis_id']))
         tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, str(row['postnumber']))
 

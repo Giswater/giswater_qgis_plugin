@@ -273,7 +273,7 @@ class GwInfo(QObject):
             if type(widget) in(QLineEdit, QPushButton, QSpinBox, QDoubleSpinBox):
                 value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
             elif type(widget) is QComboBox:
-                value = tools_qt.get_item_data(dialog, widget, 0)
+                value = tools_qt.get_combo_value(dialog, widget, 0)
             elif type(widget) is QCheckBox:
                 value = tools_qt.isChecked(dialog, widget)
             elif type(widget) is QgsDateTimeEdit:
@@ -999,7 +999,7 @@ class GwInfo(QObject):
                 if tools_qt.getWidgetType(dialog, widget) is QLineEdit:
                     tools_qt.setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
                 elif tools_qt.getWidgetType(dialog, widget) is QComboBox:
-                    tools_qt.set_combo_itemData(widget, str(snapped_feature_attr_aux[i]), 0)
+                    tools_qt.set_combo_value(widget, str(snapped_feature_attr_aux[i]), 0)
 
         self.api_disable_copy_paste(dialog, emit_point)
 
@@ -2283,7 +2283,7 @@ class GwInfo(QObject):
         rows = self.controller.get_rows(sql)
         if not rows:
             return False
-        tools_qt.set_item_data(self.dlg_cf.cmb_cat_period_id_filter, rows, add_empty=True, sort_combo=False)
+        tools_qt.fill_combo_values(self.dlg_cf.cmb_cat_period_id_filter, rows, add_empty=True, sort_combo=False)
 
         sql = ("SELECT hydrometer_id, hydrometer_customer_code "
                " FROM v_rtc_hydrometer "
@@ -2295,7 +2295,7 @@ class GwInfo(QObject):
         if rows:
             for row in rows:
                 rows_list.append(row)
-        tools_qt.set_item_data(self.dlg_cf.cmb_hyd_customer_code, rows_list, 1)
+        tools_qt.fill_combo_values(self.dlg_cf.cmb_hyd_customer_code, rows_list, 1)
 
         self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
         tools_qt.set_columns_config(self.tbl_hydrometer_value, table_hydro_value)
@@ -2309,8 +2309,8 @@ class GwInfo(QObject):
     def fill_tbl_hydrometer_values(self, qtable, table_name):
         """ Fill the table control to show hydrometers values """
 
-        cat_period = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 1)
-        customer_code = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.cmb_hyd_customer_code)
+        cat_period = tools_qt.get_combo_value(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 1)
+        customer_code = tools_qt.get_combo_value(self.dlg_cf, self.dlg_cf.cmb_hyd_customer_code)
         filter_ = f"connec_id::text = '{self.feature_id}' "
         if cat_period != '':
             filter_ += f" AND cat_period_id::text = '{cat_period}'"
@@ -2326,7 +2326,7 @@ class GwInfo(QObject):
         """ Get Filter for table hydrometer value with combo value"""
 
         # Get combo value
-        cat_period_id_filter = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 0)
+        cat_period_id_filter = tools_qt.get_combo_value(self.dlg_cf, self.dlg_cf.cmb_cat_period_id_filter, 0)
 
         # Set filter
         expr = f"{self.field_id} = '{self.feature_id}'"
@@ -2394,7 +2394,7 @@ class GwInfo(QObject):
         rows = self.controller.get_rows(sql)
         if rows:
             rows.append(['', ''])
-            tools_qt.set_item_data(self.dlg_cf.event_id, rows)
+            tools_qt.fill_combo_values(self.dlg_cf.event_id, rows)
         # Fill ComboBox event_type
         sql = (f"SELECT DISTINCT(parameter_type), parameter_type "
                f"FROM {table_name_event_id} "
@@ -2403,7 +2403,7 @@ class GwInfo(QObject):
         rows = self.controller.get_rows(sql)
         if rows:
             rows.append(['', ''])
-            tools_qt.set_item_data(self.dlg_cf.event_type, rows)
+            tools_qt.fill_combo_values(self.dlg_cf.event_type, rows)
 
         self.set_model_to_table(widget, table_name)
         self.set_filter_table_event(widget)
@@ -2562,7 +2562,7 @@ class GwInfo(QObject):
 
         # Cascade filter
         table_name_event_id = "config_visit_parameter"
-        event_type_value = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
+        event_type_value = tools_qt.get_combo_value(self.dlg_cf, self.dlg_cf.event_type, 0)
 
         feature_type = {'arc_id': 'ARC', 'connec_id': 'CONNEC', 'gully_id': 'GULLY', 'node_id': 'NODE'}
         # Fill ComboBox event_id
@@ -2574,12 +2574,12 @@ class GwInfo(QObject):
         rows = self.controller.get_rows(sql)
         if rows:
             rows.append(['', ''])
-            tools_qt.set_item_data(self.dlg_cf.event_id, rows, 1)
+            tools_qt.fill_combo_values(self.dlg_cf.event_id, rows, 1)
 
         # End cascading filter
         # Get selected values in Comboboxes
-        event_type_value = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
-        event_id = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.event_id, 0)
+        event_type_value = tools_qt.get_combo_value(self.dlg_cf, self.dlg_cf.event_type, 0)
+        event_id = tools_qt.get_combo_value(self.dlg_cf, self.dlg_cf.event_id, 0)
         format_low = 'yyyy-MM-dd 00:00:00.000'
         format_high = 'yyyy-MM-dd 23:59:59.999'
         interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
@@ -2623,10 +2623,10 @@ class GwInfo(QObject):
         expr += f" AND visit_start BETWEEN {interval}"
 
         # Get selected values in Comboboxes
-        event_type_value = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.event_type, 0)
+        event_type_value = tools_qt.get_combo_value(self.dlg_cf, self.dlg_cf.event_type, 0)
         if event_type_value != 'null':
             expr += f" AND parameter_type ILIKE '%{event_type_value}%'"
-        event_id = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.event_id, 0)
+        event_id = tools_qt.get_combo_value(self.dlg_cf, self.dlg_cf.event_id, 0)
         if event_id != 'null':
             expr += f" AND parameter_id ILIKE '%{event_id}%'"
 
@@ -2657,7 +2657,7 @@ class GwInfo(QObject):
         """ Call button 64: om_add_visit """
 
         # Get expl_id to save it on om_visit and show the geometry of visit
-        expl_id = tools_qt.get_item_data(self.dlg_cf, self.tab_type + '_expl_id', 0)
+        expl_id = tools_qt.get_combo_value(self.dlg_cf, self.tab_type + '_expl_id', 0)
         if expl_id == -1:
             msg = "Widget expl_id not found"
             self.controller.show_warning(msg)
@@ -2826,7 +2826,7 @@ class GwInfo(QObject):
         rows = self.controller.get_rows(sql)
         if rows:
             rows.append(['', ''])
-        tools_qt.set_item_data(doc_type, rows)
+        tools_qt.fill_combo_values(doc_type, rows)
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "doc"
@@ -2857,7 +2857,7 @@ class GwInfo(QObject):
         expr += f" AND(date BETWEEN {interval}) AND (date BETWEEN {interval})"
 
         # Get selected values in Comboboxes
-        doc_type_value = tools_qt.get_item_data(self.dlg_cf, self.dlg_cf.doc_type, 0)
+        doc_type_value = tools_qt.get_combo_value(self.dlg_cf, self.dlg_cf.doc_type, 0)
         if doc_type_value != 'null' and doc_type_value is not None:
             expr += f" AND doc_type ILIKE '%{doc_type_value}%'"
 
@@ -3367,13 +3367,13 @@ class GwInfo(QObject):
         :return:
         """
         w_dma_id = self.dlg_cf.findChild(QComboBox, 'data_dma_id')
-        dma_id = tools_qt.get_item_data(self.dlg_cf, w_dma_id)
+        dma_id = tools_qt.get_combo_value(self.dlg_cf, w_dma_id)
         w_presszone_id = self.dlg_cf.findChild(QComboBox, 'data_presszone_id')
-        presszone_id = tools_qt.get_item_data(self.dlg_cf, w_presszone_id)
+        presszone_id = tools_qt.get_combo_value(self.dlg_cf, w_presszone_id)
         w_sector_id = self.dlg_cf.findChild(QComboBox, 'data_sector_id')
-        sector_id = tools_qt.get_item_data(self.dlg_cf, w_sector_id)
+        sector_id = tools_qt.get_combo_value(self.dlg_cf, w_sector_id)
         w_dqa_id = self.dlg_cf.findChild(QComboBox, 'data_dqa_id')
-        dqa_id = tools_qt.get_item_data(self.dlg_cf, w_dqa_id)
+        dqa_id = tools_qt.get_combo_value(self.dlg_cf, w_dqa_id)
 
         feature = f'"featureType":"{self.feature_type}", "id":"{self.feature_id}"'
         extras = (f'"arcId":"{feat_id}", "dmaId":"{dma_id}", "presszoneId":"{presszone_id}", "sectorId":"{sector_id}", '

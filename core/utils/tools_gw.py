@@ -696,7 +696,7 @@ def draw_by_json(complet_result, rubber_band, margin=None, reset_rb=True, color=
         point = QgsPointXY(float(max_x), float(max_y))
         draw_point(point, rubber_band, color, width)
     else:
-        points = tools_qgis.get_points(list_coord)
+        points = tools_qgis.get_geometry_vertex(list_coord)
         draw_polyline(points, rubber_band, color, width)
     if margin is not None:
         tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
@@ -1036,7 +1036,7 @@ def populate_vlayer(virtual_layer, data, layer_type, counter, group='GW Temporal
             prov.addAttributes([QgsField(str(key), QVariant.String)])
 
     for feature in data[layer_type]['features']:
-        geometry = get_geometry(feature)
+        geometry = get_geometry_from_json(feature)
         if not geometry:
             continue
         attributes = []
@@ -1060,20 +1060,20 @@ def populate_vlayer(virtual_layer, data, layer_type, counter, group='GW Temporal
     my_group.insertLayer(0, virtual_layer)
 
 
-def get_geometry(feature):
+def get_geometry_from_json(feature):
     """ Get coordinates from GeoJson and return QGsGeometry
     :param feature: feature to get geometry type and coordinates (GeoJson)
     :return: Geometry of the feature (QgsGeometry)
     functions  called in -> getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
-        def get_point(feature)
-        get_linestring(feature)
-        get_multilinestring(feature)
-        get_polygon(feature)
-        get_multipolygon(feature)
+        def get_vertex_from_point(feature)
+        get_vertex_from_linestring(feature)
+        get_vertex_from_multilinestring(feature)
+        get_vertex_from_polygon(feature)
+        get_vertex_from_multipolygon(feature)
     """
 
     try:
-        coordinates = getattr(sys.modules[__name__], f"get_{feature['geometry']['type'].lower()}")(feature)
+        coordinates = getattr(sys.modules[__name__], f"get_vertex_from_{feature['geometry']['type'].lower()}")(feature)
         type_ = feature['geometry']['type']
         geometry = f"{type_}{coordinates}"
         return QgsGeometry.fromWkt(geometry)
@@ -1082,51 +1082,51 @@ def get_geometry(feature):
         return None
 
 
-def get_point(feature):
+def get_vertex_from_point(feature):
     """ Manage feature geometry when is Point
     :param feature: feature to get geometry type and coordinates (GeoJson)
     :return: Coordinates of the feature (String)
-    This function is called in def get_geometry(feature)
+    This function is called in def get_geometry_from_json(feature)
           geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
     """
     return f"({feature['geometry']['coordinates'][0]} {feature['geometry']['coordinates'][1]})"
 
 
-def get_linestring(feature):
+def get_vertex_from_linestring(feature):
     """ Manage feature geometry when is LineString
     :param feature: feature to get geometry type and coordinates (GeoJson)
     :return: Coordinates of the feature (String)
-    This function is called in def get_geometry(feature)
+    This function is called in def get_geometry_from_json(feature)
           geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
     """
-    return get_coordinates(feature)
+    return get_vertex_from_points(feature)
 
 
-def get_multilinestring(feature):
+def get_vertex_from_multilinestring(feature):
     """ Manage feature geometry when is MultiLineString
     :param feature: feature to get geometry type and coordinates (GeoJson)
     :return: Coordinates of the feature (String)
-    This function is called in def get_geometry(feature)
+    This function is called in def get_geometry_from_json(feature)
           geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
     """
     return get_multi_coordinates(feature)
 
 
-def get_polygon(feature):
+def get_vertex_from_polygon(feature):
     """ Manage feature geometry when is Polygon
     :param feature: feature to get geometry type and coordinates (GeoJson)
     :return: Coordinates of the feature (String)
-    This function is called in def get_geometry(feature)
+    This function is called in def get_geometry_from_json(feature)
           geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
     """
     return get_multi_coordinates(feature)
 
 
-def get_multipolygon(feature):
+def get_vertex_from_multipolygon(feature):
     """ Manage feature geometry when is MultiPolygon
     :param feature: feature to get geometry type and coordinates (GeoJson)
     :return: Coordinates of the feature (String)
-    This function is called in def get_geometry(feature)
+    This function is called in def get_geometry_from_json(feature)
           geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
     """
 
@@ -1143,7 +1143,7 @@ def get_multipolygon(feature):
     return coordinates
 
 
-def get_coordinates(feature):
+def get_vertex_from_points(feature):
     """ Get coordinates of the received feature, to be a point
     :param feature: Json with the information of the received feature (geoJson)
     :return: Coordinates of the feature received (String)
@@ -1598,7 +1598,7 @@ def get_values_changed_param_user(dialog, chk, widget, field, list, value=None):
     if type(widget) is QLineEdit:
         value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
     elif type(widget) is QComboBox:
-        value = tools_qt.get_item_data(dialog, widget, 0)
+        value = tools_qt.get_combo_value(dialog, widget, 0)
     elif type(widget) is QCheckBox:
         value = tools_qt.isChecked(dialog, widget)
     elif type(widget) is QDateEdit:
@@ -1688,7 +1688,7 @@ def get_values(dialog, widget, _json=None):
     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit) and widget.isReadOnly() is False:
         value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
     elif type(widget) is QComboBox and widget.isEnabled():
-        value = tools_qt.get_item_data(dialog, widget, 0)
+        value = tools_qt.get_combo_value(dialog, widget, 0)
     elif type(widget) is QCheckBox and widget.isEnabled():
         value = tools_qt.isChecked(dialog, widget)
     elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
@@ -1915,7 +1915,7 @@ def add_combo(field):
         widget.setProperty('columnname', field['columnname'])
     widget = fill_combo(widget, field)
     if 'selectedId' in field:
-        tools_qt.set_combo_itemData(widget, field['selectedId'], 0)
+        tools_qt.set_combo_value(widget, field['selectedId'], 0)
         widget.setProperty('selectedId', field['selectedId'])
     else:
         widget.setProperty('selectedId', None)
@@ -1964,8 +1964,8 @@ def manage_child(dialog, combo_parent, combo_child):
                 'enableWhenParent' not in combo_child['widgetcontrols']:
             return
         #
-        if (str(tools_qt.get_item_data(dialog, combo_parent, 0)) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
-                and (tools_qt.get_item_data(dialog, combo_parent, 0) not in (None, '')):
+        if (str(tools_qt.get_combo_value(dialog, combo_parent, 0)) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
+                and (tools_qt.get_combo_value(dialog, combo_parent, 0) not in (None, '')):
             # The keepDisbled property is used to keep the edition enabled or disabled,
             # when we activate the layer and call the "enable_all" function
             child.setProperty('keepDisbled', False)
@@ -1985,7 +1985,7 @@ def get_child(dialog, widget, feature_type, tablename, field_id):
     """
 
     combo_parent = widget.property('columnname')
-    combo_id = tools_qt.get_item_data(dialog, widget)
+    combo_id = tools_qt.get_combo_value(dialog, widget)
 
     feature = f'"featureType":"{feature_type}", '
     feature += f'"tableName":"{tablename}", '
@@ -2004,7 +2004,7 @@ def get_child(dialog, widget, feature_type, tablename, field_id):
 def fill_child(dialog, widget, action, geom_type=''):
 
     combo_parent = widget.objectName()
-    combo_id = tools_qt.get_item_data(dialog, widget)
+    combo_id = tools_qt.get_combo_value(dialog, widget)
     # TODO cambiar por gw_fct_getchilds then unified with get_child if posible
     json_result = global_vars.controller.get_json('gw_fct_getcombochilds', f"'{action}' ,'' ,'' ,'{combo_parent}', '{combo_id}','{geom_type}'")
     for combo_child in json_result['fields']:
@@ -2019,3 +2019,30 @@ def cast_boolean(param):
         return bool_dict[param]
     except KeyError:
         return True
+
+
+def get_expression_filter(geom_type, list_ids=None, layers=None):
+    """ Set an expression filter with the contents of the list.
+        Set a model with selected filter. Attach that model to selected table
+    """
+
+    list_ids = list_ids[geom_type]
+    field_id = geom_type + "_id"
+    if len(list_ids) == 0:
+        return None
+
+    # Set expression filter with features in the list
+    expr_filter = field_id + " IN ("
+    for i in range(len(list_ids)):
+        expr_filter += f"'{list_ids[i]}', "
+    expr_filter = expr_filter[:-2] + ")"
+
+    # Check expression
+    (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
+    if not is_valid:
+        return None
+
+    # Select features of layers applying @expr
+    tools_qgis.select_features_by_ids(geom_type, expr, layers=layers)
+
+    return expr_filter

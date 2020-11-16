@@ -129,7 +129,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
             node_type = feature.attribute('node_type')
             sql = "SELECT DISTINCT(id), id FROM cat_node  ORDER BY id"
             rows = self.controller.get_rows(sql)
-            tools_qt.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
+            tools_qt.fill_combo_values(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
         self.dlg_chg_node_type.node_node_type.setText(node_type)
         self.dlg_chg_node_type.btn_catalog.clicked.connect(partial(self.open_catalog))
@@ -157,7 +157,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
         # Populate catalog_id
         sql = f"SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '{node_node_type_new}' ORDER BY id"
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
 
     """ QgsMapTools inherited event functions """

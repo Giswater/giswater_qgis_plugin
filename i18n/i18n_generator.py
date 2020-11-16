@@ -67,10 +67,10 @@ class GwI18NGenerator:
         tools_qt.setWidgetText(self.dlg_qm, 'lbl_info', f'Connected to {host}')
         sql = "SELECT user_language, py_language, xml_language, py_file FROM i18n.cat_language"
         rows = self.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_qm.cmb_language, rows, 0)
+        tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows, 0)
         cur_user = self.controller.get_current_user()
         language = self.controller.plugin_settings_value('qm_lang_language' + cur_user)
-        tools_qt.set_combo_itemData(self.dlg_qm.cmb_language, language, 0)
+        tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0)
 
 
     def check_translate_options(self):
@@ -106,9 +106,9 @@ class GwI18NGenerator:
         # In the database, the dialog_name column must match the name of the ui file (no extension).
         # Also, open_dialog function must be called, passed as parameter dlg_name = 'ui_file_name_without_extension'
 
-        py_language = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
-        xml_language = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 2)
-        py_file = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
+        py_language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 1)
+        xml_language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 2)
+        py_file = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 3)
         key_lbl = f'lb_{py_language}'
         key_tooltip = f'tt_{py_language}'
 
@@ -242,8 +242,8 @@ class GwI18NGenerator:
 
     def get_files_config_messages(self):
         """ Read the values of the database and update the i18n files """
-        db_lang = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
-        file_lng = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
+        db_lang = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 1)
+        file_lng = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 3)
 
         version_metadata = get_plugin_version()
         ver = version_metadata.split('.')
@@ -295,7 +295,7 @@ class GwI18NGenerator:
 
 
         file = open(path, "a")
-        db_lang = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
+        db_lang = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 1)
 
         for row in rows:
             table = row['context'] if row['context'] is not None else ""
@@ -356,7 +356,7 @@ class GwI18NGenerator:
         port = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_port, return_string_null=False)
         db = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_db, return_string_null=False)
         user = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_user, return_string_null=False)
-        language = tools_qt.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 0)
+        language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         py_msg = tools_qt.isChecked(self.dlg_qm, self.dlg_qm.chk_py_msg)
         db_msg = tools_qt.isChecked(self.dlg_qm, self.dlg_qm.chk_db_msg)
         set_parser_value('i18n_generator', 'qm_lang_host', f"{host}")

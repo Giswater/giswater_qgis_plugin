@@ -223,7 +223,7 @@ class GwInfoButton(GwParentMapTool):
             point = QgsPointXY(float(max_x), float(max_y))
             tools_gw.draw_point(point, self.rubber_band)
         else:
-            points = tools_qgis.get_points(list_coord)
+            points = tools_qgis.get_geometry_vertex(list_coord)
             tools_gw.draw_polyline(points, self.rubber_band)
 
 

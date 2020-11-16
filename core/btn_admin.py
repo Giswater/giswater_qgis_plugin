@@ -219,7 +219,7 @@ class GwAdmin:
         self.cmb_project_type.currentIndexChanged.connect(partial(self.set_info_project))
         self.cmb_project_type.currentIndexChanged.connect(partial(self.update_manage_ui))
         self.dlg_readsql.btn_custom_select_file.clicked.connect(
-            partial(tools_qt.get_folder_dialog, self.dlg_readsql, "custom_path_folder"))
+            partial(tools_qt.get_folder_path, self.dlg_readsql, "custom_path_folder"))
         self.cmb_connection.currentIndexChanged.connect(partial(self.event_change_connection))
         self.cmb_connection.currentIndexChanged.connect(partial(self.set_info_project))
         self.dlg_readsql.btn_schema_rename.clicked.connect(partial(self.open_rename))
@@ -268,10 +268,10 @@ class GwAdmin:
         self.populate_combo_connections()
 
         if str(self.list_connections) != '[]':
-            tools_qt.set_item_data(self.cmb_connection, self.list_connections, 1)
+            tools_qt.fill_combo_values(self.cmb_connection, self.list_connections, 1)
 
         # Set last connection for default
-        tools_qt.set_combo_itemData(self.cmb_connection, str(self.last_connection), 1)
+        tools_qt.set_combo_value(self.cmb_connection, str(self.last_connection), 1)
 
         # Set title
         connection = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
@@ -457,7 +457,7 @@ class GwAdmin:
 
         # Set listeners
         self.dlg_create_gis_project.btn_gis_folder.clicked.connect(
-            partial(tools_qt.get_folder_dialog, self.dlg_create_gis_project, "txt_gis_folder"))
+            partial(tools_qt.get_folder_path, self.dlg_create_gis_project, "txt_gis_folder"))
         self.dlg_create_gis_project.btn_accept.clicked.connect(partial(self.gis_create_project))
         self.dlg_create_gis_project.btn_close.clicked.connect(partial(self.close_dialog_admin, self.dlg_create_gis_project))
         self.dlg_create_gis_project.chk_is_sample.stateChanged.connect(partial(self.sample_state_changed))
@@ -1918,7 +1918,7 @@ class GwAdmin:
         # TODO:: Populate combo from visitclass manager and wip
         # sql = ("SELECT id, idval FROM config_visit_class")
         # rows = self.controller.get_rows(sql, commit=True)
-        # qt_tools.set_item_data(self.dlg_readsql.cmb_visit_class, rows, 1)
+        # qt_tools.fill_combo_values(self.dlg_readsql.cmb_visit_class, rows, 1)
 
         # Set listeners
         # self.dlg_readsql.btn_visit_create.clicked.connect(partial(self.create_visit_param))
@@ -1935,11 +1935,11 @@ class GwAdmin:
         # Manage widgets
         sql = "SELECT id, id as idval FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2"
         rows = self.controller.get_rows(sql, commit=True)
-        tools_qt.set_item_data(self.dlg_manage_visit_class.feature_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_visit_class.feature_type, rows, 1)
 
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue ='visit_type'"
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_manage_visit_class.visit_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_visit_class.visit_type, rows, 1)
 
         # Set listeners
 
@@ -1958,19 +1958,19 @@ class GwAdmin:
         # Manage widgets
         sql = "SELECT id, id as idval FROM om_visit_parameter_type"
         rows = self.controller.get_rows(sql, commit=True)
-        tools_qt.set_item_data(self.dlg_manage_visit_param.parameter_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_visit_param.parameter_type, rows, 1)
 
         sql = "SELECT id, idval FROM config_typevalue WHERE typevalue = 'datatype'"
         rows = self.controller.get_rows(sql, commit=True)
-        tools_qt.set_item_data(self.dlg_manage_visit_param.data_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_visit_param.data_type, rows, 1)
 
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_form_type'"
         rows = self.controller.get_rows(sql, commit=True)
-        tools_qt.set_item_data(self.dlg_manage_visit_param.form_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_visit_param.form_type, rows, 1)
 
         sql = "SELECT id, idval FROM config_typevalue WHERE typevalue = 'widgettype'"
         rows = self.controller.get_rows(sql, commit=True)
-        tools_qt.set_item_data(self.dlg_manage_visit_param.widget_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_visit_param.widget_type, rows, 1)
 
         # Set listeners
 
@@ -2103,7 +2103,7 @@ class GwAdmin:
             self.dlg_readsql.project_schema_name.clear()
             return
 
-        tools_qt.set_item_data(self.dlg_readsql.project_schema_name, result_list, 1)
+        tools_qt.fill_combo_values(self.dlg_readsql.project_schema_name, result_list, 1)
 
     def manage_srid(self):
         """ Manage SRID configuration """
@@ -2797,14 +2797,14 @@ class GwAdmin:
             sql = (f"SELECT cat_feature.child_layer, cat_feature.child_layer FROM {schema_name}.cat_feature "
                    f" ORDER BY id")
             rows = self.controller.get_rows(sql)
-            tools_qt.set_item_data(self.dlg_readsql.cmb_formname_ui, rows, 1)
+            tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_ui, rows, 1)
 
             sql = (f"SELECT cat_feature.id, cat_feature.id FROM {schema_name}.cat_feature "
                    f" ORDER BY id")
             rows = self.controller.get_rows(sql)
-            tools_qt.set_item_data(self.dlg_readsql.cmb_formname_fields, rows, 1)
-            tools_qt.set_item_data(self.dlg_readsql.cmb_feature_name_view, rows, 1)
-            tools_qt.set_item_data(self.dlg_readsql.cmb_feature_sys_fields, rows, 1)
+            tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_fields, rows, 1)
+            tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_name_view, rows, 1)
+            tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_sys_fields, rows, 1)
 
 
     def create_child_view(self):
@@ -3011,20 +3011,20 @@ class GwAdmin:
         sql = (f"SELECT DISTINCT(id), idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_manage_fields.widgettype, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_fields.widgettype, rows, 1)
 
         # Populate datatype combo
         sql = (f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_manage_fields.datatype, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_fields.datatype, rows, 1)
 
         # Populate widgetfunction combo
         sql = (f"SELECT null as id, null as idval UNION ALL "
                f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_manage_fields.widgetfunction, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_fields.widgetfunction, rows, 1)
 
         # Set default value for formtype widget
         tools_qt.setWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
@@ -3090,7 +3090,7 @@ class GwAdmin:
                    f"WHERE cat_feature_id = '" + form_name + "'")
 
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_manage_fields.cmb_fields, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_fields.cmb_fields, rows, 1)
 
 
     def manage_close_dlg(self, dlg_to_close):
@@ -3116,7 +3116,7 @@ class GwAdmin:
                 if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
                     value = tools_qt.getWidgetText(self.dlg_manage_sys_fields, widget, return_string_null=False)
                 elif type(widget) is QComboBox:
-                    value = tools_qt.get_item_data(self.dlg_manage_sys_fields, widget, 0)
+                    value = tools_qt.get_combo_value(self.dlg_manage_sys_fields, widget, 0)
                 elif type(widget) is QCheckBox:
                     value = tools_qt.isChecked(self.dlg_manage_sys_fields, widget)
                 elif type(widget) is QgsDateTimeEdit:
@@ -3181,7 +3181,7 @@ class GwAdmin:
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
                         value = tools_qt.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)
                     elif type(widget) is QComboBox:
-                        value = tools_qt.get_item_data(self.dlg_manage_fields, widget, 0)
+                        value = tools_qt.get_combo_value(self.dlg_manage_fields, widget, 0)
                     elif type(widget) is QCheckBox:
                         value = tools_qt.isChecked(self.dlg_manage_fields, widget)
                     elif type(widget) is QgsDateTimeEdit:
@@ -3222,7 +3222,7 @@ class GwAdmin:
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
                         value = tools_qt.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)
                     elif type(widget) is QComboBox:
-                        value = tools_qt.get_item_data(self.dlg_manage_fields, widget, 0)
+                        value = tools_qt.get_combo_value(self.dlg_manage_fields, widget, 0)
                     elif type(widget) is QCheckBox:
                         value = tools_qt.isChecked(self.dlg_manage_fields, widget)
                     elif type(widget) is QgsDateTimeEdit:
@@ -3446,7 +3446,7 @@ class GwAdmin:
         self.dlg_credentials = Credentials()
 
         if str(self.list_connections) != '[]':
-            tools_qt.set_item_data(self.dlg_credentials.cmb_connection, self.list_connections, 1)
+            tools_qt.fill_combo_values(self.dlg_credentials.cmb_connection, self.list_connections, 1)
         else:
             msg = "You don't have any connection configurated on QGIS. Check your connections."
             self.controller.show_info_box(msg, "Info")

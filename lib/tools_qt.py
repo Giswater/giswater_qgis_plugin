@@ -313,26 +313,6 @@ def setImage(dialog, widget, cat_shape):
         widget.show()
 
 
-def fillWidget(dialog, widget, row):
-
-    if type(widget) is str or type(widget) is str:
-        widget = dialog.findChild(QWidget, widget)
-    if not widget:
-        return
-    key = widget.objectName()
-    if key in row:
-        if row[key] is not None:
-            value = str(row[key])
-            if type(widget) is QLineEdit or type(widget) is QTextEdit:
-                if value == 'None':
-                    value = ""
-                widget.setText(value)
-        else:
-            widget.setText("")
-    else:
-        widget.setText("")
-
-
 def set_autocompleter(combobox, list_items=None):
     """ Iterate over the items in the QCombobox, create a list,
         create the model, and set the model according to the list
@@ -369,12 +349,12 @@ def set_model_by_list(string_list, widget, proxy_model):
     widget.setCompleter(completer)
 
 
-def get_item_data(dialog, widget, index=0, add_quote=False):
+def get_combo_value(dialog, widget, index=0, add_quote=False):
     """ Get item data of current index of the @widget """
 
-    code = -1
+    value = -1
     if add_quote:
-        code = ''
+        value = ''
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
     if widget:
@@ -383,12 +363,12 @@ def get_item_data(dialog, widget, index=0, add_quote=False):
             elem = widget.itemData(current_index)
             if index == -1:
                 return elem
-            code = elem[index]
+            value = elem[index]
 
-    return code
+    return value
 
 
-def set_combo_itemData(combo, value, item1):
+def set_combo_value(combo, value, item1):
     """ Set text to combobox populate with more than 1 item for row
         @item1: element to compare
         @item2: element to show
@@ -401,7 +381,7 @@ def set_combo_itemData(combo, value, item1):
     return False
 
 
-def set_item_data(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True, sort_by=1, add_empty=False):
+def fill_combo_values(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True, sort_by=1, add_empty=False):
     """ Populate @combo with list @rows and show field @index_to_show
     :param sort_by: sort combo by this element (column)
     """
@@ -966,8 +946,8 @@ def set_model_to_table(widget, table_name, expr_filter):
         global_vars.controller.log_info("set_model_to_table: widget not found")
 
 
-def get_folder_dialog(dialog, widget):
-    """ Get folder dialog """
+def get_folder_path(dialog, widget):
+    """ Get folder path """
 
     # Check if selected folder exists. Set default value if necessary
     folder_path = getWidgetText(dialog, widget)
@@ -1159,9 +1139,9 @@ def put_combobox(qtable, rows, field, widget_pos, combo_values):
         combo = QComboBox()
         row = rows[x]
         # Populate QComboBox
-        set_item_data(combo, combo_values, 1)
+        fill_combo_values(combo, combo_values, 1)
         # Set QCombobox to wanted item
-        set_combo_itemData(combo, str(row[field]), 1)
+        set_combo_value(combo, str(row[field]), 1)
         # Get index and put QComboBox into QTableView at index position
         idx = qtable.model().index(x, widget_pos)
         qtable.setIndexWidget(idx, combo)
@@ -1328,7 +1308,7 @@ def get_records_geom_type(dialog, table_object, geom_type, ids=None, list_ids=No
             list_ids[geom_type].append(str(row[0]))
             ids.append(str(row[0]))
 
-        expr_filter = get_expr_filter(geom_type, list_ids=list_ids, layers=layers)
+        expr_filter = tools_gw.get_expression_filter(geom_type, list_ids=list_ids, layers=layers)
         set_table_model(dialog, widget_name, geom_type, expr_filter)
 
     return ids, layers, list_ids
@@ -1477,7 +1457,7 @@ def fill_widgets(dialog, table_object, row):
         setWidgetText(dialog, "elementcat_id", row['elementcat_id'])
         setWidgetText(dialog, "num_elements", row['num_elements'])
         setWidgetText(dialog, "state", state)
-        set_combo_itemData(dialog.state_type, f"{row['state_type']}", 0)
+        set_combo_value(dialog.state_type, f"{row['state_type']}", 0)
         setWidgetText(dialog, "expl_id", expl_id)
         setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
         setWidgetText(dialog, "location_type", row['location_type'])
@@ -1518,33 +1498,6 @@ def set_calendars(dialog, widget, table_name, value, parameter):
     else:
         date = QDate.currentDate()
     setCalendarDate(dialog, widget, date)
-
-
-def get_expr_filter(geom_type, list_ids=None, layers=None):
-    """ Set an expression filter with the contents of the list.
-        Set a model with selected filter. Attach that model to selected table
-    """
-
-    list_ids = list_ids[geom_type]
-    field_id = geom_type + "_id"
-    if len(list_ids) == 0:
-        return None
-
-    # Set expression filter with features in the list
-    expr_filter = field_id + " IN ("
-    for i in range(len(list_ids)):
-        expr_filter += f"'{list_ids[i]}', "
-    expr_filter = expr_filter[:-2] + ")"
-
-    # Check expression
-    (is_valid, expr) = check_expression_filter(expr_filter)
-    if not is_valid:
-        return None
-
-    # Select features of layers applying @expr
-    tools_qgis.select_features_by_ids(geom_type, expr, layers=layers)
-
-    return expr_filter
 
 
 def reload_qtable(dialog, geom_type):

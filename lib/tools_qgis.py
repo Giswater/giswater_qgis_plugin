@@ -831,7 +831,7 @@ def get_composer_index(name):
     return index
 
 
-def get_points(list_coord=None):
+def get_geometry_vertex(list_coord=None):
     """ Return list of QgsPoints taken from geometry
     :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
     """

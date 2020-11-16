@@ -144,15 +144,15 @@ class GwElement:
         # Fill combo boxes
         sql = "SELECT DISTINCT(elementtype_id), elementtype_id FROM cat_element ORDER BY elementtype_id"
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_add_element.element_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.element_type, rows, 1)
 
         sql = "SELECT expl_id, name FROM exploitation WHERE expl_id != '0' ORDER BY name"
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_add_element.expl_id, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.expl_id, rows, 1)
 
         sql = "SELECT DISTINCT(id), name FROM value_state"
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_add_element.state, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.state, rows, 1)
 
         self.filter_state_type()
 
@@ -160,32 +160,32 @@ class GwElement:
                " WHERE feature_type = 'ELEMENT' "
                " ORDER BY location_type")
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_add_element.location_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.location_type, rows, 1)
 
         if rows:
-            tools_qt.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)
+            tools_qt.set_combo_value(self.dlg_add_element.location_type, rows[0][0], 0)
 
         sql = "SELECT DISTINCT(id), id FROM cat_owner"
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_add_element.ownercat_id, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.ownercat_id, rows, 1, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM cat_builder"
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_add_element.buildercat_id, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.buildercat_id, rows, 1, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM cat_work"
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_add_element.workcat_id, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.workcat_id, rows, 1, add_empty=True)
         self.dlg_add_element.workcat_id.currentIndexChanged.connect(partial(
             self.set_style_sheet, self.dlg_add_element.workcat_id, None))
 
         sql = "SELECT DISTINCT(id), id FROM cat_work"
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_add_element.workcat_id_end, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.workcat_id_end, rows, 1, add_empty=True)
 
         sql = "SELECT id, idval FROM edit_typevalue WHERE typevalue = 'value_verified'"
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_add_element.verified, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.verified, rows, 1, add_empty=True)
         self.filter_elementcat_id()
 
         if self.new_element_id:
@@ -245,16 +245,16 @@ class GwElement:
 
         row = self.controller.get_config(parameter)
         if row:
-            tools_qt.set_combo_itemData(combo, row[0], 0)
+            tools_qt.set_combo_value(combo, row[0], 0)
 
 
     def filter_state_type(self):
 
-        state = tools_qt.get_item_data(self.dlg_add_element, self.dlg_add_element.state, 0)
+        state = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.state, 0)
         sql = (f"SELECT DISTINCT(id), name FROM value_state_type "
                f"WHERE state = {state}")
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_add_element.state_type, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.state_type, rows, 1)
 
 
     def update_location_cmb(self):
@@ -265,9 +265,9 @@ class GwElement:
                f" AND (featurecat_id = '{element_type}' OR featurecat_id is null)"
                f" ORDER BY location_type")
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_add_element.location_type, rows, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_add_element.location_type, rows, add_empty=True)
         if rows:
-            tools_qt.set_combo_itemData(self.dlg_add_element.location_type, rows[0][0], 0)
+            tools_qt.set_combo_value(self.dlg_add_element.location_type, rows[0][0], 0)
 
 
     def fill_tbl_new_element(self, dialog, geom_type, feature_id):
@@ -292,17 +292,17 @@ class GwElement:
         # Get values from dialog
         element_id = tools_qt.getWidgetText(self.dlg_add_element, "element_id", return_string_null=False)
         code = tools_qt.getWidgetText(self.dlg_add_element, "code", return_string_null=False)
-        elementcat_id = tools_qt.get_item_data(self.dlg_add_element, self.dlg_add_element.elementcat_id)
-        ownercat_id = tools_qt.get_item_data(self.dlg_add_element, self.dlg_add_element.ownercat_id)
-        location_type = tools_qt.get_item_data(self.dlg_add_element, self.dlg_add_element.location_type)
-        buildercat_id = tools_qt.get_item_data(self.dlg_add_element, self.dlg_add_element.buildercat_id)
+        elementcat_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.elementcat_id)
+        ownercat_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.ownercat_id)
+        location_type = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.location_type)
+        buildercat_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.buildercat_id)
         builtdate = tools_qt.getWidgetText(self.dlg_add_element, "builtdate", return_string_null=False)
-        workcat_id = tools_qt.get_item_data(self.dlg_add_element, self.dlg_add_element.workcat_id)
-        workcat_id_end = tools_qt.get_item_data(self.dlg_add_element, self.dlg_add_element.workcat_id_end)
+        workcat_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.workcat_id)
+        workcat_id_end = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.workcat_id_end)
         comment = tools_qt.getWidgetText(self.dlg_add_element, "comment", return_string_null=False)
         observ = tools_qt.getWidgetText(self.dlg_add_element, "observ", return_string_null=False)
         link = tools_qt.getWidgetText(self.dlg_add_element, "link", return_string_null=False)
-        verified = tools_qt.get_item_data(self.dlg_add_element, self.dlg_add_element.verified)
+        verified = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.verified)
         rotation = tools_qt.getWidgetText(self.dlg_add_element, "rotation")
         if rotation == 0 or rotation is None or rotation == 'null':
             rotation = '0'
@@ -317,13 +317,13 @@ class GwElement:
         if num_elements == '':
             self.controller.show_warning(message, parameter="num_elements")
             return
-        state = tools_qt.get_item_data(self.dlg_add_element, self.dlg_add_element.state)
+        state = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.state)
         if state == '':
             self.controller.show_warning(message, parameter="state_id")
             return
 
-        state_type = tools_qt.get_item_data(self.dlg_add_element, self.dlg_add_element.state_type)
-        expl_id = tools_qt.get_item_data(self.dlg_add_element, self.dlg_add_element.expl_id)
+        state_type = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.state_type)
+        expl_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.expl_id)
 
         # Get SRID
         srid = global_vars.srid
@@ -479,12 +479,12 @@ class GwElement:
     def filter_elementcat_id(self):
         """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
 
-        element_type = tools_qt.get_item_data(self.dlg_add_element, self.dlg_add_element.element_type, 1)
+        element_type = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.element_type, 1)
         sql = (f"SELECT DISTINCT(id), id FROM cat_element"
                f" WHERE elementtype_id = '{element_type}'"
                f" ORDER BY id")
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_add_element.elementcat_id, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_element.elementcat_id, rows, 1)
 
 
     def edit_element(self):

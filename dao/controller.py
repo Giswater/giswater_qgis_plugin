@@ -1637,7 +1637,7 @@ class DaoController:
         try:
             stack_level += stack_level_increase
             module_path = inspect.stack()[stack_level][1]
-            file_name = tools_os.get_file_with_parents(module_path, 2)
+            file_name = tools_os.get_relative_path(module_path, 2)
             function_line = inspect.stack()[stack_level][2]
             function_name = inspect.stack()[stack_level][3]
 
@@ -1719,7 +1719,7 @@ class DaoController:
 
                 stack_level += stack_level_increase
                 module_path = inspect.stack()[stack_level][1]
-                file_name = tools_os.get_file_with_parents(module_path, 2)
+                file_name = tools_os.get_relative_path(module_path, 2)
                 function_line = inspect.stack()[stack_level][2]
                 function_name = inspect.stack()[stack_level][3]
 
@@ -1986,7 +1986,7 @@ class DaoController:
                             style_id = style_type[key]['id']
                             extras = f'"style_id":"{style_id}"'
                             body = tools_gw.create_body(extras=extras)
-                            style = global_vars.controller.get_json('gw_fct_getstyle', body)
+                            style = self.get_json('gw_fct_getstyle', body)
                             if style['status'] == 'Failed': return
                             if 'styles' in style['body']:
                                 if 'style' in style['body']['styles']:

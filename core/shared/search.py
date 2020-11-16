@@ -244,7 +244,7 @@ class GwSearch:
                 msg = "Empty coordinate list"
                 self.controller.show_warning(msg)
                 return
-            points = tools_qgis.get_points(list_coord)
+            points = tools_qgis.get_geometry_vertex(list_coord)
             self.draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y)
@@ -260,7 +260,7 @@ class GwSearch:
                 msg = "Empty coordinate list"
                 self.controller.show_warning(msg)
                 return
-            points = tools_qgis.get_points(list_coord)
+            points = tools_qgis.get_geometry_vertex(list_coord)
             self.rubber_band.reset()
             self.draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
@@ -303,10 +303,10 @@ class GwSearch:
 
         if combo_list:
             combo = combo_list[0]
-            id = tools_qt.get_item_data(self.dlg_search, combo, 0)
-            name = tools_qt.get_item_data(self.dlg_search, combo, 1)
+            id = tools_qt.get_combo_value(self.dlg_search, combo, 0)
+            name = tools_qt.get_combo_value(self.dlg_search, combo, 1)
             try:
-                feature_type = tools_qt.get_item_data(self.dlg_search, combo, 2)
+                feature_type = tools_qt.get_combo_value(self.dlg_search, combo, 2)
                 extras_search += f'"searchType":"{feature_type}", '
             except IndexError:
                 pass
@@ -387,9 +387,9 @@ class GwSearch:
         widget.setObjectName(field['widgetname'])
         widget.setProperty('columnname', field['columnname'])
         list_items = self.get_list_items(widget, field)
-        tools_qt.set_item_data(widget, list_items, 1)
+        tools_qt.fill_combo_values(widget, list_items, 1)
         if 'selectedId' in field:
-            tools_qt.set_combo_itemData(widget, field['selectedId'], 0)
+            tools_qt.set_combo_value(widget, field['selectedId'], 0)
         # noinspection PyUnresolvedReferences
         widget.currentIndexChanged.connect(partial(self.clear_lineedits))
 

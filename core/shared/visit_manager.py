@@ -469,7 +469,7 @@ class GwVisitManager:
             self.fill_widget_with_fields(self.dlg_add_visit, self.current_visit, self.current_visit.field_names())
             # Get parameter_id and feature_type from his event
             self.event_parameter_id, self.event_feature_type = self.get_data_from_event(self.visit_id_value)
-            tools_qt.set_combo_itemData(self.dlg_add_visit.parameter_id, self.event_parameter_id, 0)
+            tools_qt.set_combo_value(self.dlg_add_visit.parameter_id, self.event_parameter_id, 0)
 
         # C) load all related events in the relative table
         self.filter = f"visit_id = '{text}'"
@@ -532,9 +532,9 @@ class GwVisitManager:
         self.current_visit.enddate = tools_qt.getCalendarDate(self.dlg_add_visit, 'enddate')
         self.current_visit.user_name = self.user_name.text()
         self.current_visit.ext_code = self.ext_code.text()
-        self.current_visit.visitcat_id = tools_qt.get_item_data(self.dlg_add_visit, 'visitcat_id', 0)
+        self.current_visit.visitcat_id = tools_qt.get_combo_value(self.dlg_add_visit, 'visitcat_id', 0)
         self.current_visit.descript = tools_qt.getWidgetText(self.dlg_add_visit, 'descript', False, False)
-        self.current_visit.status = tools_qt.get_item_data(self.dlg_add_visit, 'status', 0)
+        self.current_visit.status = tools_qt.get_combo_value(self.dlg_add_visit, 'status', 0)
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
 
@@ -653,7 +653,7 @@ class GwVisitManager:
         # Set user devault parameter
         parameter_id = self.controller.get_config('om_visit_parameter_vdefault')
         if parameter_id:
-            tools_qt.set_combo_itemData(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
+            tools_qt.set_combo_value(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
 
 
     def set_parameter_id_combo(self, dialog):
@@ -668,12 +668,12 @@ class GwVisitManager:
         sql += f"ORDER BY id"
         rows = self.controller.get_rows(sql)
         if rows:
-            tools_qt.set_item_data(dialog.parameter_id, rows, 1)
+            tools_qt.fill_combo_values(dialog.parameter_id, rows, 1)
 
         # Set user devault parameter
         parameter_id = self.controller.get_config('om_visit_parameter_vdefault')
         if parameter_id:
-            tools_qt.set_combo_itemData(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
+            tools_qt.set_combo_value(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
 
 
     def get_feature_type_of_parameter(self):
@@ -807,7 +807,7 @@ class GwVisitManager:
         self.fill_combo_parameter_id()
 
         if self.event_parameter_id:
-            tools_qt.set_combo_itemData(self.dlg_add_visit.parameter_id, self.event_parameter_id, 0)
+            tools_qt.set_combo_value(self.dlg_add_visit.parameter_id, self.event_parameter_id, 0)
 
         if geom_type.lower() == 'all':
             return
@@ -973,13 +973,13 @@ class GwVisitManager:
         self.visitcat_ids = self.controller.get_rows(sql)
 
         if self.visitcat_ids:
-            tools_qt.set_item_data(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
+            tools_qt.fill_combo_values(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
             # now get default value to be show in visitcat_id
             row = self.controller.get_config('om_visit_cat_vdefault')
             if row:
                 # if int then look for default row ans set it
                 try:
-                    tools_qt.set_combo_itemData(self.dlg_add_visit.visitcat_id, row[0], 0)
+                    tools_qt.set_combo_value(self.dlg_add_visit.visitcat_id, row[0], 0)
                     for i in range(0, self.dlg_add_visit.visitcat_id.count()):
                         elem = self.dlg_add_visit.visitcat_id.itemData(i)
                         if str(row[0]) == str(elem[0]):
@@ -998,22 +998,22 @@ class GwVisitManager:
                        f" WHERE active is true AND id = '{id_visitcat[0]}' "
                        f" ORDER BY name")
                 row = self.controller.get_row(sql)
-                tools_qt.set_combo_itemData(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
+                tools_qt.set_combo_value(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
 
         # Fill ComboBox status
         rows = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
         if rows:
-            tools_qt.set_item_data(self.dlg_add_visit.status, rows, 1, sort_combo=True)
+            tools_qt.fill_combo_values(self.dlg_add_visit.status, rows, 1, sort_combo=True)
             status = self.controller.get_config('om_visit_status_vdefault')
             if status:
-                tools_qt.set_combo_itemData(self.dlg_add_visit.status, str(status[0]), 0)
+                tools_qt.set_combo_value(self.dlg_add_visit.status, str(status[0]), 0)
 
             if visit_id is not None:
                 sql = (f"SELECT status "
                        f"FROM om_visit "
                        f"WHERE id = '{visit_id}'")
                 status = self.controller.get_row(sql)
-                tools_qt.set_combo_itemData(self.dlg_add_visit.status, str(status[0]), 0)
+                tools_qt.set_combo_value(self.dlg_add_visit.status, str(status[0]), 0)
 
         # Relations tab
         # fill feature_type
@@ -1029,12 +1029,12 @@ class GwVisitManager:
         # Fill ComboBox parameter_type_id
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_param_type' ORDER by idval"
         parameter_type_ids = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
+        tools_qt.fill_combo_values(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
 
         # now get default value to be show in parameter_type_id
         row = self.controller.get_config('om_param_type_vdefault', log_info=False)
         if row:
-            tools_qt.set_combo_itemData(self.dlg_add_visit.parameter_type_id, row[0], 0)
+            tools_qt.set_combo_value(self.dlg_add_visit.parameter_type_id, row[0], 0)
 
 
     def fill_combo_parameter_id(self):
@@ -1055,7 +1055,7 @@ class GwVisitManager:
         sql += where
         sql += f"ORDER BY id"
         rows = self.controller.get_rows(sql)
-        tools_qt.set_item_data(self.dlg_add_visit.parameter_id, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_add_visit.parameter_id, rows, 1)
 
 
     def set_completers(self):
@@ -1111,8 +1111,8 @@ class GwVisitManager:
         self.files_all = []
 
         # check a parameter_id is selected (can be that no value is available)
-        parameter_id = tools_qt.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 0)
-        parameter_text = tools_qt.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 1)
+        parameter_id = tools_qt.get_combo_value(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 0)
+        parameter_text = tools_qt.get_combo_value(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 1)
 
         if not parameter_id or parameter_id == -1:
             message = "You need to select a valid parameter id"
@@ -1188,7 +1188,7 @@ class GwVisitManager:
             if type(getattr(self.dlg_event, field_name)) is QTextEdit:
                 value = getattr(self.dlg_event, field_name).toPlainText()
             if type(getattr(self.dlg_event, field_name)) is QComboBox:
-                value = tools_qt.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
+                value = tools_qt.get_combo_value(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
 
             if value:
                 setattr(event, field_name, value)
@@ -1386,7 +1386,7 @@ class GwVisitManager:
             self.controller.show_info_box(message)
             return
         # check a parameter_id is selected (can be that no value is available)
-        parameter_id = tools_qt.get_item_data(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 0)
+        parameter_id = tools_qt.get_combo_value(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 0)
 
         # Get selected rows
         # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent
@@ -1497,7 +1497,7 @@ class GwVisitManager:
             elif type(getattr(self.dlg_event, field_name)) is QTextEdit:
                 value = getattr(self.dlg_event, field_name).toPlainText()
             if type(getattr(self.dlg_event, field_name)) is QComboBox:
-                value = tools_qt.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
+                value = tools_qt.get_combo_value(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
             setattr(event, field_name, value)
 
         # set fixed values
@@ -1517,7 +1517,7 @@ class GwVisitManager:
                 elif type(getattr(self.dlg_event, field_name)) is QTextEdit:
                     value = getattr(self.dlg_event, field_name).toPlainText()
                 elif type(getattr(self.dlg_event, field_name)) is QComboBox:
-                    value = tools_qt.get_item_data(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
+                    value = tools_qt.get_combo_value(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
                 setattr(event, field_name, value)
 
             # update the record
@@ -1661,7 +1661,7 @@ class GwVisitManager:
 
         node_list.append([node_1, f"node 1: {node_1}"])
         node_list.append([node_2, f"node 2: {node_2}"])
-        tools_qt.set_item_data(self.dlg_event.position_id, node_list, 1, True, False)
+        tools_qt.fill_combo_values(self.dlg_event.position_id, node_list, 1, True, False)
 
 
     def visit_tab_feature_changed(self, dialog, table_object='visit', excluded_layers=[], layers=None):

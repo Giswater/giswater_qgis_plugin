@@ -38,7 +38,7 @@ def manage_tstamp(prefix_name='log', tstamp_format='%Y%m%d'):
     return name
 
 
-def get_file_with_parents(filepath, levels=1):
+def get_relative_path(filepath, levels=1):
 
     common = filepath
     for i in range(levels + 1):
