@@ -3291,7 +3291,7 @@ class GwInfo(QObject):
         self.vertex_marker.setPenWidth(3)
 
         # Store user snapping configuration
-        self.previous_snapping = self.snapper_manager.get_snapping_options
+        self.snapper_manager.store_snapping_options()
 
         # Disable snapping
         self.snapper_manager.enable_snapping()
@@ -3356,7 +3356,7 @@ class GwInfo(QObject):
         elif option == 'set_to_arc':
             # functions called in -> getattr(self, options[option][0])(feat_id) --> def set_to_arc(self, feat_id)
             getattr(self, options[option][1])(feat_id)
-        self.snapper_manager.restore_snap_options(self.previous_snapping)
+        self.snapper_manager.recover_snapping_options()
         self.cancel_snapping_tool(dialog, action)
 
 
