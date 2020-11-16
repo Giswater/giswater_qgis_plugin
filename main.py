@@ -93,6 +93,10 @@ class Giswater(QObject):
         self.controller.set_plugin_dir(self.plugin_dir)
         global_vars.controller = self.controller
 
+        # Check for developers options
+        self.check_developers_settings()
+        self.check_developers_settings('developers', 'show_message_durations')
+
         # Set main information button (always visible)
         self.set_info_button()
 
@@ -101,6 +105,33 @@ class Giswater(QObject):
 
         # Manage section 'toolbars' of config file
         self.manage_section_toolbars()
+
+
+    def check_developers_settings(self, section='developers', parameter='log_sql'):
+        """ Check if @section and @parameter exists in user settings file. If not add them with @value """
+        value = None
+        try:
+            parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+            main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
+            path = main_folder + os.sep + "config" + os.sep + 'user.config'
+            if not os.path.exists(path):
+                return value
+            parser.read(path)
+
+            # Check if section exists in file
+            if section not in parser:
+                parser.add_section(section)
+
+            # Check if parameter exists in section, if not exist, create
+            if parameter not in parser[section]:
+                parser[section][parameter] = 'None'
+                with open(path, 'w') as configfile:
+                    parser.write(configfile)
+                    configfile.close()
+            value = parser[section][parameter]
+        except:
+            return value
+        return value
 
 
     def set_signals(self):
