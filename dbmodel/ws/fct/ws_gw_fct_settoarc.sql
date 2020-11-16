@@ -107,10 +107,10 @@ BEGIN
     FOREACH rec IN ARRAY(v_mapzone_array) LOOP
 
         IF rec = 'minsector' THEN
-            INSERT INTO config_mincut_checkvalve (node_id, to_arc, active) 
+            INSERT INTO config_checkvalve (node_id, to_arc, active) 
             VALUES (v_feature_id, v_arc_id,TRUE) ON CONFLICT (node_id) DO UPDATE SET to_arc = v_arc_id;
 
-            INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, concat('Set to_arc of config_mincut_checkvalve for node ', v_feature_id, ' with value ',v_arc_id, '.'));
+            INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, concat('Set to_arc of config_checkvalve for node ', v_feature_id, ' with value ',v_arc_id, '.'));
 
         ELSIF rec = 'dma' OR rec = 'presszone'  THEN
             IF rec = 'dma' THEN
