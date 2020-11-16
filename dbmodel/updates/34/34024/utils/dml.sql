@@ -307,3 +307,5 @@ UPDATE config_toolbox SET alias = 'Import dxf file' WHERE alias = 'Manage dxf fi
 
 UPDATE sys_function SET descript ='Function to reset user values. 
 Two options are enabled: 1-reset from default values; 2-reset from values of another user' WHERE id = 2922;
+
+UPDATE config_toolbox SET alias = 'Linear Reference System' WHERE alias = 'LRS';

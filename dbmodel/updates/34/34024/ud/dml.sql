@@ -27,8 +27,6 @@ INSERT INTO config_toolbox
 VALUES (3008, 'Arc reverse', TRUE, '{"featureType":["arc"]}',null, null, TRUE)
 ON CONFLICT (id) DO NOTHING;
 
-UPDATE config_toolbox SET alias = 'Linear Reference System' WHERE alias = 'LRS';
-
 UPDATE config_toolbox SET id = 2858 WHERE id = 2848;
 
 UPDATE config_toolbox SET id = 2431 WHERE id = 2430;
