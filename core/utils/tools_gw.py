@@ -2046,3 +2046,23 @@ def get_expression_filter(geom_type, list_ids=None, layers=None):
     tools_qgis.select_features_by_ids(geom_type, expr, layers=layers)
 
     return expr_filter
+
+# TODO tools_gw_config
+
+
+# TODO tools_gw_db
+
+
+# TODO tools_gw_log
+
+
+# TODO tools_gw_os
+
+
+# TODO tools_gw_pgdao
+
+
+# TODO tools_gw_qgis
+
+
+# TODO tools_gw_qt
