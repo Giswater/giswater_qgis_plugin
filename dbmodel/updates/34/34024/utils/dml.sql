@@ -321,4 +321,4 @@ VALUES (359, 'Set configuration of field to_arc', 'ws') ON CONFLICT (fid) DO NOT
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
 VALUES (3012, 'gw_fct_mincut_connec', 'ws', 'function','json', 'json', 
-'Function that sets mincut connec & hydrometer class', 'role_om', NULL) ON CONFLICT (id) DO NOTHING;
+'Function that sets mincut connec & hydrometer class', 'role_om', NULL) ON CONFLICT (function_name, project_type) DO NOTHING;
