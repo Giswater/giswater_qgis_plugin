@@ -1899,7 +1899,7 @@ class MincutParent(ParentAction):
         extras = f'"mincutId":"{result_mincut_id}"'
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_getmincut', body)
-        self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, False)
+        self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, False, disable_tabs=False)
 
         # Manage location
         utils_giswater.set_combo_itemData(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
