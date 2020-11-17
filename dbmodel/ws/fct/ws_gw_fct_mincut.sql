@@ -39,7 +39,7 @@ v_debug Boolean;
 v_geometry text;
 v_data json;
 v_mincutversion integer;
-v_mincutdetails	text;
+v_mincutdetails	json;
 v_visiblelayer text = '"v_om_mincut_arc", "v_om_mincut_node", "v_om_mincut_connec", "v_anl_mincut_init_point"';
 
 v_result text;
@@ -360,7 +360,7 @@ BEGIN
 	v_return = ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
 	',"body":{"form":{}'||
 			',"data":{ '||
-			', "info":'||v_result_info||
+			'  "info":'||v_result_info||
 			', "geometry":"'||v_geometry||'"'||
 			', "mincutDetails":'||v_mincutdetails||
 			', "setVisibleLayers":['||v_visiblelayer||']}'||
