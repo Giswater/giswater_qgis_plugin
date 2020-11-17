@@ -69,18 +69,15 @@ BEGIN
 	SELECT count(connec_id) INTO v_numconnecs FROM om_mincut_connec WHERE result_id=v_mincut;
 
 	-- count hydrometers
-	SELECT count (rtc_hydrometer_x_connec.hydrometer_id) INTO v_numhydrometer 
-	FROM rtc_hydrometer_x_connec JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
-	JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
-	JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=v_mincut;
+	SELECT count (*) INTO v_numhydrometer FROM om_mincut_hydrometer WHERE result_id=v_mincut;
 
 	-- count priority hydrometers
 	v_priority = (SELECT (array_to_json(array_agg((b)))) FROM 
-	(SELECT concat('{"category":"',category_id,'","number":"', count(rtc_hydrometer_x_connec.hydrometer_id), '"}')::json as b FROM rtc_hydrometer_x_connec 
-		JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
-		JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
-		JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=v_mincut 
-		GROUP BY category_id ORDER BY category_id)a);
+	(SELECT concat('{"category":"',observ,'","number":"', count(om_mincut_hydrometer.hydrometer_id), '"}')::json as b FROM om_mincut_hydrometer 
+			JOIN v_rtc_hydrometer USING (hydrometer_id)
+			LEFT JOIN ext_hydrometer_category ON ext_hydrometer_category.id::text=v_rtc_hydrometer.category_id::text
+			WHERE result_id=v_mincut
+			GROUP BY observ ORDER BY observ)a);
 
 	-- profilactic control of priority
 	IF v_priority IS NULL THEN v_priority='{}'; END IF;
@@ -96,7 +93,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, error_message) VALUES (216, 'Mincut stats');
 	INSERT INTO audit_check_data (fid, error_message) VALUES (216, '-----------------');
 	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Number of arcs: 0'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Length of affected network: 0 mts');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Length of affected network: 0 mts'));
 	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Total network water volume: 0 m3'));
 	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Number of connecs affected: ', (v_mincutrec.output->>'connecs')::json->>'number'));
 	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Total of hydrometers affected: ', ((v_mincutrec.output->>'connecs')::json->>'hydrometers')::json->>'total'));

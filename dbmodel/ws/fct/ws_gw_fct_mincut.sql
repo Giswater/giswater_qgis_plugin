@@ -296,9 +296,10 @@ BEGIN
 	-- count arcs
 	SELECT count(arc_id), sum(st_length(arc.the_geom))::numeric(12,2) INTO v_numarcs, v_length 
 	FROM om_mincut_arc JOIN arc USING (arc_id) WHERE result_id=result_id_arg group by result_id;
+	
 	SELECT sum(area*st_length(arc.the_geom))::numeric(12,2) INTO v_volume 
 	FROM om_mincut_arc JOIN arc USING (arc_id) JOIN cat_arc ON arccat_id=cat_arc.id 
-	WHERE result_id=result_id_arg group by result_id, arccat_id;
+	WHERE result_id=result_id_arg;
 
 	-- count connec
 	SELECT count(connec_id) INTO v_numconnecs FROM om_mincut_connec WHERE result_id=result_id_arg;
@@ -311,11 +312,12 @@ BEGIN
 
 	-- priority hydrometers
 	v_priority = 	(SELECT (array_to_json(array_agg((b)))) FROM 
-	(SELECT concat('{"category":"',category_id,'","number":"', count(rtc_hydrometer_x_connec.hydrometer_id), '"}')::json as b FROM rtc_hydrometer_x_connec 
+	(SELECT concat('{"category":"',hc.observ,'","number":"', count(rtc_hydrometer_x_connec.hydrometer_id), '"}')::json as b FROM rtc_hydrometer_x_connec 
 			JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
 			JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
+			LEFT JOIN ext_hydrometer_category hc ON hc.id::text=v_rtc_hydrometer.category_id::text
 			JOIN connec ON connec.connec_id=v_rtc_hydrometer.connec_id WHERE result_id=result_id_arg 
-			GROUP BY category_id ORDER BY category_id)a);
+			GROUP BY hc.observ ORDER BY hc.observ)a);
 				
 	IF v_priority IS NULL THEN v_priority='{}'; END IF;
 	
