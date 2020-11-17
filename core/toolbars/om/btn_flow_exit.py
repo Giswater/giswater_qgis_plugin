@@ -84,7 +84,7 @@ class GwFlowExitButton(GwParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Select a node and click on it, the downstream nodes are computed"
-            self.controller.show_info(message)
+            tools_gw.show_info(message)
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() is None:

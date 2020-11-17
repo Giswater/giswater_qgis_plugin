@@ -275,7 +275,7 @@ class GwVisitManager:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         row = selected_list[0].row()
@@ -938,7 +938,7 @@ class GwVisitManager:
         visit_end = dialog.date_event_to.date()
         if visit_start > visit_end:
             message = "Selected date interval is not valid"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         # Create interval dates
@@ -1399,7 +1399,7 @@ class GwVisitManager:
 
         elif len(selected_list) > 1:
             message = "More then one event selected. Select just one"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         # fetch the record
@@ -1572,11 +1572,11 @@ class GwVisitManager:
         # do the action
         if not event.delete(pks=selected_id):
             message = "Error deleting records"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         message = "Records deleted"
-        self.controller.show_info(message)
+        tools_gw.show_info(message)
 
         # update Table
         self.tbl_event.model().select()
@@ -1590,11 +1590,11 @@ class GwVisitManager:
         visit_id = self.visit_id.text()
         if not doc_id:
             message = "You need to insert doc_id"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
         if not visit_id:
             message = "You need to insert visit_id"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         # Insert into new table
@@ -1603,7 +1603,7 @@ class GwVisitManager:
         status = self.controller.execute_sql(sql)
         if status:
             message = "Document inserted successfully"
-            self.controller.show_info(message)
+            tools_gw.show_info(message)
 
         self.dlg_add_visit.tbl_document.model().select()
 

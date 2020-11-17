@@ -64,7 +64,7 @@ class GwPsectorDuplicate(QObject):
         complet_result = self.controller.get_json('gw_fct_psector_duplicate', body)
         if not complet_result or complet_result['status'] == 'Failed':
             message = 'Function gw_fct_psector_duplicate executed with no result'
-            self.controller.show_message(message, 3)
+            tools_gw.show_message(message, 3)
             return
 
         # Populate tab info

@@ -95,7 +95,7 @@ class GwGo2Epa:
 
         if file_inp is None:
             msg = "Select valid INP file"
-            self.controller.show_warning(msg, parameter=str(file_inp))
+            tools_gw.show_warning(msg, parameter=str(file_inp))
             return False
 
 
@@ -111,13 +111,13 @@ class GwGo2Epa:
 
             if file_rpt is None:
                 msg = "Select valid RPT file"
-                self.controller.show_warning(msg, parameter=str(file_rpt))
+                tools_gw.show_warning(msg, parameter=str(file_rpt))
                 return False
 
             if not tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
                 if not os.path.exists(file_inp):
                     msg = "File INP not found"
-                    self.controller.show_warning(msg, parameter=str(file_rpt))
+                    tools_gw.show_warning(msg, parameter=str(file_rpt))
                     return False
 
 
@@ -150,12 +150,12 @@ class GwGo2Epa:
         if tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result):
             if file_rpt is None:
                 msg = "Select valid RPT file"
-                self.controller.show_warning(msg, parameter=str(file_rpt))
+                tools_gw.show_warning(msg, parameter=str(file_rpt))
                 return False
             if not tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
                 if not os.path.exists(file_rpt):
                     msg = "File RPT not found"
-                    self.controller.show_warning(msg, parameter=str(file_rpt))
+                    tools_gw.show_warning(msg, parameter=str(file_rpt))
                     return False
             else:
                 if self.check_rpt() is False:
@@ -234,11 +234,11 @@ class GwGo2Epa:
         if tableleft == 'cat_dscenario':
             dlg_psector_sel.setWindowTitle(" Dscenario selector")
             tools_qt.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_filter,
-                                   self.controller.tr('Filter by: Dscenario name', context_name='labels'))
+                                   tools_gw.tr('Filter by: Dscenario name', context_name='labels'))
             tools_qt.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_unselected,
-                                   self.controller.tr('Unselected dscenarios', context_name='labels'))
+                                   tools_gw.tr('Unselected dscenarios', context_name='labels'))
             tools_qt.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected,
-                                   self.controller.tr('Selected dscenarios', context_name='labels'))
+                                   tools_gw.tr('Selected dscenarios', context_name='labels'))
 
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
 
@@ -268,7 +268,7 @@ class GwGo2Epa:
         rows = self.controller.get_rows(sql)
         if not rows:
             message = "Any data found in table"
-            self.controller.show_warning(message, parameter='cat_hydrology')
+            tools_gw.show_warning(message, parameter='cat_hydrology')
             return False
 
         tools_qt.fill_combo_values(self.dlg_hydrology_selector.hydrology, rows)
@@ -302,7 +302,7 @@ class GwGo2Epa:
         self.controller.execute_sql(sql)
 
         message = "Values has been update"
-        self.controller.show_info(message)
+        tools_gw.show_info(message)
         tools_gw.close_dialog(self.dlg_hydrology_selector)
 
 
@@ -325,7 +325,7 @@ class GwGo2Epa:
         rows = self.controller.get_rows(sql)
         if not rows:
             message = "Check the table 'cat_hydrology' "
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return False
         tools_qt.fill_combo_values(widgetcbx, rows)
         self.update_labels()
@@ -344,7 +344,7 @@ class GwGo2Epa:
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        message = self.controller.tr("Select INP file")
+        message = tools_gw.tr("Select INP file")
         widget_is_checked = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
         if widget_is_checked:
             self.file_inp, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.inp')
@@ -365,7 +365,7 @@ class GwGo2Epa:
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        message = self.controller.tr("Select RPT file")
+        message = tools_gw.tr("Select RPT file")
         widget_is_checked = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
         if widget_is_checked:
             self.file_rpt, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
@@ -460,7 +460,7 @@ class GwGo2Epa:
         row = self.controller.get_row(sql)
         if not row:
             message = "Any data found in table"
-            self.controller.show_warning(message, parameter=tablename)
+            tools_gw.show_warning(message, parameter=tablename)
             return None
 
         # Iterate over all columns and populate its corresponding widget
@@ -594,7 +594,7 @@ class GwGo2Epa:
         selected_list = qtable_right.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            global_vars.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
         expl_id = []
         for i in range(0, len(selected_list)):
@@ -637,7 +637,7 @@ class GwGo2Epa:
 
         if len(selected_list) == 0:
             message = "Any record selected"
-            global_vars.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
         expl_id = []
         curuser_list = []
@@ -692,7 +692,7 @@ class GwGo2Epa:
 
         # Check for errors
         if model.lastError().isValid():
-            global_vars.controller.show_warning(model.lastError().text())
+            tools_gw.show_warning(model.lastError().text())
 
 
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l,

@@ -154,7 +154,7 @@ class GwProfileButton(GwParentMapTool):
         # Manage level and message from query result
         if self.profile_json['message']:
             level = int(self.profile_json['message']['level'])
-            self.controller.show_message(self.profile_json['message']['text'], level)
+            tools_gw.show_message(self.profile_json['message']['text'], level)
             if self.profile_json['message']['level'] != 3:
                 return
 
@@ -182,7 +182,7 @@ class GwProfileButton(GwParentMapTool):
         profile_id = tools_qt.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_profile_id)
         if profile_id in (None, 'null'):
             message = "Profile name is mandatory."
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         # Clear and populate list with new arcs
@@ -205,7 +205,7 @@ class GwProfileButton(GwParentMapTool):
         result = self.controller.get_json('gw_fct_setprofile', body)
         if result is None or result['status'] == 'Failed': return
         message = f"{result['message']}"
-        self.controller.show_info(message)
+        tools_gw.show_info(message)
 
 
     def open_profile(self):
@@ -220,7 +220,7 @@ class GwProfileButton(GwParentMapTool):
         if not result_profile or result_profile['status'] == 'Failed':
             return
         message = f"{result_profile['message']}"
-        self.controller.show_info(message)
+        tools_gw.show_info(message)
 
         self.dlg_load.rejected.connect(partial(tools_gw.close_dialog, self.dlg_load.rejected))
         self.dlg_load.btn_open.clicked.connect(partial(self.load_profile, result_profile))
@@ -241,7 +241,7 @@ class GwProfileButton(GwParentMapTool):
         selected_list = self.dlg_load.tbl_profiles.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         tools_gw.close_dialog(self.dlg_load)
@@ -1276,7 +1276,7 @@ class GwProfileButton(GwParentMapTool):
         selected_list = self.dlg_load.tbl_profiles.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         # Selected item from list
@@ -1286,7 +1286,7 @@ class GwProfileButton(GwParentMapTool):
         body = tools_gw.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_setprofile', body)
         message = f"{result['message']}"
-        self.controller.show_info(message)
+        tools_gw.show_info(message)
 
         # Remove profile from list
         self.dlg_load.tbl_profiles.takeItem(self.dlg_load.tbl_profiles.row(self.dlg_load.tbl_profiles.currentItem()))

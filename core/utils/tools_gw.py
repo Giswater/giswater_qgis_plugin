@@ -15,7 +15,7 @@ if 'nt' in sys.builtin_module_names:
 from functools import partial
 from collections import OrderedDict
 
-from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint, QDate
+from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint, QDate, QCoreApplication
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
     QCompleter, QFileDialog, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit,\
@@ -413,7 +413,7 @@ class SnappingConfigManager(object):
         return_point['y'] = point.y()
 
         message = "Geometry has been added!"
-        global_vars.controller.show_info(message)
+        show_info(message)
         emit_point.canvasClicked.disconnect()
         global_vars.canvas.xyCoordinates.disconnect()
         global_vars.iface.mapCanvas().refreshAllLayers()
@@ -664,7 +664,7 @@ def get_plugin_version():
     metadata_file = os.path.join(global_vars.plugin_dir, 'metadata.txt')
     if not os.path.exists(metadata_file):
         message = "Metadata file not found"
-        global_vars.controller.show_warning(message, parameter=metadata_file)
+        show_warning(message, parameter=metadata_file)
         return None
 
     metadata = configparser.ConfigParser()
@@ -672,7 +672,7 @@ def get_plugin_version():
     plugin_version = metadata.get('general', 'version')
     if plugin_version is None:
         message = "Plugin version not found"
-        global_vars.controller.show_warning(message)
+        show_warning(message)
 
     return plugin_version
 
@@ -815,7 +815,7 @@ def set_completer_feature_id(widget, geom_type, viewname):
 
 def open_file_path(filter_="All (*.*)"):
     """ Open QFileDialog """
-    msg = global_vars.controller.tr("Select DXF file")
+    msg = show_warning("Select DXF file")
     path, filter_ = QFileDialog.getOpenFileName(None, msg, "", filter_)
 
     return path, filter_
@@ -1289,7 +1289,7 @@ def delete_selected_rows(widget, table_object):
     selected_list = widget.selectionModel().selectedRows()
     if len(selected_list) == 0:
         message = "Any record selected"
-        global_vars.controller.show_warning(message)
+        show_warning(message)
         return
 
     inf_text = ""
@@ -1426,7 +1426,7 @@ def manage_feature_cat():
     feature_cat = OrderedDict(sorted(feature_cat.items(), key=lambda t: t[0]))
 
     if msg != "Field child_layer of id: ":
-        global_vars.controller.show_warning(msg + "is not defined in table cat_feature")
+        show_warning(msg + "is not defined in table cat_feature")
 
     return feature_cat
 
@@ -1650,11 +1650,11 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
             exist = global_vars.controller.check_python_function(module, function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
-                global_vars.controller.show_message(msg, 2)
+                show_message(msg, 2)
                 return widget
         else:
             message = "Parameter button_function is null for button"
-            global_vars.controller.show_message(message, 2, parameter=widget.objectName())
+            show_message(message, 2, parameter=widget.objectName())
 
     kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name, 'temp_layers_added': temp_layers_added}
     widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
@@ -1760,14 +1760,14 @@ def add_hyperlink(field):
             exist = global_vars.controller.check_python_function(tools_qt, func_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
-                global_vars.controller.show_message(msg, 2)
+                show_message(msg, 2)
                 return widget
         else:
             message = "Parameter widgetfunction is null for widget"
-            global_vars.controller.show_message(message, 2, parameter=real_name)
+            show_message(message, 2, parameter=real_name)
     else:
         message = "Parameter not found"
-        global_vars.controller.show_message(message, 2, parameter='widgetfunction')
+        show_message(message, 2, parameter='widgetfunction')
     # Call function (self, widget) or def no_function_associated(self, widget=None, message_level=1)
     widget.clicked.connect(partial(getattr(tools_qt, func_name), widget))
 
@@ -1884,7 +1884,7 @@ def add_tableview(complet_result, field):
             exist = global_vars.controller.check_python_function(sys.modules[__name__], function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
-                global_vars.controller.show_message(msg, 2)
+                show_message(msg, 2)
                 return widget
 
     # Call def gw_api_open_rpt_result(widget, complet_result) of class ApiCf
@@ -2064,5 +2064,67 @@ def get_expression_filter(geom_type, list_ids=None, layers=None):
 
 # TODO tools_gw_qgis
 
+def show_message(text, message_level=1, duration=10, context_name=None, parameter=None, title=""):
+    """ Show message to the user with selected message level
+    message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)} """
+
+    # Check duration message for developers
+    dev_duration = get_parser_value('developers', 'show_message_durations')
+    if dev_duration not in (None, "None"):
+        duration = int(duration)
+
+    msg = None
+    if text:
+        msg = tr(text, context_name)
+        if parameter:
+            msg += ": " + str(parameter)
+    try:
+
+        global_vars.iface.messageBar().pushMessage(title, msg, message_level, duration)
+    except AttributeError:
+        pass
+
+
+def show_info( text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
+    """ Show information message to the user """
+
+    show_message(text, 0, duration, context_name, parameter, title)
+    if global_vars.logger and logger_file:
+        global_vars.logger.info(text)
+
+
+def show_warning(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
+    """ Show warning message to the user """
+
+    show_message(text, 1, duration, context_name, parameter, title)
+    if global_vars.logger and logger_file:
+        global_vars.logger.warning(text)
+
+
+def show_critical(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
+    """ Show warning message to the user """
+
+    show_message(text, 2, duration, context_name, parameter, title)
+    if global_vars.logger and logger_file:
+        global_vars.logger.critical(text)
+
 
 # TODO tools_gw_qt
+
+def tr(message, context_name=None):
+    """ Translate @message looking it in @context_name """
+
+    if context_name is None:
+        context_name = global_vars.plugin_name
+
+    value = None
+    try:
+        value = QCoreApplication.translate(context_name, message)
+    except TypeError:
+        value = QCoreApplication.translate(context_name, str(message))
+    finally:
+        # If not translation has been found, check into 'ui_message' context
+        if value == message:
+            value = QCoreApplication.translate('ui_message', message)
+
+    return value

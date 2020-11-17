@@ -110,7 +110,7 @@ class GwAdmin:
         folder_name = os.path.dirname(os.path.abspath(__file__))
         self.sql_dir = os.path.normpath(os.path.normpath(folder_name + os.sep + os.pardir)) + os.sep + 'sql'
         if not os.path.exists(self.sql_dir):
-            self.controller.show_message("SQL folder not found", parameter=self.sql_dir)
+            tools_gw.show_message("SQL folder not found", parameter=self.sql_dir)
             return
 
         self.project_version = '0'
@@ -210,7 +210,7 @@ class GwAdmin:
             partial(self.load_custom_sql_files, self.dlg_readsql, "custom_path_folder"))
         self.dlg_readsql.btn_update_schema.clicked.connect(partial(self.load_updates, None))
         self.dlg_readsql.btn_schema_file_to_db.clicked.connect(partial(self.schema_file_to_db))
-        self.dlg_readsql.btn_info.clicked.connect(partial(self.show_info))
+        self.dlg_readsql.btn_info.clicked.connect(partial(self.open_update_info))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.set_info_project))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self.update_manage_ui))
         self.cmb_project_type.currentIndexChanged.connect(
@@ -280,7 +280,7 @@ class GwAdmin:
 
         if connection_status is False:
             msg = "Connection Failed. Please, check connection parameters"
-            self.controller.show_message(msg, 1)
+            tools_gw.show_message(msg, 1)
             tools_qt.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.setWidgetText(self.dlg_readsql, 'lbl_status_text', msg)
@@ -308,7 +308,7 @@ class GwAdmin:
         role_admin = self.controller.check_role_user("role_admin", self.username)
         if not role_admin and self.username not in self.super_users:
             msg = "You don't have permissions to administrate project schemas on this connection"
-            self.controller.show_message(msg, 1)
+            tools_gw.show_message(msg, 1)
             tools_qt.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
@@ -381,12 +381,12 @@ class GwAdmin:
         # Get gis folder, gis file, project type and schema
         gis_folder = tools_qt.getWidgetText(self.dlg_create_gis_project, 'txt_gis_folder')
         if gis_folder is None or gis_folder == 'null':
-            self.controller.show_warning("GIS folder not set")
+            tools_gw.show_warning("GIS folder not set")
             return
 
         gis_file = tools_qt.getWidgetText(self.dlg_create_gis_project, 'txt_gis_file')
         if gis_file is None or gis_file == 'null':
-            self.controller.show_warning("GIS file name not set")
+            tools_gw.show_warning("GIS file name not set")
             return
 
         project_type = tools_qt.getWidgetText(self.dlg_readsql, 'cmb_project_type')
@@ -626,7 +626,7 @@ class GwAdmin:
         if str(project_type) in ('ws', 'ud'):
 
             if not os.path.exists(self.folderUpdates):
-                self.controller.show_message("The update folder was not found in sql folder.", 1)
+                tools_gw.show_message("The update folder was not found in sql folder.", 1)
                 self.error_count = self.error_count + 1
                 return
             folders = sorted(os.listdir(self.folderUpdates + ''))
@@ -865,7 +865,7 @@ class GwAdmin:
         if str(project_type) == 'ws' or str(project_type) == 'ud':
 
             if not os.path.exists(self.folderUpdates):
-                self.controller.show_message("The update folder was not found in sql folder.", 1)
+                tools_gw.show_message("The update folder was not found in sql folder.", 1)
                 self.error_count = self.error_count + 1
                 return True
 
@@ -1991,7 +1991,7 @@ class GwAdmin:
         return
 
 
-    def show_info(self):
+    def open_update_info(self):
 
         # Create dialog
         self.dlg_readsql_show_info = MainProjectInfoUi()
@@ -2018,7 +2018,7 @@ class GwAdmin:
     def read_info_version(self):
 
         if not os.path.exists(self.folderUpdates):
-            self.controller.show_message("The updates folder was not found in sql folder.", 1)
+            tools_gw.show_message("The updates folder was not found in sql folder.", 1)
             return
 
         folders = sorted(os.listdir(self.folderUpdates + ''))
@@ -2595,7 +2595,7 @@ class GwAdmin:
             setting_file = os.path.join(self.plugin_dir, 'config', 'system.config')
             if not os.path.exists(setting_file):
                 message = "File not found"
-                self.controller.show_warning(message, parameter=setting_file)
+                tools_gw.show_warning(message, parameter=setting_file)
                 return
 
             # Set plugin settings
@@ -2608,7 +2608,7 @@ class GwAdmin:
             self.xml_set_labels = self.dev_settings.value('xml_set/labels')
             if not os.path.exists(self.folder_path):
                 message = "Folder not found"
-                self.controller.show_warning(message, parameter=self.folder_path)
+                tools_gw.show_warning(message, parameter=self.folder_path)
                 return
 
             # Set wait cursor
@@ -2759,7 +2759,7 @@ class GwAdmin:
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        message = self.controller.tr("Select UI file")
+        message = tools_gw.tr("Select UI file")
         file_ui, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.ui')
         tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.tpath, str(file_ui))
 
@@ -2908,7 +2908,7 @@ class GwAdmin:
 
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         # Create the dialog and signals
@@ -2958,7 +2958,7 @@ class GwAdmin:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         # Create the dialog and signals
@@ -3288,7 +3288,7 @@ class GwAdmin:
 
         # Check for errors
         if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
+            tools_gw.show_warning(model.lastError().text())
         # Attach model to table view
         qtable.setModel(model)
 
@@ -3376,7 +3376,7 @@ class GwAdmin:
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        message = self.controller.tr("Select INP file")
+        message = tools_gw.tr("Select INP file")
         file_inp, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.inp')
         self.dlg_readsql_create_project.data_file.setText(file_inp)
 
@@ -3429,7 +3429,7 @@ class GwAdmin:
             else:
                 msg = "Key on returned json from ddbb is missed"
 
-            self.controller.show_message(msg, level, parameter=parameter, title=title)
+            tools_gw.show_message(msg, level, parameter=parameter, title=title)
 
 
     def save_selection(self):

@@ -25,6 +25,7 @@ project_vars = {}
 action_select_arc = None
 action_select_plot = None
 srid = None
+logger = None
 
 
 def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name):

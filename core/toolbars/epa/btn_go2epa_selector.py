@@ -174,7 +174,7 @@ class GwGo2EpaSelectorButton(GwParentAction):
 
         # Show message to user
         message = "Values has been updated"
-        self.controller.show_info(message)
+        tools_gw.show_info(message)
         tools_gw.close_dialog(self.dlg_go2epa_result)
 
 

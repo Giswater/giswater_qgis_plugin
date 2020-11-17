@@ -199,7 +199,7 @@ class GwDocument:
 
         if doc_type in (None, ''):
             message = "You need to insert doc_type"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         # Check if this document already exists
@@ -221,7 +221,7 @@ class GwDocument:
                 # Ask question before executing
                 msg = ("You have selected multiple documents. In this case, doc_id will be a sequencial number for "
                        "all selected documents and your doc_id won't be used.")
-                answer = self.controller.ask_question(msg, self.controller.tr("Add document"))
+                answer = self.controller.ask_question(msg, tools_gw.tr("Add document"))
                 if answer:
                     for file in self.files_path:
                         sql, doc_id = self.insert_doc_sql(doc_type, observ, date, file)
@@ -240,7 +240,7 @@ class GwDocument:
                 # Ask question before executing
                 msg = ("You have selected multiple documents. In this case, doc_id will be a sequencial number for "
                        "all selected documents and your doc_id won't be used.")
-                answer = self.controller.ask_question(msg, self.controller.tr("Add document"))
+                answer = self.controller.ask_question(msg, tools_gw.tr("Add document"))
                 if answer:
                     for cont, file in enumerate(self.files_path):
                         if cont == 0:
@@ -347,7 +347,7 @@ class GwDocument:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         row = selected_list[0].row()
@@ -390,7 +390,7 @@ class GwDocument:
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.AnyFile)
         message = "Select file"
-        files_path, filter_ = file_dialog.getOpenFileNames(parent=None, caption=global_vars.controller.tr(message))
+        files_path, filter_ = file_dialog.getOpenFileNames(parent=None, caption=tools_gw.tr(message))
 
         file_text = ""
         for file in files_path:

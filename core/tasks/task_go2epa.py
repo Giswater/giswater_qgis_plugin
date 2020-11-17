@@ -107,7 +107,7 @@ class GwGo2EpaTask(QgsTask):
                         self.message = self.rpt_result['message']['text']
 
             if self.common_msg != "":
-                self.controller.show_info(self.common_msg)
+                tools_gw.show_info(self.common_msg)
             if self.message is not None:
                 self.controller.show_info_box(self.message)
             self.go2epa.check_result_id()
@@ -134,7 +134,7 @@ class GwGo2EpaTask(QgsTask):
     def cancel(self):
 
         self.controller.show_db_exception = True
-        self.controller.show_info(f"Task canceled - {self.description()}")
+        tools_gw.show_info(f"Task canceled - {self.description()}")
         self.close_file()
         super().cancel()
 

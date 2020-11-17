@@ -705,7 +705,7 @@ def fill_table(widget, table_name, expr_filter=None, set_edit_strategy=QSqlTable
 
     # Check for errors
     if model.lastError().isValid():
-        global_vars.controller.show_warning(model.lastError().text())
+        tools_gw.show_warning(model.lastError().text())
 
     # Attach model to table view
     widget.setModel(model)
@@ -741,7 +741,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
         widget = getWidget(dialog, widget_name)
         if not widget:
             message = "Widget not found"
-            global_vars.controller.show_warning(message, parameter=widget_name)
+            tools_gw.show_warning(message, parameter=widget_name)
             return
     elif type(table_object) is QTableView:
         widget = table_object
@@ -892,7 +892,7 @@ def fill_table_object(widget, table_name, expr_filter=None):
 
     # Check for errors
     if model.lastError().isValid():
-        global_vars.controller.show_warning(model.lastError().text())
+        tools_gw.show_warning(model.lastError().text())
 
     # Attach model to table view
     widget.setModel(model)
@@ -937,7 +937,7 @@ def set_model_to_table(widget, table_name, expr_filter):
 
     # Check for errors
     if model.lastError().isValid():
-        global_vars.controller.show_warning(model.lastError().text())
+        tools_gw.show_warning(model.lastError().text())
 
     # Attach model to table view
     if widget:
@@ -960,7 +960,7 @@ def get_folder_path(dialog, widget):
     file_dialog.setFileMode(QFileDialog.Directory)
     message = "Select folder"
     folder_path = file_dialog.getExistingDirectory(
-        parent=None, caption=global_vars.controller.tr(message), directory=folder_path)
+        parent=None, caption=tools_gw.tr(message), directory=folder_path)
     if folder_path:
         setWidgetText(dialog, widget, str(folder_path))
 
@@ -1033,7 +1033,7 @@ def multi_rows_delete(widget, table_name, column_id):
     selected_list = widget.selectionModel().selectedRows()
     if len(selected_list) == 0:
         message = "Any record selected"
-        global_vars.controller.show_warning(message)
+        tools_gw.show_warning(message)
         return
 
     inf_text = ""
@@ -1177,7 +1177,7 @@ def document_open(qtable):
         return
     elif len(selected_list) > 1:
         message = "More then one document selected. Select just one document."
-        global_vars.controller.show_warning(message)
+        tools_gw.show_warning(message)
         return
 
     path = selected_list[0].data()
@@ -1216,11 +1216,11 @@ def document_delete(qtable, tablename):
         status = global_vars.controller.execute_sql(sql)
         if not status:
             message = "Error deleting data"
-            global_vars.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
         else:
             message = "Document deleted"
-            global_vars.controller.show_info(message)
+            tools_gw.show_info(message)
             qtable.model().select()
 
 
@@ -1337,7 +1337,7 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
     model.select()
     if model.lastError().isValid():
-        global_vars.controller.show_warning(model.lastError().text())
+        tools_gw.show_warning(model.lastError().text())
         return expr
 
     # Attach model to selected widget
@@ -1530,7 +1530,7 @@ def fill_table_by_expr(qtable, table_name, expr):
 
     # Check for errors
     if model.lastError().isValid():
-        global_vars.controller.show_warning(model.lastError().text())
+        tools_gw.show_warning(model.lastError().text())
 
 
 def set_open_url(widget):

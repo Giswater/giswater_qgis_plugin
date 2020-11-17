@@ -90,7 +90,7 @@ class GwCSVButton(GwParentAction):
         rows = self.controller.get_rows(sql)
         if not rows:
             message = "You do not have permission to execute this application"
-            self.dlg_csv.lbl_info.setText(self.controller.tr(message))
+            self.dlg_csv.lbl_info.setText(tools_gw.tr(message))
             self.dlg_csv.lbl_info.setStyleSheet("QLabel{color: red;}")
 
             self.dlg_csv.cmb_import_type.setEnabled(False)
@@ -129,7 +129,7 @@ class GwCSVButton(GwParentAction):
                 csvfile.close()
                 del csvfile
         except Exception as e:
-            self.controller.show_warning("EXCEPTION: " + str(e))
+            tools_gw.show_warning("EXCEPTION: " + str(e))
 
         if insert_status is False:
             return
@@ -172,7 +172,7 @@ class GwCSVButton(GwParentAction):
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        message = self.controller.tr("Select CSV file")
+        message = tools_gw.tr("Select CSV file")
         file_csv, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.csv')
         tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv, file_csv)
 
@@ -197,7 +197,7 @@ class GwCSVButton(GwParentAction):
             with open(path, "r", encoding=_unicode) as file_input:
                 self.read_csv_file(model, file_input, delimiter, _unicode)
         except Exception as e:
-            self.controller.show_warning(str(e))
+            tools_gw.show_warning(str(e))
 
 
     def load_settings_values(self):
@@ -313,11 +313,11 @@ class GwCSVButton(GwParentAction):
         path = tools_qt.getWidgetText(dialog, dialog.txt_file_csv)
         if path is None or path == 'null' or not os.path.exists(path):
             message = "Please choose a valid path"
-            self.controller.show_message(message, message_level=0)
+            tools_gw.show_message(message, message_level=0)
             return None
         if path.find('.csv') == -1:
             message = "Please choose a csv file"
-            self.controller.show_message(message, message_level=0)
+            tools_gw.show_message(message, message_level=0)
             return None
 
         return path

@@ -117,25 +117,6 @@ class DaoController:
             del self.logger
 
 
-    def tr(self, message, context_name=None):
-        """ Translate @message looking it in @context_name """
-
-        if context_name is None:
-            context_name = self.plugin_name
-
-        value = None
-        try:
-            value = QCoreApplication.translate(context_name, message)
-        except TypeError:
-            value = QCoreApplication.translate(context_name, str(message))
-        finally:
-            # If not translation has been found, check into 'ui_message' context
-            if value == message:
-                value = QCoreApplication.translate('ui_message', message)
-
-        return value
-
-
     def plugin_settings_value(self, key, default_value=""):
 
         key = self.plugin_name + "/" + key
@@ -253,7 +234,7 @@ class DaoController:
         if layer is None and settings is None:
             not_version = False
             self.log_warning("Layer 'v_edit_node' is None and settings is None")
-            self.last_error = self.tr("Layer not found") + ": 'v_edit_node'"
+            self.last_error = tools_gw.tr("Layer not found") + ": 'v_edit_node'"
             return None, not_version
 
         # Get sslmode from user config file
@@ -272,7 +253,7 @@ class DaoController:
             status, credentials = self.connect_to_database_credentials(credentials, conn_info)
             if not status:
                 self.log_warning("Error connecting to database (layer)")
-                self.last_error = self.tr("Error connecting to database")
+                self.last_error = tools_gw.tr("Error connecting to database")
                 return None, not_version
 
             # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
@@ -299,11 +280,11 @@ class DaoController:
                 status, credentials = self.connect_to_database_credentials(credentials, max_attempts=0)
                 if not status:
                     self.log_warning("Error connecting to database (settings)")
-                    self.last_error = self.tr("Error connecting to database")
+                    self.last_error = tools_gw.tr("Error connecting to database")
                     return None, not_version
             else:
                 self.log_warning("Error getting default connection (settings)")
-                self.last_error = self.tr("Error getting default connection")
+                self.last_error = tools_gw.tr("Error getting default connection")
                 return None, not_version
 
         self.credentials = credentials
@@ -340,7 +321,7 @@ class DaoController:
         # Check if selected parameters is correct
         if None in (host, port, db, user, pwd):
             message = "Database connection error. Please check your connection parameters."
-            self.last_error = self.tr(message)
+            self.last_error = tools_gw.tr(message)
             return False
 
         # Update current user
@@ -358,7 +339,7 @@ class DaoController:
         status = self.db.open()
         if not status:
             message = "Database connection error. Please open plugin log file to get more details"
-            self.last_error = self.tr(message)
+            self.last_error = tools_gw.tr(message)
             details = self.db.lastError().databaseText()
             self.log_warning(str(details))
             return False
@@ -369,7 +350,7 @@ class DaoController:
         status = self.dao.init_db()
         if not status:
             message = "Database connection error. Please open plugin log file to get more details"
-            self.last_error = self.tr(message)
+            self.last_error = tools_gw.tr(message)
             self.log_warning(str(self.dao.last_error))
             return False
 
@@ -392,7 +373,7 @@ class DaoController:
         status = self.db.open()
         if not status:
             message = "Database connection error (QSqlDatabase). Please open plugin log file to get more details"
-            self.last_error = self.tr(message)
+            self.last_error = tools_gw.tr(message)
             details = self.db.lastError().databaseText()
             self.log_warning(str(details))
             return False
@@ -403,7 +384,7 @@ class DaoController:
         status = self.dao.init_db()
         if not status:
             message = "Database connection error (PgDao). Please open plugin log file to get more details"
-            self.last_error = self.tr(message)
+            self.last_error = tools_gw.tr(message)
             self.log_warning(str(self.dao.last_error))
             return False
 
@@ -451,59 +432,14 @@ class DaoController:
         return self.postgis_version
 
 
-    def show_message(self, text, message_level=1, duration=10, context_name=None, parameter=None, title=""):
-        """ Show message to the user with selected message level
-        message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)} """
-
-        # Check duration message for developers
-        dev_duration = tools_gw.get_parser_value('developers', 'show_message_durations')
-        if dev_duration not in (None, "None"):
-            duration = int(duration)
-
-        msg = None
-        if text:
-            msg = self.tr(text, context_name)
-            if parameter:
-                msg += ": " + str(parameter)
-        try:
-
-            self.iface.messageBar().pushMessage(title, msg, message_level, duration)
-        except AttributeError:
-            pass
-
-
-    def show_info(self, text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
-        """ Show information message to the user """
-
-        self.show_message(text, 0, duration, context_name, parameter, title)
-        if self.logger and logger_file:
-            self.logger.info(text)
-
-
-    def show_warning(self, text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
-        """ Show warning message to the user """
-
-        self.show_message(text, 1, duration, context_name, parameter, title)
-        if self.logger and logger_file:
-            self.logger.warning(text)
-
-
-    def show_critical(self, text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
-        """ Show warning message to the user """
-
-        self.show_message(text, 2, duration, context_name, parameter, title)
-        if self.logger and logger_file:
-            self.logger.critical(text)
-
-
     def show_warning_detail(self, text, detail_text, context_name=None):
         """ Show warning message with a button to show more details """
 
         inf_text = "Press 'Show Me' button to get more details..."
-        widget = self.iface.messageBar().createMessage(self.tr(text, context_name), self.tr(inf_text))
+        widget = self.iface.messageBar().createMessage(tools_gw.tr(text, context_name), tools_gw.tr(inf_text))
         button = QPushButton(widget)
-        button.setText(self.tr("Show Me"))
-        button.clicked.connect(partial(self.show_details, detail_text, self.tr('Warning details')))
+        button.setText(tools_gw.tr("Show Me"))
+        button.clicked.connect(partial(self.show_details, detail_text, tools_gw.tr('Warning details')))
         widget.layout().addWidget(button)
         self.iface.messageBar().pushWidget(widget, 1)
 
@@ -518,10 +454,10 @@ class DaoController:
         msg_box = QMessageBox()
         msg_box.setText(detail_text)
         if title:
-            title = self.tr(title)
+            title = tools_gw.tr(title)
             msg_box.setWindowTitle(title)
         if inf_text:
-            inf_text = self.tr(inf_text)
+            inf_text = tools_gw.tr(inf_text)
             msg_box.setInformativeText(inf_text)
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         msg_box.setStandardButtons(QMessageBox.Ok)
@@ -532,9 +468,9 @@ class DaoController:
     def show_warning_open_file(self, text, inf_text, file_path, context_name=None):
         """ Show warning message with a button to open @file_path """
 
-        widget = self.iface.messageBar().createMessage(self.tr(text, context_name), self.tr(inf_text))
+        widget = self.iface.messageBar().createMessage(tools_gw.tr(text, context_name), tools_gw.tr(inf_text))
         button = QPushButton(widget)
-        button.setText(self.tr("Open file"))
+        button.setText(tools_gw.tr("Open file"))
         button.clicked.connect(partial(tools_os.open_file, file_path))
         widget.layout().addWidget(button)
         self.iface.messageBar().pushWidget(widget, 1)
@@ -544,15 +480,15 @@ class DaoController:
         """ Ask question to the user """
 
         msg_box = QMessageBox()
-        msg = self.tr(text, context_name)
+        msg = tools_gw.tr(text, context_name)
         if parameter:
             msg += ": " + str(parameter)
         msg_box.setText(msg)
         if title:
-            title = self.tr(title, context_name)
+            title = tools_gw.tr(title, context_name)
             msg_box.setWindowTitle(title)
         if inf_text:
-            inf_text = self.tr(inf_text, context_name)
+            inf_text = tools_gw.tr(inf_text, context_name)
             msg_box.setInformativeText(inf_text)
         msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
         msg_box.setDefaultButton(QMessageBox.Ok)
@@ -569,7 +505,7 @@ class DaoController:
 
         msg = ""
         if text:
-            msg = self.tr(text, context_name)
+            msg = tools_gw.tr(text, context_name)
             if parameter:
                 msg += ": " + str(parameter)
 
@@ -577,10 +513,10 @@ class DaoController:
         msg_box.setText(msg)
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         if title:
-            title = self.tr(title, context_name)
+            title = tools_gw.tr(title, context_name)
             msg_box.setWindowTitle(title)
         if inf_text:
-            inf_text = self.tr(inf_text, context_name)
+            inf_text = tools_gw.tr(inf_text, context_name)
             msg_box.setInformativeText(inf_text)
         msg_box.setDefaultButton(QMessageBox.No)
         msg_box.exec_()
@@ -795,7 +731,7 @@ class DaoController:
         # Check if function exists
         row = self.check_function(function_name, schema_name, commit)
         if not row:
-            self.show_warning("Function not found in database", parameter=function_name)
+            tools_gw.show_warning("Function not found in database", parameter=function_name)
             return None
 
         # Execute function. If failed, always log it
@@ -880,14 +816,14 @@ class DaoController:
 
         if type(widget) is QTabWidget:
             widget_name = widget.widget(idx).objectName()
-            tooltip = self.tr(f'tooltip_{widget_name}', context_name)
+            tooltip = tools_gw.tr(f'tooltip_{widget_name}', context_name)
             if tooltip not in (f'tooltip_{widget_name}', None, 'None'):
                 widget.setTabToolTip(idx, tooltip)
             elif widget.toolTip() in ("", None):
                 widget.setTabToolTip(idx, widget.tabText(idx))
         else:
             widget_name = widget.objectName()
-            tooltip = self.tr(f'tooltip_{widget_name}', context_name)
+            tooltip = tools_gw.tr(f'tooltip_{widget_name}', context_name)
             if tooltip not in (f'tooltip_{widget_name}', None, 'None'):
                 widget.setToolTip(tooltip)
             elif widget.toolTip() in ("", None):
@@ -906,7 +842,7 @@ class DaoController:
                 self.translate_widget(context_name, widget)
 
         # Translate title of the form
-        text = self.tr('title', context_name)
+        text = tools_gw.tr('title', context_name)
         if text != 'title':
             dialog.setWindowTitle(text)
 
@@ -923,12 +859,12 @@ class DaoController:
                 num_tabs = widget.count()
                 for i in range(0, num_tabs):
                     widget_name = widget.widget(i).objectName()
-                    text = self.tr(widget_name, context_name)
+                    text = tools_gw.tr(widget_name, context_name)
                     if text not in (widget_name, None, 'None'):
                         widget.setTabText(i, text)
                     else:
                         widget_text = widget.tabText(i)
-                        text = self.tr(widget_text, context_name)
+                        text = tools_gw.tr(widget_text, context_name)
                         if text != widget_text:
                             widget.setTabText(i, text)
                     self.translate_tooltip(context_name, widget, i)
@@ -936,34 +872,34 @@ class DaoController:
                 num_tabs = widget.count()
                 for i in range(0, num_tabs):
                     widget_name = widget.widget(i).objectName()
-                    text = self.tr(widget_name, context_name)
+                    text = tools_gw.tr(widget_name, context_name)
                     if text not in (widget_name, None, 'None'):
                         widget.setItemText(i, text)
                     else:
                         widget_text = widget.itemText(i)
-                        text = self.tr(widget_text, context_name)
+                        text = tools_gw.tr(widget_text, context_name)
                         if text != widget_text:
                             widget.setItemText(i, text)
                     self.translate_tooltip(context_name, widget.widget(i))
             elif type(widget) is QGroupBox:
                 widget_name = widget.objectName()
-                text = self.tr(widget_name, context_name)
+                text = tools_gw.tr(widget_name, context_name)
                 if text not in (widget_name, None, 'None'):
                     widget.setTitle(text)
                 else:
                     widget_title = widget.title()
-                    text = self.tr(widget_title, context_name)
+                    text = tools_gw.tr(widget_title, context_name)
                     if text != widget_title:
                         widget.setTitle(text)
                 self.translate_tooltip(context_name, widget)
             else:
                 widget_name = widget.objectName()
-                text = self.tr(widget_name, context_name)
+                text = tools_gw.tr(widget_name, context_name)
                 if text not in (widget_name, None, 'None'):
                     widget.setText(text)
                 else:
                     widget_text = widget.text()
-                    text = self.tr(widget_text, context_name)
+                    text = tools_gw.tr(widget_text, context_name)
                     if text != widget_text:
                         widget.setText(text)
                 self.translate_tooltip(context_name, widget)
@@ -1021,7 +957,7 @@ class DaoController:
 
         msg = None
         if text:
-            msg = self.tr(text, context_name)
+            msg = tools_gw.tr(text, context_name)
             if parameter:
                 msg += ": " + str(parameter)
 
@@ -1713,7 +1649,7 @@ class DaoController:
                     self.log_info(msg, parameter=parameter, level=level)
                 elif not is_notify and self.show_db_exception:
                     # Show exception message only if we are not in a task process
-                    self.show_message(msg, level, parameter=parameter)
+                    tools_gw.show_message(msg, level, parameter=parameter)
 
             else:
 

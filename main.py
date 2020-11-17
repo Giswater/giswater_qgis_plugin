@@ -18,6 +18,7 @@ from .core.load_project import LoadProject
 from .core.btn_admin import GwAdmin
 from .dao.controller import DaoController
 from .lib.tools_qgis import get_value_from_metadata
+from .core.utils import tools_gw
 
 
 class Giswater(QObject):
@@ -187,7 +188,7 @@ class Giswater(QObject):
             if list_values:
                 self.dict_actions[key] = list_values
             else:
-                self.controller.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
+                tools_gw.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
 
         # Get list of actions not checkable (normally because they open a form)
         aux = []
@@ -214,7 +215,7 @@ class Giswater(QObject):
                     list_values = [list_values]
                 self.dict_toolbars[key] = list_values
             else:
-                self.controller.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
+                tools_gw.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
 
 
     def project_new(self):

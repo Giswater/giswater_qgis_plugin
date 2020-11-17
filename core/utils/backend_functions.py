@@ -471,10 +471,10 @@ class GwInfoTools:
         msg_box = QMessageBox()
         msg_box.setText(msg)
         if title:
-            title = self.controller.tr(title)
+            title = tools_gw.tr(title)
             msg_box.setWindowTitle(title)
         if inf_text:
-            inf_text = self.controller.tr(inf_text)
+            inf_text = tools_gw.tr(inf_text)
             msg_box.setInformativeText(inf_text)
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         msg_box.setStandardButtons(QMessageBox.Ok)

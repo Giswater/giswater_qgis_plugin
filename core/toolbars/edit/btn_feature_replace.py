@@ -246,7 +246,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         # Check null values
         if self.workcat_id_end_aux in (None, 'null'):
             message = "Mandatory field is missing. Please, set a value"
-            self.controller.show_warning(message, parameter='Workcat_id')
+            tools_gw.show_warning(message, parameter='Workcat_id')
             return
 
         feature_type_new = tools_qt.getWidgetText(dialog, dialog.feature_type_new)
@@ -271,7 +271,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             row = self.controller.get_row(sql)
             if not row:
                 message = "Error replacing feature"
-                self.controller.show_warning(message)
+                tools_gw.show_warning(message)
                 self.deactivate()
                 self.set_action_pan()
                 tools_gw.close_dialog(dialog, self.controller.plugin_name)
@@ -279,7 +279,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
             complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
             message = "Feature replaced successfully"
-            self.controller.show_info(message)
+            tools_gw.show_info(message)
 
             # Force user to manage with state = 1 features
             current_user = self.controller.get_project_user()
@@ -312,7 +312,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                         self.controller.execute_sql(sql)
 
                 message = "Values has been updated"
-                self.controller.show_info(message)
+                tools_gw.show_info(message)
 
             # Fill tab 'Info log'
             if complet_result and complet_result[0]['status'] == "Accepted":
@@ -425,7 +425,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Select the feature by clicking on it and it will be replaced"
-            self.controller.show_info(message)
+            tools_gw.show_info(message)
 
 
     def deactivate(self):

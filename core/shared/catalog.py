@@ -39,7 +39,7 @@ class GwCatalog:
         sql = f"SELECT gw_fct_getcatalog({body})::text"
         row = self.controller.get_row(sql)
         if not row:
-            self.controller.show_message("NOT ROW FOR: " + sql, 2)
+            tools_gw.show_message("NOT ROW FOR: " + sql, 2)
             return
 
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -227,7 +227,7 @@ class GwCatalog:
             widget.setFocus()
         else:
             message = "Widget not found"
-            self.controller.show_message(message, 2, parameter=str(widget_name))
+            tools_gw.show_message(message, 2, parameter=str(widget_name))
 
         tools_gw.close_dialog(self.dlg_catalog)
 

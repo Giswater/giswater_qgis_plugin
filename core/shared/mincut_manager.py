@@ -113,7 +113,7 @@ class GwMincutManager:
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         field_code = self.custom_action_sms['field_code']
@@ -147,7 +147,7 @@ class GwMincutManager:
 
         path = self.custom_action_sms['path_sms_script']
         if path is None or not os.path.exists(path):
-            self.controller.show_warning("File not found", parameter=path)
+            tools_gw.show_warning("File not found", parameter=path)
             return
 
         selected_list = qtable.selectionModel().selectedRows()
@@ -205,7 +205,7 @@ class GwMincutManager:
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
         inf_text = ""
         list_id = ""
@@ -238,7 +238,7 @@ class GwMincutManager:
 
         if len(selected_mincuts) == 0:
             msg = "There are no visible mincuts in the table. Try a different filter or make one"
-            self.controller.show_message(msg)
+            tools_gw.show_message(msg)
             return
         selector_values = f'"selector_mincut", "ids":{selected_mincuts}'
         mincut_selector = Selector()
@@ -278,7 +278,7 @@ class GwMincutManager:
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         row = selected_list[0].row()
@@ -339,7 +339,7 @@ class GwMincutManager:
             date_to = visit_end.toString('yyyyMMdd 23:59:59')
             if date_from > date_to:
                 message = "Selected date interval is not valid"
-                self.controller.show_warning(message)
+                tools_gw.show_warning(message)
                 return
 
             # Create interval dates
@@ -385,7 +385,7 @@ class GwMincutManager:
 
         # Check for errors
         if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
+            tools_gw.show_warning(model.lastError().text())
 
         # Attach model to table view
         widget.setModel(model)
@@ -398,7 +398,7 @@ class GwMincutManager:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         inf_text = ""

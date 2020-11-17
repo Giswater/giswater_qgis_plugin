@@ -217,7 +217,7 @@ class GwSearch:
                 tools_qgis.zoom_to_rectangle(x1, y1, x2, y2)
             else:
                 message = f"Zoom unavailable. Doesn't exist the geometry for the street"
-                self.controller.show_info(message, parameter=item['display_name'])
+                tools_gw.show_info(message, parameter=item['display_name'])
 
         # Tab 'address'
         elif tab_selected == 'address' and 'sys_x' in item and 'sys_y' in item:
@@ -242,7 +242,7 @@ class GwSearch:
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
             if not list_coord:
                 msg = "Empty coordinate list"
-                self.controller.show_warning(msg)
+                tools_gw.show_warning(msg)
                 return
             points = tools_qgis.get_geometry_vertex(list_coord)
             self.draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
@@ -258,7 +258,7 @@ class GwSearch:
             self.manage_new_psector.dlg_plan_psector.rejected.connect(self.rubber_band.reset)
             if not list_coord:
                 msg = "Empty coordinate list"
-                self.controller.show_warning(msg)
+                tools_gw.show_warning(msg)
                 return
             points = tools_qgis.get_geometry_vertex(list_coord)
             self.rubber_band.reset()
@@ -271,7 +271,7 @@ class GwSearch:
             list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
             if not list_coord:
                 msg = "Empty coordinate list"
-                self.controller.show_warning(msg)
+                tools_gw.show_warning(msg)
                 return
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             self.rubber_band.reset()
@@ -616,7 +616,7 @@ class GwSearch:
                        f" VALUES('{row[0]}', current_user)")
                 self.controller.execute_sql(sql)
             msg = "Your exploitation selector has been updated"
-            self.controller.show_info(msg)
+            tools_gw.show_info(msg)
 
 
     def update_selector_workcat(self, workcat_id):
@@ -654,7 +654,7 @@ class GwSearch:
         file_dialog.setFileMode(QFileDialog.Directory)
 
         msg = "Save as"
-        folder_path, filter_ = file_dialog.getSaveFileName(None, self.controller.tr(msg), folder_path, '*.csv')
+        folder_path, filter_ = file_dialog.getSaveFileName(None, tools_gw.tr(msg), folder_path, '*.csv')
         if folder_path:
             tools_qt.setWidgetText(dialog, widget, str(folder_path))
 
@@ -730,7 +730,7 @@ class GwSearch:
                 self.write_to_csv(dialog, folder_path, all_rows)
         except:
             msg = "File path doesn't exist or you dont have permission or file is opened"
-            self.controller.show_warning(msg)
+            tools_gw.show_warning(msg)
 
 
     def write_to_csv(self, dialog, folder_path=None, all_rows=None):
@@ -740,7 +740,7 @@ class GwSearch:
             writer.writerows(all_rows)
         tools_gw.set_parser_value('search', 'search_csv_path', f"{tools_qt.getWidgetText(dialog, 'txt_path')}")
         message = "The csv file has been successfully exported"
-        self.controller.show_info(message)
+        tools_gw.show_info(message)
 
 
     def workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
@@ -779,7 +779,7 @@ class GwSearch:
         widget.setEditTriggers(set_edit_triggers)
         # Check for errors
         if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
+            tools_gw.show_warning(model.lastError().text())
         # Attach model to table view
         if expr:
             widget.setModel(model)
@@ -795,7 +795,7 @@ class GwSearch:
         element = qtable.selectionModel().selectedRows()
         if len(element) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         row = element[0].row()
@@ -856,7 +856,7 @@ class GwSearch:
                         length = length + row[0]
                     else:
                         message = "Some data is missing. Check gis_length for arc"
-                        self.controller.show_warning(message, parameter=arc_id)
+                        tools_gw.show_warning(message, parameter=arc_id)
                         return
                 if extension is not None:
                     widget = self.items_dialog.findChild(QLabel, f"lbl_length{extension}")
@@ -897,7 +897,7 @@ class GwSearch:
         doc_id = dialog.doc_id.text()
         if not doc_id:
             message = "You need to insert doc_id"
-            global_vars.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         # Check if document already exist
@@ -907,7 +907,7 @@ class GwSearch:
         row = global_vars.controller.get_row(sql)
         if row:
             msg = "Document already exist"
-            global_vars.controller.show_warning(msg)
+            tools_gw.show_warning(msg)
             return
 
         # Insert into new table
@@ -916,6 +916,6 @@ class GwSearch:
         status = global_vars.controller.execute_sql(sql)
         if status:
             message = "Document inserted successfully"
-            global_vars.controller.show_info(message)
+            tools_gw.show_info(message)
 
         dialog.tbl_document.model().select()

@@ -11,6 +11,7 @@ from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QIcon
 
 from ... import global_vars
+from ..utils import tools_gw
 
 
 class GwParentAction:
@@ -43,4 +44,4 @@ class GwParentAction:
 
 
     def clicked_event(self):
-        self.controller.show_message("Action has no function!!", "INFO")
+        tools_gw.show_message("Action has no function!!", "INFO")

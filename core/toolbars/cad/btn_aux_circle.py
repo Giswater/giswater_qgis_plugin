@@ -163,7 +163,7 @@ class GwAuxCircleButton(GwParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Select an element and click it to set radius"
-            self.controller.show_info(message)
+            tools_gw.show_info(message)
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
@@ -173,7 +173,7 @@ class GwAuxCircleButton(GwParentMapTool):
 
         self.layer_circle = self.controller.get_layer_by_tablename('v_edit_cad_auxcircle')
         if self.layer_circle is None:
-            self.controller.show_warning("Layer not found", parameter='v_edit_cad_auxcircle')
+            tools_gw.show_warning("Layer not found", parameter='v_edit_cad_auxcircle')
             self.iface.actionPan().trigger()
             self.cancel_circle = True
             self.cancel_map_tool()

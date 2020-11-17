@@ -97,7 +97,7 @@ class GwDeleteFeatureButton(GwParentAction):
         feature_id = tools_qt.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
         if feature_id in (None, "null"):
             message = f"Select one"
-            self.controller.show_warning(message, parameter=feature_type)
+            tools_gw.show_warning(message, parameter=feature_type)
             return
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
@@ -134,7 +134,7 @@ class GwDeleteFeatureButton(GwParentAction):
         complet_result = self.controller.get_json('gw_fct_setfeaturedelete', body)
 
         if not complet_result:
-            self.controller.show_message("Function gw_fct_setfeaturedelete executed with no result ", 3)
+            tools_gw.show_message("Function gw_fct_setfeaturedelete executed with no result ", 3)
             return
 
         if 'status' in complet_result and complet_result['status'] == 'Failed':

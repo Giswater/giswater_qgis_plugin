@@ -356,7 +356,7 @@ class GwMincut:
                 sql = (f"DELETE FROM om_mincut"
                        f" WHERE id = {result_mincut_id}")
                 self.controller.execute_sql(sql)
-                self.controller.show_info("Mincut canceled!")
+                tools_gw.show_info("Mincut canceled!")
 
         # Rollback transaction
         else:
@@ -549,7 +549,7 @@ class GwMincut:
         for data in check_data:
             if data == '':
                 message = "Mandatory field is missing. Please, set a value"
-                self.controller.show_warning(message)
+                tools_gw.show_warning(message)
                 return
 
         if self.is_new:
@@ -621,11 +621,11 @@ class GwMincut:
         status = self.controller.execute_sql(sql, log_error=True)
         if status:
             message = "Values has been updated"
-            self.controller.show_info(message)
+            tools_gw.show_info(message)
             self.update_result_selector(result_mincut_id)
         else:
             message = "Error updating element in table, you need to review data"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
 
         # Close dialog and disconnect snapping
         self.disconnect_snapping()
@@ -697,7 +697,7 @@ class GwMincut:
                 polygon = polygon.split(',')
                 if polygon[0] == '':
                     message = "Error on create auto mincut, you need to review data"
-                    self.controller.show_warning(message)
+                    tools_gw.show_warning(message)
                     tools_qgis.set_cursor_restore()
                     self.task1.setProgress(100)
                     return
@@ -728,7 +728,7 @@ class GwMincut:
         status = self.controller.execute_sql(sql, commit)
         if not status:
             message = "Error updating table"
-            self.controller.show_warning(message, parameter='selector_mincut_result')
+            tools_gw.show_warning(message, parameter='selector_mincut_result')
 
 
     def real_end_accept(self):
@@ -1256,7 +1256,7 @@ class GwMincut:
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.select()
         if model.lastError().isValid():
-            self.controller.show_warning(model.lastError().text())
+            tools_gw.show_warning(model.lastError().text())
             return expr
         # Attach model to selected table
         if expr_filter:
@@ -1299,7 +1299,7 @@ class GwMincut:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         del_id = []
@@ -1353,7 +1353,7 @@ class GwMincut:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         del_id = []
@@ -1580,7 +1580,7 @@ class GwMincut:
         status = self.controller.execute_sql(sql)
         if status:
             message = "Real location has been updated"
-            self.controller.show_info(message)
+            tools_gw.show_info(message)
 
         # Snapping
         result = self.snapper_manager.snap_to_background_layers(event_point)
@@ -1639,7 +1639,7 @@ class GwMincut:
                 self.controller.show_info_box(message, parameter=complet_result['mincutOverlap'])
             else:
                 message = "Mincut done successfully"
-                self.controller.show_info(message)
+                tools_gw.show_info(message)
 
             # Zoom to rectangle (zoom to mincut)
             polygon = complet_result['body']['data']['geometry']
@@ -1647,7 +1647,7 @@ class GwMincut:
             polygon = polygon.split(',')
             if polygon[0] == '':
                 message = "Error on create auto mincut, you need to review data"
-                self.controller.show_warning(message)
+                tools_gw.show_warning(message)
                 tools_qgis.set_cursor_restore()
                 self.task1.setProgress(100)
                 return
@@ -1665,7 +1665,7 @@ class GwMincut:
             self.task1.setProgress(50)
             if not status:
                 message = "Error updating element in table, you need to review data"
-                self.controller.show_warning(message)
+                tools_gw.show_warning(message)
                 tools_qgis.set_cursor_restore()
                 self.task1.setProgress(100)
                 return
@@ -1799,7 +1799,7 @@ class GwMincut:
             result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
             if result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
-                self.controller.show_message(result['message']['text'], level)
+                tools_gw.show_message(result['message']['text'], level)
 
         # Disconnect snapping and related signals
         self.disconnect_snapping(False)
@@ -2066,7 +2066,7 @@ class GwMincut:
             template_files = os.listdir(template_folder)
         except FileNotFoundError:
             message = "Your composer's path is bad configured. Please, modify it and try again."
-            self.controller.show_message(message, 1)
+            tools_gw.show_message(message, 1)
             return
 
         # Set dialog add_connec
@@ -2101,7 +2101,7 @@ class GwMincut:
         # Check if template is selected
         if str(self.dlg_comp.cbx_template.currentText()) == "":
             message = "You need to select a template"
-            self.controller.show_warning(message)
+            tools_gw.show_warning(message)
             return
 
         # Check if template file exists
@@ -2112,7 +2112,7 @@ class GwMincut:
 
         if not os.path.exists(template_path):
             message = "File not found"
-            self.controller.show_warning(message, parameter=template_path)
+            tools_gw.show_warning(message, parameter=template_path)
             return
 
         # Check if composer exist

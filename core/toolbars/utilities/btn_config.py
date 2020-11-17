@@ -243,7 +243,7 @@ class GwConfigButton(GwParentAction):
             return False
 
         message = "Values has been updated"
-        self.controller.show_info(message)
+        tools_gw.show_info(message)
         # Close dialog
         tools_gw.close_dialog(self.dlg_config)
 

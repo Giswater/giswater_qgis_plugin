@@ -15,6 +15,7 @@ __revision__ = '$Format:%H$'
 
 from weakref import WeakKeyDictionary
 
+from ..utils import tools_gw
 
 class GenericDescriptor(object):
     """A descriptor that set getter and setter. class example from:
@@ -70,7 +71,7 @@ class Table(object):
 
         if not getattr(self, self.pk()):
             message = "No primary key value set"
-            self.controller().show_info(message, parameter=self.pk)
+            tools_gw.show_info(message, parameter=self.pk)
             return False
 
         fields = list(vars(self.__class__).keys())
@@ -113,7 +114,7 @@ class Table(object):
             self.table_name(), self.pk(), str(current_pk), fields, values, commit=commit)
         if status:
             message = "Values has been updated"
-            self.controller().show_info(message)
+            tools_gw.show_info(message)
             return status
 
         # get new added id in case of an insert
