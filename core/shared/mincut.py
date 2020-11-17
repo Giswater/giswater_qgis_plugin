@@ -642,7 +642,11 @@ class GwMincut:
         result = self.controller.get_json('gw_fct_setmincut', body)
         if not result or result['status'] == 'Failed':
             return
+
         if self.mincut_class in (2, 3) or result['body']['actions']['overlap'] == 'Ok':
+            extras = f'"mincutId":"{result_mincut_id_text}"'
+            body = tools_gw.create_body(extras=extras)
+            result = self.controller.get_json('gw_fct_getmincut', body)
             self.mincut_ok(result)
         elif result['body']['actions']['overlap'] == 'Conflict':
             self.dlg_dtext = DialogTextUi()
@@ -674,7 +678,7 @@ class GwMincut:
     def mincut_ok(self, result):
 
         # Manage result and force tab log
-        # add_temp_layer(self.dlg_mincut, result['body']['data'], None, True, tab_idx=3)
+        tools_gw.populate_info_text(self.dlg_mincut, result['body']['data'], True, True, tab_idx=3)
 
         # Set tabs enabled(True/False)
         qtabwidget = self.dlg_mincut.findChild(QTabWidget, 'mainTab')
@@ -685,19 +689,21 @@ class GwMincut:
 
         self.dlg_mincut.closeMainWin = False
         self.dlg_mincut.mincutCanceled = True
+
         if self.mincut_class == 1:
-            polygon = result['body']['data']['geometry']
-            polygon = polygon[9:len(polygon) - 2]
-            polygon = polygon.split(',')
-            if polygon[0] == '':
-                message = "Error on create auto mincut, you need to review data"
-                self.controller.show_warning(message)
-                tools_qgis.set_cursor_restore()
-                self.task1.setProgress(100)
-                return
-            x1, y1 = polygon[0].split(' ')
-            x2, y2 = polygon[2].split(' ')
-            tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+            if 'geometry' in result['body']['data']:
+                polygon = result['body']['data']['geometry']
+                polygon = polygon[9:len(polygon) - 2]
+                polygon = polygon.split(',')
+                if polygon[0] == '':
+                    message = "Error on create auto mincut, you need to review data"
+                    self.controller.show_warning(message)
+                    tools_qgis.set_cursor_restore()
+                    self.task1.setProgress(100)
+                    return
+                x1, y1 = polygon[0].split(' ')
+                x2, y2 = polygon[2].split(' ')
+                tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
 
         self.dlg_mincut.btn_accept.hide()
         self.dlg_mincut.btn_cancel.setText('Close')
@@ -1627,9 +1633,8 @@ class GwMincut:
         body = tools_gw.create_body(extras=extras)
         complet_result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
         if complet_result in (False, None) or ('status' in complet_result and complet_result['status'] == 'Failed'): return False
-
-        if 'mincutOverlap' in complet_result:
-            if complet_result['mincutOverlap'] != "":
+        if 'mincutOverlap' in complet_result or complet_result['status'] == 'Accepted':
+            if 'mincutOverlap' in complet_result and complet_result['mincutOverlap'] != "":
                 message = "Mincut done, but has conflict and overlaps with"
                 self.controller.show_info_box(message, parameter=complet_result['mincutOverlap'])
             else:
@@ -1637,7 +1642,7 @@ class GwMincut:
                 self.controller.show_info(message)
 
             # Zoom to rectangle (zoom to mincut)
-            polygon = complet_result['geometry']
+            polygon = complet_result['body']['data']['geometry']
             polygon = polygon[9:len(polygon) - 2]
             polygon = polygon.split(',')
             if polygon[0] == '':
@@ -1846,11 +1851,11 @@ class GwMincut:
         tools_qt.set_combo_value(self.dlg_mincut.type, row['mincut_type'], 0)
         tools_qt.set_combo_value(self.dlg_mincut.cause, row['anl_cause'], 0)
         tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, mincut_state_name)
-        if 'output' in row and row['output']:
-            self.dlg_mincut.txt_infolog.setEnabled(False)
-            text = tools_qt.getWidgetText(self.dlg_mincut, 'txt_infolog', return_string_null=False)
-            text += json.dumps(row['output'], indent=2, sort_keys=True)
-            tools_qt.setWidgetText(self.dlg_mincut, "txt_infolog", text)
+        extras = f'"mincutId":"{result_mincut_id}"'
+        body = tools_gw.create_body(extras=extras)
+        result = self.controller.get_json('gw_fct_getmincut', body)
+        tools_gw.add_temp_layer(self.dlg_mincut, result['body']['data'], None, False, disable_tabs=False)
+        self.dlg_mincut.txt_infolog.setEnabled(False)
 
         # Manage location
         tools_qt.set_combo_value(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
