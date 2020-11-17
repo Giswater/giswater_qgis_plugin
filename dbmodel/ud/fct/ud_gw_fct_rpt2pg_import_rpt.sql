@@ -75,13 +75,13 @@ BEGIN
 		END IF;	
 						
 		IF type_aux='rpt_cat_result' THEN
-			UPDATE rpt_cat_result set flow_units=rpt_rec.csv4 WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Flow Units%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set rain_runof=rpt_rec.csv3 WHERE rpt_rec.csv1 ilike 'Rainfall/Runoff%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set snowmelt=rpt_rec.csv3 WHERE rpt_rec.csv1 ilike 'Snowmelt%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set groundw=rpt_rec.csv3 WHERE rpt_rec.csv1 ilike 'Groundwater%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set flow_rout=rpt_rec.csv4 WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2,' ',rpt_rec.csv3) ilike 'Flow Routing ...........%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set pond_all=rpt_rec.csv4 WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Ponding Allowed%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set water_q=rpt_rec.csv4 WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Water Quality%' and result_id=v_result_id;
+			UPDATE rpt_cat_result set flow_units=SUBSTRING(rpt_rec.csv4,1,3) WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Flow Units%' and result_id=v_result_id;
+			UPDATE rpt_cat_result set rain_runof=SUBSTRING(rpt_rec.csv3,1,3) WHERE rpt_rec.csv1 ilike 'Rainfall/Runoff%' and result_id=v_result_id;
+			UPDATE rpt_cat_result set snowmelt=SUBSTRING(rpt_rec.csv3,1,3) WHERE rpt_rec.csv1 ilike 'Snowmelt%' and result_id=v_result_id;
+			UPDATE rpt_cat_result set groundw=SUBSTRING(rpt_rec.csv3,1,3) WHERE rpt_rec.csv1 ilike 'Groundwater%' and result_id=v_result_id;
+			UPDATE rpt_cat_result set flow_rout=SUBSTRING(rpt_rec.csv4,1,3) WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2,' ',rpt_rec.csv3) ilike 'Flow Routing ...........%' and result_id=v_result_id;
+			UPDATE rpt_cat_result set pond_all=SUBSTRING(rpt_rec.csv4,1,3) WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Ponding Allowed%' and result_id=v_result_id;
+			UPDATE rpt_cat_result set water_q=SUBSTRING(rpt_rec.csv4,1,3) WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Water Quality%' and result_id=v_result_id;
 			UPDATE rpt_cat_result set infil_m=rpt_rec.csv4 WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Infiltration Method%' and result_id=v_result_id;
 			UPDATE rpt_cat_result set flowrout_m=rpt_rec.csv5 WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2,' ',rpt_rec.csv3) ilike 'Flow Routing Method%' and result_id=v_result_id;
 			UPDATE rpt_cat_result set start_date=concat(rpt_rec.csv4,' ',rpt_rec.csv5) WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Starting Date%' and result_id=v_result_id;
@@ -128,13 +128,17 @@ BEGIN
 			IF v_result_id NOT IN (SELECT result_id FROM rpt_runoff_quant) then
 				INSERT INTO rpt_runoff_quant(result_id) VALUES (v_result_id);
 			END IF;
-	
-			UPDATE rpt_runoff_quant set total_prec=rpt_rec.csv4::numeric WHERE result_id=v_result_id AND rpt_rec.csv1='Total';
-			UPDATE rpt_runoff_quant set evap_loss=rpt_rec.csv4::numeric WHERE result_id=v_result_id AND rpt_rec.csv1='Evaporation';
-			UPDATE rpt_runoff_quant set infil_loss=rpt_rec.csv4::numeric WHERE result_id=v_result_id AND rpt_rec.csv1='Infiltration';
-			UPDATE rpt_runoff_quant set surf_runof=rpt_rec.csv4::numeric WHERE result_id=v_result_id AND rpt_rec.csv1='Surface';
-			UPDATE rpt_runoff_quant set finals_sto=rpt_rec.csv5::numeric WHERE result_id=v_result_id AND rpt_rec.csv1='Final';
-			UPDATE rpt_runoff_quant set cont_error=rpt_rec.csv5::numeric WHERE result_id=v_result_id AND rpt_rec.csv1='Continuity';
+			
+			IF (rpt_rec.csv4 ~ '^([0-9]+[.]?[0-9]*|[.][0-9]+)$') THEN
+				UPDATE rpt_runoff_quant set total_prec=rpt_rec.csv4::numeric WHERE result_id=v_result_id AND rpt_rec.csv1='Total';
+				UPDATE rpt_runoff_quant set evap_loss=rpt_rec.csv4::numeric WHERE result_id=v_result_id AND rpt_rec.csv1='Evaporation';
+				UPDATE rpt_runoff_quant set infil_loss=rpt_rec.csv4::numeric WHERE result_id=v_result_id AND rpt_rec.csv1='Infiltration';
+				UPDATE rpt_runoff_quant set surf_runof=rpt_rec.csv4::numeric WHERE result_id=v_result_id AND rpt_rec.csv1='Surface';
+			END IF;
+			IF (rpt_rec.csv5 ~ '^([0-9]+[.]?[0-9]*|[.][0-9]+)$') THEN
+				UPDATE rpt_runoff_quant set finals_sto=rpt_rec.csv5::numeric WHERE result_id=v_result_id AND rpt_rec.csv1='Final';
+				UPDATE rpt_runoff_quant set cont_error=rpt_rec.csv5::numeric WHERE result_id=v_result_id AND rpt_rec.csv1='Continuity';
+			END IF;
 
 		ELSIF type_aux='rpt_flowrouting_cont' then 			 
 			IF v_result_id NOT IN (SELECT result_id FROM rpt_flowrouting_cont) then
