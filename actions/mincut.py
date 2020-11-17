@@ -644,75 +644,76 @@ class MincutParent(ParentAction):
         if not result:
             return
 
-        if self.mincut_class in (2, 3) or result['body']['actions']['overlap'] == 'Ok':
-            extras = f'"mincutId":"{result_mincut_id_text}"'
-            body = self.create_body(extras=extras)
-            result = self.controller.get_json('gw_fct_getmincut', body)
+        if self.mincut_class in (2, 3):
             self.mincut_ok(result)
-        elif result['body']['actions']['overlap'] == 'Conflict':
-            result_layer = self.add_layer.add_temp_layer(
-                self.dlg_mincut, result['body']['data'], None, False, tab_idx=2)
-            for layer in result_layer['temp_layers_added']:
-                symbol = QgsSymbol.defaultSymbol(layer.geometryType())
-                if type(symbol) == QgsLineSymbol:
-                    props = {'capstyle': 'round', 'customdash': '5;2', 'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
-                             'customdash_unit': 'MM', 'draw_inside_polygon': '0', 'joinstyle': 'round',
-                             'line_color': '76,119,220,255', 'line_style': 'solid', 'line_width': '1.6',
-                             'line_width_unit': 'MM', 'offset': '0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
-                             'offset_unit': 'MM', 'ring_filter': '0', 'use_custom_dash': '0',
-                             'width_map_unit_scale': '3x:0,0,0,0,0,0'}
-                    self.add_layer.set_layer_symbology(layer, props)
-                    # Add border
-                    renderer = layer.renderer()
-                    symbol1 = renderer.symbol()
-                    props2 = {'capstyle': 'round', 'customdash': '5;2', 'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
-                              'customdash_unit': 'MM', 'draw_inside_polygon': '0', 'joinstyle': 'round',
-                              'line_color': '76,38,0,255', 'line_style': 'solid', 'line_width': '1.8',
-                              'line_width_unit': 'MM', 'offset': '0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
-                              'offset_unit': 'MM', 'ring_filter': '0', 'use_custom_dash': '0',
-                              'width_map_unit_scale': '3x:0,0,0,0,0,0'}
-                    symbol2 = QgsLineSymbol.createSimple(props2)
-                    symbol_layer = symbol2.symbolLayer(0)
-                    symbol1.insertSymbolLayer(0, symbol_layer.clone())
 
-                elif type(symbol) == QgsMarkerSymbol:
-                    props = {'angle': '0', 'color': '255,0,0,150', 'horizontal_anchor_point': '1',
-                             'joinstyle': 'bevel', 'name': 'circle', 'offset': '0,0',
-                             'offset_map_unit_scale': '3x:0,0,0,0,0,0',
-                             'offset_unit': 'MM', 'outline_color': '35,35,35,255', 'outline_style': 'solid',
-                             'outline_width': '0', 'outline_width_map_unit_scale': '3x:0,0,0,0,0,0',
-                             'outline_width_unit': 'MM', 'scale_method': 'diameter', 'size': '2.6',
-                             'size_map_unit_scale': '3x:0,0,0,0,0,0', 'size_unit': 'MM', 'vertical_anchor_point': '1'}
-                    self.add_layer.set_layer_symbology(layer, props)
-                    # Add cross
-                    renderer = layer.renderer()
-                    symbol1 = renderer.symbol()
-                    symbol2 = QgsMarkerSymbol.createSimple({'name': 'cross', 'color': 'black', 'size': '4.0'})
-                    symbol_layer = symbol2.symbolLayer(0)
-                    symbol1.appendSymbolLayer(symbol_layer.clone())
+        elif self.mincut_class == 1:
+            if result['body']['actions']['overlap'] == 'Ok':
+                self.mincut_ok(result)
+            elif result['body']['actions']['overlap'] == 'Conflict':
+                result_layer = self.add_layer.add_temp_layer(
+                    self.dlg_mincut, result['body']['data'], None, False, tab_idx=2)
+                for layer in result_layer['temp_layers_added']:
+                    symbol = QgsSymbol.defaultSymbol(layer.geometryType())
+                    if type(symbol) == QgsLineSymbol:
+                        props = {'capstyle': 'round', 'customdash': '5;2', 'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
+                                 'customdash_unit': 'MM', 'draw_inside_polygon': '0', 'joinstyle': 'round',
+                                 'line_color': '76,119,220,255', 'line_style': 'solid', 'line_width': '1.6',
+                                 'line_width_unit': 'MM', 'offset': '0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
+                                 'offset_unit': 'MM', 'ring_filter': '0', 'use_custom_dash': '0',
+                                 'width_map_unit_scale': '3x:0,0,0,0,0,0'}
+                        self.add_layer.set_layer_symbology(layer, props)
+                        # Add border
+                        renderer = layer.renderer()
+                        symbol1 = renderer.symbol()
+                        props2 = {'capstyle': 'round', 'customdash': '5;2', 'customdash_map_unit_scale': '3x:0,0,0,0,0,0',
+                                  'customdash_unit': 'MM', 'draw_inside_polygon': '0', 'joinstyle': 'round',
+                                  'line_color': '76,38,0,255', 'line_style': 'solid', 'line_width': '1.8',
+                                  'line_width_unit': 'MM', 'offset': '0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
+                                  'offset_unit': 'MM', 'ring_filter': '0', 'use_custom_dash': '0',
+                                  'width_map_unit_scale': '3x:0,0,0,0,0,0'}
+                        symbol2 = QgsLineSymbol.createSimple(props2)
+                        symbol_layer = symbol2.symbolLayer(0)
+                        symbol1.insertSymbolLayer(0, symbol_layer.clone())
 
-                elif type(symbol) == QgsFillSymbol:
-                    props = {'border_width_map_unit_scale': '3x:0,0,0,0,0,0', 'color': '255,112,40,125',
-                             'joinstyle': 'bevel', 'offset': '0,0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
-                             'offset_unit': 'MM', 'outline_color': '35,35,35,255', 'outline_style': 'solid',
-                             'outline_width': '0.26', 'outline_width_unit': 'MM', 'style': 'solid'}
+                    elif type(symbol) == QgsMarkerSymbol:
+                        props = {'angle': '0', 'color': '255,0,0,150', 'horizontal_anchor_point': '1',
+                                 'joinstyle': 'bevel', 'name': 'circle', 'offset': '0,0',
+                                 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
+                                 'offset_unit': 'MM', 'outline_color': '35,35,35,255', 'outline_style': 'solid',
+                                 'outline_width': '0', 'outline_width_map_unit_scale': '3x:0,0,0,0,0,0',
+                                 'outline_width_unit': 'MM', 'scale_method': 'diameter', 'size': '2.6',
+                                 'size_map_unit_scale': '3x:0,0,0,0,0,0', 'size_unit': 'MM', 'vertical_anchor_point': '1'}
+                        self.add_layer.set_layer_symbology(layer, props)
+                        # Add cross
+                        renderer = layer.renderer()
+                        symbol1 = renderer.symbol()
+                        symbol2 = QgsMarkerSymbol.createSimple({'name': 'cross', 'color': 'black', 'size': '4.0'})
+                        symbol_layer = symbol2.symbolLayer(0)
+                        symbol1.appendSymbolLayer(symbol_layer.clone())
 
-                    self.add_layer.set_layer_symbology(layer, props)
-                layer.triggerRepaint()
-                self.iface.layerTreeView().refreshLayerSymbology(layer.id())
+                    elif type(symbol) == QgsFillSymbol:
+                        props = {'border_width_map_unit_scale': '3x:0,0,0,0,0,0', 'color': '255,112,40,125',
+                                 'joinstyle': 'bevel', 'offset': '0,0', 'offset_map_unit_scale': '3x:0,0,0,0,0,0',
+                                 'offset_unit': 'MM', 'outline_color': '35,35,35,255', 'outline_style': 'solid',
+                                 'outline_width': '0.26', 'outline_width_unit': 'MM', 'style': 'solid'}
 
-            self.dlg_dtext = DialogTextUi()
-            self.load_settings(self.dlg_dtext)
-            self.dlg_dtext.btn_close.setText('Cancel')
-            self.dlg_dtext.btn_accept.setText('Continue')
-            self.dlg_dtext.setWindowTitle('Mincut conflict')
-            self.dlg_dtext.btn_accept.clicked.connect(partial(self.force_mincut_overlap))
-            self.dlg_dtext.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_dtext))
-            self.dlg_dtext.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_dtext))
+                        self.add_layer.set_layer_symbology(layer, props)
+                    layer.triggerRepaint()
+                    self.iface.layerTreeView().refreshLayerSymbology(layer.id())
 
-            self.add_layer.populate_info_text(self.dlg_dtext, result['body']['data'], False)
+                self.dlg_dtext = DialogTextUi()
+                self.load_settings(self.dlg_dtext)
+                self.dlg_dtext.btn_close.setText('Cancel')
+                self.dlg_dtext.btn_accept.setText('Continue')
+                self.dlg_dtext.setWindowTitle('Mincut conflict')
+                self.dlg_dtext.btn_accept.clicked.connect(partial(self.force_mincut_overlap))
+                self.dlg_dtext.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_dtext))
+                self.dlg_dtext.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_dtext))
 
-            self.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
+                self.add_layer.populate_info_text(self.dlg_dtext, result['body']['data'], False)
+
+                self.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 
         self.iface.actionPan().trigger()
         self.remove_selection()
