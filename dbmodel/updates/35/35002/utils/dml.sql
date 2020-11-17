@@ -87,9 +87,6 @@ UPDATE config_function SET  function_name = 'gw_fct_setfeaturereplace' WHERE fun
 UPDATE sys_function SET function_name = 'gw_fct_setfeaturedelete' WHERE function_name='gw_fct_feature_delete';
 UPDATE config_function SET  function_name = 'gw_fct_setfeaturedelete' WHERE function_name='gw_fct_feature_delete';
 
-UPDATE sys_function SET function_name = 'gw_fct_setmincutoverlap' WHERE function_name='gw_fct_mincut_result_overlap';
-UPDATE config_function SET  function_name = 'gw_fct_setmincutoverlap' WHERE function_name='gw_fct_mincut_result_overlap';
-
 UPDATE sys_function SET function_name = 'gw_fct_setcheckproject' WHERE function_name='gw_fct_audit_check_project';
 UPDATE config_function SET  function_name = 'gw_fct_setcheckproject' WHERE function_name='gw_fct_audit_check_project';
 

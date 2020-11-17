@@ -7,16 +7,16 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2244
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut_result_overlap(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setmincutoverlap(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut_result_overlap(p_data json)
   RETURNS json AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_setmincutoverlap($${
+SELECT SCHEMA_NAME.gw_fct_mincut_result_overlap($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},"data":{"status":"check", "mincutId":5}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_setmincutoverlap($${
+SELECT SCHEMA_NAME.gw_fct_mincut_result_overlap($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, "data":{"status":"continue", "mincutId":333}}$$)
 
