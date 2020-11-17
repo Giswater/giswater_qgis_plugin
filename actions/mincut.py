@@ -272,7 +272,7 @@ class MincutParent(ParentAction):
         mincut_id = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         sql = (f"SELECT notified FROM om_mincut "
                f"WHERE id = '{mincut_id}'")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if not row or row[0] is None:
             text = "Nothing to show"
             self.controller.show_info_box(str(text), "Sms info")
@@ -633,18 +633,21 @@ class MincutParent(ParentAction):
         self.disconnect_snapping()
         sql = (f"SELECT mincut_state, mincut_class FROM om_mincut "
                f" WHERE id = '{result_mincut_id}'")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if not row:
             return
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         extras = f'"action":"mincutAccept", "mincutClass":{self.mincut_class}, "status":"check", '
         extras += f'"mincutId":"{result_mincut_id_text}"'
         body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_setmincut', body)
         if not result:
             return
 
         if self.mincut_class in (2, 3) or result['body']['actions']['overlap'] == 'Ok':
+            extras = f'"mincutId":"{result_mincut_id_text}"'
+            body = self.create_body(extras=extras)
+            result = self.controller.get_json('gw_fct_getmincut', body)
             self.mincut_ok(result)
         elif result['body']['actions']['overlap'] == 'Conflict':
             result_layer = self.add_layer.add_temp_layer(
@@ -721,7 +724,7 @@ class MincutParent(ParentAction):
         extras = f'"action":"mincutAccept", "mincutClass":{self.mincut_class}, "status":"continue", '
         extras += f'"mincutId":"{result_mincut_id_text}"'
         body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_setmincut', body)
         self.mincut_ok(result)
 
 
@@ -1648,12 +1651,12 @@ class MincutParent(ParentAction):
 
             sql = ("INSERT INTO om_mincut (mincut_state)"
                    " VALUES (0) RETURNING id;")
-            new_mincut_id = self.controller.execute_returning(sql, log_sql=True)
+            new_mincut_id = self.controller.execute_returning(sql)
             if new_mincut_id[0] < 1:
                 real_mincut_id = 1
                 sql = (f"UPDATE om_mincut SET(id) = (1) "
                        f"WHERE id = {new_mincut_id[0]};")
-                self.controller.execute_sql(sql, log_sql=True)
+                self.controller.execute_sql(sql)
             else:
                 real_mincut_id = new_mincut_id[0]
 
@@ -1663,9 +1666,9 @@ class MincutParent(ParentAction):
         extras = f'"action":"mincutNetwork", '
         extras += f'"mincutId":"{real_mincut_id}", "arcId":"{elem_id}"'
         body = self.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
-        if 'mincutOverlap' in complet_result:
-            if complet_result['mincutOverlap'] != "":
+        complet_result = self.controller.get_json('gw_fct_setmincut', body)
+        if 'mincutOverlap' in complet_result or complet_result['status'] == 'Accepted':
+            if 'mincutOverlap' in complet_result and complet_result['mincutOverlap'] != "":
                 message = "Mincut done, but has conflict and overlaps with"
                 self.controller.show_info_box(message, parameter=complet_result['mincutOverlap'])
             else:
@@ -1673,7 +1676,7 @@ class MincutParent(ParentAction):
                 self.controller.show_info(message)
 
             # Zoom to rectangle (zoom to mincut)
-            polygon = complet_result['geometry']
+            polygon = complet_result['body']['data']['geometry']
             polygon = polygon[9:len(polygon) - 2]
             polygon = polygon.split(',')
             if polygon[0] == '':
@@ -1692,7 +1695,7 @@ class MincutParent(ParentAction):
                    f" anl_user = current_user, anl_feature_type = '{elem_type.upper()}',"
                    f" anl_feature_id = '{elem_id}'"
                    f" WHERE id = '{real_mincut_id}'")
-            status = self.controller.execute_sql(sql, log_sql=True)
+            status = self.controller.execute_sql(sql)
             self.task1.setProgress(50)
             if not status:
                 message = "Error updating element in table, you need to review data"
@@ -1712,7 +1715,7 @@ class MincutParent(ParentAction):
             sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;\n"
                    f"INSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
                    f" (current_user, {real_mincut_id});")
-            self.controller.execute_sql(sql, log_error=True, log_sql=True)
+            self.controller.execute_sql(sql, log_error=True)
             self.task1.setProgress(75)
             # Refresh map canvas
             self.refresh_map_canvas()
@@ -1842,7 +1845,7 @@ class MincutParent(ParentAction):
         if result_mincut_id != 'null':
             extras = f'"action":"mincutValveUnaccess", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}"'
             body = self.create_body(extras=extras)
-            self.controller.get_json('gw_fct_setmincut', body, log_sql=True)
+            self.controller.get_json('gw_fct_setmincut', body)
         # Disconnect snapping and related signals
         self.disconnect_snapping(False)
 
@@ -1880,7 +1883,7 @@ class MincutParent(ParentAction):
                f" INNER JOIN cat_users"
                f" ON cat_users.id = om_mincut.assigned_to"
                f" WHERE om_mincut.id = '{result_mincut_id}'")
-        row = self.controller.get_row(sql, log_sql=True)
+        row = self.controller.get_row(sql)
         if not row:
             return
 
