@@ -1896,14 +1896,12 @@ class MincutParent(ParentAction):
         utils_giswater.set_combo_itemData(self.dlg_mincut.type, row['mincut_type'], 0)
         utils_giswater.set_combo_itemData(self.dlg_mincut.cause, row['anl_cause'], 0)
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, mincut_state_name)
+        extras = f'"mincutId":"{result_mincut_id}"'
+        body = self.create_body(extras=extras)
+        result = self.controller.get_json('gw_fct_getmincut', body)
+        self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, False)
 
-        if 'output' in row and row['output']:
-            self.dlg_mincut.txt_infolog.setEnabled(False)
-            text = utils_giswater.getWidgetText(self.dlg_mincut, 'txt_infolog', return_string_null=False)
-            text += json.dumps(row['output'], indent=2, sort_keys=True)
-            utils_giswater.setWidgetText(self.dlg_mincut, "txt_infolog", text)
-
-         # Manage location
+        # Manage location
         utils_giswater.set_combo_itemData(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, str(row['streetaxis_id']))
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, str(row['postnumber']))
