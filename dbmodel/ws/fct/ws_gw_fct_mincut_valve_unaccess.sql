@@ -18,18 +18,16 @@ feature_type_aux text;
 v_flag boolean = false;
 v_node_id character varying;
 v_result_id integer;
-v_cur_user text;
 v_error_context text;
 
 BEGIN 
 	-- set search_path
     SET search_path= 'SCHEMA_NAME','public';
-		-- get input parameters
+
+	-- get input parameters
 	v_node_id := (p_data ->>'data')::json->>'nodeId';
 	v_result_id := ((p_data ->>'data')::json->>'mincutId')::integer;	
-	v_cur_user := ((p_data ->>'data')::json->>'cur_user');
-	
-    	
+
 	SELECT anl_feature_id INTO feature_id_aux FROM om_mincut WHERE id=v_result_id;
 	SELECT anl_feature_type INTO feature_type_aux FROM om_mincut WHERE id=v_result_id;
 
@@ -49,6 +47,7 @@ BEGIN
 		END IF;
 	END IF;
 	RAISE NOTICE 'TEST 10';
+	
 	-- Recalculate the mincut
 	PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, v_result_id);
 	
@@ -58,6 +57,7 @@ BEGIN
 		INSERT INTO om_mincut_valve (result_id, node_id) VALUES (v_result_id, v_node_id);
         UPDATE om_mincut_valve SET closed=TRUE, proposed=TRUE, broken=FALSE, unaccess=FALSE, 
 		the_geom=(SELECT the_geom FROM node WHERE node_id=v_node_id) WHERE node_id=v_node_id;
+		
 		--restore man_valve original values
 		UPDATE man_valve SET closed=TRUE WHERE node_id=v_node_id;
 	END IF;
@@ -67,6 +67,7 @@ BEGIN
 		',"body":{"form":{}'||
 		',"data":{}'||
 		'}}')::json;
+		
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
