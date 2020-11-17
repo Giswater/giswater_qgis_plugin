@@ -742,7 +742,7 @@ class MincutParent(ParentAction):
 
         self.dlg_mincut.closeMainWin = False
         self.dlg_mincut.mincutCanceled = True
-        if self.mincut_class == 1:
+        if self.mincut_class == 1 and 'geometry' in result['body']['data']:
             polygon = result['body']['data']['geometry']
             polygon = polygon[9:len(polygon) - 2]
             polygon = polygon.split(',')
