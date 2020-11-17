@@ -9,3 +9,4 @@
 - New function (3008) set arc reverse
 - Activate EPA functions 2431, 2858 on toolbox for ud
 - Solve import inp swmm files when barrels
+- New function gw_fct_mincut_connec to manage mincut_class 2,3
