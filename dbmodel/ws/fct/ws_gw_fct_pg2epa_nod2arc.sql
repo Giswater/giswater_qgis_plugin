@@ -11,8 +11,9 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_nod2arc(result_id_var varch
 AS $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_pg2epa($${"data":{"geometryLog":false, "resultId":"t1", "useNetworkGeom":"false"}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{"resultId":"t1", "useNetworkGeom":"false"}}$$)
 */
+
 
 DECLARE
 
@@ -55,32 +56,28 @@ BEGIN
 						      (SELECT node_1 as node_id FROM v_edit_arc 
 							UNION ALL SELECT node_2 FROM v_edit_arc) a using (node_id) group by n.node_id';
 
-	-- query text to make easy later sql senteces (in function of all nod2arcs have been choosed or not)
+	-- query text for mandatory node2arcs
 	v_querytext = 'SELECT a.*, inp_valve.to_arc FROM temp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id  
 				UNION  
-				SELECT a.*, inp_pump.to_arc FROM temp_node a JOIN inp_pump ON a.node_id=inp_pump.node_id';
-				
-	IF p_only_mandatory_nodarc IS FALSE THEN
-		v_querytext = concat(v_querytext , ' UNION SELECT a.*, inp_shortpipe.to_arc FROM temp_node a JOIN inp_shortpipe ON a.node_id=inp_shortpipe.node_id');
-	END IF;
+				SELECT a.*, inp_pump.to_arc FROM temp_node a JOIN inp_pump ON a.node_id=inp_pump.node_id
+				UNION
+				SELECT a.*, inp_shortpipe.to_arc FROM temp_node a JOIN inp_shortpipe ON a.node_id=inp_shortpipe.node_id WHERE inp_shortpipe.to_arc IS NOT NULL';
 
 	v_querytext = concat (' INSERT INTO anl_node (num_arcs, arc_id, node_id, elevation, elev, nodecat_id, sector_id, state, state_type, descript, arc_distance, the_geom, fid, cur_user)
-				SELECT c.numarcs, to_arc, b.node_id, elevation, elev, nodecat_id, sector_id, state, state_type, annotation, demand, the_geom, 124, current_user 
+				SELECT c.numarcs, to_arc, b.node_id, elevation, elev, nodecat_id, sector_id, state, state_type, ''MANDATORY'', demand, the_geom, 124, current_user 
 				FROM ( ',v_querytext, ' ) b JOIN ( ',v_query_number,' ) c USING (node_id)');
 	EXECUTE v_querytext; 
 
-	/*
-		INSERT INTO anl_node (num_arcs, arc_id, node_id, elevation, elev, nodecat_id, sector_id, state, state_type, descript, arc_distance, the_geom, fid, cur_user)
-		SELECT c.numarcs, to_arc, b.node_id, elevation, elev, nodecat_id, sector_id, state, state_type, annotation, demand, the_geom, 124, current_user 
-		FROM ( 
-			SELECT a.*, inp_valve.to_arc FROM temp_node a JOIN inp_valve ON a.node_id=inp_valve.node_id 
-			UNION  
-			SELECT a.*, inp_pump.to_arc FROM temp_node a JOIN inp_pump ON a.node_id=inp_pump.node_id
-			) b 
-			JOIN ( SELECT count(*)as numarcs, node_id FROM node n JOIN 
-					(SELECT node_1 as node_id FROM v_edit_arc 
-					UNION ALL SELECT node_2 FROM v_edit_arc) a using (node_id) group by n.node_id ) c USING (node_id);
-*/
+	-- query text for non-mandatory node2arcs
+	IF p_only_mandatory_nodarc IS FALSE THEN
+		v_querytext = 'SELECT a.*, inp_shortpipe.to_arc FROM temp_node a JOIN inp_shortpipe ON a.node_id=inp_shortpipe.node_id WHERE inp_shortpipe.to_arc IS NULL';
+
+		v_querytext = concat (' INSERT INTO anl_node (num_arcs, arc_id, node_id, elevation, elev, nodecat_id, sector_id, state, state_type, descript, arc_distance, the_geom, fid, cur_user)
+				SELECT c.numarcs, to_arc, b.node_id, elevation, elev, nodecat_id, sector_id, state, state_type, ''NOT-MANDATORY'', demand, the_geom, 124, current_user 
+				FROM ( ',v_querytext, ' ) b JOIN ( ',v_query_number,' ) c USING (node_id)');
+		EXECUTE v_querytext; 
+	END IF;
+	
 
 	RAISE NOTICE ' reverse geometries when node acts as node1 from arc but must be node2';
 	EXECUTE 'UPDATE temp_arc SET the_geom = st_reverse(the_geom) , node_1 = node_2 , node_2 = node_1 WHERE arc_id IN (SELECT arc_id FROM (
@@ -214,7 +211,7 @@ BEGIN
 			a.state_type,
 			case when (c.addparam::json->>''diameter'')::text !='''' then  (c.addparam::json->>''diameter'')::numeric else '||v_diameter||' end as diameter,
 			case when (c.addparam::json->>''roughness'')::text !='''' then  (c.addparam::json->>''roughness'')::numeric else '||v_roughness||' end as roughness,
-			c.annotation,
+			a.annotation,
 			st_length2d(st_makeline(a.the_geom, b.the_geom)) as length,
 			c.addparam::json->>''status'' status,
 			st_makeline(a.the_geom, b.the_geom) AS the_geom,
@@ -244,7 +241,7 @@ BEGIN
 		a.state_type,
 		case when (c.addparam::json->>''diameter'')::text !='''' then  (c.addparam::json->>''diameter'')::numeric else '||v_diameter||' end as diameter,
 		case when (c.addparam::json->>''roughness'')::text !='''' then  (c.addparam::json->>''roughness'')::numeric else '||v_roughness||' end as roughness,
-		c.annotation,
+		a.annotation,
 		st_length2d(st_makeline(a.the_geom, b.the_geom)) as length,
 		c.addparam::json->>''status'' status,
 		st_makeline(a.the_geom, b.the_geom) AS the_geom,
@@ -255,18 +252,37 @@ BEGIN
 			LEFT JOIN result c ON c.node_id = b.nodeparent
 			WHERE a.nodeparent = b.nodeparent AND a.arcposition = 1 AND b.arcposition = 2';
 			
-	RAISE NOTICE ' update geometries and node_1';
-	EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, ('||0.5*v_nod2arc||' / length) , 1), node_1 = concat(node_1, ''_n2a_1'') 
-			FROM anl_node n WHERE n.node_id = node_1 AND fid  = 124 and cur_user = current_user';
-
-	RAISE NOTICE ' update geometries and node_2';
-	EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, 0, ( 1 - '||0.5*v_nod2arc||' / length)), node_2 = concat(node_2, ''_n2a_2'') 
-			FROM anl_node n WHERE n.node_id = node_2 AND fid  = 124 and cur_user = current_user';
-
-	RAISE NOTICE ' Deleting old node from node table';
+	RAISE NOTICE ' Mark old node from node table';
 	EXECUTE ' UPDATE temp_node SET epa_type =''TODELETE'' FROM (SELECT node_id FROM  anl_node a WHERE fid  = 124 and cur_user = current_user ) b
 		  WHERE b.node_id  = temp_node.node_id';
 
+	RAISE NOTICE ' Update geometries and node_1';
+	EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, ('||0.5*v_nod2arc||' / length) , 1) 
+			FROM temp_node n WHERE n.node_id = node_1 AND n.epa_type =''TODELETE''';
+
+	EXECUTE 'UPDATE temp_arc a SET node_1 = node_id FROM (
+			WITH qt AS (SELECT a.id, a.arc_id, n.node_id, ST_Distance(n.the_geom, ST_startpoint(a.the_geom)) as d FROM temp_arc a, temp_node n WHERE ST_DWithin(ST_startpoint(a.the_geom), n.the_geom, 0.5) AND arcposition is not null)
+			SELECT arc_id, node_id FROM (SELECT min(d) min, id FROM qt GROUP by id)a
+			JOIN (SELECT * FROM qt)b USING (id)
+			where min = d
+			)b
+			WHERE a.arc_id = b.arc_id
+			AND node_1 IN (SELECT node_id FROM temp_node WHERE epa_type =''TODELETE'')'; 
+
+	RAISE NOTICE ' update geometries and node_2';
+	EXECUTE 'UPDATE temp_arc SET the_geom = ST_linesubstring(temp_arc.the_geom, 0, ( 1 - '||0.5*v_nod2arc||' / length))
+			FROM temp_node n WHERE n.node_id = node_2 AND n.epa_type =''TODELETE''';
+
+	EXECUTE 'UPDATE temp_arc a SET node_2 = node_id FROM (
+			WITH qt AS (SELECT a.id, a.arc_id, n.node_id, ST_Distance(n.the_geom, ST_endpoint(a.the_geom)) as d FROM temp_arc a, temp_node n WHERE ST_DWithin(ST_endpoint(a.the_geom), n.the_geom, 0.5) AND arcposition is not null)
+			SELECT arc_id, node_id FROM (SELECT min(d) min, id FROM qt GROUP by id)a
+			JOIN (SELECT * FROM qt)b USING (id)
+			where min = d
+			)b
+			WHERE a.arc_id = b.arc_id
+			AND node_2 IN (SELECT node_id FROM  temp_node WHERE epa_type =''TODELETE'')';
+
+	RAISE NOTICE ' Delete old node from node table';
 	EXECUTE ' DELETE FROM temp_node WHERE epa_type =''TODELETE''';
 
 	RETURN 1;
