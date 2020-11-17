@@ -26,7 +26,7 @@ v_mincut integer;
 v_numconnecs integer;
 v_numhydrometer integer;
 v_priority json;
-v_mincutdetails text;
+v_mincutdetails json;
 v_mincut_class integer;
 v_version text;
 v_error_context text;
@@ -113,7 +113,7 @@ BEGIN
 
 	RETURN ('{"status":"Accepted", "version":"'||v_version||'","body":{"form":{}'||
 			',"data":{ "info":'||v_result_info||'}'||
-			'}')::json;
+			'}}')::json;
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
