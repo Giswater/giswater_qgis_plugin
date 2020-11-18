@@ -643,23 +643,23 @@ class GwMincut:
         if not result or result['status'] == 'Failed':
             return
 
-        if self.mincut_class in (2, 3) or result['body']['actions']['overlap'] == 'Ok':
-            extras = f'"mincutId":"{result_mincut_id_text}"'
-            body = tools_gw.create_body(extras=extras)
-            result = self.controller.get_json('gw_fct_getmincut', body)
+        if self.mincut_class in (2, 3):
             self.mincut_ok(result)
-        elif result['body']['actions']['overlap'] == 'Conflict':
-            self.dlg_dtext = DialogTextUi()
-            tools_gw.load_settings(self.dlg_dtext)
-            self.dlg_dtext.btn_close.setText('Cancel')
-            self.dlg_dtext.btn_accept.setText('Continue')
-            self.dlg_dtext.setWindowTitle('Mincut conflict')
-            self.dlg_dtext.btn_accept.clicked.connect(partial(self.force_mincut_overlap))
-            self.dlg_dtext.btn_accept.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
-            self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
+        if self.mincut_class == 1:
+            if result['body']['actions']['overlap'] == 'Ok':
+                self.mincut_ok(result)
+            elif result['body']['actions']['overlap'] == 'Conflict':
+                self.dlg_dtext = DialogTextUi()
+                tools_gw.load_settings(self.dlg_dtext)
+                self.dlg_dtext.btn_close.setText('Cancel')
+                self.dlg_dtext.btn_accept.setText('Continue')
+                self.dlg_dtext.setWindowTitle('Mincut conflict')
+                self.dlg_dtext.btn_accept.clicked.connect(partial(self.force_mincut_overlap))
+                self.dlg_dtext.btn_accept.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
+                self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
 
-            tools_gw.populate_info_text(self.dlg_dtext, result['body']['data'], False)
-            tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
+                tools_gw.populate_info_text(self.dlg_dtext, result['body']['data'], False)
+                tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 
         self.iface.actionPan().trigger()
         self.remove_selection()
