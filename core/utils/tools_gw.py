@@ -15,20 +15,20 @@ if 'nt' in sys.builtin_module_names:
 from functools import partial
 from collections import OrderedDict
 
-from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint, QDate, QCoreApplication
+from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint, QDate, QCoreApplication, QSettings
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
     QCompleter, QFileDialog, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit,\
     QTextEdit, QToolButton, QWidget
 from qgis.core import QgsProject, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
     QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
-    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest
+    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest, QgsDataSourceUri, QgsCredentials
 from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint, QgsDateTimeEdit
 
 from ..models.sys_feature_cat import SysFeatureCat
 from ..ui.ui_manager import GwDialog, GwMainWindow
 from ... import global_vars
-from ...lib import tools_qgis, tools_pgdao, tools_qt, tools_log
+from ...lib import tools_qgis, tools_pgdao, tools_qt, tools_log, tools_config
 from ...lib.tools_qt import GwHyperLinkLabel
 
 
@@ -2052,6 +2052,94 @@ def get_expression_filter(geom_type, list_ids=None, layers=None):
 
 # TODO tools_gw_db
 
+def get_layer_source_from_credentials():
+    """ Get database parameters from layer 'v_edit_node' or  database connection settings """
+
+    # Get layer 'v_edit_node'
+    layer = global_vars.controller.get_layer_by_tablename("v_edit_node")
+
+    # Get database connection settings
+    settings = QSettings()
+    settings.beginGroup("PostgreSQL/connections")
+
+    if layer is None and settings is None:
+        not_version = False
+        tools_log.log_warning("Layer 'v_edit_node' is None and settings is None")
+        global_vars.last_error = tr("Layer not found") + ": 'v_edit_node'"
+        return None, not_version
+
+    # Get sslmode from user config file
+    tools_config.manage_user_config_file()
+    sslmode = tools_config.get_user_setting_value('sslmode', 'disable')
+    # tools_log.log_info(f"sslmode user config file: {sslmode}")
+
+    credentials = None
+    not_version = True
+    if layer:
+        not_version = False
+        credentials = global_vars.controller.get_layer_source(layer)
+        credentials['sslmode'] = sslmode
+        global_vars.schema_name = credentials['schema']
+        conn_info = QgsDataSourceUri(layer.dataProvider().dataSourceUri()).connectionInfo()
+        status, credentials = connect_to_database_credentials(credentials, conn_info)
+        if not status:
+            tools_log.log_warning("Error connecting to database (layer)")
+            global_vars.last_error = tr("Error connecting to database")
+            return None, not_version
+
+        # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
+        QgsCredentials.instance().put(conn_info, credentials['user'], credentials['password'])
+
+    elif settings:
+        not_version = True
+        default_connection = settings.value('selected')
+        settings.endGroup()
+        credentials = {'db': None, 'schema': None, 'table': None, 'service': None,
+                       'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
+        if default_connection:
+            settings.beginGroup("PostgreSQL/connections/" + default_connection)
+            if settings.value('host') in (None, ""):
+                credentials['host'] = 'localhost'
+            else:
+                credentials['host'] = settings.value('host')
+            credentials['port'] = settings.value('port')
+            credentials['db'] = settings.value('database')
+            credentials['user'] = settings.value('username')
+            credentials['password'] = settings.value('password')
+            credentials['sslmode'] = sslmode
+            settings.endGroup()
+            status, credentials = connect_to_database_credentials(credentials, max_attempts=0)
+            if not status:
+                tools_log.log_warning("Error connecting to database (settings)")
+                global_vars.last_error = tr("Error connecting to database")
+                return None, not_version
+        else:
+            tools_log.log_warning("Error getting default connection (settings)")
+            global_vars.last_error = tr("Error getting default connection")
+            return None, not_version
+
+    return credentials, not_version
+
+
+def connect_to_database_credentials(credentials, conn_info=None, max_attempts=2):
+    """ Connect to database with selected database @credentials """
+
+    # Check if credential parameter 'service' is set
+    if 'service' in credentials and credentials['service']:
+        logged = global_vars.controller.connect_to_database_service(credentials['service'], credentials['sslmode'])
+        return logged, credentials
+
+    attempt = 0
+    logged = False
+    while not logged and attempt <= max_attempts:
+        attempt += 1
+        if conn_info and attempt > 1:
+            (success, credentials['user'], credentials['password']) = \
+                QgsCredentials.instance().get(conn_info, credentials['user'], credentials['password'])
+        logged = global_vars.controller.connect_to_database(credentials['host'], credentials['port'], credentials['db'],
+            credentials['user'], credentials['password'], credentials['sslmode'])
+
+    return logged, credentials
 
 # TODO tools_gw_log
 

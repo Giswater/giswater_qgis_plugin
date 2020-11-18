@@ -105,7 +105,7 @@ class DaoController:
         self.logged = False
         self.current_user = None
 
-        self.layer_source, not_version = self.get_layer_source_from_credentials()
+        self.layer_source, not_version = tools_gw.get_layer_source_from_credentials()
         if self.layer_source:
             if self.layer_source['service'] is None and (self.layer_source['db'] is None
                     or self.layer_source['host'] is None or self.layer_source['user'] is None
@@ -117,118 +117,6 @@ class DaoController:
         self.logged = True
 
         return True, not_version
-
-
-    def manage_user_config_file(self):
-        """ Manage user configuration file """
-
-        if self.user_settings:
-            return
-
-        self.user_settings = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
-        main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
-        config_folder = main_folder + os.sep + "config" + os.sep
-        self.user_settings_path = config_folder + 'user.config'
-        if not os.path.exists(self.user_settings_path):
-            tools_log.log_info(f"File not found: {self.user_settings_path}")
-            tools_config.save_user_settings()
-        else:
-            tools_log.log_info(f"User settings file: {self.user_settings_path}")
-
-        # Open file
-        self.user_settings.read(self.user_settings_path)
-
-
-    def get_layer_source_from_credentials(self):
-        """ Get database parameters from layer 'v_edit_node' or  database connection settings """
-
-        # Get layer 'v_edit_node'
-        layer = self.get_layer_by_tablename("v_edit_node")
-
-        # Get database connection settings
-        settings = QSettings()
-        settings.beginGroup("PostgreSQL/connections")
-
-        if layer is None and settings is None:
-            not_version = False
-            tools_log.log_warning("Layer 'v_edit_node' is None and settings is None")
-            self.last_error = tools_gw.tr("Layer not found") + ": 'v_edit_node'"
-            return None, not_version
-
-        # Get sslmode from user config file
-        self.manage_user_config_file()
-        sslmode = tools_config.get_user_setting_value('sslmode', 'disable')
-        # tools_log.log_info(f"sslmode user config file: {sslmode}")
-
-        credentials = None
-        not_version = True
-        if layer:
-            not_version = False
-            credentials = self.get_layer_source(layer)
-            credentials['sslmode'] = sslmode
-            self.schema_name = credentials['schema']
-            conn_info = QgsDataSourceUri(layer.dataProvider().dataSourceUri()).connectionInfo()
-            status, credentials = self.connect_to_database_credentials(credentials, conn_info)
-            if not status:
-                tools_log.log_warning("Error connecting to database (layer)")
-                self.last_error = tools_gw.tr("Error connecting to database")
-                return None, not_version
-
-            # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
-            QgsCredentials.instance().put(conn_info, credentials['user'], credentials['password'])
-
-        elif settings:
-            not_version = True
-            default_connection = settings.value('selected')
-            settings.endGroup()
-            credentials = {'db': None, 'schema': None, 'table': None, 'service': None,
-                           'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
-            if default_connection:
-                settings.beginGroup("PostgreSQL/connections/" + default_connection)
-                if settings.value('host') in (None, ""):
-                    credentials['host'] = 'localhost'
-                else:
-                    credentials['host'] = settings.value('host')
-                credentials['port'] = settings.value('port')
-                credentials['db'] = settings.value('database')
-                credentials['user'] = settings.value('username')
-                credentials['password'] = settings.value('password')
-                credentials['sslmode'] = sslmode
-                settings.endGroup()
-                status, credentials = self.connect_to_database_credentials(credentials, max_attempts=0)
-                if not status:
-                    tools_log.log_warning("Error connecting to database (settings)")
-                    self.last_error = tools_gw.tr("Error connecting to database")
-                    return None, not_version
-            else:
-                tools_log.log_warning("Error getting default connection (settings)")
-                self.last_error = tools_gw.tr("Error getting default connection")
-                return None, not_version
-
-        self.credentials = credentials
-
-        return credentials, not_version
-
-
-    def connect_to_database_credentials(self, credentials, conn_info=None, max_attempts=2):
-        """ Connect to database with selected database @credentials """
-
-        # Check if credential parameter 'service' is set
-        if 'service' in credentials and credentials['service']:
-            logged = self.connect_to_database_service(credentials['service'], credentials['sslmode'])
-            return logged, credentials
-
-        attempt = 0
-        logged = False
-        while not logged and attempt <= max_attempts:
-            attempt += 1
-            if conn_info and attempt > 1:
-                (success, credentials['user'], credentials['password']) = \
-                    QgsCredentials.instance().get(conn_info, credentials['user'], credentials['password'])
-            logged = self.connect_to_database(credentials['host'], credentials['port'], credentials['db'],
-                credentials['user'], credentials['password'], credentials['sslmode'])
-
-        return logged, credentials
 
 
     def connect_to_database(self, host, port, db, user, pwd, sslmode):
@@ -1091,7 +979,7 @@ class DaoController:
         if schemaname is None:
             schemaname = self.schema_name
             if schemaname is None:
-                self.get_layer_source_from_credentials()
+                tools_gw.get_layer_source_from_credentials()
                 schemaname = self.schema_name
                 if schemaname is None:
                     return None

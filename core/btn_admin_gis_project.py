@@ -138,7 +138,7 @@ class GwAdminGisProject:
     def get_database_parameters(self, schema):
         """ Get database parameters from layer source """
 
-        layer_source, not_version = self.controller.get_layer_source_from_credentials()
+        layer_source, not_version = tools_gw.get_layer_source_from_credentials()
         if layer_source is None:
             tools_gw.show_warning("Error getting database parameters")
             return False

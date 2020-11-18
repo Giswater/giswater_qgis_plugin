@@ -5,6 +5,9 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import configparser
+import os
+
 
 from .. import global_vars
 from . import tools_log
@@ -58,3 +61,23 @@ def save_user_settings():
             configfile.close()
     except Exception as e:
         tools_log.log_warning(str(e))
+
+
+def manage_user_config_file():
+    """ Manage user configuration file """
+
+    if global_vars.user_settings:
+        return
+
+    global_vars.user_settings = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+    main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
+    config_folder = main_folder + os.sep + "config" + os.sep
+    global_vars.user_settings_path = config_folder + 'user.config'
+    if not os.path.exists(global_vars.user_settings_path):
+        tools_log.log_info(f"File not found: {global_vars.user_settings_path}")
+        save_user_settings()
+    else:
+        tools_log.log_info(f"User settings file: {global_vars.user_settings_path}")
+
+    # Open file
+    global_vars.user_settings.read(global_vars.user_settings_path)
