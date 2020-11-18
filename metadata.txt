@@ -13,8 +13,13 @@ version=3.4.024
 
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
 # End of mandatory metadata
-changelog=Version 3.4.024 (xx/xx/2020)
-   - Bug fix
+changelog=Version 3.4.024 (18/11/2020)
+   - Various Bug fix
+   - Added two new actions to info
+   - Apply changes of Pull Request #780
+   - Allow remove layers from toc with Gw layers tool
+   - Enhance control of reload fields only for not nulls
+   - Enhance Mincut manage when class is 2 or 3
 
 # Tags are comma separated with spaces allowed
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
