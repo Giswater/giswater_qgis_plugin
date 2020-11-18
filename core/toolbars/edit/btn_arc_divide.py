@@ -38,7 +38,7 @@ class GwArcDivideButton(GwParentMapTool):
         if status:
             feature_id = f'"id":["{node_id}"]'
             body = tools_gw.create_body(feature=feature_id)
-            result = self.controller.get_json('gw_fct_setarcdivide', body)
+            result = tools_gw.get_json('gw_fct_setarcdivide', body)
             if not result or result['status'] == 'Failed':
                 return
             if 'hideForm' not in result['body']['actions'] or not result['body']['actions']['hideForm']:

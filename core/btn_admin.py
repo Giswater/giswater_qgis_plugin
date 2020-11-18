@@ -1320,7 +1320,7 @@ class GwAdmin:
 
         extras += ', "isToolbox":false'
         body = tools_gw.create_body(extras=extras)
-        complet_result = self.controller.get_json('gw_fct_gettoolbox', body, schema_name=self.schema, commit=False)
+        complet_result = tools_gw.get_json('gw_fct_gettoolbox', body, schema_name=self.schema, commit=False)
         if not complet_result or complet_result['status'] == 'Failed':
             return False
         self.populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data'])
@@ -1367,7 +1367,7 @@ class GwAdmin:
         client = '"client":{"device":4, "lang":"' + str(locale) + '"}, '
         data = '"data":{' + extras + '}'
         body = "$${" + client + data + "}$$"
-        result = self.controller.get_json('gw_fct_admin_schema_lastprocess', body,
+        result = tools_gw.get_json('gw_fct_admin_schema_lastprocess', body,
                                           schema_name=self.schema_name, commit=False, log_sql=True)
         if result is None or ('status' in result and result['status'] == 'Failed'):
             self.error_count = self.error_count + 1
@@ -2472,7 +2472,7 @@ class GwAdmin:
         extras = f'"parameters":{{"source_schema":"{schema}", "dest_schema":"{new_schema_name}"}}'
         body = tools_gw.create_body(extras=extras)
         self.task1.setProgress(50)
-        result = self.controller.get_json('gw_fct_admin_schema_clone', body,
+        result = tools_gw.get_json('gw_fct_admin_schema_clone', body,
                                           schema_name=schema, commit=False)
         if not result or result['status'] == 'Failed':
             return
@@ -2821,7 +2821,7 @@ class GwAdmin:
         body = body.replace('""', 'null')
 
         # Execute query
-        json_result = self.controller.get_json('gw_fct_admin_manage_child_views', body,
+        json_result = tools_gw.get_json('gw_fct_admin_manage_child_views', body,
                                           schema_name=schema_name, commit=True)
         self.manage_json_message(json_result, title="Create child view")
 
@@ -3201,7 +3201,7 @@ class GwAdmin:
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            json_result = self.controller.get_json('gw_fct_admin_manage_addfields', body,
+            json_result = tools_gw.get_json('gw_fct_admin_manage_addfields', body,
                                               schema_name=schema_name, commit=True)
             self.manage_json_message(json_result, parameter="Field configured in 'config_form_fields'")
             if not json_result or json_result['status'] == 'Failed':
@@ -3243,7 +3243,7 @@ class GwAdmin:
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            json_result = self.controller.get_json('gw_fct_admin_manage_addfields', body,
+            json_result = tools_gw.get_json('gw_fct_admin_manage_addfields', body,
                                               schema_name=schema_name, commit=True)
             self.manage_json_message(json_result, parameter="Field update in 'config_form_fields'")
             if not json_result or json_result['status'] == 'Failed':
@@ -3260,7 +3260,7 @@ class GwAdmin:
             body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute manage add fields function
-            json_result = self.controller.get_json('gw_fct_admin_manage_addfields', body,
+            json_result = tools_gw.get_json('gw_fct_admin_manage_addfields', body,
                                               schema_name=schema_name, commit=True)
             self.manage_json_message(json_result, parameter="Delete function")
 

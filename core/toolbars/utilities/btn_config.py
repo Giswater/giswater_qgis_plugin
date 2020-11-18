@@ -38,7 +38,7 @@ class GwConfigButton(GwParentAction):
         result = self.get_layers_name()
 
         body = tools_gw.create_body(form='"formName":"config"', extras=result)
-        json_result = self.controller.get_json('gw_fct_getconfig', body)
+        json_result = tools_gw.get_json('gw_fct_getconfig', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
@@ -238,7 +238,7 @@ class GwConfigButton(GwParentAction):
         my_json = json.dumps(self.list_update)
         extras = f'"fields":{my_json}'
         body = tools_gw.create_body(form='"formName":"config"', extras=extras)
-        json_result = self.controller.get_json('gw_fct_setconfig', body)
+        json_result = tools_gw.get_json('gw_fct_setconfig', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 

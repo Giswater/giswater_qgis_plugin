@@ -38,7 +38,7 @@ class GwToolBoxButton(GwParentAction):
     def clicked_event(self):
 
         function_name = "gw_fct_gettoolbox"
-        row = self.controller.check_function(function_name)
+        row = tools_gw.check_function(function_name)
         if not row:
             tools_gw.show_warning("Function not found in database", parameter=function_name)
             return
@@ -49,7 +49,7 @@ class GwToolBoxButton(GwParentAction):
         self.dlg_toolbox_doc.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'
         body = tools_gw.create_body(extras=extras)
-        json_result = self.controller.get_json('gw_fct_gettoolbox', body)
+        json_result = tools_gw.get_json('gw_fct_gettoolbox', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
@@ -63,7 +63,7 @@ class GwToolBoxButton(GwParentAction):
 
         extras = f'"filterText":"{text}"'
         body = tools_gw.create_body(extras=extras)
-        json_result = self.controller.get_json('gw_fct_gettoolbox', body)
+        json_result = tools_gw.get_json('gw_fct_gettoolbox', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
@@ -93,7 +93,7 @@ class GwToolBoxButton(GwParentAction):
         extras = f'"filterText":"{self.alias_function}"'
         extras += ', "isToolbox":true'
         body = tools_gw.create_body(extras=extras)
-        json_result = self.controller.get_json('gw_fct_gettoolbox', body)
+        json_result = tools_gw.get_json('gw_fct_gettoolbox', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
@@ -352,7 +352,7 @@ class GwToolBoxButton(GwParentAction):
             extras += '}'
 
         body = tools_gw.create_body(feature=feature_field, extras=extras)
-        json_result = self.controller.get_json(function_name, body)
+        json_result = tools_gw.get_json(function_name, body)
         if json_result['status'] == 'Failed': return
         tools_gw.populate_info_text(dialog, json_result['body']['data'], True, True, 1, True)
 
@@ -383,7 +383,7 @@ class GwToolBoxButton(GwParentAction):
             msg += f"<b>key container: </b>'body/data/ <br>"
             msg += f"<b>Python file: </b>{__name__} <br>"
             msg += f"<b>Python function:</b> {self.execute_function.__name__} <br>"
-            self.controller.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
+            tools_gw.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
 
         self.remove_layers()
 
@@ -552,7 +552,7 @@ class GwToolBoxButton(GwParentAction):
                 font = label.font()
                 font.setPointSize(8)
                 label.setFont(font)
-                row = self.controller.check_function(function['functionname'])
+                row = tools_gw.check_function(function['functionname'])
                 if not row:
                     if os.path.exists(path_icon_red):
                         icon = QIcon(path_icon_red)

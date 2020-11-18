@@ -36,6 +36,11 @@ min_message_level = 0
 
 last_error = None
 
+show_db_exception = None
+
+dlg_info = None
+
+gw_infotools = None
 
 def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name):
 

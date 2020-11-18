@@ -115,7 +115,7 @@ class GwGo2EpaTask(QgsTask):
             return
 
         if self.function_failed:
-            self.controller.manage_exception_api(self.complet_result)
+            tools_gw.manage_exception_api(self.complet_result)
 
         if self.error_msg:
             title = f"Task aborted - {self.description()}"
@@ -165,7 +165,7 @@ class GwGo2EpaTask(QgsTask):
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         body = self.create_body(extras=extras)
-        json_result = self.controller.get_json('gw_fct_pg2epa_main', body, log_sql=True)
+        json_result = tools_gw.get_json('gw_fct_pg2epa_main', body, log_sql=True)
         self.complet_result = json_result
         if json_result is None or not json_result:
             self.function_failed = True
@@ -412,7 +412,7 @@ class GwGo2EpaTask(QgsTask):
             extras += f', "file": {self.json_rpt}'
         body = self.create_body(extras=extras)
         function_name = 'gw_fct_rpt2pg_main'
-        json_result = self.controller.get_json(function_name, body)
+        json_result = tools_gw.get_json(function_name, body)
         self.rpt_result = json_result
         if json_result is None or not json_result:
             self.function_failed = True

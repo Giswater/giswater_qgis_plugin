@@ -9,6 +9,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsTask
 
 from ...lib import tools_log
+from ..utils import tools_gw
 
 
 class GwConfigLayerTask(QgsTask):
@@ -131,7 +132,7 @@ class GwConfigLayerTask(QgsTask):
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = self.create_body(feature=feature, extras=extras)
-            complet_result = self.controller.get_json('gw_fct_getinfofromid', body, log_sql=False)
+            complet_result = tools_gw.get_json('gw_fct_getinfofromid', body, log_sql=False)
             if not complet_result  or complet_result['status'] == 'Failed':
                 continue
 
@@ -210,10 +211,10 @@ class GwConfigLayerTask(QgsTask):
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
         if msg_failed != "":
-            self.controller.show_exceptions_msg("Execute failed.", msg_failed)
+            tools_gw.show_exceptions_msg("Execute failed.", msg_failed)
 
         if msg_key != "":
-            self.controller.show_exceptions_msg("Key on returned json from ddbb is missed.", msg_key)
+            tools_gw.show_exceptions_msg("Key on returned json from ddbb is missed.", msg_key)
 
         tools_log.log_info("Finish set_layer_config")
 

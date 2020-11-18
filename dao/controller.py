@@ -434,93 +434,7 @@ class DaoController:
         return result
 
 
-    def get_json(self, function_name, parameters=None, schema_name=None, commit=True, log_sql=False,
-                 log_result=False, json_loads=False, is_notify=False, rubber_band=None):
-        """ Manage execution API function
-        :param function_name: Name of function to call (text)
-        :param parameters: Parameters for function (json) or (query parameters)
-        :param commit: Commit sql (bool)
-        :param log_sql: Show query in qgis log (bool)
-        :return: Response of the function executed (json)
-        """
 
-        # Check if function exists
-        row = self.check_function(function_name, schema_name, commit)
-        if not row:
-            tools_gw.show_warning("Function not found in database", parameter=function_name)
-            return None
-
-        # Execute function. If failed, always log it
-        if schema_name:
-            sql = f"SELECT {schema_name}.{function_name}("
-        else:
-            sql = f"SELECT {function_name}("
-        if parameters:
-            sql += f"{parameters}"
-        sql += f");"
-
-        # Check log_sql for developers
-        dev_log_sql = tools_gw.get_parser_value('developers', 'log_sql')
-        if dev_log_sql not in (None, "None", "none"):
-            log_sql = tools_gw.cast_boolean(dev_log_sql)
-
-        row = self.get_row(sql, commit=commit, log_sql=log_sql)
-        if not row or not row[0]:
-            tools_log.log_warning(f"Function error: {function_name}")
-            tools_log.log_warning(sql)
-            return None
-
-        # Get json result
-        if json_loads:
-            # If content of row[0] is not a to json, cast it
-            json_result = json.loads(row[0], object_pairs_hook=OrderedDict)
-        else:
-            json_result = row[0]
-
-        # Log result
-        if log_result:
-            tools_log.log_info(json_result, stack_level_increase=1)
-
-        # If failed, manage exception
-        if 'status' in json_result and json_result['status'] == 'Failed':
-            self.manage_exception_api(json_result, sql, is_notify=is_notify)
-            return json_result
-
-        try:
-            # Layer styles
-            self.manage_return_manager(json_result, sql, rubber_band)
-            self.manage_layer_manager(json_result, sql)
-            self.get_actions_from_json(json_result, sql)
-        except Exception:
-            pass
-
-        return json_result
-
-
-    def get_actions_from_json(self, json_result, sql):
-        """
-        Manage options for layers (active, visible, zoom and indexing)
-        :param json_result: Json result of a query (Json)
-        :return: None
-        """
-
-        try:
-            actions = json_result['body']['python_actions']
-        except KeyError:
-            return
-        try:
-            for action in actions:
-                try:
-                    function_name = action['funcName']
-                    params = action['params']
-                    getattr(self.gw_infotools, f"{function_name}")(**params)
-                except AttributeError as e:
-                    # If function_name not exist as python function
-                    tools_log.log_warning(f"Exception error: {e}")
-                except Exception as e:
-                    tools_log.log_debug(f"{type(e).__name__}: {e}")
-        except Exception as e:
-            self.manage_exception(None, f"{type(e).__name__}: {e}", sql)
 
 
 
@@ -868,21 +782,6 @@ class DaoController:
         return row
 
 
-    def check_function(self, function_name, schema_name=None, commit=True):
-        """ Check if @function_name exists in selected schema """
-
-        if schema_name is None:
-            schema_name = self.schema_name
-
-        schema_name = schema_name.replace('"', '')
-        sql = ("SELECT routine_name FROM information_schema.routines "
-               "WHERE lower(routine_schema) = %s "
-               "AND lower(routine_name) = %s")
-        params = [schema_name, function_name]
-        row = self.get_row(sql, params=params, commit=commit)
-        return row
-
-
     def check_table(self, tablename, schemaname=None):
         """ Check if selected table exists in selected schema """
 
@@ -1170,39 +1069,6 @@ class DaoController:
             layer.triggerRepaint()
 
 
-    def manage_exception(self, title=None, description=None, sql=None):
-        """ Manage exception and show information to the user """
-
-        # Get traceback
-        trace = traceback.format_exc()
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        path = exc_tb.tb_frame.f_code.co_filename
-        file_name = os.path.split(path)[1]
-        #folder_name = os.path.dirname(path)
-
-        # Set exception message details
-        msg = ""
-        msg += f"Error type: {exc_type}\n"
-        msg += f"File name: {file_name}\n"
-        msg += f"Line number: {exc_tb.tb_lineno}\n"
-        msg += f"{trace}\n"
-        if description:
-            msg += f"Description: {description}\n"
-        if sql:
-            msg += f"SQL:\n {sql}\n\n"
-        msg += f"Schema name: {self.schema_name}"
-
-        # Show exception message in dialog and log it
-        self.show_exceptions_msg(title, msg)
-        tools_log.log_warning(msg)
-
-        # Log exception message
-        tools_log.log_warning(msg)
-
-        # Show exception message only if we are not in a task process
-        if self.show_db_exception:
-            self.show_exceptions_msg(title, msg)
-
 
     def manage_exception_db(self, exception=None, sql=None, stack_level=2, stack_level_increase=0, filepath=None):
         """ Manage exception in database queries and show information to the user """
@@ -1237,13 +1103,13 @@ class DaoController:
             # Show exception message in dialog and log it
             if show_exception_msg:
                 title = "Database error"
-                self.show_exceptions_msg(title, msg)
+                tools_gw.show_exceptions_msg(title, msg)
             else:
                 tools_log.log_warning("Exception message not shown to user")
             tools_log.log_warning(msg, stack_level_increase=2)
 
         except Exception:
-            self.manage_exception("Unhandled Error")
+            tools_gw.manage_exception("Unhandled Error")
 
 
     def set_text_bold(self, widget, pattern=None):
@@ -1271,78 +1137,6 @@ class DaoController:
             cursor.mergeCharFormat(format)
             # Move to the next match
             index = regex.indexIn(widget.toPlainText(), pos)
-
-
-    def manage_exception_api(self, json_result, sql=None, stack_level=2, stack_level_increase=0, is_notify=False):
-        """ Manage exception in JSON database queries and show information to the user """
-
-        try:
-
-            if 'message' in json_result:
-
-                parameter = None
-                level = 1
-                if 'level' in json_result['message']:
-                    level = int(json_result['message']['level'])
-                if 'text' in json_result['message']:
-                    msg = json_result['message']['text']
-                else:
-                    parameter = 'text'
-                    msg = "Key on returned json from ddbb is missed"
-                if is_notify is True:
-                    tools_log.log_info(msg, parameter=parameter, level=level)
-                elif not is_notify and self.show_db_exception:
-                    # Show exception message only if we are not in a task process
-                    tools_gw.show_message(msg, level, parameter=parameter)
-
-            else:
-
-                stack_level += stack_level_increase
-                module_path = inspect.stack()[stack_level][1]
-                file_name = tools_os.get_relative_path(module_path, 2)
-                function_line = inspect.stack()[stack_level][2]
-                function_name = inspect.stack()[stack_level][3]
-
-                # Set exception message details
-                title = "Database API execution failed"
-                msg = ""
-                msg += f"File name: {file_name}\n"
-                msg += f"Function name: {function_name}\n"
-                msg += f"Line number: {function_line}\n"
-                if 'SQLERR' in json_result:
-                    msg += f"Detail: {json_result['SQLERR']}\n"
-                elif 'NOSQLERR' in json_result:
-                    msg += f"Detail: {json_result['NOSQLERR']}\n"
-                if 'SQLCONTEXT' in json_result:
-                    msg += f"Context: {json_result['SQLCONTEXT']}\n"
-                if sql:
-                    msg += f"SQL: {sql}"
-
-                tools_log.log_warning(msg, stack_level_increase=2)
-                # Show exception message only if we are not in a task process
-                if self.show_db_exception:
-                    self.show_exceptions_msg(title, msg)
-
-        except Exception:
-            self.manage_exception("Unhandled Error")
-
-
-    def show_exceptions_msg(self, title=None, msg="", window_title="Information about exception"):
-        """ Show exception message in dialog """
-
-        self.dlg_info = DialogTextUi()
-        self.dlg_info.btn_accept.setVisible(False)
-        self.dlg_info.btn_close.clicked.connect(lambda: self.dlg_info.close())
-        self.dlg_info.setWindowTitle(window_title)
-        if title:
-            self.dlg_info.lbl_text.setText(title)
-        tools_qt.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
-        self.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.set_text_bold(self.dlg_info.txt_infolog)
-
-        # Show dialog only if we are not in a task process
-        if self.show_db_exception:
-            self.show_dlg_info()
 
 
     def show_dlg_info(self):
@@ -1479,210 +1273,3 @@ class DaoController:
                     self.iface.zoomToActiveLayer()
                     if prev_layer:
                         self.iface.setActiveLayer(prev_layer)
-
-
-    def manage_return_manager(self, json_result, sql, rubber_band=None):
-        """
-        Manage options for layers (active, visible, zoom and indexing)
-        :param json_result: Json result of a query (Json)
-        :param sql: query executed (String)
-        :return: None
-        """
-
-        try:
-            return_manager = json_result['body']['returnManager']
-        except KeyError:
-            return
-        srid = global_vars.srid
-        try:
-            margin = None
-            opacity = 100
-
-            if 'zoom' in return_manager and 'margin' in return_manager['zoom']:
-                margin = return_manager['zoom']['margin']
-
-            if 'style' in return_manager and 'ruberband' in return_manager['style']:
-                # Set default values
-                width = 3
-                color = QColor(255, 0, 0, 125)
-                if 'transparency' in return_manager['style']['ruberband']:
-                    opacity = return_manager['style']['ruberband']['transparency'] * 255
-                if 'color' in return_manager['style']['ruberband']:
-                    color = return_manager['style']['ruberband']['color']
-                    color = QColor(color[0], color[1], color[2], opacity)
-                if 'width' in return_manager['style']['ruberband']:
-                    width = return_manager['style']['ruberband']['width']
-                tools_gw.draw_by_json(json_result, rubber_band, margin, color=color, width=width)
-
-            else:
-
-                for key, value in list(json_result['body']['data'].items()):
-                    if key.lower() in ('point', 'line', 'polygon'):
-                        if key not in json_result['body']['data']:
-                            continue
-                        if 'features' not in json_result['body']['data'][key]:
-                            continue
-                        if len(json_result['body']['data'][key]['features']) == 0:
-                            continue
-
-                        layer_name = f'{key}'
-                        if 'layerName' in json_result['body']['data'][key]:
-                            if json_result['body']['data'][key]['layerName']:
-                                layer_name = json_result['body']['data'][key]['layerName']
-
-                        tools_qgis.remove_layer_from_toc(layer_name, 'GW Temporal Layers')
-
-                        # Get values for create and populate layer
-                        counter = len(json_result['body']['data'][key]['features'])
-                        geometry_type = json_result['body']['data'][key]['geometryType']
-                        v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
-
-                        tools_gw.populate_vlayer(v_layer, json_result['body']['data'], key, counter)
-
-                        # Get values for set layer style
-                        opacity = 100
-                        style_type = json_result['body']['returnManager']['style']
-                        if 'style' in return_manager and 'transparency' in return_manager['style'][key]:
-                            opacity = return_manager['style'][key]['transparency'] * 255
-
-                        if style_type[key]['style'] == 'categorized':
-                            color_values = {}
-                            for item in json_result['body']['returnManager']['style'][key]['values']:
-                                color = QColor(item['color'][0], item['color'][1], item['color'][2], opacity * 255)
-                                color_values[item['id']] = color
-                            cat_field = str(style_type[key]['field'])
-                            size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
-                            tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values)
-
-                        elif style_type[key]['style'] == 'random':
-                            size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
-                            if geometry_type == 'Point':
-                                v_layer.renderer().symbol().setSize(size)
-                            else:
-                                v_layer.renderer().symbol().setWidth(size)
-                            v_layer.renderer().symbol().setOpacity(opacity)
-
-                        elif style_type[key]['style'] == 'qml':
-                            style_id = style_type[key]['id']
-                            extras = f'"style_id":"{style_id}"'
-                            body = tools_gw.create_body(extras=extras)
-                            style = self.get_json('gw_fct_getstyle', body)
-                            if style['status'] == 'Failed': return
-                            if 'styles' in style['body']:
-                                if 'style' in style['body']['styles']:
-                                    qml = style['body']['styles']['style']
-                                    tools_gw.create_qml(v_layer, qml)
-
-                        elif style_type[key]['style'] == 'unique':
-                            color = style_type[key]['values']['color']
-                            size = style_type['width'] if 'width' in style_type and style_type['width'] else 2
-                            color = QColor(color[0], color[1], color[2])
-                            if key == 'point':
-                                v_layer.renderer().symbol().setSize(size)
-                            elif key in ('line', 'polygon'):
-                                v_layer.renderer().symbol().setWidth(size)
-                            v_layer.renderer().symbol().setColor(color)
-                            v_layer.renderer().symbol().setOpacity(opacity)
-
-                        global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
-                        if margin:
-                            self.set_margin(v_layer, margin)
-
-        except Exception as e:
-            global_vars.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
-
-
-    def manage_layer_manager(self, json_result, sql):
-        """
-        Manage options for layers (active, visible, zoom and indexing)
-        :param json_result: Json result of a query (Json)
-        :return: None
-        """
-
-        try:
-            layermanager = json_result['body']['layerManager']
-        except KeyError:
-            return
-
-        try:
-
-            # force visible and in case of does not exits, load it
-            if 'visible' in layermanager:
-                for lyr in layermanager['visible']:
-                    layer_name = [key for key in lyr][0]
-                    layer = global_vars.controller.get_layer_by_tablename(layer_name)
-                    if layer is None:
-                        the_geom = lyr[layer_name]['geom_field']
-                        field_id = lyr[layer_name]['pkey_field']
-                        if lyr[layer_name]['group_layer'] is not None:
-                            group = lyr[layer_name]['group_layer']
-                        else:
-                            group = "GW Layers"
-                        style_id = lyr[layer_name]['style_id']
-                        tools_gw.from_postgres_to_toc(layer_name, the_geom, field_id, group=group, style_id=style_id)
-                    global_vars.controller.set_layer_visible(layer)
-
-            # force reload dataProvider in order to reindex.
-            if 'index' in layermanager:
-                for lyr in layermanager['index']:
-                    layer_name = [key for key in lyr][0]
-                    layer = global_vars.controller.get_layer_by_tablename(layer_name)
-                    if layer:
-                        global_vars.controller.set_layer_index(layer)
-
-            # Set active
-            if 'active' in layermanager:
-                layer = global_vars.controller.get_layer_by_tablename(layermanager['active'])
-                if layer:
-                    global_vars.iface.setActiveLayer(layer)
-
-            # Set zoom to extent with a margin
-            if 'zoom' in layermanager:
-                layer = global_vars.controller.get_layer_by_tablename(layermanager['zoom']['layer'])
-                if layer:
-                    prev_layer = global_vars.iface.activeLayer()
-                    global_vars.iface.setActiveLayer(layer)
-                    global_vars.iface.zoomToActiveLayer()
-                    margin = layermanager['zoom']['margin']
-                    self.set_margin(layer, margin)
-                    if prev_layer:
-                        global_vars.iface.setActiveLayer(prev_layer)
-
-            # Set snnaping options
-            if 'snnaping' in layermanager:
-                self.snapper_manager = SnappingConfigManager(self.iface)
-                for layer_name in layermanager['snnaping']:
-                    layer = global_vars.controller.get_layer_by_tablename(layer_name)
-                    if layer:
-                        QgsProject.instance().blockSignals(True)
-                        layer_settings = self.snapper_manager.snap_to_layer(layer, QgsPointLocator.All, True)
-                        if layer_settings:
-                            layer_settings.setType(2)
-                            layer_settings.setTolerance(15)
-                            layer_settings.setEnabled(True)
-                        else:
-                            layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
-                        snapping_config = self.snapper_manager.get_snapping_options()
-                        snapping_config.setIndividualLayerSettings(layer, layer_settings)
-                        QgsProject.instance().blockSignals(False)
-                        QgsProject.instance().snappingConfigChanged.emit(snapping_config)
-                self.snapper_manager.set_snapping_mode()
-                del self.snapper_manager
-
-
-        except Exception as e:
-            global_vars.controller.manage_exception(None, f"{type(e).__name__}: {e}", sql)
-
-
-    def set_margin(self, layer, margin):
-
-        extent = QgsRectangle()
-        extent.setMinimal()
-        extent.combineExtentWith(layer.extent())
-        xmax = extent.xMaximum() + margin
-        xmin = extent.xMinimum() - margin
-        ymax = extent.yMaximum() + margin
-        ymin = extent.yMinimum() - margin
-        extent.set(xmin, ymin, xmax, ymax)
-        global_vars.iface.mapCanvas().setExtent(extent)
-        global_vars.iface.mapCanvas().refresh()

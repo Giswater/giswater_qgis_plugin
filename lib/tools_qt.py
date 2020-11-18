@@ -9,7 +9,7 @@ from qgis.core import QgsExpression, QgsProject
 from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator, QStandardItemModel, \
-    QStandardItem, QIcon
+    QStandardItem, QIcon, QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, \
     QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, QPlainTextEdit, \
@@ -1649,3 +1649,30 @@ def show_info_box(text, title=None, inf_text=None, context_name=None, parameter=
         msg_box.setInformativeText(inf_text)
     msg_box.setDefaultButton(QMessageBox.No)
     msg_box.exec_()
+
+
+def set_text_bold(widget, pattern=None):
+    """ Set bold text when word match with pattern
+    :param widget: QTextEdit
+    :param pattern: Text to find used as pattern for QRegExp (String)
+    :return:
+    """
+
+    if not pattern:
+        pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:|Description|Schema name"
+    cursor = widget.textCursor()
+    format = QTextCharFormat()
+    format.setFontWeight(QFont.Bold)
+    regex = QRegExp(pattern)
+    pos = 0
+    index = regex.indexIn(widget.toPlainText(), pos)
+    while index != -1:
+        # Set cursor at begin of match
+        cursor.setPosition(index, 0)
+        pos = index + regex.matchedLength()
+        # Set cursor at end of match
+        cursor.setPosition(pos, 1)
+        # Select the matched text and apply the desired format
+        cursor.mergeCharFormat(format)
+        # Move to the next match
+        index = regex.indexIn(widget.toPlainText(), pos)

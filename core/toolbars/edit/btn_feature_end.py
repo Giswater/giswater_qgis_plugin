@@ -307,7 +307,7 @@ class GwEndFeatureButton(GwParentAction):
         # TODO: Check this
         feature = f'"featureType":"{geom_type}", "featureId":"{ids_list}"'
         body = tools_gw.create_body(feature=feature)
-        self.controller.get_json('gw_fct_setendfeature', body)
+        tools_gw.get_json('gw_fct_setendfeature', body)
 
 
     def fill_table(self, widget, table_name, filter_):

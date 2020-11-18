@@ -1167,7 +1167,7 @@ class GwPsector:
         # TODO: Check this
         extras = f'"psectorId":"{tools_qt.getWidgetText(self.dlg_plan_psector, self.psector_id)}"'
         body = tools_gw.create_body(extras=extras)
-        json_result = self.controller.get_json('gw_fct_setplan', body, log_sql=True)
+        json_result = tools_gw.get_json('gw_fct_setplan', body, log_sql=True)
         return json_result
         
         
@@ -1603,7 +1603,7 @@ class GwPsector:
             if cur_psector is not None and (str(id_) == str(cur_psector[0])):
                 message = ("You are trying to delete your current psector. "
                            "Please, change your current psector before delete.")
-                self.controller.show_exceptions_msg('Current psector', tools_gw.tr(message))
+                tools_gw.show_exceptions_msg('Current psector', tools_gw.tr(message))
                 return
 
             list_id += f"'{id_}', "

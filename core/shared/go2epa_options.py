@@ -40,7 +40,7 @@ class GwGo2EpaOptions:
 
         form = '"formName":"epaoptions"'
         body = tools_gw.create_body(form=form)
-        json_result = self.controller.get_json('gw_fct_getconfig', body)
+        json_result = tools_gw.get_json('gw_fct_getconfig', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
@@ -71,7 +71,7 @@ class GwGo2EpaOptions:
         form = '"formName":"epaoptions"'
         extras = f'"fields":{my_json}'
         body = tools_gw.create_body(form=form, extras=extras)
-        json_result = self.controller.get_json('gw_fct_setconfig', body)
+        json_result = tools_gw.get_json('gw_fct_setconfig', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
@@ -95,7 +95,7 @@ class GwGo2EpaOptions:
         combo_parent = widget.objectName()
         combo_id = tools_qt.get_combo_value(dialog, widget)
         # TODO cambiar por gw_fct_getchilds then unified with tools_gw.get_child if posible
-        json_result = self.controller.get_json('gw_fct_getcombochilds', f"'epaoptions', '', '', '{combo_parent}', '{combo_id}', ''")
+        json_result = tools_gw.get_json('gw_fct_getcombochilds', f"'epaoptions', '', '', '{combo_parent}', '{combo_id}', ''")
         if not json_result or json_result['status'] == 'Failed':
             return False
 

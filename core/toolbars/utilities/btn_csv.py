@@ -138,7 +138,7 @@ class GwCSVButton(GwParentAction):
         extras += f', "fid":"{fid_aux}"'
         body = tools_gw.create_body(extras=extras)
 
-        result = self.controller.get_json(self.func_name, body)
+        result = tools_gw.get_json(self.func_name, body)
         if not result:
             return
         else:

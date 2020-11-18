@@ -48,7 +48,7 @@ class GwFlowExitButton(GwParentMapTool):
             elem_id = self.snapped_feat.attribute('node_id')
             feature_id = f'"id":["{elem_id}"]'
             body = tools_gw.create_body(feature=feature_id)
-            result = self.controller.get_json(function_name, body)
+            result = tools_gw.get_json(function_name, body)
             if not result or result['status'] == 'Failed':
                 return
 

@@ -201,7 +201,7 @@ class GwConnectLinkButton(GwParentMapTool):
             extras = f'"feature_type":"{geom_type.upper()}"'
             body = tools_gw.create_body(feature=feature_id, extras=extras)
             # Execute SQL function and show result to the user
-            result = self.controller.get_json('gw_fct_setlinktonetwork ', body)
+            result = tools_gw.get_json('gw_fct_setlinktonetwork ', body)
             if result:
                 self.dlg_dtext = DialogTextUi()
                 tools_gw.load_settings(self.dlg_dtext)

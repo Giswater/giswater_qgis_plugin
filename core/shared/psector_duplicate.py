@@ -61,7 +61,7 @@ class GwPsectorDuplicate(QObject):
         extras = f'"psector_id":"{id_psector}", "new_psector_name":"{new_psector_name}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
-        complet_result = self.controller.get_json('gw_fct_psector_duplicate', body)
+        complet_result = tools_gw.get_json('gw_fct_psector_duplicate', body)
         if not complet_result or complet_result['status'] == 'Failed':
             message = 'Function gw_fct_psector_duplicate executed with no result'
             tools_gw.show_message(message, 3)

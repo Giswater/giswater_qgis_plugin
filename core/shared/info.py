@@ -177,7 +177,7 @@ class GwInfo(QObject):
         if function_name is None:
             return False, None
 
-        json_result = self.controller.get_json(function_name, body, rubber_band=self.rubber_band, log_sql=False)
+        json_result = tools_gw.get_json(function_name, body, rubber_band=self.rubber_band, log_sql=False)
         if json_result is None:
             return False, None
 
@@ -734,7 +734,7 @@ class GwInfo(QObject):
             extras += f'"node1":"{self.node1}", '
             extras += f'"node2":"{self.node2}"}}'
             body = tools_gw.create_body(extras=extras)
-            self.interpolate_result = global_vars.controller.get_json('gw_fct_node_interpolate', body)
+            self.interpolate_result = tools_gw.get_json('gw_fct_node_interpolate', body)
             tools_gw.populate_info_text(dlg_dtext, self.interpolate_result['body']['data'])
 
 
@@ -1441,7 +1441,7 @@ class GwInfo(QObject):
 
         feature = '"id":"' + self.feature_id + '"'
         body = tools_gw.create_body(feature=feature)
-        json_result = self.controller.get_json('gw_fct_getinfocrossection', body)
+        json_result = tools_gw.get_json('gw_fct_getinfocrossection', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
@@ -1557,7 +1557,7 @@ class GwInfo(QObject):
         feature += f' "featureType":"{self.feature_type}" '
         extras = f'"fields":{my_json}, "reload":"{fields_reload}", "afterInsert":"{after_insert}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
-        json_result = self.controller.get_json('gw_fct_setfields', body, log_sql=True)
+        json_result = tools_gw.get_json('gw_fct_setfields', body, log_sql=True)
         if not json_result:
             self.connect_signals()
             return False
@@ -3007,7 +3007,7 @@ class GwInfo(QObject):
         feature = f'"tableName":"{self.tablename}", "idName":"{id_name}", "id":"{self.feature_id}"'
         body = tools_gw.create_body(form, feature, filter_fields)
         function_name = 'gw_fct_getlist'
-        json_result = self.controller.get_json(function_name, body)
+        json_result = tools_gw.get_json(function_name, body)
         if json_result is None or json_result['status'] == 'Failed':
             return False
         complet_list = [json_result]
@@ -3099,7 +3099,7 @@ class GwInfo(QObject):
             feature += f'"idName":"{self.field_id}", '
             feature += f'"id":"{self.feature_id}"'
             body = tools_gw.create_body(form, feature, filter_fields='')
-            json_result = self.controller.get_json('gw_fct_getinfoplan', body)
+            json_result = tools_gw.get_json('gw_fct_getinfoplan', body)
             if not json_result or json_result['status'] == 'Failed':
                 return False
 
@@ -3156,7 +3156,7 @@ class GwInfo(QObject):
             body += f'"form":{{"formName":"{form_name}", "tabName":"data", "editable":"TRUE"}}, '
             body += f'"feature":{{}}, '
             body += f'"data":{{}}}}$$'
-            json_result = self.controller.get_json(sql_function_name, body)
+            json_result = tools_gw.get_json(sql_function_name, body)
             if json_result is None:
                 return
 
@@ -3379,7 +3379,7 @@ class GwInfo(QObject):
         extras = (f'"arcId":"{feat_id}", "dmaId":"{dma_id}", "presszoneId":"{presszone_id}", "sectorId":"{sector_id}", '
                   f'"dqaId":"{dqa_id}"')
         body = tools_gw.create_body(feature=feature, extras=extras)
-        json_result = self.controller.get_json('gw_fct_settoarc', body, log_sql=True)
+        json_result = tools_gw.get_json('gw_fct_settoarc', body, log_sql=True)
         if 'status' in json_result and json_result['status'] == 'Accepted':
             if json_result['message']:
                 level = 1
