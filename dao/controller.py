@@ -119,17 +119,6 @@ class DaoController:
         return True, not_version
 
 
-    def save_user_settings(self):
-        """ Save user settings file """
-
-        try:
-            with open(self.user_settings_path, 'w') as configfile:
-                self.user_settings.write(configfile)
-                configfile.close()
-        except Exception as e:
-            tools_log.log_warning(str(e))
-
-
     def manage_user_config_file(self):
         """ Manage user configuration file """
 
@@ -142,7 +131,7 @@ class DaoController:
         self.user_settings_path = config_folder + 'user.config'
         if not os.path.exists(self.user_settings_path):
             tools_log.log_info(f"File not found: {self.user_settings_path}")
-            self.save_user_settings()
+            tools_config.save_user_settings()
         else:
             tools_log.log_info(f"User settings file: {self.user_settings_path}")
 

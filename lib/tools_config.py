@@ -17,7 +17,7 @@ def check_user_settings(parameter, value=None, section='system'):
     if not global_vars.user_settings.has_section(section):
         global_vars.user_settings.add_section(section)
         global_vars.user_settings.set(section, parameter, value)
-        self.save_user_settings()
+        save_user_settings()
 
     # Check if @parameter exists
     if not global_vars.user_settings.has_option(section, parameter):
