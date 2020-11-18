@@ -15,7 +15,7 @@ from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGrou
 from ..ui.ui_manager import InfoCatalogUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qt
+from ...lib import tools_qt, tools_log
 
 
 class GwCatalog:
@@ -117,7 +117,7 @@ class GwCatalog:
         row = self.controller.get_row(sql)
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         if complet_result[0]['status'] == "Failed":
-            self.controller.log_warning(complet_result[0])
+            tools_log.log_warning(complet_result[0])
             return False
         if complet_result[0]['status'] == "Accepted":
             result = complet_result[0]['body']['data']

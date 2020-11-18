@@ -20,7 +20,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QPixmap
 from qgis.PyQt.QtWidgets import QDockWidget, QApplication
 
-from . import tools_qt
+from . import tools_qt, tools_log
 from .. import global_vars
 from ..core.utils import tools_gw
 
@@ -642,7 +642,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
     tools_gw.enable_feature_type(dialog, table_object, ids=ids)
     connect_signal_selection_changed(dialog, table_object, geom_type)
 
-    global_vars.controller.log_info(list_ids[geom_type])
+    tools_log.log_info(list_ids[geom_type])
 
     return ids, layers, list_ids
 
@@ -728,7 +728,7 @@ def connect_signal_selection_changed(dialog, table_object, query=False, geom_typ
             global_vars.canvas.selectionChanged.connect(
                 partial(selection_changed, dialog, table_object, geom_type, query, layers=layers))
     except Exception as e:
-        global_vars.controller.log_info(f"connect_signal_selection_changed: {e}")
+        tools_log.log_info(f"connect_signal_selection_changed: {e}")
 
 
 def zoom_to_selected_features(layer, geom_type=None, zoom=None):

@@ -15,7 +15,7 @@ import os
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_qgis
-from ...lib import tools_qt
+from ...lib import tools_qt, tools_log
 
 
 def gw_function_dxf(**kwargs):
@@ -172,7 +172,7 @@ def export_layer_to_db(layer, crs):
     error = QgsVectorLayerExporter.exportLayer(
         layer, uri.uri(), global_vars.controller.credentials['user'], crs, False)
     if error[0] != 0:
-        global_vars.controller.log_info(F"ERROR --> {error[1]}")
+        tools_log.log_info(F"ERROR --> {error[1]}")
 
 
 def set_uri():
@@ -225,7 +225,7 @@ class GwInfoTools:
             layer = self.controller.get_layer_by_tablename(layer_name)
             if not layer:
                 msg = f"Layer {layer_name} does not found, therefore, not configured"
-                self.controller.log_info(msg)
+                tools_log.log_info(msg)
                 continue
 
             # Get sys variale
@@ -326,7 +326,7 @@ class GwInfoTools:
             col_name = kwargs["field"]
             hidden = kwargs["hidden"]
         except Exception as e:
-            self.controller.log_info(f"{kwargs}-->{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{kwargs}-->{type(e).__name__} --> {e}")
             return
 
         config = layer.attributeTableConfig()
@@ -349,7 +349,7 @@ class GwInfoTools:
                 layer = self.controller.get_layer_by_tablename(layer)
             field_index = kwargs["fieldIndex"]
         except Exception as e:
-            self.controller.log_info(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
             return
 
         if field['widgettype'] == 'text':
@@ -369,7 +369,7 @@ class GwInfoTools:
                 layer = self.controller.get_layer_by_tablename(layer)
             field_index = kwargs["fieldIndex"]
         except Exception as e:
-            self.controller.log_info(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
             return
         # Get layer config
         config = layer.editFormConfig()
@@ -401,11 +401,11 @@ class GwInfoTools:
         qml_path = kwargs['qmlPath'] if 'qmlPath' in kwargs else None
 
         if not os.path.exists(qml_path):
-            self.controller.log_warning("File not found", parameter=qml_path)
+            tools_log.log_warning("File not found", parameter=qml_path)
             return False
 
         if not qml_path.endswith(".qml"):
-            self.controller.log_warning("File extension not valid", parameter=qml_path)
+            tools_log.log_warning("File extension not valid", parameter=qml_path)
             return False
 
         layer.loadNamedStyle(qml_path)
@@ -488,7 +488,7 @@ class GwInfoTools:
 
         msg_list = kwargs['msg']
         for msg in msg_list:
-            self.controller.log_info(f"{msg}")
+            tools_log.log_info(f"{msg}")
 
 
     def refreshCanvas(self, **kwargs):

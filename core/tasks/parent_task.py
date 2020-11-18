@@ -10,6 +10,8 @@ from time import sleep
 from qgis.PyQt.QtCore import pyqtSignal, QObject
 from qgis.core import QgsTask
 
+from ...lib import tools_log
+
 
 class GwTask(QgsTask, QObject):
     """ This shows how to subclass QgsTask """
@@ -68,5 +70,5 @@ class GwTask(QgsTask, QObject):
     def manage_message(self, msg):
 
         if self.controller:
-            self.controller.log_info(msg)
+            tools_log.log_info(msg)
 

@@ -27,7 +27,7 @@ from ..utils import tools_gw
 from ..utils.tools_gw import SnappingConfigManager
 from ..ui.ui_manager import DialogTextUi, Mincut, MincutComposer, MincutConnec, MincutEndUi, MincutHydrometer
 from ... import global_vars
-from ...lib import tools_qt, tools_qgis
+from ...lib import tools_qt, tools_qgis, tools_log
 from ...lib.tools_qgis import MultipleSelection
 
 
@@ -375,23 +375,23 @@ class GwMincut:
         try:
             self.canvas.xyCoordinates.disconnect()
         except TypeError as e:
-            self.controller.log_info(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
         except AttributeError as e:
-            self.controller.log_info(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
 
         try:
             self.emit_point.canvasClicked.disconnect()
         except TypeError as e:
-            self.controller.log_info(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
         except AttributeError as e:
-            self.controller.log_info(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
 
         if action_pan:
             self.iface.actionPan().trigger()
         try:
             self.vertex_marker.hide()
         except AttributeError as e:
-            self.controller.log_info(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
 
 
     def real_start(self):
@@ -2147,7 +2147,7 @@ class GwMincut:
         """ Manage mincut layout """
 
         if layout is None:
-            self.controller.log_warning("Layout not found")
+            tools_log.log_warning("Layout not found")
             return
 
         title = self.dlg_comp.title.text()

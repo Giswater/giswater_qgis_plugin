@@ -96,7 +96,7 @@ class GwProjectCheck:
             if not result or (result['body']['variables']['hideForm'] == True):
                 return result
         except KeyError as e:
-            self.controller.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
+            tools_log.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
             return result
 
         # Show dialog with audit check project result

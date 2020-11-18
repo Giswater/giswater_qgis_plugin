@@ -24,7 +24,7 @@ import sys
 
 from .. import global_vars
 from ..core.ui.ui_manager import DialogTextUi, DockerUi
-from ..lib import tools_os, tools_qt, tools_qgis, tools_config
+from ..lib import tools_os, tools_qt, tools_qgis, tools_config, tools_log
 from ..core.utils import tools_gw
 from ..lib.tools_pgdao import PgDao
 from ..lib.tools_log import Logger
@@ -65,7 +65,7 @@ class DaoController:
         self.is_inserting = False
 
         if create_logger:
-            self.set_logger(logger_name)
+            tools_log.set_logger(self, logger_name)
 
 
     def close_db(self):
@@ -73,7 +73,7 @@ class DaoController:
 
         if self.dao:
             if not self.dao.close_db():
-                self.log_info(str(self.last_error))
+                tools_log.log_info(str(self.last_error))
             del self.dao
 
         self.current_user = None
@@ -85,28 +85,7 @@ class DaoController:
 
     def set_plugin_dir(self, plugin_dir):
         self.plugin_dir = plugin_dir
-        self.log_info(f"Plugin folder: {self.plugin_dir}")
-
-
-    def set_logger(self, logger_name=None):
-        """ Set logger class """
-
-        if self.logger is None:
-            if logger_name is None:
-                logger_name = 'plugin'
-
-            self.min_log_level = int(self.settings.value('status/log_level'))
-            log_suffix = self.settings.value('status/log_suffix')
-            self.logger = Logger(self, logger_name, self.min_log_level, log_suffix)
-
-            if self.min_log_level == 10:
-                self.min_message_level = 0
-            elif self.min_log_level == 20:
-                self.min_message_level = 0
-            elif self.min_log_level == 30:
-                self.min_message_level = 1
-            elif self.min_log_level == 40:
-                self.min_message_level = 2
+        tools_log.log_info(f"Plugin folder: {self.plugin_dir}")
 
 
     def close_logger(self):
@@ -148,7 +127,7 @@ class DaoController:
                 self.user_settings.write(configfile)
                 configfile.close()
         except Exception as e:
-            self.log_warning(str(e))
+            tools_log.log_warning(str(e))
 
 
     def manage_user_config_file(self):
@@ -162,10 +141,10 @@ class DaoController:
         config_folder = main_folder + os.sep + "config" + os.sep
         self.user_settings_path = config_folder + 'user.config'
         if not os.path.exists(self.user_settings_path):
-            self.log_info(f"File not found: {self.user_settings_path}")
+            tools_log.log_info(f"File not found: {self.user_settings_path}")
             self.save_user_settings()
         else:
-            self.log_info(f"User settings file: {self.user_settings_path}")
+            tools_log.log_info(f"User settings file: {self.user_settings_path}")
 
         # Open file
         self.user_settings.read(self.user_settings_path)
@@ -183,14 +162,14 @@ class DaoController:
 
         if layer is None and settings is None:
             not_version = False
-            self.log_warning("Layer 'v_edit_node' is None and settings is None")
+            tools_log.log_warning("Layer 'v_edit_node' is None and settings is None")
             self.last_error = tools_gw.tr("Layer not found") + ": 'v_edit_node'"
             return None, not_version
 
         # Get sslmode from user config file
         self.manage_user_config_file()
         sslmode = tools_config.get_user_setting_value('sslmode', 'disable')
-        # self.log_info(f"sslmode user config file: {sslmode}")
+        # tools_log.log_info(f"sslmode user config file: {sslmode}")
 
         credentials = None
         not_version = True
@@ -202,7 +181,7 @@ class DaoController:
             conn_info = QgsDataSourceUri(layer.dataProvider().dataSourceUri()).connectionInfo()
             status, credentials = self.connect_to_database_credentials(credentials, conn_info)
             if not status:
-                self.log_warning("Error connecting to database (layer)")
+                tools_log.log_warning("Error connecting to database (layer)")
                 self.last_error = tools_gw.tr("Error connecting to database")
                 return None, not_version
 
@@ -229,11 +208,11 @@ class DaoController:
                 settings.endGroup()
                 status, credentials = self.connect_to_database_credentials(credentials, max_attempts=0)
                 if not status:
-                    self.log_warning("Error connecting to database (settings)")
+                    tools_log.log_warning("Error connecting to database (settings)")
                     self.last_error = tools_gw.tr("Error connecting to database")
                     return None, not_version
             else:
-                self.log_warning("Error getting default connection (settings)")
+                tools_log.log_warning("Error getting default connection (settings)")
                 self.last_error = tools_gw.tr("Error getting default connection")
                 return None, not_version
 
@@ -266,7 +245,7 @@ class DaoController:
     def connect_to_database(self, host, port, db, user, pwd, sslmode):
         """ Connect to database with selected parameters """
 
-        # self.log_info(f"connect_to_database - sslmode: {sslmode}")
+        # tools_log.log_info(f"connect_to_database - sslmode: {sslmode}")
 
         # Check if selected parameters is correct
         if None in (host, port, db, user, pwd):
@@ -291,7 +270,7 @@ class DaoController:
             message = "Database connection error. Please open plugin log file to get more details"
             self.last_error = tools_gw.tr(message)
             details = self.db.lastError().databaseText()
-            self.log_warning(str(details))
+            tools_log.log_warning(str(details))
             return False
 
         # Connect to Database
@@ -301,7 +280,7 @@ class DaoController:
         if not status:
             message = "Database connection error. Please open plugin log file to get more details"
             self.last_error = tools_gw.tr(message)
-            self.log_warning(str(self.dao.last_error))
+            tools_log.log_warning(str(self.dao.last_error))
             return False
 
         return status
@@ -315,7 +294,7 @@ class DaoController:
         if sslmode:
             conn_string += f" sslmode={sslmode}"
 
-        self.log_info(f"connect_to_database_service: {conn_string}")
+        tools_log.log_info(f"connect_to_database_service: {conn_string}")
 
         # We need to create this connections for Table Views
         self.db = QSqlDatabase.addDatabase("QPSQL", self.plugin_name)
@@ -325,7 +304,7 @@ class DaoController:
             message = "Database connection error (QSqlDatabase). Please open plugin log file to get more details"
             self.last_error = tools_gw.tr(message)
             details = self.db.lastError().databaseText()
-            self.log_warning(str(details))
+            tools_log.log_warning(str(details))
             return False
 
         # Connect to Database
@@ -335,7 +314,7 @@ class DaoController:
         if not status:
             message = "Database connection error (PgDao). Please open plugin log file to get more details"
             self.last_error = tools_gw.tr(message)
-            self.log_warning(str(self.dao.last_error))
+            tools_log.log_warning(str(self.dao.last_error))
             return False
 
         return status
@@ -351,9 +330,9 @@ class DaoController:
                 opened = self.db.open()
                 if not opened:
                     details = self.db.lastError().databaseText()
-                    self.log_warning(f"check_db_connection not opened: {details}")
+                    tools_log.log_warning(f"check_db_connection not opened: {details}")
         except Exception as e:
-            self.log_warning(f"check_db_connection Exception: {e}")
+            tools_log.log_warning(f"check_db_connection Exception: {e}")
         finally:
             return opened
 
@@ -482,7 +461,7 @@ class DaoController:
         if params:
             sql = self.dao.mogrify(sql, params)
         if log_sql:
-            self.log_info(sql, stack_level_increase=2)
+            tools_log.log_info(sql, stack_level_increase=2)
 
         return sql
 
@@ -498,7 +477,7 @@ class DaoController:
             if self.last_error:
                 self.manage_exception_db(self.last_error, sql)
             elif self.last_error is None and log_info:
-                self.log_info("Any record found", parameter=sql, stack_level_increase=1)
+                tools_log.log_info("Any record found", parameter=sql, stack_level_increase=1)
 
         return row
 
@@ -515,7 +494,7 @@ class DaoController:
             if self.last_error:
                 self.manage_exception_db(self.last_error, sql)
             elif self.last_error is None and log_info:
-                self.log_info("Any record found", parameter=sql, stack_level_increase=1)
+                tools_log.log_info("Any record found", parameter=sql, stack_level_increase=1)
         else:
             if add_empty_row:
                 rows = [('', '')]
@@ -530,12 +509,12 @@ class DaoController:
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         if log_sql:
-            self.log_info(sql, stack_level_increase=1)
+            tools_log.log_info(sql, stack_level_increase=1)
         result = self.dao.execute_sql(sql, commit)
         self.last_error = self.dao.last_error
         if not result:
             if log_error:
-                self.log_info(sql, stack_level_increase=1)
+                tools_log.log_info(sql, stack_level_increase=1)
             self.manage_exception_db(self.last_error, sql, filepath=filepath)
             return False
 
@@ -546,12 +525,12 @@ class DaoController:
         """ Execute SQL. Check its result in log tables, and show it to the user """
 
         if log_sql:
-            self.log_info(sql, stack_level_increase=1)
+            tools_log.log_info(sql, stack_level_increase=1)
         value = self.dao.execute_returning(sql, commit)
         self.last_error = self.dao.last_error
         if not value:
             if log_error:
-                self.log_info(sql, stack_level_increase=1)
+                tools_log.log_info(sql, stack_level_increase=1)
             self.manage_exception_db(self.last_error, sql)
             return False
 
@@ -604,7 +583,7 @@ class DaoController:
         sql = sql.replace("''", "'")
 
         # Execute sql
-        self.log_info(sql, stack_level_increase=1)
+        tools_log.log_info(sql, stack_level_increase=1)
         result = self.dao.execute_sql(sql, commit)
         self.last_error = self.dao.last_error
         if not result:
@@ -657,7 +636,7 @@ class DaoController:
                 " WHERE " + tablename + "." + unique_field + " = " + unique_value)
 
         # Execute UPSERT
-        self.log_info(sql, stack_level_increase=1)
+        tools_log.log_info(sql, stack_level_increase=1)
         result = self.dao.execute_sql(sql, commit)
         self.last_error = self.dao.last_error
         if not result:
@@ -700,8 +679,8 @@ class DaoController:
 
         row = self.get_row(sql, commit=commit, log_sql=log_sql)
         if not row or not row[0]:
-            self.log_warning(f"Function error: {function_name}")
-            self.log_warning(sql)
+            tools_log.log_warning(f"Function error: {function_name}")
+            tools_log.log_warning(sql)
             return None
 
         # Get json result
@@ -713,7 +692,7 @@ class DaoController:
 
         # Log result
         if log_result:
-            self.log_info(json_result, stack_level_increase=1)
+            tools_log.log_info(json_result, stack_level_increase=1)
 
         # If failed, manage exception
         if 'status' in json_result and json_result['status'] == 'Failed':
@@ -750,9 +729,9 @@ class DaoController:
                     getattr(self.gw_infotools, f"{function_name}")(**params)
                 except AttributeError as e:
                     # If function_name not exist as python function
-                    self.log_warning(f"Exception error: {e}")
+                    tools_log.log_warning(f"Exception error: {e}")
                 except Exception as e:
-                    self.log_debug(f"{type(e).__name__}: {e}")
+                    tools_log.log_debug(f"{type(e).__name__}: {e}")
         except Exception as e:
             self.manage_exception(None, f"{type(e).__name__}: {e}", sql)
 
@@ -855,7 +834,7 @@ class DaoController:
                 self.translate_tooltip(context_name, widget)
 
         except Exception as e:
-            self.log_info(f"{widget_name} --> {type(e).__name__} --> {e}")
+            tools_log.log_info(f"{widget_name} --> {type(e).__name__} --> {e}")
 
 
     def get_layer_by_layername(self, layername, log_info=False):
@@ -866,7 +845,7 @@ class DaoController:
             layer = layer[0]
         elif not layer and log_info:
             layer = None
-            self.log_info("Layer not found", parameter=layername)
+            tools_log.log_info("Layer not found", parameter=layername)
 
         return layer
 
@@ -900,78 +879,6 @@ class DaoController:
         return self.user
 
 
-    def qgis_log_message(self, text=None, message_level=0, context_name=None, parameter=None, tab_name=None):
-        """ Write message into QGIS Log Messages Panel with selected message level
-            @message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3, NONE = 4}
-        """
-
-        msg = None
-        if text:
-            msg = tools_gw.tr(text, context_name)
-            if parameter:
-                msg += ": " + str(parameter)
-
-        if tab_name is None:
-            tab_name = self.plugin_name
-
-        if message_level >= self.min_message_level:
-            QgsMessageLog.logMessage(msg, tab_name, message_level)
-
-        return msg
-
-
-    def log_message(self, text=None, message_level=0, context_name=None, parameter=None, logger_file=True,
-                    stack_level_increase=0, tab_name=None):
-        """ Write message into QGIS Log Messages Panel """
-
-        msg = self.qgis_log_message(text, message_level, context_name, parameter, tab_name)
-        if self.logger and logger_file:
-            if message_level == 0:
-                self.logger.info(msg, stack_level_increase=stack_level_increase)
-            elif message_level == 1:
-                self.logger.warning(msg, stack_level_increase=stack_level_increase)
-            elif message_level == 2:
-                self.logger.error(msg, stack_level_increase=stack_level_increase)
-            elif message_level == 4:
-                self.logger.debug(msg, stack_level_increase=stack_level_increase)
-
-
-    def log_debug(self, text=None, context_name=None, parameter=None, logger_file=True,
-                  stack_level_increase=0, tab_name=None):
-        """ Write debug message into QGIS Log Messages Panel """
-
-        msg = self.qgis_log_message(text, 0, context_name, parameter, tab_name)
-        if self.logger and logger_file:
-            self.logger.debug(msg, stack_level_increase=stack_level_increase)
-
-
-    def log_info(self, text=None, context_name=None, parameter=None, logger_file=True,
-                 stack_level_increase=0, tab_name=None, level=0):
-        """ Write information message into QGIS Log Messages Panel """
-
-        msg = self.qgis_log_message(text, level, context_name, parameter, tab_name)
-        if self.logger and logger_file:
-            self.logger.info(msg, stack_level_increase=stack_level_increase)
-
-
-    def log_warning(self, text=None, context_name=None, parameter=None, logger_file=True,
-                    stack_level_increase=0, tab_name=None):
-        """ Write warning message into QGIS Log Messages Panel """
-
-        msg = self.qgis_log_message(text, 1, context_name, parameter, tab_name)
-        if self.logger and logger_file:
-            self.logger.warning(msg, stack_level_increase=stack_level_increase)
-
-
-    def log_error(self, text=None, context_name=None, parameter=None, logger_file=True,
-                  stack_level_increase=0, tab_name=None):
-        """ Write error message into QGIS Log Messages Panel """
-
-        msg = self.qgis_log_message(text, 2, context_name, parameter, tab_name)
-        if self.logger and logger_file:
-            self.logger.error(msg, stack_level_increase=stack_level_increase)
-
-
     def add_translator(self, locale_path, log_info=False):
         """ Add translation file to the list of translation files to be used for translations """
 
@@ -980,10 +887,10 @@ class DaoController:
             self.translator.load(locale_path)
             QCoreApplication.installTranslator(self.translator)
             if log_info:
-                self.log_info("Add translator", parameter=locale_path)
+                tools_log.log_info("Add translator", parameter=locale_path)
         else:
             if log_info:
-                self.log_info("Locale not found", parameter=locale_path)
+                tools_log.log_info("Locale not found", parameter=locale_path)
 
 
     def manage_translation(self, locale_name, dialog=None, log_info=False):
@@ -1006,14 +913,14 @@ class DaoController:
         locale_path = os.path.join(self.plugin_dir, 'i18n', f'giswater_{locale}.qm')
         if not os.path.exists(locale_path):
             if log_info:
-                self.log_info("Locale not found", parameter=locale_path)
+                tools_log.log_info("Locale not found", parameter=locale_path)
             locale_default = 'en'
             locale_path = os.path.join(self.plugin_dir, 'i18n', f'giswater_{locale_default}.qm')
             # If English locale file not found, exit function
             # It means that probably that form has not been translated yet
             if not os.path.exists(locale_path):
                 if log_info:
-                    self.log_info("Locale not found", parameter=locale_path)
+                    tools_log.log_info("Locale not found", parameter=locale_path)
                 return
 
         # Add translation file
@@ -1500,10 +1407,10 @@ class DaoController:
 
         # Show exception message in dialog and log it
         self.show_exceptions_msg(title, msg)
-        self.log_warning(msg)
+        tools_log.log_warning(msg)
 
         # Log exception message
-        self.log_warning(msg)
+        tools_log.log_warning(msg)
 
         # Show exception message only if we are not in a task process
         if self.show_db_exception:
@@ -1545,8 +1452,8 @@ class DaoController:
                 title = "Database error"
                 self.show_exceptions_msg(title, msg)
             else:
-                self.log_warning("Exception message not shown to user")
-            self.log_warning(msg, stack_level_increase=2)
+                tools_log.log_warning("Exception message not shown to user")
+            tools_log.log_warning(msg, stack_level_increase=2)
 
         except Exception:
             self.manage_exception("Unhandled Error")
@@ -1596,7 +1503,7 @@ class DaoController:
                     parameter = 'text'
                     msg = "Key on returned json from ddbb is missed"
                 if is_notify is True:
-                    self.log_info(msg, parameter=parameter, level=level)
+                    tools_log.log_info(msg, parameter=parameter, level=level)
                 elif not is_notify and self.show_db_exception:
                     # Show exception message only if we are not in a task process
                     tools_gw.show_message(msg, level, parameter=parameter)
@@ -1624,7 +1531,7 @@ class DaoController:
                 if sql:
                     msg += f"SQL: {sql}"
 
-                self.log_warning(msg, stack_level_increase=2)
+                tools_log.log_warning(msg, stack_level_increase=2)
                 # Show exception message only if we are not in a task process
                 if self.show_db_exception:
                     self.show_exceptions_msg(title, msg)
@@ -1668,7 +1575,7 @@ class DaoController:
             self.dlg_docker.setWindowFlags(Qt.WindowContextHelpButtonHint)
             self.iface.addDockWidget(positions[self.dlg_docker.position], self.dlg_docker)
         except RuntimeError as e:
-            self.log_warning(f"{type(e).__name__} --> {e}")
+            tools_log.log_warning(f"{type(e).__name__} --> {e}")
 
 
     def init_docker(self, docker_param='qgis_info_docker'):

@@ -35,7 +35,7 @@ from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMain
 from ..utils import tools_gw
 from ..utils.tools_gw import SnappingConfigManager
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt
+from ...lib import tools_qgis, tools_qt, tools_log
 from ...lib.tools_qt import GwHyperLinkLabel
 
 
@@ -211,7 +211,7 @@ class GwInfo(QObject):
         try:
             template = self.complet_result[0]['body']['form']['template']
         except Exception as e:
-            self.controller.log_info(str(e))
+            tools_log.log_info(str(e))
             return False, None
 
         if template == 'info_generic':
@@ -248,7 +248,7 @@ class GwInfo(QObject):
             manage_visit.manage_visit(visit_id=visit_id, tag='info')
 
         else:
-            self.controller.log_warning(f"template not managed: {template}")
+            tools_log.log_warning(f"template not managed: {template}")
             return False, None
 
 
@@ -286,7 +286,7 @@ class GwInfo(QObject):
             if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
                 self.my_json[str(widget.property('columnname'))] = str(value)
 
-        self.controller.log_info(str(self.my_json))
+        tools_log.log_info(str(self.my_json))
 
 
     def open_generic_form(self, complet_result):
@@ -864,7 +864,7 @@ class GwInfo(QObject):
         try:
             emit_point.canvasClicked.disconnect()
         except Exception as e:
-            global_vars.controller.log_info(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
         self.cancel_snapping_tool(dialog, action)
 
     def api_action_copy_paste(self, dialog, geom_type, tab_type=None):
@@ -1526,7 +1526,7 @@ class GwInfo(QObject):
             status = self.layer_new_feature.commitChanges()
             if status is False:
                 error = self.layer_new_feature.commitErrors()
-                self.controller.log_warning(f"{error}")
+                tools_log.log_warning(f"{error}")
                 self.connect_signals()
                 return False
             
@@ -2083,7 +2083,7 @@ class GwInfo(QObject):
         if widget:
             widget.setModel(model)
         else:
-            self.controller.log_info("set_model_to_table: widget not found")
+            tools_log.log_info("set_model_to_table: widget not found")
 
 
     """ FUNCTIONS RELATED WITH TAB RELATIONS"""
@@ -2153,7 +2153,7 @@ class GwInfo(QObject):
         api_cf = GwInfo(self.tab_type)
         complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
-            self.controller.log_info("FAIL open_relation")
+            tools_log.log_info("FAIL open_relation")
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
@@ -2191,7 +2191,7 @@ class GwInfo(QObject):
         api_cf = GwInfo(self.tab_type)
         complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
-            self.controller.log_info("FAIL open_up_down_stream")
+            tools_log.log_info("FAIL open_up_down_stream")
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
@@ -2231,7 +2231,7 @@ class GwInfo(QObject):
         api_cf = GwInfo(self.tab_type)
         complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
-            self.controller.log_info("FAIL open_selected_hydro")
+            tools_log.log_info("FAIL open_selected_hydro")
             return
 
 
@@ -3077,7 +3077,7 @@ class GwInfo(QObject):
         api_cf = GwInfo(self.tab_type)
         complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
-            self.controller.log_info("FAIL open_rpt_result")
+            tools_log.log_info("FAIL open_rpt_result")
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
@@ -3405,7 +3405,7 @@ class GwInfo(QObject):
                 self.iface.actionPan().trigger()
             self.vertex_marker.hide()
         except Exception as e:
-            self.controller.log_info(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
 
 
     """ OTHER FUNCTIONS """
@@ -3429,7 +3429,7 @@ class GwInfo(QObject):
         complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=feature_id,
             tab_type=self.tab_type, is_docker=False)
         if not complet_result:
-            self.controller.log_info("FAIL open_node")
+            tools_log.log_info("FAIL open_node")
             return
 
 
@@ -3514,7 +3514,7 @@ class GwInfo(QObject):
             list_points = f'"x1":{init_point.x()}, "y1":{init_point.y()}'
             list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
         else:
-            self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
+            tools_log.log_info(str(type("NO FEATURE TYPE DEFINED")))
 
         self.controller.init_docker()
         self.controller.is_inserting = True

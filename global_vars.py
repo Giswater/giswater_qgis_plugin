@@ -31,6 +31,10 @@ logger = None
 user_settings = None
 user_settings_path = None
 
+min_log_level = None
+min_message_level = 0
+
+
 def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name):
 
     global iface, canvas, plugin_dir, plugin_name

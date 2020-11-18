@@ -12,6 +12,7 @@ import shutil
 import sqlite3
 
 from .utils import tools_gw
+from ..lib import tools_log
 
 
 class GwAdminGisProject:
@@ -53,7 +54,7 @@ class GwAdminGisProject:
 
         # If QGIS template locale folder not found, use English one
         if not os.path.exists(gis_locale_path):
-            self.controller.log_info("Locale gis folder not found", parameter=gis_locale_path)
+            tools_log.log_info("Locale gis folder not found", parameter=gis_locale_path)
             gis_locale_path = gis_folder + os.sep + "en"
 
         # Check if template_path and folder_path exists
@@ -85,7 +86,7 @@ class GwAdminGisProject:
                 return False, qgs_path
 
         # Create destination file from template file
-        self.controller.log_info("Creating GIS file... " + qgs_path)
+        tools_log.log_info("Creating GIS file... " + qgs_path)
         shutil.copyfile(template_path, qgs_path)
 
         if get_database_parameters:
@@ -163,15 +164,15 @@ class GwAdminGisProject:
         status = False
         try:
             db_path = self.plugin_dir + os.sep + "resources" + os.sep + "gis" + os.sep + "srid.sqlite"
-            self.controller.log_info(db_path)
+            tools_log.log_info(db_path)
             if os.path.exists(db_path):
                 self.conn = sqlite3.connect(db_path)
                 self.cursor = self.conn.cursor()
                 status = True
             else:
-                self.controller.log_warning("Config database file not found", parameter=db_path)
+                tools_log.log_warning("Config database file not found", parameter=db_path)
         except Exception as e:
-            self.controller.log_warning(str(e))
+            tools_log.log_warning(str(e))
 
         return status
 

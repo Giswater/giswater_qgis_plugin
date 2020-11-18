@@ -20,7 +20,7 @@ from .utils.backend_functions import GwInfoTools
 from .utils.notify import GwNotifyTools
 from .shared.search import GwSearch
 from .utils import tools_gw
-from ..lib import tools_qgis, tools_config
+from ..lib import tools_qgis, tools_config, tools_log
 from .toolbars import buttons
 
 
@@ -128,7 +128,7 @@ class LoadProject(QObject):
 
         # Log it
         message = "Project read successfully"
-        self.controller.log_info(message)
+        tools_log.log_info(message)
 
 
     def check_project(self, show_warning):
@@ -153,10 +153,10 @@ class LoadProject(QObject):
 
         try:
             if self.controller.dao and force_commit:
-                self.controller.log_info("Force commit")
+                tools_log.log_info("Force commit")
                 self.controller.dao.commit()
         except Exception as e:
-            self.controller.log_info(str(e))
+            tools_log.log_info(str(e))
         finally:
             self.connection_status, not_version = self.controller.set_database_connection()
             if not self.connection_status or not_version:
@@ -164,7 +164,7 @@ class LoadProject(QObject):
                 if show_warning:
                     if message:
                         tools_gw.show_warning(message, 15)
-                    self.controller.log_warning(str(self.controller.layer_source))
+                    tools_log.log_warning(str(self.controller.layer_source))
                 return False
 
             return True
@@ -375,7 +375,7 @@ class LoadProject(QObject):
                 if plugin_toolbar.enabled:
                     plugin_toolbar.toolbar.setVisible(visible)
         except Exception as e:
-            self.controller.log_warning(str(e))
+            tools_log.log_warning(str(e))
 
 
     def enable_toolbar(self, toolbar_id, enable=True):
@@ -414,7 +414,7 @@ class LoadProject(QObject):
     def init_user_config_file(self, path, toolbar_names):
         """ Initialize UI config file with default values """
 
-        self.controller.log_info(f"init_user_config_file: {path}")
+        tools_log.log_info(f"init_user_config_file: {path}")
 
         # Create file and configure section 'toolbars_position'
         parser = configparser.RawConfigParser()

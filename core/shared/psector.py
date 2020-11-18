@@ -25,7 +25,7 @@ from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate
 from ..ui.ui_manager import Plan_psector, PsectorRapportUi, PsectorManagerUi, PriceManagerUi
 from ..utils import tools_gw
-from ...lib import tools_db, tools_qgis, tools_qt
+from ...lib import tools_db, tools_qgis, tools_qt, tools_log
 
 
 class GwPsector:
@@ -691,7 +691,7 @@ class GwPsector:
                     message = "Cannot create file, check if its open"
                     tools_gw.show_warning(message, parameter=path)
             except Exception as e:
-                self.controller.log_warning(str(e))
+                tools_log.log_warning(str(e))
                 msg = "Cannot create file, check if selected composer is the correct composer"
                 tools_gw.show_warning(msg, parameter=path)
             finally:

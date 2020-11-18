@@ -10,6 +10,7 @@ import threading
 from collections import OrderedDict
 
 from ... import global_vars
+from ...lib import tools_log
 
 
 class GwNotifyTools:
@@ -45,7 +46,7 @@ class GwNotifyTools:
 
     def task_stopped(self, task):
 
-        self.controller.log_info('Task "{name}" was cancelled'.format(name=task.description()))
+        tools_log.log_info('Task "{name}" was cancelled'.format(name=task.description()))
 
 
     def task_completed(self, exception, result):
@@ -53,19 +54,19 @@ class GwNotifyTools:
         Exception is not None if run raises an exception. Result is the return value of run
         """
 
-        self.controller.log_info("task_completed")
+        tools_log.log_info("task_completed")
 
         if exception is None:
             if result is None:
                 msg = 'Completed with no exception and no result'
-                self.controller.log_info(msg)
+                tools_log.log_info(msg)
             else:
-                self.controller.log_info('Task {name} completed\n'
+                tools_log.log_info('Task {name} completed\n'
                     'Total: {total} (with {iterations} '
                     'iterations)'.format(name=result['task'], total=result['total'],
                                          iterations=result['iterations']))
         else:
-            self.controller.log_info("Exception: {}".format(exception))
+            tools_log.log_info("Exception: {}".format(exception))
             raise exception
 
 
@@ -100,7 +101,7 @@ class GwNotifyTools:
                 notify = dao.conn.notifies.pop()
                 msg = f'<font color="blue"><bold>Got NOTIFY: </font>'
                 msg += f'<font color="black"><bold>{notify.pid}, {notify.channel}, {notify.payload} </font>'
-                self.controller.log_info(msg)
+                tools_log.log_info(msg)
                 if notify.payload and notify.payload != last_paiload:
                     last_paiload = notify.payload
                     try:
@@ -131,4 +132,4 @@ class GwNotifyTools:
                 getattr(self.controller.gw_infotools, function_name)(**params)
             except AttributeError as e:
                 # If function_name not exist as python function
-                self.controller.log_warning(f"Exception error: {e}")
+                tools_log.log_warning(f"Exception error: {e}")

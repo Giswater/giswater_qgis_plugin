@@ -15,7 +15,7 @@ from ..parent_dialog import GwParentAction
 from ...load_project_check import GwProjectCheck
 from ...tasks.task_layer_config import GwConfigLayerTask
 from ...utils import tools_gw
-from ....lib import tools_qgis
+from ....lib import tools_qgis, tools_log
 
 
 class GwAddChildLayerButton(GwParentAction):
@@ -155,10 +155,10 @@ class GwAddChildLayerButton(GwParentAction):
                     if 'useGuideMap' in result['body']['actions']:
                         guided_map = result['body']['actions']['useGuideMap']
                         if guided_map:
-                            self.controller.log_info("manage_guided_map")
+                            tools_log.log_info("manage_guided_map")
                             self.manage_guided_map()
             except Exception as e:
-                self.controller.log_info(str(e))
+                tools_log.log_info(str(e))
             finally:
                 QApplication.restoreOverrideCursor()
                 return status
@@ -191,7 +191,7 @@ class GwAddChildLayerButton(GwParentAction):
         features = self.layer_muni.getSelectedFeatures()
         for feature in features:
             muni_id = feature["muni_id"]
-            self.controller.log_info(f"Selected muni_id: {muni_id}")
+            tools_log.log_info(f"Selected muni_id: {muni_id}")
             break
 
         self.iface.mapCanvas().selectionChanged.disconnect()

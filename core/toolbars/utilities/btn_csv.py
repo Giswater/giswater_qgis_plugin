@@ -17,7 +17,7 @@ from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import CsvUi
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qt
+from ....lib import tools_qt, tools_log
 
 
 class GwCSVButton(GwParentAction):
@@ -157,7 +157,7 @@ class GwCSVButton(GwParentAction):
     def get_function_name(self):
 
         self.func_name = tools_qt.get_combo_value(self.dlg_csv, self.dlg_csv.cmb_import_type, 3)
-        self.controller.log_info(str(self.func_name))
+        tools_log.log_info(str(self.func_name))
 
 
     def select_file_csv(self):

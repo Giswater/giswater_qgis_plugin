@@ -28,7 +28,7 @@ from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint, QgsDate
 from ..models.sys_feature_cat import SysFeatureCat
 from ..ui.ui_manager import GwDialog, GwMainWindow
 from ... import global_vars
-from ...lib import tools_qgis, tools_pgdao, tools_qt
+from ...lib import tools_qgis, tools_pgdao, tools_qt, tools_log
 from ...lib.tools_qt import GwHyperLinkLabel
 
 
@@ -896,11 +896,11 @@ def load_qml(layer, qml_path):
         return False
 
     if not os.path.exists(qml_path):
-        global_vars.controller.log_warning("File not found", parameter=qml_path)
+        tools_log.log_warning("File not found", parameter=qml_path)
         return False
 
     if not qml_path.endswith(".qml"):
-        global_vars.controller.log_warning("File extension not valid", parameter=qml_path)
+        tools_log.log_warning("File extension not valid", parameter=qml_path)
         return False
 
     layer.loadNamedStyle(qml_path)
@@ -1078,7 +1078,7 @@ def get_geometry_from_json(feature):
         geometry = f"{type_}{coordinates}"
         return QgsGeometry.fromWkt(geometry)
     except AttributeError as e:
-        global_vars.controller.log_info(f"{type(e).__name__} --> {e}")
+        tools_log.log_info(f"{type(e).__name__} --> {e}")
         return None
 
 
@@ -1623,7 +1623,7 @@ def get_values_changed_param_user(dialog, chk, widget, field, list, value=None):
     if 'sys_role_id' in field:
         elem['sys_role_id'] = str(field['sys_role_id'])
     list.append(elem)
-    global_vars.controller.log_info(str(list))
+    tools_log.log_info(str(list))
 
 
 def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name__]):

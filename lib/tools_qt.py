@@ -25,7 +25,7 @@ from functools import partial
 
 from .. import global_vars
 from ..core.utils import tools_gw
-from . import tools_qgis
+from . import tools_qgis, tools_log
 
 
 class GwExtendedQLabel(QLabel):
@@ -679,11 +679,11 @@ def check_expression_filter(expr_filter, log_info=False):
     """ Check if expression filter @expr is valid """
 
     if log_info:
-        global_vars.controller.log_info(expr_filter)
+        tools_log.log_info(expr_filter)
     expr = QgsExpression(expr_filter)
     if expr.hasParserError():
         message = "Expression Error"
-        global_vars.controller.log_warning(message, parameter=expr_filter)
+        tools_log.log_warning(message, parameter=expr_filter)
         return False, expr
 
     return True, expr
@@ -747,7 +747,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
         widget = table_object
     else:
         msg = "Table_object is not a table name or QTableView"
-        global_vars.controller.log_info(msg)
+        tools_log.log_info(msg)
         return
 
     # Control when QTableView is void or has no model
@@ -943,7 +943,7 @@ def set_model_to_table(widget, table_name, expr_filter):
     if widget:
         widget.setModel(model)
     else:
-        global_vars.controller.log_info("set_model_to_table: widget not found")
+        tools_log.log_info("set_model_to_table: widget not found")
 
 
 def get_folder_path(dialog, widget):
@@ -974,7 +974,7 @@ def set_icon(widget, icon):
     if os.path.exists(icon_path):
         widget.setIcon(QIcon(icon_path))
     else:
-        global_vars.controller.log_info("File not found", parameter=icon_path)
+        tools_log.log_info("File not found", parameter=icon_path)
 
 
 def set_table_columns(dialog, widget, table_name, sort_order=0, isQStandardItemModel=False, schema_name=None):
@@ -1296,7 +1296,7 @@ def get_records_geom_type(dialog, table_object, geom_type, ids=None, list_ids=No
 
     exists = global_vars.controller.check_table(table_relation)
     if not exists:
-        global_vars.controller.log_info(f"Not found: {table_relation}")
+        tools_log.log_info(f"Not found: {table_relation}")
         return ids, layers, list_ids
 
     sql = (f"SELECT {geom_type}_id "
@@ -1345,14 +1345,14 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
         widget = getWidget(dialog, table_object)
         if not widget:
             message = "Widget not found"
-            global_vars.controller.log_info(message, parameter=table_object)
+            tools_log.log_info(message, parameter=table_object)
             return expr
     elif type(table_object) is QTableView:
         # parent_vars.controller.log_debug(f"set_table_model: {table_object.objectName()}")
         widget = table_object
     else:
         msg = "Table_object is not a table name or QTableView"
-        global_vars.controller.log_info(msg)
+        tools_log.log_info(msg)
         return expr
 
     if expr_filter:
@@ -1373,13 +1373,13 @@ def reload_table(dialog, table_object, geom_type, expr_filter):
         widget = getWidget(dialog, widget_name)
         if not widget:
             message = "Widget not found"
-            global_vars.controller.log_info(message, parameter=widget_name)
+            tools_log.log_info(message, parameter=widget_name)
             return None
     elif type(table_object) is QTableView:
         widget = table_object
     else:
         msg = "Table_object is not a table name or QTableView"
-        global_vars.controller.log_info(msg)
+        tools_log.log_info(msg)
         return None
 
     expr = set_table_model(dialog, widget, geom_type, expr_filter)

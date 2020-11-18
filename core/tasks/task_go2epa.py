@@ -14,6 +14,7 @@ from qgis.core import QgsTask
 
 from ..utils import tools_gw
 from ... import global_vars
+from ...lib import tools_log
 
 
 class GwGo2EpaTask(QgsTask):
@@ -141,7 +142,7 @@ class GwGo2EpaTask(QgsTask):
 
     def progress_changed(self, progress):
 
-        self.controller.log_info(f"progressChanged: {progress}")
+        tools_log.log_info(f"progressChanged: {progress}")
 
 
     def close_file(self, file=None):
@@ -171,7 +172,7 @@ class GwGo2EpaTask(QgsTask):
             return False
 
         if 'status' in json_result and json_result['status'] == 'Failed':
-            self.controller.log_warning(json_result)
+            tools_log.log_warning(json_result)
             self.function_failed = True
             return False
 
@@ -183,7 +184,7 @@ class GwGo2EpaTask(QgsTask):
         if self.isCanceled():
             return False
 
-        self.controller.log_info(f"Create inp file into POSTGRESQL")
+        tools_log.log_info(f"Create inp file into POSTGRESQL")
 
         # Get values from complet_result['body']['file'] and insert into INP file
         if 'file' not in self.complet_result['body']:
@@ -198,7 +199,7 @@ class GwGo2EpaTask(QgsTask):
 
     def fill_inp_file(self, folder_path=None, all_rows=None):
 
-        self.controller.log_info(f"Write inp file........: {folder_path}")
+        tools_log.log_info(f"Write inp file........: {folder_path}")
 
         file1 = open(folder_path, "w")
         for row in all_rows:
@@ -214,7 +215,7 @@ class GwGo2EpaTask(QgsTask):
         if self.isCanceled():
             return False
 
-        self.controller.log_info(f"Execute EPA software")
+        tools_log.log_info(f"Execute EPA software")
 
         if self.file_rpt == "null":
             message = "You have to set this parameter"
@@ -253,7 +254,7 @@ class GwGo2EpaTask(QgsTask):
     def import_rpt(self):
         """import result file"""
 
-        self.controller.log_info(f"Import rpt file........: {self.file_rpt}")
+        tools_log.log_info(f"Import rpt file........: {self.file_rpt}")
 
         self.rpt_result = None
         self.json_rpt = None
@@ -327,7 +328,7 @@ class GwGo2EpaTask(QgsTask):
                     elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
                         if 'Version' not in dirty_list and 'VERSION' not in dirty_list:
                             error_near = f"Error near line {line_number+1} -> {dirty_list}"
-                            self.controller.log_info(error_near)
+                            tools_log.log_info(error_near)
                             message = (f"The rpt file is not valid to import. "
                                        f"Because columns on rpt file are overlaped, it seems you need to improve your simulation. "
                                        f"Please ckeck and fix it before continue. \n"
@@ -336,7 +337,7 @@ class GwGo2EpaTask(QgsTask):
                             return False
                     elif bool(re.search('>50', str(dirty_list[x]))):
                         error_near = f"Error near line {line_number+1} -> {dirty_list}"
-                        self.controller.log_info(error_near)
+                        tools_log.log_info(error_near)
                         message = (f"The rpt file is not valid to import. "
                                    f"Because velocity has not numeric value (>50), it seems you need to improve your simulation. "
                                    f"Please ckeck and fix it before continue. \n"
@@ -357,7 +358,7 @@ class GwGo2EpaTask(QgsTask):
                 except IndexError:
                     pass
                 except Exception as e:
-                    self.controller.log_info(type(e).__name__)
+                    tools_log.log_info(type(e).__name__)
 
             if len(sp_n) > 0:
                 json_elem = f'"target": "{target}", "col40": "{col40}", '
@@ -418,7 +419,7 @@ class GwGo2EpaTask(QgsTask):
             return False
 
         if 'status' in json_result and json_result['status'] == 'Failed':
-            self.controller.log_warning(json_result)
+            tools_log.log_warning(json_result)
             self.function_failed = True
             return False
 

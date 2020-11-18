@@ -9,8 +9,14 @@ import logging
 import inspect
 import os
 import time
+import sys
+
+from qgis.core import QgsMessageLog
+
 
 from .. import global_vars
+from ..core.utils import tools_gw
+from ..lib import tools_log
 
 class Logger(object):
 
@@ -40,7 +46,7 @@ class Logger(object):
         filepath += ".log"
 
         self.log_folder = log_folder
-        self.controller.log_info(f"Log file: {filepath}", logger_file=False)
+        tools_log.log_info(f"Log file: {filepath}", logger_file=False)
         if remove_previous and os.path.exists(filepath):
             os.remove(filepath)
 
@@ -85,7 +91,7 @@ class Logger(object):
             self.logger_file.log(log_level, text)
 
         except Exception as e:
-            self.controller.log_warning("Error logging: " + str(e), logger_file=False)
+            tools_log.log_warning("Error logging: " + str(e), logger_file=False)
 
 
     def debug(self, msg=None, stack_level=2, stack_level_increase=0):
@@ -117,3 +123,91 @@ class Logger(object):
         self.log(msg, logging.CRITICAL, stack_level + stack_level_increase + 1)
         if sum_error:
             self.num_errors += 1
+
+
+def set_logger(self, logger_name=None):
+    """ Set logger class """
+    if global_vars.logger is None:
+        if logger_name is None:
+            logger_name = 'plugin'
+        global_vars.min_log_level = int(global_vars.settings.value('status/log_level'))
+        log_suffix = global_vars.settings.value('status/log_suffix')
+        global_vars.logger = Logger(self, logger_name, global_vars.min_log_level, log_suffix)
+        if global_vars.min_log_level == 10:
+            global_vars.min_message_level = 0
+        elif global_vars.min_log_level == 20:
+            global_vars.min_message_level = 0
+        elif global_vars.min_log_level == 30:
+            global_vars.min_message_level = 1
+        elif global_vars.min_log_level == 40:
+            global_vars.min_message_level = 2
+
+def qgis_log_message(text=None, message_level=0, context_name=None, parameter=None, tab_name=None):
+    """ Write message into QGIS Log Messages Panel with selected message level
+        @message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3, NONE = 4}
+    """
+
+    msg = None
+    if text:
+        msg = tools_gw.tr(text, context_name)
+        if parameter:
+            msg += ": " + str(parameter)
+
+    if tab_name is None:
+        tab_name = global_vars.plugin_name
+    if message_level >= global_vars.min_message_level:
+        QgsMessageLog.logMessage(msg, tab_name, message_level)
+
+    return msg
+
+
+def log_message(text=None, message_level=0, context_name=None, parameter=None, logger_file=True,
+                stack_level_increase=0, tab_name=None):
+    """ Write message into QGIS Log Messages Panel """
+
+    msg = qgis_log_message(text, message_level, context_name, parameter, tab_name)
+    if global_vars.logger and logger_file:
+        if message_level == 0:
+            global_vars.logger.info(msg, stack_level_increase=stack_level_increase)
+        elif message_level == 1:
+            global_vars.logger.warning(msg, stack_level_increase=stack_level_increase)
+        elif message_level == 2:
+            global_vars.logger.error(msg, stack_level_increase=stack_level_increase)
+        elif message_level == 4:
+            global_vars.logger.debug(msg, stack_level_increase=stack_level_increase)
+
+
+def log_debug(text=None, context_name=None, parameter=None, logger_file=True,
+              stack_level_increase=0, tab_name=None):
+    """ Write debug message into QGIS Log Messages Panel """
+
+    msg = qgis_log_message(text, 0, context_name, parameter, tab_name)
+    if global_vars.logger and logger_file:
+        global_vars.logger.debug(msg, stack_level_increase=stack_level_increase)
+
+
+def log_info(text=None, context_name=None, parameter=None, logger_file=True,
+             stack_level_increase=0, tab_name=None, level=0):
+    """ Write information message into QGIS Log Messages Panel """
+
+    msg = qgis_log_message(text, level, context_name, parameter, tab_name)
+    if global_vars.logger and logger_file:
+        global_vars.logger.info(msg, stack_level_increase=stack_level_increase)
+
+
+def log_warning(text=None, context_name=None, parameter=None, logger_file=True,
+                stack_level_increase=0, tab_name=None):
+    """ Write warning message into QGIS Log Messages Panel """
+
+    msg = qgis_log_message(text, 1, context_name, parameter, tab_name)
+    if global_vars.logger and logger_file:
+        global_vars.logger.warning(msg, stack_level_increase=stack_level_increase)
+
+
+def log_error(text=None, context_name=None, parameter=None, logger_file=True,
+              stack_level_increase=0, tab_name=None):
+    """ Write error message into QGIS Log Messages Panel """
+
+    msg = qgis_log_message(text, 2, context_name, parameter, tab_name)
+    if global_vars.logger and logger_file:
+        global_vars.logger.error(msg, stack_level_increase=stack_level_increase)

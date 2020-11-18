@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import QSettings, Qt
 
 from ...shared.dimensioning import GwDimensioning
 from ..parent_maptool import GwParentMapTool
-from ....lib import tools_qt
+from ....lib import tools_qt, tools_log
 
 
 class GwDimensioningButton(GwParentMapTool):
@@ -38,7 +38,7 @@ class GwDimensioningButton(GwParentMapTool):
             list_points = f'"x1":{init_point.x()}, "y1":{init_point.y()}'
             list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
         else:
-            self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
+            tools_log.log_info(str(type("NO FEATURE TYPE DEFINED")))
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
         config = self.layer.editFormConfig()

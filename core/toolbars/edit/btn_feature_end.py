@@ -16,7 +16,7 @@ from qgis.core import QgsExpression, QgsFeatureRequest
 from ...toolbars.parent_dialog import GwParentAction
 from ...ui.ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
 from ...utils import tools_gw
-from ....lib import tools_qgis, tools_qt
+from ....lib import tools_qgis, tools_qt, tools_log
 
 
 class GwEndFeatureButton(GwParentAction):
@@ -173,7 +173,7 @@ class GwEndFeatureButton(GwParentAction):
             date_result = date_result.replace("-", "/")
             date_result = datetime.strptime(date_result, '%Y/%m/%d')
         except Exception as e:
-            self.controller.log_warning(str(e))
+            tools_log.log_warning(str(e))
         finally:
             return date_result
 

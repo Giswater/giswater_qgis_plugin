@@ -16,7 +16,7 @@ from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import FeatureReplace, InfoWorkcatUi
 from ...shared.catalog import GwCatalog
 from ...utils import tools_gw
-from ....lib import tools_qt
+from ....lib import tools_qt, tools_log
 
 
 class GwFeatureReplaceButton(GwParentMapTool):
@@ -44,7 +44,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             date_result = date_result.replace("-", "/")
             date_result = datetime.strptime(date_result, '%Y/%m/%d')
         except Exception as e:
-            self.controller.log_warning(str(e))
+            tools_log.log_warning(str(e))
         finally:
             return date_result
 

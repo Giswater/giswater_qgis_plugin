@@ -22,7 +22,7 @@ from qgis.gui import QgsMapToolEmitPoint
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import Profile, ProfilesList
 from ...utils import tools_gw
-from ....lib import tools_qt
+from ....lib import tools_qt, tools_log
 
 
 class NodeData:
@@ -378,19 +378,19 @@ class GwProfileButton(GwParentMapTool):
         try:
             self.canvas.xyCoordinates.disconnect()
         except TypeError as e:
-            self.controller.log_info(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
 
         try:
             self.emit_point.canvasClicked.disconnect()
         except TypeError as e:
-            self.controller.log_info(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
 
         if action_pan is True:
             self.iface.actionPan().trigger()
         try:
             self.vertex_marker.hide()
         except AttributeError as e:
-            self.controller.log_info(f"{type(e).__name__} --> {e}")
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
 
 
     def paint_event(self, arcs, nodes, terrains):
@@ -450,7 +450,7 @@ class GwProfileButton(GwParentMapTool):
         if not os.path.exists(img_path):
             os.makedirs(temp_folder)
         else:
-            self.controller.log_info(f"User settings file: {img_path}")
+            tools_log.log_info(f"User settings file: {img_path}")
 
 
         fig_size = plt.rcParams["figure.figsize"]

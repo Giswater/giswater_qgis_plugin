@@ -30,7 +30,7 @@ from ..ui.ui_manager import VisitUi, VisitEvent, VisitEventRehab, VisitManagerUi
 
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt
+from ...lib import tools_qgis, tools_qt, tools_log
 from ..utils.tools_gw import SnappingConfigManager
 
 
@@ -404,7 +404,7 @@ class GwVisitManager:
         body = tools_gw.create_body(feature=feature)
         sql = f"SELECT gw_fct_om_visit_multiplier({body})::text"
         row = self.controller.get_row(sql)
-        self.controller.log_info(f"execute_pgfunction: {row}")
+        tools_log.log_info(f"execute_pgfunction: {row}")
 
 
     def update_geom(self):
@@ -438,7 +438,7 @@ class GwVisitManager:
             tools_qgis.disconnect_signal_selection_changed()
             self.layers = tools_qgis.remove_selection(layers=self.layers)
         except Exception as e:
-            self.controller.log_info(f"manage_rejected: {e}")
+            tools_log.log_info(f"manage_rejected: {e}")
 
 
     def tab_index(self, tab_name):
@@ -600,12 +600,12 @@ class GwVisitManager:
         widget = tools_qt.getWidget(self.dlg_add_visit, f"tbl_visit_x_{geom_type}")
         if not widget:
             message = "Widget not found"
-            self.controller.log_info(message, parameter=f"tbl_visit_x_{geom_type}")
+            tools_log.log_info(message, parameter=f"tbl_visit_x_{geom_type}")
             return None
 
         # do nothing if model is None or no element is present
         if not widget.model():  # or not widget.rowCount():
-            self.controller.log_info(f"Widget model is none: tbl_visit_x_{geom_type}")
+            tools_log.log_info(f"Widget model is none: tbl_visit_x_{geom_type}")
             return
 
         db_record = None
@@ -699,7 +699,7 @@ class GwVisitManager:
             else:
                 self.dlg_add_visit.tab_feature.currentChanged.disconnect()
         except Exception as e:
-            self.controller.log_info(f"connect_signal_tab_feature_signal error: {e}")
+            tools_log.log_info(f"connect_signal_tab_feature_signal error: {e}")
 
 
     def manage_tabs_enabled(self, disable_tabs=False):
@@ -753,7 +753,7 @@ class GwVisitManager:
             self.dlg_add_visit.btn_feature_delete.clicked.disconnect()
             self.dlg_add_visit.btn_feature_snapping.clicked.disconnect()
         except Exception as e:
-            self.controller.log_info(f"manage_geom_type_selected exception: {e}")
+            tools_log.log_info(f"manage_geom_type_selected exception: {e}")
         finally:
             # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
@@ -1690,7 +1690,7 @@ class GwVisitManager:
             self.dlg_add_visit.btn_feature_delete.clicked.disconnect()
             self.dlg_add_visit.btn_feature_snapping.clicked.disconnect()
         except Exception as e:
-            self.controller.log_info(f"visit_tab_feature_changed exception: {e}")
+            tools_log.log_info(f"visit_tab_feature_changed exception: {e}")
         finally:
             # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_insert.clicked.connect(

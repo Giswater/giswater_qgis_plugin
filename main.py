@@ -17,8 +17,8 @@ from . import global_vars
 from .core.load_project import LoadProject
 from .core.btn_admin import GwAdmin
 from .dao.controller import DaoController
-from .lib.tools_qgis import get_value_from_metadata
 from .core.utils import tools_gw
+from .lib import tools_log, tools_qgis
 
 
 class Giswater(QObject):
@@ -65,7 +65,7 @@ class Giswater(QObject):
         self.plugin_dir = os.path.dirname(__file__)
         global_vars.plugin_dir = self.plugin_dir
         global_vars.iface = self.iface
-        self.plugin_name = get_value_from_metadata('name', 'giswater')
+        self.plugin_name = tools_qgis.get_value_from_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'shared' + os.sep
 
         global_vars.init_global(self.iface, self.iface.mapCanvas(), self.plugin_dir, self.plugin_name)
@@ -285,7 +285,7 @@ class Giswater(QObject):
         try:
             self.save_toolbars_position()
         except Exception as e:
-            self.controller.log_warning(str(e))
+            tools_log.log_warning(str(e))
 
         try:
             # Unlisten notify channel and stop thread

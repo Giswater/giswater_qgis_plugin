@@ -27,7 +27,7 @@ from functools import partial
 from time import sleep
 
 from .. import global_vars
-from ..lib import tools_qt, tools_qgis
+from ..lib import tools_qt, tools_qgis, tools_log
 from .btn_admin_gis_project import GwAdminGisProject
 from .tasks.parent_task import GwTask
 from ..i18n.i18n_generator import GwI18NGenerator
@@ -302,7 +302,7 @@ class GwAdmin:
         self.visit_manager()
 
         if not self.controller.check_role(self.username) and not show_dialog:
-            self.controller.log_warning(f"User not found: {self.username}")
+            tools_log.log_warning(f"User not found: {self.username}")
             return
 
         role_admin = self.controller.check_role_user("role_admin", self.username)
@@ -351,7 +351,7 @@ class GwAdmin:
             else:
                 tools_gw.open_dialog(self.dlg_readsql, dlg_name='main_ui')
         except RuntimeError as e:
-            self.controller.log_info(str(e))
+            tools_log.log_info(str(e))
 
 
     def set_credentials(self, dialog, new_connection=False):
@@ -1128,14 +1128,14 @@ class GwAdmin:
             return False
 
         if not os.path.exists(self.folderUpdatesApi):
-            self.controller.log_info(f"Folder not found: {self.folderUpdatesApi}")
+            tools_log.log_info(f"Folder not found: {self.folderUpdatesApi}")
             return True
 
         if project_type is False:
             project_type = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
 
         folders = sorted(os.listdir(self.folderUpdatesApi + ''))
-        self.controller.log_info(str(folders))
+        tools_log.log_info(str(folders))
         for folder in folders:
             sub_folders = sorted(os.listdir(self.folderUpdatesApi + folder))
             for sub_folder in sub_folders:
@@ -1382,7 +1382,7 @@ class GwAdmin:
         This will be passed together with the exception (None in case of success) to the on_finished method
         """
 
-        self.controller.log_info("Started task '{}'".format(task.description()))
+        tools_log.log_info("Started task '{}'".format(task.description()))
 
         wait_time = wait_time / 100
         total = 0
@@ -1407,7 +1407,7 @@ class GwAdmin:
 
     def task_stopped(self, task):
 
-        self.controller.log_info('Task "{name}" was cancelled'.format(name=task.description()))
+        tools_log.log_info('Task "{name}" was cancelled'.format(name=task.description()))
 
 
     def task_completed(self, exception, result):
@@ -1415,25 +1415,25 @@ class GwAdmin:
         Exception is not None if run raises an exception. Result is the return value of run
         """
 
-        self.controller.log_info("task_completed")
+        tools_log.log_info("task_completed")
 
         if exception is None:
             if result is None:
                 msg = 'Completed with no exception and no result'
-                self.controller.log_info(msg)
+                tools_log.log_info(msg)
             else:
-                self.controller.log_info('Task {name} completed\n'
+                tools_log.log_info('Task {name} completed\n'
                     'Total: {total} (with {iterations} '
                     'iterations)'.format(name=result['task'], total=result['total'],
                                          iterations=result['iterations']))
         else:
-            self.controller.log_info("Exception: {}".format(exception))
+            tools_log.log_info("Exception: {}".format(exception))
             raise exception
 
 
     def task_example(self):
 
-        self.controller.log_info("task_example")
+        tools_log.log_info("task_example")
         task1 = QgsTask.fromFunction('task_example', self.task_started, on_finished=self.task_completed, wait_time=20)
         QgsApplication.taskManager().addTask(task1)
 
@@ -1521,7 +1521,7 @@ class GwAdmin:
         if not self.check_project_name(project_name_schema, project_descript):
             return
 
-        self.controller.log_info(f"Create schema of type '{project_type}': '{project_name_schema}'")
+        tools_log.log_info(f"Create schema of type '{project_type}': '{project_name_schema}'")
 
         if not is_test:
             self.task1 = GwTask('Manage schema')
@@ -2342,11 +2342,11 @@ class GwAdmin:
     def executeFiles(self, filedir, i18n=False, no_ct=False, log_folder=True, log_files=False):
 
         if not os.path.exists(filedir):
-            self.controller.log_info("Folder not found", parameter=filedir)
+            tools_log.log_info("Folder not found", parameter=filedir)
             return True
 
         if log_folder:
-            self.controller.log_info("Processing folder", parameter=filedir)
+            tools_log.log_info("Processing folder", parameter=filedir)
 
         filelist = sorted(os.listdir(filedir))
         status = True
@@ -2361,11 +2361,11 @@ class GwAdmin:
             for file in filelist:
                 if "utils.sql" in file:
                     if log_files:
-                        self.controller.log_info(str(filedir + os.sep + 'utils.sql'))
+                        tools_log.log_info(str(filedir + os.sep + 'utils.sql'))
                     status = self.read_execute_file(filedir, os.sep + 'utils.sql', schema_name, self.project_epsg)
                 elif str(self.project_type_selected) + ".sql" in file:
                     if log_files:
-                        self.controller.log_info(str(filedir + os.sep + str(self.project_type_selected) + '.sql'))
+                        tools_log.log_info(str(filedir + os.sep + str(self.project_type_selected) + '.sql'))
                     status = self.read_execute_file(filedir, os.sep + str(self.project_type_selected) + '.sql',
                         schema_name, self.project_epsg)
                 if not status and self.dev_commit == 'FALSE':
@@ -2375,7 +2375,7 @@ class GwAdmin:
                 if ".sql" in file:
                     if (no_ct is True and "tablect.sql" not in file) or no_ct is False:
                         if log_files:
-                            self.controller.log_info(str(filedir + os.sep + file))
+                            tools_log.log_info(str(filedir + os.sep + file))
                         status = self.read_execute_file(filedir, file, schema_name, self.project_epsg)
                         if not status and self.dev_commit == 'FALSE':
                             return False
@@ -2399,16 +2399,16 @@ class GwAdmin:
 
                 if status is False:
                     self.error_count = self.error_count + 1
-                    self.controller.log_info(str("read_execute_file error"), parameter=filepath)
-                    self.controller.log_info(str('Message: ' + str(self.controller.last_error)))
+                    tools_log.log_info(str("read_execute_file error"), parameter=filepath)
+                    tools_log.log_info(str('Message: ' + str(self.controller.last_error)))
                     if self.dev_commit == 'TRUE':
                         self.controller.dao.rollback()
                     return False
 
         except Exception as e:
             self.error_count = self.error_count + 1
-            self.controller.log_info(str("read_execute_file exception"), parameter=file)
-            self.controller.log_info(str(e))
+            tools_log.log_info(str("read_execute_file exception"), parameter=file)
+            tools_log.log_info(str(e))
             if self.dev_commit == 'TRUE':
                 self.controller.dao.rollback()
             status = False
@@ -2429,7 +2429,7 @@ class GwAdmin:
                 else:
                     return False
             except Exception as e:
-                self.controller.log_warning("Error readFiles: " + str(e))
+                tools_log.log_warning("Error readFiles: " + str(e))
                 return False
 
         return True
@@ -2619,7 +2619,7 @@ class GwAdmin:
             # Start read files
             qgis_files = sorted(os.listdir(self.folder_path))
             for file in qgis_files:
-                self.controller.log_info("Reading file", parameter=file)
+                tools_log.log_info("Reading file", parameter=file)
                 # Open file for read
                 f = open(self.folder_path + os.sep + file, 'r')
                 if f:
@@ -2628,12 +2628,12 @@ class GwAdmin:
                     # Replace into template text
                     for text_replace in self.text_replace_labels:
                         self.text_replace = self.dev_settings.value('text_replace/' + text_replace)
-                        self.controller.log_info("Replacing template text", parameter=self.text_replace[1])
+                        tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
                         f_to_read = re.sub(str(self.text_replace[0]), str(self.text_replace[1]), f_to_read)
 
                     for text_replace in self.xml_set_labels:
                         self.text_replace = self.dev_settings.value('xml_set/' + text_replace)
-                        self.controller.log_info("Replacing template text", parameter=self.text_replace[1])
+                        tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
                         f_to_read = re.sub(str(self.text_replace[0]), str(self.text_replace[1]), f_to_read)
 
                     # Close file

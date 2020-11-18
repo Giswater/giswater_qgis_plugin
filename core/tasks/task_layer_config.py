@@ -8,6 +8,8 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsTask
 
+from ...lib import tools_log
+
 
 class GwConfigLayerTask(QgsTask):
     """ This shows how to subclass QgsTask """
@@ -29,11 +31,11 @@ class GwConfigLayerTask(QgsTask):
 
     def run(self):
 
-        self.controller.log_info(f"Task started: {self.description()}")
+        tools_log.log_info(f"Task started: {self.description()}")
 
         self.setProgress(0)
         if self.get_layers:
-            # self.controller.log_info("get_layers_to_config")
+            # tools_log.log_info("get_layers_to_config")
             self.get_layers_to_config()
         self.set_layer_config(self.available_layers)
         self.setProgress(100)
@@ -44,18 +46,18 @@ class GwConfigLayerTask(QgsTask):
     def finished(self, result):
 
         if result:
-            self.controller.log_info(f"Task finished: {self.description()}")
+            tools_log.log_info(f"Task finished: {self.description()}")
             return
 
         if self.exception:
-            self.controller.log_info(f"Task aborted: {self.description()}")
-            self.controller.log_warning(f"Exception: {self.exception}")
+            tools_log.log_info(f"Task aborted: {self.description()}")
+            tools_log.log_warning(f"Exception: {self.exception}")
             raise self.exception
 
 
     def cancel(self):
 
-        self.controller.log_info(f"Task cancelled: {self.description()}")
+        tools_log.log_info(f"Task cancelled: {self.description()}")
         super().cancel()
 
 
@@ -108,7 +110,7 @@ class GwConfigLayerTask(QgsTask):
             At the moment manage:
                 Column names as alias, combos as ValueMap, typeahead as textedit"""
 
-        self.controller.log_info("Start set_layer_config")
+        tools_log.log_info("Start set_layer_config")
 
         msg_failed = ""
         msg_key = ""
@@ -133,15 +135,15 @@ class GwConfigLayerTask(QgsTask):
             if not complet_result  or complet_result['status'] == 'Failed':
                 continue
 
-            # self.controller.log_info(str(complet_result))
+            # tools_log.log_info(str(complet_result))
             if not 'body' in complet_result:
-                self.controller.log_info("Not 'body'")
+                tools_log.log_info("Not 'body'")
                 continue
             if not 'data' in complet_result['body']:
-                self.controller.log_info("Not 'data'")
+                tools_log.log_info("Not 'data'")
                 continue
 
-            # self.controller.log_info(complet_result['body']['data']['fields'])
+            # tools_log.log_info(complet_result['body']['data']['fields'])
             for field in complet_result['body']['data']['fields']:
                 valuemap_values = {}
 
@@ -213,7 +215,7 @@ class GwConfigLayerTask(QgsTask):
         if msg_key != "":
             self.controller.show_exceptions_msg("Key on returned json from ddbb is missed.", msg_key)
 
-        self.controller.log_info("Finish set_layer_config")
+        tools_log.log_info("Finish set_layer_config")
 
 
     def set_read_only(self, layer, field, field_index):
