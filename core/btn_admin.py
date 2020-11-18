@@ -399,7 +399,7 @@ class GwAdmin:
 
         if export_passwd:
             msg = "Credentials will be stored in GIS project file"
-            self.controller.show_info_box(msg, "Warning")
+            tools_qt.show_info_box(msg, "Warning")
 
         # Generate QGIS project
         self.generate_qgis_project(gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, sample)
@@ -434,7 +434,7 @@ class GwAdmin:
         schema_name = tools_qt.getWidgetText(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
             msg = "In order to create a qgis project you have to create a schema first ."
-            self.controller.show_info_box(msg)
+            tools_qt.show_info_box(msg)
             return
 
         # Create GIS project dialog
@@ -1444,19 +1444,19 @@ class GwAdmin:
         # Check if project name is valid
         if project_name == 'null':
             msg = "The 'Project_name' field is required."
-            self.controller.show_info_box(msg, "Info")
+            tools_qt.show_info_box(msg, "Info")
             return False
         elif any(c.isupper() for c in project_name) is True:
             msg = "The 'Project_name' field require only lower caracters"
-            self.controller.show_info_box(msg, "Info")
+            tools_qt.show_info_box(msg, "Info")
             return False
         elif (bool(re.match('^[a-z0-9_]*$', project_name))) is False:
             msg = "The 'Project_name' field have invalid character"
-            self.controller.show_info_box(msg, "Info")
+            tools_qt.show_info_box(msg, "Info")
             return False
         if project_descript == 'null':
             msg = "The 'Description' field is required."
-            self.controller.show_info_box(msg, "Info")
+            tools_qt.show_info_box(msg, "Info")
             return False
 
         # Check is project name already exists
@@ -1468,7 +1468,7 @@ class GwAdmin:
                 i = 0
                 msg = "This 'Project_name' is already exist. Do you want rename old schema to '" + str(
                     project_name) + "_bk_" + str(i) + "' ?"
-                result = self.controller.ask_question(msg, "Info")
+                result = tools_qt.ask_question(msg, "Info")
                 if result:
                     while available is False:
                         # TODO: Check this!
@@ -1477,7 +1477,7 @@ class GwAdmin:
                                str(project_name) + "_bk_" + str(i) == str(row[0]):
                                 msg = "This 'Project_name' is already exist. Do you want rename old schema to '" + str(
                                     project_name) + "_bk_" + str(i + 1) + "' ?"
-                                result = self.controller.ask_question(msg, "Info")
+                                result = tools_qt.ask_question(msg, "Info")
                                 i = i + 1
                             else:
                                 available = True
@@ -1532,14 +1532,14 @@ class GwAdmin:
             self.file_inp = tools_qt.getWidgetText(self.dlg_readsql_create_project, 'data_file')
             if self.file_inp is 'null':
                 msg = "The 'Path' field is required for Import INP data."
-                self.controller.show_info_box(msg, "Info")
+                tools_qt.show_info_box(msg, "Info")
                 return
 
         elif self.rdb_sample.isChecked() or self.rdb_sample_dev.isChecked():
             if self.locale != 'EN' or self.project_epsg != '25831':
                 msg = ("This functionality is only allowed with the locality 'EN' and SRID 25831."
                        "\nDo you want change it and continue?")
-                result = self.controller.ask_question(msg, "Info Message")
+                result = tools_qt.ask_question(msg, "Info Message")
                 if result:
                     self.project_epsg = '25831'
                     self.locale = 'EN'
@@ -1604,7 +1604,7 @@ class GwAdmin:
             tools_gw.set_parser_value('admin', 'create_schema_type', 'rdb_import_data')
             msg = ("The sql files have been correctly executed."
                    "\nNow, a form will be opened to manage the import inp.")
-            self.controller.show_info_box(msg, "Info")
+            tools_qt.show_info_box(msg, "Info")
             self.execute_import_data(schema_type=project_type)
             return
         elif self.rdb_sample.isChecked() and example_data:
@@ -1654,7 +1654,7 @@ class GwAdmin:
             self.schema = tools_qt.getWidgetText(self.dlg_readsql_rename, self.dlg_readsql_rename.schema_rename_copy)
             if str(self.schema) == str(schema):
                 msg = "Please, select a diferent project name than current."
-                self.controller.show_info_box(msg, "Info")
+                tools_qt.show_info_box(msg, "Info")
                 return
         else:
             close_dlg_rename = False
@@ -1665,7 +1665,7 @@ class GwAdmin:
         for row in rows:
             if str(self.schema) == str(row[0]):
                 msg = "This project name alredy exist."
-                self.controller.show_info_box(msg, "Info")
+                tools_qt.show_info_box(msg, "Info")
                 return
             else:
                 continue
@@ -1730,7 +1730,7 @@ class GwAdmin:
     def update(self, project_type):
 
         msg = "Are you sure to update the project schema to last version?"
-        result = self.controller.ask_question(msg, "Info")
+        result = tools_qt.ask_question(msg, "Info")
         if result:
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
@@ -2321,7 +2321,7 @@ class GwAdmin:
         # Open rename if schema is updated
         if str(self.plugin_version) != str(self.project_version):
             msg = "The schema version has to be updated to make rename"
-            self.controller.show_info_box(msg, "Info")
+            tools_qt.show_info_box(msg, "Info")
             return
 
         # Create dialog
@@ -2461,7 +2461,7 @@ class GwAdmin:
         for row in rows:
             if str(new_schema_name) == str(row[0]):
                 msg = "This project name alredy exist."
-                self.controller.show_info_box(msg, "Info")
+                tools_qt.show_info_box(msg, "Info")
                 return
             else:
                 continue
@@ -2498,17 +2498,17 @@ class GwAdmin:
         project_name = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         if project_name is None:
             msg = "Please, select a project to delete"
-            self.controller.show_info_box(msg, "Info")
+            tools_qt.show_info_box(msg, "Info")
             return
 
         msg = f"Are you sure you want delete schema '{project_name}' ?"
-        result = self.controller.ask_question(msg, "Info")
+        result = tools_qt.ask_question(msg, "Info")
         if result:
             sql = f'DROP SCHEMA {project_name} CASCADE;'
             status = self.controller.execute_sql(sql)
             if status:
                 msg = "Process finished successfully"
-                self.controller.show_info_box(msg, "Info", parameter="Delete schema")
+                tools_qt.show_info_box(msg, "Info", parameter="Delete schema")
                 self.populate_data_schema_name(self.cmb_project_type)
                 self.set_info_project()
 
@@ -2559,7 +2559,7 @@ class GwAdmin:
                 self.set_log_text(self.dlg_import_inp, complet_result[0]['body']['data'])
                 if  complet_result[0]['status'] == 'Failed':
                     msg = "The importation process have been failed"
-                    self.controller.show_info_box(msg, "Info")
+                    tools_qt.show_info_box(msg, "Info")
                     self.controller.dao.rollback()
                     self.error_count = 0
 
@@ -2576,7 +2576,7 @@ class GwAdmin:
 
         else:
             msg = "A rollback on schema will be done."
-            self.controller.show_info_box(msg, "Info")
+            tools_qt.show_info_box(msg, "Info")
             self.controller.dao.rollback()
             self.error_count = 0
 
@@ -2589,7 +2589,7 @@ class GwAdmin:
 
         msg = ("Warning: Are you sure to continue?. This button will update your plugin qgis templates file replacing "
                "all strings defined on the config/system.config file. Be sure your config file is OK before continue")
-        result = self.controller.ask_question(msg, "Info")
+        result = tools_qt.ask_question(msg, "Info")
         if result:
             # Get dev config file
             setting_file = os.path.join(self.plugin_dir, 'config', 'system.config')
@@ -2651,7 +2651,7 @@ class GwAdmin:
 
             # Finish proces
             msg = "The QGIS Projects templates was correctly created."
-            self.controller.show_info_box(msg, "Info")
+            tools_qt.show_info_box(msg, "Info")
 
 
     """ Import / Export UI and manage fields """
@@ -2666,7 +2666,7 @@ class GwAdmin:
         # Control if ui path is invalid or null
         if tpath in (None, 'null'):
             msg = "Please, select a valid UI Path."
-            self.controller.show_info_box(msg, "Info")
+            tools_qt.show_info_box(msg, "Info")
             return
 
         with open(str(tpath)) as f:
@@ -2695,7 +2695,7 @@ class GwAdmin:
         # Control if ui path is invalid or null
         if tpath is None or tpath == '' or tpath == 'null':
             msg = "Please, select a valid UI Path."
-            self.controller.show_info_box(msg, "Info")
+            tools_qt.show_info_box(msg, "Info")
             return
 
         # Export xml from database
@@ -2704,7 +2704,7 @@ class GwAdmin:
         status = self.controller.execute_sql(sql)
         if status is False:
             msg = "Process finished with some errors"
-            self.controller.show_info_box(msg, "Warning", parameter="Function import/export")
+            tools_qt.show_info_box(msg, "Warning", parameter="Function import/export")
             return
 
         # Populate UI file
@@ -2729,7 +2729,7 @@ class GwAdmin:
         del file_ui
         msg = ("Exported data into '" + str(tpath) + "' successfully."
                "\nDo you want to open the UI form?")
-        result = self.controller.ask_question(msg, "Info")
+        result = tools_qt.ask_question(msg, "Info")
         if result:
             opener = "C:\OSGeo4W64/bin/designer.exe"
             subprocess.Popen([opener, tpath])
@@ -3155,18 +3155,18 @@ class GwAdmin:
             if tools_qt.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id) is 'null' or \
                     tools_qt.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.label) is 'null':
                 msg = "Column_id and Label fields mandatory. Please set correctly value."
-                self.controller.show_info_box(msg, "Info")
+                tools_qt.show_info_box(msg, "Info")
                 return
 
             elif row is not None:
                 msg = "Column name already exists."
-                self.controller.show_info_box(msg, "Info")
+                tools_qt.show_info_box(msg, "Info")
                 return
 
             elif tools_qt.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.widgettype) == 'combo' and \
                     tools_qt.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.dv_querytext) in ('null', None):
                 msg = "Parameter 'Query text:' is mandatory for 'combo' widgets. Please set value."
-                self.controller.show_info_box(msg, "Info")
+                tools_qt.show_info_box(msg, "Info")
                 return
 
             list_widgets = self.dlg_manage_fields.tab_create.findChildren(QWidget)
@@ -3409,11 +3409,11 @@ class GwAdmin:
         if status:
             if msg_ok is None:
                 msg_ok = "Process finished successfully"
-            self.controller.show_info_box(msg_ok, "Info", parameter=parameter)
+            tools_qt.show_info_box(msg_ok, "Info", parameter=parameter)
         else:
             if msg_error is None:
                 msg_error = "Process finished with some errors"
-            self.controller.show_info_box(msg_error, "Warning", parameter=parameter)
+            tools_qt.show_info_box(msg_error, "Warning", parameter=parameter)
 
 
     def manage_json_message(self, json_result, parameter=None, title=None):
@@ -3449,7 +3449,7 @@ class GwAdmin:
             tools_qt.fill_combo_values(self.dlg_credentials.cmb_connection, self.list_connections, 1)
         else:
             msg = "You don't have any connection configurated on QGIS. Check your connections."
-            self.controller.show_info_box(msg, "Info")
+            tools_qt.show_info_box(msg, "Info")
             return
 
         tools_qt.setWidgetText(self.dlg_credentials, self.dlg_credentials.cmb_connection, str(set_connection))

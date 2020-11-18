@@ -138,7 +138,7 @@ class GwMincutManager:
 
         inf_text = inf_text[:-2]
         inf_text += "\n"
-        answer = self.controller.ask_question(str(inf_text))
+        answer = tools_qt.ask_question(str(inf_text))
         if answer:
             self.call_sms_script(qtable)
 
@@ -218,7 +218,7 @@ class GwMincutManager:
         list_id = list_id[:-2]
         message = "Are you sure you want to cancel these mincuts?"
         title = "Cancel mincuts"
-        answer = self.controller.ask_question(message, title, inf_text)
+        answer = tools_qt.ask_question(message, title, inf_text)
         if answer:
             sql = (f"UPDATE om_mincut SET mincut_state = 3 "
                    f" WHERE id::text IN ({list_id})")
@@ -412,7 +412,7 @@ class GwMincutManager:
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these mincuts?"
         title = "Delete mincut"
-        answer = self.controller.ask_question(message, title, inf_text)
+        answer = tools_qt.ask_question(message, title, inf_text)
         if answer:
             sql = (f"DELETE FROM {table_name}"
                    f" WHERE {column_id} IN ({list_id})")

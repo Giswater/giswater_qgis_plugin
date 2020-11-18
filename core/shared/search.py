@@ -723,7 +723,7 @@ class GwSearch:
         try:
             if os.path.exists(folder_path):
                 msg = "Are you sure you want to overwrite this file?"
-                answer = self.controller.ask_question(msg, "Overwrite")
+                answer = tools_qt.ask_question(msg, "Overwrite")
                 if answer:
                     self.write_to_csv(dialog, folder_path, all_rows)
             else:

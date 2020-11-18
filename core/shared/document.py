@@ -221,7 +221,7 @@ class GwDocument:
                 # Ask question before executing
                 msg = ("You have selected multiple documents. In this case, doc_id will be a sequencial number for "
                        "all selected documents and your doc_id won't be used.")
-                answer = self.controller.ask_question(msg, tools_gw.tr("Add document"))
+                answer = tools_qt.ask_question(msg, tools_gw.tr("Add document"))
                 if answer:
                     for file in self.files_path:
                         sql, doc_id = self.insert_doc_sql(doc_type, observ, date, file)
@@ -229,7 +229,7 @@ class GwDocument:
         # If document exists perform an UPDATE
         else:
             message = "Are you sure you want to update the data?"
-            answer = self.controller.ask_question(message)
+            answer = tools_qt.ask_question(message)
             if not answer:
                 return
             if len(self.files_path) <= 1:
@@ -240,7 +240,7 @@ class GwDocument:
                 # Ask question before executing
                 msg = ("You have selected multiple documents. In this case, doc_id will be a sequencial number for "
                        "all selected documents and your doc_id won't be used.")
-                answer = self.controller.ask_question(msg, tools_gw.tr("Add document"))
+                answer = tools_qt.ask_question(msg, tools_gw.tr("Add document"))
                 if answer:
                     for cont, file in enumerate(self.files_path):
                         if cont == 0:

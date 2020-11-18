@@ -1116,7 +1116,7 @@ class GwVisitManager:
 
         if not parameter_id or parameter_id == -1:
             message = "You need to select a valid parameter id"
-            self.controller.show_info_box(message)
+            tools_qt.show_info_box(message)
             return
 
         # get form associated
@@ -1140,7 +1140,7 @@ class GwVisitManager:
             self.dlg_event.position_value.setEnabled(True)
         else:
             message = "Unrecognised form type"
-            self.controller.show_info_box(message, parameter=form_type)
+            tools_qt.show_info_box(message, parameter=form_type)
             return
 
         # form_type event_ud_arc_rehabit dont have widget value
@@ -1335,7 +1335,7 @@ class GwVisitManager:
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            self.controller.show_info_box(message)
+            tools_qt.show_info_box(message)
             return
 
         list_values = ""
@@ -1355,7 +1355,7 @@ class GwVisitManager:
 
         message = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = self.controller.ask_question(message, title, list_values)
+        answer = tools_qt.ask_question(message, title, list_values)
         if answer:
             sql = (f"DELETE FROM om_visit_event_photo "
                    f"WHERE visit_id='{visit_id}' "
@@ -1383,7 +1383,7 @@ class GwVisitManager:
         self.files_all = []
         if not self.tbl_event.selectionModel().hasSelection():
             message = "Any record selected"
-            self.controller.show_info_box(message)
+            tools_qt.show_info_box(message)
             return
         # check a parameter_id is selected (can be that no value is available)
         parameter_id = tools_qt.get_combo_value(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 0)
@@ -1394,7 +1394,7 @@ class GwVisitManager:
         selected_list = self.tbl_event.selectionModel().selectedRows(0)
         if selected_list == 0:
             message = "Any record selected"
-            self.controller.show_info_box(message)
+            tools_qt.show_info_box(message)
             return
 
         elif len(selected_list) > 1:
@@ -1536,7 +1536,7 @@ class GwVisitManager:
 
         if not self.tbl_event.selectionModel().hasSelection():
             message = "Any record selected"
-            self.controller.show_info_box(message)
+            tools_qt.show_info_box(message)
             return
 
         # a fake event to get some ancyllary data
@@ -1565,7 +1565,7 @@ class GwVisitManager:
         if any_docs:
             message += "\nSome events have documents"
         title = "Delete records"
-        answer = self.controller.ask_question(message, title, list_id)
+        answer = tools_qt.ask_question(message, title, list_id)
         if not answer:
             return
 

@@ -145,7 +145,7 @@ class GwCSVButton(GwParentAction):
             if result['status'] == "Accepted":
                 tools_gw.populate_info_text(dialog, result['body']['data'])
             msg = result['message']['text']
-            self.controller.show_info_box(msg)
+            tools_qt.show_info_box(msg)
 
 
     def update_info(self, dialog):

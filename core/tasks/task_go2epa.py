@@ -14,7 +14,7 @@ from qgis.core import QgsTask
 
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_log
+from ...lib import tools_log, tools_qt
 
 
 class GwGo2EpaTask(QgsTask):
@@ -110,7 +110,7 @@ class GwGo2EpaTask(QgsTask):
             if self.common_msg != "":
                 tools_gw.show_info(self.common_msg)
             if self.message is not None:
-                self.controller.show_info_box(self.message)
+                tools_qt.show_info_box(self.message)
             self.go2epa.check_result_id()
             return
 
@@ -119,12 +119,12 @@ class GwGo2EpaTask(QgsTask):
 
         if self.error_msg:
             title = f"Task aborted - {self.description()}"
-            self.controller.show_info_box(self.error_msg, title=title)
+            tools_qt.show_info_box(self.error_msg, title=title)
             return
 
         if self.exception:
             title = f"Task aborted - {self.description()}"
-            self.controller.show_info_box(self.exception, title=title)
+            tools_qt.show_info_box(self.exception, title=title)
             raise self.exception
 
         # If Database exception, show dialog after task has finished

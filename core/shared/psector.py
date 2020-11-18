@@ -1251,7 +1251,7 @@ class GwPsector:
             if row is not None:
                 # if exist - show warning
                 message = "Id already selected"
-                self.controller.show_info_box(message, "Info", parameter=str(expl_id[i]))
+                tools_qt.show_info_box(message, "Info", parameter=str(expl_id[i]))
             else:
                 sql = (f"INSERT INTO {tableright}"
                        f" (psector_id, unit, price_id, descript, price) "
@@ -1423,7 +1423,7 @@ class GwPsector:
               "a process that updates the state & state_type values of all that features that belong to the psector, " \
               "according to the system variables plan_psector_statetype, " \
               "plan_statetype_planned and plan_statetype_ficticious, will be triggered."
-        self.controller.show_details(msg, 'Message warning')
+        tools_qt.show_details(msg, 'Message warning')
 
 
     def hilight_feature_by_id(self, qtable, layer_name, field_id, rubber_band, width, index):
@@ -1610,7 +1610,7 @@ class GwPsector:
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", inf_text)
+        answer = tools_qt.ask_question(message, "Delete records", inf_text)
 
         if answer:
             if is_price is True:

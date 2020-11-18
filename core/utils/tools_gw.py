@@ -1310,7 +1310,7 @@ def delete_selected_rows(widget, table_object):
     list_id = list_id[:-2]
     message = "Are you sure you want to delete these records?"
     title = "Delete records"
-    answer = global_vars.controller.ask_question(message, title, inf_text)
+    answer = tools_qt.ask_question(message, title, inf_text)
     if answer:
         sql = (f"DELETE FROM {table_object} "
                f"WHERE {field_object_id} IN ({list_id})")
@@ -2140,6 +2140,8 @@ def connect_to_database_credentials(credentials, conn_info=None, max_attempts=2)
             credentials['user'], credentials['password'], credentials['sslmode'])
 
     return logged, credentials
+
+
 
 # TODO tools_gw_log
 

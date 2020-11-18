@@ -272,12 +272,12 @@ class GwMincut:
         row = self.controller.get_row(sql)
         if not row or row[0] is None:
             text = "Nothing to show"
-            self.controller.show_info_box(str(text), "Sms info")
+            tools_qt.show_info_box(str(text), "Sms info")
             return
         text = ""
         for item in row[0]:
             text += f"SMS sended on date: {item['date']}, with code result: {item['code']} .\n"
-        self.controller.show_info_box(str(text), "Sms info")
+        tools_qt.show_info_box(str(text), "Sms info")
 
 
     def set_id_val(self):
@@ -880,7 +880,7 @@ class GwMincut:
                     # Add element
                     if connec_id in self.connec_list:
                         message = "Feature already in the list"
-                        self.controller.show_info_box(message, parameter=connec_id)
+                        tools_qt.show_info_box(message, parameter=connec_id)
                         return
                     else:
                         self.connec_list.append(connec_id)
@@ -1019,13 +1019,13 @@ class GwMincut:
         hydrometer_cc = tools_qt.getWidgetText(self.dlg_hydro, self.dlg_hydro.hydrometer_cc)
         if hydrometer_cc == "null":
             message = "You need to enter hydrometer_id"
-            self.controller.show_info_box(message)
+            tools_qt.show_info_box(message)
             return
 
         # Show message if element is already in the list
         if hydrometer_cc in self.hydro_list:
             message = "Selected element already in the list"
-            self.controller.show_info_box(message, parameter=hydrometer_cc)
+            tools_qt.show_info_box(message, parameter=hydrometer_cc)
             return
 
         # Check if hydrometer_id belongs to any 'connec_id'
@@ -1034,12 +1034,12 @@ class GwMincut:
         row = self.controller.get_row(sql, log_sql=False)
         if not row:
             message = "Selected hydrometer_id not found"
-            self.controller.show_info_box(message, parameter=hydrometer_cc)
+            tools_qt.show_info_box(message, parameter=hydrometer_cc)
             return
 
         if row[0] in self.hydro_list:
             message = "Selected element already in the list"
-            self.controller.show_info_box(message, parameter=hydrometer_cc)
+            tools_qt.show_info_box(message, parameter=hydrometer_cc)
             return
 
         # Set expression filter with 'hydro_list'
@@ -1168,7 +1168,7 @@ class GwMincut:
         customer_code = tools_qt.getWidgetText(self.dlg_connec, self.dlg_connec.connec_id)
         if customer_code == 'null':
             message = "You need to enter a customer code"
-            self.controller.show_info_box(message)
+            tools_qt.show_info_box(message)
             return
 
         connec_id = self.get_connec_id_from_customer_code(customer_code)
@@ -1189,7 +1189,7 @@ class GwMincut:
         # Show message if element is already in the list
         if connec_id in self.connec_list:
             message = "Selected element already in the list"
-            self.controller.show_info_box(message, parameter=connec_id)
+            tools_qt.show_info_box(message, parameter=connec_id)
             return
 
         # If feature id doesn't exist in list -> add
@@ -1231,7 +1231,7 @@ class GwMincut:
         row = self.controller.get_row(sql)
         if not row:
             message = "Any connec_id found with this customer_code"
-            self.controller.show_info_box(message, parameter=customer_code)
+            tools_qt.show_info_box(message, parameter=customer_code)
             return None
         else:
             return str(row[0])
@@ -1315,7 +1315,7 @@ class GwMincut:
         inf_text = inf_text[:-2]
         message = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = self.controller.ask_question(message, title, inf_text)
+        answer = tools_qt.ask_question(message, title, inf_text)
 
         if not answer:
             return
@@ -1367,7 +1367,7 @@ class GwMincut:
         inf_text = inf_text[:-2]
         message = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = self.controller.ask_question(message, title, inf_text)
+        answer = tools_qt.ask_question(message, title, inf_text)
 
         if not answer:
             return
@@ -1636,7 +1636,7 @@ class GwMincut:
         if 'mincutOverlap' in complet_result or complet_result['status'] == 'Accepted':
             if 'mincutOverlap' in complet_result and complet_result['mincutOverlap'] != "":
                 message = "Mincut done, but has conflict and overlaps with"
-                self.controller.show_info_box(message, parameter=complet_result['mincutOverlap'])
+                tools_qt.show_info_box(message, parameter=complet_result['mincutOverlap'])
             else:
                 message = "Mincut done successfully"
                 tools_gw.show_info(message)

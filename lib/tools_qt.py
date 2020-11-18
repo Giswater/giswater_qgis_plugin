@@ -13,7 +13,7 @@ from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator, QStanda
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, \
     QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, QPlainTextEdit, \
-    QRadioButton, QSizePolicy, QSpacerItem, QFileDialog, QGroupBox
+    QRadioButton, QSizePolicy, QSpacerItem, QFileDialog, QGroupBox, QMessageBox
 
 import os
 import operator
@@ -25,7 +25,7 @@ from functools import partial
 
 from .. import global_vars
 from ..core.utils import tools_gw
-from . import tools_qgis, tools_log
+from . import tools_qgis, tools_log, tools_os
 
 
 class GwExtendedQLabel(QLabel):
@@ -759,7 +759,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
 
     if len(selected_list) == 0:
         message = "Any record selected"
-        global_vars.controller.show_info_box(message)
+        show_info_box(message)
         return
 
     if query:
@@ -784,7 +784,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
     list_id = list_id[:-2]
     message = "Are you sure you want to delete these records?"
     title = "Delete records"
-    answer = global_vars.controller.ask_question(message, title, inf_text)
+    answer = ask_question(message, title, inf_text)
     if answer:
         for el in del_id:
             ids.remove(el)
@@ -1047,7 +1047,7 @@ def multi_rows_delete(widget, table_name, column_id):
     list_id = list_id[:-2]
     message = "Are you sure you want to delete these records?"
     title = "Delete records"
-    answer = global_vars.controller.ask_question(message, title, inf_text)
+    answer = ask_question(message, title, inf_text)
     if answer:
         sql = f"DELETE FROM {table_name}"
         sql += f" WHERE {column_id} IN ({list_id})"
@@ -1173,7 +1173,7 @@ def document_open(qtable):
     selected_list = qtable.selectionModel().selectedRows(field_index)
     if not selected_list:
         message = "Any record selected"
-        global_vars.controller.show_info_box(message)
+        show_info_box(message)
         return
     elif len(selected_list) > 1:
         message = "More then one document selected. Select just one document."
@@ -1200,7 +1200,7 @@ def document_delete(qtable, tablename):
     selected_list = qtable.selectionModel().selectedRows(0)
     if len(selected_list) == 0:
         message = "Any record selected"
-        global_vars.controller.show_info_box(message)
+        show_info_box(message)
         return
 
     selected_id = []
@@ -1209,7 +1209,7 @@ def document_delete(qtable, tablename):
         selected_id.append(str(doc_id))
     message = "Are you sure you want to delete these records?"
     title = "Delete records"
-    answer = global_vars.controller.ask_question(message, title, ','.join(selected_id))
+    answer = ask_question(message, title, ','.join(selected_id))
     if answer:
         sql = (f"DELETE FROM {tablename}"
                f" WHERE id IN ({','.join(selected_id)})")
@@ -1559,3 +1559,93 @@ def get_feature_by_id(layer, id, field_id=None):
             if feature[field_id] == id:
                 return feature
     return False
+
+
+def show_warning_detail(text, detail_text, context_name=None):
+    """ Show warning message with a button to show more details """
+
+    inf_text = "Press 'Show Me' button to get more details..."
+    widget = global_vars.iface.messageBar().createMessage(tools_gw.tr(text, context_name), tools_gw.tr(inf_text))
+    button = QPushButton(widget)
+    button.setText(tools_gw.tr("Show Me"))
+    button.clicked.connect(partial(show_details, detail_text, tools_gw.tr('Warning details')))
+    widget.layout().addWidget(button)
+    global_vars.iface.messageBar().pushWidget(widget, 1)
+
+    if global_vars.logger:
+        global_vars.logger.warning(text + "\n" + detail_text)
+
+
+def show_details(detail_text, title=None, inf_text=None):
+    """ Shows a message box with detail information """
+
+    global_vars.iface.messageBar().clearWidgets()
+    msg_box = QMessageBox()
+    msg_box.setText(detail_text)
+    if title:
+        title = tools_gw.tr(title)
+        msg_box.setWindowTitle(title)
+    if inf_text:
+        inf_text = tools_gw.tr(inf_text)
+        msg_box.setInformativeText(inf_text)
+    msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
+    msg_box.setStandardButtons(QMessageBox.Ok)
+    msg_box.setDefaultButton(QMessageBox.Ok)
+    msg_box.exec_()
+
+
+def show_warning_open_file(text, inf_text, file_path, context_name=None):
+    """ Show warning message with a button to open @file_path """
+
+    widget = global_vars.iface.messageBar().createMessage(tools_gw.tr(text, context_name), tools_gw.tr(inf_text))
+    button = QPushButton(widget)
+    button.setText(tools_gw.tr("Open file"))
+    button.clicked.connect(partial(tools_os.open_file, file_path))
+    widget.layout().addWidget(button)
+    global_vars.iface.messageBar().pushWidget(widget, 1)
+
+
+def ask_question(text, title=None, inf_text=None, context_name=None, parameter=None):
+    """ Ask question to the user """
+
+    msg_box = QMessageBox()
+    msg = tools_gw.tr(text, context_name)
+    if parameter:
+        msg += ": " + str(parameter)
+    msg_box.setText(msg)
+    if title:
+        title = tools_gw.tr(title, context_name)
+        msg_box.setWindowTitle(title)
+    if inf_text:
+        inf_text = tools_gw.tr(inf_text, context_name)
+        msg_box.setInformativeText(inf_text)
+    msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
+    msg_box.setDefaultButton(QMessageBox.Ok)
+    msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
+    ret = msg_box.exec_()
+    if ret == QMessageBox.Ok:
+        return True
+    elif ret == QMessageBox.Discard:
+        return False
+
+
+def show_info_box(text, title=None, inf_text=None, context_name=None, parameter=None):
+    """ Show information box to the user """
+
+    msg = ""
+    if text:
+        msg = tools_gw.tr(text, context_name)
+        if parameter:
+            msg += ": " + str(parameter)
+
+    msg_box = QMessageBox()
+    msg_box.setText(msg)
+    msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
+    if title:
+        title = tools_gw.tr(title, context_name)
+        msg_box.setWindowTitle(title)
+    if inf_text:
+        inf_text = tools_gw.tr(inf_text, context_name)
+        msg_box.setInformativeText(inf_text)
+    msg_box.setDefaultButton(QMessageBox.No)
+    msg_box.exec_()

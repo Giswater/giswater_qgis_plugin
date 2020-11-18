@@ -128,7 +128,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         feature_type = tools_qt.getWidgetText(self.dlg_replace, self.dlg_replace.feature_type_new)
         if feature_type is 'null':
             msg = "New feature type is null. Please, select a valid value."
-            self.controller.show_info_box(msg, "Info")
+            tools_qt.show_info_box(msg, "Info")
             return
 
         sql = f"SELECT lower(feature_type) FROM cat_feature WHERE id = '{feature_type}'"
@@ -214,7 +214,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             values = values[:-2]
             if cat_work_id == 'null':
                 msg = "Work_id field is empty"
-                self.controller.show_info_box(msg, "Warning")
+                tools_qt.show_info_box(msg, "Warning")
             else:
                 # Check if this element already exists
                 sql = (f"SELECT DISTINCT(id) "
@@ -235,7 +235,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                     tools_gw.close_dialog(self.dlg_new_workcat)
                 else:
                     msg = "This Workcat is already exist"
-                    self.controller.show_info_box(msg, "Warning")
+                    tools_qt.show_info_box(msg, "Warning")
 
 
     def get_values(self, dialog):
@@ -254,7 +254,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
         # Ask question before executing
         message = "Are you sure you want to replace selected feature with a new one?"
-        answer = self.controller.ask_question(message, "Replace feature")
+        answer = tools_qt.ask_question(message, "Replace feature")
         if answer:
 
             # Get function input parameters

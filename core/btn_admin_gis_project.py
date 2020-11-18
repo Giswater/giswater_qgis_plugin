@@ -12,7 +12,7 @@ import shutil
 import sqlite3
 
 from .utils import tools_gw
-from ..lib import tools_log
+from ..lib import tools_log, tools_qt
 
 
 class GwAdminGisProject:
@@ -81,7 +81,7 @@ class GwAdminGisProject:
         qgs_path = folder_path + os.sep + filename + "." + gis_extension
         if os.path.exists(qgs_path):
             message = "Do you want to overwrite file?"
-            answer = self.controller.ask_question(message, "overwrite file")
+            answer = tools_qt.ask_question(message, "overwrite file")
             if not answer:
                 return False, qgs_path
 
@@ -126,7 +126,7 @@ class GwAdminGisProject:
                 f.write(content)
             tools_gw.show_info("GIS file generated successfully", parameter=qgs_path)
             message = "Do you want to open GIS project?"
-            answer = self.controller.ask_question(message, "GIS file generated successfully")
+            answer = tools_qt.ask_question(message, "GIS file generated successfully")
             if answer:
                 return True, qgs_path
             return False, qgs_path

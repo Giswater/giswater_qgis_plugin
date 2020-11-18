@@ -747,7 +747,7 @@ class GwInfo(QObject):
                 text = tools_qt.getWidgetText(self.dlg_cf, widget, False, False)
                 if text:
                     msg = "Do you want to overwrite custom values?"
-                    answer = global_vars.controller.ask_question(msg, "Overwrite values")
+                    answer = tools_qt.ask_question(msg, "Overwrite values")
                     if answer:
                         self.set_values(dlg_dtext)
                     break
@@ -984,7 +984,7 @@ class GwInfo(QObject):
             msg += f"{fields_aux[i]}: {snapped_feature_attr_aux[i]}\n"
 
         # Ask confirmation question showing fields that will be copied
-        answer = global_vars.controller.ask_question(msg, "Update records", None)
+        answer = tools_qt.ask_question(msg, "Update records", None)
         if answer:
             for i in range(0, len(fields)):
                 for x in range(0, len(fields_aux)):
@@ -1190,7 +1190,7 @@ class GwInfo(QObject):
     def ask_for_save(self, action_edit, fid):
 
         msg = 'Are you sure to save this feature?'
-        answer = self.controller.ask_question(msg, "Save feature", None, parameter=fid)
+        answer = tools_qt.ask_question(msg, "Save feature", None, parameter=fid)
         if not answer:
             tools_qt.check_actions(action_edit, True)
             return False
@@ -2022,7 +2022,7 @@ class GwInfo(QObject):
         list_object_id = list_object_id[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", list_object_id)
+        answer = tools_qt.ask_question(message, "Delete records", list_object_id)
         if answer:
             sql = ("DELETE FROM " + table_name + ""
                    " WHERE id::integer IN (" + list_id + ")")
@@ -3222,7 +3222,7 @@ class GwInfo(QObject):
             values = values[:-2]
             if cat_work_id == 'null':
                 msg = "El campo Work id esta vacio"
-                self.controller.show_info_box(msg, "Warning")
+                tools_qt.show_info_box(msg, "Warning")
             else:
                 # Check if this element already exists
                 sql = (f"SELECT DISTINCT(id)"
@@ -3244,7 +3244,7 @@ class GwInfo(QObject):
                     tools_gw.close_dialog(dialog)
                 else:
                     msg = "This workcat already exists"
-                    self.controller.show_info_box(msg, "Warning")
+                    tools_qt.show_info_box(msg, "Warning")
 
 
     def cf_open_dialog(self, dlg=None, dlg_name='giswater', maximize_button=True, stay_on_top=True):

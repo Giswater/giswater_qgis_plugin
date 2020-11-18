@@ -392,7 +392,7 @@ class GwEndFeatureButton(GwParentAction):
 
         message = "Are you sure you want to disconnect this elements?"
         title = "Disconnect elements"
-        answer = self.controller.ask_question(message, title)
+        answer = tools_qt.ask_question(message, title)
         if not answer:
             return
 
@@ -488,7 +488,7 @@ class GwEndFeatureButton(GwParentAction):
                 ids_ = ids_[:-2]
                 if show_warning and len(ids_) != 0:
                     msg = 'These items could not be downgrade to state 0'
-                    self.controller.show_info_box(msg, title="Warning", inf_text=str(ids_))
+                    tools_qt.show_info_box(msg, title="Warning", inf_text=str(ids_))
                 sql = ("DELETE FROM audit_log_data "
                        "WHERE fid = 128 AND cur_user = current_user")
                 self.controller.execute_sql(sql)
@@ -553,7 +553,7 @@ class GwEndFeatureButton(GwParentAction):
         values = values[:-2]
         if cat_work_id == 'null':
             msg = "Work_id field is empty"
-            self.controller.show_info_box(msg, "Warning")
+            tools_qt.show_info_box(msg, "Warning")
         else:
             # Check if this element already exists
             sql = (f"SELECT DISTINCT(id)"
@@ -574,5 +574,5 @@ class GwEndFeatureButton(GwParentAction):
 
             else:
                 msg = "This Workcat already exist"
-                self.controller.show_info_box(msg, "Warning")
+                tools_qt.show_info_box(msg, "Warning")
 

@@ -14,7 +14,7 @@ from qgis.core import QgsVectorLayer, QgsRectangle
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import DialogTextUi
 from ...utils import tools_gw
-from ....lib import tools_qgis
+from ....lib import tools_qgis, tools_qt
 
 
 class GwConnectLinkButton(GwParentMapTool):
@@ -117,7 +117,7 @@ class GwConnectLinkButton(GwParentMapTool):
             if number_features > 0:
                 message = "Number of features selected in the group of"
                 title = "Interpolate value - Do you want to update values"
-                answer = self.controller.ask_question(message, title, parameter='connec: ' + str(number_features))
+                answer = tools_qt.ask_question(message, title, parameter='connec: ' + str(number_features))
                 if answer:
                     # Create link
                     self.link_selected_features('connec', layer)
@@ -132,7 +132,7 @@ class GwConnectLinkButton(GwParentMapTool):
                 if number_features > 0:
                     message = "Number of features selected in the group of"
                     title = "Interpolate value - Do you want to update values"
-                    answer = self.controller.ask_question(message, title, parameter='gully: ' + str(number_features))
+                    answer = tools_qt.ask_question(message, title, parameter='gully: ' + str(number_features))
                     if answer:
                         # Create link
                         self.link_selected_features('gully', layer)

@@ -404,7 +404,7 @@ class GwElement:
         # If object already exist perform an UPDATE
         else:
             message = "Are you sure you want to update the data?"
-            answer = self.controller.ask_question(message)
+            answer = tools_qt.ask_question(message)
             if not answer:
                 return
             sql = (f"UPDATE element"

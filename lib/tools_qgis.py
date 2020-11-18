@@ -18,7 +18,7 @@ from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QPixmap
-from qgis.PyQt.QtWidgets import QDockWidget, QApplication
+from qgis.PyQt.QtWidgets import QDockWidget, QApplication, QPushButton
 
 from . import tools_qt, tools_log
 from .. import global_vars
@@ -593,7 +593,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
 
     if feature_id == 'null':
         message = "You need to enter a feature id"
-        global_vars.controller.show_info_box(message)
+        tools_qt.show_info_box(message)
         return
 
     # Iterate over all layers of the group

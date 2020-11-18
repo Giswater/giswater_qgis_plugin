@@ -131,7 +131,7 @@ class GwI18NGenerator:
         # Check if file exist
         if os.path.exists(ts_path):
             msg = "Are you sure you want to overwrite this file?"
-            answer = self.controller.ask_question(msg, "Overwrite", parameter=f"\n\n{ts_path}")
+            answer = tools_qt.ask_question(msg, "Overwrite", parameter=f"\n\n{ts_path}")
             if not answer:
                 return None
         ts_file = open(ts_path, "w")
@@ -256,7 +256,7 @@ class GwI18NGenerator:
         # Check if file exist
         if os.path.exists(cfg_path + file_name):
             msg = "Are you sure you want to overwrite this file?"
-            answer = self.controller.ask_question(msg, "Overwrite", parameter=f"\n\n{cfg_path}{file_name}")
+            answer = tools_qt.ask_question(msg, "Overwrite", parameter=f"\n\n{cfg_path}{file_name}")
             if not answer:
                 return
         else:

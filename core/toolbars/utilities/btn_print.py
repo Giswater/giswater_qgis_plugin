@@ -39,7 +39,7 @@ class GwPrintButton(GwParentAction):
         composers_list = self.get_composer()
         if composers_list == '"{}"':
             msg = "No composers found."
-            self.controller.show_info_box(msg, "Info")
+            tools_qt.show_info_box(msg, "Info")
             return
 
         self.initial_rotation = self.iface.mapCanvas().rotation()

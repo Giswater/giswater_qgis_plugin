@@ -134,7 +134,7 @@ class GwGo2Epa:
 
         if not export_checked and not exec_checked and not import_result_checked:
             msg = "You need to select at least one process"
-            self.controller.show_info_box(msg, title="Go2Epa")
+            tools_qt.show_info_box(msg, title="Go2Epa")
             return False
 
         # Control export INP
@@ -165,7 +165,7 @@ class GwGo2Epa:
         if result_name == '':
             self.dlg_go2epa.txt_result_name.setStyleSheet("border: 1px solid red")
             msg = "This parameter is mandatory. Please, set a value"
-            self.controller.show_details(msg, title="Rpt fail", inf_text=None)
+            tools_qt.show_details(msg, title="Rpt fail", inf_text=None)
             return False
 
         sql = (f"SELECT result_id FROM rpt_cat_result "
@@ -173,7 +173,7 @@ class GwGo2Epa:
         row = self.controller.get_row(sql)
         if row:
             msg = "Result name already exists, do you want overwrite?"
-            answer = self.controller.ask_question(msg, title="Alert")
+            answer = tools_qt.ask_question(msg, title="Alert")
             if not answer:
                 return False
 
@@ -402,7 +402,7 @@ class GwGo2Epa:
             row = self.controller.get_row(sql)
             if row is None:
                 msg = "You need to select some sector"
-                self.controller.show_info_box(msg)
+                tools_qt.show_info_box(msg)
                 return
 
         # Set background task 'Go2Epa'
@@ -657,7 +657,7 @@ class GwGo2Epa:
             if row:
                 # if exist - show warning
                 message = "Id already selected"
-                global_vars.controller.show_info_box(message, "Info", parameter=str(expl_id[i]))
+                tools_qt.show_info_box(message, "Info", parameter=str(expl_id[i]))
             else:
                 sql = (f"INSERT INTO {tablename_des} ({field_id}, cur_user) "
                        f" VALUES ({expl_id[i]}, current_user)")

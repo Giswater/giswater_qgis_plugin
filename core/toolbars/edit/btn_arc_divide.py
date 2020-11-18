@@ -12,6 +12,7 @@ from qgis.gui import QgsVertexMarker
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import DialogTextUi
 from ...utils import tools_gw
+from ....lib import tools_qt
 from .... import global_vars
 
 
@@ -222,7 +223,7 @@ class GwArcDivideButton(GwParentMapTool):
                            "Please ensure that features has no undelete value on true.\n"
                            "On the other hand you must know that traceability table will storage precedent information.")
                 title = "Info"
-                answer = self.controller.ask_question(message, title)
+                answer = tools_qt.ask_question(message, title)
                 if answer:
                     self.move_node(node_id, point)
                     self.controller.set_layer_index('v_edit_arc')
