@@ -24,7 +24,7 @@ import sys
 
 from .. import global_vars
 from ..core.ui.ui_manager import DialogTextUi, DockerUi
-from ..lib import tools_os, tools_qt, tools_qgis
+from ..lib import tools_os, tools_qt, tools_qgis, tools_config
 from ..core.utils import tools_gw
 from ..lib.tools_pgdao import PgDao
 from ..lib.tools_log import Logger
@@ -117,17 +117,6 @@ class DaoController:
             del self.logger
 
 
-    def plugin_settings_value(self, key, default_value=""):
-
-        key = self.plugin_name + "/" + key
-        value = self.qgis_settings.value(key, default_value)
-        return value
-
-
-    def plugin_settings_set_value(self, key, value):
-        self.qgis_settings.setValue(self.plugin_name + "/" + key, value)
-
-
     def set_database_connection(self):
         """ Set database connection """
 
@@ -149,45 +138,6 @@ class DaoController:
         self.logged = True
 
         return True, not_version
-
-
-    def check_user_settings(self, parameter, value=None, section='system'):
-        """ Check if @section and @parameter exists in user settings file. If not add them with @value """
-
-        # Check if @section exists
-        if not self.user_settings.has_section(section):
-            self.user_settings.add_section(section)
-            self.user_settings.set(section, parameter, value)
-            self.save_user_settings()
-
-        # Check if @parameter exists
-        if not self.user_settings.has_option(section, parameter):
-            self.user_settings.set(section, parameter, value)
-            self.save_user_settings()
-
-
-    def get_user_setting_value(self, parameter, default_value=None, section='system'):
-        """ Get value from user settings file of selected @parameter located in @section """
-
-        value = default_value
-        if self.user_settings is None:
-            return value
-
-        self.check_user_settings(parameter, value)
-        value = self.user_settings.get(section, parameter).lower()
-
-        return value
-
-
-    def set_user_settings_value(self, parameter, value, section='system'):
-        """ Set @value from user settings file of selected @parameter located in @section """
-
-        if self.user_settings is None:
-            return value
-
-        self.check_user_settings(parameter, value)
-        self.user_settings.set(section, parameter, value)
-        self.save_user_settings()
 
 
     def save_user_settings(self):
@@ -239,7 +189,7 @@ class DaoController:
 
         # Get sslmode from user config file
         self.manage_user_config_file()
-        sslmode = self.get_user_setting_value('sslmode', 'disable')
+        sslmode = tools_config.get_user_setting_value('sslmode', 'disable')
         # self.log_info(f"sslmode user config file: {sslmode}")
 
         credentials = None
@@ -1727,7 +1677,7 @@ class DaoController:
         self.show_docker = True
         if docker_param == 'qgis_main_docker':
             # Show 'main dialog' in docker depending its value in user settings
-            self.qgis_main_docker = self.get_user_setting_value(docker_param, 'true')
+            self.qgis_main_docker = tools_config.get_user_setting_value(docker_param, 'true')
             value = self.qgis_main_docker.lower()
         else:
             # Show info or form in docker?

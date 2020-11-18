@@ -27,7 +27,7 @@ from functools import partial
 from time import sleep
 
 from .. import global_vars
-from ..lib import tools_qt
+from ..lib import tools_qt, tools_qgis
 from .btn_admin_gis_project import GwAdminGisProject
 from .tasks.parent_task import GwTask
 from ..i18n.i18n_generator import GwI18NGenerator
@@ -122,7 +122,7 @@ class GwAdmin:
             self.super_users.append(str(super_user))
 
         # Get locale of QGIS application
-        self.locale = self.controller.plugin_settings_value('locale/userLocale', 'en_us').lower()
+        self.locale = tools_qgis.plugin_settings_value('locale/userLocale', 'en_us').lower()
         if self.locale == 'es_es':
             self.locale = 'ES'
         elif self.locale == 'es_ca':

@@ -27,6 +27,9 @@ action_select_plot = None
 srid = None
 logger = None
 
+# TODO: Temporal variables? Create and move into new file?
+user_settings = None
+user_settings_path = None
 
 def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name):
 
@@ -52,16 +55,16 @@ def init_qgis_settings(p_plugin_name):
     qgis_settings.setIniCodec(sys.getfilesystemencoding())
 
 
-def plugin_settings_set_value(key, value):
-
-    global plugin_name
-    qgis_settings.setValue(plugin_name + "/" + key, value)
-
-
-def plugin_settings_value(key, default_value=""):
-
-    global plugin_name, qgis_settings
-    key = plugin_name + "/" + key
-    value = qgis_settings.value(key, default_value)
-    return value
+# def plugin_settings_set_value(key, value):
+#
+#     global plugin_name
+#     qgis_settings.setValue(plugin_name + "/" + key, value)
+#
+#
+# def plugin_settings_value(key, default_value=""):
+#
+#     global plugin_name, qgis_settings
+#     key = plugin_name + "/" + key
+#     value = qgis_settings.value(key, default_value)
+#     return value
 

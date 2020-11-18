@@ -933,3 +933,14 @@ def remove_layer_from_toc(layer_name, group_name):
             if not layers:
                 root.removeChildNode(group)
         remove_layer_from_toc(layer_name, group_name)
+
+
+def plugin_settings_value(key, default_value=""):
+
+    key = global_vars.plugin_name + "/" + key
+    value = global_vars.qgis_settings.value(key, default_value)
+    return value
+
+
+def plugin_settings_set_value(key, value):
+    global_vars.qgis_settings.setValue(global_vars.plugin_name + "/" + key, value)

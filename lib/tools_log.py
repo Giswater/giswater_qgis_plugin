@@ -10,6 +10,8 @@ import inspect
 import os
 import time
 
+from .. import global_vars
+
 class Logger(object):
 
     def __init__(self, controller, log_name, log_level, log_suffix, folder_has_tstamp=False, file_has_tstamp=True,
@@ -115,4 +117,3 @@ class Logger(object):
         self.log(msg, logging.CRITICAL, stack_level + stack_level_increase + 1)
         if sum_error:
             self.num_errors += 1
-

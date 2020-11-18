@@ -14,6 +14,7 @@ from functools import partial
 from .. import global_vars
 
 from .utils import tools_gw
+from ..lib import tools_qgis
 from .ui.ui_manager import ProjectCheckUi
 from ..lib.tools_qt import hide_void_groupbox
 
@@ -71,11 +72,11 @@ class GwProjectCheck:
         """ Execute function 'gw_fct_setcheckproject' """
 
         # get project variables
-        add_schema = self.controller.plugin_settings_value('gwAddSchema')
-        main_schema = self.controller.plugin_settings_value('gwMainSchema')
-        project_role = self.controller.plugin_settings_value('gwProjecRole')
-        info_type = self.controller.plugin_settings_value('gwInfoType')
-        project_type = self.controller.plugin_settings_value('gwProjectType')
+        add_schema = tools_qgis.plugin_settings_value('gwAddSchema')
+        main_schema = tools_qgis.plugin_settings_value('gwMainSchema')
+        project_role = tools_qgis.plugin_settings_value('gwProjecRole')
+        info_type = tools_qgis.plugin_settings_value('gwInfoType')
+        project_type = tools_qgis.plugin_settings_value('gwProjectType')
 
         version = tools_gw.get_plugin_version()
         extras = f'"version":"{version}"'

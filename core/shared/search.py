@@ -26,7 +26,7 @@ from .visit_manager import GwVisitManager
 from ..ui.ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_db, tools_qgis, tools_qt
+from ...lib import tools_db, tools_qgis, tools_qt, tools_config
 
 
 class GwSearch:
@@ -61,14 +61,14 @@ class GwSearch:
 
     def api_search(self, dlg_mincut=None, load_project=False):
         # If search is open, dont let user open another one
-        open_search = self.controller.get_user_setting_value('open_search', 'false')
+        open_search = tools_config.get_user_setting_value('open_search', 'false')
         if open_search in ("True", "true", True) and dlg_mincut is None and load_project is False:
             return
 
         form = ""
         if self.dlg_search is None and dlg_mincut is None:
             self.init_dialog()
-            self.controller.set_user_settings_value('open_search', 'true')
+            tools_config.set_user_settings_value('open_search', 'true')
 
         if dlg_mincut:
             self.dlg_search = dlg_mincut
@@ -140,7 +140,7 @@ class GwSearch:
     def close_search(self):
 
         self.dlg_search = None
-        self.controller.set_user_settings_value('open_search', 'false')
+        tools_config.set_user_settings_value('open_search', 'false')
 
 
     def set_typeahead_completer(self, widget, completer=None):
@@ -322,7 +322,7 @@ class GwSearch:
             if str(value) == '':
                 return
 
-            qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+            qgis_project_add_schema = tools_qgis.plugin_settings_value('gwAddSchema')
             extras_search += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}, '
             extras_search += f'"addSchema":"{qgis_project_add_schema}"'
             extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
@@ -423,7 +423,7 @@ class GwSearch:
     def open_hydrometer_dialog(self, table_name=None, feature_id=None):
 
         # get sys variale
-        qgis_project_infotype = self.controller.plugin_settings_value('infoType')
+        qgis_project_infotype = tools_qgis.plugin_settings_value('infoType')
 
         feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
         extras = f'"infoType":"{qgis_project_infotype}"'
@@ -572,7 +572,7 @@ class GwSearch:
 
     def restore_selectors(self, current_selectors):
         """ Restore selector_expl and selector_state to how the user had it """
-        qgis_project_add_schema = self.controller.plugin_settings_value('gwAddSchema')
+        qgis_project_add_schema = tools_qgis.plugin_settings_value('gwAddSchema')
         for form_tab in current_selectors['body']['form']['formTabs']:
             if form_tab['tableName'] not in ('selector_expl', 'selector_state'):
                 continue

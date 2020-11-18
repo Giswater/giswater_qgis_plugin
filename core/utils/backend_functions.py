@@ -49,7 +49,7 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
     :return:
     """
 
-    srid = global_vars.controller.plugin_settings_value('srid')
+    srid = tools_qgis.plugin_settings_value('srid')
     # Block the signals so that the window does not appear asking for crs / srid and / or alert message
     global_vars.iface.mainWindow().blockSignals(True)
     dialog.txt_infolog.clear()
@@ -229,7 +229,7 @@ class GwInfoTools:
                 continue
 
             # Get sys variale
-            self.qgis_project_infotype = self.controller.plugin_settings_value('infoType')
+            self.qgis_project_infotype = tools_qgis.plugin_settings_value('infoType')
 
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'

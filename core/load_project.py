@@ -20,7 +20,7 @@ from .utils.backend_functions import GwInfoTools
 from .utils.notify import GwNotifyTools
 from .shared.search import GwSearch
 from .utils import tools_gw
-from ..lib import tools_qgis
+from ..lib import tools_qgis, tools_config
 from .toolbars import buttons
 
 
@@ -119,7 +119,7 @@ class LoadProject(QObject):
             self.notify.start_listening(list_channels)
 
         # Open automatically 'search docker' depending its value in user settings
-        open_search = self.controller.get_user_setting_value('open_search', 'true')
+        open_search = tools_config.get_user_setting_value('open_search', 'true')
         if open_search == 'true':
             GwSearch().api_search(load_project=True)
 
