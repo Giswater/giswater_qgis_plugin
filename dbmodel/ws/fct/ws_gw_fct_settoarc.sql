@@ -57,10 +57,10 @@ BEGIN
 
     v_feature_type := json_extract_path_text (p_data,'feature','featureType')::text;
     v_feature_id:= json_extract_path_text (p_data,'feature','id')::text;
-    v_arc_id:= json_extract_path_text (p_data,'data','parameters','arcId')::text;
-    v_dma_id:= json_extract_path_text (p_data,'data','parameters','dmaId')::text;
-    v_presszone_id:= json_extract_path_text (p_data,'data','parameters','presszoneId')::text;
-    v_dqa_id:= json_extract_path_text (p_data,'data','parameters','presszoneId')::text;
+    v_arc_id:= json_extract_path_text (p_data,'data','arcId')::text;
+    v_dma_id:= json_extract_path_text (p_data,'data','dmaId')::text;
+    v_presszone_id:= json_extract_path_text (p_data,'data','presszoneId')::text;
+    v_dqa_id:= json_extract_path_text (p_data,'data','presszoneId')::text;
 
     SELECT upper(type), upper(graf_delimiter)  INTO v_systype, v_grafdelim FROM cat_feature_node WHERE id = v_feature_type;
     SELECT upper(epa_type) INTO v_epatype FROM node WHERE node_id = v_feature_id;
