@@ -1226,6 +1226,7 @@ class DaoController:
         try:
             # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
             pos = int(tools_gw.get_parser_value('docker_info', 'position'))
+            self.dlg_docker.position = 2
             if pos in (1, 2, 4, 8):
                 self.dlg_docker.position = pos
         except:
