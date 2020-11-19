@@ -31,12 +31,12 @@ logger = None
 user_settings = None
 user_settings_path = None
 
-min_log_level = None
+min_log_level = 20
 min_message_level = 0
 
 last_error = None
 
-show_db_exception = None
+show_db_exception = True
 
 dlg_info = None
 

@@ -2297,7 +2297,7 @@ def manage_exception_api(json_result, sql=None, stack_level=2, stack_level_incre
 
             tools_log.log_warning(msg, stack_level_increase=2)
             # Show exception message only if we are not in a task process
-            if global_vars.controller.show_db_exception:
+            if global_vars.show_db_exception:
                 show_exceptions_msg(title, msg)
 
     except Exception:
@@ -2505,7 +2505,7 @@ def show_exceptions_msg(title=None, msg="", window_title="Information about exce
     tools_qt.set_text_bold(global_vars.dlg_info.txt_infolog)
 
     # Show dialog only if we are not in a task process
-    if global_vars.controller.show_db_exception:
+    if global_vars.show_db_exception:
         show_dlg_info()
 
 

@@ -29,7 +29,6 @@ class DaoController:
         """ Class constructor """
 
         self.settings = global_vars.settings
-        self.qgis_settings = global_vars.qgis_settings
         self.plugin_name = plugin_name
         self.iface = iface
         self.translator = None
@@ -41,12 +40,8 @@ class DaoController:
         self.dao = None
         self.credentials = None
         self.current_user = None
-        self.min_log_level = 20
-        self.min_message_level = 0
         self.last_error = None
         self.user = None
-        self.user_settings = None
-        self.user_settings_path = None
         self.dlg_docker = None
         self.docker_type = None
         self.show_docker = None
