@@ -11,13 +11,13 @@ import re
 import sys
 from functools import partial
 
-from qgis.core import QgsPointXY, QgsGeometry
-from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QHeaderView, \
     QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
+from qgis.core import QgsPointXY, QgsGeometry
+from qgis.gui import QgsRubberBand
 
 from .document import GwDocument
 from .info import GwInfo

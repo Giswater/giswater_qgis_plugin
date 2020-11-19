@@ -7,8 +7,8 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QSettings, Qt
 
-from ...shared.dimensioning import GwDimensioning
 from ..parent_maptool import GwParentMapTool
+from ...shared.dimensioning import GwDimensioning
 from ....lib import tools_qt, tools_log
 
 

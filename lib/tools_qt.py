@@ -13,8 +13,6 @@ import subprocess
 import webbrowser
 from functools import partial
 
-from qgis.core import QgsExpression, QgsProject
-from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QRegExpValidator, QStandardItemModel, \
     QStandardItem, QIcon, QTextCharFormat, QFont
@@ -22,6 +20,8 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, QDateEdit, \
     QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, QPlainTextEdit, \
     QRadioButton, QSizePolicy, QSpacerItem, QFileDialog, QGroupBox, QMessageBox
+from qgis.core import QgsExpression, QgsProject
+from qgis.gui import QgsDateTimeEdit
 
 from . import tools_qgis, tools_log, tools_os
 from .. import global_vars

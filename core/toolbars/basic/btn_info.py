@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 import os
 import re
 from functools import partial
@@ -47,6 +46,13 @@ class GwInfoButton(GwParentMapTool):
             return False
 
         return point
+
+
+    def reactivate_map_tool(self):
+        """ Reactivate tool """
+        self.block_signal = True
+        info_action = self.iface.mainWindow().findChild(QAction, self.action_name)
+        info_action.trigger()
 
 
     """ QgsMapTools inherited event functions """
@@ -94,13 +100,6 @@ class GwInfoButton(GwParentMapTool):
             if point is False:
                 return
             self.get_layers_from_coordinates(point, self.rubberband_list, self.tab_type)
-
-
-    def reactivate_map_tool(self):
-        """ Reactivate tool """
-        self.block_signal = True
-        info_action = self.iface.mainWindow().findChild(QAction, self.action_name)
-        info_action.trigger()
 
 
     def activate(self):

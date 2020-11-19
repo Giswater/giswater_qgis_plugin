@@ -5,11 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+from functools import partial
+
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtWidgets import QAbstractItemView
 from qgis.PyQt.QtGui import QRegExpValidator
-
-from functools import partial
 
 from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import EpaManager

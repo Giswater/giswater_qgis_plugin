@@ -12,10 +12,10 @@ from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 
-from ....lib import tools_qt
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import AuxCircle
 from ...utils import tools_gw
+from ....lib import tools_qt
 
 
 class GwAuxCircleButton(GwParentMapTool):

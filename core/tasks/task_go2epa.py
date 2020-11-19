@@ -9,8 +9,8 @@ import os
 import re
 import subprocess
 
-from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
+from qgis.core import QgsTask
 
 from ..utils import tools_gw
 from ... import global_vars

@@ -12,13 +12,13 @@ import shlex
 from functools import partial
 from random import randrange
 
-from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
-    QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
-    QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QCursor, QPixmap
 from qgis.PyQt.QtWidgets import QDockWidget, QApplication, QPushButton
+from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
+    QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
+    QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer
 
 from . import tools_qt, tools_log
 from .. import global_vars
