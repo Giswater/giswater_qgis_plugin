@@ -13,13 +13,13 @@ import sys
 from collections import OrderedDict
 from functools import partial
 
-from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
-from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget,  QDoubleSpinBox, QTextEdit, QPushButton
+from qgis.core import QgsLayoutExporter, QgsPointXY, QgsProject, QgsRectangle
+from qgis.gui import QgsRubberBand
 
 from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate

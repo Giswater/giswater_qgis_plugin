@@ -5,19 +5,19 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QObject
-from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton
-from qgis.PyQt.QtGui import QIcon
-
 import configparser
 import os.path
 import sys
 
+from qgis.PyQt.QtCore import QObject
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton
+
 from . import global_vars
-from .core.load_project import LoadProject
 from .core.btn_admin import GwAdmin
-from .dao.controller import DaoController
+from .core.load_project import LoadProject
 from .core.utils import tools_gw
+from .dao.controller import DaoController
 from .lib import tools_log, tools_qgis
 
 

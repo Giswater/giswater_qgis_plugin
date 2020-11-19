@@ -15,14 +15,14 @@ from collections import OrderedDict
 from functools import partial
 from sip import isdeleted
 
-from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY
-from qgis.gui import QgsDateTimeEdit, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand
 from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, QStringListModel, Qt, QSettings
 from qgis.PyQt.QtGui import QColor, QRegExpValidator, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
+from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY
+from qgis.gui import QgsDateTimeEdit, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand
 
 from .catalog import GwCatalog
 from .dimensioning import GwDimensioning

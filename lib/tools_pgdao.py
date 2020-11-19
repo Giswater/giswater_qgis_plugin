@@ -8,8 +8,9 @@ or (at your option) any later version.
 import psycopg2
 import psycopg2.extras
 
-from .. import global_vars
 from qgis.core import QgsDataSourceUri
+
+from .. import global_vars
 
 
 class PgDao(object):

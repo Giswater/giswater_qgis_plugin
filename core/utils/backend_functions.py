@@ -7,10 +7,10 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 
-from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsProject, \
-    QgsVectorLayer, QgsVectorLayerExporter, QgsDataSourceUri
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QMessageBox, QWidget
+from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsProject, \
+    QgsVectorLayer, QgsVectorLayerExporter, QgsDataSourceUri
 
 from ..utils import tools_gw
 from ... import global_vars

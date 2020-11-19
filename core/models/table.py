@@ -17,6 +17,7 @@ from weakref import WeakKeyDictionary
 
 from ..utils import tools_gw
 
+
 class GenericDescriptor(object):
     """A descriptor that set getter and setter. class example from:
     http://nbviewer.jupyter.org/urls/gist.github.com/ChrisBeaumont/5758381/raw/descriptor_writeup.ipynb"""

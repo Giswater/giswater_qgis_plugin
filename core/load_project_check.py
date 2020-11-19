@@ -8,8 +8,8 @@ or (at your option) any later version.
 import platform
 from functools import partial
 
-from qgis.core import Qgis
 from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QSizePolicy
+from qgis.core import Qgis
 
 from .utils import tools_gw
 from .ui.ui_manager import ProjectCheckUi

@@ -9,11 +9,11 @@ import os
 import sys
 from functools import partial
 
-from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QDate, QStringListModel, QTime, Qt
 from qgis.PyQt.QtSql import QSqlQueryModel
 from qgis.PyQt.QtWidgets import QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, QFileDialog, \
     QTableView, QAbstractItemView
+from qgis.core import QgsApplication
 
 from .go2epa_options import GwGo2EpaOptions
 from ..btn_admin import GwAdmin

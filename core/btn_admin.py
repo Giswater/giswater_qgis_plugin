@@ -16,15 +16,15 @@ from collections import OrderedDict
 from functools import partial
 from time import sleep
 
-from qgis.core import QgsProject, QgsTask, QgsApplication
-from qgis.gui import QgsDateTimeEdit
-from qgis.utils import reloadPlugin
 from qgis.PyQt.QtCore import QSettings, Qt, QDate
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
 from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QAbstractItemView, QTextEdit, QFileDialog, \
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
     QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView
+from qgis.core import QgsProject, QgsTask, QgsApplication
+from qgis.gui import QgsDateTimeEdit
+from qgis.utils import reloadPlugin
 
 from .btn_admin_gis_project import GwAdminGisProject
 from .tasks.parent_task import GwTask

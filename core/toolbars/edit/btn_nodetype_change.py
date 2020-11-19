@@ -11,13 +11,11 @@ from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsFeatureRequest
 
 from ..parent_maptool import GwParentMapTool
-from ...ui.ui_manager import NodeTypeChange
-from ...utils import tools_gw
-
-
-from ....lib import tools_qgis, tools_qt
 from ...shared.catalog import GwCatalog
 from ...shared.info import GwInfo
+from ...ui.ui_manager import NodeTypeChange
+from ...utils import tools_gw
+from ....lib import tools_qgis, tools_qt
 
 
 class GwNodeTypeChangeButton(GwParentMapTool):

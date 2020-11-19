@@ -7,11 +7,11 @@ or (at your option) any later version.
 # -*- coding: latin-1 -*-
 from functools import partial
 
-from qgis.core import QgsPointXY
-from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsRubberBand, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, \
     QSizePolicy, QSpacerItem
+from qgis.core import QgsPointXY
+from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsRubberBand, QgsVertexMarker
 
 from ..utils import tools_gw
 from ..ui.ui_manager import DimensioningUi

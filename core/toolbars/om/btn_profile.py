@@ -5,10 +5,10 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import configparser
+import json
 import math
 import os
-import json
-import configparser
 from collections import OrderedDict
 from decimal import Decimal
 from functools import partial
