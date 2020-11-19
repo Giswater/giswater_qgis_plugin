@@ -145,3 +145,6 @@ VALUES (3156, 'Input parameter has null value', 'Please check it before continue
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
 VALUES (3158, 'Value of the function variable is null', 'Please check it before continue', 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING ;
 
+--2020/11/19
+UPDATE sys_table SET sys_sequence=NULL, sys_sequence_field=NULL WHERE id IN ('config_user_x_expl', 'config_param_user', 'config_param_system');
+
