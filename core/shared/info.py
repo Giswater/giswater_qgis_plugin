@@ -517,8 +517,8 @@ class GwInfo(QObject):
         # Actions signals
         action_edit.triggered.connect(partial(self.manage_edition, dlg_cf, action_edit, fid, new_feature))
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
-        action_workcat.triggered.connect(partial(self.call_action_function, 'gw_fct_getcatalog', 'cf_manage_new_workcat_accept', 'new_workcat'))
-        action_mapzone.triggered.connect(partial(self.call_action_function, 'gw_fct_getcatalog', 'manage_mapzone', 'new_mapzone'))
+        action_workcat.triggered.connect(partial(self.get_catalog, 'new_workcat', self.tablename))
+        action_mapzone.triggered.connect(partial(self.get_catalog, 'new_mapzone', self.tablename))
         action_set_to_arc.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_set_to_arc, 'v_edit_arc', 'set_to_arc', None))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id,  'v_edit_arc', 'arc', 'data_arc_id'))
         action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_parent_id, 'v_edit_node', 'node', 'data_parent_id'))
@@ -3147,19 +3147,14 @@ class GwInfo(QObject):
         return widget
 
 
-    def call_action_function(self, sql_function_name, py_function_name, form_name):
+    def get_catalog(self, form_name, table_name):
 
-        json_result = None
-        if sql_function_name is not None:
-            body = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
-            body += f'"form":{{"formName":"{form_name}", "tabName":"data", "editable":"TRUE"}}, '
-            body += f'"feature":{{}}, '
-            body += f'"data":{{}}}}$$'
-            json_result = tools_gw.get_json(sql_function_name, body)
-            if json_result is None:
-                return
-
-        if py_function_name is None:
+        body = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
+        body += f'"form":{{"formName":"{form_name}", "tabName":"data", "editable":"TRUE"}}, '
+        body += f'"feature":{{}}, '
+        body += f'"data":{{}}}}$$'
+        json_result = tools_gw.get_json('gw_fct_getcatalog', body)
+        if json_result is None:
             return
 
         dlg_generic = InfoGenericUi()
@@ -3168,7 +3163,7 @@ class GwInfo(QObject):
         # Set signals
         dlg_generic.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_generic))
         dlg_generic.rejected.connect(partial(tools_gw.close_dialog, dlg_generic))
-        dlg_generic.btn_accept.clicked.connect(lambda: getattr(self, py_function_name)(dlg_generic))
+        dlg_generic.btn_accept.clicked.connect(partial(self.set_catalog, dlg_generic, form_name, table_name))
 
         tools_gw.populate_basic_info(dlg_generic, [json_result], self.field_id)
 
@@ -3177,73 +3172,47 @@ class GwInfo(QObject):
         tools_gw.open_dialog(dlg_generic)
 
 
-    def cf_manage_new_workcat_accept(self, dialog):
+    def set_catalog(self, dialog, form_name, table_name):
         """ Insert table 'cat_work'. Add cat_work """
 
-        # Take widgets
-        cat_work_id = dialog.findChild(QLineEdit, "data_cat_work_id")
-        descript = dialog.findChild(QLineEdit, "data_descript")
-        link = dialog.findChild(QLineEdit, "data_link")
-        workid_key_1 = dialog.findChild(QLineEdit, "data_workid_key_1")
-        workid_key_2 = dialog.findChild(QLineEdit, "data_workid_key_2")
-        builtdate = dialog.findChild(QgsDateTimeEdit, "data_builtdate")
+        # Manage mandatory fields
+        missing_mandatory = False
+        widgets = dialog.scrollArea.findChildren(QWidget)
+        for widget in widgets:
+            widget.setStyleSheet(None)
+            # Check mandatory fields
+            if widget.property('ismandatory') and tools_qt.getWidgetText(dialog, widget, False, False) in (None, ''):
+                missing_mandatory = True
+                tools_qt.set_stylesheet(widget, "border: 2px solid red")
+        if missing_mandatory:
+            message = "Mandatory field is missing. Please, set a value"
+            tools_gw.show_warning(message)
+            return
 
-        # Get values from dialog
-        values = ""
-        fields = ""
-        cat_work_id = tools_qt.getWidgetText(dialog, cat_work_id)
-        if cat_work_id != "null":
-            fields += 'id, '
-            values += f"'{cat_work_id}', "
-        descript = tools_qt.getWidgetText(dialog, descript)
-        if descript != "null":
-            fields += 'descript, '
-            values += f"'{descript}', "
-        link = tools_qt.getWidgetText(dialog, link)
-        if link != "null":
-            fields += 'link, '
-            values += f"'{link}', "
-        workid_key_1 = tools_qt.getWidgetText(dialog, workid_key_1)
-        if workid_key_1 != "null":
-            fields += 'workid_key1, '
-            values += f"'{workid_key_1}', "
-        workid_key_2 = tools_qt.getWidgetText(dialog, workid_key_2)
-        if workid_key_2 != "null":
-            fields += 'workid_key2, '
-            values += f"'{workid_key_2}', "
-        builtdate = builtdate.dateTime().toString('yyyy-MM-dd')
-        if builtdate != "null" and builtdate != '':
-            fields += 'builtdate, '
-            values += f"'{builtdate}', "
+        # Get widgets values
+        values = {}
+        for widget in widgets:
+            if widget.property('columnname') in (None, ''): continue
+            values = tools_gw.get_values(dialog, widget, values)
+        fields = json.dumps(values)
 
-        if values != "":
-            fields = fields[:-2]
-            values = values[:-2]
-            if cat_work_id == 'null':
-                msg = "El campo Work id esta vacio"
-                tools_qt.show_info_box(msg, "Warning")
-            else:
-                # Check if this element already exists
-                sql = (f"SELECT DISTINCT(id)"
-                       f"FROM cat_work "
-                       f"WHERE id = '{cat_work_id}' ")
-                row = self.controller.get_row(sql, log_info=False)
-                if row is None:
-                    sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
-                    self.controller.execute_sql(sql)
-                    sql = "SELECT id, id FROM cat_work ORDER BY id"
-                    rows = self.controller.get_rows(sql)
-                    if rows:
-                        cmb_workcat_id = self.dlg_cf.findChild(QWidget, "data_workcat_id")
-                        model = QStringListModel()
-                        completer = QCompleter()
-                        tools_qt.set_completer_object_api(completer, model, cmb_workcat_id, rows[0])
-                        tools_qt.setWidgetText(self.dlg_cf, cmb_workcat_id, cat_work_id)
-                        self.my_json[str(cmb_workcat_id.property('columnname'))] = str(cat_work_id)
-                    tools_gw.close_dialog(dialog)
-                else:
-                    msg = "This workcat already exists"
-                    tools_qt.show_info_box(msg, "Warning")
+        # Call gw_fct_setcatalog
+        fields = f'"fields":{fields}'
+        form = f'"formName":"{form_name}"'
+        feature = f'"tableName":"{table_name}"'
+        body = tools_gw.create_body(form, feature, extras=fields)
+        result = tools_gw.get_json('gw_fct_setcatalog', body)
+        if result['status'] != 'Accepted':
+            return
+
+        # Set new value to the corresponding widget
+        for field in result['body']['data']['fields']:
+            widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
+            if widget.property('typeahead'):
+                tools_qt.set_completer_object_api(QCompleter(), QStringListModel(), widget, field['comboIds'])
+            tools_qt.setWidgetText(self.dlg_cf, widget, field['selectedId'])
+            self.my_json[str(widget.property('columnname'))] = field['selectedId']
+        tools_gw.close_dialog(dialog)
 
 
     def cf_open_dialog(self, dlg=None, dlg_name='giswater', maximize_button=True, stay_on_top=True):

@@ -1477,7 +1477,7 @@ def populate_basic_info(dialog, result, field_id, my_json=None, new_feature_id=N
             widget.stateChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] == 'button':
             widget = add_button(dialog, field)
-
+        widget.setProperty('ismandatory', field['ismandatory'])
         grid_layout.addWidget(label, x, 0)
         grid_layout.addWidget(widget, x, 1)
 
@@ -1701,7 +1701,7 @@ def get_values(dialog, widget, _json=None):
         _json[str(widget.property('columnname'))] = None
     else:
         _json[str(widget.property('columnname'))] = str(value)
-
+    return _json
 
 def add_checkbox(field):
 
@@ -1803,6 +1803,7 @@ def set_typeahead(field, dialog, widget, completer):
     if field['widgettype'] == 'typeahead':
         if 'queryText' not in field or 'queryTextFilter' not in field:
             return widget
+        widget.setProperty('typeahead', True)
         model = QStringListModel()
         widget.textChanged.connect(partial(populate_lineedit, completer, model, field, dialog, widget))
 
