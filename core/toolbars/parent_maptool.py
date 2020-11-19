@@ -7,11 +7,11 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 
+from qgis.core import QgsWkbTypes
+from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor, QColor, QIcon
 from qgis.PyQt.QtWidgets import QAction
-from qgis.core import QgsWkbTypes
-from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
 
 from ..utils.tools_gw import SnappingConfigManager
 from ... import global_vars

@@ -5,6 +5,14 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import os
+import operator
+import re
+import sys
+import subprocess
+import webbrowser
+from functools import partial
+
 from qgis.core import QgsExpression, QgsProject
 from qgis.gui import QgsDateTimeEdit
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal
@@ -15,17 +23,9 @@ from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleS
     QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, QPlainTextEdit, \
     QRadioButton, QSizePolicy, QSpacerItem, QFileDialog, QGroupBox, QMessageBox
 
-import os
-import operator
-import re
-import sys
-import subprocess
-import webbrowser
-from functools import partial
-
+from . import tools_qgis, tools_log, tools_os
 from .. import global_vars
 from ..core.utils import tools_gw
-from . import tools_qgis, tools_log, tools_os
 
 
 class GwExtendedQLabel(QLabel):

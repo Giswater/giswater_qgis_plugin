@@ -5,17 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import Qgis
-from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QSizePolicy
-
 import platform
 from functools import partial
 
-from .. import global_vars
+from qgis.core import Qgis
+from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QSizePolicy
 
 from .utils import tools_gw
-from ..lib import tools_qgis
 from .ui.ui_manager import ProjectCheckUi
+from .. import global_vars
+from ..lib import tools_qgis
 from ..lib.tools_qt import hide_void_groupbox
 
 

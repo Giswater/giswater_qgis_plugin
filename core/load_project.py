@@ -5,23 +5,23 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QObject
-from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
-
 import os
 import json
 import configparser
 from collections import OrderedDict, Counter
 
-from .. import global_vars
+from qgis.PyQt.QtCore import QObject
+from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
+
 from .models.plugin_toolbar import PluginToolbar
+from .shared.search import GwSearch
+from .toolbars import buttons
 from .ui.ui_manager import DialogTextUi
+from .utils import tools_gw
 from .utils.backend_functions import GwInfoTools
 from .utils.notify import GwNotifyTools
-from .shared.search import GwSearch
-from .utils import tools_gw
+from .. import global_vars
 from ..lib import tools_qgis, tools_config, tools_log
-from .toolbars import buttons
 
 
 class LoadProject(QObject):

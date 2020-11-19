@@ -6,9 +6,9 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import configparser
+import console
 import os.path
 import shlex
-import console
 from functools import partial
 from random import randrange
 

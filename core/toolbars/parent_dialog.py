@@ -10,8 +10,8 @@ import os
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QIcon
 
-from ... import global_vars
 from ..utils import tools_gw
+from ... import global_vars
 
 
 class GwParentAction:

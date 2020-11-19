@@ -9,14 +9,13 @@ import logging
 import inspect
 import os
 import time
-import sys
 
 from qgis.core import QgsMessageLog
-
 
 from .. import global_vars
 from ..core.utils import tools_gw
 from ..lib import tools_log
+
 
 class Logger(object):
 

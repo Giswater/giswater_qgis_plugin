@@ -7,13 +7,13 @@ or (at your option) any later version.
 # -*- coding: latin-1 -*-
 import json
 import operator
-from functools import partial
 from collections import OrderedDict
+from functools import partial
 
 from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGroupBox, QSpacerItem, QSizePolicy, QWidget
 
-from ..ui.ui_manager import InfoCatalogUi
 from ..utils import tools_gw
+from ..ui.ui_manager import InfoCatalogUi
 from ... import global_vars
 from ...lib import tools_qt, tools_log
 

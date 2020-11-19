@@ -12,26 +12,25 @@ import webbrowser
 from datetime import datetime
 from functools import partial
 
+from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal, QDateTime
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
     QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit
-from qgis.gui import QgsVertexMarker
 
 from .document import GwDocument
-from ..models.om_visit_event import OmVisitEvent
 from ..models.om_visit import OmVisit
+from ..models.om_visit_event import OmVisitEvent
 from ..models.om_visit_x_arc import OmVisitXArc
 from ..models.om_visit_x_connec import OmVisitXConnec
 from ..models.om_visit_x_node import OmVisitXNode
 from ..models.om_visit_x_gully import OmVisitXGully
 from ..models.om_visit_parameter import OmVisitParameter
 from ..ui.ui_manager import VisitUi, VisitEvent, VisitEventRehab, VisitManagerUi
-
 from ..utils import tools_gw
+from ..utils.tools_gw import SnappingConfigManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log
-from ..utils.tools_gw import SnappingConfigManager
 
 
 class GwVisitManager:

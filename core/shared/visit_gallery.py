@@ -5,9 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import urllib.error
-import urllib.parse
-import urllib.request
+from urllib import error, parse, request
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt

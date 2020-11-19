@@ -7,16 +7,16 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 
+from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtGui import QRegExpValidator
 from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView
-from qgis.gui import QgsVertexMarker
 
 from ..utils import tools_gw
 from ..ui.ui_manager import ElementUi, ElementManager
+from ..utils.tools_gw import SnappingConfigManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt
-from ..utils.tools_gw import SnappingConfigManager
 
 
 class GwElement:

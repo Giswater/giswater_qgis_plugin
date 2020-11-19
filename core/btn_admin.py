@@ -5,6 +5,17 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import json
+import os
+import random
+import re
+import subprocess
+import sys
+import xml.etree.cElementTree as ET
+from collections import OrderedDict
+from functools import partial
+from time import sleep
+
 from qgis.core import QgsProject, QgsTask, QgsApplication
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
@@ -15,25 +26,14 @@ from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QAbstractItemView, QT
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
     QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView
 
-import os
-import sys
-import random
-import re
-import json
-import subprocess
-import xml.etree.cElementTree as ET
-from collections import OrderedDict
-from functools import partial
-from time import sleep
-
-from .. import global_vars
-from ..lib import tools_qt, tools_qgis, tools_log
 from .btn_admin_gis_project import GwAdminGisProject
 from .tasks.parent_task import GwTask
-from ..i18n.i18n_generator import GwI18NGenerator
 from .ui.ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjectInfoUi, \
-    MainGisProjectUi, MainImportUi, MainFields, MainVisitClass, MainVisitParam, MainSysFields, Credentials
+    MainGisProjectUi, MainImportUi, MainFields, MainVisitClass, MainSysFields, Credentials
 from .utils import tools_gw
+from .. import global_vars
+from ..i18n.i18n_generator import GwI18NGenerator
+from ..lib import tools_qt, tools_qgis, tools_log
 
 
 class GwAdmin:

@@ -5,30 +5,22 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.core import QgsMessageLog, QgsCredentials, QgsProject, QgsDataSourceUri, QgsVectorLayer, QgsPointLocator, \
-    QgsSnappingConfig, QgsRectangle
+import inspect
+import os
+
 from qgis.PyQt.QtCore import QCoreApplication, QRegExp, QSettings, Qt, QTranslator
 from qgis.PyQt.QtGui import QTextCharFormat, QFont, QColor
 from qgis.PyQt.QtSql import QSqlDatabase
 from qgis.PyQt.QtWidgets import QCheckBox, QGroupBox, QLabel, QMessageBox, QPushButton, QRadioButton, QTabWidget, \
     QToolBox
-
-import configparser
-import json
-import os
-from collections import OrderedDict
-from functools import partial
-import inspect
-import traceback
-import sys
+from qgis.core import QgsMessageLog, QgsCredentials, QgsProject, QgsDataSourceUri, QgsVectorLayer, QgsPointLocator, \
+    QgsSnappingConfig, QgsRectangle
 
 from .. import global_vars
-from ..core.ui.ui_manager import DialogTextUi, DockerUi
-from ..lib import tools_os, tools_qt, tools_qgis, tools_config, tools_log
+from ..core.ui.ui_manager import DockerUi
 from ..core.utils import tools_gw
+from ..lib import tools_os, tools_qgis, tools_config, tools_log
 from ..lib.tools_pgdao import PgDao
-from ..lib.tools_log import Logger
-from ..core.utils.tools_gw import SnappingConfigManager
 
 
 class DaoController:

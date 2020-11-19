@@ -11,6 +11,7 @@ import psycopg2.extras
 from .. import global_vars
 from qgis.core import QgsDataSourceUri
 
+
 class PgDao(object):
 
     def __init__(self):

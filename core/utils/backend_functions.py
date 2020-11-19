@@ -5,18 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import os
+
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsProject, \
     QgsVectorLayer, QgsVectorLayerExporter, QgsDataSourceUri
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QMessageBox, QWidget
 
-import os
-
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qgis
-from ...lib import tools_qt, tools_log
-
+from ...lib import tools_qgis, tools_qt, tools_log
 
 def gw_function_dxf(**kwargs):
     """ Function called in def add_button(self, dialog, field): -->

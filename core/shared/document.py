@@ -11,8 +11,8 @@ from functools import partial
 
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
 
-from ..ui.ui_manager import DocUi, DocManager
 from ..utils import tools_gw
+from ..ui.ui_manager import DocUi, DocManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt
 

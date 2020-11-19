@@ -5,15 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QObject, QSettings
-
 import configparser
 import os.path
 import sys
 
-from ..dao.controller import DaoController
+from qgis.PyQt.QtCore import QObject, QSettings
+
 from ..core.btn_admin import GwAdmin
 from ..core.shared.visit_manager import GwVisitManager
+from ..dao.controller import DaoController
 
 
 class TestGiswater(QObject):

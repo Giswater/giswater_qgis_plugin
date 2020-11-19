@@ -11,14 +11,14 @@ from collections import OrderedDict
 from datetime import datetime
 from functools import partial
 
+from qgis.core import QgsApplication,  QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext,\
+    QgsVectorLayer
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtXml import QDomDocument
-from qgis.core import QgsApplication,  QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext,\
-    QgsVectorLayer
-from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 
 from .mincut_manager import GwMincutManager
 from .search import GwSearch

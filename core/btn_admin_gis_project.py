@@ -5,11 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import QSettings
-
 import os
 import shutil
 import sqlite3
+
+from qgis.PyQt.QtCore import QSettings
 
 from .utils import tools_gw
 from ..lib import tools_log, tools_qt

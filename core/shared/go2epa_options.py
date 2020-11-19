@@ -10,8 +10,8 @@ from functools import partial
 
 from qgis.PyQt.QtWidgets import QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QWidget, QComboBox
 
-from ..ui.ui_manager import Go2EpaOptionsUi
 from ..utils import tools_gw
+from ..ui.ui_manager import Go2EpaOptionsUi
 from ... import global_vars
 from ...lib import tools_qt
 

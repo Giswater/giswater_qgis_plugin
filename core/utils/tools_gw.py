@@ -6,27 +6,27 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import configparser
+import inspect
+import json
 import os
 import random
 import re
 import sys
-import json
-import inspect
 import traceback
 if 'nt' in sys.builtin_module_names:
     import ctypes
-from functools import partial
 from collections import OrderedDict
+from functools import partial
 
+from qgis.core import QgsProject, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
+    QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
+    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest, QgsDataSourceUri, QgsCredentials, QgsRectangle
+from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint, QgsDateTimeEdit
 from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint, QDate, QCoreApplication, QSettings
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
     QCompleter, QFileDialog, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit,\
     QTextEdit, QToolButton, QWidget
-from qgis.core import QgsProject, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
-    QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
-    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest, QgsDataSourceUri, QgsCredentials, QgsRectangle
-from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint, QgsDateTimeEdit
 
 from ..models.sys_feature_cat import SysFeatureCat
 from ..ui.ui_manager import GwDialog, GwMainWindow, DialogTextUi

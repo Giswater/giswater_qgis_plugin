@@ -8,9 +8,8 @@ or (at your option) any later version.
 import configparser
 import os
 
-
-from .. import global_vars
 from . import tools_log
+from .. import global_vars
 
 
 def check_user_settings(parameter, value=None, section='system'):

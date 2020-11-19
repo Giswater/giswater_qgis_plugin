@@ -5,11 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsTask
+from qgis.PyQt.QtCore import pyqtSignal
 
-from ...lib import tools_log
 from ..utils import tools_gw
+from ...lib import tools_log
 
 
 class GwConfigLayerTask(QgsTask):

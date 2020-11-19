@@ -7,8 +7,8 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from time import sleep
 
-from qgis.PyQt.QtCore import pyqtSignal, QObject
 from qgis.core import QgsTask
+from qgis.PyQt.QtCore import pyqtSignal, QObject
 
 from ...lib import tools_log
 
