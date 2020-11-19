@@ -13,8 +13,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 ALTER TABLE sys_table RENAME CONSTRAINT audit_cat_table_pkey TO sys_table_pkey;
 
 --DROP
-ALTER TABLE sys_table DROP CONSTRAINT audit_cat_table_qgis_role_id_fkey;
-ALTER TABLE sys_table DROP CONSTRAINT audit_cat_table_sys_role_id_fkey;
+ALTER TABLE sys_table DROP CONSTRAINT IF EXISTS audit_cat_table_qgis_role_id_fkey;
+ALTER TABLE sys_table DROP CONSTRAINT IF EXISTS audit_cat_table_sys_role_id_fkey;
 
 ALTER TABLE sys_table ADD CONSTRAINT sys_table_qgis_role_id_fkey FOREIGN KEY (qgis_role_id) 
 REFERENCES sys_role (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;

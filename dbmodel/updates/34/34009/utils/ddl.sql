@@ -91,61 +91,61 @@ ALTER TABLE plan_psector_selector RENAME to selector_plan_psector;
 
 
 -- remove id from all selectors
-ALTER TABLE selector_audit DROP CONSTRAINT selector_audit_fprocesscat_id_cur_user_unique;
-ALTER TABLE selector_audit DROP CONSTRAINT selector_audit_pkey;
+ALTER TABLE selector_audit DROP CONSTRAINT IF EXISTS selector_audit_fprocesscat_id_cur_user_unique;
+ALTER TABLE selector_audit DROP CONSTRAINT IF EXISTS selector_audit_pkey;
 ALTER TABLE selector_audit ADD CONSTRAINT selector_audit_pkey PRIMARY KEY(fprocesscat_id, cur_user);
 ALTER TABLE selector_audit DROP COLUMN id;
 
-ALTER TABLE selector_date DROP CONSTRAINT selector_date_pkey;
+ALTER TABLE selector_date DROP CONSTRAINT IF EXISTS selector_date_pkey;
 ALTER TABLE selector_date ADD CONSTRAINT selector_date_pkey PRIMARY KEY(context, cur_user);
 ALTER TABLE selector_date DROP COLUMN id;
 
-ALTER TABLE selector_expl DROP CONSTRAINT expl_id_cur_user_unique;
-ALTER TABLE selector_expl DROP CONSTRAINT selector_expl_pkey;
+ALTER TABLE selector_expl DROP CONSTRAINT IF EXISTS expl_id_cur_user_unique;
+ALTER TABLE selector_expl DROP CONSTRAINT IF EXISTS selector_expl_pkey;
 ALTER TABLE selector_expl ADD CONSTRAINT selector_expl_pkey PRIMARY KEY(expl_id, cur_user);
 ALTER TABLE selector_expl DROP COLUMN id;
 
-ALTER TABLE selector_hydrometer DROP CONSTRAINT selector_hydrometer_state_id_cur_user_unique;
-ALTER TABLE selector_hydrometer DROP CONSTRAINT selector_hydrometer_pkey;
+ALTER TABLE selector_hydrometer DROP CONSTRAINT IF EXISTS selector_hydrometer_state_id_cur_user_unique;
+ALTER TABLE selector_hydrometer DROP CONSTRAINT IF EXISTS selector_hydrometer_pkey;
 ALTER TABLE selector_hydrometer ADD CONSTRAINT selector_hydrometer_pkey PRIMARY KEY(state_id, cur_user);
 ALTER TABLE selector_hydrometer DROP COLUMN id;
 
-ALTER TABLE selector_inp_result DROP CONSTRAINT inp_selector_result_result_id_cur_user_unique;
-ALTER TABLE selector_inp_result DROP CONSTRAINT inp_selector_result_pkey;
+ALTER TABLE selector_inp_result DROP CONSTRAINT IF EXISTS inp_selector_result_result_id_cur_user_unique;
+ALTER TABLE selector_inp_result DROP CONSTRAINT IF EXISTS inp_selector_result_pkey;
 ALTER TABLE selector_inp_result ADD CONSTRAINT selector_inp_result_pkey PRIMARY KEY(result_id, cur_user);
 ALTER TABLE selector_inp_result DROP COLUMN id;
 
-ALTER TABLE selector_lot DROP CONSTRAINT selector_lot_lot_id_cur_user_unique;
-ALTER TABLE selector_lot DROP CONSTRAINT selector_lot_pkey;
+ALTER TABLE selector_lot DROP CONSTRAINT IF EXISTS selector_lot_lot_id_cur_user_unique;
+ALTER TABLE selector_lot DROP CONSTRAINT IF EXISTS selector_lot_pkey;
 ALTER TABLE selector_lot ADD CONSTRAINT selector_lot_pkey PRIMARY KEY(lot_id, cur_user);
 ALTER TABLE selector_lot DROP COLUMN id;
 
-ALTER TABLE selector_plan_result DROP CONSTRAINT plan_result_selector_result_id_cur_user_unique;
-ALTER TABLE selector_plan_result DROP CONSTRAINT plan_result_selector_pkey;
+ALTER TABLE selector_plan_result DROP CONSTRAINT IF EXISTS plan_result_selector_result_id_cur_user_unique;
+ALTER TABLE selector_plan_result DROP CONSTRAINT IF EXISTS plan_result_selector_pkey;
 ALTER TABLE selector_plan_result ADD CONSTRAINT selector_plan_result_pkey PRIMARY KEY(result_id, cur_user);
 ALTER TABLE selector_plan_result DROP COLUMN id;
 
-ALTER TABLE selector_psector DROP CONSTRAINT psector_id_cur_user_unique;
-ALTER TABLE selector_psector DROP CONSTRAINT selector_psector_pkey;
+ALTER TABLE selector_psector DROP CONSTRAINT IF EXISTS psector_id_cur_user_unique;
+ALTER TABLE selector_psector DROP CONSTRAINT IF EXISTS selector_psector_pkey;
 ALTER TABLE selector_psector ADD CONSTRAINT selector_psector_pkey PRIMARY KEY(psector_id, cur_user);
 ALTER TABLE selector_psector DROP COLUMN id;
 
-ALTER TABLE selector_sector DROP CONSTRAINT inp_selector_sector_sector_id_cur_user_unique;
-ALTER TABLE selector_sector DROP CONSTRAINT inp_selector_sector_pkey;
+ALTER TABLE selector_sector DROP CONSTRAINT IF EXISTS inp_selector_sector_sector_id_cur_user_unique;
+ALTER TABLE selector_sector DROP CONSTRAINT IF EXISTS inp_selector_sector_pkey;
 ALTER TABLE selector_sector ADD CONSTRAINT selector_sector_pkey PRIMARY KEY(sector_id, cur_user);
 ALTER TABLE selector_sector DROP COLUMN id;
 
-ALTER TABLE selector_state DROP CONSTRAINT state_id_cur_user_unique;
-ALTER TABLE selector_state DROP CONSTRAINT selector_state_pkey;
+ALTER TABLE selector_state DROP CONSTRAINT IF EXISTS state_id_cur_user_unique;
+ALTER TABLE selector_state DROP CONSTRAINT IF EXISTS selector_state_pkey;
 ALTER TABLE selector_state ADD CONSTRAINT selector_state_pkey PRIMARY KEY(state_id, cur_user);
 ALTER TABLE selector_state DROP COLUMN id;
 
-ALTER TABLE selector_workcat DROP CONSTRAINT selector_workcat_workcat_cur_user_unique;
-ALTER TABLE selector_workcat DROP CONSTRAINT selector_workcat_pkey;
+ALTER TABLE selector_workcat DROP CONSTRAINT IF EXISTS selector_workcat_workcat_cur_user_unique;
+ALTER TABLE selector_workcat DROP CONSTRAINT IF EXISTS selector_workcat_pkey;
 ALTER TABLE selector_workcat ADD CONSTRAINT selector_workcat_pkey PRIMARY KEY(workcat_id, cur_user);
 ALTER TABLE selector_workcat DROP COLUMN id;
 
-ALTER TABLE selector_plan_psector DROP CONSTRAINT plan_psector_selector_pkey;
+ALTER TABLE selector_plan_psector DROP CONSTRAINT IF EXISTS plan_psector_selector_pkey;
 ALTER TABLE selector_plan_psector ADD CONSTRAINT plan_psector_selector_pkey PRIMARY KEY(psector_id, cur_user);
 ALTER TABLE selector_plan_psector DROP COLUMN id;
 
@@ -191,7 +191,7 @@ DROP SEQUENCE IF EXISTS SCHEMA_NAME.config_api_visit_cat_multievent_id_seq;
 ALTER TABLE config_toolbox ADD CONSTRAINT config_toolbox_id_fkey FOREIGN KEY (id)
 REFERENCES sys_function (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
-ALTER TABLE plan_psector DROP CONSTRAINT plan_psector_priority_fkey;
+ALTER TABLE plan_psector DROP CONSTRAINT IF EXISTS plan_psector_priority_fkey;
 
 --2020/05/18
 ALTER TABLE value_verified RENAME TO _value_verified_;

@@ -8,9 +8,9 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2020/05/24
-ALTER TABLE exploitation_x_user DROP CONSTRAINT exploitation_x_user_pkey;
+ALTER TABLE exploitation_x_user DROP CONSTRAINT IF EXISTS exploitation_x_user_pkey;
 ALTER TABLE exploitation_x_user ADD CONSTRAINT exploitation_x_user_pkey PRIMARY KEY(expl_id, username);
-ALTER TABLE exploitation_x_user DROP CONSTRAINT exploitation_x_user_expl_username_unique;
+ALTER TABLE exploitation_x_user DROP CONSTRAINT IF EXISTS exploitation_x_user_expl_username_unique;
 ALTER TABLE exploitation_x_user DROP COLUMN id;
 ALTER TABLE exploitation_x_user RENAME to config_user_x_expl;
 
