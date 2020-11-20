@@ -523,12 +523,13 @@ def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top
     if not global_vars.controller.check_db_connection():
         return
 
+    # Manage translate
+    if dlg_name:
+        global_vars.controller.manage_translation(dlg_name, dlg)
+
     # Set window title
     if title is not None:
         dlg.setWindowTitle(title)
-    else:
-        if dlg_name:
-            global_vars.controller.manage_translation(dlg_name, dlg)
 
     # Manage stay on top, maximize/minimize button and information button
     # if info is True maximize flag will be ignored
