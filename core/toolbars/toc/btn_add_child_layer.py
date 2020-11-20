@@ -23,7 +23,7 @@ class GwAddChildLayerButton(GwParentAction):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.project_vars = tools_qgis.get_qgis_project_variables()
+        self.project_vars = tools_qgis.get_project_variables()
         self.qgis_project_infotype = self.project_vars['infotype']
         self.qgis_project_add_schema = self.project_vars['add_schema']
         self.available_layers = None

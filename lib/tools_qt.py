@@ -1269,49 +1269,22 @@ def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=N
     fill_widgets(dialog, table_object, row)
 
     # Check related 'arcs'
-    ids, layers, list_ids = get_records_geom_type(dialog, table_object, "arc", ids=ids, list_ids=list_ids, layers=layers)
+    ids, layers, list_ids = tools_gw.get_rows_by_feature_type(dialog, table_object, "arc", ids=ids, list_ids=list_ids, layers=layers)
 
     # Check related 'nodes'
-    ids, layers, list_ids = get_records_geom_type(dialog, table_object, "node", ids=ids, list_ids=list_ids, layers=layers)
+    ids, layers, list_ids = tools_gw.get_rows_by_feature_type(dialog, table_object, "node", ids=ids, list_ids=list_ids, layers=layers)
 
     # Check related 'connecs'
-    ids, layers, list_ids = get_records_geom_type(dialog, table_object, "connec", ids=ids, list_ids=list_ids, layers=layers)
+    ids, layers, list_ids = tools_gw.get_rows_by_feature_type(dialog, table_object, "connec", ids=ids, list_ids=list_ids, layers=layers)
 
     # Check related 'elements'
-    ids, layers, list_ids = get_records_geom_type(dialog, table_object, "element", ids=ids, list_ids=list_ids, layers=layers)
+    ids, layers, list_ids = tools_gw.get_rows_by_feature_type(dialog, table_object, "element", ids=ids, list_ids=list_ids, layers=layers)
 
     # Check related 'gullys'
     if global_vars.project_type == 'ud':
-        ids, layers, list_ids = get_records_geom_type(dialog, table_object, "gully", ids=ids, list_ids=list_ids, layers=layers)
+        ids, layers, list_ids = tools_gw.get_rows_by_feature_type(dialog, table_object, "gully", ids=ids, list_ids=list_ids, layers=layers)
 
     return layers, ids, list_ids
-
-
-def get_records_geom_type(dialog, table_object, geom_type, ids=None, list_ids=None, layers=None):
-    """ Get records of @geom_type associated to selected @table_object """
-
-    object_id = getWidgetText(dialog, table_object + "_id")
-    table_relation = table_object + "_x_" + geom_type
-    widget_name = "tbl_" + table_relation
-
-    exists = global_vars.controller.check_table(table_relation)
-    if not exists:
-        tools_log.log_info(f"Not found: {table_relation}")
-        return ids, layers, list_ids
-
-    sql = (f"SELECT {geom_type}_id "
-           f"FROM {table_relation} "
-           f"WHERE {table_object}_id = '{object_id}'")
-    rows = global_vars.controller.get_rows(sql, log_info=False)
-    if rows:
-        for row in rows:
-            list_ids[geom_type].append(str(row[0]))
-            ids.append(str(row[0]))
-
-        expr_filter = tools_gw.get_expression_filter(geom_type, list_ids=list_ids, layers=layers)
-        set_table_model(dialog, widget_name, geom_type, expr_filter)
-
-    return ids, layers, list_ids
 
 
 def set_table_model(dialog, table_object, geom_type, expr_filter):

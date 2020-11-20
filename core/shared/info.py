@@ -3238,7 +3238,7 @@ class GwInfo(QObject):
         form = f'"formName":"{form_name}"'
         feature = f'"tableName":"{table_name}"'
         body = tools_gw.create_body(form, feature, extras=fields)
-        result = tools_gw.get_json('gw_fct_setcatalog', body)
+        result = tools_gw.get_json('gw_fct_setcatalog', body, log_sql=True)
         if result['status'] != 'Accepted':
             return
 
