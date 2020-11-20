@@ -460,7 +460,7 @@ BEGIN
 	END IF;
 	
 	
-	RAISE NOTICE '19 - Check dint value for catalog of arcs (283)';
+	RAISE NOTICE '19 - Check dint value for catalogs';
 	SELECT count(*) INTO v_count FROM cat_arc WHERE dint IS NULL AND arctype_id !='VARC';
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -469,10 +469,22 @@ BEGIN
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '283', 'INFO: Dint for arc''s catalog checked. No mandatory values missed.',v_count);
+		VALUES (v_fid, v_result_id, 1, '283', 'INFO: Dint for arc''s catalog checked. No values missed.',v_count);
 	END IF;
 	
 	
+	SELECT count(*) INTO v_count FROM cat_node WHERE dint IS NULL;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '283',concat(
+		'WARNING: There is/are ',v_count,' register(s) on node''s catalog without dint defined. If this registers acts as shortipe on the epanet exportation dint is needed.'), v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 1, '283', 'INFO: Dint for node''s catalog checked. No values missed.',v_count);
+	END IF;
+	
+		
 	RAISE NOTICE '20 - tanks (fid: 198)';
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
 	select 198, a.node_id, nodecat_id, the_geom, 'Tanks with null mandatory values' FROM v_edit_inp_tank a

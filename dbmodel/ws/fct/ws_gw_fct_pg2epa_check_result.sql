@@ -498,6 +498,23 @@ BEGIN
 			END IF;
 		END IF;
 		
+		RAISE NOTICE '11 - Check for valve/shortipe diameter control';	
+
+		SELECT count(*) INTO v_count FROM temp_arc WHERE epa_type IN ('SHORTPIPE', 'VALVE') AND diameter IS NULL;
+		
+		IF  v_count > 0 THEN 
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 2, concat('WARNING: There are ', v_count , 'epanet shortpipe and valves without diameter. Neighbourg value have been setted. Please fill dint column on cat_node table'));
+		ELSE 
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 2, concat('INFO: There aren''t any shortpipe and valves without diameter defined on dint column in cat_node table'));
+		END IF;
+
+
+		RAISE NOTICE '12 - Info about roughness and diameter for shortpipes';	
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 2, concat('INFO: All roughness values used for shortpipes have been taken from neighbourg values'));
+
 	END IF;
 	
 	RAISE NOTICE '11 - Check if there are features with sector_id = 0';

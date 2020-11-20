@@ -1,0 +1,3 @@
+3.4.025
+*************
+- Enhance dint valve export values to epanet

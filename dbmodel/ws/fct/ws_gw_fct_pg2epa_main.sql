@@ -251,8 +251,11 @@ BEGIN
 	DELETE FROM temp_node 
 	WHERE id IN (SELECT id FROM temp_node LEFT JOIN (SELECT node_1 as node_id FROM temp_arc UNION SELECT node_2 FROM temp_arc) a USING (node_id) WHERE a.node_id is null);
 
+	-- update shortpipe/valve diameter USING neighbourg
+	UPDATE temp_arc SET diameter = dint FROM (SELECT node_1 as n, diameter dint FROM temp_arc UNION SELECT node_2, diameter FROM temp_arc)t WHERE t.n = node_1 AND epa_type IN ('SHORTPIPE', 'VALVE') AND diameter IS NULL;
+	UPDATE temp_arc SET diameter = dint FROM (SELECT node_1 as n, diameter dint FROM temp_arc UNION SELECT node_2, diameter FROM temp_arc)t WHERE t.n = node_2 AND epa_type IN ('SHORTPIPE', 'VALVE') AND diameter IS NULL;
 
-	-- values without value
+	-- other null values
 	UPDATE temp_arc SET minorloss = 0 WHERE minorloss IS NULL;
 	UPDATE temp_arc SET status = 'OPEN' WHERE status IS NULL OR status = '';
 

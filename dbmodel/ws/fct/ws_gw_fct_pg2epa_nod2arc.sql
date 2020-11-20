@@ -209,7 +209,7 @@ BEGIN
 			a.expl_id,
 			a.state,
 			a.state_type,
-			case when (c.addparam::json->>''diameter'')::text !='''' then  (c.addparam::json->>''diameter'')::numeric else '||v_diameter||' end as diameter,
+			case when (c.addparam::json->>''diameter'')::text !='''' then  (c.addparam::json->>''diameter'')::numeric else NULL end as diameter,
 			case when (c.addparam::json->>''roughness'')::text !='''' then  (c.addparam::json->>''roughness'')::numeric else '||v_roughness||' end as roughness,
 			a.annotation,
 			st_length2d(st_makeline(a.the_geom, b.the_geom)) as length,
@@ -239,7 +239,7 @@ BEGIN
 		c.expl_id,
 		a.state,
 		a.state_type,
-		case when (c.addparam::json->>''diameter'')::text !='''' then  (c.addparam::json->>''diameter'')::numeric else '||v_diameter||' end as diameter,
+		case when (c.addparam::json->>''diameter'')::text !='''' then  (c.addparam::json->>''diameter'')::numeric else NULL end as diameter,
 		case when (c.addparam::json->>''roughness'')::text !='''' then  (c.addparam::json->>''roughness'')::numeric else '||v_roughness||' end as roughness,
 		a.annotation,
 		st_length2d(st_makeline(a.the_geom, b.the_geom)) as length,
@@ -285,6 +285,12 @@ BEGIN
 	RAISE NOTICE ' Delete old node from node table';
 	EXECUTE ' DELETE FROM temp_node WHERE epa_type =''TODELETE''';
 
+	RAISE NOTICE ' Improve diameter';
+	
+	-- update nodarc diameter when is null, keeping possible values of inp_valve.diameter USING cat_node.dint
+	UPDATE temp_arc SET diameter = dint FROM cat_node c WHERE arccat_id = c.id AND c.id IS NOT NULL AND diameter IS NULL;
+
+	
 	RETURN 1;
 		
 END;
