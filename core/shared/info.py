@@ -3248,8 +3248,14 @@ class GwInfo(QObject):
             widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
             if widget.property('typeahead'):
                 tools_qt.set_completer_object_api(QCompleter(), QStringListModel(), widget, field['comboIds'])
-            tools_qt.setWidgetText(self.dlg_cf, widget, field['selectedId'])
-            self.my_json[str(widget.property('columnname'))] = field['selectedId']
+                tools_qt.setWidgetText(self.dlg_cf, widget, field['selectedId'])
+                self.my_json[str(widget.property('columnname'))] = field['selectedId']
+            elif type(widget) == QComboBox:
+                widget = tools_gw.fill_combo(widget, field)
+                tools_qt.set_combo_value(widget, field['selectedId'], 0)
+                widget.setProperty('selectedId', field['selectedId'])
+                self.my_json[str(widget.property('columnname'))] = field['selectedId']
+
         tools_gw.close_dialog(dialog)
 
 
