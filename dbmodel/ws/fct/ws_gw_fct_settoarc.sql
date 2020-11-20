@@ -183,11 +183,12 @@ BEGIN
     fid = 359;
     
     v_result_info = v_result;
-
-    v_result = concat ('{"geometryType":"", "values":',to_json(v_result), '}');
-
+    
     --    Control nulls
+    v_result_info := COALESCE(v_result_info, '{}'); 
     v_result := COALESCE(v_result, '{}'); 
+    
+    v_result = concat ('{"geometryType":"", "values":',to_json(v_result), '}');
 
     --  Return
     RETURN ('{"status":"Accepted", "message":{"level":3, "text":"'||v_result_info||'"}, "version":"'||v_version||'"'||
