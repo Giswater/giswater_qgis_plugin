@@ -3188,10 +3188,9 @@ class GwInfo(QObject):
 
     def get_catalog(self, form_name, table_name):
 
-        body = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
-        body += f'"form":{{"formName":"{form_name}", "tabName":"data", "editable":"TRUE"}}, '
-        body += f'"feature":{{}}, '
-        body += f'"data":{{}}}}$$'
+        form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
+        feature = f'"tableName":"{table_name}", "featureId":"{self.feature_id}"'
+        body = tools_gw.create_body(form, feature)
         json_result = tools_gw.get_json('gw_fct_getcatalog', body)
         if json_result is None:
             return
