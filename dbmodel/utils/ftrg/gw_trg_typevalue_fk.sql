@@ -52,7 +52,8 @@ BEGIN
 					CONTINUE;
 				ELSE 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3022", "function":"2744","debug_msg":"'||concat(rec.typevalue_table,', ',rec.target_field)||'"}}$$);';	
+					"data":{"message":"3022", "function":"2744","debug_msg":
+					"'||concat('Catalog: ', rec.typevalue_table,', insert table: ',v_table, ', field: ',rec.target_field,', value: ', v_new_field)||'"}}$$);';	
 
 				END IF;
 				
