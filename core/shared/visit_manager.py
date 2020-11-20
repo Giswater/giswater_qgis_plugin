@@ -1167,7 +1167,7 @@ class GwVisitManager:
             partial(self.delete_files, self.dlg_event.tbl_docs_x_event, event.visit_id, event.id))
 
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.controller.manage_translation(dlg_name, self.dlg_event)
+        tools_gw.manage_translation(dlg_name, self.dlg_event)
         ret = self.dlg_event.exec_()
 
         # check return
@@ -1503,7 +1503,7 @@ class GwVisitManager:
         self.dlg_event.parameter_id.setText(parameter_id)
 
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.controller.manage_translation(dlg_name, self.dlg_event)
+        tools_gw.manage_translation(dlg_name, self.dlg_event)
         if self.dlg_event.exec_():
 
             # set record values basing on widget

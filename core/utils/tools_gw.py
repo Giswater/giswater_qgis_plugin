@@ -18,7 +18,7 @@ if 'nt' in sys.builtin_module_names:
 from collections import OrderedDict
 from functools import partial
 
-from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint, QDate, QCoreApplication, QSettings
+from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint, QDate, QCoreApplication, QSettings, QTranslator
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
     QCompleter, QFileDialog, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit,\
@@ -526,7 +526,7 @@ def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top
 
     # Manage translate
     if dlg_name:
-        global_vars.controller.manage_translation(dlg_name, dlg)
+        manage_translation(dlg_name, dlg)
 
     # Set window title
     if title is not None:
@@ -2620,6 +2620,58 @@ def translate_widget(context_name, widget):
 
     except Exception as e:
         tools_log.log_info(f"{widget_name} --> {type(e).__name__} --> {e}")
+
+
+def add_translator(locale_path, log_info=False):
+    """ Add translation file to the list of translation files to be used for translations """
+
+    if os.path.exists(locale_path):
+        global_vars.translator = QTranslator()
+        global_vars.translator.load(locale_path)
+        QCoreApplication.installTranslator(global_vars.translator)
+        if log_info:
+            tools_log.log_info("Add translator", parameter=locale_path)
+    else:
+        if log_info:
+            tools_log.log_info("Locale not found", parameter=locale_path)
+
+
+def manage_translation(context_name, dialog=None, log_info=False):
+    """ Manage locale and corresponding 'i18n' file """
+
+    # Get locale of QGIS application
+    try:
+        locale = QSettings().value('locale/userLocale').lower()
+    except AttributeError:
+        locale = "en"
+
+    if locale == 'es_es':
+        locale = 'es'
+    elif locale == 'es_ca':
+        locale = 'ca'
+    elif locale == 'en_us':
+        locale = 'en'
+
+    # If user locale file not found, set English one by default
+    locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'giswater_{locale}.qm')
+    if not os.path.exists(locale_path):
+        if log_info:
+            tools_log.log_info("Locale not found", parameter=locale_path)
+        locale_default = 'en'
+        locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'giswater_{locale_default}.qm')
+        # If English locale file not found, exit function
+        # It means that probably that form has not been translated yet
+        if not os.path.exists(locale_path):
+            if log_info:
+                tools_log.log_info("Locale not found", parameter=locale_path)
+            return
+
+    # Add translation file
+    add_translator(locale_path)
+
+    # If dialog is set, then translate form
+    if dialog:
+        translate_form(dialog, context_name)
 
 
 def show_exceptions_msg(title=None, msg="", window_title="Information about exception"):

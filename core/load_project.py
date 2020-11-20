@@ -67,7 +67,7 @@ class LoadProject(QObject):
         global_vars.project_type = self.controller.get_project_type()
 
         # Manage locale and corresponding 'i18n' file
-        self.controller.manage_translation(self.plugin_name)
+        tools_gw.manage_translation(self.plugin_name)
 
         # Set PostgreSQL parameter 'search_path'
         self.controller.set_search_path(layer_source['schema'])

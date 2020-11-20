@@ -318,7 +318,7 @@ class GwMincut:
 
         # Show form in docker?
         self.manage_docker()
-        self.controller.manage_translation('mincut', self.dlg_mincut)
+        tools_gw.manage_translation('mincut', self.dlg_mincut)
 
 
     def manage_docker(self):

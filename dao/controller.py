@@ -29,7 +29,6 @@ class DaoController:
         self.settings = global_vars.settings
         self.plugin_name = plugin_name
         self.iface = iface
-        self.translator = None
         self.plugin_dir = None
         self.logged = False
         self.postgresql_version = None
@@ -440,58 +439,6 @@ class DaoController:
         """ Get primary key of selected layer """
 
         return tools_qgis.qgis_get_layer_primary_key(layer)
-
-
-    def add_translator(self, locale_path, log_info=False):
-        """ Add translation file to the list of translation files to be used for translations """
-
-        if os.path.exists(locale_path):
-            self.translator = QTranslator()
-            self.translator.load(locale_path)
-            QCoreApplication.installTranslator(self.translator)
-            if log_info:
-                tools_log.log_info("Add translator", parameter=locale_path)
-        else:
-            if log_info:
-                tools_log.log_info("Locale not found", parameter=locale_path)
-
-
-    def manage_translation(self, context_name, dialog=None, log_info=False):
-        """ Manage locale and corresponding 'i18n' file """
-
-        # Get locale of QGIS application
-        try:
-            locale = QSettings().value('locale/userLocale').lower()
-        except AttributeError:
-            locale = "en"
-
-        if locale == 'es_es':
-            locale = 'es'
-        elif locale == 'es_ca':
-            locale = 'ca'
-        elif locale == 'en_us':
-            locale = 'en'
-
-        # If user locale file not found, set English one by default
-        locale_path = os.path.join(self.plugin_dir, 'i18n', f'giswater_{locale}.qm')
-        if not os.path.exists(locale_path):
-            if log_info:
-                tools_log.log_info("Locale not found", parameter=locale_path)
-            locale_default = 'en'
-            locale_path = os.path.join(self.plugin_dir, 'i18n', f'giswater_{locale_default}.qm')
-            # If English locale file not found, exit function
-            # It means that probably that form has not been translated yet
-            if not os.path.exists(locale_path):
-                if log_info:
-                    tools_log.log_info("Locale not found", parameter=locale_path)
-                return
-
-        # Add translation file
-        self.add_translator(locale_path)
-
-        # If dialog is set, then translate form
-        if dialog:
-            tools_gw.translate_form(dialog, context_name)
 
 
     def get_project_type(self, schemaname=None):
