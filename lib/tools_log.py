@@ -132,14 +132,10 @@ def set_logger(self, logger_name=None):
         global_vars.min_log_level = int(global_vars.settings.value('status/log_level'))
         log_suffix = global_vars.settings.value('status/log_suffix')
         global_vars.logger = Logger(self, logger_name, global_vars.min_log_level, log_suffix)
-        if global_vars.min_log_level == 10:
-            global_vars.min_message_level = 0
-        elif global_vars.min_log_level == 20:
-            global_vars.min_message_level = 0
-        elif global_vars.min_log_level == 30:
-            global_vars.min_message_level = 1
-        elif global_vars.min_log_level == 40:
-            global_vars.min_message_level = 2
+
+        values = {10: 0, 20: 0, 30: 1, 40: 2}
+        global_vars.min_message_level = values[global_vars.min_log_level]
+
 
 def qgis_log_message(text=None, message_level=0, context_name=None, parameter=None, tab_name=None):
     """ Write message into QGIS Log Messages Panel with selected message level
