@@ -82,7 +82,7 @@ class LoadProject(QObject):
         global_vars.srid = srid
 
         # Get variables from qgis project
-        self.project_vars = tools_qgis.get_qgis_project_variables()
+        self.project_vars = tools_qgis.get_project_variables()
         global_vars.project_vars = self.project_vars
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes

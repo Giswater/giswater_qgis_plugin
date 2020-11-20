@@ -224,6 +224,7 @@ class SnappingConfigManager(object):
         """ Return snapper """
 
         snapper = QgsMapCanvas.snappingUtils(self.canvas)
+        print(snapper)
         return snapper
 
 
@@ -2415,6 +2416,34 @@ def manage_return_manager(json_result, sql, rubber_band=None):
     except Exception as e:
         manage_exception(None, f"{type(e).__name__}: {e}", sql)
 
+
+def get_rows_by_feature_type(dialog, table_object, geom_type, ids=None, list_ids=None, layers=None):
+    """ Get records of @geom_type associated to selected @table_object """
+
+    object_id = tools_qt.getWidgetText(dialog, table_object + "_id")
+    table_relation = table_object + "_x_" + geom_type
+    widget_name = "tbl_" + table_relation
+
+    exists = global_vars.controller.check_table(table_relation)
+    if not exists:
+        tools_log.log_info(f"Not found: {table_relation}")
+        return ids, layers, list_ids
+
+    sql = (f"SELECT {geom_type}_id "
+           f"FROM {table_relation} "
+           f"WHERE {table_object}_id = '{object_id}'")
+    rows = global_vars.controller.get_rows(sql, log_info=False)
+    if rows:
+        for row in rows:
+            list_ids[geom_type].append(str(row[0]))
+            ids.append(str(row[0]))
+
+        expr_filter = get_expression_filter(geom_type, list_ids=list_ids, layers=layers)
+        tools_qt.set_table_model(dialog, widget_name, geom_type, expr_filter)
+
+    return ids, layers, list_ids
+
+
 # TODO tools_gw_log
 
 
@@ -2490,6 +2519,7 @@ def tr(message, context_name=None):
             value = QCoreApplication.translate('ui_message', message)
 
     return value
+
 
 def translate_tooltip(context_name, widget, idx=None):
     """ Translate tooltips widgets of the form to current language

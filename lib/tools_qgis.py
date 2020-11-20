@@ -244,7 +244,7 @@ def get_value_from_metadata(parameter, default_value):
         return value
 
 
-def get_qgis_project_variables():
+def get_project_variables():
     """ Manage QGIS project variables """
 
     project_vars = {}
@@ -388,7 +388,7 @@ def qgis_get_layer_by_tablename(tablename, show_warning=False, log_info=False, s
 
     # Iterate over all layers
     layer = None
-    project_vars = get_qgis_project_variables()
+    project_vars = get_project_variables()
     if schema_name is None:
         schema_name = project_vars['main_schema']
     for cur_layer in layers:
