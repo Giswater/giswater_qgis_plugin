@@ -1469,8 +1469,7 @@ def populate_basic_info(dialog, result, field_id, my_json=None, new_feature_id=N
         elif field['widgettype'] == 'textarea':
             widget = add_textarea(field)
         elif field['widgettype'] in ('combo', 'combobox'):
-            widget = QComboBox()
-            fill_combo(widget, field)
+            widget = add_combo(field)
             widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         elif field['widgettype'] in ('check', 'checkbox'):
             widget = add_checkbox(field)

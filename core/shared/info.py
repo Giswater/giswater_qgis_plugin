@@ -3177,7 +3177,7 @@ class GwInfo(QObject):
 
         # Manage mandatory fields
         missing_mandatory = False
-        widgets = dialog.scrollArea.findChildren(QWidget)
+        widgets = dialog.findChildren(QWidget)
         for widget in widgets:
             widget.setStyleSheet(None)
             # Check mandatory fields
