@@ -132,7 +132,7 @@ class GwMincut:
 
         tools_qt.double_validator(self.distance, 0, 9999999, 3)
         tools_qt.double_validator(self.depth, 0, 9999999, 3)
-        tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.txt_exec_user, self.controller.get_project_user())
+        tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.txt_exec_user, global_vars.user)
 
         # Fill ComboBox type
         sql = ("SELECT id, descript "
@@ -541,7 +541,7 @@ class GwMincut:
         received_date = received_day.toString('yyyy-MM-dd') + " " + received_time.toString('HH:mm:ss')
 
         assigned_to = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.assigned_to, 0)
-        cur_user = self.controller.get_project_user()
+        cur_user = global_vars.user
         appropiate_status = tools_qt.isChecked(self.dlg_mincut, "appropiate")
 
         check_data = [str(mincut_result_state), str(anl_cause), str(received_date),

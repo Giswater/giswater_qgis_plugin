@@ -230,9 +230,9 @@ class GwInfoButton(GwParentMapTool):
         """ Set active selected layer """
         self.rubber_band.reset()
         parent_menu = action.associatedWidgets()[0]
-        layer = self.controller.get_layer_by_layername(parent_menu.title())
+        layer = tools_qgis.get_layer_by_layername(parent_menu.title())
         if layer:
             layer_source = self.controller.get_layer_source(layer)
             self.iface.setActiveLayer(layer)
-            complet_result, dialog = self.api_cf.get_info_from_id(
+            self.api_cf.get_info_from_id(
                 table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type)

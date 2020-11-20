@@ -17,6 +17,7 @@ from ...ui.ui_manager import FeatureReplace, InfoWorkcatUi
 from ...shared.catalog import GwCatalog
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_log
+import global_vars
 
 
 class GwFeatureReplaceButton(GwParentMapTool):
@@ -282,7 +283,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             tools_gw.show_info(message)
 
             # Force user to manage with state = 1 features
-            current_user = self.controller.get_project_user()
+            current_user = global_vars.user
             sql = (f"DELETE FROM selector_state "
                    f"WHERE state_id = 1 AND cur_user = '{current_user}';"
                    f"\nINSERT INTO selector_state (state_id, cur_user) "

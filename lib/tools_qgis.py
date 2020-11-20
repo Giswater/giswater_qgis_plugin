@@ -944,3 +944,16 @@ def plugin_settings_value(key, default_value=""):
 
 def plugin_settings_set_value(key, value):
     global_vars.qgis_settings.setValue(global_vars.plugin_name + "/" + key, value)
+
+
+def get_layer_by_layername(layername, log_info=False):
+    """ Get layer with selected @layername (the one specified in the TOC) """
+
+    layer = QgsProject.instance().mapLayersByName(layername)
+    if layer:
+        layer = layer[0]
+    elif not layer and log_info:
+        layer = None
+        tools_log.log_info("Layer not found", parameter=layername)
+
+    return layer

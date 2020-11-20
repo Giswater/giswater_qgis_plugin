@@ -11,8 +11,6 @@ import os
 from qgis.PyQt.QtCore import QCoreApplication, QRegExp, QSettings, Qt, QTranslator
 from qgis.PyQt.QtGui import QTextCharFormat, QFont, QColor
 from qgis.PyQt.QtSql import QSqlDatabase
-from qgis.PyQt.QtWidgets import QCheckBox, QGroupBox, QLabel, QMessageBox, QPushButton, QRadioButton, QTabWidget, \
-    QToolBox
 from qgis.core import QgsMessageLog, QgsCredentials, QgsProject, QgsDataSourceUri, QgsVectorLayer, QgsPointLocator, \
     QgsSnappingConfig, QgsRectangle
 
@@ -41,7 +39,6 @@ class DaoController:
         self.credentials = None
         self.current_user = None
         self.last_error = None
-        self.user = None
         self.dlg_docker = None
         self.docker_type = None
         self.show_docker = None
@@ -118,7 +115,7 @@ class DaoController:
             return False
 
         # Update current user
-        self.user = user
+        global_vars.user = user
         self.current_user = user
 
         # We need to create this connections for Table Views
@@ -421,19 +418,6 @@ class DaoController:
         return result
 
 
-    def get_layer_by_layername(self, layername, log_info=False):
-        """ Get layer with selected @layername (the one specified in the TOC) """
-
-        layer = QgsProject.instance().mapLayersByName(layername)
-        if layer:
-            layer = layer[0]
-        elif not layer and log_info:
-            layer = None
-            tools_log.log_info("Layer not found", parameter=layername)
-
-        return layer
-
-
     def get_layer_by_tablename(self, tablename, show_warning=False, log_info=False, schema_name=None):
         """ Iterate over all layers and get the one with selected @tablename """
 
@@ -456,11 +440,6 @@ class DaoController:
         """ Get primary key of selected layer """
 
         return tools_qgis.qgis_get_layer_primary_key(layer)
-
-
-    def get_project_user(self):
-        """ Set user """
-        return self.user
 
 
     def add_translator(self, locale_path, log_info=False):
@@ -747,7 +726,7 @@ class DaoController:
             return False
 
         if username is None:
-            username = self.user
+            username = global_vars.user
 
         if not self.check_role(username):
             return False
@@ -779,7 +758,7 @@ class DaoController:
         """ Get list of rolenames of current user """
 
         super_users = self.settings.value('system_variables/super_users')
-        if self.user in super_users:
+        if global_vars.user in super_users:
             roles = "('role_admin', 'role_basic', 'role_edit', 'role_epa', 'role_master', 'role_om')"
         else:
             sql = ("SELECT rolname FROM pg_roles "
@@ -896,12 +875,12 @@ class DaoController:
         super_users = self.settings.value('system_variables/super_users')
 
         # Manage user 'postgres'
-        if self.user == 'postgres' or self.user == 'gisadmin':
+        if global_vars.user == 'postgres' or global_vars.user == 'gisadmin':
             role_master = True
 
         # Manage super_user
         if super_users is not None:
-            if self.user in super_users:
+            if global_vars.user in super_users:
                 role_master = True
 
         if role_basic or qgis_project_role == 'role_basic':
