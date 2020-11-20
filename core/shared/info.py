@@ -1218,20 +1218,20 @@ class GwInfo(QObject):
 
     def set_widgets(self, dialog, complet_result, field, new_feature):
         """
-        functions called in -> widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field):
-            def manage_text(self, dialog, complet_result, field)
-            def manage_typeahead(self, dialog, complet_result, field)
-            def manage_combo(self, dialog, complet_result, field)
-            def manage_check(self, dialog, complet_result, field)
-            def manage_datetime(self, dialog, complet_result, field)
-            def manage_button(self, dialog, complet_result, field)
-            def manage_hyperlink(self, dialog, complet_result, field)
-            def manage_hspacer(self, dialog, complet_result, field)
-            def manage_vspacer(self, dialog, complet_result, field)
-            def manage_textarea(self, dialog, complet_result, field)
-            def manage_spinbox(self, dialog, complet_result, field)
-            def manage_doubleSpinbox(self, dialog, complet_result, field)
-            def manage_tableView(self, dialog, complet_result, field)
+        functions called in -> widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+            def manage_text(self, **kwargs)
+            def manage_typeahead(self, **kwargs)
+            def manage_combo(self, **kwargs)
+            def manage_check(self, **kwargs)
+            def manage_datetime(self, **kwargs)
+            def manage_button(self, **kwargs)
+            def manage_hyperlink(self, **kwargs)
+            def manage_hspacer(self, **kwargs)
+            def manage_vspacer(self, **kwargs)
+            def manage_textarea(self, **kwargs)
+            def manage_spinbox(self, **kwargs)
+            def manage_doubleSpinbox(self, **kwargs)
+            def manage_tableView(self, **kwargs)
          """
 
         widget = None
@@ -1254,7 +1254,8 @@ class GwInfo(QObject):
             return label, widget
 
         try:
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field, new_feature)
+            kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature}
+            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
         except Exception as e:
             msg = f"{type(e).__name__}: {e}"
             tools_gw.show_message(msg, 2)
@@ -1263,10 +1264,13 @@ class GwInfo(QObject):
         return label, widget
 
 
-    def manage_text(self, dialog, complet_result, field, new_feature):
+    def manage_text(self, **kwargs):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
         """
+        dialog = kwargs['dialog']
+        field = kwargs['field']
+        new_feature = kwargs['new_feature']
 
         widget = tools_gw.add_lineedit(field)
         widget = tools_gw.set_widget_size(widget, field)
@@ -1315,102 +1319,134 @@ class GwInfo(QObject):
         return widget
 
 
-    def manage_typeahead(self, dialog, complet_result, field, new_feature):
+    def manage_typeahead(self, **kwargs):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
         """
+        dialog = kwargs['dialog']
+        field = kwargs['field']
+
         completer = QCompleter()
-        widget = self.manage_text(dialog, complet_result, field, new_feature)
+        widget = self.manage_text(**kwargs)
         widget = tools_gw.set_typeahead(field, dialog, widget, completer)
         return widget
 
 
-    def manage_combo(self, dialog, complet_result, field, new_feature):
+    def manage_combo(self, **kwargs):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
         """
+        dialog = kwargs['dialog']
+        field = kwargs['field']
+        new_feature = kwargs['new_feature']
+
         widget = tools_gw.add_combo(field)
         widget = tools_gw.set_widget_size(widget, field)
         widget = self.set_auto_update_combobox(field, dialog, widget, new_feature)
         return widget
 
 
-    def manage_check(self, dialog, complet_result, field, new_feature):
+    def manage_check(self, **kwargs):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
         """
+        dialog = kwargs['dialog']
+        field = kwargs['field']
+        new_feature = kwargs['new_feature']
+
         widget = tools_gw.add_checkbox(field)
         widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
         widget = self.set_auto_update_checkbox(field, dialog, widget, new_feature)
         return widget
 
 
-    def manage_datetime(self, dialog, complet_result, field, new_feature):
+    def manage_datetime(self, **kwargs):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
         """
+        dialog = kwargs['dialog']
+        field = kwargs['field']
+        new_feature = kwargs['new_feature']
+
         widget = tools_gw.add_calendar(dialog, field)
         widget = self.set_auto_update_dateedit(field, dialog, widget, new_feature)
         return widget
 
 
-    def manage_button(self, dialog, complet_result, field, new_feature):
+    def manage_button(self, **kwargs):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
         """
+        dialog = kwargs['dialog']
+        field = kwargs['field']
+
         widget = tools_gw.add_button(dialog, field, module=self)
         widget = tools_gw.set_widget_size(widget, field)
         return widget
 
 
-    def manage_hyperlink(self, dialog, complet_result, field, new_feature):
+    def manage_hyperlink(self, **kwargs):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
         """
+        field = kwargs['field']
+
         widget = tools_gw.add_hyperlink(field)
         widget = tools_gw.set_widget_size(widget, field)
         return widget
 
 
-    def manage_hspacer(self, dialog, complet_result, field, new_feature):
+    def manage_hspacer(self, **kwargs):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
         """
+
         widget = tools_qt.add_horizontal_spacer()
         return widget
 
 
-    def manage_vspacer(self, dialog, complet_result, field, new_feature):
+    def manage_vspacer(self, **kwargs):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
         """
         widget = tools_qt.add_verticalspacer()
         return widget
 
 
-    def manage_textarea(self, dialog, complet_result, field, new_feature):
+    def manage_textarea(self, **kwargs):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
         """
+        dialog = kwargs['dialog']
+        field = kwargs['field']
+        new_feature = kwargs['new_feature']
 
         widget = tools_gw.add_textarea(field)
         widget = self.set_auto_update_textarea(field, dialog, widget, new_feature)
         return widget
 
 
-    def manage_spinbox(self, dialog, complet_result, field, new_feature):
+    def manage_spinbox(self, **kwargs):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
         """
+        dialog = kwargs['dialog']
+        field = kwargs['field']
+        new_feature = kwargs['new_feature']
+
         widget = tools_gw.add_spinbox(field)
         widget = self.set_auto_update_spinbox(field, dialog, widget, new_feature)
         return widget
 
 
-    def manage_doubleSpinbox(self, dialog, complet_result, field, new_feature):
+    def manage_doubleSpinbox(self, **kwargs):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
         """
+        dialog = kwargs['dialog']
+        field = kwargs['field']
+        new_feature = kwargs['new_feature']
+
         widget = tools_gw.add_spinbox(field)
         if 'widgetcontrols' in field and field['widgetcontrols'] and 'spinboxDecimals' in field['widgetcontrols']:
             widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
@@ -1418,10 +1454,13 @@ class GwInfo(QObject):
         return widget
 
 
-    def manage_tableView(self, dialog, complet_result, field, new_feature):
+    def manage_tableView(self, **kwargs):
         """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(dialog, complet_result, field)
+            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
         """
+        complet_result = kwargs['complet_result']
+        field = kwargs['field']
+
         widget = tools_gw.add_tableview(complet_result, field)
         widget = tools_qt.set_headers(widget, field)
         widget = tools_qt.populate_table(widget, field)
