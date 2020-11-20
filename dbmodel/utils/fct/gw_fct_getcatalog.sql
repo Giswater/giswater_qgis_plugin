@@ -15,7 +15,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_getcatalog($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"},
-"feature":{"tableName":"ve_arc_pipe", "idName":"arc_id", "id":"2001", "feature_type":"PIPE"},
+"feature":{"tableName":"ve_arc_pipe", "idName":"arc_id", "featureId":"2001", "feature_type":"PIPE"},
 "data":{"fields":{"matcat_id":"PVC", "pnom":"16", "dnom":"160"}}}$$)
 */
 
@@ -48,6 +48,9 @@ v_feature_type text;
 v_featurecat_id text;
 v_project_type text;
 v_errcontext text;
+v_expl_id integer;
+v_system_id text;
+v_featureid text;
 
 BEGIN
 
@@ -58,26 +61,42 @@ BEGIN
 
 	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	INTO v_version;
 
 	--	getting input data 
 	v_device := ((p_data ->>'client')::json->>'device')::text;
 	v_formname :=  ((p_data ->>'form')::json->>'formName')::text;
 	v_tabname :=  ((p_data ->>'form')::json->>'tabName')::text;
 	v_feature_type :=  (((p_data ->>'feature')::json->>'feature_type')::text);
+	v_featureid :=  (((p_data ->>'feature')::json->>'featureId')::text);
 	v_matcat :=  ((((p_data ->>'data')::json->>'fields')::json)->>'matcat_id');
 
 	-- Set 1st parent field
 	fields_array[1] := gw_fct_json_object_set_key(fields_array[1], 'selectedId', v_matcat);
+	
 
 	-- 	Calling function to build form fields
 	SELECT gw_fct_getformfields(v_formname, 'form_catalog', v_tabname, v_feature_type, null, null, null, 'INSERT',v_matcat, v_device, null)
 		INTO fields_array;
+	
 
 	--	Remove selectedId form fields
 	FOREACH field in ARRAY fields_array
-	LOOP
-		fields_array[(field->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(field->>'orderby')::INT], 'selectedId', ''::text);
+	LOOP	
+	
+		IF v_formname='new_mapzone' AND json_extract_path_text(field,'columnname') = 'expl_id' THEN
+
+			EXECUTE 'SELECT lower(feature_type) FROM cat_feature WHERE id = '||quote_literal(v_feature_type)||';'
+			INTO v_system_id;
+			
+			EXECUTE 'SELECT expl_id FROM '||v_system_id||' WHERE '||v_system_id||'_id = '||quote_literal(v_featureid)||';'
+			INTO v_expl_id;
+
+			fields_array[(field->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(field->>'orderby')::INT], 'selectedId', v_expl_id::text);
+		
+		ELSE
+			fields_array[(field->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(field->>'orderby')::INT], 'selectedId', ''::text);
+		END IF;
 	END LOOP;
 	
 	-- Set featuretype_id
