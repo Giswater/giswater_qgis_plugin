@@ -421,110 +421,6 @@ class DaoController:
         return result
 
 
-
-
-
-
-    def translate_tooltip(self, context_name, widget, idx=None):
-        """ Translate tooltips widgets of the form to current language
-            If we find a translation, it will be put
-            If the object does not have a tooltip we will put the object text itself as a tooltip
-        """
-
-        if type(widget) is QTabWidget:
-            widget_name = widget.widget(idx).objectName()
-            tooltip = tools_gw.tr(f'tooltip_{widget_name}', context_name)
-            if tooltip not in (f'tooltip_{widget_name}', None, 'None'):
-                widget.setTabToolTip(idx, tooltip)
-            elif widget.toolTip() in ("", None):
-                widget.setTabToolTip(idx, widget.tabText(idx))
-        else:
-            widget_name = widget.objectName()
-            tooltip = tools_gw.tr(f'tooltip_{widget_name}', context_name)
-            if tooltip not in (f'tooltip_{widget_name}', None, 'None'):
-                widget.setToolTip(tooltip)
-            elif widget.toolTip() in ("", None):
-                if type(widget) is QGroupBox:
-                    widget.setToolTip(widget.title())
-                else:
-                    widget.setToolTip(widget.text())
-
-
-    def translate_form(self, dialog, context_name):
-        """ Translate widgets of the form to current language """
-        type_widget_list = [QCheckBox, QGroupBox, QLabel, QPushButton, QRadioButton, QTabWidget]
-        for widget_type in type_widget_list:
-            widget_list = dialog.findChildren(widget_type)
-            for widget in widget_list:
-                self.translate_widget(context_name, widget)
-
-        # Translate title of the form
-        text = tools_gw.tr('title', context_name)
-        if text != 'title':
-            dialog.setWindowTitle(text)
-
-
-    def translate_widget(self, context_name, widget):
-        """ Translate widget text """
-
-        if not widget:
-            return
-
-        widget_name = ""
-        try:
-            if type(widget) is QTabWidget:
-                num_tabs = widget.count()
-                for i in range(0, num_tabs):
-                    widget_name = widget.widget(i).objectName()
-                    text = tools_gw.tr(widget_name, context_name)
-                    if text not in (widget_name, None, 'None'):
-                        widget.setTabText(i, text)
-                    else:
-                        widget_text = widget.tabText(i)
-                        text = tools_gw.tr(widget_text, context_name)
-                        if text != widget_text:
-                            widget.setTabText(i, text)
-                    self.translate_tooltip(context_name, widget, i)
-            elif type(widget) is QToolBox:
-                num_tabs = widget.count()
-                for i in range(0, num_tabs):
-                    widget_name = widget.widget(i).objectName()
-                    text = tools_gw.tr(widget_name, context_name)
-                    if text not in (widget_name, None, 'None'):
-                        widget.setItemText(i, text)
-                    else:
-                        widget_text = widget.itemText(i)
-                        text = tools_gw.tr(widget_text, context_name)
-                        if text != widget_text:
-                            widget.setItemText(i, text)
-                    self.translate_tooltip(context_name, widget.widget(i))
-            elif type(widget) is QGroupBox:
-                widget_name = widget.objectName()
-                text = tools_gw.tr(widget_name, context_name)
-                if text not in (widget_name, None, 'None'):
-                    widget.setTitle(text)
-                else:
-                    widget_title = widget.title()
-                    text = tools_gw.tr(widget_title, context_name)
-                    if text != widget_title:
-                        widget.setTitle(text)
-                self.translate_tooltip(context_name, widget)
-            else:
-                widget_name = widget.objectName()
-                text = tools_gw.tr(widget_name, context_name)
-                if text not in (widget_name, None, 'None'):
-                    widget.setText(text)
-                else:
-                    widget_text = widget.text()
-                    text = tools_gw.tr(widget_text, context_name)
-                    if text != widget_text:
-                        widget.setText(text)
-                self.translate_tooltip(context_name, widget)
-
-        except Exception as e:
-            tools_log.log_info(f"{widget_name} --> {type(e).__name__} --> {e}")
-
-
     def get_layer_by_layername(self, layername, log_info=False):
         """ Get layer with selected @layername (the one specified in the TOC) """
 
@@ -581,7 +477,7 @@ class DaoController:
                 tools_log.log_info("Locale not found", parameter=locale_path)
 
 
-    def manage_translation(self, locale_name, dialog=None, log_info=False):
+    def manage_translation(self, context_name, dialog=None, log_info=False):
         """ Manage locale and corresponding 'i18n' file """
 
         # Get locale of QGIS application
@@ -616,7 +512,7 @@ class DaoController:
 
         # If dialog is set, then translate form
         if dialog:
-            self.translate_form(dialog, locale_name)
+            tools_gw.translate_form(dialog, context_name)
 
 
     def get_project_type(self, schemaname=None):

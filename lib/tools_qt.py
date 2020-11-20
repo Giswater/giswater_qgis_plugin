@@ -1680,3 +1680,4 @@ def set_text_bold(widget, pattern=None):
 
 def set_stylesheet(widget, style="border: 2px solid red"):
     widget.setStyleSheet(style)
+
