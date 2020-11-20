@@ -517,8 +517,8 @@ class GwInfo(QObject):
         # Actions signals
         action_edit.triggered.connect(partial(self.manage_edition, dlg_cf, action_edit, fid, new_feature))
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
-        action_workcat.triggered.connect(partial(self.get_catalog, 'new_workcat', self.tablename))
-        action_mapzone.triggered.connect(partial(self.get_catalog, 'new_mapzone', self.tablename))
+        action_workcat.triggered.connect(partial(self.get_catalog, 'new_workcat', self.tablename, self.feature_type, self.feature_id, self.field_id))
+        action_mapzone.triggered.connect(partial(self.get_catalog, 'new_mapzone', self.tablename, self.feature_type, self.feature_id, self.field_id))
         action_set_to_arc.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_set_to_arc, 'v_edit_arc', 'set_to_arc', None))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id,  'v_edit_arc', 'arc', 'data_arc_id'))
         action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_parent_id, 'v_edit_node', 'node', 'data_parent_id'))
@@ -3186,10 +3186,9 @@ class GwInfo(QObject):
         return widget
 
 
-    def get_catalog(self, form_name, table_name):
-
+    def get_catalog(self, form_name, table_name, feature_type, feature_id, field_id):
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
-        feature = f'"tableName":"{table_name}", "featureId":"{self.feature_id}"'
+        feature = f'"tableName":"{table_name}", "featureId":"{feature_id}", "feature_type":"{feature_type}"'
         body = tools_gw.create_body(form, feature)
         json_result = tools_gw.get_json('gw_fct_getcatalog', body)
         if json_result is None:
@@ -3203,7 +3202,7 @@ class GwInfo(QObject):
         dlg_generic.rejected.connect(partial(tools_gw.close_dialog, dlg_generic))
         dlg_generic.btn_accept.clicked.connect(partial(self.set_catalog, dlg_generic, form_name, table_name))
 
-        tools_gw.populate_basic_info(dlg_generic, [json_result], self.field_id)
+        tools_gw.populate_basic_info(dlg_generic, [json_result], field_id)
 
         # Open dialog
         dlg_generic.setWindowTitle(f"{(form_name.lower()).capitalize().replace('_', ' ')}")
@@ -3323,7 +3322,8 @@ class GwInfo(QObject):
 
         """ Get selected attribute from snapped feature """
         # @options{'key':['att to get from snapped feature', 'widget name destination']}
-        options = {'arc': ['arc_id', 'data_arc_id'], 'node': ['node_id', 'data_parent_id'], 'set_to_arc': ['arc_id', 'set_to_arc']}
+        options = {'arc': ['arc_id', 'data_arc_id'], 'node': ['node_id', 'data_parent_id'],
+                   'set_to_arc': ['arc_id', 'set_to_arc']}
 
         if event == Qt.RightButton:
             self.disconnect_snapping(False)
