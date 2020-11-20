@@ -3253,28 +3253,6 @@ class GwInfo(QObject):
         tools_gw.close_dialog(dialog)
 
 
-    def cf_open_dialog(self, dlg=None, dlg_name='giswater', maximize_button=True, stay_on_top=True):
-        """ Open dialog """
-
-        if dlg is None or type(dlg) is bool:
-            dlg = self.dlg
-
-        # Manage i18n of the dialog
-        if dlg_name:
-            self.controller.manage_translation(dlg_name, dlg)
-
-        # Manage stay on top and maximize button
-        if maximize_button and stay_on_top:
-            dlg.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowStaysOnTopHint)
-        elif not maximize_button and stay_on_top:
-            dlg.setWindowFlags(Qt.WindowMinimizeButtonHint | Qt.WindowStaysOnTopHint)
-        elif maximize_button and not stay_on_top:
-            dlg.setWindowFlags(Qt.WindowMaximizeButtonHint)
-
-        # Open dialog
-        dlg.open()
-
-
     def get_snapped_feature_id(self, dialog, action, layer_name, option, widget_name):
         """ Snap feature and set a value into dialog """
 
