@@ -247,7 +247,7 @@ BEGIN
 				v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id=current_user);
 
 				-- getting visit class in function: 1st v_lot, 2nd feature_type
-				IF v_lot IS NOT NULL THEN
+				IF v_lot IS NOT NULL AND p_visittype = 1 THEN
 					v_visitclass := (SELECT visitclass_id FROM om_visit_lot WHERE id=v_lot);
 				END IF;
 				
