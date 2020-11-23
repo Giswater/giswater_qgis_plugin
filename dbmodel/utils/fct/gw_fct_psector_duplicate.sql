@@ -107,46 +107,50 @@ BEGIN
 	VALUES (153, v_result_id, concat('Set ',v_new_psector_name,' as current psector.' ));
 
 	--copy arcs with state 0 inside plan_psector tables
-	SELECT string_agg(arc_id,',') INTO v_feature_list FROM plan_psector_x_arc  WHERE psector_id=v_old_psector_id and state=0;
+	SELECT string_agg(arc_id,',') INTO v_feature_list FROM plan_psector_x_arc  WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
 
 	IF v_feature_list IS NOT NULL THEN
 		INSERT INTO plan_psector_x_arc(arc_id, psector_id, state, doable, descript, addparam) 
-		SELECT arc_id, v_new_psector_id, state, doable, descript, addparam FROM plan_psector_x_arc WHERE psector_id=v_old_psector_id and state=0;
+		SELECT arc_id, v_new_psector_id, state, doable, descript, addparam FROM plan_psector_x_arc 
+		WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
 
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied arcs with state 0: ', v_feature_list ));
 	END IF;
 
 	--copy nodes with state 0 inside plan_psector tables
-	SELECT string_agg(node_id,',') INTO v_feature_list FROM plan_psector_x_node  WHERE psector_id=v_old_psector_id and state=0;
+	SELECT string_agg(node_id,',') INTO v_feature_list FROM plan_psector_x_node  WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
 
 	IF v_feature_list IS NOT NULL THEN
 		INSERT INTO plan_psector_x_node(node_id, psector_id, state, doable, descript) 
-		SELECT node_id, v_new_psector_id, state, doable, descript FROM plan_psector_x_node WHERE psector_id=v_old_psector_id and state=0;
+		SELECT node_id, v_new_psector_id, state, doable, descript FROM plan_psector_x_node 
+		WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
 
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied nodes with state 0: ', v_feature_list ));
 	END IF;
 
 	--copy connecs with state 0 inside plan_psector tables
-	SELECT string_agg(connec_id,',') INTO v_feature_list FROM plan_psector_x_connec WHERE psector_id=v_old_psector_id and state=0;
+	SELECT string_agg(connec_id,',') INTO v_feature_list FROM plan_psector_x_connec WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
 
 	IF v_feature_list IS NOT NULL THEN
 		INSERT INTO plan_psector_x_connec(connec_id, psector_id, state, doable, descript,link_geom, vnode_geom) 
-		SELECT connec_id, v_new_psector_id, state, doable, descript,link_geom, vnode_geom FROM plan_psector_x_connec WHERE psector_id=v_old_psector_id and state=0;
+		SELECT connec_id, v_new_psector_id, state, doable, descript,link_geom, vnode_geom FROM plan_psector_x_connec 
+		WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
 
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied connecs with state 0: ', v_feature_list ));
 	END IF;
 
 	--copy gullies with state 0 inside plan_psector tables
 	IF v_project_type='UD' THEN
-		SELECT string_agg(gully_id,',') INTO v_feature_list FROM plan_psector_x_gully WHERE psector_id=v_old_psector_id and state=0;
+		SELECT string_agg(gully_id,',') INTO v_feature_list FROM plan_psector_x_gully WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
 		IF v_feature_list IS NOT NULL THEN
 			INSERT INTO plan_psector_x_gully(gully_id, psector_id, state, doable, descript,link_geom, vnode_geom) 
-			SELECT gully_id, v_new_psector_id, state, doable, descript,link_geom, vnode_geom FROM plan_psector_x_gully WHERE psector_id=v_old_psector_id and state=0;
+			SELECT gully_id, v_new_psector_id, state, doable, descript,link_geom, vnode_geom FROM plan_psector_x_gully 
+			WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
 	
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied gullies with state 0: ', v_feature_list ));
 		END IF;
 	END IF;
-	--copy featuthers inside plan_psector tables
+	--copy featothers inside plan_psector tables
 	SELECT string_agg(price_id,',') INTO v_feature_list FROM plan_psector_x_other WHERE psector_id=v_old_psector_id;	
 	IF v_feature_list IS NOT NULL THEN
 		INSERT INTO plan_psector_x_other(price_id, measurement, psector_id, descript)
@@ -168,7 +172,7 @@ BEGIN
 		AND column_name!='''||lower(rec_type.id)||'_id'' and column_name!=''state'' and column_name != ''node_1'' and  column_name != ''node_2'';'
 		INTO v_insert_fields;
 
-		FOR rec IN EXECUTE 'SELECT * FROM plan_psector_x_'||lower(rec_type.id)||' WHERE psector_id='||v_old_psector_id||' and state=1' LOOP
+		FOR rec IN EXECUTE 'SELECT * FROM plan_psector_x_'||lower(rec_type.id)||' WHERE psector_id='||v_old_psector_id||' and state=1 AND doable = true' LOOP
 			IF rec_type.id='ARC' THEN
 				v_field_id=rec.arc_id;
 			ELSIF rec_type.id='NODE' THEN
