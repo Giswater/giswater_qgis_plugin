@@ -125,8 +125,8 @@ class SnappingConfigManager(object):
         else:
             layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
         self.snapping_config.setIndividualLayerSettings(self.layer_arc, layer_settings)
-        QgsProject.instance().blockSignals(False)
-        QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
+
+        self.apply_snapping_options(self.snapping_config)
 
 
     def snap_to_node(self):
@@ -141,8 +141,8 @@ class SnappingConfigManager(object):
         else:
             layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
         self.snapping_config.setIndividualLayerSettings(self.layer_node, layer_settings)
-        QgsProject.instance().blockSignals(False)
-        QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
+
+        self.apply_snapping_options(self.snapping_config)
 
 
     def snap_to_connec_gully(self):
@@ -168,8 +168,7 @@ class SnappingConfigManager(object):
 
         self.snapping_config.setIndividualLayerSettings(self.layer_gully, layer_settings)
 
-        QgsProject.instance().blockSignals(False)
-        QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
+        self.apply_snapping_options(self.snapping_config)
 
 
     def snap_to_layer(self, layer, point_locator=QgsPointLocator.All, set_settings=False):
@@ -186,12 +185,13 @@ class SnappingConfigManager(object):
             return layer_settings
 
 
-    def apply_snapping_options(self, snappings_options):
+    def apply_snapping_options(self, snappings_options=None):
         """ Function that applies selected snapping configuration """
 
         QgsProject.instance().blockSignals(True)
-        if snappings_options:
-            QgsProject.instance().setSnappingConfig(snappings_options)
+        if snappings_options is None and self.snapping_config:
+            snappings_options = self.snapping_config
+        QgsProject.instance().setSnappingConfig(snappings_options)
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
 
