@@ -40,7 +40,7 @@ class GwCSVButton(GwParentAction):
                              'alias, config_csv.descript, functionname, readheader, orderby', 'config_csv', roles)
 
         self.dlg_csv.lbl_info.setWordWrap(True)
-        tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
+        tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.cmb_unicode_list, 'utf8')
         self.dlg_csv.rb_comma.setChecked(False)
         self.dlg_csv.rb_semicolon.setChecked(True)
 
@@ -174,7 +174,7 @@ class GwCSVButton(GwParentAction):
         os.chdir(folder_path)
         message = tools_gw.tr("Select CSV file")
         file_csv, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.csv')
-        tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv, file_csv)
+        tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.txt_file_csv, file_csv)
 
         self.save_settings_values()
         self.preview_csv(self.dlg_csv)
@@ -207,15 +207,15 @@ class GwCSVButton(GwParentAction):
         tools_qt.set_combo_value(self.dlg_csv.cmb_import_type, value, 0)
 
         value = tools_gw.get_parser_value('csv2Pg', 'txt_import')
-        tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.txt_import, value)
+        tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.txt_import, value)
 
         value = tools_gw.get_parser_value('csv2Pg', 'txt_file_csv')
-        tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv, value)
+        tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.txt_file_csv, value)
 
         unicode = tools_gw.get_parser_value('csv2Pg', 'cmb_unicode_list')
         if not unicode:
             unicode = 'latin1'
-        tools_qt.setWidgetText(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
+        tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
 
         if tools_gw.get_parser_value('csv2Pg', 'rb_semicolon') == 'True':
             self.dlg_csv.rb_semicolon.setChecked(True)

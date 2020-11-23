@@ -103,12 +103,12 @@ class GwProfileButton(GwParentMapTool):
         self.dlg_draw_profile.dlg_closed.connect(partial(self.remove_selection, actionpan=True))
 
         # Set calendar date as today
-        tools_qt.setCalendarDate(self.dlg_draw_profile, "date", None)
+        tools_qt.set_calendar(self.dlg_draw_profile, "date", None)
 
         # Set last parameters
-        tools_qt.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance,
+        tools_qt.set_widget_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance,
                                tools_gw.get_parser_value('btn_profile', 'minDistanceProfile'))
-        tools_qt.setWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title,
+        tools_qt.set_widget_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title,
                                tools_gw.get_parser_value('btn_profile', 'titleProfile'))
 
         # Show form in docker
@@ -267,7 +267,7 @@ class GwProfileButton(GwParentMapTool):
 
                 self.dlg_draw_profile.txt_title.setText(str(profile['values']['title']))
                 date = QDate.fromString(profile['values']['date'], 'dd-MM-yyyy')
-                tools_qt.setCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date, date)
+                tools_qt.set_calendar(self.dlg_draw_profile, self.dlg_draw_profile.date, date)
 
                 self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
                 self.remove_selection()

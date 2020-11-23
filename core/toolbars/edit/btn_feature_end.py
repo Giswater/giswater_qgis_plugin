@@ -105,7 +105,7 @@ class GwEndFeatureButton(GwParentAction):
             partial(tools_qgis.selection_init, self.dlg_work_end, self.table_object, geom_type=geom_type, layers=self.layers))
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(
-            partial(tools_gw.tab_feature_changed, self.dlg_work_end, excluded_layers=["v_edit_element"]))
+            partial(tools_gw.get_signal_change_tab, self.dlg_work_end, excluded_layers=["v_edit_element"]))
 
         # Set values
         self.fill_fields()
@@ -115,7 +115,7 @@ class GwEndFeatureButton(GwParentAction):
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
-        tools_gw.tab_feature_changed(self.dlg_work_end, excluded_layers=["v_edit_element"])
+        tools_gw.get_signal_change_tab(self.dlg_work_end, excluded_layers=["v_edit_element"])
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end', maximize_button=False)
@@ -153,7 +153,7 @@ class GwEndFeatureButton(GwParentAction):
             self.dlg_work_end.enddate.setDate(enddate)
         else:
             enddate = QDate.currentDate()
-        tools_qt.setCalendarDate(self.dlg_work_end, "enddate", enddate)
+        tools_qt.set_calendar(self.dlg_work_end, "enddate", enddate)
 
         sql = "SELECT id FROM cat_work"
         rows = self.controller.get_rows(sql)
@@ -161,7 +161,7 @@ class GwEndFeatureButton(GwParentAction):
         tools_qt.set_autocompleter(self.dlg_work_end.workcat_id_end)
         row = tools_gw.get_config('edit_workcat_vdefault')
         if row:
-            tools_qt.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
+            tools_qt.set_widget_text(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 
 
     def manage_dates(self, date_value):
@@ -189,11 +189,11 @@ class GwEndFeatureButton(GwParentAction):
                f"WHERE id = '{workcat_id}'")
         row = self.controller.get_row(sql)
         if row:
-            tools_qt.setWidgetText(self.dlg_work_end, self.dlg_work_end.descript, row['descript'])
-            tools_qt.setCalendarDate(self.dlg_work_end, self.dlg_work_end.builtdate, row['builtdate'], False)
+            tools_qt.set_widget_text(self.dlg_work_end, self.dlg_work_end.descript, row['descript'])
+            tools_qt.set_calendar(self.dlg_work_end, self.dlg_work_end.builtdate, row['builtdate'], False)
         else:
-            tools_qt.setWidgetText(self.dlg_work_end, self.dlg_work_end.descript, '')
-            tools_qt.setCalendarDate(self.dlg_work_end, self.dlg_work_end.builtdate, None, False)
+            tools_qt.set_widget_text(self.dlg_work_end, self.dlg_work_end.descript, '')
+            tools_qt.set_calendar(self.dlg_work_end, self.dlg_work_end.builtdate, None, False)
 
 
     def get_list_selected_id(self, qtable):
@@ -501,7 +501,7 @@ class GwEndFeatureButton(GwParentAction):
         self.dlg_new_workcat = InfoWorkcatUi()
         tools_gw.load_settings(self.dlg_new_workcat)
 
-        tools_qt.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
+        tools_qt.set_calendar(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
         table_object = "cat_work"
         tools_qt.set_completer_widget(table_object, self.dlg_new_workcat.cat_work_id, 'id')
 

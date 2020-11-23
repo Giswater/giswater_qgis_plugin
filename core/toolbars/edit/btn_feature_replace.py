@@ -168,7 +168,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         self.dlg_new_workcat = InfoWorkcatUi()
 
         tools_gw.load_settings(self.dlg_new_workcat)
-        tools_qt.setCalendarDate(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
+        tools_qt.set_calendar(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
         table_object = "cat_work"
         tools_qt.set_completer_object(self.dlg_new_workcat, "cat_work")
 
@@ -456,7 +456,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
         if self.project_type == 'ws':
             # Fill 3rd combo_box-catalog_id
-            tools_qt.setWidgetEnabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
+            tools_qt.set_widget_enabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
                    f"WHERE {self.feature_type_ws} = '{feature_type_new}'")

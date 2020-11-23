@@ -172,7 +172,7 @@ class GwToolBoxButton(GwParentAction):
                 continue
             if type(widget) in (QCheckBox, QRadioButton):
                 value = tools_gw.get_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}")
-                tools_qt.setChecked(dialog, widget, value)
+                tools_qt.set_checked(dialog, widget, value)
 
             elif type(widget) is QComboBox:
                 if widget.property('selectedId') in (None, '', 'NULL'):
@@ -182,7 +182,7 @@ class GwToolBoxButton(GwParentAction):
                 tools_qt.set_combo_value(widget, value, 0)
             elif type(widget) in (QLineEdit, QSpinBox):
                 value = tools_gw.get_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}")
-                tools_qt.setWidgetText(dialog, widget, value)
+                tools_qt.set_widget_text(dialog, widget, value)
 
 
     def save_parametric_values(self, dialog, function):
@@ -218,9 +218,9 @@ class GwToolBoxButton(GwParentAction):
         tools_qt.set_combo_value(dialog.cmb_layers, layer, 0)
 
         if tools_gw.get_parser_value('toolbox', f"{function_name}_rbt_previous") == 'True':
-            tools_qt.setChecked(dialog, 'rbt_previous', True)
+            tools_qt.set_checked(dialog, 'rbt_previous', True)
         else:
-            tools_qt.setChecked(dialog, 'rbt_layer', True)
+            tools_qt.set_checked(dialog, 'rbt_layer', True)
 
     def save_settings_values(self, dialog, function):
         """ Save QGIS settings related with toolbox options """

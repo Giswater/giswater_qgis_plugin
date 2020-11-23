@@ -65,7 +65,7 @@ class GwGo2Epa:
 
         # Check OS and enable/disable checkbox execute EPA software
         if sys.platform != "win32":
-            tools_qt.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, False)
+            tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, False)
             self.dlg_go2epa.chk_exec.setEnabled(False)
             self.dlg_go2epa.chk_exec.setText('Execute EPA software (Runs only on Windows)')
 
@@ -192,15 +192,15 @@ class GwGo2Epa:
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
 
         value = tools_gw.get_parser_value('go2epa', 'go2epa_chk_NETWORK_GEOM')
-        tools_qt.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, value)
+        tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, value)
         value = tools_gw.get_parser_value('go2epa', 'go2epa_chk_INP')
-        tools_qt.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export, value)
+        tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export, value)
         value = tools_gw.get_parser_value('go2epa', 'go2epa_chk_UD')
-        tools_qt.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, value)
+        tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, value)
         value = tools_gw.get_parser_value('go2epa', 'go2epa_chk_EPA')
-        tools_qt.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, value)
+        tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, value)
         value = tools_gw.get_parser_value('go2epa', 'go2epa_chk_RPT')
-        tools_qt.setChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, value)
+        tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, value)
 
 
     def save_user_values(self):
@@ -233,11 +233,11 @@ class GwGo2Epa:
 
         if tableleft == 'cat_dscenario':
             dlg_psector_sel.setWindowTitle(" Dscenario selector")
-            tools_qt.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_filter,
+            tools_qt.set_widget_text(dlg_psector_sel, dlg_psector_sel.lbl_filter,
                                    tools_gw.tr('Filter by: Dscenario name', context_name='labels'))
-            tools_qt.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_unselected,
+            tools_qt.set_widget_text(dlg_psector_sel, dlg_psector_sel.lbl_unselected,
                                    tools_gw.tr('Unselected dscenarios', context_name='labels'))
-            tools_qt.setWidgetText(dlg_psector_sel, dlg_psector_sel.lbl_selected,
+            tools_qt.set_widget_text(dlg_psector_sel, dlg_psector_sel.lbl_selected,
                                    tools_gw.tr('Selected dscenarios', context_name='labels'))
 
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
@@ -278,9 +278,9 @@ class GwGo2Epa:
                "WHERE t2.cur_user = current_user")
         row = self.controller.get_row(sql)
         if row:
-            tools_qt.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, row[0])
+            tools_qt.set_widget_text(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, row[0])
         else:
-            tools_qt.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 0)
+            tools_qt.set_widget_text(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 0)
 
         self.update_labels()
         tools_gw.open_dialog(self.dlg_hydrology_selector)
@@ -313,8 +313,8 @@ class GwGo2Epa:
                f" WHERE name = '{self.dlg_hydrology_selector.hydrology.currentText()}'")
         row = self.controller.get_row(sql)
         if row is not None:
-            tools_qt.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.infiltration, row[0])
-            tools_qt.setWidgetText(self.dlg_hydrology_selector, self.dlg_hydrology_selector.descript, row[1])
+            tools_qt.set_widget_text(self.dlg_hydrology_selector, self.dlg_hydrology_selector.infiltration, row[0])
+            tools_qt.set_widget_text(self.dlg_hydrology_selector, self.dlg_hydrology_selector.descript, row[1])
 
 
     def filter_cbx_by_text(self, tablename, widgettxt, widgetcbx):
@@ -350,7 +350,7 @@ class GwGo2Epa:
             self.file_inp, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.inp')
         else:
             self.file_inp, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.inp')
-        tools_qt.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, self.file_inp)
+        tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, self.file_inp)
 
 
     def go2epa_select_file_rpt(self):
@@ -371,7 +371,7 @@ class GwGo2Epa:
             self.file_rpt, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
         else:
             self.file_rpt, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.rpt')
-        tools_qt.setWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.file_rpt)
+        tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.file_rpt)
 
 
     def go2epa_accept(self):
@@ -471,13 +471,13 @@ class GwGo2Epa:
             widget_type = tools_qt.getWidgetType(dialog, widget)
             if row[column_name] is not None:
                 if widget_type is QCheckBox:
-                    tools_qt.setChecked(dialog, widget, row[column_name])
+                    tools_qt.set_checked(dialog, widget, row[column_name])
                 elif widget_type is QComboBox:
                     tools_qt.set_combo_value(widget, row[column_name], 0)
                 elif widget_type is QDateEdit:
                     dateaux = row[column_name].replace('/', '-')
                     date = QDate.fromString(dateaux, 'dd-MM-yyyy')
-                    tools_qt.setCalendarDate(dialog, widget, date)
+                    tools_qt.set_calendar(dialog, widget, date)
                 elif widget_type is QTimeEdit:
                     timeparts = str(row[column_name]).split(':')
                     if len(timeparts) < 3:
@@ -487,10 +487,10 @@ class GwGo2Epa:
                     minuts = int(timeparts[1])
                     seconds = int(timeparts[2])
                     time = QTime(hours, minuts, seconds)
-                    tools_qt.setTimeEdit(dialog, widget, time)
-                    tools_qt.setWidgetText(dialog, column_name + "_day", days)
+                    tools_qt.set_time(dialog, widget, time)
+                    tools_qt.set_widget_text(dialog, column_name + "_day", days)
                 else:
-                    tools_qt.setWidgetText(dialog, widget, str(row[column_name]))
+                    tools_qt.set_widget_text(dialog, widget, str(row[column_name]))
 
             columns.append(column_name)
 

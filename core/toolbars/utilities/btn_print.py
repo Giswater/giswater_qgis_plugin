@@ -69,14 +69,14 @@ class GwPrintButton(GwParentAction):
         w_rotation = self.dlg_composer.findChild(QLineEdit, "data_rotation")
         if w_rotation:
             w_rotation.editingFinished.connect(partial(self.set_rotation, w_rotation))
-            tools_qt.setWidgetText(self.dlg_composer, w_rotation, rotation)
+            tools_qt.set_widget_text(self.dlg_composer, w_rotation, rotation)
 
         w_scale = self.dlg_composer.findChild(QLineEdit, "data_scale")
         if w_scale:
             w_scale.editingFinished.connect(partial(self.set_scale, w_scale))
             reg_exp = QRegExp("\d{0,8}[\r]?")
             w_scale.setValidator(QRegExpValidator(reg_exp))
-            tools_qt.setWidgetText(self.dlg_composer, w_scale, scale)
+            tools_qt.set_widget_text(self.dlg_composer, w_scale, scale)
         self.my_json['rotation'] = rotation
         self.my_json['scale'] = scale
 

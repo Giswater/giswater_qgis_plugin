@@ -89,11 +89,11 @@ class GwDocument:
 
         # Set current/selected date and link
         if row:
-            tools_qt.setCalendarDate(self.dlg_add_doc, 'date', row.value('date'))
-            tools_qt.setWidgetText(self.dlg_add_doc, 'path', row.value('path'))
+            tools_qt.set_calendar(self.dlg_add_doc, 'date', row.value('date'))
+            tools_qt.set_widget_text(self.dlg_add_doc, 'path', row.value('path'))
             self.files_path.append(row.value('path'))
         else:
-            tools_qt.setCalendarDate(self.dlg_add_doc, 'date', None)
+            tools_qt.set_calendar(self.dlg_add_doc, 'date', None)
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"
@@ -118,8 +118,7 @@ class GwDocument:
                     cur_active_layer, excluded_layers=["v_edit_element"],single_tool_mode=self.single_tool_mode,
                     layers=self.layers)))
         self.dlg_add_doc.tab_feature.currentChanged.connect(
-
-        partial(tools_gw.tab_feature_changed, self.dlg_add_doc, excluded_layers=["v_edit_element"]))
+        partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, excluded_layers=["v_edit_element"]))
 
 
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
@@ -144,7 +143,7 @@ class GwDocument:
         # Set default tab 'arc'
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        tools_gw.tab_feature_changed(self.dlg_add_doc, excluded_layers=["v_edit_element"])
+        tools_gw.get_signal_change_tab(self.dlg_add_doc, excluded_layers=["v_edit_element"])
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_add_doc, dlg_name='doc', maximize_button=False)
@@ -161,7 +160,7 @@ class GwDocument:
         rows = global_vars.controller.get_rows(sql)
         tools_qt.fillComboBox(dialog, widget, rows)
         if rows:
-            tools_qt.setCurrentIndex(dialog, widget, 0)
+            tools_qt.set_current_index(dialog, widget, 0)
 
 
     def activate_relations(self):
@@ -361,7 +360,7 @@ class GwDocument:
         dialog.close()
 
         self.manage_document(row=widget.model().record(row), feature=widget.model().record(row))
-        tools_qt.setWidgetText(self.dlg_add_doc, widget_id, selected_object_id)
+        tools_qt.set_widget_text(self.dlg_add_doc, widget_id, selected_object_id)
 
 
     def open_web_browser(self, dialog, widget=None):
@@ -396,5 +395,5 @@ class GwDocument:
         for file in files_path:
             file_text += f"{file}\n\n"
         if files_path:
-            tools_qt.setWidgetText(dialog, widget, str(file_text))
+            tools_qt.set_widget_text(dialog, widget, str(file_text))
         return files_path

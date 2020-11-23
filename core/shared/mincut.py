@@ -132,7 +132,7 @@ class GwMincut:
 
         tools_qt.double_validator(self.distance, 0, 9999999, 3)
         tools_qt.double_validator(self.depth, 0, 9999999, 3)
-        tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.txt_exec_user, global_vars.user)
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.txt_exec_user, global_vars.user)
 
         # Fill ComboBox type
         sql = ("SELECT id, descript "
@@ -199,7 +199,7 @@ class GwMincut:
 
         # Set state name
         if self.states != {}:
-            tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
+            tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.state, str(self.states[0]))
 
         self.current_state = 0
         self.sql_connec = ""
@@ -291,7 +291,7 @@ class GwMincut:
         elif row[0]:
             result_mincut_id = str(int(row[0]) + 1)
 
-        tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, str(result_mincut_id))
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id, str(result_mincut_id))
 
 
     def mg_mincut(self):
@@ -303,11 +303,11 @@ class GwMincut:
 
         # Get current date. Set all QDateEdit to current date
         date_start = QDate.currentDate()
-        tools_qt.setCalendarDate(self.dlg_mincut, "cbx_date_start", date_start)
-        tools_qt.setCalendarDate(self.dlg_mincut, "cbx_date_end", date_start)
-        tools_qt.setCalendarDate(self.dlg_mincut, "cbx_recieved_day", date_start)
-        tools_qt.setCalendarDate(self.dlg_mincut, "cbx_date_start_predict", date_start)
-        tools_qt.setCalendarDate(self.dlg_mincut, "cbx_date_end_predict", date_start)
+        tools_qt.set_calendar(self.dlg_mincut, "cbx_date_start", date_start)
+        tools_qt.set_calendar(self.dlg_mincut, "cbx_date_end", date_start)
+        tools_qt.set_calendar(self.dlg_mincut, "cbx_recieved_day", date_start)
+        tools_qt.set_calendar(self.dlg_mincut, "cbx_date_start_predict", date_start)
+        tools_qt.set_calendar(self.dlg_mincut, "cbx_date_end_predict", date_start)
 
         # Get current time
         current_time = QTime.currentTime()
@@ -408,7 +408,7 @@ class GwMincut:
         self.dlg_mincut.real_description.setEnabled(True)
 
         # Set state to 'In Progress'
-        tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[1]))
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.state, str(self.states[1]))
         self.current_state = 1
 
         # Enable/Disable widget depending state
@@ -432,18 +432,18 @@ class GwMincut:
         self.dlg_fin.address_add_postnumber = tools_qt.getWidget(self.dlg_fin, 'address_add_postnumber')
 
         mincut = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
-        tools_qt.setWidgetText(self.dlg_fin, self.dlg_fin.mincut, mincut)
+        tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.mincut, mincut)
         work_order = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.work_order)
         if str(work_order) != 'null':
-            tools_qt.setWidgetText(self.dlg_fin, self.dlg_fin.work_order, work_order)
+            tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.work_order, work_order)
 
         # Manage address
         municipality_current = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.address_add_muni, 1)
         tools_qt.set_combo_value(self.dlg_fin.address_add_muni, municipality_current, 1)
         address_street_current = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
-        tools_qt.setWidgetText(self.dlg_fin, self.dlg_fin.address_add_street, address_street_current)
+        tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.address_add_street, address_street_current)
         address_number_current = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
-        tools_qt.setWidgetText(self.dlg_fin, self.dlg_fin.address_add_postnumber, address_number_current)
+        tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.address_add_postnumber, address_number_current)
 
         # Fill ComboBox exec_user
         sql = ("SELECT name "
@@ -452,7 +452,7 @@ class GwMincut:
         rows = self.controller.get_rows(sql)
         tools_qt.fillComboBox(self.dlg_fin, "exec_user", rows, False)
         assigned_to = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.assigned_to, 1)
-        tools_qt.setWidgetText(self.dlg_fin, "exec_user", str(assigned_to))
+        tools_qt.set_widget_text(self.dlg_fin, "exec_user", str(assigned_to))
 
         date_start = self.dlg_mincut.cbx_date_start.date()
         time_start = self.dlg_mincut.cbx_hours_start.time()
@@ -464,7 +464,7 @@ class GwMincut:
         self.dlg_fin.cbx_hours_end_fin.setTime(time_end)
 
         # Set state to 'Finished'
-        tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[2]))
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.state, str(self.states[2]))
         self.current_state = 2
 
         # Enable/Disable widget depending state
@@ -744,13 +744,13 @@ class GwMincut:
         self.dlg_mincut.cbx_hours_start.setTime(exec_start_time)
         self.dlg_mincut.cbx_date_end.setDate(exec_end_day)
         self.dlg_mincut.cbx_hours_end.setTime(exec_end_time)
-        tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, str(self.dlg_fin.work_order.text()))
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.work_order, str(self.dlg_fin.work_order.text()))
         municipality = self.dlg_fin.address_add_muni.currentText()
         tools_qt.set_combo_value(self.dlg_mincut.address_add_muni, municipality, 1)
         street = tools_qt.getWidgetText(self.dlg_fin, self.dlg_fin.address_add_street, return_string_null=False)
-        tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, street)
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.address_add_street, street)
         number = tools_qt.getWidgetText(self.dlg_fin, self.dlg_fin.address_add_postnumber, return_string_null=False)
-        tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, number)
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, number)
         exec_user = tools_qt.getWidgetText(self.dlg_fin, self.dlg_fin.exec_user)
         tools_qt.set_combo_value(self.dlg_mincut.assigned_to, exec_user, 1)
 
@@ -760,7 +760,7 @@ class GwMincut:
     def real_end_cancel(self):
 
         # Return to state 'In Progress'
-        tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, str(self.states[1]))
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.state, str(self.states[1]))
         self.enable_widgets('1')
 
         self.dlg_fin.close()
@@ -1237,55 +1237,19 @@ class GwMincut:
             return str(row[0])
 
 
-    def set_table_model(self, widget, table_name, expr_filter):
-        """ Sets a TableModel to @widget attached to @table_name and filter @expr_filter """
-
-        expr = None
-        if expr_filter:
-            # Check expression
-            (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
-            if not is_valid:
-                return expr
-
-        if self.schema_name not in table_name:
-            table_name = self.schema_name + "." + table_name
-
-        # Set a model with selected filter expression
-        model = QSqlTableModel(db=self.controller.db)
-        model.setTable(table_name)
-        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        model.select()
-        if model.lastError().isValid():
-            tools_gw.show_warning(model.lastError().text())
-            return expr
-        # Attach model to selected table
-        if expr_filter:
-            widget.setModel(model)
-            widget.model().setFilter(expr_filter)
-            widget.model().select()
-        else:
-            widget.setModel(None)
-
-        return expr
-
-
     def reload_table_connec(self, expr_filter=None):
         """ Reload contents of table 'connec' with selected @expr_filter """
 
-        table_name = self.schema_name + ".v_edit_connec"
-        widget = self.dlg_connec.tbl_mincut_connec
-        expr = self.set_table_model(widget, table_name, expr_filter)
-        tools_qt.set_table_columns(self.dlg_connec, widget, 'v_edit_connec')
+        expr = tools_gw.set_table_model(self.dlg_connec, 'tbl_mincut_connec', "connec", expr_filter)
+        tools_qt.set_table_columns(self.dlg_connec, 'tbl_mincut_connec', 'v_edit_connec')
         return expr
 
 
     def reload_table_hydro(self, expr_filter=None):
         """ Reload contents of table 'hydro' """
 
-        table_name = self.schema_name + ".v_rtc_hydrometer"
-        widget = self.dlg_hydro.tbl_hydro
-        expr = self.set_table_model(widget, table_name, expr_filter)
-        tools_qt.set_table_columns(self.dlg_hydro, widget, 'v_rtc_hydrometer')
+        expr = tools_gw.set_table_model(self.dlg_hydro, "tbl_hydro", "v_rtc_hydrometer", expr_filter)
+        tools_qt.set_table_columns(self.dlg_hydro, "tbl_hydro", 'v_rtc_hydrometer')
         return expr
 
 
@@ -1625,7 +1589,7 @@ class GwMincut:
             else:
                 real_mincut_id = new_mincut_id[0]
 
-        tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id, real_mincut_id)
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id, real_mincut_id)
         self.task1.setProgress(25)
 
         extras = f'"action":"mincutNetwork", '
@@ -1847,10 +1811,10 @@ class GwMincut:
         if row['mincut_state'] in self.states:
             mincut_state_name = self.states[row['mincut_state']]
 
-        tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.work_order, row['work_order'])
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.work_order, row['work_order'])
         tools_qt.set_combo_value(self.dlg_mincut.type, row['mincut_type'], 0)
         tools_qt.set_combo_value(self.dlg_mincut.cause, row['anl_cause'], 0)
-        tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, mincut_state_name)
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.state, mincut_state_name)
         extras = f'"mincutId":"{result_mincut_id}"'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.get_json('gw_fct_getmincut', body)
@@ -1859,17 +1823,17 @@ class GwMincut:
 
         # Manage location
         tools_qt.set_combo_value(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
-        tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, str(row['streetaxis_id']))
-        tools_qt.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, str(row['postnumber']))
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.address_add_street, str(row['streetaxis_id']))
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, str(row['postnumber']))
 
         # Manage dates
         self.open_mincut_manage_dates(row)
 
-        tools_qt.setWidgetText(self.dlg_mincut, "pred_description", row['anl_descript'])
-        tools_qt.setWidgetText(self.dlg_mincut, "real_description", row['exec_descript'])
-        tools_qt.setWidgetText(self.dlg_mincut, "distance", row['exec_from_plot'])
-        tools_qt.setWidgetText(self.dlg_mincut, "depth", row['exec_depth'])
-        tools_qt.setWidgetText(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
+        tools_qt.set_widget_text(self.dlg_mincut, "pred_description", row['anl_descript'])
+        tools_qt.set_widget_text(self.dlg_mincut, "real_description", row['exec_descript'])
+        tools_qt.set_widget_text(self.dlg_mincut, "distance", row['exec_from_plot'])
+        tools_qt.set_widget_text(self.dlg_mincut, "depth", row['exec_depth'])
+        tools_qt.set_widget_text(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
 
         # Update table 'selector_mincut_result'
         self.update_result_selector(result_mincut_id)
@@ -2049,8 +2013,8 @@ class GwMincut:
                 date = date.replace('/', '-')
             qt_date = QDate.fromString(date, 'yyyy-MM-dd')
             qt_time = QTime.fromString(time, 'h:mm:ss')
-            tools_qt.setCalendarDate(self.dlg_mincut, widget_date, qt_date)
-            tools_qt.setTimeEdit(self.dlg_mincut, widget_time, qt_time)
+            tools_qt.set_calendar(self.dlg_mincut, widget_date, qt_date)
+            tools_qt.set_time(self.dlg_mincut, widget_time, qt_time)
 
 
     def mincut_composer(self):

@@ -111,7 +111,7 @@ def getCalendarDate(dialog, widget, date_format="yyyy/MM/dd", datetime_format="y
     return date
 
 
-def setCalendarDate(dialog, widget, date, default_current_date=True):
+def set_calendar(dialog, widget, date, default_current_date=True):
 
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
@@ -132,7 +132,7 @@ def setCalendarDate(dialog, widget, date, default_current_date=True):
         widget.setDateTime(date)
 
 
-def setTimeEdit(dialog, widget, time):
+def set_time(dialog, widget, time):
 
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
@@ -192,7 +192,7 @@ def getWidgetText(dialog, widget, add_quote=False, return_string_null=True):
     return text
 
 
-def setWidgetText(dialog, widget, text):
+def set_widget_text(dialog, widget, text):
 
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
@@ -212,11 +212,11 @@ def setWidgetText(dialog, widget, text):
             text = 0
         widget.setValue(float(text))
     elif type(widget) is QComboBox:
-        setSelectedItem(dialog, widget, text)
+        set_selected_item(dialog, widget, text)
     elif type(widget) is QTimeEdit:
-        setTimeEdit(dialog, widget, text)
+        set_time(dialog, widget, text)
     elif type(widget) is QCheckBox:
-        setChecked(dialog, widget, text)
+        set_checked(dialog, widget, text)
 
 
 def isChecked(dialog, widget):
@@ -231,7 +231,7 @@ def isChecked(dialog, widget):
     return checked
 
 
-def setChecked(dialog, widget, checked=True):
+def set_checked(dialog, widget, checked=True):
 
     if str(checked) in ('true', 't', 'True'):
         checked = True
@@ -260,7 +260,7 @@ def getSelectedItem(dialog, widget, return_string_null=True):
     return widget_text
 
 
-def setSelectedItem(dialog, widget, text):
+def set_selected_item(dialog, widget, text):
 
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QComboBox, widget)
@@ -271,7 +271,7 @@ def setSelectedItem(dialog, widget, text):
         widget.setCurrentIndex(index)
 
 
-def setCurrentIndex(dialog, widget, index):
+def set_current_index(dialog, widget, index):
 
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QComboBox, widget)
@@ -281,7 +281,7 @@ def setCurrentIndex(dialog, widget, index):
         widget.setCurrentIndex(index)
 
 
-def setWidgetVisible(dialog, widget, visible=True):
+def set_widget_visible(dialog, widget, visible=True):
 
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
@@ -289,7 +289,7 @@ def setWidgetVisible(dialog, widget, visible=True):
         widget.setVisible(visible)
 
 
-def setWidgetEnabled(dialog, widget, enabled=True):
+def set_widget_enabled(dialog, widget, enabled=True):
 
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
@@ -297,7 +297,7 @@ def setWidgetEnabled(dialog, widget, enabled=True):
         widget.setEnabled(enabled)
 
 
-def setImage(dialog, widget, cat_shape):
+def add_image(dialog, widget, cat_shape):
     """ Set pictures for UD"""
 
     element = cat_shape.lower()
@@ -735,7 +735,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
     """ Delete selected elements of the table """
 
     tools_qgis.disconnect_signal_selection_changed()
-    geom_type = tools_gw.tab_feature_changed(dialog, table_object)
+    geom_type = tools_gw.get_signal_change_tab(dialog, table_object)
     if type(table_object) is str:
         widget_name = f"tbl_{table_object}_x_{geom_type}"
         widget = getWidget(dialog, widget_name)
@@ -962,7 +962,7 @@ def get_folder_path(dialog, widget):
     folder_path = file_dialog.getExistingDirectory(
         parent=None, caption=tools_gw.tr(message), directory=folder_path)
     if folder_path:
-        setWidgetText(dialog, widget, str(folder_path))
+        set_widget_text(dialog, widget, str(folder_path))
 
 
 def set_icon(widget, icon):
@@ -1146,10 +1146,10 @@ def put_combobox(qtable, rows, field, widget_pos, combo_values):
         idx = qtable.model().index(x, widget_pos)
         qtable.setIndexWidget(idx, combo)
         # noinspection PyUnresolvedReferences
-        combo.currentIndexChanged.connect(partial(update_status, combo, qtable, x, widget_pos))
+        combo.currentIndexChanged.connect(partial(set_status, combo, qtable, x, widget_pos))
 
 
-def update_status(qtable, combo, pos_x, combo_pos, col_update):
+def set_status(qtable, combo, pos_x, combo_pos, col_update):
     """ Update values from QComboBox to QTableView
     :param qtable: QTableView Where update values
      :param combo: QComboBox from which we will take the value
@@ -1287,57 +1287,6 @@ def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=N
     return layers, ids, list_ids
 
 
-def set_table_model(dialog, table_object, geom_type, expr_filter):
-    """ Sets a TableModel to @widget_name attached to
-        @table_name and filter @expr_filter
-    """
-
-    expr = None
-    if expr_filter:
-        # Check expression
-        (is_valid, expr) = check_expression_filter(expr_filter)  # @UnusedVariable
-        if not is_valid:
-            return expr
-
-    # Set a model with selected filter expression
-    table_name = f"v_edit_{geom_type}"
-    if global_vars.schema_name not in table_name:
-        table_name = global_vars.schema_name + "." + table_name
-
-    # Set the model
-    model = QSqlTableModel(db=global_vars.controller.db)
-    model.setTable(table_name)
-    model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-    model.select()
-    if model.lastError().isValid():
-        tools_gw.show_warning(model.lastError().text())
-        return expr
-
-    # Attach model to selected widget
-    if type(table_object) is str:
-        widget = getWidget(dialog, table_object)
-        if not widget:
-            message = "Widget not found"
-            tools_log.log_info(message, parameter=table_object)
-            return expr
-    elif type(table_object) is QTableView:
-        # parent_vars.controller.log_debug(f"set_table_model: {table_object.objectName()}")
-        widget = table_object
-    else:
-        msg = "Table_object is not a table name or QTableView"
-        tools_log.log_info(msg)
-        return expr
-
-    if expr_filter:
-        widget.setModel(model)
-        widget.model().setFilter(expr_filter)
-        widget.model().select()
-    else:
-        widget.setModel(None)
-
-    return expr
-
-
 def reload_table(dialog, table_object, geom_type, expr_filter):
     """ Reload @widget with contents of @tablename applying selected @expr_filter """
 
@@ -1355,7 +1304,7 @@ def reload_table(dialog, table_object, geom_type, expr_filter):
         tools_log.log_info(msg)
         return None
 
-    expr = set_table_model(dialog, widget, geom_type, expr_filter)
+    expr = tools_gw.set_table_model(dialog, widget, geom_type, expr_filter)
     return expr
 
 
@@ -1373,24 +1322,24 @@ def reset_widgets(dialog, table_object):
     """ Clear contents of input widgets """
 
     if table_object == "doc":
-        setWidgetText(dialog, "doc_type", "")
-        setWidgetText(dialog, "observ", "")
-        setWidgetText(dialog, "path", "")
+        set_widget_text(dialog, "doc_type", "")
+        set_widget_text(dialog, "observ", "")
+        set_widget_text(dialog, "path", "")
     elif table_object == "element":
-        setWidgetText(dialog, "elementcat_id", "")
-        setWidgetText(dialog, "state", "")
-        setWidgetText(dialog, "expl_id", "")
-        setWidgetText(dialog, "ownercat_id", "")
-        setWidgetText(dialog, "location_type", "")
-        setWidgetText(dialog, "buildercat_id", "")
-        setWidgetText(dialog, "workcat_id", "")
-        setWidgetText(dialog, "workcat_id_end", "")
-        setWidgetText(dialog, "comment", "")
-        setWidgetText(dialog, "observ", "")
-        setWidgetText(dialog, "path", "")
-        setWidgetText(dialog, "rotation", "")
-        setWidgetText(dialog, "verified", "")
-        setWidgetText(dialog, dialog.num_elements, "")
+        set_widget_text(dialog, "elementcat_id", "")
+        set_widget_text(dialog, "state", "")
+        set_widget_text(dialog, "expl_id", "")
+        set_widget_text(dialog, "ownercat_id", "")
+        set_widget_text(dialog, "location_type", "")
+        set_widget_text(dialog, "buildercat_id", "")
+        set_widget_text(dialog, "workcat_id", "")
+        set_widget_text(dialog, "workcat_id_end", "")
+        set_widget_text(dialog, "comment", "")
+        set_widget_text(dialog, "observ", "")
+        set_widget_text(dialog, "path", "")
+        set_widget_text(dialog, "rotation", "")
+        set_widget_text(dialog, "verified", "")
+        set_widget_text(dialog, dialog.num_elements, "")
 
 
 def fill_widgets(dialog, table_object, row):
@@ -1398,9 +1347,9 @@ def fill_widgets(dialog, table_object, row):
 
     if table_object == "doc":
 
-        setWidgetText(dialog, "doc_type", row["doc_type"])
-        setWidgetText(dialog, "observ", row["observ"])
-        setWidgetText(dialog, "path", row["path"])
+        set_widget_text(dialog, "doc_type", row["doc_type"])
+        set_widget_text(dialog, "observ", row["observ"])
+        set_widget_text(dialog, "path", row["path"])
 
     elif table_object == "element":
 
@@ -1420,29 +1369,29 @@ def fill_widgets(dialog, table_object, row):
             if row_aux:
                 expl_id = row_aux[0]
 
-        setWidgetText(dialog, "code", row['code'])
+        set_widget_text(dialog, "code", row['code'])
         sql = (f"SELECT elementtype_id FROM cat_element"
                f" WHERE id = '{row['elementcat_id']}'")
         row_type = global_vars.controller.get_row(sql)
         if row_type:
-            setWidgetText(dialog, "element_type", row_type[0])
+            set_widget_text(dialog, "element_type", row_type[0])
 
-        setWidgetText(dialog, "elementcat_id", row['elementcat_id'])
-        setWidgetText(dialog, "num_elements", row['num_elements'])
-        setWidgetText(dialog, "state", state)
+        set_widget_text(dialog, "elementcat_id", row['elementcat_id'])
+        set_widget_text(dialog, "num_elements", row['num_elements'])
+        set_widget_text(dialog, "state", state)
         set_combo_value(dialog.state_type, f"{row['state_type']}", 0)
-        setWidgetText(dialog, "expl_id", expl_id)
-        setWidgetText(dialog, "ownercat_id", row['ownercat_id'])
-        setWidgetText(dialog, "location_type", row['location_type'])
-        setWidgetText(dialog, "buildercat_id", row['buildercat_id'])
-        setWidgetText(dialog, "builtdate", row['builtdate'])
-        setWidgetText(dialog, "workcat_id", row['workcat_id'])
-        setWidgetText(dialog, "workcat_id_end", row['workcat_id_end'])
-        setWidgetText(dialog, "comment", row['comment'])
-        setWidgetText(dialog, "observ", row['observ'])
-        setWidgetText(dialog, "link", row['link'])
-        setWidgetText(dialog, "verified", row['verified'])
-        setWidgetText(dialog, "rotation", row['rotation'])
+        set_widget_text(dialog, "expl_id", expl_id)
+        set_widget_text(dialog, "ownercat_id", row['ownercat_id'])
+        set_widget_text(dialog, "location_type", row['location_type'])
+        set_widget_text(dialog, "buildercat_id", row['buildercat_id'])
+        set_widget_text(dialog, "builtdate", row['builtdate'])
+        set_widget_text(dialog, "workcat_id", row['workcat_id'])
+        set_widget_text(dialog, "workcat_id_end", row['workcat_id_end'])
+        set_widget_text(dialog, "comment", row['comment'])
+        set_widget_text(dialog, "observ", row['observ'])
+        set_widget_text(dialog, "link", row['link'])
+        set_widget_text(dialog, "verified", row['verified'])
+        set_widget_text(dialog, "rotation", row['rotation'])
         if str(row['undelete']) == 'True':
             dialog.undelete.setChecked(True)
 
@@ -1455,7 +1404,7 @@ def set_combo(dialog, widget, table_name, parameter, field_id='id', field_name='
            f" WHERE parameter = '{parameter}' AND cur_user = current_user")
     row = global_vars.controller.get_row(sql)
     if row:
-        setWidgetText(dialog, widget, row[0])
+        set_widget_text(dialog, widget, row[0])
 
 
 def set_calendars(dialog, widget, table_name, value, parameter):
@@ -1470,7 +1419,7 @@ def set_calendars(dialog, widget, table_name, value, parameter):
         date = QDate.fromString(row[0], 'yyyy-MM-dd')
     else:
         date = QDate.currentDate()
-    setCalendarDate(dialog, widget, date)
+    set_calendar(dialog, widget, date)
 
 
 def reload_qtable(dialog, geom_type):

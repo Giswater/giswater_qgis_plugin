@@ -223,7 +223,7 @@ class GwCatalog:
             widget.setText(catalog_id)
             widget.setFocus()
         elif type(widget) is QComboBox:
-            tools_qt.setWidgetText(previous_dialog, widget, catalog_id)
+            tools_qt.set_widget_text(previous_dialog, widget, catalog_id)
             widget.setFocus()
         else:
             message = "Widget not found"

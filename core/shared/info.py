@@ -650,7 +650,7 @@ class GwInfo(QObject):
         dlg_dtext = DialogTextUi()
         tools_gw.load_settings(dlg_dtext)
 
-        tools_qt.setWidgetText(dlg_dtext, dlg_dtext.txt_infolog, 'Interpolate tool')
+        tools_qt.set_widget_text(dlg_dtext, dlg_dtext.txt_infolog, 'Interpolate tool')
         dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
                                    "interpolation\nNode1: \nNode2:")
 
@@ -761,7 +761,7 @@ class GwInfo(QObject):
             widget = self.dlg_cf.findChild(QWidget, k)
             if widget:
                 widget.setStyleSheet(None)
-                tools_qt.setWidgetText(self.dlg_cf, widget, f'{v}')
+                tools_qt.set_widget_text(self.dlg_cf, widget, f'{v}')
                 widget.editingFinished.emit()
         tools_gw.close_dialog(dlg_dtext)
 
@@ -846,13 +846,13 @@ class GwInfo(QObject):
                f" WHERE node_id = '{self.feature_id}'")
         row = global_vars.controller.get_row(sql)
         if row:
-            tools_qt.setWidgetText(dialog, "data_rotation", str(row[0]))
+            tools_qt.set_widget_text(dialog, "data_rotation", str(row[0]))
 
         sql = (f"SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}),"
                f" ST_Point({point.x()}, {point.y()})))")
         row = global_vars.controller.get_row(sql)
         if row:
-            tools_qt.setWidgetText(dialog, "data_hemisphere", str(row[0]))
+            tools_qt.set_widget_text(dialog, "data_hemisphere", str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
             tools_gw.show_info(message, parameter=str(row[0]))
 
@@ -996,7 +996,7 @@ class GwInfo(QObject):
             for i in range(0, len(fields_aux)):
                 widget = dialog.findChild(QWidget, tab_type + "_" + fields_aux[i])
                 if tools_qt.getWidgetType(dialog, widget) is QLineEdit:
-                    tools_qt.setWidgetText(dialog, widget, str(snapped_feature_attr_aux[i]))
+                    tools_qt.set_widget_text(dialog, widget, str(snapped_feature_attr_aux[i]))
                 elif tools_qt.getWidgetType(dialog, widget) is QComboBox:
                     tools_qt.set_combo_value(widget, str(snapped_feature_attr_aux[i]), 0)
 
@@ -1485,14 +1485,14 @@ class GwInfo(QObject):
 
         # Set image
         img = json_result['body']['data']['shapepng']
-        tools_qt.setImage(dlg_sections, 'lbl_section_image', img)
+        tools_qt.add_image(dlg_sections, 'lbl_section_image', img)
 
         # Set values into QLineEdits
         for field in json_result['body']['data']['fields']:
             widget = dlg_sections.findChild(QLineEdit, field['columnname'])
             if widget:
                 if 'value' in field:
-                    tools_qt.setWidgetText(dlg_sections, widget, field['value'])
+                    tools_qt.set_widget_text(dlg_sections, widget, field['value'])
 
         dlg_sections.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_sections))
         tools_gw.open_dialog(dlg_sections, dlg_name='info_crossect', maximize_button=False)
@@ -2081,7 +2081,7 @@ class GwInfo(QObject):
         tools_qt.set_completer_object(dialog, self.table_object)
 
         if element_id:
-            tools_qt.setWidgetText(elem.dlg_add_element, "element_id", element_id)
+            tools_qt.set_widget_text(elem.dlg_add_element, "element_id", element_id)
 
         # Open dialog
         tools_gw.open_dialog(elem.dlg_add_element)
@@ -2093,7 +2093,7 @@ class GwInfo(QObject):
         if elem.element_id is None:
             return
 
-        tools_qt.setWidgetText(dialog, "element_id", elem.element_id)
+        tools_qt.set_widget_text(dialog, "element_id", elem.element_id)
         self.add_object(self.tbl_element, "element", "v_ui_element")
         self.tbl_element.model().select()
 
@@ -2461,25 +2461,25 @@ class GwInfo(QObject):
         if not row:
             return
 
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.id, row['id'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.event_code, row['event_code'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.visit_id, row['visit_id'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.position_id, row['position_id'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.position_value, row['position_value'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.parameter_id, row['parameter_id'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.value, row['value'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.value1, row['value1'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.value2, row['value2'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom1, row['geom1'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom2, row['geom2'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.geom3, row['geom3'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.xcoord, row['xcoord'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.ycoord, row['ycoord'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.compass, row['compass'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.tstamp, row['tstamp'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.text, row['text'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.index_val, row['index_val'])
-        tools_qt.setWidgetText(self.dlg_event_full, self.dlg_event_full.is_last, row['is_last'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.id, row['id'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.event_code, row['event_code'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.visit_id, row['visit_id'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.position_id, row['position_id'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.position_value, row['position_value'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.parameter_id, row['parameter_id'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.value, row['value'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.value1, row['value1'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.value2, row['value2'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.geom1, row['geom1'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.geom2, row['geom2'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.geom3, row['geom3'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.xcoord, row['xcoord'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.ycoord, row['ycoord'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.compass, row['compass'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.tstamp, row['tstamp'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.text, row['text'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.index_val, row['index_val'])
+        tools_qt.set_widget_text(self.dlg_event_full, self.dlg_event_full.is_last, row['is_last'])
         self.populate_tbl_docs_x_event()
 
         # Set all QLineEdit readOnly(True)
@@ -2945,7 +2945,7 @@ class GwInfo(QObject):
         # Set completer
         tools_qt.set_completer_object(dialog, self.table_object)
         if doc_id:
-            tools_qt.setWidgetText(dialog, "doc_id", doc_id)
+            tools_qt.set_widget_text(dialog, "doc_id", doc_id)
 
         # # Open dialog
         # doc.open_dialog(doc.dlg_add_doc)
@@ -2957,7 +2957,7 @@ class GwInfo(QObject):
         if doc.doc_id is None:
             return
 
-        tools_qt.setWidgetText(dialog, "doc_id", doc.doc_id)
+        tools_qt.set_widget_text(dialog, "doc_id", doc.doc_id)
         self.add_object(self.tbl_document, "doc", "v_ui_doc")
 
 
@@ -3247,7 +3247,7 @@ class GwInfo(QObject):
             widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
             if widget.property('typeahead'):
                 tools_qt.set_completer_object_api(QCompleter(), QStringListModel(), widget, field['comboIds'])
-                tools_qt.setWidgetText(self.dlg_cf, widget, field['selectedId'])
+                tools_qt.set_widget_text(self.dlg_cf, widget, field['selectedId'])
                 self.my_json[str(widget.property('columnname'))] = field['selectedId']
             elif type(widget) == QComboBox:
                 widget = tools_gw.fill_combo(widget, field)
@@ -3342,7 +3342,7 @@ class GwInfo(QObject):
         if option in ('arc', 'node'):
             widget = dialog.findChild(QWidget, f"{options[option][1]}")
             widget.setFocus()
-            tools_qt.setWidgetText(dialog, widget, str(feat_id))
+            tools_qt.set_widget_text(dialog, widget, str(feat_id))
         elif option == 'set_to_arc':
             # functions called in -> getattr(self, options[option][0])(feat_id) --> def set_to_arc(self, feat_id)
             getattr(self, options[option][1])(feat_id)
@@ -3401,7 +3401,7 @@ class GwInfo(QObject):
     """ OTHER FUNCTIONS """
 
     def set_image(self, dialog, widget):
-        tools_qt.setImage(dialog, widget, "ws_shape.png")
+        tools_qt.add_image(dialog, widget, "ws_shape.png")
 
 
 

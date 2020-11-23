@@ -55,7 +55,7 @@ class GwI18NGenerator:
 
         if not status:
             self.dlg_qm.btn_translate.setEnabled(False)
-            tools_qt.setWidgetText(self.dlg_qm, 'lbl_info', self.last_error)
+            tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', self.last_error)
             return
         self.populate_cmb_language()
 
@@ -64,7 +64,7 @@ class GwI18NGenerator:
         """ Populate combo with languages values """
         self.dlg_qm.btn_translate.setEnabled(True)
         host = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host)
-        tools_qt.setWidgetText(self.dlg_qm, 'lbl_info', f'Connected to {host}')
+        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f'Connected to {host}')
         sql = "SELECT user_language, py_language, xml_language, py_file FROM i18n.cat_language"
         rows = self.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows, 0)
@@ -98,7 +98,7 @@ class GwI18NGenerator:
                 msg += "Data base translation canceled\n"
 
         if msg != '':
-            tools_qt.setWidgetText(self.dlg_qm, 'lbl_info', msg)
+            tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
 
 
     def create_files_py_message(self):
@@ -379,12 +379,12 @@ class GwI18NGenerator:
         user = get_parser_value('i18n_generator', 'qm_lang_user')
         py_msg = get_parser_value('i18n_generator', 'qm_lang_py_msg')
         db_msg = get_parser_value('i18n_generator', 'qm_lang_db_msg')
-        tools_qt.setWidgetText(self.dlg_qm, 'txt_host', host)
-        tools_qt.setWidgetText(self.dlg_qm, 'txt_port', port)
-        tools_qt.setWidgetText(self.dlg_qm, 'txt_db', db)
-        tools_qt.setWidgetText(self.dlg_qm, 'txt_user', user)
-        tools_qt.setChecked(self.dlg_qm, self.dlg_qm.chk_py_msg, py_msg)
-        tools_qt.setChecked(self.dlg_qm, self.dlg_qm.chk_db_msg, db_msg)
+        tools_qt.set_widget_text(self.dlg_qm, 'txt_host', host)
+        tools_qt.set_widget_text(self.dlg_qm, 'txt_port', port)
+        tools_qt.set_widget_text(self.dlg_qm, 'txt_db', db)
+        tools_qt.set_widget_text(self.dlg_qm, 'txt_user', user)
+        tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_py_msg, py_msg)
+        tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_db_msg, db_msg)
 
 
     def init_db(self, host, port, db, user, password):

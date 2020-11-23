@@ -475,7 +475,7 @@ def remove_selection(remove_groups=True, layers=None):
 def selection_init(dialog, table_object, query=False, geom_type=None, layers=None):
     """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
-    geom_type = tools_gw.tab_feature_changed(dialog)
+    geom_type = tools_gw.get_signal_change_tab(dialog)
     if geom_type in ('all', None):
         geom_type = 'arc'
     multiple_selection = MultipleSelection(layers, geom_type, parent_manage=None,
@@ -573,7 +573,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
     disconnect_signal_selection_changed()
 
     if geom_type in ('all', None):
-        geom_type = tools_gw.tab_feature_changed(dialog)
+        geom_type = tools_gw.get_signal_change_tab(dialog)
 
     # Clear list of ids
     if remove_ids:

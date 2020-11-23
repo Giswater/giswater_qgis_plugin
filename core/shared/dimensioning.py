@@ -106,7 +106,7 @@ class GwDimensioning:
             label, widget = self.set_widgets(self.dlg_dim, db_return, field)
 
             if widget.objectName() == 'id':
-                tools_qt.setWidgetText(self.dlg_dim, widget, self.fid)
+                tools_qt.set_widget_text(self.dlg_dim, widget, self.fid)
             layout = self.dlg_dim.findChild(QGridLayout, field['layoutname'])
 
             # Profilactic issue to prevent missed layouts againts db response and form
@@ -308,11 +308,11 @@ class GwDimensioning:
 
             depth = snapped_feat.attribute(fieldname)
             if depth in ('', None, 0, '0', 'NULL'):
-                tools_qt.setWidgetText(self.dlg_dim, "depth", None)
+                tools_qt.set_widget_text(self.dlg_dim, "depth", None)
             else:
-                tools_qt.setWidgetText(self.dlg_dim, "depth", depth)
-            tools_qt.setWidgetText(self.dlg_dim, "feature_id", element_id)
-            tools_qt.setWidgetText(self.dlg_dim, "feature_type", feat_type.upper())
+                tools_qt.set_widget_text(self.dlg_dim, "depth", depth)
+            tools_qt.set_widget_text(self.dlg_dim, "feature_id", element_id)
+            tools_qt.set_widget_text(self.dlg_dim, "feature_type", feat_type.upper())
 
             self.snapper_manager.restore_snap_options(self.previous_snapping)
             self.deactivate_signals(action, emit_point)

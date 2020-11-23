@@ -111,7 +111,7 @@ class GwDeleteFeatureButton(GwParentAction):
         for value in result['body']['data']['info']['values']:
             result_msg += value['message'] + '\n\n'
 
-        tools_qt.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.txt_feature_infolog, result_msg)
+        tools_qt.set_widget_text(self.dlg_feature_delete, self.dlg_feature_delete.txt_feature_infolog, result_msg)
 
         # Enable button delete feature
         if result_msg != '':
@@ -190,7 +190,7 @@ class GwDeleteFeatureButton(GwParentAction):
                 selected_id = feature.attribute(field_id)
 
             if selected_id:
-                tools_qt.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, str(selected_id))
+                tools_qt.set_widget_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, str(selected_id))
 
 
     def set_active_layer(self):
@@ -208,5 +208,5 @@ class GwDeleteFeatureButton(GwParentAction):
         tools_qgis.set_layer_visible(layer)
 
         # Clear feature id field
-        tools_qt.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, '')
+        tools_qt.set_widget_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, '')
         self.dlg_feature_delete.feature_id.setStyleSheet(None)

@@ -400,7 +400,7 @@ class GwSearch:
 
         # Clear all lineedit widgets from search tabs
         for widget in self.lineedit_list:
-            tools_qt.setWidgetText(self.dlg_search, widget, '')
+            tools_qt.set_widget_text(self.dlg_search, widget, '')
 
 
     def get_list_items(self, widget, field):
@@ -475,9 +475,9 @@ class GwSearch:
         self.items_dialog.btn_state0.setEnabled(False)
 
         search_csv_path = tools_gw.get_parser_value('search', 'search_csv_path')
-        tools_qt.setWidgetText(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
-        tools_qt.setWidgetText(self.items_dialog, self.items_dialog.lbl_init, f"Filter by: {field_id}")
-        tools_qt.setWidgetText(self.items_dialog, self.items_dialog.lbl_end, f"Filter by: {field_id}")
+        tools_qt.set_widget_text(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
+        tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_init, f"Filter by: {field_id}")
+        tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_end, f"Filter by: {field_id}")
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -656,7 +656,7 @@ class GwSearch:
         msg = "Save as"
         folder_path, filter_ = file_dialog.getSaveFileName(None, tools_gw.tr(msg), folder_path, '*.csv')
         if folder_path:
-            tools_qt.setWidgetText(dialog, widget, str(folder_path))
+            tools_qt.set_widget_text(dialog, widget, str(folder_path))
 
 
     def force_state(self, qbutton, state, qtable):

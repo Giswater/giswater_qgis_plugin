@@ -59,7 +59,7 @@ class GwArcFusionButton(GwParentMapTool):
 
             # Set QDateEdit to current date
             current_date = QDate.currentDate()
-            tools_qt.setCalendarDate(self.dlg_fusion, "enddate", current_date)
+            tools_qt.set_calendar(self.dlg_fusion, "enddate", current_date)
 
             # Set signals
             self.dlg_fusion.btn_accept.clicked.connect(self.exec_fusion)

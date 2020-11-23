@@ -118,7 +118,7 @@ class GwElement:
         self.dlg_add_element.rejected.connect(
             partial(tools_qgis.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
-            partial(tools_gw.tab_feature_changed, self.dlg_add_element, []))
+            partial(tools_gw.get_signal_change_tab, self.dlg_add_element, []))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.element_id.textChanged.connect(
             partial(tools_qt.exist_object, self.dlg_add_element, table_object, layers=self.layers,
@@ -203,7 +203,7 @@ class GwElement:
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        tools_gw.tab_feature_changed(self.dlg_add_element)
+        tools_gw.get_signal_change_tab(self.dlg_add_element)
 
         # Force layer v_edit_element set active True
         if layer_element:
@@ -211,7 +211,7 @@ class GwElement:
 
         # If is a new element dont need set enddate
         if self.new_element_id is True:
-            tools_qt.setWidgetText(self.dlg_add_element, 'num_elements', '1')
+            tools_qt.set_widget_text(self.dlg_add_element, 'num_elements', '1')
 
         self.update_location_cmb()
         if not self.new_element_id:
@@ -533,7 +533,7 @@ class GwElement:
         dialog.close()
 
         self.manage_element(new_element_id=False)
-        tools_qt.setWidgetText(self.dlg_add_element, widget_id, selected_object_id)
+        tools_qt.set_widget_text(self.dlg_add_element, widget_id, selected_object_id)
 
 
     def check_date(self, widget, button=None, regex_type=1):

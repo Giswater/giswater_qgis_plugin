@@ -187,7 +187,7 @@ class Selector:
                 index = dialog.main_tab.currentIndex()
                 tab_name = dialog.main_tab.widget(index).objectName()
                 value = selector_vars[f"var_txt_filter_{tab_name}"]
-                tools_qt.setWidgetText(dialog, widget, f'{value}')
+                tools_qt.set_widget_text(dialog, widget, f'{value}')
                 widget.blockSignals(False)
 
     def set_selection_mode(self, dialog, widget, selection_mode, selector_vars):
@@ -211,7 +211,7 @@ class Selector:
             is_alone = True
             if widget_all is not None:
                 widget_all.blockSignals(True)
-                tools_qt.setChecked(dialog, widget_all, False)
+                tools_qt.set_checked(dialog, widget_all, False)
                 widget_all.blockSignals(False)
             self.remove_previuos(dialog, widget, widget_all, widget_list)
 
@@ -286,12 +286,12 @@ class Selector:
                     continue
                 elif checkbox.objectName() != widget.objectName():
                     checkbox.blockSignals(True)
-                    tools_qt.setChecked(dialog, checkbox, False)
+                    tools_qt.set_checked(dialog, checkbox, False)
                     checkbox.blockSignals(False)
 
             elif checkbox.objectName() != widget.objectName():
                 checkbox.blockSignals(True)
-                tools_qt.setChecked(dialog, checkbox, False)
+                tools_qt.set_checked(dialog, checkbox, False)
                 checkbox.blockSignals(False)
 
 
@@ -318,7 +318,7 @@ class Selector:
                 if widget == widget_all or widget.objectName() == widget_all.objectName():
                     continue
             widget.blockSignals(True)
-            tools_qt.setChecked(dialog, widget, status)
+            tools_qt.set_checked(dialog, widget, status)
             widget.blockSignals(False)
 
         self.set_selector(dialog, widget_all, False, selector_vars)

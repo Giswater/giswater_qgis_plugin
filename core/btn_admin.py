@@ -195,7 +195,7 @@ class GwAdmin:
         self.set_signals()
 
         # Set default project type
-        tools_qt.setWidgetText(self.dlg_readsql, self.cmb_project_type, 'ws')
+        tools_qt.set_widget_text(self.dlg_readsql, self.cmb_project_type, 'ws')
 
         # Update folderSoftware
         self.change_project_type(self.cmb_project_type)
@@ -283,8 +283,8 @@ class GwAdmin:
             tools_gw.show_message(msg, 1)
             tools_qt.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-            tools_qt.setWidgetText(self.dlg_readsql, 'lbl_status_text', msg)
-            tools_qt.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', msg)
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
             tools_gw.open_dialog(self.dlg_readsql, dlg_name='main_ui')
             return
 
@@ -311,30 +311,30 @@ class GwAdmin:
             tools_gw.show_message(msg, 1)
             tools_qt.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-            tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
         else:
             if str(self.plugin_version) > str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                     '(Schema version is lower than plugin version, please update schema)')
                 self.dlg_readsql.btn_info.setEnabled(True)
             elif str(self.plugin_version) < str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                     '(Schema version is higher than plugin version, please update plugin)')
                 self.dlg_readsql.btn_info.setEnabled(True)
             else:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
-                tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
                 self.dlg_readsql.btn_info.setEnabled(False)
             tools_qt.dis_enable_dialog(self.dlg_readsql, True)
 
         # Load last schema name selected and project type
         if tools_gw.get_parser_value('admin', 'last_project_type_selected') not in ('', None):
-            tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
                                    tools_gw.get_parser_value('admin', 'last_project_type_selected'))
         if tools_gw.get_parser_value('admin', 'last_schema_name_selected') not in ('', None):
-            tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name,
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name,
                                    tools_gw.get_parser_value('admin', 'last_schema_name_selected'))
 
         if show_dialog:
@@ -443,9 +443,9 @@ class GwAdmin:
 
         # Set default values
         schema_name = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        tools_qt.setWidgetText(self.dlg_create_gis_project, 'txt_gis_file', schema_name)
+        tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_file', schema_name)
         users_home = os.path.expanduser("~")
-        tools_qt.setWidgetText(self.dlg_create_gis_project, 'txt_gis_folder', users_home)
+        tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_folder', users_home)
 
         # Manage widgets
         if self.project_issample:
@@ -470,7 +470,7 @@ class GwAdmin:
 
         checked = self.dlg_create_gis_project.chk_is_sample.isChecked()
         self.dlg_create_gis_project.cmb_roletype.setEnabled(not checked)
-        tools_qt.setWidgetText(self.dlg_create_gis_project, self.dlg_create_gis_project.cmb_roletype, 'admin')
+        tools_qt.set_widget_text(self.dlg_create_gis_project, self.dlg_create_gis_project.cmb_roletype, 'admin')
 
 
     def btn_constrains_changed(self, button, call_function=False):
@@ -1543,8 +1543,8 @@ class GwAdmin:
                 if result:
                     self.project_epsg = '25831'
                     self.locale = 'EN'
-                    tools_qt.setWidgetText(self.dlg_readsql_create_project, 'srid_id', self.project_epsg)
-                    tools_qt.setWidgetText(self.dlg_readsql_create_project, 'cmb_locale', self.locale)
+                    tools_qt.set_widget_text(self.dlg_readsql_create_project, 'srid_id', self.project_epsg)
+                    tools_qt.set_widget_text(self.dlg_readsql_create_project, 'cmb_locale', self.locale)
                 else:
                     return
 
@@ -1639,7 +1639,7 @@ class GwAdmin:
             if not is_test:
                 self.populate_data_schema_name(self.cmb_project_type)
                 if schema_name is not None:
-                    tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
+                    tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
                     self.set_info_project()
         else:
             self.controller.dao.rollback()
@@ -1694,7 +1694,7 @@ class GwAdmin:
         if status:
             self.controller.dao.commit()
             self.event_change_connection()
-            tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
             if close_dlg_rename:
                 self.close_dialog_admin(self.dlg_readsql_rename)
         else:
@@ -1851,17 +1851,17 @@ class GwAdmin:
         else:
             if str(self.plugin_version) > str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                 '(Schema version is lower than plugin version, please update schema)')
                 self.dlg_readsql.btn_info.setEnabled(True)
             elif str(self.plugin_version) < str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-                tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                 '(Schema version is higher than plugin version, please update plugin)')
                 self.dlg_readsql.btn_info.setEnabled(True)
             else:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
-                tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+                tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
                 self.dlg_readsql.btn_info.setEnabled(False)
             tools_qt.dis_enable_dialog(self.dlg_readsql, True)
 
@@ -1874,9 +1874,9 @@ class GwAdmin:
             if not role_admin and self.username not in self.super_users:
                 tools_qt.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
-                tools_qt.setWidgetText(self.dlg_readsql, 'lbl_status_text',
+                tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text',
                     "You don't have permissions to administrate project schemas on this connection")
-                tools_qt.setWidgetText(self.dlg_readsql, 'lbl_schema_name', '')
+                tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
 
 
     def set_last_connection(self, connection_name):
@@ -2109,7 +2109,7 @@ class GwAdmin:
         """ Manage SRID configuration """
 
         self.filter_srid = self.dlg_readsql_create_project.findChild(QLineEdit, 'srid_id')
-        tools_qt.setWidgetText(self.dlg_readsql_create_project, self.filter_srid, '25831')
+        tools_qt.set_widget_text(self.dlg_readsql_create_project, self.filter_srid, '25831')
         self.tbl_srid = self.dlg_readsql_create_project.findChild(QTableView, 'tbl_srid')
         self.tbl_srid.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.model_srid = QSqlQueryModel()
@@ -2176,20 +2176,20 @@ class GwAdmin:
         self.dlg_readsql.setWindowTitle(window_title)
 
         if schema_name == 'Nothing to select' or schema_name == '':
-            tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
         elif str(self.plugin_version) > str(self.project_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-            tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                    '(Schema version is lower than plugin version, please update schema)')
             self.dlg_readsql.btn_info.setEnabled(True)
         elif str(self.plugin_version) < str(self.project_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
-            tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                    '(Schema version is higher than plugin version, please update plugin)')
             self.dlg_readsql.btn_info.setEnabled(False)
         else:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
-            tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
             self.dlg_readsql.btn_info.setEnabled(False)
 
 
@@ -2242,7 +2242,7 @@ class GwAdmin:
         self.project_descript.setText(tools_gw.get_parser_value('admin', 'project_descript'))
         create_schema_type = tools_gw.get_parser_value('admin', 'create_schema_type')
         if create_schema_type == 'True':
-            tools_qt.setChecked(self.dlg_readsql_create_project, str(create_schema_type))
+            tools_qt.set_checked(self.dlg_readsql_create_project, str(create_schema_type))
         if tools_gw.get_parser_value('admin', 'inp_file_path') not in ('null', None):
             self.data_file.setText(tools_gw.get_parser_value('admin', 'inp_file_path'))
 
@@ -2261,7 +2261,7 @@ class GwAdmin:
             self.cmb_create_project_type.addItem(str(aux))
 
         if project_type:
-            tools_qt.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type, project_type)
+            tools_qt.set_widget_text(self.dlg_readsql_create_project, self.cmb_create_project_type, project_type)
             self.change_project_type(self.cmb_create_project_type)
 
         # Enable_disable data file widgets
@@ -2275,7 +2275,7 @@ class GwAdmin:
         for locale in locales:
             self.cmb_locale.addItem(locale)
             if locale == 'EN':
-                tools_qt.setWidgetText(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
+                tools_qt.set_widget_text(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
 
         # Get database connection name
         self.connection_name = str(tools_qt.getWidgetText(self.dlg_readsql, self.cmb_connection))
@@ -2307,7 +2307,7 @@ class GwAdmin:
 
         # Get project_type from previous dialog
         self.cmb_project_type = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-        tools_qt.setWidgetText(self.dlg_readsql_create_project, self.cmb_create_project_type,
+        tools_qt.set_widget_text(self.dlg_readsql_create_project, self.cmb_create_project_type,
                                self.cmb_project_type)
         self.change_project_type(self.cmb_create_project_type)
 
@@ -2484,7 +2484,7 @@ class GwAdmin:
         if status:
             self.controller.dao.commit()
             self.event_change_connection()
-            tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(new_schema_name))
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(new_schema_name))
             self.close_dialog_admin(self.dlg_readsql_copy)
         else:
             self.controller.dao.rollback()
@@ -2761,7 +2761,7 @@ class GwAdmin:
         os.chdir(folder_path)
         message = tools_gw.tr("Select UI file")
         file_ui, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.ui')
-        tools_qt.setWidgetText(self.dlg_readsql, self.dlg_readsql.tpath, str(file_ui))
+        tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.tpath, str(file_ui))
 
 
     def update_manage_ui(self):
@@ -2948,7 +2948,7 @@ class GwAdmin:
 
             if value == 'NULL':
                 value = None
-            tools_qt.setWidgetText(self.dlg_manage_sys_fields, result, value)
+            tools_qt.set_widget_text(self.dlg_manage_sys_fields, result, value)
 
         tools_gw.open_dialog(self.dlg_manage_sys_fields)
 
@@ -2998,7 +2998,7 @@ class GwAdmin:
             value = str(widget.model().data(index))
             if value == 'NULL':
                 value = None
-            tools_qt.setWidgetText(self.dlg_manage_fields, result, value)
+            tools_qt.set_widget_text(self.dlg_manage_fields, result, value)
 
         tools_gw.open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
 
@@ -3027,7 +3027,7 @@ class GwAdmin:
         tools_qt.fill_combo_values(self.dlg_manage_fields.widgetfunction, rows, 1)
 
         # Set default value for formtype widget
-        tools_qt.setWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
+        tools_qt.set_widget_text(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
 
 
     def manage_update_sys_field(self, form_name):
@@ -3452,7 +3452,7 @@ class GwAdmin:
             tools_qt.show_info_box(msg, "Info")
             return
 
-        tools_qt.setWidgetText(self.dlg_credentials, self.dlg_credentials.cmb_connection, str(set_connection))
+        tools_qt.set_widget_text(self.dlg_credentials, self.dlg_credentials.cmb_connection, str(set_connection))
 
         self.dlg_credentials.btn_accept.clicked.connect(partial(self.set_credentials, self.dlg_credentials))
         self.dlg_credentials.cmb_connection.currentIndexChanged.connect(

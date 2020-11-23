@@ -266,7 +266,7 @@ class GwPsector:
             tools_qt.set_combo_value(self.cmb_sector_id, str(result['name']), 1)
             tools_qt.set_combo_value(self.cmb_status, str(row['status']), 0)
 
-            tools_qt.setChecked(self.dlg_plan_psector, "active", row['active'])
+            tools_qt.set_checked(self.dlg_plan_psector, "active", row['active'])
             self.fill_widget(self.dlg_plan_psector, "name", row)
             self.fill_widget(self.dlg_plan_psector, "descript", row)
             tools_qt.set_combo_value(self.dlg_plan_psector.priority, str(row["priority"]), 1)
@@ -405,7 +405,7 @@ class GwPsector:
             self.dlg_plan_psector, table_object, True, geom_type=self.geom_type, layers=self.layers))
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
-        self.dlg_plan_psector.tab_feature.currentChanged.connect(partial(tools_gw.tab_feature_changed,
+        self.dlg_plan_psector.tab_feature.currentChanged.connect(partial(tools_gw.get_signal_change_tab,
             self.dlg_plan_psector, excluded_layers=["v_edit_element"]))
         self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
         viewname = 'v_edit_plan_psector_x_other'
@@ -445,20 +445,20 @@ class GwPsector:
                 gexpenses = float(row[1]) if row[1] is not None else 0
                 vat = float(row[2]) if row[2] is not None else 0
 
-            tools_qt.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, other)
-            tools_qt.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, gexpenses)
-            tools_qt.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, vat)
+            tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.other, other)
+            tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, gexpenses)
+            tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.vat, vat)
 
-            tools_qt.setWidgetText(self.dlg_plan_psector, 'cur_total_node', self.sys_currency['symbol'])
-            tools_qt.setWidgetText(self.dlg_plan_psector, 'cur_total_arc', self.sys_currency['symbol'])
-            tools_qt.setWidgetText(self.dlg_plan_psector, 'cur_total_other', self.sys_currency['symbol'])
-            tools_qt.setWidgetText(self.dlg_plan_psector, 'cur_pem', self.sys_currency['symbol'])
-            tools_qt.setWidgetText(self.dlg_plan_psector, 'cur_pec_pem', self.sys_currency['symbol'])
-            tools_qt.setWidgetText(self.dlg_plan_psector, 'cur_pec', self.sys_currency['symbol'])
-            tools_qt.setWidgetText(self.dlg_plan_psector, 'cur_pecvat_pem', self.sys_currency['symbol'])
-            tools_qt.setWidgetText(self.dlg_plan_psector, 'cur_pec_vat', self.sys_currency['symbol'])
-            tools_qt.setWidgetText(self.dlg_plan_psector, 'cur_pca_pecvat', self.sys_currency['symbol'])
-            tools_qt.setWidgetText(self.dlg_plan_psector, 'cur_pca', self.sys_currency['symbol'])
+            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_total_node', self.sys_currency['symbol'])
+            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_total_arc', self.sys_currency['symbol'])
+            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_total_other', self.sys_currency['symbol'])
+            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pem', self.sys_currency['symbol'])
+            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pec_pem', self.sys_currency['symbol'])
+            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pec', self.sys_currency['symbol'])
+            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pecvat_pem', self.sys_currency['symbol'])
+            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pec_vat', self.sys_currency['symbol'])
+            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pca_pecvat', self.sys_currency['symbol'])
+            tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pca', self.sys_currency['symbol'])
 
         # Adding auto-completion to a QLineEdit for default feature
         viewname = "v_edit_" + self.geom_type
@@ -466,7 +466,7 @@ class GwPsector:
 
         # Set default tab 'arc'
         self.dlg_plan_psector.tab_feature.setCurrentIndex(0)
-        tools_gw.tab_feature_changed(self.dlg_plan_psector, excluded_layers=["v_edit_element"])
+        tools_gw.get_signal_change_tab(self.dlg_plan_psector, excluded_layers=["v_edit_element"])
 
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
@@ -529,7 +529,7 @@ class GwPsector:
                 if int(qtable.model().record(x).value('psector_id')) == int(psector_id):
                     if str(qtable.model().record(x).value('total_budget')) != 'NULL':
                         total += float(qtable.model().record(x).value('total_budget'))
-            tools_qt.setWidgetText(dialog, 'lbl_total', str(total))
+            tools_qt.set_widget_text(dialog, 'lbl_total', str(total))
         except:
             pass
 
@@ -541,9 +541,9 @@ class GwPsector:
         self.dlg_psector_rapport = PsectorRapportUi()
         tools_gw.load_settings(self.dlg_psector_rapport)
 
-        tools_qt.setWidgetText(self.dlg_psector_rapport, 'txt_composer_path', default_file_name + " comp.pdf")
-        tools_qt.setWidgetText(self.dlg_psector_rapport, 'txt_csv_detail_path', default_file_name + " detail.csv")
-        tools_qt.setWidgetText(self.dlg_psector_rapport, 'txt_csv_path', default_file_name + ".csv")
+        tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_composer_path', default_file_name + " comp.pdf")
+        tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_detail_path', default_file_name + " detail.csv")
+        tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_csv_path', default_file_name + ".csv")
 
         self.dlg_psector_rapport.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_psector_rapport))
         self.dlg_psector_rapport.btn_ok.clicked.connect(partial(self.generate_rapports))
@@ -551,20 +551,20 @@ class GwPsector:
             self.dlg_psector_rapport.txt_path))
 
         value = tools_gw.get_parser_value('psector_rapport', 'psector_rapport_path')
-        tools_qt.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path, value)
+        tools_qt.set_widget_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path, value)
         value = tools_gw.get_parser_value('psector_rapport', 'psector_rapport_chk_composer')
-        tools_qt.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer, value)
+        tools_qt.set_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer, value)
         value = tools_gw.get_parser_value('psector_rapport', 'psector_rapport_chk_csv_detail')
-        tools_qt.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail, value)
+        tools_qt.set_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail, value)
         value = tools_gw.get_parser_value('psector_rapport', 'psector_rapport_chk_csv')
-        tools_qt.setChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv, value)
+        tools_qt.set_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv, value)
 
         if tools_qt.getWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path) == 'null':
             if 'nt' in sys.builtin_module_names:
                 plugin_dir = os.path.expanduser("~\Documents")
             else:
                 plugin_dir = os.path.expanduser("~")
-            tools_qt.setWidgetText(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path, plugin_dir)
+            tools_qt.set_widget_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path, plugin_dir)
         self.populate_cmb_templates()
 
         # Open dialog
@@ -751,9 +751,9 @@ class GwPsector:
             for column_name in columns:
                 if column_name in row:
                     if row[column_name] is not None:
-                        tools_qt.setWidgetText(dialog, column_name, f"{row[column_name]:.02f}")
+                        tools_qt.set_widget_text(dialog, column_name, f"{row[column_name]:.02f}")
                     else:
-                        tools_qt.setWidgetText(dialog, column_name, f"{0:.02f}")
+                        tools_qt.set_widget_text(dialog, column_name, f"{0:.02f}")
 
         self.calc_pec_pem(dialog)
         self.calc_pecvat_pec(dialog)
@@ -773,7 +773,7 @@ class GwPsector:
             pem = 0
 
         res = f"{round(pec - pem, 2):.02f}"
-        tools_qt.setWidgetText(dialog, 'pec_pem', res)
+        tools_qt.set_widget_text(dialog, 'pec_pem', res)
 
 
     def calc_pecvat_pec(self, dialog):
@@ -788,7 +788,7 @@ class GwPsector:
         else:
             pec = 0
         res = f"{round(pec_vat - pec, 2):.02f}"
-        tools_qt.setWidgetText(dialog, 'pecvat_pem', res)
+        tools_qt.set_widget_text(dialog, 'pecvat_pem', res)
 
 
     def calc_pca_pecvat(self, dialog):
@@ -803,7 +803,7 @@ class GwPsector:
         else:
             pec_vat = 0
         res = f"{round(pca - pec_vat, 2):.02f}"
-        tools_qt.setWidgetText(dialog, 'pca_pecvat', res)
+        tools_qt.set_widget_text(dialog, 'pca_pecvat', res)
 
 
     def calulate_percents(self, tablename, psector_id, field):
@@ -824,7 +824,7 @@ class GwPsector:
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             des = self.dlg_plan_psector.all_rows.model().record(row).value('descript')
-        tools_qt.setWidgetText(self.dlg_plan_psector, self.lbl_descript, des)
+        tools_qt.set_widget_text(self.dlg_plan_psector, self.lbl_descript, des)
 
 
     def enable_tabs(self, enabled):
@@ -907,9 +907,9 @@ class GwPsector:
                f" WHERE psector_id = '{tools_qt.getWidgetText(self.dlg_plan_psector, 'psector_id')}'")
         row = self.controller.get_row(sql)
         if row:
-            tools_qt.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, row[0])
-            tools_qt.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, row[1])
-            tools_qt.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, row[2])
+            tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.other, row[0])
+            tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, row[1])
+            tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.vat, row[2])
 
         self.dlg_plan_psector.chk_enable_all.setEnabled(True)
 
@@ -1049,7 +1049,7 @@ class GwPsector:
 
         rotation = tools_qt.getWidgetText(self.dlg_plan_psector, "rotation", return_string_null=False)
         if rotation == "":
-            tools_qt.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.rotation, 0)
+            tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.rotation, 0)
 
         name_exist = self.check_name(psector_name)
         if name_exist and not self.update:
@@ -1135,7 +1135,7 @@ class GwPsector:
         if not self.update:
             sql += " RETURNING psector_id;"
             new_psector_id = self.controller.execute_returning(sql)
-            tools_qt.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
+            tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id and self.plan_om == 'plan':
                 row = tools_gw.get_config('plan_psector_vdefault')
                 if row:
@@ -1618,7 +1618,7 @@ class GwPsector:
                 if list_id != '':
                     sql += f"{list_id}) AND cur_user = current_user;"
                     self.controller.execute_sql(sql)
-                    tools_qt.setWidgetText(dialog, label, '')
+                    tools_qt.set_widget_text(dialog, label, '')
             sql = (f"DELETE FROM {table_name}"
                    f" WHERE {column_id} IN ({list_id});")
             self.controller.execute_sql(sql)
@@ -1637,7 +1637,7 @@ class GwPsector:
                f"WHERE cur_user = current_user)")
         row = self.controller.get_row(sql)
         if row:
-            tools_qt.setWidgetText(self.dlg_merm, 'lbl_vdefault_price', str(row[0]))
+            tools_qt.set_widget_text(self.dlg_merm, 'lbl_vdefault_price', str(row[0]))
 
         # Tables
         tablename = 'plan_result_cat'
@@ -1669,7 +1669,7 @@ class GwPsector:
         row = selected_list[0].row()
         price_name = self.dlg_merm.tbl_om_result_cat.model().record(row).value("name")
         result_id = self.dlg_merm.tbl_om_result_cat.model().record(row).value("result_id")
-        tools_qt.setWidgetText(self.dlg_merm, 'lbl_vdefault_price', price_name)
+        tools_qt.set_widget_text(self.dlg_merm, 'lbl_vdefault_price', price_name)
         sql = (f"DELETE FROM selector_plan_result WHERE current_user = cur_user;"
                f"\nINSERT INTO selector_plan_result (result_id, cur_user)"
                f" VALUES({result_id}, current_user);")
@@ -1719,4 +1719,4 @@ class GwPsector:
         row = global_vars.controller.get_row(sql)
         if not row:
             return
-        tools_qt.setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
+        tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', row[0])

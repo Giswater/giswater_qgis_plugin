@@ -18,6 +18,7 @@ if 'nt' in sys.builtin_module_names:
 from collections import OrderedDict
 from functools import partial
 
+from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint, QDate, QCoreApplication, QSettings, QTranslator
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
@@ -770,7 +771,7 @@ def reset_layers(layers):
     return layers
 
 
-def tab_feature_changed(dialog, excluded_layers=[]):
+def get_signal_change_tab(dialog, excluded_layers=[]):
     """ Set geom_type and layer depending selected tab
         @table_object = ['doc' | 'element' | 'cat_work']
     """
@@ -1009,7 +1010,7 @@ def populate_info_text(dialog, data, force_tab=True, reset_text=True, tab_idx=1,
             else:
                 text += "\n"
 
-    tools_qt.setWidgetText(dialog, 'txt_infolog', text + "\n")
+    tools_qt.set_widget_text(dialog, 'txt_infolog', text + "\n")
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
     if qtabwidget is not None:
         if change_tab and qtabwidget is not None:
@@ -1340,7 +1341,7 @@ def disable_tabs(dialog):
 
     btn_cancel = dialog.findChild(QPushButton, 'btn_cancel')
     if btn_cancel:
-        tools_qt.setWidgetText(dialog, btn_accept, 'Close')
+        tools_qt.set_widget_text(dialog, btn_accept, 'Close')
 
 
 def set_style_mapzones():
@@ -1790,7 +1791,7 @@ def add_calendar(dialog, field):
     widget.setDisplayFormat('dd/MM/yyyy')
     if 'value' in field and field['value'] not in ('', None, 'null'):
         date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
-        tools_qt.setCalendarDate(dialog, widget, date)
+        tools_qt.set_calendar(dialog, widget, date)
     else:
         widget.clear()
     btn_calendar = widget.findChild(QToolButton)
@@ -2448,7 +2449,7 @@ def get_rows_by_feature_type(dialog, table_object, geom_type, ids=None, list_ids
             ids.append(str(row[0]))
 
         expr_filter = get_expression_filter(geom_type, list_ids=list_ids, layers=layers)
-        tools_qt.set_table_model(dialog, widget_name, geom_type, expr_filter)
+        set_table_model(dialog, widget_name, geom_type, expr_filter)
 
     return ids, layers, list_ids
 
@@ -2892,7 +2893,7 @@ def show_exceptions_msg(title=None, msg="", window_title="Information about exce
     global_vars.dlg_info.setWindowTitle(window_title)
     if title:
         global_vars.dlg_info.lbl_text.setText(title)
-    tools_qt.setWidgetText(global_vars.dlg_info, global_vars.dlg_info.txt_infolog, msg)
+    tools_qt.set_widget_text(global_vars.dlg_info, global_vars.dlg_info.txt_infolog, msg)
     global_vars.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
     tools_qt.set_text_bold(global_vars.dlg_info.txt_infolog)
 
@@ -3026,3 +3027,103 @@ def manage_docker_options():
             global_vars.dlg_docker.position = pos
     except:
         global_vars.dlg_docker.position = 2
+
+
+def set_table_model(dialog, table_object, geom_type, expr_filter):
+    """ Sets a TableModel to @widget_name attached to
+        @table_name and filter @expr_filter
+    """
+
+    expr = None
+    if expr_filter:
+        # Check expression
+        (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
+        if not is_valid:
+            return expr
+
+    # Set a model with selected filter expression
+    #TODO:: Remove this if/else, parametize geom_type, send all layers maybe?
+    if geom_type in ("v_rtc_hydrometer"):
+        table_name = geom_type
+    else:
+        table_name = f"v_edit_{geom_type}"
+    if global_vars.schema_name not in table_name:
+        table_name = global_vars.schema_name + "." + table_name
+
+    # Set the model
+    model = QSqlTableModel(db=global_vars.controller.db)
+    model.setTable(table_name)
+    model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+    model.select()
+    if model.lastError().isValid():
+        show_warning(model.lastError().text())
+        return expr
+
+    # Attach model to selected widget
+    if type(table_object) is str:
+        widget = tools_qt.getWidget(dialog, table_object)
+        if not widget:
+            message = "Widget not found"
+            tools_log.log_info(message, parameter=table_object)
+            return expr
+    elif type(table_object) is QTableView:
+        # parent_vars.controller.log_debug(f"set_table_model: {table_object.objectName()}")
+        widget = table_object
+    else:
+        msg = "Table_object is not a table name or QTableView"
+        tools_log.log_info(msg)
+        return expr
+
+    if expr_filter:
+        widget.setModel(model)
+        widget.model().setFilter(expr_filter)
+        widget.model().select()
+    else:
+        widget.setModel(None)
+
+    return expr
+
+
+def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardItemModel=False, schema_name=None):
+    """ Configuration of tables. Set visibility and width of columns """
+
+    widget = tools_qt.getWidget(dialog, widget)
+    if not widget:
+        return
+
+    if schema_name is not None:
+        config_table = f"{schema_name}.config_form_tableview"
+    else:
+        config_table = f"config_form_tableview"
+
+    # Set width and alias of visible columns
+    columns_to_delete = []
+    sql = (f"SELECT columnindex, width, alias, status"
+           f" FROM {config_table}"
+           f" WHERE tablename = '{table_name}'"
+           f" ORDER BY columnindex")
+    rows = global_vars.controller.get_rows(sql, log_info=False)
+    if not rows:
+        return
+
+    for row in rows:
+        if not row['status']:
+            columns_to_delete.append(row['columnindex'] - 1)
+        else:
+            width = row['width']
+            if width is None:
+                width = 100
+            widget.setColumnWidth(row['columnindex'] - 1, width)
+            widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
+
+    # Set order
+    if isQStandardItemModel:
+        widget.model().sort(0, sort_order)
+    else:
+        widget.model().setSort(0, sort_order)
+        widget.model().select()
+    # Delete columns
+    for column in columns_to_delete:
+        widget.hideColumn(column)
+
+    return widget

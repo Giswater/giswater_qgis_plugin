@@ -458,7 +458,7 @@ class GwVisitManager:
 
         self.event_parameter_id = None
         self.event_feature_type = None
-        tools_qt.setWidgetEnabled(self.dlg_add_visit, 'parameter_id', True)
+        tools_qt.set_widget_enabled(self.dlg_add_visit, 'parameter_id', True)
 
         # A) Update current Visit record
         self.current_visit.id = int(text)
@@ -818,7 +818,7 @@ class GwVisitManager:
         # set a fake where expression to avoid to set model to None
         fake_filter = f'{geom_type}_id IN (-1)'
         widget_name = f'tbl_visit_x_{geom_type}'
-        tools_qt.set_table_model(dialog, widget_name, geom_type, fake_filter)
+        tools_gw.set_table_model(dialog, widget_name, geom_type, fake_filter)
 
         # set the callback to setup all events later
         # its not possible to setup listener in this moment beacouse set_table_model without
@@ -884,7 +884,7 @@ class GwVisitManager:
 
         if geom_type is None:
             # Set a model with selected filter. Attach that model to selected table
-            tools_qt.setWidgetText(self.dlg_man, self.dlg_man.lbl_filter, 'Filter by ext_code')
+            tools_qt.set_widget_text(self.dlg_man, self.dlg_man.lbl_filter, 'Filter by ext_code')
             filed_to_filter = "ext_code"
             table_object = "v_ui_om_visit"
             expr_filter = ""
@@ -892,7 +892,7 @@ class GwVisitManager:
             tools_qt.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
         else:
             # Set a model with selected filter. Attach that model to selected table
-            tools_qt.setWidgetText(self.dlg_man, self.dlg_man.lbl_filter, 'Filter by code')
+            tools_qt.set_widget_text(self.dlg_man, self.dlg_man.lbl_filter, 'Filter by code')
             filed_to_filter = "code"
             table_object = "v_ui_om_visitman_x_" + str(geom_type)
             expr_filter = f"{geom_type}_id = '{feature_id}'"
@@ -982,7 +982,7 @@ class GwVisitManager:
                     for i in range(0, self.dlg_add_visit.visitcat_id.count()):
                         elem = self.dlg_add_visit.visitcat_id.itemData(i)
                         if str(row[0]) == str(elem[0]):
-                            tools_qt.setWidgetText(self.dlg_add_visit.visitcat_id, (elem[1]))
+                            tools_qt.set_widget_text(self.dlg_add_visit.visitcat_id, (elem[1]))
                 except TypeError:
                     pass
                 except ValueError:
@@ -1146,7 +1146,7 @@ class GwVisitManager:
         if form_type != 'event_ud_arc_rehabit':
             val = tools_gw.get_config('om_visit_paramvalue_vdefault')
             if val:
-                tools_qt.setWidgetText(self.dlg_event, self.dlg_event.value, val[0])
+                tools_qt.set_widget_text(self.dlg_event, self.dlg_event.value, val[0])
 
         # Manage QTableView docx_x_event
         tools_qt.set_qtv_config(self.dlg_event.tbl_docs_x_event)
@@ -1424,13 +1424,13 @@ class GwVisitManager:
             dlg_name = 'visit_event'
             # set fixed values
             if event_code not in ('NULL', None):
-                tools_qt.setWidgetText(self.dlg_event, self.dlg_event.event_code, event_code)
+                tools_qt.set_widget_text(self.dlg_event, self.dlg_event.event_code, event_code)
             if _value not in ('NULL', None):
-                tools_qt.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
+                tools_qt.set_widget_text(self.dlg_event, self.dlg_event.value, _value)
             if position_value not in ('NULL', None):
-                tools_qt.setWidgetText(self.dlg_event, self.dlg_event.position_value, position_value)
+                tools_qt.set_widget_text(self.dlg_event, self.dlg_event.position_value, position_value)
             if text not in ('NULL', None):
-                tools_qt.setWidgetText(self.dlg_event, self.dlg_event.text, text)
+                tools_qt.set_widget_text(self.dlg_event, self.dlg_event.text, text)
             self.dlg_event.position_id.setEnabled(False)
             self.dlg_event.position_value.setEnabled(False)
 
@@ -1452,7 +1452,7 @@ class GwVisitManager:
             self.dlg_event.geom1.setText(str(geom1))
             self.dlg_event.geom2.setText(str(geom2))
             self.dlg_event.geom3.setText(str(geom3))
-            tools_qt.setWidgetText(self.dlg_event, self.dlg_event.text, text)
+            tools_qt.set_widget_text(self.dlg_event, self.dlg_event.text, text)
             # disable position_x fields because not allowed in multiple view
             self.dlg_event.position_id.setEnabled(True)
             self.dlg_event.position_value.setEnabled(True)
@@ -1472,11 +1472,11 @@ class GwVisitManager:
             self.dlg_event = VisitEvent()
             tools_gw.load_settings(self.dlg_event)
             if event_code not in ('NULL', None):
-                tools_qt.setWidgetText(self.dlg_event, self.dlg_event.event_code, event_code)
+                tools_qt.set_widget_text(self.dlg_event, self.dlg_event.event_code, event_code)
             if _value not in ('NULL', None):
-                tools_qt.setWidgetText(self.dlg_event, self.dlg_event.value, _value)
+                tools_qt.set_widget_text(self.dlg_event, self.dlg_event.value, _value)
             if text not in ('NULL', None):
-                tools_qt.setWidgetText(self.dlg_event, self.dlg_event.text, text)
+                tools_qt.set_widget_text(self.dlg_event, self.dlg_event.text, text)
 
         # Manage QTableView docx_x_event
         tools_qt.set_qtv_config(self.dlg_event.tbl_docs_x_event)
