@@ -68,7 +68,7 @@ def manage_user_config_file():
     if global_vars.user_settings:
         return
 
-    global_vars.user_settings = configparser.ConfigParser(comment_prefixes='/', allow_no_value=True)
+    global_vars.user_settings = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
     main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
     config_folder = main_folder + os.sep + "config" + os.sep
     global_vars.user_settings_path = config_folder + 'user.config'

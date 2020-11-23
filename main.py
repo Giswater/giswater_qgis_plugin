@@ -114,7 +114,7 @@ class Giswater(QObject):
         """ Check if @section and @parameter exists in user settings file. If not add them = None """
         value = None
         try:
-            parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+            parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
             main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
             path = main_folder + os.sep + "config" + os.sep + 'user.config'
             if not os.path.exists(path):
@@ -239,7 +239,7 @@ class Giswater(QObject):
 
     def save_toolbars_position(self):
 
-        parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+        parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
         config_folder = main_folder + os.sep + "config" + os.sep
         if not os.path.exists(config_folder):

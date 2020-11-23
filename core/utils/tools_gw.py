@@ -464,7 +464,7 @@ def get_parser_value(section: str, parameter: str) -> str:
     """ Load a simple parser value """
     value = None
     try:
-        parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+        parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
         path = main_folder + os.sep + "config" + os.sep + 'user.config'
         if not os.path.exists(path):
@@ -479,7 +479,7 @@ def get_parser_value(section: str, parameter: str) -> str:
 def set_parser_value(section: str, parameter: str, value: str):
     """  Save simple parser value """
     try:
-        parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+        parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
         config_folder = main_folder + os.sep + "config" + os.sep
         if not os.path.exists(config_folder):

@@ -234,7 +234,7 @@ class LoadProject(QObject):
         toolbar_names = global_vars.settings.value(f"toolbars/list_toolbars")
 
         # Get user UI config file
-        parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+        parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
         path = main_folder + os.sep + "config" + os.sep + 'user.config'
 
