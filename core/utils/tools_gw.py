@@ -129,6 +129,7 @@ class SnappingConfigManager(object):
         """ Set snapping to 'arc' """
 
         QgsProject.instance().blockSignals(True)
+        self.set_snapping_layers()
         layer_settings = self.snap_to_layer(self.layer_arc, QgsPointLocator.All, True)
         if layer_settings:
             layer_settings.setType(2)
@@ -610,7 +611,7 @@ def refresh_legend(controller):
     for layer in layers:
         if layer:
             ltl = QgsProject.instance().layerTreeRoot().findLayer(layer.id())
-            ltm = controller.iface.layerTreeView().model()
+            ltm = global_vars.iface.layerTreeView().model()
             legendNodes = ltm.layerLegendNodes(ltl)
             for ln in legendNodes:
                 current_state = ln.data(Qt.CheckStateRole)

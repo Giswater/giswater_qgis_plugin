@@ -23,6 +23,7 @@ from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import Profile, ProfilesList
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_log
+import global_vars
 
 
 class NodeData:
@@ -112,7 +113,7 @@ class GwProfileButton(GwParentMapTool):
 
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
-        if self.controller.dlg_docker:
+        if global_vars.dlg_docker:
             # self.controller.manage_translation('draw_profile', self.dlg_draw_profile)
             tools_gw.dock_dialog(self.dlg_draw_profile)
         else:
