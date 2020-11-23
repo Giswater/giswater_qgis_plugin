@@ -33,7 +33,7 @@ from .ui.ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjec
 from .utils import tools_gw
 from .. import global_vars
 from ..i18n.i18n_generator import GwI18NGenerator
-from ..lib import tools_qt, tools_qgis, tools_log
+from ..lib import tools_qt, tools_qgis, tools_log, tools_db
 
 
 class GwAdmin:
@@ -301,11 +301,11 @@ class GwAdmin:
         self.update_manage_ui()
         self.visit_manager()
 
-        if not self.controller.check_role(self.username) and not show_dialog:
+        if not tools_db.check_role(self.username) and not show_dialog:
             tools_log.log_warning(f"User not found: {self.username}")
             return
 
-        role_admin = self.controller.check_role_user("role_admin", self.username)
+        role_admin = tools_db.check_role_user("role_admin", self.username)
         if not role_admin and self.username not in self.super_users:
             msg = "You don't have permissions to administrate project schemas on this connection"
             tools_gw.show_message(msg, 1)
@@ -344,10 +344,10 @@ class GwAdmin:
     def manage_docker(self):
 
         try:
-            self.controller.init_docker('qgis_main_docker')
-            if self.controller.dlg_docker:
-                self.controller.dock_dialog(self.dlg_readsql)
-                self.dlg_readsql.dlg_closed.connect(self.controller.close_docker)
+            tools_gw.init_docker('qgis_main_docker')
+            if global_vars.dlg_docker:
+                tools_gw.dock_dialog(self.dlg_readsql)
+                self.dlg_readsql.dlg_closed.connect(tools_gw.close_docker)
             else:
                 tools_gw.open_dialog(self.dlg_readsql, dlg_name='main_ui')
         except RuntimeError as e:
@@ -1870,7 +1870,7 @@ class GwAdmin:
 
         if self.logged:
             self.username = self.get_user_connection(self.get_last_connection())
-            role_admin = self.controller.check_role_user("role_admin", self.username)
+            role_admin = tools_db.check_role_user("role_admin", self.username)
             if not role_admin and self.username not in self.super_users:
                 tools_qt.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
@@ -2140,10 +2140,10 @@ class GwAdmin:
         schema_name = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         # TODO: Make just one SQL query
-        self.project_type = self.controller.get_project_type(schemaname=schema_name)
-        self.project_epsg = self.controller.get_project_epsg(schemaname=schema_name)
-        self.project_version = self.controller.get_project_version(schemaname=schema_name)
-        self.project_language = self.controller.get_project_language(schemaname=schema_name)
+        self.project_type = tools_gw.get_project_type(schemaname=schema_name)
+        self.project_epsg = self.get_project_epsg(schemaname=schema_name)
+        self.project_version = self.get_project_version(schemaname=schema_name)
+        self.project_language = self.get_project_language(schemaname=schema_name)
 
         self.postgresql_version = self.controller.get_postgresql_version()
         self.postgis_version = self.controller.get_postgis_version()
@@ -2400,7 +2400,7 @@ class GwAdmin:
                 if status is False:
                     self.error_count = self.error_count + 1
                     tools_log.log_info(str("read_execute_file error"), parameter=filepath)
-                    tools_log.log_info(str('Message: ' + str(self.controller.last_error)))
+                    tools_log.log_info(str('Message: ' + str(global_vars.last_error)))
                     if self.dev_commit == 'TRUE':
                         self.controller.dao.rollback()
                     return False
@@ -3470,3 +3470,81 @@ class GwAdmin:
                f"SET value = '{composers_path_vdef}' "
                f"WHERE parameter = 'qgis_composers_folderpath' AND cur_user = current_user")
         self.controller.execute_sql(sql)
+
+
+    def get_project_version(self, schemaname=None):
+        """ Get project version from table 'version' """
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        project_version = None
+        tablename = "sys_version"
+        exists = tools_db.check_table(tablename, schemaname)
+        if exists:
+            sql = ("SELECT giswater FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
+            row = self.controller.get_row(sql)
+            if row:
+                project_version = row[0]
+        else:
+            tablename = "version"
+            exists = tools_db.check_table(tablename, schemaname)
+            if exists:
+                sql = ("SELECT giswater FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
+                row = self.controller.get_row(sql)
+                if row:
+                    project_version = row[0]
+
+        return project_version
+
+
+    def get_project_language(self, schemaname=None):
+        """ Get project langugage from table 'version' """
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        project_language = None
+        tablename = "sys_version"
+        exists = tools_db.check_table(tablename, schemaname)
+        if exists:
+            sql = ("SELECT language FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
+            row = self.controller.get_row(sql)
+            if row:
+                project_language = row[0]
+        else:
+            tablename = "version"
+            exists = tools_db.check_table(tablename, schemaname)
+            if exists:
+                sql = ("SELECT language FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
+                row = self.controller.get_row(sql)
+                if row:
+                    project_language = row[0]
+
+        return project_language
+
+
+    def get_project_epsg(self, schemaname=None):
+        """ Get project epsg from table 'version' """
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        project_epsg = None
+        tablename = "sys_version"
+        exists = tools_db.check_table(tablename, schemaname)
+        if exists:
+            sql = ("SELECT epsg FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
+            row = self.controller.get_row(sql)
+            if row:
+                project_epsg = row[0]
+        else:
+            tablename = "version"
+            exists = tools_db.check_table(tablename, schemaname)
+            if exists:
+                sql = ("SELECT epsg FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
+                row = self.controller.get_row(sql)
+                if row:
+                    project_epsg = row[0]
+
+        return project_epsg

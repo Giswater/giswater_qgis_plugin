@@ -69,17 +69,17 @@ class GwElement:
         self.layers['gully'] = []
         self.layers['element'] = []
 
-        self.layers['arc'] = self.controller.get_group_layers('arc')
-        self.layers['node'] = self.controller.get_group_layers('node')
-        self.layers['connec'] = self.controller.get_group_layers('connec')
-        self.layers['element'] = self.controller.get_group_layers('element')
+        self.layers['arc'] = tools_gw.get_group_layers('arc')
+        self.layers['node'] = tools_gw.get_group_layers('node')
+        self.layers['connec'] = tools_gw.get_group_layers('connec')
+        self.layers['element'] = tools_gw.get_group_layers('element')
 
         # Remove 'gully' for 'WS'
-        self.project_type = self.controller.get_project_type()
+        self.project_type = tools_gw.get_project_type()
         if self.project_type == 'ws':
             tools_qt.remove_tab_by_tabName(self.dlg_add_element.tab_feature, 'tab_gully')
         else:
-            self.layers['gully'] = self.controller.get_group_layers('gully')
+            self.layers['gully'] = tools_gw.get_group_layers('gully')
 
         # Set icons
         tools_qt.set_icon(self.dlg_add_element.btn_add_geom, "133")
@@ -99,7 +99,7 @@ class GwElement:
         layer_element = self.controller.get_layer_by_tablename("v_edit_element")
         layer_is_visible = False
         if layer_element:
-            layer_is_visible = self.controller.is_layer_visible(layer_element)
+            layer_is_visible = tools_qgis.is_layer_visible(layer_element)
 
         # Adding auto-completion to a QLineEdit
         table_object = "element"
@@ -108,15 +108,15 @@ class GwElement:
         # Set signals
         self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
         self.dlg_add_element.btn_accept.clicked.connect(
-            partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
+            partial(tools_qgis.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.btn_cancel.clicked.connect(lambda: setattr(self, 'layers',
             tools_qt.manage_close(self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[],layers=self.layers)))
         self.dlg_add_element.btn_cancel.clicked.connect(
-            partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
+            partial(tools_qgis.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.rejected.connect(lambda: setattr(self, 'layers', tools_qt.manage_close(self.dlg_add_element,
             table_object, cur_active_layer, excluded_layers=[],layers=self.layers)))
         self.dlg_add_element.rejected.connect(
-            partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
+            partial(tools_qgis.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
             partial(tools_gw.tab_feature_changed, self.dlg_add_element, []))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
@@ -207,7 +207,7 @@ class GwElement:
 
         # Force layer v_edit_element set active True
         if layer_element:
-            self.controller.set_layer_visible(layer_element)
+            tools_qgis.set_layer_visible(layer_element)
 
         # If is a new element dont need set enddate
         if self.new_element_id is True:
@@ -239,7 +239,7 @@ class GwElement:
 
     def manage_combo(self, combo, parameter):
 
-        row = self.controller.get_config(parameter)
+        row = tools_gw.get_config(parameter)
         if row:
             tools_qt.set_combo_value(combo, row[0], 0)
 

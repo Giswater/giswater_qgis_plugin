@@ -38,7 +38,7 @@ class GwDeleteFeatureButton(GwParentAction):
         layer_name = 'v_edit_' + tools_qt.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
-        self.controller.set_layer_visible(layer)
+        tools_qgis.set_layer_visible(layer)
 
         # Disable button delete feature
         self.dlg_feature_delete.btn_delete.setEnabled(False)
@@ -205,7 +205,7 @@ class GwDeleteFeatureButton(GwParentAction):
                      tools_qt.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
-        self.controller.set_layer_visible(layer)
+        tools_qgis.set_layer_visible(layer)
 
         # Clear feature id field
         tools_qt.setWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, '')

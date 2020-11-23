@@ -52,3 +52,9 @@ def open_browser(web_tag):
 
     webbrowser.open_new_tab('https://giswater.org/giswater-manual/#' + web_tag)
 
+
+def get_values_from_dictionary(dictionary):
+    """ Return values from @dictionary """
+
+    list_values = iter(dictionary.values())
+    return list_values

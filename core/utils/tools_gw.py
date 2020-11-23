@@ -29,9 +29,9 @@ from qgis.core import QgsProject, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsFi
 from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint, QgsDateTimeEdit
 
 from ..models.sys_feature_cat import SysFeatureCat
-from ..ui.ui_manager import GwDialog, GwMainWindow, DialogTextUi
+from ..ui.ui_manager import GwDialog, GwMainWindow, DialogTextUi, DockerUi
 from ... import global_vars
-from ...lib import tools_qgis, tools_pgdao, tools_qt, tools_log, tools_config, tools_os
+from ...lib import tools_qgis, tools_pgdao, tools_qt, tools_log, tools_config, tools_os, tools_db
 from ...lib.tools_qt import GwHyperLinkLabel
 
 
@@ -448,6 +448,7 @@ def load_settings(dialog):
     except:
         pass
 
+# TODO Start Generic Section
 
 def save_settings(dialog):
     """ Save user UI related with dialog position and size """
@@ -637,26 +638,26 @@ def hide_generic_layers(excluded_layers=[]):
     layers_changed = {}
     layer = global_vars.controller.get_layer_by_tablename("v_edit_arc")
     if layer and "v_edit_arc" not in excluded_layers:
-        layers_changed[layer] = global_vars.controller.is_layer_visible(layer)
-        global_vars.controller.set_layer_visible(layer)
+        layers_changed[layer] = tools_qgis.is_layer_visible(layer)
+        tools_qgis.set_layer_visible(layer)
     layer = global_vars.controller.get_layer_by_tablename("v_edit_node")
     if layer and "v_edit_node" not in excluded_layers:
-        layers_changed[layer] = global_vars.controller.is_layer_visible(layer)
-        global_vars.controller.set_layer_visible(layer)
+        layers_changed[layer] = tools_qgis.is_layer_visible(layer)
+        tools_qgis.set_layer_visible(layer)
     layer = global_vars.controller.get_layer_by_tablename("v_edit_connec")
     if layer and "v_edit_connec" not in excluded_layers:
-        layers_changed[layer] = global_vars.controller.is_layer_visible(layer)
-        global_vars.controller.set_layer_visible(layer)
+        layers_changed[layer] = tools_qgis.is_layer_visible(layer)
+        tools_qgis.set_layer_visible(layer)
     layer = global_vars.controller.get_layer_by_tablename("v_edit_element")
     if layer and "v_edit_element" not in excluded_layers:
-        layers_changed[layer] = global_vars.controller.is_layer_visible(layer)
-        global_vars.controller.set_layer_visible(layer)
+        layers_changed[layer] = tools_qgis.is_layer_visible(layer)
+        tools_qgis.set_layer_visible(layer)
 
     if global_vars.project_type == 'ud':
         layer = global_vars.controller.get_layer_by_tablename("v_edit_gully")
         if layer and "v_edit_gully" not in excluded_layers:
-            layers_changed[layer] = global_vars.controller.is_layer_visible(layer)
-            global_vars.controller.set_layer_visible(layer)
+            layers_changed[layer] = tools_qgis.is_layer_visible(layer)
+            tools_qgis.set_layer_visible(layer)
 
     return layers_changed
 
@@ -877,7 +878,7 @@ def from_postgres_to_toc(tablename=None, the_geom="the_geom", field_id="id", chi
 
 def create_qml(layer, style):
 
-    main_folder = os.path.join(os.path.expanduser("~"), global_vars.controller.plugin_name)
+    main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
     config_folder = main_folder + os.sep + "temp" + os.sep
     if not os.path.exists(config_folder):
         os.makedirs(config_folder)
@@ -1650,7 +1651,7 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             function_name = field['widgetfunction']
-            exist = global_vars.controller.check_python_function(module, function_name)
+            exist = check_python_function(module, function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
                 show_message(msg, 2)
@@ -1760,7 +1761,7 @@ def add_hyperlink(field):
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             func_name = field['widgetfunction']
-            exist = global_vars.controller.check_python_function(tools_qt, func_name)
+            exist = check_python_function(tools_qt, func_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
                 show_message(msg, 2)
@@ -1885,7 +1886,7 @@ def add_tableview(complet_result, field):
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             function_name = field['widgetfunction']
-            exist = global_vars.controller.check_python_function(sys.modules[__name__], function_name)
+            exist = check_python_function(sys.modules[__name__], function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
                 show_message(msg, 2)
@@ -2076,6 +2077,14 @@ def get_actions_from_json(json_result, sql):
                 tools_log.log_debug(f"{type(e).__name__}: {e}")
     except Exception as e:
         manage_exception(None, f"{type(e).__name__}: {e}", sql)
+
+
+def check_python_function(object_, function_name):
+
+    object_functions = [method_name for method_name in dir(object_) if callable(getattr(object_, method_name))]
+    return function_name in object_functions
+
+# TODO End Generic Section
 
 
 # TODO tools_gw_config
@@ -2423,7 +2432,7 @@ def get_rows_by_feature_type(dialog, table_object, geom_type, ids=None, list_ids
     table_relation = table_object + "_x_" + geom_type
     widget_name = "tbl_" + table_relation
 
-    exists = global_vars.controller.check_table(table_relation)
+    exists = tools_db.check_table(table_relation)
     if not exists:
         tools_log.log_info(f"Not found: {table_relation}")
         return ids, layers, list_ids
@@ -2442,6 +2451,111 @@ def get_rows_by_feature_type(dialog, table_object, geom_type, ids=None, list_ids
 
     return ids, layers, list_ids
 
+
+def get_project_type(schemaname=None):
+    """ Get project type from table 'version' """
+
+    # init variables
+    project_type = None
+    if schemaname is None:
+        schemaname = global_vars.schema_name
+
+    # start process
+    tablename = "sys_version"
+    exists = tools_db.check_table(tablename, schemaname)
+    if exists:
+        sql = ("SELECT lower(project_type) FROM " + schemaname + "." + tablename + " ORDER BY id ASC LIMIT 1")
+        row = global_vars.controller.get_row(sql)
+        if row:
+            project_type = row[0]
+    else:
+        tablename = "version"
+        exists = tools_db.check_table(tablename, schemaname)
+        if exists:
+            sql = ("SELECT lower(wsoftware) FROM " + schemaname + "." + tablename + " ORDER BY id ASC LIMIT 1")
+            row = global_vars.controller.get_row(sql)
+            if row:
+                project_type = row[0]
+        else:
+            tablename = "version_tm"
+            exists = tools_db.check_table(tablename, schemaname)
+            if exists:
+                project_type = "tm"
+
+    return project_type
+
+
+def get_group_layers(geom_type):
+    """ Get layers of the group @geom_type """
+
+    list_items = []
+    sql = ("SELECT child_layer "
+           "FROM cat_feature "
+           "WHERE upper(feature_type) = '" + geom_type.upper() + "' "
+           "UNION SELECT DISTINCT parent_layer "
+           "FROM cat_feature "
+           "WHERE upper(feature_type) = '" + geom_type.upper() + "';")
+    rows = global_vars.controller.get_rows(sql)
+    if rows:
+        for row in rows:
+            layer = global_vars.controller.get_layer_by_tablename(row[0])
+            if layer:
+                list_items.append(layer)
+
+    return list_items
+
+
+def get_restriction(qgis_project_role):
+
+    role_edit = False
+    role_om = False
+    role_epa = False
+    role_basic = False
+
+    role_master = tools_db.check_role_user("role_master")
+    if not role_master:
+        role_epa = tools_db.check_role_user("role_epa")
+        if not role_epa:
+            role_edit = tools_db.check_role_user("role_edit")
+            if not role_edit:
+                role_om = tools_db.check_role_user("role_om")
+                if not role_om:
+                    role_basic = tools_db.check_role_user("role_basic")
+    super_users = global_vars.settings.value('system_variables/super_users')
+
+    # Manage user 'postgres'
+    if global_vars.user == 'postgres' or global_vars.user == 'gisadmin':
+        role_master = True
+
+    # Manage super_user
+    if super_users is not None:
+        if global_vars.user in super_users:
+            role_master = True
+
+    if role_basic or qgis_project_role == 'role_basic':
+        return 'role_basic'
+    elif role_om or qgis_project_role == 'role_om':
+        return 'role_om'
+    elif role_edit or qgis_project_role == 'role_edit':
+        return 'role_edit'
+    elif role_epa or qgis_project_role == 'role_epa':
+        return 'role_epa'
+    elif role_master or qgis_project_role == 'role_master':
+        return 'role_master'
+    else:
+        return 'role_basic'
+
+
+def get_config(parameter='', columns='value', table='config_param_user', sql_added=None, log_info=True):
+
+    sql = f"SELECT {columns} FROM {table} WHERE parameter = '{parameter}' "
+    if sql_added:
+        sql += sql_added
+    if table == 'config_param_user':
+        sql += " AND cur_user = current_user"
+    sql += ";"
+    row = global_vars.controller.get_row(sql, log_info=log_info)
+    return row
 
 # TODO tools_gw_log
 
@@ -2497,6 +2611,101 @@ def show_critical(text, duration=10, context_name=None, parameter=None, logger_f
     show_message(text, 2, duration, context_name, parameter, title)
     if global_vars.logger and logger_file:
         global_vars.logger.critical(text)
+
+
+def manage_layer_manager(json_result, sql):
+    """
+    Manage options for layers (active, visible, zoom and indexing)
+    :param json_result: Json result of a query (Json)
+    :return: None
+    """
+
+    try:
+        layermanager = json_result['body']['layerManager']
+    except KeyError:
+        return
+
+    try:
+
+        # force visible and in case of does not exits, load it
+        if 'visible' in layermanager:
+            for lyr in layermanager['visible']:
+                layer_name = [key for key in lyr][0]
+                layer = global_vars.controller.get_layer_by_tablename(layer_name)
+                if layer is None:
+                    the_geom = lyr[layer_name]['geom_field']
+                    field_id = lyr[layer_name]['pkey_field']
+                    if lyr[layer_name]['group_layer'] is not None:
+                        group = lyr[layer_name]['group_layer']
+                    else:
+                        group = "GW Layers"
+                    style_id = lyr[layer_name]['style_id']
+                    from_postgres_to_toc(layer_name, the_geom, field_id, group=group, style_id=style_id)
+                tools_qgis.set_layer_visible(layer)
+
+        # force reload dataProvider in order to reindex.
+        if 'index' in layermanager:
+            for lyr in layermanager['index']:
+                layer_name = [key for key in lyr][0]
+                layer = global_vars.controller.get_layer_by_tablename(layer_name)
+                if layer:
+                    tools_qgis.set_layer_index(layer)
+
+        # Set active
+        if 'active' in layermanager:
+            layer = global_vars.controller.get_layer_by_tablename(layermanager['active'])
+            if layer:
+                global_vars.iface.setActiveLayer(layer)
+
+        # Set zoom to extent with a margin
+        if 'zoom' in layermanager:
+            layer = global_vars.controller.get_layer_by_tablename(layermanager['zoom']['layer'])
+            if layer:
+                prev_layer = global_vars.iface.activeLayer()
+                global_vars.iface.setActiveLayer(layer)
+                global_vars.iface.zoomToActiveLayer()
+                margin = layermanager['zoom']['margin']
+                set_margin(layer, margin)
+                if prev_layer:
+                    global_vars.iface.setActiveLayer(prev_layer)
+
+        # Set snnaping options
+        if 'snnaping' in layermanager:
+            snapper_manager = SnappingConfigManager(global_vars.iface)
+            for layer_name in layermanager['snnaping']:
+                layer = global_vars.controller.get_layer_by_tablename(layer_name)
+                if layer:
+                    QgsProject.instance().blockSignals(True)
+                    layer_settings = snapper_manager.snap_to_layer(layer, QgsPointLocator.All, True)
+                    if layer_settings:
+                        layer_settings.setType(2)
+                        layer_settings.setTolerance(15)
+                        layer_settings.setEnabled(True)
+                    else:
+                        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
+                    snapping_config = snapper_manager.get_snapping_options()
+                    snapping_config.setIndividualLayerSettings(layer, layer_settings)
+                    QgsProject.instance().blockSignals(False)
+                    QgsProject.instance().snappingConfigChanged.emit(snapping_config)
+            snapper_manager.set_snapping_mode()
+            del snapper_manager
+
+
+    except Exception as e:
+        manage_exception(None, f"{type(e).__name__}: {e}", sql)
+
+
+def set_margin(layer, margin):
+    extent = QgsRectangle()
+    extent.setMinimal()
+    extent.combineExtentWith(layer.extent())
+    xmax = extent.xMaximum() + margin
+    xmin = extent.xMinimum() - margin
+    ymax = extent.yMaximum() + margin
+    ymin = extent.yMinimum() - margin
+    extent.set(xmin, ymin, xmax, ymax)
+    global_vars.iface.mapCanvas().setExtent(extent)
+    global_vars.iface.mapCanvas().refresh()
 
 
 # TODO tools_gw_qt
@@ -2731,98 +2940,88 @@ def show_dlg_info():
     if global_vars.dlg_info:
         global_vars.dlg_info.show()
 
+def dock_dialog(dialog):
 
-def manage_layer_manager(json_result, sql):
-    """
-    Manage options for layers (active, visible, zoom and indexing)
-    :param json_result: Json result of a query (Json)
-    :return: None
-    """
-
+    positions = {8: Qt.BottomDockWidgetArea, 4: Qt.TopDockWidgetArea,
+                 2: Qt.RightDockWidgetArea, 1: Qt.LeftDockWidgetArea}
     try:
-        layermanager = json_result['body']['layerManager']
-    except KeyError:
-        return
+        global_vars.dlg_docker.setWindowTitle(dialog.windowTitle())
+        global_vars.dlg_docker.setWidget(dialog)
+        global_vars.dlg_docker.setWindowFlags(Qt.WindowContextHelpButtonHint)
+        global_vars.iface.addDockWidget(positions[global_vars.dlg_docker.position], global_vars.dlg_docker)
+    except RuntimeError as e:
+        tools_log.log_warning(f"{type(e).__name__} --> {e}")
 
+
+def init_docker(docker_param='qgis_info_docker'):
+    """ Get user config parameter @docker_param """
+
+    global_vars.show_docker = True
+    if docker_param == 'qgis_main_docker':
+        # Show 'main dialog' in docker depending its value in user settings
+        qgis_main_docker = tools_config.get_user_setting_value(docker_param, 'true')
+        value = qgis_main_docker.lower()
+    else:
+        # Show info or form in docker?
+        row = get_config(docker_param)
+        if not row:
+            global_vars.dlg_docker = None
+            global_vars.docker_type = None
+            return None
+        value = row[0].lower()
+
+    # Check if docker has dialog of type 'form' or 'main'
+    if docker_param == 'qgis_info_docker':
+        if global_vars.dlg_docker:
+            if global_vars.docker_type:
+                if global_vars.docker_type != 'qgis_info_docker':
+                    global_vars.show_docker = False
+                    return None
+
+    if value == 'true':
+        close_docker()
+        global_vars.docker_type = docker_param
+        global_vars.dlg_docker = DockerUi()
+        global_vars.dlg_docker.dlg_closed.connect(close_docker)
+        manage_docker_options()
+    else:
+        global_vars.dlg_docker = None
+        global_vars.docker_type = None
+
+    return global_vars.dlg_docker
+
+
+def close_docker():
+    """ Save QDockWidget position (1=Left, 2=Right, 4=Top, 8=Bottom),
+        remove from iface and del class
+    """
     try:
-
-        # force visible and in case of does not exits, load it
-        if 'visible' in layermanager:
-            for lyr in layermanager['visible']:
-                layer_name = [key for key in lyr][0]
-                layer = global_vars.controller.get_layer_by_tablename(layer_name)
-                if layer is None:
-                    the_geom = lyr[layer_name]['geom_field']
-                    field_id = lyr[layer_name]['pkey_field']
-                    if lyr[layer_name]['group_layer'] is not None:
-                        group = lyr[layer_name]['group_layer']
-                    else:
-                        group = "GW Layers"
-                    style_id = lyr[layer_name]['style_id']
-                    from_postgres_to_toc(layer_name, the_geom, field_id, group=group, style_id=style_id)
-                global_vars.controller.set_layer_visible(layer)
-
-        # force reload dataProvider in order to reindex.
-        if 'index' in layermanager:
-            for lyr in layermanager['index']:
-                layer_name = [key for key in lyr][0]
-                layer = global_vars.controller.get_layer_by_tablename(layer_name)
-                if layer:
-                    global_vars.controller.set_layer_index(layer)
-
-        # Set active
-        if 'active' in layermanager:
-            layer = global_vars.controller.get_layer_by_tablename(layermanager['active'])
-            if layer:
-                global_vars.iface.setActiveLayer(layer)
-
-        # Set zoom to extent with a margin
-        if 'zoom' in layermanager:
-            layer = global_vars.controller.get_layer_by_tablename(layermanager['zoom']['layer'])
-            if layer:
-                prev_layer = global_vars.iface.activeLayer()
-                global_vars.iface.setActiveLayer(layer)
-                global_vars.iface.zoomToActiveLayer()
-                margin = layermanager['zoom']['margin']
-                set_margin(layer, margin)
-                if prev_layer:
-                    global_vars.iface.setActiveLayer(prev_layer)
-
-        # Set snnaping options
-        if 'snnaping' in layermanager:
-            snapper_manager = SnappingConfigManager(global_vars.iface)
-            for layer_name in layermanager['snnaping']:
-                layer = global_vars.controller.get_layer_by_tablename(layer_name)
-                if layer:
-                    QgsProject.instance().blockSignals(True)
-                    layer_settings = snapper_manager.snap_to_layer(layer, QgsPointLocator.All, True)
-                    if layer_settings:
-                        layer_settings.setType(2)
-                        layer_settings.setTolerance(15)
-                        layer_settings.setEnabled(True)
-                    else:
-                        layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 2, 15, 1)
-                    snapping_config = snapper_manager.get_snapping_options()
-                    snapping_config.setIndividualLayerSettings(layer, layer_settings)
-                    QgsProject.instance().blockSignals(False)
-                    QgsProject.instance().snappingConfigChanged.emit(snapping_config)
-            snapper_manager.set_snapping_mode()
-            del snapper_manager
+        if global_vars.dlg_docker:
+            if not global_vars.dlg_docker.isFloating():
+                docker_pos = global_vars.iface.mainWindow().dockWidgetArea(global_vars.dlg_docker)
+                widget = global_vars.dlg_docker.widget()
+                if widget:
+                    widget.close()
+                    del widget
+                    global_vars.dlg_docker.setWidget(None)
+                    global_vars.docker_type = None
+                    set_parser_value('docker_info', 'position', f'{docker_pos}')
+                global_vars.iface.removeDockWidget(global_vars.dlg_docker)
+                global_vars.dlg_docker = None
+    except AttributeError:
+        global_vars.docker_type = None
+        global_vars.dlg_docker = None
 
 
-    except Exception as e:
-        manage_exception(None, f"{type(e).__name__}: {e}", sql)
+def manage_docker_options():
+    """ Check if user want dock the dialog or not """
 
-
-def set_margin(layer, margin):
-
-    extent = QgsRectangle()
-    extent.setMinimal()
-    extent.combineExtentWith(layer.extent())
-    xmax = extent.xMaximum() + margin
-    xmin = extent.xMinimum() - margin
-    ymax = extent.yMaximum() + margin
-    ymin = extent.yMinimum() - margin
-    extent.set(xmin, ymin, xmax, ymax)
-    global_vars.iface.mapCanvas().setExtent(extent)
-    global_vars.iface.mapCanvas().refresh()
+    # Load last docker position
+    try:
+        # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
+        pos = int(get_parser_value('docker_info', 'position'))
+        global_vars.dlg_docker.position = 2
+        if pos in (1, 2, 4, 8):
+            global_vars.dlg_docker.position = pos
+    except:
+        global_vars.dlg_docker.position = 2

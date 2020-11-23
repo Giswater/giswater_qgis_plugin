@@ -44,7 +44,7 @@ class GwPsector:
     def new_psector(self, psector_id=None, plan_om=None, is_api=False):
         """ Buttons 45 and 81: New psector """
 
-        row = self.controller.get_config(parameter='admin_currency', columns='value::text', table='config_param_system')
+        row = tools_gw.get_config(parameter='admin_currency', columns='value::text', table='config_param_system')
         if row:
             self.sys_currency = json.loads(row[0], object_pairs_hook=OrderedDict)
 
@@ -56,7 +56,7 @@ class GwPsector:
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
         tools_qt.set_selectionbehavior(self.dlg_plan_psector)
-        self.project_type = self.controller.get_project_type()
+        self.project_type = tools_gw.get_project_type()
 
         # Get layers of every geom_type
         self.list_elemets = {}
@@ -81,11 +81,11 @@ class GwPsector:
         self.layers['element'] = []
 
 
-        self.layers['arc'] = self.controller.get_group_layers('arc')
-        self.layers['node'] = self.controller.get_group_layers('node')
-        self.layers['connec'] = self.controller.get_group_layers('connec')
+        self.layers['arc'] = tools_gw.get_group_layers('arc')
+        self.layers['node'] = tools_gw.get_group_layers('node')
+        self.layers['connec'] = tools_gw.get_group_layers('connec')
         if self.project_type.upper() == 'UD':
-            self.layers['gully'] = self.controller.get_group_layers('gully')
+            self.layers['gully'] = tools_gw.get_group_layers('gully')
         else:
             tools_qt.remove_tab_by_tabName(self.dlg_plan_psector.tab_feature, 'tab_gully')
 
@@ -599,7 +599,7 @@ class GwPsector:
             self.dlg_psector_rapport.lbl_composer_disabled.setText('')
             tools_qt.fill_combo_values(self.dlg_psector_rapport.cmb_templates, records, 1)
 
-        row = self.controller.get_config(f'composer_plan_vdefault')
+        row = tools_gw.get_config(f'composer_plan_vdefault')
         if row:
             tools_qt.set_combo_value(self.dlg_psector_rapport.cmb_templates, row[0], 1)
 
@@ -929,7 +929,7 @@ class GwPsector:
 
         project_vars = global_vars.project_vars
         role = project_vars['role']
-        role = global_vars.controller.get_restriction(role)
+        role = tools_gw.get_restriction(role)
         if role in restriction:
             widget_list = dialog.findChildren(QWidget)
             for widget in widget_list:
@@ -1137,7 +1137,7 @@ class GwPsector:
             new_psector_id = self.controller.execute_returning(sql)
             tools_qt.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id and self.plan_om == 'plan':
-                row = self.controller.get_config('plan_psector_vdefault')
+                row = tools_gw.get_config('plan_psector_vdefault')
                 if row:
                     sql = (f"UPDATE config_param_user "
                            f" SET value = $${new_psector_id[0]}$$ "
@@ -1594,7 +1594,7 @@ class GwPsector:
             message = "Any record selected"
             tools_gw.show_warning(message)
             return
-        cur_psector = self.controller.get_config('plan_psector_vdefault')
+        cur_psector = tools_gw.get_config('plan_psector_vdefault')
         inf_text = ""
         list_id = ""
         for i in range(0, len(selected_list)):

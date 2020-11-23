@@ -7,8 +7,8 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from ..parent_dialog import GwParentAction
 from ...shared.selector import Selector
-from .... import global_vars
 
+from ....core.utils import tools_gw
 
 class GwSelectorButton(GwParentAction):
 
@@ -20,6 +20,6 @@ class GwSelectorButton(GwParentAction):
         selector_type = '"selector_basic"'
 
         # Show form in docker?
-        global_vars.controller.init_docker('qgis_form_docker')
+        tools_gw.init_docker('qgis_form_docker')
         selector = Selector()
         selector.open_selector(selector_type)

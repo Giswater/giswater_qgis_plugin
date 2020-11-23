@@ -32,7 +32,7 @@ class GwGo2Epa:
         self.g2epa_opt = GwGo2EpaOptions()
         self.iterations = 0
         self.controller = global_vars.controller
-        self.project_type = self.controller.get_project_type()
+        self.project_type = tools_gw.get_project_type()
         self.plugin_dir = global_vars.plugin_dir
 
 
@@ -40,7 +40,7 @@ class GwGo2Epa:
         """ Button 23: Open form to set INP, RPT and project """
 
         # Show form in docker?
-        self.controller.init_docker('qgis_form_docker')
+        tools_gw.init_docker('qgis_form_docker')
 
         # Create dialog
         self.dlg_go2epa = Go2EpaUI()
@@ -71,11 +71,11 @@ class GwGo2Epa:
 
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
 
-        if self.controller.dlg_docker:
+        if global_vars.dlg_docker:
             tools_gw.manage_translation('go2epa', self.dlg_go2epa)
-            self.controller.dock_dialog(self.dlg_go2epa)
+            tools_gw.dock_dialog(self.dlg_go2epa)
             self.dlg_go2epa.btn_cancel.clicked.disconnect()
-            self.dlg_go2epa.btn_cancel.clicked.connect(self.controller.close_docker)
+            self.dlg_go2epa.btn_cancel.clicked.connect(tools_gw.close_docker)
         else:
             tools_gw.open_dialog(self.dlg_go2epa, dlg_name='go2epa')
 

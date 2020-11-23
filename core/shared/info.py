@@ -35,7 +35,7 @@ from ..utils.tools_gw import SnappingConfigManager
 from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log
+from ...lib import tools_qgis, tools_qt, tools_log, tools_db
 from ...lib.tools_qt import GwHyperLinkLabel
 
 
@@ -257,7 +257,7 @@ class GwInfo(QObject):
         layers_visibility = {}
         for layer in layers:
 
-            layers_visibility[layer] = self.controller.is_layer_visible(layer)
+            layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
         return layers_visibility
 
 
@@ -537,16 +537,16 @@ class GwInfo(QObject):
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
         title = f"{complet_result[0]['body']['feature']['childType']} - {self.feature_id}"
 
-        if self.controller.dlg_docker and is_docker and self.controller.show_docker:
+        if global_vars.dlg_docker and is_docker and global_vars.show_docker:
             # Delete last form from memory
-            last_info = self.controller.dlg_docker.findChild(GwMainWindow, 'api_cf')
+            last_info = global_vars.dlg_docker.findChild(GwMainWindow, 'api_cf')
             if last_info:
                 last_info.setParent(None)
                 del last_info
 
-            self.controller.dock_dialog(dlg_cf)
-            self.controller.dlg_docker.dlg_closed.connect(self.manage_docker_close)
-            self.controller.dlg_docker.setWindowTitle(title)
+            tools_gw.dock_dialog(dlg_cf)
+            global_vars.dlg_docker.dlg_closed.connect(self.manage_docker_close)
+            global_vars.dlg_docker.setWindowTitle(title)
             btn_cancel.clicked.connect(self.manage_docker_close)
 
         else:
@@ -560,7 +560,7 @@ class GwInfo(QObject):
 
         # Set title
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
-        row = self.controller.get_config('admin_customform_param', 'value', 'config_param_system')
+        row = tools_gw.get_config('admin_customform_param', 'value', 'config_param_system')
         if row:
             results = json.loads(row[0], object_pairs_hook=OrderedDict)
             for result in results['custom_form_tab_labels']:
@@ -584,7 +584,7 @@ class GwInfo(QObject):
             locale = 'ca'
         elif locale == 'en_us':
             locale = 'en'
-        project_type = global_vars.controller.get_project_type()
+        project_type = tools_gw.get_project_type()
         # Get PDF file
         pdf_folder = os.path.join(global_vars.plugin_dir, f'resources{os.sep}png')
         pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
@@ -1023,7 +1023,7 @@ class GwInfo(QObject):
 
         self.roll_back()
         self.rubber_band.reset()
-        self.controller.close_docker()
+        tools_gw.close_docker()
 
 
     def manage_info_close(self, dialog):
@@ -1130,7 +1130,7 @@ class GwInfo(QObject):
                 self.manage_accept(dialog, action_edit, new_feature, self.my_json, False)
                 self.my_json = {}
             elif self.new_feature_id is not None:
-                if self.controller.dlg_docker and self.controller.show_docker:
+                if global_vars.dlg_docker and global_vars.show_docker:
                     self.manage_docker_close()
                 else:
                     tools_gw.close_dialog(dialog)
@@ -1517,9 +1517,9 @@ class GwInfo(QObject):
         after_insert = False
 
         if _json == '' or str(_json) == '{}':
-            if self.controller.dlg_docker:
-                self.controller.dlg_docker.setMinimumWidth(dialog.width())
-                self.controller.close_docker()
+            if global_vars.dlg_docker:
+                global_vars.dlg_docker.setMinimumWidth(dialog.width())
+                tools_gw.close_docker()
             tools_gw.close_dialog(dialog)
             return None
 
@@ -1576,8 +1576,8 @@ class GwInfo(QObject):
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
                 if close_dlg:
-                    if self.controller.dlg_docker:
-                        self.controller.close_docker()
+                    if global_vars.dlg_docker:
+                        tools_gw.close_docker()
                     tools_gw.close_dialog(dialog)
                 return True
 
@@ -1613,7 +1613,7 @@ class GwInfo(QObject):
             return False
 
         if close_dlg:
-            if self.controller.dlg_docker:
+            if global_vars.dlg_docker:
                 self.manage_docker_close()
             tools_gw.close_dialog(dialog)
             return None
@@ -2506,7 +2506,7 @@ class GwInfo(QObject):
         self.dlg_event_full.tbl_docs_x_event.horizontalHeader().setStretchLastSection(True)
         self.dlg_event_full.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(3)
         # Get columns name and set headers of model with that
-        columns_name = self.controller.get_columns_list('om_visit_event_photo')
+        columns_name = tools_db.get_columns_list('om_visit_event_photo')
         headers = []
         for x in columns_name:
             headers.append(x[0])
@@ -3506,7 +3506,7 @@ class GwInfo(QObject):
         else:
             tools_log.log_info(str(type("NO FEATURE TYPE DEFINED")))
 
-        self.controller.init_docker()
+        tools_gw.init_docker()
         self.controller.is_inserting = True
 
         self.api_cf = GwInfo('data')

@@ -295,7 +295,7 @@ class GwDimensioning:
 
             # Get depth of the feature
             fieldname = None
-            self.project_type = self.controller.get_project_type()
+            self.project_type = tools_gw.get_project_type()
             if self.project_type == 'ws':
                 fieldname = "depth"
             elif self.project_type == 'ud' and feat_type == 'node':
@@ -362,7 +362,7 @@ class GwDimensioning:
     def create_map_tips(self):
         """ Create MapTips on the map """
 
-        row = self.controller.get_config('qgis_dim_tooltip')
+        row = tools_gw.get_config('qgis_dim_tooltip')
         if not row or row[0].lower() != 'true':
             return
 

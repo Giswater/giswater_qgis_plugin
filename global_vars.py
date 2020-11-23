@@ -48,6 +48,13 @@ user = None
 
 translator = None
 
+current_user = None
+
+dlg_docker = None
+show_docker = None
+docker_type = None
+
+
 def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name):
 
     global iface, canvas, plugin_dir, plugin_name

@@ -80,7 +80,7 @@ class GwInfoButton(GwParentMapTool):
             self.block_signal = False
             return
 
-        self.controller.init_docker()
+        tools_gw.init_docker()
 
         if event.button() == Qt.LeftButton:
             point = self.create_point(event)
@@ -91,7 +91,7 @@ class GwInfoButton(GwParentMapTool):
             api_cf.signal_activate.connect(self.reactivate_map_tool)
             api_cf.get_info_from_coordinates(point, tab_type=self.tab_type)
             # Remove previous rubberband when open new docker
-            if isinstance(self.previous_api_cf, GwInfo) and self.controller.dlg_docker is not None:
+            if isinstance(self.previous_api_cf, GwInfo) and global_vars.dlg_docker is not None:
                 self.previous_api_cf.resetRubberbands()
             self.previous_api_cf = api_cf
 

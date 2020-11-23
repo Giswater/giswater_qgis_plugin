@@ -204,7 +204,7 @@ def get_visible_layers(as_list=False):
         visible_layer = '['
     layers = global_vars.controller.get_layers()
     for layer in layers:
-        if global_vars.controller.is_layer_visible(layer):
+        if is_layer_visible(layer):
             table_name = global_vars.controller.get_layer_source_table_name(layer)
             table = layer.dataProvider().dataSourceUri()
             # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
@@ -957,3 +957,32 @@ def get_layer_by_layername(layername, log_info=False):
         tools_log.log_info("Layer not found", parameter=layername)
 
     return layer
+
+
+def is_layer_visible(layer):
+    """ Is layer visible """
+
+    visible = False
+    if layer:
+        visible = QgsProject.instance().layerTreeRoot().findLayer(layer.id()).itemVisibilityChecked()
+
+    return visible
+
+
+def set_layer_visible(layer, recursive=True, visible=True):
+    """ Set layer visible """
+
+    if layer:
+        if recursive:
+            QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityCheckedParentRecursive(visible)
+        else:
+            QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(visible)
+
+
+def set_layer_index(layer_name):
+    """ Force reload dataProvider of layer """
+
+    layer = global_vars.controller.get_layer_by_tablename(layer_name)
+    if layer:
+        layer.dataProvider().forceReload()
+        layer.triggerRepaint()

@@ -14,7 +14,7 @@ from qgis.core import Qgis
 from .utils import tools_gw
 from .ui.ui_manager import ProjectCheckUi
 from .. import global_vars
-from ..lib import tools_qgis
+from ..lib import tools_qgis, tools_log
 from ..lib.tools_qt import hide_void_groupbox
 
 
@@ -209,7 +209,7 @@ class GwProjectCheck:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']
                             tools_gw.create_qml(layer, qml)
-                self.controller.set_layer_visible(layer)
+                tools_qgis.set_layer_visible(layer)
 
         tools_gw.close_dialog(self.dlg_audit_project)
 

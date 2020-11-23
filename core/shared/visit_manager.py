@@ -30,7 +30,7 @@ from ..ui.ui_manager import VisitUi, VisitEvent, VisitEventRehab, VisitManagerUi
 from ..utils import tools_gw
 from ..utils.tools_gw import SnappingConfigManager
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log
+from ...lib import tools_qgis, tools_qt, tools_log, tools_db
 
 
 class GwVisitManager:
@@ -109,15 +109,15 @@ class GwVisitManager:
         self.layers['gully'] = []
         self.layers['element'] = []
 
-        self.layers['arc'] = self.controller.get_group_layers('arc')
-        self.layers['node'] = self.controller.get_group_layers('node')
-        self.layers['connec'] = self.controller.get_group_layers('connec')
-        self.layers['element'] = self.controller.get_group_layers('element')
-        if self.controller.get_project_type() == 'ud':
-            self.layers['gully'] = self.controller.get_group_layers('gully')
+        self.layers['arc'] = tools_gw.get_group_layers('arc')
+        self.layers['node'] = tools_gw.get_group_layers('node')
+        self.layers['connec'] = tools_gw.get_group_layers('connec')
+        self.layers['element'] = tools_gw.get_group_layers('element')
+        if tools_gw.get_project_type() == 'ud':
+            self.layers['gully'] = tools_gw.get_group_layers('gully')
 
         # Remove 'gully' for 'WS'
-        if self.controller.get_project_type() == 'ws':
+        if tools_gw.get_project_type() == 'ws':
             tools_qt.remove_tab_by_tabName(self.dlg_add_visit.tab_feature, 'tab_gully')
 
         # Feature type of selected parameter
@@ -167,26 +167,26 @@ class GwVisitManager:
 
         # Check the default dates, if it does not exist force today
         _date = QDate.currentDate()
-        date_string = self.controller.get_config('om_visit_startdate_vdefault')
+        date_string = tools_gw.get_config('om_visit_startdate_vdefault')
         if date_string:
             _date = datetime.strptime(date_string[0], '%Y/%m/%d')
         self.dlg_add_visit.startdate.setDate(_date)
 
         # Check the default dates, if it does not exist force today
         _date = QDate.currentDate()
-        date_string = self.controller.get_config('om_visit_startdate_vdefault')
+        date_string = tools_gw.get_config('om_visit_startdate_vdefault')
         if date_string:
             _date = datetime.strptime(date_string[0], '%Y/%m/%d')
         self.dlg_add_visit.startdate.setDate(_date)
 
-        date_string = self.controller.get_config('om_visit_enddate_vdefault')
+        date_string = tools_gw.get_config('om_visit_enddate_vdefault')
         if date_string is not None:
             _date = datetime.strptime(date_string[0], '%Y/%m/%d')
         self.dlg_add_visit.enddate.setDate(_date)
 
         # set User name get from controller login
-        if self.controller.user and self.user_name:
-            self.user_name.setText(str(self.controller.user))
+        if global_vars.user and self.user_name:
+            self.user_name.setText(str(global_vars.user))
 
         # set the start tab to be shown (e.g. tab_visit)
         self.current_tab_index = self.tab_index('tab_visit')
@@ -205,7 +205,7 @@ class GwVisitManager:
 
         self.visit_id.setText(str(visit_id))
 
-        if self.controller.get_project_type() == 'ud':
+        if tools_gw.get_project_type() == 'ud':
             self.event_feature_type_selected(self.dlg_add_visit, "gully")
         self.event_feature_type_selected(self.dlg_add_visit, "node")
         self.event_feature_type_selected(self.dlg_add_visit, "connec")
@@ -250,7 +250,7 @@ class GwVisitManager:
     def restore_layers_visibility(self, layers):
 
         for layer, visibility in layers.items():
-            self.controller.set_layer_visible(layer, False, visibility)
+            tools_qgis.set_layer_visible(layer, False, visibility)
 
 
     def zoom_box(self, box):
@@ -556,7 +556,7 @@ class GwVisitManager:
             self.update_relations_geom_type("arc")
             self.update_relations_geom_type("node")
             self.update_relations_geom_type("connec")
-            if self.controller.get_project_type() == 'ud':
+            if tools_gw.get_project_type() == 'ud':
                 self.update_relations_geom_type("gully")
         else:
             self.update_relations_geom_type(self.geom_type)
@@ -650,7 +650,7 @@ class GwVisitManager:
         self.current_tab_index = index
 
         # Set user devault parameter
-        parameter_id = self.controller.get_config('om_visit_parameter_vdefault')
+        parameter_id = tools_gw.get_config('om_visit_parameter_vdefault')
         if parameter_id:
             tools_qt.set_combo_value(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
 
@@ -670,7 +670,7 @@ class GwVisitManager:
             tools_qt.fill_combo_values(dialog.parameter_id, rows, 1)
 
         # Set user devault parameter
-        parameter_id = self.controller.get_config('om_visit_parameter_vdefault')
+        parameter_id = tools_gw.get_config('om_visit_parameter_vdefault')
         if parameter_id:
             tools_qt.set_combo_value(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
 
@@ -974,7 +974,7 @@ class GwVisitManager:
         if self.visitcat_ids:
             tools_qt.fill_combo_values(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
             # now get default value to be show in visitcat_id
-            row = self.controller.get_config('om_visit_cat_vdefault')
+            row = tools_gw.get_config('om_visit_cat_vdefault')
             if row:
                 # if int then look for default row ans set it
                 try:
@@ -1003,7 +1003,7 @@ class GwVisitManager:
         rows = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
         if rows:
             tools_qt.fill_combo_values(self.dlg_add_visit.status, rows, 1, sort_combo=True)
-            status = self.controller.get_config('om_visit_status_vdefault')
+            status = tools_gw.get_config('om_visit_status_vdefault')
             if status:
                 tools_qt.set_combo_value(self.dlg_add_visit.status, str(status[0]), 0)
 
@@ -1031,7 +1031,7 @@ class GwVisitManager:
         tools_qt.fill_combo_values(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
 
         # now get default value to be show in parameter_type_id
-        row = self.controller.get_config('om_param_type_vdefault', log_info=False)
+        row = tools_gw.get_config('om_param_type_vdefault', log_info=False)
         if row:
             tools_qt.set_combo_value(self.dlg_add_visit.parameter_type_id, row[0], 0)
 
@@ -1144,7 +1144,7 @@ class GwVisitManager:
 
         # form_type event_ud_arc_rehabit dont have widget value
         if form_type != 'event_ud_arc_rehabit':
-            val = self.controller.get_config('om_visit_paramvalue_vdefault')
+            val = tools_gw.get_config('om_visit_paramvalue_vdefault')
             if val:
                 tools_qt.setWidgetText(self.dlg_event, self.dlg_event.value, val[0])
 
@@ -1227,7 +1227,7 @@ class GwVisitManager:
         self.dlg_event.tbl_docs_x_event.horizontalHeader().setSectionResizeMode(3)
 
         # Get columns name and set headers of model with that
-        columns_name = self.controller.get_columns_list('om_visit_event_photo')
+        columns_name = tools_db.get_columns_list('om_visit_event_photo')
         headers = []
         for x in columns_name:
             headers.append(x[0])

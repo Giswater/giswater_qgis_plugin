@@ -46,7 +46,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
     def edit_change_elem_type_accept(self):
         """ Update current type of node and save changes in database """
 
-        project_type = self.controller.get_project_type()
+        project_type = tools_gw.get_project_type()
         node_node_type_new = tools_qt.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
         node_nodecat_id = tools_qt.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id)
 
@@ -119,7 +119,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 
         # Get nodetype_id from current node
         node_type = ""
-        project_type = self.controller.get_project_type()
+        project_type = tools_gw.get_project_type()
         if project_type == 'ws':
             node_type = feature.attribute('nodetype_id')
             self.dlg_chg_node_type.node_node_type_new.currentIndexChanged.connect(partial(self.filter_catalog))

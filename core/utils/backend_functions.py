@@ -202,10 +202,10 @@ class GwInfoTools:
         if not layers_name_list:
             return
         if type(layers_name_list) == str:
-            self.controller.set_layer_index(layers_name_list)
+            tools_qgis.set_layer_index(layers_name_list)
         if type(layers_name_list) == list:
             for layer_name in layers_name_list:
-                self.controller.set_layer_index(layer_name)
+                tools_qgis.set_layer_index(layer_name)
 
 
     def refresh_attribute_table(self, **kwargs):
@@ -307,7 +307,7 @@ class GwInfoTools:
                 layer.triggerRepaint()
             elif type(layers_name_list) == list:
                 for layer_name in layers_name_list:
-                    self.controller.set_layer_index(layer_name)
+                    tools_qgis.set_layer_index(layer_name)
         except:
             all_layers = self.controller.get_layers()
             for layer in all_layers:

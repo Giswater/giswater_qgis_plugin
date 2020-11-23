@@ -139,8 +139,8 @@ class GwConnectLinkButton(GwParentMapTool):
                         self.cancel_map_tool()
 
         # Force reload dataProvider of layer
-        self.controller.set_layer_index('v_edit_link')
-        self.controller.set_layer_index('v_edit_vnode')
+        tools_qgis.set_layer_index('v_edit_link')
+        tools_qgis.set_layer_index('v_edit_vnode')
 
 
     def activate(self):

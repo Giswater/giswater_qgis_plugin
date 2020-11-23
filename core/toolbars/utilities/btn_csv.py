@@ -33,7 +33,7 @@ class GwCSVButton(GwParentAction):
         tools_gw.load_settings(self.dlg_csv)
 
         # Get roles from BD
-        roles = self.controller.get_rolenames()
+        roles = self.get_rolenames()
         temp_tablename = 'temp_csv'
         self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
         self.populate_combos(self.dlg_csv.cmb_import_type, 'fid',
@@ -330,3 +330,25 @@ class GwCSVButton(GwParentAction):
             unicode_row = [x for x in row]
             items = [QStandardItem(field) for field in unicode_row]
             model.appendRow(items)
+
+
+    def get_rolenames(self):
+        """ Get list of rolenames of current user """
+
+        super_users = self.settings.value('system_variables/super_users')
+        if global_vars.user in super_users:
+            roles = "('role_admin', 'role_basic', 'role_edit', 'role_epa', 'role_master', 'role_om')"
+        else:
+            sql = ("SELECT rolname FROM pg_roles "
+                   " WHERE pg_has_role(current_user, oid, 'member')")
+            rows = self.controller.get_rows(sql)
+            if not rows:
+                return None
+
+            roles = "("
+            for i in range(0, len(rows)):
+                roles += "'" + str(rows[i][0]) + "', "
+            roles = roles[:-2]
+            roles += ")"
+
+        return roles

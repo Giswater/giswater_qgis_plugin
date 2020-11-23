@@ -45,9 +45,9 @@ class GwEndFeatureButton(GwParentAction):
         self.layers['gully'] = []
         self.layers['element'] = []
 
-        self.layers['arc'] = self.controller.get_group_layers('arc')
-        self.layers['node'] = self.controller.get_group_layers('node')
-        self.layers['connec'] = self.controller.get_group_layers('connec')
+        self.layers['arc'] = tools_gw.get_group_layers('arc')
+        self.layers['node'] = tools_gw.get_group_layers('node')
+        self.layers['connec'] = tools_gw.get_group_layers('connec')
         self.layers['element'] = [self.controller.get_layer_by_tablename('v_edit_element')]
 
         self.layers = tools_qgis.remove_selection(True, layers=self.layers)
@@ -67,11 +67,11 @@ class GwEndFeatureButton(GwParentAction):
         tools_qt.set_selectionbehavior(self.dlg_work_end)
 
         # Remove 'gully' for 'WS'
-        self.project_type = self.controller.get_project_type()
+        self.project_type = tools_gw.get_project_type()
         if self.project_type == 'ws':
             tools_qt.remove_tab_by_tabName(self.dlg_work_end.tab_feature, 'tab_gully')
         else:
-            self.layers['gully'] = self.controller.get_group_layers('gully')
+            self.layers['gully'] = tools_gw.get_group_layers('gully')
 
         # Set icons
         tools_qt.set_icon(self.dlg_work_end.btn_insert, "111")
@@ -125,7 +125,7 @@ class GwEndFeatureButton(GwParentAction):
     def set_edit_arc_downgrade_force(self, value):
 
         # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
-        row = self.controller.get_config('edit_arc_downgrade_force')
+        row = tools_gw.get_config('edit_arc_downgrade_force')
         if row:
             sql = (f"UPDATE config_param_user "
                    f"SET value = '{value}' "
@@ -143,10 +143,10 @@ class GwEndFeatureButton(GwParentAction):
         sql = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0'
         rows = self.controller.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_work_end.cmb_statetype_end, rows, 1)
-        row = self.controller.get_config('edit_statetype_0_vdefault')
+        row = tools_gw.get_config('edit_statetype_0_vdefault')
         if row:
             tools_qt.set_combo_value(self.dlg_work_end.cmb_statetype_end, row[0], 0)
-        row = self.controller.get_config('edit_enddate_vdefault')
+        row = tools_gw.get_config('edit_enddate_vdefault')
 
         if row:
             enddate = self.manage_dates(row[0]).date()
@@ -159,7 +159,7 @@ class GwEndFeatureButton(GwParentAction):
         rows = self.controller.get_rows(sql)
         tools_qt.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         tools_qt.set_autocompleter(self.dlg_work_end.workcat_id_end)
-        row = self.controller.get_config('edit_workcat_vdefault')
+        row = tools_gw.get_config('edit_workcat_vdefault')
         if row:
             tools_qt.setWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 

@@ -12,7 +12,7 @@ import sqlite3
 from qgis.PyQt.QtCore import QSettings
 
 from .utils import tools_gw
-from ..lib import tools_log, tools_qt
+from ..lib import tools_log, tools_qt, tools_db
 
 
 class GwAdminGisProject:
@@ -144,7 +144,7 @@ class GwAdminGisProject:
             return False
 
         self.set_database_parameters(layer_source['host'], layer_source['port'], layer_source['db'], layer_source['user'],
-            layer_source['password'], self.controller.get_srid('v_edit_node', schema))
+            layer_source['password'],tools_db.get_srid('v_edit_node', schema))
 
         return True
 

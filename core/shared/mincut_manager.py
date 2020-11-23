@@ -88,7 +88,7 @@ class GwMincutManager:
         tools_qt.set_icon(self.btn_notify, "307")
 
         try:
-            row = self.controller.get_config('om_mincut_enable_alerts', 'value', 'config_param_system')
+            row = tools_gw.get_config('om_mincut_enable_alerts', 'value', 'config_param_system')
             if row:
                 self.custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
                 self.btn_notify.setVisible(self.custom_action_sms['show_mincut_sms'])

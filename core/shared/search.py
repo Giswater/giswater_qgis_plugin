@@ -182,7 +182,7 @@ class GwSearch:
 
         # Show info in docker?
         if self.is_mincut is False:
-            self.controller.init_docker()
+            tools_gw.init_docker()
 
         # Get selected tab name
         tab_selected = self.dlg_search.main_tab.widget(index).objectName()

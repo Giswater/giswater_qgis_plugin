@@ -5,19 +5,12 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import inspect
-import os
 
-from qgis.PyQt.QtCore import QCoreApplication, QRegExp, QSettings, Qt, QTranslator
-from qgis.PyQt.QtGui import QTextCharFormat, QFont, QColor
 from qgis.PyQt.QtSql import QSqlDatabase
-from qgis.core import QgsMessageLog, QgsCredentials, QgsProject, QgsDataSourceUri, QgsVectorLayer, QgsPointLocator, \
-    QgsSnappingConfig, QgsRectangle
 
 from .. import global_vars
-from ..core.ui.ui_manager import DockerUi
 from ..core.utils import tools_gw
-from ..lib import tools_os, tools_qgis, tools_config, tools_log
+from ..lib import tools_qgis, tools_log, tools_db
 from ..lib.tools_pgdao import PgDao
 
 
@@ -27,8 +20,8 @@ class DaoController:
         """ Class constructor """
 
         self.settings = global_vars.settings
-        self.plugin_name = plugin_name
-        self.iface = iface
+        global_vars.plugin_name = plugin_name
+        global_vars.iface = iface
         self.plugin_dir = None
         self.logged = False
         self.postgresql_version = None
@@ -36,15 +29,8 @@ class DaoController:
         self.schema_name = None
         self.dao = None
         self.credentials = None
-        self.current_user = None
-        self.last_error = None
-        self.dlg_docker = None
-        self.docker_type = None
-        self.show_docker = None
         self.prev_maptool = None
         self.gw_infotools = None
-        self.dlg_info = None
-        self.show_db_exception = True
         self.is_inserting = False
 
         if create_logger:
@@ -56,10 +42,10 @@ class DaoController:
 
         if self.dao:
             if not self.dao.close_db():
-                tools_log.log_info(str(self.last_error))
+                tools_log.log_info(str(global_vars.last_error))
             del self.dao
 
-        self.current_user = None
+        global_vars.current_user = None
 
 
     def set_schema_name(self, schema_name):
@@ -84,9 +70,9 @@ class DaoController:
 
         # Initialize variables
         self.dao = None
-        self.last_error = None
+        global_vars.last_error = None
         self.logged = False
-        self.current_user = None
+        global_vars.current_user = None
 
         self.layer_source, not_version = tools_gw.get_layer_source_from_credentials()
         if self.layer_source:
@@ -110,7 +96,7 @@ class DaoController:
         # Check if selected parameters is correct
         if None in (host, port, db, user, pwd):
             message = "Database connection error. Please check your connection parameters."
-            self.last_error = tools_gw.tr(message)
+            global_vars.last_error = tools_gw.tr(message)
             return False
 
         # Update current user
@@ -118,7 +104,7 @@ class DaoController:
         self.current_user = user
 
         # We need to create this connections for Table Views
-        self.db = QSqlDatabase.addDatabase("QPSQL", self.plugin_name)
+        self.db = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
         self.db.setHostName(host)
         if port != '':
             self.db.setPort(int(port))
@@ -128,7 +114,7 @@ class DaoController:
         status = self.db.open()
         if not status:
             message = "Database connection error. Please open plugin log file to get more details"
-            self.last_error = tools_gw.tr(message)
+            global_vars.last_error = tools_gw.tr(message)
             details = self.db.lastError().databaseText()
             tools_log.log_warning(str(details))
             return False
@@ -139,7 +125,7 @@ class DaoController:
         status = self.dao.init_db()
         if not status:
             message = "Database connection error. Please open plugin log file to get more details"
-            self.last_error = tools_gw.tr(message)
+            global_vars.last_error = tools_gw.tr(message)
             tools_log.log_warning(str(self.dao.last_error))
             return False
 
@@ -157,12 +143,12 @@ class DaoController:
         tools_log.log_info(f"connect_to_database_service: {conn_string}")
 
         # We need to create this connections for Table Views
-        self.db = QSqlDatabase.addDatabase("QPSQL", self.plugin_name)
+        self.db = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
         self.db.setConnectOptions(conn_string)
         status = self.db.open()
         if not status:
             message = "Database connection error (QSqlDatabase). Please open plugin log file to get more details"
-            self.last_error = tools_gw.tr(message)
+            global_vars.last_error = tools_gw.tr(message)
             details = self.db.lastError().databaseText()
             tools_log.log_warning(str(details))
             return False
@@ -173,7 +159,7 @@ class DaoController:
         status = self.dao.init_db()
         if not status:
             message = "Database connection error (PgDao). Please open plugin log file to get more details"
-            self.last_error = tools_gw.tr(message)
+            global_vars.last_error = tools_gw.tr(message)
             tools_log.log_warning(str(self.dao.last_error))
             return False
 
@@ -241,12 +227,12 @@ class DaoController:
 
         sql = self.get_sql(sql, log_sql, params)
         row = self.dao.get_row(sql, commit)
-        self.last_error = self.dao.last_error
+        global_vars.last_error = self.dao.last_error
         if not row:
             # Check if any error has been raised
-            if self.last_error:
-                self.manage_exception_db(self.last_error, sql)
-            elif self.last_error is None and log_info:
+            if global_vars.last_error:
+                tools_db.manage_exception_db(global_vars.last_error, sql)
+            elif global_vars.last_error is None and log_info:
                 tools_log.log_info("Any record found", parameter=sql, stack_level_increase=1)
 
         return row
@@ -258,12 +244,12 @@ class DaoController:
         sql = self.get_sql(sql, log_sql, params)
         rows = None
         rows2 = self.dao.get_rows(sql, commit)
-        self.last_error = self.dao.last_error
+        global_vars.last_error = self.dao.last_error
         if not rows2:
             # Check if any error has been raised
-            if self.last_error:
-                self.manage_exception_db(self.last_error, sql)
-            elif self.last_error is None and log_info:
+            if global_vars.last_error:
+                tools_db.manage_exception_db(global_vars.last_error, sql)
+            elif global_vars.last_error is None and log_info:
                 tools_log.log_info("Any record found", parameter=sql, stack_level_increase=1)
         else:
             if add_empty_row:
@@ -281,11 +267,11 @@ class DaoController:
         if log_sql:
             tools_log.log_info(sql, stack_level_increase=1)
         result = self.dao.execute_sql(sql, commit)
-        self.last_error = self.dao.last_error
+        global_vars.last_error = self.dao.last_error
         if not result:
             if log_error:
                 tools_log.log_info(sql, stack_level_increase=1)
-            self.manage_exception_db(self.last_error, sql, filepath=filepath)
+            tools_db.manage_exception_db(global_vars.last_error, sql, filepath=filepath)
             return False
 
         return True
@@ -297,11 +283,11 @@ class DaoController:
         if log_sql:
             tools_log.log_info(sql, stack_level_increase=1)
         value = self.dao.execute_returning(sql, commit)
-        self.last_error = self.dao.last_error
+        global_vars.last_error = self.dao.last_error
         if not value:
             if log_error:
                 tools_log.log_info(sql, stack_level_increase=1)
-            self.manage_exception_db(self.last_error, sql)
+            tools_db.manage_exception_db(global_vars.last_error, sql)
             return False
 
         return value
@@ -355,11 +341,11 @@ class DaoController:
         # Execute sql
         tools_log.log_info(sql, stack_level_increase=1)
         result = self.dao.execute_sql(sql, commit)
-        self.last_error = self.dao.last_error
+        global_vars.last_error = self.dao.last_error
         if not result:
             # Check if any error has been raised
-            if self.last_error:
-                self.manage_exception_db(self.last_error, sql)
+            if global_vars.last_error:
+                tools_db.manage_exception_db(global_vars.last_error, sql)
 
         return result
 
@@ -408,11 +394,11 @@ class DaoController:
         # Execute UPSERT
         tools_log.log_info(sql, stack_level_increase=1)
         result = self.dao.execute_sql(sql, commit)
-        self.last_error = self.dao.last_error
+        global_vars.last_error = self.dao.last_error
         if not result:
             # Check if any error has been raised
-            if self.last_error:
-                self.manage_exception_db(self.last_error, sql)
+            if global_vars.last_error:
+                tools_db.manage_exception_db(global_vars.last_error, sql)
 
         return result
 
@@ -441,320 +427,6 @@ class DaoController:
         return tools_qgis.qgis_get_layer_primary_key(layer)
 
 
-    def get_project_type(self, schemaname=None):
-        """ Get project type from table 'version' """
-
-        # init variables
-        project_type = None
-        if schemaname is None:
-            schemaname = self.schema_name
-
-        # start process
-        tablename = "sys_version"
-        exists = self.check_table(tablename, schemaname)
-        if exists:
-            sql = ("SELECT lower(project_type) FROM " + schemaname + "." + tablename + " ORDER BY id ASC LIMIT 1")
-            row = self.get_row(sql)
-            if row:
-                project_type = row[0]
-        else:
-            tablename = "version"
-            exists = self.check_table(tablename, schemaname)
-            if exists:
-                sql = ("SELECT lower(wsoftware) FROM " + schemaname + "." + tablename + " ORDER BY id ASC LIMIT 1")
-                row = self.get_row(sql)
-                if row:
-                    project_type = row[0]
-            else:
-                tablename = "version_tm"
-                exists = self.check_table(tablename, schemaname)
-                if exists:
-                    project_type = "tm"
-
-        return project_type
-
-
-    def get_project_version(self, schemaname=None):
-        """ Get project version from table 'version' """
-
-        if schemaname is None:
-            schemaname = self.schema_name
-
-        project_version = None
-        tablename = "sys_version"
-        exists = self.check_table(tablename, schemaname)
-        if exists:
-            sql = ("SELECT giswater FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-            row = self.get_row(sql)
-            if row:
-                project_version = row[0]
-        else:
-            tablename = "version"
-            exists = self.check_table(tablename, schemaname)
-            if exists:
-                sql = ("SELECT giswater FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-                row = self.get_row(sql)
-                if row:
-                    project_version = row[0]
-
-        return project_version
-
-
-    def get_project_language(self, schemaname=None):
-        """ Get project langugage from table 'version' """
-
-        if schemaname is None:
-            schemaname = self.schema_name
-
-        project_language = None
-        tablename = "sys_version"
-        exists = self.check_table(tablename, schemaname)
-        if exists:
-            sql = ("SELECT language FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-            row = self.get_row(sql)
-            if row:
-                project_language = row[0]
-        else:
-            tablename = "version"
-            exists = self.check_table(tablename, schemaname)
-            if exists:
-                sql = ("SELECT language FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-                row = self.get_row(sql)
-                if row:
-                    project_language = row[0]
-
-        return project_language
-
-
-    def get_project_epsg(self, schemaname=None):
-        """ Get project epsg from table 'version' """
-
-        if schemaname is None:
-            schemaname = self.schema_name
-
-        project_epsg = None
-        tablename = "sys_version"
-        exists = self.check_table(tablename, schemaname)
-        if exists:
-            sql = ("SELECT epsg FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-            row = self.get_row(sql)
-            if row:
-                project_epsg = row[0]
-        else:
-            tablename = "version"
-            exists = self.check_table(tablename, schemaname)
-            if exists:
-                sql = ("SELECT epsg FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-                row = self.get_row(sql)
-                if row:
-                    project_epsg = row[0]
-
-        return project_epsg
-
-
-    def get_project_sample(self, schemaname=None):
-        """ Get if project is sample from table 'version' """
-
-        if schemaname is None:
-            schemaname = self.schema_name
-
-        project_sample = None
-        tablename = "sys_version"
-        exists = self.check_table(tablename, schemaname)
-        if exists:
-            sql = ("SELECT sample FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-            row = self.get_row(sql)
-            if row:
-                project_sample = row[0]
-        else:
-            tablename = "version"
-            exists = self.check_table(tablename, schemaname)
-            if exists:
-                sql = ("SELECT language FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-                row = self.get_row(sql)
-                if row:
-                    project_sample = row[0]
-
-        return project_sample
-
-
-    def check_schema(self, schemaname=None):
-        """ Check if selected schema exists """
-
-        if schemaname is None:
-            schemaname = self.schema_name
-
-        schemaname = schemaname.replace('"', '')
-        sql = "SELECT nspname FROM pg_namespace WHERE nspname = %s"
-        params = [schemaname]
-        row = self.get_row(sql, params=params)
-        return row
-
-
-    def check_table(self, tablename, schemaname=None):
-        """ Check if selected table exists in selected schema """
-
-        if schemaname is None:
-            schemaname = self.schema_name
-            if schemaname is None:
-                tools_gw.get_layer_source_from_credentials()
-                schemaname = self.schema_name
-                if schemaname is None:
-                    return None
-
-        schemaname = schemaname.replace('"', '')
-        sql = "SELECT * FROM pg_tables WHERE schemaname = %s AND tablename = %s"
-        params = [schemaname, tablename]
-        row = self.get_row(sql, log_info=False, params=params)
-        return row
-
-
-    def check_view(self, viewname, schemaname=None):
-        """ Check if selected view exists in selected schema """
-
-        if schemaname is None:
-            schemaname = self.schema_name
-
-        schemaname = schemaname.replace('"', '')
-        sql = ("SELECT * FROM pg_views "
-               "WHERE schemaname = %s AND viewname = %s ")
-        params = [schemaname, viewname]
-        row = self.get_row(sql, log_info=False, params=params)
-        return row
-
-
-    def check_column(self, tablename, columname, schemaname=None):
-        """ Check if @columname exists table @schemaname.@tablename """
-
-        if schemaname is None:
-            schemaname = self.schema_name
-
-        schemaname = schemaname.replace('"', '')
-        sql = ("SELECT * FROM information_schema.columns "
-               "WHERE table_schema = %s AND table_name = %s AND column_name = %s")
-        params = [schemaname, tablename, columname]
-        row = self.get_row(sql, log_info=False, params=params)
-        return row
-
-
-    def get_group_layers(self, geom_type):
-        """ Get layers of the group @geom_type """
-
-        list_items = []
-        sql = ("SELECT child_layer "
-               "FROM cat_feature "
-               "WHERE upper(feature_type) = '" + geom_type.upper() + "' "
-               "UNION SELECT DISTINCT parent_layer "
-               "FROM cat_feature "
-               "WHERE upper(feature_type) = '" + geom_type.upper() + "';")
-        rows = self.get_rows(sql)
-        if rows:
-            for row in rows:
-                layer = self.get_layer_by_tablename(row[0])
-                if layer:
-                    list_items.append(layer)
-
-        return list_items
-
-
-    def check_role(self, role_name):
-        """ Check if @role_name exists """
-
-        sql = f"SELECT * FROM pg_roles WHERE rolname = '{role_name}'"
-        row = self.get_row(sql, log_info=False)
-        return row
-
-
-    def check_role_user(self, role_name, username=None):
-        """ Check if current user belongs to @role_name """
-
-        # Check both @role_name and @username exists
-        if not self.check_role(role_name):
-            return False
-
-        if username is None:
-            username = global_vars.user
-
-        if not self.check_role(username):
-            return False
-
-        sql = ("SELECT pg_has_role('" + username + "', '" + role_name + "', 'MEMBER');")
-        row = self.get_row(sql)
-        if row:
-            return row[0]
-        else:
-            return False
-
-
-    def get_current_user(self):
-        """ Get current user connected to database """
-
-        if self.current_user:
-            return self.current_user
-
-        sql = "SELECT current_user"
-        row = self.get_row(sql)
-        cur_user = ""
-        if row:
-            cur_user = str(row[0])
-        self.current_user = cur_user
-        return cur_user
-
-
-    def get_rolenames(self):
-        """ Get list of rolenames of current user """
-
-        super_users = self.settings.value('system_variables/super_users')
-        if global_vars.user in super_users:
-            roles = "('role_admin', 'role_basic', 'role_edit', 'role_epa', 'role_master', 'role_om')"
-        else:
-            sql = ("SELECT rolname FROM pg_roles "
-                   " WHERE pg_has_role(current_user, oid, 'member')")
-            rows = self.get_rows(sql)
-            if not rows:
-                return None
-
-            roles = "("
-            for i in range(0, len(rows)):
-                roles += "'" + str(rows[i][0]) + "', "
-            roles = roles[:-2]
-            roles += ")"
-
-        return roles
-
-
-    def get_columns_list(self, tablename, schemaname=None):
-        """ Return list of all columns in @tablename """
-
-        if schemaname is None:
-            schemaname = self.schema_name
-
-        schemaname = schemaname.replace('"', '')
-        sql = ("SELECT column_name FROM information_schema.columns "
-               "WHERE table_schema = %s AND table_name = %s "
-               "ORDER BY ordinal_position")
-        params = [schemaname, tablename]
-        column_names = self.get_rows(sql, params=params)
-        return column_names
-
-
-    def get_srid(self, tablename, schemaname=None):
-        """ Find SRID of selected schema """
-
-        if schemaname is None:
-            schemaname = self.schema_name
-
-        schemaname = schemaname.replace('"', '')
-        srid = None
-        sql = "SELECT Find_SRID(%s, %s, 'the_geom');"
-        params = [schemaname, tablename]
-        row = self.get_row(sql, params=params)
-        if row:
-            srid = row[0]
-
-        return srid
-
-
     def get_log_folder(self):
         """ Return log folder """
         return self.logger.log_folder
@@ -762,26 +434,6 @@ class DaoController:
 
 
     """  Functions related with Qgis versions """
-
-    def is_layer_visible(self, layer):
-        """ Is layer visible """
-
-        visible = False
-        if layer:
-            visible = QgsProject.instance().layerTreeRoot().findLayer(layer.id()).itemVisibilityChecked()
-
-        return visible
-
-
-    def set_layer_visible(self, layer, recursive=True, visible=True):
-        """ Set layer visible """
-
-        if layer:
-            if recursive:
-                QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityCheckedParentRecursive(visible)
-            else:
-                QgsProject.instance().layerTreeRoot().findLayer(layer.id()).setItemVisibilityChecked(visible)
-
 
     def get_layers(self):
         """ Return layers in the same order as listed in TOC """
@@ -795,291 +447,3 @@ class DaoController:
         sql = f"SET search_path = {schema_name}, public;"
         self.execute_sql(sql)
         self.dao.set_search_path = sql
-
-
-    def set_path_from_qfiledialog(self, qtextedit, path):
-
-        if path[0]:
-            qtextedit.setText(path[0])
-
-
-    def get_restriction(self, qgis_project_role):
-
-        role_edit = False
-        role_om = False
-        role_epa = False
-        role_basic = False
-
-        role_master = self.check_role_user("role_master")
-        if not role_master:
-            role_epa = self.check_role_user("role_epa")
-            if not role_epa:
-                role_edit = self.check_role_user("role_edit")
-                if not role_edit:
-                    role_om = self.check_role_user("role_om")
-                    if not role_om:
-                        role_basic = self.check_role_user("role_basic")
-        super_users = self.settings.value('system_variables/super_users')
-
-        # Manage user 'postgres'
-        if global_vars.user == 'postgres' or global_vars.user == 'gisadmin':
-            role_master = True
-
-        # Manage super_user
-        if super_users is not None:
-            if global_vars.user in super_users:
-                role_master = True
-
-        if role_basic or qgis_project_role == 'role_basic':
-            return 'role_basic'
-        elif role_om or qgis_project_role == 'role_om':
-            return 'role_om'
-        elif role_edit or qgis_project_role == 'role_edit':
-            return 'role_edit'
-        elif role_epa or qgis_project_role == 'role_epa':
-            return 'role_epa'
-        elif role_master or qgis_project_role == 'role_master':
-            return 'role_master'
-        else:
-            return 'role_basic'
-
-
-    def get_values_from_dictionary(self, dictionary):
-        """ Return values from @dictionary """
-
-        list_values = iter(dictionary.values())
-        return list_values
-
-
-    def check_python_function(self, object_, function_name):
-
-        object_functions = [method_name for method_name in dir(object_) if callable(getattr(object_, method_name))]
-        return function_name in object_functions
-
-
-    def get_config(self, parameter='', columns='value', table='config_param_user', sql_added=None, log_info=True):
-
-        sql = f"SELECT {columns} FROM {table} WHERE parameter = '{parameter}' "
-        if sql_added:
-            sql += sql_added
-        if table == 'config_param_user':
-            sql += " AND cur_user = current_user"
-        sql += ";"
-        row = self.get_row(sql, log_info=log_info)
-        return row
-
-
-    def set_layer_index(self, layer_name):
-        """ Force reload dataProvider of layer """
-
-        layer = self.get_layer_by_tablename(layer_name)
-        if layer:
-            layer.dataProvider().forceReload()
-            layer.triggerRepaint()
-
-
-
-    def manage_exception_db(self, exception=None, sql=None, stack_level=2, stack_level_increase=0, filepath=None):
-        """ Manage exception in database queries and show information to the user """
-
-        show_exception_msg = True
-        description = ""
-        if exception:
-            description = str(exception)
-            if 'unknown error' in description:
-                show_exception_msg = False
-
-        try:
-            stack_level += stack_level_increase
-            module_path = inspect.stack()[stack_level][1]
-            file_name = tools_os.get_relative_path(module_path, 2)
-            function_line = inspect.stack()[stack_level][2]
-            function_name = inspect.stack()[stack_level][3]
-
-            # Set exception message details
-            msg = ""
-            msg += f"File name: {file_name}\n"
-            msg += f"Function name: {function_name}\n"
-            msg += f"Line number: {function_line}\n"
-            if exception:
-                msg += f"Description:\n{description}\n"
-            if filepath:
-                msg += f"SQL file:\n{filepath}\n\n"
-            if sql:
-                msg += f"SQL:\n {sql}\n\n"
-            msg += f"Schema name: {self.schema_name}"
-
-            # Show exception message in dialog and log it
-            if show_exception_msg:
-                title = "Database error"
-                tools_gw.show_exceptions_msg(title, msg)
-            else:
-                tools_log.log_warning("Exception message not shown to user")
-            tools_log.log_warning(msg, stack_level_increase=2)
-
-        except Exception:
-            tools_gw.manage_exception("Unhandled Error")
-
-
-    def set_text_bold(self, widget, pattern=None):
-        """ Set bold text when word match with pattern
-        :param widget: QTextEdit
-        :param pattern: Text to find used as pattern for QRegExp (String)
-        :return:
-        """
-
-        if not pattern:
-            pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:|Description|Schema name"
-        cursor = widget.textCursor()
-        format = QTextCharFormat()
-        format.setFontWeight(QFont.Bold)
-        regex = QRegExp(pattern)
-        pos = 0
-        index = regex.indexIn(widget.toPlainText(), pos)
-        while index != -1:
-            # Set cursor at begin of match
-            cursor.setPosition(index, 0)
-            pos = index + regex.matchedLength()
-            # Set cursor at end of match
-            cursor.setPosition(pos, 1)
-            # Select the matched text and apply the desired format
-            cursor.mergeCharFormat(format)
-            # Move to the next match
-            index = regex.indexIn(widget.toPlainText(), pos)
-
-
-    def show_dlg_info(self):
-        """ Show dialog with exception message generated in function show_exceptions_msg """
-
-        if self.dlg_info:
-            self.dlg_info.show()
-
-
-    def dock_dialog(self, dialog):
-
-        positions = {8: Qt.BottomDockWidgetArea, 4: Qt.TopDockWidgetArea,
-                     2: Qt.RightDockWidgetArea, 1: Qt.LeftDockWidgetArea}
-        try:
-            self.dlg_docker.setWindowTitle(dialog.windowTitle())
-            self.dlg_docker.setWidget(dialog)
-            self.dlg_docker.setWindowFlags(Qt.WindowContextHelpButtonHint)
-            self.iface.addDockWidget(positions[self.dlg_docker.position], self.dlg_docker)
-        except RuntimeError as e:
-            tools_log.log_warning(f"{type(e).__name__} --> {e}")
-
-
-    def init_docker(self, docker_param='qgis_info_docker'):
-        """ Get user config parameter @docker_param """
-
-        self.show_docker = True
-        if docker_param == 'qgis_main_docker':
-            # Show 'main dialog' in docker depending its value in user settings
-            self.qgis_main_docker = tools_config.get_user_setting_value(docker_param, 'true')
-            value = self.qgis_main_docker.lower()
-        else:
-            # Show info or form in docker?
-            row = self.get_config(docker_param)
-            if not row:
-                self.dlg_docker = None
-                self.docker_type = None
-                return None
-            value = row[0].lower()
-
-        # Check if docker has dialog of type 'form' or 'main'
-        if docker_param == 'qgis_info_docker':
-            if self.dlg_docker:
-                if self.docker_type:
-                    if self.docker_type != 'qgis_info_docker':
-                        self.show_docker = False
-                        return None
-
-        if value == 'true':
-            self.close_docker()
-            self.docker_type = docker_param
-            self.dlg_docker = DockerUi()
-            self.dlg_docker.dlg_closed.connect(self.close_docker)
-            self.manage_docker_options()
-        else:
-            self.dlg_docker = None
-            self.docker_type = None
-
-        return self.dlg_docker
-
-
-    def close_docker(self):
-        """ Save QDockWidget position (1=Left, 2=Right, 4=Top, 8=Bottom),
-            remove from iface and del class
-        """
-        try:
-            if self.dlg_docker:
-                if not self.dlg_docker.isFloating():
-                    docker_pos = self.iface.mainWindow().dockWidgetArea(self.dlg_docker)
-                    widget = self.dlg_docker.widget()
-                    if widget:
-                        widget.close()
-                        del widget
-                        self.dlg_docker.setWidget(None)
-                        self.docker_type = None
-                        tools_gw.set_parser_value('docker_info', 'position', f'{docker_pos}')
-                    self.iface.removeDockWidget(self.dlg_docker)
-                    self.dlg_docker = None
-        except AttributeError:
-            self.docker_type = None
-            self.dlg_docker = None
-
-
-    def manage_docker_options(self):
-        """ Check if user want dock the dialog or not """
-
-        # Load last docker position
-        try:
-            # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
-            pos = int(tools_gw.get_parser_value('docker_info', 'position'))
-            self.dlg_docker.position = 2
-            if pos in (1, 2, 4, 8):
-                self.dlg_docker.position = pos
-        except:
-            self.dlg_docker.position = 2
-
-
-    def layer_manager(self, json_result):
-        """
-        Manage options for layers (active, visible, zoom and indexing)
-        :param json_result: Json result of a query (Json)
-        :return: None
-        """
-
-        try:
-            layermanager = json_result['body']['form']['layerManager']
-        except KeyError:
-            return
-        # Get a list of layers names force reload dataProvider of layer
-        if 'index' in layermanager:
-            for layer_name in layermanager['index']:
-                self.set_layer_index(layer_name)
-                layer = self.get_layer_by_tablename(layer_name)
-
-        # Get a list of layers names, but obviously it will stay active the last one
-        if 'active' in layermanager:
-            for layer_name in layermanager['active']:
-                layer = self.get_layer_by_tablename(layer_name)
-                if layer:
-                    self.iface.setActiveLayer(layer)
-
-        # Get a list of layers names and set visible
-        if 'visible' in layermanager:
-            for layer_name in layermanager['visible']:
-                layer = self.get_layer_by_tablename(layer_name)
-                if layer:
-                    self.set_layer_visible(layer)
-
-        # Get a list of layers names, but obviously remain zoomed to the last
-        if 'zoom' in layermanager:
-            for layer_name in layermanager['zoom']:
-                layer = self.get_layer_by_tablename(layer_name)
-                if layer:
-                    prev_layer = self.iface.activeLayer()
-                    self.iface.setActiveLayer(layer)
-                    self.iface.zoomToActiveLayer()
-                    if prev_layer:
-                        self.iface.setActiveLayer(prev_layer)

@@ -13,7 +13,7 @@ import subprocess
 from functools import partial
 
 from .. import global_vars
-from ..lib import tools_qt, tools_qgis
+from ..lib import tools_qt, tools_qgis, tools_db
 from ..core.ui.ui_manager import MainQtDialogUi
 from ..core.utils.tools_gw import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
     get_plugin_version
@@ -68,7 +68,7 @@ class GwI18NGenerator:
         sql = "SELECT user_language, py_language, xml_language, py_file FROM i18n.cat_language"
         rows = self.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows, 0)
-        cur_user = self.controller.get_current_user()
+        cur_user = tools_db.get_current_user()
         language = tools_qgis.plugin_settings_value('qm_lang_language' + cur_user)
         tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0)
 

@@ -12,7 +12,7 @@ from qgis.gui import QgsVertexMarker
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import DialogTextUi
 from ...utils import tools_gw
-from ....lib import tools_qt
+from ....lib import tools_qt, tools_qgis
 from .... import global_vars
 
 
@@ -226,10 +226,10 @@ class GwArcDivideButton(GwParentMapTool):
                 answer = tools_qt.ask_question(message, title)
                 if answer:
                     self.move_node(node_id, point)
-                    self.controller.set_layer_index('v_edit_arc')
-                    self.controller.set_layer_index('v_edit_connec')
-                    self.controller.set_layer_index('v_edit_gully')
-                    self.controller.set_layer_index('v_edit_node')
+                    tools_qgis.set_layer_index('v_edit_arc')
+                    tools_qgis.set_layer_index('v_edit_connec')
+                    tools_qgis.set_layer_index('v_edit_gully')
+                    tools_qgis.set_layer_index('v_edit_node')
                     tools_gw.refresh_legend(self.controller)
 
 

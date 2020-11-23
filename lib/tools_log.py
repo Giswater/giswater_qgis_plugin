@@ -14,7 +14,6 @@ from qgis.core import QgsMessageLog
 
 from .. import global_vars
 from ..core.utils import tools_gw
-from ..lib import tools_log
 
 
 class Logger(object):
@@ -29,7 +28,7 @@ class Logger(object):
         self.logger_file.setLevel(log_level)
 
         # Define log folder in users folder
-        main_folder = os.path.join(os.path.expanduser("~"), self.controller.plugin_name)
+        main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
         log_folder = main_folder + os.sep + "log" + os.sep
         if folder_has_tstamp:
             tstamp = str(time.strftime(log_suffix))
@@ -45,7 +44,7 @@ class Logger(object):
         filepath += ".log"
 
         self.log_folder = log_folder
-        tools_log.log_info(f"Log file: {filepath}", logger_file=False)
+        log_info(f"Log file: {filepath}", logger_file=False)
         if remove_previous and os.path.exists(filepath):
             os.remove(filepath)
 
@@ -90,7 +89,7 @@ class Logger(object):
             self.logger_file.log(log_level, text)
 
         except Exception as e:
-            tools_log.log_warning("Error logging: " + str(e), logger_file=False)
+            log_warning("Error logging: " + str(e), logger_file=False)
 
 
     def debug(self, msg=None, stack_level=2, stack_level_increase=0):

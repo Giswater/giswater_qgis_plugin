@@ -16,7 +16,7 @@ from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import FeatureReplace, InfoWorkcatUi
 from ...shared.catalog import GwCatalog
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_log
+from ....lib import tools_qt, tools_log, tools_qgis
 import global_vars
 
 
@@ -62,13 +62,13 @@ class GwFeatureReplaceButton(GwParentMapTool):
             tools_qt.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
             tools_qt.set_autocompleter(self.dlg_replace.workcat_id_end)
 
-        row = self.controller.get_config('edit_workcat_vdefault')
+        row = tools_gw.get_config('edit_workcat_vdefault')
         if row:
             edit_workcat_vdefault = self.dlg_replace.workcat_id_end.findText(row[0])
             self.dlg_replace.workcat_id_end.setCurrentIndex(edit_workcat_vdefault)
 
 
-        row = self.controller.get_config('edit_enddate_vdefault')
+        row = tools_gw.get_config('edit_enddate_vdefault')
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
@@ -141,7 +141,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
     def update_date(self):
 
-        row = self.controller.get_config('edit_enddate_vdefault')
+        row = tools_gw.get_config('edit_enddate_vdefault')
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
@@ -275,7 +275,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                 tools_gw.show_warning(message)
                 self.deactivate()
                 self.set_action_pan()
-                tools_gw.close_dialog(dialog, self.controller.plugin_name)
+                tools_gw.close_dialog(dialog, global_vars.plugin_name)
                 return
 
             complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
@@ -321,10 +321,10 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
             # Refresh canvas
             self.refresh_map_canvas()
-            self.controller.set_layer_index('v_edit_arc')
-            self.controller.set_layer_index('v_edit_connec')
-            self.controller.set_layer_index('v_edit_gully')
-            self.controller.set_layer_index('v_edit_node')
+            tools_qgis.set_layer_index('v_edit_arc')
+            tools_qgis.set_layer_index('v_edit_connec')
+            tools_qgis.set_layer_index('v_edit_gully')
+            tools_qgis.set_layer_index('v_edit_node')
             tools_gw.refresh_legend(self.controller)
 
             # Deactivate map tool
@@ -421,7 +421,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         # Change cursor
         self.canvas.setCursor(self.cursor)
 
-        self.project_type = self.controller.get_project_type()
+        self.project_type = tools_gw.get_project_type()
 
         # Show help message when action is activated
         if self.show_help:

@@ -21,7 +21,7 @@ from .utils import tools_gw
 from .utils.backend_functions import GwInfoTools
 from .utils.notify import GwNotifyTools
 from .. import global_vars
-from ..lib import tools_qgis, tools_config, tools_log
+from ..lib import tools_qgis, tools_config, tools_log, tools_db
 
 
 class LoadProject(QObject):
@@ -55,7 +55,7 @@ class LoadProject(QObject):
             return
 
         # Manage schema name
-        self.controller.get_current_user()
+        tools_db.get_current_user()
         layer_source = tools_qgis.qgis_get_layer_source(self.layer_node)
         self.schema_name = layer_source['schema']
         self.schema_name = self.schema_name.replace('"', '')
@@ -64,7 +64,7 @@ class LoadProject(QObject):
 
         # TEMP
         global_vars.schema_name = self.schema_name
-        global_vars.project_type = self.controller.get_project_type()
+        global_vars.project_type = tools_gw.get_project_type()
 
         # Manage locale and corresponding 'i18n' file
         tools_gw.manage_translation(self.plugin_name)
@@ -73,12 +73,12 @@ class LoadProject(QObject):
         self.controller.set_search_path(layer_source['schema'])
 
         # Check if schema exists
-        self.schema_exists = self.controller.check_schema(self.schema_name)
+        self.schema_exists = self.check_schema(self.schema_name)
         if not self.schema_exists:
             tools_gw.show_warning("Selected schema not found", parameter=self.schema_name)
 
         # Get SRID from table node
-        srid = self.controller.get_srid('v_edit_node', self.schema_name)
+        srid = tools_db.get_srid('v_edit_node', self.schema_name)
         global_vars.srid = srid
 
         # Get variables from qgis project
@@ -90,10 +90,10 @@ class LoadProject(QObject):
         if status is False:
             return
 
-        self.controller.gw_infotools = GwInfoTools()
+        global_vars.gw_infotools = GwInfoTools()
 
         # Get water software from table 'version'
-        self.project_type = self.controller.get_project_type()
+        self.project_type = tools_gw.get_project_type()
         if self.project_type is None:
             return
 
@@ -115,7 +115,7 @@ class LoadProject(QObject):
         # Create a thread to listen selected database channels
         if global_vars.settings.value('system_variables/use_notify').upper() == 'TRUE':
             self.notify = GwNotifyTools()
-            list_channels = ['desktop', self.controller.current_user]
+            list_channels = ['desktop', global_vars.current_user]
             self.notify.start_listening(list_channels)
 
         # Open automatically 'search docker' depending its value in user settings
@@ -160,7 +160,7 @@ class LoadProject(QObject):
         finally:
             self.connection_status, not_version = self.controller.set_database_connection()
             if not self.connection_status or not_version:
-                message = self.controller.last_error
+                message = global_vars.last_error
                 if show_warning:
                     if message:
                         tools_gw.show_warning(message, 15)
@@ -211,7 +211,7 @@ class LoadProject(QObject):
 
         try:
             # db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
-            row = self.controller.get_config('qgis_toolbar_hidebuttons')
+            row = tools_gw.get_config('qgis_toolbar_hidebuttons')
             if not row: return
             json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
             self.buttons_to_hide = [str(x) for x in json_list['action_index']]
@@ -332,7 +332,7 @@ class LoadProject(QObject):
     def check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
 
-        restriction = self.controller.get_restriction(self.project_vars['role'])
+        restriction = tools_gw.get_restriction(self.project_vars['role'])
 
         if restriction == 'role_basic':
             pass
@@ -429,4 +429,17 @@ class LoadProject(QObject):
             del configfile
 
         return parser
+
+
+    def check_schema(self, schemaname=None):
+        """ Check if selected schema exists """
+
+        if schemaname is None:
+            schemaname = self.schema_name
+
+        schemaname = schemaname.replace('"', '')
+        sql = "SELECT nspname FROM pg_namespace WHERE nspname = %s"
+        params = [schemaname]
+        row = self.controller.get_row(sql, params=params)
+        return row
 

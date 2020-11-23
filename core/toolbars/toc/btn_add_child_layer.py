@@ -173,7 +173,7 @@ class GwAddChildLayerButton(GwParentAction):
             return
 
         self.iface.setActiveLayer(self.layer_muni)
-        self.controller.set_layer_visible(self.layer_muni)
+        tools_qgis.set_layer_visible(self.layer_muni)
         self.layer_muni.selectAll()
         self.iface.actionZoomToSelected().trigger()
         self.layer_muni.removeSelection()

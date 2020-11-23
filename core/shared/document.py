@@ -58,18 +58,18 @@ class GwDocument:
 
         # Setting layers
         self.layers = {'arc': [], 'node': [], 'connec': [], 'element': []}
-        self.layers['arc'] = self.controller.get_group_layers('arc')
-        self.layers['node'] = self.controller.get_group_layers('node')
-        self.layers['connec'] = self.controller.get_group_layers('connec')
-        self.layers['element'] = self.controller.get_group_layers('element')
+        self.layers['arc'] = tools_gw.get_group_layers('arc')
+        self.layers['node'] = tools_gw.get_group_layers('node')
+        self.layers['connec'] = tools_gw.get_group_layers('connec')
+        self.layers['element'] = tools_gw.get_group_layers('element')
 
         # Remove 'gully' for 'WS'
-        self.project_type = self.controller.get_project_type()
+        self.project_type = tools_gw.get_project_type()
         if self.project_type == 'ws':
             tools_qt.remove_tab_by_tabName(self.dlg_add_doc.tab_feature, 'tab_gully')
 
         else:
-            self.layers['gully'] = self.controller.get_group_layers('gully')
+            self.layers['gully'] = tools_gw.get_group_layers('gully')
 
         # Remove all previous selections
         if self.single_tool_mode:

@@ -35,9 +35,9 @@ class Selector:
         current_tab = tools_gw.get_parser_value('last_tabs', f"{dlg_selector.objectName()}_basic")
         self.get_selector(dlg_selector, selector_type, current_tab=current_tab, selector_vars=selector_vars)
 
-        if global_vars.controller.dlg_docker:
-            global_vars.controller.dock_dialog(dlg_selector)
-            dlg_selector.btn_close.clicked.connect(global_vars.controller.close_docker)
+        if global_vars.dlg_docker:
+            tools_gw.dock_dialog(dlg_selector)
+            dlg_selector.btn_close.clicked.connect(tools_gw.close_docker)
         else:
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))
             dlg_selector.rejected.connect(partial(tools_gw.save_settings, dlg_selector))
@@ -257,12 +257,12 @@ class Selector:
                 pass
 
         # Refresh canvas
-        global_vars.controller.set_layer_index('v_edit_arc')
-        global_vars.controller.set_layer_index('v_edit_node')
-        global_vars.controller.set_layer_index('v_edit_connec')
-        global_vars.controller.set_layer_index('v_edit_gully')
-        global_vars.controller.set_layer_index('v_edit_link')
-        global_vars.controller.set_layer_index('v_edit_plan_psector')
+        tools_qgis.set_layer_index('v_edit_arc')
+        tools_qgis.set_layer_index('v_edit_node')
+        tools_qgis.set_layer_index('v_edit_connec')
+        tools_qgis.set_layer_index('v_edit_gully')
+        tools_qgis.set_layer_index('v_edit_link')
+        tools_qgis.set_layer_index('v_edit_plan_psector')
         tools_qgis.refresh_map_canvas()
         self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result, selector_vars=selector_vars)
 

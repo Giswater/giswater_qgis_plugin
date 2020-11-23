@@ -17,7 +17,7 @@ from qgis.gui import QgsDateTimeEdit
 from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import ConfigUi
 from ...utils import tools_gw
-from ....lib import tools_qt
+from ....lib import tools_qt, tools_db
 
 
 class GwConfigButton(GwParentAction):
@@ -30,7 +30,7 @@ class GwConfigButton(GwParentAction):
 
         # Get user and role
         super_users = self.settings.value('system_variables/super_users')
-        cur_user = self.controller.get_current_user()
+        cur_user = tools_db.get_current_user()
 
         self.list_update = []
 
@@ -200,7 +200,7 @@ class GwConfigButton(GwParentAction):
             chk_expl.stateChanged.connect(partial(self.check_parent_to_child, chk_expl, chk_dma))
         tools_qt.hide_void_groupbox(self.dlg_config)
         # Check user/role and remove tabs
-        role_admin = self.controller.check_role_user("role_admin", cur_user)
+        role_admin = tools_db.check_role_user("role_admin", cur_user)
         if not role_admin and cur_user not in super_users:
             tools_qt.remove_tab_by_tabName(self.dlg_config.tab_main, "tab_admin")
 

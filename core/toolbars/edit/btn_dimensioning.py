@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import QSettings, Qt
 
 from ..parent_maptool import GwParentMapTool
 from ...shared.dimensioning import GwDimensioning
-from ....lib import tools_qt, tools_log
+from ....lib import tools_qt, tools_log, tools_qgis
 
 
 class GwDimensioningButton(GwParentMapTool):
@@ -85,7 +85,7 @@ class GwDimensioningButton(GwParentMapTool):
             self.layer.setEditFormConfig(config)
             
             self.iface.setActiveLayer(self.layer)
-            self.controller.set_layer_visible(self.layer)
+            tools_qgis.set_layer_visible(self.layer)
             self.layer.startEditing()
 
             # Implement the Add Feature button

@@ -88,7 +88,7 @@ class GwMincut:
         self.remove_selection()
 
         # Parametrize list of layers
-        self.layers['connec'] = self.controller.get_group_layers('connec')
+        self.layers['connec'] = tools_gw.get_group_layers('connec')
         self.layers_connec = self.layers['connec']
 
         self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
@@ -186,7 +186,7 @@ class GwMincut:
         self.show_notified = action
 
         try:
-            row = self.controller.get_config('om_mincut_enable_alerts', 'value', 'config_param_system')
+            row = tools_gw.get_config('om_mincut_enable_alerts', 'value', 'config_param_system')
             if row:
                 custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
                 self.show_notified.setVisible(custom_action_sms['show_sms_info'])
@@ -210,8 +210,8 @@ class GwMincut:
 
     def set_signals(self):
 
-        if self.controller.dlg_docker:
-            self.dlg_mincut.dlg_closed.connect(self.controller.close_docker)
+        if global_vars.dlg_docker:
+            self.dlg_mincut.dlg_closed.connect(tools_gw.close_docker)
 
         self.dlg_mincut.btn_accept.clicked.connect(self.accept_save_data)
         self.dlg_mincut.btn_cancel.clicked.connect(self.mincut_close)
@@ -323,9 +323,9 @@ class GwMincut:
 
     def manage_docker(self):
 
-        self.controller.init_docker('qgis_form_docker')
-        if self.controller.dlg_docker:
-            self.controller.dock_dialog(self.dlg_mincut)
+        tools_gw.init_docker('qgis_form_docker')
+        if global_vars.dlg_docker:
+            tools_gw.dock_dialog(self.dlg_mincut)
         else:
             tools_gw.open_dialog(self.dlg_mincut, dlg_name='mincut')
 
@@ -1539,22 +1539,22 @@ class GwMincut:
         layer_zoomed = None
         layer = self.controller.get_layer_by_tablename("v_om_mincut_valve")
         if layer:
-            self.controller.set_layer_visible(layer)
+            tools_qgis.set_layer_visible(layer)
 
         layer = self.controller.get_layer_by_tablename("v_om_mincut_arc")
         if layer:
-            self.controller.set_layer_visible(layer)
+            tools_qgis.set_layer_visible(layer)
 
         layer = self.controller.get_layer_by_tablename("v_om_mincut_connec")
         if layer:
-            self.controller.set_layer_visible(layer)
+            tools_qgis.set_layer_visible(layer)
             if layer.featureCount() > 0:
                 layer_zoomed = layer
 
 
         layer = self.controller.get_layer_by_tablename("v_om_mincut_node")
         if layer:
-            self.controller.set_layer_visible(layer)
+            tools_qgis.set_layer_visible(layer)
             if layer.featureCount() > 0:
                 layer_zoomed = layer
 
@@ -1591,7 +1591,7 @@ class GwMincut:
         layer = self.snapper_manager.get_snapped_layer(result)
 
         # Check feature
-        layers_arc = self.controller.get_group_layers('arc')
+        layers_arc = tools_gw.get_group_layers('arc')
         self.layernames_arc = []
         for layer in layers_arc:
             self.layernames_arc.append(layer.name())
@@ -2058,7 +2058,7 @@ class GwMincut:
 
         # Check if path exist
         template_folder = ""
-        row = self.controller.get_config('qgis_composers_folderpath')
+        row = tools_gw.get_config('qgis_composers_folderpath')
         if row:
             template_folder = row[0]
 
@@ -2106,7 +2106,7 @@ class GwMincut:
 
         # Check if template file exists
         template_path = ""
-        row = self.controller.get_config('qgis_composers_folderpath')
+        row = tools_gw.get_config('qgis_composers_folderpath')
         if row:
             template_path = row[0] + f'{os.sep}{self.template}.qpt'
 
