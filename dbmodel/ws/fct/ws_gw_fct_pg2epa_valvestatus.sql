@@ -63,11 +63,11 @@ BEGIN
 		IF v_valvemode = 3 THEN --mincut results
 			UPDATE temp_arc a SET status='CLOSED'
 			FROM man_valve v
-				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=true AND epa_type = 'SHORPIPE';
+				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=true AND epa_type = 'SHORTPIPE';
 
 			UPDATE temp_arc a SET status='OPEN'
 			FROM man_valve v
-				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=false AND epa_type = 'SHORPIPE';
+				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=false AND epa_type = 'SHORTPIPE';
 		
 			UPDATE temp_arc a SET status='CLOSED' 
 			FROM om_mincut_valve v
@@ -76,11 +76,11 @@ BEGIN
 		ELSIF v_valvemode = 2 THEN -- inventory
 			UPDATE temp_arc a SET status='CLOSED'
 			FROM man_valve v
-				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=true AND epa_type = 'SHORPIPE';
+				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=true AND epa_type = 'SHORTPIPE';
 
 			UPDATE temp_arc a SET status='OPEN'
 			FROM man_valve v
-				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=false AND epa_type = 'SHORPIPE';
+				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=false AND epa_type = 'SHORTPIPE';
 		
 		ELSIF v_valvemode = 1 THEN -- epa tables
 			UPDATE temp_arc a SET status=p.status 

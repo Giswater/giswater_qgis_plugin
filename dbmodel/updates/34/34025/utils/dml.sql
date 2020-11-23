@@ -12,3 +12,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 UPDATE sys_message SET error_message='The inserted value is not present in a catalog.'
 WHERE ID = 3022;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (357, 'Store hydrometer user selector values', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (358, 'Store state user selector values', 'utils') ON CONFLICT (fid) DO NOTHING ;
