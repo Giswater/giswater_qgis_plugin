@@ -95,8 +95,10 @@ class Giswater(QObject):
         global_vars.controller = self.controller
 
         # Check for developers options
-        self.check_developers_settings()
-        self.check_developers_settings('developers', 'show_message_durations')
+        comment = '  # If True: show all get_json log, if False: does not show any, if None: show python log_sql option'
+        self.check_developers_settings(comment=comment)
+        comment = '  # Integer or None'
+        self.check_developers_settings('developers', 'show_message_durations', comment)
 
         # Set main information button (always visible)
         self.set_info_button()
@@ -108,8 +110,8 @@ class Giswater(QObject):
         self.manage_section_toolbars()
 
 
-    def check_developers_settings(self, section='developers', parameter='log_sql'):
-        """ Check if @section and @parameter exists in user settings file. If not add them with @value """
+    def check_developers_settings(self, section='developers', parameter='log_sql', comment=None):
+        """ Check if @section and @parameter exists in user settings file. If not add them = None """
         value = None
         try:
             parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
@@ -125,7 +127,7 @@ class Giswater(QObject):
 
             # Check if parameter exists in section, if not exist, create
             if parameter not in parser[section]:
-                parser[section][parameter] = 'None'
+                parser[section][parameter] = f'None{comment}'
                 with open(path, 'w') as configfile:
                     parser.write(configfile)
                     configfile.close()

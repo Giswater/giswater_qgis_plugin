@@ -224,7 +224,6 @@ class SnappingConfigManager(object):
         """ Return snapper """
 
         snapper = QgsMapCanvas.snappingUtils(self.canvas)
-        print(snapper)
         return snapper
 
 
