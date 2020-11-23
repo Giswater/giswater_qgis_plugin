@@ -507,13 +507,13 @@ BEGIN
 			VALUES (v_fid, v_result_id, 2, concat('WARNING: There are ', v_count , 'epanet shortpipe and valves without diameter. Neighbourg value have been setted. Please fill dint column on cat_node table'));
 		ELSE 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 2, concat('INFO: There aren''t any shortpipe and valves without diameter defined on dint column in cat_node table'));
+			VALUES (v_fid, v_result_id, 1, concat('INFO: There aren''t any shortpipe and valves without diameter defined on dint column in cat_node table'));
 		END IF;
 
 
 		RAISE NOTICE '12 - Info about roughness and diameter for shortpipes';	
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 2, concat('INFO: All roughness values used for shortpipes have been taken from neighbourg values'));
+			VALUES (v_fid, v_result_id, 1, concat('INFO: All roughness values used for shortpipes have been taken from neighbourg values'));
 
 	END IF;
 	
