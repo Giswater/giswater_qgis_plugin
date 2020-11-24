@@ -221,7 +221,7 @@ def get_visible_layers(as_list=False):
     return visible_layer
 
 
-def get_value_from_metadata(parameter, default_value):
+def get_plugin_metadata(parameter, default_value):
     """ Get @parameter from metadata.txt file """
 
     # Check if metadata file exists

@@ -22,7 +22,7 @@ from qgis.gui import QgsMapToolEmitPoint
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import Profile, ProfilesList
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_log
+from ....lib import tools_qt, tools_log, tools_qgis
 import global_vars
 
 
@@ -444,7 +444,7 @@ class GwProfileButton(GwParentMapTool):
         self.plot = plt
 
         # If file profile.png exist overwrite
-        plugin_name = self.get_value_from_metadata('name', 'giswater')
+        plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater')
         main_folder = os.path.join(os.path.expanduser("~"), plugin_name)
         temp_folder = main_folder + os.sep + "temp"
         img_path = temp_folder + os.sep + "profile.png"
@@ -1302,26 +1302,3 @@ class GwProfileButton(GwParentMapTool):
         self.canvas.refresh()
         if actionpan:
             self.iface.actionPan().trigger()
-
-
-    def get_value_from_metadata(self, parameter, default_value):
-        """ Get @parameter from metadata.txt file """
-
-        # Check if metadata file exists
-        metadata_file = os.path.join(self.plugin_dir, 'metadata.txt')
-        if not os.path.exists(metadata_file):
-            message = f"Metadata file not found: {metadata_file}"
-            self.iface.messageBar().pushMessage("", message, 1, 20)
-            return default_value
-
-        value = None
-        try:
-            metadata = configparser.ConfigParser()
-            metadata.read(metadata_file)
-            value = metadata.get('general', parameter)
-        except configparser.NoOptionError:
-            message = f"Parameter not found: {parameter}"
-            self.iface.messageBar().pushMessage("", message, 1, 20)
-            value = default_value
-        finally:
-            return value

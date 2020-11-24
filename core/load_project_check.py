@@ -195,7 +195,7 @@ class GwProjectCheck:
                 group = layer_info['group_layer'] if layer_info['group_layer'] is not None else 'GW Layers'
                 style_id = layer_info['style_id']
 
-                tools_gw.from_postgres_to_toc(layer_info['layer'], geom_field, pkey_field, None, group=group)
+                tools_gw.insert_pg_layer(layer_info['layer'], geom_field, pkey_field, None, group=group)
                 layer = None
                 qml = None
                 if style_id is not None:

@@ -107,7 +107,7 @@ class GwAddChildLayerButton(GwParentAction):
         if is_checked is True:
             layer = self.controller.get_layer_by_tablename(tablename)
             if layer is None:
-                tools_gw.from_postgres_to_toc(tablename, the_geom, field_id, child_layers, group, style_id)
+                tools_gw.insert_pg_layer(tablename, the_geom, field_id, child_layers, group, style_id)
         elif is_checked is False:
             layer = self.controller.get_layer_by_tablename(tablename)
             if layer is not None:

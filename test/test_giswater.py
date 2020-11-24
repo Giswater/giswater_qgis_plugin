@@ -35,7 +35,7 @@ class TestGiswater(QObject):
 
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(os.path.dirname(__file__))
-        self.plugin_name = self.get_value_from_metadata('name', 'giswater')
+        self.plugin_name = self.get_plugin_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'shared' + os.sep
 
         # Check if config file exists
@@ -70,7 +70,7 @@ class TestGiswater(QObject):
         self.visit_manager = GwVisitManager(self.iface, self.settings, self.controller, self.plugin_dir)
 
 
-    def get_value_from_metadata(self, parameter, default_value):
+    def get_plugin_metadata(self, parameter, default_value):
         """ Get @parameter from metadata.txt file """
 
         # Check if metadata file exists

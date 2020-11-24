@@ -819,13 +819,13 @@ def set_completer_feature_id(widget, geom_type, viewname):
 
 def open_file_path(filter_="All (*.*)"):
     """ Open QFileDialog """
-    msg = show_warning("Select DXF file")
+    msg = "Select DXF file"
     path, filter_ = QFileDialog.getOpenFileName(None, msg, "", filter_)
 
     return path, filter_
 
 
-def from_postgres_to_toc(tablename=None, the_geom="the_geom", field_id="id", child_layers=None,
+def insert_pg_layer(tablename=None, the_geom="the_geom", field_id="id", child_layers=None,
                          group="GW Layers", style_id="-1"):
     """ Put selected layer into TOC
     :param tablename: Postgres table name (String)
@@ -2639,7 +2639,7 @@ def manage_layer_manager(json_result, sql):
                     else:
                         group = "GW Layers"
                     style_id = lyr[layer_name]['style_id']
-                    from_postgres_to_toc(layer_name, the_geom, field_id, group=group, style_id=style_id)
+                    insert_pg_layer(layer_name, the_geom, field_id, group=group, style_id=style_id)
                 tools_qgis.set_layer_visible(layer)
 
         # force reload dataProvider in order to reindex.
