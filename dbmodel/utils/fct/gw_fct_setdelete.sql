@@ -32,13 +32,18 @@ DECLARE
 v_tablename text;
 v_id  character varying;
 v_querytext varchar;
-v_version json;
-v_schemaname text;
 v_featuretype text;
 v_idname text;
+v_psector_array text; 
+rec_type record;
+rec text;
+v_count integer;
+v_feature_array text[];
+
+v_version json;
+v_schemaname text;
 v_message text;
 v_result text;
-v_messagelevel integer = 0;
 v_feature json;
 v_error_context text;
 
@@ -51,7 +56,7 @@ BEGIN
 	
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
+	INTO v_version;
        
 	-- Get input parameters:
 	v_feature := (p_data ->> 'feature');
@@ -60,36 +65,83 @@ BEGIN
 	v_id := (p_data ->> 'feature')::json->> 'id';
 	v_idname := (p_data ->> 'feature')::json->> 'idName';
 
-	/* IF don't receive info
-	-- Get featureType
-	IF v_featuretype IS NULL THEN
-		IF v_tablename = 'om_visit_lot' THEN
-			v_featuretype ='lot';
-		ELSIF v_tablename = 'om_visit_event_photo' THEN
-			v_featuretype ='file';
-		ELSIF v_tablename = 'om_visit' THEN
-			v_featuretype ='visit';	
-	END IF;
-	*/
-		
-	-- check if feature exists
-	v_querytext := 'SELECT * FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' = '||quote_literal(v_id);
-	EXECUTE v_querytext INTO v_result ;
+	IF v_featuretype='PSECTOR' THEN
 
-	-- if exists
-	IF v_result IS NOT NULL THEN
-		v_querytext := 'DELETE FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' = '||quote_literal(v_id);
+		select string_agg(quote_literal(a),',') into v_psector_array from json_array_elements_text(v_id::json) a;
+
+		--loop over distinct feature types
+		FOR rec_type IN SELECT * FROM sys_feature_type WHERE classlevel=1 OR classlevel=2 LOOP
+
+			EXECUTE 'SELECT array_agg('||rec_type.id||'_id) FROM plan_psector_x_'||rec_type.id||' 
+			WHERE  psector_id::text IN ('||v_psector_array||')'
+			INTO v_feature_array;
 		
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3114", "function":"2608","debug_msg":""}}$$)'
-		INTO v_message;
-		EXECUTE v_querytext ;
+			IF v_feature_array IS NOT NULL THEN
+	
+					FOREACH rec IN ARRAY(v_feature_array) LOOP
+						
+						EXECUTE 'SELECT count(psector_id) FROM plan_psector_x_'||rec_type.id||' 
+						JOIN '||rec_type.id||' n USING ('||rec_type.id||'_id) 
+						WHERE n.state = 2 AND '||rec_type.id||'_id = '||quote_literal(rec)||''
+						INTO v_count;
+						
+						IF v_count = 1 THEN
+							EXECUTE 'SELECT gw_fct_setfeaturedelete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+							"feature":{"type":"'||rec_type.id||'"}, 
+							"data":{"filterFields":{}, "pageInfo":{}, "feature_id":"'||rec||'"}}$$);';
+						END IF;
+					 
+					END LOOP;
+			END IF;
+		END LOOP;
+
+		-- check if feature exists
+		EXECUTE 'SELECT * FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' IN ('||v_psector_array||')'
+		iNTO v_result ;
+
+		v_id=replace(v_psector_array::text,'''','');
+		
+		IF v_result IS NOT NULL THEN
+			EXECUTE 'DELETE FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' IN ('||v_psector_array||')';
+			v_message = concat('"Psector ',v_id,' has been deleted."');
+		ELSE
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3116", "function":"2608","debug_msg":"'||v_id||'"}}$$)' 
+			INTO v_message;
+		END IF;
+
 	ELSE
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3116", "function":"2608","debug_msg":""}}$$)' 
-		INTO v_message;
-	END IF;
 
+		/* IF don't receive info
+		-- Get featureType
+		IF v_featuretype IS NULL THEN
+			IF v_tablename = 'om_visit_lot' THEN
+				v_featuretype ='lot';
+			ELSIF v_tablename = 'om_visit_event_photo' THEN
+				v_featuretype ='file';
+			ELSIF v_tablename = 'om_visit' THEN
+				v_featuretype ='visit';	
+		END IF;
+		*/
+			
+		-- check if feature exists
+		v_querytext := 'SELECT * FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' = '||quote_literal(v_id);
+		EXECUTE v_querytext INTO v_result ;
+
+		-- if exists
+		IF v_result IS NOT NULL THEN
+			v_querytext := 'DELETE FROM ' || quote_ident(v_tablename) ||' WHERE '|| quote_ident(v_idname) ||' = '||quote_literal(v_id);
+			
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3114", "function":"2608","debug_msg":""}}$$)'
+			INTO v_message;
+			EXECUTE v_querytext ;
+		ELSE
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3116", "function":"2608","debug_msg":""}}$$)' 
+			INTO v_message;
+		END IF;
+	END IF;
 	-- Return
     RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_version ||
 	    ', "body": {"feature":{"tableName":"'||v_tablename||'", "id":"'||v_id||'"}}}')::json;    

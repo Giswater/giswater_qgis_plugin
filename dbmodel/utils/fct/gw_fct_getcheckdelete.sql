@@ -16,6 +16,11 @@ SELECT SCHEMA_NAME.gw_fct_getcheckdelete($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"id":"1007","featureType":"NODE"},
 "data":{}}$$)
+
+SELECT SCHEMA_NAME.gw_fct_getcheckdelete($${
+"client":{"device":4, "infoType":1, "lang":"ES"},
+"feature":{"id":["1",2"],"featureType":"PSECTOR"},
+"data":{}}$$)
 */
 
 DECLARE
@@ -26,6 +31,11 @@ v_project_type text;
 v_error text;
 v_feature_type text;
 v_feature_id text;
+v_psector_array text; 
+v_count integer;
+v_feature_array text[];
+rec text;
+rec_type record;
 
 v_result text;
 v_result_info text;
@@ -172,7 +182,7 @@ BEGIN
 		END IF;	
 
 
-		ELSIF v_feature_type='GULLY' THEN
+	ELSIF v_feature_type='GULLY' THEN
 
 		SELECT count(element_id) INTO v_num_feature FROM element_x_gully WHERE gully_id=v_feature_id ;
 		IF v_num_feature > 0 THEN
@@ -201,20 +211,71 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1064", "function":"2120","debug_msg":"'||v_error||'"}}$$);';
 		END IF;	
+
+	ELSIF v_feature_type='PSECTOR' THEN
+	
+		DELETE FROM audit_check_data WHERE fid= 360 AND cur_user=current_user;
 		
+		select string_agg(quote_literal(a),',') into v_psector_array from json_array_elements_text(v_feature_id::json) a;
+	
+		--loop over distinct feature types
+		FOR rec_type IN SELECT * FROM sys_feature_type WHERE classlevel=1 OR classlevel=2 LOOP
+
+			EXECUTE 'SELECT array_agg('||rec_type.id||'_id) FROM plan_psector_x_'||rec_type.id||' 
+			WHERE  psector_id::text IN ('||v_psector_array||')'
+			INTO v_feature_array;
+		
+			IF v_feature_array IS NOT NULL THEN
+	
+					FOREACH rec IN ARRAY(v_feature_array) LOOP
+						
+						EXECUTE 'SELECT count(psector_id) FROM plan_psector_x_'||rec_type.id||' 
+						JOIN '||rec_type.id||' n USING ('||rec_type.id||'_id) 
+						WHERE n.state = 2 AND '||rec_type.id||'_id = '||quote_literal(rec)||''
+						INTO v_count;
+						
+						IF v_count = 1 THEN
+							RAISE NOTICE 'INSERT,%',v_count;
+							EXECUTE 'INSERT INTO audit_check_data (fid, error_message)
+							SELECT DISTINCT 360,concat('||QUOTE_LITERAL(rec_type.id)||','' '','||rec||',
+							'' is only assigned to psector '',psector_id, '' and will be removed from the inventory.'')
+							FROM plan_psector_x_'||rec_type.id||' JOIN '||rec_type.id||' n
+							USING ('||rec_type.id||'_id) 
+							WHERE n.state = 2 AND psector_id::text IN ('||v_psector_array||');';
+						END IF;
+					 
+					END LOOP;
+			END IF;
+		END LOOP;
+
+
     END IF;
 
 
 	v_result_info := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
-
 	v_status = 'Accepted';
-    v_level = 3;
-    v_message = 'Process done successfully';
+	
+	IF v_feature_type='PSECTOR' THEN
+
+		SELECT string_agg(error_message,' ') INTO v_message FROM audit_check_data 
+		WHERE cur_user="current_user"() AND fid=360;
+		
+		IF v_message IS NOT NULL THEN
+			v_level = 1;
+		ELSE
+			v_level = 3;
+			v_message = concat('Are you sure you want to delete psector: ',v_psector_array,'?');
+		END IF;
+		
+	ELSE
+		v_level = 3;
+		v_message = 'Process done successfully';
+	END IF;
 
 	--  Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||
 			'}}'||
