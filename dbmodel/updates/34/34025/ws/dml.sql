@@ -11,4 +11,4 @@ SET search_path = ws_sample, public, pg_catalog;
 -- 2020/11/20
 INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden)
 SELECT formname, formtype, 'custom_dint', 21, 'double', 'text', 'custom_dint', widgetdim, ismandatory, isparent, iseditable, isautoupdate, hidden FROM config_form_fields 
-WHERE formname = 'v_edit_inp_valve' and columnname = 'flow';
+WHERE formname = 'v_edit_inp_valve' and columnname = 'flow' ON CONFLICT  (formname, formtype, columnname) DO NOTHING;

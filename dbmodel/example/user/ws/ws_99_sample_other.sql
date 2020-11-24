@@ -232,7 +232,7 @@ UPDATE cat_arc SET cost = 'VIRTUAL_M', m2bottom_cost = 'VIRTUAL_M2', m3protec_co
 
 
 
-UPDATE inp_valve SET diameter = 100;
+UPDATE inp_valve SET custom_dint = 100;
 
 --move closed and broken to the top of lyt_data_2
 UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=0 WHERE columnname = 'closed' AND formname like '%_valve';
