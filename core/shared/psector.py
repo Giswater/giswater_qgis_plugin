@@ -552,13 +552,13 @@ class GwPsector:
         self.dlg_psector_rapport.btn_path.clicked.connect(partial(tools_qt.get_folder_path, self.dlg_psector_rapport,
             self.dlg_psector_rapport.txt_path))
 
-        value = tools_gw.get_parser_value('psector_rapport', 'psector_rapport_path')
+        value = tools_gw.get_config_parser('psector_rapport', 'psector_rapport_path')
         tools_qt.set_widget_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path, value)
-        value = tools_gw.get_parser_value('psector_rapport', 'psector_rapport_chk_composer')
+        value = tools_gw.get_config_parser('psector_rapport', 'psector_rapport_chk_composer')
         tools_qt.set_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer, value)
-        value = tools_gw.get_parser_value('psector_rapport', 'psector_rapport_chk_csv_detail')
+        value = tools_gw.get_config_parser('psector_rapport', 'psector_rapport_chk_csv_detail')
         tools_qt.set_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail, value)
-        value = tools_gw.get_parser_value('psector_rapport', 'psector_rapport_chk_csv')
+        value = tools_gw.get_config_parser('psector_rapport', 'psector_rapport_chk_csv')
         tools_qt.set_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv, value)
 
         if tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path) == 'null':
@@ -607,13 +607,13 @@ class GwPsector:
 
 
     def generate_rapports(self):
-        tools_gw.set_parser_value('psector_rapport', 'psector_rapport_path',
+        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_path',
                          f"{tools_qt.get_text(self.dlg_psector_rapport, 'txt_path')}")
-        tools_gw.set_parser_value('psector_rapport', 'psector_rapport_chk_composer',
+        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_composer',
                          f"{tools_qt.isChecked(self.dlg_psector_rapport, 'chk_composer')}")
-        tools_gw.set_parser_value('psector_rapport', 'psector_rapport_chk_csv_detail',
+        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_csv_detail',
                          f"{tools_qt.isChecked(self.dlg_psector_rapport, 'chk_csv_detail')}")
-        tools_gw.set_parser_value('psector_rapport', 'psector_rapport_chk_csv',
+        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_csv',
                          f"{tools_qt.isChecked(self.dlg_psector_rapport, 'chk_csv')}")
 
         folder_path = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)

@@ -107,9 +107,9 @@ class GwProfileButton(GwParentMapTool):
 
         # Set last parameters
         tools_qt.set_widget_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance,
-                               tools_gw.get_parser_value('btn_profile', 'minDistanceProfile'))
+                               tools_gw.get_config_parser('btn_profile', 'minDistanceProfile'))
         tools_qt.set_widget_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title,
-                               tools_gw.get_parser_value('btn_profile', 'titleProfile'))
+                               tools_gw.get_config_parser('btn_profile', 'titleProfile'))
 
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
@@ -167,8 +167,8 @@ class GwProfileButton(GwParentMapTool):
                          self.profile_json['body']['data']['terrain'])
 
         # Save profile values
-        tools_gw.set_parser_value('btn_profile', 'minDistanceProfile', f'{links_distance}')
-        tools_gw.set_parser_value('btn_profile', 'titleProfile',
+        tools_gw.set_config_parser('btn_profile', 'minDistanceProfile', f'{links_distance}')
+        tools_gw.set_config_parser('btn_profile', 'titleProfile',
                          f'{tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)}')
 
         # Maximize window (after drawing)

@@ -426,10 +426,10 @@ def load_settings(dialog):
     """ Load user UI settings related with dialog position and size """
     # Get user UI config file
     try:
-        x = get_parser_value('dialogs_position', f"{dialog.objectName()}_x")
-        y = get_parser_value('dialogs_position', f"{dialog.objectName()}_y")
-        width = get_parser_value('dialogs_position', f"{dialog.objectName()}_width")
-        height = get_parser_value('dialogs_position', f"{dialog.objectName()}_height")
+        x = get_config_parser('dialogs_position', f"{dialog.objectName()}_x")
+        y = get_config_parser('dialogs_position', f"{dialog.objectName()}_y")
+        width = get_config_parser('dialogs_position', f"{dialog.objectName()}_width")
+        height = get_config_parser('dialogs_position', f"{dialog.objectName()}_height")
 
         v_screens = ctypes.windll.user32
         screen_x = v_screens.GetSystemMetrics(78)  # Width of virtual screen
@@ -452,15 +452,15 @@ def load_settings(dialog):
 def save_settings(dialog):
     """ Save user UI related with dialog position and size """
     try:
-        set_parser_value('dialogs_position', f"{dialog.objectName()}_width", f"{dialog.property('width')}")
-        set_parser_value('dialogs_position', f"{dialog.objectName()}_height", f"{dialog.property('height')}")
-        set_parser_value('dialogs_position', f"{dialog.objectName()}_x", f"{dialog.pos().x() + 8}")
-        set_parser_value('dialogs_position', f"{dialog.objectName()}_y", f"{dialog.pos().y() + 31}")
+        set_config_parser('dialogs_position', f"{dialog.objectName()}_width", f"{dialog.property('width')}")
+        set_config_parser('dialogs_position', f"{dialog.objectName()}_height", f"{dialog.property('height')}")
+        set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{dialog.pos().x() + 8}")
+        set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{dialog.pos().y() + 31}")
     except Exception as e:
         pass
 
 
-def get_parser_value(section: str, parameter: str) -> str:
+def get_config_parser(section: str, parameter: str) -> str:
     """ Load a simple parser value """
     value = None
     try:
@@ -476,7 +476,7 @@ def get_parser_value(section: str, parameter: str) -> str:
     return value
 
 
-def set_parser_value(section: str, parameter: str, value: str):
+def set_config_parser(section: str, parameter: str, value: str):
     """  Save simple parser value """
     try:
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
@@ -510,7 +510,7 @@ def save_current_tab(dialog, tab_widget, selector_name):
         if tab:
             tab_name = tab.objectName()
             dlg_name = dialog.objectName()
-            set_parser_value('last_tabs', f"{dlg_name}_{selector_name}", f"{tab_name}")
+            set_config_parser('last_tabs', f"{dlg_name}_{selector_name}", f"{tab_name}")
 
     except Exception as e:
         pass
@@ -2208,7 +2208,7 @@ def get_json(function_name, parameters=None, schema_name=None, commit=True, log_
     sql += f");"
 
     # Check log_sql for developers
-    dev_log_sql = get_parser_value('developers', 'log_sql')
+    dev_log_sql = get_config_parser('developers', 'log_sql')
     if dev_log_sql not in (None, "None", "none"):
         log_sql = cast_boolean(dev_log_sql)
 
@@ -2573,7 +2573,7 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
     message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)} """
 
     # Check duration message for developers
-    dev_duration = get_parser_value('developers', 'show_message_durations')
+    dev_duration = get_config_parser('developers', 'show_message_durations')
     if dev_duration not in (None, "None"):
         duration = int(duration)
 
@@ -3005,7 +3005,7 @@ def close_docker():
                     del widget
                     global_vars.dlg_docker.setWidget(None)
                     global_vars.docker_type = None
-                    set_parser_value('docker_info', 'position', f'{docker_pos}')
+                    set_config_parser('docker_info', 'position', f'{docker_pos}')
                 global_vars.iface.removeDockWidget(global_vars.dlg_docker)
                 global_vars.dlg_docker = None
     except AttributeError:
@@ -3019,7 +3019,7 @@ def manage_docker_options():
     # Load last docker position
     try:
         # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
-        pos = int(get_parser_value('docker_info', 'position'))
+        pos = int(get_config_parser('docker_info', 'position'))
         global_vars.dlg_docker.position = 2
         if pos in (1, 2, 4, 8):
             global_vars.dlg_docker.position = pos

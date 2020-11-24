@@ -330,12 +330,12 @@ class GwAdmin:
             tools_qt.dis_enable_dialog(self.dlg_readsql, True)
 
         # Load last schema name selected and project type
-        if tools_gw.get_parser_value('admin', 'last_project_type_selected') not in ('', None):
+        if tools_gw.get_config_parser('admin', 'last_project_type_selected') not in ('', None):
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
-                                   tools_gw.get_parser_value('admin', 'last_project_type_selected'))
-        if tools_gw.get_parser_value('admin', 'last_schema_name_selected') not in ('', None):
+                                   tools_gw.get_config_parser('admin', 'last_project_type_selected'))
+        if tools_gw.get_config_parser('admin', 'last_schema_name_selected') not in ('', None):
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name,
-                                   tools_gw.get_parser_value('admin', 'last_schema_name_selected'))
+                                   tools_gw.get_config_parser('admin', 'last_schema_name_selected'))
 
         if show_dialog:
             self.manage_docker()
@@ -1512,10 +1512,10 @@ class GwAdmin:
         self.project_issample = example_data
 
         # Save in settings
-        tools_gw.set_parser_value('admin', 'project_name_schema', f'{project_name_schema}')
-        tools_gw.set_parser_value('admin', 'project_descript', f'{project_descript}')
+        tools_gw.set_config_parser('admin', 'project_name_schema', f'{project_name_schema}')
+        tools_gw.set_config_parser('admin', 'project_descript', f'{project_descript}')
         inp_file_path = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file')
-        tools_gw.set_parser_value('admin', 'inp_file_path', f'{inp_file_path}')
+        tools_gw.set_config_parser('admin', 'inp_file_path', f'{inp_file_path}')
 
         # Check if project name is valid
         if not self.check_project_name(project_name_schema, project_descript):
@@ -1601,25 +1601,25 @@ class GwAdmin:
             # TODO:
             if not is_test:
                 self.task1.setProgress(100)
-            tools_gw.set_parser_value('admin', 'create_schema_type', 'rdb_import_data')
+            tools_gw.set_config_parser('admin', 'create_schema_type', 'rdb_import_data')
             msg = ("The sql files have been correctly executed."
                    "\nNow, a form will be opened to manage the import inp.")
             tools_qt.show_info_box(msg, "Info")
             self.execute_import_data(schema_type=project_type)
             return
         elif self.rdb_sample.isChecked() and example_data:
-            tools_gw.set_parser_value('admin', 'create_schema_type', 'rdb_sample')
+            tools_gw.set_config_parser('admin', 'create_schema_type', 'rdb_sample')
             self.load_sample_data(project_type=project_type)
             if not is_test:
                 self.task1.setProgress(80)
         elif self.rdb_sample_dev.isChecked():
-            tools_gw.set_parser_value('admin', 'create_schema_type', 'rdb_sample_dev')
+            tools_gw.set_config_parser('admin', 'create_schema_type', 'rdb_sample_dev')
             self.load_sample_data(project_type=project_type)
             self.load_dev_data(project_type=project_type)
             if not is_test:
                 self.task1.setProgress(80)
         elif self.rdb_data.isChecked():
-            tools_gw.set_parser_value('admin', 'create_schema_type', 'rdb_data')
+            tools_gw.set_config_parser('admin', 'create_schema_type', 'rdb_data')
 
         self.manage_process_result(project_name_schema, is_test)
 
@@ -2238,13 +2238,13 @@ class GwAdmin:
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
 
         # Load user values
-        self.project_name.setText(tools_gw.get_parser_value('admin', 'project_name_schema'))
-        self.project_descript.setText(tools_gw.get_parser_value('admin', 'project_descript'))
-        create_schema_type = tools_gw.get_parser_value('admin', 'create_schema_type')
+        self.project_name.setText(tools_gw.get_config_parser('admin', 'project_name_schema'))
+        self.project_descript.setText(tools_gw.get_config_parser('admin', 'project_descript'))
+        create_schema_type = tools_gw.get_config_parser('admin', 'create_schema_type')
         if create_schema_type == 'True':
             tools_qt.set_checked(self.dlg_readsql_create_project, str(create_schema_type))
-        if tools_gw.get_parser_value('admin', 'inp_file_path') not in ('null', None):
-            self.data_file.setText(tools_gw.get_parser_value('admin', 'inp_file_path'))
+        if tools_gw.get_config_parser('admin', 'inp_file_path') not in ('null', None):
+            self.data_file.setText(tools_gw.get_config_parser('admin', 'inp_file_path'))
 
         # TODO: do and call listener for buton + table -> temp_csv
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
@@ -3437,8 +3437,8 @@ class GwAdmin:
         # Save last Project schema name and type selected
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-        tools_gw.set_parser_value('admin', 'last_project_type_selected', f'{project_type}')
-        tools_gw.set_parser_value('admin', 'last_schema_name_selected', f'{schema_name}')
+        tools_gw.set_config_parser('admin', 'last_project_type_selected', f'{project_type}')
+        tools_gw.set_config_parser('admin', 'last_schema_name_selected', f'{schema_name}')
 
 
     def create_credentials_form(self, set_connection):

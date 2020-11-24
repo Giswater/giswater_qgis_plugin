@@ -184,43 +184,43 @@ class GwGo2Epa:
         """ Load QGIS settings related with file_manager """
 
         self.dlg_go2epa.txt_result_name.setMaxLength(16)
-        self.result_name = tools_gw.get_parser_value('go2epa', 'go2epa_RESULT_NAME')
+        self.result_name = tools_gw.get_config_parser('go2epa', 'go2epa_RESULT_NAME')
         self.dlg_go2epa.txt_result_name.setText(self.result_name)
-        self.file_inp = tools_gw.get_parser_value('go2epa', 'go2epa_FILE_INP')
+        self.file_inp = tools_gw.get_config_parser('go2epa', 'go2epa_FILE_INP')
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
-        self.file_rpt = tools_gw.get_parser_value('go2epa', 'go2epa_FILE_RPT')
+        self.file_rpt = tools_gw.get_config_parser('go2epa', 'go2epa_FILE_RPT')
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
 
-        value = tools_gw.get_parser_value('go2epa', 'go2epa_chk_NETWORK_GEOM')
+        value = tools_gw.get_config_parser('go2epa', 'go2epa_chk_NETWORK_GEOM')
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, value)
-        value = tools_gw.get_parser_value('go2epa', 'go2epa_chk_INP')
+        value = tools_gw.get_config_parser('go2epa', 'go2epa_chk_INP')
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export, value)
-        value = tools_gw.get_parser_value('go2epa', 'go2epa_chk_UD')
+        value = tools_gw.get_config_parser('go2epa', 'go2epa_chk_UD')
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, value)
-        value = tools_gw.get_parser_value('go2epa', 'go2epa_chk_EPA')
+        value = tools_gw.get_config_parser('go2epa', 'go2epa_chk_EPA')
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, value)
-        value = tools_gw.get_parser_value('go2epa', 'go2epa_chk_RPT')
+        value = tools_gw.get_config_parser('go2epa', 'go2epa_chk_RPT')
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, value)
 
 
     def save_user_values(self):
         """ Save QGIS settings related with file_manager """
 
-        tools_gw.set_parser_value('go2epa', 'go2epa_RESULT_NAME',
+        tools_gw.set_config_parser('go2epa', 'go2epa_RESULT_NAME',
                          f"{tools_qt.get_text(self.dlg_go2epa, 'txt_result_name', return_string_null=False)}")
-        tools_gw.set_parser_value('go2epa', 'go2epa_FILE_INP',
+        tools_gw.set_config_parser('go2epa', 'go2epa_FILE_INP',
                          f"{tools_qt.get_text(self.dlg_go2epa, 'txt_file_inp', return_string_null=False)}")
-        tools_gw.set_parser_value('go2epa', 'go2epa_FILE_RPT',
+        tools_gw.set_config_parser('go2epa', 'go2epa_FILE_RPT',
                          f"{tools_qt.get_text(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False)}")
-        tools_gw.set_parser_value('go2epa', 'go2epa_chk_NETWORK_GEOM',
+        tools_gw.set_config_parser('go2epa', 'go2epa_chk_NETWORK_GEOM',
                          f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)}")
-        tools_gw.set_parser_value('go2epa', 'go2epa_chk_INP',
+        tools_gw.set_config_parser('go2epa', 'go2epa_chk_INP',
                          f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)}")
-        tools_gw.set_parser_value('go2epa', 'go2epa_chk_UD',
+        tools_gw.set_config_parser('go2epa', 'go2epa_chk_UD',
                          f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)}")
-        tools_gw.set_parser_value('go2epa', 'go2epa_chk_EPA',
+        tools_gw.set_config_parser('go2epa', 'go2epa_chk_EPA',
                          f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)}")
-        tools_gw.set_parser_value('go2epa', 'go2epa_chk_RPT',
+        tools_gw.set_config_parser('go2epa', 'go2epa_chk_RPT',
                          f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)}")
 
 

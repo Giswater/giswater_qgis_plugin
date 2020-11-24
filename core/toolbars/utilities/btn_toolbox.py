@@ -171,17 +171,17 @@ class GwToolBoxButton(GwParentAction):
             if type(widget) not in (QCheckBox, QComboBox, QLineEdit, QRadioButton):
                 continue
             if type(widget) in (QCheckBox, QRadioButton):
-                value = tools_gw.get_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}")
+                value = tools_gw.get_config_parser('toolbox', f"parametric_{function_name}_{widget.objectName()}")
                 tools_qt.set_checked(dialog, widget, value)
 
             elif type(widget) is QComboBox:
                 if widget.property('selectedId') in (None, '', 'NULL'):
-                    value = tools_gw.get_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}")
+                    value = tools_gw.get_config_parser('toolbox', f"parametric_{function_name}_{widget.objectName()}")
                 else:
                     value = widget.property('selectedId')
                 tools_qt.set_combo_value(widget, value, 0)
             elif type(widget) in (QLineEdit, QSpinBox):
-                value = tools_gw.get_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}")
+                value = tools_gw.get_config_parser('toolbox', f"parametric_{function_name}_{widget.objectName()}")
                 tools_qt.set_widget_text(dialog, widget, value)
 
 
@@ -193,13 +193,13 @@ class GwToolBoxButton(GwParentAction):
         widgets = layout.findChildren(QWidget)
         for widget in widgets:
             if type(widget) is QCheckBox:
-                tools_gw.set_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{widget.isChecked()}")
+                tools_gw.set_config_parser('toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{widget.isChecked()}")
             elif type(widget) is QComboBox:
                 value = tools_qt.get_combo_value(dialog, widget, 0)
-                tools_gw.set_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{value}")
+                tools_gw.set_config_parser('toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{value}")
             elif type(widget) in (QLineEdit, QSpinBox):
                 value = tools_qt.get_text(dialog, widget, False, False)
-                tools_gw.set_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{value}")
+                tools_gw.set_config_parser('toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{value}")
 
 
     def load_settings_values(self, dialog, function):
@@ -207,17 +207,17 @@ class GwToolBoxButton(GwParentAction):
 
         function_name = function[0]['functionname']
         if dialog.cmb_geom_type.property('selectedId') in (None, '', 'NULL'):
-            geom_type = tools_gw.get_parser_value('toolbox', f"{function_name}_cmb_geom_type")
+            geom_type = tools_gw.get_config_parser('toolbox', f"{function_name}_cmb_geom_type")
         else:
             geom_type = dialog.cmb_geom_type.property('selectedId')
         tools_qt.set_combo_value(dialog.cmb_geom_type, geom_type, 0)
         if dialog.cmb_layers.property('selectedId') in (None, '', 'NULL'):
-            layer = tools_gw.get_parser_value('toolbox', f"{function_name}_cmb_layers")
+            layer = tools_gw.get_config_parser('toolbox', f"{function_name}_cmb_layers")
         else:
             layer = dialog.cmb_layers.property('selectedId')
         tools_qt.set_combo_value(dialog.cmb_layers, layer, 0)
 
-        if tools_gw.get_parser_value('toolbox', f"{function_name}_rbt_previous") == 'True':
+        if tools_gw.get_config_parser('toolbox', f"{function_name}_rbt_previous") == 'True':
             tools_qt.set_checked(dialog, 'rbt_previous', True)
         else:
             tools_qt.set_checked(dialog, 'rbt_layer', True)
@@ -227,10 +227,10 @@ class GwToolBoxButton(GwParentAction):
 
         function_name = function[0]['functionname']
         geom_type = tools_qt.get_combo_value(dialog, dialog.cmb_geom_type, 0)
-        tools_gw.set_parser_value('toolbox', f"{function_name}_cmb_geom_type", f"{geom_type}")
+        tools_gw.set_config_parser('toolbox', f"{function_name}_cmb_geom_type", f"{geom_type}")
         layer = tools_qt.get_combo_value(dialog, dialog.cmb_layers, 0)
-        tools_gw.set_parser_value('toolbox', f"{function_name}_cmb_layers", f"{layer}")
-        tools_gw.set_parser_value('toolbox', f"{function_name}_rbt_previous", f"{dialog.rbt_previous.isChecked()}")
+        tools_gw.set_config_parser('toolbox', f"{function_name}_cmb_layers", f"{layer}")
+        tools_gw.set_config_parser('toolbox', f"{function_name}_rbt_previous", f"{dialog.rbt_previous.isChecked()}")
 
 
     def execute_function(self, dialog, combo, result):

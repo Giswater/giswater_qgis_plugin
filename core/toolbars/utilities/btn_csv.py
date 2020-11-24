@@ -203,21 +203,21 @@ class GwCSVButton(GwParentAction):
     def load_settings_values(self):
         """ Load QGIS settings related with csv options """
 
-        value = tools_gw.get_parser_value('csv2Pg', 'cmb_import_type')
+        value = tools_gw.get_config_parser('csv2Pg', 'cmb_import_type')
         tools_qt.set_combo_value(self.dlg_csv.cmb_import_type, value, 0)
 
-        value = tools_gw.get_parser_value('csv2Pg', 'txt_import')
+        value = tools_gw.get_config_parser('csv2Pg', 'txt_import')
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.txt_import, value)
 
-        value = tools_gw.get_parser_value('csv2Pg', 'txt_file_csv')
+        value = tools_gw.get_config_parser('csv2Pg', 'txt_file_csv')
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.txt_file_csv, value)
 
-        unicode = tools_gw.get_parser_value('csv2Pg', 'cmb_unicode_list')
+        unicode = tools_gw.get_config_parser('csv2Pg', 'cmb_unicode_list')
         if not unicode:
             unicode = 'latin1'
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
 
-        if tools_gw.get_parser_value('csv2Pg', 'rb_semicolon') == 'True':
+        if tools_gw.get_config_parser('csv2Pg', 'rb_semicolon') == 'True':
             self.dlg_csv.rb_semicolon.setChecked(True)
         else:
             self.dlg_csv.rb_comma.setChecked(True)
@@ -225,11 +225,11 @@ class GwCSVButton(GwParentAction):
 
     def save_settings_values(self):
         """ Save QGIS settings related with csv options """
-        tools_gw.set_parser_value('csv2Pg', 'cmb_import_type', f"{tools_qt.get_combo_value(self.dlg_csv, 'cmb_import_type', 0)}")
-        tools_gw.set_parser_value('csv2Pg', 'txt_import', tools_qt.get_text(self.dlg_csv, 'txt_import'))
-        tools_gw.set_parser_value('csv2Pg', 'txt_file_csv', tools_qt.get_text(self.dlg_csv, 'txt_file_csv'))
-        tools_gw.set_parser_value('csv2Pg', 'cmb_unicode_list', tools_qt.get_text(self.dlg_csv, 'cmb_unicode_list'))
-        tools_gw.set_parser_value('csv2Pg', 'rb_semicolon', f"{self.dlg_csv.rb_semicolon.isChecked()}")
+        tools_gw.set_config_parser('csv2Pg', 'cmb_import_type', f"{tools_qt.get_combo_value(self.dlg_csv, 'cmb_import_type', 0)}")
+        tools_gw.set_config_parser('csv2Pg', 'txt_import', tools_qt.get_text(self.dlg_csv, 'txt_import'))
+        tools_gw.set_config_parser('csv2Pg', 'txt_file_csv', tools_qt.get_text(self.dlg_csv, 'txt_file_csv'))
+        tools_gw.set_config_parser('csv2Pg', 'cmb_unicode_list', tools_qt.get_text(self.dlg_csv, 'cmb_unicode_list'))
+        tools_gw.set_config_parser('csv2Pg', 'rb_semicolon', f"{self.dlg_csv.rb_semicolon.isChecked()}")
 
 
     def validate_params(self, dialog):

@@ -15,8 +15,7 @@ from functools import partial
 from .. import global_vars
 from ..lib import tools_qt, tools_qgis, tools_db
 from ..core.ui.ui_manager import MainQtDialogUi
-from ..core.utils.tools_gw import close_dialog, get_parser_value, load_settings, open_dialog, set_parser_value, \
-    get_plugin_version
+from ..core.utils import tools_gw
 
 
 class GwI18NGenerator:
@@ -28,17 +27,17 @@ class GwI18NGenerator:
 
     def init_dialog(self):
         self.dlg_qm = MainQtDialogUi()
-        load_settings(self.dlg_qm)
+        tools_gw.load_settings(self.dlg_qm)
         self.load_user_values()
 
         self.dlg_qm.btn_translate.setEnabled(False)
         # Mysteriously without the partial the function check_connection is not called
         self.dlg_qm.btn_connection.clicked.connect(partial(self.check_connection))
         self.dlg_qm.btn_translate.clicked.connect(self.check_translate_options)
-        self.dlg_qm.btn_close.clicked.connect(partial(close_dialog, self.dlg_qm))
+        self.dlg_qm.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_qm))
         self.dlg_qm.rejected.connect(self.save_user_values)
         self.dlg_qm.rejected.connect(self.close_db)
-        open_dialog(self.dlg_qm, dlg_name='main_qtdialog')
+        tools_gw.open_dialog(self.dlg_qm, dlg_name='main_qtdialog')
 
 
     def check_connection(self):
@@ -245,7 +244,7 @@ class GwI18NGenerator:
         db_lang = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 1)
         file_lng = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 3)
 
-        version_metadata = get_plugin_version()
+        version_metadata = tools_gw.get_plugin_version()
         ver = version_metadata.split('.')
         plugin_version = f'{ver[0]}{ver[1]}'
         plugin_release = version_metadata.replace('.', '')
@@ -359,13 +358,13 @@ class GwI18NGenerator:
         language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         py_msg = tools_qt.isChecked(self.dlg_qm, self.dlg_qm.chk_py_msg)
         db_msg = tools_qt.isChecked(self.dlg_qm, self.dlg_qm.chk_db_msg)
-        set_parser_value('i18n_generator', 'qm_lang_host', f"{host}")
-        set_parser_value('i18n_generator', 'qm_lang_port', f"{port}")
-        set_parser_value('i18n_generator', 'qm_lang_db', f"{db}")
-        set_parser_value('i18n_generator', 'qm_lang_user', f"{user}")
-        set_parser_value('i18n_generator', 'qm_lang_language', f"{language}")
-        set_parser_value('i18n_generator', 'qm_lang_py_msg', f"{py_msg}")
-        set_parser_value('i18n_generator', 'qm_lang_db_msg', f"{db_msg}")
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_host', f"{host}")
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_port', f"{port}")
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db', f"{db}")
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_user', f"{user}")
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_language', f"{language}")
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_py_msg', f"{py_msg}")
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db_msg', f"{db_msg}")
 
 
     def load_user_values(self):
@@ -373,12 +372,12 @@ class GwI18NGenerator:
         :return: Dictionary with values
         """
 
-        host = get_parser_value('i18n_generator', 'qm_lang_host')
-        port = get_parser_value('i18n_generator', 'qm_lang_port')
-        db = get_parser_value('i18n_generator', 'qm_lang_db')
-        user = get_parser_value('i18n_generator', 'qm_lang_user')
-        py_msg = get_parser_value('i18n_generator', 'qm_lang_py_msg')
-        db_msg = get_parser_value('i18n_generator', 'qm_lang_db_msg')
+        host = tools_gw.get_config_parser('i18n_generator', 'qm_lang_host')
+        port = tools_gw.get_config_parser('i18n_generator', 'qm_lang_port')
+        db = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db')
+        user = tools_gw.get_config_parser('i18n_generator', 'qm_lang_user')
+        py_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_py_msg')
+        db_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db_msg')
         tools_qt.set_widget_text(self.dlg_qm, 'txt_host', host)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_port', port)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_db', db)

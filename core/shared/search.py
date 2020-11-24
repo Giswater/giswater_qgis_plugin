@@ -474,7 +474,7 @@ class GwSearch:
         self.items_dialog.btn_state1.setEnabled(False)
         self.items_dialog.btn_state0.setEnabled(False)
 
-        search_csv_path = tools_gw.get_parser_value('search', 'search_csv_path')
+        search_csv_path = tools_gw.get_config_parser('search', 'search_csv_path')
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_init, f"Filter by: {field_id}")
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_end, f"Filter by: {field_id}")
@@ -562,7 +562,7 @@ class GwSearch:
     def get_current_selectors(self):
         """ Take the current selector_expl and selector_state to restore them at the end of the operation """
 
-        current_tab = tools_gw.get_parser_value('last_tabs', 'dlg_selector_basic')
+        current_tab = tools_gw.get_config_parser('last_tabs', 'dlg_selector_basic')
         form = f'"currentTab":"{current_tab}"'
         extras = f'"selectorType":"selector_basic", "filterText":""'
         body = tools_gw.create_body(form=form, extras=extras)
@@ -738,7 +738,7 @@ class GwSearch:
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
-        tools_gw.set_parser_value('search', 'search_csv_path', f"{tools_qt.get_text(dialog, 'txt_path')}")
+        tools_gw.set_config_parser('search', 'search_csv_path', f"{tools_qt.get_text(dialog, 'txt_path')}")
         message = "The csv file has been successfully exported"
         tools_gw.show_info(message)
 
