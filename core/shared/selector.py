@@ -61,7 +61,7 @@ class Selector:
         # Set filter
         if filter is not False:
             main_tab = dialog.findChild(QTabWidget, 'main_tab')
-            text_filter = tools_qt.getWidgetText(dialog, widget)
+            text_filter = tools_qt.get_text(dialog, widget)
             if text_filter in ('null', None):
                 text_filter = ''
 
@@ -267,7 +267,7 @@ class Selector:
         self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result, selector_vars=selector_vars)
 
         widget_filter = tools_qt.getWidget(dialog, f"txt_filter_{tab_name}")
-        if widget_filter and tools_qt.getWidgetText(dialog, widget_filter, False, False) not in (None, ''):
+        if widget_filter and tools_qt.get_text(dialog, widget_filter, False, False) not in (None, ''):
             widget_filter.textChanged.emit(widget_filter.text())
 
 
@@ -299,7 +299,7 @@ class Selector:
         index = dialog.main_tab.currentIndex()
         tab_name = dialog.main_tab.widget(index).objectName()
         if action == 'save':
-            selector_vars[f"var_txt_filter_{tab_name}"] = tools_qt.getWidgetText(dialog, widget)
+            selector_vars[f"var_txt_filter_{tab_name}"] = tools_qt.get_text(dialog, widget)
         else:
             selector_vars[f"var_txt_filter_{tab_name}"] = ''
 

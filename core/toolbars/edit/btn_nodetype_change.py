@@ -34,7 +34,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
     def open_catalog(self):
 
         # Get feature_type
-        feature_type = tools_qt.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
+        feature_type = tools_qt.get_text(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
         if feature_type is 'null':
             msg = "New node type is null. Please, select a valid value."
             tools_qt.show_info_box(msg, "Info")
@@ -47,8 +47,8 @@ class GwNodeTypeChangeButton(GwParentMapTool):
         """ Update current type of node and save changes in database """
 
         project_type = tools_gw.get_project_type()
-        node_node_type_new = tools_qt.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
-        node_nodecat_id = tools_qt.getWidgetText(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id)
+        node_node_type_new = tools_qt.get_text(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
+        node_nodecat_id = tools_qt.get_text(self.dlg_chg_node_type, self.dlg_chg_node_type.node_nodecat_id)
 
         layer = False
         if node_node_type_new != "null":
@@ -146,7 +146,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 
     def filter_catalog(self):
 
-        node_node_type_new = tools_qt.getWidgetText(self.dlg_chg_node_type,
+        node_node_type_new = tools_qt.get_text(self.dlg_chg_node_type,
                                                     self.dlg_chg_node_type.node_node_type_new)
 
         if node_node_type_new == "null":

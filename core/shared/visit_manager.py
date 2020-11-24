@@ -83,7 +83,7 @@ class GwVisitManager:
         self.current_visit = OmVisit(self.controller)
         self.dlg_add_visit = VisitUi(tag)
         tools_gw.load_settings(self.dlg_add_visit)
-        layers_visibility = tools_gw.hide_generic_layers(['v_edit_element'])
+        layers_visibility = tools_gw.hide_parent_layers(['v_edit_element'])
         self.dlg_add_visit.rejected.connect(partial(self.restore_layers_visibility, layers_visibility))
         self.dlg_add_visit.accepted.connect(partial(self.restore_layers_visibility, layers_visibility))
 
@@ -529,12 +529,12 @@ class GwVisitManager:
 
         # A) fill Visit basing on GUI values
         self.current_visit.id = int(self.visit_id.text())
-        self.current_visit.startdate = tools_qt.getCalendarDate(self.dlg_add_visit, 'startdate')
-        self.current_visit.enddate = tools_qt.getCalendarDate(self.dlg_add_visit, 'enddate')
+        self.current_visit.startdate = tools_qt.get_calendar_date(self.dlg_add_visit, 'startdate')
+        self.current_visit.enddate = tools_qt.get_calendar_date(self.dlg_add_visit, 'enddate')
         self.current_visit.user_name = self.user_name.text()
         self.current_visit.ext_code = self.ext_code.text()
         self.current_visit.visitcat_id = tools_qt.get_combo_value(self.dlg_add_visit, 'visitcat_id', 0)
-        self.current_visit.descript = tools_qt.getWidgetText(self.dlg_add_visit, 'descript', False, False)
+        self.current_visit.descript = tools_qt.get_text(self.dlg_add_visit, 'descript', False, False)
         self.current_visit.status = tools_qt.get_combo_value(self.dlg_add_visit, 'status', 0)
         if self.expl_id:
             self.current_visit.expl_id = self.expl_id
@@ -552,7 +552,7 @@ class GwVisitManager:
                 geom_type = self.feature_type.itemText(index).lower()
                 self.delete_relations_geom_type(geom_type)
 
-        feature_type = tools_qt.getWidgetText(self.dlg_add_visit, self.feature_type).lower()
+        feature_type = tools_qt.get_text(self.dlg_add_visit, self.feature_type).lower()
         # Save new relations listed in every table of geom_type
         if feature_type == 'all':
             self.update_relations_geom_type("arc")
@@ -744,7 +744,7 @@ class GwVisitManager:
 
         self.connect_signal_tab_feature_signal(True)
 
-        # tools_gw.hide_generic_layers(excluded_layers=excluded_layers)
+        # tools_gw.hide_parent_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_visit_x_{self.geom_type}"
         viewname = f"v_edit_{self.geom_type}"
         widget_table = tools_qt.getWidget(self.dlg_add_visit, widget_name)
@@ -934,7 +934,7 @@ class GwVisitManager:
     def filter_visit(self, dialog, widget_table, widget_txt, table_object, expr_filter, filed_to_filter):
         """ Filter om_visit in self.dlg_man.tbl_visit based on (id AND text AND between dates) """
 
-        object_id = tools_qt.getWidgetText(dialog, widget_txt)
+        object_id = tools_qt.get_text(dialog, widget_txt)
         visit_start = dialog.date_event_from.date()
         visit_end = dialog.date_event_to.date()
         if visit_start > visit_end:
@@ -1044,7 +1044,7 @@ class GwVisitManager:
         sql = (f"SELECT id, descript "
                f"FROM config_visit_parameter ")
         where = None
-        parameter_type_id = tools_qt.getWidgetText(self.dlg_add_visit, "parameter_type_id")
+        parameter_type_id = tools_qt.get_text(self.dlg_add_visit, "parameter_type_id")
         if parameter_type_id:
             where = f"WHERE parameter_type = '{parameter_type_id}' "
         if self.geom_type:
@@ -1096,7 +1096,7 @@ class GwVisitManager:
     def manage_document(self, qtable):
         """Access GUI to manage documents e.g Execute action of button 34 """
 
-        visit_id = tools_qt.getWidgetText(self.dlg_add_visit, self.dlg_add_visit.visit_id)
+        visit_id = tools_qt.get_text(self.dlg_add_visit, self.dlg_add_visit.visit_id)
         manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.manage_document(
             tablename='visit', qtable=self.dlg_add_visit.tbl_document, item_id=visit_id)
@@ -1237,7 +1237,7 @@ class GwVisitManager:
         model.setHorizontalHeaderLabels(headers)
 
         # Get values in order to populate model
-        visit_id = tools_qt.getWidgetText(self.dlg_add_visit, self.dlg_add_visit.visit_id)
+        visit_id = tools_qt.get_text(self.dlg_add_visit, self.dlg_add_visit.visit_id)
         sql = (f"SELECT value, filetype, fextension FROM om_visit_event_photo "
                f"WHERE visit_id='{visit_id}' AND event_id='{event_id}'")
         rows = self.controller.get_rows(sql)
@@ -1681,7 +1681,7 @@ class GwVisitManager:
         if self.geom_type == '':
             return
 
-        tools_gw.hide_generic_layers(excluded_layers=excluded_layers)
+        tools_gw.hide_parent_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_{table_object}_x_{self.geom_type}"
         viewname = f"v_edit_{self.geom_type}"
         widget_table = tools_qt.getWidget(dialog, widget_name)

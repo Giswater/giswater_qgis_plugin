@@ -632,7 +632,7 @@ def get_cursor_multiple_selection():
     return cursor
 
 
-def hide_generic_layers(excluded_layers=[]):
+def hide_parent_layers(excluded_layers=[]):
     """ Hide generic layers """
     layers_changed = {}
     layer = global_vars.controller.get_layer_by_tablename("v_edit_arc")
@@ -786,7 +786,7 @@ def get_signal_change_tab(dialog, excluded_layers=[]):
         geom_type = "gully"
     elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_elem':
         geom_type = "element"
-    hide_generic_layers(excluded_layers=excluded_layers)
+    hide_parent_layers(excluded_layers=excluded_layers)
     viewname = f"v_edit_{geom_type}"
 
     # Adding auto-completion to a QLineEdit
@@ -994,7 +994,7 @@ def fill_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_disa
     """
 
     change_tab = False
-    text = tools_qt.getWidgetText(dialog, dialog.txt_infolog, return_string_null=False)
+    text = tools_qt.get_text(dialog, dialog.txt_infolog, return_string_null=False)
 
     if reset_text:
         text = ""
@@ -1599,13 +1599,13 @@ def get_values_changed_param_user(dialog, chk, widget, field, list, value=None):
 
     elem = {}
     if type(widget) is QLineEdit:
-        value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
+        value = tools_qt.get_text(dialog, widget, return_string_null=False)
     elif type(widget) is QComboBox:
         value = tools_qt.get_combo_value(dialog, widget, 0)
     elif type(widget) is QCheckBox:
         value = tools_qt.isChecked(dialog, widget)
     elif type(widget) is QDateEdit:
-        value = tools_qt.getCalendarDate(dialog, widget)
+        value = tools_qt.get_calendar_date(dialog, widget)
 
     # When the QDoubleSpinbox contains decimals, for example 2,0001 when collecting the value, the spinbox itself sends
     # 2.0000999999, as in reality we only want, maximum 4 decimal places, we round up, thus fixing this small failure
@@ -1689,13 +1689,13 @@ def get_values(dialog, widget, _json=None):
 
     value = None
     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit) and widget.isReadOnly() is False:
-        value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
+        value = tools_qt.get_text(dialog, widget, return_string_null=False)
     elif type(widget) is QComboBox and widget.isEnabled():
         value = tools_qt.get_combo_value(dialog, widget, 0)
     elif type(widget) is QCheckBox and widget.isEnabled():
         value = tools_qt.isChecked(dialog, widget)
     elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
-        value = tools_qt.getCalendarDate(dialog, widget)
+        value = tools_qt.get_calendar_date(dialog, widget)
 
     if str(value) == '' or value is None:
         _json[str(widget.property('columnname'))] = None
@@ -1825,8 +1825,8 @@ def fill_typeahead(completer, model, field, dialog, widget):
     extras = f'"queryText":"{field["queryText"]}"'
     extras += f', "queryTextFilter":"{field["queryTextFilter"]}"'
     extras += f', "parentId":"{parent_id}"'
-    extras += f', "parentValue":"{tools_qt.getWidgetText(dialog, "data_" + str(field["parentId"]))}"'
-    extras += f', "textToSearch":"{tools_qt.getWidgetText(dialog, widget)}"'
+    extras += f', "parentValue":"{tools_qt.get_text(dialog, "data_" + str(field["parentId"]))}"'
+    extras += f', "textToSearch":"{tools_qt.get_text(dialog, widget)}"'
     body = create_body(extras=extras)
     complet_list = get_json('gw_fct_gettypeahead', body)
     if not complet_list or complet_list['status'] == 'Failed':
@@ -2427,7 +2427,7 @@ def manage_return_manager(json_result, sql, rubber_band=None):
 def get_rows_by_feature_type(dialog, table_object, geom_type, ids=None, list_ids=None, layers=None):
     """ Get records of @geom_type associated to selected @table_object """
 
-    object_id = tools_qt.getWidgetText(dialog, table_object + "_id")
+    object_id = tools_qt.get_text(dialog, table_object + "_id")
     table_relation = table_object + "_x_" + geom_type
     widget_name = "tbl_" + table_relation
 

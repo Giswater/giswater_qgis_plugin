@@ -183,7 +183,7 @@ class GwEndFeatureButton(GwParentAction):
     def fill_workids(self):
         """ Auto fill descriptions and workid's """
 
-        workcat_id = tools_qt.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
+        workcat_id = tools_qt.get_text(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
         if not workcat_id:
             return
         sql = (f"SELECT descript, builtdate "
@@ -221,8 +221,8 @@ class GwEndFeatureButton(GwParentAction):
         """ Get elements from all the tables and update his data """
 
         # Setting values
-        self.workcat_id_end = tools_qt.getWidgetText(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
-        self.enddate = tools_qt.getCalendarDate(self.dlg_work_end, self.dlg_work_end.enddate)
+        self.workcat_id_end = tools_qt.get_text(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
+        self.enddate = tools_qt.get_calendar_date(self.dlg_work_end, self.dlg_work_end.enddate)
         self.statetype_id_end = tools_qt.get_combo_value(self.dlg_work_end, self.dlg_work_end.cmb_statetype_end, 0)
 
         if self.workcat_id_end in ('null', None):
@@ -421,7 +421,7 @@ class GwEndFeatureButton(GwParentAction):
 
     def filter_by_id(self, table, widget_txt, tablename):
 
-        id_ = tools_qt.getWidgetText(self.dlg_work, widget_txt)
+        id_ = tools_qt.get_text(self.dlg_work, widget_txt)
         if id_ != 'null':
             expr = f" arc_id = '{id_}'"
             # Refresh model with selected filter
@@ -469,7 +469,7 @@ class GwEndFeatureButton(GwParentAction):
         """ Close dialog and disconnect snapping """
 
         tools_gw.close_dialog(dialog)
-        tools_gw.hide_generic_layers(excluded_layers=["v_edit_element"])
+        tools_gw.hide_parent_layers(excluded_layers=["v_edit_element"])
         tools_qgis.disconnect_snapping()
         tools_qgis.disconnect_signal_selection_changed()
         if force_downgrade:
@@ -522,23 +522,23 @@ class GwEndFeatureButton(GwParentAction):
         values = ""
         fields = ""
 
-        cat_work_id = tools_qt.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.cat_work_id)
+        cat_work_id = tools_qt.get_text(self.dlg_new_workcat, self.dlg_new_workcat.cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
             values += f"'{cat_work_id}', "
-        descript = tools_qt.getWidgetText(self.dlg_new_workcat, "descript")
+        descript = tools_qt.get_text(self.dlg_new_workcat, "descript")
         if descript != "null":
             fields += 'descript, '
             values += f"'{descript}', "
-        link = tools_qt.getWidgetText(self.dlg_new_workcat, "link")
+        link = tools_qt.get_text(self.dlg_new_workcat, "link")
         if link != "null":
             fields += 'link, '
             values += f"'{link}', "
-        workid_key_1 = tools_qt.getWidgetText(self.dlg_new_workcat, "workid_key_1")
+        workid_key_1 = tools_qt.get_text(self.dlg_new_workcat, "workid_key_1")
         if workid_key_1 != "null":
             fields += 'workid_key1, '
             values += f"'{workid_key_1}', "
-        workid_key_2 = tools_qt.getWidgetText(self.dlg_new_workcat, "workid_key_2")
+        workid_key_2 = tools_qt.get_text(self.dlg_new_workcat, "workid_key_2")
         if workid_key_2 != "null":
             fields += 'workid_key2, '
             values += f"'{workid_key_2}', "

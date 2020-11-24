@@ -164,7 +164,7 @@ class GwDimensioning:
         list_widgets = self.dlg_dim.findChildren(QLineEdit)
         for widget in list_widgets:
             widget_name = widget.property('columnname')
-            widget_value = tools_qt.getWidgetText(self.dlg_dim, widget)
+            widget_value = tools_qt.get_text(self.dlg_dim, widget)
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":"{widget_value}", '

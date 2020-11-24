@@ -198,7 +198,7 @@ class GwToolBoxButton(GwParentAction):
                 value = tools_qt.get_combo_value(dialog, widget, 0)
                 tools_gw.set_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{value}")
             elif type(widget) in (QLineEdit, QSpinBox):
-                value = tools_qt.getWidgetText(dialog, widget, False, False)
+                value = tools_qt.get_text(dialog, widget, False, False)
                 tools_gw.set_parser_value('toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{value}")
 
 
@@ -311,13 +311,13 @@ class GwToolBoxButton(GwParentAction):
                         param_name = widget.objectName()
                         if type(widget) in ('', QLineEdit):
                             widget.setStyleSheet(None)
-                            value = tools_qt.getWidgetText(dialog, widget, False, False)
+                            value = tools_qt.get_text(dialog, widget, False, False)
                             extras += f'"{param_name}":"{value}", '.replace('""', 'null')
                             if value is '' and widget.property('ismandatory'):
                                 widget_is_void = True
                                 widget.setStyleSheet("border: 1px solid red")
                         elif type(widget) in ('', QSpinBox, QDoubleSpinBox):
-                            value = tools_qt.getWidgetText(dialog, widget, False, False)
+                            value = tools_qt.get_text(dialog, widget, False, False)
                             if value == '':
                                 value = 0
                             extras += f'"{param_name}":"{value}", '
@@ -328,7 +328,7 @@ class GwToolBoxButton(GwParentAction):
                             value = tools_qt.isChecked(dialog, widget)
                             extras += f'"{param_name}":"{str(value).lower()}", '
                         elif type(widget) in ('', QgsDateTimeEdit):
-                            value = tools_qt.getCalendarDate(dialog, widget)
+                            value = tools_qt.get_calendar_date(dialog, widget)
                             if value == "" or value is None:
                                 extras += f'"{param_name}":null, '
                             else:

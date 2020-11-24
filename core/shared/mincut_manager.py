@@ -320,7 +320,7 @@ class GwMincutManager:
     def filter_by_id(self, qtable):
 
         expr = ""
-        id_ = tools_qt.getWidgetText(self.dlg_min_edit, self.dlg_min_edit.txt_mincut_id, False, False)
+        id_ = tools_qt.get_text(self.dlg_min_edit, self.dlg_min_edit.txt_mincut_id, False, False)
         state_id = tools_qt.get_combo_value(self.dlg_min_edit, self.dlg_min_edit.state_edit, 0)
         state_text = tools_qt.get_combo_value(self.dlg_min_edit, self.dlg_min_edit.state_edit, 1)
         expl = tools_qt.get_combo_value(self.dlg_min_edit, self.dlg_min_edit.cmb_expl, 1)

@@ -73,7 +73,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
-            work_id = tools_qt.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
+            work_id = tools_qt.get_text(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
                    f"WHERE id = '{work_id}'")
             row = self.controller.get_row(sql)
@@ -127,7 +127,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
     def open_catalog(self):
 
         # Get feature_type
-        feature_type = tools_qt.getWidgetText(self.dlg_replace, self.dlg_replace.feature_type_new)
+        feature_type = tools_qt.get_text(self.dlg_replace, self.dlg_replace.feature_type_new)
         if feature_type is 'null':
             msg = "New feature type is null. Please, select a valid value."
             tools_qt.show_info_box(msg, "Info")
@@ -146,7 +146,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
-            work_id = tools_qt.getWidgetText(self.dlg_replace, self.dlg_replace.workcat_id_end)
+            work_id = tools_qt.get_text(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
                    f"WHERE id = '{work_id}'")
             row = self.controller.get_row(sql)
@@ -186,23 +186,23 @@ class GwFeatureReplaceButton(GwParentMapTool):
         # Get values from dialog
         values = ""
         fields = ""
-        cat_work_id = tools_qt.getWidgetText(self.dlg_new_workcat, self.dlg_new_workcat.cat_work_id)
+        cat_work_id = tools_qt.get_text(self.dlg_new_workcat, self.dlg_new_workcat.cat_work_id)
         if cat_work_id != "null":
             fields += 'id, '
             values += ("'" + str(cat_work_id) + "', ")
-        descript = tools_qt.getWidgetText(self.dlg_new_workcat, "descript")
+        descript = tools_qt.get_text(self.dlg_new_workcat, "descript")
         if descript != "null":
             fields += 'descript, '
             values += ("'" + str(descript) + "', ")
-        link = tools_qt.getWidgetText(self.dlg_new_workcat, "link")
+        link = tools_qt.get_text(self.dlg_new_workcat, "link")
         if link != "null":
             fields += 'link, '
             values += ("'" + str(link) + "', ")
-        workid_key_1 = tools_qt.getWidgetText(self.dlg_new_workcat, "workid_key_1")
+        workid_key_1 = tools_qt.get_text(self.dlg_new_workcat, "workid_key_1")
         if workid_key_1 != "null":
             fields += 'workid_key1, '
             values += ("'" + str(workid_key_1) + "', ")
-        workid_key_2 = tools_qt.getWidgetText(self.dlg_new_workcat, "workid_key_2")
+        workid_key_2 = tools_qt.get_text(self.dlg_new_workcat, "workid_key_2")
         if workid_key_2 != "null":
             fields += 'workid_key2, '
             values += ("'" + str(workid_key_2) + "', ")
@@ -242,7 +242,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
     def get_values(self, dialog):
 
-        self.workcat_id_end_aux = tools_qt.getWidgetText(dialog, dialog.workcat_id_end)
+        self.workcat_id_end_aux = tools_qt.get_text(dialog, dialog.workcat_id_end)
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
 
         # Check null values
@@ -251,8 +251,8 @@ class GwFeatureReplaceButton(GwParentMapTool):
             tools_gw.show_warning(message, parameter='Workcat_id')
             return
 
-        feature_type_new = tools_qt.getWidgetText(dialog, dialog.feature_type_new)
-        featurecat_id = tools_qt.getWidgetText(dialog, dialog.featurecat_id)
+        feature_type_new = tools_qt.get_text(dialog, dialog.feature_type_new)
+        featurecat_id = tools_qt.get_text(dialog, dialog.featurecat_id)
 
         # Ask question before executing
         message = "Are you sure you want to replace selected feature with a new one?"
@@ -443,7 +443,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             return
 
         # Get selected value from 2nd combobox
-        feature_type_new = tools_qt.getWidgetText(self.dlg_replace, "feature_type_new")
+        feature_type_new = tools_qt.get_text(self.dlg_replace, "feature_type_new")
 
         # When value is selected, enabled 3rd combo box
         if feature_type_new == 'null':

@@ -318,7 +318,7 @@ class GwSearch:
             if len(line_list) == 2:
                 line_edit.textChanged.connect(partial(self.clear_line_edit_add, line_list))
 
-            value = tools_qt.getWidgetText(self.dlg_search, line_edit, return_string_null=False)
+            value = tools_qt.get_text(self.dlg_search, line_edit, return_string_null=False)
             if str(value) == '':
                 return
 
@@ -354,7 +354,7 @@ class GwSearch:
 
         if len(line_list) == 2:
             line_edit_add = line_list[1]
-            value = tools_qt.getWidgetText(self.dlg_search, line_edit_add)
+            value = tools_qt.get_text(self.dlg_search, line_edit_add)
             if str(value) == 'null':
                 return
 
@@ -680,7 +680,7 @@ class GwSearch:
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
 
-        folder_path = tools_qt.getWidgetText(dialog, path)
+        folder_path = tools_qt.get_text(dialog, path)
         if folder_path is None or folder_path == 'null':
             path.setStyleSheet("border: 1px solid red")
             return
@@ -738,7 +738,7 @@ class GwSearch:
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
-        tools_gw.set_parser_value('search', 'search_csv_path', f"{tools_qt.getWidgetText(dialog, 'txt_path')}")
+        tools_gw.set_parser_value('search', 'search_csv_path', f"{tools_qt.get_text(dialog, 'txt_path')}")
         message = "The csv file has been successfully exported"
         tools_gw.show_info(message)
 
@@ -746,7 +746,7 @@ class GwSearch:
     def workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
         """ Filter list of workcats by workcat_id and field_id """
 
-        result_select = tools_qt.getWidgetText(dialog, widget_txt)
+        result_select = tools_qt.get_text(dialog, widget_txt)
         if result_select != 'null':
             expr = (f"workcat_id = '{workcat_id}'"
                     f" and {field_id} ILIKE '%{result_select}%'")

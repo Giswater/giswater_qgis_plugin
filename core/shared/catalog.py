@@ -169,9 +169,9 @@ class GwCatalog:
         widget_id = self.dlg_catalog.findChild(QComboBox, 'id')
 
         # Get values from combo parents
-        metcat_value = tools_qt.getWidgetText(self.dlg_catalog, widget_metcat_id)
-        pn_value = tools_qt.getWidgetText(self.dlg_catalog, widget_pn)
-        dn_value = tools_qt.getWidgetText(self.dlg_catalog, widget_dn)
+        metcat_value = tools_qt.get_text(self.dlg_catalog, widget_metcat_id)
+        pn_value = tools_qt.get_text(self.dlg_catalog, widget_pn)
+        dn_value = tools_qt.get_text(self.dlg_catalog, widget_dn)
 
         exists = tools_gw.check_function('gw_api_get_catalog_id')
         if exists:
@@ -215,7 +215,7 @@ class GwCatalog:
     def fill_geomcat_id(self, previous_dialog, widget_name):
 
         widget_id = self.dlg_catalog.findChild(QComboBox, 'id')
-        catalog_id = tools_qt.getWidgetText(self.dlg_catalog, widget_id)
+        catalog_id = tools_qt.get_text(self.dlg_catalog, widget_id)
 
         widget = previous_dialog.findChild(QWidget, widget_name)
 

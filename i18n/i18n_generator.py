@@ -46,11 +46,11 @@ class GwI18NGenerator:
         self.dlg_qm.cmb_language.clear()
         self.dlg_qm.lbl_info.clear()
         self.close_db()
-        host = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host)
-        port = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_port)
-        db = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_db)
-        user = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_user)
-        password = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_pass)
+        host = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host)
+        port = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_port)
+        db = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_db)
+        user = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_user)
+        password = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_pass)
         status = self.init_db(host, port, db, user, password)
 
         if not status:
@@ -63,7 +63,7 @@ class GwI18NGenerator:
     def populate_cmb_language(self):
         """ Populate combo with languages values """
         self.dlg_qm.btn_translate.setEnabled(True)
-        host = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host)
+        host = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f'Connected to {host}')
         sql = "SELECT user_language, py_language, xml_language, py_file FROM i18n.cat_language"
         rows = self.get_rows(sql)
@@ -352,10 +352,10 @@ class GwI18NGenerator:
     def save_user_values(self):
         """ Save selected user values """
 
-        host = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host, return_string_null=False)
-        port = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_port, return_string_null=False)
-        db = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_db, return_string_null=False)
-        user = tools_qt.getWidgetText(self.dlg_qm, self.dlg_qm.txt_user, return_string_null=False)
+        host = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host, return_string_null=False)
+        port = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_port, return_string_null=False)
+        db = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_db, return_string_null=False)
+        user = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_user, return_string_null=False)
         language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         py_msg = tools_qt.isChecked(self.dlg_qm, self.dlg_qm.chk_py_msg)
         db_msg = tools_qt.isChecked(self.dlg_qm, self.dlg_qm.chk_db_msg)

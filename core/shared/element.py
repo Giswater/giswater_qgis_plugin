@@ -257,7 +257,7 @@ class GwElement:
 
     def update_location_cmb(self):
 
-        element_type = tools_qt.getWidgetText(self.dlg_add_element, self.dlg_add_element.element_type)
+        element_type = tools_qt.get_text(self.dlg_add_element, self.dlg_add_element.element_type)
         sql = (f"SELECT location_type, location_type FROM man_type_location"
                f" WHERE feature_type = 'ELEMENT' "
                f" AND (featurecat_id = '{element_type}' OR featurecat_id is null)"
@@ -288,20 +288,20 @@ class GwElement:
         """ Insert or update table 'element'. Add element to selected feature """
 
         # Get values from dialog
-        element_id = tools_qt.getWidgetText(self.dlg_add_element, "element_id", return_string_null=False)
-        code = tools_qt.getWidgetText(self.dlg_add_element, "code", return_string_null=False)
+        element_id = tools_qt.get_text(self.dlg_add_element, "element_id", return_string_null=False)
+        code = tools_qt.get_text(self.dlg_add_element, "code", return_string_null=False)
         elementcat_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.elementcat_id)
         ownercat_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.ownercat_id)
         location_type = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.location_type)
         buildercat_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.buildercat_id)
-        builtdate = tools_qt.getWidgetText(self.dlg_add_element, "builtdate", return_string_null=False)
+        builtdate = tools_qt.get_text(self.dlg_add_element, "builtdate", return_string_null=False)
         workcat_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.workcat_id)
         workcat_id_end = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.workcat_id_end)
-        comment = tools_qt.getWidgetText(self.dlg_add_element, "comment", return_string_null=False)
-        observ = tools_qt.getWidgetText(self.dlg_add_element, "observ", return_string_null=False)
-        link = tools_qt.getWidgetText(self.dlg_add_element, "link", return_string_null=False)
+        comment = tools_qt.get_text(self.dlg_add_element, "comment", return_string_null=False)
+        observ = tools_qt.get_text(self.dlg_add_element, "observ", return_string_null=False)
+        link = tools_qt.get_text(self.dlg_add_element, "link", return_string_null=False)
         verified = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.verified)
-        rotation = tools_qt.getWidgetText(self.dlg_add_element, "rotation")
+        rotation = tools_qt.get_text(self.dlg_add_element, "rotation")
         if rotation == 0 or rotation is None or rotation == 'null':
             rotation = '0'
         undelete = self.dlg_add_element.undelete.isChecked()
@@ -311,7 +311,7 @@ class GwElement:
         if elementcat_id == '':
             tools_gw.show_warning(message, parameter="elementcat_id")
             return
-        num_elements = tools_qt.getWidgetText(self.dlg_add_element, "num_elements", return_string_null=False)
+        num_elements = tools_qt.get_text(self.dlg_add_element, "num_elements", return_string_null=False)
         if num_elements == '':
             tools_gw.show_warning(message, parameter="num_elements")
             return

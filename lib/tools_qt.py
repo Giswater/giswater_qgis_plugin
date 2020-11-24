@@ -92,7 +92,7 @@ def fillComboBoxList(dialog, widget, list_object, allow_nulls=True, clear_combo=
         widget.addItem(str(elem))
 
 
-def getCalendarDate(dialog, widget, date_format="yyyy/MM/dd", datetime_format="yyyy/MM/dd hh:mm:ss"):
+def get_calendar_date(dialog, widget, date_format="yyyy/MM/dd", datetime_format="yyyy/MM/dd hh:mm:ss"):
 
     date = None
     if type(widget) is str or type(widget) is str:
@@ -153,7 +153,7 @@ def getWidget(dialog, widget):
     return widget
 
 
-def getWidgetType(dialog, widget):
+def get_widget_type(dialog, widget):
 
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
@@ -162,7 +162,7 @@ def getWidgetType(dialog, widget):
     return type(widget)
 
 
-def getWidgetText(dialog, widget, add_quote=False, return_string_null=True):
+def get_text(dialog, widget, add_quote=False, return_string_null=True):
 
     if type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
@@ -859,7 +859,7 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
     if global_vars.project_type == 'ud':
         reset_model(dialog, table_object, "gully")
     tools_gw.close_dialog(dialog)
-    tools_gw.hide_generic_layers(excluded_layers=excluded_layers)
+    tools_gw.hide_parent_layers(excluded_layers=excluded_layers)
     tools_qgis.disconnect_snapping()
     tools_qgis.disconnect_signal_selection_changed()
 
@@ -869,7 +869,7 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
 def delete_feature_at_plan(dialog, geom_type, list_id):
     """ Delete features_id to table plan_@geom_type_x_psector"""
 
-    value = getWidgetText(dialog, dialog.psector_id)
+    value = get_text(dialog, dialog.psector_id)
     sql = (f"DELETE FROM plan_psector_x_{geom_type} "
            f"WHERE {geom_type}_id IN ({list_id}) AND psector_id = '{value}'")
     global_vars.controller.execute_sql(sql)
@@ -903,7 +903,7 @@ def filter_by_id(dialog, widget_table, widget_txt, table_object):
     field_object_id = "id"
     if table_object == "element":
         field_object_id = table_object + "_id"
-    object_id = getWidgetText(dialog, widget_txt)
+    object_id = get_text(dialog, widget_txt)
     if object_id != 'null':
         expr = f"{field_object_id}::text ILIKE '%{object_id}%'"
         # Refresh model with selected filter
@@ -950,7 +950,7 @@ def get_folder_path(dialog, widget):
     """ Get folder path """
 
     # Check if selected folder exists. Set default value if necessary
-    folder_path = getWidgetText(dialog, widget)
+    folder_path = get_text(dialog, widget)
     if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
         folder_path = os.path.expanduser("~")
 
@@ -1014,13 +1014,12 @@ def hide_void_groupbox(dialog):
     """ Rceives a dialog, searches it all the QGroupBox, looks 1 to 1 if the grb have widgets, if it does not have
      (if it is empty), hides the QGroupBox
     :param dialog: QDialog or QMainWindow
-    :return:
+    :return: Dictionario with names of hidden QGroupBox
     """
 
     grb_list = {}
     grbox_list = dialog.findChildren(QGroupBox)
     for grbox in grbox_list:
-
         widget_list = grbox.findChildren(QWidget)
         if len(widget_list) == 0:
             grb_list[grbox.objectName()] = 0
@@ -1066,7 +1065,7 @@ def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
             widget_to.setDate(current_date)
 
 
-def integer_validator(value, widget, btn_accept):
+def check_integer(value, widget, btn_accept):
     """ Check if the value is an integer or not.
         This function is called in def set_datatype_validator(self, value, widget, btn)
         widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
@@ -1188,7 +1187,7 @@ def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=N
     field_object_id = "id"
     if table_object == "element":
         field_object_id = table_object + "_id"
-    object_id = getWidgetText(dialog, table_object + "_id")
+    object_id = get_text(dialog, table_object + "_id")
 
     # Check if we already have data with selected object_id
     sql = (f"SELECT * "
@@ -1380,7 +1379,7 @@ def set_calendars(dialog, widget, table_name, value, parameter):
 def reload_qtable(dialog, geom_type):
     """ Reload QtableView """
 
-    value = getWidgetText(dialog, dialog.psector_id)
+    value = get_text(dialog, dialog.psector_id)
     expr = f"psector_id = '{value}'"
     qtable = getWidget(dialog, f'tbl_psector_x_{geom_type}')
     fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)

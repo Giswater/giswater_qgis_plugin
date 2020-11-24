@@ -140,7 +140,7 @@ class GwProfileButton(GwParentMapTool):
         self.links = []
 
         # Get parameters
-        links_distance = tools_qt.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance)
+        links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance)
 
         # Create variable with all the content of the form
         extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", ' \
@@ -169,7 +169,7 @@ class GwProfileButton(GwParentMapTool):
         # Save profile values
         tools_gw.set_parser_value('btn_profile', 'minDistanceProfile', f'{links_distance}')
         tools_gw.set_parser_value('btn_profile', 'titleProfile',
-                         f'{tools_qt.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)}')
+                         f'{tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)}')
 
         # Maximize window (after drawing)
         self.plot.show()
@@ -180,7 +180,7 @@ class GwProfileButton(GwParentMapTool):
     def save_profile(self):
         """ Save profile """
 
-        profile_id = tools_qt.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_profile_id)
+        profile_id = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_profile_id)
         if profile_id in (None, 'null'):
             message = "Profile name is mandatory."
             tools_gw.show_warning(message)
@@ -193,9 +193,9 @@ class GwProfileButton(GwParentMapTool):
             list_arc.append(int(self.dlg_draw_profile.tbl_list_arc.item(i).text()))
 
         # Get values from profile form
-        links_distance = tools_qt.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance)
-        title = tools_qt.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
-        date = tools_qt.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date, date_format='dd/MM/yyyy')
+        links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance)
+        title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
+        date = tools_qt.get_calendar_date(self.dlg_draw_profile, self.dlg_draw_profile.date, date_format='dd/MM/yyyy')
 
         # Create variable with all the content of the form
         extras = f'"profile_id":"{profile_id}", "listArcs":"{list_arc}","initNode":"{self.initNode}", ' \
@@ -716,14 +716,14 @@ class GwProfileButton(GwParentMapTool):
 
         # noinspection PyUnusedLocal
         scale = self.profile_json['body']['data']['scale']
-        title = tools_qt.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
+        title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
         if title in (None, 'null'):
             title = ''
 
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(5.75) * self.height_row - self.height_row / 2,
                  title.upper(), fontsize=11, verticalalignment='center')
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(6) * self.height_row - self.height_row / 2,
-                 "(" + str(tools_qt.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date)) + ")",
+                 "(" + str(tools_qt.get_calendar_date(self.dlg_draw_profile, self.dlg_draw_profile.date)) + ")",
                  verticalalignment='center')
 
         # Fill table with values

@@ -580,7 +580,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
         ids = []
 
     field_id = f"{geom_type}_id"
-    feature_id = tools_qt.getWidgetText(dialog, "feature_id")
+    feature_id = tools_qt.get_text(dialog, "feature_id")
     expr_filter = f"{field_id} = '{feature_id}'"
 
     # Check expression
@@ -650,7 +650,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
 def insert_feature_to_plan(dialog, geom_type, ids=None):
     """ Insert features_id to table plan_@geom_type_x_psector """
 
-    value = tools_qt.getWidgetText(dialog, dialog.psector_id)
+    value = tools_qt.get_text(dialog, dialog.psector_id)
     for i in range(len(ids)):
         sql = f"INSERT INTO plan_psector_x_{geom_type} ({geom_type}_id, psector_id) "
         sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"

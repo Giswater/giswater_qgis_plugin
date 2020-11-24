@@ -116,7 +116,7 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
     extras = "  "
     for widget in dialog.grb_parameters.findChildren(QWidget):
         widget_name = widget.property('columnname')
-        value = tools_qt.getWidgetText(dialog, widget, add_quote=False)
+        value = tools_qt.get_text(dialog, widget, add_quote=False)
         extras += f'"{widget_name}":"{value}", '
     extras = extras[:-2]
     body = tools_gw.create_body(extras)

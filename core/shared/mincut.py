@@ -237,7 +237,7 @@ class GwMincut:
 
     def refresh_tab_hydro(self):
 
-        result_mincut_id = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
+        result_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         expr_filter = f"result_id={result_mincut_id}"
         tools_qt.set_qtv_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
         tools_qt.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
@@ -266,7 +266,7 @@ class GwMincut:
 
     def show_notified_list(self):
 
-        mincut_id = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
+        mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         sql = (f"SELECT notified FROM om_mincut "
                f"WHERE id = '{mincut_id}'")
         row = self.controller.get_row(sql)
@@ -431,18 +431,18 @@ class GwMincut:
         self.dlg_fin.address_add_street = tools_qt.getWidget(self.dlg_fin, 'address_add_street')
         self.dlg_fin.address_add_postnumber = tools_qt.getWidget(self.dlg_fin, 'address_add_postnumber')
 
-        mincut = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
+        mincut = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.mincut, mincut)
-        work_order = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.work_order)
+        work_order = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.work_order)
         if str(work_order) != 'null':
             tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.work_order, work_order)
 
         # Manage address
         municipality_current = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.address_add_muni, 1)
         tools_qt.set_combo_value(self.dlg_fin.address_add_muni, municipality_current, 1)
-        address_street_current = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
+        address_street_current = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
         tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.address_add_street, address_street_current)
-        address_number_current = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
+        address_number_current = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
         tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.address_add_postnumber, address_number_current)
 
         # Fill ComboBox exec_user
@@ -501,18 +501,18 @@ class GwMincut:
 
         # Manage 'address'
         address_exploitation_id = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.address_add_muni)
-        address_street = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
-        address_number = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
+        address_street = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
+        address_number = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
 
         mincut_result_type = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.type, 0)
         anl_cause = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.cause, 0)
         work_order = self.dlg_mincut.work_order.text()
 
-        anl_descript = tools_qt.getWidgetText(self.dlg_mincut, "pred_description", return_string_null=False)
+        anl_descript = tools_qt.get_text(self.dlg_mincut, "pred_description", return_string_null=False)
         exec_from_plot = str(self.dlg_mincut.distance.text())
         exec_depth = str(self.dlg_mincut.depth.text())
-        exec_descript = tools_qt.getWidgetText(self.dlg_mincut, "real_description", return_string_null=False)
-        exec_user = tools_qt.getWidgetText(self.dlg_mincut, "exec_user", return_string_null=False)
+        exec_descript = tools_qt.get_text(self.dlg_mincut, "real_description", return_string_null=False)
+        exec_user = tools_qt.get_text(self.dlg_mincut, "exec_user", return_string_null=False)
 
         # Get prediction date - start
         date_start_predict = self.dlg_mincut.cbx_date_start_predict.date()
@@ -747,11 +747,11 @@ class GwMincut:
         tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.work_order, str(self.dlg_fin.work_order.text()))
         municipality = self.dlg_fin.address_add_muni.currentText()
         tools_qt.set_combo_value(self.dlg_mincut.address_add_muni, municipality, 1)
-        street = tools_qt.getWidgetText(self.dlg_fin, self.dlg_fin.address_add_street, return_string_null=False)
+        street = tools_qt.get_text(self.dlg_fin, self.dlg_fin.address_add_street, return_string_null=False)
         tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.address_add_street, street)
-        number = tools_qt.getWidgetText(self.dlg_fin, self.dlg_fin.address_add_postnumber, return_string_null=False)
+        number = tools_qt.get_text(self.dlg_fin, self.dlg_fin.address_add_postnumber, return_string_null=False)
         tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, number)
-        exec_user = tools_qt.getWidgetText(self.dlg_fin, self.dlg_fin.exec_user)
+        exec_user = tools_qt.get_text(self.dlg_fin, self.dlg_fin.exec_user)
         tools_qt.set_combo_value(self.dlg_mincut.assigned_to, exec_user, 1)
 
         self.dlg_fin.close()
@@ -1016,7 +1016,7 @@ class GwMincut:
         """
 
         # Check if user entered hydrometer_id
-        hydrometer_cc = tools_qt.getWidgetText(self.dlg_hydro, self.dlg_hydro.hydrometer_cc)
+        hydrometer_cc = tools_qt.get_text(self.dlg_hydro, self.dlg_hydro.hydrometer_cc)
         if hydrometer_cc == "null":
             message = "You need to enter hydrometer_id"
             tools_qt.show_info_box(message)
@@ -1081,7 +1081,7 @@ class GwMincut:
         """ Select features of 'connec' of selected mincut """
 
         # Set 'expr_filter' of connecs related with current mincut
-        result_mincut_id = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
+        result_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         sql = (f"SELECT connec_id FROM om_mincut_connec"
                f" WHERE result_id = {result_mincut_id}")
         rows = self.controller.get_rows(sql)
@@ -1112,7 +1112,7 @@ class GwMincut:
         self.connec_list = []
 
         # Set 'expr_filter' of connecs related with current mincut
-        result_mincut_id = tools_qt.getWidgetText(self.dlg_hydro, self.result_mincut_id)
+        result_mincut_id = tools_qt.get_text(self.dlg_hydro, self.result_mincut_id)
         sql = (f"SELECT DISTINCT(connec_id) FROM rtc_hydrometer_x_connec AS rtc"
                f" INNER JOIN om_mincut_hydrometer AS anl"
                f" ON anl.hydrometer_id = rtc.hydrometer_id"
@@ -1134,7 +1134,7 @@ class GwMincut:
             self.select_features_group_layers(expr)
 
         # Get list of 'hydrometer_id' belonging to current result_mincut
-        result_mincut_id = tools_qt.getWidgetText(self.dlg_hydro, self.result_mincut_id)
+        result_mincut_id = tools_qt.get_text(self.dlg_hydro, self.result_mincut_id)
         sql = (f"SELECT hydrometer_id FROM om_mincut_hydrometer"
                f" WHERE result_id = {result_mincut_id}")
         rows = self.controller.get_rows(sql)
@@ -1165,7 +1165,7 @@ class GwMincut:
         tools_qgis.disconnect_signal_selection_changed()
 
         # Get 'connec_id' from selected 'customer_code'
-        customer_code = tools_qt.getWidgetText(self.dlg_connec, self.dlg_connec.connec_id)
+        customer_code = tools_qt.get_text(self.dlg_connec, self.dlg_connec.connec_id)
         if customer_code == 'null':
             message = "You need to enter a customer code"
             tools_qt.show_info_box(message)
@@ -1360,7 +1360,7 @@ class GwMincut:
             Insert into table 'om_mincut_connec' values of current mincut
         """
 
-        result_mincut_id = tools_qt.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
+        result_mincut_id = tools_qt.get_text(dlg, self.dlg_mincut.result_mincut_id)
         if result_mincut_id == 'null':
             return
 
@@ -1391,7 +1391,7 @@ class GwMincut:
             Insert into table 'om_mincut_hydrometer' values of current mincut
         """
 
-        result_mincut_id = tools_qt.getWidgetText(dlg, self.dlg_mincut.result_mincut_id)
+        result_mincut_id = tools_qt.get_text(dlg, self.dlg_mincut.result_mincut_id)
         if result_mincut_id == 'null':
             return
 
@@ -1573,7 +1573,7 @@ class GwMincut:
         self.task1.setProgress(0)
 
         srid = global_vars.srid
-        real_mincut_id = tools_qt.getWidgetText(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
+        real_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         if self.is_new:
             self.set_id_val()
             self.is_new = False
@@ -1756,7 +1756,7 @@ class GwMincut:
         # Change cursor to 'WaitCursor'
         tools_qgis.set_cursor_wait()
 
-        result_mincut_id = tools_qt.getWidgetText(self.dlg_mincut, "result_mincut_id")
+        result_mincut_id = tools_qt.get_text(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
             extras = f'"action":"mincutValveUnaccess", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}"'
             body = tools_gw.create_body(extras=extras)

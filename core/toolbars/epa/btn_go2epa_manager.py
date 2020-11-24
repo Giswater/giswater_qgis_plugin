@@ -62,7 +62,7 @@ class GwGo2EpaManagerButton(GwParentAction):
         table = self.dlg_manager.tbl_rpt_cat_result
         widget_txt = self.dlg_manager.txt_result_id
         tablename = 'v_ui_rpt_cat_result'
-        result_id = tools_qt.getWidgetText(self.dlg_manager, widget_txt)
+        result_id = tools_qt.get_text(self.dlg_manager, widget_txt)
         if result_id != 'null':
             expr = f" result_id ILIKE '%{result_id}%'"
             # Refresh model with selected filter

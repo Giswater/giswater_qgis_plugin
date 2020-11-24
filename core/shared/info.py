@@ -270,13 +270,13 @@ class GwInfo(QObject):
             widget = dialog.findChild(QWidget, field['widgetname'])
             value = None
             if type(widget) in(QLineEdit, QPushButton, QSpinBox, QDoubleSpinBox):
-                value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
+                value = tools_qt.get_text(dialog, widget, return_string_null=False)
             elif type(widget) is QComboBox:
                 value = tools_qt.get_combo_value(dialog, widget, 0)
             elif type(widget) is QCheckBox:
                 value = tools_qt.isChecked(dialog, widget)
             elif type(widget) is QgsDateTimeEdit:
-                value = tools_qt.getCalendarDate(dialog, widget)
+                value = tools_qt.get_calendar_date(dialog, widget)
             else:
                 if widget is None:
                     msg = f"Widget {field['columnname']} is not configured or have a bad config"
@@ -743,7 +743,7 @@ class GwInfo(QObject):
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
             widget = self.dlg_cf.findChild(QWidget, k)
             if widget:
-                text = tools_qt.getWidgetText(self.dlg_cf, widget, False, False)
+                text = tools_qt.get_text(self.dlg_cf, widget, False, False)
                 if text:
                     msg = "Do you want to overwrite custom values?"
                     answer = tools_qt.ask_question(msg, "Overwrite values")
@@ -995,9 +995,9 @@ class GwInfo(QObject):
             # dialog.refreshFeature()
             for i in range(0, len(fields_aux)):
                 widget = dialog.findChild(QWidget, tab_type + "_" + fields_aux[i])
-                if tools_qt.getWidgetType(dialog, widget) is QLineEdit:
+                if tools_qt.get_widget_type(dialog, widget) is QLineEdit:
                     tools_qt.set_widget_text(dialog, widget, str(snapped_feature_attr_aux[i]))
-                elif tools_qt.getWidgetType(dialog, widget) is QComboBox:
+                elif tools_qt.get_widget_type(dialog, widget) is QComboBox:
                     tools_qt.set_combo_value(widget, str(snapped_feature_attr_aux[i]), 0)
 
         self.api_disable_copy_paste(dialog, emit_point)
@@ -1106,7 +1106,7 @@ class GwInfo(QObject):
             widgets.extend(other_widgets)
             for widget in widgets:
                 if widget.hasFocus():
-                    value = tools_qt.getWidgetText(self.dlg_cf, widget)
+                    value = tools_qt.get_text(self.dlg_cf, widget)
                     if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
                         self.my_json[str(widget.property('columnname'))] = str(value)
                     widget.clearFocus()
@@ -1537,7 +1537,7 @@ class GwInfo(QObject):
                 widget_name = 'data_' + field['columnname']
                 widget = dialog.findChild(QWidget, widget_name)
                 widget.setStyleSheet(None)
-                value = tools_qt.getWidgetText(dialog, widget)
+                value = tools_qt.get_text(dialog, widget)
                 if value in ('null', None, ''):
                     widget.setStyleSheet("border: 1px solid red")
                     list_mandatory.append(widget_name)
@@ -1656,7 +1656,7 @@ class GwInfo(QObject):
             def double_validator(tools_qt, value, widget, btn_accept)
         """
 
-        value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
+        value = tools_qt.get_text(dialog, widget, return_string_null=False)
         try:
             getattr(tools_qt, f"{widget.property('datatype')}_validator")(value, widget, btn)
         except AttributeError:
@@ -1665,7 +1665,7 @@ class GwInfo(QObject):
 
     def check_min_max_value(self, dialog, widget, btn_accept):
 
-        value = tools_qt.getWidgetText(dialog, widget, return_string_null=False)
+        value = tools_qt.get_text(dialog, widget, return_string_null=False)
         try:
             if value and ((widget.property('minValue') and float(value) < float(widget.property('minValue'))) or
                     (widget.property('maxValue') and float(value) > float(widget.property('maxValue')))):
@@ -1773,7 +1773,7 @@ class GwInfo(QObject):
             if widget is None:
                 widget = dialog.findChild(QPushButton, f'{field["widgetname"]}')
             if widget:
-                cur_value = tools_qt.getWidgetText(dialog, widget)
+                cur_value = tools_qt.get_text(dialog, widget)
                 value = field["value"]
                 if str(cur_value) != str(value) and str(value) != '':
                     widget.setText(value)
@@ -1989,7 +1989,7 @@ class GwInfo(QObject):
         """ Add object (doc or element) to selected feature """
 
         # Get values from dialog
-        object_id = tools_qt.getWidgetText(self.dlg_cf, table_object + "_id")
+        object_id = tools_qt.get_text(self.dlg_cf, table_object + "_id")
         if object_id == 'null':
             message = "You need to insert data"
             tools_gw.show_warning(message, parameter=table_object + "_id")
@@ -3081,7 +3081,7 @@ class GwInfo(QObject):
         for widget in widget_list:
             if type(widget) != QTableView:
                 columnname = widget.property('columnname')
-                text = tools_qt.getWidgetText(dialog, widget)
+                text = tools_qt.get_text(dialog, widget)
                 if text != "null":
                     filter_fields += f'"{columnname}":"{text}", '
 
@@ -3218,7 +3218,7 @@ class GwInfo(QObject):
         for widget in widgets:
             widget.setStyleSheet(None)
             # Check mandatory fields
-            if widget.property('ismandatory') and tools_qt.getWidgetText(dialog, widget, False, False) in (None, ''):
+            if widget.property('ismandatory') and tools_qt.get_text(dialog, widget, False, False) in (None, ''):
                 missing_mandatory = True
                 tools_qt.set_stylesheet(widget, "border: 2px solid red")
         if missing_mandatory:
@@ -3414,7 +3414,7 @@ class GwInfo(QObject):
         dialog = kwargs['dialog']
         widget = kwargs['widget']
 
-        feature_id = tools_qt.getWidgetText(dialog, widget)
+        feature_id = tools_qt.get_text(dialog, widget)
         self.ApiCF = GwInfo(self.tab_type)
         complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=feature_id,
             tab_type=self.tab_type, is_docker=False)

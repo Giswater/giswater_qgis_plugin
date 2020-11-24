@@ -168,7 +168,7 @@ class GwDocument:
     def activate_relations(self):
         """ Force user to set doc_id and doc_type """
 
-        doc_type = tools_qt.getWidgetText(self.dlg_add_doc, self.dlg_add_doc.doc_type, False, False)
+        doc_type = tools_qt.get_text(self.dlg_add_doc, self.dlg_add_doc.doc_type, False, False)
 
         if doc_type in (None, '', 'null'):
             self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
@@ -192,11 +192,11 @@ class GwDocument:
         """ Insert or update table 'document'. Add document to selected feature """
 
         # Get values from dialog
-        doc_id = tools_qt.getWidgetText(self.dlg_add_doc, "doc_id", False, False)
-        doc_type = tools_qt.getWidgetText(self.dlg_add_doc, "doc_type", False, False)
-        date = tools_qt.getCalendarDate(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
-        path = tools_qt.getWidgetText(self.dlg_add_doc, "path", return_string_null=False)
-        observ = tools_qt.getWidgetText(self.dlg_add_doc, "observ", False, False)
+        doc_id = tools_qt.get_text(self.dlg_add_doc, "doc_id", False, False)
+        doc_type = tools_qt.get_text(self.dlg_add_doc, "doc_type", False, False)
+        date = tools_qt.get_calendar_date(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
+        path = tools_qt.get_text(self.dlg_add_doc, "path", return_string_null=False)
+        observ = tools_qt.get_text(self.dlg_add_doc, "observ", False, False)
 
         if doc_type in (None, ''):
             message = "You need to insert doc_type"
@@ -369,7 +369,7 @@ class GwDocument:
         """ Display url using the default browser """
 
         if widget is not None:
-            url = tools_qt.getWidgetText(dialog, widget)
+            url = tools_qt.get_text(dialog, widget)
             if url == 'null':
                 url = 'http://www.giswater.org'
         else:
@@ -381,7 +381,7 @@ class GwDocument:
     def get_file_dialog(self, dialog, widget):
         """ Get file dialog """
         # Check if selected file exists. Set default value if necessary
-        file_path = tools_qt.getWidgetText(dialog, widget)
+        file_path = tools_qt.get_text(dialog, widget)
         if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
             folder_path = global_vars.plugin_dir
         else:

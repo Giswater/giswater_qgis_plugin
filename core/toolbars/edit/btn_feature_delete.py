@@ -35,7 +35,7 @@ class GwDeleteFeatureButton(GwParentAction):
         tools_qt.fill_combo_values(self.dlg_feature_delete.feature_type, rows, 1)
 
         # Set active layer
-        layer_name = 'v_edit_' + tools_qt.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+        layer_name = 'v_edit_' + tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         tools_qgis.set_layer_visible(layer)
@@ -73,8 +73,8 @@ class GwDeleteFeatureButton(GwParentAction):
     def filter_typeahead(self, widget, completer, model):
 
         # Get feature_type and feature_id
-        feature_type = tools_qt.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
-        feature_id = tools_qt.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
+        feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
+        feature_id = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
 
         # Get child layer
         sql = (f"SELECT array_agg({feature_type}_id) FROM {feature_type} "
@@ -93,8 +93,8 @@ class GwDeleteFeatureButton(GwParentAction):
     def show_feature_relation(self):
 
         # Get feature_type and feature_id
-        feature_type = tools_qt.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
-        feature_id = tools_qt.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
+        feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
+        feature_id = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
         if feature_id in (None, "null"):
             message = f"Select one"
             tools_gw.show_warning(message, parameter=feature_type)
@@ -121,8 +121,8 @@ class GwDeleteFeatureButton(GwParentAction):
     def delete_feature_relation(self):
 
         # Get feature_type and feature_id
-        feature_type = tools_qt.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
-        feature_id = tools_qt.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
+        feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
+        feature_id = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
         
         if feature_id == 'null':
             self.dlg_feature_delete.feature_id.setStyleSheet("border: 1px solid red")
@@ -175,7 +175,7 @@ class GwDeleteFeatureButton(GwParentAction):
         """ Slot function for signal 'canvas.selectionChanged' """
 
         # Get feature_type and feature_id
-        feature_type = tools_qt.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+        feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer_name = 'v_edit_' + feature_type
         layer = self.controller.get_layer_by_tablename(layer_name)
         field_id = feature_type + "_id"
@@ -202,7 +202,7 @@ class GwDeleteFeatureButton(GwParentAction):
 
         # Set active layer
         layer_name = 'v_edit_' + \
-                     tools_qt.getWidgetText(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+                     tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = self.controller.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         tools_qgis.set_layer_visible(layer)

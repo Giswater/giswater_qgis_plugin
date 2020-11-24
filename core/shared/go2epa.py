@@ -101,8 +101,8 @@ class GwGo2Epa:
 
     def check_rpt(self):
 
-        file_inp = tools_qt.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
-        file_rpt = tools_qt.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
+        file_inp = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
+        file_rpt = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
 
         # Control execute epa software
         if tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
@@ -123,9 +123,9 @@ class GwGo2Epa:
 
     def check_fields(self):
 
-        file_inp = tools_qt.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
-        file_rpt = tools_qt.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
-        result_name = tools_qt.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
+        file_inp = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
+        file_rpt = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
+        result_name = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
 
         # Check if at least one process is selected
         export_checked = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
@@ -207,11 +207,11 @@ class GwGo2Epa:
         """ Save QGIS settings related with file_manager """
 
         tools_gw.set_parser_value('go2epa', 'go2epa_RESULT_NAME',
-                         f"{tools_qt.getWidgetText(self.dlg_go2epa, 'txt_result_name', return_string_null=False)}")
+                         f"{tools_qt.get_text(self.dlg_go2epa, 'txt_result_name', return_string_null=False)}")
         tools_gw.set_parser_value('go2epa', 'go2epa_FILE_INP',
-                         f"{tools_qt.getWidgetText(self.dlg_go2epa, 'txt_file_inp', return_string_null=False)}")
+                         f"{tools_qt.get_text(self.dlg_go2epa, 'txt_file_inp', return_string_null=False)}")
         tools_gw.set_parser_value('go2epa', 'go2epa_FILE_RPT',
-                         f"{tools_qt.getWidgetText(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False)}")
+                         f"{tools_qt.get_text(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False)}")
         tools_gw.set_parser_value('go2epa', 'go2epa_chk_NETWORK_GEOM',
                          f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)}")
         tools_gw.set_parser_value('go2epa', 'go2epa_chk_INP',
@@ -334,7 +334,7 @@ class GwGo2Epa:
     def go2epa_select_file_inp(self):
         """ Select INP file """
 
-        self.file_inp = tools_qt.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
+        self.file_inp = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
         # Set default value if necessary
         if self.file_inp is None or self.file_inp == '':
             self.file_inp = global_vars.plugin_dir
@@ -387,13 +387,13 @@ class GwGo2Epa:
             return
 
         # Get widgets values
-        self.result_name = tools_qt.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
+        self.result_name = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
         self.net_geom = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)
         self.export_inp = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
         self.export_subcatch = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)
-        self.file_inp = tools_qt.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
+        self.file_inp = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
         self.exec_epa = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)
-        self.file_rpt = tools_qt.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
+        self.file_rpt = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
         self.import_result = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)
 
         # Check for sector selector
@@ -417,7 +417,7 @@ class GwGo2Epa:
             getting id's from selected @viewname
         """
 
-        result_name = tools_qt.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
+        result_name = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
 
         # Adding auto-completion to a QLineEdit
         self.completer = QCompleter()
@@ -442,7 +442,7 @@ class GwGo2Epa:
     def check_result_id(self):
         """ Check if selected @result_id already exists """
 
-        result_id = tools_qt.getWidgetText(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
+        result_id = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
         sql = (f"SELECT result_id FROM v_ui_rpt_cat_result"
                f" WHERE result_id = '{result_id}'")
         row = self.controller.get_row(sql, log_info=False)
@@ -468,7 +468,7 @@ class GwGo2Epa:
         for i in range(0, len(row)):
             column_name = self.controller.dao.get_column_name(i)
             widget = dialog.findChild(QWidget, column_name)
-            widget_type = tools_qt.getWidgetType(dialog, widget)
+            widget_type = tools_qt.get_widget_type(dialog, widget)
             if row[column_name] is not None:
                 if widget_type is QCheckBox:
                     tools_qt.set_checked(dialog, widget, row[column_name])
@@ -700,7 +700,7 @@ class GwGo2Epa:
         """ Fill the QTableView by filtering through the QLineEdit"""
 
         schema_name = global_vars.schema_name.replace('"', '')
-        query = tools_qt.getWidgetText(dialog, text_line, return_string_null=False).lower()
+        query = tools_qt.get_text(dialog, text_line, return_string_null=False).lower()
         sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
                f"(SELECT {tableleft}.{name} FROM {schema_name}.{tableleft}"
                f" RIGHT JOIN {schema_name}.{tableright}"

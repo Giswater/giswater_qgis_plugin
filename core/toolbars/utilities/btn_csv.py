@@ -57,7 +57,7 @@ class GwCSVButton(GwParentAction):
         self.get_function_name()
         self.load_settings_values()
 
-        if str(tools_qt.getWidgetText(self.dlg_csv, self.dlg_csv.txt_file_csv)) != 'null':
+        if str(tools_qt.get_text(self.dlg_csv, self.dlg_csv.txt_file_csv)) != 'null':
             self.preview_csv(self.dlg_csv)
         self.dlg_csv.progressBar.setVisible(False)
 
@@ -118,10 +118,10 @@ class GwCSVButton(GwParentAction):
 
         fid_aux = tools_qt.get_combo_value(dialog, dialog.cmb_import_type, 0)
         self.delete_table_csv(temp_tablename, fid_aux)
-        path = tools_qt.getWidgetText(dialog, dialog.txt_file_csv)
-        label_aux = tools_qt.getWidgetText(dialog, dialog.txt_import, return_string_null=False)
+        path = tools_qt.get_text(dialog, dialog.txt_file_csv)
+        label_aux = tools_qt.get_text(dialog, dialog.txt_import, return_string_null=False)
         delimiter = self.get_delimiter(dialog)
-        _unicode = tools_qt.getWidgetText(dialog, dialog.cmb_unicode_list)
+        _unicode = tools_qt.get_text(dialog, dialog.cmb_unicode_list)
 
         try:
             with open(path, 'r', encoding=_unicode) as csvfile:
@@ -163,7 +163,7 @@ class GwCSVButton(GwParentAction):
     def select_file_csv(self):
         """ Select CSV file """
 
-        file_csv = tools_qt.getWidgetText(self.dlg_csv, 'txt_file_csv')
+        file_csv = tools_qt.get_text(self.dlg_csv, 'txt_file_csv')
         # Set default value if necessary
         if file_csv is None or file_csv == '':
             file_csv = global_vars.plugin_dir
@@ -189,7 +189,7 @@ class GwCSVButton(GwParentAction):
 
         delimiter = self.get_delimiter(dialog)
         model = QStandardItemModel()
-        _unicode = tools_qt.getWidgetText(dialog, dialog.cmb_unicode_list)
+        _unicode = tools_qt.get_text(dialog, dialog.cmb_unicode_list)
         dialog.tbl_csv.setModel(model)
         dialog.tbl_csv.horizontalHeader().setStretchLastSection(True)
 
@@ -226,9 +226,9 @@ class GwCSVButton(GwParentAction):
     def save_settings_values(self):
         """ Save QGIS settings related with csv options """
         tools_gw.set_parser_value('csv2Pg', 'cmb_import_type', f"{tools_qt.get_combo_value(self.dlg_csv, 'cmb_import_type', 0)}")
-        tools_gw.set_parser_value('csv2Pg', 'txt_import', tools_qt.getWidgetText(self.dlg_csv, 'txt_import'))
-        tools_gw.set_parser_value('csv2Pg', 'txt_file_csv', tools_qt.getWidgetText(self.dlg_csv, 'txt_file_csv'))
-        tools_gw.set_parser_value('csv2Pg', 'cmb_unicode_list', tools_qt.getWidgetText(self.dlg_csv, 'cmb_unicode_list'))
+        tools_gw.set_parser_value('csv2Pg', 'txt_import', tools_qt.get_text(self.dlg_csv, 'txt_import'))
+        tools_gw.set_parser_value('csv2Pg', 'txt_file_csv', tools_qt.get_text(self.dlg_csv, 'txt_file_csv'))
+        tools_gw.set_parser_value('csv2Pg', 'cmb_unicode_list', tools_qt.get_text(self.dlg_csv, 'cmb_unicode_list'))
         tools_gw.set_parser_value('csv2Pg', 'rb_semicolon', f"{self.dlg_csv.rb_semicolon.isChecked()}")
 
 
@@ -310,7 +310,7 @@ class GwCSVButton(GwParentAction):
     def get_path(self, dialog):
         """ Take the file path if exist. AND if not exit ask it """
 
-        path = tools_qt.getWidgetText(dialog, dialog.txt_file_csv)
+        path = tools_qt.get_text(dialog, dialog.txt_file_csv)
         if path is None or path == 'null' or not os.path.exists(path):
             message = "Please choose a valid path"
             tools_gw.show_message(message, message_level=0)

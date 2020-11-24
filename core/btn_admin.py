@@ -274,7 +274,7 @@ class GwAdmin:
         tools_qt.set_combo_value(self.cmb_connection, str(self.last_connection), 1)
 
         # Set title
-        connection = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
+        connection = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_connection)
         window_title = f'Giswater ({connection} - {self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
@@ -293,7 +293,7 @@ class GwAdmin:
         self.controller.execute_sql(sql)
 
         # Set projecte type
-        self.project_type_selected = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+        self.project_type_selected = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
 
         # Manage widgets tabs
         self.populate_data_schema_name(self.cmb_project_type)
@@ -356,11 +356,11 @@ class GwAdmin:
 
     def set_credentials(self, dialog, new_connection=False):
 
-        user_name = tools_qt.getWidgetText(dialog, dialog.txt_user, False, False)
-        password = tools_qt.getWidgetText(dialog, dialog.txt_pass, False, False)
+        user_name = tools_qt.get_text(dialog, dialog.txt_user, False, False)
+        password = tools_qt.get_text(dialog, dialog.txt_pass, False, False)
         settings = QSettings()
         settings.beginGroup("PostgreSQL/connections")
-        default_connection = tools_qt.getWidgetText(dialog, dialog.cmb_connection)
+        default_connection = tools_qt.get_text(dialog, dialog.cmb_connection)
         settings.setValue('selected', default_connection)
         if new_connection:
             connection_status, not_version = self.controller.set_database_connection()
@@ -379,21 +379,21 @@ class GwAdmin:
     def gis_create_project(self):
 
         # Get gis folder, gis file, project type and schema
-        gis_folder = tools_qt.getWidgetText(self.dlg_create_gis_project, 'txt_gis_folder')
+        gis_folder = tools_qt.get_text(self.dlg_create_gis_project, 'txt_gis_folder')
         if gis_folder is None or gis_folder == 'null':
             tools_gw.show_warning("GIS folder not set")
             return
 
-        gis_file = tools_qt.getWidgetText(self.dlg_create_gis_project, 'txt_gis_file')
+        gis_file = tools_qt.get_text(self.dlg_create_gis_project, 'txt_gis_file')
         if gis_file is None or gis_file == 'null':
             tools_gw.show_warning("GIS file name not set")
             return
 
-        project_type = tools_qt.getWidgetText(self.dlg_readsql, 'cmb_project_type')
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        project_type = tools_qt.get_text(self.dlg_readsql, 'cmb_project_type')
+        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
 
         # Get roletype and export password
-        roletype = tools_qt.getWidgetText(self.dlg_create_gis_project, 'cmb_roletype')
+        roletype = tools_qt.get_text(self.dlg_create_gis_project, 'cmb_roletype')
         export_passwd = tools_qt.isChecked(self.dlg_create_gis_project, 'chk_export_passwd')
         sample = self.dlg_create_gis_project.chk_is_sample.isChecked()
 
@@ -431,7 +431,7 @@ class GwAdmin:
     def open_form_create_gis_project(self):
 
         # Check if exist schema
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
             msg = "In order to create a qgis project you have to create a schema first ."
             tools_qt.show_info_box(msg)
@@ -442,7 +442,7 @@ class GwAdmin:
         tools_gw.load_settings(self.dlg_create_gis_project)
 
         # Set default values
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_file', schema_name)
         users_home = os.path.expanduser("~")
         tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_folder', users_home)
@@ -476,7 +476,7 @@ class GwAdmin:
     def btn_constrains_changed(self, button, call_function=False):
 
         lbl_constrains_info = self.dlg_readsql.findChild(QLabel, 'lbl_constrains_info')
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         if button.text() == 'OFF':
             button.setText("ON")
@@ -604,7 +604,7 @@ class GwAdmin:
             if not status and self.dev_commit == 'FALSE':
                 return False
 
-            cmb_locale = tools_qt.getWidgetText(self.dlg_readsql, self.cmb_locale)
+            cmb_locale = tools_qt.get_text(self.dlg_readsql, self.cmb_locale)
             folder_i18n = self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n'
             if self.process_folder(folder_i18n + os.sep + self.locale + os.sep, '') is False:
                 if self.process_folder(folder_i18n + os.sep, 'EN') is False:
@@ -1132,7 +1132,7 @@ class GwAdmin:
             return True
 
         if project_type is False:
-            project_type = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+            project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
 
         folders = sorted(os.listdir(self.folderUpdatesApi + ''))
         tools_log.log_info(str(folders))
@@ -1361,7 +1361,7 @@ class GwAdmin:
 
         # Get current locale
         if not locale:
-            locale = tools_qt.getWidgetText(self.dlg_readsql_create_project,
+            locale = tools_qt.get_text(self.dlg_readsql_create_project,
                                             self.dlg_readsql_create_project.cmb_locale)
 
         client = '"client":{"device":4, "lang":"' + str(locale) + '"}, '
@@ -1493,15 +1493,15 @@ class GwAdmin:
 
         # Get project parameters
         if project_name_schema is None or not project_name_schema:
-            project_name_schema = tools_qt.getWidgetText(self.dlg_readsql_create_project, 'project_name')
+            project_name_schema = tools_qt.get_text(self.dlg_readsql_create_project, 'project_name')
         if project_descript is None or not project_descript:
-            project_descript = tools_qt.getWidgetText(self.dlg_readsql_create_project, 'project_descript')
+            project_descript = tools_qt.get_text(self.dlg_readsql_create_project, 'project_descript')
         if project_type is None:
-            project_type = tools_qt.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
+            project_type = tools_qt.get_text(self.dlg_readsql_create_project, 'cmb_create_project_type')
         if project_srid is None:
-            project_srid = tools_qt.getWidgetText(self.dlg_readsql_create_project, 'srid_id')
+            project_srid = tools_qt.get_text(self.dlg_readsql_create_project, 'srid_id')
         if project_locale is None:
-            project_locale = tools_qt.getWidgetText(self.dlg_readsql_create_project, 'cmb_locale')
+            project_locale = tools_qt.get_text(self.dlg_readsql_create_project, 'cmb_locale')
 
         # Set class variables
         self.schema = project_name_schema
@@ -1514,7 +1514,7 @@ class GwAdmin:
         # Save in settings
         tools_gw.set_parser_value('admin', 'project_name_schema', f'{project_name_schema}')
         tools_gw.set_parser_value('admin', 'project_descript', f'{project_descript}')
-        inp_file_path = tools_qt.getWidgetText(self.dlg_readsql_create_project, 'data_file')
+        inp_file_path = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file')
         tools_gw.set_parser_value('admin', 'inp_file_path', f'{inp_file_path}')
 
         # Check if project name is valid
@@ -1529,7 +1529,7 @@ class GwAdmin:
             self.task1.setProgress(0)
 
         if self.rdb_import_data.isChecked():
-            self.file_inp = tools_qt.getWidgetText(self.dlg_readsql_create_project, 'data_file')
+            self.file_inp = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file')
             if self.file_inp is 'null':
                 msg = "The 'Path' field is required for Import INP data."
                 tools_qt.show_info_box(msg, "Info")
@@ -1651,7 +1651,7 @@ class GwAdmin:
 
         if create_project is None or create_project is False:
             close_dlg_rename = True
-            self.schema = tools_qt.getWidgetText(self.dlg_readsql_rename, self.dlg_readsql_rename.schema_rename_copy)
+            self.schema = tools_qt.get_text(self.dlg_readsql_rename, self.dlg_readsql_rename.schema_rename_copy)
             if str(self.schema) == str(schema):
                 msg = "Please, select a diferent project name than current."
                 tools_qt.show_info_box(msg, "Info")
@@ -1706,7 +1706,7 @@ class GwAdmin:
 
     def load_custom_sql_files(self, dialog, widget):
 
-        folder_path = tools_qt.getWidgetText(dialog, widget)
+        folder_path = tools_qt.get_text(dialog, widget)
         self.task1 = GwTask('Manage schema')
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(50)
@@ -1802,7 +1802,7 @@ class GwAdmin:
 
     def get_schema_name(self):
 
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         return schema_name
 
 
@@ -1822,7 +1822,7 @@ class GwAdmin:
 
     def event_change_connection(self):
 
-        connection_name = str(tools_qt.getWidgetText(self.dlg_readsql, self.cmb_connection))
+        connection_name = str(tools_qt.get_text(self.dlg_readsql, self.cmb_connection))
 
         credentials = {'db': None, 'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
 
@@ -2046,7 +2046,7 @@ class GwAdmin:
     def update_locale(self):
 
         # TODO: Check this!
-        cmb_locale = tools_qt.getWidgetText(self.dlg_readsql, self.cmb_locale)
+        cmb_locale = tools_qt.get_text(self.dlg_readsql, self.cmb_locale)
         self.folderLocale = self.sql_dir + os.sep + 'i18n' + os.sep + cmb_locale + os.sep
 
 
@@ -2063,7 +2063,7 @@ class GwAdmin:
     def populate_data_schema_name(self, widget):
 
         # Get filter
-        filter_ = tools_qt.getWidgetText(self.dlg_readsql, widget)
+        filter_ = tools_qt.get_text(self.dlg_readsql, widget)
         if filter_ in (None, 'null') and self.schema_type:
             filter_ = self.schema_type
         if filter_ is None:
@@ -2118,7 +2118,7 @@ class GwAdmin:
 
     def filter_srid_changed(self):
 
-        filter_value = tools_qt.getWidgetText(self.dlg_readsql_create_project, self.filter_srid)
+        filter_value = tools_qt.get_text(self.dlg_readsql_create_project, self.filter_srid)
         if filter_value is 'null':
             filter_value = ''
         sql = ("SELECT substr(srtext, 1, 6) as " + '"Type"' + ", srid as " + '"SRID"' + ", "
@@ -2137,7 +2137,7 @@ class GwAdmin:
     def set_info_project(self):
 
         # set variables from table version
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         # TODO: Make just one SQL query
         self.project_type = tools_gw.get_project_type(schemaname=schema_name)
@@ -2171,7 +2171,7 @@ class GwAdmin:
             self.software_version_info.setText(msg)
 
         # Update windowTitle
-        connection = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_connection)
+        connection = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_connection)
         window_title = f'Giswater ({connection} - {self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
@@ -2278,7 +2278,7 @@ class GwAdmin:
                 tools_qt.set_widget_text(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
 
         # Get database connection name
-        self.connection_name = str(tools_qt.getWidgetText(self.dlg_readsql, self.cmb_connection))
+        self.connection_name = str(tools_qt.get_text(self.dlg_readsql, self.cmb_connection))
 
         # Set signals
         self.set_signals_create_project()
@@ -2306,7 +2306,7 @@ class GwAdmin:
         self.filter_srid_changed()
 
         # Get project_type from previous dialog
-        self.cmb_project_type = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+        self.cmb_project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         tools_qt.set_widget_text(self.dlg_readsql_create_project, self.cmb_create_project_type,
                                self.cmb_project_type)
         self.change_project_type(self.cmb_create_project_type)
@@ -2328,7 +2328,7 @@ class GwAdmin:
         self.dlg_readsql_rename = MainRenameProjUi()
         tools_gw.load_settings(self.dlg_readsql_rename)
 
-        schema = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         # Set listeners
         self.dlg_readsql_rename.btn_accept.clicked.connect(partial(self.rename_project_data_schema, schema))
@@ -2351,7 +2351,7 @@ class GwAdmin:
         filelist = sorted(os.listdir(filedir))
         status = True
         if self.schema is None:
-            schema_name = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+            schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
             schema_name = schema_name.replace('"', '')
         else:
             schema_name = self.schema.replace('"', '')
@@ -2441,7 +2441,7 @@ class GwAdmin:
         self.dlg_readsql_copy = MainRenameProjUi()
         tools_gw.load_settings(self.dlg_readsql_copy)
 
-        schema = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         # Set listeners
         self.dlg_readsql_copy.btn_accept.clicked.connect(partial(self.copy_project_data_schema, schema))
@@ -2454,7 +2454,7 @@ class GwAdmin:
 
     def copy_project_data_schema(self, schema):
 
-        new_schema_name = tools_qt.getWidgetText(self.dlg_readsql_copy, self.dlg_readsql_copy.schema_rename_copy)
+        new_schema_name = tools_qt.get_text(self.dlg_readsql_copy, self.dlg_readsql_copy.schema_rename_copy)
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
         rows = self.controller.get_rows(sql)
 
@@ -2495,7 +2495,7 @@ class GwAdmin:
 
     def delete_schema(self):
 
-        project_name = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        project_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         if project_name is None:
             msg = "Please, select a project to delete"
             tools_qt.show_info_box(msg, "Info")
@@ -2658,9 +2658,9 @@ class GwAdmin:
 
     def execute_import_ui(self):
 
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, 'project_schema_name')
-        tpath = tools_qt.getWidgetText(self.dlg_readsql, 'tpath')
-        form_name_ui = tools_qt.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
+        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+        tpath = tools_qt.get_text(self.dlg_readsql, 'tpath')
+        form_name_ui = tools_qt.get_text(self.dlg_readsql, 'cmb_formname_ui')
         status_update_childs = self.dlg_readsql.chk_multi_update.isChecked()
 
         # Control if ui path is invalid or null
@@ -2687,9 +2687,9 @@ class GwAdmin:
 
     def execute_export_ui(self):
 
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, 'project_schema_name')
-        tpath = tools_qt.getWidgetText(self.dlg_readsql, 'tpath')
-        form_name_ui = tools_qt.getWidgetText(self.dlg_readsql, 'cmb_formname_ui')
+        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+        tpath = tools_qt.get_text(self.dlg_readsql, 'tpath')
+        form_name_ui = tools_qt.get_text(self.dlg_readsql, 'cmb_formname_ui')
         status_update_childs = self.dlg_readsql.chk_multi_update.isChecked()
 
         # Control if ui path is invalid or null
@@ -2740,7 +2740,7 @@ class GwAdmin:
 
     def clear_temp_table(self):
 
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         # Clear temp_csv
         sql = f"DELETE FROM {schema_name}.temp_csv WHERE cur_user = current_user"
         status = self.controller.execute_sql(sql)
@@ -2749,7 +2749,7 @@ class GwAdmin:
     def select_file_ui(self):
         """ Select UI file """
 
-        file_ui = tools_qt.getWidgetText(self.dlg_readsql, 'tpath')
+        file_ui = tools_qt.get_text(self.dlg_readsql, 'tpath')
         # Set default value if necessary
         if file_ui is None or file_ui == '':
             file_ui = self.plugin_dir
@@ -2766,7 +2766,7 @@ class GwAdmin:
 
     def update_manage_ui(self):
 
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
             tools_qt.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
             return
@@ -2810,8 +2810,8 @@ class GwAdmin:
     def create_child_view(self):
         """ Create child view """
 
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, 'project_schema_name')
-        form_name = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_name_view)
+        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+        form_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_feature_name_view)
 
         # Create body
         feature = '"catFeature":"' + form_name + '"'
@@ -2840,7 +2840,7 @@ class GwAdmin:
             if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != 'tab_update':
                 tab_name = self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()
                 tools_qt.remove_tab_by_tabName(self.dlg_manage_sys_fields.tab_sys_add_fields, tab_name)
-            form_name_fields = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
+            form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
 
         self.manage_update_field(self.dlg_manage_sys_fields, form_name_fields, tableview='ve_config_sysfields')
 
@@ -2872,7 +2872,7 @@ class GwAdmin:
                 tools_qt.remove_tab_by_tabName(
                     self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
-        form_name_fields = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
+        form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
         self.chk_multi_insert = tools_qt.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
 
         window_title = ""
@@ -2917,7 +2917,7 @@ class GwAdmin:
         tools_gw.load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
 
-        form_name_fields = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
+        form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
 
         # Set listeners
         self.dlg_manage_sys_fields.btn_accept.clicked.connect(
@@ -2967,7 +2967,7 @@ class GwAdmin:
         tools_gw.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
-        form_name_fields = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
+        form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
         self.chk_multi_insert = tools_qt.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
         self.dlg_manage_fields.column_id.setEnabled(False)
 
@@ -3005,7 +3005,7 @@ class GwAdmin:
 
     def manage_create_field(self, form_name):
 
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
 
         # Populate widgettype combo
         sql = (f"SELECT DISTINCT(id), idval FROM {schema_name}.config_typevalue "
@@ -3033,7 +3033,7 @@ class GwAdmin:
     def manage_update_sys_field(self, form_name):
         # TODO:: Enhance this function and use parametric parameters
 
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
 
         # Populate table update
         qtable = self.dlg_manage_sys_fields.findChild(QTableView, "tbl_update")
@@ -3049,7 +3049,7 @@ class GwAdmin:
         if form_name is None:
             return
 
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
             tools_qt.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
             return
@@ -3072,7 +3072,7 @@ class GwAdmin:
 
     def manage_delete_field(self, form_name):
 
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
             tools_qt.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
             return
@@ -3105,7 +3105,7 @@ class GwAdmin:
     def manage_sys_update(self, form_name):
 
         list_widgets = self.dlg_manage_sys_fields.tab_create.findChildren(QWidget)
-        column_id = tools_qt.getWidgetText(self.dlg_manage_sys_fields, self.dlg_manage_sys_fields.column_id)
+        column_id = tools_qt.get_text(self.dlg_manage_sys_fields, self.dlg_manage_sys_fields.column_id)
         sql = f"UPDATE ve_config_sys_fields SET "
         for widget in list_widgets:
             if type(widget) not in (
@@ -3114,13 +3114,13 @@ class GwAdmin:
 
                 value = None
                 if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
-                    value = tools_qt.getWidgetText(self.dlg_manage_sys_fields, widget, return_string_null=False)
+                    value = tools_qt.get_text(self.dlg_manage_sys_fields, widget, return_string_null=False)
                 elif type(widget) is QComboBox:
                     value = tools_qt.get_combo_value(self.dlg_manage_sys_fields, widget, 0)
                 elif type(widget) is QCheckBox:
                     value = tools_qt.isChecked(self.dlg_manage_sys_fields, widget)
                 elif type(widget) is QgsDateTimeEdit:
-                    value = tools_qt.getCalendarDate(self.dlg_manage_sys_fields, widget)
+                    value = tools_qt.get_calendar_date(self.dlg_manage_sys_fields, widget)
                 elif type(widget) is QPlainTextEdit:
                     value = widget.document().toPlainText()
 
@@ -3141,10 +3141,10 @@ class GwAdmin:
 
     def manage_accept(self, action, form_name, model=None):
 
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
 
         # Execute manage add fields function
-        param_name = tools_qt.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.columnname)
+        param_name = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.columnname)
         sql = (f"SELECT param_name FROM {schema_name}.sys_addfields "
                f"WHERE param_name = '{param_name}' AND  cat_feature_id = '{form_name}' ")
         row = self.controller.get_row(sql)
@@ -3152,8 +3152,8 @@ class GwAdmin:
         if action == 'create':
 
             # Control mandatory widgets
-            if tools_qt.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.column_id) is 'null' or \
-                    tools_qt.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.label) is 'null':
+            if tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.column_id) is 'null' or \
+                    tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.label) is 'null':
                 msg = "Column_id and Label fields mandatory. Please set correctly value."
                 tools_qt.show_info_box(msg, "Info")
                 return
@@ -3163,8 +3163,8 @@ class GwAdmin:
                 tools_qt.show_info_box(msg, "Info")
                 return
 
-            elif tools_qt.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.widgettype) == 'combo' and \
-                    tools_qt.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.dv_querytext) in ('null', None):
+            elif tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.widgettype) == 'combo' and \
+                    tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.dv_querytext) in ('null', None):
                 msg = "Parameter 'Query text:' is mandatory for 'combo' widgets. Please set value."
                 tools_qt.show_info_box(msg, "Info")
                 return
@@ -3179,13 +3179,13 @@ class GwAdmin:
 
                     value = None
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
-                        value = tools_qt.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)
+                        value = tools_qt.get_text(self.dlg_manage_fields, widget, return_string_null=False)
                     elif type(widget) is QComboBox:
                         value = tools_qt.get_combo_value(self.dlg_manage_fields, widget, 0)
                     elif type(widget) is QCheckBox:
                         value = tools_qt.isChecked(self.dlg_manage_fields, widget)
                     elif type(widget) is QgsDateTimeEdit:
-                        value = tools_qt.getCalendarDate(self.dlg_manage_fields, widget)
+                        value = tools_qt.get_calendar_date(self.dlg_manage_fields, widget)
                     elif type(widget) is QPlainTextEdit:
                         value = widget.document().toPlainText()
 
@@ -3220,13 +3220,13 @@ class GwAdmin:
 
                     value = None
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
-                        value = tools_qt.getWidgetText(self.dlg_manage_fields, widget, return_string_null=False)
+                        value = tools_qt.get_text(self.dlg_manage_fields, widget, return_string_null=False)
                     elif type(widget) is QComboBox:
                         value = tools_qt.get_combo_value(self.dlg_manage_fields, widget, 0)
                     elif type(widget) is QCheckBox:
                         value = tools_qt.isChecked(self.dlg_manage_fields, widget)
                     elif type(widget) is QgsDateTimeEdit:
-                        value = tools_qt.getCalendarDate(self.dlg_manage_fields, widget)
+                        value = tools_qt.get_calendar_date(self.dlg_manage_fields, widget)
                     elif type(widget) is QPlainTextEdit:
                         value = widget.document().toPlainText()
 
@@ -3251,7 +3251,7 @@ class GwAdmin:
 
         elif action == 'delete':
 
-            field_value = tools_qt.getWidgetText(self.dlg_manage_fields, self.dlg_manage_fields.cmb_fields)
+            field_value = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.cmb_fields)
 
             # Create body
             feature = '"catFeature":"' + form_name + '"'
@@ -3275,7 +3275,7 @@ class GwAdmin:
         """ Set a model with selected filter.
         Attach that model to selected table """
 
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, 'project_schema_name')
+        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name not in table_name:
             table_name = schema_name + "." + table_name
 
@@ -3296,7 +3296,7 @@ class GwAdmin:
     def change_project_type(self, widget):
         """ Take current project type changed """
 
-        self.project_type_selected = tools_qt.getWidgetText(self.dlg_readsql, widget)
+        self.project_type_selected = tools_qt.get_text(self.dlg_readsql, widget)
         self.folderSoftware = self.sql_dir + os.sep + self.project_type_selected + os.sep
 
 
@@ -3366,7 +3366,7 @@ class GwAdmin:
     def select_file_inp(self):
         """ Select INP file """
 
-        file_inp = tools_qt.getWidgetText(self.dlg_readsql_create_project, 'data_file')
+        file_inp = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file')
         # Set default value if necessary
         if file_inp is None or file_inp == '':
             file_inp = self.plugin_dir
@@ -3435,8 +3435,8 @@ class GwAdmin:
     def save_selection(self):
 
         # Save last Project schema name and type selected
-        schema_name = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name)
-        project_type = tools_qt.getWidgetText(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         tools_gw.set_parser_value('admin', 'last_project_type_selected', f'{project_type}')
         tools_gw.set_parser_value('admin', 'last_schema_name_selected', f'{schema_name}')
 
