@@ -388,9 +388,6 @@ class GwFeatureReplaceButton(GwParentMapTool):
                 elif tablename == 'v_edit_gully':
                     self.geom_type = 'gully'
 
-                print(f"AA -> {tablename}")
-                print(f"bb -> {self.geom_type}")
-
                 self.geom_view = tablename
                 self.cat_table = 'cat_' + self.geom_type
                 self.feature_type_ws = self.geom_type + 'type_id'
@@ -416,8 +413,6 @@ class GwFeatureReplaceButton(GwParentMapTool):
         self.snapper_manager.enable_snapping()
 
         # Set snapping to 'node', 'connec' and 'gully'
-        self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper_manager.set_controller(self.controller)
         self.snapper_manager.set_snapping_layers()
 
         self.snapper_manager.snap_to_node()
