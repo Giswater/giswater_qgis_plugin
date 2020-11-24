@@ -668,15 +668,15 @@ def disconnect_snapping():
         pass
 
 
-def refresh_map_canvas(restore_cursor=False):
+def refresh_map_canvas(_restore_cursor=False):
     """ Refresh all layers present in map canvas """
 
     global_vars.canvas.refreshAllLayers()
     for layer_refresh in global_vars.canvas.layers():
         layer_refresh.triggerRepaint()
 
-    if restore_cursor:
-        set_cursor_restore()
+    if _restore_cursor:
+        restore_cursor()
 
 
 def set_cursor_wait():
