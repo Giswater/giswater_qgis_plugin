@@ -2157,6 +2157,7 @@ def get_layer_source_from_credentials():
             global_vars.last_error = tr("Error getting default connection")
             return None, not_version
 
+    global_vars.controller.credentials = credentials
     return credentials, not_version
 
 
