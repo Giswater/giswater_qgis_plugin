@@ -31,7 +31,7 @@ def open_file(file_path):
         return True
 
 
-def manage_tstamp(prefix_name='log', tstamp_format='%Y%m%d'):
+def set_filename(prefix_name='log', tstamp_format='%Y%m%d'):
 
     tstamp = str(time.strftime(tstamp_format))
     name = prefix_name + "_" + tstamp + ".log"
@@ -45,12 +45,6 @@ def get_relative_path(filepath, levels=1):
         common = os.path.dirname(common)
 
     return os.path.relpath(filepath, common)
-
-
-def open_browser(web_tag):
-    """ Open the web browser according to the drop down menu of the feature to insert """
-
-    webbrowser.open_new_tab('https://giswater.org/giswater-manual/#' + web_tag)
 
 
 def get_values_from_dictionary(dictionary):

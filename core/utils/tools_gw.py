@@ -501,7 +501,7 @@ def set_config_parser(section: str, parameter: str, value: str):
 def save_current_tab(dialog, tab_widget, selector_name):
     """ Save the name of current tab used by the user into QSettings()
     :param dialog: QDialog
-    :param tab_widget:  QTabWidget
+    :param tab_widget: QTabWidget
     :param selector_name: Name of the selector (String)
     """
     try:

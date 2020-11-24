@@ -154,7 +154,6 @@ class Selector:
                     field['layoutname'] = gridlayout.objectName()
                     field['layoutorder'] = i
                     i = i + 1
-                    chk_all = widget
                     tools_gw.put_widgets(dialog, field, label, widget)
 
             for order, field in enumerate(form_tab['fields']):

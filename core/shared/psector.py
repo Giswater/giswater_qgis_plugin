@@ -1709,7 +1709,6 @@ class GwPsector:
     def psector_duplicate(self):
         """" Button 51: Duplicate psector """
 
-
         selected_list = self.qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
