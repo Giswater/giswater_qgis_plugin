@@ -658,7 +658,7 @@ class GwMincut:
                 self.dlg_dtext.btn_accept.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
                 self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
 
-                tools_gw.populate_info_text(self.dlg_dtext, result['body']['data'], False)
+                tools_gw.fill_log(self.dlg_dtext, result['body']['data'], False)
                 tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 
         self.iface.actionPan().trigger()
@@ -678,7 +678,7 @@ class GwMincut:
     def mincut_ok(self, result):
 
         # Manage result and force tab log
-        tools_gw.populate_info_text(self.dlg_mincut, result['body']['data'], True, True, tab_idx=3)
+        tools_gw.fill_log(self.dlg_mincut, result['body']['data'], True, True, tab_idx=3)
 
         # Set tabs enabled(True/False)
         qtabwidget = self.dlg_mincut.findChild(QTabWidget, 'mainTab')
@@ -698,7 +698,7 @@ class GwMincut:
                 if polygon[0] == '':
                     message = "Error on create auto mincut, you need to review data"
                     tools_gw.show_warning(message)
-                    tools_qgis.set_cursor_restore()
+                    tools_qgis.restore_cursor()
                     self.task1.setProgress(100)
                     return
                 x1, y1 = polygon[0].split(' ')
@@ -1612,7 +1612,7 @@ class GwMincut:
             if polygon[0] == '':
                 message = "Error on create auto mincut, you need to review data"
                 tools_gw.show_warning(message)
-                tools_qgis.set_cursor_restore()
+                tools_qgis.restore_cursor()
                 self.task1.setProgress(100)
                 return
             x1, y1 = polygon[0].split(' ')
@@ -1630,7 +1630,7 @@ class GwMincut:
             if not status:
                 message = "Error updating element in table, you need to review data"
                 tools_gw.show_warning(message)
-                tools_qgis.set_cursor_restore()
+                tools_qgis.restore_cursor()
                 self.task1.setProgress(100)
                 return
 

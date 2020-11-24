@@ -45,7 +45,7 @@ class GwArcDivideButton(GwParentMapTool):
                 self.dlg_dtext = DialogTextUi()
                 self.dlg_dtext.btn_accept.hide()
                 self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
-                tools_gw.populate_info_text(self.dlg_dtext, result['body']['data'], False, True, 1)
+                tools_gw.fill_log(self.dlg_dtext, result['body']['data'], False, True, 1)
                 self.dlg_dtext.exec()
 
         else:

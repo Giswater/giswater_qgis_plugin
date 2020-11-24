@@ -3400,7 +3400,7 @@ class GwAdmin:
 
         for k, v in list(data.items()):
             if str(k) == "info":
-                tools_gw.populate_info_text(dialog, data)
+                tools_gw.fill_log(dialog, data)
 
 
     def manage_result_message(self, status, msg_ok=None, msg_error=None, parameter=None):

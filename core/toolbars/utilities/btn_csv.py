@@ -143,7 +143,7 @@ class GwCSVButton(GwParentAction):
             return
         else:
             if result['status'] == "Accepted":
-                tools_gw.populate_info_text(dialog, result['body']['data'])
+                tools_gw.fill_log(dialog, result['body']['data'])
             msg = result['message']['text']
             tools_qt.show_info_box(msg)
 

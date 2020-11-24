@@ -684,7 +684,7 @@ def set_cursor_wait():
     QApplication.setOverrideCursor(Qt.WaitCursor)
 
 
-def set_cursor_restore():
+def restore_cursor():
     """ Restore to previous cursors """
     QApplication.restoreOverrideCursor()
 

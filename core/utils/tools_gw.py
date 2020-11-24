@@ -936,7 +936,7 @@ def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     srid = global_vars.srid
     for k, v in list(data.items()):
         if str(k) == "info":
-            text_result, change_tab = populate_info_text(dialog, data, force_tab, reset_text, tab_idx, disable_tabs)
+            text_result, change_tab = fill_log(dialog, data, force_tab, reset_text, tab_idx, disable_tabs)
         elif k in ('point', 'line', 'polygon'):
             if 'values' in data[k]:
                 key = 'values'
@@ -985,7 +985,7 @@ def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
 
 
-def populate_info_text(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_disable_tabs=True):
+def fill_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_disable_tabs=True):
     """ Populate txt_infolog QTextEdit widget
     :param dialog: QDialog
     :param data: Json
@@ -1808,12 +1808,12 @@ def set_typeahead(field, dialog, widget, completer):
             return widget
         widget.setProperty('typeahead', True)
         model = QStringListModel()
-        widget.textChanged.connect(partial(populate_lineedit, completer, model, field, dialog, widget))
+        widget.textChanged.connect(partial(fill_typeahead, completer, model, field, dialog, widget))
 
     return widget
 
 
-def populate_lineedit(completer, model, field, dialog, widget):
+def fill_typeahead(completer, model, field, dialog, widget):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object.
         WARNING: Each QLineEdit needs their own QCompleter and their own QStringListModel!!!

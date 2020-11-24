@@ -354,7 +354,7 @@ class GwToolBoxButton(GwParentAction):
         body = tools_gw.create_body(feature=feature_field, extras=extras)
         json_result = tools_gw.get_json(function_name, body)
         if json_result['status'] == 'Failed': return
-        tools_gw.populate_info_text(dialog, json_result['body']['data'], True, True, 1, True)
+        tools_gw.fill_log(dialog, json_result['body']['data'], True, True, 1, True)
 
         dialog.progressBar.setAlignment(Qt.AlignCenter)
         dialog.progressBar.setMinimum(0)

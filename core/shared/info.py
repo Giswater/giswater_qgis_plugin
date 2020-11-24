@@ -734,7 +734,7 @@ class GwInfo(QObject):
             extras += f'"node2":"{self.node2}"}}'
             body = tools_gw.create_body(extras=extras)
             self.interpolate_result = tools_gw.get_json('gw_fct_node_interpolate', body)
-            tools_gw.populate_info_text(dlg_dtext, self.interpolate_result['body']['data'])
+            tools_gw.fill_log(dlg_dtext, self.interpolate_result['body']['data'])
 
 
     def chek_for_existing_values(self, dlg_dtext):
