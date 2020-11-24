@@ -163,7 +163,9 @@ class GwVisitManager:
         self.tbl_document = self.dlg_add_visit.findChild(QTableView, "tbl_document")
         self.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        tools_qt.set_selectionbehavior(self.dlg_add_visit)
+        widget_list = self.dlg_add_visit.findChildren(QTableView)
+        for widget in widget_list:
+            tools_qt.set_qtv_config(widget)
 
         # Check the default dates, if it does not exist force today
         _date = QDate.currentDate()
@@ -889,7 +891,7 @@ class GwVisitManager:
             table_object = "v_ui_om_visit"
             expr_filter = ""
             tools_qt.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
-            tools_qt.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
+            tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_visit, table_object)
         else:
             # Set a model with selected filter. Attach that model to selected table
             tools_qt.set_widget_text(self.dlg_man, self.dlg_man.lbl_filter, 'Filter by code')
@@ -898,7 +900,7 @@ class GwVisitManager:
             expr_filter = f"{geom_type}_id = '{feature_id}'"
             # Refresh model with selected filter
             tools_qt.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object, expr_filter)
-            tools_qt.set_table_columns(self.dlg_man, self.dlg_man.tbl_visit, table_object)
+            tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_visit, table_object)
 
         # manage save and rollback when closing the dialog
         self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))

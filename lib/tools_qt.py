@@ -977,51 +977,6 @@ def set_icon(widget, icon):
         tools_log.log_info("File not found", parameter=icon_path)
 
 
-def set_table_columns(dialog, widget, table_name, sort_order=0, isQStandardItemModel=False, schema_name=None):
-    """ Configuration of tables. Set visibility and width of columns """
-
-    widget = getWidget(dialog, widget)
-    if not widget:
-        return
-
-    if schema_name is not None:
-        config_table = f"{schema_name}.config_form_tableview"
-    else:
-        config_table = f"config_form_tableview"
-
-    # Set width and alias of visible columns
-    columns_to_delete = []
-    sql = (f"SELECT columnindex, width, alias, status"
-           f" FROM {config_table}"
-           f" WHERE tablename = '{table_name}'"
-           f" ORDER BY columnindex")
-    rows = global_vars.controller.get_rows(sql, log_info=False)
-    if not rows:
-        return
-
-    for row in rows:
-        if not row['status']:
-            columns_to_delete.append(row['columnindex'] - 1)
-        else:
-            width = row['width']
-            if width is None:
-                width = 100
-            widget.setColumnWidth(row['columnindex'] - 1, width)
-            widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
-
-    # Set order
-    if isQStandardItemModel:
-        widget.model().sort(0, sort_order)
-    else:
-        widget.model().setSort(0, sort_order)
-        widget.model().select()
-    # Delete columns
-    for column in columns_to_delete:
-        widget.hideColumn(column)
-
-    return widget
-
-
 def multi_rows_delete(widget, table_name, column_id):
     """ Delete selected elements of the table
     :param QTableView widget: origin
@@ -1429,7 +1384,7 @@ def reload_qtable(dialog, geom_type):
     expr = f"psector_id = '{value}'"
     qtable = getWidget(dialog, f'tbl_psector_x_{geom_type}')
     fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
-    set_table_columns(dialog, qtable, f"plan_psector_x_{geom_type}")
+    tools_gw.set_tablemodel_config(dialog, qtable, f"plan_psector_x_{geom_type}")
     tools_qgis.refresh_map_canvas()
 
 

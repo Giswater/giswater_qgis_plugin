@@ -531,13 +531,13 @@ class GwSearch:
 
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
-        tools_qt.set_table_columns(self.items_dialog, self.items_dialog.tbl_psm, table_name)
+        tools_gw.set_tablemodel_config(self.items_dialog, self.items_dialog.tbl_psm, table_name)
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
-        tools_qt.set_table_columns(self.items_dialog, self.items_dialog.tbl_psm_end, table_name_end)
+        tools_gw.set_tablemodel_config(self.items_dialog, self.items_dialog.tbl_psm_end, table_name_end)
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
         self.workcat_fill_table(self.items_dialog.tbl_document, table_doc, expr=expr)
-        tools_qt.set_table_columns(self.items_dialog, self.items_dialog.tbl_document, table_doc)
+        tools_gw.set_tablemodel_config(self.items_dialog, self.items_dialog.tbl_document, table_doc)
 
         #
         # Add data to workcat search form
@@ -753,7 +753,7 @@ class GwSearch:
         else:
             expr = f"workcat_id ILIKE '%{workcat_id}%'"
         self.workcat_fill_table(qtable, table_name, expr=expr)
-        tools_qt.set_table_columns(dialog, qtable, table_name)
+        tools_gw.set_tablemodel_config(dialog, qtable, table_name)
 
 
     def workcat_fill_table(self, widget, table_name, set_edit_triggers=QTableView.NoEditTriggers, expr=None):

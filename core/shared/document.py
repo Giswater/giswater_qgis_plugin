@@ -48,7 +48,9 @@ class GwDocument:
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
 
-        tools_qt.set_selectionbehavior(self.dlg_add_doc)
+        widget_list = self.dlg_add_doc.findChildren(QTableView)
+        for widget in widget_list:
+            tools_qt.set_qtv_config(widget)
 
         # Get layers of every geom_type
 
@@ -325,7 +327,7 @@ class GwDocument:
 
         # Set a model with selected filter. Attach that model to selected table
         tools_qt.fill_table_object(self.dlg_man.tbl_document, self.schema_name + "." + table_object)
-        tools_qt.set_table_columns(self.dlg_man, self.dlg_man.tbl_document, table_object)
+        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, table_object)
 
         # Set dignals
         self.dlg_man.doc_id.textChanged.connect(

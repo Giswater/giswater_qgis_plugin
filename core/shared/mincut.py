@@ -241,7 +241,7 @@ class GwMincut:
         expr_filter = f"result_id={result_mincut_id}"
         tools_qt.set_qtv_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
         tools_qt.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
-        tools_qt.set_table_columns(self.dlg_mincut, self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer')
+        tools_gw.set_tablemodel_config(self.dlg_mincut, self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer')
 
 
     def check_dates_coherence(self, date_from, date_to, time_from, time_to):
@@ -1241,7 +1241,7 @@ class GwMincut:
         """ Reload contents of table 'connec' with selected @expr_filter """
 
         expr = tools_gw.set_table_model(self.dlg_connec, 'tbl_mincut_connec', "connec", expr_filter)
-        tools_qt.set_table_columns(self.dlg_connec, 'tbl_mincut_connec', 'v_edit_connec')
+        tools_gw.set_tablemodel_config(self.dlg_connec, 'tbl_mincut_connec', 'v_edit_connec')
         return expr
 
 
@@ -1249,7 +1249,7 @@ class GwMincut:
         """ Reload contents of table 'hydro' """
 
         expr = tools_gw.set_table_model(self.dlg_hydro, "tbl_hydro", "v_rtc_hydrometer", expr_filter)
-        tools_qt.set_table_columns(self.dlg_hydro, "tbl_hydro", 'v_rtc_hydrometer')
+        tools_gw.set_tablemodel_config(self.dlg_hydro, "tbl_hydro", 'v_rtc_hydrometer')
         return expr
 
 

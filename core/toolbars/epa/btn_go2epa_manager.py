@@ -37,7 +37,7 @@ class GwGo2EpaManagerButton(GwParentAction):
         self.fill_combo_result_id()
         self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectRows)
         tools_qt.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
-        tools_qt.set_table_columns(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
+        tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
 
         # Set signals
         self.dlg_manager.btn_delete.clicked.connect(partial(tools_qt.multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,

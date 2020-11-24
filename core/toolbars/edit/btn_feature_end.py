@@ -64,7 +64,9 @@ class GwEndFeatureButton(GwParentAction):
         # Capture the current layer to return it at the end of the operation
         self.cur_active_layer = self.iface.activeLayer()
 
-        tools_qt.set_selectionbehavior(self.dlg_work_end)
+        widget_list = self.dlg_work_end.findChildren(QTableView)
+        for widget in widget_list:
+            tools_qt.set_qtv_config(widget)
 
         # Remove 'gully' for 'WS'
         self.project_type = tools_gw.get_project_type()

@@ -95,7 +95,7 @@ class GwDimensioningButton(GwParentMapTool):
             self.snapper_manager.snap_to_connec()
             self.snapper_manager.snap_to_gully()
             self.snapper_manager.snap_to_node()
-            self.snapper_manager.set_snapping_mode()
+            self.snapper_manager.set_snap_mode()
 
             # Manage new api tool
             self.layer.featureAdded.connect(self.open_new_dimensioning)

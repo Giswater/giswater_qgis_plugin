@@ -55,7 +55,9 @@ class GwPsector:
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
-        tools_qt.set_selectionbehavior(self.dlg_plan_psector)
+        widget_list = self.dlg_plan_psector.findChildren(QTableView)
+        for widget in widget_list:
+            tools_qt.set_qtv_config(widget)
         self.project_type = tools_gw.get_project_type()
 
         # Get layers of every geom_type
@@ -214,17 +216,17 @@ class GwPsector:
                 self.dlg_plan_psector.chk_enable_all.setChecked(row[0])
             self.fill_table(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc",
                 set_edit_triggers=QTableView.DoubleClicked)
-            tools_qt.set_table_columns(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc")
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc")
             self.fill_table(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node",
                 set_edit_triggers=QTableView.DoubleClicked)
-            tools_qt.set_table_columns(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node")
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node")
             self.fill_table(self.dlg_plan_psector, self.qtbl_connec, "plan_psector_x_connec",
                 set_edit_triggers=QTableView.DoubleClicked)
-            tools_qt.set_table_columns(self.dlg_plan_psector, self.qtbl_connec, "plan_psector_x_connec")
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_connec, "plan_psector_x_connec")
             if self.project_type.upper() == 'UD':
                 self.fill_table(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully",
                                 set_edit_triggers=QTableView.DoubleClicked)
-                tools_qt.set_table_columns(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully")
+                tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully")
             sql = (f"SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, "
                    f"text3, text4, text5, text6, num_value, observ, atlas_id, scale, rotation, active, ext_code, status"
                    f" FROM plan_psector "
@@ -1177,7 +1179,7 @@ class GwPsector:
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.fill_table(dialog, tbl_all_rows, tableleft)
-        tools_qt.set_table_columns(dialog, tbl_all_rows, tableleft)
+        tools_gw.set_tablemodel_config(dialog, tbl_all_rows, tableleft)
 
         # fill QTableView selected_rows
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
@@ -1185,7 +1187,7 @@ class GwPsector:
         expr = f" psector_id = '{tools_qt.getWidgetText(dialog, 'psector_id')}'"
         # Refresh model with selected filter
         self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
-        tools_qt.set_table_columns(dialog, tbl_selected_rows, tableright)
+        tools_gw.set_tablemodel_config(dialog, tbl_selected_rows, tableright)
 
         # Button select
         dialog.btn_select.clicked.connect(partial(self.rows_selector, dialog, tbl_all_rows, tbl_selected_rows, 'id',
@@ -1262,7 +1264,7 @@ class GwPsector:
         expr = f" psector_id = '{tools_qt.getWidgetText(dialog, 'psector_id')}'"
         # Refresh model with selected filter
         self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
-        tools_qt.set_table_columns(dialog, tbl_selected_rows, tableright)
+        tools_gw.set_tablemodel_config(dialog, tbl_selected_rows, tableright)
         self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
 
 
@@ -1289,7 +1291,7 @@ class GwPsector:
         expr = f" psector_id = '{tools_qt.getWidgetText(dialog, 'psector_id')}'"
         # Refresh model with selected filter
         self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
-        tools_qt.set_table_columns(dialog, tbl_selected_rows, tableright)
+        tools_gw.set_tablemodel_config(dialog, tbl_selected_rows, tableright)
         self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
 
 
@@ -1481,7 +1483,7 @@ class GwPsector:
                     table_name))
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
         self.fill_table(self.dlg_psector_mng, self.qtbl_psm, table_name)
-        tools_qt.set_table_columns(self.dlg_psector_mng, self.qtbl_psm, table_name)
+        tools_gw.set_tablemodel_config(self.dlg_psector_mng, self.qtbl_psm, table_name)
         self.set_label_current_psector(self.dlg_psector_mng)
 
         # Open form
@@ -1506,7 +1508,7 @@ class GwPsector:
         tools_gw.show_info(message)
 
         self.fill_table(dialog, qtbl_psm, "v_ui_plan_psector")
-        tools_qt.set_table_columns(dialog, qtbl_psm, "v_ui_plan_psector")
+        tools_gw.set_tablemodel_config(dialog, qtbl_psm, "v_ui_plan_psector")
         self.set_label_current_psector(dialog)
         tools_gw.open_dialog(dialog)
 
@@ -1653,7 +1655,7 @@ class GwPsector:
 
         # set_edit_strategy = QSqlTableModel.OnManualSubmit
         self.fill_table(self.dlg_merm, self.tbl_om_result_cat, tablename)
-        tools_qt.set_table_columns(self.tbl_om_result_cat, self.dlg_merm.tbl_om_result_cat, tablename)
+        tools_gw.set_tablemodel_config(self.tbl_om_result_cat, self.dlg_merm.tbl_om_result_cat, tablename)
 
         # Open form
         self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)

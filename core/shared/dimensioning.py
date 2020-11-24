@@ -232,7 +232,7 @@ class GwDimensioning:
         self.snapper_manager.snap_to_node()
         self.snapper_manager.snap_to_connec()
         self.snapper_manager.snap_to_gully()
-        self.snapper_manager.set_snapping_mode()
+        self.snapper_manager.set_snap_mode()
 
         self.dlg_dim.actionOrientation.setChecked(False)
         self.iface.setActiveLayer(self.layer_node)
@@ -332,7 +332,7 @@ class GwDimensioning:
         self.snapper_manager.snap_to_node()
         self.snapper_manager.snap_to_connec()
         self.snapper_manager.snap_to_gully()
-        self.snapper_manager.set_snapping_mode()
+        self.snapper_manager.set_snap_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)
         emit_point.canvasClicked.connect(partial(self.click_button_orientation, action, emit_point))

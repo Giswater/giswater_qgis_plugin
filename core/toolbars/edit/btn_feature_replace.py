@@ -424,7 +424,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         self.snapper_manager.snap_to_connec()
         self.snapper_manager.snap_to_gully()
 
-        self.snapper_manager.set_snapping_mode()
+        self.snapper_manager.set_snap_mode()
 
         # Change cursor
         self.canvas.setCursor(self.cursor)

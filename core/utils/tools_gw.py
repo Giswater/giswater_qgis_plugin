@@ -112,7 +112,7 @@ class SnappingConfigManager(object):
         QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
 
 
-    def set_snapping_mode(self, mode=3):
+    def set_snap_mode(self, mode=3):
         """ Defines on which layer the snapping is performed
         :param mode: 1 = ActiveLayer, 2=AllLayers, 3=AdvancedConfiguration (int or SnappingMode)
         """
@@ -2689,7 +2689,7 @@ def manage_layer_manager(json_result, sql):
                     snapping_config.setIndividualLayerSettings(layer, layer_settings)
                     QgsProject.instance().blockSignals(False)
                     QgsProject.instance().snappingConfigChanged.emit(snapping_config)
-            snapper_manager.set_snapping_mode()
+            snapper_manager.set_snap_mode()
             del snapper_manager
 
 

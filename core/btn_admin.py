@@ -3041,7 +3041,7 @@ class GwAdmin:
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
         expr_filter = "cat_feature_id = '" + form_name + "'"
         self.fill_table(qtable, 've_config_sysfields', self.model_update_table, expr_filter)
-        tools_qt.set_table_columns(self.dlg_manage_sys_fields, qtable, 've_config_sysfields', schema_name=schema_name)
+        tools_gw.set_tablemodel_config(self.dlg_manage_sys_fields, qtable, 've_config_sysfields', schema_name=schema_name)
 
 
     def manage_update_field(self, dialog, form_name, tableview):
@@ -3067,7 +3067,7 @@ class GwAdmin:
             expr_filter = "cat_feature_id = '" + form_name + "'"
 
         self.fill_table(qtable, tableview, self.model_update_table, expr_filter)
-        tools_qt.set_table_columns(dialog, qtable, tableview, schema_name=schema_name)
+        tools_gw.set_tablemodel_config(dialog, qtable, tableview, schema_name=schema_name)
 
 
     def manage_delete_field(self, form_name):
