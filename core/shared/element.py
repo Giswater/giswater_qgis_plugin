@@ -84,10 +84,10 @@ class GwElement:
             self.layers['gully'] = tools_gw.get_group_layers('gully')
 
         # Set icons
-        tools_qt.set_icon(self.dlg_add_element.btn_add_geom, "133")
-        tools_qt.set_icon(self.dlg_add_element.btn_insert, "111")
-        tools_qt.set_icon(self.dlg_add_element.btn_delete, "112")
-        tools_qt.set_icon(self.dlg_add_element.btn_snapping, "137")
+        tools_gw.add_icon(self.dlg_add_element.btn_add_geom, "133")
+        tools_gw.add_icon(self.dlg_add_element.btn_insert, "111")
+        tools_gw.add_icon(self.dlg_add_element.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_add_element.btn_snapping, "137")
 
         # Remove all previous selections
         self.layers = tools_qgis.remove_selection(True, layers=self.layers)
@@ -135,7 +135,7 @@ class GwElement:
                     ids=self.ids, list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_snapping.clicked.connect(
-            partial(tools_qgis.selection_init, self.dlg_add_element, table_object, geom_type=geom_type, layers=self.layers))
+            partial(tools_gw.selection_init, self.dlg_add_element, table_object, geom_type=geom_type, layers=self.layers))
         self.point_xy = self.dlg_add_element.btn_add_geom.clicked.connect(partial(self.snapper_manager.add_point, self.vertex_marker))
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
 

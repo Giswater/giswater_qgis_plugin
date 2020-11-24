@@ -82,9 +82,9 @@ class GwDocument:
 
 
         # Set icons
-        tools_qt.set_icon(self.dlg_add_doc.btn_insert, "111")
-        tools_qt.set_icon(self.dlg_add_doc.btn_delete, "112")
-        tools_qt.set_icon(self.dlg_add_doc.btn_snapping, "137")
+        tools_gw.add_icon(self.dlg_add_doc.btn_insert, "111")
+        tools_gw.add_icon(self.dlg_add_doc.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_add_doc.btn_snapping, "137")
         self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
         # Fill combo boxes
         self.fill_combo_by_query(self.dlg_add_doc, "doc_type", "doc_type")
@@ -136,7 +136,7 @@ class GwDocument:
                                                             geom_type=geom_type, layers=self.layers, ids=self.ids,
                                                             list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_add_doc.btn_snapping.clicked.connect(partial(tools_qgis.selection_init, self.dlg_add_doc, table_object,
+        self.dlg_add_doc.btn_snapping.clicked.connect(partial(tools_gw.selection_init, self.dlg_add_doc, table_object,
                                                               geom_type=geom_type, layers=self.layers))
         if feature:
             self.dlg_add_doc.tabWidget.currentChanged.connect(

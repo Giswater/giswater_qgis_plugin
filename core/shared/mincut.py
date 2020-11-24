@@ -158,27 +158,27 @@ class GwMincut:
         # Toolbar actions
         action = self.dlg_mincut.findChild(QAction, "actionMincut")
         action.triggered.connect(self.auto_mincut)
-        tools_qt.set_icon(action, "126")
+        tools_gw.add_icon(action, "126")
         self.action_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionCustomMincut")
         action.triggered.connect(partial(self.custom_mincut, action))
-        tools_qt.set_icon(action, "123")
+        tools_gw.add_icon(action, "123")
         self.action_custom_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionAddConnec")
         action.triggered.connect(self.add_connec)
-        tools_qt.set_icon(action, "121")
+        tools_gw.add_icon(action, "121")
         self.action_add_connec = action
 
         action = self.dlg_mincut.findChild(QAction, "actionAddHydrometer")
         action.triggered.connect(self.add_hydrometer)
-        tools_qt.set_icon(action, "122")
+        tools_gw.add_icon(action, "122")
         self.action_add_hydrometer = action
 
         action = self.dlg_mincut.findChild(QAction, "actionComposer")
         action.triggered.connect(self.mincut_composer)
-        tools_qt.set_icon(action, "181")
+        tools_gw.add_icon(action, "181")
         self.action_mincut_composer = action
 
         action = self.dlg_mincut.findChild(QAction, "actionShowNotified")
@@ -795,9 +795,9 @@ class GwMincut:
         tools_gw.load_settings(self.dlg_connec)
         self.dlg_connec.tbl_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
         # Set icons
-        tools_qt.set_icon(self.dlg_connec.btn_insert, "111")
-        tools_qt.set_icon(self.dlg_connec.btn_delete, "112")
-        tools_qt.set_icon(self.dlg_connec.btn_snapping, "137")
+        tools_gw.add_icon(self.dlg_connec.btn_insert, "111")
+        tools_gw.add_icon(self.dlg_connec.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_connec.btn_snapping, "137")
 
         # Set signals
         self.dlg_connec.btn_insert.clicked.connect(partial(self.insert_connec))
@@ -965,8 +965,8 @@ class GwMincut:
         # self.dlg_hydro.btn_snapping.setEnabled(False)
 
         # Set icons
-        tools_qt.set_icon(self.dlg_hydro.btn_insert, "111")
-        tools_qt.set_icon(self.dlg_hydro.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_hydro.btn_insert, "111")
+        tools_gw.add_icon(self.dlg_hydro.btn_delete, "112")
 
         # Set dignals
         self.dlg_hydro.btn_insert.clicked.connect(partial(self.insert_hydro))

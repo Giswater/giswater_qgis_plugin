@@ -76,10 +76,10 @@ class GwEndFeatureButton(GwParentAction):
             self.layers['gully'] = tools_gw.get_group_layers('gully')
 
         # Set icons
-        tools_qt.set_icon(self.dlg_work_end.btn_insert, "111")
-        tools_qt.set_icon(self.dlg_work_end.btn_delete, "112")
-        tools_qt.set_icon(self.dlg_work_end.btn_snapping, "137")
-        tools_qt.set_icon(self.dlg_work_end.btn_new_workcat, "193")
+        tools_gw.add_icon(self.dlg_work_end.btn_insert, "111")
+        tools_gw.add_icon(self.dlg_work_end.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_work_end.btn_snapping, "137")
+        tools_gw.add_icon(self.dlg_work_end.btn_new_workcat, "193")
 
 
         # Adding auto-completion to a QLineEdit
@@ -104,7 +104,7 @@ class GwEndFeatureButton(GwParentAction):
                                                              list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_work_end.btn_snapping.clicked.connect(
-            partial(tools_qgis.selection_init, self.dlg_work_end, self.table_object, geom_type=geom_type, layers=self.layers))
+            partial(tools_gw.selection_init, self.dlg_work_end, self.table_object, geom_type=geom_type, layers=self.layers))
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_work_end, excluded_layers=["v_edit_element"]))

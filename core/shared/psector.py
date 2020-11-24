@@ -99,13 +99,13 @@ class GwPsector:
         self.layers = tools_qgis.remove_selection(True, layers=self.layers)
 
         # Set icons
-        tools_qt.set_icon(self.dlg_plan_psector.btn_insert, "111")
-        tools_qt.set_icon(self.dlg_plan_psector.btn_delete, "112")
-        tools_qt.set_icon(self.dlg_plan_psector.btn_snapping, "137")
-        tools_qt.set_icon(self.dlg_plan_psector.btn_doc_insert, "111")
-        tools_qt.set_icon(self.dlg_plan_psector.btn_doc_delete, "112")
-        tools_qt.set_icon(self.dlg_plan_psector.btn_doc_new, "34")
-        tools_qt.set_icon(self.dlg_plan_psector.btn_open_doc, "170")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_insert, "111")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_snapping, "137")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_doc_insert, "111")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_doc_delete, "112")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_doc_new, "34")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_open_doc, "170")
 
         table_object = "psector"
 
@@ -403,7 +403,7 @@ class GwPsector:
                                                                  ids=self.ids, list_ids=self.list_ids))
         self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_plan_psector.btn_snapping.clicked.connect(partial(tools_qgis.selection_init,
+        self.dlg_plan_psector.btn_snapping.clicked.connect(partial(tools_gw.selection_init,
             self.dlg_plan_psector, table_object, True, geom_type=self.geom_type, layers=self.layers))
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
@@ -852,7 +852,7 @@ class GwPsector:
         try:
             # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.canvas.selectionChanged.connect(
-                partial(tools_qgis.selection_changed, dialog, table_object, self.geom_type, query, plan_om='plan',
+                partial(tools_gw.selection_changed, dialog, table_object, self.geom_type, query, plan_om='plan',
                         layers=self.layers, list_ids=self.list_ids))
         except Exception:
             pass

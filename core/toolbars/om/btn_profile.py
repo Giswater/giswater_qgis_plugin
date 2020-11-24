@@ -87,7 +87,7 @@ class GwProfileButton(GwParentMapTool):
 
         # Toolbar actions
         action = self.dlg_draw_profile.findChild(QAction, "actionProfile")
-        tools_qt.set_icon(action, "131")
+        tools_gw.add_icon(action, "131")
         action.triggered.connect(partial(self.activate_snapping_node))
         self.action_profile = action
 

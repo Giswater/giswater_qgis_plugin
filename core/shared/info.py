@@ -406,42 +406,42 @@ class GwInfo(QObject):
             pass
 
         # Set actions icon
-        tools_qt.set_icon(action_edit, "101")
-        tools_qt.set_icon(action_copy_paste, "107b")
-        tools_qt.set_icon(action_rotation, "107c")
-        tools_qt.set_icon(action_catalog, "195")
-        tools_qt.set_icon(action_workcat, "193")
-        tools_qt.set_icon(action_mapzone, "213")
-        tools_qt.set_icon(action_set_to_arc, "212")
-        tools_qt.set_icon(action_get_arc_id, "209")
-        tools_qt.set_icon(action_get_parent_id, "210")
-        tools_qt.set_icon(action_zoom_in, "103")
-        tools_qt.set_icon(action_zoom_out, "107")
-        tools_qt.set_icon(action_centered, "104")
-        tools_qt.set_icon(action_link, "173")
-        tools_qt.set_icon(action_section, "207")
-        tools_qt.set_icon(action_help, "73")
-        tools_qt.set_icon(action_interpolate, "194")
+        tools_gw.add_icon(action_edit, "101")
+        tools_gw.add_icon(action_copy_paste, "107b")
+        tools_gw.add_icon(action_rotation, "107c")
+        tools_gw.add_icon(action_catalog, "195")
+        tools_gw.add_icon(action_workcat, "193")
+        tools_gw.add_icon(action_mapzone, "213")
+        tools_gw.add_icon(action_set_to_arc, "212")
+        tools_gw.add_icon(action_get_arc_id, "209")
+        tools_gw.add_icon(action_get_parent_id, "210")
+        tools_gw.add_icon(action_zoom_in, "103")
+        tools_gw.add_icon(action_zoom_out, "107")
+        tools_gw.add_icon(action_centered, "104")
+        tools_gw.add_icon(action_link, "173")
+        tools_gw.add_icon(action_section, "207")
+        tools_gw.add_icon(action_help, "73")
+        tools_gw.add_icon(action_interpolate, "194")
 
         # Set buttons icon
         # tab elements
-        tools_qt.set_icon(self.dlg_cf.btn_insert, "111b")
-        tools_qt.set_icon(self.dlg_cf.btn_delete, "112b")
-        tools_qt.set_icon(self.dlg_cf.btn_new_element, "131b")
-        tools_qt.set_icon(self.dlg_cf.btn_open_element, "134b")
+        tools_gw.add_icon(self.dlg_cf.btn_insert, "111b")
+        tools_gw.add_icon(self.dlg_cf.btn_delete, "112b")
+        tools_gw.add_icon(self.dlg_cf.btn_new_element, "131b")
+        tools_gw.add_icon(self.dlg_cf.btn_open_element, "134b")
         # tab hydrometer
-        tools_qt.set_icon(self.dlg_cf.btn_link, "70b")
+        tools_gw.add_icon(self.dlg_cf.btn_link, "70b")
         # tab om
-        tools_qt.set_icon(self.dlg_cf.btn_open_visit, "65b")
-        tools_qt.set_icon(self.dlg_cf.btn_new_visit, "64b")
-        tools_qt.set_icon(self.dlg_cf.btn_open_gallery, "136b")
-        tools_qt.set_icon(self.dlg_cf.btn_open_visit_doc, "170b")
-        tools_qt.set_icon(self.dlg_cf.btn_open_visit_event, "134b")
+        tools_gw.add_icon(self.dlg_cf.btn_open_visit, "65b")
+        tools_gw.add_icon(self.dlg_cf.btn_new_visit, "64b")
+        tools_gw.add_icon(self.dlg_cf.btn_open_gallery, "136b")
+        tools_gw.add_icon(self.dlg_cf.btn_open_visit_doc, "170b")
+        tools_gw.add_icon(self.dlg_cf.btn_open_visit_event, "134b")
         # tab doc
-        tools_qt.set_icon(self.dlg_cf.btn_doc_insert, "111b")
-        tools_qt.set_icon(self.dlg_cf.btn_doc_delete, "112b")
-        tools_qt.set_icon(self.dlg_cf.btn_doc_new, "131b")
-        tools_qt.set_icon(self.dlg_cf.btn_open_doc, "170b")
+        tools_gw.add_icon(self.dlg_cf.btn_doc_insert, "111b")
+        tools_gw.add_icon(self.dlg_cf.btn_doc_delete, "112b")
+        tools_gw.add_icon(self.dlg_cf.btn_doc_new, "131b")
+        tools_gw.add_icon(self.dlg_cf.btn_open_doc, "170b")
 
         # Get feature type as geom_type (node, arc, connec, gully)
         self.geom_type = str(complet_result[0]['body']['feature']['featureType'])
@@ -1462,7 +1462,7 @@ class GwInfo(QObject):
         field = kwargs['field']
 
         widget = tools_gw.add_tableview(complet_result, field)
-        widget = tools_qt.set_headers(widget, field)
+        widget = tools_gw.add_headers(widget, field)
         widget = tools_qt.populate_table(widget, field)
         widget = tools_qt.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
         tools_qt.set_qtv_config(widget)
@@ -3068,7 +3068,7 @@ class GwInfo(QObject):
             if field['widgettype'] == "tableview":
                 qtable = dialog.findChild(QTableView, field['widgetname'])
                 if qtable:
-                    tools_qt.set_headers(qtable, field)
+                    tools_gw.add_headers(qtable, field)
                     tools_qt.populate_table(qtable, field)
 
         return complet_list

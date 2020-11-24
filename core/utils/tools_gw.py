@@ -20,7 +20,7 @@ from functools import partial
 
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint, QDate, QCoreApplication, QSettings, QTranslator
-from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics
+from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
     QCompleter, QFileDialog, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit,\
     QTextEdit, QToolButton, QWidget, QGroupBox, QToolBox, QRadioButton
@@ -29,6 +29,7 @@ from qgis.core import QgsProject, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsFi
     QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest, QgsDataSourceUri, QgsCredentials, QgsRectangle
 from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint, QgsDateTimeEdit
 
+from ...lib.tools_qgis import MultipleSelection
 from ..models.sys_feature_cat import SysFeatureCat
 from ..ui.ui_manager import GwDialog, GwMainWindow, DialogTextUi, DockerUi
 from ... import global_vars
@@ -2684,6 +2685,78 @@ def set_margin(layer, margin):
     global_vars.iface.mapCanvas().refresh()
 
 
+def selection_init(dialog, table_object, query=False, geom_type=None, layers=None):
+    """ Set canvas map tool to an instance of class 'MultipleSelection' """
+
+    geom_type = get_signal_change_tab(dialog)
+    if geom_type in ('all', None):
+        geom_type = 'arc'
+    multiple_selection = MultipleSelection(layers, geom_type, parent_manage=None,
+                                           table_object=table_object, dialog=dialog, query=query)
+    global_vars.canvas.setMapTool(multiple_selection)
+
+    cursor = get_cursor_multiple_selection()
+    global_vars.canvas.setCursor(cursor)
+
+
+def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None, layers=None,
+                      list_ids={"arc":[], "node":[], "connec":[], "gully":[], "element":[]}, lazy_widget=None,
+                      lazy_init_function=None):
+    """ Slot function for signal 'canvas.selectionChanged' """
+    tools_qgis.disconnect_signal_selection_changed()
+    field_id = f"{geom_type}_id"
+
+    ids = []
+    if layers is None: return
+
+    # Iterate over all layers of the group
+    for layer in layers[geom_type]:
+        if layer.selectedFeatureCount() > 0:
+            # Get selected features of the layer
+            features = layer.selectedFeatures()
+            for feature in features:
+                # Append 'feature_id' into the list
+                selected_id = feature.attribute(field_id)
+                if selected_id not in ids:
+                    ids.append(selected_id)
+
+    for id in ids:
+        list_ids[geom_type].append(int(id))
+
+    expr_filter = None
+    if len(ids) > 0:
+        # Set 'expr_filter' with features that are in the list
+        expr_filter = f'"{field_id}" IN ('
+        for i in range(len(ids)):
+            expr_filter += f"'{ids[i]}', "
+        expr_filter = expr_filter[:-2] + ")"
+
+        # Check expression
+        (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
+        if not is_valid:
+            return
+
+        tools_qgis.select_features_by_ids(geom_type, expr, layers=layers)
+
+    # Reload contents of table 'tbl_@table_object_x_@geom_type'
+    if query:
+        tools_qgis.insert_feature_to_plan(dialog, geom_type, ids=ids)
+        if plan_om == 'plan':
+            layers = tools_qgis.remove_selection()
+        tools_qt.reload_qtable(dialog, geom_type)
+    else:
+        tools_qt.reload_table(dialog, table_object, geom_type, expr_filter)
+        tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
+
+    # Remove selection in generic 'v_edit' layers
+    if plan_om == 'plan':
+        layers = tools_qgis.remove_selection(False)
+
+    enable_feature_type(dialog, table_object, ids=ids)
+
+    return ids, layers, list_ids
+
+
 # TODO tools_gw_qt
 
 def tr(message, context_name=None):
@@ -3101,3 +3174,49 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
         widget.hideColumn(column)
 
     return widget
+
+
+def add_icon(widget, icon):
+    """ Set @icon to selected @widget """
+
+    # Get icons folder
+    icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}shared")
+    icon_path = os.path.join(icons_folder, str(icon) + ".png")
+    if os.path.exists(icon_path):
+        widget.setIcon(QIcon(icon_path))
+    else:
+        tools_log.log_info("File not found", parameter=icon_path)
+
+
+def add_headers(widget, field):
+
+    standar_model = widget.model()
+    if standar_model is None:
+        standar_model = QStandardItemModel()
+    # Related by Qtable
+    widget.setModel(standar_model)
+    widget.horizontalHeader().setStretchLastSection(True)
+
+    # # Get headers
+    headers = []
+    for x in field['value'][0]:
+        headers.append(x)
+    # Set headers
+    standar_model.setHorizontalHeaderLabels(headers)
+
+    return widget
+
+
+def set_calendar_by_user_param(dialog, widget, table_name, value, parameter):
+    """ Executes query and set QDateEdit """
+
+    sql = (f"SELECT {value} FROM {table_name}"
+           f" WHERE parameter = '{parameter}' AND cur_user = current_user")
+    row = global_vars.controller.get_row(sql)
+    if row:
+        if row[0]:
+            row[0] = row[0].replace('/', '-')
+        date = QDate.fromString(row[0], 'yyyy-MM-dd')
+    else:
+        date = QDate.currentDate()
+    tools_qt.set_calendar(dialog, widget, date)

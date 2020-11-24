@@ -74,11 +74,11 @@ class GwDimensioning:
         # ACTION SIGNALS
         actionSnapping = self.dlg_dim.findChild(QAction, "actionSnapping")
         actionSnapping.triggered.connect(partial(self.snapping, actionSnapping))
-        tools_qt.set_icon(actionSnapping, "103")
+        tools_gw.add_icon(actionSnapping, "103")
 
         actionOrientation = self.dlg_dim.findChild(QAction, "actionOrientation")
         actionOrientation.triggered.connect(partial(self.orientation, actionOrientation))
-        tools_qt.set_icon(actionOrientation, "133")
+        tools_gw.add_icon(actionOrientation, "133")
 
 
         # LAYER SIGNALS
@@ -452,7 +452,7 @@ class GwDimensioning:
             widget = tools_gw.add_spinbox(field)
         elif field['widgettype'] == 'tableview':
             widget = tools_gw.add_tableview(db_return, field)
-            widget = tools_qt.set_headers(widget, field)
+            widget = tools_gw.add_headers(widget, field)
             widget = tools_qt.populate_table(widget, field)
             widget = tools_qt.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
             tools_qt.set_qtv_config(widget)

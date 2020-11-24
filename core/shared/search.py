@@ -465,10 +465,10 @@ class GwSearch:
         self.items_dialog = SearchWorkcat()
         self.items_dialog.setWindowTitle(f'Workcat: {display_name}')
 
-        tools_qt.set_icon(self.items_dialog.btn_doc_insert, "111")
-        tools_qt.set_icon(self.items_dialog.btn_doc_delete, "112")
-        tools_qt.set_icon(self.items_dialog.btn_doc_new, "34")
-        tools_qt.set_icon(self.items_dialog.btn_open_doc, "170")
+        tools_gw.add_icon(self.items_dialog.btn_doc_insert, "111")
+        tools_gw.add_icon(self.items_dialog.btn_doc_delete, "112")
+        tools_gw.add_icon(self.items_dialog.btn_doc_new, "34")
+        tools_gw.add_icon(self.items_dialog.btn_open_doc, "170")
 
         tools_gw.load_settings(self.items_dialog)
         self.items_dialog.btn_state1.setEnabled(False)

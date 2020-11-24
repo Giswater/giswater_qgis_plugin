@@ -55,7 +55,7 @@ class GwDeleteFeatureButton(GwParentAction):
         # Set button snapping
         self.dlg_feature_delete.btn_snapping.clicked.connect(partial(self.set_active_layer))
         self.dlg_feature_delete.btn_snapping.clicked.connect(partial(self.selection_init))
-        tools_qt.set_icon(self.dlg_feature_delete.btn_snapping, "137")
+        tools_gw.add_icon(self.dlg_feature_delete.btn_snapping, "137")
 
         # Set listeners
         self.dlg_feature_delete.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_feature_delete))

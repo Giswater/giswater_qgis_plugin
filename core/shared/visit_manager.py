@@ -127,14 +127,14 @@ class GwVisitManager:
         self.point_xy = {"x": None, "y": None}
 
         # Set icons
-        tools_qt.set_icon(self.dlg_add_visit.btn_feature_insert, "111")
-        tools_qt.set_icon(self.dlg_add_visit.btn_feature_delete, "112")
-        tools_qt.set_icon(self.dlg_add_visit.btn_feature_snapping, "137")
-        tools_qt.set_icon(self.dlg_add_visit.btn_doc_insert, "111")
-        tools_qt.set_icon(self.dlg_add_visit.btn_doc_delete, "112")
-        tools_qt.set_icon(self.dlg_add_visit.btn_doc_new, "134")
-        tools_qt.set_icon(self.dlg_add_visit.btn_open_doc, "170")
-        tools_qt.set_icon(self.dlg_add_visit.btn_add_geom, "133")
+        tools_gw.add_icon(self.dlg_add_visit.btn_feature_insert, "111")
+        tools_gw.add_icon(self.dlg_add_visit.btn_feature_delete, "112")
+        tools_gw.add_icon(self.dlg_add_visit.btn_feature_snapping, "137")
+        tools_gw.add_icon(self.dlg_add_visit.btn_doc_insert, "111")
+        tools_gw.add_icon(self.dlg_add_visit.btn_doc_delete, "112")
+        tools_gw.add_icon(self.dlg_add_visit.btn_doc_new, "134")
+        tools_gw.add_icon(self.dlg_add_visit.btn_open_doc, "170")
+        tools_gw.add_icon(self.dlg_add_visit.btn_add_geom, "133")
 
         # tab events
         self.tabs = self.dlg_add_visit.findChild(QTabWidget, 'tab_widget')
@@ -1707,7 +1707,7 @@ class GwVisitManager:
 
         # Adding auto-completion to a QLineEdit
         tools_qt.set_completer_widget(viewname, dialog.feature_id, str(self.geom_type) + "_id")
-        self.ids, self.layers, self.list_ids = tools_qgis.selection_changed(dialog, widget_table, self.geom_type, False,
+        self.ids, self.layers, self.list_ids = tools_gw.selection_changed(dialog, widget_table, self.geom_type, False,
                                                                  layers=self.layers, list_ids=self.list_ids,
                                                                  lazy_widget=self.lazy_widget,
                                                                  lazy_init_function=self.lazy_init_function)
@@ -1720,7 +1720,7 @@ class GwVisitManager:
 
     def feature_snapping_clicked(self, dialog, table_object):
         self.previous_map_tool = global_vars.canvas.mapTool()
-        tools_qgis.selection_init(dialog, table_object, geom_type=self.geom_type, layers=self.layers)
+        tools_gw.selection_init(dialog, table_object, geom_type=self.geom_type, layers=self.layers)
 
 
     def manage_visit_multifeature(self):

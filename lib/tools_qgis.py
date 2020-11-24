@@ -472,78 +472,6 @@ def remove_selection(remove_groups=True, layers=None):
     return layers
 
 
-def selection_init(dialog, table_object, query=False, geom_type=None, layers=None):
-    """ Set canvas map tool to an instance of class 'MultipleSelection' """
-
-    geom_type = tools_gw.get_signal_change_tab(dialog)
-    if geom_type in ('all', None):
-        geom_type = 'arc'
-    multiple_selection = MultipleSelection(layers, geom_type, parent_manage=None,
-                                           table_object=table_object, dialog=dialog, query=query)
-    global_vars.canvas.setMapTool(multiple_selection)
-
-    cursor = get_cursor_multiple_selection()
-    global_vars.canvas.setCursor(cursor)
-
-
-def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None, layers=None,
-                      list_ids={"arc":[], "node":[], "connec":[], "gully":[], "element":[]}, lazy_widget=None,
-                      lazy_init_function=None):
-    """ Slot function for signal 'canvas.selectionChanged' """
-    disconnect_signal_selection_changed()
-    field_id = f"{geom_type}_id"
-
-    ids = []
-    if layers is None: return
-
-    # Iterate over all layers of the group
-    for layer in layers[geom_type]:
-        if layer.selectedFeatureCount() > 0:
-            # Get selected features of the layer
-            features = layer.selectedFeatures()
-            for feature in features:
-                # Append 'feature_id' into the list
-                selected_id = feature.attribute(field_id)
-                if selected_id not in ids:
-                    ids.append(selected_id)
-
-    for id in ids:
-        list_ids[geom_type].append(int(id))
-
-    expr_filter = None
-    if len(ids) > 0:
-        # Set 'expr_filter' with features that are in the list
-        expr_filter = f'"{field_id}" IN ('
-        for i in range(len(ids)):
-            expr_filter += f"'{ids[i]}', "
-        expr_filter = expr_filter[:-2] + ")"
-
-        # Check expression
-        (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
-        if not is_valid:
-            return
-
-        select_features_by_ids(geom_type, expr, layers=layers)
-
-    # Reload contents of table 'tbl_@table_object_x_@geom_type'
-    if query:
-        insert_feature_to_plan(dialog, geom_type, ids=ids)
-        if plan_om == 'plan':
-            layers = remove_selection()
-        tools_qt.reload_qtable(dialog, geom_type)
-    else:
-        tools_qt.reload_table(dialog, table_object, geom_type, expr_filter)
-        tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
-
-    # Remove selection in generic 'v_edit' layers
-    if plan_om == 'plan':
-        layers = remove_selection(False)
-
-    tools_gw.enable_feature_type(dialog, table_object, ids=ids)
-
-    return ids, layers, list_ids
-
-
 def select_features_by_ids(geom_type, expr, layers=None):
     """ Select features of layers of group @geom_type applying @expr """
 
@@ -722,11 +650,11 @@ def connect_signal_selection_changed(dialog, table_object, query=False, geom_typ
             geom_type = 'arc'
         if form == "psector":
             global_vars.canvas.selectionChanged.connect(
-                partial(selection_changed, dialog, table_object, geom_type, query, plan_om='plan',
+                partial(tools_gw.selection_changed, dialog, table_object, geom_type, query, plan_om='plan',
                         layers=layers, list_ids=list_ids))
         else:
             global_vars.canvas.selectionChanged.connect(
-                partial(selection_changed, dialog, table_object, geom_type, query, layers=layers))
+                partial(tools_gw.selection_changed, dialog, table_object, geom_type, query, layers=layers))
     except Exception as e:
         tools_log.log_info(f"connect_signal_selection_changed: {e}")
 

@@ -591,25 +591,6 @@ def check_actions(action, enabled, dialog=None):
         pass
 
 
-def set_headers(widget, field):
-
-    standar_model = widget.model()
-    if standar_model is None:
-        standar_model = QStandardItemModel()
-    # Related by Qtable
-    widget.setModel(standar_model)
-    widget.horizontalHeader().setStretchLastSection(True)
-
-    # # Get headers
-    headers = []
-    for x in field['value'][0]:
-        headers.append(x)
-    # Set headers
-    standar_model.setHorizontalHeaderLabels(headers)
-
-    return widget
-
-
 def populate_table(widget, field):
 
     standar_model = widget.model()
@@ -965,18 +946,6 @@ def get_folder_path(dialog, widget):
         set_widget_text(dialog, widget, str(folder_path))
 
 
-def set_icon(widget, icon):
-    """ Set @icon to selected @widget """
-
-    # Get icons folder
-    icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}shared")
-    icon_path = os.path.join(icons_folder, str(icon) + ".png")
-    if os.path.exists(icon_path):
-        widget.setIcon(QIcon(icon_path))
-    else:
-        tools_log.log_info("File not found", parameter=icon_path)
-
-
 def multi_rows_delete(widget, table_name, column_id):
     """ Delete selected elements of the table
     :param QTableView widget: origin
@@ -1199,11 +1168,11 @@ def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=N
     if not row:
         reset_widgets(dialog, table_object)
         if table_object == 'element':
-            set_combo(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
-            set_combo(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
+            set_combo_from_param_user(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
+            set_combo_from_param_user(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
                       field_id='expl_id', field_name='name')
-            set_calendars(dialog, 'builtdate', 'config_param_user', 'value', 'edit_builtdate_vdefault')
-            set_combo(dialog, 'workcat_id', 'cat_work',
+            tools_gw.set_calendar_by_user_param(dialog, 'builtdate', 'config_param_user', 'value', 'edit_builtdate_vdefault')
+            set_combo_from_param_user(dialog, 'workcat_id', 'cat_work',
                       'edit_workcat_vdefault', field_id='id', field_name='id')
 
         if single_tool_mode is not None:
@@ -1350,7 +1319,7 @@ def fill_widgets(dialog, table_object, row):
             dialog.undelete.setChecked(True)
 
 
-def set_combo(dialog, widget, table_name, parameter, field_id='id', field_name='id'):
+def set_combo_from_param_user(dialog, widget, table_name, parameter, field_id='id', field_name='id'):
     """ Executes query and set combo box """
 
     sql = (f"SELECT t1.{field_name} FROM {table_name} as t1"
@@ -1359,21 +1328,6 @@ def set_combo(dialog, widget, table_name, parameter, field_id='id', field_name='
     row = global_vars.controller.get_row(sql)
     if row:
         set_widget_text(dialog, widget, row[0])
-
-
-def set_calendars(dialog, widget, table_name, value, parameter):
-    """ Executes query and set QDateEdit """
-
-    sql = (f"SELECT {value} FROM {table_name}"
-           f" WHERE parameter = '{parameter}' AND cur_user = current_user")
-    row = global_vars.controller.get_row(sql)
-    if row:
-        if row[0]:
-            row[0] = row[0].replace('/', '-')
-        date = QDate.fromString(row[0], 'yyyy-MM-dd')
-    else:
-        date = QDate.currentDate()
-    set_calendar(dialog, widget, date)
 
 
 def reload_qtable(dialog, geom_type):
@@ -1407,21 +1361,6 @@ def fill_table_by_expr(qtable, table_name, expr):
     # Check for errors
     if model.lastError().isValid():
         tools_gw.show_warning(model.lastError().text())
-
-
-def set_open_url(widget):
-
-    path = widget.text()
-    # Check if file exist
-    if os.path.exists(path):
-        # Open the document
-        if sys.platform == "win32":
-            os.startfile(path)
-        else:
-            opener = "open" if sys.platform == "darwin" else "xdg-open"
-            subprocess.call([opener, path])
-    else:
-        webbrowser.open(path)
 
 
 def get_feature_by_id(layer, id, field_id=None):

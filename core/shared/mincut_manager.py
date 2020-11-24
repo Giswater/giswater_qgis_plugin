@@ -48,7 +48,7 @@ class GwMincutManager:
             'forecast_start, exec_start', 'forecast_end, exec_end')
         self.dlg_min_edit.date_from.setEnabled(False)
         self.dlg_min_edit.date_to.setEnabled(False)
-        tools_qt.set_icon(self.dlg_min_edit.btn_selector_mincut, "191")
+        tools_gw.add_icon(self.dlg_min_edit.btn_selector_mincut, "191")
 
         self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
         self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
@@ -85,7 +85,7 @@ class GwMincutManager:
             self.mincut_selector, self.tbl_mincut_edit, 'id'))
         self.btn_notify = self.dlg_min_edit.findChild(QPushButton, "btn_notify")
         self.btn_notify.clicked.connect(partial(self.get_clients_codes, self.dlg_min_edit.tbl_mincut_edit))
-        tools_qt.set_icon(self.btn_notify, "307")
+        tools_gw.add_icon(self.btn_notify, "307")
 
         try:
             row = tools_gw.get_config('om_mincut_enable_alerts', 'value', 'config_param_system')
