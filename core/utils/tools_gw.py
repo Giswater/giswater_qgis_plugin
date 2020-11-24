@@ -742,8 +742,8 @@ def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, du
 
 def enable_feature_type(dialog, widget_name='tbl_relation', ids=None):
 
-    feature_type = tools_qt.getWidget(dialog, 'feature_type')
-    widget_table = tools_qt.getWidget(dialog, widget_name)
+    feature_type = tools_qt.get_widget(dialog, 'feature_type')
+    widget_table = tools_qt.get_widget(dialog, widget_name)
     if feature_type is not None and widget_table is not None:
         if len(ids) > 0:
             feature_type.setEnabled(False)
@@ -886,31 +886,7 @@ def create_qml(layer, style):
     file.write(style)
     file.close()
     del file
-    load_qml(layer, path_temp_file)
-
-
-def load_qml(layer, qml_path):
-    """ Apply QML style located in @qml_path in @layer
-    :param layer: layer to set qml (QgsVectorLayer)
-    :param qml_path: desired path (string)
-    :return: True or False (boolean)
-    """
-
-    if layer is None:
-        return False
-
-    if not os.path.exists(qml_path):
-        tools_log.log_warning("File not found", parameter=qml_path)
-        return False
-
-    if not qml_path.endswith(".qml"):
-        tools_log.log_warning("File extension not valid", parameter=qml_path)
-        return False
-
-    layer.loadNamedStyle(qml_path)
-    layer.triggerRepaint()
-
-    return True
+    tools_qgis.load_qml(layer, path_temp_file)
 
 
 def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
@@ -962,7 +938,7 @@ def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                     populate_vlayer(v_layer, data, k, counter, group)
                 if 'qmlPath' in data[k] and data[k]['qmlPath']:
                     qml_path = data[k]['qmlPath']
-                    load_qml(v_layer, qml_path)
+                    tools_qgis.load_qml(v_layer, qml_path)
                 elif 'category_field' in data[k] and data[k]['category_field']:
                     cat_field = data[k]['category_field']
                     size = data[k]['size'] if 'size' in data[k] and data[k]['size'] else 2
@@ -3059,7 +3035,7 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
 
     # Attach model to selected widget
     if type(table_object) is str:
-        widget = tools_qt.getWidget(dialog, table_object)
+        widget = tools_qt.get_widget(dialog, table_object)
         if not widget:
             message = "Widget not found"
             tools_log.log_info(message, parameter=table_object)
@@ -3085,7 +3061,7 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
 def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardItemModel=False, schema_name=None):
     """ Configuration of tables. Set visibility and width of columns """
 
-    widget = tools_qt.getWidget(dialog, widget)
+    widget = tools_qt.get_widget(dialog, widget)
     if not widget:
         return
 

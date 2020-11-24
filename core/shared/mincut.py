@@ -118,9 +118,9 @@ class GwMincut:
         # These widgets are put from the api, mysteriously if we do something like:
         # self.dlg_mincut.address_add_muni.text() or self.dlg_mincut.address_add_muni.setDiabled(True) etc...
         # it doesn't count them, and that's why we have to force them
-        self.dlg_mincut.address_add_muni = tools_qt.getWidget(self.dlg_mincut, 'address_add_muni')
-        self.dlg_mincut.address_add_street = tools_qt.getWidget(self.dlg_mincut, 'address_add_street')
-        self.dlg_mincut.address_add_postnumber = tools_qt.getWidget(self.dlg_mincut, 'address_add_postnumber')
+        self.dlg_mincut.address_add_muni = tools_qt.get_widget(self.dlg_mincut, 'address_add_muni')
+        self.dlg_mincut.address_add_street = tools_qt.get_widget(self.dlg_mincut, 'address_add_street')
+        self.dlg_mincut.address_add_postnumber = tools_qt.get_widget(self.dlg_mincut, 'address_add_postnumber')
 
         self.result_mincut_id = self.dlg_mincut.findChild(QLineEdit, "result_mincut_id")
         self.customer_state = self.dlg_mincut.findChild(QLineEdit, "customer_state")
@@ -427,9 +427,9 @@ class GwMincut:
         # These widgets are put from the api, mysteriously if we do something like:
         # self.dlg_mincut.address_add_muni.text() or self.dlg_mincut.address_add_muni.setDiabled(True) etc...
         # it doesn't count them, and that's why we have to force them
-        self.dlg_fin.address_add_muni = tools_qt.getWidget(self.dlg_fin, 'address_add_muni')
-        self.dlg_fin.address_add_street = tools_qt.getWidget(self.dlg_fin, 'address_add_street')
-        self.dlg_fin.address_add_postnumber = tools_qt.getWidget(self.dlg_fin, 'address_add_postnumber')
+        self.dlg_fin.address_add_muni = tools_qt.get_widget(self.dlg_fin, 'address_add_muni')
+        self.dlg_fin.address_add_street = tools_qt.get_widget(self.dlg_fin, 'address_add_street')
+        self.dlg_fin.address_add_postnumber = tools_qt.get_widget(self.dlg_fin, 'address_add_postnumber')
 
         mincut = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         tools_qt.set_widget_text(self.dlg_fin, self.dlg_fin.mincut, mincut)

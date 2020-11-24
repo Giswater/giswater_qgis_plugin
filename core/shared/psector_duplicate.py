@@ -77,7 +77,7 @@ class GwPsectorDuplicate(QObject):
         if not change_tab:
             tools_gw.close_dialog(self.dlg_duplicate_psector)
         else:
-            tools_qt.getWidget(self.dlg_duplicate_psector, self.dlg_duplicate_psector.btn_accept).setEnabled(False)
+            tools_qt.get_widget(self.dlg_duplicate_psector, self.dlg_duplicate_psector.btn_accept).setEnabled(False)
             self.dlg_duplicate_psector.setWindowTitle(f'SUCCESS IN DUPLICATING PSECTOR')
 
         self.is_duplicated.emit()

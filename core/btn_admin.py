@@ -2776,10 +2776,10 @@ class GwAdmin:
         # Control if schema_version is updated to 3.2
         if str(self.project_version).replace('.', '') < str(self.plugin_version).replace('.', ''):
 
-            tools_qt.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(False)
-            tools_qt.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(False)
-            tools_qt.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(False)
-            tools_qt.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(False)
+            tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(False)
+            tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(False)
+            tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(False)
+            tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(False)
 
             self.dlg_readsql.cmb_feature_name_view.clear()
             self.dlg_readsql.cmb_formname_fields.clear()
@@ -2789,10 +2789,10 @@ class GwAdmin:
 
         else:
 
-            tools_qt.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
-            tools_qt.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(True)
-            tools_qt.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(True)
-            tools_qt.getWidget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(True)
+            tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
+            tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(True)
+            tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(True)
+            tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(True)
 
             sql = (f"SELECT cat_feature.child_layer, cat_feature.child_layer FROM {schema_name}.cat_feature "
                    f" ORDER BY id")
@@ -2938,7 +2938,7 @@ class GwAdmin:
         for column in range(widget.model().columnCount()):
             index = widget.model().index(row, column)
 
-            result = tools_qt.getWidget(self.dlg_manage_sys_fields,
+            result = tools_qt.get_widget(self.dlg_manage_sys_fields,
                                         str(widget.model().headerData(column, Qt.Horizontal)))
 
             if result is None:
@@ -2991,7 +2991,7 @@ class GwAdmin:
         for column in range(widget.model().columnCount()):
             index = widget.model().index(row, column)
 
-            result = tools_qt.getWidget(self.dlg_manage_fields, str(widget.model().headerData(column, Qt.Horizontal)))
+            result = tools_qt.get_widget(self.dlg_manage_fields, str(widget.model().headerData(column, Qt.Horizontal)))
             if result is None:
                 continue
 

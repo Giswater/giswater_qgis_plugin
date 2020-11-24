@@ -114,7 +114,7 @@ class Selector:
                 label = QLabel()
                 label.setObjectName('lbl_filter')
                 label.setText('Filter:')
-                if tools_qt.getWidget(dialog, 'txt_filter_' + str(form_tab['tabName'])) is None:
+                if tools_qt.get_widget(dialog, 'txt_filter_' + str(form_tab['tabName'])) is None:
                     widget = QLineEdit()
                     widget.setObjectName('txt_filter_' + str(form_tab['tabName']))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -126,7 +126,7 @@ class Selector:
                     widget.setLayoutDirection(Qt.RightToLeft)
 
                 else:
-                    widget = tools_qt.getWidget(dialog, 'txt_filter_' + str(form_tab['tabName']))
+                    widget = tools_qt.get_widget(dialog, 'txt_filter_' + str(form_tab['tabName']))
 
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = i
@@ -136,21 +136,21 @@ class Selector:
 
             if 'manageAll' in form_tab:
                 if (form_tab['manageAll']).lower() == 'true':
-                    if tools_qt.getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}") is None:
+                    if tools_qt.get_widget(dialog, f"lbl_manage_all_{form_tab['tabName']}") is None:
                         label = QLabel()
                         label.setObjectName(f"lbl_manage_all_{form_tab['tabName']}")
                         label.setText('Check all')
                     else:
-                        label = tools_qt.getWidget(dialog, f"lbl_manage_all_{form_tab['tabName']}")
+                        label = tools_qt.get_widget(dialog, f"lbl_manage_all_{form_tab['tabName']}")
 
-                    if tools_qt.getWidget(dialog, f"chk_all_{form_tab['tabName']}") is None:
+                    if tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}") is None:
                         widget = QCheckBox()
                         widget.setObjectName('chk_all_' + str(form_tab['tabName']))
                         widget.stateChanged.connect(partial(self.manage_all, dialog, widget, selector_vars))
                         widget.setLayoutDirection(Qt.RightToLeft)
 
                     else:
-                        widget = tools_qt.getWidget(dialog, f"chk_all_{form_tab['tabName']}")
+                        widget = tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}")
                     field['layoutname'] = gridlayout.objectName()
                     field['layoutorder'] = i
                     i = i + 1
@@ -266,7 +266,7 @@ class Selector:
         tools_qgis.refresh_map_canvas()
         self.get_selector(dialog, f'"{selector_type}"', is_setselector=json_result, selector_vars=selector_vars)
 
-        widget_filter = tools_qt.getWidget(dialog, f"txt_filter_{tab_name}")
+        widget_filter = tools_qt.get_widget(dialog, f"txt_filter_{tab_name}")
         if widget_filter and tools_qt.get_text(dialog, widget_filter, False, False) not in (None, ''):
             widget_filter.textChanged.emit(widget_filter.text())
 

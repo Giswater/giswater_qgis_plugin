@@ -986,3 +986,27 @@ def set_layer_index(layer_name):
     if layer:
         layer.dataProvider().forceReload()
         layer.triggerRepaint()
+
+
+def load_qml(layer, qml_path):
+    """ Apply QML style located in @qml_path in @layer
+    :param layer: layer to set qml (QgsVectorLayer)
+    :param qml_path: desired path (string)
+    :return: True or False (boolean)
+    """
+
+    if layer is None:
+        return False
+
+    if not os.path.exists(qml_path):
+        tools_log.log_warning("File not found", parameter=qml_path)
+        return False
+
+    if not qml_path.endswith(".qml"):
+        tools_log.log_warning("File extension not valid", parameter=qml_path)
+        return False
+
+    layer.loadNamedStyle(qml_path)
+    layer.triggerRepaint()
+
+    return True

@@ -1025,7 +1025,7 @@ class GwPsector:
 
         table_relation = "" + geom_type + "_plan"
         widget_name = "tbl_" + table_relation
-        widget = tools_qt.getWidget(self.dlg_plan_psector, widget_name)
+        widget = tools_qt.get_widget(self.dlg_plan_psector, widget_name)
         if widget:
             widget.setModel(None)
 
@@ -1089,7 +1089,7 @@ class GwPsector:
                             date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
                             value = date.dateTime().toString('yyyy-MM-dd HH:mm:ss')
                         elif widget_type is QComboBox:
-                            combo = tools_qt.getWidget(self.dlg_plan_psector, column_name)
+                            combo = tools_qt.get_widget(self.dlg_plan_psector, column_name)
                             value = str(tools_qt.get_combo_value(self.dlg_plan_psector, combo))
                         else:
                             value = tools_qt.get_text(self.dlg_plan_psector, column_name)
@@ -1118,7 +1118,7 @@ class GwPsector:
                                 date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
                                 values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss') + ", "
                             elif widget_type is QComboBox:
-                                combo = tools_qt.getWidget(self.dlg_plan_psector, column_name)
+                                combo = tools_qt.get_widget(self.dlg_plan_psector, column_name)
                                 value = str(tools_qt.get_combo_value(self.dlg_plan_psector, combo))
                             else:
                                 value = tools_qt.get_text(self.dlg_plan_psector, column_name)

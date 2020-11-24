@@ -144,7 +144,7 @@ def set_time(dialog, widget, time):
         widget.setTime(time)
 
 
-def getWidget(dialog, widget):
+def get_widget(dialog, widget):
 
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
@@ -528,7 +528,7 @@ def set_completer_object(dialog, table_object, field_object_id="id"):
         getting id's from selected @table_object
     """
 
-    widget = getWidget(dialog, table_object + "_id")
+    widget = get_widget(dialog, table_object + "_id")
     if not widget:
         return
 
@@ -738,7 +738,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
     geom_type = tools_gw.get_signal_change_tab(dialog, table_object)
     if type(table_object) is str:
         widget_name = f"tbl_{table_object}_x_{geom_type}"
-        widget = getWidget(dialog, widget_name)
+        widget = get_widget(dialog, widget_name)
         if not widget:
             message = "Widget not found"
             tools_gw.show_warning(message, parameter=widget_name)
@@ -1246,7 +1246,7 @@ def reload_table(dialog, table_object, geom_type, expr_filter):
 
     if type(table_object) is str:
         widget_name = f"tbl_{table_object}_x_{geom_type}"
-        widget = getWidget(dialog, widget_name)
+        widget = get_widget(dialog, widget_name)
         if not widget:
             message = "Widget not found"
             tools_log.log_info(message, parameter=widget_name)
@@ -1267,7 +1267,7 @@ def reset_model(dialog, table_object, geom_type):
 
     table_relation = f"{table_object}_x_{geom_type}"
     widget_name = f"tbl_{table_relation}"
-    widget = getWidget(dialog, widget_name)
+    widget = get_widget(dialog, widget_name)
     if widget:
         widget.setModel(None)
 
@@ -1381,7 +1381,7 @@ def reload_qtable(dialog, geom_type):
 
     value = get_text(dialog, dialog.psector_id)
     expr = f"psector_id = '{value}'"
-    qtable = getWidget(dialog, f'tbl_psector_x_{geom_type}')
+    qtable = get_widget(dialog, f'tbl_psector_x_{geom_type}')
     fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
     tools_gw.set_tablemodel_config(dialog, qtable, f"plan_psector_x_{geom_type}")
     tools_qgis.refresh_map_canvas()

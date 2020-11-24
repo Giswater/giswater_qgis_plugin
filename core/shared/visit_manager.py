@@ -356,7 +356,7 @@ class GwVisitManager:
 
             # do selection allowing @table_name to be linked to canvas selectionChanged
             widget_name = f'tbl_visit_x_{self.geom_type}'
-            widget_table = tools_qt.getWidget(self.dlg_add_visit, widget_name)
+            widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
             tools_qgis.disconnect_signal_selection_changed()
             tools_qgis.connect_signal_selection_changed(self.dlg_add_visit, widget_table, geom_type=self.geom_type)
             tools_qgis.select_features_by_ids(self.geom_type, expr)
@@ -598,7 +598,7 @@ class GwVisitManager:
 
         # for each showed element of a specific geom_type create an db entry
         column_name = f"{geom_type}_id"
-        widget = tools_qt.getWidget(self.dlg_add_visit, f"tbl_visit_x_{geom_type}")
+        widget = tools_qt.get_widget(self.dlg_add_visit, f"tbl_visit_x_{geom_type}")
         if not widget:
             message = "Widget not found"
             tools_log.log_info(message, parameter=f"tbl_visit_x_{geom_type}")
@@ -747,7 +747,7 @@ class GwVisitManager:
         # tools_gw.hide_parent_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_visit_x_{self.geom_type}"
         viewname = f"v_edit_{self.geom_type}"
-        widget_table = tools_qt.getWidget(self.dlg_add_visit, widget_name)
+        widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
 
         try:
             self.dlg_add_visit.btn_feature_insert.clicked.disconnect()
@@ -825,7 +825,7 @@ class GwVisitManager:
         # set the callback to setup all events later
         # its not possible to setup listener in this moment beacouse set_table_model without
         # a valid expression parameter return a None model => no events can be triggered
-        widget_table = tools_qt.getWidget(dialog, widget_name)
+        widget_table = tools_qt.get_widget(dialog, widget_name)
         self.lazy_widget, self.lazy_init_function = self.lazy_configuration(widget_table, self.config_relation_table)
 
         # check if there are features related to the current visit
@@ -867,7 +867,7 @@ class GwVisitManager:
 
         if widget_table is None:
             widget_name = f'tbl_visit_x_{geom_type}'
-            widget_table = tools_qt.getWidget(self.dlg_add_visit, widget_name)
+            widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
 
         # Do selection allowing @widget_table to be linked to canvas selectionChanged
         tools_qgis.disconnect_signal_selection_changed()
@@ -1612,7 +1612,7 @@ class GwVisitManager:
     def set_configuration(self, dialog, widget, table_name):
         """ Configuration of tables. Set visibility and width of columns """
 
-        widget = tools_qt.getWidget(dialog, widget)
+        widget = tools_qt.get_widget(dialog, widget)
         if not widget:
             return
 
@@ -1653,7 +1653,7 @@ class GwVisitManager:
         node_list = []
         if self.geom_type != 'all':
             widget_name = f"tbl_visit_x_{self.geom_type}"
-            widget_table = tools_qt.getWidget(self.dlg_add_visit, widget_name)
+            widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
             node_1 = widget_table.model().record(0).value('node_1')
             node_2 = widget_table.model().record(0).value('node_2')
         else:
@@ -1684,7 +1684,7 @@ class GwVisitManager:
         tools_gw.hide_parent_layers(excluded_layers=excluded_layers)
         widget_name = f"tbl_{table_object}_x_{self.geom_type}"
         viewname = f"v_edit_{self.geom_type}"
-        widget_table = tools_qt.getWidget(dialog, widget_name)
+        widget_table = tools_qt.get_widget(dialog, widget_name)
 
         try:
             self.dlg_add_visit.btn_feature_insert.clicked.disconnect()
