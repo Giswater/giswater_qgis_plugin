@@ -123,7 +123,7 @@ class GwDimensioning:
                     layout.addWidget(label, 0, field['layoutorder'])
                     layout.addWidget(widget, 1, field['layoutorder'])
                 else:
-                    tools_gw.put_widgets(self.dlg_dim, field, label, widget)
+                    tools_gw.add_widget(self.dlg_dim, field, label, widget)
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:

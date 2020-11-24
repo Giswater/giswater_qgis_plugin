@@ -373,7 +373,7 @@ class GwInfo(QObject):
 
         for x in range(self.tab_main.count() - 1, 0, -1):
             if self.tab_main.widget(x).objectName() not in tabs_to_show:
-                tools_qt.remove_tab_by_tabName(self.tab_main, self.tab_main.widget(x).objectName())
+                tools_qt.remove_tab(self.tab_main, self.tab_main.widget(x).objectName())
 
         # Actions
         action_edit = self.dlg_cf.findChild(QAction, "actionEdit")
@@ -475,7 +475,7 @@ class GwInfo(QObject):
                     layout.addWidget(label, 0, field['layoutorder'])
                     layout.addWidget(widget, 1, field['layoutorder'])
                 else:
-                    tools_gw.put_widgets(self.dlg_cf, field, label, widget)
+                    tools_gw.add_widget(self.dlg_cf, field, label, widget)
 
         # Add a QSpacerItem into each QGridLayout of the list
         for layout in layout_list:
@@ -2136,7 +2136,7 @@ class GwInfo(QObject):
 
         if not row:
             # Hide tab 'relations'
-            tools_qt.remove_tab_by_tabName(self.tab_main, "relations")
+            tools_qt.remove_tab(self.tab_main, "relations")
 
         else:
             # Manage signal 'doubleClicked'

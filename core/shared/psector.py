@@ -89,7 +89,7 @@ class GwPsector:
         if self.project_type.upper() == 'UD':
             self.layers['gully'] = tools_gw.get_group_layers('gully')
         else:
-            tools_qt.remove_tab_by_tabName(self.dlg_plan_psector.tab_feature, 'tab_gully')
+            tools_qt.remove_tab(self.dlg_plan_psector.tab_feature, 'tab_gully')
 
         self.update = False  # if false: insert; if true: update
 
@@ -156,7 +156,7 @@ class GwPsector:
 
         if self.plan_om == 'om':
             self.populate_result_id(self.dlg_plan_psector.result_id, 'om_result_cat')
-            tools_qt.remove_tab_by_tabName(self.dlg_plan_psector.tabWidget, 'tab_document')
+            tools_qt.remove_tab(self.dlg_plan_psector.tabWidget, 'tab_document')
             self.dlg_plan_psector.chk_enable_all.setVisible(False)
         elif self.plan_om == 'plan':
             self.dlg_plan_psector.lbl_result_id.setVisible(False)
@@ -504,11 +504,11 @@ class GwPsector:
         psector_id = tools_qt.get_text(self.dlg_plan_psector, "psector_id")
         sql = f"SELECT gw_fct_plan_psector_enableall({value}, '{psector_id}')"
         self.controller.execute_sql(sql)
-        tools_qt.reload_qtable(self.dlg_plan_psector, 'arc')
-        tools_qt.reload_qtable(self.dlg_plan_psector, 'node')
-        tools_qt.reload_qtable(self.dlg_plan_psector, 'connec')
+        tools_gw.reload_qtable(self.dlg_plan_psector, 'arc')
+        tools_gw.reload_qtable(self.dlg_plan_psector, 'node')
+        tools_gw.reload_qtable(self.dlg_plan_psector, 'connec')
         if self.project_type.upper() == 'UD':
-            tools_qt.reload_qtable(self.dlg_plan_psector, 'gully')
+            tools_gw.reload_qtable(self.dlg_plan_psector, 'gully')
 
         sql = (f"UPDATE plan_psector "
                f"SET enable_all = '{value}' "
@@ -1416,7 +1416,7 @@ class GwPsector:
         manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.manage_document(tablename='psector', qtable=qtable, item_id=psector_id)
         dlg_docman.btn_accept.clicked.connect(partial(tools_qt.set_completer_object, dlg_docman, 'doc'))
-        tools_qt.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
+        tools_qt.remove_tab(dlg_docman.tabWidget, 'tab_rel')
 
 
     def show_status_warning(self):

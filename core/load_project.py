@@ -56,7 +56,7 @@ class LoadProject(QObject):
 
         # Manage schema name
         tools_db.get_current_user()
-        layer_source = tools_qgis.qgis_get_layer_source(self.layer_node)
+        layer_source = tools_qgis.get_layer_source(self.layer_node)
         self.schema_name = layer_source['schema']
         self.schema_name = self.schema_name.replace('"', '')
         tools_gw.set_config_parser('load_project', 'schema_name', f'{self.schema_name}')
@@ -323,10 +323,10 @@ class LoadProject(QObject):
     def manage_snapping_layers(self):
         """ Manage snapping of layers """
 
-        tools_qgis.qgis_manage_snapping_layer('v_edit_arc', snapping_type=2)
-        tools_qgis.qgis_manage_snapping_layer('v_edit_connec', snapping_type=0)
-        tools_qgis.qgis_manage_snapping_layer('v_edit_node', snapping_type=0)
-        tools_qgis.qgis_manage_snapping_layer('v_edit_gully', snapping_type=0)
+        tools_qgis.manage_snapping_layer('v_edit_arc', snapping_type=2)
+        tools_qgis.manage_snapping_layer('v_edit_connec', snapping_type=0)
+        tools_qgis.manage_snapping_layer('v_edit_node', snapping_type=0)
+        tools_qgis.manage_snapping_layer('v_edit_gully', snapping_type=0)
 
 
     def check_user_roles(self):

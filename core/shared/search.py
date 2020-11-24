@@ -556,7 +556,7 @@ class GwSearch:
         manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.manage_document(tablename='workcat', qtable=qtable, item_id=item_id)
         dlg_docman.btn_accept.clicked.connect(partial(tools_qt.set_completer_object, dlg_docman, 'doc'))
-        tools_qt.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
+        tools_qt.remove_tab(dlg_docman.tabWidget, 'tab_rel')
 
 
     def get_current_selectors(self):

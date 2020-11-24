@@ -412,7 +412,7 @@ class DaoController:
     def get_layer_source(self, layer):
         """ Get database connection paramaters of @layer """
 
-        return tools_qgis.qgis_get_layer_source(layer)
+        return tools_qgis.get_layer_source(layer)
 
 
     def get_layer_source_table_name(self, layer):
@@ -424,7 +424,7 @@ class DaoController:
     def get_layer_primary_key(self, layer=None):
         """ Get primary key of selected layer """
 
-        return tools_qgis.qgis_get_layer_primary_key(layer)
+        return tools_qgis.get_primary_key(layer)
 
 
     def get_log_folder(self):
@@ -438,7 +438,7 @@ class DaoController:
     def get_layers(self):
         """ Return layers in the same order as listed in TOC """
 
-        return tools_qgis.qgis_get_layers()
+        return tools_qgis.get_project_layers()
 
 
     def set_search_path(self, schema_name):

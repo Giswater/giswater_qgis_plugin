@@ -167,9 +167,9 @@ class GwAdmin:
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
         if self.dev_user != 'TRUE':
-            tools_qt.remove_tab_by_tabName(self.dlg_readsql.tab_main, "schema_manager")
-            tools_qt.remove_tab_by_tabName(self.dlg_readsql.tab_main, "api_manager")
-            tools_qt.remove_tab_by_tabName(self.dlg_readsql.tab_main, "custom")
+            tools_qt.remove_tab(self.dlg_readsql.tab_main, "schema_manager")
+            tools_qt.remove_tab(self.dlg_readsql.tab_main, "api_manager")
+            tools_qt.remove_tab(self.dlg_readsql.tab_main, "custom")
             self.project_types = self.settings.value('system_variables/project_types')
         else:
             self.project_types = self.settings.value('system_variables/project_types_dev')
@@ -1912,7 +1912,7 @@ class GwAdmin:
 
     def visit_manager(self):
         # TODO:: Remove tab visitclas. WIP
-        tools_qt.remove_tab_by_tabName(self.dlg_readsql.tab_main, "visitclass")
+        tools_qt.remove_tab(self.dlg_readsql.tab_main, "visitclass")
         return
         # Populate visit class
         # TODO:: Populate combo from visitclass manager and wip
@@ -2839,7 +2839,7 @@ class GwAdmin:
         for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
             if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != 'tab_update':
                 tab_name = self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()
-                tools_qt.remove_tab_by_tabName(self.dlg_manage_sys_fields.tab_sys_add_fields, tab_name)
+                tools_qt.remove_tab(self.dlg_manage_sys_fields.tab_sys_add_fields, tab_name)
             form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_feature_sys_fields)
 
         self.manage_update_field(self.dlg_manage_sys_fields, form_name_fields, tableview='ve_config_sysfields')
@@ -2869,7 +2869,7 @@ class GwAdmin:
         # Remove unused tabs
         for x in range(self.dlg_manage_fields.tab_add_fields.count() - 1, -1, -1):
             if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != f'tab_{action}':
-                tools_qt.remove_tab_by_tabName(
+                tools_qt.remove_tab(
                     self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
         form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
@@ -2928,7 +2928,7 @@ class GwAdmin:
         # Remove unused tabs
         for x in range(self.dlg_manage_sys_fields.tab_sys_add_fields.count() - 1, -1, -1):
             if str(self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName()) != str('tab_create'):
-                tools_qt.remove_tab_by_tabName(self.dlg_manage_sys_fields.tab_sys_add_fields,
+                tools_qt.remove_tab(self.dlg_manage_sys_fields.tab_sys_add_fields,
                                                self.dlg_manage_sys_fields.tab_sys_add_fields.widget(x).objectName())
 
         window_title = 'Update field on "' + str(form_name_fields) + '"'
@@ -2979,7 +2979,7 @@ class GwAdmin:
         # Remove unused tabs
         for x in range(self.dlg_manage_fields.tab_add_fields.count() - 1, -1, -1):
             if str(self.dlg_manage_fields.tab_add_fields.widget(x).objectName()) != str('tab_create'):
-                tools_qt.remove_tab_by_tabName(self.dlg_manage_fields.tab_add_fields,
+                tools_qt.remove_tab(self.dlg_manage_fields.tab_add_fields,
                                                self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
         window_title = 'Update field on "' + str(form_name_fields) + '"'

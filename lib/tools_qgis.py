@@ -285,7 +285,7 @@ def get_project_variable(var_name):
         return value
 
 
-def qgis_get_layers():
+def get_project_layers():
     """ Return layers in the same order as listed in TOC """
 
     layers = [layer.layer() for layer in QgsProject.instance().layerTreeRoot().findLayers()]
@@ -293,7 +293,7 @@ def qgis_get_layers():
     return layers
 
 
-def qgis_get_layer_source(layer):
+def get_layer_source(layer):
     """ Get database connection paramaters of @layer """
 
     # Initialize variables
@@ -343,7 +343,7 @@ def qgis_get_layer_source_table_name(layer):
     return uri_table
 
 
-def qgis_get_layer_schema(layer):
+def get_layer_schema(layer):
     """ Get table or view schema_name of selected layer """
 
     if layer is None:
@@ -361,7 +361,7 @@ def qgis_get_layer_schema(layer):
     return table_schema
 
 
-def qgis_get_layer_primary_key(layer=None):
+def get_primary_key(layer=None):
     """ Get primary key of selected layer """
 
     uri_pk = None
@@ -382,7 +382,7 @@ def qgis_get_layer_by_tablename(tablename, show_warning=False, log_info=False, s
     """ Iterate over all layers and get the one with selected @tablename """
 
     # Check if we have any layer loaded
-    layers = qgis_get_layers()
+    layers = get_project_layers()
     if len(layers) == 0:
         return None
 
@@ -393,7 +393,7 @@ def qgis_get_layer_by_tablename(tablename, show_warning=False, log_info=False, s
         schema_name = project_vars['main_schema']
     for cur_layer in layers:
         uri_table = qgis_get_layer_source_table_name(cur_layer)
-        table_schema = qgis_get_layer_schema(cur_layer)
+        table_schema = get_layer_schema(cur_layer)
         if (uri_table is not None and uri_table == tablename) and schema_name in ('', None, table_schema):
             layer = cur_layer
             break
@@ -409,7 +409,7 @@ def qgis_get_layer_by_tablename(tablename, show_warning=False, log_info=False, s
     return layer
 
 
-def qgis_manage_snapping_layer(layername, snapping_type=0, tolerance=15.0):
+def manage_snapping_layer(layername, snapping_type=0, tolerance=15.0):
     """ Manage snapping of @layername """
 
     layer = qgis_get_layer_by_tablename(layername)
@@ -562,7 +562,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type
         insert_feature_to_plan(dialog, geom_type, ids=ids)
         layers = remove_selection()
     else:
-        tools_qt.reload_table(dialog, table_object, geom_type, expr_filter)
+        tools_gw.load_table(dialog, table_object, geom_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Update list
@@ -583,7 +583,7 @@ def insert_feature_to_plan(dialog, geom_type, ids=None):
         sql = f"INSERT INTO plan_psector_x_{geom_type} ({geom_type}_id, psector_id) "
         sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"
         global_vars.controller.execute_sql(sql)
-        tools_qt.reload_qtable(dialog, geom_type)
+        tools_gw.reload_qtable(dialog, geom_type)
 
 
 def disconnect_snapping():

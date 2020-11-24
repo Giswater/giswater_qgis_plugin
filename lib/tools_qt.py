@@ -449,7 +449,7 @@ def set_combo_item_select_unselectable(qcombo, list_id=[], column=0, opt=0):
             qcombo.model().setData(index, opt, Qt.UserRole - 1)
 
 
-def remove_tab_by_tabName(tab_widget, tab_name):
+def remove_tab(tab_widget, tab_name):
     """ Look in @tab_widget for a tab with @tab_name and remove it """
 
     for x in range(0, tab_widget.count()):
@@ -790,9 +790,9 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
     # Update model of the widget with selected expr_filter
     if query:
         delete_feature_at_plan(dialog, geom_type, list_id)
-        reload_qtable(dialog, geom_type)
+        tools_gw.reload_qtable(dialog, geom_type)
     else:
-        reload_table(dialog, table_object, geom_type, expr_filter)
+        tools_gw.load_table(dialog, table_object, geom_type, expr_filter)
         set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Select features with previous filter
@@ -1151,7 +1151,7 @@ def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=N
     """ Check if selected object (document or element) already exists """
 
     # Reset list of selected records
-    tools_gw.reset_lists(ids, list_ids)
+    tools_gw.reset_feature_list(ids, list_ids)
 
     field_object_id = "id"
     if table_object == "element":
@@ -1208,27 +1208,6 @@ def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=N
         ids, layers, list_ids = tools_gw.get_rows_by_feature_type(dialog, table_object, "gully", ids=ids, list_ids=list_ids, layers=layers)
 
     return layers, ids, list_ids
-
-
-def reload_table(dialog, table_object, geom_type, expr_filter):
-    """ Reload @widget with contents of @tablename applying selected @expr_filter """
-
-    if type(table_object) is str:
-        widget_name = f"tbl_{table_object}_x_{geom_type}"
-        widget = get_widget(dialog, widget_name)
-        if not widget:
-            message = "Widget not found"
-            tools_log.log_info(message, parameter=widget_name)
-            return None
-    elif type(table_object) is QTableView:
-        widget = table_object
-    else:
-        msg = "Table_object is not a table name or QTableView"
-        tools_log.log_info(msg)
-        return None
-
-    expr = tools_gw.set_table_model(dialog, widget, geom_type, expr_filter)
-    return expr
 
 
 def reset_model(dialog, table_object, geom_type):
@@ -1328,17 +1307,6 @@ def set_combo_from_param_user(dialog, widget, table_name, parameter, field_id='i
     row = global_vars.controller.get_row(sql)
     if row:
         set_widget_text(dialog, widget, row[0])
-
-
-def reload_qtable(dialog, geom_type):
-    """ Reload QtableView """
-
-    value = get_text(dialog, dialog.psector_id)
-    expr = f"psector_id = '{value}'"
-    qtable = get_widget(dialog, f'tbl_psector_x_{geom_type}')
-    fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
-    tools_gw.set_tablemodel_config(dialog, qtable, f"plan_psector_x_{geom_type}")
-    tools_qgis.refresh_map_canvas()
 
 
 def fill_table_by_expr(qtable, table_name, expr):

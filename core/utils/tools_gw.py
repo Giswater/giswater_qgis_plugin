@@ -752,7 +752,7 @@ def enable_feature_type(dialog, widget_name='tbl_relation', ids=None):
             feature_type.setEnabled(True)
 
 
-def reset_lists(ids, list_ids):
+def reset_feature_list(ids, list_ids):
     """ Reset list of selected records """
 
     ids = []
@@ -761,7 +761,7 @@ def reset_lists(ids, list_ids):
     return ids, list_ids
 
 
-def reset_layers(layers):
+def reset_feature_layers(layers):
     """ Reset list of layers """
 
     layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
@@ -1558,10 +1558,10 @@ def construct_form_param_user(dialog, row, pos, _json, temp_layers_added=None):
             if 'iseditable' in field:
                 widget.setEnabled(bool(field['iseditable']))
 
-            put_widgets(dialog, field, lbl, widget)
+            add_widget(dialog, field, lbl, widget)
 
 
-def put_widgets(dialog, field, lbl, widget):
+def add_widget(dialog, field, lbl, widget):
     """ Insert widget into layout """
 
     layout = dialog.findChild(QGridLayout, field['layoutname'])
@@ -2743,9 +2743,9 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
         tools_qgis.insert_feature_to_plan(dialog, geom_type, ids=ids)
         if plan_om == 'plan':
             layers = tools_qgis.remove_selection()
-        tools_qt.reload_qtable(dialog, geom_type)
+        reload_qtable(dialog, geom_type)
     else:
-        tools_qt.reload_table(dialog, table_object, geom_type, expr_filter)
+        load_table(dialog, table_object, geom_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Remove selection in generic 'v_edit' layers
@@ -3220,3 +3220,35 @@ def set_calendar_by_user_param(dialog, widget, table_name, value, parameter):
     else:
         date = QDate.currentDate()
     tools_qt.set_calendar(dialog, widget, date)
+
+
+def load_table(dialog, table_object, geom_type, expr_filter):
+    """ Reload @widget with contents of @tablename applying selected @expr_filter """
+
+    if type(table_object) is str:
+        widget_name = f"tbl_{table_object}_x_{geom_type}"
+        widget = tools_qt.get_widget(dialog, widget_name)
+        if not widget:
+            message = "Widget not found"
+            tools_log.log_info(message, parameter=widget_name)
+            return None
+    elif type(table_object) is QTableView:
+        widget = table_object
+    else:
+        msg = "Table_object is not a table name or QTableView"
+        tools_log.log_info(msg)
+        return None
+
+    expr = set_table_model(dialog, widget, geom_type, expr_filter)
+    return expr
+
+
+def reload_qtable(dialog, geom_type):
+    """ Reload QtableView """
+
+    value = tools_qt.get_text(dialog, dialog.psector_id)
+    expr = f"psector_id = '{value}'"
+    qtable = tools_qt.get_widget(dialog, f'tbl_psector_x_{geom_type}')
+    tools_qt.fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
+    set_tablemodel_config(dialog, qtable, f"plan_psector_x_{geom_type}")
+    tools_qgis.refresh_map_canvas()

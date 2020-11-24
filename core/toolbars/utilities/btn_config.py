@@ -202,7 +202,7 @@ class GwConfigButton(GwParentAction):
         # Check user/role and remove tabs
         role_admin = tools_db.check_role_user("role_admin", cur_user)
         if not role_admin and cur_user not in super_users:
-            tools_qt.remove_tab_by_tabName(self.dlg_config.tab_main, "tab_admin")
+            tools_qt.remove_tab(self.dlg_config.tab_main, "tab_admin")
 
         # Open form
         tools_gw.open_dialog(self.dlg_config, dlg_name='config')

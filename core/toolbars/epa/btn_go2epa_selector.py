@@ -29,9 +29,9 @@ class GwGo2EpaSelectorButton(GwParentAction):
         self.dlg_go2epa_result = Go2EpaSelectorUi()
         tools_gw.load_settings(self.dlg_go2epa_result)
         if self.project_type == 'ud':
-            tools_qt.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_time")
+            tools_qt.remove_tab(self.dlg_go2epa_result.tabWidget, "tab_time")
         if self.project_type == 'ws':
-            tools_qt.remove_tab_by_tabName(self.dlg_go2epa_result.tabWidget, "tab_datetime")
+            tools_qt.remove_tab(self.dlg_go2epa_result.tabWidget, "tab_datetime")
         self.dlg_go2epa_result.btn_accept.clicked.connect(self.result_selector_accept)
         self.dlg_go2epa_result.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_result))
         self.dlg_go2epa_result.rejected.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_result))

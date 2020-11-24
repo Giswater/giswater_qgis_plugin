@@ -131,7 +131,7 @@ class Selector:
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = i
                 i = i + 1
-                tools_gw.put_widgets(dialog, field, label, widget)
+                tools_gw.add_widget(dialog, field, label, widget)
                 widget.setFocus()
 
             if 'manageAll' in form_tab:
@@ -154,7 +154,7 @@ class Selector:
                     field['layoutname'] = gridlayout.objectName()
                     field['layoutorder'] = i
                     i = i + 1
-                    tools_gw.put_widgets(dialog, field, label, widget)
+                    tools_gw.add_widget(dialog, field, label, widget)
 
             for order, field in enumerate(form_tab['fields']):
                 label = QLabel()
@@ -167,7 +167,7 @@ class Selector:
 
                 field['layoutname'] = gridlayout.objectName()
                 field['layoutorder'] = order + i
-                tools_gw.put_widgets(dialog, field, label, widget)
+                tools_gw.add_widget(dialog, field, label, widget)
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)

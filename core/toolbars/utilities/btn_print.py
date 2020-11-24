@@ -125,7 +125,7 @@ class GwPrintButton(GwParentAction):
 
         for field in fields['fields']:
             label, widget = self.set_widgets_into_composer(dialog, field, self.my_json)
-            tools_gw.put_widgets(dialog, field, label, widget)
+            tools_gw.add_widget(dialog, field, label, widget)
             tools_gw.get_values(dialog, widget, self.my_json)
 
 

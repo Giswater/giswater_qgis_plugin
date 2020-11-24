@@ -118,7 +118,7 @@ class GwVisitManager:
 
         # Remove 'gully' for 'WS'
         if tools_gw.get_project_type() == 'ws':
-            tools_qt.remove_tab_by_tabName(self.dlg_add_visit.tab_feature, 'tab_gully')
+            tools_qt.remove_tab(self.dlg_add_visit.tab_feature, 'tab_gully')
 
         # Feature type of selected parameter
         self.feature_type_parameter = None
@@ -1100,7 +1100,7 @@ class GwVisitManager:
         manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.manage_document(
             tablename='visit', qtable=self.dlg_add_visit.tbl_document, item_id=visit_id)
-        tools_qt.remove_tab_by_tabName(dlg_docman.tabWidget, 'tab_rel')
+        tools_qt.remove_tab(dlg_docman.tabWidget, 'tab_rel')
         dlg_docman.btn_accept.clicked.connect(partial(tools_qt.set_completer_object, dlg_docman, 'doc'))
 
 

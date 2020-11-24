@@ -68,7 +68,7 @@ class GwDocument:
         # Remove 'gully' for 'WS'
         self.project_type = tools_gw.get_project_type()
         if self.project_type == 'ws':
-            tools_qt.remove_tab_by_tabName(self.dlg_add_doc.tab_feature, 'tab_gully')
+            tools_qt.remove_tab(self.dlg_add_doc.tab_feature, 'tab_gully')
 
         else:
             self.layers['gully'] = tools_gw.get_group_layers('gully')
