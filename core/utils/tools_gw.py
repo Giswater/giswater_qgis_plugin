@@ -2699,7 +2699,7 @@ def selection_init(dialog, table_object, query=False, geom_type=None, layers=Non
     global_vars.canvas.setCursor(cursor)
 
 
-def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None, layers=None,
+def selection_changed(dialog, table_object, geom_type, query=False, layers=None,
                       list_ids={"arc":[], "node":[], "connec":[], "gully":[], "element":[]}, lazy_widget=None,
                       lazy_init_function=None):
     """ Slot function for signal 'canvas.selectionChanged' """
@@ -2741,16 +2741,14 @@ def selection_changed(dialog, table_object, geom_type, query=False, plan_om=None
     # Reload contents of table 'tbl_@table_object_x_@geom_type'
     if query:
         tools_qgis.insert_feature_to_plan(dialog, geom_type, ids=ids)
-        if plan_om == 'plan':
-            layers = tools_qgis.remove_selection()
+        layers = tools_qgis.remove_selection()
         reload_qtable(dialog, geom_type)
     else:
         load_table(dialog, table_object, geom_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Remove selection in generic 'v_edit' layers
-    if plan_om == 'plan':
-        layers = tools_qgis.remove_selection(False)
+    layers = tools_qgis.remove_selection(False)
 
     enable_feature_type(dialog, table_object, ids=ids)
 

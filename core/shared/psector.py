@@ -41,7 +41,7 @@ class GwPsector:
         self.rubber_band = QgsRubberBand(self.canvas)
 
 
-    def new_psector(self, psector_id=None, plan_om=None, is_api=False):
+    def new_psector(self, psector_id=None, is_api=False):
         """ Buttons 45 and 81: New psector """
 
         row = tools_gw.get_config(parameter='admin_currency', columns='value::text', table='config_param_system')
@@ -51,7 +51,6 @@ class GwPsector:
         # Create the dialog and signals
         self.dlg_plan_psector = Plan_psector()
         tools_gw.load_settings(self.dlg_plan_psector)
-        self.plan_om = str(plan_om)
 
         # Capture the current layer to return it at the end of the operation
         cur_active_layer = self.iface.activeLayer()
@@ -114,10 +113,7 @@ class GwPsector:
         self.ext_code = self.dlg_plan_psector.findChild(QLineEdit, "ext_code")
         self.cmb_psector_type = self.dlg_plan_psector.findChild(QComboBox, "psector_type")
         self.cmb_expl_id = self.dlg_plan_psector.findChild(QComboBox, "expl_id")
-        self.cmb_result_id = self.dlg_plan_psector.findChild(QComboBox, "result_id")
         self.cmb_status = self.dlg_plan_psector.findChild(QComboBox, "status")
-        self.dlg_plan_psector.lbl_result_id.setVisible(True)
-        self.cmb_result_id.setVisible(True)
 
         scale = self.dlg_plan_psector.findChild(QLineEdit, "scale")
         scale.setValidator(QDoubleValidator())
@@ -147,15 +143,6 @@ class GwPsector:
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status'"
         rows = self.controller.get_rows(sql)
         tools_qt.fill_combo_values(self.cmb_status, rows, 1)
-
-        if self.plan_om == 'om':
-            self.populate_result_id(self.dlg_plan_psector.result_id, 'om_result_cat')
-            tools_qt.remove_tab(self.dlg_plan_psector.tabWidget, 'tab_document')
-            self.dlg_plan_psector.chk_enable_all.setVisible(False)
-        elif self.plan_om == 'plan':
-            self.dlg_plan_psector.lbl_result_id.setVisible(False)
-            self.cmb_result_id.setVisible(False)
-            self.dlg_plan_psector.chk_enable_all.setEnabled(False)
 
         # tab Bugdet
         gexpenses = self.dlg_plan_psector.findChild(QLineEdit, "gexpenses")
@@ -306,11 +293,10 @@ class GwPsector:
                        f"WHERE cur_user = current_user")
                 self.controller.execute_sql(sql)
                 self.insert_psector_selector('selector_plan_psector', 'psector_id', psector_id_aux)
-            if self.plan_om == 'plan':
-                sql = (f"DELETE FROM selector_psector "
-                       f"WHERE cur_user = current_user AND psector_id = '{psector_id_aux}'")
-                self.controller.execute_sql(sql)
-                self.insert_psector_selector('selector_psector', 'psector_id', psector_id_aux)
+            sql = (f"DELETE FROM selector_psector "
+                   f"WHERE cur_user = current_user AND psector_id = '{psector_id_aux}'")
+            self.controller.execute_sql(sql)
+            self.insert_psector_selector('selector_psector', 'psector_id', psector_id_aux)
             layer = None
             if not is_api:
                 layername = f'v_edit_plan_psector'
@@ -370,8 +356,6 @@ class GwPsector:
                                                                  'v_edit_plan_psector', True))
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
-        self.dlg_plan_psector.psector_type.currentIndexChanged.connect(partial(self.populate_result_id,
-            self.dlg_plan_psector.result_id, 'plan_result_cat'))
         self.dlg_plan_psector.rejected.connect(partial(self.close_psector, cur_active_layer))
         self.dlg_plan_psector.chk_enable_all.stateChanged.connect(partial(self.enable_all))
 
@@ -624,10 +608,6 @@ class GwPsector:
         if tools_qt.isChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail):
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_path')
             viewname = f"v_plan_current_psector_budget_detail"
-            if self.plan_om == 'om' and self.dlg_plan_psector.psector_type.currentIndex() == 0:
-                viewname = 'v_om_current_psector_budget_detail_rec'
-            elif self.plan_om == 'om' and self.dlg_plan_psector.psector_type.currentIndex() == 1:
-                viewname = 'v_om_current_psector_budget_detail_reh'
             if file_name is None or file_name == 'null':
                 message = "Price list csv file name is required"
                 tools_gw.show_warning(message)
@@ -840,8 +820,8 @@ class GwPsector:
         try:
             # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.canvas.selectionChanged.connect(
-                partial(tools_gw.selection_changed, dialog, table_object, self.geom_type, query, plan_om='plan',
-                        layers=self.layers, list_ids=self.list_ids))
+                partial(tools_gw.selection_changed, dialog, table_object, self.geom_type, query, layers=self.layers,
+                        list_ids=self.list_ids))
         except Exception:
             pass
 
@@ -931,29 +911,6 @@ class GwPsector:
                     widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
                 elif type(widget) in (QComboBox, QCheckBox, QTableView, QPushButton):
                     widget.setEnabled(False)
-
-
-    def populate_result_id(self, combo, table_name):
-
-        index = self.dlg_plan_psector.psector_type.itemData(self.dlg_plan_psector.psector_type.currentIndex())
-        sql = (f"SELECT result_type, name FROM {table_name}"
-               f" WHERE result_type = {index[0]} ORDER BY name DESC")
-        rows = self.controller.get_rows(sql)
-        if not rows:
-            return False
-
-        records = []
-        for row in rows:
-            elem = [row[0], row[1]]
-            records.append(elem)
-
-        combo.blockSignals(True)
-        combo.clear()
-
-        records_sorted = sorted(records, key=operator.itemgetter(1))
-        for record in records_sorted:
-            combo.addItem(record[1], record)
-        combo.blockSignals(False)
 
 
     def populate_combos(self, combo, field_name, field_id, table_name, where=None):
@@ -1126,7 +1083,7 @@ class GwPsector:
             sql += " RETURNING psector_id;"
             new_psector_id = self.controller.execute_returning(sql)
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
-            if new_psector_id and self.plan_om == 'plan':
+            if new_psector_id:
                 row = tools_gw.get_config('plan_psector_vdefault')
                 if row:
                     sql = (f"UPDATE config_param_user "

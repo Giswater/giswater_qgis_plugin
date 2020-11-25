@@ -17,5 +17,5 @@ class GwPsectorButton(GwParentAction):
 
 
     def clicked_event(self):
-        self.psector.new_psector(plan_om='plan')
+        self.psector.new_psector()
 

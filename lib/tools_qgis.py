@@ -615,8 +615,8 @@ def connect_signal_selection_changed(dialog, table_object, query=False, geom_typ
             geom_type = 'arc'
         if form == "psector":
             global_vars.canvas.selectionChanged.connect(
-                partial(tools_gw.selection_changed, dialog, table_object, geom_type, query, plan_om='plan',
-                        layers=layers, list_ids=list_ids))
+                partial(tools_gw.selection_changed, dialog, table_object, geom_type, query, layers=layers,
+                        list_ids=list_ids))
         else:
             global_vars.canvas.selectionChanged.connect(
                 partial(tools_gw.selection_changed, dialog, table_object, geom_type, query, layers=layers))
