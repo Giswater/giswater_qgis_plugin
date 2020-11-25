@@ -35,7 +35,7 @@ from ..utils.tools_gw import SnappingConfigManager
 from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_db
+from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
 from ...lib.tools_qt import GwHyperLinkLabel
 
 
@@ -3434,8 +3434,8 @@ class GwInfo(QObject):
                 break
 
         if widget:
-            # Call def  function (self, widget)
-            getattr(tools_qt, function_name)(widget)
+            # Call def function (self, widget)
+            getattr(tools_os, function_name)(widget)
 
 
     def edit_add_feature(self, feature_cat):

@@ -52,3 +52,19 @@ def get_values_from_dictionary(dictionary):
 
     list_values = iter(dictionary.values())
     return list_values
+
+
+def open_url(widget):
+
+    path = widget.text()
+    # Check if file exist
+    if os.path.exists(path):
+        # Open the document
+        if sys.platform == "win32":
+            os.startfile(path)
+        else:
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, path])
+    else:
+        webbrowser.open(path)
+

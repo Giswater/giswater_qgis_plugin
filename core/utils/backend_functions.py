@@ -347,7 +347,7 @@ class GwInfoTools:
     def open_url(self, widget):
         """ Function called in def add_hyperlink(field): -->
                 widget.clicked.connect(partial(getattr(global_vars.gw_infotools, func_name), widget)) """
-        tools_qt.open_url(widget)
+        tools_os.open_url(widget)
 
 
 def gw_function_dxf(**kwargs):
