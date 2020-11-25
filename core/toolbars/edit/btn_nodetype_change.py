@@ -108,7 +108,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
             if not complet_result:
                 return
 
-            dialog.dlg_closed.connect(tools_qgis.restore_user_layer)
+            dialog.dlg_closed.connect(partial(tools_qgis.restore_user_layer, 'v_edit_node'))
 
 
     def change_elem_type(self, feature):

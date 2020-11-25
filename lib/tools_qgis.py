@@ -37,7 +37,6 @@ class MultipleSelection(QgsMapTool):
         :param query:
         """
 
-
         self.layers = layers
         self.geom_type = geom_type
         self.iface = global_vars.iface
@@ -75,6 +74,7 @@ class MultipleSelection(QgsMapTool):
 
 
     def canvasReleaseEvent(self, event):
+
         self.is_emitting_point = False
         rectangle = self.get_rectangle()
         selected_rectangle = None
@@ -746,12 +746,12 @@ def resetRubberbands(rubber_band):
     rubber_band.reset()
 
 
-def restore_user_layer(user_current_layer=None):
+def restore_user_layer(layer_name, user_current_layer=None):
 
     if user_current_layer:
         global_vars.iface.setActiveLayer(user_current_layer)
     else:
-        layer = global_vars.controller.get_layer_by_tablename('v_edit_node')
+        layer = global_vars.controller.get_layer_by_tablename(layer_name)
         if layer:
             global_vars.iface.setActiveLayer(layer)
 

@@ -334,7 +334,7 @@ class GwMincut:
 
     def mincut_close(self):
 
-        tools_qgis.restore_user_layer(self.user_current_layer)
+        tools_qgis.restore_user_layer('v_edit_node', self.user_current_layer)
         self.remove_selection()
         tools_qgis.resetRubberbands(self.api_search.rubber_band)
 
@@ -709,7 +709,7 @@ class GwMincut:
         self.dlg_mincut.btn_cancel.setText('Close')
         self.dlg_mincut.btn_cancel.disconnect()
         self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_mincut))
-        self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.restore_user_layer, self.user_current_layer))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.restore_user_layer, 'v_edit_node', self.user_current_layer))
         self.dlg_mincut.btn_cancel.clicked.connect(partial(self.remove_selection))
         # TODO: Check this class doesn't have rubber_band
         self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.resetRubberbands, self.api_search.rubber_band))

@@ -150,7 +150,7 @@ class GwDimensioning:
 
         self.iface.actionRollbackEdits().trigger()
         tools_gw.close_dialog(self.dlg_dim)
-        tools_qgis.restore_user_layer(self.user_current_layer)
+        tools_qgis.restore_user_layer('v_edit_node', self.user_current_layer)
 
 
     def save_dimensioning(self, qgis_feature, layer):
