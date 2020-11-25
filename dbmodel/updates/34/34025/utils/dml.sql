@@ -33,3 +33,12 @@ VALUES (3166, 'Id value for this catalog already exists', 'Look for it in the pr
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
 VALUES (360, 'Find features state=2 deleted with psector', 'utils') ON CONFLICT (fid) DO NOTHING ;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (361, 'Auxiliar cad polygons', 'utils') ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (362, 'Auxiliar cad lines', 'utils') ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO sys_table (id, descript, sys_role, sys_criticity, qgis_role_id, qgis_criticity)
+VALUES ('v_edit_cad_auxline', 'Layer to store line geometry', 'role_edit', 0, 'role_edit', 0) ON CONFLICT (id) DO NOTHING;

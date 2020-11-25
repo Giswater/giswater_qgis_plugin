@@ -24,13 +24,16 @@ BEGIN
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN          
 	
-		IF geom_type='circle' THEN					   
-			INSERT INTO temp_table (fid, geom_polygon, cur_user)
-			VALUES  (28, NEW.geom_polygon, current_user);
-		ELSIF geom_type='point' THEN
-            INSERT INTO temp_table (fid, geom_point, cur_user)
-            VALUES  (27, NEW.geom_point, current_user);
-		END IF;
+	IF geom_type='circle' THEN					   
+		INSERT INTO temp_table (fid, geom_polygon, cur_user)
+		VALUES  (361, NEW.geom_polygon, current_user);
+	ELSIF geom_type='point' THEN
+		INSERT INTO temp_table (fid, geom_point, cur_user)
+		VALUES  (127, NEW.geom_point, current_user);
+	ELSIF geom_type='line' THEN
+		INSERT INTO temp_table (fid, geom_line, cur_user)
+		VALUES  (362, NEW.geom_line, current_user);
+	END IF;
 		
         RETURN NEW;
 
@@ -43,6 +46,10 @@ BEGIN
 	ELSIF geom_type='point' THEN	               
 		UPDATE temp_table 
 		SET id=NEW.id, geom_point=NEW.geom_point
+		WHERE id=OLD.id;
+	ELSIF geom_type='line' THEN	               
+		UPDATE temp_table 
+		SET id=NEW.id, geom_line=NEW.geom_line
 		WHERE id=OLD.id;
 	END IF;
                
