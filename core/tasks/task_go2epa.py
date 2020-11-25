@@ -71,7 +71,7 @@ class GwGo2EpaTask(QgsTask):
             return False
 
         if self.export_inp:
-            status = self.export_to_inp()
+            status = self.export_inp()
 
         if status and self.exec_epa:
             status = self.execute_epa()
@@ -186,7 +186,7 @@ class GwGo2EpaTask(QgsTask):
         return True
 
 
-    def export_to_inp(self):
+    def export_inp(self):
 
         if self.isCanceled():
             return False
