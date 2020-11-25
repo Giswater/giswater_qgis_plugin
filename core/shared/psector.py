@@ -1579,7 +1579,7 @@ class GwPsector:
                 sql = (f"DELETE FROM {table_name}"
                        f" WHERE {column_id} IN ({list_id});")
                 self.controller.execute_sql(sql)
-                widget.model().select()
+        widget.model().select()
 
 
     def master_estimate_result_manager(self):
