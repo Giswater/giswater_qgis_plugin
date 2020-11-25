@@ -30,7 +30,3 @@ ON CONFLICT (function_name, project_type) DO NOTHING;
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
 VALUES (3166, 'Id value for this catalog already exists', 'Look for it in the proposed values or set a new id', 2, true, 'utils') ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
-VALUES (3014,'gw_fct_setmapzone', 'ws', 'function', 'json', 'json', 'Function that creates mapzones using button located in the info form', 'role_edit') 
-ON CONFLICT (function_name, project_type) DO NOTHING;
