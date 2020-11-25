@@ -2923,7 +2923,8 @@ def show_exceptions_msg(title=None, msg="", window_title="Information about exce
         global_vars.dlg_info.lbl_text.setText(title)
     tools_qt.set_widget_text(global_vars.dlg_info, global_vars.dlg_info.txt_infolog, msg)
     global_vars.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
-    # pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:|Description|Schema name"
+    if pattern is None:
+        pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:|Description|Schema name"
     tools_qt.set_text_bold(global_vars.dlg_info.txt_infolog, pattern)
 
     # Show dialog only if we are not in a task process
