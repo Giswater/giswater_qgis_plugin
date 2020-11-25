@@ -68,3 +68,20 @@ def open_url(widget):
     else:
         webbrowser.open(path)
 
+
+def cast_boolean(param):
+    """ Receives a string and returns a bool """
+
+    bool_dict = {"True": True, "true": True, "False": False, "false": False}
+    try:
+        return bool_dict[param]
+    except KeyError:
+        return True
+
+
+def open_file_path(msg="Select file", filter_="All (*.*)"):
+    """ Open QFileDialog """
+
+    path, filter_ = QFileDialog.getOpenFileName(None, msg, "", filter_)
+    return path, filter_
+

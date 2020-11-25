@@ -816,14 +816,6 @@ def set_completer_feature_id(widget, geom_type, viewname):
         completer.setModel(model)
 
 
-def open_file_path(filter_="All (*.*)"):
-    """ Open QFileDialog """
-    msg = "Select DXF file"
-    path, filter_ = QFileDialog.getOpenFileName(None, msg, "", filter_)
-
-    return path, filter_
-
-
 def insert_pg_layer(tablename=None, the_geom="the_geom", field_id="id", child_layers=None,
                          group="GW Layers", style_id="-1"):
     """ Put selected layer into TOC
@@ -1993,15 +1985,6 @@ def fill_child(dialog, widget, action, geom_type=''):
             fill_combo_child(dialog, combo_child)
 
 
-def cast_boolean(param):
-    """ Receives a string and returns a bool """
-    bool_dict = {"True": True, "true": True, "False": False, "false": False}
-    try:
-        return bool_dict[param]
-    except KeyError:
-        return True
-
-
 def get_expression_filter(geom_type, list_ids=None, layers=None):
     """ Set an expression filter with the contents of the list.
         Set a model with selected filter. Attach that model to selected table
@@ -2068,11 +2051,11 @@ def check_python_function(object_, function_name):
 
 # TODO tools_gw_db
 
-def get_layer_source_from_credentials():
+def get_layer_source_from_credentials(layer_name):
     """ Get database parameters from layer 'v_edit_node' or  database connection settings """
 
     # Get layer 'v_edit_node'
-    layer = global_vars.controller.get_layer_by_tablename("v_edit_node")
+    layer = global_vars.controller.get_layer_by_tablename(layer_name)
 
     # Get database connection settings
     settings = QSettings()
@@ -2081,7 +2064,7 @@ def get_layer_source_from_credentials():
     if layer is None and settings is None:
         not_version = False
         tools_log.log_warning("Layer 'v_edit_node' is None and settings is None")
-        global_vars.last_error = tr("Layer not found") + ": 'v_edit_node'"
+        global_vars.last_error = tr("Layer not found") + ": " + layer_name
         return None, not_version
 
     # Get sslmode from user config file
@@ -2187,7 +2170,7 @@ def get_json(function_name, parameters=None, schema_name=None, commit=True, log_
     # Check log_sql for developers
     dev_log_sql = get_config_parser('developers', 'log_sql')
     if dev_log_sql not in (None, "None", "none"):
-        log_sql = cast_boolean(dev_log_sql)
+        log_sql = tools_os.cast_boolean(dev_log_sql)
 
     row = global_vars.controller.get_row(sql, commit=commit, log_sql=log_sql)
     if not row or not row[0]:
@@ -2929,7 +2912,7 @@ def manage_translation(context_name, dialog=None, log_info=False):
         translate_form(dialog, context_name)
 
 
-def show_exceptions_msg(title=None, msg="", window_title="Information about exception"):
+def show_exceptions_msg(title=None, msg="", window_title="Information about exception", pattern=None):
     """ Show exception message in dialog """
 
     global_vars.dlg_info = DialogTextUi()
@@ -2940,7 +2923,8 @@ def show_exceptions_msg(title=None, msg="", window_title="Information about exce
         global_vars.dlg_info.lbl_text.setText(title)
     tools_qt.set_widget_text(global_vars.dlg_info, global_vars.dlg_info.txt_infolog, msg)
     global_vars.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
-    tools_qt.set_text_bold(global_vars.dlg_info.txt_infolog)
+    # pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:|Description|Schema name"
+    tools_qt.set_text_bold(global_vars.dlg_info.txt_infolog, pattern)
 
     # Show dialog only if we are not in a task process
     if global_vars.show_db_exception:

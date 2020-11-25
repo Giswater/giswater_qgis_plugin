@@ -17,7 +17,7 @@ from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, 
 
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log
+from ...lib import tools_qgis, tools_qt, tools_log, tools_os
 
 
 class GwInfoTools:
@@ -354,7 +354,7 @@ def gw_function_dxf(**kwargs):
     """ Function called in def add_button(self, dialog, field): -->
             widget.clicked.connect(partial(getattr(self, function_name), dialog, widget)) """
 
-    path, filter_ = tools_gw.open_file_path(filter_="DXF Files (*.dxf)")
+    path, filter_ = tools_os.open_file_path("Select DXF file", "DXF Files (*.dxf)")
     if not path:
         return
 
