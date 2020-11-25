@@ -114,7 +114,6 @@ class GwPsector:
         self.ext_code = self.dlg_plan_psector.findChild(QLineEdit, "ext_code")
         self.cmb_psector_type = self.dlg_plan_psector.findChild(QComboBox, "psector_type")
         self.cmb_expl_id = self.dlg_plan_psector.findChild(QComboBox, "expl_id")
-        self.cmb_sector_id = self.dlg_plan_psector.findChild(QComboBox, "sector_id")
         self.cmb_result_id = self.dlg_plan_psector.findChild(QComboBox, "result_id")
         self.cmb_status = self.dlg_plan_psector.findChild(QComboBox, "status")
         self.dlg_plan_psector.lbl_result_id.setVisible(True)
@@ -136,11 +135,6 @@ class GwPsector:
         rows = self.controller.get_rows(sql)
         
         tools_qt.fill_combo_values(self.dlg_plan_psector.priority, rows, 1)
-
-        # Set visible FALSE for cmb_sector
-        self.populate_combos(self.cmb_sector_id, 'name', 'sector_id', 'sector')
-        self.dlg_plan_psector.lbl_sector.setVisible(False)
-        self.cmb_sector_id.setVisible(False)
 
         # Populate combo expl_id
         sql = ("SELECT expl_id, name from exploitation "
@@ -227,7 +221,7 @@ class GwPsector:
                 self.fill_table(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully",
                                 set_edit_triggers=QTableView.DoubleClicked)
                 tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully")
-            sql = (f"SELECT psector_id, name, psector_type, expl_id, sector_id, priority, descript, text1, text2, "
+            sql = (f"SELECT psector_id, name, psector_type, expl_id, priority, descript, text1, text2, "
                    f"text3, text4, text5, text6, num_value, observ, atlas_id, scale, rotation, active, ext_code, status"
                    f" FROM plan_psector "
                    f"WHERE psector_id = {psector_id}")
@@ -261,12 +255,6 @@ class GwPsector:
                 self.controller.execute_sql(sql)
                 msg = "Your exploitation selector has been updated"
                 tools_gw.show_warning(msg, 1)
-
-            sql = (f"SELECT name FROM sector "
-                   f"WHERE sector_id = {row['sector_id']}")
-            result = self.controller.get_row(sql)
-            tools_qt.set_combo_value(self.cmb_sector_id, str(result['name']), 1)
-            tools_qt.set_combo_value(self.cmb_status, str(row['status']), 0)
 
             tools_qt.set_checked(self.dlg_plan_psector, "active", row['active'])
             self.fill_widget(self.dlg_plan_psector, "name", row)

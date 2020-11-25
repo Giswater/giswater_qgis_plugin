@@ -20,7 +20,7 @@
       <string>test1</string>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="General">
       <attribute name="title">
@@ -172,7 +172,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>11</width>
+             <width>14</width>
              <height>20</height>
             </size>
            </property>
@@ -242,7 +242,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>20</width>
+             <width>22</width>
              <height>20</height>
             </size>
            </property>
@@ -263,39 +263,6 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_6">
          <item>
-          <widget class="QLabel" name="lbl_sector">
-           <property name="text">
-            <string>Sector:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_8">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>33</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QComboBox" name="sector_id">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QLabel" name="lbl_result_id">
            <property name="text">
             <string>Result id:</string>
@@ -312,7 +279,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>8</width>
+             <width>23</width>
              <height>20</height>
             </size>
            </property>
