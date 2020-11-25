@@ -130,10 +130,10 @@ INSERT INTO sector VALUES (5, 'sector2-1d', 2, NULL, NULL, '0106000020E764000001
 
 
 
-INSERT INTO plan_psector (psector_id, name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale, sector_id, atlas_id, gexpenses, vat, other, active, the_geom, status) 
-VALUES (2, 'Masterplan 02', 1, 'Expanding the capacity of the pipes located on Legalitat street.', 1, '3', NULL, NULL, 'Action caused by the headloss of the pipe.', 90.0000, 750.00, 2, '02', 19.00, 21.00, 0.00, true, '0106000020E76400000100000001030000000100000005000000381DD4A516941941573C70AA91755141381DD4A5169419414F030E2380755141926E3B4B559319414F030E2380755141926E3B4B55931941573C70AA91755141381DD4A516941941573C70AA91755141',2);
+INSERT INTO plan_psector (psector_id, name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale, atlas_id, gexpenses, vat, other, active, the_geom, status) 
+VALUES (2, 'Masterplan 02', 1, 'Expanding the capacity of the pipes located on Legalitat street.', 1, '3', NULL, NULL, 'Action caused by the headloss of the pipe.', 90.0000, 750.00, '02', 19.00, 21.00, 0.00, true, '0106000020E76400000100000001030000000100000005000000381DD4A516941941573C70AA91755141381DD4A5169419414F030E2380755141926E3B4B559319414F030E2380755141926E3B4B55931941573C70AA91755141381DD4A516941941573C70AA91755141',2);
 
-INSERT INTO plan_psector (psector_id, name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale, sector_id, atlas_id, gexpenses, vat, other, active, the_geom, status)
-VALUES (1, 'Masterplan 01', 1, 'Expanding the capacity of the pipes located on Francesc Layret street.', 1, '2', NULL, NULL, 'Action caused by the headloss of the pipe.', 0.0000, 750.00, 2, '01', 19.00, 21.00, 0.00, true, '0106000020E76400000100000001030000000100000005000000DF7F8D6B26961941FB72887B42755141DF7F8D6B269619412117DBD63D7551411988DCCE469419412117DBD63D7551411988DCCE46941941FB72887B42755141DF7F8D6B26961941FB72887B42755141',2);
+INSERT INTO plan_psector (psector_id, name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale, atlas_id, gexpenses, vat, other, active, the_geom, status)
+VALUES (1, 'Masterplan 01', 1, 'Expanding the capacity of the pipes located on Francesc Layret street.', 1, '2', NULL, NULL, 'Action caused by the headloss of the pipe.', 0.0000, 750.00, '01', 19.00, 21.00, 0.00, true, '0106000020E76400000100000001030000000100000005000000DF7F8D6B26961941FB72887B42755141DF7F8D6B269619412117DBD63D7551411988DCCE469419412117DBD63D7551411988DCCE46941941FB72887B42755141DF7F8D6B26961941FB72887B42755141',2);
 
 

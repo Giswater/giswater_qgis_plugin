@@ -52,4 +52,11 @@ CREATE TRIGGER gw_trg_edit_config_sysfields
   ON ve_config_sysfields
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_config_sysfields();
+  
+  
+DROP VIEW IF EXISTS v_plan_psector;
+DROP VIEW IF EXISTS v_ui_plan_psector;
+DROP VIEW IF EXISTS v_plan_psector_all;
+DROP VIEW IF EXISTS v_edit_plan_psector;
+DROP VIEW IF EXISTS v_plan_current_psector;
 
