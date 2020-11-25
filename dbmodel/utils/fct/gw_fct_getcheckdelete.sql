@@ -216,7 +216,7 @@ BEGIN
 	
 		DELETE FROM audit_check_data WHERE fid= 360 AND cur_user=current_user;
 		
-		select string_agg(quote_literal(a),',') into v_psector_array from json_array_elements_text(v_feature_id::json) a;
+		select string_agg(quote_literal(a),', ') into v_psector_array from json_array_elements_text(v_feature_id::json) a;
 	
 		--loop over distinct feature types
 		FOR rec_type IN SELECT * FROM sys_feature_type WHERE classlevel=1 OR classlevel=2 LOOP
@@ -235,13 +235,18 @@ BEGIN
 						INTO v_count;
 						
 						IF v_count = 1 THEN
-							RAISE NOTICE 'INSERT,%',v_count;
-							EXECUTE 'INSERT INTO audit_check_data (fid, error_message)
-							SELECT DISTINCT 360,concat('||QUOTE_LITERAL(rec_type.id)||','' '','||rec||',
-							'' is only assigned to psector '',psector_id, '' and will be removed from the inventory.'')
+							
+							IF (SELECT result_id FROM audit_check_data WHERE fid=360 limit 1)is null then
+								EXECUTE 'INSERT INTO audit_check_data (fid, error_message, result_id)
+								VALUES (360, CONCAT(''Features that will be removed from the inventory:''),'||quote_literal(rec_type.id)||');';
+							END IF;
+							
+							EXECUTE 'INSERT INTO audit_check_data (fid, error_message, result_id)
+							SELECT DISTINCT 360,concat('||quote_literal(initcap(rec_type.id))||','' '','||rec||',
+							'' - psector '',psector_id, ''.''),'''||rec_type.id||'''
 							FROM plan_psector_x_'||rec_type.id||' JOIN '||rec_type.id||' n
 							USING ('||rec_type.id||'_id) 
-							WHERE n.state = 2 AND psector_id::text IN ('||v_psector_array||');';
+							WHERE n.state = 2 AND n.'||rec_type.id||'_id = '||quote_literal(rec)||';';
 						END IF;
 					 
 					END LOOP;
@@ -259,14 +264,14 @@ BEGIN
 	
 	IF v_feature_type='PSECTOR' THEN
 
-		SELECT string_agg(error_message,' ') INTO v_message FROM audit_check_data 
+		SELECT string_agg(error_message,' \n') INTO v_message FROM audit_check_data 
 		WHERE cur_user="current_user"() AND fid=360;
 		
 		IF v_message IS NOT NULL THEN
 			v_level = 1;
 		ELSE
 			v_level = 3;
-			v_message = concat('Are you sure you want to delete psector: ',v_psector_array,'?');
+			v_message = concat('Are you sure you want to delete psector: ',replace(v_psector_array,'''',''),'?');
 		END IF;
 		
 	ELSE
