@@ -49,7 +49,7 @@ ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 INSERT INTO config_form_fields(formname, formtype, columnname, layoutorder, datatype, widgettype,
 label, ismandatory, isparent, iseditable, isautoupdate, layoutname, hidden,dv_querytext,dv_orderby_id,dv_isnullvalue)
 VALUES ('new_mapzone', 'form_catalog', 'expl_id', 4, 'integer','combo', 'Exploitation', TRUE, FALSE,TRUE, FALSE,'lyt_data_1',FALSE,
-'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL', true, false)
+'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id != 0 AND expl_id IS NOT NULL', true, false)
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
 INSERT INTO config_form_fields(formname, formtype, columnname, layoutorder, datatype, widgettype,
