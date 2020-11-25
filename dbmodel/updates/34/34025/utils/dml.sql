@@ -18,19 +18,3 @@ VALUES (357, 'Store hydrometer user selector values', 'utils') ON CONFLICT (fid)
 
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
 VALUES (358, 'Store state user selector values', 'utils') ON CONFLICT (fid) DO NOTHING ;
-
--- 2020/11/24
-UPDATE config_form_fields SET columnname = 'id', ismandatory = TRUE WHERE columnname='cat_work_id' AND formname = 'new_workcat';
-UPDATE config_form_fields SET columnname = 'workid_key1' WHERE columnname='workid_key_1' AND formname = 'new_workcat';
-UPDATE config_form_fields SET columnname = 'workid_key2' WHERE columnname='workid_key_2' AND formname = 'new_workcat';
-
-INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
-VALUES (3010,'gw_fct_setcatalog', 'utils', 'function', 'json', 'json', 'Function that saves data into catalogs created using button located in the info form', 'role_edit') 
-ON CONFLICT (function_name, project_type) DO NOTHING;
-
-INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)
-VALUES (3166, 'Id value for this catalog already exists', 'Look for it in the proposed values or set a new id', 2, true, 'utils') ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
-VALUES (3014,'gw_fct_setmapzone', 'ws', 'function', 'json', 'json', 'Function that creates mapzones using button located in the info form', 'role_edit') 
-ON CONFLICT (function_name, project_type) DO NOTHING;
