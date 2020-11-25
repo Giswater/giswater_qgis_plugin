@@ -148,3 +148,5 @@ VALUES (3158, 'Value of the function variable is null', 'Please check it before 
 --2020/11/19
 UPDATE sys_table SET sys_sequence=NULL, sys_sequence_field=NULL WHERE id IN ('config_user_x_expl', 'config_param_user', 'config_param_system');
 
+--2020/11/25
+UPDATE config_typevalue set id='open_url', idval='open_url' where typevalue='widgetfunction_typevalue' and id='set_open_url';
