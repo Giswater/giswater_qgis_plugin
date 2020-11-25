@@ -2675,13 +2675,15 @@ def manage_layer_manager(json_result, sql):
 
 
 def set_margin(layer, margin):
+    if layer.extent().isNull():
+        return
     extent = QgsRectangle()
     extent.setMinimal()
     extent.combineExtentWith(layer.extent())
-    xmax = extent.xMaximum() + margin
     xmin = extent.xMinimum() - margin
-    ymax = extent.yMaximum() + margin
     ymin = extent.yMinimum() - margin
+    xmax = extent.xMaximum() + margin
+    ymax = extent.yMaximum() + margin
     extent.set(xmin, ymin, xmax, ymax)
     global_vars.iface.mapCanvas().setExtent(extent)
     global_vars.iface.mapCanvas().refresh()
