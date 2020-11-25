@@ -48,6 +48,7 @@ BEGIN
 	END IF;
 
 	v_roughness = (SELECT avg(roughness) FROM temp_arc);
+	IF v_roughness is null then v_roughness = 0; END IF;
 
 	delete from anl_node  WHERE fid  = 124 and cur_user = current_user;
 					

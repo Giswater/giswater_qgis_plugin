@@ -1,3 +1,4 @@
 3.4.025
 *************
 - Enhance dint valve export values to epanet
+- Enhance go2epa options exporting timeseries from real time control, creating ext_arc and ext_node tables

@@ -44,6 +44,13 @@ v_vdefault boolean;
 v_delnetwork boolean;
 v_removedemand boolean;
 v_fid integer = 227;
+v_timserstat boolean;
+v_timeseries json;
+v_starttime timestamp;
+v_endtime timestamp;
+v_flow json;
+v_pressure json;
+v_clorinathor json;
 	
 BEGIN
 
@@ -59,6 +66,9 @@ BEGIN
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
 	v_advancedsettings = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_advancedsettings' AND cur_user=current_user)::boolean;
 	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
+	v_timserstat = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_timeseries' AND cur_user=current_user);
+	v_starttime = (SELECT (value::json->>'period')::json->>'startTime' FROM config_param_user WHERE parameter='inp_timeseries' AND cur_user=current_user);
+	v_endtime = (SELECT (value::json->>'period')::json->>'endTime' FROM config_param_user WHERE parameter='inp_timeseries' AND cur_user=current_user);
 
 	-- get debug parameters (settings)
 	v_onlyexport = (SELECT value::json->>'onlyExport' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
@@ -269,14 +279,38 @@ BEGIN
 	SELECT result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, expl_id, flw_code, minorloss, addparam, arcparent 
 	FROM temp_arc;
 
-	RAISE NOTICE '25 - Create the inp file structure';	
+	RAISE NOTICE '25 - Getting inp file';	
 	SELECT gw_fct_pg2epa_export_inp(v_result, null) INTO v_file;
-	
-	-- manage return message
+
+	IF v_timserstat THEN
+
+		RAISE NOTICE '26 - Getting timeseries';	
+		-- flow
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_flow FROM (SELECT arc_id, val, to_char(tstamp,'YYYY-MM-DD HH:MM:SS') FROM ext_arc
+		WHERE fid = 363 AND tstamp >= v_starttime AND tstamp <=  v_endtime) row;
+		-- pressure
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_pressure  FROM (SELECT node_id, val, to_char(tstamp,'YYYY-MM-DD HH:MM:SS') FROM ext_node
+		WHERE fid = 364 AND tstamp >= v_starttime AND tstamp <=  v_endtime) row;
+		-- clorinathor
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_clorinathor FROM (SELECT arc_id, val, to_char(tstamp,'YYYY-MM-DD HH:MM:SS') FROM ext_arc
+		WHERE fid = 365 AND tstamp >= v_starttime AND tstamp <=  v_endtime) row;
+		
+		-- build json
+		v_flow = coalesce (v_flow, '{}');
+		v_pressure = coalesce (v_pressure, '{}');
+		v_clorinathor = coalesce (v_clorinathor, '{}');
+		v_timeseries := concat('{"interval":{"startTime":"',v_starttime,'","endTime":"',v_endtime,'"}, "values":{"flow":',v_flow,', "pressure":',v_pressure,', "clorinathor":',v_clorinathor,'}}');
+
+		RAISE NOTICE ' v_timeseries % ', v_timeseries;
+	END IF;
+
+	v_timeseries = coalesce (v_timeseries, '{}');
+
+
+	-- manage return
 	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
+	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'timeseries', v_timeseries);
 	v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
-	v_return =  gw_fct_json_object_set_key (v_return, 'continue', false);                                
-	v_return =  gw_fct_json_object_set_key (v_return, 'steps', 0);
 	v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', 
 	'"message":{"level":1, "text":"Inp export done succesfully"}')::json;
 

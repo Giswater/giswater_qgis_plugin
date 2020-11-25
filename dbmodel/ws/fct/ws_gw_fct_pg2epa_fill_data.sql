@@ -74,7 +74,7 @@ BEGIN
 	FROM inp_inlet WHERE temp_node.node_id=inp_inlet.node_id;
 	
 	-- update child param for inp_valve
-	UPDATE temp_node SET addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "diameter":"',diameter,'", "flow":"',
+	UPDATE temp_node SET addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "diameter":"',custom_dint,'", "flow":"',
 	flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "minorloss":"',minorloss,'", "status":"',status,
 	'", "to_arc":"',to_arc,'"}')
 	FROM inp_valve WHERE temp_node.node_id=inp_valve.node_id;
