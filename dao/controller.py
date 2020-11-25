@@ -207,10 +207,6 @@ class DaoController:
         return self.postgis_version
 
 
-    def get_conn_encoding(self):
-        return self.dao.get_conn_encoding()
-
-
     def get_sql(self, sql, log_sql=False, params=None):
         """ Generate SQL with params. Useful for debugging """
 
