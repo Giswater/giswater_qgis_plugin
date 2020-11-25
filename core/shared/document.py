@@ -133,11 +133,10 @@ class GwDocument:
                                                             list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_doc.btn_delete.clicked.connect(partial(tools_qt.delete_records, self.dlg_add_doc, table_object,
-                                                            geom_type=geom_type, layers=self.layers, ids=self.ids,
-                                                            list_ids=self.list_ids))
+                                                            layers=self.layers, ids=self.ids, list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_doc.btn_snapping.clicked.connect(partial(tools_gw.selection_init, self.dlg_add_doc, table_object,
-                                                              geom_type=geom_type, layers=self.layers))
+                                                              layers=self.layers))
         if feature:
             self.dlg_add_doc.tabWidget.currentChanged.connect(
                 partial(self.fill_table_doc, self.dlg_add_doc, geom_type, feature[geom_type + "_id"]))

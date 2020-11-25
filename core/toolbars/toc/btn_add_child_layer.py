@@ -179,7 +179,7 @@ class GwAddChildLayerButton(GwParentAction):
         self.layer_muni.removeSelection()
         self.iface.actionSelect().trigger()
         self.iface.mapCanvas().selectionChanged.connect(self.selection_changed)
-        cursor = tools_qgis.get_cursor_multiple_selection()
+        cursor = tools_gw.get_cursor_multiple_selection()
         if cursor:
             self.iface.mapCanvas().setCursor(cursor)
 

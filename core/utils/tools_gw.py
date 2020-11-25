@@ -622,9 +622,7 @@ def refresh_legend(controller):
 def get_cursor_multiple_selection():
     """ Set cursor for multiple selection """
 
-    path_folder = os.path.join(os.path.dirname(__file__), os.pardir)
-    path_cursor = os.path.join(path_folder, f"icons{os.sep}shared", '201.png')
-
+    path_cursor = os.path.join(global_vars.controller.plugin_dir, f"icons{os.sep}shared", '201.png')
     if os.path.exists(path_cursor):
         cursor = QCursor(QPixmap(path_cursor))
     else:
@@ -2691,14 +2689,12 @@ def set_margin(layer, margin):
 
 def selection_init(dialog, table_object, query=False, geom_type=None, layers=None):
     """ Set canvas map tool to an instance of class 'MultipleSelection' """
-
-    geom_type = get_signal_change_tab(dialog)
-    if geom_type in ('all', None):
-        geom_type = 'arc'
-    multiple_selection = MultipleSelection(layers, geom_type, parent_manage=None,
-                                           table_object=table_object, dialog=dialog, query=query)
+    if geom_type is None:
+        geom_type = get_signal_change_tab(dialog)
+        if geom_type in ('all', None):
+            geom_type = 'arc'
+    multiple_selection = MultipleSelection(layers, geom_type, table_object=table_object, dialog=dialog, query=query)
     global_vars.canvas.setMapTool(multiple_selection)
-
     cursor = get_cursor_multiple_selection()
     global_vars.canvas.setCursor(cursor)
 

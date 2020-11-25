@@ -27,15 +27,11 @@ from ..core.utils import tools_gw
 
 class MultipleSelection(QgsMapTool):
 
-    def __init__(self, layers, geom_type,
-                 mincut=None, parent_manage=None, manage_new_psector=None, table_object=None, dialog=None, query=None):
+    def __init__(self, layers, geom_type, table_object=None, dialog=None, query=None):
         """
         Class constructor
         :param layers: dict of list of layers {'arc': [v_edit_node, ...]}
         :param geom_type:
-        :param mincut:
-        :param parent_manage:
-        :param manage_new_psector:
         :param table_object:
         :param dialog:
         :param query:
@@ -46,9 +42,6 @@ class MultipleSelection(QgsMapTool):
         self.geom_type = geom_type
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
-        self.mincut = mincut
-        self.parent_manage = parent_manage
-        self.manage_new_psector = manage_new_psector
         self.table_object = table_object
         self.dialog = dialog
         self.query = query
@@ -82,7 +75,6 @@ class MultipleSelection(QgsMapTool):
 
 
     def canvasReleaseEvent(self, event):
-
         self.is_emitting_point = False
         rectangle = self.get_rectangle()
         selected_rectangle = None
@@ -96,25 +88,11 @@ class MultipleSelection(QgsMapTool):
         # We will reconnect it when processing last layer of the group
         disconnect_signal_selection_changed()
 
-        #TODO:: Refactor manage_new_psector and mincut call
-
-        # if self.manage_new_psector:
-        #     self.manage_new_psector.disconnect_signal_selection_changed()
 
         for i, layer in enumerate(self.layers[self.geom_type]):
             if i == len(self.layers[self.geom_type]) - 1:
-                # if self.mincut:
-                #     self.mincut.connect_signal_selection_changed("mincut_connec")
-                #
-                # if self.parent_manage:
-                #     connect_signal_selection_changed(self.dialog, self.table_object, layers=self.layers)
-
-                # if self.manage_new_psector:
-                #     self.manage_new_psector.connect_signal_selection_changed(
-                #         self.manage_new_psector.dlg_plan_psector, self.table_object)
                 connect_signal_selection_changed(self.dialog, self.table_object, query=self.query,
-                                                 geom_type = self.geom_type, layers = self.layers)
-
+                                                 geom_type=self.geom_type, layers=self.layers)
 
                 # Selection by rectangle
             if rectangle:
@@ -615,19 +593,6 @@ def set_cursor_wait():
 def restore_cursor():
     """ Restore to previous cursors """
     QApplication.restoreOverrideCursor()
-
-
-def get_cursor_multiple_selection():
-    """ Set cursor for multiple selection """
-
-    path_folder = os.path.join(os.path.dirname(__file__), os.pardir)
-    path_cursor = os.path.join(path_folder, f"icons{os.sep}shared", '201.png')
-    if os.path.exists(path_cursor):
-        cursor = QCursor(QPixmap(path_cursor))
-    else:
-        cursor = QCursor(Qt.ArrowCursor)
-
-    return cursor
 
 
 def disconnect_signal_selection_changed():

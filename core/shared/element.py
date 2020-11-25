@@ -135,7 +135,7 @@ class GwElement:
                     ids=self.ids, list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self.dlg_add_element, table_object, geom_type=geom_type, layers=self.layers))
+            partial(tools_gw.selection_init, self.dlg_add_element, table_object, layers=self.layers))
         self.point_xy = self.dlg_add_element.btn_add_geom.clicked.connect(partial(self.snapper_manager.add_point, self.vertex_marker))
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
 

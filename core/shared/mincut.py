@@ -846,22 +846,17 @@ class GwMincut:
 
     def snapping_init_connec(self):
         """ Snap connec """
+        tools_gw.selection_init(self.dlg_connec, self.dlg_connec.tbl_mincut_connec, geom_type='connec', layers=self.layers)
 
-        multiple_snapping = MultipleSelection(self.layers, 'connec', mincut=self)
-        self.canvas.setMapTool(multiple_snapping)
-        self.canvas.selectionChanged.connect(partial(self.snapping_selection_connec))
-        cursor = tools_qgis.get_cursor_multiple_selection()
-        self.canvas.setCursor(cursor)
 
 
     def snapping_init_hydro(self):
         """ Snap also to connec (hydrometers has no geometry) """
 
-        multiple_snapping = MultipleSelection(self.layers, 'connec', mincut=self)
+        multiple_snapping = MultipleSelection(self.layers, 'connec')
         self.canvas.setMapTool(multiple_snapping)
-        self.canvas.selectionChanged.connect(
-            partial(self.snapping_selection_hydro))
-        cursor = tools_qgis.get_cursor_multiple_selection()
+        self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro))
+        cursor = tools_gw.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)
 
 

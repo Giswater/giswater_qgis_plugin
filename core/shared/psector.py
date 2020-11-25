@@ -392,7 +392,7 @@ class GwPsector:
         self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_plan_psector.btn_snapping.clicked.connect(partial(tools_gw.selection_init,
-            self.dlg_plan_psector, table_object, True, geom_type=self.geom_type, layers=self.layers))
+            self.dlg_plan_psector, table_object, True, layers=self.layers))
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(partial(tools_gw.get_signal_change_tab,
