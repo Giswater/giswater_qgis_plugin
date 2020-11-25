@@ -1485,7 +1485,7 @@ class GwInfo(QObject):
 
         # Set image
         img = json_result['body']['data']['shapepng']
-        tools_qt.add_image(dlg_sections, 'lbl_section_image', img)
+        tools_qt.add_image(dlg_sections, 'lbl_section_image', f"{self.plugin_dir}{os.sep}resources{os.sep}png{os.sep}{img}")
 
         # Set values into QLineEdits
         for field in json_result['body']['data']['fields']:
