@@ -344,6 +344,22 @@ class GwInfoTools:
                 self.get_all_layers(child)
 
 
+    def open_url(self, widget):
+        """ Function called in def add_hyperlink(field): -->
+                widget.clicked.connect(partial(getattr(global_vars.gw_infotools, func_name), widget)) """
+        path = widget.text()
+        # Check if file exist
+        if os.path.exists(path):
+            # Open the document
+            if sys.platform == "win32":
+                os.startfile(path)
+            else:
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, path])
+        else:
+            webbrowser.open(path)
+
+
 def gw_function_dxf(**kwargs):
     """ Function called in def add_button(self, dialog, field): -->
             widget.clicked.connect(partial(getattr(self, function_name), dialog, widget)) """
@@ -513,17 +529,4 @@ def set_uri():
     return uri
 
 
-def open_url(widget):
-
-    path = widget.text()
-    # Check if file exist
-    if os.path.exists(path):
-        # Open the document
-        if sys.platform == "win32":
-            os.startfile(path)
-        else:
-            opener = "open" if sys.platform == "darwin" else "xdg-open"
-            subprocess.call([opener, path])
-    else:
-        webbrowser.open(path)
 

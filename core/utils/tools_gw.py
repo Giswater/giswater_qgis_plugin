@@ -1723,6 +1723,8 @@ def add_textarea(field):
 
 
 def add_hyperlink(field):
+    """ functions called in -> widget.clicked.connect(partial(getattr(global_vars.gw_infotools, func_name), widget))
+            def open_url(self, widget)"""
 
     widget = GwHyperLinkLabel()
     widget.setObjectName(field['widgetname'])
@@ -1737,7 +1739,7 @@ def add_hyperlink(field):
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             func_name = field['widgetfunction']
-            exist = check_python_function(tools_qt, func_name)
+            exist = check_python_function(global_vars.gw_infotools, func_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
                 show_message(msg, 2)
@@ -1748,8 +1750,8 @@ def add_hyperlink(field):
     else:
         message = "Parameter not found"
         show_message(message, 2, parameter='widgetfunction')
-    # Call function (self, widget) or def no_function_associated(self, widget=None, message_level=1)
-    widget.clicked.connect(partial(getattr(tools_qt, func_name), widget))
+    # Call function-->func_name(widget) or def no_function_associated(self, widget=None, message_level=1)
+    widget.clicked.connect(partial(getattr(global_vars.gw_infotools, func_name), widget))
 
     return widget
 
