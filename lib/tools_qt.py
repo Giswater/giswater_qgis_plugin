@@ -1464,3 +1464,17 @@ def set_text_bold(widget, pattern=None):
 def set_stylesheet(widget, style="border: 2px solid red"):
     widget.setStyleSheet(style)
 
+
+def open_url(widget):
+
+    path = widget.text()
+    # Check if file exist
+    if os.path.exists(path):
+        # Open the document
+        if sys.platform == "win32":
+            os.startfile(path)
+        else:
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, path])
+    else:
+        webbrowser.open(path)

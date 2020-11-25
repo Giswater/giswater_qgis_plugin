@@ -347,17 +347,7 @@ class GwInfoTools:
     def open_url(self, widget):
         """ Function called in def add_hyperlink(field): -->
                 widget.clicked.connect(partial(getattr(global_vars.gw_infotools, func_name), widget)) """
-        path = widget.text()
-        # Check if file exist
-        if os.path.exists(path):
-            # Open the document
-            if sys.platform == "win32":
-                os.startfile(path)
-            else:
-                opener = "open" if sys.platform == "darwin" else "xdg-open"
-                subprocess.call([opener, path])
-        else:
-            webbrowser.open(path)
+        tools_qt.open_url(widget)
 
 
 def gw_function_dxf(**kwargs):

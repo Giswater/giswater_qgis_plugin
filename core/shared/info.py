@@ -3435,7 +3435,7 @@ class GwInfo(QObject):
 
         if widget:
             # Call def  function (self, widget)
-            getattr(sys.modules[__name__], function_name)(widget)
+            getattr(tools_qt, function_name)(widget)
 
 
     def edit_add_feature(self, feature_cat):
