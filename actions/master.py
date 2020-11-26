@@ -58,7 +58,7 @@ class Master(ParentAction):
         self.dlg_psector_mng.rejected.connect(partial(self.close_dialog, self.dlg_psector_mng))
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(
             self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id, 'lbl_vdefault_psector',
-            'plan_psector_vdefault'))
+            'psector'))
         self.dlg_psector_mng.btn_update_psector.clicked.connect(
             partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
@@ -166,13 +166,12 @@ class Master(ParentAction):
         self.master_new_psector(psector_id)
 
 
-    def multi_rows_delete(self, dialog, widget, table_name, column_id, label, config_param, is_price=False):
+    def multi_rows_delete(self, dialog, widget, table_name, column_id, label, action):
         """ Delete selected elements of the table
         :param QTableView widget: origin
         :param table_name: table origin
         :param column_id: Refers to the id of the source table
         """
-
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -186,28 +185,41 @@ class Master(ParentAction):
             row = selected_list[i].row()
             id_ = widget.model().record(row).value(str(column_id))
             if cur_psector is not None and (str(id_) == str(cur_psector[0])):
-                message = ("You are trying to delete your current psector. " 
+                message = ("You are trying to delete your current psector. "
                            "Please, change your current psector before delete.")
-                self.show_exceptions_msg('Current psector', self.controller.tr(message))
+                self.controller.show_exceptions_msg('Current psector', self.controller.tr(message))
                 return
-
-            list_id += f"'{id_}', "
+            inf_text += f'"{id_}", '
+            list_id += f'"{id_}", '
         inf_text = inf_text[:-2]
         list_id = list_id[:-2]
-        message = "Are you sure you want to delete these records?"
-        answer = self.controller.ask_question(message, "Delete records", inf_text)
 
-        if answer:
-            if is_price is True:
+        if action == 'psector':
+            feature = f'"id":[{inf_text}], "featureType":"PSECTOR"'
+            body = self.create_body(feature=feature)
+            result = self.controller.get_json('gw_fct_check_delete', body, log_sql=True)
+            if result is None: return
+            if result['status'] == "Accepted":
+                if result['message']:
+                    answer = self.controller.ask_question(result['message']['text'])
+                    if answer:
+                        feature += f', "tableName":"{table_name}", "idName":"{column_id}"'
+                        body = self.create_body(feature=feature)
+                        result = self.controller.get_json('gw_fct_setdelete', body, log_sql=True)
+
+        elif action == 'price':
+            message = "Are you sure you want to delete these records?"
+            answer = self.controller.ask_question(message, "Delete records", inf_text)
+            if answer:
                 sql = "DELETE FROM selector_plan_result WHERE result_id in ("
                 if list_id != '':
                     sql += f"{list_id}) AND cur_user = current_user;"
-                    self.controller.execute_sql(sql, log_sql=True)
+                    self.controller.execute_sql(sql)
                     utils_giswater.setWidgetText(dialog, label, '')
-            sql = (f"DELETE FROM {table_name}"
-                   f" WHERE {column_id} IN ({list_id});")
-            self.controller.execute_sql(sql)
-            widget.model().select()
+                sql = (f"DELETE FROM {table_name}"
+                       f" WHERE {column_id} IN ({list_id});")
+                self.controller.execute_sql(sql)
+        widget.model().select()
  
 
     def master_estimate_result_manager(self):
@@ -271,7 +283,7 @@ class Master(ParentAction):
         """ Delete selected row from 'master_estimate_result_manager' dialog from selected tab """
 
         self.multi_rows_delete(dialog, dialog.tbl_om_result_cat, 'plan_result_cat',
-                               'result_id', 'lbl_vdefault_price', '', is_price=True)
+                               'result_id', 'lbl_vdefault_price', 'price')
 
 
     def filter_merm(self, dialog, tablename):

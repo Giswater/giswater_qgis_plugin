@@ -871,7 +871,7 @@ class DaoController(object):
 
         # Check if function exists
         row = self.check_function(function_name, schema_name, commit)
-        if not row:
+        if row in (None, ''):
             self.show_warning("Function not found in database", parameter=function_name)
             return None
 
