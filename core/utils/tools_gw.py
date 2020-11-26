@@ -2028,7 +2028,7 @@ def get_actions_from_json(json_result, sql):
             except Exception as e:
                 tools_log.log_debug(f"{type(e).__name__}: {e}")
     except Exception as e:
-        manage_exception(None, f"{type(e).__name__}: {e}", sql)
+        manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
 
 def check_python_function(object_, function_name):
@@ -2374,7 +2374,7 @@ def manage_return_manager(json_result, sql, rubber_band=None):
                         set_margin(v_layer, margin)
 
     except Exception as e:
-        manage_exception(None, f"{type(e).__name__}: {e}", sql)
+        manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
 
 def get_rows_by_feature_type(dialog, table_object, geom_type, ids=None, list_ids=None, layers=None):
@@ -2644,7 +2644,7 @@ def manage_layer_manager(json_result, sql):
 
 
     except Exception as e:
-        manage_exception(None, f"{type(e).__name__}: {e}", sql)
+        manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
 
 def set_margin(layer, margin):
@@ -3077,7 +3077,7 @@ def show_exceptions_msg(title=None, msg="", window_title="Information about exce
         show_dlg_info()
 
 
-def manage_exception(title=None, description=None, sql=None):
+def manage_exception(title=None, description=None, sql=None, schema_name=None):
     """ Manage exception and show information to the user """
 
     # Get traceback
@@ -3097,7 +3097,7 @@ def manage_exception(title=None, description=None, sql=None):
         msg += f"Description: {description}\n"
     if sql:
         msg += f"SQL:\n {sql}\n\n"
-    msg += f"Schema name: {global_vars.schema_name}"
+    msg += f"Schema name: {schema_name}"
 
     # Show exception message in dialog and log it
     show_exceptions_msg(title, msg)
@@ -3109,6 +3109,48 @@ def manage_exception(title=None, description=None, sql=None):
     # Show exception message only if we are not in a task process
     if global_vars.show_db_exception:
         show_exceptions_msg(title, msg)
+
+
+def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_increase=0, filepath=None, schema_name=None):
+    """ Manage exception in database queries and show information to the user """
+
+    show_exception_msg = True
+    description = ""
+    if exception:
+        description = str(exception)
+        if 'unknown error' in description:
+            show_exception_msg = False
+
+    try:
+        stack_level += stack_level_increase
+        module_path = inspect.stack()[stack_level][1]
+        file_name = tools_os.get_relative_path(module_path, 2)
+        function_line = inspect.stack()[stack_level][2]
+        function_name = inspect.stack()[stack_level][3]
+
+        # Set exception message details
+        msg = ""
+        msg += f"File name: {file_name}\n"
+        msg += f"Function name: {function_name}\n"
+        msg += f"Line number: {function_line}\n"
+        if exception:
+            msg += f"Description:\n{description}\n"
+        if filepath:
+            msg += f"SQL file:\n{filepath}\n\n"
+        if sql:
+            msg += f"SQL:\n {sql}\n\n"
+        msg += f"Schema name: {schema_name}"
+
+        # Show exception message in dialog and log it
+        if show_exception_msg:
+            title = "Database error"
+            show_exceptions_msg(title, msg)
+        else:
+            tools_log.log_warning("Exception message not shown to user")
+        tools_log.log_warning(msg, stack_level_increase=2)
+
+    except Exception:
+        manage_exception("Unhandled Error")
 
 
 def show_dlg_info():

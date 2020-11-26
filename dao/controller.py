@@ -227,7 +227,7 @@ class DaoController:
         if not row:
             # Check if any error has been raised
             if global_vars.last_error:
-                tools_db.manage_exception_db(global_vars.last_error, sql)
+                tools_gw.manage_exception_db(global_vars.last_error, sql, schema_name=global_vars.schema_name)
             elif global_vars.last_error is None and log_info:
                 tools_log.log_info("Any record found", parameter=sql, stack_level_increase=1)
 
@@ -244,7 +244,7 @@ class DaoController:
         if not rows2:
             # Check if any error has been raised
             if global_vars.last_error:
-                tools_db.manage_exception_db(global_vars.last_error, sql)
+                tools_gw.manage_exception_db(global_vars.last_error, sql, schema_name=global_vars.schema_name)
             elif global_vars.last_error is None and log_info:
                 tools_log.log_info("Any record found", parameter=sql, stack_level_increase=1)
         else:
@@ -267,7 +267,7 @@ class DaoController:
         if not result:
             if log_error:
                 tools_log.log_info(sql, stack_level_increase=1)
-            tools_db.manage_exception_db(global_vars.last_error, sql, filepath=filepath)
+            tools_gw.manage_exception_db(global_vars.last_error, sql, filepath=filepath, schema_name=global_vars.schema_name)
             return False
 
         return True
@@ -283,7 +283,7 @@ class DaoController:
         if not value:
             if log_error:
                 tools_log.log_info(sql, stack_level_increase=1)
-            tools_db.manage_exception_db(global_vars.last_error, sql)
+            tools_gw.manage_exception_db(global_vars.last_error, sql, schema_name=global_vars.schema_name)
             return False
 
         return value
@@ -341,7 +341,7 @@ class DaoController:
         if not result:
             # Check if any error has been raised
             if global_vars.last_error:
-                tools_db.manage_exception_db(global_vars.last_error, sql)
+                tools_gw.manage_exception_db(global_vars.last_error, sql, schema_name=global_vars.schema_name)
 
         return result
 
@@ -394,7 +394,7 @@ class DaoController:
         if not result:
             # Check if any error has been raised
             if global_vars.last_error:
-                tools_db.manage_exception_db(global_vars.last_error, sql)
+                tools_gw.manage_exception_db(global_vars.last_error, sql, schema_name=global_vars.schema_name)
 
         return result
 

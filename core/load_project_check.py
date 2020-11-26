@@ -172,7 +172,7 @@ class GwProjectCheck:
                     grl_others.addWidget(widget, pos, 1)
             except KeyError:
                 description = "Key on returned json from ddbb is missed"
-                tools_gw.manage_exception(None, description)
+                tools_gw.manage_exception(None, description, schema_name=global_vars.schema_name)
 
         return critical_level
 
