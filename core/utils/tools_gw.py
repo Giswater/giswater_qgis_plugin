@@ -2040,8 +2040,9 @@ def check_python_function(object_, function_name):
 def document_delete(qtable):
     status = tools_qt.delete_rows_qtv(qtable)
     if not status:
+        error = qtable.model().lastError().text()
         message = "Error deleting data"
-        show_warning(message)
+        show_warning(message, parameter=error)
         return
     else:
         message = "Document deleted"
