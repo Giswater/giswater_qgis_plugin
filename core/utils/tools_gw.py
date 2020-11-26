@@ -2146,7 +2146,7 @@ def get_json(function_name, parameters=None, schema_name=None, commit=True, log_
 
     # Check if function exists
     row = check_function(function_name, schema_name, commit)
-    if not row:
+    if row in (None, ''):
         show_warning("Function not found in database", parameter=function_name)
         return None
 
