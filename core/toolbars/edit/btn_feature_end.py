@@ -50,7 +50,7 @@ class GwEndFeatureButton(GwParentAction):
         self.layers['connec'] = tools_gw.get_group_layers('connec')
         self.layers['element'] = [tools_qgis.get_layer_by_tablename('v_edit_element')]
 
-        self.layers = tools_qgis.remove_selection(True, layers=self.layers)
+        self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
         # Create the dialog and signals
         self.dlg_work_end = FeatureEndUi()
@@ -95,7 +95,7 @@ class GwEndFeatureButton(GwParentAction):
         self.dlg_work_end.workcat_id_end.editTextChanged.connect(partial(self.fill_workids))
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_work_end.btn_insert.clicked.connect(partial(tools_qgis.insert_feature, self.dlg_work_end, self.table_object,
+        self.dlg_work_end.btn_insert.clicked.connect(partial(tools_gw.insert_feature, self.dlg_work_end, self.table_object,
                                                              geom_type=geom_type, ids=self.ids, layers=self.layers,
                                                              list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters

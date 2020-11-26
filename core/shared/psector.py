@@ -95,7 +95,7 @@ class GwPsector:
         self.geom_type = "arc"
 
         # Remove all previous selections
-        self.layers = tools_qgis.remove_selection(True, layers=self.layers)
+        self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
         # Set icons
         tools_gw.add_icon(self.dlg_plan_psector.btn_insert, "111")
@@ -329,9 +329,9 @@ class GwPsector:
                         psector_rec = feature.geometry().boundingBox()
                         # Do zoom when QgsRectangles don't intersect
                         if not canvas_rec.intersects(psector_rec):
-                            tools_qgis.zoom_to_selected_features(layer)
+                            self.zoom_to_selected_features(layer)
                         if psector_rec.width() < (canvas_width * 10) / 100 or psector_rec.height() < (canvas_height * 10) / 100:
-                            tools_qgis.zoom_to_selected_features(layer)
+                            self.zoom_to_selected_features(layer)
                         layer.removeSelection()
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
@@ -366,7 +366,7 @@ class GwPsector:
         self.dlg_plan_psector.btn_unselect.clicked.connect(partial(self.update_total,
             self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_plan_psector.btn_insert.clicked.connect(partial(tools_qgis.insert_feature,
+        self.dlg_plan_psector.btn_insert.clicked.connect(partial(tools_gw.insert_feature,
             self.dlg_plan_psector, table_object, True, geom_type=self.geom_type, ids=self.ids, layers=self.layers,
                                                                  list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
@@ -952,7 +952,7 @@ class GwPsector:
         self.reload_states_selector()
         if cur_active_layer:
             self.iface.setActiveLayer(cur_active_layer)
-        self.layers = tools_qgis.remove_selection(True, layers=self.layers)
+        self.layers = tools_gw.remove_selection(True, layers=self.layers)
         self.reset_model_psector("arc")
         self.reset_model_psector("node")
         self.reset_model_psector("connec")
@@ -1676,3 +1676,32 @@ class GwPsector:
         if not row:
             return
         tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', row[0])
+
+
+    def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
+        """ Zoom to selected features of the @layer with @geom_type """
+
+        if not layer:
+            return
+
+        global_vars.iface.setActiveLayer(layer)
+        global_vars.iface.actionZoomToSelected().trigger()
+
+        if geom_type and zoom:
+
+            # Set scale = scale_zoom
+            if geom_type in ('node', 'connec', 'gully'):
+                scale = zoom
+
+            # Set scale = max(current_scale, scale_zoom)
+            elif geom_type == 'arc':
+                scale = global_vars.iface.mapCanvas().scale()
+                if int(scale) < int(zoom):
+                    scale = zoom
+            else:
+                scale = 5000
+
+            if zoom is not None:
+                scale = zoom
+
+            global_vars.iface.mapCanvas().zoomScale(float(scale))

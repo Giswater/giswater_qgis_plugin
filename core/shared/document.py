@@ -75,7 +75,7 @@ class GwDocument:
 
         # Remove all previous selections
         if self.single_tool_mode:
-            self.layers = tools_qgis.remove_selection(True, layers=self.layers)
+            self.layers = tools_gw.remove_selection(True, layers=self.layers)
         if feature is not None:
             layer = self.iface.activeLayer()
             layer.selectByIds([feature.id()])
@@ -128,7 +128,7 @@ class GwDocument:
                                                             self.single_tool_mode, layers=self.layers, ids=self.ids,
                                                             list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_add_doc.btn_insert.clicked.connect(partial(tools_qgis.insert_feature, self.dlg_add_doc, table_object,
+        self.dlg_add_doc.btn_insert.clicked.connect(partial(tools_gw.insert_feature, self.dlg_add_doc, table_object,
                                                             geom_type=geom_type, ids=self.ids, layers=self.layers,
                                                             list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters

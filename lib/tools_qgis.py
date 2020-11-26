@@ -91,7 +91,7 @@ class MultipleSelection(QgsMapTool):
 
         for i, layer in enumerate(self.layers[self.geom_type]):
             if i == len(self.layers[self.geom_type]) - 1:
-                connect_signal_selection_changed(self.dialog, self.table_object, query=self.query,
+                tools_gw.connect_signal_selection_changed(self.dialog, self.table_object, query=self.query,
                                                  geom_type=self.geom_type, layers=self.layers)
 
                 # Selection by rectangle
@@ -403,48 +403,6 @@ def manage_snapping_layer(layername, snapping_type=0, tolerance=15.0):
     QgsSnappingUtils.LayerConfig(layer, snapping_type, tolerance, QgsTolerance.Pixels)
 
 
-# Snapping utilities
-
-def remove_selection(remove_groups=True, layers=None):
-    """ Remove all previous selections """
-
-    layer = get_layer_by_tablename("v_edit_arc")
-    if layer:
-        layer.removeSelection()
-    layer = get_layer_by_tablename("v_edit_node")
-    if layer:
-        layer.removeSelection()
-    layer = get_layer_by_tablename("v_edit_connec")
-    if layer:
-        layer.removeSelection()
-    layer = get_layer_by_tablename("v_edit_element")
-    if layer:
-        layer.removeSelection()
-
-    if global_vars.project_type == 'ud':
-        layer = get_layer_by_tablename("v_edit_gully")
-        if layer:
-            layer.removeSelection()
-
-    try:
-        if remove_groups:
-            for layer in layers['arc']:
-                layer.removeSelection()
-            for layer in layers['node']:
-                layer.removeSelection()
-            for layer in layers['connec']:
-                layer.removeSelection()
-            for layer in layers['gully']:
-                layer.removeSelection()
-            for layer in layers['element']:
-                layer.removeSelection()
-    except:
-        pass
-
-    global_vars.canvas.refresh()
-
-    return layers
-
 
 def select_features_by_ids(geom_type, expr, layers=None):
     """ Select features of layers of group @geom_type applying @expr """
@@ -464,100 +422,6 @@ def select_features_by_ids(geom_type, expr, layers=None):
                 layer.selectByIds(id_list)
             else:
                 layer.removeSelection()
-
-
-def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type=None, ids=None, layers=None,
-                   list_ids=None, lazy_widget=None, lazy_init_function=None):
-    """ Select feature with entered id. Set a model with selected filter.
-        Attach that model to selected table
-    """
-
-    disconnect_signal_selection_changed()
-
-    if geom_type in ('all', None):
-        geom_type = tools_gw.get_signal_change_tab(dialog)
-
-    # Clear list of ids
-    if remove_ids:
-        ids = []
-
-    field_id = f"{geom_type}_id"
-    feature_id = tools_qt.get_text(dialog, "feature_id")
-    expr_filter = f"{field_id} = '{feature_id}'"
-
-    # Check expression
-    (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
-    if not is_valid:
-        return None
-
-    # Select features of layers applying @expr
-    select_features_by_ids(geom_type, expr, layers=layers)
-
-    if feature_id == 'null':
-        message = "You need to enter a feature id"
-        tools_qt.show_info_box(message)
-        return
-
-    # Iterate over all layers of the group
-    for layer in layers[geom_type]:
-        if layer.selectedFeatureCount() > 0:
-            # Get selected features of the layer
-            features = layer.selectedFeatures()
-            for feature in features:
-                # Append 'feature_id' into the list
-                selected_id = feature.attribute(field_id)
-                if selected_id not in ids:
-                    ids.append(selected_id)
-        if feature_id not in ids:
-            # If feature id doesn't exist in list -> add
-            ids.append(str(feature_id))
-
-    # Set expression filter with features in the list
-    expr_filter = f'"{field_id}" IN (  '
-    for i in range(len(ids)):
-        expr_filter += f"'{ids[i]}', "
-    expr_filter = expr_filter[:-2] + ")"
-
-    # Check expression
-    (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
-    if not is_valid:
-        return
-
-    # Select features with previous filter
-    # Build a list of feature id's and select them
-    for layer in layers[geom_type]:
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        id_list = [i.id() for i in it]
-        if len(id_list) > 0:
-            layer.selectByIds(id_list)
-
-    # Reload contents of table 'tbl_???_x_@geom_type'
-    if query:
-        insert_feature_to_plan(dialog, geom_type, ids=ids)
-        layers = remove_selection()
-    else:
-        tools_gw.load_table(dialog, table_object, geom_type, expr_filter)
-        tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
-
-    # Update list
-    list_ids[geom_type] = ids
-    tools_gw.enable_feature_type(dialog, table_object, ids=ids)
-    connect_signal_selection_changed(dialog, table_object, geom_type)
-
-    tools_log.log_info(list_ids[geom_type])
-
-    return ids, layers, list_ids
-
-
-def insert_feature_to_plan(dialog, geom_type, ids=None):
-    """ Insert features_id to table plan_@geom_type_x_psector """
-
-    value = tools_qt.get_text(dialog, dialog.psector_id)
-    for i in range(len(ids)):
-        sql = f"INSERT INTO plan_psector_x_{geom_type} ({geom_type}_id, psector_id) "
-        sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"
-        global_vars.controller.execute_sql(sql)
-        tools_gw.reload_qtable(dialog, geom_type)
 
 
 def disconnect_snapping():
@@ -600,53 +464,6 @@ def disconnect_signal_selection_changed():
         pass
     finally:
         global_vars.iface.actionPan().trigger()
-
-
-def connect_signal_selection_changed(dialog, table_object, query=False, geom_type=None, layers=None, form=None,
-                                    list_ids=None):
-    """ Connect signal selectionChanged """
-
-    try:
-        if geom_type in ('all', None):
-            geom_type = 'arc'
-        if form == "psector":
-            global_vars.canvas.selectionChanged.connect(
-                partial(tools_gw.selection_changed, dialog, table_object, geom_type, query, layers=layers,
-                        list_ids=list_ids))
-        else:
-            global_vars.canvas.selectionChanged.connect(
-                partial(tools_gw.selection_changed, dialog, table_object, geom_type, query, layers=layers))
-    except Exception as e:
-        tools_log.log_info(f"connect_signal_selection_changed: {e}")
-
-
-def zoom_to_selected_features(layer, geom_type=None, zoom=None):
-    """ Zoom to selected features of the @layer with @geom_type """
-
-    if not layer:
-        return
-
-    global_vars.iface.setActiveLayer(layer)
-    global_vars.iface.actionZoomToSelected().trigger()
-
-    if geom_type and zoom:
-
-        # Set scale = scale_zoom
-        if geom_type in ('node', 'connec', 'gully'):
-            scale = zoom
-
-        # Set scale = max(current_scale, scale_zoom)
-        elif geom_type == 'arc':
-            scale = global_vars.iface.mapCanvas().scale()
-            if int(scale) < int(zoom):
-                scale = zoom
-        else:
-            scale = 5000
-
-        if zoom is not None:
-            scale = zoom
-
-        global_vars.iface.mapCanvas().zoomScale(float(scale))
 
 
 def select_features_by_expr(layer, expr):

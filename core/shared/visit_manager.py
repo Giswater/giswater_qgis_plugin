@@ -358,7 +358,7 @@ class GwVisitManager:
             widget_name = f'tbl_visit_x_{self.geom_type}'
             widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
             tools_qgis.disconnect_signal_selection_changed()
-            tools_qgis.connect_signal_selection_changed(self.dlg_add_visit, widget_table, geom_type=self.geom_type)
+            tools_gw.connect_signal_selection_changed(self.dlg_add_visit, widget_table, geom_type=self.geom_type)
             tools_qgis.select_features_by_ids(self.geom_type, expr)
             tools_qgis.disconnect_signal_selection_changed()
 
@@ -375,7 +375,7 @@ class GwVisitManager:
 
         # Remove all previous selections
         tools_qgis.disconnect_signal_selection_changed()
-        self.layers = tools_qgis.remove_selection(layers=self.layers)
+        self.layers = tools_gw.remove_selection(layers=self.layers)
 
         # Update geometry field (if user have selected a point)
         if self.point_xy['x'] is not None:
@@ -437,7 +437,7 @@ class GwVisitManager:
 
             # Remove all previous selections
             tools_qgis.disconnect_signal_selection_changed()
-            self.layers = tools_qgis.remove_selection(layers=self.layers)
+            self.layers = tools_gw.remove_selection(layers=self.layers)
         except Exception as e:
             tools_log.log_info(f"manage_rejected: {e}")
 
@@ -758,7 +758,7 @@ class GwVisitManager:
         finally:
             # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
-                partial(tools_qgis.insert_feature, self.dlg_add_visit, widget_table, geom_type=self.geom_type, ids=self.ids,
+                partial(tools_gw.insert_feature, self.dlg_add_visit, widget_table, geom_type=self.geom_type, ids=self.ids,
                         layers=self.layers, list_ids=self.list_ids, lazy_widget=self.lazy_widget,
                         lazy_init_function=self.lazy_init_function))
             # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
@@ -871,7 +871,7 @@ class GwVisitManager:
 
         # Do selection allowing @widget_table to be linked to canvas selectionChanged
         tools_qgis.disconnect_signal_selection_changed()
-        tools_qgis.connect_signal_selection_changed(self.dlg_add_visit, widget_table, geom_type=geom_type)
+        tools_gw.connect_signal_selection_changed(self.dlg_add_visit, widget_table, geom_type=geom_type)
         tools_qgis.select_features_by_ids(geom_type, expr)
         tools_qgis.disconnect_signal_selection_changed()
 
@@ -1695,7 +1695,7 @@ class GwVisitManager:
         finally:
             # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
-                partial(tools_qgis.insert_feature, self.dlg_add_visit, widget_table, self.geom_type, ids=self.ids,
+                partial(tools_gw.insert_feature, self.dlg_add_visit, widget_table, self.geom_type, ids=self.ids,
                         layers=self.layers, list_ids=self.list_ids))
             # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_delete.clicked.connect(
