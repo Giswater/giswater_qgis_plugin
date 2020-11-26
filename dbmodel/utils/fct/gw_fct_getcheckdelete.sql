@@ -18,9 +18,9 @@ SELECT SCHEMA_NAME.gw_fct_getcheckdelete($${
 "data":{}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_getcheckdelete($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"id":["1",2"],"featureType":"PSECTOR"},
-"data":{}}$$)
+"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+"feature":{"id":["1"], "featureType":"PSECTOR", "tableName":"v_ui_plan_psector", 
+"idName":"psector_id"}, "data":{"filterFields":{}, "pageInfo":{}}}$$);
 */
 
 DECLARE
