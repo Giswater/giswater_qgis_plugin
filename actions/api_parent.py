@@ -498,6 +498,7 @@ class ApiParent(ParentAction):
         if field['widgettype'] == 'typeahead':
             if 'queryText' not in field or 'queryTextFilter' not in field:
                 return widget
+            widget.setProperty('typeahead', True)
             model = QStringListModel()
             widget.textChanged.connect(partial(self.populate_lineedit, completer, model, field, dialog, widget))
 
@@ -953,8 +954,6 @@ class ApiParent(ParentAction):
                 widget = self.set_data_type(field, widget)
                 if field['widgettype'] == 'typeahead':
                     widget = self.manage_lineedit(field, dialog, widget, completer)
-                if widget.property('columnname') == field_id:
-                    self.feature_id = widget.text()
             elif field['widgettype'] == 'datetime':
                 widget = self.add_calendar(dialog, field)
             elif field['widgettype'] == 'hyperlink':
@@ -962,15 +961,14 @@ class ApiParent(ParentAction):
             elif field['widgettype'] == 'textarea':
                 widget = self.add_textarea(field)
             elif field['widgettype'] in ('combo', 'combobox'):
-                widget = QComboBox()
-                self.populate_combo(widget, field)
+                widget = self.add_combobox(field)
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] in ('check', 'checkbox'):
                 widget = self.add_checkbox(field)
                 widget.stateChanged.connect(partial(self.get_values, dialog, widget, self.my_json))
             elif field['widgettype'] == 'button':
                 widget = self.add_button(dialog, field)
-
+            widget.setProperty('ismandatory', field['ismandatory'])
             grid_layout.addWidget(label, x, 0)
             grid_layout.addWidget(widget, x, 1)
 
@@ -1401,6 +1399,8 @@ class ApiParent(ParentAction):
             _json[str(widget.property('columnname'))] = None
         else:
             _json[str(widget.property('columnname'))] = str(value)
+
+        return _json
 
 
     def set_function_associated(self, dialog, widget, field):
