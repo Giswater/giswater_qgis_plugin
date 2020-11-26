@@ -66,3 +66,7 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('ext_node', 'External table for node values', 'role_edit') 
 ON CONFLICT (id) DO NOTHING;
+
+--2020/11/26
+UPDATE sys_param_user SET dv_querytext='SELECT id, idval FROM om_typevalue WHERE typevalue=''visit_status'''
+WHERE id = 'om_visit_status_vdefault';
