@@ -1464,7 +1464,7 @@ class GwInfo(QObject):
         widget = tools_gw.add_tableview(complet_result, field)
         widget = tools_gw.add_headers(widget, field)
         widget = tools_qt.populate_table(widget, field)
-        widget = tools_qt.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
+        widget = tools_gw.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
         tools_qt.set_qtv_config(widget)
         return widget
 
@@ -1934,7 +1934,7 @@ class GwInfo(QObject):
 
         table_element = "v_ui_element_x_" + self.geom_type
         self.fill_tbl_element_man(self.dlg_cf, self.tbl_element, table_element, self.filter)
-        tools_qt.set_columns_config(self.tbl_element, table_element)
+        tools_gw.set_columns_config(self.tbl_element, table_element)
 
 
     def fill_tbl_element_man(self, dialog, widget, table_name, expr_filter):
@@ -1962,7 +1962,7 @@ class GwInfo(QObject):
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "element"
-        tools_qt.set_completer_object(dialog, self.table_object)
+        tools_gw.set_completer_object(dialog, self.table_object)
 
 
     def open_selected_element(self, dialog, widget):
@@ -2078,7 +2078,7 @@ class GwInfo(QObject):
         elem.dlg_add_element.rejected.connect(partial(self.manage_element_new, dialog, elem))
 
         # Set completer
-        tools_qt.set_completer_object(dialog, self.table_object)
+        tools_gw.set_completer_object(dialog, self.table_object)
 
         if element_id:
             tools_qt.set_widget_text(elem.dlg_add_element, "element_id", element_id)
@@ -2148,7 +2148,7 @@ class GwInfo(QObject):
 
         table_relations = f"v_ui_{self.geom_type}_x_relations"
         tools_qt.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
-        tools_qt.set_columns_config(self.tbl_relations, table_relations)
+        tools_gw.set_columns_config(self.tbl_relations, table_relations)
         self.tbl_relations.doubleClicked.connect(partial(self.open_relation, str(self.field_id)))
 
 
@@ -2205,10 +2205,10 @@ class GwInfo(QObject):
 
         filter_ = f"node_id='{self.feature_id}'"
         tools_qt.fill_table(self.dlg_cf.tbl_upstream, self.schema_name + ".v_ui_node_x_connection_upstream", filter_)
-        tools_qt.set_columns_config(self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
+        tools_gw.set_columns_config(self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
 
         tools_qt.fill_table(self.dlg_cf.tbl_downstream, self.schema_name + ".v_ui_node_x_connection_downstream", filter_)
-        tools_qt.set_columns_config(self.dlg_cf.tbl_downstream, "v_ui_node_x_connection_downstream")
+        tools_gw.set_columns_config(self.dlg_cf.tbl_downstream, "v_ui_node_x_connection_downstream")
 
         self.dlg_cf.tbl_upstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
         self.dlg_cf.tbl_downstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
@@ -2244,7 +2244,7 @@ class GwInfo(QObject):
         table_hydro = "v_ui_hydrometer"
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
         self.fill_tbl_hydrometer(self.tbl_hydrometer, table_hydro)
-        tools_qt.set_columns_config(self.tbl_hydrometer, table_hydro)
+        tools_gw.set_columns_config(self.tbl_hydrometer, table_hydro)
         txt_hydrometer_id.textChanged.connect(partial(self.fill_tbl_hydrometer, self.tbl_hydrometer, table_hydro))
         self.tbl_hydrometer.doubleClicked.connect(partial(self.open_selected_hydro, self.tbl_hydrometer))
         self.dlg_cf.findChild(QPushButton, "btn_link").clicked.connect(self.check_url)
@@ -2336,7 +2336,7 @@ class GwInfo(QObject):
         tools_qt.fill_combo_values(self.dlg_cf.cmb_hyd_customer_code, rows_list, 1)
 
         self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
-        tools_qt.set_columns_config(self.tbl_hydrometer_value, table_hydro_value)
+        tools_gw.set_columns_config(self.tbl_hydrometer_value, table_hydro_value)
 
         self.dlg_cf.cmb_cat_period_id_filter.currentIndexChanged.connect(
             partial(self.fill_tbl_hydrometer_values, self.tbl_hydrometer_value, table_hydro_value))
@@ -2357,7 +2357,7 @@ class GwInfo(QObject):
 
         # Set model of selected widget
         self.set_model_to_table(qtable, self.schema_name + "." + table_name, filter_, QSqlTableModel.OnFieldChange)
-        tools_qt.set_columns_config(self.tbl_hydrometer_value, table_name)
+        tools_gw.set_columns_config(self.tbl_hydrometer_value, table_name)
 
 
     def set_filter_hydrometer_values(self, widget):
@@ -2383,7 +2383,7 @@ class GwInfo(QObject):
         table_event_geom = "v_ui_event_x_" + geom_type
         self.fill_tbl_event(self.tbl_event_cf, table_event_geom, self.filter)
         self.tbl_event_cf.doubleClicked.connect(self.open_visit_event)
-        tools_qt.set_columns_config(self.tbl_event_cf, table_event_geom)
+        tools_gw.set_columns_config(self.tbl_event_cf, table_event_geom)
 
 
     def fill_tbl_event(self, widget, table_name, filter_):
@@ -2396,7 +2396,7 @@ class GwInfo(QObject):
         self.date_event_to = self.dlg_cf.findChild(QDateEdit, "date_event_to")
         self.date_event_from = self.dlg_cf.findChild(QDateEdit, "date_event_from")
 
-        tools_qt.set_dates_from_to(self.date_event_from, self.date_event_to, table_name, 'visit_start', 'visit_end')
+        tools_gw.set_dates_from_to(self.date_event_from, self.date_event_to, table_name, 'visit_start', 'visit_end')
 
         btn_open_visit = self.dlg_cf.findChild(QPushButton, "btn_open_visit")
         btn_new_visit = self.dlg_cf.findChild(QPushButton, "btn_new_visit")
@@ -2687,7 +2687,7 @@ class GwInfo(QObject):
     def update_visit_table(self):
         """ Convenience fuction set as slot to update table after a Visit GUI close. """
         table_name = "v_ui_event_x_" + self.geom_type
-        tools_qt.set_dates_from_to(self.date_event_from, self.date_event_to, table_name, 'visit_start', 'visit_end')
+        tools_gw.set_dates_from_to(self.date_event_from, self.date_event_to, table_name, 'visit_start', 'visit_end')
         self.tbl_event_cf.model().select()
 
 
@@ -2825,7 +2825,7 @@ class GwInfo(QObject):
 
         table_document = "v_ui_doc_x_" + self.geom_type
         self.fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
-        tools_qt.set_columns_config(self.tbl_document, table_document)
+        tools_gw.set_columns_config(self.tbl_document, table_document)
 
 
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
@@ -2844,7 +2844,7 @@ class GwInfo(QObject):
         btn_doc_new = self.dlg_cf.findChild(QPushButton, "btn_doc_new")
 
         # Set max and min dates
-        tools_qt.set_dates_from_to(self.date_document_from, self.date_document_to, table_name, 'date', 'date')
+        tools_gw.set_dates_from_to(self.date_document_from, self.date_document_to, table_name, 'date', 'date')
 
         # Set model of selected widget
         self.set_model_to_table(widget, self.schema_name + "." + table_name, expr_filter)
@@ -2868,7 +2868,7 @@ class GwInfo(QObject):
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "doc"
-        tools_qt.set_completer_object(dialog, self.table_object)
+        tools_gw.set_completer_object(dialog, self.table_object)
 
         # Set filter expresion
         self.set_filter_table_man(widget)
@@ -2943,7 +2943,7 @@ class GwInfo(QObject):
         doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, dialog, doc))
 
         # Set completer
-        tools_qt.set_completer_object(dialog, self.table_object)
+        tools_gw.set_completer_object(dialog, self.table_object)
         if doc_id:
             tools_qt.set_widget_text(dialog, "doc_id", doc_id)
 

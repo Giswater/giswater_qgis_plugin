@@ -105,17 +105,17 @@ class GwElement:
 
         # Adding auto-completion to a QLineEdit
         table_object = "element"
-        tools_qt.set_completer_object(self.dlg_add_element, table_object)
+        tools_gw.set_completer_object(self.dlg_add_element, table_object)
 
         # Set signals
         self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
         self.dlg_add_element.btn_accept.clicked.connect(
             partial(tools_qgis.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.btn_cancel.clicked.connect(lambda: setattr(self, 'layers',
-            tools_qt.manage_close(self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[],layers=self.layers)))
+            tools_gw.manage_close(self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[],layers=self.layers)))
         self.dlg_add_element.btn_cancel.clicked.connect(
             partial(tools_qgis.set_layer_visible, layer_element, layer_is_visible))
-        self.dlg_add_element.rejected.connect(lambda: setattr(self, 'layers', tools_qt.manage_close(self.dlg_add_element,
+        self.dlg_add_element.rejected.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_element,
             table_object, cur_active_layer, excluded_layers=[],layers=self.layers)))
         self.dlg_add_element.rejected.connect(
             partial(tools_qgis.set_layer_visible, layer_element, layer_is_visible))
@@ -123,7 +123,7 @@ class GwElement:
             partial(tools_gw.get_signal_change_tab, self.dlg_add_element, []))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.element_id.textChanged.connect(
-            partial(tools_qt.exist_object, self.dlg_add_element, table_object, layers=self.layers,
+            partial(tools_gw.exist_object, self.dlg_add_element, table_object, layers=self.layers,
                     ids=self.ids, list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_insert.clicked.connect(
@@ -131,7 +131,7 @@ class GwElement:
                     layers=self.layers, list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_delete.clicked.connect(
-            partial(tools_qt.delete_records, self.dlg_add_element, table_object, geom_type=geom_type, layers=self.layers,
+            partial(tools_gw.delete_records, self.dlg_add_element, table_object, geom_type=geom_type, layers=self.layers,
                     ids=self.ids, list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_snapping.clicked.connect(
@@ -196,7 +196,7 @@ class GwElement:
             self.set_default_values()
 
         # Adding auto-completion to a QLineEdit for default feature
-        tools_qt.set_completer_widget("v_edit_arc", self.dlg_add_element.feature_id, "arc_id", )
+        tools_gw.set_completer_widget("v_edit_arc", self.dlg_add_element.feature_id, "arc_id", )
 
         if feature:
             self.dlg_add_element.tabWidget.currentChanged.connect(partial(self.fill_tbl_new_element,
@@ -217,7 +217,7 @@ class GwElement:
 
         self.update_location_cmb()
         if not self.new_element_id:
-            self.ids, self.layers, self.list_ids = tools_qt.exist_object(self.dlg_add_element, 'element', layers=self.layers,
+            self.ids, self.layers, self.list_ids = tools_gw.exist_object(self.dlg_add_element, 'element', layers=self.layers,
                                                                 ids=self.ids, list_ids=self.list_ids)
 
         # Open the dialog
@@ -281,7 +281,7 @@ class GwElement:
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "element"
-        tools_qt.set_completer_object(dialog, self.table_object)
+        tools_gw.set_completer_object(dialog, self.table_object)
 
 
     def manage_element_accept(self, table_object):
@@ -471,7 +471,7 @@ class GwElement:
         status = self.controller.execute_sql(sql)
         if status:
             self.element_id = element_id
-            self.layers = tools_qt.manage_close(self.dlg_add_element, table_object, excluded_layers=[], layers=self.layers)
+            self.layers = tools_gw.manage_close(self.dlg_add_element, table_object, excluded_layers=[], layers=self.layers)
 
 
     def filter_elementcat_id(self):
@@ -495,7 +495,7 @@ class GwElement:
 
         # Adding auto-completion to a QLineEdit
         table_object = "element"
-        tools_qt.set_completer_object(self.dlg_man, table_object)
+        tools_gw.set_completer_object(self.dlg_man, table_object)
 
         # Set a model with selected filter. Attach that model to selected table
         tools_qt.fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)

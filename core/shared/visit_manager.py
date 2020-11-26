@@ -311,8 +311,8 @@ class GwVisitManager:
         self.dlg_add_visit.btn_doc_delete.clicked.connect(
             partial(tools_qt.document_delete, self.tbl_document, "doc_x_visit"))
         self.dlg_add_visit.btn_doc_new.clicked.connect(self.manage_document)
-        self.dlg_add_visit.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document))
-        self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document))
+        self.dlg_add_visit.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
+        self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
         self.dlg_add_visit.btn_add_geom.clicked.connect(self.add_feature_clicked)
 
         # Fill combo boxes of the form and related events
@@ -763,14 +763,14 @@ class GwVisitManager:
                         lazy_init_function=self.lazy_init_function))
             # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_delete.clicked.connect(
-                partial(tools_qt.delete_records, self.dlg_add_visit, widget_table, geom_type=self.geom_type, layers=self.layers,
+                partial(tools_gw.delete_records, self.dlg_add_visit, widget_table, geom_type=self.geom_type, layers=self.layers,
                         ids=self.ids, list_ids=self.list_ids, lazy_widget=self.lazy_widget,
                         lazy_init_function=self.lazy_init_function))
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
-        tools_qt.set_completer_widget(viewname, self.dlg_add_visit.feature_id, str(self.geom_type) + "_id")
+        tools_gw.set_completer_widget(viewname, self.dlg_add_visit.feature_id, str(self.geom_type) + "_id")
 
 
     def config_relation_table(self, dialog):
@@ -814,7 +814,7 @@ class GwVisitManager:
             return
 
         viewname = f"v_edit_{geom_type}"
-        tools_qt.set_completer_widget(viewname, dialog.feature_id, str(geom_type) + "_id")
+        tools_gw.set_completer_widget(viewname, dialog.feature_id, str(geom_type) + "_id")
 
         # set table model and completer
         # set a fake where expression to avoid to set model to None
@@ -918,7 +918,7 @@ class GwVisitManager:
             self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
 
         # set timeStart and timeEnd as the min/max dave values get from model
-        tools_qt.set_dates_from_to(self.dlg_man.date_event_from, self.dlg_man.date_event_to,
+        tools_gw.set_dates_from_to(self.dlg_man.date_event_from, self.dlg_man.date_event_to,
                           'om_visit', 'startdate', 'enddate')
 
         # set date events
@@ -1101,7 +1101,7 @@ class GwVisitManager:
         dlg_docman = manage_document.manage_document(
             tablename='visit', qtable=self.dlg_add_visit.tbl_document, item_id=visit_id)
         tools_qt.remove_tab(dlg_docman.tabWidget, 'tab_rel')
-        dlg_docman.btn_accept.clicked.connect(partial(tools_qt.set_completer_object, dlg_docman, 'doc'))
+        dlg_docman.btn_accept.clicked.connect(partial(tools_gw.set_completer_object, dlg_docman, 'doc'))
 
 
     def event_insert(self):
@@ -1699,14 +1699,14 @@ class GwVisitManager:
                         layers=self.layers, list_ids=self.list_ids))
             # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_delete.clicked.connect(
-                partial(tools_qt.delete_records, self.dlg_add_visit, widget_table, geom_type=self.geom_type, layers=self.layers,
+                partial(tools_gw.delete_records, self.dlg_add_visit, widget_table, geom_type=self.geom_type, layers=self.layers,
                         ids=self.ids, list_ids=self.list_ids, lazy_widget=self.lazy_widget,
                         lazy_init_function=self.lazy_init_function))
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
-        tools_qt.set_completer_widget(viewname, dialog.feature_id, str(self.geom_type) + "_id")
+        tools_gw.set_completer_widget(viewname, dialog.feature_id, str(self.geom_type) + "_id")
         self.ids, self.layers, self.list_ids = tools_gw.selection_changed(dialog, widget_table, self.geom_type, False,
                                                                  layers=self.layers, list_ids=self.list_ids,
                                                                  lazy_widget=self.lazy_widget,

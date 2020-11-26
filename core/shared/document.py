@@ -99,13 +99,13 @@ class GwDocument:
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"
-        tools_qt.set_completer_object(self.dlg_add_doc, table_object)
+        tools_gw.set_completer_object(self.dlg_add_doc, table_object)
 
         # Adding auto-completion to a QLineEdit for default feature
         if geom_type is None:
             geom_type = "arc"
         viewname = f"v_edit_{geom_type}"
-        tools_qt.set_completer_widget(viewname, self.dlg_add_doc.feature_id, str(geom_type) + "_id")
+        tools_gw.set_completer_widget(viewname, self.dlg_add_doc.feature_id, str(geom_type) + "_id")
 
         # Set signals
         self.dlg_add_doc.doc_type.currentIndexChanged.connect(self.activate_relations)
@@ -113,10 +113,10 @@ class GwDocument:
         self.dlg_add_doc.btn_path_doc.clicked.connect(lambda: setattr(self, 'files_path', self.get_file_dialog(self.dlg_add_doc, "path")))
         self.dlg_add_doc.btn_accept.clicked.connect(
             partial(self.manage_document_accept, table_object, tablename, qtable, item_id))
-        self.dlg_add_doc.btn_cancel.clicked.connect(lambda: setattr(self, 'layers', tools_qt.manage_close(self.dlg_add_doc,
+        self.dlg_add_doc.btn_cancel.clicked.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_doc,
                     table_object, cur_active_layer, excluded_layers=["v_edit_element"],
                     single_tool_mode=self.single_tool_mode, layers=self.layers)))
-        self.dlg_add_doc.rejected.connect(lambda: setattr(self, 'layers', tools_qt.manage_close(self.dlg_add_doc, table_object,
+        self.dlg_add_doc.rejected.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_doc, table_object,
                     cur_active_layer, excluded_layers=["v_edit_element"],single_tool_mode=self.single_tool_mode,
                     layers=self.layers)))
         self.dlg_add_doc.tab_feature.currentChanged.connect(
@@ -124,7 +124,7 @@ class GwDocument:
 
 
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_add_doc.doc_id.textChanged.connect(partial(tools_qt.exist_object, self.dlg_add_doc, table_object,
+        self.dlg_add_doc.doc_id.textChanged.connect(partial(tools_gw.exist_object, self.dlg_add_doc, table_object,
                                                             self.single_tool_mode, layers=self.layers, ids=self.ids,
                                                             list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
@@ -132,7 +132,7 @@ class GwDocument:
                                                             geom_type=geom_type, ids=self.ids, layers=self.layers,
                                                             list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_add_doc.btn_delete.clicked.connect(partial(tools_qt.delete_records, self.dlg_add_doc, table_object,
+        self.dlg_add_doc.btn_delete.clicked.connect(partial(tools_gw.delete_records, self.dlg_add_doc, table_object,
                                                             layers=self.layers, ids=self.ids, list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_doc.btn_snapping.clicked.connect(partial(tools_gw.selection_init, self.dlg_add_doc, table_object,
@@ -299,7 +299,7 @@ class GwDocument:
         status = self.controller.execute_sql(sql)
         if status:
             self.doc_id = doc_id
-            tools_qt.manage_close(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"],
+            tools_gw.manage_close(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"],
                          single_tool_mode=self.single_tool_mode, layers=self.layers)
 
         if tablename is None:
@@ -322,7 +322,7 @@ class GwDocument:
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"
-        tools_qt.set_completer_object(self.dlg_man, table_object)
+        tools_gw.set_completer_object(self.dlg_man, table_object)
 
         # Set a model with selected filter. Attach that model to selected table
         tools_qt.fill_table_object(self.dlg_man.tbl_document, self.schema_name + "." + table_object)

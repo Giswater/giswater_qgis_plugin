@@ -3227,3 +3227,416 @@ def reload_qtable(dialog, geom_type):
     tools_qt.fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
     set_tablemodel_config(dialog, qtable, f"plan_psector_x_{geom_type}")
     tools_qgis.refresh_map_canvas()
+
+
+def set_completer_object(dialog, table_object, field_object_id="id"):
+    """ Set autocomplete of widget @table_object + "_id"
+        getting id's from selected @table_object
+    """
+
+    widget = tools_qt.get_widget(dialog, table_object + "_id")
+    if not widget:
+        return
+
+    # Set SQL
+    if table_object == "element":
+        field_object_id = table_object + "_id"
+    sql = (f"SELECT DISTINCT({field_object_id})"
+           f" FROM {table_object}"
+           f" ORDER BY {field_object_id}")
+
+    rows = global_vars.controller.get_rows(sql)
+    if rows is None:
+        return
+
+    for i in range(0, len(rows)):
+        aux = rows[i]
+        rows[i] = str(aux[0])
+
+    # Set completer and model: add autocomplete in the widget
+    completer = QCompleter()
+    completer.setCaseSensitivity(Qt.CaseInsensitive)
+    widget.setCompleter(completer)
+    model = QStringListModel()
+    model.setStringList(rows)
+    completer.setModel(model)
+
+
+def set_completer_widget(tablename, widget, field_id):
+    """ Set autocomplete of widget @table_object + "_id"
+        getting id's from selected @table_object
+    """
+
+    if not widget:
+        return
+
+    # Set SQL
+    sql = (f"SELECT DISTINCT({field_id})"
+           f" FROM {tablename}"
+           f" ORDER BY {field_id}")
+    row = global_vars.controller.get_rows(sql)
+    for i in range(0, len(row)):
+        aux = row[i]
+        row[i] = str(aux[0])
+
+    # Set completer and model: add autocomplete in the widget
+    completer = QCompleter()
+    completer.setCaseSensitivity(Qt.CaseInsensitive)
+    widget.setCompleter(completer)
+    model = QStringListModel()
+    model.setStringList(row)
+    completer.setModel(model)
+
+
+def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
+
+    sql = (f"SELECT MIN(LEAST({field_from}, {field_to})),"
+           f" MAX(GREATEST({field_from}, {field_to}))"
+           f" FROM {table_name}")
+    row = global_vars.controller.get_row(sql, log_sql=False)
+    current_date = QDate.currentDate()
+    if row:
+        if row[0]:
+            widget_from.setDate(row[0])
+        else:
+            widget_from.setDate(current_date)
+        if row[1]:
+            widget_to.setDate(row[1])
+        else:
+            widget_to.setDate(current_date)
+
+
+def set_columns_config(widget, table_name, sort_order=0, isQStandardItemModel=False):
+    """ Configuration of tables. Set visibility and width of columns """
+
+    # Set width and alias of visible columns
+    columns_to_delete = []
+    sql = (f"SELECT columnindex, width, alias, status FROM config_form_tableview"
+           f" WHERE tablename = '{table_name}' ORDER BY columnindex")
+    rows = global_vars.controller.get_rows(sql, log_info=True)
+    if not rows:
+        return widget
+
+    for row in rows:
+        if not row['status']:
+            columns_to_delete.append(row['columnindex'] - 1)
+        else:
+            width = row['width']
+            if width is None:
+                width = 100
+            widget.setColumnWidth(row['columnindex'] - 1, width)
+            if row['alias'] is not None:
+                widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
+
+    # Set order
+    if isQStandardItemModel:
+        widget.model().sort(sort_order, Qt.AscendingOrder)
+    else:
+        widget.model().setSort(sort_order, Qt.AscendingOrder)
+        widget.model().select()
+    # Delete columns
+    for column in columns_to_delete:
+        widget.hideColumn(column)
+
+    return widget
+
+
+def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[], single_tool_mode=None, layers=None):
+    """ Close dialog and disconnect snapping """
+
+    if cur_active_layer:
+        global_vars.iface.setActiveLayer(cur_active_layer)
+    # some tools can work differently if standalone or integrated in
+    # another tool
+    if single_tool_mode is not None:
+        layers = tools_qgis.remove_selection(single_tool_mode, layers=layers)
+    else:
+        layers = tools_qgis.remove_selection(True, layers=layers)
+
+    tools_qt.reset_model(dialog, table_object, "arc")
+    tools_qt.reset_model(dialog, table_object, "node")
+    tools_qt.reset_model(dialog, table_object, "connec")
+    tools_qt.reset_model(dialog, table_object, "element")
+    if global_vars.project_type == 'ud':
+        tools_qt.reset_model(dialog, table_object, "gully")
+    tools_qt.tools_gw.close_dialog(dialog)
+    tools_qt.tools_gw.hide_parent_layers(excluded_layers=excluded_layers)
+    tools_qgis.disconnect_snapping()
+    tools_qgis.disconnect_signal_selection_changed()
+
+    return layers
+
+
+def delete_feature_at_plan(dialog, geom_type, list_id):
+    """ Delete features_id to table plan_@geom_type_x_psector"""
+
+    value = tools_qt.get_text(dialog, dialog.psector_id)
+    sql = (f"DELETE FROM plan_psector_x_{geom_type} "
+           f"WHERE {geom_type}_id IN ({list_id}) AND psector_id = '{value}'")
+    global_vars.controller.execute_sql(sql)
+
+
+def delete_records(dialog, table_object, query=False, geom_type=None, layers=None, ids=None, list_ids=None,
+                   lazy_widget=None, lazy_init_function=None):
+    """ Delete selected elements of the table """
+
+    tools_qgis.disconnect_signal_selection_changed()
+    geom_type = get_signal_change_tab(dialog, table_object)
+    if type(table_object) is str:
+        widget_name = f"tbl_{table_object}_x_{geom_type}"
+        widget = tools_qt.get_widget(dialog, widget_name)
+        if not widget:
+            message = "Widget not found"
+            show_warning(message, parameter=widget_name)
+            return
+    elif type(table_object) is QTableView:
+        widget = table_object
+    else:
+        msg = "Table_object is not a table name or QTableView"
+        tools_log.log_info(msg)
+        return
+
+    # Control when QTableView is void or has no model
+    try:
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+    except AttributeError:
+        selected_list = []
+
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qt.show_info_box(message)
+        return
+
+    if query:
+        full_list = widget.model()
+        for x in range(0, full_list.rowCount()):
+            ids.append(widget.model().record(x).value(f"{geom_type}_id"))
+    else:
+        ids = list_ids[geom_type]
+
+    field_id = geom_type + "_id"
+
+    del_id = []
+    inf_text = ""
+    list_id = ""
+    for i in range(0, len(selected_list)):
+        row = selected_list[i].row()
+        id_feature = widget.model().record(row).value(field_id)
+        inf_text += f"{id_feature}, "
+        list_id += f"'{id_feature}', "
+        del_id.append(id_feature)
+    inf_text = inf_text[:-2]
+    list_id = list_id[:-2]
+    message = "Are you sure you want to delete these records?"
+    title = "Delete records"
+    answer = tools_qt.ask_question(message, title, inf_text)
+    if answer:
+        for el in del_id:
+            ids.remove(el)
+    else:
+        return
+
+    expr_filter = None
+    expr = None
+    if len(ids) > 0:
+
+        # Set expression filter with features in the list
+        expr_filter = f'"{field_id}" IN ('
+        for i in range(len(ids)):
+            expr_filter += f"'{ids[i]}', "
+        expr_filter = expr_filter[:-2] + ")"
+
+        # Check expression
+        (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
+        if not is_valid:
+            return
+
+    # Update model of the widget with selected expr_filter
+    if query:
+        delete_feature_at_plan(dialog, geom_type, list_id)
+        reload_qtable(dialog, geom_type)
+    else:
+        load_table(dialog, table_object, geom_type, expr_filter)
+        tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
+
+    # Select features with previous filter
+    # Build a list of feature id's and select them
+    tools_qgis.select_features_by_ids(geom_type, expr, layers=layers)
+
+    if query:
+        layers = tools_qgis.remove_selection(layers=layers)
+
+    # Update list
+    list_ids[geom_type] = ids
+    enable_feature_type(dialog, table_object, ids=ids)
+    tools_qgis.connect_signal_selection_changed(dialog, table_object, geom_type)
+
+    return ids, layers, list_ids
+
+
+def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=None, list_ids=None):
+    """ Check if selected object (document or element) already exists """
+
+    # Reset list of selected records
+    reset_feature_list(ids, list_ids)
+
+    field_object_id = "id"
+    if table_object == "element":
+        field_object_id = table_object + "_id"
+    object_id = tools_qt.get_text(dialog, table_object + "_id")
+
+    # Check if we already have data with selected object_id
+    sql = (f"SELECT * "
+           f" FROM {table_object}"
+           f" WHERE {field_object_id} = '{object_id}'")
+    row = global_vars.controller.get_row(sql, log_info=False)
+
+    # If object_id not found: Clear data
+    if not row:
+        reset_widgets(dialog, table_object)
+        if table_object == 'element':
+            set_combo_from_param_user(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
+            set_combo_from_param_user(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
+                      field_id='expl_id', field_name='name')
+            set_calendar_by_user_param(dialog, 'builtdate', 'config_param_user', 'value', 'edit_builtdate_vdefault')
+            set_combo_from_param_user(dialog, 'workcat_id', 'cat_work',
+                      'edit_workcat_vdefault', field_id='id', field_name='id')
+
+        if single_tool_mode is not None:
+            layers = tools_qgis.remove_selection(single_tool_mode, layers=layers)
+        else:
+            layers = tools_qgis.remove_selection(True, layers=layers)
+        tools_qt.reset_model(dialog, table_object, "arc")
+        tools_qt.reset_model(dialog, table_object, "node")
+        tools_qt.reset_model(dialog, table_object, "connec")
+        tools_qt.reset_model(dialog, table_object, "element")
+        if global_vars.project_type == 'ud':
+            tools_qt.reset_model(dialog, table_object, "gully")
+
+        return layers, ids, list_ids
+
+    # Fill input widgets with data of the @row
+    fill_widgets(dialog, table_object, row)
+
+    # Check related 'arcs'
+    ids, layers, list_ids = get_rows_by_feature_type(dialog, table_object, "arc", ids=ids, list_ids=list_ids, layers=layers)
+
+    # Check related 'nodes'
+    ids, layers, list_ids = get_rows_by_feature_type(dialog, table_object, "node", ids=ids, list_ids=list_ids, layers=layers)
+
+    # Check related 'connecs'
+    ids, layers, list_ids = get_rows_by_feature_type(dialog, table_object, "connec", ids=ids, list_ids=list_ids, layers=layers)
+
+    # Check related 'elements'
+    ids, layers, list_ids = get_rows_by_feature_type(dialog, table_object, "element", ids=ids, list_ids=list_ids, layers=layers)
+
+    # Check related 'gullys'
+    if global_vars.project_type == 'ud':
+        ids, layers, list_ids = get_rows_by_feature_type(dialog, table_object, "gully", ids=ids, list_ids=list_ids, layers=layers)
+
+    return layers, ids, list_ids
+
+
+def reset_widgets(dialog, table_object):
+    """ Clear contents of input widgets """
+
+    if table_object == "doc":
+        tools_qt.set_widget_text(dialog, "doc_type", "")
+        tools_qt.set_widget_text(dialog, "observ", "")
+        tools_qt.set_widget_text(dialog, "path", "")
+    elif table_object == "element":
+        tools_qt.set_widget_text(dialog, "elementcat_id", "")
+        tools_qt.set_widget_text(dialog, "state", "")
+        tools_qt.set_widget_text(dialog, "expl_id", "")
+        tools_qt.set_widget_text(dialog, "ownercat_id", "")
+        tools_qt.set_widget_text(dialog, "location_type", "")
+        tools_qt.set_widget_text(dialog, "buildercat_id", "")
+        tools_qt.set_widget_text(dialog, "workcat_id", "")
+        tools_qt.set_widget_text(dialog, "workcat_id_end", "")
+        tools_qt.set_widget_text(dialog, "comment", "")
+        tools_qt.set_widget_text(dialog, "observ", "")
+        tools_qt.set_widget_text(dialog, "path", "")
+        tools_qt.set_widget_text(dialog, "rotation", "")
+        tools_qt.set_widget_text(dialog, "verified", "")
+        tools_qt.set_widget_text(dialog, dialog.num_elements, "")
+
+
+def fill_widgets(dialog, table_object, row):
+    """ Fill input widgets with data int he @row """
+
+    if table_object == "doc":
+
+        tools_qt.set_widget_text(dialog, "doc_type", row["doc_type"])
+        tools_qt.set_widget_text(dialog, "observ", row["observ"])
+        tools_qt.set_widget_text(dialog, "path", row["path"])
+
+    elif table_object == "element":
+
+        state = ""
+        if row['state']:
+            sql = (f"SELECT name FROM value_state"
+                   f" WHERE id = '{row['state']}'")
+            row_aux = global_vars.controller.get_row(sql)
+            if row_aux:
+                state = row_aux[0]
+
+        expl_id = ""
+        if row['expl_id']:
+            sql = (f"SELECT name FROM exploitation"
+                   f" WHERE expl_id = '{row['expl_id']}'")
+            row_aux = global_vars.controller.get_row(sql)
+            if row_aux:
+                expl_id = row_aux[0]
+
+        tools_qt.set_widget_text(dialog, "code", row['code'])
+        sql = (f"SELECT elementtype_id FROM cat_element"
+               f" WHERE id = '{row['elementcat_id']}'")
+        row_type = global_vars.controller.get_row(sql)
+        if row_type:
+            tools_qt.set_widget_text(dialog, "element_type", row_type[0])
+
+        tools_qt.set_widget_text(dialog, "elementcat_id", row['elementcat_id'])
+        tools_qt.set_widget_text(dialog, "num_elements", row['num_elements'])
+        tools_qt.set_widget_text(dialog, "state", state)
+        tools_qt.set_combo_value(dialog.state_type, f"{row['state_type']}", 0)
+        tools_qt.set_widget_text(dialog, "expl_id", expl_id)
+        tools_qt.set_widget_text(dialog, "ownercat_id", row['ownercat_id'])
+        tools_qt.set_widget_text(dialog, "location_type", row['location_type'])
+        tools_qt.set_widget_text(dialog, "buildercat_id", row['buildercat_id'])
+        tools_qt.set_widget_text(dialog, "builtdate", row['builtdate'])
+        tools_qt.set_widget_text(dialog, "workcat_id", row['workcat_id'])
+        tools_qt.set_widget_text(dialog, "workcat_id_end", row['workcat_id_end'])
+        tools_qt.set_widget_text(dialog, "comment", row['comment'])
+        tools_qt.set_widget_text(dialog, "observ", row['observ'])
+        tools_qt.set_widget_text(dialog, "link", row['link'])
+        tools_qt.set_widget_text(dialog, "verified", row['verified'])
+        tools_qt.set_widget_text(dialog, "rotation", row['rotation'])
+        if str(row['undelete']) == 'True':
+            dialog.undelete.setChecked(True)
+
+
+def set_combo_from_param_user(dialog, widget, table_name, parameter, field_id='id', field_name='id'):
+    """ Executes query and set combo box """
+
+    sql = (f"SELECT t1.{field_name} FROM {table_name} as t1"
+           f" INNER JOIN config_param_user as t2 ON t1.{field_id}::text = t2.value::text"
+           f" WHERE parameter = '{parameter}' AND cur_user = current_user")
+    row = global_vars.controller.get_row(sql)
+    if row:
+        tools_qt.set_widget_text(dialog, widget, row[0])
+
+
+def show_warning_detail(text, detail_text, context_name=None):
+    """ Show warning message with a button to show more details """
+
+    inf_text = "Press 'Show Me' button to get more details..."
+    widget = global_vars.iface.messageBar().createMessage(tr(text, context_name), tr(inf_text))
+    button = QPushButton(widget)
+    button.setText(tr("Show Me"))
+    button.clicked.connect(partial(tools_qt.show_details, detail_text, tr('Warning details')))
+    widget.layout().addWidget(button)
+    global_vars.iface.messageBar().pushWidget(widget, 1)
+
+    if global_vars.logger:
+        global_vars.logger.warning(text + "\n" + detail_text)

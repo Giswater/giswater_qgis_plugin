@@ -84,7 +84,7 @@ class GwEndFeatureButton(GwParentAction):
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "cat_work"
-        tools_qt.set_completer_object(self.dlg_work_end, self.table_object)
+        tools_gw.set_completer_object(self.dlg_work_end, self.table_object)
 
         # Set signals
         self.dlg_work_end.btn_accept.clicked.connect(partial(self.manage_workcat_end_accept))
@@ -99,7 +99,7 @@ class GwEndFeatureButton(GwParentAction):
                                                              geom_type=geom_type, ids=self.ids, layers=self.layers,
                                                              list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_work_end.btn_delete.clicked.connect(partial(tools_qt.delete_records, self.dlg_work_end, self.table_object,
+        self.dlg_work_end.btn_delete.clicked.connect(partial(tools_gw.delete_records, self.dlg_work_end, self.table_object,
                                                              geom_type=geom_type, layers=self.layers, ids=self.ids,
                                                              list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
@@ -113,7 +113,7 @@ class GwEndFeatureButton(GwParentAction):
         self.fill_fields()
 
         # Adding auto-completion to a QLineEdit for default feature
-        tools_qt.set_completer_widget(viewname, self.dlg_work_end.feature_id, str(geom_type) + "_id")
+        tools_gw.set_completer_widget(viewname, self.dlg_work_end.feature_id, str(geom_type) + "_id")
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
@@ -505,7 +505,7 @@ class GwEndFeatureButton(GwParentAction):
 
         tools_qt.set_calendar(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
         table_object = "cat_work"
-        tools_qt.set_completer_widget(table_object, self.dlg_new_workcat.cat_work_id, 'id')
+        tools_gw.set_completer_widget(table_object, self.dlg_new_workcat.cat_work_id, 'id')
 
         # Set signals
         self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))

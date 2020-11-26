@@ -170,7 +170,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         tools_gw.load_settings(self.dlg_new_workcat)
         tools_qt.set_calendar(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)
         table_object = "cat_work"
-        tools_qt.set_completer_object(self.dlg_new_workcat, "cat_work")
+        tools_gw.set_completer_object(self.dlg_new_workcat, "cat_work")
 
         # Set signals
         self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))

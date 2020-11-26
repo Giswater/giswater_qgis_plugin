@@ -454,7 +454,7 @@ class GwDimensioning:
             widget = tools_gw.add_tableview(db_return, field)
             widget = tools_gw.add_headers(widget, field)
             widget = tools_qt.populate_table(widget, field)
-            widget = tools_qt.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
+            widget = tools_gw.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
             tools_qt.set_qtv_config(widget)
         widget.setObjectName(widget.property('columnname'))
 

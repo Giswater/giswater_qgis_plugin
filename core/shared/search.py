@@ -503,9 +503,9 @@ class GwSearch:
             partial(tools_qt.document_delete, self.items_dialog.tbl_document, 'doc_x_workcat'))
         self.items_dialog.btn_doc_new.clicked.connect(
             partial(self.manage_document, self.items_dialog.tbl_document, item['sys_id']))
-        self.items_dialog.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.items_dialog.tbl_document))
+        self.items_dialog.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.items_dialog.tbl_document, 'path'))
         self.items_dialog.tbl_document.doubleClicked.connect(
-            partial(tools_qt.document_open, self.items_dialog.tbl_document))
+            partial(tools_qt.document_open, self.items_dialog.tbl_document, 'path'))
 
         self.items_dialog.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.items_dialog))
         self.items_dialog.btn_path.clicked.connect(
@@ -555,7 +555,7 @@ class GwSearch:
 
         manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.manage_document(tablename='workcat', qtable=qtable, item_id=item_id)
-        dlg_docman.btn_accept.clicked.connect(partial(tools_qt.set_completer_object, dlg_docman, 'doc'))
+        dlg_docman.btn_accept.clicked.connect(partial(tools_gw.set_completer_object, dlg_docman, 'doc'))
         tools_qt.remove_tab(dlg_docman.tabWidget, 'tab_rel')
 
 

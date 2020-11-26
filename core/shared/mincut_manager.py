@@ -44,7 +44,7 @@ class GwMincutManager:
         # Create the dialog and signals
         self.dlg_min_edit = MincutManagerUi()
         tools_gw.load_settings(self.dlg_min_edit)
-        tools_qt.set_dates_from_to(self.dlg_min_edit.date_from, self.dlg_min_edit.date_to, 'om_mincut',
+        tools_gw.set_dates_from_to(self.dlg_min_edit.date_from, self.dlg_min_edit.date_to, 'om_mincut',
             'forecast_start, exec_start', 'forecast_end, exec_end')
         self.dlg_min_edit.date_from.setEnabled(False)
         self.dlg_min_edit.date_to.setEnabled(False)

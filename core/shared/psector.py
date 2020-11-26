@@ -336,7 +336,7 @@ class GwPsector:
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
             tools_qt.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
-            self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document))
+            self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
 
         else:
 
@@ -370,7 +370,7 @@ class GwPsector:
             self.dlg_plan_psector, table_object, True, geom_type=self.geom_type, ids=self.ids, layers=self.layers,
                                                                  list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_plan_psector.btn_delete.clicked.connect(partial(tools_qt.delete_records,
+        self.dlg_plan_psector.btn_delete.clicked.connect(partial(tools_gw.delete_records,
             self.dlg_plan_psector, table_object, True, geom_type=self.geom_type, layers=self.layers,
                                                                  ids=self.ids, list_ids=self.list_ids))
         self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
@@ -397,7 +397,7 @@ class GwPsector:
         self.dlg_plan_psector.btn_doc_delete.clicked.connect(
             partial(tools_qt.document_delete, self.tbl_document, 'doc_x_psector'))
         self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
-        self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document))
+        self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
         self.cmb_status.currentIndexChanged.connect(partial(self.show_status_warning))
 
         # Create list for completer QLineEdit
@@ -436,7 +436,7 @@ class GwPsector:
 
         # Adding auto-completion to a QLineEdit for default feature
         viewname = "v_edit_" + self.geom_type
-        tools_qt.set_completer_widget(viewname, self.dlg_plan_psector.feature_id, str(self.geom_type) + "_id")
+        tools_gw.set_completer_widget(viewname, self.dlg_plan_psector.feature_id, str(self.geom_type) + "_id")
 
         # Set default tab 'arc'
         self.dlg_plan_psector.tab_feature.setCurrentIndex(0)
@@ -1360,7 +1360,7 @@ class GwPsector:
         psector_id = tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
         manage_document = GwDocument(single_tool=False)
         dlg_docman = manage_document.manage_document(tablename='psector', qtable=qtable, item_id=psector_id)
-        dlg_docman.btn_accept.clicked.connect(partial(tools_qt.set_completer_object, dlg_docman, 'doc'))
+        dlg_docman.btn_accept.clicked.connect(partial(tools_gw.set_completer_object, dlg_docman, 'doc'))
         tools_qt.remove_tab(dlg_docman.tabWidget, 'tab_rel')
 
 
