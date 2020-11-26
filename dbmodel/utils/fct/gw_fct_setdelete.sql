@@ -25,6 +25,10 @@ lot:
 SELECT SCHEMA_NAME.gw_fct_setdelete('{"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"featureType":"lot", "tableName":"om_visit_lot", "id":44, "idName": "id"}}')
 
+psector:
+  SELECT SCHEMA_NAME.gw_fct_setdelete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+  "feature":{"id":["1"], "featureType":"PSECTOR", "tableName":"v_ui_plan_psector", "idName":"psector_id"}, 
+  "data":{"filterFields":{}, "pageInfo":{}}}$$);
 */
 
 DECLARE
@@ -65,7 +69,7 @@ BEGIN
 	v_id := (p_data ->> 'feature')::json->> 'id';
 	v_idname := (p_data ->> 'feature')::json->> 'idName';
 
-	IF v_featuretype='PSECTOR' THEN
+	IF upper(v_featuretype)='PSECTOR' THEN
 
 		select string_agg(quote_literal(a),',') into v_psector_array from json_array_elements_text(v_id::json) a;
 
