@@ -34,10 +34,10 @@ v_systype text;
 v_epatype text;
 v_grafdelim text;
 v_config json;
-v_mapzone_id integer;
-v_dma_id integer;
-v_dqa_id integer;
-v_presszone_id integer;
+v_mapzone_id text;
+v_dma_id text;
+v_dqa_id text;
+v_presszone_id text;
 v_mapzone_array text[];
 rec text;
 v_check_grafconfig text;
@@ -136,7 +136,7 @@ BEGIN
                     INTO v_mapzone_id;
                 END IF;
 
-                EXECUTE 'SELECT grafconfig FROM '||rec||' WHERE '||rec||'_id::text = '||v_mapzone_id||'::text'
+                EXECUTE 'SELECT grafconfig FROM '||rec||' WHERE '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text'
                 INTO v_check_grafconfig;
 
                     IF v_check_grafconfig IS NULL THEN 
@@ -148,11 +148,11 @@ BEGIN
                     ''toArc'',   ARRAY['||v_arc_id||'::text] ) AS feature)a'
                     INTO v_config;
 
-                    EXECUTE'UPDATE '||rec||' SET grafconfig = '||quote_literal(v_config)||' WHERE '||rec||'_id::text = '||v_mapzone_id||'::text;';
+                    EXECUTE'UPDATE '||rec||' SET grafconfig = '||quote_literal(v_config)||' WHERE '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text;';
                 ELSE
                     
                     EXECUTE  'SELECT 1 FROM '||rec||' CROSS JOIN json_array_elements((grafconfig->>''use'')::json) elem 
-                    WHERE elem->>''nodeParent'' = '||quote_literal(v_feature_id)||' AND '||rec||'_id::text = '||v_mapzone_id||'::text LIMIT 1'
+                    WHERE elem->>''nodeParent'' = '||quote_literal(v_feature_id)||' AND '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text LIMIT 1'
                     INTO v_check_grafconfig;
 
                     IF v_check_grafconfig = '1'  THEN 
@@ -162,8 +162,8 @@ BEGIN
                         select json_array_elements_text((elem->>''toArc'')::json) as toarc, elem->>''nodeParent'' as elem
                         from '||rec||'
                         cross join json_array_elements((grafconfig->>''use'')::json) elem
-                        where elem->>''nodeParent'' = '||quote_literal(v_feature_id)||' AND '||rec||'_id::text = '||v_mapzone_id||'::text)a 
-                        WHERE '||rec||'_id::text ='||v_mapzone_id||'::text';
+                        where elem->>''nodeParent'' = '||quote_literal(v_feature_id)||' AND '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text)a 
+                        WHERE '||rec||'_id::text ='||quote_literal(v_mapzone_id)||'::text';
 
                     ELSE    
                         --Define grafconfig in case when there is definition for mapzone and node is not defined there
@@ -176,10 +176,10 @@ BEGIN
                         EXECUTE 'SELECT jsonb_build_object(''use'',b.feature, ''ignore'',(grafconfig->>''ignore'')::json) FROM '||rec||',( 
                         SELECT jsonb_agg(a.use) || '''||v_config||'''::jsonb as feature   FROM (
                         select '||rec||'_id, json_array_elements((grafconfig->>''use'')::json) as use, grafconfig
-                        from '||rec||' where '||rec||'_id::text ='||v_mapzone_id||'::text)a)b where '||rec||'_id::text ='||v_mapzone_id||'::text'
+                        from '||rec||' where '||rec||'_id::text ='||quote_literal(v_mapzone_id)||'::text)a)b where '||rec||'_id::text ='||quote_literal(v_mapzone_id)||'::text'
                         INTO v_config;
      
-                        EXECUTE'UPDATE '||rec||' SET grafconfig = '||quote_literal(v_config)||' WHERE '||rec||'_id::text = '||v_mapzone_id||'::text;';
+                        EXECUTE'UPDATE '||rec||' SET grafconfig = '||quote_literal(v_config)||' WHERE '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text;';
                         
                     END IF;
                 END IF;
