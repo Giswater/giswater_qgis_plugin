@@ -16,7 +16,7 @@ from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import AuxPoint
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qt
+from ....lib import tools_qgis, tools_qt
 
 
 class GwAuxPointButton(GwParentMapTool):
@@ -198,7 +198,7 @@ class GwAuxPointButton(GwParentMapTool):
         # Get current layer
         self.current_layer = self.iface.activeLayer()
 
-        self.layer_points = self.controller.get_layer_by_tablename('v_edit_cad_auxpoint')
+        self.layer_points = tools_qgis.get_layer_by_tablename('v_edit_cad_auxpoint')
         if self.layer_points is None:
             tools_gw.show_warning("Layer not found", parameter='v_edit_cad_auxpoint')
             self.cancel_map_tool()
@@ -210,7 +210,7 @@ class GwAuxPointButton(GwParentMapTool):
         row = tools_gw.get_config('edit_cadtools_baselayer_vdefault')
         if row:
             self.snap_to_selected_layer = True
-            self.vdefault_layer = self.controller.get_layer_by_tablename(row[0], True)
+            self.vdefault_layer = tools_qgis.get_layer_by_tablename(row[0], True)
             if self.vdefault_layer:
                 self.iface.setActiveLayer(self.vdefault_layer)
 

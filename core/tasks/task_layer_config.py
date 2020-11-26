@@ -99,7 +99,7 @@ class GwConfigLayerTask(QgsTask):
         """ Set form suppress on "Hide form on add feature (global settings) """
 
         for layer_name in layers_list:
-            layer = self.controller.get_layer_by_tablename(layer_name)
+            layer = tools_qgis.get_layer_by_tablename(layer_name)
             if layer is None: continue
             config = layer.editFormConfig()
             config.setSuppress(0)
@@ -122,7 +122,7 @@ class GwConfigLayerTask(QgsTask):
             if self.isCanceled():
                 return False
 
-            layer = self.controller.get_layer_by_tablename(layer_name)
+            layer = tools_qgis.get_layer_by_tablename(layer_name)
             if not layer:
                 continue
 

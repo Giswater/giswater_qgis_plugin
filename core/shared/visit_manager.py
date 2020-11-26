@@ -229,7 +229,7 @@ class GwVisitManager:
 
         # Zoom to selected geometry or relations
         if self.it_is_new_visit is False:
-            visit_layer = self.controller.get_layer_by_tablename('v_edit_om_visit')
+            visit_layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
             if visit_layer:
                 visit_layer.selectByExpression(f'"id"={visit_id}')
                 box = visit_layer.boundingBoxOfSelected()
@@ -381,7 +381,7 @@ class GwVisitManager:
         if self.point_xy['x'] is not None:
             self.update_geom()
             
-        layer = self.controller.get_layer_by_tablename('v_edit_om_visit')
+        layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
         if layer:
             layer.dataProvider().forceReload()
 
@@ -392,7 +392,7 @@ class GwVisitManager:
         # notify that a new visit has been added
         self.visit_added.emit(self.current_visit.id)
 
-        layer = self.controller.get_layer_by_tablename('v_edit_om_visit')
+        layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
         if layer:
             layer.dataProvider().forceReload()
         tools_qgis.refresh_map_canvas()

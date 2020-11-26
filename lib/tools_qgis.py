@@ -356,7 +356,7 @@ def get_primary_key(layer=None):
     return uri_pk
 
 
-def qgis_get_layer_by_tablename(tablename, show_warning=False, log_info=False, schema_name=None):
+def get_layer_by_tablename(tablename, show_warning=False, log_info=False, schema_name=None):
     """ Iterate over all layers and get the one with selected @tablename """
 
     # Check if we have any layer loaded
@@ -390,7 +390,7 @@ def qgis_get_layer_by_tablename(tablename, show_warning=False, log_info=False, s
 def manage_snapping_layer(layername, snapping_type=0, tolerance=15.0):
     """ Manage snapping of @layername """
 
-    layer = qgis_get_layer_by_tablename(layername)
+    layer = get_layer_by_tablename(layername)
     if not layer:
         return
     if snapping_type == 0:
@@ -404,29 +404,25 @@ def manage_snapping_layer(layername, snapping_type=0, tolerance=15.0):
 
 
 # Snapping utilities
-# TODO: Maybe find a better solution
-def get_layer(tablename):
-    return global_vars.controller.get_layer_by_tablename(tablename)
-
 
 def remove_selection(remove_groups=True, layers=None):
     """ Remove all previous selections """
 
-    layer = global_vars.controller.get_layer_by_tablename("v_edit_arc")
+    layer = get_layer_by_tablename("v_edit_arc")
     if layer:
         layer.removeSelection()
-    layer = global_vars.controller.get_layer_by_tablename("v_edit_node")
+    layer = get_layer_by_tablename("v_edit_node")
     if layer:
         layer.removeSelection()
-    layer = global_vars.controller.get_layer_by_tablename("v_edit_connec")
+    layer = get_layer_by_tablename("v_edit_connec")
     if layer:
         layer.removeSelection()
-    layer = global_vars.controller.get_layer_by_tablename("v_edit_element")
+    layer = get_layer_by_tablename("v_edit_element")
     if layer:
         layer.removeSelection()
 
     if global_vars.project_type == 'ud':
-        layer = global_vars.controller.get_layer_by_tablename("v_edit_gully")
+        layer = get_layer_by_tablename("v_edit_gully")
         if layer:
             layer.removeSelection()
 
@@ -751,7 +747,7 @@ def restore_user_layer(layer_name, user_current_layer=None):
     if user_current_layer:
         global_vars.iface.setActiveLayer(user_current_layer)
     else:
-        layer = global_vars.controller.get_layer_by_tablename(layer_name)
+        layer = get_layer_by_tablename(layer_name)
         if layer:
             global_vars.iface.setActiveLayer(layer)
 
@@ -875,7 +871,7 @@ def set_layer_visible(layer, recursive=True, visible=True):
 def set_layer_index(layer_name):
     """ Force reload dataProvider of layer """
 
-    layer = global_vars.controller.get_layer_by_tablename(layer_name)
+    layer = get_layer_by_tablename(layer_name)
     if layer:
         layer.dataProvider().forceReload()
         layer.triggerRepaint()

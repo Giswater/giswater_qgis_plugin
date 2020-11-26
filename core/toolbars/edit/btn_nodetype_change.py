@@ -65,7 +65,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
                     self.controller.execute_sql(sql)
 
                 # Set active layer
-                layer = self.controller.get_layer_by_tablename('v_edit_node')
+                layer = tools_qgis.get_layer_by_tablename('v_edit_node')
                 if layer:
                     self.iface.setActiveLayer(layer)
                 message = "Values has been updated"
@@ -201,7 +201,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
         self.snapper_manager.enable_snapping()
         self.current_layer = self.iface.activeLayer()
         # Set active layer to 'v_edit_node'
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)
 
         # Change cursor

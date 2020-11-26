@@ -55,7 +55,7 @@ class GwInfoTools:
             return
 
         for layer_name in layers_name_list:
-            layer = self.controller.get_layer_by_tablename(layer_name)
+            layer = tools_qgis.get_layer_by_tablename(layer_name)
             if not layer:
                 msg = f"Layer {layer_name} does not found, therefore, not configured"
                 tools_log.log_info(msg)
@@ -138,7 +138,7 @@ class GwInfoTools:
             if not layers_name_list:
                 return
             if type(layers_name_list) == str:
-                layer = self.controller.get_layer_by_tablename(layers_name_list)
+                layer = tools_qgis.get_layer_by_tablename(layers_name_list)
                 layer.triggerRepaint()
             elif type(layers_name_list) == list:
                 for layer_name in layers_name_list:
@@ -155,7 +155,7 @@ class GwInfoTools:
         try:
             layer = kwargs["layer"]
             if type(layer) is str:
-                layer = self.controller.get_layer_by_tablename(layer)
+                layer = tools_qgis.get_layer_by_tablename(layer)
             col_name = kwargs["field"]
             hidden = kwargs["hidden"]
         except Exception as e:
@@ -179,7 +179,7 @@ class GwInfoTools:
             field = kwargs["field"]
             layer = kwargs["layer"]
             if type(layer) is str:
-                layer = self.controller.get_layer_by_tablename(layer)
+                layer = tools_qgis.get_layer_by_tablename(layer)
             field_index = kwargs["fieldIndex"]
         except Exception as e:
             tools_log.log_info(f"{type(e).__name__} --> {e}")
@@ -199,7 +199,7 @@ class GwInfoTools:
             field = kwargs["field"]
             layer = kwargs["layer"]
             if type(layer) is str:
-                layer = self.controller.get_layer_by_tablename(layer)
+                layer = tools_qgis.get_layer_by_tablename(layer)
             field_index = kwargs["fieldIndex"]
         except Exception as e:
             tools_log.log_info(f"{type(e).__name__} --> {e}")
@@ -226,7 +226,7 @@ class GwInfoTools:
         """
 
         # Get layer
-        layer = self.controller.get_layer_by_tablename(kwargs['layerName']) if 'layerName' in kwargs else None
+        layer = tools_qgis.get_layer_by_tablename(kwargs['layerName']) if 'layerName' in kwargs else None
         if layer is None:
             return False
 
@@ -330,7 +330,7 @@ class GwInfoTools:
         root = QgsProject.instance().layerTreeRoot()
         self.get_all_layers(root)
         for layer_name in self.all_layers:
-            layer = self.controller.get_layer_by_tablename(layer_name)
+            layer = tools_qgis.get_layer_by_tablename(layer_name)
             layer.triggerRepaint()
 
 

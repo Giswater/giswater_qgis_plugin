@@ -9,6 +9,7 @@ from qgis.PyQt.QtCore import Qt
 
 from ..parent_maptool import GwParentMapTool
 from ...utils import tools_gw
+from ....lib import tools_qgis
 
 
 class GwFlowTraceButton(GwParentMapTool):
@@ -62,7 +63,7 @@ class GwFlowTraceButton(GwParentMapTool):
     def activate(self):
 
         # set active and current layer
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)
         self.current_layer = self.layer_node
 
@@ -88,7 +89,7 @@ class GwFlowTraceButton(GwParentMapTool):
 
         # Control current layer (due to QGIS bug in snapping system)
         if self.canvas.currentLayer() is None:
-            layer = self.controller.get_layer_by_tablename('v_edit_node')
+            layer = tools_qgis.get_layer_by_tablename('v_edit_node')
             if layer:
                 self.iface.setActiveLayer(layer)
 

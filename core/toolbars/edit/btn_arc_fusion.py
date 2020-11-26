@@ -106,7 +106,7 @@ class GwArcFusionButton(GwParentMapTool):
         self.snapper_manager.enable_snapping()
 
         # Set active layer to 'v_edit_node'
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)
 
         # Change cursor

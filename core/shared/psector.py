@@ -300,7 +300,7 @@ class GwPsector:
             layer = None
             if not is_api:
                 layername = f'v_edit_plan_psector'
-                layer = self.controller.get_layer_by_tablename(layername, show_warning=False)
+                layer = tools_qgis.get_layer_by_tablename(layername, show_warning=False)
 
             if layer:
 
@@ -1378,7 +1378,7 @@ class GwPsector:
          and is painted in red on the canvas """
 
         rubber_band.reset()
-        layer = global_vars.controller.get_layer_by_tablename(layer_name)
+        layer = tools_qgis.get_layer_by_tablename(layer_name)
         if not layer: return
 
         row = index.row()

@@ -98,7 +98,7 @@ class GwElement:
         self.check_date(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
 
         # Get layer element and save if is visible or not for restore when finish process
-        layer_element = self.controller.get_layer_by_tablename("v_edit_element")
+        layer_element = tools_qgis.get_layer_by_tablename("v_edit_element")
         layer_is_visible = False
         if layer_element:
             layer_is_visible = tools_qgis.is_layer_visible(layer_element)

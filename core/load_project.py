@@ -135,10 +135,10 @@ class LoadProject(QObject):
         """ # Check if loaded project is valid for Giswater """
 
         # Check if table 'v_edit_node' is loaded
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
         if not self.layer_node and show_warning:
-            layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
-            layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
+            layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+            layer_connec = tools_qgis.get_layer_by_tablename("v_edit_connec")
             if layer_arc or layer_connec:
                 title = "Giswater plugin cannot be loaded"
                 msg = "QGIS project seems to be a Giswater project, but layer 'v_edit_node' is missing"

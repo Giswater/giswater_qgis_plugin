@@ -48,7 +48,7 @@ class GwEndFeatureButton(GwParentAction):
         self.layers['arc'] = tools_gw.get_group_layers('arc')
         self.layers['node'] = tools_gw.get_group_layers('node')
         self.layers['connec'] = tools_gw.get_group_layers('connec')
-        self.layers['element'] = [self.controller.get_layer_by_tablename('v_edit_element')]
+        self.layers['element'] = [tools_qgis.get_layer_by_tablename('v_edit_element')]
 
         self.layers = tools_qgis.remove_selection(True, layers=self.layers)
 
@@ -364,7 +364,7 @@ class GwEndFeatureButton(GwParentAction):
 
         arc_type = row[0].lower()
         arc_table = "v_edit_man_" + arc_type
-        layer_arc = self.controller.get_layer_by_tablename(arc_table)
+        layer_arc = tools_qgis.get_layer_by_tablename(arc_table)
 
         aux = "\"arc_id\" = "
         aux += f"'{arc_id}'"

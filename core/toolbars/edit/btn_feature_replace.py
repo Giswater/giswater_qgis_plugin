@@ -399,7 +399,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
     def activate(self):
 
         # Set active and current layer
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)
         self.current_layer = self.layer_node
 

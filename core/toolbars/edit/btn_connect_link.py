@@ -73,8 +73,8 @@ class GwConnectLinkButton(GwParentMapTool):
                 # Check if it belongs to 'connec' or 'gully' group
                 layer = self.snapper_manager.get_snapped_layer(result)
                 feature_id = self.snapper_manager.get_snapped_feature_id(result)
-                layer_connec = tools_qgis.get_layer(layer)
-                layer_gully = tools_qgis.get_layer(layer)
+                layer_connec = tools_qgis.get_layer_by_tablename(layer)
+                layer_gully = tools_qgis.get_layer_by_tablename(layer)
                 if layer_connec or layer_gully:
                     key = QApplication.keyboardModifiers()
                     # If Ctrl+Shift is clicked: deselect snapped feature
@@ -110,7 +110,7 @@ class GwConnectLinkButton(GwParentMapTool):
 
             # Check selected records
             number_features = 0
-            layer = tools_qgis.get_layer('v_edit_connec')
+            layer = tools_qgis.get_layer_by_tablename('v_edit_connec')
             if layer:
                 number_features += layer.selectedFeatureCount()
 
@@ -123,7 +123,7 @@ class GwConnectLinkButton(GwParentMapTool):
                     self.link_selected_features('connec', layer)
                     self.cancel_map_tool()
 
-            layer = tools_qgis.get_layer('v_edit_gully')
+            layer = tools_qgis.get_layer_by_tablename('v_edit_gully')
             if layer:
                 # Check selected records
                 number_features = 0
@@ -257,11 +257,11 @@ class GwConnectLinkButton(GwParentMapTool):
             behaviour = QgsVectorLayer.AddToSelection
 
         # Selection for all connec and gully layers
-        layer = tools_qgis.get_layer('v_edit_connec')
+        layer = tools_qgis.get_layer_by_tablename('v_edit_connec')
         if layer:
             layer.selectByRect(selectGeometry, behaviour)
 
-        layer = tools_qgis.get_layer('v_edit_gully')
+        layer = tools_qgis.get_layer_by_tablename('v_edit_gully')
         if layer:
             layer.selectByRect(selectGeometry, behaviour)
 

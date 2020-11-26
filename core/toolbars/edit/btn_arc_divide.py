@@ -88,11 +88,11 @@ class GwArcDivideButton(GwParentMapTool):
         self.active_layer = self.iface.activeLayer()
 
         # Set active layer to 'v_edit_node'
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
+        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer_node)
 
         # Get layer to 'v_edit_arc'
-        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
 
         # Set the mapTool's parent cursor
         self.canvas.setCursor(self.cursor)

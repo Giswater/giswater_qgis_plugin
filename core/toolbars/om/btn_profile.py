@@ -83,7 +83,7 @@ class GwProfileButton(GwParentMapTool):
         self.composers_path = self.dlg_draw_profile.findChild(QLineEdit, "composers_path")
 
         # Set layer_node
-        self.layer_node = self.controller.get_layer_by_tablename('v_edit_node', show_warning=False)
+        self.layer_node = tools_qgis.get_layer_by_tablename('v_edit_node', show_warning=False)
 
         # Toolbar actions
         action = self.dlg_draw_profile.findChild(QAction, "actionProfile")
@@ -269,7 +269,7 @@ class GwProfileButton(GwParentMapTool):
                 date = QDate.fromString(profile['values']['date'], 'dd-MM-yyyy')
                 tools_qt.set_calendar(self.dlg_draw_profile, self.dlg_draw_profile.date, date)
 
-                self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+                self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
                 self.remove_selection()
                 list_arcs = profile['values']['listArcs']
                 expr_filter = "\"arc_id\" IN ("
@@ -350,7 +350,7 @@ class GwProfileButton(GwParentMapTool):
                     body = tools_gw.create_body(extras=extras)
                     result = tools_gw.get_json('gw_fct_getprofilevalues', body)
                     if result['status'] == 'Failed': return
-                    self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+                    self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
                     self.remove_selection()
                     list_arcs = []
                     for arc in result['body']['data']['arc']:

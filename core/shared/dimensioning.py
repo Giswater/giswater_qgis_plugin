@@ -43,9 +43,9 @@ class GwDimensioning:
 
         self.user_current_layer = self.iface.activeLayer()
         # Set layers dimensions, node and connec
-        self.layer_dimensions = self.controller.get_layer_by_tablename("v_edit_dimensions")
-        self.layer_node = self.controller.get_layer_by_tablename("v_edit_node")
-        self.layer_connec = self.controller.get_layer_by_tablename("v_edit_connec")
+        self.layer_dimensions = tools_qgis.get_layer_by_tablename("v_edit_dimensions")
+        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
+        self.layer_connec = tools_qgis.get_layer_by_tablename("v_edit_connec")
 
         feature = None
         if qgis_feature is None:

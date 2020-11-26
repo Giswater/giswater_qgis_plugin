@@ -199,7 +199,7 @@ class GwProjectCheck:
                 layer = None
                 qml = None
                 if style_id is not None:
-                    layer = self.controller.get_layer_by_tablename(layer_info['layer'])
+                    layer = tools_qgis.get_layer_by_tablename(layer_info['layer'])
                     if layer:
                         extras = f'"style_id":"{style_id}"'
                         body = tools_gw.create_body(extras=extras)

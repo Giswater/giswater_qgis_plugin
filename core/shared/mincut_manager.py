@@ -20,7 +20,7 @@ from ..shared.selector import Selector
 from ..ui.ui_manager import SelectorUi, MincutManagerUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qt
+from ...lib import tools_qgis, tools_qt
 
 
 class GwMincutManager:
@@ -418,21 +418,21 @@ class GwMincutManager:
                    f" WHERE {column_id} IN ({list_id})")
             self.controller.execute_sql(sql)
             widget.model().select()
-            layer = self.controller.get_layer_by_tablename('v_om_mincut_node')
+            layer = tools_qgis.get_layer_by_tablename('v_om_mincut_node')
             if layer is not None:
                 layer.triggerRepaint()
-            layer = self.controller.get_layer_by_tablename('v_om_mincut_connec')
+            layer = tools_qgis.get_layer_by_tablename('v_om_mincut_connec')
             if layer is not None:
                 layer.triggerRepaint()
-            layer = self.controller.get_layer_by_tablename('v_om_mincut_arc')
+            layer = tools_qgis.get_layer_by_tablename('v_om_mincut_arc')
             if layer is not None:
                 layer.triggerRepaint()
-            layer = self.controller.get_layer_by_tablename('v_om_mincut_valve')
+            layer = tools_qgis.get_layer_by_tablename('v_om_mincut_valve')
             if layer is not None:
                 layer.triggerRepaint()
-            layer = self.controller.get_layer_by_tablename('v_om_mincut')
+            layer = tools_qgis.get_layer_by_tablename('v_om_mincut')
             if layer is not None:
                 layer.triggerRepaint()
-            layer = self.controller.get_layer_by_tablename('v_om_mincut_hydrometer')
+            layer = tools_qgis.get_layer_by_tablename('v_om_mincut_hydrometer')
             if layer is not None:
                 layer.triggerRepaint()

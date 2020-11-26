@@ -221,7 +221,7 @@ class GwInfo(QObject):
             return result, dialog
 
         elif template == 'dimensioning':
-            self.lyr_dim = self.controller.get_layer_by_tablename("v_edit_dimensions", show_warning=True)
+            self.lyr_dim = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning=True)
             if self.lyr_dim:
                 self.api_dim = GwDimensioning()
                 feature_id = self.complet_result[0]['body']['feature']['id']
@@ -355,7 +355,7 @@ class GwInfo(QObject):
         # Get tableParent and select layer
         self.table_parent = str(complet_result[0]['body']['feature']['tableParent'])
         schema_name = str(complet_result[0]['body']['feature']['schemaName'])
-        self.layer = self.controller.get_layer_by_tablename(self.table_parent, False, False, schema_name)
+        self.layer = tools_qgis.get_layer_by_tablename(self.table_parent, False, False, schema_name)
         if self.layer is None:
             tools_gw.show_message("Layer not found: " + self.table_parent, 2)
             return False, self.dlg_cf
@@ -679,7 +679,7 @@ class GwInfo(QObject):
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options
 
-        self.layer_node = global_vars.controller.get_layer_by_tablename("v_edit_node")
+        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
         global_vars.iface.setActiveLayer(self.layer_node)
 
         global_vars.canvas.xyCoordinates.connect(partial(self.mouse_move))
@@ -2181,7 +2181,7 @@ class GwInfo(QObject):
         if feature_id is None:
             feature_id = selected_object_id
 
-        layer = self.controller.get_layer_by_tablename(table_name, log_info=True)
+        layer = tools_qgis.get_layer_by_tablename(table_name, log_info=True)
 
         if not layer:
             message = "Layer not found"
@@ -3261,7 +3261,7 @@ class GwInfo(QObject):
     def get_snapped_feature_id(self, dialog, action, layer_name, option, widget_name):
         """ Snap feature and set a value into dialog """
 
-        layer = self.controller.get_layer_by_tablename(layer_name)
+        layer = tools_qgis.get_layer_by_tablename(layer_name)
         if not layer:
             action.setChecked(False)
             return
@@ -3459,7 +3459,7 @@ class GwInfo(QObject):
         self.feature_cat = feature_cat
         # self.info_layer must be global because apparently the disconnect signal is not disconnected correctly if
         # parameters are passed to it
-        self.info_layer = self.controller.get_layer_by_tablename(feature_cat.parent_layer)
+        self.info_layer = tools_qgis.get_layer_by_tablename(feature_cat.parent_layer)
         if self.info_layer:
             self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
             QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)

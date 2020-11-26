@@ -20,7 +20,7 @@ from qgis.gui import QgsDateTimeEdit
 from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import ToolboxDockerUi, ToolboxUi
 from ...utils import tools_gw
-from ....lib import tools_qt
+from ....lib import tools_qt, tools_qgis
 
 
 class GwToolBoxButton(GwParentAction):
@@ -142,7 +142,7 @@ class GwToolBoxButton(GwParentAction):
     def set_selected_layer(self, dialog, combo):
 
         layer_name = tools_qt.get_combo_value(dialog, combo, 1)
-        layer = self.controller.get_layer_by_tablename(layer_name)
+        layer = tools_qgis.get_layer_by_tablename(layer_name)
         if layer is None:
             tools_gw.show_warning("Layer not found", parameter=layer_name)
             return None
@@ -471,7 +471,7 @@ class GwToolBoxButton(GwParentAction):
         rows = self.controller.get_rows(sql)
         if rows:
             for row in rows:
-                layer = self.controller.get_layer_by_tablename(row[0])
+                layer = tools_qgis.get_layer_by_tablename(row[0])
                 if layer:
                     elem = [row[1], layer]
                     list_items.append(elem)

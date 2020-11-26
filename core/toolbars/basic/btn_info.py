@@ -155,7 +155,7 @@ class GwInfoButton(GwParentMapTool):
 
         # Create one menu for each layer
         for layer in json_result['body']['data']['layersNames']:
-            layer_name = self.controller.get_layer_by_tablename(layer['layerName'])
+            layer_name = tools_qgis.get_layer_by_tablename(layer['layerName'])
             icon_path = self.icon_folder + layer['icon'] + '.png'
             if os.path.exists(str(icon_path)):
                 icon = QIcon(icon_path)

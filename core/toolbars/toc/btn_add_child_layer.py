@@ -105,11 +105,11 @@ class GwAddChildLayerButton(GwParentAction):
         """
 
         if is_checked is True:
-            layer = self.controller.get_layer_by_tablename(tablename)
+            layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is None:
                 tools_gw.insert_pg_layer(tablename, the_geom, field_id, child_layers, group, style_id)
         elif is_checked is False:
-            layer = self.controller.get_layer_by_tablename(tablename)
+            layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
                 tools_qgis.remove_layer_from_toc(tablename, group)
 
@@ -168,7 +168,7 @@ class GwAddChildLayerButton(GwParentAction):
     def manage_guided_map(self):
         """ Guide map works using ext_municipality """
 
-        self.layer_muni = self.controller.get_layer_by_tablename('ext_municipality')
+        self.layer_muni = tools_qgis.get_layer_by_tablename('ext_municipality')
         if self.layer_muni is None:
             return
 

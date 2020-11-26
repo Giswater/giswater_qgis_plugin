@@ -399,12 +399,6 @@ class DaoController:
         return result
 
 
-    def get_layer_by_tablename(self, tablename, show_warning=False, log_info=False, schema_name=None):
-        """ Iterate over all layers and get the one with selected @tablename """
-
-        return tools_qgis.qgis_get_layer_by_tablename(tablename, show_warning, log_info, schema_name)
-
-
     def get_layer_source(self, layer):
         """ Get database connection paramaters of @layer """
 

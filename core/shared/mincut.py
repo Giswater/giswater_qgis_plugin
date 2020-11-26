@@ -91,7 +91,7 @@ class GwMincut:
         self.layers['connec'] = tools_gw.get_group_layers('connec')
         self.layers_connec = self.layers['connec']
 
-        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
 
         # Set active and current layer
         self.iface.setActiveLayer(self.layer_arc)
@@ -1464,7 +1464,7 @@ class GwMincut:
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Set active and current layer
-        self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
+        self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
         self.iface.setActiveLayer(self.layer_arc)
         self.current_layer = self.layer_arc
 
@@ -1496,22 +1496,22 @@ class GwMincut:
         """ Set visible mincut result layers """
 
         layer_zoomed = None
-        layer = self.controller.get_layer_by_tablename("v_om_mincut_valve")
+        layer = tools_qgis.get_layer_by_tablename("v_om_mincut_valve")
         if layer:
             tools_qgis.set_layer_visible(layer)
 
-        layer = self.controller.get_layer_by_tablename("v_om_mincut_arc")
+        layer = tools_qgis.get_layer_by_tablename("v_om_mincut_arc")
         if layer:
             tools_qgis.set_layer_visible(layer)
 
-        layer = self.controller.get_layer_by_tablename("v_om_mincut_connec")
+        layer = tools_qgis.get_layer_by_tablename("v_om_mincut_connec")
         if layer:
             tools_qgis.set_layer_visible(layer)
             if layer.featureCount() > 0:
                 layer_zoomed = layer
 
 
-        layer = self.controller.get_layer_by_tablename("v_om_mincut_node")
+        layer = tools_qgis.get_layer_by_tablename("v_om_mincut_node")
         if layer:
             tools_qgis.set_layer_visible(layer)
             if layer.featureCount() > 0:
@@ -1673,7 +1673,7 @@ class GwMincut:
         self.vertex_marker.setPenWidth(3)
 
         # Set active and current layer
-        self.layer = self.controller.get_layer_by_tablename("v_om_mincut_valve")
+        self.layer = tools_qgis.get_layer_by_tablename("v_om_mincut_valve")
         self.iface.setActiveLayer(self.layer)
         self.current_layer = self.layer
 

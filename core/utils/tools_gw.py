@@ -75,10 +75,10 @@ class SnappingConfigManager(object):
     def set_snapping_layers(self):
         """ Set main snapping layers """
 
-        self.layer_arc = self.controller.get_layer_by_tablename('v_edit_arc')
-        self.layer_connec = self.controller.get_layer_by_tablename('v_edit_connec')
-        self.layer_gully = self.controller.get_layer_by_tablename('v_edit_gully')
-        self.layer_node = self.controller.get_layer_by_tablename('v_edit_node')
+        self.layer_arc = tools_qgis.get_layer_by_tablename('v_edit_arc')
+        self.layer_connec = tools_qgis.get_layer_by_tablename('v_edit_connec')
+        self.layer_gully = tools_qgis.get_layer_by_tablename('v_edit_gully')
+        self.layer_node = tools_qgis.get_layer_by_tablename('v_edit_node')
 
 
     def get_snapping_options(self):
@@ -163,14 +163,14 @@ class SnappingConfigManager(object):
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
-        layer_settings = self.snap_to_layer(tools_qgis.get_layer('v_edit_connec'), QgsPointLocator.Vertex, True)
+        layer_settings = self.snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_connec'), QgsPointLocator.Vertex, True)
         if layer_settings:
             layer_settings.setType(1)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
             layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
-        snapping_config.setIndividualLayerSettings(tools_qgis.get_layer('v_edit_connec'), layer_settings)
+        snapping_config.setIndividualLayerSettings(tools_qgis.get_layer_by_tablename('v_edit_connec'), layer_settings)
         self.restore_snap_options(self.snapping_config)
 
 
@@ -178,14 +178,14 @@ class SnappingConfigManager(object):
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
-        layer_settings = self.snap_to_layer(tools_qgis.get_layer('v_edit_gully'), QgsPointLocator.Vertex, True)
+        layer_settings = self.snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_gully'), QgsPointLocator.Vertex, True)
         if layer_settings:
             layer_settings.setType(1)
             layer_settings.setTolerance(15)
             layer_settings.setEnabled(True)
         else:
             layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, 1, 15, 1)
-        snapping_config.setIndividualLayerSettings(tools_qgis.get_layer('v_edit_gully'), layer_settings)
+        snapping_config.setIndividualLayerSettings(tools_qgis.get_layer_by_tablename('v_edit_gully'), layer_settings)
         self.restore_snap_options(self.snapping_config)
 
 
@@ -376,7 +376,7 @@ class SnappingConfigManager(object):
 
         active_layer = global_vars.iface.activeLayer()
         if active_layer is None:
-            active_layer = global_vars.controller.get_layer_by_tablename('version')
+            active_layer = tools_qgis.get_layer_by_tablename('version')
             global_vars.iface.setActiveLayer(active_layer)
 
         # Vertex marker
@@ -595,9 +595,9 @@ def refresh_legend(controller):
     # TODO solve this bug
     """
 
-    layers = [controller.get_layer_by_tablename('v_edit_node'),
-              controller.get_layer_by_tablename('v_edit_connec'),
-              controller.get_layer_by_tablename('v_edit_gully')]
+    layers = [tools_qgis.get_layer_by_tablename('v_edit_node'),
+              tools_qgis.get_layer_by_tablename('v_edit_connec'),
+              tools_qgis.get_layer_by_tablename('v_edit_gully')]
 
     for layer in layers:
         if layer:
@@ -627,25 +627,25 @@ def hide_parent_layers(excluded_layers=[]):
     """ Hide generic layers """
 
     layers_changed = {}
-    layer = global_vars.controller.get_layer_by_tablename("v_edit_arc")
+    layer = tools_qgis.get_layer_by_tablename("v_edit_arc")
     if layer and "v_edit_arc" not in excluded_layers:
         layers_changed[layer] = tools_qgis.is_layer_visible(layer)
         tools_qgis.set_layer_visible(layer)
-    layer = global_vars.controller.get_layer_by_tablename("v_edit_node")
+    layer = tools_qgis.get_layer_by_tablename("v_edit_node")
     if layer and "v_edit_node" not in excluded_layers:
         layers_changed[layer] = tools_qgis.is_layer_visible(layer)
         tools_qgis.set_layer_visible(layer)
-    layer = global_vars.controller.get_layer_by_tablename("v_edit_connec")
+    layer = tools_qgis.get_layer_by_tablename("v_edit_connec")
     if layer and "v_edit_connec" not in excluded_layers:
         layers_changed[layer] = tools_qgis.is_layer_visible(layer)
         tools_qgis.set_layer_visible(layer)
-    layer = global_vars.controller.get_layer_by_tablename("v_edit_element")
+    layer = tools_qgis.get_layer_by_tablename("v_edit_element")
     if layer and "v_edit_element" not in excluded_layers:
         layers_changed[layer] = tools_qgis.is_layer_visible(layer)
         tools_qgis.set_layer_visible(layer)
 
     if global_vars.project_type == 'ud':
-        layer = global_vars.controller.get_layer_by_tablename("v_edit_gully")
+        layer = tools_qgis.get_layer_by_tablename("v_edit_gully")
         if layer and "v_edit_gully" not in excluded_layers:
             layers_changed[layer] = tools_qgis.is_layer_visible(layer)
             tools_qgis.set_layer_visible(layer)
@@ -825,7 +825,7 @@ def insert_pg_layer(tablename=None, the_geom="the_geom", field_id="id", child_la
     if child_layers is not None:
         for layer in child_layers:
             if layer[0] != 'Load all':
-                vlayer = global_vars.controller.get_layer_by_tablename(layer[0])
+                vlayer = tools_qgis.get_layer_by_tablename(layer[0])
                 if vlayer: continue
                 uri.setDataSource(schema_name, f"{layer[0]}", the_geom, None, layer[1] + "_id")
                 vlayer = QgsVectorLayer(uri.uri(), f'{layer[0]}', "postgres")
@@ -1312,7 +1312,7 @@ def set_style_mapzones():
     for mapzone in json_return['body']['data']['mapzones']:
 
         # Loop for each mapzone returned on json
-        lyr = global_vars.controller.get_layer_by_tablename(mapzone['layer'])
+        lyr = tools_qgis.get_layer_by_tablename(mapzone['layer'])
         categories = []
         status = mapzone['status']
         if status == 'Disable':
@@ -2048,7 +2048,7 @@ def get_layer_source_from_credentials(layer_name='v_edit_node'):
     """ Get database parameters from layer @layer_name or database connection settings """
 
     # Get layer @layer_name
-    layer = global_vars.controller.get_layer_by_tablename(layer_name)
+    layer = tools_qgis.get_layer_by_tablename(layer_name)
 
     # Get database connection settings
     settings = QSettings()
@@ -2450,7 +2450,7 @@ def get_group_layers(geom_type):
     rows = global_vars.controller.get_rows(sql)
     if rows:
         for row in rows:
-            layer = global_vars.controller.get_layer_by_tablename(row[0])
+            layer = tools_qgis.get_layer_by_tablename(row[0])
             if layer:
                 list_items.append(layer)
 
@@ -2583,7 +2583,7 @@ def manage_layer_manager(json_result, sql):
         if 'visible' in layermanager:
             for lyr in layermanager['visible']:
                 layer_name = [key for key in lyr][0]
-                layer = global_vars.controller.get_layer_by_tablename(layer_name)
+                layer = tools_qgis.get_layer_by_tablename(layer_name)
                 if layer is None:
                     the_geom = lyr[layer_name]['geom_field']
                     field_id = lyr[layer_name]['pkey_field']
@@ -2599,19 +2599,19 @@ def manage_layer_manager(json_result, sql):
         if 'index' in layermanager:
             for lyr in layermanager['index']:
                 layer_name = [key for key in lyr][0]
-                layer = global_vars.controller.get_layer_by_tablename(layer_name)
+                layer = tools_qgis.get_layer_by_tablename(layer_name)
                 if layer:
                     tools_qgis.set_layer_index(layer)
 
         # Set active
         if 'active' in layermanager:
-            layer = global_vars.controller.get_layer_by_tablename(layermanager['active'])
+            layer = tools_qgis.get_layer_by_tablename(layermanager['active'])
             if layer:
                 global_vars.iface.setActiveLayer(layer)
 
         # Set zoom to extent with a margin
         if 'zoom' in layermanager:
-            layer = global_vars.controller.get_layer_by_tablename(layermanager['zoom']['layer'])
+            layer = tools_qgis.get_layer_by_tablename(layermanager['zoom']['layer'])
             if layer:
                 prev_layer = global_vars.iface.activeLayer()
                 global_vars.iface.setActiveLayer(layer)
@@ -2625,7 +2625,7 @@ def manage_layer_manager(json_result, sql):
         if 'snnaping' in layermanager:
             snapper_manager = SnappingConfigManager(global_vars.iface)
             for layer_name in layermanager['snnaping']:
-                layer = global_vars.controller.get_layer_by_tablename(layer_name)
+                layer = tools_qgis.get_layer_by_tablename(layer_name)
                 if layer:
                     QgsProject.instance().blockSignals(True)
                     layer_settings = snapper_manager.snap_to_layer(layer, QgsPointLocator.All, True)
