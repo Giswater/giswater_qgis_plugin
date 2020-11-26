@@ -527,7 +527,7 @@ class GwInfo(QObject):
         action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, self.layer))
         action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, self.dlg_cf, self.geom_type, tab_type))
         action_rotation.triggered.connect(partial(self.change_hemisphere, self.dlg_cf, action_rotation))
-        action_link.triggered.connect(partial(self.action_open_url, self.dlg_cf, result))
+        action_link.triggered.connect(lambda: webbrowser.open('http://www.giswater.org'))
         action_section.triggered.connect(partial(self.open_section_form))
         action_help.triggered.connect(partial(self.open_help, self.geom_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
@@ -3421,21 +3421,6 @@ class GwInfo(QObject):
         if not complet_result:
             tools_log.log_info("FAIL open_node")
             return
-
-
-    def action_open_url(self, dialog, result):
-
-        widget = None
-        function_name = 'no_function_associated'
-        for field in result['fields']:
-            if field['linkedaction'] == 'action_link':
-                function_name = field['widgetfunction']
-                widget = dialog.findChild(GwHyperLinkLabel, field['widgetname'])
-                break
-
-        if widget:
-            # Call def function (self, widget)
-            getattr(tools_os, function_name)(widget)
 
 
     def edit_add_feature(self, feature_cat):
