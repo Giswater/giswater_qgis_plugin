@@ -786,9 +786,6 @@ INSERT INTO ext_cat_period VALUES ('5', '2015-05-01 00:00:00', '2015-05-31 00:00
 INSERT INTO ext_cat_period VALUES ('6', '2015-06-01 00:00:00', '2015-06-30 00:00:00', 2592000, NULL, '6');
 INSERT INTO ext_cat_period VALUES ('7', '2015-07-01 00:00:00', '2015-07-31 00:00:00', 2678400, NULL, '7');
 
-INSERT INTO ext_cat_scada VALUES ('01', 'FLOW', 'lps');
-INSERT INTO ext_cat_scada VALUES ('02', 'PRESSURE', 'wcm');
-
 INSERT INTO ext_hydrometer_category VALUES ('1', 'Domestic');
 INSERT INTO ext_hydrometer_category VALUES ('2', 'Industry');
 INSERT INTO ext_hydrometer_category VALUES ('3', 'Other');
@@ -10396,9 +10393,6 @@ INSERT INTO ext_rtc_hydrometer_x_data VALUES (3598, '1201', 0, 0.021690188172043
 INSERT INTO ext_rtc_hydrometer_x_data VALUES (3599, '1202', 0, 0.0079655764635603293, 0.0015931152927120701, 4.2670000000000003, NULL, '7');
 INSERT INTO ext_rtc_hydrometer_x_data VALUES (3600, '1203', 0, 0.012836021505376299, 0.0025672043010752702, 6.8760000000000003, NULL, '7');
 
-
-INSERT INTO ext_rtc_scada VALUES ('01', '01');
-INSERT INTO ext_rtc_scada VALUES ('02', '02');
 
 INSERT INTO ext_rtc_dma_period VALUES (1, '2', '5', 0.81999999999999995, 0.20000000000000001, 2.2000000000000002, 'dma02_period05');
 INSERT INTO ext_rtc_dma_period VALUES (2, '2', '6', 0.81999999999999995, 0.20000000000000001, 2.2000000000000002, 'dma02_period06');

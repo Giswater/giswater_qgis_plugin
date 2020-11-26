@@ -55,12 +55,11 @@ VALUES (365, 'Clorinathor values', 'ws') ON CONFLICT (fid) DO NOTHING ;
 INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
 VALUES (366, 'Temperature values', 'ws') ON CONFLICT (fid) DO NOTHING ;
 
-INSERT INTO sys_param_user (inp_timeseries);
-
 INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutorder, project_type, isparent, 
 isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable, isdeprecated, vdefault)
 VALUES ('inp_timeseries', 'hidden', 'Values for advanced exportation, managing timeseries for epanet',
-'role_epa', 'Timeseries', FALSE, NULL, 'ws', FALSE, FALSE, 'json', 'text', FALSE, NULL, NULL, FALSE, '{"status":true, "period":{"startTime":"2000-01-01 00:00:00", "endTime":"2000-01-01 00:00:00"}}') ON CONFLICT (id) DO NOTHING;
+'role_epa', 'Timeseries', FALSE, NULL, 'ws', FALSE, FALSE, 'json', 'text', FALSE, NULL, NULL, FALSE, 
+'{"status":true, "period":{"startTime":"2000-01-01 00:00:00", "endTime":"2000-01-01 00:00:00"}}') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table (id, descript, sys_role) VALUES ('ext_arc', 'External table for arc values', 'role_edit') 
 ON CONFLICT (id) DO NOTHING;
