@@ -13,7 +13,7 @@ import subprocess
 import webbrowser
 from functools import partial
 
-from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal
+from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal, QPersistentModelIndex
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator,  QStandardItem, QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, \
@@ -870,8 +870,8 @@ def document_open(qtable, field_name):
         webbrowser.open(path)
 
 
-def document_delete(qtable, tablename):
-    """ Delete record from selected rows in tbl_document """
+def delete_rows_qtv(qtable):
+    """ Delete record from selected rows in a QTableView """
 
     # Get selected rows. 0 is the column of the pk 0 'id'
     selected_list = qtable.selectionModel().selectedRows(0)
@@ -888,17 +888,15 @@ def document_delete(qtable, tablename):
     title = "Delete records"
     answer = ask_question(message, title, ','.join(selected_id))
     if answer:
-        sql = (f"DELETE FROM {tablename}"
-               f" WHERE id IN ({','.join(selected_id)})")
-        status = global_vars.controller.execute_sql(sql)
-        if not status:
-            message = "Error deleting data"
-            tools_gw.show_warning(message)
-            return
-        else:
-            message = "Document deleted"
-            tools_gw.show_info(message)
-            qtable.model().select()
+        qtable.model().setEditStrategy(QSqlTableModel.OnManualSubmit)
+        for model_index in qtable.selectionModel().selectedRows():
+            index = QPersistentModelIndex(model_index)
+            qtable.model().removeRow(index.row())
+        status = qtable.model().submitAll()
+        qtable.model().select()
+
+        return status
+
 
 
 def reset_model(dialog, table_object, geom_type):

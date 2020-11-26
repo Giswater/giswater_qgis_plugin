@@ -499,8 +499,7 @@ class GwSearch:
         table_doc = "v_ui_doc_x_workcat"
         self.items_dialog.btn_doc_insert.clicked.connect(
             partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id', item['sys_id']))
-        self.items_dialog.btn_doc_delete.clicked.connect(
-            partial(tools_qt.document_delete, self.items_dialog.tbl_document, 'doc_x_workcat'))
+        self.items_dialog.btn_doc_delete.clicked.connect(partial(tools_gw.document_delete, self.items_dialog.tbl_document))
         self.items_dialog.btn_doc_new.clicked.connect(
             partial(self.manage_document, self.items_dialog.tbl_document, item['sys_id']))
         self.items_dialog.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.items_dialog.tbl_document, 'path'))

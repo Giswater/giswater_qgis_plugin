@@ -2036,6 +2036,19 @@ def check_python_function(object_, function_name):
     object_functions = [method_name for method_name in dir(object_) if callable(getattr(object_, method_name))]
     return function_name in object_functions
 
+
+def document_delete(qtable):
+    status = tools_qt.delete_rows_qtv(qtable)
+    if not status:
+        message = "Error deleting data"
+        show_warning(message)
+        return
+    else:
+        message = "Document deleted"
+        show_info(message)
+        qtable.model().select()
+
+
 # TODO End Generic Section
 
 
@@ -3835,3 +3848,5 @@ def show_warning_detail(text, detail_text, context_name=None):
 
     if global_vars.logger:
         global_vars.logger.warning(text + "\n" + detail_text)
+
+
