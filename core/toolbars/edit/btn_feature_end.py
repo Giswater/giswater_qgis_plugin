@@ -104,7 +104,7 @@ class GwEndFeatureButton(GwParentAction):
                                                              list_ids=self.list_ids))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_work_end.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self.dlg_work_end, self.table_object, layers=self.layers))
+            partial(tools_gw.selection_init, self.dlg_work_end, self.table_object, False, None, self.layers))
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_work_end, excluded_layers=["v_edit_element"]))

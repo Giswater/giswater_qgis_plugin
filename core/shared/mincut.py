@@ -846,7 +846,7 @@ class GwMincut:
 
     def snapping_init_connec(self):
         """ Snap connec """
-        tools_gw.selection_init(self.dlg_connec, self.dlg_connec.tbl_mincut_connec, geom_type='connec', layers=self.layers)
+        tools_gw.selection_init(self.dlg_connec, self.dlg_connec.tbl_mincut_connec, False, 'connec', self.layers)
 
 
 

@@ -2737,7 +2737,7 @@ def selection_changed(dialog, table_object, geom_type, query=False, layers=None,
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Remove selection in generic 'v_edit' layers
-    layers = remove_selection(False)
+    layers = remove_selection(False, layers)
 
     enable_feature_type(dialog, table_object, ids=ids)
 

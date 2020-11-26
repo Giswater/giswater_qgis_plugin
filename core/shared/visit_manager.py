@@ -1719,7 +1719,7 @@ class GwVisitManager:
 
     def feature_snapping_clicked(self, dialog, table_object):
         self.previous_map_tool = global_vars.canvas.mapTool()
-        tools_gw.selection_init(dialog, table_object, layers=self.layers)
+        tools_gw.selection_init(dialog, table_object, False, None, self.layers)
 
 
     def manage_visit_multifeature(self):
