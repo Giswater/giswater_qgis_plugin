@@ -1001,7 +1001,7 @@ class GwVisitManager:
                 tools_qt.set_combo_value(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
 
         # Fill ComboBox status
-        rows = self.get_values_from_catalog('om_typevalue', 'visit_cat_status')
+        rows = self.get_values_from_catalog('om_typevalue', 'visit_status')
         if rows:
             tools_qt.fill_combo_values(self.dlg_add_visit.status, rows, 1, sort_combo=True)
             status = tools_gw.get_config('om_visit_status_vdefault')
