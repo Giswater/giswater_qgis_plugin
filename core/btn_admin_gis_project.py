@@ -194,7 +194,7 @@ class GwAdminGisProject:
                    f"'GRS80' as ellipsoid_acronym, 0 as is_geo "
                    f"FROM spatial_ref_sys "
                    f"WHERE srid = '{srid}'")
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
 
         if row:
             aux = aux.replace("__PROJ4__", row[0])
@@ -221,7 +221,7 @@ class GwAdminGisProject:
                f"ST_YMax(gometries) AS ymax, ST_YMin(gometries) AS ymin "
                f"FROM "
                f"(SELECT ST_Collect({geom_name}) AS gometries FROM {schema_name}.{table_name}) AS foo")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             valor = row["xmin"]
             if valor is None:

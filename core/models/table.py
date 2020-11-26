@@ -16,6 +16,7 @@ __revision__ = '$Format:%H$'
 from weakref import WeakKeyDictionary
 
 from ..utils import tools_gw
+from ...lib import tools_db
 
 
 class GenericDescriptor(object):
@@ -84,7 +85,7 @@ class Table(object):
             self.table_name(),
             self.pk(),
             getattr(self, self.pk()))
-        row = self.controller().get_row(sql, commit=commit)
+        row = tools_db.get_row(sql, commit=commit)
         if not row:
             return False
 
@@ -133,7 +134,7 @@ class Table(object):
 
         sql = "SELECT nextval(pg_get_serial_sequence('{}', '{}'))".format(
             self.table_name(), self.pk())
-        row = self.controller().get_row(sql, commit=commit)
+        row = tools_db.get_row(sql, commit=commit)
         if row:
             return row[0]
         else:
@@ -148,7 +149,7 @@ class Table(object):
         # sql = ("SELECT lastval()")
         sql = "SELECT currval(pg_get_serial_sequence('{}', '{}'))".format(
             self.table_name(), self.pk())
-        row = self.controller().get_row(sql, commit=commit)
+        row = tools_db.get_row(sql, commit=commit)
         if row:
             return row[0]
         else:
@@ -162,7 +163,7 @@ class Table(object):
         # doe not use DB nextval function becouse each call it is incremented
         sql = "SELECT MAX({1}) FROM {0}".format(
             self.table_name(), self.pk())
-        row = self.controller().get_row(sql, commit=commit)
+        row = tools_db.get_row(sql, commit=commit)
         if not row or not row[0]:
             return 0
         else:
@@ -174,7 +175,7 @@ class Table(object):
 
         sql = "SELECT {1} FROM {0} ORDER BY {1}".format(
             self.table_name(), self.pk())
-        rows = self.controller().get_rows(sql, commit=commit)
+        rows = tools_db.get_rows(sql, commit=commit)
         return rows
 
 
@@ -194,5 +195,5 @@ class Table(object):
             else:
                 sql += " WHERE {}".format(where_clause)
 
-        return self.controller().execute_sql(sql, commit=commit)
+        return tools_db.execute_sql(sql, commit=commit)
 

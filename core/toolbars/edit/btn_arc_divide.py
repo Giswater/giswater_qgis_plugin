@@ -12,7 +12,7 @@ from qgis.gui import QgsVertexMarker
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import DialogTextUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_qgis
+from ....lib import tools_qt, tools_qgis, tools_db
 from .... import global_vars
 
 
@@ -34,7 +34,7 @@ class GwArcDivideButton(GwParentMapTool):
         the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {srid})"
         sql = (f"UPDATE node SET the_geom = {the_geom} "
                f"WHERE node_id = '{node_id}'")
-        status = self.controller.execute_sql(sql)
+        status = tools_db.execute_sql(sql)
         if status:
             feature_id = f'"id":["{node_id}"]'
             body = tools_gw.create_body(feature=feature_id)

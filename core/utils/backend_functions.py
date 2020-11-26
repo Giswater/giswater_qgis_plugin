@@ -6,9 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
-import sys
-import subprocess
-import webbrowser
 
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QMessageBox, QWidget
@@ -17,7 +14,7 @@ from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, 
 
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_os
+from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
 
 
 class GwInfoTools:
@@ -144,7 +141,7 @@ class GwInfoTools:
                 for layer_name in layers_name_list:
                     tools_qgis.set_layer_index(layer_name)
         except:
-            all_layers = self.controller.get_layers()
+            all_layers = tools_qgis.get_project_layers()
             for layer in all_layers:
                 layer.triggerRepaint()
 
@@ -387,7 +384,7 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
     dialog.txt_infolog.clear()
 
     sql = "DELETE FROM temp_table WHERE fid = 206;\n"
-    global_vars.controller.execute_sql(sql)
+    tools_db.execute_sql(sql)
     temp_layers_added = []
     for type_ in ['LineString', 'Point', 'Polygon']:
 
@@ -423,13 +420,13 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
             geometry = manage_geometry(feature.geometry())
             sql = sql[:-2] + f"}}', (SELECT ST_GeomFromText('{geometry}', {srid})));\n"
             if count != 0 and count % 500 == 0:
-                status = global_vars.controller.execute_sql(sql)
+                status = tools_db.execute_sql(sql)
                 if not status:
                     return False
                 sql = ""
 
         if sql != "":
-            status = global_vars.controller.execute_sql(sql)
+            status = tools_db.execute_sql(sql)
             if not status:
                 return False
 
@@ -495,14 +492,14 @@ def export_layer_to_db(layer, crs):
     """
 
     sql = f'DROP TABLE "{layer.name()}";'
-    global_vars.controller.execute_sql(sql)
+    tools_db.execute_sql(sql)
 
-    schema_name = global_vars.controller.credentials['schema'].replace('"', '')
+    schema_name = global_vars.credentials['schema'].replace('"', '')
     uri = set_uri()
     uri.setDataSource(schema_name, layer.name(), None, "", layer.name())
 
     error = QgsVectorLayerExporter.exportLayer(
-        layer, uri.uri(), global_vars.controller.credentials['user'], crs, False)
+        layer, uri.uri(), global_vars.credentials['user'], crs, False)
     if error[0] != 0:
         tools_log.log_info(F"ERROR --> {error[1]}")
 
@@ -513,9 +510,9 @@ def set_uri():
     """
 
     uri = QgsDataSourceUri()
-    uri.setConnection(global_vars.controller.credentials['host'], global_vars.controller.credentials['port'],
-                           global_vars.controller.credentials['db'], global_vars.controller.credentials['user'],
-                           global_vars.controller.credentials['password'])
+    uri.setConnection(global_vars.credentials['host'], global_vars.credentials['port'],
+                           global_vars.credentials['db'], global_vars.credentials['user'],
+                           global_vars.credentials['password'])
     return uri
 
 

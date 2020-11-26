@@ -27,7 +27,7 @@ from ..utils import tools_gw
 from ..utils.tools_gw import SnappingConfigManager
 from ..ui.ui_manager import DialogTextUi, Mincut, MincutComposer, MincutConnec, MincutEndUi, MincutHydrometer
 from ... import global_vars
-from ...lib import tools_qt, tools_qgis, tools_log
+from ...lib import tools_qt, tools_qgis, tools_log, tools_db
 from ...lib.tools_qgis import MultipleSelection
 
 
@@ -70,7 +70,7 @@ class GwMincut:
         sql = ("SELECT id, idval "
                "FROM om_typevalue WHERE typevalue = 'mincut_state' "
                "ORDER BY id")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if not rows:
             return
 
@@ -138,21 +138,21 @@ class GwMincut:
         sql = ("SELECT id, descript "
                "FROM om_mincut_cat_type "
                "ORDER BY id")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_mincut.type, rows, 1)
 
         # Fill ComboBox cause
         sql = ("SELECT id, idval "
                "FROM om_typevalue WHERE typevalue = 'mincut_cause' "
                "ORDER BY id")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_mincut.cause, rows, 1)
 
         # Fill ComboBox assigned_to
         sql = ("SELECT id, name "
                "FROM cat_users "
                "ORDER BY name")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_mincut.assigned_to, rows, 1)
 
         # Toolbar actions
@@ -269,7 +269,7 @@ class GwMincut:
         mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         sql = (f"SELECT notified FROM om_mincut "
                f"WHERE id = '{mincut_id}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if not row or row[0] is None:
             text = "Nothing to show"
             tools_qt.show_info_box(str(text), "Sms info")
@@ -284,7 +284,7 @@ class GwMincut:
 
         # Show future id of mincut
         sql = "SELECT setval('om_mincut_seq', (SELECT max(id::integer) FROM om_mincut), true)"
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         result_mincut_id = '1'
         if not row or row[0] is None or row[0] < 1:
             result_mincut_id = '1'
@@ -351,11 +351,11 @@ class GwMincut:
             result_mincut_id = self.dlg_mincut.result_mincut_id.text()
             sql = (f"SELECT id FROM om_mincut"
                    f" WHERE id = {result_mincut_id}")
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
             if row:
                 sql = (f"DELETE FROM om_mincut"
                        f" WHERE id = {result_mincut_id}")
-                self.controller.execute_sql(sql)
+                tools_db.execute_sql(sql)
                 tools_gw.show_info("Mincut canceled!")
 
         # Rollback transaction
@@ -449,7 +449,7 @@ class GwMincut:
         sql = ("SELECT name "
                "FROM cat_users "
                "ORDER BY name")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fillComboBox(self.dlg_fin, "exec_user", rows, False)
         assigned_to = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.assigned_to, 1)
         tools_qt.set_widget_text(self.dlg_fin, "exec_user", str(assigned_to))
@@ -560,7 +560,7 @@ class GwMincut:
         result_mincut_id = self.dlg_mincut.result_mincut_id.text()
         sql = (f"SELECT id FROM om_mincut "
                f"WHERE id = '{result_mincut_id}';")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
 
         # If not found Insert just its 'id'
         sql = ""
@@ -618,7 +618,7 @@ class GwMincut:
         if self.sql_hydro != "":
             sql += self.sql_hydro
 
-        status = self.controller.execute_sql(sql, log_error=True)
+        status = tools_db.execute_sql(sql, log_error=True)
         if status:
             message = "Values has been updated"
             tools_gw.show_info(message)
@@ -631,7 +631,7 @@ class GwMincut:
         self.disconnect_snapping()
         sql = (f"SELECT mincut_state, mincut_class FROM om_mincut "
                f" WHERE id = '{result_mincut_id}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if not row:
             return
 
@@ -725,7 +725,7 @@ class GwMincut:
         sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;"
                f"\nINSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
                f" (current_user, {result_mincut_id});")
-        status = self.controller.execute_sql(sql, commit)
+        status = tools_db.execute_sql(sql, commit)
         if not status:
             message = "Error updating table"
             tools_gw.show_warning(message, parameter='selector_mincut_result')
@@ -777,11 +777,11 @@ class GwMincut:
         # Check if id exist in om_mincut
         sql = (f"SELECT id FROM om_mincut"
                f" WHERE id = '{result_mincut_id_text}';")
-        exist_id = self.controller.get_row(sql)
+        exist_id = tools_db.get_row(sql)
         if not exist_id:
             sql = (f"INSERT INTO om_mincut (id, mincut_class) "
                    f" VALUES ('{result_mincut_id_text}', 2);")
-            self.controller.execute_sql(sql)
+            tools_db.execute_sql(sql)
             self.is_new = False
 
         # Disable Auto, Custom, Hydrometer
@@ -826,7 +826,7 @@ class GwMincut:
 
         # Get list of 'customer_code'
         sql = "SELECT DISTINCT(customer_code) FROM v_edit_connec"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         values = []
         if rows:
             for row in rows:
@@ -940,11 +940,11 @@ class GwMincut:
         # Check if id exist in table 'om_mincut'
         sql = (f"SELECT id FROM om_mincut"
                f" WHERE id = '{result_mincut_id_text}';")
-        exist_id = self.controller.get_row(sql)
+        exist_id = tools_db.get_row(sql)
         if not exist_id:
             sql = (f"INSERT INTO om_mincut (id, mincut_class)"
                    f" VALUES ('{result_mincut_id_text}', 3);")
-            self.controller.execute_sql(sql)
+            tools_db.execute_sql(sql)
             self.is_new = False
 
         # On inserting work order
@@ -996,7 +996,7 @@ class GwMincut:
         sql = (f"SELECT DISTINCT(hydrometer_customer_code)"
                f" FROM v_rtc_hydrometer"
                f" WHERE connec_id = '{connec_id}'")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         values = []
         for row in rows:
             values.append(str(row[0]))
@@ -1026,7 +1026,7 @@ class GwMincut:
         # Check if hydrometer_id belongs to any 'connec_id'
         sql = (f"SELECT hydrometer_id FROM v_rtc_hydrometer"
                f" WHERE hydrometer_customer_code = '{hydrometer_cc}'")
-        row = self.controller.get_row(sql, log_sql=False)
+        row = tools_db.get_row(sql, log_sql=False)
         if not row:
             message = "Selected hydrometer_id not found"
             tools_qt.show_info_box(message, parameter=hydrometer_cc)
@@ -1079,7 +1079,7 @@ class GwMincut:
         result_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         sql = (f"SELECT connec_id FROM om_mincut_connec"
                f" WHERE result_id = {result_mincut_id}")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if rows:
             expr_filter = "\"connec_id\" IN ("
             for row in rows:
@@ -1112,7 +1112,7 @@ class GwMincut:
                f" INNER JOIN om_mincut_hydrometer AS anl"
                f" ON anl.hydrometer_id = rtc.hydrometer_id"
                f" WHERE result_id = {result_mincut_id}")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if rows:
             expr_filter = "\"connec_id\" IN ("
             for row in rows:
@@ -1132,7 +1132,7 @@ class GwMincut:
         result_mincut_id = tools_qt.get_text(self.dlg_hydro, self.result_mincut_id)
         sql = (f"SELECT hydrometer_id FROM om_mincut_hydrometer"
                f" WHERE result_id = {result_mincut_id}")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
 
         expr_filter = "\"hydrometer_id\" IN ("
         if rows:
@@ -1223,7 +1223,7 @@ class GwMincut:
 
         sql = (f"SELECT connec_id FROM v_edit_connec"
                f" WHERE customer_code = '{customer_code}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if not row:
             message = "Any connec_id found with this customer_code"
             tools_qt.show_info_box(message, parameter=customer_code)
@@ -1368,7 +1368,7 @@ class GwMincut:
             # Get hydrometer_id of selected connec
             sql2 = (f"SELECT hydrometer_id FROM v_rtc_hydrometer"
                     f" WHERE connec_id = '{element_id}'")
-            rows = self.controller.get_rows(sql2)
+            rows = tools_db.get_rows(sql2)
             if rows:
                 for row in rows:
                     # Hydrometers associated to selected connec inserted to the table om_mincut_hydrometer
@@ -1452,7 +1452,7 @@ class GwMincut:
         if self.snapper_manager.result_is_valid():
             layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
-            viewname = self.controller.get_layer_source_table_name(layer)
+            viewname = tools_qgis.get_layer_source_table_name(layer)
             if viewname == 'v_edit_arc':
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
@@ -1536,7 +1536,7 @@ class GwMincut:
         sql = (f"UPDATE om_mincut"
                f" SET exec_the_geom = ST_SetSRID(ST_Point({point.x()}, {point.y()}), {srid})"
                f" WHERE id = '{result_mincut_id_text}'")
-        status = self.controller.execute_sql(sql)
+        status = tools_db.execute_sql(sql)
         if status:
             message = "Real location has been updated"
             tools_gw.show_info(message)
@@ -1575,12 +1575,12 @@ class GwMincut:
 
             sql = ("INSERT INTO om_mincut (mincut_state)"
                    " VALUES (0) RETURNING id;")
-            new_mincut_id = self.controller.execute_returning(sql)
+            new_mincut_id = tools_db.execute_returning(sql)
             if new_mincut_id[0] < 1:
                 real_mincut_id = 1
                 sql = (f"UPDATE om_mincut SET(id) = (1) "
                        f"WHERE id = {new_mincut_id[0]};")
-                self.controller.execute_sql(sql)
+                tools_db.execute_sql(sql)
             else:
                 real_mincut_id = new_mincut_id[0]
 
@@ -1620,7 +1620,7 @@ class GwMincut:
                    f" anl_user = current_user, anl_feature_type = '{elem_type.upper()}',"
                    f" anl_feature_id = '{elem_id}'"
                    f" WHERE id = '{real_mincut_id}'")
-            status = self.controller.execute_sql(sql)
+            status = tools_db.execute_sql(sql)
             self.task1.setProgress(50)
             if not status:
                 message = "Error updating element in table, you need to review data"
@@ -1640,7 +1640,7 @@ class GwMincut:
             sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;\n"
                    f"INSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
                    f" (current_user, {real_mincut_id});")
-            self.controller.execute_sql(sql, log_error=True)
+            tools_db.execute_sql(sql, log_error=True)
             self.task1.setProgress(75)
             # Refresh map canvas
             tools_qgis.refresh_map_canvas()
@@ -1694,7 +1694,7 @@ class GwMincut:
             layer = self.snapper_manager.get_snapped_layer(result)
 
             # Check feature
-            tablename = self.controller.get_layer_source_table_name(layer)
+            tablename = tools_qgis.get_layer_source_table_name(layer)
             if tablename == 'v_om_mincut_valve':
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
@@ -1716,7 +1716,7 @@ class GwMincut:
         if result.isValid():
             layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
-            viewname = self.controller.get_layer_source_table_name(layer)
+            viewname = tools_qgis.get_layer_source_table_name(layer)
             if viewname == 'v_edit_arc':
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
@@ -1732,7 +1732,7 @@ class GwMincut:
         if result.isValid():
             # Check feature
             layer = self.snapper_manager.get_snapped_layer(result)
-            viewname = self.controller.get_layer_source_table_name(layer)
+            viewname = tools_qgis.get_layer_source_table_name(layer)
             if viewname == 'v_om_mincut_valve':
                 # Get the point. Leave selection
                 snapped_feat = self.snapper_manager.get_snapped_feature(result, True)
@@ -1797,7 +1797,7 @@ class GwMincut:
                f" INNER JOIN cat_users"
                f" ON cat_users.id = om_mincut.assigned_to"
                f" WHERE om_mincut.id = '{result_mincut_id}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if not row:
             return
 
@@ -1836,7 +1836,7 @@ class GwMincut:
         self.current_state = str(row['mincut_state'])
         sql = (f"SELECT mincut_class FROM om_mincut"
                f" WHERE id = '{result_mincut_id}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         mincut_class_status = None
         if row[0]:
             mincut_class_status = str(row[0])

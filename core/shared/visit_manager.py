@@ -403,7 +403,7 @@ class GwVisitManager:
         feature = f'"id":"{self.current_visit.id}"'
         body = tools_gw.create_body(feature=feature)
         sql = f"SELECT gw_fct_om_visit_multiplier({body})::text"
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         tools_log.log_info(f"execute_pgfunction: {row}")
 
 
@@ -414,13 +414,13 @@ class GwVisitManager:
         sql = (f"UPDATE om_visit"
                f" SET the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
                f" WHERE id = {self.current_visit.id}")
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
 
 
     def get_geom(self):
 
         sql = f"SELECT St_AsText((select the_geom from om_visit where id={self.current_visit.id})::text)"
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         return row
 
 
@@ -502,7 +502,7 @@ class GwVisitManager:
             if geom_type != '' and geom_type != 'all':
                 table_name = f'om_visit_x_{geom_type}'
                 sql = f"SELECT id FROM {table_name} WHERE visit_id = '{self.current_visit.id}'"
-                rows = self.controller.get_rows(sql, log_info=False)
+                rows = tools_db.get_rows(sql, log_info=False)
                 if not rows or not rows[0]:
                     continue
 
@@ -666,7 +666,7 @@ class GwVisitManager:
         if self.feature_type.currentText() != '':
             sql += f"AND UPPER(feature_type) = '{self.feature_type.currentText().upper()}' "
         sql += f"ORDER BY id"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(dialog.parameter_id, rows, 1)
 
@@ -682,7 +682,7 @@ class GwVisitManager:
         sql = (f"SELECT feature_type "
                f"FROM config_visit_parameter "
                f"WHERE descript = '{self.parameter_id.currentText()}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             self.feature_type_parameter = row[0]
             self.geom_type = self.feature_type_parameter.lower()
@@ -851,7 +851,7 @@ class GwVisitManager:
 
         table_name = f'om_visit_x_{geom_type}'
         sql = f"SELECT {geom_type}_id FROM {table_name} WHERE visit_id = '{visit_id}'"
-        rows = self.controller.get_rows(sql, log_info=False)
+        rows = tools_db.get_rows(sql, log_info=False)
         if not rows or not rows[0]:
             return
 
@@ -970,7 +970,7 @@ class GwVisitManager:
                " FROM om_visit_cat"
                " WHERE active is true"
                " ORDER BY name")
-        self.visitcat_ids = self.controller.get_rows(sql)
+        self.visitcat_ids = tools_db.get_rows(sql)
 
         if self.visitcat_ids:
             tools_qt.fill_combo_values(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
@@ -992,12 +992,12 @@ class GwVisitManager:
                 sql = (f"SELECT visitcat_id"
                        f" FROM om_visit"
                        f" WHERE id = '{visit_id}' ")
-                id_visitcat = self.controller.get_row(sql)
+                id_visitcat = tools_db.get_row(sql)
                 sql = (f"SELECT id, name"
                        f" FROM om_visit_cat"
                        f" WHERE active is true AND id = '{id_visitcat[0]}' "
                        f" ORDER BY name")
-                row = self.controller.get_row(sql)
+                row = tools_db.get_row(sql)
                 tools_qt.set_combo_value(self.dlg_add_visit.visitcat_id, str(row[1]), 1)
 
         # Fill ComboBox status
@@ -1012,7 +1012,7 @@ class GwVisitManager:
                 sql = (f"SELECT status "
                        f"FROM om_visit "
                        f"WHERE id = '{visit_id}'")
-                status = self.controller.get_row(sql)
+                status = tools_db.get_row(sql)
                 tools_qt.set_combo_value(self.dlg_add_visit.status, str(status[0]), 0)
 
         # Relations tab
@@ -1022,13 +1022,13 @@ class GwVisitManager:
                "FROM sys_feature_type "
                "WHERE classlevel = 1 OR classlevel = 2"
                "ORDER BY id")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fillComboBox(self.dlg_add_visit, "feature_type", rows, False)
 
         # Event tab
         # Fill ComboBox parameter_type_id
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_param_type' ORDER by idval"
-        parameter_type_ids = self.controller.get_rows(sql)
+        parameter_type_ids = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
 
         # now get default value to be show in parameter_type_id
@@ -1054,7 +1054,7 @@ class GwVisitManager:
 
         sql += where
         sql += f"ORDER BY id"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_visit.parameter_id, rows, 1)
 
 
@@ -1067,7 +1067,7 @@ class GwVisitManager:
         model = QStringListModel()
 
         sql = "SELECT DISTINCT(id) FROM om_visit"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         values = []
         if rows:
             for row in rows:
@@ -1082,7 +1082,7 @@ class GwVisitManager:
         model = QStringListModel()
 
         sql = "SELECT DISTINCT(id) FROM v_ui_document"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         values = []
         if rows:
             for row in rows:
@@ -1123,7 +1123,7 @@ class GwVisitManager:
         sql = (f"SELECT form_type"
                f" FROM config_visit_parameter"
                f" WHERE id = '{parameter_id}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         form_type = str(row[0])
         dlg_name = None
         if form_type in ('event_ud_arc_standard', 'event_standard'):
@@ -1239,7 +1239,7 @@ class GwVisitManager:
         visit_id = tools_qt.get_text(self.dlg_add_visit, self.dlg_add_visit.visit_id)
         sql = (f"SELECT value, filetype, fextension FROM om_visit_event_photo "
                f"WHERE visit_id='{visit_id}' AND event_id='{event_id}'")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if rows is None:
             return
 
@@ -1267,7 +1267,7 @@ class GwVisitManager:
         file_dialog.setFileMode(QFileDialog.Directory)
         # Get file types from catalog and populate QFileDialog filter
         sql = "SELECT filetype, fextension FROM config_file"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         f_types = rows
         file_types = ""
         for row in rows:
@@ -1309,7 +1309,7 @@ class GwVisitManager:
 
         if self.files_added:
             sql = "SELECT filetype, fextension FROM config_file"
-            f_types = self.controller.get_rows(sql)
+            f_types = tools_db.get_rows(sql)
             sql = ""
             for path in self.files_added:
                 filename, file_extension = os.path.splitext(path)
@@ -1325,7 +1325,7 @@ class GwVisitManager:
                         f"(visit_id, event_id, value, filetype, fextension) "
                         f" VALUES('{visit_id}', '{event_id}', '{path}', "
                         f"'{file_type}', ' {file_extension}'); \n")
-            self.controller.execute_sql(sql)
+            tools_db.execute_sql(sql)
 
 
     def delete_files(self, qtable, visit_id, event_id):
@@ -1361,7 +1361,7 @@ class GwVisitManager:
                    f"WHERE visit_id='{visit_id}' "
                    f"AND event_id='{event_id}' "
                    f"AND value IN ({list_values})")
-            self.controller.execute_sql(sql)
+            tools_db.execute_sql(sql)
             self.populate_tbl_docs_x_event(event_id)
         else:
             return
@@ -1554,7 +1554,7 @@ class GwVisitManager:
             list_id += "Event_id: " + str(index.data())
             sql = (f"SELECT value FROM om_visit_event_photo "
                    f"WHERE event_id='{index.data()}'")
-            rows = self.controller.get_rows(sql)
+            rows = tools_db.get_rows(sql)
             if rows:
                 any_docs = True
                 list_id += "(Docs associated)"
@@ -1600,7 +1600,7 @@ class GwVisitManager:
         # Insert into new table
         sql = (f"INSERT INTO doc_x_visit (doc_id, visit_id)"
                f" VALUES ('{doc_id}', {visit_id})")
-        status = self.controller.execute_sql(sql)
+        status = tools_db.execute_sql(sql)
         if status:
             message = "Document inserted successfully"
             tools_gw.show_info(message)
@@ -1621,7 +1621,7 @@ class GwVisitManager:
                f" FROM config_form_tableview"
                f" WHERE tablename = '{table_name}'"
                f" ORDER BY columnindex")
-        rows = self.controller.get_rows(sql, log_info=False)
+        rows = tools_db.get_rows(sql, log_info=False)
         if not rows:
             return
 
@@ -1741,7 +1741,7 @@ class GwVisitManager:
                f"FROM om_visit_event "
                f"INNER JOIN config_visit_parameter ON parameter_id = config_visit_parameter.id "
                f"WHERE visit_id = {visit_id}")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             parameter_id = row["parameter_id"]
             feature_type = row["feature_type"].lower()
@@ -1791,5 +1791,5 @@ class GwVisitManager:
                f" FROM {table_name}"
                f" WHERE typevalue = '{typevalue}'"
                f" ORDER BY {order_by}")
-        rows = global_vars.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         return rows

@@ -11,6 +11,8 @@ import subprocess
 import time
 import webbrowser
 
+from qgis.PyQt.QtWidgets import QFileDialog
+
 
 def open_file(file_path):
 

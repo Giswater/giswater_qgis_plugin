@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import QDateEdit, QPushButton
 from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import SelectorDate
 from ...utils import tools_gw
-from ....lib import tools_qgis, tools_qt
+from ....lib import tools_qgis, tools_qt, tools_db
 import global_vars
 
 
@@ -52,7 +52,7 @@ class GwDateSelectorButton(GwParentAction):
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         sql = (f"SELECT * FROM selector_date"
                f" WHERE cur_user = '{self.current_user}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if not row:
             sql = (f"INSERT INTO selector_date"
                    f" (from_date, to_date, context, cur_user)"
@@ -62,7 +62,7 @@ class GwDateSelectorButton(GwParentAction):
                    f" SET (from_date, to_date) = ('{from_date}', '{to_date}')"
                    f" WHERE cur_user = '{self.current_user}'")
 
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
 
         tools_gw.close_dialog(self.dlg_selector_date)
         tools_qgis.refresh_map_canvas()
@@ -98,7 +98,7 @@ class GwDateSelectorButton(GwParentAction):
 
         sql = (f"SELECT from_date, to_date FROM selector_date"
                f" WHERE cur_user = '{self.current_user}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         try:
             if row:
                 self.from_date = QDate(row[0])

@@ -267,7 +267,7 @@ def get_uri():
     """
 
     uri = QgsDataSourceUri()
-    uri.setConnection(global_vars.controller.credentials['host'], global_vars.controller.credentials['port'],
-                      global_vars.controller.credentials['db'], global_vars.controller.credentials['user'],
-                      global_vars.controller.credentials['password'])
+    uri.setConnection(global_vars.credentials['host'], global_vars.credentials['port'],
+                      global_vars.credentials['db'], global_vars.credentials['user'],
+                      global_vars.credentials['password'])
     return uri

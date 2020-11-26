@@ -100,7 +100,7 @@ class SnappingConfigManager(object):
 
         QgsProject.instance().blockSignals(True)
 
-        layers = self.controller.get_layers()
+        layers = tools_qgis.get_project_layers()
         # Loop through all the layers in the project
         for layer in layers:
             if type(layer) != QgsVectorLayer:
@@ -521,7 +521,7 @@ def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top
     """ Open dialog """
 
     # Check database connection before opening dialog
-    if not global_vars.controller.check_db_connection():
+    if not tools_db.check_db_connection():
         return
 
     # Manage translate
@@ -614,7 +614,7 @@ def refresh_legend(controller):
 def get_cursor_multiple_selection():
     """ Set cursor for multiple selection """
 
-    path_cursor = os.path.join(global_vars.controller.plugin_dir, f"icons{os.sep}shared", '201.png')
+    path_cursor = os.path.join(global_vars.plugin_dir, f"icons{os.sep}shared", '201.png')
     if os.path.exists(path_cursor):
         cursor = QCursor(QPixmap(path_cursor))
     else:
@@ -800,7 +800,7 @@ def set_completer_feature_id(widget, geom_type, viewname):
     model = QStringListModel()
     sql = (f"SELECT {geom_type}_id"
            f" FROM {viewname}")
-    row = global_vars.controller.get_rows(sql)
+    row = tools_db.get_rows(sql)
     if row:
         for i in range(0, len(row)):
             aux = row[i]
@@ -821,7 +821,7 @@ def insert_pg_layer(tablename=None, the_geom="the_geom", field_id="id", child_la
     """
 
     uri = tools_pgdao.get_uri()
-    schema_name = global_vars.controller.credentials['schema'].replace('"', '')
+    schema_name = global_vars.credentials['schema'].replace('"', '')
     if child_layers is not None:
         for layer in child_layers:
             if layer[0] != 'Load all':
@@ -1166,7 +1166,7 @@ def populate_vlayer_old(virtual_layer, data, layer_type, counter, group='GW Temp
                 attributes.append(v)
             if str(k) in 'the_geom':
                 sql = f"SELECT St_AsText('{v}')"
-                row = global_vars.controller.get_row(sql, log_sql=False)
+                row = tools_db.get_row(sql, log_sql=False)
                 if row and row[0]:
                     geometry = QgsGeometry.fromWkt(str(row[0]))
                     fet.setGeometry(geometry)
@@ -1278,7 +1278,7 @@ def delete_selected_rows(widget, table_object):
     if answer:
         sql = (f"DELETE FROM {table_object} "
                f"WHERE {field_object_id} IN ({list_id})")
-        global_vars.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
         widget.model().select()
 
 
@@ -1369,11 +1369,11 @@ def manage_feature_cat():
     feature_cat = {}
     sql = ("SELECT cat_feature.* FROM cat_feature "
            "WHERE active IS TRUE ORDER BY id")
-    rows = global_vars.controller.get_rows(sql)
+    rows = tools_db.get_rows(sql)
 
     # If rows ara none, probably the conection has broken so try again
     if not rows:
-        rows = global_vars.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if not rows:
             return None
 
@@ -2082,7 +2082,7 @@ def get_layer_source_from_credentials(layer_name='v_edit_node'):
     not_version = True
     if layer:
         not_version = False
-        credentials = global_vars.controller.get_layer_source(layer)
+        credentials = tools_qgis.get_layer_source(layer)
         credentials['sslmode'] = sslmode
         global_vars.schema_name = credentials['schema']
         conn_info = QgsDataSourceUri(layer.dataProvider().dataSourceUri()).connectionInfo()
@@ -2123,7 +2123,7 @@ def get_layer_source_from_credentials(layer_name='v_edit_node'):
             global_vars.last_error = tr("Error getting default connection")
             return None, not_version
 
-    global_vars.controller.credentials = credentials
+    global_vars.credentials = credentials
     return credentials, not_version
 
 
@@ -2132,7 +2132,7 @@ def connect_to_database_credentials(credentials, conn_info=None, max_attempts=2)
 
     # Check if credential parameter 'service' is set
     if 'service' in credentials and credentials['service']:
-        logged = global_vars.controller.connect_to_database_service(credentials['service'], credentials['sslmode'])
+        logged = tools_db.connect_to_database_service(credentials['service'], credentials['sslmode'])
         return logged, credentials
 
     attempt = 0
@@ -2142,7 +2142,7 @@ def connect_to_database_credentials(credentials, conn_info=None, max_attempts=2)
         if conn_info and attempt > 1:
             (success, credentials['user'], credentials['password']) = \
                 QgsCredentials.instance().get(conn_info, credentials['user'], credentials['password'])
-        logged = global_vars.controller.connect_to_database(credentials['host'], credentials['port'], credentials['db'],
+        logged = tools_db.connect_to_database(credentials['host'], credentials['port'], credentials['db'],
             credentials['user'], credentials['password'], credentials['sslmode'])
 
     return logged, credentials
@@ -2178,7 +2178,7 @@ def get_json(function_name, parameters=None, schema_name=None, commit=True, log_
     if dev_log_sql not in (None, "None", "none"):
         log_sql = tools_os.cast_boolean(dev_log_sql)
 
-    row = global_vars.controller.get_row(sql, commit=commit, log_sql=log_sql)
+    row = tools_db.get_row(sql, commit=commit, log_sql=log_sql)
     if not row or not row[0]:
         tools_log.log_warning(f"Function error: {function_name}")
         tools_log.log_warning(sql)
@@ -2222,7 +2222,7 @@ def check_function(function_name, schema_name=None, commit=True):
            "WHERE lower(routine_schema) = %s "
            "AND lower(routine_name) = %s")
     params = [schema_name, function_name]
-    row = global_vars.controller.get_row(sql, params=params, commit=commit)
+    row = tools_db.get_row(sql, params=params, commit=commit)
     return row
 
 
@@ -2406,7 +2406,7 @@ def get_rows_by_feature_type(dialog, table_object, geom_type, ids=None, list_ids
     sql = (f"SELECT {geom_type}_id "
            f"FROM {table_relation} "
            f"WHERE {table_object}_id = '{object_id}'")
-    rows = global_vars.controller.get_rows(sql, log_info=False)
+    rows = tools_db.get_rows(sql, log_info=False)
     if rows:
         for row in rows:
             list_ids[geom_type].append(str(row[0]))
@@ -2431,7 +2431,7 @@ def get_project_type(schemaname=None):
     exists = tools_db.check_table(tablename, schemaname)
     if exists:
         sql = ("SELECT lower(project_type) FROM " + schemaname + "." + tablename + " ORDER BY id ASC LIMIT 1")
-        row = global_vars.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             project_type = row[0]
     else:
@@ -2439,7 +2439,7 @@ def get_project_type(schemaname=None):
         exists = tools_db.check_table(tablename, schemaname)
         if exists:
             sql = ("SELECT lower(wsoftware) FROM " + schemaname + "." + tablename + " ORDER BY id ASC LIMIT 1")
-            row = global_vars.controller.get_row(sql)
+            row = tools_db.get_row(sql)
             if row:
                 project_type = row[0]
         else:
@@ -2461,7 +2461,7 @@ def get_group_layers(geom_type):
            "UNION SELECT DISTINCT parent_layer "
            "FROM cat_feature "
            "WHERE upper(feature_type) = '" + geom_type.upper() + "';")
-    rows = global_vars.controller.get_rows(sql)
+    rows = tools_db.get_rows(sql)
     if rows:
         for row in rows:
             layer = tools_qgis.get_layer_by_tablename(row[0])
@@ -2520,7 +2520,7 @@ def get_config(parameter='', columns='value', table='config_param_user', sql_add
     if table == 'config_param_user':
         sql += " AND cur_user = current_user"
     sql += ";"
-    row = global_vars.controller.get_row(sql, log_info=log_info)
+    row = tools_db.get_row(sql, log_info=log_info)
     return row
 
 # TODO tools_gw_log
@@ -2875,7 +2875,7 @@ def insert_feature_to_plan(dialog, geom_type, ids=None):
     for i in range(len(ids)):
         sql = f"INSERT INTO plan_psector_x_{geom_type} ({geom_type}_id, psector_id) "
         sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"
-        global_vars.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
         reload_qtable(dialog, geom_type)
 
 
@@ -3125,48 +3125,6 @@ def manage_exception(title=None, description=None, sql=None, schema_name=None):
         show_exceptions_msg(title, msg)
 
 
-def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_increase=0, filepath=None, schema_name=None):
-    """ Manage exception in database queries and show information to the user """
-
-    show_exception_msg = True
-    description = ""
-    if exception:
-        description = str(exception)
-        if 'unknown error' in description:
-            show_exception_msg = False
-
-    try:
-        stack_level += stack_level_increase
-        module_path = inspect.stack()[stack_level][1]
-        file_name = tools_os.get_relative_path(module_path, 2)
-        function_line = inspect.stack()[stack_level][2]
-        function_name = inspect.stack()[stack_level][3]
-
-        # Set exception message details
-        msg = ""
-        msg += f"File name: {file_name}\n"
-        msg += f"Function name: {function_name}\n"
-        msg += f"Line number: {function_line}\n"
-        if exception:
-            msg += f"Description:\n{description}\n"
-        if filepath:
-            msg += f"SQL file:\n{filepath}\n\n"
-        if sql:
-            msg += f"SQL:\n {sql}\n\n"
-        msg += f"Schema name: {schema_name}"
-
-        # Show exception message in dialog and log it
-        if show_exception_msg:
-            title = "Database error"
-            show_exceptions_msg(title, msg)
-        else:
-            tools_log.log_warning("Exception message not shown to user")
-        tools_log.log_warning(msg, stack_level_increase=2)
-
-    except Exception:
-        manage_exception("Unhandled Error")
-
-
 def show_dlg_info():
     """ Show dialog with exception message generated in function show_exceptions_msg """
 
@@ -3333,7 +3291,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
            f" FROM {config_table}"
            f" WHERE tablename = '{table_name}'"
            f" ORDER BY columnindex")
-    rows = global_vars.controller.get_rows(sql, log_info=False)
+    rows = tools_db.get_rows(sql, log_info=False)
     if not rows:
         return
 
@@ -3396,7 +3354,7 @@ def set_calendar_by_user_param(dialog, widget, table_name, value, parameter):
 
     sql = (f"SELECT {value} FROM {table_name}"
            f" WHERE parameter = '{parameter}' AND cur_user = current_user")
-    row = global_vars.controller.get_row(sql)
+    row = tools_db.get_row(sql)
     if row:
         if row[0]:
             row[0] = row[0].replace('/', '-')
@@ -3454,7 +3412,7 @@ def set_completer_object(dialog, table_object, field_object_id="id"):
            f" FROM {table_object}"
            f" ORDER BY {field_object_id}")
 
-    rows = global_vars.controller.get_rows(sql)
+    rows = tools_db.get_rows(sql)
     if rows is None:
         return
 
@@ -3483,7 +3441,7 @@ def set_completer_widget(tablename, widget, field_id):
     sql = (f"SELECT DISTINCT({field_id})"
            f" FROM {tablename}"
            f" ORDER BY {field_id}")
-    row = global_vars.controller.get_rows(sql)
+    row = tools_db.get_rows(sql)
     for i in range(0, len(row)):
         aux = row[i]
         row[i] = str(aux[0])
@@ -3502,7 +3460,7 @@ def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
     sql = (f"SELECT MIN(LEAST({field_from}, {field_to})),"
            f" MAX(GREATEST({field_from}, {field_to}))"
            f" FROM {table_name}")
-    row = global_vars.controller.get_row(sql, log_sql=False)
+    row = tools_db.get_row(sql, log_sql=False)
     current_date = QDate.currentDate()
     if row:
         if row[0]:
@@ -3522,7 +3480,7 @@ def set_columns_config(widget, table_name, sort_order=0, isQStandardItemModel=Fa
     columns_to_delete = []
     sql = (f"SELECT columnindex, width, alias, status FROM config_form_tableview"
            f" WHERE tablename = '{table_name}' ORDER BY columnindex")
-    rows = global_vars.controller.get_rows(sql, log_info=True)
+    rows = tools_db.get_rows(sql, log_info=True)
     if not rows:
         return widget
 
@@ -3582,7 +3540,7 @@ def delete_feature_at_plan(dialog, geom_type, list_id):
     value = tools_qt.get_text(dialog, dialog.psector_id)
     sql = (f"DELETE FROM plan_psector_x_{geom_type} "
            f"WHERE {geom_type}_id IN ({list_id}) AND psector_id = '{value}'")
-    global_vars.controller.execute_sql(sql)
+    tools_db.execute_sql(sql)
 
 
 def delete_records(dialog, table_object, query=False, geom_type=None, layers=None, ids=None, list_ids=None,
@@ -3699,7 +3657,7 @@ def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=N
     sql = (f"SELECT * "
            f" FROM {table_object}"
            f" WHERE {field_object_id} = '{object_id}'")
-    row = global_vars.controller.get_row(sql, log_info=False)
+    row = tools_db.get_row(sql, log_info=False)
 
     # If object_id not found: Clear data
     if not row:
@@ -3786,7 +3744,7 @@ def fill_widgets(dialog, table_object, row):
         if row['state']:
             sql = (f"SELECT name FROM value_state"
                    f" WHERE id = '{row['state']}'")
-            row_aux = global_vars.controller.get_row(sql)
+            row_aux = tools_db.get_row(sql)
             if row_aux:
                 state = row_aux[0]
 
@@ -3794,14 +3752,14 @@ def fill_widgets(dialog, table_object, row):
         if row['expl_id']:
             sql = (f"SELECT name FROM exploitation"
                    f" WHERE expl_id = '{row['expl_id']}'")
-            row_aux = global_vars.controller.get_row(sql)
+            row_aux = tools_db.get_row(sql)
             if row_aux:
                 expl_id = row_aux[0]
 
         tools_qt.set_widget_text(dialog, "code", row['code'])
         sql = (f"SELECT elementtype_id FROM cat_element"
                f" WHERE id = '{row['elementcat_id']}'")
-        row_type = global_vars.controller.get_row(sql)
+        row_type = tools_db.get_row(sql)
         if row_type:
             tools_qt.set_widget_text(dialog, "element_type", row_type[0])
 
@@ -3831,7 +3789,7 @@ def set_combo_from_param_user(dialog, widget, table_name, parameter, field_id='i
     sql = (f"SELECT t1.{field_name} FROM {table_name} as t1"
            f" INNER JOIN config_param_user as t2 ON t1.{field_id}::text = t2.value::text"
            f" WHERE parameter = '{parameter}' AND cur_user = current_user")
-    row = global_vars.controller.get_row(sql)
+    row = tools_db.get_row(sql)
     if row:
         tools_qt.set_widget_text(dialog, widget, row[0])
 

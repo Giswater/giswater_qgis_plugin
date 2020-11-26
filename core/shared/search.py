@@ -605,7 +605,7 @@ class GwSearch:
                f" WHERE expl_id NOT IN "
                f"  (SELECT expl_id FROM selector_expl "
                f"   WHERE cur_user=current_user)")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if not rows:
             return
 
@@ -613,7 +613,7 @@ class GwSearch:
             for row in rows:
                 sql = (f"INSERT INTO selector_expl(expl_id, cur_user) "
                        f" VALUES('{row[0]}', current_user)")
-                self.controller.execute_sql(sql)
+                tools_db.execute_sql(sql)
             msg = "Your exploitation selector has been updated"
             tools_gw.show_info(msg)
 
@@ -625,14 +625,14 @@ class GwSearch:
                " WHERE cur_user = current_user;\n")
         sql += (f"INSERT INTO selector_workcat(workcat_id, cur_user) "
                 f" VALUES('{workcat_id}', current_user);\n")
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
 
 
     def disable_qatable_by_state(self, qtable, _id, qbutton):
 
         sql = (f"SELECT state_id FROM selector_state "
                f" WHERE cur_user = current_user AND state_id ='{_id}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row is None:
             qtable.setEnabled(False)
             qbutton.setEnabled(True)
@@ -664,13 +664,13 @@ class GwSearch:
         sql = (f"SELECT state_id "
                f"FROM selector_state "
                f"WHERE cur_user = current_user AND state_id = '{state}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             return
 
         sql = (f"INSERT INTO selector_state(state_id, cur_user) "
                f"VALUES('{state}', current_user)")
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
         qtable.setEnabled(True)
         qbutton.setEnabled(False)
         tools_qgis.refresh_map_canvas()
@@ -823,7 +823,7 @@ class GwSearch:
             sql = (f"SELECT feature_id "
                    f" FROM {table_name}")
             sql += f" WHERE workcat_id = '{workcat_id}' AND feature_type = '{feature}'"
-            rows = self.controller.get_rows(sql)
+            rows = tools_db.get_rows(sql)
             if extension is not None:
                 widget_name = f"lbl_total_{feature.lower()}{extension}"
             else:
@@ -850,7 +850,7 @@ class GwSearch:
                     sql = (f"SELECT st_length2d(the_geom)::numeric(12,2) "
                            f" FROM arc"
                            f" WHERE arc_id = '{arc_id}'")
-                    row = self.controller.get_row(sql)
+                    row = tools_db.get_row(sql)
                     if row:
                         length = length + row[0]
                     else:
@@ -903,7 +903,7 @@ class GwSearch:
         sql = (f"SELECT doc_id"
                f" FROM {tablename}"
                f" WHERE doc_id = '{doc_id}' AND {field} = '{field_value}'")
-        row = global_vars.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             msg = "Document already exist"
             tools_gw.show_warning(msg)
@@ -912,7 +912,7 @@ class GwSearch:
         # Insert into new table
         sql = (f"INSERT INTO {tablename} (doc_id, {field})"
                f" VALUES ('{doc_id}', '{field_value}')")
-        status = global_vars.controller.execute_sql(sql)
+        status = tools_db.execute_sql(sql)
         if status:
             message = "Document inserted successfully"
             tools_gw.show_info(message)

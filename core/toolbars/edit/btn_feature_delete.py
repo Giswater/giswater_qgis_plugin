@@ -13,7 +13,7 @@ from qgis.PyQt.QtWidgets import QCompleter
 from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import FeatureDelete
 from ...utils import tools_gw
-from ....lib import tools_qgis, tools_qt
+from ....lib import tools_qgis, tools_qt, tools_db
 
 
 class GwDeleteFeatureButton(GwParentAction):
@@ -31,7 +31,7 @@ class GwDeleteFeatureButton(GwParentAction):
 
         # Populate combo feature type
         sql = 'SELECT DISTINCT(feature_type) AS id, feature_type AS idval FROM cat_feature'
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_feature_delete.feature_type, rows, 1)
 
         # Set active layer
@@ -79,7 +79,7 @@ class GwDeleteFeatureButton(GwParentAction):
         # Get child layer
         sql = (f"SELECT array_agg({feature_type}_id) FROM {feature_type} "
                f"WHERE {feature_type}_id LIKE '%{feature_id}%' LIMIT 10")
-        rows_typeahead = self.controller.get_rows(sql)
+        rows_typeahead = tools_db.get_rows(sql)
         rows_typeahead = rows_typeahead[0][0]
 
         if rows_typeahead is None:

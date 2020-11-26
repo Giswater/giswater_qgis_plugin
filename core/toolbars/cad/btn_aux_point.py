@@ -16,7 +16,7 @@ from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import AuxPoint
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qgis, tools_qt
+from ....lib import tools_qgis, tools_qt, tools_db
 
 
 class GwAuxPointButton(GwParentMapTool):
@@ -79,16 +79,16 @@ class GwAuxPointButton(GwParentMapTool):
                 self.direction = 2
 
             sql = f"SELECT ST_GeomFromText('POINT({point_1[0]} {point_1[1]})', {self.srid})"
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
             point_1 = row[0]
             sql = f"SELECT ST_GeomFromText('POINT({point_2[0]} {point_2[1]})', {self.srid})"
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
             point_2 = row[0]
 
             sql = (f"SELECT gw_fct_cad_add_relative_point "
                    f"('{point_1}', '{point_2}', {self.dist_x}, "
                    f"{self.dist_y}, {self.direction}, {self.delete_prev})")
-            self.controller.execute_sql(sql)
+            tools_db.execute_sql(sql)
             self.layer_points.commitChanges()
             self.layer_points.dataProvider().forceReload()
             self.layer_points.triggerRepaint()

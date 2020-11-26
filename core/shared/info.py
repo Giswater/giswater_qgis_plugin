@@ -118,7 +118,7 @@ class GwInfo(QObject):
         if self.iface.activeLayer() is None or type(self.iface.activeLayer()) != QgsVectorLayer:
             active_layer = ""
         else:
-            active_layer = self.controller.get_layer_source_table_name(self.iface.activeLayer())
+            active_layer = tools_qgis.get_layer_source_table_name(self.iface.activeLayer())
 
         # Used by action_interpolate
         last_click = self.canvas.mouseLastXY()
@@ -253,7 +253,7 @@ class GwInfo(QObject):
 
     def get_layers_visibility(self):
 
-        layers = self.controller.get_layers()
+        layers = tools_qgis.get_project_layers()
         layers_visibility = {}
         for layer in layers:
 
@@ -451,7 +451,7 @@ class GwInfo(QObject):
             else:
                 parent_layer = str(complet_result[0]['body']['feature']['tableParent'])
             sql = f"SELECT lower(feature_type) FROM cat_feature WHERE parent_layer = '{parent_layer}' LIMIT 1"
-            result = self.controller.get_row(sql)
+            result = tools_db.get_row(sql)
             if result:
                 self.geom_type = result[0]
 
@@ -639,7 +639,7 @@ class GwInfo(QObject):
         except Exception as e:
             pass
         self.connected = False
-        self.controller.is_inserting = False
+        self.is_inserting = False
 
 
     def activate_snapping(self, complet_result, ep):
@@ -822,11 +822,11 @@ class GwInfo(QObject):
 
         existing_point_x = None
         existing_point_y = None
-        viewname = global_vars.controller.get_layer_source_table_name(self.layer)
+        viewname = tools_qgis.get_layer_source_table_name(self.layer)
         sql = (f"SELECT ST_X(the_geom), ST_Y(the_geom)"
                f" FROM {viewname}"
                f" WHERE node_id = '{self.feature_id}'")
-        row = global_vars.controller.get_row(sql)
+        row = tools_db.get_row(sql)
 
         if row:
             existing_point_x = row[0]
@@ -837,20 +837,20 @@ class GwInfo(QObject):
                    f" SET hemisphere = (SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}), "
                    f" ST_Point({point.x()}, {point.y()}))))"
                    f" WHERE node_id = '{self.feature_id}'")
-            status = global_vars.controller.execute_sql(sql)
+            status = tools_db.execute_sql(sql)
             if not status:
                 global_vars.canvas.setMapTool(self.previous_map_tool)
                 return
 
         sql = (f"SELECT rotation FROM node "
                f" WHERE node_id = '{self.feature_id}'")
-        row = global_vars.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             tools_qt.set_widget_text(dialog, "data_rotation", str(row[0]))
 
         sql = (f"SELECT degrees(ST_Azimuth(ST_Point({existing_point_x}, {existing_point_y}),"
                f" ST_Point({point.x()}, {point.y()})))")
-        row = global_vars.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             tools_qt.set_widget_text(dialog, "data_hemisphere", str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
@@ -1572,7 +1572,7 @@ class GwInfo(QObject):
             self.enable_action(dialog, "actionZoom", True)
             self.enable_action(dialog, "actionZoomOut", True)
             self.enable_action(dialog, "actionCentered", True)
-            self.controller.is_inserting = False
+            self.is_inserting = False
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
                 if close_dlg:
@@ -1999,7 +1999,7 @@ class GwInfo(QObject):
         field_object_id = "id"
         sql = ("SELECT * FROM " + view_object + ""
                " WHERE " + field_object_id + " = '" + object_id + "'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if not row:
             tools_gw.show_warning("Object id not found", parameter=object_id)
             return
@@ -2011,7 +2011,7 @@ class GwInfo(QObject):
                " FROM " + str(tablename) + ""
                " WHERE " + str(self.field_id) + " = '" + str(self.feature_id) + "'"
                " AND " + str(field_object_id) + " = '" + str(object_id) + "'")
-        row = self.controller.get_row(sql, log_info=False, log_sql=False)
+        row = tools_db.get_row(sql, log_info=False, log_sql=False)
 
         # If object already exist show warning message
         if row:
@@ -2023,7 +2023,7 @@ class GwInfo(QObject):
             sql = ("INSERT INTO " + tablename + " "
                    "(" + str(field_object_id) + ", " + str(self.field_id) + ")"
                    " VALUES ('" + str(object_id) + "', '" + str(self.feature_id) + "');")
-            self.controller.execute_sql(sql, log_sql=False)
+            tools_db.execute_sql(sql, log_sql=False)
             if widget.objectName() == 'tbl_document':
                 date_to = self.dlg_cf.tab_main.findChild(QDateEdit, 'date_document_to')
                 if date_to:
@@ -2064,7 +2064,7 @@ class GwInfo(QObject):
         if answer:
             sql = ("DELETE FROM " + table_name + ""
                    " WHERE id::integer IN (" + list_id + ")")
-            self.controller.execute_sql(sql, log_sql=False)
+            tools_db.execute_sql(sql, log_sql=False)
             widget.model().select()
 
     """ FUNCTIONS RELATED WITH TAB ELEMENT"""
@@ -2132,7 +2132,7 @@ class GwInfo(QObject):
         # Check if data in the view
         sql = (f"SELECT * FROM {viewname}"
                f" WHERE {field_id} = '{self.feature_id}';")
-        row = self.controller.get_row(sql, log_info=True, log_sql=False)
+        row = tools_db.get_row(sql, log_info=True, log_sql=False)
 
         if not row:
             # Hide tab 'relations'
@@ -2171,7 +2171,7 @@ class GwInfo(QObject):
         sys_type = self.tbl_relations.model().record(row).value("sys_type")
         sql = (f"SELECT feature_type FROM cat_feature "
                f"WHERE system_id = '{sys_type}'")
-        sys_type = self.controller.get_row(sql)
+        sys_type = tools_db.get_row(sql)
         table_name = self.tbl_relations.model().record(row).value("sys_table_id")
         feature_id = self.tbl_relations.model().record(row).value("sys_id")
 
@@ -2318,7 +2318,7 @@ class GwInfo(QObject):
                f"FROM ext_cat_period as t1 "
                f"join v_ui_hydroval_x_connec as t2 on t1.id = t2.cat_period_id "
                f"ORDER BY t2.cat_period_id DESC")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if not rows:
             return False
         tools_qt.fill_combo_values(self.dlg_cf.cmb_cat_period_id_filter, rows, add_empty=True, sort_combo=False)
@@ -2328,7 +2328,7 @@ class GwInfo(QObject):
                " WHERE connec_id = '" + str(self.feature_id) + "' "
                " ORDER BY hydrometer_customer_code")
         rows_list = []
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         rows_list.append(['', ''])
         if rows:
             for row in rows:
@@ -2429,7 +2429,7 @@ class GwInfo(QObject):
                f"FROM {table_name_event_id} "
                f"WHERE feature_type = '{feature_type[self.field_id]}' OR feature_type = 'ALL' "
                f"ORDER BY id")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if rows:
             rows.append(['', ''])
             tools_qt.fill_combo_values(self.dlg_cf.event_id, rows)
@@ -2438,7 +2438,7 @@ class GwInfo(QObject):
                f"FROM {table_name_event_id} "
                f"WHERE feature_type = '{feature_type[self.field_id]}' OR feature_type = 'ALL' "
                f"ORDER BY parameter_type")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if rows:
             rows.append(['', ''])
             tools_qt.fill_combo_values(self.dlg_cf.event_type, rows)
@@ -2457,7 +2457,7 @@ class GwInfo(QObject):
         # Get all data for one visit
         sql = (f"SELECT * FROM om_visit_event"
                f" WHERE id = '{self.event_id}' AND visit_id = '{self.visit_id}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if not row:
             return
 
@@ -2516,7 +2516,7 @@ class GwInfo(QObject):
         # Get values in order to populate model
         sql = (f"SELECT value, filetype, fextension FROM om_visit_event_photo "
                f"WHERE visit_id='{self.visit_id}' AND event_id='{self.event_id}'")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if rows is None:
             return
 
@@ -2572,7 +2572,7 @@ class GwInfo(QObject):
 
         sql = (f"SELECT gallery, document FROM {table_name}"
                f" WHERE event_id = '{self.event_id}' AND visit_id = '{self.visit_id}'")
-        row = self.controller.get_row(sql, log_sql=False)
+        row = tools_db.get_row(sql, log_sql=False)
         if not row:
             return
 
@@ -2609,7 +2609,7 @@ class GwInfo(QObject):
         if event_type_value != 'null':
             sql += f" AND parameter_type ILIKE '%{event_type_value}%'"
         sql += " ORDER BY id"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if rows:
             rows.append(['', ''])
             tools_qt.fill_combo_values(self.dlg_cf.event_id, rows, 1)
@@ -2707,7 +2707,7 @@ class GwInfo(QObject):
         # the DB connection is not available during manage_visit.manage_visit first call
         # so the workaroud is to do a unuseful query to have the dao controller active
         sql = "SELECT id FROM om_visit LIMIT 1"
-        self.controller.get_rows(sql)
+        tools_db.get_rows(sql)
         manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.feature_id, expl_id=expl_id, is_new_from_cf=True)
 
 
@@ -2726,7 +2726,7 @@ class GwInfo(QObject):
         # Get all documents for one visit
         sql = (f"SELECT doc_id FROM doc_x_visit"
                f" WHERE visit_id = '{self.visit_id}'")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if not rows:
             return
 
@@ -2738,7 +2738,7 @@ class GwInfo(QObject):
             sql = (f"SELECT path"
                    f" FROM v_ui_doc"
                    f" WHERE id = '{rows[0][0]}'")
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
             if not row:
                 return
 
@@ -2794,7 +2794,7 @@ class GwInfo(QObject):
         # Get path of selected document
         sql = (f"SELECT path FROM v_ui_doc"
                f" WHERE id = '{selected_document}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if not row:
             return
 
@@ -2861,7 +2861,7 @@ class GwInfo(QObject):
 
         # Fill ComboBox doc_type
         sql = "SELECT id, id FROM doc_type ORDER BY id"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if rows:
             rows.append(['', ''])
         tools_qt.fill_combo_values(doc_type, rows)
@@ -3302,7 +3302,7 @@ class GwInfo(QObject):
 
         # Set active layer
         self.iface.setActiveLayer(layer)
-        layer_name = self.controller.get_layer_source_table_name(layer)
+        layer_name = tools_qgis.get_layer_source_table_name(layer)
 
         # Get clicked point
         self.vertex_marker.hide()
@@ -3313,7 +3313,7 @@ class GwInfo(QObject):
         if result.isValid():
             layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
-            viewname = self.controller.get_layer_source_table_name(layer)
+            viewname = tools_qgis.get_layer_source_table_name(layer)
             if viewname == layer_name:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
@@ -3425,7 +3425,7 @@ class GwInfo(QObject):
 
     def edit_add_feature(self, feature_cat):
         """ Button 01, 02: Add 'node' or 'arc' """
-        if self.controller.is_inserting:
+        if self.is_inserting:
             msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
             tools_gw.show_message(msg)
             return
@@ -3492,7 +3492,7 @@ class GwInfo(QObject):
             tools_log.log_info(str(type("NO FEATURE TYPE DEFINED")))
 
         tools_gw.init_docker()
-        self.controller.is_inserting = True
+        self.is_inserting = True
 
         self.api_cf = GwInfo('data')
         result, dialog = self.api_cf.get_feature_insert(point=list_points, feature_cat=self.feature_cat,
@@ -3507,4 +3507,4 @@ class GwInfo(QObject):
         if not result:
             self.info_layer.deleteFeature(feature.id())
             self.iface.actionRollbackEdits().trigger()
-            self.controller.is_inserting = False
+            self.is_inserting = False

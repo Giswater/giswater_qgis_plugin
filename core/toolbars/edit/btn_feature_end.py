@@ -16,7 +16,7 @@ from qgis.core import QgsExpression, QgsFeatureRequest
 from ...toolbars.parent_dialog import GwParentAction
 from ...ui.ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
 from ...utils import tools_gw
-from ....lib import tools_qgis, tools_qt, tools_log
+from ....lib import tools_qgis, tools_qt, tools_log, tools_db
 
 
 class GwEndFeatureButton(GwParentAction):
@@ -132,18 +132,18 @@ class GwEndFeatureButton(GwParentAction):
             sql = (f"UPDATE config_param_user "
                    f"SET value = '{value}' "
                    f"WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user")
-            self.controller.execute_sql(sql)
+            tools_db.execute_sql(sql)
         else:
             sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                    f"VALUES ('edit_arc_downgrade_force', '{value}', current_user)")
-            self.controller.execute_sql(sql)
+            tools_db.execute_sql(sql)
 
 
     def fill_fields(self):
         """ Fill dates and combos cat_work/state type end """
 
         sql = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0'
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_work_end.cmb_statetype_end, rows, 1)
         row = tools_gw.get_config('edit_statetype_0_vdefault')
         if row:
@@ -158,7 +158,7 @@ class GwEndFeatureButton(GwParentAction):
         tools_qt.set_calendar(self.dlg_work_end, "enddate", enddate)
 
         sql = "SELECT id FROM cat_work"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         tools_qt.set_autocompleter(self.dlg_work_end.workcat_id_end)
         row = tools_gw.get_config('edit_workcat_vdefault')
@@ -189,7 +189,7 @@ class GwEndFeatureButton(GwParentAction):
         sql = (f"SELECT descript, builtdate "
                f"FROM cat_work "
                f"WHERE id = '{workcat_id}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             tools_qt.set_widget_text(self.dlg_work_end, self.dlg_work_end.descript, row['descript'])
             tools_qt.set_calendar(self.dlg_work_end, self.dlg_work_end.builtdate, row['builtdate'], False)
@@ -235,7 +235,7 @@ class GwEndFeatureButton(GwParentAction):
         if ids_list:
             sql = (f"SELECT * FROM v_ui_arc_x_relations "
                    f"WHERE arc_id IN ( {ids_list}) AND arc_state = '1'")
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
 
         if row:
             self.dlg_work = FeatureEndConnecUi()
@@ -302,7 +302,7 @@ class GwEndFeatureButton(GwParentAction):
                     f"enddate = '{self.enddate}' "
                     f"WHERE {geom_type}_id = '{id_}';\n")
         if sql != "":
-            status = self.controller.execute_sql(sql, log_sql=False)
+            status = tools_db.execute_sql(sql, log_sql=False)
             if status:
                 tools_gw.show_info("Features updated successfully!")
 
@@ -358,7 +358,7 @@ class GwEndFeatureButton(GwParentAction):
         sql = (f"SELECT sys_type"
                f" FROM v_edit_arc"
                f" WHERE arc_id = '{arc_id}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if not row:
             return
 
@@ -476,7 +476,7 @@ class GwEndFeatureButton(GwParentAction):
             sql = ("SELECT feature_type, feature_id, log_message "
                    "FROM audit_log_data "
                    "WHERE  fid = 128 AND cur_user = current_user")
-            rows = self.controller.get_rows(sql, log_sql=False)
+            rows = tools_db.get_rows(sql, log_sql=False)
             ids_ = ""
             if rows:
                 for row in rows:
@@ -485,7 +485,7 @@ class GwEndFeatureButton(GwParentAction):
                     sql = (f"UPDATE {row[0].lower()} "
                            f"SET state = '{state_statetype[0]}', state_type = '{state_statetype[1]}' "
                            f"WHERE {row[0]}_id = '{row[1]}';")
-                    self.controller.execute_sql(sql)
+                    tools_db.execute_sql(sql)
 
                 ids_ = ids_[:-2]
                 if show_warning and len(ids_) != 0:
@@ -493,7 +493,7 @@ class GwEndFeatureButton(GwParentAction):
                     tools_qt.show_info_box(msg, title="Warning", inf_text=str(ids_))
                 sql = ("DELETE FROM audit_log_data "
                        "WHERE fid = 128 AND cur_user = current_user")
-                self.controller.execute_sql(sql)
+                tools_db.execute_sql(sql)
         self.set_edit_arc_downgrade_force('False')
         self.canvas.refresh()
 
@@ -561,12 +561,12 @@ class GwEndFeatureButton(GwParentAction):
             sql = (f"SELECT DISTINCT(id)"
                    f" FROM {table_object}"
                    f" WHERE id = '{cat_work_id}'")
-            row = self.controller.get_row(sql, log_info=False)
+            row = tools_db.get_row(sql, log_info=False)
             if row is None:
                 sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
-                self.controller.execute_sql(sql)
+                tools_db.execute_sql(sql)
                 sql = "SELECT id FROM cat_work ORDER BY id"
-                rows = self.controller.get_rows(sql)
+                rows = tools_db.get_rows(sql)
                 if rows:
                     tools_qt.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows)
                     aux = self.dlg_work_end.workcat_id_end.findText(str(cat_work_id))

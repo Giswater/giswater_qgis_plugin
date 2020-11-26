@@ -22,7 +22,7 @@ from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleS
 from qgis.core import QgsExpression, QgsProject
 from qgis.gui import QgsDateTimeEdit
 
-from . import tools_qgis, tools_log, tools_os
+from . import tools_log, tools_os, tools_db
 from .. import global_vars
 from ..core.utils import tools_gw
 
@@ -748,7 +748,7 @@ def multi_rows_delete(widget, table_name, column_id):
     if answer:
         sql = f"DELETE FROM {table_name}"
         sql += f" WHERE {column_id} IN ({list_id})"
-        global_vars.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
         widget.model().select()
 
 
@@ -896,7 +896,6 @@ def delete_rows_qtv(qtable):
         qtable.model().select()
 
         return status
-
 
 
 def reset_model(dialog, table_object, geom_type):

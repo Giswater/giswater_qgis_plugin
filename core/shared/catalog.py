@@ -15,7 +15,7 @@ from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGrou
 from ..utils import tools_gw
 from ..ui.ui_manager import InfoCatalogUi
 from ... import global_vars
-from ...lib import tools_qt, tools_log
+from ...lib import tools_qt, tools_log, tools_db
 
 
 class GwCatalog:
@@ -37,7 +37,7 @@ class GwCatalog:
         feature = f'"feature_type":"{feature_type}"'
         body = tools_gw.create_body(form, feature)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if not row:
             tools_gw.show_message("NOT ROW FOR: " + sql, 2)
             return
@@ -114,7 +114,7 @@ class GwCatalog:
 
         body = tools_gw.create_body(form=form, feature=feature, extras=extras)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         if complet_result[0]['status'] == "Failed":
             tools_log.log_warning(complet_result[0])
@@ -136,7 +136,7 @@ class GwCatalog:
         extras = f'"fields":{{"matcat_id":"{matcat_id_value}"}}'
         body = tools_gw.create_body(form=form, feature=feature, extras=extras)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
         result = complet_list[0]['body']['data']
         for field in result['fields']:
@@ -176,7 +176,7 @@ class GwCatalog:
         exists = tools_gw.check_function('gw_api_get_catalog_id')
         if exists:
             sql = f"SELECT gw_api_get_catalog_id('{metcat_value}', '{pn_value}', '{dn_value}', '{geom_type}', 9)"
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
             self.fill_combo(widget_id, row[0]['catalog_id'][0])
 
 

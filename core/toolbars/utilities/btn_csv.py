@@ -17,7 +17,7 @@ from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import CsvUi
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qt, tools_log
+from ....lib import tools_qt, tools_log, tools_db
 
 
 class GwCSVButton(GwParentAction):
@@ -87,7 +87,7 @@ class GwCSVButton(GwParentAction):
                f" FROM {table_name}"
                f" JOIN sys_function ON function_name =  functionname"
                f" WHERE sys_role IN {roles} AND active is True ORDER BY orderby")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if not rows:
             message = "You do not have permission to execute this application"
             self.dlg_csv.lbl_info.setText(tools_gw.tr(message))
@@ -247,7 +247,7 @@ class GwCSVButton(GwParentAction):
 
         sql = (f"DELETE FROM {temp_tablename} "
                f"WHERE fid = '{fid_aux}' AND cur_user = current_user")
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
 
 
     def get_delimiter(self, dialog):
@@ -295,12 +295,12 @@ class GwCSVButton(GwParentAction):
             dialog.progressBar.setValue(progress)
 
             if progress % 500 == 0:
-                status = self.controller.execute_sql(sql)
+                status = tools_db.execute_sql(sql)
                 if not status:
                     return False
                 sql = ""
         if sql != "":
-            status = self.controller.execute_sql(sql)
+            status = tools_db.execute_sql(sql)
             if not status:
                 return False
 
@@ -341,7 +341,7 @@ class GwCSVButton(GwParentAction):
         else:
             sql = ("SELECT rolname FROM pg_roles "
                    " WHERE pg_has_role(current_user, oid, 'member')")
-            rows = self.controller.get_rows(sql)
+            rows = tools_db.get_rows(sql)
             if not rows:
                 return None
 

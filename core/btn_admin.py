@@ -67,9 +67,9 @@ class GwAdmin:
         # Bug #733 was here
         # Check if connection is still False
         if set_database_connection:
-            connection_status, not_version = self.controller.set_database_connection()
+            connection_status, not_version = tools_db.set_database_connection()
         else:
-            connection_status = self.controller.logged
+            connection_status = global_vars.logged
 
         if not connection_status:
             self.create_credentials_form(set_connection=default_connection)
@@ -290,7 +290,7 @@ class GwAdmin:
 
         # Create extension postgis if not exist
         sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
 
         # Set projecte type
         self.project_type_selected = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
@@ -363,7 +363,7 @@ class GwAdmin:
         default_connection = tools_qt.get_text(dialog, dialog.cmb_connection)
         settings.setValue('selected', default_connection)
         if new_connection:
-            connection_status, not_version = self.controller.set_database_connection()
+            connection_status, not_version = tools_db.set_database_connection()
         else:
             if default_connection:
                 settings.endGroup()
@@ -484,7 +484,7 @@ class GwAdmin:
             if call_function:
                 # Enable constrains
                 sql = 'SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"ADD"}}$$)'
-                self.controller.execute_sql(sql)
+                tools_db.execute_sql(sql)
 
         elif button.text() == 'ON':
             button.setText("OFF")
@@ -492,7 +492,7 @@ class GwAdmin:
             if call_function:
                 # Disable constrains
                 sql = 'SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$)'
-                self.controller.execute_sql(sql)
+                tools_db.execute_sql(sql)
 
 
     """ Declare all read sql process """
@@ -991,7 +991,7 @@ class GwAdmin:
     def load_sample_data(self, project_type=False):
 
         sql = f"UPDATE {self.schema}.sys_version SET sample = True"
-        self.controller.execute_sql(sql, commit=False)
+        tools_db.execute_sql(sql, commit=False)
 
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderExemple + 'user' + os.sep + project_type
@@ -1461,7 +1461,7 @@ class GwAdmin:
 
         # Check is project name already exists
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
-        rows = self.controller.get_rows(sql, commit=False)
+        rows = tools_db.get_rows(sql, commit=False)
         available = False
         for row in rows:
             if str(project_name) == str(row[0]):
@@ -1661,7 +1661,7 @@ class GwAdmin:
             self.schema = str(create_project)
 
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         for row in rows:
             if str(self.schema) == str(row[0]):
                 msg = "This project name alredy exist."
@@ -1674,7 +1674,7 @@ class GwAdmin:
         QgsApplication.taskManager().addTask(self.task1)
         self.task1.setProgress(0)
         sql = f'ALTER SCHEMA {schema} RENAME TO {self.schema}'
-        status = self.controller.execute_sql(sql, commit=False)
+        status = tools_db.execute_sql(sql, commit=False)
         if status:
             self.reload_fct_ftrg(project_type=self.project_type_selected)
             self.task1.setProgress(20)
@@ -1684,7 +1684,7 @@ class GwAdmin:
             self.task1.setProgress(60)
             sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_rename_fixviews($${"data":{"currentSchemaName":"'
                    + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
-            self.controller.execute_sql(sql, commit=False)
+            tools_db.execute_sql(sql, commit=False)
             self.execute_last_process(schema_name=self.schema, locale=True)
         self.task1.setProgress(100)
 
@@ -1842,7 +1842,7 @@ class GwAdmin:
         credentials['sslmode'] = sslmode
         settings.endGroup()
 
-        self.logged = self.controller.connect_to_database(credentials['host'], credentials['port'],
+        self.logged = tools_db.connect_to_database(credentials['host'], credentials['port'],
             credentials['db'], credentials['user'], credentials['password'], credentials['sslmode'])
 
         if not self.logged:
@@ -1917,7 +1917,7 @@ class GwAdmin:
         # Populate visit class
         # TODO:: Populate combo from visitclass manager and wip
         # sql = ("SELECT id, idval FROM config_visit_class")
-        # rows = self.controller.get_rows(sql, commit=True)
+        # rows = tools_db.get_rows(sql, commit=True)
         # qt_tools.fill_combo_values(self.dlg_readsql.cmb_visit_class, rows, 1)
 
         # Set listeners
@@ -1934,11 +1934,11 @@ class GwAdmin:
 
         # Manage widgets
         sql = "SELECT id, id as idval FROM sys_feature_type WHERE classlevel = 1 OR classlevel = 2"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = tools_db.get_rows(sql, commit=True)
         tools_qt.fill_combo_values(self.dlg_manage_visit_class.feature_type, rows, 1)
 
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue ='visit_type'"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_manage_visit_class.visit_type, rows, 1)
 
         # Set listeners
@@ -1957,19 +1957,19 @@ class GwAdmin:
 
         # Manage widgets
         sql = "SELECT id, id as idval FROM om_visit_parameter_type"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = tools_db.get_rows(sql, commit=True)
         tools_qt.fill_combo_values(self.dlg_manage_visit_param.parameter_type, rows, 1)
 
         sql = "SELECT id, idval FROM config_typevalue WHERE typevalue = 'datatype'"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = tools_db.get_rows(sql, commit=True)
         tools_qt.fill_combo_values(self.dlg_manage_visit_param.data_type, rows, 1)
 
         sql = "SELECT id, idval FROM om_typevalue WHERE typevalue = 'visit_form_type'"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = tools_db.get_rows(sql, commit=True)
         tools_qt.fill_combo_values(self.dlg_manage_visit_param.form_type, rows, 1)
 
         sql = "SELECT id, idval FROM config_typevalue WHERE typevalue = 'widgettype'"
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = tools_db.get_rows(sql, commit=True)
         tools_qt.fill_combo_values(self.dlg_manage_visit_param.widget_type, rows, 1)
 
         # Set listeners
@@ -2071,7 +2071,7 @@ class GwAdmin:
 
         # Populate Project data schema Name
         sql = "SELECT schema_name FROM information_schema.schemata"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if rows is None:
             return
 
@@ -2081,10 +2081,10 @@ class GwAdmin:
             sql = (f"SELECT EXISTS (SELECT * FROM information_schema.tables "
                    f"WHERE table_schema = '{row[0]}' "
                    f"AND table_name = 'version')")
-            exists = self.controller.get_row(sql)
+            exists = tools_db.get_row(sql)
             if exists and str(exists[0]) == 'True':
                 sql = f"SELECT wsoftware FROM {row[0]}.version"
-                result = self.controller.get_row(sql)
+                result = tools_db.get_row(sql)
                 if result is not None and result[0] == filter_.upper():
                     elem = [row[0], row[0]]
                     result_list.append(elem)
@@ -2092,10 +2092,10 @@ class GwAdmin:
             sql = (f"SELECT EXISTS (SELECT * FROM information_schema.tables "
                    f"WHERE table_schema = '{row[0]}' "
                    f"AND table_name = 'sys_version')")
-            exists = self.controller.get_row(sql)
+            exists = tools_db.get_row(sql)
             if exists and str(exists[0]) == 'True':
                 sql = f"SELECT project_type FROM {row[0]}.sys_version"
-                result = self.controller.get_row(sql)
+                result = tools_db.get_row(sql)
                 if result is not None and result[0] == filter_.upper():
                     elem = [row[0], row[0]]
                     result_list.append(elem)
@@ -2145,8 +2145,8 @@ class GwAdmin:
         self.project_version = self.get_project_version(schemaname=schema_name)
         self.project_language = self.get_project_language(schemaname=schema_name)
 
-        self.postgresql_version = self.controller.get_postgresql_version()
-        self.postgis_version = self.controller.get_postgis_version()
+        self.postgresql_version = tools_db.get_postgresql_version()
+        self.postgis_version = tools_db.get_postgis_version()
 
         if schema_name is None:
             schema_name = 'Nothing to select'
@@ -2393,9 +2393,9 @@ class GwAdmin:
             if f:
                 f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", project_epsg))
                 if self.dev_commit == 'TRUE':
-                    status = self.controller.execute_sql(str(f_to_read), filepath=filepath)
+                    status = tools_db.execute_sql(str(f_to_read), filepath=filepath)
                 else:
-                    status = self.controller.execute_sql(str(f_to_read), commit=False, filepath=filepath)
+                    status = tools_db.execute_sql(str(f_to_read), commit=False, filepath=filepath)
 
                 if status is False:
                     self.error_count = self.error_count + 1
@@ -2456,7 +2456,7 @@ class GwAdmin:
 
         new_schema_name = tools_qt.get_text(self.dlg_readsql_copy, self.dlg_readsql_copy.schema_rename_copy)
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
 
         for row in rows:
             if str(new_schema_name) == str(row[0]):
@@ -2505,7 +2505,7 @@ class GwAdmin:
         result = tools_qt.ask_question(msg, "Info")
         if result:
             sql = f'DROP SCHEMA {project_name} CASCADE;'
-            status = self.controller.execute_sql(sql)
+            status = tools_db.execute_sql(sql)
             if status:
                 msg = "Process finished successfully"
                 tools_qt.show_info_box(msg, "Info", parameter="Delete schema")
@@ -2550,7 +2550,7 @@ class GwAdmin:
 
             body = tools_gw.create_body(extras=extras)
             sql = ("SELECT " + str(function_name) + "(" + body + ")::text")
-            row = self.controller.get_row(sql, commit=False)
+            row = tools_db.get_row(sql, commit=False)
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
@@ -2673,12 +2673,12 @@ class GwAdmin:
             content = f.read()
         sql = ("INSERT INTO " + schema_name + ".temp_csv(source, csv1, fid) VALUES('" +
                str(form_name_ui) + "', '" + str(content) + "', 247);")
-        status = self.controller.execute_sql(sql)
+        status = tools_db.execute_sql(sql)
 
         # Import xml to database
         sql = ("SELECT " + schema_name + ".gw_fct_import_ui_xml('" + str(form_name_ui) + "', " +
                str(status_update_childs) + ")::text")
-        status = self.controller.execute_sql(sql)
+        status = tools_db.execute_sql(sql)
         self.manage_result_message(status, parameter="Import data into 'config_form_fields'")
 
         # Clear temp_csv
@@ -2701,7 +2701,7 @@ class GwAdmin:
         # Export xml from database
         sql = ("SELECT " + schema_name + ".gw_fct_export_ui_xml('"
                + str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
-        status = self.controller.execute_sql(sql)
+        status = tools_db.execute_sql(sql)
         if status is False:
             msg = "Process finished with some errors"
             tools_qt.show_info_box(msg, "Warning", parameter="Function import/export")
@@ -2711,7 +2711,7 @@ class GwAdmin:
         sql = ("SELECT csv1 FROM " + schema_name + ".temp_csv "
                "WHERE cur_user = current_user AND source = '" + str(form_name_ui) + "' "
                "ORDER BY id DESC")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if not row:
             return
 
@@ -2743,7 +2743,7 @@ class GwAdmin:
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         # Clear temp_csv
         sql = f"DELETE FROM {schema_name}.temp_csv WHERE cur_user = current_user"
-        status = self.controller.execute_sql(sql)
+        status = tools_db.execute_sql(sql)
 
 
     def select_file_ui(self):
@@ -2796,12 +2796,12 @@ class GwAdmin:
 
             sql = (f"SELECT cat_feature.child_layer, cat_feature.child_layer FROM {schema_name}.cat_feature "
                    f" ORDER BY id")
-            rows = self.controller.get_rows(sql)
+            rows = tools_db.get_rows(sql)
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_ui, rows, 1)
 
             sql = (f"SELECT cat_feature.id, cat_feature.id FROM {schema_name}.cat_feature "
                    f" ORDER BY id")
-            rows = self.controller.get_rows(sql)
+            rows = tools_db.get_rows(sql)
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_fields, rows, 1)
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_name_view, rows, 1)
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_sys_fields, rows, 1)
@@ -3010,20 +3010,20 @@ class GwAdmin:
         # Populate widgettype combo
         sql = (f"SELECT DISTINCT(id), idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_manage_fields.widgettype, rows, 1)
 
         # Populate datatype combo
         sql = (f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_manage_fields.datatype, rows, 1)
 
         # Populate widgetfunction combo
         sql = (f"SELECT null as id, null as idval UNION ALL "
                f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_manage_fields.widgetfunction, rows, 1)
 
         # Set default value for formtype widget
@@ -3089,7 +3089,7 @@ class GwAdmin:
                    f"FROM {schema_name}.ve_config_addfields "
                    f"WHERE cat_feature_id = '" + form_name + "'")
 
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_manage_fields.cmb_fields, rows, 1)
 
 
@@ -3132,7 +3132,7 @@ class GwAdmin:
 
         sql = sql[:-1]
         sql += f" WHERE cat_feature_id = '{form_name}' and columname = '{column_id}'"
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
 
         # Close dialog
         self.close_dialog_admin(self.dlg_manage_sys_fields)
@@ -3147,7 +3147,7 @@ class GwAdmin:
         param_name = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.columnname)
         sql = (f"SELECT param_name FROM {schema_name}.sys_addfields "
                f"WHERE param_name = '{param_name}' AND  cat_feature_id = '{form_name}' ")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
 
         if action == 'create':
 
@@ -3352,12 +3352,12 @@ class GwAdmin:
 
             if progress % 500 == 0:
                 # TODO:: Use dev_commit or dev_user?
-                self.controller.execute_sql(sql, commit=self.dev_user)
+                tools_db.execute_sql(sql, commit=self.dev_user)
                 sql = ""
 
         if sql != "":
             # TODO:: Use dev_commit or dev_user?
-            self.controller.execute_sql(sql, commit=self.dev_user)
+            tools_db.execute_sql(sql, commit=self.dev_user)
 
         _file.close()
         del _file
@@ -3469,7 +3469,7 @@ class GwAdmin:
         sql = (f"UPDATE {self.schema_name}.config_param_user "
                f"SET value = '{composers_path_vdef}' "
                f"WHERE parameter = 'qgis_composers_folderpath' AND cur_user = current_user")
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
 
 
     def get_project_version(self, schemaname=None):
@@ -3483,7 +3483,7 @@ class GwAdmin:
         exists = tools_db.check_table(tablename, schemaname)
         if exists:
             sql = ("SELECT giswater FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
             if row:
                 project_version = row[0]
         else:
@@ -3491,7 +3491,7 @@ class GwAdmin:
             exists = tools_db.check_table(tablename, schemaname)
             if exists:
                 sql = ("SELECT giswater FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-                row = self.controller.get_row(sql)
+                row = tools_db.get_row(sql)
                 if row:
                     project_version = row[0]
 
@@ -3509,7 +3509,7 @@ class GwAdmin:
         exists = tools_db.check_table(tablename, schemaname)
         if exists:
             sql = ("SELECT language FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
             if row:
                 project_language = row[0]
         else:
@@ -3517,7 +3517,7 @@ class GwAdmin:
             exists = tools_db.check_table(tablename, schemaname)
             if exists:
                 sql = ("SELECT language FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-                row = self.controller.get_row(sql)
+                row = tools_db.get_row(sql)
                 if row:
                     project_language = row[0]
 
@@ -3535,7 +3535,7 @@ class GwAdmin:
         exists = tools_db.check_table(tablename, schemaname)
         if exists:
             sql = ("SELECT epsg FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
             if row:
                 project_epsg = row[0]
         else:
@@ -3543,7 +3543,7 @@ class GwAdmin:
             exists = tools_db.check_table(tablename, schemaname)
             if exists:
                 sql = ("SELECT epsg FROM " + schemaname + "." + tablename + " ORDER BY id DESC LIMIT 1")
-                row = self.controller.get_row(sql)
+                row = tools_db.get_row(sql)
                 if row:
                     project_epsg = row[0]
 

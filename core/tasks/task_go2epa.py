@@ -14,7 +14,7 @@ from qgis.core import QgsTask
 
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_log, tools_qt
+from ...lib import tools_log, tools_qt, tools_db
 
 
 class GwGo2EpaTask(QgsTask):
@@ -286,7 +286,7 @@ class GwGo2EpaTask(QgsTask):
 
         # Create dict with sources
         sql = f"SELECT tablename, target FROM config_fprocess WHERE fid = {self.fid};"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         sources = {}
         for row in rows:
             json_elem = row[1].replace('{', '').replace('}', '')

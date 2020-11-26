@@ -20,7 +20,7 @@ from ..shared.selector import Selector
 from ..ui.ui_manager import SelectorUi, MincutManagerUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt
+from ...lib import tools_qgis, tools_qt, tools_db
 
 
 class GwMincutManager:
@@ -60,7 +60,7 @@ class GwMincutManager:
         model = QStringListModel()
 
         sql = "SELECT DISTINCT(id) FROM om_mincut WHERE id > 0 "
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         values = []
         if rows:
             for row in rows:
@@ -127,7 +127,7 @@ class GwMincutManager:
                    f"JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
                    f"JOIN om_mincut AS t2 ON t1.result_id = t2.id "
                    f"WHERE result_id = {id_}")
-            rows = self.controller.get_rows(sql)
+            rows = tools_db.get_rows(sql)
             if not rows:
                 inf_text += "\nClients: None(No messages will be sent)"
                 continue
@@ -161,7 +161,7 @@ class GwMincutManager:
                    f"JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
                    f"JOIN om_mincut AS t2 ON t1.result_id = t2.id "
                    f"WHERE result_id = {id_}")
-            rows = self.controller.get_rows(sql)
+            rows = tools_db.get_rows(sql)
             if not rows:
                 continue
 
@@ -193,7 +193,7 @@ class GwMincutManager:
             else:
                 sql += f"SET notified= concat(replace(notified::text,']',','),'{{\"code\":\"{result[0]}\",\"date\":\"{_date_sended}\",\"avisats\":\"{result[1]}\",\"afectats\":\"{result[2]}\"}}]')::json "
             sql += f"WHERE id = '{id_}'"
-            self.controller.execute_sql(sql)
+            tools_db.execute_sql(sql)
 
             # Set a model with selected filter. Attach that model to selected table
             self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
@@ -222,7 +222,7 @@ class GwMincutManager:
         if answer:
             sql = (f"UPDATE om_mincut SET mincut_state = 3 "
                    f" WHERE id::text IN ({list_id})")
-            self.controller.execute_sql(sql, log_sql=False)
+            tools_db.execute_sql(sql, log_sql=False)
             self.tbl_mincut_edit.model().select()
 
 
@@ -263,12 +263,12 @@ class GwMincutManager:
         sql = ("SELECT id, idval "
                "FROM om_typevalue WHERE typevalue = 'mincut_state' "
                "ORDER BY id")
-        rows = self.controller.get_rows(sql, add_empty_row=True)
+        rows = tools_db.get_rows(sql, add_empty_row=True)
         tools_qt.fill_combo_values(self.dlg_min_edit.state_edit, rows, 1)
 
         # Fill ComboBox exploitation
         sql = "SELECT expl_id, name FROM exploitation WHERE expl_id > 0 ORDER BY name"
-        rows = self.controller.get_rows(sql, add_empty_row=True)
+        rows = tools_db.get_rows(sql, add_empty_row=True)
         tools_qt.fill_combo_values(self.dlg_min_edit.cmb_expl, rows, 1)
 
 
@@ -416,7 +416,7 @@ class GwMincutManager:
         if answer:
             sql = (f"DELETE FROM {table_name}"
                    f" WHERE {column_id} IN ({list_id})")
-            self.controller.execute_sql(sql)
+            tools_db.execute_sql(sql)
             widget.model().select()
             layer = tools_qgis.get_layer_by_tablename('v_om_mincut_node')
             if layer is not None:

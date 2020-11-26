@@ -18,7 +18,7 @@ class GwProjectCheckButton(GwParentAction):
     def clicked_event(self):
 
         # Return layers in the same order as listed in TOC
-        layers = self.controller.get_layers()
+        layers = tools_qgis.get_project_layers()
 
         check_project_result = GwProjectCheck()
         check_project_result.populate_audit_check_project(layers, "false")

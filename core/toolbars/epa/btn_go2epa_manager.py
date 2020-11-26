@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QRegExpValidator
 from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import EpaManager
 from ...utils import tools_gw
-from ....lib import tools_qt
+from ....lib import tools_qt, tools_db
 
 
 class GwGo2EpaManagerButton(GwParentAction):
@@ -53,7 +53,7 @@ class GwGo2EpaManagerButton(GwParentAction):
     def fill_combo_result_id(self):
 
         sql = "SELECT result_id FROM v_ui_rpt_cat_result ORDER BY result_id"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fillComboBox(self.dlg_manager, self.dlg_manager.txt_result_id, rows)
 
 

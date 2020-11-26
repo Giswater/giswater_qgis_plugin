@@ -60,7 +60,7 @@ class LoadProject(QObject):
         self.schema_name = layer_source['schema']
         self.schema_name = self.schema_name.replace('"', '')
         tools_gw.set_config_parser('load_project', 'schema_name', f'{self.schema_name}')
-        self.controller.set_schema_name(self.schema_name)
+        global_vars.schema_name = self.schema_name
 
         # TEMP
         global_vars.schema_name = self.schema_name
@@ -70,7 +70,7 @@ class LoadProject(QObject):
         tools_gw.manage_translation(self.plugin_name)
 
         # Set PostgreSQL parameter 'search_path'
-        self.controller.set_search_path(layer_source['schema'])
+        tools_db.set_search_path(layer_source['schema'])
 
         # Check if schema exists
         self.schema_exists = self.check_schema(self.schema_name)
@@ -158,7 +158,7 @@ class LoadProject(QObject):
         except Exception as e:
             tools_log.log_info(str(e))
         finally:
-            self.connection_status, not_version = self.controller.set_database_connection()
+            self.connection_status, not_version = tools_db.set_database_connection()
             if not self.connection_status or not_version:
                 message = global_vars.last_error
                 if show_warning:
@@ -177,12 +177,12 @@ class LoadProject(QObject):
 
     def check_layers_from_distinct_schema(self):
 
-        layers = self.controller.get_layers()
+        layers = tools_qgis.get_project_layers()
         repeated_layers = {}
         for layer in layers:
-            layer_toc_name = self.controller.get_layer_source_table_name(layer)
+            layer_toc_name = tools_qgis.get_layer_source_table_name(layer)
             if layer_toc_name == 'v_edit_node':
-                layer_source = self.controller.get_layer_source(layer)
+                layer_source = tools_qgis.get_layer_source(layer)
                 repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
 
         if len(repeated_layers) > 1:
@@ -202,7 +202,7 @@ class LoadProject(QObject):
             # If there are layers with a different schema, the one that the user has in the project variable
             # 'gwMainSchema' is taken as the schema_name.
             self.schema_name = self.project_vars['main_schema']
-            self.controller.set_schema_name(self.project_vars['main_schema'])
+            global_vars.schema_name = self.project_vars['main_schema']
 
         return True
 
@@ -440,6 +440,6 @@ class LoadProject(QObject):
         schemaname = schemaname.replace('"', '')
         sql = "SELECT nspname FROM pg_namespace WHERE nspname = %s"
         params = [schemaname]
-        row = self.controller.get_row(sql, params=params)
+        row = tools_db.get_row(sql, params=params)
         return row
 

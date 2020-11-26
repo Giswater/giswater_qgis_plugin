@@ -12,7 +12,7 @@ from qgis.PyQt.QtCore import pyqtSignal, QObject
 from ..ui.ui_manager import PsectorDuplicate
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qt
+from ...lib import tools_qt, tools_db
 
 
 class GwPsectorDuplicate(QObject):
@@ -35,7 +35,7 @@ class GwPsectorDuplicate(QObject):
 
         # Populate combo duplicate psector
         sql = "SELECT psector_id, name FROM plan_psector"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_duplicate_psector.duplicate_psector, rows, 1)
 
         # Set QComboBox with selected psector

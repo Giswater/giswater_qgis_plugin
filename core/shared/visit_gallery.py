@@ -15,7 +15,7 @@ from qgis.PyQt.QtWidgets import QLabel, QPushButton, QLineEdit
 from ..ui.ui_manager import Gallery, GalleryZoom
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qt
+from ...lib import tools_db
 from ...lib.tools_qt import GwExtendedQLabel
 
 
@@ -42,7 +42,7 @@ class GwVisitGallery:
         # Get all pictures for event_id | visit_id
         sql = (f"SELECT value FROM om_visit_event_photo"
                f" WHERE event_id = '{event_id}' AND visit_id = '{visit_id}'")
-        rows = self.controller.get_rows(sql, commit=True)
+        rows = tools_db.get_rows(sql, commit=True)
         num = len(rows)
         for m in range(0, num):
             self.img_path_list1D.append(rows[m][0])

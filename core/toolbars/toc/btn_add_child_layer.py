@@ -15,7 +15,7 @@ from ..parent_dialog import GwParentAction
 from ...load_project_check import GwProjectCheck
 from ...tasks.task_layer_config import GwConfigLayerTask
 from ...utils import tools_gw
-from ....lib import tools_qgis, tools_log
+from ....lib import tools_qgis, tools_log, tools_db
 
 
 class GwAddChildLayerButton(GwParentAction):
@@ -44,7 +44,7 @@ class GwAddChildLayerButton(GwParentAction):
                "WHEN 'v_edit_arc' THEN 'Arc' WHEN 'v_edit_connec' THEN 'Connec' "
                "WHEN 'v_edit_gully' THEN 'Gully' END ), parent_layer FROM cat_feature "
                "ORDER BY parent_layer")
-        parent_layers = self.controller.get_rows(sql)
+        parent_layers = tools_db.get_rows(sql)
 
         for parent_layer in parent_layers:
 
@@ -59,7 +59,7 @@ class GwAddChildLayerButton(GwParentAction):
                    f"   WHERE table_schema = '{schema_name}')"
                    f" ORDER BY child_layer")
 
-            child_layers = self.controller.get_rows(sql)
+            child_layers = tools_db.get_rows(sql)
             if not child_layers: continue
 
             # Create sub menu
@@ -140,7 +140,7 @@ class GwAddChildLayerButton(GwParentAction):
         """ Get references to project main layers """
 
         # Check if we have any layer loaded
-        layers = self.controller.get_layers()
+        layers = tools_qgis.get_project_layers()
         if len(layers) == 0:
             return False
 
@@ -205,7 +205,7 @@ class GwAddChildLayerButton(GwParentAction):
         extras += f'"addSchema":"{self.qgis_project_add_schema}"'
         body = tools_gw.create_body(extras=extras)
         sql = f"SELECT gw_fct_setselectors({body})::text"
-        row = self.controller.get_row(sql, commit=True)
+        row = tools_db.get_row(sql, commit=True)
         if row:
             self.iface.mapCanvas().refreshAllLayers()
             self.layer_muni.triggerRepaint()

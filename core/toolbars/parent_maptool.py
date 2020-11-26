@@ -87,7 +87,7 @@ class GwParentMapTool(QgsMapTool):
 
 
     def clicked_event(self):
-        self.controller.prev_maptool = self.iface.mapCanvas().mapTool()
+        self.prev_maptool = self.iface.mapCanvas().mapTool()
         if not (self == self.iface.mapCanvas().mapTool()):
             self.iface.mapCanvas().setMapTool(self)
         else:
@@ -130,9 +130,9 @@ class GwParentMapTool(QgsMapTool):
 
 
     def recover_previus_maptool(self):
-        if self.controller.prev_maptool:
-            self.iface.mapCanvas().setMapTool(self.controller.prev_maptool)
-            self.controller.prev_maptool = None
+        if self.prev_maptool:
+            self.iface.mapCanvas().setMapTool(self.prev_maptool)
+            self.prev_maptool = None
 
 
     def remove_vertex(self):

@@ -16,7 +16,7 @@ from ..utils import tools_gw
 from ..ui.ui_manager import ElementUi, ElementManager
 from ..utils.tools_gw import SnappingConfigManager
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt
+from ...lib import tools_qgis, tools_qt, tools_db
 
 
 class GwElement:
@@ -145,15 +145,15 @@ class GwElement:
         # TODO maybe all this values can be in one Json query
         # Fill combo boxes
         sql = "SELECT DISTINCT(elementtype_id), elementtype_id FROM cat_element ORDER BY elementtype_id"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.element_type, rows, 1)
 
         sql = "SELECT expl_id, name FROM exploitation WHERE expl_id != '0' ORDER BY name"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.expl_id, rows, 1)
 
         sql = "SELECT DISTINCT(id), name FROM value_state"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.state, rows, 1)
 
         self.filter_state_type()
@@ -161,32 +161,32 @@ class GwElement:
         sql = ("SELECT location_type, location_type FROM man_type_location"
                " WHERE feature_type = 'ELEMENT' "
                " ORDER BY location_type")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.location_type, rows, 1)
 
         if rows:
             tools_qt.set_combo_value(self.dlg_add_element.location_type, rows[0][0], 0)
 
         sql = "SELECT DISTINCT(id), id FROM cat_owner"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.ownercat_id, rows, 1, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM cat_builder"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.buildercat_id, rows, 1, add_empty=True)
 
         sql = "SELECT DISTINCT(id), id FROM cat_work"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.workcat_id, rows, 1, add_empty=True)
         self.dlg_add_element.workcat_id.currentIndexChanged.connect(partial(
             tools_qt.set_stylesheet, self.dlg_add_element.workcat_id, None))
 
         sql = "SELECT DISTINCT(id), id FROM cat_work"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.workcat_id_end, rows, 1, add_empty=True)
 
         sql = "SELECT id, idval FROM edit_typevalue WHERE typevalue = 'value_verified'"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.verified, rows, 1, add_empty=True)
         self.filter_elementcat_id()
 
@@ -251,7 +251,7 @@ class GwElement:
         state = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.state, 0)
         sql = (f"SELECT DISTINCT(id), name FROM value_state_type "
                f"WHERE state = {state}")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.state_type, rows, 1)
 
 
@@ -262,7 +262,7 @@ class GwElement:
                f" WHERE feature_type = 'ELEMENT' "
                f" AND (featurecat_id = '{element_type}' OR featurecat_id is null)"
                f" ORDER BY location_type")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.location_type, rows, add_empty=True)
         if rows:
             tools_qt.set_combo_value(self.dlg_add_element.location_type, rows[0][0], 0)
@@ -330,7 +330,7 @@ class GwElement:
         sql = (f"SELECT DISTINCT(element_id)"
                f" FROM {table_object}"
                f" WHERE element_id = '{element_id}'")
-        row = self.controller.get_row(sql, log_info=False)
+        row = tools_db.get_row(sql, log_info=False)
 
         if row is None:
             # If object not exist perform an INSERT
@@ -391,7 +391,7 @@ class GwElement:
                 sql_values += ", null"
             if element_id == '':
                 sql += sql_values + ") RETURNING element_id;"
-                new_elem_id = self.controller.execute_returning(sql)
+                new_elem_id = tools_db.execute_returning(sql)
                 sql_values = ""
                 sql = ""
                 element_id = str(new_elem_id[0])
@@ -468,7 +468,7 @@ class GwElement:
                 sql += (f"\nINSERT INTO element_x_connec (element_id, connec_id)"
                         f" VALUES ('{element_id}', '{feature_id}');")
 
-        status = self.controller.execute_sql(sql)
+        status = tools_db.execute_sql(sql)
         if status:
             self.element_id = element_id
             self.layers = tools_gw.manage_close(self.dlg_add_element, table_object, excluded_layers=[], layers=self.layers)
@@ -481,7 +481,7 @@ class GwElement:
         sql = (f"SELECT DISTINCT(id), id FROM cat_element"
                f" WHERE elementtype_id = '{element_type}'"
                f" ORDER BY id")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.elementcat_id, rows, 1)
 
 

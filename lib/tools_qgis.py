@@ -180,10 +180,10 @@ def get_visible_layers(as_list=False):
     visible_layer = '{'
     if as_list is True:
         visible_layer = '['
-    layers = global_vars.controller.get_layers()
+    layers = get_project_layers()
     for layer in layers:
         if is_layer_visible(layer):
-            table_name = global_vars.controller.get_layer_source_table_name(layer)
+            table_name = get_layer_source_table_name(layer)
             table = layer.dataProvider().dataSourceUri()
             # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
             if 'SELECT row_number() over ()' in str(table) or 'srid' not in str(table):
@@ -304,7 +304,7 @@ def get_layer_source(layer):
     return layer_source
 
 
-def qgis_get_layer_source_table_name(layer):
+def get_layer_source_table_name(layer):
     """ Get table or view name of selected layer """
 
     if layer is None:
@@ -370,7 +370,7 @@ def get_layer_by_tablename(tablename, show_warning=False, log_info=False, schema
     if schema_name is None:
         schema_name = project_vars['main_schema']
     for cur_layer in layers:
-        uri_table = qgis_get_layer_source_table_name(cur_layer)
+        uri_table = get_layer_source_table_name(cur_layer)
         table_schema = get_layer_schema(cur_layer)
         if (uri_table is not None and uri_table == tablename) and schema_name in ('', None, table_schema):
             layer = cur_layer

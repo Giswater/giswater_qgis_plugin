@@ -16,8 +16,7 @@ from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import FeatureReplace, InfoWorkcatUi
 from ...shared.catalog import GwCatalog
 from ...utils import tools_gw
-from ...utils.tools_gw import SnappingConfigManager
-from ....lib import tools_qt, tools_log, tools_qgis
+from ....lib import tools_qt, tools_log, tools_qgis, tools_db
 import global_vars
 
 
@@ -58,7 +57,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         tools_gw.load_settings(self.dlg_replace)
 
         sql = "SELECT id FROM cat_work ORDER BY id"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
             tools_qt.set_autocompleter(self.dlg_replace.workcat_id_end)
@@ -76,7 +75,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             work_id = tools_qt.get_text(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
                    f"WHERE id = '{work_id}'")
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
             current_date = self.manage_dates(self.current_date)
             if row and row[0]:
                 builtdate = self.manage_dates(row[0])
@@ -97,11 +96,11 @@ class GwFeatureReplaceButton(GwParentMapTool):
             feature_type = feature.attribute(self.feature_type_ud)
             if self.geom_type in ('node', 'connec'):
                 sql = f"SELECT DISTINCT(id) FROM {self.cat_table} ORDER BY id"
-                rows = self.controller.get_rows(sql)
+                rows = tools_db.get_rows(sql)
                 tools_qt.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
             elif self.geom_type in 'gully':
                 sql = f"SELECT DISTINCT(id) FROM cat_grate ORDER BY id"
-                rows = self.controller.get_rows(sql)
+                rows = tools_db.get_rows(sql)
                 tools_qt.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
         self.dlg_replace.feature_type.setText(feature_type)
@@ -113,7 +112,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         sql = (f"SELECT DISTINCT(id) FROM cat_feature WHERE lower(feature_type) = '{self.geom_type}' "
                f"AND active is True "
                f"ORDER BY id")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fillComboBox(self.dlg_replace, "feature_type_new", rows)
 
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self.new_workcat))
@@ -134,7 +133,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             return
 
         sql = f"SELECT lower(feature_type) FROM cat_feature WHERE id = '{feature_type}'"
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
 
         self.catalog = GwCatalog()
         self.catalog.api_catalog(self.dlg_replace, 'featurecat_id', row[0], feature_type)
@@ -149,7 +148,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             work_id = tools_qt.get_text(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
                    f"WHERE id = '{work_id}'")
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
             current_date = self.manage_dates(self.current_date)
             if row and row[0]:
                 builtdate = self.manage_dates(row[0])
@@ -222,13 +221,13 @@ class GwFeatureReplaceButton(GwParentMapTool):
                 sql = (f"SELECT DISTINCT(id) "
                        f"FROM {table_object} "
                        f"WHERE id = '{cat_work_id}'")
-                row = self.controller.get_row(sql, log_info=False)
+                row = tools_db.get_row(sql, log_info=False)
                 if row is None:
                     sql = f"INSERT INTO cat_work ({fields}) VALUES ({values})"
-                    self.controller.execute_sql(sql)
+                    tools_db.execute_sql(sql)
 
                     sql = "SELECT id FROM cat_work ORDER BY id"
-                    rows = self.controller.get_rows(sql)
+                    rows = tools_db.get_rows(sql)
                     if rows:
                         tools_qt.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
                         current_index = self.dlg_replace.workcat_id_end.findText(str(cat_work_id))
@@ -270,7 +269,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             # Execute SQL function and show result to the user
             function_name = "gw_fct_setfeaturereplace"
             sql = f"SELECT {function_name}({body})::text"
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
             if not row:
                 message = "Error replacing feature"
                 tools_gw.show_warning(message)
@@ -289,14 +288,14 @@ class GwFeatureReplaceButton(GwParentMapTool):
                    f"WHERE state_id = 1 AND cur_user = '{current_user}';"
                    f"\nINSERT INTO selector_state (state_id, cur_user) "
                    f"VALUES (1, '{current_user}');")
-            self.controller.execute_sql(sql)
+            tools_db.execute_sql(sql)
 
             if feature_type_new != "null" and featurecat_id != "null":
                 # Get id of new generated feature
                 sql = (f"SELECT {self.geom_type}_id "
                        f"FROM {self.geom_view} "
                        f"ORDER BY {self.geom_type}_id::int4 DESC LIMIT 1")
-                row = self.controller.get_row(sql)
+                row = tools_db.get_row(sql)
                 if row:
                     if self.geom_type == 'connec':
                         field_cat_id = "connecat_id"
@@ -306,12 +305,12 @@ class GwFeatureReplaceButton(GwParentMapTool):
                         sql = (f"UPDATE {self.geom_view} "
                                f"SET {field_cat_id} = '{featurecat_id}' "
                                f"WHERE {self.geom_type}_id = '{row[0]}'")
-                    self.controller.execute_sql(sql)
+                    tools_db.execute_sql(sql)
                     if self.project_type == 'ud':
                         sql = (f"UPDATE {self.geom_view} "
                                f"SET {self.geom_type}_type = '{feature_type_new}' "
                                f"WHERE {self.geom_type}_id = '{row[0]}'")
-                        self.controller.execute_sql(sql)
+                        tools_db.execute_sql(sql)
 
                 message = "Values has been updated"
                 tools_gw.show_info(message)
@@ -356,7 +355,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         result = self.snapper_manager.snap_to_background_layers(event_point)
         if result.isValid():
             layer = self.snapper_manager.get_snapped_layer(result)
-            tablename = self.controller.get_layer_source_table_name(layer)
+            tablename = tools_qgis.get_layer_source_table_name(layer)
             if tablename and 'v_edit' in tablename:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
@@ -378,7 +377,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         snapped_feat = self.snapper_manager.get_snapped_feature(result)
         if snapped_feat:
             layer = self.snapper_manager.get_snapped_layer(result)
-            tablename = self.controller.get_layer_source_table_name(layer)
+            tablename = tools_qgis.get_layer_source_table_name(layer)
 
             if tablename and 'v_edit' in tablename:
                 if tablename == 'v_edit_node':
@@ -455,6 +454,6 @@ class GwFeatureReplaceButton(GwParentMapTool):
             sql = (f"SELECT DISTINCT(id) "
                    f"FROM {self.cat_table} "
                    f"WHERE {self.feature_type_ws} = '{feature_type_new}'")
-            rows = self.controller.get_rows(sql)
+            rows = tools_db.get_rows(sql)
             tools_qt.fillComboBox(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
 

@@ -17,7 +17,7 @@ from qgis.gui import QgsDateTimeEdit
 from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import ConfigUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_db
+from ....lib import tools_qt, tools_db, tools_qgis
 
 
 class GwConfigButton(GwParentAction):
@@ -219,7 +219,7 @@ class GwConfigButton(GwParentAction):
         tables_name = '"list_tables_name":"{'
         for layer in layers:
             layers_name += f"{layer.name()}, "
-            tables_name += f"{self.controller.get_layer_source_table_name(layer)}, "
+            tables_name += f"{tools_qgis.get_layer_source_table_name(layer)}, "
         result = layers_name[:-2] + '}", ' + tables_name[:-2] + '}"'
 
         return result

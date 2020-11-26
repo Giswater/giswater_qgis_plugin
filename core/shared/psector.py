@@ -128,7 +128,7 @@ class GwPsector:
 
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'value_priority'"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         
         tools_qt.fill_combo_values(self.dlg_plan_psector.priority, rows, 1)
 
@@ -136,12 +136,12 @@ class GwPsector:
         sql = ("SELECT expl_id, name from exploitation "
                " JOIN selector_expl USING (expl_id) "
                " WHERE exploitation.expl_id != 0 and cur_user = current_user")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.cmb_expl_id, rows, 1)
 
         # Populate combo status
         sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status'"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.cmb_status, rows, 1)
 
         # tab Bugdet
@@ -192,7 +192,7 @@ class GwPsector:
             sql = (f"SELECT enable_all "
                    f"FROM plan_psector "
                    f"WHERE psector_id = '{psector_id}'")
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
             if row:
                 self.dlg_plan_psector.chk_enable_all.setChecked(row[0])
             self.fill_table(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc",
@@ -212,7 +212,7 @@ class GwPsector:
                    f"text3, text4, text5, text6, num_value, observ, atlas_id, scale, rotation, active, ext_code, status"
                    f" FROM plan_psector "
                    f"WHERE psector_id = {psector_id}")
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
 
             if not row:
                 return
@@ -223,23 +223,23 @@ class GwPsector:
                 self.ext_code.setText(str(row['ext_code']))
             sql = (f"SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_type' AND "
                    f"id = '{row['psector_type']}'")
-            result = self.controller.get_row(sql)
+            result = tools_db.get_row(sql)
             tools_qt.set_combo_value(self.cmb_psector_type, str(result['idval']), 1)
             sql = (f"SELECT name FROM exploitation "
                    f"WHERE expl_id = {row['expl_id']}")
-            result = self.controller.get_row(sql)
+            result = tools_db.get_row(sql)
             tools_qt.set_combo_value(self.cmb_expl_id, str(result['name']), 1)
 
             # Check if expl_id already exists in expl_selector
             sql = ("SELECT DISTINCT(expl_id, cur_user)"
                    " FROM selector_expl"
                    f" WHERE expl_id = '{row['expl_id']}' AND cur_user = current_user")
-            exist = self.controller.get_row(sql)
+            exist = tools_db.get_row(sql)
             if exist is None:
                 sql = ("INSERT INTO selector_expl (expl_id, cur_user) "
                        f" VALUES ({str(row['expl_id'])}, current_user)"
                        f" ON CONFLICT DO NOTHING;")
-                self.controller.execute_sql(sql)
+                tools_db.execute_sql(sql)
                 msg = "Your exploitation selector has been updated"
                 tools_gw.show_warning(msg, 1)
 
@@ -291,11 +291,11 @@ class GwPsector:
             if psector_id_aux != 'null':
                 sql = (f"DELETE FROM selector_plan_psector "
                        f"WHERE cur_user = current_user")
-                self.controller.execute_sql(sql)
+                tools_db.execute_sql(sql)
                 self.insert_psector_selector('selector_plan_psector', 'psector_id', psector_id_aux)
             sql = (f"DELETE FROM selector_psector "
                    f"WHERE cur_user = current_user AND psector_id = '{psector_id_aux}'")
-            self.controller.execute_sql(sql)
+            tools_db.execute_sql(sql)
             self.insert_psector_selector('selector_psector', 'psector_id', psector_id_aux)
             layer = None
             if not is_api:
@@ -342,11 +342,11 @@ class GwPsector:
 
             # Set psector_status vdefault
             sql = "SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_status' and id = '2'"
-            result = self.controller.get_row(sql)
+            result = tools_db.get_row(sql)
             tools_qt.set_combo_value(self.cmb_status, str(result[1]), 1)
 
         sql = "SELECT state_id FROM selector_state WHERE cur_user = current_user"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         self.all_states = rows
         self.delete_psector_selector('selector_state')
         self.insert_psector_selector('selector_state', 'state_id', '1')
@@ -408,7 +408,7 @@ class GwPsector:
             sql = (f"SELECT other, gexpenses, vat "
                    f"FROM plan_psector "
                    f"WHERE psector_id = '{psector_id}'")
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
 
             other = 0
             gexpenses = 0
@@ -474,7 +474,7 @@ class GwPsector:
         value = tools_qt.isChecked(self.dlg_plan_psector, "chk_enable_all")
         psector_id = tools_qt.get_text(self.dlg_plan_psector, "psector_id")
         sql = f"SELECT gw_fct_plan_psector_enableall({value}, '{psector_id}')"
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
         tools_gw.reload_qtable(self.dlg_plan_psector, 'arc')
         tools_gw.reload_qtable(self.dlg_plan_psector, 'node')
         tools_gw.reload_qtable(self.dlg_plan_psector, 'connec')
@@ -484,7 +484,7 @@ class GwPsector:
         sql = (f"UPDATE plan_psector "
                f"SET enable_all = '{value}' "
                f"WHERE psector_id = '{psector_id}'")
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
         tools_qgis.refresh_map_canvas()
 
 
@@ -676,7 +676,7 @@ class GwPsector:
                f" WHERE table_name = '{viewname}'"
                f" AND table_schema = '" + self.schema_name.replace('"', '') + "'"
                f" ORDER BY ordinal_position")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         columns = []
 
         if not rows or rows is None or rows == '':
@@ -689,7 +689,7 @@ class GwPsector:
 
         sql = (f"SELECT * FROM {viewname}"
                f" WHERE psector_id = '{tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)}'")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         all_rows = []
         all_rows.append(columns)
         if not rows or rows is None or rows == '':
@@ -706,7 +706,7 @@ class GwPsector:
 
         sql = (f"SELECT DISTINCT(column_name) FROM information_schema.columns"
                f" WHERE table_name = 'v_plan_current_psector'")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         columns = []
         for i in range(0, len(rows)):
             column_name = rows[i]
@@ -715,7 +715,7 @@ class GwPsector:
         sql = (f"SELECT total_arc, total_node, total_other, pem, pec, pec_vat, gexpenses, vat, other, pca"
                f" FROM v_plan_current_psector"
                f" WHERE psector_id = '{psector_id}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             for column_name in columns:
                 if column_name in row:
@@ -781,7 +781,7 @@ class GwPsector:
         sql = ("UPDATE " + tablename + " "
                " SET " + field + " = '" + tools_qt.get_text(self.dlg_plan_psector, field) + "'"
                " WHERE psector_id = '" + str(psector_id) + "'")
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
         self.populate_budget(self.dlg_plan_psector, psector_id)
 
 
@@ -829,7 +829,7 @@ class GwPsector:
 
         sql = (f"SELECT name FROM {tablename} "
                f" WHERE LOWER(name) = '{tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.name)}'")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if not rows:
             if self.dlg_plan_psector.name.text() != '':
                 self.enable_tabs(True)
@@ -843,14 +843,14 @@ class GwPsector:
 
         sql = (f"DELETE FROM {tablename}"
                f" WHERE cur_user = current_user;")
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
 
 
     def insert_psector_selector(self, tablename, field, value):
 
         sql = (f"INSERT INTO {tablename} ({field}, cur_user) "
                f"VALUES ('{value}', current_user);")
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
 
 
     def check_tab_position(self):
@@ -874,7 +874,7 @@ class GwPsector:
         sql = (f"SELECT other, gexpenses, vat"
                f" FROM plan_psector "
                f" WHERE psector_id = '{tools_qt.get_text(self.dlg_plan_psector, 'psector_id')}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.other, row[0])
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, row[1])
@@ -918,7 +918,7 @@ class GwPsector:
         if where:
             sql += where
         sql += f" ORDER BY {field_name}"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if not rows:
             return
 
@@ -938,7 +938,7 @@ class GwPsector:
             for x in range(0, len(self.all_states)):
                 sql = (f"INSERT INTO selector_state (state_id, cur_user)"
                        f" VALUES ('{self.all_states[x][0]}', current_user)")
-                self.controller.execute_sql(sql)
+                tools_db.execute_sql(sql)
         except TypeError:
             # Control if self.all_states is None (object of type 'NoneType' has no len())
             pass
@@ -979,7 +979,7 @@ class GwPsector:
 
         sql = (f"SELECT name FROM plan_psector"
                f" WHERE name = '{psector_name}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row is None:
             return False
         return True
@@ -1011,7 +1011,7 @@ class GwPsector:
                f"WHERE table_name = {viewname} "
                f"AND table_schema = '" + self.schema_name.replace('"', '') + "' "
                f"ORDER BY ordinal_position;")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if not rows or rows is None or rows == '':
             message = "Check fields from table or view"
             tools_gw.show_warning(message, parameter=viewname)
@@ -1080,7 +1080,7 @@ class GwPsector:
 
         if not self.update:
             sql += " RETURNING psector_id;"
-            new_psector_id = self.controller.execute_returning(sql)
+            new_psector_id = tools_db.execute_returning(sql)
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id:
                 row = tools_gw.get_config('plan_psector_vdefault')
@@ -1092,9 +1092,9 @@ class GwPsector:
                 else:
                     sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                            f" VALUES ('plan_psector_vdefault', '{new_psector_id[0]}', current_user);")
-                self.controller.execute_sql(sql)
+                tools_db.execute_sql(sql)
         else:
-            self.controller.execute_sql(sql)
+            tools_db.execute_sql(sql)
 
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, True)
         self.delete_psector_selector('selector_plan_psector')
@@ -1193,7 +1193,7 @@ class GwPsector:
                    f" WHERE {id_des} = '{expl_id[i]}'"
                    f" AND psector_id = '{psector_id}'")
 
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
             if row is not None:
                 # if exist - show warning
                 message = "Id already selected"
@@ -1202,7 +1202,7 @@ class GwPsector:
                 sql = (f"INSERT INTO {tableright}"
                        f" (psector_id, unit, price_id, descript, price) "
                        f" VALUES ({values})")
-                self.controller.execute_sql(sql)
+                tools_db.execute_sql(sql)
 
         # Refresh
         expr = f" psector_id = '{tools_qt.get_text(dialog, 'psector_id')}'"
@@ -1229,7 +1229,7 @@ class GwPsector:
         for i in range(0, len(expl_id)):
             sql = (f"{query}'{expl_id[i]}'"
                    f" AND psector_id = '{tools_qt.get_text(dialog, 'psector_id')}'")
-            self.controller.execute_sql(sql)
+            tools_db.execute_sql(sql)
 
         # Refresh
         expr = f" psector_id = '{tools_qt.get_text(dialog, 'psector_id')}'"
@@ -1336,7 +1336,7 @@ class GwPsector:
         sql = (f"SELECT doc_id"
                f" FROM doc_x_psector"
                f" WHERE doc_id = '{doc_id}' AND psector_id = '{psector_id}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             msg = "Document already exist"
             tools_gw.show_warning(msg)
@@ -1345,7 +1345,7 @@ class GwPsector:
         # Insert into new table
         sql = (f"INSERT INTO doc_x_psector (doc_id, psector_id)"
                f" VALUES ('{doc_id}', {psector_id})")
-        status = self.controller.execute_sql(sql)
+        status = tools_db.execute_sql(sql)
         if status:
             message = "Document inserted successfully"
             tools_gw.show_info(message)
@@ -1462,7 +1462,7 @@ class GwPsector:
         tablename = "config_param_user"
         sql = (f"SELECT * FROM {tablename}"
                f" WHERE cur_user = current_user")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         exist_param = False
         if type(widget) != QDateEdit:
             if tools_qt.get_text(dialog, widget) != "":
@@ -1498,7 +1498,7 @@ class GwPsector:
             else:
                 sql = (f"INSERT INTO {tablename} (parameter, value, cur_user)"
                        f" VALUES ('{parameter}', '{_date}', current_user);")
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
 
 
     def filter_by_text(self, dialog, table, widget_txt, tablename):
@@ -1573,11 +1573,11 @@ class GwPsector:
                 sql = "DELETE FROM selector_plan_result WHERE result_id in ("
                 if list_id != '':
                     sql += f"{list_id}) AND cur_user = current_user;"
-                    self.controller.execute_sql(sql)
+                    tools_db.execute_sql(sql)
                     tools_qt.set_widget_text(dialog, label, '')
                 sql = (f"DELETE FROM {table_name}"
                        f" WHERE {column_id} IN ({list_id});")
-                self.controller.execute_sql(sql)
+                tools_db.execute_sql(sql)
         widget.model().select()
 
 
@@ -1591,7 +1591,7 @@ class GwPsector:
         # Set current value
         sql = (f"SELECT name FROM plan_result_cat WHERE result_id IN (SELECT result_id FROM selector_plan_result "
                f"WHERE cur_user = current_user)")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             tools_qt.set_widget_text(self.dlg_merm, 'lbl_vdefault_price', str(row[0]))
 
@@ -1629,7 +1629,7 @@ class GwPsector:
         sql = (f"DELETE FROM selector_plan_result WHERE current_user = cur_user;"
                f"\nINSERT INTO selector_plan_result (result_id, cur_user)"
                f" VALUES({result_id}, current_user);")
-        status = self.controller.execute_sql(sql)
+        status = tools_db.execute_sql(sql)
         if status:
             message = "Values has been updated"
             tools_gw.show_info(message)
@@ -1671,7 +1671,7 @@ class GwPsector:
         sql = ("SELECT t1.name FROM plan_psector AS t1 "
                " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
                " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
-        row = global_vars.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if not row:
             return
         tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', row[0])

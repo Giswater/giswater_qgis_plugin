@@ -21,7 +21,7 @@ from ..tasks.task_go2epa import GwGo2EpaTask
 from ..utils import tools_gw
 from ..ui.ui_manager import Go2EpaUI, HydrologySelector, Multirow_selector
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt
+from ...lib import tools_qgis, tools_qt, tools_db
 
 
 class GwGo2Epa:
@@ -170,7 +170,7 @@ class GwGo2Epa:
 
         sql = (f"SELECT result_id FROM rpt_cat_result "
                f"WHERE result_id = '{result_name}' LIMIT 1")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             msg = "Result name already exists, do you want overwrite?"
             answer = tools_qt.ask_question(msg, title="Alert")
@@ -265,7 +265,7 @@ class GwGo2Epa:
                     self.dlg_hydrology_selector.hydrology))
 
         sql = "SELECT DISTINCT(name), hydrology_id FROM cat_hydrology ORDER BY name"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if not rows:
             message = "Any data found in table"
             tools_gw.show_warning(message, parameter='cat_hydrology')
@@ -276,7 +276,7 @@ class GwGo2Epa:
         sql = ("SELECT DISTINCT(t1.name) FROM cat_hydrology AS t1 "
                "INNER JOIN selector_inp_hydrology AS t2 ON t1.hydrology_id = t2.hydrology_id "
                "WHERE t2.cur_user = current_user")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             tools_qt.set_widget_text(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, row[0])
         else:
@@ -291,7 +291,7 @@ class GwGo2Epa:
         hydrology_id = tools_qt.get_combo_value(self.dlg_hydrology_selector, self.dlg_hydrology_selector.hydrology, 1)
         sql = ("SELECT cur_user FROM selector_inp_hydrology "
                "WHERE cur_user = current_user")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row:
             sql = (f"UPDATE selector_inp_hydrology "
                    f"SET hydrology_id = {hydrology_id} "
@@ -299,7 +299,7 @@ class GwGo2Epa:
         else:
             sql = (f"INSERT INTO selector_inp_hydrology (hydrology_id, cur_user) "
                    f"VALUES('{hydrology_id}', current_user)")
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
 
         message = "Values has been update"
         tools_gw.show_info(message)
@@ -311,7 +311,7 @@ class GwGo2Epa:
 
         sql = (f"SELECT infiltration, text FROM cat_hydrology"
                f" WHERE name = '{self.dlg_hydrology_selector.hydrology.currentText()}'")
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if row is not None:
             tools_qt.set_widget_text(self.dlg_hydrology_selector, self.dlg_hydrology_selector.infiltration, row[0])
             tools_qt.set_widget_text(self.dlg_hydrology_selector, self.dlg_hydrology_selector.descript, row[1])
@@ -322,7 +322,7 @@ class GwGo2Epa:
         sql = (f"SELECT DISTINCT(name), hydrology_id FROM {tablename}"
                f" WHERE name LIKE '%{widgettxt.text()}%'"
                f" ORDER BY name ")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if not rows:
             message = "Check the table 'cat_hydrology' "
             tools_gw.show_warning(message)
@@ -399,7 +399,7 @@ class GwGo2Epa:
         # Check for sector selector
         if self.export_inp:
             sql = "SELECT sector_id FROM selector_sector LIMIT 1"
-            row = self.controller.get_row(sql)
+            row = tools_db.get_row(sql)
             if row is None:
                 msg = "You need to select some sector"
                 tools_qt.show_info_box(msg)
@@ -426,7 +426,7 @@ class GwGo2Epa:
         model = QStringListModel()
 
         sql = f"SELECT {field_name} FROM {viewname}"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
 
         if rows:
             for i in range(0, len(rows)):
@@ -445,7 +445,7 @@ class GwGo2Epa:
         result_id = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
         sql = (f"SELECT result_id FROM v_ui_rpt_cat_result"
                f" WHERE result_id = '{result_id}'")
-        row = self.controller.get_row(sql, log_info=False)
+        row = tools_db.get_row(sql, log_info=False)
         if not row:
             self.dlg_go2epa.chk_only_check.setChecked(False)
             self.dlg_go2epa.chk_only_check.setEnabled(False)
@@ -457,7 +457,7 @@ class GwGo2Epa:
         """ Get data from selected table """
 
         sql = f"SELECT * FROM {tablename}"
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if not row:
             message = "Any data found in table"
             tools_gw.show_warning(message, parameter=tablename)
@@ -602,7 +602,7 @@ class GwGo2Epa:
             id_ = str(qtable_right.model().record(row).value(field_id_right))
             expl_id.append(id_)
         for i in range(0, len(expl_id)):
-            global_vars.controller.execute_sql(query_delete + str(expl_id[i]))
+            tools_db.execute_sql(query_delete + str(expl_id[i]))
 
         # Refresh
         oder_by = {0: "ASC", 1: "DESC"}
@@ -652,7 +652,7 @@ class GwGo2Epa:
             sql = (f"SELECT DISTINCT({id_des}, cur_user)"
                    f" FROM {tablename_des}"
                    f" WHERE {id_des} = '{expl_id[i]}' AND cur_user = current_user")
-            row = global_vars.controller.get_row(sql)
+            row = tools_db.get_row(sql)
 
             if row:
                 # if exist - show warning
@@ -661,7 +661,7 @@ class GwGo2Epa:
             else:
                 sql = (f"INSERT INTO {tablename_des} ({field_id}, cur_user) "
                        f" VALUES ({expl_id[i]}, current_user)")
-                global_vars.controller.execute_sql(sql)
+                tools_db.execute_sql(sql)
 
         # Refresh
         oder_by = {0: "ASC", 1: "DESC"}

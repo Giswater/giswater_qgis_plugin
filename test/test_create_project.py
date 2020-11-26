@@ -10,7 +10,8 @@ from qgis.core import QgsApplication, QgsProviderRegistry
 
 from .test_giswater import TestGiswater
 from ..core.btn_admin_gis_project import GwAdminGisProject
-
+from .. import global_vars
+from ..lib import tools_db
 
 # dummy instance to replace qgis.utils.iface
 class QgisInterfaceDummy(object):
@@ -60,8 +61,8 @@ class TestQgis:
     def connect_to_database(self, service_name):
         """ Connect to a database providing a service_name set in .pg_service.conf """
 
-        status = self.test_giswater.controller.connect_to_database_service(service_name)
-        self.test_giswater.controller.logged = status
+        status = tools_db.connect_to_database_service(service_name)
+        global_vars.logged = status
 
         if self.test_giswater.controller.last_error:
             msg = self.test_giswater.controller.last_error
@@ -164,7 +165,7 @@ class TestQgis:
         if not self.connect_to_database(self.service_name):
             return False
 
-        self.test_giswater.controller.set_search_path(project_name)
+        tools_db.set_search_path(project_name)
         self.test_giswater.visit_manager.visit_manager(open_dialog=False)
         dlg = self.test_giswater.visit_manager.dlg_add_visit
         res = dlg.exec()

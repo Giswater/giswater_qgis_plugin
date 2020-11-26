@@ -15,7 +15,7 @@ from ...shared.catalog import GwCatalog
 from ...shared.info import GwInfo
 from ...ui.ui_manager import NodeTypeChange
 from ...utils import tools_gw
-from ....lib import tools_qgis, tools_qt
+from ....lib import tools_qgis, tools_qt, tools_db
 
 
 class GwNodeTypeChangeButton(GwParentMapTool):
@@ -57,12 +57,12 @@ class GwNodeTypeChangeButton(GwParentMapTool):
                 # Update field 'nodecat_id'
                 sql = (f"UPDATE v_edit_node SET nodecat_id = '{node_nodecat_id}' "
                        f"WHERE node_id = '{self.node_id}'")
-                self.controller.execute_sql(sql)
+                tools_db.execute_sql(sql)
 
                 if project_type == 'ud':
                     sql = (f"UPDATE v_edit_node SET node_type = '{node_node_type_new}' "
                            f"WHERE node_id = '{self.node_id}'")
-                    self.controller.execute_sql(sql)
+                    tools_db.execute_sql(sql)
 
                 # Set active layer
                 layer = tools_qgis.get_layer_by_tablename('v_edit_node')
@@ -126,7 +126,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
         elif project_type == 'ud':
             node_type = feature.attribute('node_type')
             sql = "SELECT DISTINCT(id), id FROM cat_node  ORDER BY id"
-            rows = self.controller.get_rows(sql)
+            rows = tools_db.get_rows(sql)
             tools_qt.fill_combo_values(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
         self.dlg_chg_node_type.node_node_type.setText(node_type)
@@ -137,7 +137,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
         # Fill 1st combo boxes-new system node type
         sql = ("SELECT DISTINCT(id) FROM cat_feature WHERE active is True "
                "AND feature_type = 'NODE' ORDER BY id")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
 
         # Open dialog
@@ -154,7 +154,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 
         # Populate catalog_id
         sql = f"SELECT DISTINCT(id), id FROM cat_node WHERE nodetype_id = '{node_node_type_new}' ORDER BY id"
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
 

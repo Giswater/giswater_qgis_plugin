@@ -54,6 +54,16 @@ dlg_docker = None
 show_docker = None
 docker_type = None
 
+logged = None
+
+db = None
+
+postgresql_version = None
+
+dao = None
+
+credentials = None
+
 
 def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name):
 

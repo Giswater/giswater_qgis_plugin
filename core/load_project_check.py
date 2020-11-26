@@ -14,7 +14,7 @@ from qgis.core import Qgis
 from .utils import tools_gw
 from .ui.ui_manager import ProjectCheckUi
 from .. import global_vars
-from ..lib import tools_qgis, tools_log
+from ..lib import tools_qgis, tools_log, tools_db
 from ..lib.tools_qt import hide_void_groupbox
 
 
@@ -36,7 +36,7 @@ class GwProjectCheck:
                 continue
             if layer.providerType() != 'postgres':
                 continue
-            layer_source = self.controller.get_layer_source(layer)
+            layer_source = tools_qgis.get_layer_source(layer)
             if layer_source['schema'] is None:
                 continue
             layer_source['schema'] = layer_source['schema'].replace('"', '')
@@ -138,7 +138,7 @@ class GwProjectCheck:
                f" VALUES('qgis_form_initproject_hidden', '{value[state]}', current_user) "
                f" ON CONFLICT  (parameter, cur_user) "
                f" DO UPDATE SET value='{value[state]}'")
-        self.controller.execute_sql(sql)
+        tools_db.execute_sql(sql)
 
 
     def get_missing_layers(self, dialog, m_layers, critical_level):

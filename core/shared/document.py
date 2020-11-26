@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
 from ..utils import tools_gw
 from ..ui.ui_manager import DocUi, DocManager
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt
+from ...lib import tools_qt, tools_db
 
 
 class GwDocument:
@@ -158,7 +158,7 @@ class GwDocument:
         sql = (f"SELECT {field_name}"
                f" FROM {table_name}"
                f" ORDER BY {field_name}")
-        rows = global_vars.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         tools_qt.fillComboBox(dialog, widget, rows)
         if rows:
             tools_qt.set_current_index(dialog, widget, 0)
@@ -206,7 +206,7 @@ class GwDocument:
         sql = (f"SELECT DISTINCT(id)"
                f" FROM {table_object}"
                f" WHERE id = '{doc_id}'")
-        row = self.controller.get_row(sql, log_info=False)
+        row = tools_db.get_row(sql, log_info=False)
 
         # If document not exists perform an INSERT
         if row is None:
@@ -254,7 +254,7 @@ class GwDocument:
     def insert_doc_sql(self, doc_type, observ, date, path):
         sql = (f"INSERT INTO doc (doc_type, path, observ, date)"
                f" VALUES ('{doc_type}', '{path}', '{observ}', '{date}') RETURNING id;")
-        new_doc_id = self.controller.execute_returning(sql)
+        new_doc_id = tools_db.execute_returning(sql)
         sql = ""
         doc_id = str(new_doc_id[0])
         return sql, doc_id
@@ -296,7 +296,7 @@ class GwDocument:
                 sql += (f"\nINSERT INTO doc_x_gully (doc_id, gully_id)"
                         f" VALUES ('{doc_id}', '{feature_id}');")
 
-        status = self.controller.execute_sql(sql)
+        status = tools_db.execute_sql(sql)
         if status:
             self.doc_id = doc_id
             tools_gw.manage_close(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"],
@@ -307,7 +307,7 @@ class GwDocument:
         else:
             sql = (f"INSERT INTO doc_x_{tablename} (doc_id, {tablename}_id) "
                    f" VALUES('{doc_id}', '{item_id}')")
-            self.controller.execute_sql(sql)
+            tools_db.execute_sql(sql)
             expr = f"{tablename}_id = '{item_id}'"
             tools_qt.fill_table_object(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr_filter=expr)
 

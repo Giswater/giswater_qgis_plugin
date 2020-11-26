@@ -20,7 +20,7 @@ from qgis.gui import QgsDateTimeEdit
 from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import ToolboxDockerUi, ToolboxUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_qgis
+from ....lib import tools_qt, tools_qgis, tools_db
 
 
 class GwToolBoxButton(GwParentAction):
@@ -396,7 +396,7 @@ class GwToolBoxButton(GwParentAction):
         dialog.progressBar.setFormat("")
 
         sql = f"SELECT {function_name}()::text"
-        row = self.controller.get_row(sql)
+        row = tools_db.get_row(sql)
         if not row or row[0] in (None, ''):
             tools_gw.show_message(f"Function: {function_name} executed with no result ", 3)
             return True
@@ -468,7 +468,7 @@ class GwToolBoxButton(GwParentAction):
                f"UNION SELECT child_layer, feature_type, 2 as c "
                f"FROM cat_feature WHERE feature_type = '{geom_type.upper()}') as t "
                f"ORDER BY c, tablename")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         if rows:
             for row in rows:
                 layer = tools_qgis.get_layer_by_tablename(row[0])
@@ -509,11 +509,11 @@ class GwToolBoxButton(GwParentAction):
         self.layers = self.get_all_group_layers(geom_type)
 
         layers = []
-        legend_layers = self.controller.get_layers()
+        legend_layers = tools_qgis.get_project_layers()
         for geom_type, layer in self.layers:
             if layer in legend_layers:
                 elem = []
-                layer_name = self.controller.get_layer_source_table_name(layer)
+                layer_name = tools_qgis.get_layer_source_table_name(layer)
                 elem.append(layer.name())
                 elem.append(layer_name)
                 elem.append(geom_type)

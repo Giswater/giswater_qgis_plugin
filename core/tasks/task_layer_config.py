@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsTask
 
 from ..utils import tools_gw
-from ...lib import tools_log
+from ...lib import tools_log, tools_db, tools_qgis
 
 
 class GwConfigLayerTask(QgsTask):
@@ -80,18 +80,18 @@ class GwConfigLayerTask(QgsTask):
               f"WHERE child_layer IN ("
               f"     SELECT table_name FROM information_schema.tables"
               f"     WHERE table_schema = '{schema_name}')")
-        rows = self.controller.get_rows(sql)
+        rows = tools_db.get_rows(sql)
         self.available_layers = [layer[0] for layer in rows]
 
         self.set_form_suppress(self.available_layers)
-        all_layers_toc = self.controller.get_layers()
+        all_layers_toc = tools_qgis.get_project_layers()
         for layer in all_layers_toc:
-            layer_source = self.controller.get_layer_source(layer)
+            layer_source = tools_qgis.get_layer_source(layer)
             # Filter to take only the layers of the current schema
             if 'schema' in layer_source:
                 schema = layer_source['schema']
                 if schema and schema.replace('"', '') == self.schema_name:
-                    table_name = f"{self.controller.get_layer_source_table_name(layer)}"
+                    table_name = f"{tools_qgis.get_layer_source_table_name(layer)}"
                     self.available_layers.append(table_name)
 
 

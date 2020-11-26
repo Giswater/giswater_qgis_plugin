@@ -10,7 +10,7 @@ import threading
 from collections import OrderedDict
 
 from ... import global_vars
-from ...lib import tools_log
+from ...lib import tools_log, tools_db
 
 
 class GwNotifyTools:
@@ -38,7 +38,7 @@ class GwNotifyTools:
         """
         self.list_channels = list_channels
         for channel_name in list_channels:
-            self.controller.execute_sql(f'LISTEN "{channel_name}";')
+            tools_db.execute_sql(f'LISTEN "{channel_name}";')
 
         thread = threading.Thread(target=self.wait_notifications)
         thread.start()
@@ -76,7 +76,7 @@ class GwNotifyTools:
         """
 
         for channel_name in list_channels:
-            self.controller.execute_sql(f'UNLISTEN "{channel_name}";')
+            tools_db.execute_sql(f'UNLISTEN "{channel_name}";')
 
 
     def wait_notifications(self):
@@ -84,7 +84,7 @@ class GwNotifyTools:
         try:
             if self.conn_failed:
                 for channel_name in self.list_channels:
-                    self.controller.execute_sql(f'LISTEN "{channel_name}";')
+                    tools_db.execute_sql(f'LISTEN "{channel_name}";')
 
                 self.conn_failed = False
 

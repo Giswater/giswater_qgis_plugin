@@ -12,7 +12,7 @@ from qgis.PyQt.QtCore import Qt, QDate
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import ArcFusionUi
 from ...utils import tools_gw
-from ....lib import tools_qt
+from ....lib import tools_qt, tools_db
 
 
 class GwArcFusionButton(GwParentMapTool):
@@ -54,7 +54,7 @@ class GwArcFusionButton(GwParentMapTool):
 
             # Fill ComboBox workcat_id_end
             sql = "SELECT id FROM cat_work ORDER BY id"
-            rows = self.controller.get_rows(sql)
+            rows = tools_db.get_rows(sql)
             tools_qt.fillComboBox(self.dlg_fusion, "workcat_id_end", rows, False)
 
             # Set QDateEdit to current date
