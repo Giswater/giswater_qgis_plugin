@@ -812,18 +812,6 @@ class GwPsector:
         self.set_restriction_by_role(self.dlg_plan_psector, widget_to_ignore, restriction)
 
 
-    def connect_signal_selection_changed(self, dialog, table_object, query=True):
-        """ Connect signal selectionChanged """
-
-        try:
-            # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-            self.canvas.selectionChanged.connect(
-                partial(tools_gw.selection_changed, dialog, table_object, self.geom_type, query, layers=self.layers,
-                        list_ids=self.list_ids))
-        except Exception:
-            pass
-
-
     def enable_relation_tab(self, tablename):
 
         sql = (f"SELECT name FROM {tablename} "
