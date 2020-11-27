@@ -46,7 +46,7 @@ class GwDateSelectorButton(GwParentAction):
         """ Insert or update dates into data base """
 
         # Set project user
-        self.current_user = global_vars.user
+        self.current_user = global_vars.current_user
 
         from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
@@ -94,7 +94,7 @@ class GwDateSelectorButton(GwParentAction):
         """ Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date) """
 
         # Set project user
-        self.current_user = global_vars.user
+        self.current_user = global_vars.current_user
 
         sql = (f"SELECT from_date, to_date FROM selector_date"
                f" WHERE cur_user = '{self.current_user}'")

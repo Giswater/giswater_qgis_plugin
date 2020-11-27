@@ -43,8 +43,6 @@ dlg_info = None
 
 gw_infotools = None
 
-user = None
-
 translator = None
 
 current_user = None

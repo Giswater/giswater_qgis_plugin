@@ -2485,12 +2485,12 @@ def get_restriction(qgis_project_role):
     super_users = global_vars.settings.value('system_variables/super_users')
 
     # Manage user 'postgres'
-    if global_vars.user == 'postgres' or global_vars.user == 'gisadmin':
+    if global_vars.current_user == 'postgres' or global_vars.current_user == 'gisadmin':
         role_master = True
 
     # Manage super_user
     if super_users is not None:
-        if global_vars.user in super_users:
+        if global_vars.current_user in super_users:
             role_master = True
 
     if role_basic or qgis_project_role == 'role_basic':

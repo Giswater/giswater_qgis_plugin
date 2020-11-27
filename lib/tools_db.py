@@ -91,7 +91,7 @@ def check_role_user(role_name, username=None):
         return False
 
     if username is None:
-        username = global_vars.user
+        username = global_vars.current_user
 
     if not check_role(username):
         return False
@@ -214,7 +214,6 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
         return False
 
     # Update current user
-    global_vars.user = user
     global_vars.current_user = user
 
     # We need to create this connections for Table Views
