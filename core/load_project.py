@@ -21,7 +21,7 @@ from .utils import tools_gw
 from .utils.backend_functions import GwInfoTools
 from .utils.notify import GwNotifyTools
 from .. import global_vars
-from ..lib import tools_qgis, tools_config, tools_log, tools_db
+from ..lib import tools_qgis, tools_config, tools_log, tools_db, tools_qt
 
 
 class LoadProject(QObject):
@@ -170,7 +170,7 @@ class LoadProject(QObject):
 
 
     def translate(self, message):
-        return tools_gw.tr(message)
+        return tools_qt.tr(message, aux_context='ui_message')
 
 
     def check_layers_from_distinct_schema(self):

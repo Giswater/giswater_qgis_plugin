@@ -40,7 +40,7 @@ class GwGo2EpaManagerButton(GwParentAction):
         tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
 
         # Set signals
-        self.dlg_manager.btn_delete.clicked.connect(partial(tools_qt.multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
+        self.dlg_manager.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
                                                             'rpt_cat_result', 'result_id'))
         self.dlg_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manager))
         self.dlg_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_manager))
@@ -70,3 +70,36 @@ class GwGo2EpaManagerButton(GwParentAction):
             table.model().select()
         else:
             tools_qt.fill_table(table, tablename)
+
+
+    def multi_rows_delete(self, widget, table_name, column_id):
+        """ Delete selected elements of the table
+        :param QTableView widget: origin
+        :param table_name: table origin
+        :param column_id: Refers to the id of the source table
+        """
+
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_gw.show_warning(message)
+            return
+
+        inf_text = ""
+        list_id = ""
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = widget.model().record(row).value(str(column_id))
+            inf_text += f"{id_}, "
+            list_id += f"'{id_}', "
+        inf_text = inf_text[:-2]
+        list_id = list_id[:-2]
+        message = "Are you sure you want to delete these records?"
+        title = "Delete records"
+        answer = tools_qt.ask_question(message, title, inf_text)
+        if answer:
+            sql = f"DELETE FROM {table_name}"
+            sql += f" WHERE {column_id} IN ({list_id})"
+            tools_db.execute_sql(sql)
+            widget.model().select()

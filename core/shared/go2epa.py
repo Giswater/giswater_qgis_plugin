@@ -233,11 +233,11 @@ class GwGo2Epa:
         if tableleft == 'cat_dscenario':
             dlg_psector_sel.setWindowTitle(" Dscenario selector")
             tools_qt.set_widget_text(dlg_psector_sel, dlg_psector_sel.lbl_filter,
-                                   tools_gw.tr('Filter by: Dscenario name', context_name='labels'))
+                                   tools_qt.tr('Filter by: Dscenario name', context_name='labels', aux_context='ui_message'))
             tools_qt.set_widget_text(dlg_psector_sel, dlg_psector_sel.lbl_unselected,
-                                   tools_gw.tr('Unselected dscenarios', context_name='labels'))
+                                   tools_qt.tr('Unselected dscenarios', context_name='labels', aux_context='ui_message'))
             tools_qt.set_widget_text(dlg_psector_sel, dlg_psector_sel.lbl_selected,
-                                   tools_gw.tr('Selected dscenarios', context_name='labels'))
+                                   tools_qt.tr('Selected dscenarios', context_name='labels', aux_context='ui_message'))
 
         self.multi_row_selector(dlg_psector_sel, tableleft, tableright, field_id_left, field_id_right, aql=aql)
 
@@ -343,7 +343,7 @@ class GwGo2Epa:
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        message = tools_gw.tr("Select INP file")
+        message = tools_qt.tr("Select INP file", aux_context='ui_message')
         widget_is_checked = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
         if widget_is_checked:
             self.file_inp, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.inp')
@@ -364,7 +364,7 @@ class GwGo2Epa:
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        message = tools_gw.tr("Select RPT file")
+        message = tools_qt.tr("Select RPT file", aux_context='ui_message')
         widget_is_checked = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
         if widget_is_checked:
             self.file_rpt, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.rpt')

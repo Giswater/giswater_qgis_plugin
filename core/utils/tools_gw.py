@@ -2084,7 +2084,7 @@ def get_layer_source_from_credentials(layer_name='v_edit_node'):
         status, credentials = connect_to_database_credentials(credentials, conn_info)
         if not status:
             tools_log.log_warning("Error connecting to database (layer)")
-            global_vars.last_error = tr("Error connecting to database")
+            global_vars.last_error = tools_qt.tr("Error connecting to database", aux_context='ui_message')
             return None, not_version
 
         # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
@@ -2111,11 +2111,11 @@ def get_layer_source_from_credentials(layer_name='v_edit_node'):
             status, credentials = connect_to_database_credentials(credentials, max_attempts=0)
             if not status:
                 tools_log.log_warning("Error connecting to database (settings)")
-                global_vars.last_error = tr("Error connecting to database")
+                global_vars.last_error = tools_qt.tr("Error connecting to database", aux_context='ui_message')
                 return None, not_version
         else:
             tools_log.log_warning("Error getting default connection (settings)")
-            global_vars.last_error = tr("Error getting default connection")
+            global_vars.last_error = tools_qt.tr("Error getting default connection", aux_context='ui_message')
             return None, not_version
 
     global_vars.credentials = credentials
@@ -2540,7 +2540,7 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
 
     msg = None
     if text:
-        msg = tr(text, context_name)
+        msg = tools_qt.tr(text, context_name, aux_context='ui_message')
         if parameter:
             msg += ": " + str(parameter)
     try:
@@ -2890,24 +2890,6 @@ def connect_signal_selection_changed(dialog, table_object, query=False, geom_typ
 
 # TODO tools_gw_qt
 
-def tr(message, context_name=None):
-    """ Translate @message looking it in @context_name """
-
-    if context_name is None:
-        context_name = global_vars.plugin_name
-
-    value = None
-    try:
-        value = QCoreApplication.translate(context_name, message)
-    except TypeError:
-        value = QCoreApplication.translate(context_name, str(message))
-    finally:
-        # If not translation has been found, check into 'ui_message' context
-        if value == message:
-            value = QCoreApplication.translate('ui_message', message)
-
-    return value
-
 
 def translate_tooltip(context_name, widget, idx=None):
     """ Translate tooltips widgets of the form to current language
@@ -2917,14 +2899,14 @@ def translate_tooltip(context_name, widget, idx=None):
 
     if type(widget) is QTabWidget:
         widget_name = widget.widget(idx).objectName()
-        tooltip = tr(f'tooltip_{widget_name}', context_name)
+        tooltip = tools_qt.tr(f'tooltip_{widget_name}', context_name, aux_context='ui_message')
         if tooltip not in (f'tooltip_{widget_name}', None, 'None'):
             widget.setTabToolTip(idx, tooltip)
         elif widget.toolTip() in ("", None):
             widget.setTabToolTip(idx, widget.tabText(idx))
     else:
         widget_name = widget.objectName()
-        tooltip = tr(f'tooltip_{widget_name}', context_name)
+        tooltip = tools_qt.tr(f'tooltip_{widget_name}', context_name, aux_context='ui_message')
         if tooltip not in (f'tooltip_{widget_name}', None, 'None'):
             widget.setToolTip(tooltip)
         elif widget.toolTip() in ("", None):
@@ -2944,7 +2926,7 @@ def translate_form(dialog, context_name):
             translate_widget(context_name, widget)
 
     # Translate title of the form
-    text = tr('title', context_name)
+    text = tools_qt.tr('title', context_name, aux_context='ui_message')
     if text != 'title':
         dialog.setWindowTitle(text)
 
@@ -2961,12 +2943,12 @@ def translate_widget(context_name, widget):
             num_tabs = widget.count()
             for i in range(0, num_tabs):
                 widget_name = widget.widget(i).objectName()
-                text = tr(widget_name, context_name)
+                text = tools_qt.tr(widget_name, context_name, aux_context='ui_message')
                 if text not in (widget_name, None, 'None'):
                     widget.setTabText(i, text)
                 else:
                     widget_text = widget.tabText(i)
-                    text = tr(widget_text, context_name)
+                    text = tools_qt.tr(widget_text, context_name, aux_context='ui_message')
                     if text != widget_text:
                         widget.setTabText(i, text)
                 translate_tooltip(context_name, widget, i)
@@ -2974,34 +2956,34 @@ def translate_widget(context_name, widget):
             num_tabs = widget.count()
             for i in range(0, num_tabs):
                 widget_name = widget.widget(i).objectName()
-                text = tr(widget_name, context_name)
+                text = tools_qt.tr(widget_name, context_name, aux_context='ui_message')
                 if text not in (widget_name, None, 'None'):
                     widget.setItemText(i, text)
                 else:
                     widget_text = widget.itemText(i)
-                    text = tr(widget_text, context_name)
+                    text = tools_qt.tr(widget_text, context_name, aux_context='ui_message')
                     if text != widget_text:
                         widget.setItemText(i, text)
                 translate_tooltip(context_name, widget.widget(i))
         elif type(widget) is QGroupBox:
             widget_name = widget.objectName()
-            text = tr(widget_name, context_name)
+            text = tools_qt.tr(widget_name, context_name, aux_context='ui_message')
             if text not in (widget_name, None, 'None'):
                 widget.setTitle(text)
             else:
                 widget_title = widget.title()
-                text = tr(widget_title, context_name)
+                text = tools_qt.tr(widget_title, context_name, aux_context='ui_message')
                 if text != widget_title:
                     widget.setTitle(text)
             translate_tooltip(context_name, widget)
         else:
             widget_name = widget.objectName()
-            text = tr(widget_name, context_name)
+            text = tools_qt.tr(widget_name, context_name, aux_context='ui_message')
             if text not in (widget_name, None, 'None'):
                 widget.setText(text)
             else:
                 widget_text = widget.text()
-                text = tr(widget_text, context_name)
+                text = tools_qt.tr(widget_text, context_name, aux_context='ui_message')
                 if text != widget_text:
                     widget.setText(text)
             translate_tooltip(context_name, widget)
@@ -3788,10 +3770,10 @@ def show_warning_detail(text, detail_text, context_name=None):
     """ Show warning message with a button to show more details """
 
     inf_text = "Press 'Show Me' button to get more details..."
-    widget = global_vars.iface.messageBar().createMessage(tr(text, context_name), tr(inf_text))
+    widget = global_vars.iface.messageBar().createMessage(tools_qt.tr(text, context_name, aux_context='ui_message'), tools_qt.tr(inf_text, aux_context='ui_message'))
     button = QPushButton(widget)
-    button.setText(tr("Show Me"))
-    button.clicked.connect(partial(tools_qt.show_details, detail_text, tr('Warning details')))
+    button.setText(tools_qt.tr("Show Me", aux_context='ui_message'))
+    button.clicked.connect(partial(tools_qt.show_details, detail_text, tools_qt.tr('Warning details', aux_context='ui_message')))
     widget.layout().addWidget(button)
     global_vars.iface.messageBar().pushWidget(widget, 1)
 

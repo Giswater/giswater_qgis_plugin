@@ -2758,7 +2758,7 @@ class GwAdmin:
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        message = tools_gw.tr("Select UI file")
+        message = tools_qt.tr("Select UI file", aux_context='ui_message')
         file_ui, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.ui')
         tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.tpath, str(file_ui))
 
@@ -3375,7 +3375,7 @@ class GwAdmin:
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        message = tools_gw.tr("Select INP file")
+        message = tools_qt.tr("Select INP file", aux_context='ui_message')
         file_inp, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.inp')
         self.dlg_readsql_create_project.data_file.setText(file_inp)
 

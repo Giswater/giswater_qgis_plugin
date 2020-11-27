@@ -13,8 +13,7 @@ import time
 from qgis.core import QgsMessageLog
 
 from .. import global_vars
-from ..core.utils import tools_gw
-
+from ..lib import tools_qt
 
 class Logger(object):
 
@@ -142,7 +141,7 @@ def qgis_log_message(text=None, message_level=0, context_name=None, parameter=No
 
     msg = None
     if text:
-        msg = tools_gw.tr(text, context_name)
+        msg = tools_qt.tr(text, context_name, aux_context='ui_message')
         if parameter:
             msg += ": " + str(parameter)
 

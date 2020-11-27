@@ -220,7 +220,7 @@ class GwDocument:
                 # Ask question before executing
                 msg = ("You have selected multiple documents. In this case, doc_id will be a sequencial number for "
                        "all selected documents and your doc_id won't be used.")
-                answer = tools_qt.ask_question(msg, tools_gw.tr("Add document"))
+                answer = tools_qt.ask_question(msg, tools_qt.tr("Add document", aux_context='ui_message'))
                 if answer:
                     for file in self.files_path:
                         sql, doc_id = self.insert_doc_sql(doc_type, observ, date, file)
@@ -239,7 +239,7 @@ class GwDocument:
                 # Ask question before executing
                 msg = ("You have selected multiple documents. In this case, doc_id will be a sequencial number for "
                        "all selected documents and your doc_id won't be used.")
-                answer = tools_qt.ask_question(msg, tools_gw.tr("Add document"))
+                answer = tools_qt.ask_question(msg, tools_qt.tr("Add document", aux_context='ui_message'))
                 if answer:
                     for cont, file in enumerate(self.files_path):
                         if cont == 0:
@@ -389,7 +389,7 @@ class GwDocument:
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.AnyFile)
         message = "Select file"
-        files_path, filter_ = file_dialog.getOpenFileNames(parent=None, caption=tools_gw.tr(message))
+        files_path, filter_ = file_dialog.getOpenFileNames(parent=None, caption=tools_qt.tr(message, aux_context='ui_message'))
 
         file_text = ""
         for file in files_path:

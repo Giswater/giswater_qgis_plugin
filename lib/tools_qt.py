@@ -13,7 +13,7 @@ import subprocess
 import webbrowser
 from functools import partial
 
-from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal, QPersistentModelIndex
+from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal, QPersistentModelIndex, QCoreApplication
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator,  QStandardItem, QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, \
@@ -714,42 +714,9 @@ def get_folder_path(dialog, widget):
     file_dialog.setFileMode(QFileDialog.Directory)
     message = "Select folder"
     folder_path = file_dialog.getExistingDirectory(
-        parent=None, caption=tools_gw.tr(message), directory=folder_path)
+        parent=None, caption=tr(message, aux_context='ui_message'), directory=folder_path)
     if folder_path:
         set_widget_text(dialog, widget, str(folder_path))
-
-
-def multi_rows_delete(widget, table_name, column_id):
-    """ Delete selected elements of the table
-    :param QTableView widget: origin
-    :param table_name: table origin
-    :param column_id: Refers to the id of the source table
-    """
-
-    # Get selected rows
-    selected_list = widget.selectionModel().selectedRows()
-    if len(selected_list) == 0:
-        message = "Any record selected"
-        tools_gw.show_warning(message)
-        return
-
-    inf_text = ""
-    list_id = ""
-    for i in range(0, len(selected_list)):
-        row = selected_list[i].row()
-        id_ = widget.model().record(row).value(str(column_id))
-        inf_text += f"{id_}, "
-        list_id += f"'{id_}', "
-    inf_text = inf_text[:-2]
-    list_id = list_id[:-2]
-    message = "Are you sure you want to delete these records?"
-    title = "Delete records"
-    answer = ask_question(message, title, inf_text)
-    if answer:
-        sql = f"DELETE FROM {table_name}"
-        sql += f" WHERE {column_id} IN ({list_id})"
-        tools_db.execute_sql(sql)
-        widget.model().select()
 
 
 def hide_void_groupbox(dialog):
@@ -950,10 +917,10 @@ def show_details(detail_text, title=None, inf_text=None):
     msg_box = QMessageBox()
     msg_box.setText(detail_text)
     if title:
-        title = tools_gw.tr(title)
+        title = tr(title, aux_context='ui_message')
         msg_box.setWindowTitle(title)
     if inf_text:
-        inf_text = tools_gw.tr(inf_text)
+        inf_text = tr(inf_text, aux_context='ui_message')
         msg_box.setInformativeText(inf_text)
     msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
     msg_box.setStandardButtons(QMessageBox.Ok)
@@ -964,9 +931,9 @@ def show_details(detail_text, title=None, inf_text=None):
 def show_warning_open_file(text, inf_text, file_path, context_name=None):
     """ Show warning message with a button to open @file_path """
 
-    widget = global_vars.iface.messageBar().createMessage(tools_gw.tr(text, context_name), tools_gw.tr(inf_text))
+    widget = global_vars.iface.messageBar().createMessage(tr(text, context_name, aux_context='ui_message'), tr(inf_text, aux_context='ui_message'))
     button = QPushButton(widget)
-    button.setText(tools_gw.tr("Open file"))
+    button.setText(tr("Open file", aux_context='ui_message'))
     button.clicked.connect(partial(tools_os.open_file, file_path))
     widget.layout().addWidget(button)
     global_vars.iface.messageBar().pushWidget(widget, 1)
@@ -976,15 +943,15 @@ def ask_question(text, title=None, inf_text=None, context_name=None, parameter=N
     """ Ask question to the user """
 
     msg_box = QMessageBox()
-    msg = tools_gw.tr(text, context_name)
+    msg = tr(text, context_name, aux_context='ui_message')
     if parameter:
         msg += ": " + str(parameter)
     msg_box.setText(msg)
     if title:
-        title = tools_gw.tr(title, context_name)
+        title = tr(title, context_name, aux_context='ui_message')
         msg_box.setWindowTitle(title)
     if inf_text:
-        inf_text = tools_gw.tr(inf_text, context_name)
+        inf_text = tr(inf_text, context_name, aux_context='ui_message')
         msg_box.setInformativeText(inf_text)
     msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
     msg_box.setDefaultButton(QMessageBox.Ok)
@@ -1001,7 +968,7 @@ def show_info_box(text, title=None, inf_text=None, context_name=None, parameter=
 
     msg = ""
     if text:
-        msg = tools_gw.tr(text, context_name)
+        msg = tr(text, context_name, aux_context='ui_message')
         if parameter:
             msg += ": " + str(parameter)
 
@@ -1009,10 +976,10 @@ def show_info_box(text, title=None, inf_text=None, context_name=None, parameter=
     msg_box.setText(msg)
     msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
     if title:
-        title = tools_gw.tr(title, context_name)
+        title = tr(title, context_name, aux_context='ui_message')
         msg_box.setWindowTitle(title)
     if inf_text:
-        inf_text = tools_gw.tr(inf_text, context_name)
+        inf_text = tr(inf_text, context_name, aux_context='ui_message')
         msg_box.setInformativeText(inf_text)
     msg_box.setDefaultButton(QMessageBox.No)
     msg_box.exec_()
@@ -1046,3 +1013,21 @@ def set_text_bold(widget, pattern):
 def set_stylesheet(widget, style="border: 2px solid red"):
     widget.setStyleSheet(style)
 
+
+def tr(message, context_name=None, aux_context=None):
+    """ Translate @message looking it in @context_name """
+
+    if context_name is None:
+        context_name = global_vars.plugin_name
+
+    value = None
+    try:
+        value = QCoreApplication.translate(context_name, message)
+    except TypeError:
+        value = QCoreApplication.translate(context_name, str(message))
+    finally:
+        # If not translation has been found, check into 'ui_message' context
+        if value == message:
+            value = QCoreApplication.translate(aux_context, message)
+
+    return value

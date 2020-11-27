@@ -11,7 +11,7 @@ from qgis.PyQt.QtSql import QSqlDatabase
 
 from .. import global_vars
 from ..core.utils import tools_gw
-from . import tools_os, tools_log
+from . import tools_log, tools_qt
 from ..lib.tools_pgdao import PgDao
 
 
@@ -210,7 +210,7 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
     # Check if selected parameters is correct
     if None in (host, port, db, user, pwd):
         message = "Database connection error. Please check your connection parameters."
-        global_vars.last_error = tools_gw.tr(message)
+        global_vars.last_error = tools_qt.tr(message, aux_context='ui_message')
         return False
 
     # Update current user
@@ -228,7 +228,7 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
     status = global_vars.db.open()
     if not status:
         message = "Database connection error. Please open plugin log file to get more details"
-        global_vars.last_error = tools_gw.tr(message)
+        global_vars.last_error = tools_qt.tr(message, aux_context='ui_message')
         details = global_vars.db.lastError().databaseText()
         tools_log.log_warning(str(details))
         return False
@@ -239,7 +239,7 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
     status = global_vars.dao.init_db()
     if not status:
         message = "Database connection error. Please open plugin log file to get more details"
-        global_vars.last_error = tools_gw.tr(message)
+        global_vars.last_error = tools_qt.tr(message, aux_context='ui_message')
         tools_log.log_warning(str(global_vars.dao.last_error))
         return False
 
@@ -262,7 +262,7 @@ def connect_to_database_service(service, sslmode=None):
     status = global_vars.db.open()
     if not status:
         message = "Database connection error (QSqlDatabase). Please open plugin log file to get more details"
-        global_vars.last_error = tools_gw.tr(message)
+        global_vars.last_error = tools_qt.tr(message, aux_context='ui_message')
         details = global_vars.db.lastError().databaseText()
         tools_log.log_warning(str(details))
         return False
@@ -273,7 +273,7 @@ def connect_to_database_service(service, sslmode=None):
     status = global_vars.dao.init_db()
     if not status:
         message = "Database connection error (PgDao). Please open plugin log file to get more details"
-        global_vars.last_error = tools_gw.tr(message)
+        global_vars.last_error = tools_qt.tr(message, aux_context='ui_message')
         tools_log.log_warning(str(global_vars.dao.last_error))
         return False
 

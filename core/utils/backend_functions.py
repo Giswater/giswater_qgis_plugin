@@ -300,10 +300,10 @@ class GwInfoTools:
         msg_box = QMessageBox()
         msg_box.setText(msg)
         if title:
-            title = tools_gw.tr(title)
+            title = tools_qt.tr(title, aux_context='ui_message')
             msg_box.setWindowTitle(title)
         if inf_text:
-            inf_text = tools_gw.tr(inf_text)
+            inf_text = tools_qt.tr(inf_text, aux_context='ui_message')
             msg_box.setInformativeText(inf_text)
         msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
         msg_box.setStandardButtons(QMessageBox.Ok)
