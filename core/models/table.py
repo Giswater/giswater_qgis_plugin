@@ -14,9 +14,9 @@ __copyright__ = '(C) 2018, Luigi Pirelli'
 __revision__ = '$Format:%H$'
 
 from weakref import WeakKeyDictionary
-
+import global_vars
 from ..utils import tools_gw
-from ...lib import tools_db
+from ...lib import tools_db, tools_log
 
 
 class GenericDescriptor(object):
@@ -197,3 +197,51 @@ class Table(object):
 
         return tools_db.execute_sql(sql, commit=commit)
 
+
+    def execute_upsert(self, tablename, unique_field, unique_value, fields, values, commit=True):
+        """ Execute UPSERT sentence """
+
+        # Check PostgreSQL version
+        if not global_vars.postgresql_version:
+            tools_db.get_postgresql_version()
+
+        # Set SQL for INSERT
+        sql = "INSERT INTO " + tablename + "(" + unique_field + ", "
+
+        # Iterate over fields
+        sql_fields = ""
+        for fieldname in fields:
+            sql_fields += fieldname + ", "
+        sql += sql_fields[:-2] + ") VALUES ("
+
+        # Manage value 'current_user'
+        if unique_value != 'current_user':
+            unique_value = "$$" + unique_value + "$$"
+
+        # Iterate over values
+        sql_values = ""
+        for value in values:
+            if value != 'current_user':
+                if value != '':
+                    sql_values += "$$" + value + "$$, "
+                else:
+                    sql_values += "NULL, "
+            else:
+                sql_values += value + ", "
+        sql += unique_value + ", " + sql_values[:-2] + ")"
+
+        # Set SQL for UPDATE
+        sql += (" ON CONFLICT (" + unique_field + ") DO UPDATE"
+                " SET (" + sql_fields[:-2] + ") = (" + sql_values[:-2] + ")"
+                " WHERE " + tablename + "." + unique_field + " = " + unique_value)
+
+        # Execute UPSERT
+        tools_log.log_info(sql, stack_level_increase=1)
+        result = global_vars.dao.execute_sql(sql, commit)
+        global_vars.last_error = global_vars.dao.last_error
+        if not result:
+            # Check if any error has been raised
+            if global_vars.last_error:
+                tools_gw.manage_exception_db(global_vars.last_error, sql, schema_name=global_vars.schema_name)
+
+        return result
