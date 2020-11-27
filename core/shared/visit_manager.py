@@ -289,9 +289,7 @@ class GwVisitManager(QObject):
         # Close this dialog and open selected object
         dialog.close()
 
-        if table_object == "v_ui_om_visit":
-            self.manage_visit(visit_id=selected_object_id)
-        elif "v_ui_om_visitman_x_" in table_object:
+        if table_object == "v_ui_om_visit" or "v_ui_om_visitman_x_" in table_object:
             self.manage_visit(visit_id=selected_object_id)
 
 
