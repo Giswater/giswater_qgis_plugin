@@ -23,8 +23,6 @@ project_type = None
 settings = None
 qgis_settings = None
 project_vars = {}
-action_select_arc = None
-action_select_plot = None
 srid = None
 logger = None
 
