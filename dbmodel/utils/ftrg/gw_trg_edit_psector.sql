@@ -34,6 +34,7 @@ v_ischild text;
 v_execute_mode text;
 v_parent_id integer;
 v_temporal_psector_id integer;
+v_current_psector integer;
 
 BEGIN
 
@@ -41,6 +42,7 @@ BEGIN
 
     om_aux:= TG_ARGV[0];
     v_execute_mode:= (SELECT value::json ->> 'mode' FROM config_param_system WHERE parameter='plan_psector_execute_action');
+    v_current_psector:= (SELECT value::integer FROM config_param_user WHERE parameter='plan_psector_vdefault' AND cur_user=current_user);
 
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
@@ -222,7 +224,12 @@ BEGIN
 				SELECT connec_id, arc_id, OLD.psector_id, state, doable, descript, link_geom, vnode_geom, userdefined_geom FROM plan_psector_x_connec WHERE psector_id=v_temporal_psector_id;
 
 				--delete temporal psector after all changes
-				DELETE FROM plan_psector WHERE psector_id=v_temporal_psector_id;
+				EXECUTE 'SELECT gw_fct_setdelete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
+				"feature":{"id":["'||v_temporal_psector_id||'"], "featureType":"PSECTOR", "tableName":"v_ui_plan_psector", "idName":"psector_id"},
+				"data":{"filterFields":{}, "pageInfo":{}}}$$)';
+				
+				--set the same current psector from before execute
+				UPDATE config_param_user SET value=v_current_psector WHERE parameter='plan_psector_vdefault' AND cur_user=current_user;
 
 				PERFORM setval('plan_psector_id_seq', (SELECT max(psector_id) FROM plan_psector));
 				
