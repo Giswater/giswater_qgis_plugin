@@ -3809,3 +3809,45 @@ def show_warning_detail(text, detail_text, context_name=None):
         global_vars.logger.warning(text + "\n" + detail_text)
 
 
+def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_increase=0, filepath=None, schema_name=None):
+     """ Manage exception in database queries and show information to the user """
+     show_exception_msg = True
+     description = ""
+     if exception:
+         description = str(exception)
+         if 'unknown error' in description:
+             show_exception_msg = False
+
+     try:
+         stack_level += stack_level_increase
+         module_path = inspect.stack()[stack_level][1]
+         file_name = tools_os.get_relative_path(module_path, 2)
+         function_line = inspect.stack()[stack_level][2]
+         function_name = inspect.stack()[stack_level][3]
+
+         # Set exception message details
+         msg = ""
+         msg += f"File name: {file_name}\n"
+         msg += f"Function name: {function_name}\n"
+         msg += f"Line number: {function_line}\n"
+         if exception:
+             msg += f"Description:\n{description}\n"
+         if filepath:
+             msg += f"SQL file:\n{filepath}\n\n"
+         if sql:
+             msg += f"SQL:\n {sql}\n\n"
+         msg += f"Schema name: {schema_name}"
+
+         # Show exception message in dialog and log it
+         if show_exception_msg:
+             title = "Database error"
+             show_exceptions_msg(title, msg)
+         else:
+             tools_log.log_warning("Exception message not shown to user")
+         tools_log.log_warning(msg, stack_level_increase=2)
+
+     except Exception:
+         manage_exception("Unhandled Error")
+
+
+
