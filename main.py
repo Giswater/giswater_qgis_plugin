@@ -90,9 +90,8 @@ class Giswater(QObject):
         self.set_signals()
 
         # Set controller (no database connection yet)
-        self.controller = DaoController(self.plugin_name, self.iface, create_logger=True)
+        tools_log.set_logger('pluggin')
         global_vars.plugin_name = self.plugin_name
-        global_vars.controller = self.controller
 
         # Check for developers options
         comment = '  # If True: show all get_json log, if False: does not show any, if None: show python log_sql option'

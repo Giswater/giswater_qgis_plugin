@@ -112,7 +112,7 @@ class Table(object):
 
         values = [str(x) for x in values]
         current_pk = getattr(self, self.pk())
-        status = self.controller().execute_upsert(
+        status = self.execute_upsert(
             self.table_name(), self.pk(), str(current_pk), fields, values, commit=commit)
         if status:
             message = "Values has been updated"

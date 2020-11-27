@@ -27,7 +27,6 @@ class GwDocument:
         self.single_tool_mode = single_tool
         self.previous_dialog = None
         self.iface = global_vars.iface
-        self.controller = global_vars.controller
         self.schema_name = global_vars.schema_name
         self.files_path = []
 

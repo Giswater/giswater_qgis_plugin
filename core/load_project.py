@@ -33,7 +33,6 @@ class LoadProject(QObject):
 
         self.iface = global_vars.iface
         self.settings = global_vars.settings
-        self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
         self.plugin_toolbars = {}
         self.buttons_to_hide = []
@@ -152,27 +151,26 @@ class LoadProject(QObject):
         """ Set new database connection. If force_commit=True then force commit before opening project """
 
         try:
-            if self.controller.dao and force_commit:
+            if global_vars.dao and force_commit:
                 tools_log.log_info("Force commit")
-                self.controller.dao.commit()
+                global_vars.dao.commit()
         except Exception as e:
             tools_log.log_info(str(e))
         finally:
-            self.connection_status, not_version = tools_db.set_database_connection()
+            self.connection_status, not_version, layer_source = tools_db.set_database_connection()
             if not self.connection_status or not_version:
                 message = global_vars.last_error
                 if show_warning:
                     if message:
                         tools_gw.show_warning(message, 15)
-                    tools_log.log_warning(str(self.controller.layer_source))
+                    tools_log.log_warning(str(layer_source))
                 return False
 
             return True
 
 
     def translate(self, message):
-        if self.controller:
-            return tools_gw.tr(message)
+        return tools_gw.tr(message)
 
 
     def check_layers_from_distinct_schema(self):

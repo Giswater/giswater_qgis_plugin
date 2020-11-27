@@ -13,8 +13,9 @@ from qgis.PyQt.QtCore import QObject, QSettings
 
 from ..core.btn_admin import GwAdmin
 from ..core.shared.visit_manager import GwVisitManager
-from ..dao.controller import DaoController
 from .. import global_vars
+from ..lib import tools_log
+
 
 
 class TestGiswater(QObject):
@@ -61,7 +62,7 @@ class TestGiswater(QObject):
         print("init_plugin")
 
         # Set controller (no database connection yet)
-        self.controller = DaoController(self.settings, self.plugin_name, self.iface, create_logger=True)
+        tools_log.set_logger('pluggin')
         global_vars.plugin_name = self.plugin_dir
         if schema_name:
             global_vars.schema_name = schema_name

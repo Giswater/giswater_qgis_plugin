@@ -32,7 +32,7 @@ class OmVisit(Table):
     descript = GenericDescriptor(None)
     status = GenericDescriptor(None)
 
-    def __init__(self, controller):
+    def __init__(self):
         """ Class constructor """
-        Table.__init__(self, controller, 'om_visit', 'id')
+        Table.__init__(self, 'om_visit', 'id')
 

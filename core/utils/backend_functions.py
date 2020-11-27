@@ -21,8 +21,7 @@ class GwInfoTools:
     """ Class with functions usually called from the database, either via notify or by executing a get_json """
     def __init__(self):
         """ Class to control functions called from data base """
-
-        self.controller = global_vars.controller
+        pass
 
 
     def set_layer_index(self, **kwargs):

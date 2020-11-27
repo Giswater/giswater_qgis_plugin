@@ -38,7 +38,6 @@ class GwMincut:
 
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
-        self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
         self.settings = global_vars.settings
         self.schema_name = global_vars.schema_name
@@ -360,7 +359,7 @@ class GwMincut:
 
         # Rollback transaction
         else:
-            self.controller.dao.rollback()
+            global_vars.dao.rollback()
 
         # Close dialog, save dialog position, and disconnect snapping
         tools_gw.close_dialog(self.dlg_mincut)
@@ -1409,7 +1408,6 @@ class GwMincut:
         self.canvas.setMapTool(self.emit_point)
         # Snapper
         self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper_manager.set_controller(self.controller)
         self.snapper = self.snapper_manager.get_snapper()
 
         self.init_mincut_canvas()

@@ -24,8 +24,6 @@ class GwPsectorDuplicate(QObject):
 
         super().__init__()
 
-        self.controller = global_vars.controller
-
 
     def manage_duplicate_psector(self, psector_id=None):
 

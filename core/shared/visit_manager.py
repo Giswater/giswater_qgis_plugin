@@ -41,7 +41,6 @@ class GwVisitManager:
     def __init__(self):
         """ Class to control 'Add visit' of toolbar 'edit' """
 
-        self.controller = global_vars.controller
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
         self.iface = global_vars.iface
@@ -56,7 +55,6 @@ class GwVisitManager:
         self.lazy_init_function = None
 
         self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper_manager.set_controller(self.controller)
 
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,

@@ -25,7 +25,6 @@ class GwParentMapTool(QgsMapTool):
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
         self.settings = global_vars.settings
-        self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
         self.project_type = global_vars.project_type
 
@@ -36,8 +35,6 @@ class GwParentMapTool(QgsMapTool):
         self.layer_node = None
 
         self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper_manager.set_controller(self.controller)
-
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         super().__init__(self.canvas)

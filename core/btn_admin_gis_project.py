@@ -17,9 +17,8 @@ from ..lib import tools_log, tools_qt, tools_db
 
 class GwAdminGisProject:
 
-    def __init__(self, controller, plugin_dir):
+    def __init__(self, plugin_dir):
 
-        self.controller = controller
         self.plugin_dir = plugin_dir
         self.host = None
         self.port = None

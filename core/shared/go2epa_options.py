@@ -21,7 +21,6 @@ class GwGo2EpaOptions:
     def __init__(self):
         """ Class to control toolbar 'go2epa' """
         self.epa_options_list = []
-        self.controller = global_vars.controller
 
 
     def set_project_type(self, project_type):

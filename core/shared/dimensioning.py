@@ -27,14 +27,11 @@ class GwDimensioning:
 
         self.iface = global_vars.iface
         self.settings = global_vars.settings
-        self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
         self.canvas = global_vars.canvas
         self.points = None
         self.vertex_marker = QgsVertexMarker(self.canvas)
-
         self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper_manager.set_controller(self.controller)
 
 
     def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None, rubber_band=None):

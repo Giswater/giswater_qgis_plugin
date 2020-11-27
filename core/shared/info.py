@@ -51,7 +51,6 @@ class GwInfo(QObject):
 
         self.iface = global_vars.iface
         self.settings = global_vars.settings
-        self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
@@ -61,9 +60,7 @@ class GwInfo(QObject):
         self.tab_type = tab_type
         self.connected = False
         self.rubber_band = QgsRubberBand(self.canvas, 0)
-
         self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper_manager.set_controller(self.controller)
         self.snapper_manager.set_snapping_layers()
 
         self.suppres_form = None
@@ -2106,7 +2103,7 @@ class GwInfo(QObject):
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel(db=self.controller.db)
+        model = QSqlTableModel(db=global_vars.db)
         model.setTable(table_name)
         model.setEditStrategy(edit_strategy)
         if expr_filter:

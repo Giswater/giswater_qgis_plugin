@@ -17,11 +17,10 @@ class GwConfigLayerTask(QgsTask):
 
     fake_progress = pyqtSignal()
 
-    def __init__(self, description, controller):
+    def __init__(self, description):
 
         super().__init__(description, QgsTask.CanCancel)
         self.exception = None
-        self.controller = controller
         self.message = None
         self.available_layers = None
         self.get_layers = True

@@ -22,7 +22,6 @@ class GwParentAction:
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
         self.settings = global_vars.settings
-        self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
         self.project_type = global_vars.project_type
 

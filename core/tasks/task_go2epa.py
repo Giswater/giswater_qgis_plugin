@@ -25,7 +25,6 @@ class GwGo2EpaTask(QgsTask):
     def __init__(self, description, go2epa):
 
         super().__init__(description, QgsTask.CanCancel)
-        self.controller = global_vars.controller
         self.go2epa = go2epa
         self.exception = None
         self.error_msg = None

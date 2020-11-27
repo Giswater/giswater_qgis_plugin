@@ -164,13 +164,13 @@ def set_database_connection():
         if layer_source['service'] is None and (layer_source['db'] is None
                 or layer_source['host'] is None or layer_source['user'] is None
                 or layer_source['password'] is None or layer_source['port'] is None):
-            return False, not_version
+            return False, not_version, layer_source
     else:
-        return False, not_version
+        return False, not_version, layer_source
 
     global_vars.logged = True
 
-    return True, not_version
+    return True, not_version, layer_source
 
 
 def check_db_connection():

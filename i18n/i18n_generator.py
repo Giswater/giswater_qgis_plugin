@@ -22,7 +22,6 @@ class GwI18NGenerator:
 
     def __init__(self):
         self.plugin_dir = global_vars.plugin_dir
-        self.controller = global_vars.controller
 
 
     def init_dialog(self):

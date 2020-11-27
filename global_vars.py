@@ -20,7 +20,6 @@ plugin_name = None
 schema_name = None
 project_type = None
 
-controller = None
 settings = None
 qgis_settings = None
 project_vars = {}

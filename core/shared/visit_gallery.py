@@ -24,7 +24,7 @@ class GwVisitGallery:
     def __init__(self):
         """ Class to control 'Add element' of toolbar 'edit' """
 
-        self.controller = global_vars.controller
+        pass
 
 
     def manage_gallery(self):

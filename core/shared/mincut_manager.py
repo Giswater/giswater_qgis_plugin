@@ -31,7 +31,6 @@ class GwMincutManager:
         self.mincut = mincut
         self.canvas = global_vars.canvas
         self.plugin_dir = global_vars.plugin_dir
-        self.controller = global_vars.controller
         self.schema_name = global_vars.schema_name
         self.settings = global_vars.settings
 

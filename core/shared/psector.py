@@ -33,7 +33,6 @@ class GwPsector:
     def __init__(self):
         """ Class to control 'New Psector' of toolbar 'master' """
 
-        self.controller = global_vars.controller
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
@@ -1260,7 +1259,7 @@ class GwPsector:
         """
 
         model = QSqlQueryModel()
-        model.setQuery(query, db=self.controller.db)
+        model.setQuery(query, db=global_vars.db)
         qtable.setModel(model)
         qtable.show()
 
@@ -1281,7 +1280,7 @@ class GwPsector:
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel(db=self.controller.db)
+        model = QSqlTableModel(db=global_vars.db)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)

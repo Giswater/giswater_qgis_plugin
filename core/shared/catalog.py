@@ -22,8 +22,7 @@ class GwCatalog:
 
     def __init__(self):
         """ Class to control toolbar 'om_ws' """
-
-        self.controller = global_vars.controller
+        pass
 
 
     def api_catalog(self, previous_dialog, widget_name, geom_type, feature_type):

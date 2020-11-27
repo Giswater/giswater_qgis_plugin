@@ -325,7 +325,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             tools_qgis.set_layer_index('v_edit_connec')
             tools_qgis.set_layer_index('v_edit_gully')
             tools_qgis.set_layer_index('v_edit_node')
-            tools_gw.refresh_legend(self.controller)
+            tools_gw.refresh_legend()
 
             # Deactivate map tool
             self.deactivate()

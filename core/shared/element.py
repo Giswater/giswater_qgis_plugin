@@ -25,14 +25,10 @@ class GwElement:
         """ Class to control 'Add element' of toolbar 'edit' """
 
         self.iface = global_vars.iface
-        self.controller = global_vars.controller
         self.schema_name = global_vars.schema_name
 
         self.vertex_marker = QgsVertexMarker(global_vars.canvas)
-
         self.snapper_manager = SnappingConfigManager(self.iface)
-        self.snapper_manager.set_controller(self.controller)
-
 
 
     def manage_element(self, new_element_id=True, feature=None, geom_type=None):

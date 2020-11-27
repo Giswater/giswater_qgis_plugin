@@ -31,7 +31,6 @@ class GwGo2Epa:
 
         self.g2epa_opt = GwGo2EpaOptions()
         self.iterations = 0
-        self.controller = global_vars.controller
         self.project_type = tools_gw.get_project_type()
         self.plugin_dir = global_vars.plugin_dir
 
@@ -466,7 +465,7 @@ class GwGo2Epa:
         # Iterate over all columns and populate its corresponding widget
         columns = []
         for i in range(0, len(row)):
-            column_name = self.controller.dao.get_column_name(i)
+            column_name = global_vars.dao.get_column_name(i)
             widget = dialog.findChild(QWidget, column_name)
             widget_type = tools_qt.get_widget_type(dialog, widget)
             if row[column_name] is not None:

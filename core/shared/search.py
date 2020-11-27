@@ -38,7 +38,6 @@ class GwSearch:
         self.manage_visit = GwVisitManager()
         self.iface = global_vars.iface
         self.project_type = global_vars.project_type
-        self.controller = global_vars.controller
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
 

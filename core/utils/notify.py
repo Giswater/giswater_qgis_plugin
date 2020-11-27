@@ -28,7 +28,6 @@ class GwNotifyTools:
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
         self.settings = global_vars.settings
-        self.controller = global_vars.controller
         self.plugin_dir = global_vars.plugin_dir
 
 
@@ -93,7 +92,7 @@ class GwNotifyTools:
             thread.start()
 
             # Check if any notification to process
-            dao = self.controller.dao
+            dao = global_vars.dao
             dao.get_poll()
 
             last_paiload = None
