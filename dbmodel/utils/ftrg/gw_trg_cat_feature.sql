@@ -125,8 +125,8 @@ BEGIN
 		INTO v_feature;
 
 		IF lower(NEW.feature_type)='arc' THEN
-			EXECUTE 'INSERT INTO cat_feature_arc (id, epa_default)
-			VALUES ('''||NEW.id||''', '''||v_feature.epa_default||''')';
+			EXECUTE 'INSERT INTO cat_feature_arc (id, type, man_table, epa_default, epa_table)
+			VALUES ('''||NEW.id||''','''||NEW.system_id||''', '''||v_feature.man_table||''',  '''||v_feature.epa_default||''', '''||v_feature.epa_table||''')';
 		ELSIF lower(NEW.feature_type)='node' THEN
 			EXECUTE 'INSERT INTO cat_feature_node (id, type, man_table,epa_default, epa_table, choose_hemisphere, isarcdivide, num_arcs)
 			VALUES ('''||NEW.id||''','''||NEW.system_id||''', '''||v_feature.man_table||''', '''||v_feature.epa_default||''', '''||v_feature.epa_table||''', TRUE, TRUE, 2)';
