@@ -14,8 +14,8 @@ __copyright__ = '(C) 2018, Luigi Pirelli'
 __revision__ = '$Format:%H$'
 
 from weakref import WeakKeyDictionary
-import global_vars
 from ..utils import tools_gw
+from ... import global_vars
 from ...lib import tools_db, tools_log
 
 
