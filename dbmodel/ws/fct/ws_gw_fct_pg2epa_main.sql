@@ -308,9 +308,9 @@ BEGIN
 
 
 	-- manage return
-	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
+	v_file = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
 	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'timeseries', v_timeseries);
-	v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
+	v_return = gw_fct_json_object_set_key(v_return, 'body', concat(v_body,',',v_file));
 	v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', 
 	'"message":{"level":1, "text":"Inp export done succesfully"}')::json;
 
