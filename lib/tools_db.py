@@ -319,7 +319,7 @@ def get_row( sql, log_info=True, log_sql=False, commit=True, params=None):
     return row
 
 
-def get_rows( sql, log_info=True, log_sql=False, commit=True, params=None, add_empty_row=False):
+def get_rows(sql, log_info=True, log_sql=False, commit=True, params=None, add_empty_row=False):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
     sql = get_sql(sql, log_sql, params)

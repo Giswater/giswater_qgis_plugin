@@ -91,7 +91,7 @@ class Giswater(QObject):
 
         # Set controller (no database connection yet)
         self.controller = DaoController(self.plugin_name, self.iface, create_logger=True)
-        global_vars.plugin_name = self.plugin_dir
+        global_vars.plugin_name = self.plugin_name
         global_vars.controller = self.controller
 
         # Check for developers options
