@@ -2702,7 +2702,7 @@ class GwInfo(QObject):
         manage_visit.visit_added.connect(self.update_visit_table)
         # TODO: the following query fix a (for me) misterious bug
         # the DB connection is not available during manage_visit.manage_visit first call
-        # so the workaroud is to do a unuseful query to have the dao controller active
+        # so the workaroud is to do a unuseful query to have the dao active
         sql = "SELECT id FROM om_visit LIMIT 1"
         tools_db.get_rows(sql)
         manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.feature_id, expl_id=expl_id, is_new_from_cf=True)

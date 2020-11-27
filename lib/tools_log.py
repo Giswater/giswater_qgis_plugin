@@ -18,12 +18,11 @@ from ..core.utils import tools_gw
 
 class Logger(object):
 
-    def __init__(self, controller, log_name, log_level, log_suffix, folder_has_tstamp=False, file_has_tstamp=True,
+    def __init__(self, log_name, log_level, log_suffix, folder_has_tstamp=False, file_has_tstamp=True,
             remove_previous=False):
         """ Class constructor """
 
         # Create logger
-        self.controller = controller
         self.logger_file = logging.getLogger(log_name)
         self.logger_file.setLevel(log_level)
 
@@ -123,14 +122,14 @@ class Logger(object):
             self.num_errors += 1
 
 
-def set_logger(self, logger_name=None):
+def set_logger(logger_name=None):
     """ Set logger class """
     if global_vars.logger is None:
         if logger_name is None:
             logger_name = 'plugin'
         global_vars.min_log_level = int(global_vars.settings.value('status/log_level'))
         log_suffix = global_vars.settings.value('status/log_suffix')
-        global_vars.logger = Logger(self, logger_name, global_vars.min_log_level, log_suffix)
+        global_vars.logger = Logger(logger_name, global_vars.min_log_level, log_suffix)
 
         values = {10: 0, 20: 0, 30: 1, 40: 2}
         global_vars.min_message_level = values[global_vars.min_log_level]

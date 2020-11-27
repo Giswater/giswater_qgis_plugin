@@ -16,6 +16,7 @@ from qgis.core import QgsExpression, QgsFeatureRequest
 from ...toolbars.parent_dialog import GwParentAction
 from ...ui.ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
 from ...utils import tools_gw
+from .... import global_vars
 from ....lib import tools_qgis, tools_qt, tools_log, tools_db
 
 
@@ -320,7 +321,7 @@ class GwEndFeatureButton(GwParentAction):
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        self.model = QSqlTableModel(db=self.controller.db)
+        self.model = QSqlTableModel(db=global_vars.db)
         self.model.setTable(table_name)
         self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         if filter_:
@@ -444,7 +445,7 @@ class GwEndFeatureButton(GwParentAction):
         filter_ += " AND arc_state = '1' "
 
         # Set model
-        model = QSqlTableModel(db=self.controller.db)
+        model = QSqlTableModel(db=global_vars.db)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.setFilter(filter_)

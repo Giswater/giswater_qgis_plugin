@@ -78,7 +78,7 @@ class GwVisitManager:
         self.locked_feature_id = feature_id
 
         # Create the dialog and signals and related ORM Visit class
-        self.current_visit = OmVisit(self.controller)
+        self.current_visit = OmVisit()
         self.dlg_add_visit = VisitUi(tag)
         tools_gw.load_settings(self.dlg_add_visit)
         layers_visibility = tools_gw.hide_parent_layers(['v_edit_element'])
@@ -184,7 +184,7 @@ class GwVisitManager:
             _date = datetime.strptime(date_string[0], '%Y/%m/%d')
         self.dlg_add_visit.enddate.setDate(_date)
 
-        # set User name get from controller login
+        # set User name get from login
         if global_vars.user and self.user_name:
             self.user_name.setText(str(global_vars.user))
 
@@ -572,13 +572,13 @@ class GwVisitManager:
 
         db_record = None
         if geom_type == 'arc':
-            db_record = OmVisitXArc(self.controller)
+            db_record = OmVisitXArc()
         elif geom_type == 'node':
-            db_record = OmVisitXNode(self.controller)
+            db_record = OmVisitXNode()
         elif geom_type == 'connec':
-            db_record = OmVisitXConnec(self.controller)
+            db_record = OmVisitXConnec()
         elif geom_type == 'gully':
-            db_record = OmVisitXGully(self.controller)
+            db_record = OmVisitXGully()
 
         # remove all actual saved records related with visit_id
         where_clause = f"visit_id = '{self.visit_id.text()}'"
@@ -608,13 +608,13 @@ class GwVisitManager:
 
         db_record = None
         if geom_type == 'arc':
-            db_record = OmVisitXArc(self.controller)
+            db_record = OmVisitXArc()
         elif geom_type == 'node':
-            db_record = OmVisitXNode(self.controller)
+            db_record = OmVisitXNode()
         elif geom_type == 'connec':
-            db_record = OmVisitXConnec(self.controller)
+            db_record = OmVisitXConnec()
         elif geom_type == 'gully':
-            db_record = OmVisitXGully(self.controller)
+            db_record = OmVisitXGully()
 
         if db_record:
             for row in range(widget.model().rowCount()):
@@ -690,7 +690,6 @@ class GwVisitManager:
     def connect_signal_tab_feature_signal(self, connect=True):
 
         try:
-            widget_name = f"tbl_visit_x_{self.geom_type}"
             if connect:
                 self.dlg_add_visit.tab_feature.currentChanged.connect(partial(
                     self.visit_tab_feature_changed, self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"]))
@@ -1156,7 +1155,7 @@ class GwVisitManager:
         self.dlg_event.parameter_id.setText(parameter_text)
 
         # create an empty Event
-        event = OmVisitEvent(self.controller)
+        event = OmVisitEvent()
         event.id = event.max_pk() + 1
         event.parameter_id = parameter_id
         event.visit_id = int(self.visit_id.text())
@@ -1401,13 +1400,13 @@ class GwVisitManager:
             return
 
         # fetch the record
-        event = OmVisitEvent(self.controller)
+        event = OmVisitEvent()
         event.id = selected_list[0].data()
         if not event.fetch():
             return
 
         # get parameter_id code to select the widget useful to edit the event
-        om_event_parameter = OmVisitParameter(self.controller)
+        om_event_parameter = OmVisitParameter()
         om_event_parameter.id = event.parameter_id
         if not om_event_parameter.fetch():
             return
@@ -1538,7 +1537,7 @@ class GwVisitManager:
             return
 
         # a fake event to get some ancyllary data
-        event = OmVisitEvent(self.controller)
+        event = OmVisitEvent()
 
         # Get selected rows
         # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent

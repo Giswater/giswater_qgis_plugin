@@ -30,7 +30,7 @@ class OmVisitParameter(Table):
     form_type = GenericDescriptor(None)
     vdefault = GenericDescriptor(None)
 
-    def __init__(self, controller):
+    def __init__(self):
         """ Class constructor """
-        Table.__init__(self, controller, 'config_visit_parameter', 'id')
+        Table.__init__(self, 'config_visit_parameter', 'id')
 

@@ -50,7 +50,7 @@ class LoadProject(QObject):
             return
 
         # Force commit before opening project and set new database connection
-        if not self.manage_controller(show_warning):
+        if not self.check_database_connection(show_warning):
             return
 
         # Manage schema name
@@ -147,7 +147,7 @@ class LoadProject(QObject):
         return True
 
 
-    def manage_controller(self, show_warning, force_commit=False):
+    def check_database_connection(self, show_warning, force_commit=False):
         """ Set new database connection. If force_commit=True then force commit before opening project """
 
         try:

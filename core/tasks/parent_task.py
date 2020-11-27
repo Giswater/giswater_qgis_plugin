@@ -18,18 +18,17 @@ class GwTask(QgsTask, QObject):
 
     fake_progress = pyqtSignal()
 
-    def __init__(self, description, duration=0, controller=None):
+    def __init__(self, description, duration=0):
 
         QObject.__init__(self)
         super().__init__(description, QgsTask.CanCancel)
         self.exception = None
         self.duration = duration
-        self.controller = controller
 
 
     def run(self):
 
-        self.manage_message(f"Started task {self.description()}")
+        tools_log.log_info(f"Started task {self.description()}")
 
         if self.duration is 0:
             if self.isCanceled():
@@ -52,23 +51,18 @@ class GwTask(QgsTask, QObject):
     def finished(self, result):
 
         if result:
-            self.manage_message(f"Task {self.description()} completed")
+            tools_log.log_info(f"Task {self.description()} completed")
         else:
             if self.exception is None:
-                self.manage_message(f"Task {self.description()} not successful but without exception")
+                tools_log.log_info(f"Task {self.description()} not successful but without exception")
             else:
-                self.manage_message(f"Task {self.description()} Exception: {self.exception}")
+                tools_log.log_info(f"Task {self.description()} Exception: {self.exception}")
                 raise self.exception
 
 
     def cancel(self):
 
-        self.manage_message(f"Task {self.description()} was cancelled")
+        tools_log.log_info(f"Task {self.description()} was cancelled")
         super().cancel()
 
-
-    def manage_message(self, msg):
-
-        if self.controller:
-            tools_log.log_info(msg)
 

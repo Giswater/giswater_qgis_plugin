@@ -25,7 +25,7 @@ class OmVisitXNode(Table):
     node_id = GenericDescriptor(None)
     is_last = GenericDescriptor(None)
 
-    def __init__(self, controller):
+    def __init__(self):
         """ Class constructor """
-        Table.__init__(self, controller, 'om_visit_x_node', 'id')
+        Table.__init__(self, 'om_visit_x_node', 'id')
 

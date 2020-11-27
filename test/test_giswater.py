@@ -32,7 +32,6 @@ class TestGiswater(QObject):
 
         # Initialize instance attributes
         self.iface = iface
-        self.controller = None
         self.gw_admin = None
 
         # Initialize plugin directory
@@ -55,21 +54,23 @@ class TestGiswater(QObject):
         self.qgis_settings = QSettings()
         self.qgis_settings.setIniCodec(sys.getfilesystemencoding())
 
+        self.global_vars = global_vars
+
 
     def init_plugin(self, schema_name=None):
         """ Plugin main initialization function """
 
         print("init_plugin")
 
-        # Set controller (no database connection yet)
+        # Set (no database connection yet)
         tools_log.set_logger('pluggin')
         global_vars.plugin_name = self.plugin_dir
         if schema_name:
             global_vars.schema_name = schema_name
 
         # Set test classes
-        self.gw_admin = GwAdmin(self.iface, self.settings, self.controller, self.plugin_dir)
-        self.visit_manager = GwVisitManager(self.iface, self.settings, self.controller, self.plugin_dir)
+        self.gw_admin = GwAdmin()
+        self.visit_manager = GwVisitManager()
 
 
     def get_plugin_metadata(self, parameter, default_value):

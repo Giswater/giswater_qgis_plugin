@@ -685,7 +685,7 @@ class GwGo2Epa:
         """
 
         model = QSqlQueryModel()
-        model.setQuery(query, db=self.controller.db)
+        model.setQuery(query, db=global_vars.db)
         qtable.setModel(model)
         qtable.show()
 

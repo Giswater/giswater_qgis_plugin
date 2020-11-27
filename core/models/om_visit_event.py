@@ -40,7 +40,7 @@ class OmVisitEvent(Table):
     index_val = GenericDescriptor(None)
     is_last = GenericDescriptor(None)
 
-    def __init__(self, controller):
+    def __init__(self):
         """ Class constructor """
-        Table.__init__(self, controller, 'om_visit_event', 'id')
+        Table.__init__(self, 'om_visit_event', 'id')
 

@@ -64,8 +64,8 @@ class TestQgis:
         status = tools_db.connect_to_database_service(service_name)
         global_vars.logged = status
 
-        if self.test_giswater.controller.last_error:
-            msg = self.test_giswater.controller.last_error
+        if self.test_giswater.global_vars.last_error:
+            msg = self.test_giswater.global_vars.last_error
             print(f"Database connection error: {msg}")
             return False
 
@@ -143,7 +143,7 @@ class TestQgis:
         roletype = 'admin'
         sample = True
         get_database_parameters = False
-        gis = GwAdminGisProject(self.test_giswater.controller, self.test_giswater.plugin_dir)
+        gis = GwAdminGisProject(self.test_giswater.plugin_dir)
         gis.set_database_parameters("host", "port", "db", "user", "password", "25831")
         gis.gis_project_database(gis_folder, gis_file, project_type, project_name, export_passwd,
             roletype, sample, get_database_parameters)

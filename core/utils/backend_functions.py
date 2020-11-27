@@ -505,7 +505,7 @@ def export_layer_to_db(layer, crs):
 
 def set_uri():
     """ Set the component parts of a RDBMS data source URI
-    :return: QgsDataSourceUri() with the connection established according to the parameters of the controller.
+    :return: QgsDataSourceUri() with the connection established according to the parameters of the credentials.
     """
 
     uri = QgsDataSourceUri()

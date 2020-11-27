@@ -43,13 +43,10 @@ class GenericDescriptor(object):
 class Table(object):
     """Base class representing a table. Assume it have to be used as a pure virtual."""
 
-    def __init__(self, controller, tableName, pk):
-        self.__controller = controller
-        self.__table_name = tableName
+    def __init__(self, table_name, pk):
+        self.__table_name = table_name
         self.__pk = pk
 
-    def controller(self):
-        return self.__controller
 
     def table_name(self):
         return self.__table_name

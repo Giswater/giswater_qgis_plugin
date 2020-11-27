@@ -17,7 +17,6 @@ from . import global_vars
 from .core.btn_admin import GwAdmin
 from .core.load_project import LoadProject
 from .core.utils import tools_gw
-from .dao.controller import DaoController
 from .lib import tools_log, tools_qgis
 
 
@@ -89,7 +88,7 @@ class Giswater(QObject):
         # Define signals
         self.set_signals()
 
-        # Set controller (no database connection yet)
+        # Set logger (no database connection yet)
         tools_log.set_logger('pluggin')
         global_vars.plugin_name = self.plugin_name
 

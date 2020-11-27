@@ -3235,7 +3235,7 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
         table_name = global_vars.schema_name + "." + table_name
 
     # Set the model
-    model = QSqlTableModel(db=global_vars.controller.db)
+    model = QSqlTableModel(db=global_vars.db)
     model.setTable(table_name)
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
     model.select()
@@ -3251,7 +3251,6 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
             tools_log.log_info(message, parameter=table_object)
             return expr
     elif type(table_object) is QTableView:
-        # parent_vars.controller.log_debug(f"set_table_model: {table_object.objectName()}")
         widget = table_object
     else:
         msg = "Table_object is not a table name or QTableView"
