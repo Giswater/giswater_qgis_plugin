@@ -13,7 +13,7 @@ from datetime import datetime
 from functools import partial
 
 from qgis.gui import QgsVertexMarker
-from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal, QDateTime
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal, QDateTime, QObject
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
     QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit
@@ -33,14 +33,14 @@ from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_db
 
 
-class GwVisitManager:
+class GwVisitManager(QObject):
 
     # event emitted when a new Visit is added when GUI is closed/accepted
     visit_added = pyqtSignal(int)
 
     def __init__(self):
         """ Class to control 'Add visit' of toolbar 'edit' """
-
+        QObject.__init__(self)
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
         self.iface = global_vars.iface
@@ -83,6 +83,7 @@ class GwVisitManager:
         tools_gw.load_settings(self.dlg_add_visit)
         layers_visibility = tools_gw.hide_parent_layers(['v_edit_element'])
         self.dlg_add_visit.rejected.connect(partial(self.restore_layers_visibility, layers_visibility))
+        self.dlg_add_visit.rejected.connect(tools_gw.remove_selection)
         self.dlg_add_visit.accepted.connect(partial(self.restore_layers_visibility, layers_visibility))
 
         # Get expl_id from previus dialog

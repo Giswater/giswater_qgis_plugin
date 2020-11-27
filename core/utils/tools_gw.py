@@ -2704,8 +2704,7 @@ def selection_changed(dialog, table_object, geom_type, query=False, layers=None,
                 if selected_id not in ids:
                     ids.append(selected_id)
 
-    for id in ids:
-        list_ids[geom_type].append(int(id))
+    list_ids[geom_type] = ids
 
     expr_filter = None
     if len(ids) > 0:
@@ -2730,9 +2729,6 @@ def selection_changed(dialog, table_object, geom_type, query=False, layers=None,
     else:
         load_table(dialog, table_object, geom_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
-
-    # Remove selection in generic 'v_edit' layers
-    layers = remove_selection(False, layers)
 
     enable_feature_type(dialog, table_object, ids=ids)
 
