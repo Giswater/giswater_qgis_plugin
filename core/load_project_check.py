@@ -207,7 +207,7 @@ class GwProjectCheck:
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']
-                            tools_gw.create_qml(layer, qml)
+                            tools_qgis.create_qml(layer, qml)
                 tools_qgis.set_layer_visible(layer)
 
         tools_gw.close_dialog(self.dlg_audit_project)

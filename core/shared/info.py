@@ -706,13 +706,13 @@ class GwInfo(QObject):
                 rb = QgsRubberBand(global_vars.canvas, 0)
                 if self.node1 is None:
                     self.node1 = str(element_id)
-                    tools_gw.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10, is_new=True)
+                    tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10, is_new=True)
                     rb_interpolate.append(rb)
                     dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
                     tools_gw.show_message(message, message_level=0, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
-                    tools_gw.draw_point(QgsPointXY(result.point()), rb, color=QColor(
+                    tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(
                         0, 150, 55, 100), width=10, is_new=True)
                     rb_interpolate.append(rb)
                     dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")

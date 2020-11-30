@@ -368,4 +368,4 @@ class GwPrintButton(GwParentAction):
 
         list_coord = re.search('\((.*)\)', str(result['geometry']['st_astext']))
         points = tools_qgis.get_geometry_vertex(list_coord)
-        tools_gw.draw_polyline(points, rubber_band)
+        tools_qgis.draw_polyline(points, rubber_band)

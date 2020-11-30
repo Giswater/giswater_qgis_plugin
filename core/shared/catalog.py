@@ -172,7 +172,7 @@ class GwCatalog:
         pn_value = tools_qt.get_text(self.dlg_catalog, widget_pn)
         dn_value = tools_qt.get_text(self.dlg_catalog, widget_dn)
 
-        exists = tools_gw.check_function('gw_api_get_catalog_id')
+        exists = tools_db.check_function('gw_api_get_catalog_id')
         if exists:
             sql = f"SELECT gw_api_get_catalog_id('{metcat_value}', '{pn_value}', '{dn_value}', '{geom_type}', 9)"
             row = tools_db.get_row(sql)

@@ -22,7 +22,7 @@ from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleS
 from qgis.core import QgsExpression, QgsProject
 from qgis.gui import QgsDateTimeEdit
 
-from . import tools_log, tools_os, tools_db
+from . import tools_log, tools_os
 from .. import global_vars
 from ..core.utils import tools_gw
 

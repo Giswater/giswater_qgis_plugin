@@ -9,18 +9,17 @@ import configparser
 import console
 import os.path
 import shlex
-from functools import partial
 from random import randrange
 
 from qgis.gui import QgsMapTool, QgsRubberBand
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtGui import QColor, QCursor, QPixmap
 from qgis.PyQt.QtWidgets import QDockWidget, QApplication, QPushButton
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
-    QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer
+    QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry
 
-from . import tools_qt, tools_log
+from . import tools_log
 from .. import global_vars
 from ..core.utils import tools_gw
 
@@ -715,3 +714,65 @@ def load_qml(layer, qml_path):
     layer.triggerRepaint()
 
     return True
+
+
+def set_margin(layer, margin):
+    if layer.extent().isNull():
+        return
+    extent = QgsRectangle()
+    extent.setMinimal()
+    extent.combineExtentWith(layer.extent())
+    xmin = extent.xMinimum() - margin
+    ymin = extent.yMinimum() - margin
+    xmax = extent.xMaximum() + margin
+    ymax = extent.yMaximum() + margin
+    extent.set(xmin, ymin, xmax, ymax)
+    global_vars.iface.mapCanvas().setExtent(extent)
+    global_vars.iface.mapCanvas().refresh()
+
+
+def create_qml(layer, style):
+
+    main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
+    config_folder = main_folder + os.sep + "temp" + os.sep
+    if not os.path.exists(config_folder):
+        os.makedirs(config_folder)
+    path_temp_file = config_folder + 'temp_qml.qml'
+    file = open(path_temp_file, 'w')
+    file.write(style)
+    file.close()
+    del file
+    load_qml(layer, path_temp_file)
+
+
+def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
+    """
+    :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+    """
+
+    rubber_band.reset(0)
+    rubber_band.setIconSize(10)
+    rubber_band.setColor(color)
+    rubber_band.setWidth(width)
+    rubber_band.addPoint(point)
+
+    # wait to simulate a flashing effect
+    if duration_time is not None:
+        QTimer.singleShot(duration_time, rubber_band.reset)
+
+
+def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
+    """ Draw 'line' over canvas following list of points
+     :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+     """
+
+    rubber_band.setIconSize(20)
+    polyline = QgsGeometry.fromPolylineXY(points)
+    rubber_band.setToGeometry(polyline, None)
+    rubber_band.setColor(color)
+    rubber_band.setWidth(width)
+    rubber_band.show()
+
+    # wait to simulate a flashing effect
+    if duration_time is not None:
+        QTimer.singleShot(duration_time, rubber_band.reset)

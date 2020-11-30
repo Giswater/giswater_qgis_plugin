@@ -685,46 +685,12 @@ def draw_by_json(complet_result, rubber_band, margin=None, reset_rb=True, color=
         rubber_band.reset()
     if str(max_x) == str(min_x) and str(max_y) == str(min_y):
         point = QgsPointXY(float(max_x), float(max_y))
-        draw_point(point, rubber_band, color, width)
+        tools_qgis.draw_point(point, rubber_band, color, width)
     else:
         points = tools_qgis.get_geometry_vertex(list_coord)
-        draw_polyline(points, rubber_band, color, width)
+        tools_qgis.draw_polyline(points, rubber_band, color, width)
     if margin is not None:
         tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin)
-
-
-def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
-    """
-    :param duration_time: integer milliseconds ex: 3000 for 3 seconds
-    """
-
-    rubber_band.reset(0)
-    rubber_band.setIconSize(10)
-    rubber_band.setColor(color)
-    rubber_band.setWidth(width)
-    rubber_band.addPoint(point)
-
-    # wait to simulate a flashing effect
-    if duration_time is not None:
-        QTimer.singleShot(duration_time, rubber_band.reset)
-
-
-def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
-    """ Draw 'line' over canvas following list of points
-     :param duration_time: integer milliseconds ex: 3000 for 3 seconds
-     """
-
-    rubber_band.setIconSize(20)
-    polyline = QgsGeometry.fromPolylineXY(points)
-    rubber_band.setToGeometry(polyline, None)
-    rubber_band.setColor(color)
-    rubber_band.setWidth(width)
-    rubber_band.show()
-
-    # wait to simulate a flashing effect
-    if duration_time is not None:
-        QTimer.singleShot(duration_time, rubber_band.reset)
-
 
 
 def enable_feature_type(dialog, widget_name='tbl_relation', ids=None):
@@ -835,7 +801,7 @@ def insert_pg_layer(tablename=None, the_geom="the_geom", field_id="id", child_la
                     if 'styles' in style['body']:
                         if 'style' in style['body']['styles']:
                             qml = style['body']['styles']['style']
-                            create_qml(vlayer, qml)
+                            tools_qgis.create_qml(vlayer, qml)
     else:
         uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
         vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
@@ -850,22 +816,8 @@ def insert_pg_layer(tablename=None, the_geom="the_geom", field_id="id", child_la
             if 'styles' in style['body']:
                 if 'style' in style['body']['styles']:
                     qml = style['body']['styles']['style']
-                    create_qml(vlayer, qml)
+                    tools_qgis.create_qml(vlayer, qml)
     global_vars.iface.mapCanvas().refresh()
-
-
-def create_qml(layer, style):
-
-    main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
-    config_folder = main_folder + os.sep + "temp" + os.sep
-    if not os.path.exists(config_folder):
-        os.makedirs(config_folder)
-    path_temp_file = config_folder + 'temp_qml.qml'
-    file = open(path_temp_file, 'w')
-    file.write(style)
-    file.close()
-    del file
-    tools_qgis.load_qml(layer, path_temp_file)
 
 
 def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
@@ -2081,7 +2033,7 @@ def get_layer_source_from_credentials(layer_name='v_edit_node'):
         credentials['sslmode'] = sslmode
         global_vars.schema_name = credentials['schema']
         conn_info = QgsDataSourceUri(layer.dataProvider().dataSourceUri()).connectionInfo()
-        status, credentials = connect_to_database_credentials(credentials, conn_info)
+        status, credentials = tools_db.connect_to_database_credentials(credentials, conn_info)
         if not status:
             tools_log.log_warning("Error connecting to database (layer)")
             global_vars.last_error = tools_qt.tr("Error connecting to database", aux_context='ui_message')
@@ -2108,7 +2060,7 @@ def get_layer_source_from_credentials(layer_name='v_edit_node'):
             credentials['password'] = settings.value('password')
             credentials['sslmode'] = sslmode
             settings.endGroup()
-            status, credentials = connect_to_database_credentials(credentials, max_attempts=0)
+            status, credentials = tools_db.connect_to_database_credentials(credentials, max_attempts=0)
             if not status:
                 tools_log.log_warning("Error connecting to database (settings)")
                 global_vars.last_error = tools_qt.tr("Error connecting to database", aux_context='ui_message')
@@ -2154,7 +2106,7 @@ def get_json(function_name, parameters=None, schema_name=None, commit=True, log_
     """
 
     # Check if function exists
-    row = check_function(function_name, schema_name, commit)
+    row = tools_db.check_function(function_name, schema_name, commit)
     if row in (None, ''):
         show_warning("Function not found in database", parameter=function_name)
         return None
@@ -2205,20 +2157,6 @@ def get_json(function_name, parameters=None, schema_name=None, commit=True, log_
 
     return json_result
 
-
-def check_function(function_name, schema_name=None, commit=True):
-    """ Check if @function_name exists in selected schema """
-
-    if schema_name is None:
-        schema_name = global_vars.schema_name
-
-    schema_name = schema_name.replace('"', '')
-    sql = ("SELECT routine_name FROM information_schema.routines "
-           "WHERE lower(routine_schema) = %s "
-           "AND lower(routine_name) = %s")
-    params = [schema_name, function_name]
-    row = tools_db.get_row(sql, params=params, commit=commit)
-    return row
 
 
 def manage_exception_api(json_result, sql=None, stack_level=2, stack_level_increase=0, is_notify=False):
@@ -2365,7 +2303,7 @@ def manage_return_manager(json_result, sql, rubber_band=None):
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']
-                                create_qml(v_layer, qml)
+                                tools_qgis.create_qml(v_layer, qml)
 
                     elif style_type[key]['style'] == 'unique':
                         color = style_type[key]['values']['color']
@@ -2380,7 +2318,7 @@ def manage_return_manager(json_result, sql, rubber_band=None):
 
                     global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
                     if margin:
-                        set_margin(v_layer, margin)
+                        tools_qgis.set_margin(v_layer, margin)
 
     except Exception as e:
         manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
@@ -2626,7 +2564,7 @@ def manage_layer_manager(json_result, sql):
                 global_vars.iface.setActiveLayer(layer)
                 global_vars.iface.zoomToActiveLayer()
                 margin = layermanager['zoom']['margin']
-                set_margin(layer, margin)
+                tools_qgis.set_margin(layer, margin)
                 if prev_layer:
                     global_vars.iface.setActiveLayer(prev_layer)
 
@@ -2654,21 +2592,6 @@ def manage_layer_manager(json_result, sql):
 
     except Exception as e:
         manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
-
-
-def set_margin(layer, margin):
-    if layer.extent().isNull():
-        return
-    extent = QgsRectangle()
-    extent.setMinimal()
-    extent.combineExtentWith(layer.extent())
-    xmin = extent.xMinimum() - margin
-    ymin = extent.yMinimum() - margin
-    xmax = extent.xMaximum() + margin
-    ymax = extent.yMaximum() + margin
-    extent.set(xmin, ymin, xmax, ymax)
-    global_vars.iface.mapCanvas().setExtent(extent)
-    global_vars.iface.mapCanvas().refresh()
 
 
 def selection_init(dialog, table_object, query=False, geom_type=None, layers=None):

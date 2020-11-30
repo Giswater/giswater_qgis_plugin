@@ -38,7 +38,7 @@ class GwToolBoxButton(GwParentAction):
     def clicked_event(self):
 
         function_name = "gw_fct_gettoolbox"
-        row = tools_gw.check_function(function_name)
+        row = tools_db.check_function(function_name)
         if not row:
             tools_gw.show_warning("Function not found in database", parameter=function_name)
             return
@@ -552,7 +552,7 @@ class GwToolBoxButton(GwParentAction):
                 font = label.font()
                 font.setPointSize(8)
                 label.setFont(font)
-                row = tools_gw.check_function(function['functionname'])
+                row = tools_db.check_function(function['functionname'])
                 if not row:
                     if os.path.exists(path_icon_red):
                         icon = QIcon(path_icon_red)

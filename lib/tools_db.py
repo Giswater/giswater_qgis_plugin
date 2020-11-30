@@ -5,9 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import inspect
-
 from qgis.PyQt.QtSql import QSqlDatabase
+from qgis.core import QgsCredentials
 
 from .. import global_vars
 from ..core.utils import tools_gw
@@ -379,3 +378,39 @@ def set_search_path(schema_name):
     sql = f"SET search_path = {schema_name}, public;"
     execute_sql(sql)
     global_vars.dao.set_search_path = sql
+
+
+def check_function(function_name, schema_name=None, commit=True):
+    """ Check if @function_name exists in selected schema """
+
+    if schema_name is None:
+        schema_name = global_vars.schema_name
+
+    schema_name = schema_name.replace('"', '')
+    sql = ("SELECT routine_name FROM information_schema.routines "
+           "WHERE lower(routine_schema) = %s "
+           "AND lower(routine_name) = %s")
+    params = [schema_name, function_name]
+    row = get_row(sql, params=params, commit=commit)
+    return row
+
+
+def connect_to_database_credentials(credentials, conn_info=None, max_attempts=2):
+    """ Connect to database with selected database @credentials """
+
+    # Check if credential parameter 'service' is set
+    if 'service' in credentials and credentials['service']:
+        logged = connect_to_database_service(credentials['service'], credentials['sslmode'])
+        return logged, credentials
+
+    attempt = 0
+    logged = False
+    while not logged and attempt <= max_attempts:
+        attempt += 1
+        if conn_info and attempt > 1:
+            (success, credentials['user'], credentials['password']) = \
+                QgsCredentials.instance().get(conn_info, credentials['user'], credentials['password'])
+        logged = connect_to_database(credentials['host'], credentials['port'], credentials['db'],
+            credentials['user'], credentials['password'], credentials['sslmode'])
+
+    return logged, credentials

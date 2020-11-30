@@ -223,7 +223,7 @@ class GwSearch:
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
-            tools_gw.draw_point(point, self.rubber_band, duration_time=5000)
+            tools_qgis.draw_point(point, self.rubber_band, duration_time=5000)
             tools_qgis.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
             self.canvas.refresh()
 
@@ -232,7 +232,7 @@ class GwSearch:
             x1 = item['sys_x']
             y1 = item['sys_y']
             point = QgsPointXY(float(x1), float(y1))
-            tools_gw.draw_point(point, self.rubber_band)
+            tools_qgis.draw_point(point, self.rubber_band)
             tools_qgis.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
             self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
 
@@ -275,7 +275,7 @@ class GwSearch:
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             self.rubber_band.reset()
             point = QgsPointXY(float(max_x), float(max_y))
-            tools_gw.draw_point(point, self.rubber_band)
+            tools_qgis.draw_point(point, self.rubber_band)
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=100)
             self.manage_visit.manage_visit(visit_id=item['sys_id'])
             self.manage_visit.dlg_add_visit.rejected.connect(self.rubber_band.reset)
