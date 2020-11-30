@@ -84,6 +84,7 @@ INSERT INTO cat_element VALUES ('COVER40X40', 'COVER', 'FD', '40x40 cm', 'Cover 
 INSERT INTO cat_element VALUES ('REGISTER40X40', 'REGISTER', 'CONCRET', '40x40 cm', 'Register concret 40x40', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'register_40x40.svg', true);
 INSERT INTO cat_element VALUES ('REGISTER60X60', 'REGISTER', 'CONCRET', '60x60 cm', 'Register concret 60x60', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'register_60x60.svg', true);
 INSERT INTO cat_element VALUES ('VREGISTER200X200', 'REGISTER', 'BRICK+IRON', '200x200 cm', 'Vertical register concret/Iron', 'c:\\users\users\catalog.pdf', NULL, NULL, NULL, 'v_register.svg', true);
+INSERT INTO cat_element VALUES ('HYDRANT_PLATE', 'HYDRANT_PLATE', 'N/I', '50x60 cm', 'Generic hidrant plate', NULL, NULL, NULL, NULL, NULL, true);
 
 UPDATE cat_feature SET active = false WHERE id = 'CLORINATHOR' OR id = 'FL_CONTR_VALVE' OR id = 'GEN_PURP_VALVE' OR id = 'PR_SUSTA.VALVE' OR id = 'PR_BREAK.VALVE' 
 OR id = 'VALVE_REGISTER' OR id = 'TAP' OR id = 'ADAPTATION' OR id = 'BYPASS_REGISTER' OR id = 'CONTROLREGISTER' OR id = 'THROTTLE_VALVE';

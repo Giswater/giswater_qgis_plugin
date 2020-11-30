@@ -120,6 +120,7 @@ INSERT INTO element_type VALUES ('MANHOLE', true, true, 'MANHOLE', NULL);
 INSERT INTO element_type VALUES ('COVER', true, true, 'COVER', NULL);
 INSERT INTO element_type VALUES ('STEP', true, true, 'STEP', NULL);
 INSERT INTO element_type VALUES ('PROTECT_BAND', true, true, 'PROTECT BAND', NULL);
+INSERT INTO element_type VALUES ('HYDRANT_PLATE', true, true, 'HYDRANT_PLATE', NULL);
 
 -- Records of mincut
 -- ----------------------------

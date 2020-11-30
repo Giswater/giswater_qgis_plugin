@@ -117,6 +117,7 @@ INSERT INTO element_type VALUES ('POU', true, true, 'POU', NULL);
 INSERT INTO element_type VALUES ('TAPA', true, true, 'TAPA', NULL);
 INSERT INTO element_type VALUES ('PATE', true, true, 'PATE', NULL);
 INSERT INTO element_type VALUES ('BANDA_PROTECCIO', true, true, 'BANDA_PROTECCIO', NULL);
+INSERT INTO element_type VALUES ('PLACA_HIDRANT', true, true, 'PLACA_HIDRANT', NULL);
 
 -- Records of mincut tables
 -- ----------------------------

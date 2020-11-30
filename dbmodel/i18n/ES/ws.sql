@@ -120,6 +120,7 @@ INSERT INTO element_type VALUES ('POZO', true, true, 'MANHOLE', NULL);
 INSERT INTO element_type VALUES ('TAPA', true, true, 'COVER', NULL);
 INSERT INTO element_type VALUES ('PATE', true, true, 'STEP', NULL);
 INSERT INTO element_type VALUES ('BANDA_PROTECTORA', true, true, 'BANDA_PROTECTORA', NULL);
+INSERT INTO element_type VALUES ('PLACA_HIDRANTE', true, true, 'PLACA_HIDRANTE', NULL);
 
 -- Records of mincut system table
 -- ----------------------------

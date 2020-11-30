@@ -70,3 +70,12 @@ ON CONFLICT (id) DO NOTHING;
 --2020/11/26
 UPDATE sys_param_user SET dv_querytext='SELECT id, idval FROM om_typevalue WHERE typevalue=''visit_status'''
 WHERE id = 'om_visit_status_vdefault';
+
+--2020/11/30
+UPDATE config_csv SET descript='The csv file must containts next columns on same position: 
+feature_id (can be arc, node or connec), parameter_id (choose from sys_addfields), value_param. ' WHERE fid=236;
+
+UPDATE config_csv SET descript='The csv file must containts next columns on same position:
+Id (arc_id, node_id, connec_id), code, elementcat_id, observ, comment, num_elements, state type (id), workcat_id, verified (choose from edit_typevalue>value_verified).
+- Observations and comments fields are optional
+- ATTENTION! Import label has to be filled with the type of element (node, arc, connec)' WHERE fid=235;
