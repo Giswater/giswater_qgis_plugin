@@ -313,8 +313,9 @@ class GwVisitManager(QObject):
 
         # Fill combo boxes of the form and related events
         self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
-        self.feature_type.currentIndexChanged.connect(
-            partial(self.event_feature_type_selected, self.dlg_add_visit, None))
+        if self.it_is_new_visit:
+            self.feature_type.currentIndexChanged.connect(
+                partial(self.event_feature_type_selected, self.dlg_add_visit, None))
         self.feature_type.currentIndexChanged.connect(partial(self.manage_tabs_enabled, True))
         self.parameter_id.currentIndexChanged.connect(self.get_feature_type_of_parameter)
 
@@ -355,7 +356,7 @@ class GwVisitManager(QObject):
             widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
             tools_qgis.disconnect_signal_selection_changed()
             tools_gw.connect_signal_selection_changed(self.dlg_add_visit, widget_table, geom_type=self.geom_type)
-            tools_qgis.select_features_by_ids(self.geom_type, expr)
+            tools_qgis.select_features_by_ids(self.geom_type, expr, self.layers)
             tools_qgis.disconnect_signal_selection_changed()
 
 
@@ -867,7 +868,7 @@ class GwVisitManager(QObject):
         # Do selection allowing @widget_table to be linked to canvas selectionChanged
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.connect_signal_selection_changed(self.dlg_add_visit, widget_table, geom_type=geom_type)
-        tools_qgis.select_features_by_ids(geom_type, expr)
+        tools_qgis.select_features_by_ids(geom_type, expr, self.layers)
         tools_qgis.disconnect_signal_selection_changed()
 
 
