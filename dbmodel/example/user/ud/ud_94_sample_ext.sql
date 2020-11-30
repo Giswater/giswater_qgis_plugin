@@ -782,8 +782,6 @@ INSERT INTO ext_cat_period VALUES ('5', '2015-05-01 00:00:00', '2015-05-31 00:00
 INSERT INTO ext_cat_period VALUES ('6', '2015-06-01 00:00:00', '2015-06-30 00:00:00', 2592000, NULL);
 INSERT INTO ext_cat_period VALUES ('7', '2015-07-01 00:00:00', '2015-07-31 00:00:00', 2678400, NULL);
 
-INSERT INTO ext_cat_scada VALUES ('01', 'FLOW', 'lps');
-INSERT INTO ext_cat_scada VALUES ('02', 'PRESSURE', 'wcm');
 
 INSERT INTO ext_hydrometer_category VALUES ('1', 'Domestic');
 INSERT INTO ext_hydrometer_category VALUES ('2', 'Industry');
