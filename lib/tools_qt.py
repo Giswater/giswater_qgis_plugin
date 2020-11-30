@@ -855,12 +855,18 @@ def delete_rows_qtv(qtable):
     title = "Delete records"
     answer = ask_question(message, title, ','.join(selected_id))
     if answer:
+        # Get current editStrategy
+        edit_strategy = qtable.model().editStrategy()
+
         qtable.model().setEditStrategy(QSqlTableModel.OnManualSubmit)
         for model_index in qtable.selectionModel().selectedRows():
             index = QPersistentModelIndex(model_index)
             qtable.model().removeRow(index.row())
         status = qtable.model().submitAll()
         qtable.model().select()
+        
+        # Return original editStrategy
+        qtable.model().setEditStrategy(edit_strategy)
 
         return status
 
