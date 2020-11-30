@@ -363,6 +363,14 @@ class GwInfo(QObject):
         self.field_id = str(complet_result[0]['body']['feature']['idName'])
         self.feature_id = complet_result[0]['body']['feature']['id']
 
+        # Get the start point and end point of the feature
+        list_points = None
+        if new_feature:
+            list_points = tools_qgis.get_points_from_geometry(self.layer, new_feature)
+        else:
+            feature = tools_qt.get_feature_by_id(self.layer, self.feature_id, self.field_id)
+            list_points = tools_qgis.get_points_from_geometry(self.layer, feature)
+
         if 'visibleTabs' in complet_result[0]['body']['form']:
             for tab in complet_result[0]['body']['form']['visibleTabs']:
                 tabs_to_show.append(tab['tabName'])
@@ -513,8 +521,8 @@ class GwInfo(QObject):
         # Actions signals
         action_edit.triggered.connect(partial(self.manage_edition, dlg_cf, action_edit, fid, new_feature))
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
-        action_workcat.triggered.connect(partial(self.get_catalog, 'new_workcat', self.tablename, self.feature_type, self.feature_id, self.field_id))
-        action_mapzone.triggered.connect(partial(self.get_catalog, 'new_mapzone', self.tablename, self.feature_type, self.feature_id, self.field_id))
+        action_workcat.triggered.connect(partial(self.get_catalog, 'new_workcat', self.tablename, self.feature_type, self.feature_id, self.field_id, list_points))
+        action_mapzone.triggered.connect(partial(self.get_catalog, 'new_mapzone', self.tablename, self.feature_type, self.feature_id, self.field_id, list_points))
         action_set_to_arc.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_set_to_arc, 'v_edit_arc', 'set_to_arc', None))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id,  'v_edit_arc', 'arc', 'data_arc_id'))
         action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_parent_id, 'v_edit_node', 'node', 'data_parent_id'))
@@ -3182,11 +3190,12 @@ class GwInfo(QObject):
         return widget
 
 
-    def get_catalog(self, form_name, table_name, feature_type, feature_id, field_id):
+    def get_catalog(self, form_name, table_name, feature_type, feature_id, field_id, list_points):
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"tableName":"{table_name}", "featureId":"{feature_id}", "feature_type":"{feature_type}"'
-        body = tools_gw.create_body(form, feature)
-        json_result = tools_gw.get_json('gw_fct_getcatalog', body)
+        extras = f'"coordinates":{{{list_points}}}'
+        body = tools_gw.create_body(form, feature, extras=extras)
+        json_result = tools_gw.get_json('gw_fct_getcatalog', body, log_sql=True)
         if json_result is None:
             return
 

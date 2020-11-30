@@ -422,6 +422,25 @@ def select_features_by_ids(geom_type, expr, layers=None):
                 layer.removeSelection()
 
 
+def get_points_from_geometry(layer, feature):
+    """ Get the start point and end point of the feature """
+    list_points = None
+
+    geom = feature.geometry()
+    if layer.geometryType() == 0:
+        points = geom.asPoint()
+        list_points = f'"x1":{points.x()}, "y1":{points.y()}'
+    elif layer.geometryType() in (1, 2):
+        points = geom.asPolyline()
+        init_point = points[0]
+        last_point = points[-1]
+        list_points = f'"x1":{init_point.x()}, "y1":{init_point.y()}'
+        list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
+    else:
+        tools_log.log_info(str(type("NO FEATURE TYPE DEFINED")))
+    return list_points
+
+
 def disconnect_snapping():
     """ Select 'Pan' as current map tool and disconnect snapping """
 
