@@ -36,7 +36,9 @@ class GwGo2EpaManagerButton(GwParentAction):
         # Fill combo box and table view
         self.fill_combo_result_id()
         self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectRows)
-        tools_qt.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
+        message = tools_qt.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
+        if message:
+            tools_gw.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
 
         # Set signals
@@ -69,7 +71,9 @@ class GwGo2EpaManagerButton(GwParentAction):
             table.model().setFilter(expr)
             table.model().select()
         else:
-            tools_qt.fill_table(table, tablename)
+            message = tools_qt.fill_table(table, tablename)
+            if message:
+                tools_gw.show_warning(message)
 
 
     def multi_rows_delete(self, widget, table_name, column_id):

@@ -183,7 +183,9 @@ class GwDocument:
 
         # Set model of selected widget
         table_name = f"{self.schema_name}.v_edit_{geom_type}"
-        tools_qt.set_model_to_table(widget, table_name, expr_filter)
+        message = tools_qt.set_model_to_table(widget, table_name, expr_filter)
+        if message:
+            tools_gw.show_warning(message)
 
 
     def manage_document_accept(self, table_object, tablename=None, qtable=None, item_id=None):
@@ -308,7 +310,9 @@ class GwDocument:
                    f" VALUES('{doc_id}', '{item_id}')")
             tools_db.execute_sql(sql)
             expr = f"{tablename}_id = '{item_id}'"
-            tools_qt.fill_table_object(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr_filter=expr)
+            message = tools_qt.fill_table_object(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr)
+            if message:
+                tools_gw.show_warning(message)
 
 
     def edit_document(self):
@@ -324,7 +328,9 @@ class GwDocument:
         tools_gw.set_completer_object(self.dlg_man, table_object)
 
         # Set a model with selected filter. Attach that model to selected table
-        tools_qt.fill_table_object(self.dlg_man.tbl_document, self.schema_name + "." + table_object)
+        message = tools_qt.fill_table_object(self.dlg_man.tbl_document, f"{self.schema_name}.{table_object}")
+        if message:
+            tools_gw.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, table_object)
 
         # Set dignals

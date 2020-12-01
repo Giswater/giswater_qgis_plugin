@@ -1962,7 +1962,9 @@ class GwInfo(QObject):
         btn_new_element.clicked.connect(partial(self.manage_element, dialog, feature=self.feature))
 
         # Set model of selected widget
-        self.set_model_to_table(widget, table_name, expr_filter)
+        message = tools_qt.set_model_to_table(widget, table_name, expr_filter)
+        if message:
+            tools_gw.show_warning(message)
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "element"
@@ -2102,32 +2104,6 @@ class GwInfo(QObject):
         self.tbl_element.model().select()
 
 
-    def set_model_to_table(self, widget, table_name, expr_filter=None, edit_strategy=QSqlTableModel.OnManualSubmit):
-        """ Set a model with selected filter.
-        Attach that model to selected table """
-
-        if self.schema_name not in table_name:
-            table_name = self.schema_name + "." + table_name
-
-        # Set model
-        model = QSqlTableModel(db=global_vars.db)
-        model.setTable(table_name)
-        model.setEditStrategy(edit_strategy)
-        if expr_filter:
-            model.setFilter(expr_filter)
-        model.select()
-
-        # Check for errors
-        if model.lastError().isValid():
-            tools_gw.show_warning(model.lastError().text())
-
-        # Attach model to table view
-        if widget:
-            widget.setModel(model)
-        else:
-            tools_log.log_info("set_model_to_table: widget not found")
-
-
     """ FUNCTIONS RELATED WITH TAB RELATIONS"""
 
     def manage_tab_relations(self, viewname, field_id):
@@ -2151,7 +2127,9 @@ class GwInfo(QObject):
         """ Fill tab 'Relations' """
 
         table_relations = f"v_ui_{self.geom_type}_x_relations"
-        tools_qt.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
+        message = tools_qt.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
+        if message:
+            tools_gw.show_warning(message)
         tools_gw.set_columns_config(self.tbl_relations, table_relations)
         self.tbl_relations.doubleClicked.connect(partial(self.open_relation, str(self.field_id)))
 
@@ -2208,10 +2186,16 @@ class GwInfo(QObject):
         """ Fill tab 'Connections' """
 
         filter_ = f"node_id='{self.feature_id}'"
-        tools_qt.fill_table(self.dlg_cf.tbl_upstream, self.schema_name + ".v_ui_node_x_connection_upstream", filter_)
+        table_name = f"{self.schema_name}.v_ui_node_x_connection_upstream"
+        message= tools_qt.fill_table(self.dlg_cf.tbl_upstream, table_name, filter_)
+        if message:
+            tools_gw.show_warning(message)
         tools_gw.set_columns_config(self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
 
-        tools_qt.fill_table(self.dlg_cf.tbl_downstream, self.schema_name + ".v_ui_node_x_connection_downstream", filter_)
+        table_name = f"{self.schema_name}.v_ui_node_x_connection_downstream"
+        message = tools_qt.fill_table(self.dlg_cf.tbl_downstream, table_name, filter_)
+        if message:
+            tools_gw.show_warning(message)
         tools_gw.set_columns_config(self.dlg_cf.tbl_downstream, "v_ui_node_x_connection_downstream")
 
         self.dlg_cf.tbl_upstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
@@ -2308,7 +2292,9 @@ class GwInfo(QObject):
         filter += f" AND hydrometer_customer_code ILIKE '%{txt_hydrometer_id.text()}%'"
 
         # Set model of selected widget
-        self.set_model_to_table(qtable, self.schema_name + "." + table_name, filter)
+        message = tools_qt.set_model_to_table(qtable, f"{self.schema_name}.{table_name}", filter)
+        if message:
+            tools_gw.show_warning(message)
 
 
     """ FUNCTIONS RELATED WITH TAB HYDROMETER VALUES"""
@@ -2360,7 +2346,10 @@ class GwInfo(QObject):
             filter_ += f" AND hydrometer_id::text = '{customer_code}'"
 
         # Set model of selected widget
-        self.set_model_to_table(qtable, self.schema_name + "." + table_name, filter_, QSqlTableModel.OnFieldChange)
+        edit_strategy = QSqlTableModel.OnFieldChange
+        message = tools_qt.set_model_to_table(qtable, f"{self.schema_name}.{table_name}", filter_, edit_strategy)
+        if message:
+            tools_gw.show_warning(message)
         tools_gw.set_columns_config(self.tbl_hydrometer_value, table_name)
 
 
@@ -2447,7 +2436,9 @@ class GwInfo(QObject):
             rows.append(['', ''])
             tools_qt.fill_combo_values(self.dlg_cf.event_type, rows)
 
-        self.set_model_to_table(widget, table_name)
+        message = tools_qt.set_model_to_table(widget, table_name)
+        if message:
+            tools_gw.show_warning(message)
         self.set_filter_table_event(widget)
 
 
@@ -2851,7 +2842,9 @@ class GwInfo(QObject):
         tools_gw.set_dates_from_to(self.date_document_from, self.date_document_to, table_name, 'date', 'date')
 
         # Set model of selected widget
-        self.set_model_to_table(widget, self.schema_name + "." + table_name, expr_filter)
+        message = tools_qt.set_model_to_table(widget, f"{self.schema_name}.{table_name}", expr_filter)
+        if message:
+            tools_gw.show_warning(message)
 
         # Set signals
         doc_type.currentIndexChanged.connect(partial(self.set_filter_table_man, widget))

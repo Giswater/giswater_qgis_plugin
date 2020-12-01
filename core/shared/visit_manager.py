@@ -307,8 +307,8 @@ class GwVisitManager(QObject):
         self.dlg_add_visit.btn_doc_insert.clicked.connect(self.document_insert)
         self.dlg_add_visit.btn_doc_delete.clicked.connect(partial(tools_gw.document_delete, self.tbl_document))
         self.dlg_add_visit.btn_doc_new.clicked.connect(self.manage_document)
-        self.dlg_add_visit.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
-        self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
+        self.dlg_add_visit.btn_open_doc.clicked.connect(partial(tools_gw.document_open, self.tbl_document, 'path'))
+        self.tbl_document.doubleClicked.connect(partial(tools_gw.document_open, self.tbl_document, 'path'))
         self.dlg_add_visit.btn_add_geom.clicked.connect(self.add_feature_clicked)
 
         # Fill combo boxes of the form and related events
@@ -471,13 +471,17 @@ class GwVisitManager(QObject):
         # C) load all related events in the relative table
         self.filter = f"visit_id = '{text}'"
         table_name = f"{self.schema_name}.v_ui_om_event"
-        tools_qt.fill_table_object(self.tbl_event, table_name, self.filter)
+        message = tools_qt.fill_table_object(self.tbl_event, table_name, self.filter)
+        if message:
+            tools_gw.show_warning(message)
         self.set_configuration(dialog, self.tbl_event, table_name)
         self.manage_events_changed()
 
         # D) load all related documents in the relative table
         table_name = f"{self.schema_name}.v_ui_doc_x_visit"
-        tools_qt.fill_table_object(self.tbl_document, table_name, self.filter)
+        message = tools_qt.fill_table_object(self.tbl_document, table_name, self.filter)
+        if message:
+            tools_gw.show_warning(message)
         self.set_configuration(dialog, self.tbl_document, table_name)
 
         # E) load all related Relations in the relative table
@@ -883,7 +887,9 @@ class GwVisitManager(QObject):
             filed_to_filter = "ext_code"
             table_object = "v_ui_om_visit"
             expr_filter = ""
-            tools_qt.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object)
+            message = tools_qt.fill_table_object(self.dlg_man.tbl_visit, f"{self.schema_name}.{table_object}")
+            if message:
+                tools_gw.show_warning(message)
             tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_visit, table_object)
         else:
             # Set a model with selected filter. Attach that model to selected table
@@ -892,7 +898,9 @@ class GwVisitManager(QObject):
             table_object = "v_ui_om_visitman_x_" + str(geom_type)
             expr_filter = f"{geom_type}_id = '{feature_id}'"
             # Refresh model with selected filter
-            tools_qt.fill_table_object(self.dlg_man.tbl_visit, self.schema_name + "." + table_object, expr_filter)
+            message = tools_qt.fill_table_object(self.dlg_man.tbl_visit, f"{self.schema_name}.{table_object}", expr_filter)
+            if message:
+                tools_gw.show_warning(message)
             tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_visit, table_object)
 
         # manage save and rollback when closing the dialog

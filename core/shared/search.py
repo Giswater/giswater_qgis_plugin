@@ -501,9 +501,9 @@ class GwSearch:
         self.items_dialog.btn_doc_delete.clicked.connect(partial(tools_gw.document_delete, self.items_dialog.tbl_document))
         self.items_dialog.btn_doc_new.clicked.connect(
             partial(self.manage_document, self.items_dialog.tbl_document, item['sys_id']))
-        self.items_dialog.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.items_dialog.tbl_document, 'path'))
+        self.items_dialog.btn_open_doc.clicked.connect(partial(tools_gw.document_open, self.items_dialog.tbl_document, 'path'))
         self.items_dialog.tbl_document.doubleClicked.connect(
-            partial(tools_qt.document_open, self.items_dialog.tbl_document, 'path'))
+            partial(tools_gw.document_open, self.items_dialog.tbl_document, 'path'))
 
         self.items_dialog.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.items_dialog))
         self.items_dialog.btn_path.clicked.connect(

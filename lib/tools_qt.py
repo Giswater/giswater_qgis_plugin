@@ -27,7 +27,6 @@ from qgis.gui import QgsDateTimeEdit
 
 from . import tools_log, tools_os
 from .. import global_vars
-from ..core.utils import tools_gw
 from lib.ui.ui_manager import DialogTextUi
 
 
@@ -581,8 +580,9 @@ def fill_table(widget, table_name, expr_filter=None, set_edit_strategy=QSqlTable
     model.select()
 
     # Check for errors
+    message = None
     if model.lastError().isValid():
-        tools_gw.show_warning(model.lastError().text())
+        message = model.lastError().text()
 
     # Attach model to table view
     widget.setModel(model)
@@ -618,8 +618,6 @@ def set_lazy_init(widget, lazy_widget=None, lazy_init_function=None):
     lazy_init_function(lazy_widget)
 
 
-
-
 def fill_table_object(widget, table_name, expr_filter=None):
     """ Set a model with selected filter. Attach that model to selected table """
 
@@ -636,8 +634,9 @@ def fill_table_object(widget, table_name, expr_filter=None):
     model.select()
 
     # Check for errors
+    message = None
     if model.lastError().isValid():
-        tools_gw.show_warning(model.lastError().text())
+        message = model.lastError().text()
 
     # Attach model to table view
     widget.setModel(model)
@@ -666,7 +665,7 @@ def set_selectionbehavior(dialog):
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
 
 
-def set_model_to_table(widget, table_name, expr_filter):
+def set_model_to_table(widget, table_name, expr_filter=None, edit_strategy=QSqlTableModel.OnManualSubmit):
     """ Set a model with selected filter.
     Attach that model to selected table """
 
@@ -676,13 +675,15 @@ def set_model_to_table(widget, table_name, expr_filter):
     # Set model
     model = QSqlTableModel(db=global_vars.db)
     model.setTable(table_name)
-    model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-    model.setFilter(expr_filter)
+    model.setEditStrategy(edit_strategy)
+    if expr_filter:
+        model.setFilter(expr_filter)
     model.select()
 
     # Check for errors
+    message = None
     if model.lastError().isValid():
-        tools_gw.show_warning(model.lastError().text())
+        message = model.lastError().text()
 
     # Attach model to table view
     if widget:
@@ -803,17 +804,17 @@ def set_status(qtable, combo, pos_x, combo_pos, col_update):
 def document_open(qtable, field_name):
     """ Open selected document """
 
+    message = None
+
     # Get selected rows
     field_index = qtable.model().fieldIndex(field_name)
     selected_list = qtable.selectionModel().selectedRows(field_index)
     if not selected_list:
         message = "Any record selected"
-        show_info_box(message)
-        return
+        return message
     elif len(selected_list) > 1:
         message = "More then one document selected. Select just one document."
-        tools_gw.show_warning(message)
-        return
+        return message
 
     path = selected_list[0].data()
     # Check if file exist
@@ -826,6 +827,8 @@ def document_open(qtable, field_name):
             subprocess.call([opener, path])
     else:
         webbrowser.open(path)
+
+    return message
 
 
 def delete_rows_qtv(qtable):
@@ -877,6 +880,7 @@ def fill_table_by_expr(qtable, table_name, expr):
     :param qtable: QTableView to show
     :param expr: expression to set model
     """
+
     if global_vars.schema_name not in table_name:
         table_name = global_vars.schema_name + "." + table_name
 
@@ -890,8 +894,11 @@ def fill_table_by_expr(qtable, table_name, expr):
     qtable.show()
 
     # Check for errors
+    message = None
     if model.lastError().isValid():
-        tools_gw.show_warning(model.lastError().text())
+        message = model.lastError().text()
+
+    return message
 
 
 def get_feature_by_id(layer, id, field_id=None):

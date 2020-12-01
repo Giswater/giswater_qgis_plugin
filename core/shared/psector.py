@@ -334,8 +334,10 @@ class GwPsector:
                         layer.removeSelection()
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
-            tools_qt.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", filter_)
-            self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
+            message = tools_qt.fill_table_object(self.tbl_document, f"{self.schema_name}.{v_ui_doc_x_psector}", filter_)
+            if message:
+                tools_gw.show_warning(message)
+            self.tbl_document.doubleClicked.connect(partial(tools_gw.document_open, self.tbl_document, 'path'))
 
         else:
 
@@ -395,7 +397,7 @@ class GwPsector:
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
         self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(tools_gw.document_delete, self.tbl_document))
         self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
-        self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
+        self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(self.document_open, self.tbl_document, 'path'))
         self.cmb_status.currentIndexChanged.connect(partial(self.show_status_warning))
 
         # Create list for completer QLineEdit
@@ -856,7 +858,9 @@ class GwPsector:
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
             psector_id = tools_qt.get_text(self.dlg_plan_psector, 'psector_id')
             expr = f"psector_id = '{psector_id}'"
-            tools_qt.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", expr_filter=expr)
+            message = tools_qt.fill_table_object(self.tbl_document, f"{self.schema_name}.{v_ui_doc_x_psector}", expr)
+            if message:
+                tools_gw.show_warning(message)
 
         sql = (f"SELECT other, gexpenses, vat"
                f" FROM plan_psector "
@@ -1704,3 +1708,4 @@ class GwPsector:
                 scale = zoom
 
             global_vars.iface.mapCanvas().zoomScale(float(scale))
+

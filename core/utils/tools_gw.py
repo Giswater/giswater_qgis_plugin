@@ -2112,16 +2112,23 @@ def check_python_function(object_, function_name):
 
 
 def document_delete(qtable):
+
     status = tools_qt.delete_rows_qtv(qtable)
     if not status:
         error = qtable.model().lastError().text()
         message = "Error deleting data"
         show_warning(message, parameter=error)
-        return
     else:
         message = "Document deleted"
         show_info(message)
         qtable.model().select()
+
+
+def document_open(table, field_name):
+
+    message = tools_qt.document_open()
+    if message:
+        show_warning(message)
 
 
 # TODO End Generic Section
@@ -3065,11 +3072,11 @@ def add_icon(widget, icon):
 
 def add_headers(widget, field):
 
-    standar_model = widget.model()
-    if standar_model is None:
-        standar_model = QStandardItemModel()
+    model = widget.model()
+    if model is None:
+        model = QStandardItemModel()
     # Related by Qtable
-    widget.setModel(standar_model)
+    widget.setModel(model)
     widget.horizontalHeader().setStretchLastSection(True)
 
     # # Get headers
@@ -3077,20 +3084,20 @@ def add_headers(widget, field):
     for x in field['value'][0]:
         headers.append(x)
     # Set headers
-    standar_model.setHorizontalHeaderLabels(headers)
+    model.setHorizontalHeaderLabels(headers)
 
     return widget
 
 
 def fill_standard_item_model(widget, field):
-    print(field)
-    standar_model = widget.model()
+
+    model = widget.model()
     for item in field['value']:
         row = []
         for value in item.values():
             row.append(QStandardItem(str(value)))
         if len(row) > 0:
-            standar_model.appendRow(row)
+            model.appendRow(row)
 
     return widget
 
@@ -3137,7 +3144,9 @@ def reload_qtable(dialog, geom_type):
     value = tools_qt.get_text(dialog, dialog.psector_id)
     expr = f"psector_id = '{value}'"
     qtable = tools_qt.get_widget(dialog, f'tbl_psector_x_{geom_type}')
-    tools_qt.fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
+    message = tools_qt.fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
+    if message:
+        show_warning(message)
     set_tablemodel_config(dialog, qtable, f"plan_psector_x_{geom_type}")
     tools_qgis.refresh_map_canvas()
 

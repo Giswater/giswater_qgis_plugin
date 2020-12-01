@@ -273,7 +273,9 @@ class GwElement:
 
         # Set model of selected widget
         table_name = f"{self.schema_name}.v_edit_{geom_type}"
-        tools_qt.set_model_to_table(widget, table_name, expr_filter)
+        message = tools_qt.set_model_to_table(widget, table_name, expr_filter)
+        if message:
+            tools_gw.show_warning(message)
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "element"
@@ -494,7 +496,9 @@ class GwElement:
         tools_gw.set_completer_object(self.dlg_man, table_object)
 
         # Set a model with selected filter. Attach that model to selected table
-        tools_qt.fill_table_object(self.dlg_man.tbl_element, self.schema_name + "." + table_object)
+        message = tools_qt.fill_table_object(self.dlg_man.tbl_element, f"{self.schema_name}.{table_object}")
+        if message:
+            tools_gw.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_element, table_object)
 
         # Set signals

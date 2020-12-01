@@ -239,7 +239,9 @@ class GwMincut:
         result_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         expr_filter = f"result_id={result_mincut_id}"
         tools_qt.set_qtv_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
-        tools_qt.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
+        message = tools_qt.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
+        if message:
+            tools_gw.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_mincut, self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer')
 
 
@@ -1823,7 +1825,9 @@ class GwMincut:
 
         expr_filter = f"result_id={result_mincut_id}"
         tools_qt.set_qtv_config(self.dlg_mincut.tbl_hydro)
-        tools_qt.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
+        message = tools_qt.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
+        if message:
+            tools_gw.show_warning(message)
 
         # Depend of mincut_state and mincut_clase desable/enable widgets
         # Current_state == '0': Planified
