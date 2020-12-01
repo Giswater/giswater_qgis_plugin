@@ -465,6 +465,9 @@ BEGIN
 			IF NEW.state = 1 AND OLD.state=2 THEN
 				DELETE FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id;					
 			END IF;			
+			IF NEW.state=0 THEN
+				UPDATE arc SET node_1=NULL, node_2=NULL WHERE arc_id = OLD.arc_id;
+			END IF;
 		END IF;
 		
 		-- State_type
