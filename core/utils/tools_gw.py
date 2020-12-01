@@ -2953,7 +2953,7 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
 
     # Set a model with selected filter expression
     #TODO:: Remove this if/else, parametize geom_type, send all layers maybe?
-    if geom_type in ("v_rtc_hydrometer"):
+    if geom_type in "v_rtc_hydrometer":
         table_name = geom_type
     else:
         table_name = f"v_edit_{geom_type}"

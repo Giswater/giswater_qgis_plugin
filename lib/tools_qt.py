@@ -27,7 +27,7 @@ from qgis.gui import QgsDateTimeEdit
 
 from . import tools_log, tools_os
 from .. import global_vars
-from lib.ui.ui_manager import DialogTextUi
+from .ui.ui_manager import DialogTextUi
 
 
 class GwExtendedQLabel(QLabel):

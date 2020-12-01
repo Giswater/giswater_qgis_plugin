@@ -10,8 +10,7 @@ from qgis.core import QgsCredentials, QgsDataSourceUri
 from qgis.PyQt.QtCore import QSettings
 
 from .. import global_vars
-from . import tools_log, tools_qt, tools_qgis, tools_config
-from ..lib.tools_pgdao import PgDao
+from . import tools_log, tools_qt, tools_qgis, tools_config, tools_pgdao
 
 
 def make_list_for_completer(sql):
@@ -232,7 +231,7 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
         return False
 
     # Connect to Database
-    global_vars.dao = PgDao()
+    global_vars.dao = tools_pgdao.PgDao()
     global_vars.dao.set_params(host, port, db, user, pwd, sslmode)
     status = global_vars.dao.init_db()
     if not status:
@@ -266,7 +265,7 @@ def connect_to_database_service(service, sslmode=None):
         return False
 
     # Connect to Database
-    global_vars.dao = PgDao()
+    global_vars.dao = tools_pgdao.PgDao()
     global_vars.dao.set_conn_string(conn_string)
     status = global_vars.dao.init_db()
     if not status:

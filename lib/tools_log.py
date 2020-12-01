@@ -13,7 +13,8 @@ import time
 from qgis.core import QgsMessageLog
 
 from .. import global_vars
-from ..lib import tools_qt
+from . import tools_qt
+
 
 class Logger(object):
 
@@ -123,13 +124,14 @@ class Logger(object):
 
 def set_logger(logger_name=None):
     """ Set logger class """
+
     if global_vars.logger is None:
         if logger_name is None:
             logger_name = 'plugin'
+
         global_vars.min_log_level = int(global_vars.settings.value('status/log_level'))
         log_suffix = global_vars.settings.value('status/log_suffix')
         global_vars.logger = Logger(logger_name, global_vars.min_log_level, log_suffix)
-
         values = {10: 0, 20: 0, 30: 1, 40: 2}
         global_vars.min_message_level = values.get(global_vars.min_log_level, 0)
 

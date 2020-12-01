@@ -249,8 +249,7 @@ def get_layer_by_tablename(tablename, show_warning=False, log_info=False, schema
         #self.show_warning("Layer not found", parameter=tablename)
 
     if layer is None and log_info:
-        pass
-        #self.log_info("Layer not found", parameter=tablename)
+        tools_log.log_info("Layer not found", parameter=tablename)
 
     return layer
 
@@ -269,7 +268,6 @@ def manage_snapping_layer(layername, snapping_type=0, tolerance=15.0):
         snapping_type = QgsPointLocator.All
 
     QgsSnappingUtils.LayerConfig(layer, snapping_type, tolerance, QgsTolerance.Pixels)
-
 
 
 def select_features_by_ids(geom_type, expr, layers=None):
@@ -294,6 +292,7 @@ def select_features_by_ids(geom_type, expr, layers=None):
 
 def get_points_from_geometry(layer, feature):
     """ Get the start point and end point of the feature """
+
     list_points = None
 
     geom = feature.geometry()
@@ -308,6 +307,7 @@ def get_points_from_geometry(layer, feature):
         list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
     else:
         tools_log.log_info(str(type("NO FEATURE TYPE DEFINED")))
+
     return list_points
 
 
@@ -620,8 +620,10 @@ def load_qml(layer, qml_path):
 
 
 def set_margin(layer, margin):
+
     if layer.extent().isNull():
         return
+
     extent = QgsRectangle()
     extent.setMinimal()
     extent.combineExtentWith(layer.extent())
