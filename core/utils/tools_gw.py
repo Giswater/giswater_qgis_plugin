@@ -2705,20 +2705,14 @@ def insert_feature_to_plan(dialog, geom_type, ids=None):
         reload_qtable(dialog, geom_type)
 
 
-def connect_signal_selection_changed(dialog, table_object, query=False, geom_type=None, layers=None, form=None,
-                                    list_ids=None):
+def connect_signal_selection_changed(dialog, table_object, query=False, geom_type=None, layers=None):
     """ Connect signal selectionChanged """
 
     try:
         if geom_type in ('all', None):
             geom_type = 'arc'
-        if form == "psector":
-            global_vars.canvas.selectionChanged.connect(
-                partial(selection_changed, dialog, table_object, geom_type, query, layers=layers,
-                        list_ids=list_ids))
-        else:
-            global_vars.canvas.selectionChanged.connect(
-                partial(selection_changed, dialog, table_object, geom_type, query, layers=layers))
+        global_vars.canvas.selectionChanged.connect(
+            partial(selection_changed, dialog, table_object, geom_type, query, layers=layers))
     except Exception as e:
         tools_log.log_info(f"connect_signal_selection_changed: {e}")
 
