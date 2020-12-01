@@ -1125,7 +1125,7 @@ class GwInfo(QObject):
         if not action_edit.isChecked():
             self.get_last_value()
             if str(self.my_json) == '{}':
-                tools_qt.check_actions(action_edit, False)
+                tools_qt.set_action_checked(action_edit, False)
                 tools_gw.disable_widgets(dialog, self.complet_result[0]['body']['data'], False)
                 self.enable_actions(dialog, False)
                 return
@@ -1139,7 +1139,7 @@ class GwInfo(QObject):
                 else:
                     tools_gw.close_dialog(dialog)
         else:
-            tools_qt.check_actions(action_edit, True)
+            tools_qt.set_action_checked(action_edit, True)
             tools_gw.enable_all(dialog, self.complet_result[0]['body']['data'])
             self.enable_actions(dialog, True)
 
@@ -1157,7 +1157,7 @@ class GwInfo(QObject):
         self.get_last_value()
         status = self.accept(dialog, self.complet_result[0], my_json, close_dlg=close_dlg, new_feature=new_feature)
         if status is True:  # Commit succesfull and dialog keep opened
-            tools_qt.check_actions(action_edit, False)
+            tools_qt.set_action_checked(action_edit, False)
             tools_gw.disable_widgets(dialog, self.complet_result[0]['body']['data'], False)
             self.enable_actions(dialog, False)
 
@@ -1168,7 +1168,7 @@ class GwInfo(QObject):
             # Use commitChanges just for closse edition
             layer.commitChanges()
             self.connect_signals()
-            tools_qt.check_actions(action_edit, False)
+            tools_qt.set_action_checked(action_edit, False)
             tools_gw.disable_widgets(dialog, self.complet_result[0]['body']['data'], False)
             self.enable_actions(dialog, False)
             self.connect_signals()
@@ -1183,7 +1183,7 @@ class GwInfo(QObject):
     def start_editing(self, dialog, action_edit, result, layer):
         self.disconnect_signals()
         self.iface.setActiveLayer(layer)
-        tools_qt.check_actions(action_edit, True)
+        tools_qt.set_action_checked(action_edit, True)
         tools_gw.enable_all(dialog, self.complet_result[0]['body']['data'])
         self.enable_actions(dialog, True)
         layer.startEditing()
@@ -1195,7 +1195,7 @@ class GwInfo(QObject):
         msg = 'Are you sure to save this feature?'
         answer = tools_qt.ask_question(msg, "Save feature", None, parameter=fid)
         if not answer:
-            tools_qt.check_actions(action_edit, True)
+            tools_qt.set_action_checked(action_edit, True)
             return False
         return True
 
@@ -1549,7 +1549,7 @@ class GwInfo(QObject):
         if list_mandatory:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
             tools_gw.show_warning(msg)
-            tools_qt.check_actions("actionEdit", True, dialog)
+            tools_qt.set_action_checked("actionEdit", True, dialog)
             self.connect_signals()
             return False
 

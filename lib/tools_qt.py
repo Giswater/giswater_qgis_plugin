@@ -523,8 +523,8 @@ def set_completer_object_api(completer, model, widget, list_items, max_visible=1
     completer.setModel(model)
 
 
-def check_actions(action, enabled, dialog=None):
-    if type(action) is str:
+def set_action_checked(action, enabled, dialog=None):
+    if type(action) is str and dialog is not None:
         action = dialog.findChild(QAction, action)
     try:
         action.setChecked(enabled)
