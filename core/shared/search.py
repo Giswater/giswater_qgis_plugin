@@ -440,7 +440,7 @@ class GwSearch:
         self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(self.rubber_band.reset)
         field_id = str(result[0]['body']['feature']['idName'])
-        tools_gw.populate_basic_info(self.hydro_info_dlg, result, field_id)
+        tools_gw.fill_basic_info(self.hydro_info_dlg, result, field_id)
 
         tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 

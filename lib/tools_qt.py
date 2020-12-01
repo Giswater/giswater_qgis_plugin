@@ -925,7 +925,8 @@ def show_details(detail_text, title=None, inf_text=None):
 def show_warning_open_file(text, inf_text, file_path, context_name=None):
     """ Show warning message with a button to open @file_path """
 
-    widget = global_vars.iface.messageBar().createMessage(tr(text, context_name, aux_context='ui_message'), tr(inf_text, aux_context='ui_message'))
+    widget = global_vars.iface.messageBar().createMessage(tr(text, context_name, aux_context='ui_message'),
+                                                          tr(inf_text, aux_context='ui_message'))
     button = QPushButton(widget)
     button.setText(tr("Open file", aux_context='ui_message'))
     button.clicked.connect(partial(tools_os.open_file, file_path))
