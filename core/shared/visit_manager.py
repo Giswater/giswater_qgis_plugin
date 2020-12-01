@@ -313,9 +313,8 @@ class GwVisitManager(QObject):
 
         # Fill combo boxes of the form and related events
         self.parameter_type_id.currentIndexChanged.connect(partial(self.set_parameter_id_combo, self.dlg_add_visit))
-        if self.it_is_new_visit:
-            self.feature_type.currentIndexChanged.connect(
-                partial(self.event_feature_type_selected, self.dlg_add_visit, None))
+        self.feature_type.currentIndexChanged.connect(
+            partial(self.event_feature_type_selected, self.dlg_add_visit, None))
         self.feature_type.currentIndexChanged.connect(partial(self.manage_tabs_enabled, True))
         self.parameter_id.currentIndexChanged.connect(self.get_feature_type_of_parameter)
 
@@ -813,10 +812,8 @@ class GwVisitManager(QObject):
         tools_gw.set_completer_widget(viewname, dialog.feature_id, str(geom_type) + "_id")
 
         # set table model and completer
-        # set a fake where expression to avoid to set model to None
-        fake_filter = f'{geom_type}_id IN (-1)'
         widget_name = f'tbl_visit_x_{geom_type}'
-        tools_gw.set_table_model(dialog, widget_name, geom_type, fake_filter)
+        self.get_features_visit_geom_type(self.current_visit.id, geom_type)
 
         # set the callback to setup all events later
         # its not possible to setup listener in this moment beacouse set_table_model without
