@@ -16,7 +16,12 @@ SELECT SCHEMA_NAME.gw_fct_getcatalog($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{"formName":"upsert_catalog_arc", "tabName":"data", "editable":"TRUE"},
 "feature":{"tableName":"ve_arc_pipe", "idName":"arc_id", "featureId":"2001", "feature_type":"PIPE"},
-"data":{"fields":{"matcat_id":"PVC", "pnom":"16", "dnom":"160"}}}$$)
+"data":{"fields":{"matcat_id":"PVC", "pnom":"16", "dnom":"160"}}}$$);
+
+SELECT gw_fct_getcatalog($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+"form":{"formName":"new_mapzone", "tabName":"data", "editable":"TRUE"}, 
+"feature":{"tableName":"ve_node_junction", "featureId":"1004", "feature_type":"JUNCTION"}, 
+"data":{"filterFields":{}, "pageInfo":{}, "coordinates":{"x1":419254.36901256104, "y1":4576614.161159909}}}$$);
 */
 
 
@@ -51,13 +56,16 @@ v_errcontext text;
 v_expl_id integer;
 v_system_id text;
 v_featureid text;
+v_coordx numeric;
+v_coordy numeric;
+v_srid integer;
 
 BEGIN
 
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 
-	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
+	SELECT project_type, epsg INTO v_project_type,v_srid FROM sys_version LIMIT 1;
 
 	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
@@ -70,6 +78,8 @@ BEGIN
 	v_feature_type :=  (((p_data ->>'feature')::json->>'feature_type')::text);
 	v_featureid :=  (((p_data ->>'feature')::json->>'featureId')::text);
 	v_matcat :=  ((((p_data ->>'data')::json->>'fields')::json)->>'matcat_id');
+	v_coordx :=  ((((p_data ->>'data')::json->>'coordinates')::json)->>'x1');
+	v_coordy :=  ((((p_data ->>'data')::json->>'coordinates')::json)->>'y1');
 
 	-- Set 1st parent field
 	fields_array[1] := gw_fct_json_object_set_key(fields_array[1], 'selectedId', v_matcat);
@@ -92,8 +102,12 @@ BEGIN
 			EXECUTE 'SELECT expl_id FROM '||v_system_id||' WHERE '||v_system_id||'_id = '||quote_literal(v_featureid)||';'
 			INTO v_expl_id;
 
+			IF v_expl_id IS NULL THEN
+				EXECUTE 'SELECT expl_id FROM exploitation WHERE ST_DWithin(ST_SetSrid(ST_MakePoint('||v_coordx||','||v_coordy||'),'||v_srid||'),the_geom,0.1);'
+				INTO v_expl_id;
+			END IF;
+
 			fields_array[(field->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(field->>'orderby')::INT], 'selectedId', v_expl_id::text);
-		
 		ELSE
 			fields_array[(field->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(field->>'orderby')::INT], 'selectedId', ''::text);
 		END IF;
