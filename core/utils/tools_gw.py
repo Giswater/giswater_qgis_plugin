@@ -2821,7 +2821,7 @@ def show_exceptions_msg(title=None, msg="", window_title="Information about exce
 
     # Show dialog only if we are not in a task process
     if global_vars.show_db_exception:
-        show_dlg_info()
+        global_vars.dlg_info.show()
 
 
 def manage_exception(title=None, description=None, sql=None, schema_name=None):
@@ -2857,12 +2857,6 @@ def manage_exception(title=None, description=None, sql=None, schema_name=None):
     if global_vars.show_db_exception:
         show_exceptions_msg(title, msg)
 
-
-def show_dlg_info():
-    """ Show dialog with exception message generated in function show_exceptions_msg """
-
-    if global_vars.dlg_info:
-        global_vars.dlg_info.show()
 
 def dock_dialog(dialog):
 

@@ -128,14 +128,7 @@ class GwGo2EpaTask(QgsTask):
 
         # If Database exception, show dialog after task has finished
         if global_vars.last_error:
-            self.show_dlg_info()
-
-
-    def show_dlg_info(self):
-        """ Show dialog with exception message generated in function show_exceptions_msg """
-
-        if self.dlg_info:
-            self.dlg_info.show()
+            global_vars.dlg_info.show()
 
 
     def cancel(self):
