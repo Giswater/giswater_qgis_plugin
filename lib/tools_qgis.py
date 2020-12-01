@@ -441,14 +441,28 @@ def get_points_from_geometry(layer, feature):
     return list_points
 
 
-def disconnect_snapping():
+def disconnect_snapping(action_pan=True, emit_point=None, vertex_marker=None):
     """ Select 'Pan' as current map tool and disconnect snapping """
 
     try:
-        global_vars.iface.actionPan().trigger()
         global_vars.canvas.xyCoordinates.disconnect()
-    except:
-        pass
+    except TypeError as e:
+        tools_log.log_info(f"{type(e).__name__} --> {e}")
+
+    if emit_point is not None:
+        try:
+            emit_point.canvasClicked.disconnect()
+        except TypeError as e:
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
+
+    if vertex_marker is not None:
+        try:
+            vertex_marker.hide()
+        except AttributeError as e:
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
+
+    if action_pan is True:
+        global_vars.iface.actionPan().trigger()
 
 
 def refresh_map_canvas(_restore_cursor=False):

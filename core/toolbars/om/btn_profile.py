@@ -337,7 +337,7 @@ class GwProfileButton(GwParentMapTool):
                     self.first_node = False
                 else:
                     self.endNode = element_id
-                    self.disconnect_snapping(action_pan=False)
+                    tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
                     self.dlg_draw_profile.btn_draw_profile.setEnabled(True)
                     self.dlg_draw_profile.btn_save_profile.setEnabled(True)
 
@@ -370,27 +370,6 @@ class GwProfileButton(GwParentMapTool):
 
                     # Center shortest path in canvas - ZOOM SELECTION
                     self.canvas.zoomToSelected(self.layer_arc)
-
-
-    def disconnect_snapping(self, action_pan=True):
-        """ Select 'Pan' as current map tool and disconnect snapping """
-
-        try:
-            self.canvas.xyCoordinates.disconnect()
-        except TypeError as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
-
-        try:
-            self.emit_point.canvasClicked.disconnect()
-        except TypeError as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
-
-        if action_pan is True:
-            self.iface.actionPan().trigger()
-        try:
-            self.vertex_marker.hide()
-        except AttributeError as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
 
 
     def paint_event(self, arcs, nodes, terrains):

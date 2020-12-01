@@ -363,34 +363,9 @@ class GwMincut:
 
         # Close dialog, save dialog position, and disconnect snapping
         tools_gw.close_dialog(self.dlg_mincut)
-        self.disconnect_snapping()
+        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
         self.remove_selection()
         tools_qgis.refresh_map_canvas()
-
-
-    def disconnect_snapping(self, action_pan=True):
-        """ Select 'Pan' as current map tool and disconnect snapping """
-
-        try:
-            self.canvas.xyCoordinates.disconnect()
-        except TypeError as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
-        except AttributeError as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
-
-        try:
-            self.emit_point.canvasClicked.disconnect()
-        except TypeError as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
-        except AttributeError as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
-
-        if action_pan:
-            self.iface.actionPan().trigger()
-        try:
-            self.vertex_marker.hide()
-        except AttributeError as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
 
 
     def real_start(self):
@@ -627,7 +602,7 @@ class GwMincut:
             tools_gw.show_warning(message)
 
         # Close dialog and disconnect snapping
-        self.disconnect_snapping()
+        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
         sql = (f"SELECT mincut_state, mincut_class FROM om_mincut "
                f" WHERE id = '{result_mincut_id}'")
         row = tools_db.get_row(sql)
@@ -1455,8 +1430,14 @@ class GwMincut:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
-    def auto_mincut_snapping(self, point, btn):  # @UnusedVariable
+    def auto_mincut_snapping(self, point, btn):
         """ Automatic mincut: Snapping to 'node' and 'arc' layers """
+
+        if btn == Qt.RightButton:
+            if btn == Qt.RightButton:
+                self.action_mincut.setChecked(False)
+                tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+                return
 
         # Get coordinates
         event_point = self.snapper_manager.get_event_point(point=point)
@@ -1544,7 +1525,8 @@ class GwMincut:
         if not result.isValid():
             return
 
-        self.disconnect_snapping(False)
+        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+
         layer = self.snapper_manager.get_snapped_layer(result)
 
         # Check feature
@@ -1644,7 +1626,7 @@ class GwMincut:
             tools_qgis.refresh_map_canvas()
 
         # Disconnect snapping and related signals
-        self.disconnect_snapping(False)
+        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
         self.task1.setProgress(100)
 
 
@@ -1652,13 +1634,13 @@ class GwMincut:
         """ B2-123: Custom mincut analysis. Working just with valve layer """
         if is_checked is False:
             # Disconnect snapping and related signals
-            self.disconnect_snapping(False)
+            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
             # Recover snapping options, refresh canvas & set visible layers
             self.snapper_manager.recover_snapping_options()
             return
 
         # Disconnect other snapping and signals in case wrong user clicks
-        self.disconnect_snapping(False)
+        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
 
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
@@ -1759,7 +1741,7 @@ class GwMincut:
                 tools_gw.show_message(result['message']['text'], level)
 
         # Disconnect snapping and related signals
-        self.disconnect_snapping(False)
+        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
 
 
     def remove_selection(self):

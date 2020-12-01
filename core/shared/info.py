@@ -3331,7 +3331,7 @@ class GwInfo(QObject):
                    'set_to_arc': ['arc_id', 'set_to_arc']}
 
         if event == Qt.RightButton:
-            self.disconnect_snapping(False)
+            tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
             self.cancel_snapping_tool(dialog, action)
             return
 
@@ -3385,22 +3385,10 @@ class GwInfo(QObject):
 
     def cancel_snapping_tool(self, dialog, action):
 
-        self.disconnect_snapping(False)
+        tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
         dialog.blockSignals(False)
         action.setChecked(False)
         self.signal_activate.emit()
-
-
-    def disconnect_snapping(self, action_pan=True):
-        """ Select 'Pan' as current map tool and disconnect snapping """
-
-        try:
-            self.canvas.xyCoordinates.disconnect()
-            if action_pan:
-                self.iface.actionPan().trigger()
-            self.vertex_marker.hide()
-        except Exception as e:
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
 
 
     """ OTHER FUNCTIONS """
