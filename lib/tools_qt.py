@@ -1036,15 +1036,10 @@ def manage_translation(context_name, dialog=None, log_info=False):
     except AttributeError:
         locale = "en"
 
-    if locale == 'es_es':
-        locale = 'es'
-    elif locale == 'es_ca':
-        locale = 'ca'
-    elif locale == 'en_us':
-        locale = 'en'
+    locales = {'en': 'en', 'es_es': 'es', 'es_ca': 'ca', 'en_us': 'en'}
 
     # If user locale file not found, set English one by default
-    locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'{global_vars.plugin_name}_{locale}.qm')
+    locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'{global_vars.plugin_name}_{locales[locale]}.qm')
     if not os.path.exists(locale_path):
         if log_info:
             tools_log.log_info("Locale not found", parameter=locale_path)
