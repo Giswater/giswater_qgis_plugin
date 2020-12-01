@@ -6,11 +6,12 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtSql import QSqlDatabase
-from qgis.core import QgsCredentials
+from qgis.core import QgsCredentials, QgsDataSourceUri
+from qgis.PyQt.QtCore import QSettings
 
 from .. import global_vars
 from ..core.utils import tools_gw
-from . import tools_log, tools_qt
+from . import tools_log, tools_qt, tools_qgis, tools_config
 from ..lib.tools_pgdao import PgDao
 
 
@@ -34,7 +35,7 @@ def check_table(tablename, schemaname=None):
     if schemaname is None:
         schemaname = global_vars.schema_name
         if schemaname is None:
-            tools_gw.get_layer_source_from_credentials()
+            get_layer_source_from_credentials('disable')
             schemaname = global_vars.schema_name
             if schemaname is None:
                 return None
@@ -158,7 +159,7 @@ def set_database_connection():
     global_vars.logged = False
     global_vars.current_user = None
 
-    layer_source, not_version = tools_gw.get_layer_source_from_credentials()
+    layer_source, not_version = get_layer_source_from_credentials('disable')
     if layer_source:
         if layer_source['service'] is None and (layer_source['db'] is None
                 or layer_source['host'] is None or layer_source['user'] is None
@@ -414,3 +415,73 @@ def connect_to_database_credentials(credentials, conn_info=None, max_attempts=2)
             credentials['user'], credentials['password'], credentials['sslmode'])
 
     return logged, credentials
+
+
+def get_layer_source_from_credentials(sslmode_value, layer_name='v_edit_node'):
+    """ Get database parameters from layer @layer_name or database connection settings
+    sslmode should be (disable, allow, prefer, require, verify-ca, verify-full)"""
+
+    # Get layer @layer_name
+    layer = tools_qgis.get_layer_by_tablename(layer_name)
+
+    # Get database connection settings
+    settings = QSettings()
+    settings.beginGroup("PostgreSQL/connections")
+
+    if layer is None and settings is None:
+        not_version = False
+        tools_log.log_warning(f"Layer '{layer_name}' is None and settings is None")
+        global_vars.last_error = f"Layer not found: '{layer_name}'"
+        return None, not_version
+
+    # Get sslmode from user config file
+    tools_config.manage_user_config_file()
+    sslmode = tools_config.get_user_setting_value('sslmode', sslmode_value)
+
+    credentials = None
+    not_version = True
+    if layer:
+        not_version = False
+        credentials = tools_qgis.get_layer_source(layer)
+        credentials['sslmode'] = sslmode
+        global_vars.schema_name = credentials['schema']
+        conn_info = QgsDataSourceUri(layer.dataProvider().dataSourceUri()).connectionInfo()
+        status, credentials = connect_to_database_credentials(credentials, conn_info)
+        if not status:
+            tools_log.log_warning("Error connecting to database (layer)")
+            global_vars.last_error = tools_qt.tr("Error connecting to database", aux_context='ui_message')
+            return None, not_version
+
+        # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
+        QgsCredentials.instance().put(conn_info, credentials['user'], credentials['password'])
+
+    elif settings:
+        not_version = True
+        default_connection = settings.value('selected')
+        settings.endGroup()
+        credentials = {'db': None, 'schema': None, 'table': None, 'service': None,
+                       'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
+        if default_connection:
+            settings.beginGroup("PostgreSQL/connections/" + default_connection)
+            if settings.value('host') in (None, ""):
+                credentials['host'] = 'localhost'
+            else:
+                credentials['host'] = settings.value('host')
+            credentials['port'] = settings.value('port')
+            credentials['db'] = settings.value('database')
+            credentials['user'] = settings.value('username')
+            credentials['password'] = settings.value('password')
+            credentials['sslmode'] = sslmode
+            settings.endGroup()
+            status, credentials = connect_to_database_credentials(credentials, max_attempts=0)
+            if not status:
+                tools_log.log_warning("Error connecting to database (settings)")
+                global_vars.last_error = tools_qt.tr("Error connecting to database", aux_context='ui_message')
+                return None, not_version
+        else:
+            tools_log.log_warning("Error getting default connection (settings)")
+            global_vars.last_error = tools_qt.tr("Error getting default connection", aux_context='ui_message')
+            return None, not_version
+
+    global_vars.credentials = credentials
+    return credentials, not_version
