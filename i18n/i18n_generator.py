@@ -240,13 +240,19 @@ class GwI18NGenerator:
 
     def get_files_config_messages(self):
         """ Read the values of the database and update the i18n files """
+
         db_lang = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 1)
         file_lng = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 3)
 
-        version_metadata = tools_gw.get_plugin_version()
-        ver = version_metadata.split('.')
+        plugin_version, message = tools_qgis.get_plugin_version()
+        if plugin_version is None:
+            if message:
+                tools_gw.show_warning(message)
+            return
+
+        ver = plugin_version.split('.')
         plugin_version = f'{ver[0]}{ver[1]}'
-        plugin_release = version_metadata.replace('.', '')
+        plugin_release = plugin_version.replace('.', '')
 
         cfg_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'updates' + os.sep + f'{plugin_version}' + ''
                     + os.sep + f"{plugin_release}" + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')

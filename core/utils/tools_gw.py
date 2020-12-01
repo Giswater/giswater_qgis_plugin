@@ -794,26 +794,6 @@ def hide_parent_layers(excluded_layers=[]):
     return layers_changed
 
 
-def get_plugin_version():
-    """ Get plugin version from metadata.txt file """
-
-    # Check if metadata file exists
-    metadata_file = os.path.join(global_vars.plugin_dir, 'metadata.txt')
-    if not os.path.exists(metadata_file):
-        message = "Metadata file not found"
-        show_warning(message, parameter=metadata_file)
-        return None
-
-    metadata = configparser.ConfigParser()
-    metadata.read(metadata_file)
-    plugin_version = metadata.get('general', 'version')
-    if plugin_version is None:
-        message = "Plugin version not found"
-        show_warning(message)
-
-    return plugin_version
-
-
 def draw_by_json(complet_result, rubber_band, margin=None, reset_rb=True, color=QColor(255, 0, 0, 100), width=3):
 
     try:

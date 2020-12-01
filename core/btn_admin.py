@@ -46,7 +46,7 @@ class GwAdmin:
         self.settings = global_vars.settings
         self.plugin_dir = global_vars.plugin_dir
         self.schema_name = global_vars.schema_name
-        self.plugin_version = tools_gw.get_plugin_version()
+        self.plugin_version, self.message = tools_qgis.get_plugin_version()
         self.canvas = global_vars.canvas
         self.project_type = None
         self.dlg_readsql = None

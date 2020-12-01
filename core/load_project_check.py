@@ -76,8 +76,12 @@ class GwProjectCheck:
         info_type = tools_qgis.plugin_settings_value('gwInfoType')
         project_type = tools_qgis.plugin_settings_value('gwProjectType')
 
-        version = tools_gw.get_plugin_version()
-        extras = f'"version":"{version}"'
+        plugin_version, message = tools_qgis.get_plugin_version()
+        if plugin_version is None:
+            if message:
+                tools_gw.show_warning(message)
+
+        extras = f'"version":"{plugin_version}"'
         extras += f', "fid":101'
         extras += f', "initProject":{init_project}'
         extras += f', "addSchema":"{add_schema}"'

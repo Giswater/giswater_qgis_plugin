@@ -70,6 +70,26 @@ def get_plugin_metadata(parameter, default_value):
         return value
 
 
+def get_plugin_version():
+    """ Get plugin version from metadata.txt file """
+
+    # Check if metadata file exists
+    plugin_version = None
+    message = None
+    metadata_file = os.path.join(global_vars.plugin_dir, 'metadata.txt')
+    if not os.path.exists(metadata_file):
+        message = f"Metadata file not found: {metadata_file}"
+        return plugin_version, message
+
+    metadata = configparser.ConfigParser()
+    metadata.read(metadata_file)
+    plugin_version = metadata.get('general', 'version')
+    if plugin_version is None:
+        message = "Plugin version not found"
+
+    return plugin_version, message
+
+
 def get_project_variables():
     """ Manage QGIS project variables """
 
