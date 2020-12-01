@@ -16,7 +16,7 @@ __revision__ = '$Format:%H$'
 from weakref import WeakKeyDictionary
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_db, tools_log
+from ...lib import tools_db, tools_log, tools_qt
 
 
 class GenericDescriptor(object):
@@ -239,6 +239,6 @@ class Table(object):
         if not result:
             # Check if any error has been raised
             if global_vars.last_error:
-                tools_gw.manage_exception_db(global_vars.last_error, sql, schema_name=global_vars.schema_name)
+                tools_qt.manage_exception_db(global_vars.last_error, sql, schema_name=global_vars.schema_name)
 
         return result

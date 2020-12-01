@@ -59,10 +59,10 @@ class GwAdmin:
 
     def init_sql(self, set_database_connection=False, username=None, show_dialog=True):
         """ Button 100: Execute SQL. Info show info """
-
+        tools_qt.show_exceptions_msg('Current psector', tools_qt.tr('aaa', aux_context='ui_message'))
+        return
         # Populate combo connections
         default_connection = self.populate_combo_connections()
-
         # Bug #733 was here
         # Check if connection is still False
         if set_database_connection:

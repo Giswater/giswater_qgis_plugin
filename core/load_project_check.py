@@ -14,7 +14,7 @@ from qgis.core import Qgis
 from .utils import tools_gw
 from .ui.ui_manager import ProjectCheckUi
 from .. import global_vars
-from ..lib import tools_qgis, tools_log, tools_db
+from ..lib import tools_qgis, tools_log, tools_db, tools_qt
 from ..lib.tools_qt import hide_void_groupbox
 
 
@@ -171,7 +171,7 @@ class GwProjectCheck:
                     grl_others.addWidget(widget, pos, 1)
             except KeyError:
                 description = "Key on returned json from ddbb is missed"
-                tools_gw.manage_exception(None, description, schema_name=global_vars.schema_name)
+                tools_qt.manage_exception(None, description, schema_name=global_vars.schema_name)
 
         return critical_level
 

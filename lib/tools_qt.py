@@ -12,6 +12,8 @@ import sys
 import subprocess
 import webbrowser
 from functools import partial
+import traceback
+import inspect
 
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal, \
     QPersistentModelIndex, QCoreApplication, QTranslator, QSettings
@@ -26,6 +28,7 @@ from qgis.gui import QgsDateTimeEdit
 from . import tools_log, tools_os
 from .. import global_vars
 from ..core.utils import tools_gw
+from lib.ui.ui_manager import DialogTextUi
 
 
 class GwExtendedQLabel(QLabel):
@@ -1173,3 +1176,99 @@ def translate_tooltip(context_name, widget, idx=None, aux_context='ui_message'):
                 widget.setToolTip(widget.title())
             else:
                 widget.setToolTip(widget.text())
+
+
+def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_increase=0, filepath=None,
+                        schema_name=None):
+    """ Manage exception in database queries and show information to the user """
+    show_exception_msg = True
+    description = ""
+    if exception:
+        description = str(exception)
+        if 'unknown error' in description:
+            show_exception_msg = False
+
+    try:
+        stack_level += stack_level_increase
+        module_path = inspect.stack()[stack_level][1]
+        file_name = tools_os.get_relative_path(module_path, 2)
+        function_line = inspect.stack()[stack_level][2]
+        function_name = inspect.stack()[stack_level][3]
+
+        # Set exception message details
+        msg = ""
+        msg += f"File name: {file_name}\n"
+        msg += f"Function name: {function_name}\n"
+        msg += f"Line number: {function_line}\n"
+        if exception:
+            msg += f"Description:\n{description}\n"
+        if filepath:
+            msg += f"SQL file:\n{filepath}\n\n"
+        if sql:
+            msg += f"SQL:\n {sql}\n\n"
+        msg += f"Schema name: {schema_name}"
+
+        # Show exception message in dialog and log it
+        if show_exception_msg:
+            title = "Database error"
+            show_exceptions_msg(title, msg)
+        else:
+            tools_log.log_warning("Exception message not shown to user")
+        tools_log.log_warning(msg, stack_level_increase=2)
+
+    except Exception:
+        manage_exception("Unhandled Error")
+
+
+def show_exceptions_msg(title=None, msg="", window_title="Information about exception", pattern=None):
+    """ Show exception message in dialog """
+
+    global_vars.dlg_info = DialogTextUi()
+    global_vars.dlg_info.btn_accept.setVisible(False)
+    global_vars.dlg_info.btn_close.clicked.connect(lambda: global_vars.dlg_info.close())
+    global_vars.dlg_info.setWindowTitle(window_title)
+    if title:
+        global_vars.dlg_info.lbl_text.setText(title)
+    set_widget_text(global_vars.dlg_info, global_vars.dlg_info.txt_infolog, msg)
+    global_vars.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
+    if pattern is None:
+        pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:|Description|Schema name"
+    set_text_bold(global_vars.dlg_info.txt_infolog, pattern)
+
+    # Show dialog only if we are not in a task process
+    if global_vars.show_db_exception:
+        global_vars.dlg_info.show()
+
+
+def manage_exception(title=None, description=None, sql=None, schema_name=None):
+    """ Manage exception and show information to the user """
+
+    # Get traceback
+    trace = traceback.format_exc()
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    path = exc_tb.tb_frame.f_code.co_filename
+    file_name = os.path.split(path)[1]
+    #folder_name = os.path.dirname(path)
+
+    # Set exception message details
+    msg = ""
+    msg += f"Error type: {exc_type}\n"
+    msg += f"File name: {file_name}\n"
+    msg += f"Line number: {exc_tb.tb_lineno}\n"
+    msg += f"{trace}\n"
+    if description:
+        msg += f"Description: {description}\n"
+    if sql:
+        msg += f"SQL:\n {sql}\n\n"
+    msg += f"Schema name: {schema_name}"
+
+    # Show exception message in dialog and log it
+    show_exceptions_msg(title, msg)
+    tools_log.log_warning(msg)
+
+    # Log exception message
+    tools_log.log_warning(msg)
+
+    # Show exception message only if we are not in a task process
+    if global_vars.show_db_exception:
+        show_exceptions_msg(title, msg)

@@ -10,7 +10,6 @@ from qgis.core import QgsCredentials, QgsDataSourceUri
 from qgis.PyQt.QtCore import QSettings
 
 from .. import global_vars
-from ..core.utils import tools_gw
 from . import tools_log, tools_qt, tools_qgis, tools_config
 from ..lib.tools_pgdao import PgDao
 
@@ -311,7 +310,7 @@ def get_row( sql, log_info=True, log_sql=False, commit=True, params=None):
     if not row:
         # Check if any error has been raised
         if global_vars.last_error:
-            tools_gw.manage_exception_db(global_vars.last_error, sql)
+            tools_qt.manage_exception_db(global_vars.last_error, sql)
         elif global_vars.last_error is None and log_info:
             tools_log.log_info("Any record found", parameter=sql, stack_level_increase=1)
 
@@ -328,7 +327,7 @@ def get_rows(sql, log_info=True, log_sql=False, commit=True, params=None, add_em
     if not rows2:
         # Check if any error has been raised
         if global_vars.last_error:
-            tools_gw.manage_exception_db(global_vars.last_error, sql)
+            tools_qt.manage_exception_db(global_vars.last_error, sql)
         elif global_vars.last_error is None and log_info:
             tools_log.log_info("Any record found", parameter=sql, stack_level_increase=1)
     else:
@@ -351,7 +350,7 @@ def execute_sql(sql, log_sql=False, log_error=False, commit=True, filepath=None)
     if not result:
         if log_error:
             tools_log.log_info(sql, stack_level_increase=1)
-        tools_gw.manage_exception_db(global_vars.last_error, sql, filepath=filepath)
+        tools_qt.manage_exception_db(global_vars.last_error, sql, filepath=filepath)
         return False
 
     return True
@@ -367,7 +366,7 @@ def execute_returning(sql, log_sql=False, log_error=False, commit=True):
     if not value:
         if log_error:
             tools_log.log_info(sql, stack_level_increase=1)
-        tools_gw.manage_exception_db(global_vars.last_error, sql)
+        tools_qt.manage_exception_db(global_vars.last_error, sql)
         return False
 
     return value

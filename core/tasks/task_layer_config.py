@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsTask
 
 from ..utils import tools_gw
-from ...lib import tools_log, tools_db, tools_qgis
+from ...lib import tools_log, tools_db, tools_qgis, tools_qt
 
 
 class GwConfigLayerTask(QgsTask):
@@ -210,10 +210,10 @@ class GwConfigLayerTask(QgsTask):
                     layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
 
         if msg_failed != "":
-            tools_gw.show_exceptions_msg("Execute failed.", msg_failed)
+            tools_qt.show_exceptions_msg("Execute failed.", msg_failed)
 
         if msg_key != "":
-            tools_gw.show_exceptions_msg("Key on returned json from ddbb is missed.", msg_key)
+            tools_qt.show_exceptions_msg("Key on returned json from ddbb is missed.", msg_key)
 
         tools_log.log_info("Finish set_layer_config")
 
