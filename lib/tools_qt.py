@@ -1082,9 +1082,9 @@ def add_translator(locale_path, log_info=False):
     """ Add translation file to the list of translation files to be used for translations """
 
     if os.path.exists(locale_path):
-        global_vars.translator = QTranslator()
-        global_vars.translator.load(locale_path)
-        QCoreApplication.installTranslator(global_vars.translator)
+        translator = QTranslator()
+        translator.load(locale_path)
+        QCoreApplication.installTranslator(translator)
         if log_info:
             tools_log.log_info("Add translator", parameter=locale_path)
     else:

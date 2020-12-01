@@ -41,8 +41,6 @@ dlg_info = None
 
 gw_infotools = None
 
-translator = None
-
 current_user = None
 
 dlg_docker = None
