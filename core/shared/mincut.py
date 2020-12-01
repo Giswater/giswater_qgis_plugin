@@ -28,7 +28,7 @@ from ..utils.tools_gw import SnappingConfigManager
 from ..ui.ui_manager import DialogTextUi, Mincut, MincutComposer, MincutConnec, MincutEndUi, MincutHydrometer
 from ... import global_vars
 from ...lib import tools_qt, tools_qgis, tools_log, tools_db
-from ...lib.tools_qgis import MultipleSelection
+from ..utils.tools_gw import MultipleSelection
 
 
 class GwMincut:

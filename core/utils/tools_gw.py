@@ -12,7 +12,6 @@ import os
 import random
 import re
 import sys
-import traceback
 if 'nt' in sys.builtin_module_names:
     import ctypes
 from collections import OrderedDict
@@ -23,18 +22,165 @@ from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QPoint, QDate, QSet
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget
+    QToolButton, QWidget, QApplication
 from qgis.core import QgsProject, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
     QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
-    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest, QgsDataSourceUri, QgsCredentials
-from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint, QgsDateTimeEdit
+    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest, QgsDataSourceUri, QgsCredentials, QgsRectangle
+from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint, QgsDateTimeEdit, QgsMapTool, QgsRubberBand
 
-from ...lib.tools_qgis import MultipleSelection
 from ..models.sys_feature_cat import SysFeatureCat
-from ..ui.ui_manager import GwDialog, GwMainWindow, DialogTextUi, DockerUi
+from ..ui.ui_manager import GwDialog, GwMainWindow, DockerUi
 from ... import global_vars
 from ...lib import tools_qgis, tools_pgdao, tools_qt, tools_log, tools_config, tools_os, tools_db
 from ...lib.tools_qt import GwHyperLinkLabel
+
+
+class MultipleSelection(QgsMapTool):
+
+    def __init__(self, layers, geom_type, table_object=None, dialog=None, query=None):
+        """
+        Class constructor
+        :param layers: dict of list of layers {'arc': [v_edit_node, ...]}
+        :param geom_type:
+        :param table_object:
+        :param dialog:
+        :param query:
+        """
+
+        self.layers = layers
+        self.geom_type = geom_type
+        self.iface = global_vars.iface
+        self.canvas = global_vars.canvas
+        self.table_object = table_object
+        self.dialog = dialog
+        self.query = query
+
+        # Call superclass constructor and set current action
+        QgsMapTool.__init__(self, self.canvas)
+
+        self.rubber_band = QgsRubberBand(self.canvas, 2)
+        self.rubber_band.setColor(QColor(255, 100, 255))
+        self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
+        self.rubber_band.setWidth(1)
+        self.reset()
+        self.selected_features = []
+
+
+    def reset(self):
+
+        self.start_point = self.end_point = None
+        self.is_emitting_point = False
+        self.reset_rubber_band()
+
+
+    def canvasPressEvent(self, event):
+
+        if event.button() == Qt.LeftButton:
+            self.start_point = self.toMapCoordinates(event.pos())
+            self.end_point = self.start_point
+            self.is_emitting_point = True
+            self.show_rect(self.start_point, self.end_point)
+
+
+    def canvasReleaseEvent(self, event):
+
+        self.is_emitting_point = False
+        rectangle = self.get_rectangle()
+        selected_rectangle = None
+        key = QApplication.keyboardModifiers()
+
+        if event.button() != Qt.LeftButton:
+            self.rubber_band.hide()
+            return
+
+        # Disconnect signal to enhance process
+        # We will reconnect it when processing last layer of the group
+        tools_qgis.disconnect_signal_selection_changed()
+
+
+        for i, layer in enumerate(self.layers[self.geom_type]):
+            if i == len(self.layers[self.geom_type]) - 1:
+                connect_signal_selection_changed(self.dialog, self.table_object, query=self.query,
+                                                 geom_type=self.geom_type, layers=self.layers)
+
+                # Selection by rectangle
+            if rectangle:
+                if selected_rectangle is None:
+                    selected_rectangle = self.canvas.mapSettings().mapToLayerCoordinates(layer, rectangle)
+                # If Ctrl+Shift clicked: remove features from selection
+                if key == (Qt.ControlModifier | Qt.ShiftModifier):
+                    layer.selectByRect(selected_rectangle, layer.RemoveFromSelection)
+                # If Ctrl clicked: add features to selection
+                elif key == Qt.ControlModifier:
+                    layer.selectByRect(selected_rectangle, layer.AddToSelection)
+                # If Ctrl not clicked: add features to selection
+                else:
+                    layer.selectByRect(selected_rectangle, layer.AddToSelection)
+
+            # Selection one by one
+            else:
+                event_point = self.get_event_point(event)
+                result = self.snap_to_background_layers(event_point)
+                if result.isValid():
+                    # Get the point. Leave selection
+                    self.get_snapped_feature(result, True)
+
+        self.rubber_band.hide()
+
+
+    def canvasMoveEvent(self, event):
+
+        if not self.is_emitting_point:
+            return
+
+        self.end_point = self.toMapCoordinates(event.pos())
+        self.show_rect(self.start_point, self.end_point)
+
+
+    def show_rect(self, start_point, end_point):
+
+        self.reset_rubber_band()
+        if start_point.x() == end_point.x() or start_point.y() == end_point.y():
+            return
+
+        point1 = QgsPointXY(start_point.x(), start_point.y())
+        point2 = QgsPointXY(start_point.x(), end_point.y())
+        point3 = QgsPointXY(end_point.x(), end_point.y())
+        point4 = QgsPointXY(end_point.x(), start_point.y())
+
+        self.rubber_band.addPoint(point1, False)
+        self.rubber_band.addPoint(point2, False)
+        self.rubber_band.addPoint(point3, False)
+        self.rubber_band.addPoint(point4, True)
+        self.rubber_band.show()
+
+
+    def get_rectangle(self):
+
+        if self.start_point is None or self.end_point is None:
+            return None
+        elif self.start_point.x() == self.end_point.x() or self.start_point.y() == self.end_point.y():
+            return None
+
+        return QgsRectangle(self.start_point, self.end_point)
+
+
+    def deactivate(self):
+
+        self.rubber_band.hide()
+        QgsMapTool.deactivate(self)
+
+
+    def activate(self):
+        pass
+
+
+    def reset_rubber_band(self):
+
+        try:
+            self.rubber_band.reset(2)
+        except:
+            pass
 
 
 class SnappingConfigManager(object):
