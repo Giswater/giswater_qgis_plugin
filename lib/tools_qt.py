@@ -13,12 +13,13 @@ import subprocess
 import webbrowser
 from functools import partial
 
-from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal, QPersistentModelIndex, QCoreApplication
+from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal, \
+    QPersistentModelIndex, QCoreApplication, QTranslator, QSettings
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator,  QStandardItem, QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, \
     QDateEdit,  QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, \
-    QPlainTextEdit, QRadioButton, QSizePolicy, QSpacerItem, QFileDialog, QGroupBox, QMessageBox
+    QPlainTextEdit, QRadioButton, QSizePolicy, QSpacerItem, QFileDialog, QGroupBox, QMessageBox, QTabWidget, QToolBox
 from qgis.core import QgsExpression, QgsProject
 from qgis.gui import QgsDateTimeEdit
 
@@ -1037,3 +1038,155 @@ def tr(message, context_name=None, aux_context=None):
             value = QCoreApplication.translate(aux_context, message)
 
     return value
+
+
+def manage_translation(context_name, dialog=None, log_info=False):
+    """ Manage locale and corresponding 'i18n' file """
+
+    # Get locale of QGIS application
+    try:
+        locale = QSettings().value('locale/userLocale').lower()
+    except AttributeError:
+        locale = "en"
+
+    if locale == 'es_es':
+        locale = 'es'
+    elif locale == 'es_ca':
+        locale = 'ca'
+    elif locale == 'en_us':
+        locale = 'en'
+
+    # If user locale file not found, set English one by default
+    locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'{global_vars.plugin_name}_{locale}.qm')
+    if not os.path.exists(locale_path):
+        if log_info:
+            tools_log.log_info("Locale not found", parameter=locale_path)
+        locale_default = 'en'
+        locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'{global_vars.plugin_name}_{locale_default}.qm')
+        # If English locale file not found, exit function
+        # It means that probably that form has not been translated yet
+        if not os.path.exists(locale_path):
+            if log_info:
+                tools_log.log_info("Locale not found", parameter=locale_path)
+            return
+
+    # Add translation file
+    add_translator(locale_path)
+
+    # If dialog is set, then translate form
+    if dialog:
+        translate_form(dialog, context_name)
+
+
+def add_translator(locale_path, log_info=False):
+    """ Add translation file to the list of translation files to be used for translations """
+
+    if os.path.exists(locale_path):
+        global_vars.translator = QTranslator()
+        global_vars.translator.load(locale_path)
+        QCoreApplication.installTranslator(global_vars.translator)
+        if log_info:
+            tools_log.log_info("Add translator", parameter=locale_path)
+    else:
+        if log_info:
+            tools_log.log_info("Locale not found", parameter=locale_path)
+
+
+def translate_form(dialog, context_name, aux_context='ui_message'):
+    """ Translate widgets of the form to current language """
+    type_widget_list = [QCheckBox, QGroupBox, QLabel, QPushButton, QRadioButton, QTabWidget]
+    for widget_type in type_widget_list:
+        widget_list = dialog.findChildren(widget_type)
+        for widget in widget_list:
+            translate_widget(context_name, widget)
+
+    # Translate title of the form
+    text = tr('title', context_name, aux_context=aux_context)
+    if text != 'title':
+        dialog.setWindowTitle(text)
+
+
+def translate_widget(context_name, widget, aux_context='ui_message'):
+    """ Translate widget text """
+
+    if not widget:
+        return
+
+    widget_name = ""
+    try:
+        if type(widget) is QTabWidget:
+            num_tabs = widget.count()
+            for i in range(0, num_tabs):
+                widget_name = widget.widget(i).objectName()
+                text = tr(widget_name, context_name, aux_context=aux_context)
+                if text not in (widget_name, None, 'None'):
+                    widget.setTabText(i, text)
+                else:
+                    widget_text = widget.tabText(i)
+                    text = tr(widget_text, context_name, aux_context=aux_context)
+                    if text != widget_text:
+                        widget.setTabText(i, text)
+                translate_tooltip(context_name, widget, i)
+        elif type(widget) is QToolBox:
+            num_tabs = widget.count()
+            for i in range(0, num_tabs):
+                widget_name = widget.widget(i).objectName()
+                text = tr(widget_name, context_name, aux_context=aux_context)
+                if text not in (widget_name, None, 'None'):
+                    widget.setItemText(i, text)
+                else:
+                    widget_text = widget.itemText(i)
+                    text = tr(widget_text, context_name, aux_context=aux_context)
+                    if text != widget_text:
+                        widget.setItemText(i, text)
+                translate_tooltip(context_name, widget.widget(i))
+        elif type(widget) is QGroupBox:
+            widget_name = widget.objectName()
+            text = tr(widget_name, context_name, aux_context=aux_context)
+            if text not in (widget_name, None, 'None'):
+                widget.setTitle(text)
+            else:
+                widget_title = widget.title()
+                text = tr(widget_title, context_name, aux_context=aux_context)
+                if text != widget_title:
+                    widget.setTitle(text)
+            translate_tooltip(context_name, widget)
+        else:
+            widget_name = widget.objectName()
+            text = tr(widget_name, context_name, aux_context=aux_context)
+            if text not in (widget_name, None, 'None'):
+                widget.setText(text)
+            else:
+                widget_text = widget.text()
+                text = tr(widget_text, context_name, aux_context=aux_context)
+                if text != widget_text:
+                    widget.setText(text)
+            translate_tooltip(context_name, widget)
+
+    except Exception as e:
+        tools_log.log_info(f"{widget_name} --> {type(e).__name__} --> {e}")
+
+
+def translate_tooltip(context_name, widget, idx=None, aux_context='ui_message'):
+    """ Translate tooltips widgets of the form to current language
+        If we find a translation, it will be put
+        If the object does not have a tooltip we will put the object text itself as a tooltip
+    """
+
+    if type(widget) is QTabWidget:
+        widget_name = widget.widget(idx).objectName()
+        tooltip = tr(f'tooltip_{widget_name}', context_name, aux_context=aux_context)
+        if tooltip not in (f'tooltip_{widget_name}', None, 'None'):
+            widget.setTabToolTip(idx, tooltip)
+        elif widget.toolTip() in ("", None):
+            widget.setTabToolTip(idx, widget.tabText(idx))
+    else:
+        widget_name = widget.objectName()
+        tooltip = tr(f'tooltip_{widget_name}', context_name, aux_context=aux_context)
+        if tooltip not in (f'tooltip_{widget_name}', None, 'None'):
+            widget.setToolTip(tooltip)
+        elif widget.toolTip() in ("", None):
+            if type(widget) is QGroupBox:
+                widget.setToolTip(widget.title())
+            else:
+                widget.setToolTip(widget.text())

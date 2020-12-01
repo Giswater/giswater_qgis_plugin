@@ -56,7 +56,7 @@ class GwToolBoxButton(GwParentAction):
         self.populate_trv(self.dlg_toolbox_doc.trv, json_result['body']['data'])
         self.dlg_toolbox_doc.txt_filter.textChanged.connect(partial(self.filter_functions))
         self.dlg_toolbox_doc.trv.doubleClicked.connect(partial(self.open_function))
-        tools_gw.manage_translation('toolbox_docker', self.dlg_toolbox_doc)
+        tools_qt.manage_translation('toolbox_docker', self.dlg_toolbox_doc)
 
 
     def filter_functions(self, text):

@@ -128,7 +128,7 @@ class GwSearch:
             gridlayout.addItem(vertical_spacer1)
 
         if self.is_mincut is False:
-            tools_gw.manage_translation('search', self.dlg_search)
+            tools_qt.manage_translation('search', self.dlg_search)
 
 
     def reset_rubber_band(self):

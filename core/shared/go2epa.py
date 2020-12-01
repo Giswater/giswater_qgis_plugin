@@ -71,7 +71,7 @@ class GwGo2Epa:
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
 
         if global_vars.dlg_docker:
-            tools_gw.manage_translation('go2epa', self.dlg_go2epa)
+            tools_qt.manage_translation('go2epa', self.dlg_go2epa)
             tools_gw.dock_dialog(self.dlg_go2epa)
             self.dlg_go2epa.btn_cancel.clicked.disconnect()
             self.dlg_go2epa.btn_cancel.clicked.connect(tools_gw.close_docker)
