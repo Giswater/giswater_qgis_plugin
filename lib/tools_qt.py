@@ -1040,7 +1040,7 @@ def manage_translation(context_name, dialog=None, log_info=False):
     locales = {'en': 'en', 'es_es': 'es', 'es_ca': 'ca', 'en_us': 'en'}
 
     # If user locale file not found, set English one by default
-    locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'{global_vars.plugin_name}_{locales[locale]}.qm')
+    locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'{global_vars.plugin_name}_{locales.get(locale,"en")}.qm')
     if not os.path.exists(locale_path):
         if log_info:
             tools_log.log_info("Locale not found", parameter=locale_path)

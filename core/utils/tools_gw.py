@@ -722,23 +722,13 @@ def reset_feature_layers(layers):
 
 
 def get_signal_change_tab(dialog, excluded_layers=[]):
-    """ Set geom_type and layer depending selected tab
-        @table_object = ['doc' | 'element' | 'cat_work']
-    """
+    """ Set geom_type and layer depending selected tab """
 
     tab_idx = dialog.tab_feature.currentIndex()
-    geom_type = "arc"
+    tab_name = {'tab_arc': 'arc', 'tab_node': 'node', 'tab_connec': 'connec', 'tab_gully': 'gully',
+                'tab_elem': 'element'}
 
-    if dialog.tab_feature.widget(tab_idx).objectName() == 'tab_arc':
-        geom_type = "arc"
-    elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_node':
-        geom_type = "node"
-    elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_connec':
-        geom_type = "connec"
-    elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_gully':
-        geom_type = "gully"
-    elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_elem':
-        geom_type = "element"
+    geom_type = tab_name.get(dialog.tab_feature.widget(tab_idx).objectName(), 'arc')
     hide_parent_layers(excluded_layers=excluded_layers)
     viewname = f"v_edit_{geom_type}"
 

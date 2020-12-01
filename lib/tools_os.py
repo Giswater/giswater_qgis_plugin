@@ -72,13 +72,14 @@ def open_url(widget):
 
 
 def cast_boolean(param):
-    """ Receives a string and returns a bool """
+    """ Receives a string and returns a bool
+    :param param: String to cast
+    :return: Boolean value, True if param not in bool_dict
+    """
 
     bool_dict = {"True": True, "true": True, "False": False, "false": False}
-    try:
-        return bool_dict[param]
-    except KeyError:
-        return True
+
+    return bool_dict.get(param, True)
 
 
 def open_file_path(msg="Select file", filter_="All (*.*)"):

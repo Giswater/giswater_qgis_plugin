@@ -131,7 +131,7 @@ def set_logger(logger_name=None):
         global_vars.logger = Logger(logger_name, global_vars.min_log_level, log_suffix)
 
         values = {10: 0, 20: 0, 30: 1, 40: 2}
-        global_vars.min_message_level = values[global_vars.min_log_level]
+        global_vars.min_message_level = values.get(global_vars.min_log_level, 0)
 
 
 def qgis_log_message(text=None, message_level=0, context_name=None, parameter=None, tab_name=None):
