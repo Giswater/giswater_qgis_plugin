@@ -1467,7 +1467,7 @@ class GwInfo(QObject):
 
         widget = tools_gw.add_tableview(complet_result, field)
         widget = tools_gw.add_headers(widget, field)
-        widget = tools_qt.populate_table(widget, field)
+        widget = tools_gw.fill_standard_item_model(widget, field)
         widget = tools_gw.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
         tools_qt.set_qtv_config(widget)
         return widget
@@ -3073,7 +3073,7 @@ class GwInfo(QObject):
                 qtable = dialog.findChild(QTableView, field['widgetname'])
                 if qtable:
                     tools_gw.add_headers(qtable, field)
-                    tools_qt.populate_table(qtable, field)
+                    tools_gw.fill_standard_item_model(qtable, field)
 
         return complet_list
 

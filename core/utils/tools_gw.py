@@ -19,14 +19,14 @@ from collections import OrderedDict
 from functools import partial
 
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QTimer, QStringListModel, QVariant, QPoint, QDate, QCoreApplication, QSettings, QTranslator
-from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon
+from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QPoint, QDate, QSettings
+from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
-    QCompleter, QFileDialog, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit,\
-    QTextEdit, QToolButton, QWidget, QGroupBox, QToolBox, QRadioButton
+    QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
+    QToolButton, QWidget
 from qgis.core import QgsProject, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
     QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
-    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest, QgsDataSourceUri, QgsCredentials, QgsRectangle
+    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest, QgsDataSourceUri, QgsCredentials
 from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint, QgsDateTimeEdit
 
 from ...lib.tools_qgis import MultipleSelection
@@ -842,15 +842,10 @@ def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, ta
         if str(k) == "info":
             text_result, change_tab = fill_log(dialog, data, force_tab, reset_text, tab_idx, disable_tabs)
         elif k in ('point', 'line', 'polygon'):
-            if 'values' in data[k]:
-                key = 'values'
-            elif 'features' in data[k]:
-                key = 'features'
-            else:
-                continue
-            counter = len(data[k][key])
+            if 'features' not in data[k]: continue
+            counter = len(data[k]['features'])
             if counter > 0:
-                counter = len(data[k][key])
+                counter = len(data[k]['features'])
                 geometry_type = data[k]['geometryType']
                 try:
                     if not layer_name:
@@ -861,12 +856,8 @@ def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                     tools_qgis.remove_layer_from_toc(layer_name, group)
                 v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
                 layer_name = None
-                # TODO This if controls if the function already works with GeoJson or is still to be refactored
-                # once all are refactored the if should be: if 'feature' not in data [k]: continue
-                if key == 'values':
-                    populate_vlayer_old(v_layer, data, k, counter, group)
-                elif key == 'features':
-                    populate_vlayer(v_layer, data, k, counter, group)
+                # This function already works with GeoJson
+                populate_vlayer(v_layer, data, k, counter, group)
                 if 'qmlPath' in data[k] and data[k]['qmlPath']:
                     qml_path = data[k]['qmlPath']
                     tools_qgis.load_qml(v_layer, qml_path)
@@ -3086,6 +3077,19 @@ def add_headers(widget, field):
         headers.append(x)
     # Set headers
     standar_model.setHorizontalHeaderLabels(headers)
+
+    return widget
+
+
+def fill_standard_item_model(widget, field):
+    print(field)
+    standar_model = widget.model()
+    for item in field['value']:
+        row = []
+        for value in item.values():
+            row.append(QStandardItem(str(value)))
+        if len(row) > 0:
+            standar_model.appendRow(row)
 
     return widget
 

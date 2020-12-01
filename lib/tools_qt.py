@@ -15,7 +15,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal, \
     QPersistentModelIndex, QCoreApplication, QTranslator, QSettings
-from qgis.PyQt.QtGui import QPixmap, QDoubleValidator,  QStandardItem, QTextCharFormat, QFont
+from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, \
     QDateEdit,  QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, \
@@ -530,19 +530,6 @@ def check_actions(action, enabled, dialog=None):
         action.setChecked(enabled)
     except RuntimeError:
         pass
-
-
-def populate_table(widget, field):
-
-    standar_model = widget.model()
-    for item in field['value']:
-        row = []
-        for value in item.values():
-            row.append(QStandardItem(str(value)))
-        if len(row) > 0:
-            standar_model.appendRow(row)
-
-    return widget
 
 
 def set_calendar_empty(widget):
