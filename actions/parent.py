@@ -1285,10 +1285,29 @@ class ParentAction(object):
                         symbol.changeSymbolLayer(0, symbol_layer)
                     category = QgsRendererCategory(id['id'], symbol, str(id['id']))
                     categories.append(category)
-					
-					# apply symbol to layer renderer
+
+                    # apply symbol to layer renderer
                     if 'idname' in mapzone:
                         lyr.setRenderer(QgsCategorizedSymbolRenderer(mapzone['idname'], categories))
 
                     # repaint layer
                     lyr.triggerRepaint()
+
+
+    def get_points_from_geometry(self, layer, feature):
+        """ Get the start point and end point of the feature """
+
+        list_points = None
+        geom = feature.geometry()
+        if layer.geometryType() == 0:
+            points = geom.asPoint()
+            list_points = f'"x1":{points.x()}, "y1":{points.y()}'
+        elif layer.geometryType() in (1, 2):
+            points = geom.asPolyline()
+            init_point = points[0]
+            last_point = points[-1]
+            list_points = f'"x1":{init_point.x()}, "y1":{init_point.y()}'
+            list_points += f', "x2":{last_point.x()}, "y2":{last_point.y()}'
+        else:
+            self.controller.log_info(str(type("NO FEATURE TYPE DEFINED")))
+        return list_points
