@@ -159,10 +159,10 @@ class GwConfigButton(GwParentAction):
         page1_layout2.addWidget(groupBox_8)
 
         page2_layout1.addWidget(groupBox_9)
-        page2_layout1.addWidget(groupBox_10)
-        page2_layout2.addWidget(groupBox_11)
+        page2_layout2.addWidget(groupBox_10)
         page2_layout2.addWidget(groupBox_12)
         page2_layout2.addWidget(groupBox_13)
+        page2_layout2.addWidget(groupBox_11)
 
         admin_layout1.addWidget(groupBox_14)
         admin_layout2.addWidget(groupBox_15)
@@ -171,7 +171,7 @@ class GwConfigButton(GwParentAction):
         admin_layout2.addWidget(groupBox_18)
 
         man_layout1.addWidget(groupBox_19)
-        man_layout2.addWidget(groupBox_20)
+        man_layout1.addWidget(groupBox_20)
         man_layout2.addWidget(groupBox_21)
         man_layout2.addWidget(groupBox_22)
 
