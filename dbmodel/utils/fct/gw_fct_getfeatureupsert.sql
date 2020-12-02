@@ -386,7 +386,7 @@ BEGIN
 			IF count_aux = 1 THEN
 				v_expl_id = (SELECT expl_id FROM exploitation WHERE ST_DWithin(p_reduced_geometry, exploitation.the_geom,0.001)  AND active=true LIMIT 1);
 			ELSE
-				v_expl_id =(SELECT expl_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer)  AND active=true
+				v_expl_id =(SELECT expl_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_promixity_buffer)
 				order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
