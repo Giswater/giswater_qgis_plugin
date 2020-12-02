@@ -80,13 +80,12 @@ class GwInfoButton(GwParentMapTool):
             self.block_signal = False
             return
 
-        tools_gw.init_docker()
-
         if event.button() == Qt.LeftButton:
+
             point = self.create_point(event)
             if point is False:
                 return
-
+            tools_gw.init_docker()
             api_cf = GwInfo(self.tab_type)
             api_cf.signal_activate.connect(self.reactivate_map_tool)
             api_cf.get_info_from_coordinates(point, tab_type=self.tab_type)
@@ -99,6 +98,7 @@ class GwInfoButton(GwParentMapTool):
             point = self.create_point(event)
             if point is False:
                 return
+
             self.get_layers_from_coordinates(point, self.rubberband_list, self.tab_type)
 
 
@@ -236,3 +236,4 @@ class GwInfoButton(GwParentMapTool):
             self.iface.setActiveLayer(layer)
             self.api_cf.get_info_from_id(
                 table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type)
+            tools_gw.init_docker()
