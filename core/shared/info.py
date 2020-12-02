@@ -1598,8 +1598,8 @@ class GwInfo(QObject):
         else:
             my_json = json.dumps(_json)
             feature = f'"id":"{self.feature_id}", '
-            feature += f'"tableName":"{p_table_id}", '
 
+        feature += f'"tableName":"{p_table_id}", '
         feature += f' "featureType":"{self.feature_type}" '
         extras = f'"fields":{my_json}, "reload":"{fields_reload}", "afterInsert":"{after_insert}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
