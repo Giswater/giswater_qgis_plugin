@@ -92,7 +92,7 @@ class GwInfoButton(GwParentMapTool):
             api_cf.get_info_from_coordinates(point, tab_type=self.tab_type)
             # Remove previous rubberband when open new docker
             if isinstance(self.previous_api_cf, GwInfo) and global_vars.dlg_docker is not None:
-                self.previous_api_cf.resetRubberbands()
+                self.previous_api_cf.rubber_band.reset()
             self.previous_api_cf = api_cf
 
         elif event.button() == Qt.RightButton:
