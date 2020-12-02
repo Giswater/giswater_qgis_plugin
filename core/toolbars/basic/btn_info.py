@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QColor, QCursor, QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu
 from qgis.core import QgsGeometry, QgsMapToPixel, QgsPointXY
 from qgis.gui import QgsRubberBand
-
+from ...shared import info
 from ...shared.info import GwInfo
 from ...toolbars.parent_maptool import GwParentMapTool
 from ...utils import tools_gw
@@ -103,6 +103,11 @@ class GwInfoButton(GwParentMapTool):
 
 
     def activate(self):
+        if info.is_inserting:
+            msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
+            tools_gw.show_message(msg)
+            super().deactivate()
+            return
 
         # Check button
         self.action.setChecked(True)
@@ -115,9 +120,9 @@ class GwInfoButton(GwParentMapTool):
 
 
     def deactivate(self):
-
-        for rb in self.rubberband_list:
-            rb.reset()
+        if hasattr(self, 'rubberband_list'):
+            for rb in self.rubberband_list:
+                rb.reset()
         if hasattr(self, 'api_cf'):
             self.rubber_band.reset()
 

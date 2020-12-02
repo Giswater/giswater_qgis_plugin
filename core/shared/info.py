@@ -35,8 +35,10 @@ from ..utils.tools_gw import SnappingConfigManager
 from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
-from ...lib.tools_qt import GwHyperLinkLabel
+from ...lib import tools_qgis, tools_qt, tools_log, tools_db
+
+global is_inserting
+is_inserting = False
 
 
 class GwInfo(QObject):
@@ -643,7 +645,8 @@ class GwInfo(QObject):
         except Exception as e:
             pass
         self.connected = False
-        global_vars.is_inserting = False
+        global is_inserting
+        is_inserting = False
 
 
     def activate_snapping(self, complet_result, ep):
@@ -1576,7 +1579,8 @@ class GwInfo(QObject):
             self.enable_action(dialog, "actionZoom", True)
             self.enable_action(dialog, "actionZoomOut", True)
             self.enable_action(dialog, "actionCentered", True)
-            global_vars.is_inserting = False
+            global is_inserting
+            is_inserting = False
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
                 if close_dlg:
@@ -3411,7 +3415,8 @@ class GwInfo(QObject):
 
     def edit_add_feature(self, feature_cat):
         """ Button 01, 02: Add 'node' or 'arc' """
-        if global_vars.is_inserting:
+        global is_inserting
+        if is_inserting:
             msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
             tools_gw.show_message(msg)
             return
@@ -3478,7 +3483,8 @@ class GwInfo(QObject):
             tools_log.log_info(str(type("NO FEATURE TYPE DEFINED")))
 
         tools_gw.init_docker()
-        global_vars.is_inserting = True
+        global is_inserting
+        is_inserting = True
 
         self.api_cf = GwInfo('data')
         result, dialog = self.api_cf.get_feature_insert(point=list_points, feature_cat=self.feature_cat,
@@ -3493,4 +3499,4 @@ class GwInfo(QObject):
         if not result:
             self.info_layer.deleteFeature(feature.id())
             self.iface.actionRollbackEdits().trigger()
-            global_vars.is_inserting = False
+            is_inserting = False
