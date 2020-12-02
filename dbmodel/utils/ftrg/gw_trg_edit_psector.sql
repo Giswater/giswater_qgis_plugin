@@ -220,9 +220,12 @@ BEGIN
 				INSERT INTO plan_psector_x_node(node_id, psector_id, state, doable, descript) 
 				SELECT node_id, OLD.psector_id, state, doable, descript FROM plan_psector_x_node WHERE psector_id=v_temporal_psector_id;
 
+				--only new connecs or ones which link's geom have changed
 				INSERT INTO plan_psector_x_connec(connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom, userdefined_geom) 
-				SELECT connec_id, arc_id, OLD.psector_id, state, doable, descript, link_geom, vnode_geom, userdefined_geom FROM plan_psector_x_connec WHERE psector_id=v_temporal_psector_id;
-
+				SELECT connec_id, pc.arc_id, OLD.psector_id, pc.state, pc.doable, pc.descript, link_geom, vnode_geom, pc.userdefined_geom FROM plan_psector_x_connec pc	
+				JOIN arc ON ST_DWithin(st_buffer(vnode_geom, 0.5), arc.the_geom,0.001)
+				WHERE pc.psector_id=v_temporal_psector_id AND arc.state=2;
+				
 				--delete temporal psector after all changes
 				EXECUTE 'SELECT gw_fct_setdelete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 				"feature":{"id":["'||v_temporal_psector_id||'"], "featureType":"PSECTOR", "tableName":"v_ui_plan_psector", "idName":"psector_id"},
