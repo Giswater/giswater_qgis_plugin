@@ -134,6 +134,7 @@ v_addschema text;
 v_return json;
 v_flag boolean = false;
 v_isgrafdelimiter boolean  = false;
+v_isepatoarc boolean  = false;
 v_nodetype text;
 
 BEGIN
@@ -197,6 +198,9 @@ BEGIN
 			IF (SELECT upper(graf_delimiter) FROM cat_feature_node JOIN cat_feature USING (id)
 				WHERE child_layer=v_tablename) IN ('DMA','PRESSZONE') THEN
 				v_isgrafdelimiter = TRUE;
+			ELSIF (SELECT upper(epa_default) FROM cat_feature_node JOIN cat_feature USING (id)
+				WHERE child_layer=v_tablename) IN ('PUMP', 'VALVE', 'SHORTPIPE') THEN
+					v_isepatoarc = TRUE;
 			END IF;
 		END IF;
 	ELSE  
@@ -210,6 +214,8 @@ BEGIN
 			
 			IF (SELECT upper(graf_delimiter) FROM cat_feature_node WHERE id=v_nodetype) IN ('DMA','PRESSZONE') THEN
 				v_isgrafdelimiter = TRUE;
+			ELSIF (SELECT upper(epa_type) FROM node WHERE node_id = v_id) IN ('PUMP', 'VALVE', 'SHORTPIPE') THEN
+				v_isepatoarc = TRUE;
 			END IF;
 		END IF;
 	END IF;
@@ -340,8 +346,16 @@ BEGIN
 		IF v_isgrafdelimiter OR upper(v_project_type) != 'WS' THEN
 	        EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", tabactions as tabActions 
 			FROM config_form_tabs WHERE formname = $1) a'
-	            INTO form_tabs
-	            USING v_tablename;
+	        INTO form_tabs
+	        USING v_tablename;
+	    ELSIF v_isepatoarc THEN
+	    	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
+			b.tab as tabActions  FROM (SELECT json_agg(item_object) as tab FROM config_form_tabs, jsonb_array_elements(tabactions::jsonb) 
+			with ordinality arr(item_object, position) where formname =$1
+			and item_object->>''actionName'' != ''actionMapZone'' group by tabname) b,
+			config_form_tabs WHERE formname =$1)a'
+			INTO form_tabs
+	        USING v_tablename;
 	    ELSE
 	    	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
 			b.tab as tabActions  FROM (SELECT json_agg(item_object) as tab FROM config_form_tabs, jsonb_array_elements(tabactions::jsonb) 
@@ -357,18 +371,26 @@ BEGIN
         	
         	IF v_isgrafdelimiter OR upper(v_project_type) != 'WS' THEN
 			-- Get form_tabs
-			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
-			tabactions as tabActions FROM config_form_tabs WHERE formname = $1) a'
+				EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
+				tabactions as tabActions FROM config_form_tabs WHERE formname = $1) a'
 				INTO form_tabs
 				USING v_table_parent;
+			ELSIF v_isepatoarc THEN
+				EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
+				b.tab as tabActions  FROM (SELECT json_agg(item_object) as tab FROM config_form_tabs, jsonb_array_elements(tabactions::jsonb) 
+				with ordinality arr(item_object, position) where formname =$1
+				and item_object->>''actionName'' != ''actionMapZone'' group by tabname) b,
+				config_form_tabs WHERE formname =$1)a'
+				INTO form_tabs
+		        USING v_table_parent;
 			ELSE
 		    	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
 				b.tab as tabActions  FROM (SELECT json_agg(item_object) as tab FROM config_form_tabs, jsonb_array_elements(tabactions::jsonb) 
 				with ordinality arr(item_object, position) where formname =$1
 				and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone'' group by tabname) b,
 				config_form_tabs WHERE formname =$1)a'
-				 INTO form_tabs
-		         USING v_table_parent;
+				INTO form_tabs
+		        USING v_table_parent;
 		    END IF;
 	END IF;
 
