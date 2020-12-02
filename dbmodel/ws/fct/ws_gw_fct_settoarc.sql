@@ -73,7 +73,7 @@ BEGIN
         SELECT arc_id INTO v_arc_id FROM arc WHERE node_1 =  v_feature_id;
     END IF;
 
-    IF v_epatype IN ('PUMP', 'VALVE', 'SHORTPIPE') OR v_systype IN ('TANK', 'RESERVOIR', 'WATERWELL', 'SOURCE') OR v_grafdelim != 'NONE' THEN
+    IF v_epatype IN ('PUMP', 'VALVE', 'SHORTPIPE') OR v_grafdelim != 'NONE' THEN
         --Insert to_arc of GO2EPA
         IF v_epatype = 'PUMP' THEN
             UPDATE inp_pump SET to_arc = v_arc_id WHERE node_id = v_feature_id;
@@ -91,25 +91,9 @@ BEGIN
             INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, concat('Set to_arc of shortpipe ', v_feature_id, ' with value ',v_arc_id, '.'));
         END IF;
 
-        --Insert to_arc of MINCUT
-        IF v_systype IN ('TANK', 'RESERVOIR', 'WATERWELL', 'SOURCE') THEN
-            
-            EXECUTE 'INSERT INTO config_mincut_inlet(node_id, expl_id,parameters, active)
-            SELECT '||v_feature_id||', expl_id, jsonb_build_object(''inletArc'', ARRAY['||v_arc_id::text||']), TRUE 
-            FROM node WHERE node.node_id = '||quote_literal(v_feature_id)||'
-            ON CONFLICT (node_id, expl_id) DO
-            UPDATE SET parameters = jsonb_build_object(''inletArc'', ARRAY['||v_arc_id::text||']) WHERE config_mincut_inlet.node_id = '||quote_literal(v_feature_id)||';';
-
-            INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, concat('Set inletArc of config_mincut_inlet for node ', v_feature_id, ' with value ',v_arc_id, '.'));
-
-        END IF;
-
         --define list of mapzones to be set 
-        IF  v_systype IN ('TANK', 'RESERVOIR', 'WATERWELL', 'SOURCE') THEN
-            v_mapzone_array = ARRAY['dma','presszone'];
-        ELSE 
-            v_mapzone_array = ARRAY[lower(v_grafdelim)];
-        END IF;
+     
+        v_mapzone_array = ARRAY[lower(v_grafdelim)];
 
         FOREACH rec IN ARRAY(v_mapzone_array) LOOP
 
