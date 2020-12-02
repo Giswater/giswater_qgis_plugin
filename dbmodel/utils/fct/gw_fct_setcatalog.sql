@@ -90,6 +90,11 @@ BEGIN
 		v_catname = 'cat_work';
 	ELSIF v_formname = 'new_mapzone' THEN
 		v_catname = lower(json_extract_path_text(v_fields, 'mapzoneType'))::text;
+		IF v_catname IS NULL THEN
+			EXECUTE 'SELECT lower(graf_delimiter) FROM cat_feature JOIN cat_feature_node USING (id)
+			WHERE child_layer = '||quote_literal(v_feature_table)||';'
+			INTO v_catname;
+		END IF;
 		--remove unnecessary key from insert json
 		v_fields = v_fields::jsonb -'mapzoneType';
 	END IF;

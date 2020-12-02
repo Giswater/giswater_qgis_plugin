@@ -59,6 +59,8 @@ v_featureid text;
 v_coordx numeric;
 v_coordy numeric;
 v_srid integer;
+v_grafdelimiter text;
+v_formgroup text;
 
 BEGIN
 
@@ -84,17 +86,27 @@ BEGIN
 	-- Set 1st parent field
 	fields_array[1] := gw_fct_json_object_set_key(fields_array[1], 'selectedId', v_matcat);
 	
+	IF v_formname='new_mapzone' THEN
+		EXECUTE 'SELECT lower(graf_delimiter) FROM cat_feature_node WHERE id='||quote_literal(v_feature_type)||';'
+		INTO v_grafdelimiter;
+
+		IF v_grafdelimiter IN ('dma','presszone') THEN
+			v_formgroup = 'new_mapzone';
+			v_formname = concat('new_', v_grafdelimiter);
+		END IF;
+
+	END IF;
 
 	-- 	Calling function to build form fields
 	SELECT gw_fct_getformfields(v_formname, 'form_catalog', v_tabname, v_feature_type, null, null, null, 'INSERT',v_matcat, v_device, null)
-		INTO fields_array;
+	INTO fields_array;
 	
 
 	--	Remove selectedId form fields
 	FOREACH field in ARRAY fields_array
 	LOOP	
 	
-		IF v_formname='new_mapzone' AND json_extract_path_text(field,'columnname') = 'expl_id' THEN
+		IF v_formgroup='new_mapzone' AND json_extract_path_text(field,'columnname') = 'expl_id' THEN
 
 			EXECUTE 'SELECT lower(feature_type) FROM cat_feature WHERE id = '||quote_literal(v_feature_type)||';'
 			INTO v_system_id;
