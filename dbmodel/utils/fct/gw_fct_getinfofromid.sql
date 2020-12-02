@@ -133,6 +133,8 @@ v_islayer boolean;
 v_addschema text;
 v_return json;
 v_flag boolean = false;
+v_isgrafdelimiter boolean  = false;
+v_nodetype text;
 
 BEGIN
 
@@ -187,11 +189,29 @@ BEGIN
 	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
 
 	-- check layer if it's child layer 
-        IF (SELECT child_layer FROM cat_feature WHERE child_layer=v_tablename)IS NOT NULL THEN
+    IF (SELECT child_layer FROM cat_feature WHERE child_layer=v_tablename)IS NOT NULL THEN
 		v_table_parent := (SELECT parent_layer FROM cat_feature WHERE child_layer=v_tablename);	
-	ELSE 
+
+		--check if is delimiter
+		IF upper(v_project_type) = 'WS' AND v_table_parent='v_edit_node' THEN
+			IF (SELECT upper(graf_delimiter) FROM cat_feature_node JOIN cat_feature USING (id)
+				WHERE child_layer=v_tablename) IN ('DMA','PRESSZONE') THEN
+				v_isgrafdelimiter = TRUE;
+			END IF;
+		END IF;
+	ELSE  
 		-- tablename is used as table parent.
 		v_table_parent = v_tablename;
+		--check if is delimiter
+		IF upper(v_project_type) = 'WS' AND v_table_parent='v_edit_node' THEN
+
+			EXECUTE 'SELECT nodetype_id FROM '||v_table_parent||' WHERE node_id = '||quote_literal(v_id)||';'
+			INTO v_nodetype;
+			
+			IF (SELECT upper(graf_delimiter) FROM cat_feature_node WHERE id=v_nodetype) IN ('DMA','PRESSZONE') THEN
+				v_isgrafdelimiter = TRUE;
+			END IF;
+		END IF;
 	END IF;
 
 	-- get tableparent fields
@@ -317,19 +337,39 @@ BEGIN
 
 	-- Get tabs for form
 	--------------------------------
-        EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", tabactions as tabActions 
-		FROM config_form_tabs WHERE formname = $1) a'
-            INTO form_tabs
-            USING v_tablename;
+		IF v_isgrafdelimiter OR upper(v_project_type) != 'WS' THEN
+	        EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", tabactions as tabActions 
+			FROM config_form_tabs WHERE formname = $1) a'
+	            INTO form_tabs
+	            USING v_tablename;
+	    ELSE
+	    	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
+			b.tab as tabActions  FROM (SELECT json_agg(item_object) as tab FROM config_form_tabs, jsonb_array_elements(tabactions::jsonb) 
+			with ordinality arr(item_object, position) where formname =$1
+			and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone'' group by tabname) b,
+			config_form_tabs WHERE formname =$1)a'
+			 INTO form_tabs
+	         USING v_tablename;
+	    END IF;
 
 	-- IF form_tabs is null and layer it's child layer it's child layer --> parent form_tabs is used
         IF v_linkpath IS NULL AND v_table_parent IS NOT NULL THEN
-        
-		-- Get form_tabs
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
-		tabactions as tabActions FROM config_form_tabs WHERE formname = $1) a'
-			INTO form_tabs
-			USING v_table_parent;	
+        	
+        	IF v_isgrafdelimiter OR upper(v_project_type) != 'WS' THEN
+			-- Get form_tabs
+			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
+			tabactions as tabActions FROM config_form_tabs WHERE formname = $1) a'
+				INTO form_tabs
+				USING v_table_parent;
+			ELSE
+		    	EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT tabname as "tabName", label as "tabLabel", tooltip as "tooltip", tabfunction as "tabFunction", 
+				b.tab as tabActions  FROM (SELECT json_agg(item_object) as tab FROM config_form_tabs, jsonb_array_elements(tabactions::jsonb) 
+				with ordinality arr(item_object, position) where formname =$1
+				and item_object->>''actionName'' != ''actionSetToArc'' and item_object->>''actionName'' != ''actionMapZone'' group by tabname) b,
+				config_form_tabs WHERE formname =$1)a'
+				 INTO form_tabs
+		         USING v_table_parent;
+		    END IF;
 	END IF;
 
 	-- Getting actions and layer manager
