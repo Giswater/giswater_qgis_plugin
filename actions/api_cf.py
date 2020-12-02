@@ -7,8 +7,8 @@ or (at your option) any later version.
 # -*- coding: latin-1 -*-
 from qgis.core import QgsGeometry, QgsMapToPixel, QgsPointXY, QgsVectorLayer
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand, QgsVertexMarker
-from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QPoint, QRegExp, QStringListModel, Qt
-from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QRegExpValidator, QStandardItem, QStandardItemModel
+from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QPoint, QStringListModel, Qt
+from qgis.PyQt.QtGui import QColor, QCursor, QIcon, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMenu, QPushButton, QSizePolicy, \
@@ -1024,18 +1024,6 @@ class ApiCF(ApiParent, QObject):
         if field['widgetcontrols'] and 'maxLength' in field['widgetcontrols']:
             if field['widgetcontrols']['maxLength'] is not None:
                 widget.setProperty('maxLength', field['widgetcontrols']['maxLength'])
-
-        return widget
-
-
-    def set_reg_exp(self, widget, field):
-        """ Set regular expression """
-
-        if 'widgetcontrols' in field and field['widgetcontrols']:
-            if field['widgetcontrols'] and 'regexpControl' in field['widgetcontrols']:
-                if field['widgetcontrols']['regexpControl'] is not None:
-                    reg_exp = QRegExp(str(field['widgetcontrols']['regexpControl']))
-                    widget.setValidator(QRegExpValidator(reg_exp))
 
         return widget
 

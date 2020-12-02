@@ -8,8 +8,8 @@ or (at your option) any later version.
 from qgis.core import QgsPointXY, QgsVectorLayer
 from qgis.core import QgsExpression, QgsFeatureRequest, QgsGeometry
 from qgis.gui import QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand, QgsDateTimeEdit
-from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QStringListModel
-from qgis.PyQt.QtGui import QColor, QFontMetrics, QStandardItemModel, QStandardItem
+from qgis.PyQt.QtCore import Qt, QSettings, QTimer, QDate, QStringListModel, QRegExp
+from qgis.PyQt.QtGui import QColor, QFontMetrics, QStandardItemModel, QStandardItem, QRegExpValidator
 from qgis.PyQt.QtWidgets import QLineEdit, QSizePolicy, QWidget, QComboBox, QGridLayout, QSpacerItem, QLabel, QCheckBox
 from qgis.PyQt.QtWidgets import QCompleter, QToolButton, QFrame, QSpinBox, QDoubleSpinBox, QDateEdit, QAction
 from qgis.PyQt.QtWidgets import QTableView, QTabWidget, QPushButton, QTextEdit, QApplication
@@ -493,6 +493,18 @@ class ApiParent(ParentAction):
         return widget
 
 
+    def set_reg_exp(self, widget, field):
+        """ Set regular expression """
+
+        if 'widgetcontrols' in field and field['widgetcontrols']:
+            if field['widgetcontrols'] and 'regexpControl' in field['widgetcontrols']:
+                if field['widgetcontrols']['regexpControl'] is not None:
+                    reg_exp = QRegExp(str(field['widgetcontrols']['regexpControl']))
+                    widget.setValidator(QRegExpValidator(reg_exp))
+
+        return widget
+
+
     def manage_lineedit(self, field, dialog, widget, completer):
 
         if field['widgettype'] == 'typeahead':
@@ -952,6 +964,8 @@ class ApiParent(ParentAction):
                 widget = self.add_lineedit(field)
                 widget = self.set_widget_size(widget, field)
                 widget = self.set_data_type(field, widget)
+                widget = self.set_reg_exp(widget, field)
+
                 if field['widgettype'] == 'typeahead':
                     widget = self.manage_lineedit(field, dialog, widget, completer)
             elif field['widgettype'] == 'datetime':
