@@ -234,6 +234,16 @@ class GwInfoButton(GwParentMapTool):
         if layer:
             layer_source = tools_qgis.get_layer_source(layer)
             self.iface.setActiveLayer(layer)
-            self.api_cf.get_info_from_id(
-                table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type)
             tools_gw.init_docker()
+            api_cf = GwInfo(self.tab_type)
+            api_cf.signal_activate.connect(self.reactivate_map_tool)
+            api_cf.get_info_from_id(table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type)
+            # Remove previous rubberband when open new docker
+            if isinstance(self.previous_api_cf, GwInfo) and global_vars.dlg_docker is not None:
+                self.previous_api_cf.rubber_band.reset()
+            self.previous_api_cf = api_cf
+
+
+
+
+
