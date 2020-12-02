@@ -30,6 +30,9 @@ from .. import global_vars
 from .ui.ui_manager import DialogTextUi
 
 
+translator = QTranslator()
+
+
 class GwExtendedQLabel(QLabel):
     clicked = pyqtSignal()
 
@@ -1075,7 +1078,6 @@ def add_translator(locale_path, log_info=False):
     """ Add translation file to the list of translation files to be used for translations """
 
     if os.path.exists(locale_path):
-        translator = QTranslator()
         translator.load(locale_path)
         QCoreApplication.installTranslator(translator)
         if log_info:
