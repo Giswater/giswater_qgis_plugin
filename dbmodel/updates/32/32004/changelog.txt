@@ -1,0 +1,7 @@
+3.2.004
+*******
+New result tables rpt_arc, rpt_node, rpt_subcatchment (ud)
+Bug fix on tsect_id and curve_id for arc shapes (ud)
+New column (csvversion) on sys_csv2pg_config table. New column (epaversion) on audit_cat_param_user table.
+Some additional constraint on man_addfields_value, cat_feature, sys_feature_cat tables
+Enhance and update data on system tables: sys_fprocess_cat, audit_cat_function

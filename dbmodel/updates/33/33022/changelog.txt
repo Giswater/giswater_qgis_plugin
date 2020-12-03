@@ -1,0 +1,7 @@
+3.3.022
+*************
+- Deprecate nodeparent on mapzones changing for grafconfig on editable views. Deprecate also fprocess_i18n (sys_fprocess_cat) and to_arc (anl_mincut_inlet_x_exploitation)
+- Solve search for postnumber when target number is short and other results may appear
+- Triggers that allow editing basemap layers (streetaxis, plot, address)
+- Refactor om_check_data function separating part of code by creation of 'graf_analytics_check_data' & remove from audit_check_project calls to epa and plan result functions
+- Manage information about input options and basic statistics for EPA results on result table log tab (go2epa dialog)

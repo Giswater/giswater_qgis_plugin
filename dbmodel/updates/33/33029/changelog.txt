@@ -1,0 +1,6 @@
+3.3.029
+*************
+- Remove deprecated triggers connec_update & update_link_arc_id;
+- Bug fix on connect_update and edit_link triggers;
+- Bug fix on v_edit_link view;
+- Create index for link.feature_id;

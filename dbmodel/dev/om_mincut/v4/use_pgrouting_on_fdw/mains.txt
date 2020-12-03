@@ -1,0 +1,9 @@
+GOALS:
+The goal is to execute mincut pgrouting using a pgrouting from remote database
+
+PRELIMINAR
+USE DBLINK
+	1) Execute with dblink pg_digstra from remote server
+
+USE POSTGRESQL FDW
+	2) To remap all ws schema into remote server in order to use network data to execute pg_digstra

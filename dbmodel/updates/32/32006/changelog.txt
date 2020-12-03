@@ -1,0 +1,11 @@
+3.2.006
+*******
+New strategy of dwf scenarios adding:
+-New table (cat_dwf_scenario)
+-New column (dwfscenario_id) on inp_dwf. New column (dwfscenario_id) on inp_dwf_pol_x_node
+-New user variable (inp_options_dwfscenario)
+-Update view vi_dwf and some minor constraints
+New columns (formname, functionname, isdeprecated) on sys_csv2pg_cat table. New column (sys_roleselect_id) on audit_cat_table table
+Enhance and update data on system tables: config_param_system table, sys_csv2pg_cat table, audit_cat_function table, sys_fprocess_cat table
+Remove constraint on inp_typevalue table and harmonize id/idval values on that table (ws)
+Move parameters from config to config_param_system. Function refactor.

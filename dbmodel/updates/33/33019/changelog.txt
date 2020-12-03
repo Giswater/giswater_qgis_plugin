@@ -1,0 +1,15 @@
+3.3.019
+*************
+- Enhance views to export EPA (ws)
+- Create odbc2pg_hydro_filldata function
+- Bug fix for missed trigger gw_trg_edit_link on v_edit_link 
+- Enhance sample updating all connects with pjoint_id and pjoint_type
+- Update dml values for ud/ws projects
+- Add constraints for tables ext_rtc_scada_dma_period & ext_rtc_hydrometer_data, ext_rtc_hydrometer_category_x_pattern
+- Add ymax on return for node interpolate function
+- Enhance pg2epa &rpt2pg functions
+- Bug fix managing pjoint_id and pjoint_type for connect2network and trg_edit_link functions
+- Enhance grafanalytics_mapzones managing new strategy to built mapzone geometry using not only concave hull polygons but also collect and buffer from arc geometries
+- Enable hydrometer selector in case of user has nothing selected
+- When epa result is imported changed log message have been done using result epa file in spite of giswater export log
+- Harmonize *_type on UD as WS has in terms of be parent of catalogs

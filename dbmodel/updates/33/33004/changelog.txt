@@ -1,0 +1,4 @@
+3.3.004
+*************
+- Bug fix on config_form_fields on typeahead widgets for valves
+- Bug fix on ws, sys_csv2pg_config target definition

@@ -1,0 +1,15 @@
+3.4.003
+*************
+- Deep refactor config_api_form_fields & audit_cat_param_user
+- Refactor workcat search dropping views ('v_ui_workcat_polygon_all','v_ui_workcat_polygon_aux')  and using 'on the fly' workcat geometry built-up.
+- New function admin_schema_i18n to manage the update of labels and tooltips when i18n. Three options: always, only null values, never.
+- New variable to configure the possibility to fill customercode values using code values from feature
+- Refactor constraint anl_mincut_selector_valve using ON DELETE RESTRICT
+- Enhance peformance and bug fix for import inp files (EPANET and SWMM)
+- New trigger function to control proximity againts gullys
+- New trigger function to control values on config tables
+- New variable to control label on api forms overwriting label with column_id
+- New constraint unique on man_addields_parameter (param_name, cat_feature_id)
+- Huge enhancement for go2epa - ws
+- New function to manage error messages
+- Harmonize tabLabel and tooltip for the whole functions and tables of ddbb-api

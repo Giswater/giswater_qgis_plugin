@@ -1,0 +1,6 @@
+3.4.005
+*************
+- Enhance streetname & postnumber. Huge refactor of whole feature views
+- New field for man_valve to manage the ordinary status
+- Change column name from cat_matcat_id to matcat_id
+- Allow possibility to manage matcat_id separately from catalog(ud). Important to change the widget tooltip if you use this 

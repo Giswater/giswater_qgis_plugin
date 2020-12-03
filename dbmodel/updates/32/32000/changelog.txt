@@ -1,0 +1,16 @@
+3.2.000
+*******
+Full refactor of epa tables changing the go2epa strategy:
+-New fields on: audit_cat_param_user, audit_cat_function, config_param_system, 
+-Rename and recreate tables, refactorizing: temp_csv2pg
+-New tables: sys_csv2pg_config, inp_typevalue, inp_valve_importinp (ws), inp_pump_importinp (ws)
+-New constraints and triggers on various tables
+Rename and recreate tables, refactorizing: inp_evaporation, inp_temperature, inp_snowpack, inp_pattern, inp_pattern_value, inp_hydrograph, inp_lid_control, inp_inflows (ud)
+In case of update, data treatment to fit it into changes on 3.2 8w9
+- new strategy of typevalue table (status of pipe/valve/pump)
+- refactor of reactions / energy
+- refactor of options / times / report
+In case of update, data treatment to fit it into changes on 3.2 (ud)
+- new strategy of typevalue table (various)
+- refactorized tables
+- refactor of options / times

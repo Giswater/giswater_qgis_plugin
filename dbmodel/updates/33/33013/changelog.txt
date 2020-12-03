@@ -1,0 +1,3 @@
+3.3.013
+*************
+- Trigger update child view on changes in cat feature table

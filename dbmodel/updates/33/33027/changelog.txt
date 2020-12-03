@@ -1,0 +1,3 @@
+3.3.027
+*************
+- New functions for managing dxf files - gw_fct_check_importdxf, gw_fct_insert_importdxf

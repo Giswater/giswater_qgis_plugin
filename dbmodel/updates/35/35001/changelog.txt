@@ -1,0 +1,6 @@
+3.5.001
+*************
+- Enhance grafanalytics function using config_valve table
+- Bug fix from previous developments
+- UD: new function for slope consistency analysis
+- Create returnmanager function to unify all returns to client

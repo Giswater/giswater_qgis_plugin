@@ -106,7 +106,7 @@ class GwAdmin:
 
         # Get SQL folder and check if exists
         folder_name = os.path.dirname(os.path.abspath(__file__))
-        self.sql_dir = os.path.normpath(os.path.normpath(folder_name + os.sep + os.pardir)) + os.sep + 'sql'
+        self.sql_dir = os.path.normpath(os.path.normpath(folder_name + os.sep + os.pardir)) + os.sep + 'dbmodel'
         if not os.path.exists(self.sql_dir):
             tools_gw.show_message("SQL folder not found", parameter=self.sql_dir)
             return

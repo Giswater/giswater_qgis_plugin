@@ -1,0 +1,9 @@
+3.3.016
+*************
+- New function that checks API configuration - gw_fct_admin_check_data
+- Node orphan analysis, option: choose nodes that divide arcs
+- Use qml styles for temporal analysis layers
+- Delete unused function triggers trg_edit_man_*
+- New EPANET feature (virtualvalve) to use with virtual arcs, inside tanks
+- Enhance gw_fct_om_check_data & and gw_fct_pg2epa_check_data functions
+- Enhance performance of go2epa

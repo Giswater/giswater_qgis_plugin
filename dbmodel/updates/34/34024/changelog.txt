@@ -1,0 +1,12 @@
+3.4.024
+*************
+- Enhance plan psector, adding text3,text4,text5,text6,pem, pec, pec_vat, pca on v_edit_plan_psector
+- Drop deprecated column _parent_id ON inp_subcatchments
+- Recover edit_arc_insert_automatic_endpoint variable
+- Drop _node_id and _to_arc deprecated fields on ud flowregulators features
+- Enhance mincut log when mincut_class in (2,3)
+- Refactor of reset user profile function to use on toolbox
+- New function (3008) set arc reverse
+- Activate EPA functions 2431, 2858 on toolbox for ud
+- Solve import inp swmm files when barrels
+- New function gw_fct_mincut_connec to manage mincut_class 2,3

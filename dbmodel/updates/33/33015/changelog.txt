@@ -1,0 +1,3 @@
+3.3.015
+*************
+Remove deprecated columns on man_addfields_parameter
