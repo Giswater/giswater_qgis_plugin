@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: latin-1 -*-
 import json
 import os
+import re
 import subprocess
 import sys
 import urllib.parse as parse
@@ -1659,16 +1660,45 @@ class GwInfo(QObject):
 
     def check_datatype_validator(self, dialog, widget, btn):
         """
-        functions called in ->  widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn):
-            def integer_validator(self, value, widget, btn_accept)
-            def double_validator(tools_qt, value, widget, btn_accept)
+        functions called in ->  getattr(tools_gw, f"check_{widget.property('datatype')}")(value, widget, btn)
+            def check_integer(self, value, widget, btn_accept)
+            def check_double(self, value, widget, btn_accept)
         """
-
+        print(widget.objectName())
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
         try:
-            getattr(tools_qt, f"{widget.property('datatype')}_validator")(value, widget, btn)
-        except AttributeError:
+            getattr(self, f"check_{widget.property('datatype')}")(value, widget, btn)
+        except AttributeError as e:
             """ If the function called by getattr don't exist raise this exception """
+            print(f"{type(e).__name__} --> {e}")
+
+
+    def check_double(self, value, widget, btn_accept):
+        """ Check if the value is double or not.
+            This function is called in def check_datatype_validator(self, value, widget, btn)
+            getattr(self, f"check_{widget.property('datatype')}")(value, widget, btn)
+        """
+
+        if value is None or bool(re.search("^\d*$", value)) or bool(re.search("^\d+\.\d+$", value)):
+            widget.setStyleSheet(None)
+            btn_accept.setEnabled(True)
+        else:
+            widget.setStyleSheet("border: 1px solid red")
+            btn_accept.setEnabled(False)
+
+
+    def check_integer(self, value, widget, btn_accept):
+        """ Check if the value is an integer or not.
+            This function is called in def check_datatype_validator(self, value, widget, btn)
+            getattr(self, f"check_{widget.property('datatype')}")(value, widget, btn)
+        """
+
+        if value is None or bool(re.search("^\d*$", value)):
+            widget.setStyleSheet(None)
+            btn_accept.setEnabled(True)
+        else:
+            widget.setStyleSheet("border: 1px solid red")
+            btn_accept.setEnabled(False)
 
 
     def check_min_max_value(self, dialog, widget, btn_accept):
@@ -1676,7 +1706,7 @@ class GwInfo(QObject):
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
         try:
             if value and ((widget.property('minValue') and float(value) < float(widget.property('minValue'))) or
-                    (widget.property('maxValue') and float(value) > float(widget.property('maxValue')))):
+                          (widget.property('maxValue') and float(value) > float(widget.property('maxValue')))):
                 widget.setStyleSheet("border: 1px solid red")
                 btn_accept.setEnabled(False)
             else:
@@ -1710,7 +1740,7 @@ class GwInfo(QObject):
 
 
     def set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
-
+        print(widget.objectName())
         if self.check_tab_data(dialog):
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
             # does not jump, making it lose focus, which will cause the accept function to jump sent invalid parameters

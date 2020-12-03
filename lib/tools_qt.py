@@ -750,20 +750,6 @@ def set_completer_lineedit(qlineedit, list_items):
     completer.setModel(model)
 
 
-def check_integer(value, widget, btn_accept):
-    """ Check if the value is an integer or not.
-        This function is called in def set_datatype_validator(self, value, widget, btn)
-        widget = getattr(self, f"{widget.property('datatype')}_validator")( value, widget, btn)
-    """
-
-    if value is None or bool(re.search("^\d*$", value)):
-        widget.setStyleSheet(None)
-        btn_accept.setEnabled(True)
-    else:
-        widget.setStyleSheet("border: 1px solid red")
-        btn_accept.setEnabled(False)
-
-
 def put_combobox(qtable, rows, field, widget_pos, combo_values):
     """ Set one column of a QtableView as QComboBox with values from database.
     :param qtable: QTableView to fill
