@@ -79,3 +79,28 @@ UPDATE config_csv SET descript='The csv file must containts next columns on same
 Id (arc_id, node_id, connec_id), code, elementcat_id, observ, comment, num_elements, state type (id), workcat_id, verified (choose from edit_typevalue>value_verified).
 - Observations and comments fields are optional
 - ATTENTION! Import label has to be filled with the type of element (node, arc, connec)' WHERE fid=235;
+
+--2020/03/12
+UPDATE cat_feature SET active = TRUE WHERE active IS NULL;
+UPDATE cat_arc SET active = TRUE WHERE active IS NULL;
+UPDATE cat_node SET active = TRUE WHERE active IS NULL;
+UPDATE cat_connec SET active = TRUE WHERE active IS NULL;
+UPDATE cat_element SET active = TRUE WHERE active IS NULL;
+UPDATE cat_users SET active = TRUE WHERE active IS NULL;
+UPDATE exploitation SET active = TRUE WHERE active IS NULL;
+UPDATE sys_addfields SET active = TRUE WHERE active IS NULL;
+UPDATE sys_style SET active = TRUE WHERE active IS NULL;
+
+UPDATE sys_param_user SET layoutname='lyt_connec_vdef' WHERE layoutname='lyt_connec_gully_vdef' AND id like 'edit_connec%';
+UPDATE sys_param_user SET layoutname='lyt_gully_vdef' WHERE layoutname='lyt_connec_gully_vdef' AND id like 'edit_grate%';
+
+UPDATE sys_param_user SET dv_parent_id='edit_feature_category_vdefault' WHERE dv_parent_id='feature_category_vdefault';
+UPDATE sys_param_user SET dv_parent_id='edit_feature_fluid_vdefault' WHERE dv_parent_id='feature_fluid_vdefault';
+UPDATE sys_param_user SET dv_parent_id='edit_feature_function_vdefault' WHERE dv_parent_id='feature_function_vdefault';
+UPDATE sys_param_user SET dv_parent_id='edit_feature_location_vdefault' WHERE dv_parent_id='feature_location_vdefault';
+
+UPDATE sys_param_user SET feature_field_id='fluid_type' WHERE id='edit_feature_fluid_vdefault';
+UPDATE sys_param_user SET feature_field_id='function_type' WHERE id='edit_feature_function_vdefault';
+UPDATE sys_param_user SET feature_field_id='location_type' WHERE id='edit_feature_location_vdefault';
+UPDATE sys_param_user SET feature_field_id='category_type' WHERE id='edit_feature_category_vdefault';
+
