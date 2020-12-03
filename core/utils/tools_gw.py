@@ -1682,15 +1682,27 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
 def add_spinbox(field):
 
     widget = None
-    if 'value' in field:
-        if field['widgettype'] == 'spinbox':
-            widget = QSpinBox()
+
+    if field['widgettype'] == 'spinbox':
+        widget = QSpinBox()
+    elif field['widgettype'] == 'doubleSpinbox':
+        widget = QDoubleSpinBox()
+        if 'widgetcontrols' in field and field['widgetcontrols'] and 'spinboxDecimals' in field['widgetcontrols']:
+            widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
+            
+    if 'min' in field['widgetcontrols']['maxMinValues']:
+        widget.setMinimum(field['widgetcontrols']['maxMinValues']['min'])
+    if 'max' in field['widgetcontrols']['maxMinValues']:
+        widget.setMaximum(field['widgetcontrols']['maxMinValues']['max'])
+
     widget.setObjectName(field['widgetname'])
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
         if field['widgettype'] == 'spinbox' and field['value'] != "":
             widget.setValue(int(field['value']))
+        elif field['widgettype'] == 'doubleSpinbox' and field['value'] != "":
+            widget.setValue(float(field['value']))
     if 'iseditable' in field:
         widget.setReadOnly(not field['iseditable'])
         if not field['iseditable']:

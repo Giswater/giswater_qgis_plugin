@@ -1456,8 +1456,7 @@ class GwInfo(QObject):
         new_feature = kwargs['new_feature']
 
         widget = tools_gw.add_spinbox(field)
-        if 'widgetcontrols' in field and field['widgetcontrols'] and 'spinboxDecimals' in field['widgetcontrols']:
-            widget.setDecimals(field['widgetcontrols']['spinboxDecimals'])
+
         widget = self.set_auto_update_spinbox(field, dialog, widget, new_feature)
         return widget
 

@@ -176,7 +176,10 @@ def get_text(dialog, widget, add_quote=False, return_string_null=True):
         if type(widget) in (QLineEdit, QPushButton, QLabel, GwHyperLinkLabel):
             text = widget.text()
         elif type(widget) in (QDoubleSpinBox, QSpinBox):
-            text = widget.value()
+            # When the QDoubleSpinbox contains decimals, for example 2,0001 when collecting the value,
+            # the spinbox itself sends 2.0000999999, as in reality we only want, maximum 4 decimal places, we round up,
+            # thus fixing this small failure of the widget
+            text = round(widget.value(), 4)
         elif type(widget) in (QTextEdit, QPlainTextEdit):
             text = widget.toPlainText()
         elif type(widget) is QComboBox:
