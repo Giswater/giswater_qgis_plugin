@@ -115,11 +115,10 @@ def get_ui_class(ui_file_name, subfolder='shared'):
     """ Get UI Python class from @ui_file_name """
 
     # Folder that contains UI files
-    ui_folder_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'ui'
     if subfolder in ('basic', 'edit', 'epa', 'om', 'plan', 'utilities', 'toc', 'custom'):
-        ui_folder_path += os.sep + 'toolbars' + os.sep + subfolder
+        ui_folder_path = os.path.dirname(__file__) + os.sep + 'toolbars' + os.sep + subfolder
     else:
-        ui_folder_path += os.sep + subfolder
+        ui_folder_path = os.path.dirname(__file__) + os.sep + subfolder
 
     ui_file_path = os.path.abspath(os.path.join(ui_folder_path, ui_file_name))
     return uic.loadUiType(ui_file_path)[0]
