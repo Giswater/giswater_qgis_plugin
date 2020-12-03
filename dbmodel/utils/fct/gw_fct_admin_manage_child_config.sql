@@ -95,10 +95,10 @@ BEGIN
 	END LOOP;
 
 	--update configuration of man_type fields setting featurecat related to the view
-	EXECUTE 'UPDATE config_form_fields SET dv_querytext = concat(dv_querytext, ''OR featurecat_id = '''||quote_literal(v_cat_feature)||''''')
+	EXECUTE 'UPDATE config_form_fields SET dv_querytext = concat(dv_querytext, '' OR featurecat_id = '''||quote_literal(v_cat_feature)||''''')
 	WHERE formname = '''||v_view_name||'''
 	and (columnname =''location_type'' OR columnname =''fluid_type'' OR columnname =''function_type'' OR columnname =''category_type'')
-	AND dv_querytext NOT ILIKE ''%OR%'';';
+	AND dv_querytext NOT ILIKE ''% OR%'';';
 
 	--select columns from man_* table without repeating the identifier
 	v_man_fields = 'SELECT DISTINCT column_name::text, data_type::text, numeric_precision, numeric_scale
