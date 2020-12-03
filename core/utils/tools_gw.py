@@ -3261,8 +3261,8 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
     tools_qt.reset_model(dialog, table_object, "element")
     if global_vars.project_type == 'ud':
         tools_qt.reset_model(dialog, table_object, "gully")
-    tools_qt.tools_gw.close_dialog(dialog)
-    tools_qt.tools_gw.hide_parent_layers(excluded_layers=excluded_layers)
+    close_dialog(dialog)
+    hide_parent_layers(excluded_layers=excluded_layers)
     tools_qgis.disconnect_snapping()
     tools_qgis.disconnect_signal_selection_changed()
 
