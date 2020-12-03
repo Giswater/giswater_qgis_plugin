@@ -8,8 +8,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
--- 2020/11/25
-UPDATE config_fprocess SET target = 'Routing Time Step' WHERE target = 'FRouting Time Step';
-
 -- 2020/12/03
-UPDATE cat_grate SET active = TRUE WHERE active IS NULL;
+ALTER TABLE cat_grate ALTER COLUMN active SET DEFAULT TRUE;
