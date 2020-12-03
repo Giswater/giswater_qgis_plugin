@@ -1664,13 +1664,12 @@ class GwInfo(QObject):
             def check_integer(self, value, widget, btn_accept)
             def check_double(self, value, widget, btn_accept)
         """
-        print(widget.objectName())
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
         try:
             getattr(self, f"check_{widget.property('datatype')}")(value, widget, btn)
         except AttributeError as e:
             """ If the function called by getattr don't exist raise this exception """
-            print(f"{type(e).__name__} --> {e}")
+            pass
 
 
     def check_double(self, value, widget, btn_accept):
@@ -1740,7 +1739,6 @@ class GwInfo(QObject):
 
 
     def set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
-        print(widget.objectName())
         if self.check_tab_data(dialog):
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
             # does not jump, making it lose focus, which will cause the accept function to jump sent invalid parameters
