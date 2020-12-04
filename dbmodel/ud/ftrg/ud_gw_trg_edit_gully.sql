@@ -102,7 +102,7 @@ BEGIN
 		ELSIF (NEW.gully_type IS NULL and v_customfeature IS NULL) THEN
 			NEW.gully_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='gullycat_vdefault' AND "cur_user"="current_user"() LIMIT 1);		
 			IF (NEW.gully_type IS NULL) THEN
-				NEW.gully_type:=(SELECT id FROM cat_feature WHERE feature_type = 'GULLY' LIMIT 1);
+				NEW.gully_type:=(SELECT id FROM cat_feature WHERE feature_type = 'GULLY' AND active IS TRUE  LIMIT 1);
 			END IF;
 		END IF;
 
@@ -116,7 +116,7 @@ BEGIN
 		IF (NEW.gratecat_id IS NULL OR NEW.gratecat_id = '') THEN
 				NEW.gratecat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_gratecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.gratecat_id IS NULL) THEN
-				NEW.gratecat_id:=(SELECT id FROM cat_grate LIMIT 1);
+				NEW.gratecat_id:=(SELECT id FROM cat_grate WHERE active IS TRUE LIMIT 1);
 			END IF;
 		END IF;
 
@@ -130,7 +130,7 @@ BEGIN
 		IF (NEW.expl_id IS NULL) THEN
 			
 			-- control error without any mapzones defined on the table of mapzone
-			IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
+			IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1110", "function":"1206","debug_msg":null}}$$);';
 			END IF;

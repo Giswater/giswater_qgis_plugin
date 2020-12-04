@@ -170,7 +170,7 @@ BEGIN
 
 		-- Node type
 		IF (NEW.node_type IS NULL) THEN
-			IF ((SELECT COUNT(*) FROM cat_feature_node) = 0 ) THEN
+			IF ((SELECT COUNT(*) FROM cat_feature_node JOIN cat_feature USING (id) WHERE active IS TRUE)  = 0 ) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1004", "function":"1220","debug_msg":null}}$$);';
 			END IF;
@@ -196,7 +196,7 @@ BEGIN
 
 		-- Node catalog
 		IF (NEW.nodecat_id IS NULL) THEN
-			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
+			IF ((SELECT COUNT(*) FROM cat_node WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1006", "function":"1220","debug_msg":null}}$$);'; 
 			END IF;      
@@ -207,7 +207,7 @@ BEGIN
 		IF (NEW.expl_id IS NULL) THEN
 			
 			-- control error without any mapzones defined on the table of mapzone
-			IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
+			IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1110", "function":"1220","debug_msg":null}}$$);';
 			END IF;

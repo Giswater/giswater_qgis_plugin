@@ -24,12 +24,12 @@ BEGIN
     IF TG_OP = 'INSERT' THEN
         				
 		--Exploitation ID
-            IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
+            IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"1110", "function":"1312","debug_msg":null}}$$);';
 				RETURN NULL;				
             END IF;
-            expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+            expl_id_int := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (expl_id_int IS NULL) THEN
 				expl_id_int := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_exploitation_vdefault' AND "cur_user"="current_user"());
             END IF;

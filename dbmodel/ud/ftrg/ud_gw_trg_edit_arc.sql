@@ -68,7 +68,7 @@ BEGIN
 
 		 -- Arc type
 		IF (NEW.arc_type IS NULL) THEN
-			IF ((SELECT COUNT(*) FROM cat_feature_arc) = 0) THEN
+			IF ((SELECT COUNT(*) FROM cat_feature_arc JOIN cat_feature USING (id) WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1018", "function":"1202","debug_msg":null}}$$);';
 			END IF;
@@ -95,7 +95,7 @@ BEGIN
 		
 		-- Arc catalog ID
 		IF (NEW.arccat_id IS NULL) THEN
-			IF ((SELECT COUNT(*) FROM cat_arc) = 0) THEN
+			IF ((SELECT COUNT(*) FROM cat_arc WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1020", "function":"1202","debug_msg":null}}$$);';
 			END IF; 
@@ -104,7 +104,7 @@ BEGIN
 				NEW.arccat_id := (SELECT arccat_id from arc WHERE ST_DWithin(NEW.the_geom, arc.the_geom,0.001) LIMIT 1);
 			END IF;
 			IF (NEW.arccat_id IS NULL) THEN
-					NEW.arccat_id := (SELECT id FROM cat_arc LIMIT 1);
+					NEW.arccat_id := (SELECT id FROM cat_arc WHERE active IS TRUE LIMIT 1);
 			END IF;       
 		END IF;
 		
@@ -113,7 +113,7 @@ BEGIN
 		IF (NEW.expl_id IS NULL) THEN
 			
 			-- control error without any mapzones defined on the table of mapzone
-			IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
+			IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1110", "function":"1202","debug_msg":null}}$$);';
 			END IF;

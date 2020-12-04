@@ -94,7 +94,7 @@ BEGIN
 	
 		-- Node Catalog ID
 		IF (NEW.nodecat_id IS NULL) THEN
-			IF ((SELECT COUNT(*) FROM cat_node) = 0) THEN
+			IF ((SELECT COUNT(*) FROM cat_node WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         		"data":{"message":"1006", "function":"1320","debug_msg":null}}$$);';
 			END IF;
@@ -106,7 +106,7 @@ BEGIN
 
 				-- get first value (last chance)
 				IF (NEW.nodecat_id IS NULL) THEN
-					NEW.nodecat_id := (SELECT id FROM cat_node LIMIT 1);
+					NEW.nodecat_id := (SELECT id FROM cat_node WHERE active IS TRUE LIMIT 1);
 				END IF;
 			END IF;
 			
@@ -127,7 +127,7 @@ BEGIN
 		IF (NEW.expl_id IS NULL) THEN
 			
 			-- control error without any mapzones defined on the table of mapzone
-			IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
+			IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1110", "function":"1320","debug_msg":null}}$$);';
 			END IF;

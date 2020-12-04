@@ -33,12 +33,12 @@ BEGIN
 		*/
 		
 		--Exploitation ID
-        IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
+        IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
             --EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			--"data":{"message":"1012", "function":"1112","debug_msg":null}}$$);'; 
 			RETURN NULL;				
             END IF;
-            v_expl_id_int := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+            v_expl_id_int := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
             IF (v_expl_id_int IS NULL) THEN
                -- EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				--"data":{"message":"1014", "function":"1112","debug_msg":null}}$$);'; 

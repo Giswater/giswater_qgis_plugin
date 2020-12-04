@@ -73,19 +73,19 @@ BEGIN
 		ELSIF (NEW.connec_type IS NULL) THEN
 			  NEW.connec_type:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_connectype_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.connec_type IS NULL) THEN
-				NEW.connec_type:=(SELECT id FROM cat_feature_connec LIMIT 1);
+				NEW.connec_type:=(SELECT id FROM cat_feature_connec JOIN cat_feature USING (id) WHERE active IS TRUE LIMIT 1);
 			END IF;
 		END IF;
         
 		-- connec Catalog ID
 		IF (NEW.connecat_id IS NULL) THEN
-			IF ((SELECT COUNT(*) FROM cat_connec) = 0) THEN
+			IF ((SELECT COUNT(*) FROM cat_connec WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1022", "function":"1204","debug_msg":null}}$$);';
 			END IF;
 				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			IF (NEW.connecat_id IS NULL) THEN
-				NEW.connecat_id:=(SELECT id FROM cat_connec LIMIT 1);
+				NEW.connecat_id:=(SELECT id FROM cat_connec WHERE active IS TRUE LIMIT 1);
 			END IF;
 		END IF;
 		
@@ -93,7 +93,7 @@ BEGIN
 		IF (NEW.expl_id IS NULL) THEN
 			
 			-- control error without any mapzones defined on the table of mapzone
-			IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
+			IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1110", "function":"1204","debug_msg":null}}$$);';
 			END IF;
