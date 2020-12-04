@@ -14,6 +14,8 @@ $BODY$
 /*EXAMPLE
 SELECT gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":227}}}$$)-- when is called from go2epa_main
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data('{"parameters":{}}')-- when is called from toolbox or from checkproject
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"test_bgeo_b1", "useNetworkGeom":"false"}}$$)
+
 
 -- fid: main: 225
 		other: 107,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295
@@ -198,15 +200,15 @@ BEGIN
 	RAISE NOTICE '8 - Node2arcs with more than two arcs (fid: 166)';
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
 	SELECT 166, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with more than two arcs' FROM (
-		SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node
+		SELECT node_id, nodecat_id, node.the_geom FROM node
 		JOIN selector_sector USING (sector_id) 
 		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
-		AND v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user)
+		AND node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user)
 		UNION ALL
-		SELECT node_id, nodecat_id, v_edit_node.the_geom FROM v_edit_node
+		SELECT node_id, nodecat_id, node.the_geom FROM node
 		JOIN selector_sector USING (sector_id) 
-		JOIN v_edit_arc a1 ON node_id=a1.node_2 WHERE cur_user = current_user
-		AND v_edit_node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user))a
+		JOIN arc a1 ON node_id=a1.node_2 WHERE cur_user = current_user
+		AND node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user))a
 	GROUP by node_id, nodecat_id, the_geom
 	HAVING count(*) >2;
 	
@@ -264,10 +266,11 @@ BEGIN
 	
 	RAISE NOTICE '11 - Check to arc on valves, at least arc_id exists as closest arc (fid: 170)';
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-	select 170, node_id, nodecat_id, the_geom, 'To arc is null or does not exists as closest arc for valve' FROM v_edit_inp_valve WHERE node_id NOT IN(
-		select node_id FROM v_edit_inp_valve JOIN v_edit_inp_pipe on arc_id=to_arc AND node_id=node_1
+	select 170, node_id, nodecat_id, the_geom, 'To arc is null or does not exists as closest arc for valve' FROM v_edit_inp_valve JOIN(
+		select node_id FROM v_edit_inp_valve JOIN arc on arc_id=to_arc AND node_id=node_1
 		union
-		select node_id FROM v_edit_inp_valve JOIN v_edit_inp_pipe on arc_id=to_arc AND node_id=node_2);
+		select node_id FROM v_edit_inp_valve JOIN arc on arc_id=to_arc AND node_id=node_2)a USING (node_id)
+		WHERE a.node_id IS NULL;
 	
 	SELECT count(*) INTO v_count FROM anl_node WHERE fid = 170 AND cur_user=current_user;
 	IF v_count > 0 THEN
