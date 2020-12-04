@@ -162,3 +162,16 @@ CREATE OR REPLACE VIEW v_edit_node AS
     man_valve.broken AS broken_valve
    FROM v_node
    LEFT JOIN man_valve USING (node_id);
+   
+   
+   
+CREATE OR REPLACE VIEW v_om_mincut_selected_valve AS 
+ SELECT v_node.node_id,
+    v_node.nodetype_id,
+    man_valve.closed,
+    man_valve.broken,
+    v_node.the_geom
+   FROM v_node
+     JOIN man_valve ON v_node.node_id::text = man_valve.node_id::text
+     JOIN config_mincut_valve ON v_node.nodetype_id::text = config_mincut_valve.id::text
+  WHERE config_mincut_valve.active IS TRUE;

@@ -85,7 +85,7 @@ BEGIN
 	
 	-- Starting process
 	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('MINCUT ANALYSIS'));
-	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('--------------------------------------'));
+	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('------------------------'));
 	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Minimun cut have been checked looking for overlaps againts other mincuts'));
 
 	SELECT * INTO v_mincutrec FROM om_mincut WHERE id = v_mincutid;
@@ -304,7 +304,7 @@ BEGIN
 		-- mincut details
 		INSERT INTO audit_check_data (fid, error_message) VALUES (216, '');
 		INSERT INTO audit_check_data (fid, error_message) VALUES (216, 'Mincut stats');
-		INSERT INTO audit_check_data (fid, error_message) VALUES (216, '-----------------');
+		INSERT INTO audit_check_data (fid, error_message) VALUES (216, '--------------');
 		INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Number of arcs: ', (v_mincutrec.output->>'arcs')::json->>'number'));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Length of affected network: ', (v_mincutrec.output->>'arcs')::json->>'length', ' mts'));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Total water volume: ', (v_mincutrec.output->>'arcs')::json->>'volume', ' m3'));
@@ -435,7 +435,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, error_message) VALUES (216, 'WARNING: Mincut have been executed with conflicts. All additional affetations have been joined to present mincut');
 		INSERT INTO audit_check_data (fid, error_message) VALUES (216, '');
 		INSERT INTO audit_check_data (fid, error_message) VALUES (216, 'Mincut stats (with additional affectations)');
-		INSERT INTO audit_check_data (fid, error_message) VALUES (216, '----------------------------------------------------------');
+		INSERT INTO audit_check_data (fid, error_message) VALUES (216, '-----------------------------------------------');
 		INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Number of arcs: ', (v_mincutrec.output->>'arcs')::json->>'number'));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Length of affected network: ', (v_mincutrec.output->>'arcs')::json->>'length', ' mts'));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Total water volume: ', (v_mincutrec.output->>'arcs')::json->>'volume', ' m3'));
