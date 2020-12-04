@@ -252,6 +252,9 @@ BEGIN
 			
 		ELSIF v_view='vi_transects' THEN 
 			INSERT INTO inp_transects_id (id) SELECT split_part(NEW.text,' ',1) WHERE split_part(NEW.text,' ',1)  NOT IN (SELECT id from inp_transects_id);
+			IF split_part(NEW.text,' ',1)='X1' THEN
+				INSERT INTO inp_transects_id (id) SELECT split_part(NEW.text,' ',2) WHERE split_part(NEW.text,' ',2)  NOT IN (SELECT id from inp_transects_id);			
+			END IF;
 			INSERT INTO inp_transects (tsect_id,text) VALUES (split_part(NEW.text,' ',1),NEW.text);
 			
 		ELSIF v_view='vi_controls' THEN
@@ -338,9 +341,12 @@ BEGIN
 				IF NEW.timser_id NOT IN (SELECT id FROM inp_timser_id) THEN
 					INSERT INTO inp_timser_id(id,times_type) VALUES (NEW.timser_id,'RELATIVE');
 				END IF;
-				INSERT INTO inp_timeseries (timser_id, "time", value)  VALUES (NEW.timser_id, NEW.other1, NEW.other2::numeric);
-				
-			ELSE
+				IF (SELECT times_type FROM inp_timser_id WHERE id = NEW.timser_id) = 'ABSOLUTE' THEN
+					INSERT INTO inp_timeseries (timser_id, date, hour, value) VALUES (NEW.timser_id, '', NEW.other1, NEW.other2::numeric);				
+				ELSE
+					INSERT INTO inp_timeseries (timser_id, "time", value)  VALUES (NEW.timser_id, NEW.other1, NEW.other2::numeric);
+				END IF;				
+			ELSE	
 				IF NEW.timser_id NOT IN (SELECT id FROM inp_timser_id) THEN
 					INSERT INTO inp_timser_id(id,times_type) VALUES (NEW.timser_id,'ABSOLUTE');
 				END IF;
