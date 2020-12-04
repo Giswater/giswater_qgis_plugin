@@ -373,7 +373,8 @@ BEGIN
 					LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer 
 					JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer 
 					JOIN config_valve v ON v.id = c.id
-					WHERE closed=TRUE)';
+					WHERE closed=TRUE
+					AND v.active IS TRUE)';
 			EXECUTE v_querytext;
 			
 			v_querytext  = 'UPDATE temp_anlgraf SET flag=1 WHERE 
@@ -381,8 +382,11 @@ BEGIN
 					UNION
 					SELECT (a.node_id::integer) FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
 					LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer 
-					JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer JOIN config_valve v ON v.id = c.id
-					WHERE closed=TRUE)';
+					JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer 
+					JOIN config_valve v ON v.id = c.id
+					WHERE closed=TRUE
+					AND v.active IS TRUE)';
+
 			EXECUTE v_querytext;
 
 			v_text =  concat ('SELECT * FROM (',v_text,')a JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer');
@@ -607,16 +611,25 @@ BEGIN
 					IF v_floodfromnode IS NULL THEN
 					
 						-- disconnected arcs
-						SELECT count(*) INTO v_count FROM v_edit_arc WHERE arc_id NOT IN 
-						(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid);
-						INSERT INTO audit_check_data (fid, criticity, error_message)
-						VALUES (v_fid, 2, concat('WARNING: ', v_count ,' arcs have been disconnected'));
+						SELECT count(*) INTO v_count FROM v_edit_arc WHERE arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid);
+						
+						IF v_count > 0 THEN
+							INSERT INTO audit_check_data (fid, criticity, error_message)
+							VALUES (v_fid, 2, concat('WARNING: ', v_count ,' arc''s have been disconnected'));
+						ELSE
+							INSERT INTO audit_check_data (fid, criticity, error_message)
+							VALUES (v_fid, 1, concat('INFO: ', v_count ,' arc''s have been disconnected'));
+						END IF;
 
 						-- disconnected connecs
-						SELECT count(*) INTO v_count FROM v_edit_connec c WHERE arc_id NOT IN 
-						(SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid);
-						INSERT INTO audit_check_data (fid, criticity, error_message)
-						VALUES (v_fid, 2, concat('WARNING: ', v_count ,' connecs have been disconnected'));
+						SELECT count(*) INTO v_count FROM v_edit_connec c WHERE arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid);
+						IF v_count > 0 THEN
+							INSERT INTO audit_check_data (fid, criticity, error_message)
+							VALUES (v_fid, 2, concat('WARNING: ', v_count ,' connec''s have been disconnected'));
+						ELSE
+							INSERT INTO audit_check_data (fid, criticity, error_message)
+							VALUES (v_fid, 1, concat('INFO: ', v_count ,' connec''s have been disconnected'));
+						END IF;
 
 					END IF;
 				ELSE
