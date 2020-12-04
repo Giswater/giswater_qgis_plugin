@@ -51,6 +51,7 @@ v_endtime timestamp;
 v_flow json;
 v_pressure json;
 v_clorinathor json;
+v_error_context text;
 	
 BEGIN
 
@@ -306,15 +307,20 @@ BEGIN
 
 	v_timeseries = coalesce (v_timeseries, '{}');
 
-
 	-- manage return
-	v_file = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
-	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'timeseries', v_timeseries);
-	v_return = gw_fct_json_object_set_key(v_return, 'body', concat(v_body,',',v_file));
+	v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
+	v_body = gw_fct_json_object_set_key(v_body, 'timeseries', v_timeseries);
+	v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
 	v_return = replace(v_return::text, '"message":{"level":1, "text":"Data quality analysis done succesfully"}', 
 	'"message":{"level":1, "text":"Inp export done succesfully"}')::json;
 
 	RETURN v_return;
+
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
