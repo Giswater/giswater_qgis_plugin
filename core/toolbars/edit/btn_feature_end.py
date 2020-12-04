@@ -199,11 +199,10 @@ class GwEndFeatureButton(GwParentAction):
             tools_qt.set_calendar(self.dlg_work_end, self.dlg_work_end.builtdate, None, False)
 
 
-    def get_list_selected_id(self, qtable):
+    def set_list_selected_id(self, qtable):
 
         selected_list = qtable.model()
         self.selected_list = []
-        ids_list = ""
         if selected_list is None:
             self.manage_close(self.dlg_work_end, self.table_object, self.cur_active_layer, force_downgrade=False)
             return
@@ -212,10 +211,7 @@ class GwEndFeatureButton(GwParentAction):
             index = selected_list.index(x, 0)
             id_ = selected_list.data(index)
             self.selected_list.append(id_)
-            ids_list += f"'{id_}',"
-        ids_list = ids_list[:-1]
 
-        return ids_list
 
 
     def manage_workcat_end_accept(self):
@@ -223,20 +219,23 @@ class GwEndFeatureButton(GwParentAction):
 
         # Setting values
         self.workcat_id_end = tools_qt.get_text(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
-        self.enddate = tools_qt.get_calendar_date(self.dlg_work_end, self.dlg_work_end.enddate)
         self.statetype_id_end = tools_qt.get_combo_value(self.dlg_work_end, self.dlg_work_end.cmb_statetype_end, 0)
+        self.enddate = tools_qt.get_calendar_date(self.dlg_work_end, self.dlg_work_end.enddate)
+        self.workcatdate = tools_qt.get_calendar_date(self.dlg_work_end, self.dlg_work_end.builtdate)
+        self.description = tools_qt.get_text(self.dlg_work_end, self.dlg_work_end.descript, False, False)
 
         if self.workcat_id_end in ('null', None):
             message = "Please select a workcat id end"
             tools_gw.show_warning(message)
             return
 
-        ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
+        self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
+
         row = None
-        if ids_list:
+        if len(self.selected_list) > 0:
             sql = (f"SELECT * FROM v_ui_arc_x_relations "
-                   f"WHERE arc_id IN ( {ids_list}) AND arc_state = '1'")
-            row = tools_db.get_row(sql)
+                   f"WHERE arc_id IN {tuple(self.selected_list)} AND arc_state = '1'")
+            row = tools_db.get_row(sql, log_sql=True)
 
         if row:
             self.dlg_work = FeatureEndConnecUi()
@@ -265,20 +264,19 @@ class GwEndFeatureButton(GwParentAction):
 
             tools_gw.open_dialog(self.dlg_work, dlg_name='feature_end_connec')
 
-        # TODO: Function update_geom_type() don't use parameter ids_list
         else:
             # Update tablename of every geom_type
-            ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
-            self.update_geom_type("arc", ids_list)
-            ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_node)
-            self.update_geom_type("node", ids_list)
-            ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_connec)
-            self.update_geom_type("connec", ids_list)
-            ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_element)
-            self.update_geom_type("element", ids_list)
+            self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
+            self.update_geom_type("arc")
+            self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_node)
+            self.update_geom_type("node")
+            self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_connec)
+            self.update_geom_type("connec")
+            self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_element)
+            self.update_geom_type("element")
             if str(self.project_type) == 'ud':
-                ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_gully)
-                self.update_geom_type("gully", ids_list)
+                self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_gully)
+                self.update_geom_type("gully")
 
             self.manage_close(self.dlg_work_end, self.table_object, self.cur_active_layer, force_downgrade=True)
 
@@ -289,27 +287,16 @@ class GwEndFeatureButton(GwParentAction):
             self.iface.mapCanvas().refresh()
 
 
-    def update_geom_type(self, geom_type, ids_list):
+    def update_geom_type(self, geom_type):
         """ Get elements from @geom_type and update his corresponding table """
 
-        tablename = "v_edit_" + geom_type
-        if self.selected_list is None:
+        if len(self.selected_list) == 0:
             return
 
-        sql = ""
-        for id_ in self.selected_list:
-            sql += (f"UPDATE {tablename} "
-                    f"SET state = '0', state_type = '{self.statetype_id_end}', workcat_id_end = '{self.workcat_id_end}', "
-                    f"enddate = '{self.enddate}' "
-                    f"WHERE {geom_type}_id = '{id_}';\n")
-        if sql != "":
-            status = tools_db.execute_sql(sql, log_sql=False)
-            if status:
-                tools_gw.show_info("Features updated successfully!")
-
-        # TODO: Check this
-        feature = f'"featureType":"{geom_type}", "featureId":"{ids_list}"'
-        body = tools_gw.create_body(feature=feature)
+        feature = f'"featureType":"{geom_type}", "featureId":"{self.selected_list}"'
+        extras = f'"state_type":"{self.statetype_id_end}", "workcat_id_end":"{self.workcat_id_end}", '
+        extras += f'"enddate":"{self.enddate}", "workcat_date":""{self.workcatdate}, "description":"{self.description}"'
+        body = tools_gw.create_body(feature=feature, extras=extras)
         tools_gw.get_json('gw_fct_setendfeature', body)
 
 
@@ -400,8 +387,8 @@ class GwEndFeatureButton(GwParentAction):
             return
 
         # Update tablename of every geom_type
-        ids_list = self.get_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
-        self.update_geom_type("arc", ids_list)
+        self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
+        self.update_geom_type("arc")
 
         self.canvas.refresh()
         self.dlg_work.close()
