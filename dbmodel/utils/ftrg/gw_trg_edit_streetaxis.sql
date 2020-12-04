@@ -44,11 +44,11 @@ BEGIN
        	
 	       	--get muni and expl_id value if its null    
 	        IF NEW.expl_id IS NULL THEN
-	          NEW.expl_id := (SELECT expl_id FROM exploitation WHERE ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+	          NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 	        END IF;
 
 	        IF NEW.muni_id IS NULL THEN
-	          NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
+	          NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
 	        END IF;
 
 			INSERT INTO ext_streetaxis(id, code, type, name, text, the_geom, expl_id, muni_id)
@@ -58,7 +58,7 @@ BEGIN
 	    	--get muni value if its null
 	        IF NEW.muni_id IS NULL THEN
 	          EXECUTE 'SELECT muni_id FROM '||v_schema_utils||'.municipality 
-	          WHERE ST_DWithin($1, municipality.the_geom,0.001) LIMIT 1'
+	          WHERE active IS TRUE AND ST_DWithin($1, municipality.the_geom,0.001) LIMIT 1'
 	          USING NEW.the_geom
 	          INTO NEW.muni_id;
 	        END IF; 
@@ -67,7 +67,7 @@ BEGIN
 
 				 --get expl_id value if its null
 		    	IF NEW.expl_id IS NULL THEN
-		        	EXECUTE 'SELECT expl_id FROM exploitation WHERE ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
+		        	EXECUTE 'SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
 		        	USING NEW.the_geom
 		        	INTO v_ws_expl_id;
 		      	END IF;
@@ -75,7 +75,7 @@ BEGIN
 			    --get expl_id value of the oposite schema
 		        IF v_ud_schema IS NOT NULL THEN
 		            EXECUTE 'SELECT expl_id FROM '||v_ud_schema||'.exploitation 
-		            WHERE ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
+		            WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
 		            USING NEW.the_geom
 		            INTO v_ud_expl_id;
 		        END IF;
@@ -83,7 +83,7 @@ BEGIN
 	    	ELSIF v_project_type = 'UD' THEN
 			    --get expl_id value if its null
 		        IF NEW.expl_id IS NULL THEN
-		            EXECUTE 'SELECT expl_id FROM exploitation WHERE ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
+		            EXECUTE 'SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
 		            USING NEW.the_geom
 		            INTO v_ud_expl_id;
 		        END IF;
@@ -91,7 +91,7 @@ BEGIN
 		           --get expl_id value of the oposite schema
 		        IF v_ws_schema IS NOT NULL THEN
 		            EXECUTE 'SELECT expl_id FROM '||v_ws_schema||'.exploitation 
-		            WHERE ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
+		            WHERE active IS TRUE AND ST_DWithin($1, exploitation.the_geom,0.001) LIMIT 1'
 		            USING NEW.the_geom
 		            INTO v_ws_expl_id;
 		        END IF;	    		

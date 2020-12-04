@@ -36,7 +36,7 @@ BEGIN
 		IF (NEW.expl_id IS NULL) THEN
 			
 			-- control error without any mapzones defined on the table of mapzone
-			IF ((SELECT COUNT(*) FROM exploitation) = 0) THEN
+			IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1110", "function":"1302","debug_msg":null}}$$);';
 			END IF;
@@ -66,11 +66,11 @@ BEGIN
 	
 		-- Dma ID
 		IF (NEW.dma_id IS NULL) THEN
-			IF ((SELECT COUNT(*) FROM dma) = 0) THEN
+			IF ((SELECT COUNT(*) FROM dma WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"2012", "function":"1122","debug_msg":null}}$$);';
 			END IF;
-			NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+			NEW.dma_id := (SELECT dma_id FROM dma WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
 			IF (NEW.dma_id IS NULL) THEN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"());
 			END IF; 
