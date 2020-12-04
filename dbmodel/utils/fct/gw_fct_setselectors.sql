@@ -100,7 +100,8 @@ BEGIN
 		v_tablename = v_parameter_selector->>'selector';
 		v_columnname = v_parameter_selector->>'selector_id'; 
 
-		v_id = (SELECT expl_id FROM exploitation e, ext_municipality m WHERE st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) AND muni_id::text = v_id::text limit 1);
+		v_id = (SELECT expl_id FROM exploitation e, ext_municipality m 
+			WHERE e.active IS TRUE AND st_dwithin(st_centroid(e.the_geom), m.the_geom, 0) AND muni_id::text = v_id::text limit 1);
 		EXECUTE 'DELETE FROM selector_expl WHERE cur_user = current_user';
 		EXECUTE 'INSERT INTO selector_expl (expl_id, cur_user) VALUES('|| v_id ||', '''|| current_user ||''')';	
 	END IF;

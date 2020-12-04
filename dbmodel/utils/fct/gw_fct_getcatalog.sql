@@ -115,7 +115,8 @@ BEGIN
 			INTO v_expl_id;
 
 			IF v_expl_id IS NULL THEN
-				EXECUTE 'SELECT expl_id FROM exploitation WHERE ST_DWithin(ST_SetSrid(ST_MakePoint('||v_coordx||','||v_coordy||'),'||v_srid||'),the_geom,0.1);'
+				EXECUTE 'SELECT expl_id FROM exploitation WHERE active IS TRUE AND
+				ST_DWithin(ST_SetSrid(ST_MakePoint('||v_coordx||','||v_coordy||'),'||v_srid||'),the_geom,0.1);'
 				INTO v_expl_id;
 			END IF;
 

@@ -91,6 +91,10 @@ BEGIN
 		v_errortext=concat('INFO: Create view for cat_feature DXF_JUN.');
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (206, 1, v_errortext);
+	ELSIF 'DXF_JUN' IN (SELECT id FROM cat_feature WHERE active IS NULL OR active IS False) OR
+		'DXF_JUN_CAT' IN (SELECT id FROM cat_feature WHERE active IS NULL OR active IS False) THEN
+		UPDATE cat_feature SET active = True WHERE id = 'DXF_JUN';
+		UPDATE cat_node SET active = True WHERE id = 'DXF_JUN_CAT';
 	END IF;
 
 	--check if there are nodes coming from dxf that overlap nodes existing in the network

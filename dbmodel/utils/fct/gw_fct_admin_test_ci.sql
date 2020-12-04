@@ -78,7 +78,7 @@ BEGIN
 		INSERT INTO selector_expl (expl_id,cur_user) SELECT DISTINCT expl_id, current_user FROM exploitation ON CONFLICT (expl_id, cur_user) DO NOTHING;
 		
 
-		FOR rec_fct IN (SELECT function_name, sample_query FROM sys_function WHERE sample_query IS NOT NULL
+		FOR rec_fct IN (SELECT function_name, sample_query FROM sys_function WHERE sample_query IS NOT NULL AND active IS TRUE
 		ORDER BY id) LOOP
 
 			IF rec_fct.function_name = 'gw_fct_arc_divide' OR rec_fct.function_name = 'gw_fct_setarcdivide' THEN
