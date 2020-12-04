@@ -106,3 +106,8 @@ INSERT INTO config_form_fields(formname, formtype, columnname, layoutorder, data
 label, ismandatory, isparent, iseditable, isautoupdate, layoutname, hidden)
 VALUES ('new_presszone', 'form_catalog', 'head', 7, 'numeric','text', 'Head', FALSE, FALSE,TRUE, FALSE,'lyt_data_1',FALSE)
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+
+-- 2020/12/04
+UPDATE sys_param_user SET iseditable = true, vdefault = 'NO', 
+descript = concat(descript,'. Only this widget is editable on options dialogs because giswater result reader is not enabled to read other combinations') 
+WHERE id = 'inp_report_f_factor';
