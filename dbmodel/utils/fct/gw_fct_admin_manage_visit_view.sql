@@ -87,8 +87,9 @@ BEGIN
 			    LEFT JOIN '||v_schemaname||'.om_visit_event ON om_visit.id= om_visit_event.visit_id 
 			    LEFT JOIN '||v_schemaname||'.config_visit_class on config_visit_class.id=om_visit.class_id
 			    LEFT JOIN '||v_schemaname||'.config_visit_class_x_parameter on config_visit_class_x_parameter.parameter_id=om_visit_event.parameter_id
-			    where config_visit_class.ismultievent = TRUE ORDER  BY 1,2''::text, '' VALUES '||v_new_parameters.id_param||'''::text) 
-			      ct(visit_id integer, '||v_new_parameters.datatype||')) a ON a.visit_id = om_visit.id
+			    where config_visit_class.ismultievent = TRUE AND config_visit_parameter.active IS TRUE AND config_visit_parameter_action.active IS TRUE 
+			    ORDER  BY 1,2''::text, '' VALUES '||v_new_parameters.id_param||'''::text) 
+			    ct(visit_id integer, '||v_new_parameters.datatype||')) a ON a.visit_id = om_visit.id
 				WHERE config_visit_class.ismultievent = true AND config_visit_class.id='||v_class_id||';';
 
 	ELSE 

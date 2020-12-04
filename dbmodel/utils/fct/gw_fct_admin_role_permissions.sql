@@ -97,7 +97,7 @@ BEGIN
 		v_query_text:= 'REVOKE ALL ON DATABASE '||v_dbnname||' FROM "role_basic";';
 		EXECUTE v_query_text;		
 			
-		FOR rec_user IN (SELECT * FROM cat_users) LOOP
+		FOR rec_user IN (SELECT * FROM cat_users WHERE active IS TRUE) LOOP
 			v_query_text:= 'GRANT ALL ON DATABASE '||v_dbnname||' TO '||rec_user.id||'';
 			EXECUTE v_query_text;				
 		END LOOP;

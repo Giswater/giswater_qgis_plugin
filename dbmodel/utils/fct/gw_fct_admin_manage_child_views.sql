@@ -65,7 +65,7 @@ BEGIN
 
 	IF v_cat_feature IS NULL THEN
 
-		v_cat_feature = (SELECT id FROM cat_feature LIMIT 1);
+		v_cat_feature = (SELECT id FROM cat_feature WHERE active IS TRUE LIMIT 1);
 
 	END IF;
 
