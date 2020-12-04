@@ -10,3 +10,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2020/12/03
 ALTER TABLE cat_grate ALTER COLUMN active SET DEFAULT TRUE;
+ALTER TABLE cat_node_shape ALTER COLUMN active SET DEFAULT TRUE;

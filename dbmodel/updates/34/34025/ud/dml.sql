@@ -13,3 +13,4 @@ UPDATE config_fprocess SET target = 'Routing Time Step' WHERE target = 'FRouting
 
 -- 2020/12/03
 UPDATE cat_grate SET active = TRUE WHERE active IS NULL;
+UPDATE cat_node_shape SET active = TRUE WHERE active IS NULL;

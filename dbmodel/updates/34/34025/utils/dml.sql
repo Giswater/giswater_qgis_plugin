@@ -90,6 +90,7 @@ UPDATE cat_users SET active = TRUE WHERE active IS NULL;
 UPDATE exploitation SET active = TRUE WHERE active IS NULL;
 UPDATE sys_addfields SET active = TRUE WHERE active IS NULL;
 UPDATE sys_style SET active = TRUE WHERE active IS NULL;
+UPDATE cat_arc_shape SET active = TRUE WHERE active IS NULL;
 
 UPDATE sys_param_user SET layoutname='lyt_connec_vdef' WHERE layoutname='lyt_connec_gully_vdef' AND id like 'edit_connec%';
 UPDATE sys_param_user SET layoutname='lyt_gully_vdef' WHERE layoutname='lyt_connec_gully_vdef' AND id like 'edit_grate%';
