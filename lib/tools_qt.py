@@ -5,15 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import inspect
 import os
 import operator
-import re
 import sys
 import subprocess
+import traceback
 import webbrowser
 from functools import partial
-import traceback
-import inspect
+from encodings.aliases import aliases
 
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal, \
     QPersistentModelIndex, QCoreApplication, QTranslator, QSettings
@@ -1270,3 +1270,16 @@ def manage_exception(title=None, description=None, sql=None, schema_name=None):
     # Show exception message only if we are not in a task process
     if global_vars.show_db_exception:
         show_exceptions_msg(title, msg)
+
+
+def populate_cmb_unicodes(combo):
+    """ Populate combo with full list of codes """
+
+    unicode_list = []
+    sorted_list = None
+    for item in list(aliases.items()):
+        unicode_list.append(str(item[0]))
+        sorted_list = sorted(unicode_list, key=str.lower)
+
+    if sorted_list:
+        set_autocompleter(combo, sorted_list)

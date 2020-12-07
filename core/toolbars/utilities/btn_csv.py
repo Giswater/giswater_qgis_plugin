@@ -7,7 +7,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import csv
 import os
-from encodings.aliases import aliases
 from functools import partial
 
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
@@ -35,7 +34,7 @@ class GwCSVButton(GwParentAction):
         # Get roles from BD
         roles = self.get_rolenames()
         temp_tablename = 'temp_csv'
-        self.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
+        tools_qt.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
         self.populate_combos(self.dlg_csv.cmb_import_type, 'fid',
                              'alias, config_csv.descript, functionname, readheader, orderby', 'config_csv', roles)
 
@@ -63,19 +62,6 @@ class GwCSVButton(GwParentAction):
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_csv, dlg_name='csv')
-
-
-    def populate_cmb_unicodes(self, combo):
-        """ Populate combo with full list of codes """
-
-        unicode_list = []
-        sorted_list = None
-        for item in list(aliases.items()):
-            unicode_list.append(str(item[0]))
-            sorted_list = sorted(unicode_list, key=str.lower)
-
-        if sorted_list:
-            tools_qt.set_autocompleter(combo, sorted_list)
 
 
     def populate_combos(self, combo, field_id, fields, table_name, roles):
