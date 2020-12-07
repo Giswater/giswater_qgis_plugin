@@ -69,7 +69,7 @@ class GwGo2Epa:
             self.dlg_go2epa.chk_exec.setText('Execute EPA software (Runs only on Windows)')
 
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
-
+        self.check_result_id()
         if global_vars.dlg_docker:
             tools_qt.manage_translation('go2epa', self.dlg_go2epa)
             tools_gw.dock_dialog(self.dlg_go2epa)
