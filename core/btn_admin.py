@@ -2669,8 +2669,8 @@ class GwAdmin:
 
         with open(str(tpath)) as f:
             content = f.read()
-        sql = ("INSERT INTO " + schema_name + ".temp_csv(source, csv1, fid) VALUES('" +
-               str(form_name_ui) + "', '" + str(content) + "', 247);")
+        sql = ("INSERT INTO " + schema_name + ".temp_csv(source, csv1, fid) VALUES($$" +
+               str(form_name_ui) + "$$, $$" + str(content) + "$$, 247);")
         status = tools_db.execute_sql(sql)
 
         # Import xml to database
@@ -3300,7 +3300,7 @@ class GwAdmin:
 
     def insert_inp_into_db(self, folder_path=None):
 
-        _file = open(folder_path, "r+")
+        _file = open(folder_path, "r+", encoding='utf8')
         full_file = _file.readlines()
         sql = ""
         progress = 0
@@ -3335,12 +3335,12 @@ class GwAdmin:
 
             if len(sp_n) > 0:
                 sql += "INSERT INTO temp_csv (fid, source, "
-                values = "VALUES(239, '" + target + "', "
+                values = "VALUES(239, $$" + target + "$$, "
                 for x in range(0, len(sp_n)):
                     if "''" not in sp_n[x]:
                         sql += "csv" + str(x + 1) + ", "
-                        value = "'" + sp_n[x].strip().replace("\n", "") + "', "
-                        values += value.replace("''", "null")
+                        value = "$$" + sp_n[x].strip().replace("\n", "") + "$$, "
+                        values += value.replace("$$$$", "null")
                     else:
                         sql += "csv" + str(x + 1) + ", "
                         values = "VALUES(null, "
