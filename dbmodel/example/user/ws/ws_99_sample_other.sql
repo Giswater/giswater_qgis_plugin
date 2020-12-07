@@ -558,3 +558,15 @@ INSERT INTO ext_arc (fid, arc_id, val, tstamp) VALUES (363,'2078',1.1,'2020-01-0
 INSERT INTO ext_arc (fid, arc_id, val, tstamp) VALUES (363,'2078',0.9,'2020-01-01 03:10:00');
 INSERT INTO ext_arc (fid, arc_id, val, tstamp) VALUES (365,'2078',0.02,'2020-01-01 03:05:00');
 INSERT INTO ext_arc (fid, arc_id, val, tstamp) VALUES (365,'2078',0.03,'2020-01-01 03:10:00');
+
+-- 2020/12/07
+UPDATE sys_param_user SET vdefault ='{"reservoir":{"switch2Junction":["WTP", "WATERWELL", "SOURCE"]},
+"tank":{"distVirtualReservoir":0.01}, 
+"pressGroup":{"status":"ACTIVE", "forceStatus":"ACTIVE", "defaultCurve":"GP30"}, 
+"pumpStation":{"status":"CLOSED", "forceStatus":"CLOSED", "defaultCurve":"IM00"}, 
+"PRV":{"status":"ACTIVE", "forceStatus":"ACTIVE", "pressure":"30"}, 
+"PSV":{"status":"ACTIVE", "forceStatus":"ACTIVE", "pressure":"30"}
+}'
+WHERE id = 'inp_options_buildup_supply';
+
+UPDATE cat_feature SET parent_layer = 'v_edit_node' WHERE id = 'CLORINATHOR';
