@@ -132,3 +132,6 @@ UPDATE sys_function SET input_params = 'json', return_type = 'json' WHERE id=272
 
 UPDATE sys_table SET descript = 'id' WHERE descript IS NULL;
 UPDATE sys_table SET sys_role = 'role_basic' WHERE sys_role IS NULL;
+
+DELETE FROM sys_table WHERE id = 'ext_cat_scada';
+DELETE FROM sys_table WHERE id = 'ext_rtc_scada';
