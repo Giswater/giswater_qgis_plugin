@@ -33,6 +33,16 @@ BEGIN
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
+
+	-- elevation
+	IF (NEW.elevation != OLD.elevation) OR (NEW.elevation IS NULL AND OLD.elevation IS NOT NULL) OR (NEW.elevation IS NOT NULL AND OLD.elevation IS NULL) THEN
+		UPDATE node SET elevation=NEW.elevation WHERE node_id = OLD.node_id;
+	END IF;
+
+	-- depth
+	IF (NEW.depth != OLD.depth) OR (NEW.depth IS NULL AND OLD.depth IS NOT NULL) OR (NEW.depth IS NOT NULL AND OLD.depth IS NULL) THEN
+		UPDATE node SET depth=NEW.depth WHERE node_id = OLD.node_id;
+	END IF;
 	
 	-- State
 	IF (NEW.state::text != OLD.state::text) THEN
@@ -99,7 +109,7 @@ BEGIN
         END IF;
 
         UPDATE node 
-        SET elevation=NEW.elevation, "depth"=NEW."depth", sector_id=NEW.sector_id, annotation=NEW.annotation
+        SET sector_id=NEW.sector_id, annotation=NEW.annotation
         WHERE node_id=OLD.node_id;
 
 
