@@ -755,16 +755,13 @@ class GwVisitManager(QObject):
         except Exception as e:
             tools_log.log_info(f"manage_geom_type_selected exception: {e}")
         finally:
-            # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
-                partial(tools_gw.insert_feature, self.dlg_add_visit, widget_table, geom_type=self.geom_type, ids=self.ids,
-                        layers=self.layers, list_ids=self.list_ids, lazy_widget=self.lazy_widget,
-                        lazy_init_function=self.lazy_init_function))
-            # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
+                lambda: setattr(self, 'ids, layers, list_ids', tools_gw.insert_feature(self.dlg_add_visit, widget_table,
+                                False, False, self.geom_type, self.ids, self.layers, self.list_ids)))
             self.dlg_add_visit.btn_feature_delete.clicked.connect(
-                partial(tools_gw.delete_records, self.dlg_add_visit, widget_table, geom_type=self.geom_type, layers=self.layers,
-                        ids=self.ids, list_ids=self.list_ids, lazy_widget=self.lazy_widget,
-                        lazy_init_function=self.lazy_init_function))
+                lambda: setattr(self, 'ids, layers, list_ids', tools_gw.delete_records(self.dlg_add_visit, widget_table,
+                                False, False, self.geom_type, self.layers, self.ids, self.list_ids, self.lazy_widget,
+                                self.lazy_init_function)))
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
@@ -1694,15 +1691,15 @@ class GwVisitManager(QObject):
         except Exception as e:
             tools_log.log_info(f"visit_tab_feature_changed exception: {e}")
         finally:
-            # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
-                partial(tools_gw.insert_feature, self.dlg_add_visit, widget_table, self.geom_type, ids=self.ids,
-                        layers=self.layers, list_ids=self.list_ids))
-            # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
+                lambda: setattr(self, 'ids, layers, list_ids', tools_gw.insert_feature(self.dlg_add_visit, widget_table,
+                                False, False, self.geom_type, self.ids, self.layers, self.list_ids)))
+
             self.dlg_add_visit.btn_feature_delete.clicked.connect(
-                partial(tools_gw.delete_records, self.dlg_add_visit, widget_table, geom_type=self.geom_type, layers=self.layers,
-                        ids=self.ids, list_ids=self.list_ids, lazy_widget=self.lazy_widget,
-                        lazy_init_function=self.lazy_init_function))
+                lambda: setattr(self, 'ids, layers, list_ids',tools_gw.delete_records(self.dlg_add_visit, widget_table,
+                                False, False, self.geom_type, self.layers, self.ids, self.list_ids,self.lazy_widget,
+                                self.lazy_init_function)))
+
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 

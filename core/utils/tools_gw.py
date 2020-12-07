@@ -3295,7 +3295,7 @@ def delete_records(dialog, table_object, query=False, geom_type=None, layers=Non
     """ Delete selected elements of the table """
 
     tools_qgis.disconnect_signal_selection_changed()
-    geom_type = get_signal_change_tab(dialog, table_object)
+    geom_type = get_signal_change_tab(dialog)
     if type(table_object) is str:
         widget_name = f"tbl_{table_object}_x_{geom_type}"
         widget = tools_qt.get_widget(dialog, widget_name)
