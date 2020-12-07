@@ -115,8 +115,6 @@ AND tabname = 'tab_epa' and tooltip IS NULL;
 
 UPDATE config_typevalue SET camelstyle = idval WHERE camelstyle IS NULL;
 
-SELECT * FROM sys_function WHERE input_params is null and function_type ='function'
-
 UPDATE sys_function SET sys_role = 'role_edit' WHERE id IN (2994,2996);
 UPDATE sys_function SET descript = 'Function to repair automatic vnode' WHERE id IN (2994);
 UPDATE sys_function SET descript = 'Function to triger polygons on elements', function_type = 'trigger function' WHERE id IN (2996);
@@ -124,7 +122,7 @@ UPDATE sys_function SET descript = 'Function to triger polygons on elements', fu
 UPDATE sys_function SET input_params = 'integer', return_type = 'integer' WHERE id=2400;
 
 DELETE FROM  sys_function WHERE id IN (2546, 2454, 2532, 2232, 2502, 2308, 2310, 2506, 2852);
-UPDATE sys_function SET input_params = 'json', return_type = 'json' WHERE id in (2530,2536, 2226);
+UPDATE sys_function SET input_params = 'json', return_type = 'json' WHERE id in (2530, 2536, 2226);
 UPDATE sys_function SET input_params = 'text', return_type = 'integer' WHERE id=2224;
 UPDATE sys_function SET input_params = 'character varying,character varying,character varying,character varying,character varying,character varying', return_type = 'json' WHERE id=2866;
 UPDATE sys_function SET input_params = 'json', return_type = 'json' WHERE id=2646;

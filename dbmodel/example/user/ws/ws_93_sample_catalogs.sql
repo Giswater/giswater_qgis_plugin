@@ -264,4 +264,4 @@ UPDATE cat_feature SET shortcut_key='Alt+M' WHERE id = 'WJOIN';
 UPDATE cat_feature SET shortcut_key='P' WHERE id = 'WTP';
 UPDATE cat_feature SET shortcut_key='X' WHERE id = 'X';
 
-UPDATE cat_node WHERE dint = dnom AND dint IS NULL AND dnom IS NULL;
+UPDATE cat_node SET dint = dnom::integer WHERE dint IS NULL AND dnom IS NULL;

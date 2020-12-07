@@ -558,8 +558,8 @@ DELETE FROM config_info_layer_x_type where tableinfo_id = 'v_edit_om_visit';
 UPDATE config_param_system SET value = 'false' WHERE parameter = 'admin_utils_schema';
 
 UPDATE config_param_system SET value =
-'{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, ' - ', name", "orderBy":"expl_id", 
-"manageAll":true, "query_filter":"AND expl_id > 0", "typeaheadFilter":" AND lower(concat(expl_id, ' - ', name))"}'
+'{"table":"exploitation", "selector":"selector_expl", "table_id":"expl_id",  "selector_id":"expl_id",  "label":"expl_id, '' - '', name", "orderBy":"expl_id", 
+"manageAll":true, "query_filter":"AND expl_id > 0", "typeaheadFilter":" AND lower(concat(expl_id, '' - '', name))"}'
 WHERE parameter  = 'basic_search_exploitation';
 
 UPDATE config_info_layer SET addparam = '{"forceWhenActive":true}' WHERE layer_id IN ('v_edit_dimensions','v_edit_om_visit');
