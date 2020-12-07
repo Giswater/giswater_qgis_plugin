@@ -28,7 +28,6 @@ v_featurecat text;
 v_streetaxis text;
 v_streetaxis2 text;
 
-
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -440,17 +439,22 @@ BEGIN
 
 		-- epa type
 		IF (NEW.epa_type != OLD.epa_type) THEN    
+
+			-- delete from old inp table
 			IF (OLD.epa_type = 'PIPE') THEN
-				v_inp_table:= 'inp_pipe';            
-				v_sql:= 'DELETE FROM '||v_inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
-				EXECUTE v_sql;
+				v_inp_table:= 'inp_pipe';
+			ELSIF (OLD.epa_type = 'VIRTUALVALVE') THEN
+				v_inp_table:= 'inp_virtualvalve';
 			END IF;
+			v_sql:= 'DELETE FROM '||v_inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
+			EXECUTE v_sql;
 			v_inp_table := NULL;
 
+			-- insert into new inp table
 			IF (NEW.epa_type = 'PIPE') THEN
-				v_inp_table:= 'inp_pipe';   
-				v_sql:= 'INSERT INTO '||v_inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
-				EXECUTE v_sql;
+				INSERT INTO inp_pipe VALUES (NEW.arc_id);
+			ELSIF (NEW.epa_type = 'VIRTUALVALVE') THEN
+				INSERT INTO inp_virtualvalve (arc_id, status, valv_type) VALUES (NEW.arc_id, 'ACTIVE', 'FCV');
 			END IF;
 		END IF;
 	

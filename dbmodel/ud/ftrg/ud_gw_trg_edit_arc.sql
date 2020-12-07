@@ -540,7 +540,7 @@ BEGIN
 				v_inp_table:= 'inp_virtual';
 			END IF;
 			IF v_inp_table IS NOT NULL THEN
-				v_sql:= 'DELETE FROM '||v_inp_table||' WHERE arc_id = '||quote_literal(OLD.arc_id);
+				v_sql:= 'INSERT INTO '||v_inp_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
 				EXECUTE v_sql;
 			END IF;
 
