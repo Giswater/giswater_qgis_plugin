@@ -105,3 +105,4 @@ UPDATE sys_param_user SET feature_field_id='function_type' WHERE id='edit_featur
 UPDATE sys_param_user SET feature_field_id='location_type' WHERE id='edit_feature_location_vdefault';
 UPDATE sys_param_user SET feature_field_id='category_type' WHERE id='edit_feature_category_vdefault';
 
+DELETE FROM sys_function where function_name like '%odbc2pg%';
