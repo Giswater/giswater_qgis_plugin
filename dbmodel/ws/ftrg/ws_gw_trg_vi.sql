@@ -64,7 +64,7 @@ BEGIN
 	    
 	  ELSIF v_view='vi_pumps' THEN 
 	    INSERT INTO arc (arc_id, node_1, node_2, arccat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
-	    VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'EPAPUMP-CAT','PUMP',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
+	    VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'EPAPUMP-CAT','PUMP-IMPORTINP',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
 	    IF NEW.power ='POWER' THEN
 			NEW.power=NEW.head;
 	    ELSIF NEW.power ='HEAD' THEN
@@ -77,7 +77,7 @@ BEGIN
 	    
 	  ELSIF v_view='vi_valves' THEN
 	    INSERT INTO arc (arc_id, node_1, node_2, arccat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
-	    VALUES (NEW.arc_id, NEW.node_1, NEW.node_2,concat('EPA',NEW.valv_type,'-CAT')::text,'VALVE',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
+	    VALUES (NEW.arc_id, NEW.node_1, NEW.node_2,concat('EPA',NEW.valv_type,'-CAT')::text,'VALVE-IMPORTINP',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
 	    INSERT INTO inp_valve_importinp (arc_id, diameter, valv_type, minorloss) VALUES (NEW.arc_id,NEW.diameter, NEW.valv_type, NEW.minorloss);
 	      IF NEW.valv_type='PRV' THEN
 		UPDATE inp_valve_importinp SET pressure=NEW.setting::numeric WHERE arc_id=NEW.arc_id;

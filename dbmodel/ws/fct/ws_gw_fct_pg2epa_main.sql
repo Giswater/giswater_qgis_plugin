@@ -112,34 +112,25 @@ BEGIN
 	END IF;
 
 	-- check consistency for user options 
-	SELECT gw_fct_pg2epa_check_options(v_input)
-		INTO v_return;
+	SELECT gw_fct_pg2epa_check_options(v_input) INTO v_return;
 	IF v_return->>'status' = 'Failed' THEN
 		--v_return = replace(v_return::text, 'Failed', 'Accepted');
 		RETURN v_return;
 	END IF;
-
-	IF v_usenetworkgeom IS TRUE THEN
-
-		-- delete rpt_* tables keeping rpt_inp_tables
-		DELETE FROM rpt_arc WHERE result_id = v_result;
-		DELETE FROM rpt_node WHERE result_id = v_result;
-		DELETE FROM rpt_energy_usage WHERE result_id = v_result;
-		DELETE FROM rpt_hydraulic_status WHERE result_id = v_result;
-		DELETE FROM rpt_node WHERE result_id = v_result;	
-		DELETE FROM rpt_inp_pattern_value WHERE result_id = v_result;
-	ELSE 
 	
-		RAISE NOTICE '1 - check system data';
+	RAISE NOTICE '1 - Upsert on rpt_cat_table and set selectors';
+	DELETE FROM rpt_cat_result WHERE result_id=v_result;
+	INSERT INTO rpt_cat_result (result_id, inpoptions) VALUES (v_result, v_inpoptions);
+	DELETE FROM selector_inp_result WHERE cur_user=current_user;
+	INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
+
+	-- when existing network is used (check on go2epa dialog)
+	IF v_usenetworkgeom IS NOT TRUE THEN
+	
+		RAISE NOTICE '2 - check system data';
 		IF v_checkdata THEN
 			PERFORM gw_fct_pg2epa_check_data(v_input);
 		END IF;
-			
-		RAISE NOTICE '2 - Upsert on rpt_cat_table and set selectors';
-		DELETE FROM rpt_cat_result WHERE result_id=v_result;
-		INSERT INTO rpt_cat_result (result_id, inpoptions) VALUES (v_result, v_inpoptions);
-		DELETE FROM selector_inp_result WHERE cur_user=current_user;
-		INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
 
 		RAISE NOTICE '3 - Fill inprpt tables';
 		PERFORM gw_fct_pg2epa_fill_data(v_result);
@@ -201,19 +192,24 @@ BEGIN
 	RAISE NOTICE '14 - Setting dscenarios';
 	PERFORM gw_fct_pg2epa_dscenario(v_result);
 	
-	RAISE NOTICE '15 - Setting valve status';
-	PERFORM gw_fct_pg2epa_valve_status(v_result);
+	-- when existing network is not used (check on go2epa dialog)
+	IF v_usenetworkgeom IS NOT TRUE THEN
+
+		RAISE NOTICE '15 - Setting valve status';
+		PERFORM gw_fct_pg2epa_valve_status(v_result);
 		
-	RAISE NOTICE '16 - Advanced settings';
-	IF v_advancedsettings THEN
-		PERFORM gw_fct_pg2epa_advancedsettings(v_result);
-	END IF;
+		RAISE NOTICE '16 - Advanced settings';
+		IF v_advancedsettings THEN
+			PERFORM gw_fct_pg2epa_advancedsettings(v_result);
+		END IF;
 	
-	RAISE NOTICE '17 - Check result network';
-	IF v_checknetwork THEN
-		PERFORM gw_fct_pg2epa_check_network(v_input);	
+		RAISE NOTICE '17 - Check result network';
+		IF v_checknetwork THEN
+			PERFORM gw_fct_pg2epa_check_network(v_input);	
+		END IF;
 	END IF;
-		
+
+	-- when delete network is enabled (variable of inp_options_debug)
 	IF v_delnetwork THEN
 		RAISE NOTICE '18 - Delete disconnected arcs with associated nodes';
 		INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) SELECT v_fid, arc_id, arc_type, '18 - Delete disconnected arcs with associated nodes'
@@ -235,6 +231,7 @@ BEGIN
 		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 103 AND cur_user=current_user);
 	END IF;
 
+	-- when is forced to remove demand on disconnected nodes (variable of inp_options_debug)
 	IF v_removedemand THEN
 		RAISE NOTICE '21 Set demand = 0 for dry nodes';
 		UPDATE temp_node n SET demand = 0 FROM anl_node a WHERE fid = 132 AND cur_user = current_user AND a.node_id = n.node_id;
@@ -283,6 +280,7 @@ BEGIN
 	RAISE NOTICE '25 - Getting inp file';	
 	SELECT gw_fct_pg2epa_export_inp(v_result, null) INTO v_file;
 
+	-- variable of inp_timseries
 	IF v_timserstat THEN
 
 		RAISE NOTICE '26 - Getting timeseries';	

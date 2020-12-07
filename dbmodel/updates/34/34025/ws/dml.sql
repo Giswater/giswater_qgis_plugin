@@ -112,5 +112,16 @@ UPDATE sys_param_user SET iseditable = true, vdefault = 'NO',
 descript = concat(descript,'. Only this widget is editable on options dialogs because giswater result reader is not enabled to read other combinations') 
 WHERE id = 'inp_report_f_factor';
 
+<<<<<<< HEAD
 DELETE FROM inp_arc_type WHERE id IN(PUMP','VALVE');
 INSERT INTO inp_arc_type ('VIRTUALVALVE');
+=======
+DELETE FROM inp_arc_type WHERE id IN('PUMP','VALVE');
+INSERT INTO inp_arc_type values ('VIRTUALVALVE');
+INSERT INTO inp_arc_type VALUES ('VALVE-IMPORTINP');
+INSERT INTO inp_arc_type VALUES ('PUMP-IMPORTINP');
+UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM inp_arc_type WHERE id NOT LIKE ''%IMPORT%''' 
+WHERE columnname = 'epa_type' AND formname like '%_arc%';
+
+
+>>>>>>> 809ad89d4... Enhance import inp for ws managing new entities (VALVE-IMPORTINP & PUMP-IMPORTINP)

@@ -60,6 +60,7 @@ v_version json;
 v_path text;
 v_error_context text;
 v_record record;
+v_epatype text;
 
 BEGIN
 
@@ -264,13 +265,13 @@ BEGIN
 	INSERT INTO cat_feature_arc VALUES ('EPAPIPE', 'PIPE', 'PIPE', 'man_pipe', 'inp_pipe') ON CONFLICT (id) DO NOTHING;
 	--nodarc
 	INSERT INTO cat_feature_arc VALUES ('EPACHV', 'VARC', 'PIPE', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_arc VALUES ('EPAFCV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_arc VALUES ('EPAGPV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_arc VALUES ('EPAPBV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_arc VALUES ('EPAPSV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_arc VALUES ('EPAPRV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_arc VALUES ('EPATCV', 'VARC', 'VALVE', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_arc VALUES ('EPAPUMP', 'VARC', 'PIPE', 'man_varc', 'inp_pump_importinp') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPAFCV', 'VARC', 'VALVE-IMPORTINP', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPAGPV', 'VARC', 'VALVE-IMPORTINP', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPAPBV', 'VARC', 'VALVE-IMPORTINP', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPAPSV', 'VARC', 'VALVE-IMPORTINP', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPAPRV', 'VARC', 'VALVE-IMPORTINP', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPATCV', 'VARC', 'VALVE-IMPORTINP', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPAPUMP', 'VARC', 'PUMP-IMPORTINP', 'man_varc', 'inp_pump_importinp') ON CONFLICT (id) DO NOTHING;
 	--cat_feature_node
 	--node
 	INSERT INTO cat_feature_node VALUES ('EPAJUN', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', 2, FALSE) ON CONFLICT (id) DO NOTHING;
@@ -334,14 +335,14 @@ BEGIN
 	-- improve velocity for junctions using directy tables in spite of vi_junctions view
 	INSERT INTO node (node_id, elevation, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
 	SELECT csv1, csv2::numeric(12,3), 'EPAJUN-CAT', 'JUNCTION', 1, 1, 1, 1, 2 
-	FROM temp_csv where source='[JUNCTIONS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
+	FROM temp_csv where source='[JUNCTIONS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user order by 1;
 	INSERT INTO inp_junction SELECT csv1, csv3::numeric(12,6), csv4::varchar(16) FROM temp_csv where source='[JUNCTIONS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 	INSERT INTO man_junction SELECT csv1 FROM temp_csv where source='[JUNCTIONS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
 	-- improve velocity for pipes using directy tables in spite of vi_pipes view
 	INSERT INTO arc (arc_id, node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
 	SELECT csv1, csv2, csv3, concat((csv6::numeric(12,3))::text,'-',csv5), 'PIPE', 1, 1, 1, 1, 2 
-	FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
+	FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user order by 1;
 	INSERT INTO inp_pipe SELECT csv1, csv7::numeric(12,6), csv8 FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 	INSERT INTO man_pipe SELECT csv1 FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
@@ -389,24 +390,30 @@ BEGIN
 	UPDATE inp_pump_importinp SET to_arc = b.to_arc FROM
 	(select replace (arc.arc_id,'_n2a','') as node_id, a.arc_id as to_arc from arc 
 		JOIN (SELECT arc_id, node_1 FROM arc UNION all SELECT arc_id, node_2 FROM arc)a ON a.node_1 = node_2	
-		WHERE arc.epa_type IN ('VALVE', 'PUMP') and arc.arc_id != a.arc_id order by 1) b
+		WHERE arc.epa_type IN ('PUMP-IMPORTINP') and arc.arc_id != a.arc_id order by 1) b
 	WHERE b.node_id = inp_pump_importinp.arc_id;
 
 	-- to_arc on valves
 	UPDATE inp_valve_importinp SET to_arc = b.to_arc FROM
 	(select replace (arc.arc_id,'_n2a','') as node_id, a.arc_id as to_arc from arc 
 		JOIN (SELECT arc_id, node_1 FROM arc UNION all SELECT arc_id, node_2 FROM arc)a ON a.node_1 = node_2
-		WHERE arc.epa_type IN ('VALVE', 'PUMP') and arc.arc_id != a.arc_id order by 1) b
+		WHERE arc.epa_type IN ('VALVE-IMPORTINP') and arc.arc_id != a.arc_id order by 1) b
 	WHERE b.node_id = inp_valve_importinp.arc_id;
 	
 			
 	IF v_arc2node_reverse THEN -- manage pumps & valves as a reverse nod2arc. It means transforming lines into points reversing sintaxis applied on Giswater exportation
 	
-		FOR v_data IN SELECT * FROM arc WHERE epa_type IN ('VALVE','PUMP')
-		 
+		FOR v_data IN SELECT * FROM arc WHERE epa_type IN ('VALVE-IMPORTINP','PUMP-IMPORTINP')
 		LOOP
+			-- transforming epa_type
+			IF v_data.epa_type = 'VALVE-IMPORTINP' THEN 
+				v_epatype = 'VALVE';
+			ELSIF v_data.epa_type = 'PUMP-IMPORTINP' THEN 
+				v_epatype = 'PUMP';
+			END IF;
+			
 			-- getting man_table to work with
-			SELECT man_table, epa_table INTO v_mantablename, v_epatablename FROM cat_feature JOIN cat_feature_node USING(id) WHERE epa_default=v_data.epa_type;
+			SELECT man_table, epa_table INTO v_mantablename, v_epatablename FROM cat_feature JOIN cat_feature_node USING(id) WHERE epa_default = v_epatype;
 
 			-- defining new node parameters
 			v_node_id = replace(v_data.arc_id, '_n2a', '');
@@ -431,8 +438,10 @@ BEGIN
 			v_thegeom=ST_LineInterpolatePoint(v_thegeom, 0.5);
 
 			-- Introducing new node transforming line into point
-			INSERT INTO node (node_id, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type,the_geom) VALUES (v_node_id, v_nodecat, v_data.epa_type,1,1,1,1,
+			INSERT INTO node (node_id, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type,the_geom) VALUES (v_node_id, v_nodecat, v_epatype,1,1,1,1,
 			(SELECT id FROM value_state_type WHERE state=1 LIMIT 1), v_thegeom) ;
+
+			RAISE NOTICE '% %', v_mantablename, v_node_id;
 			EXECUTE 'INSERT INTO '||v_mantablename||' VALUES ('||quote_literal(v_node_id)||')';
 
 			IF v_epatablename = 'inp_pump' THEN
@@ -441,7 +450,7 @@ BEGIN
 				DELETE FROM inp_pump_importinp WHERE arc_id=v_data.arc_id;
 
 			ELSIF v_epatablename = 'inp_valve' THEN
-				INSERT INTO inp_valve (node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, to_arc)
+				INSERT INTO inp_valve (node_id, valv_type, pressure, custom_dint, flow, coef_loss, curve_id, minorloss, status, to_arc)
 				SELECT v_node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, to_arc FROM inp_valve_importinp WHERE arc_id=v_data.arc_id;
 			END IF;
 				
@@ -466,7 +475,7 @@ BEGIN
 		
 		-- transform pump additional from node to inp_pump_additional table		
 		FOR v_data IN SELECT node_1 as nodarc_id, count 
-		from (select node_1, count(node_1) FROM ( SELECT node_1 FROM arc where state=0 AND epa_type='PUMP')a group by node_1 order by 2 desc)b where count>1
+		from (select node_1, count(node_1) FROM ( SELECT node_1 FROM arc where state=0 AND epa_type='PUMP-IMPORTINP')a group by node_1 order by 2 desc)b where count>1
 		LOOP
 			-- migrate additional from inp_pump to inp_pump_additional
 			LOOP
