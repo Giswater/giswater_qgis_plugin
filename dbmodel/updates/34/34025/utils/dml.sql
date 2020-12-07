@@ -105,9 +105,6 @@ UPDATE sys_param_user SET feature_field_id='function_type' WHERE id='edit_featur
 UPDATE sys_param_user SET feature_field_id='location_type' WHERE id='edit_feature_location_vdefault';
 UPDATE sys_param_user SET feature_field_id='category_type' WHERE id='edit_feature_category_vdefault';
 
-<<<<<<< HEAD
-DELETE FROM sys_function where function_name like '%odbc2pg%';
-=======
 DELETE FROM sys_function where function_name like '%odbc2pg%';
 
 UPDATE config_form_tabs SET tooltip = 'Admin values' WHERE formname = 'config' AND tabname = 'tab_admin' and tooltip IS NULL;
@@ -137,9 +134,3 @@ UPDATE sys_function SET input_params = 'json', return_type = 'json' WHERE id=272
 
 UPDATE sys_table SET descript = 'id' WHERE descript IS NULL;
 UPDATE sys_table SET sys_role = 'role_basic' WHERE sys_role IS NULL;
-
-
-
-
-
->>>>>>> bc496e4ab... Complete sys table values
