@@ -81,30 +81,40 @@ BEGIN
 		RETURN v_return;
 	END IF;
 
-	RAISE NOTICE '1 - check system data';
-	IF v_checkdata THEN
-		PERFORM gw_fct_pg2epa_check_data(v_input);
+
+	-- check consistency for user options 
+	SELECT gw_fct_pg2epa_check_options(v_input) INTO v_return;
+	IF v_return->>'status' = 'Failed' THEN
+		RETURN v_return;
 	END IF;
 
-	PERFORM gw_fct_pg2epa_check_options(v_input);
-
-	RAISE NOTICE '2 - Upsert on rpt_cat_table and set selectors';
+	RAISE NOTICE '1 - Upsert on rpt_cat_table and set selectors';
 	DELETE FROM rpt_cat_result WHERE result_id=v_result;
 	INSERT INTO rpt_cat_result (result_id, inpoptions) VALUES (v_result, v_inpoptions);
 	DELETE FROM selector_inp_result WHERE cur_user=current_user;
 	INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
-	
-	RAISE NOTICE '3 - Fill temp tables';
-	PERFORM gw_fct_pg2epa_fill_data(v_result);
-	
-	RAISE NOTICE '4 - manage varcs';
-	PERFORM gw_fct_pg2epa_manage_varc(v_result);
-	
-	RAISE NOTICE '5 - Call nod2arc function';
-	PERFORM gw_fct_pg2epa_nod2arc_geom(v_result);
-	
-	RAISE NOTICE '6 - Calling for gw_fct_pg2epa_flowreg_additional function';
-	PERFORM gw_fct_pg2epa_nod2arc_data(v_result);
+
+	-- when existing network is used (check on go2epa dialog)
+	IF v_usenetworkgeom IS NOT TRUE THEN
+
+		RAISE NOTICE '2 - check system data';
+		IF v_checkdata THEN
+			PERFORM gw_fct_pg2epa_check_data(v_input);
+		END IF;
+		
+		RAISE NOTICE '3 - Fill temp tables';
+		PERFORM gw_fct_pg2epa_fill_data(v_result);
+		
+		RAISE NOTICE '4 - manage varcs';
+		PERFORM gw_fct_pg2epa_manage_varc(v_result);
+		
+		RAISE NOTICE '5 - Call nod2arc function';
+		PERFORM gw_fct_pg2epa_nod2arc_geom(v_result);
+		
+		RAISE NOTICE '6 - Calling for gw_fct_pg2epa_flowreg_additional function';
+		PERFORM gw_fct_pg2epa_nod2arc_data(v_result);
+
+	END IF;
 	
 	RAISE NOTICE '7 - Try to dump subcatchments';
 	IF v_dumpsubcatch THEN
@@ -116,18 +126,22 @@ BEGIN
 		PERFORM gw_fct_pg2epa_vdefault(v_input);
 	END IF;
 
-	RAISE NOTICE '19 - Check result network';
-	IF v_checknetwork THEN
-		PERFORM gw_fct_pg2epa_check_network(v_input);
-	END IF;
-	
-	RAISE NOTICE '10 - Advanced settings';
-	IF v_advancedsettings THEN
-		PERFORM gw_fct_pg2epa_advancedsettings(v_result);
+	IF v_usenetworkgeom IS NOT TRUE THEN
+
+		RAISE NOTICE '19 - Check result network';
+		IF v_checknetwork THEN
+			PERFORM gw_fct_pg2epa_check_network(v_input);
+		END IF;
+			
+		RAISE NOTICE '10 - Advanced settings';
+		IF v_advancedsettings THEN
+			PERFORM gw_fct_pg2epa_advancedsettings(v_result);
+		END IF;
 	END IF;
 
 	RAISE NOTICE '11 - check result previous exportation';
 	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
+
 	
 	RAISE NOTICE '12 - Move from temp tables';
 	UPDATE temp_arc SET result_id  = v_result;
