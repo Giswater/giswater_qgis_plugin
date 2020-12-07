@@ -74,6 +74,7 @@ class Go2Epa(ApiParent):
 
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
 
+        self.check_result_id()
         if self.controller.dlg_docker:
             self.controller.manage_translation('go2epa', self.dlg_go2epa)
             self.controller.dock_dialog(self.dlg_go2epa)
