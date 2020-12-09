@@ -266,17 +266,18 @@ class GwEndFeatureButton(GwParentAction):
 
         else:
             # Update tablename of every geom_type
+            self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_element)
+            self.update_geom_type("element")
+            self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_connec)
+            self.update_geom_type("connec")
+            if str(self.project_type) == 'ud':
+                self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_gully)
+                self.update_geom_type("gully")
             self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
             self.update_geom_type("arc")
             self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_node)
             self.update_geom_type("node")
-            self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_connec)
-            self.update_geom_type("connec")
-            self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_element)
-            self.update_geom_type("element")
-            if str(self.project_type) == 'ud':
-                self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_gully)
-                self.update_geom_type("gully")
+
 
             self.manage_close(self.dlg_work_end, self.table_object, self.cur_active_layer, force_downgrade=True)
 
@@ -293,11 +294,16 @@ class GwEndFeatureButton(GwParentAction):
         if len(self.selected_list) == 0:
             return
 
-        feature = f'"featureType":"{geom_type}", "featureId":"{self.selected_list}"'
+        id_list = ""
+        for id_ in self.selected_list:
+            id_list += f'"{id_}", '
+        id_list = "[" + id_list[:-2] + "]"
+
+        feature = f'"featureType":"{geom_type}", "featureId":{id_list}'
         extras = f'"state_type":"{self.statetype_id_end}", "workcat_id_end":"{self.workcat_id_end}", '
-        extras += f'"enddate":"{self.enddate}", "workcat_date":""{self.workcatdate}, "description":"{self.description}"'
+        extras += f'"enddate":"{self.enddate}", "workcat_date":"{self.workcatdate}", "description":"{self.description}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
-        tools_gw.get_json('gw_fct_setendfeature', body)
+        tools_gw.get_json('gw_fct_setendfeature', body, log_sql=True)
 
 
     def fill_table(self, widget, table_name, filter_):
