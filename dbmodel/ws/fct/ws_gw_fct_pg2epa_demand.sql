@@ -373,6 +373,7 @@ BEGIN
 	END IF;
 
 	-- restore hydrometer selector
+	DELETE FROM selector_hydrometer WHERE cur_user = current_user;
 	INSERT INTO selector_hydrometer (state_id, cur_user)
 	select unnest(text_column::integer[]), current_user from temp_table where fid=357 and cur_user=current_user
 	ON CONFLICT (state_id, cur_user) DO NOTHING;
