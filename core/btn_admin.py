@@ -192,6 +192,9 @@ class GwAdmin:
         # Set Listeners
         self.set_signals()
 
+        # Set shortcut keys
+        self.dlg_readsql.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql))
+
         # Set default project type
         tools_qt.set_widget_text(self.dlg_readsql, self.cmb_project_type, 'ws')
 
@@ -459,6 +462,9 @@ class GwAdmin:
         self.dlg_create_gis_project.btn_accept.clicked.connect(partial(self.gis_create_project))
         self.dlg_create_gis_project.btn_close.clicked.connect(partial(self.close_dialog_admin, self.dlg_create_gis_project))
         self.dlg_create_gis_project.chk_is_sample.stateChanged.connect(partial(self.sample_state_changed))
+
+        # Set shortcut keys
+        self.dlg_create_gis_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_create_gis_project))
 
         # Open MainWindow
         tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='main_gisproject')
@@ -2009,6 +2015,9 @@ class GwAdmin:
         self.dlg_readsql_show_info.btn_close.clicked.connect(partial(self.close_dialog_admin, self.dlg_readsql_show_info))
         self.dlg_readsql_show_info.btn_update.clicked.connect(partial(self.update, self.project_type_selected))
 
+        # Set shortcut keys
+        self.dlg_readsql_show_info.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_show_info))
+
         # Open dialog
         tools_gw.open_dialog(self.dlg_readsql_show_info, dlg_name='main_projectinfo')
 
@@ -2275,6 +2284,9 @@ class GwAdmin:
             if locale == 'EN':
                 tools_qt.set_widget_text(self.dlg_readsql_create_project, self.cmb_locale, 'EN')
 
+        # Set shortcut keys
+        self.dlg_readsql_create_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_create_project))
+
         # Get database connection name
         self.connection_name = str(tools_qt.get_text(self.dlg_readsql, self.cmb_connection))
 
@@ -2331,6 +2343,9 @@ class GwAdmin:
         # Set listeners
         self.dlg_readsql_rename.btn_accept.clicked.connect(partial(self.rename_project_data_schema, schema))
         self.dlg_readsql_rename.btn_cancel.clicked.connect(partial(self.close_dialog_admin, self.dlg_readsql_rename))
+
+        # Set shortcut keys
+        self.dlg_readsql_rename.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_rename))
 
         # Open dialog
         self.dlg_readsql_rename.setWindowTitle(f'Rename project - {schema}')
@@ -2444,6 +2459,9 @@ class GwAdmin:
         # Set listeners
         self.dlg_readsql_copy.btn_accept.clicked.connect(partial(self.copy_project_data_schema, schema))
         self.dlg_readsql_copy.btn_cancel.clicked.connect(partial(self.close_dialog_admin, self.dlg_readsql_copy))
+
+        # Set shortcut keys
+        self.dlg_readsql_copy.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_copy))
 
         # Open dialog
         self.dlg_readsql_copy.setWindowTitle('Copy project - ' + schema)

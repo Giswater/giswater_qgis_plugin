@@ -68,13 +68,16 @@ class GwDialog(QDialog):
 class GwMainWindow(QMainWindow):
 
     dlg_closed = QtCore.pyqtSignal()
-    
+    key_escape = QtCore.pyqtSignal()
+    key_enter = QtCore.pyqtSignal()
+
     def __init__(self, subtag=None):
         super().__init__()
         self.setupUi(self)
         self.subtag = subtag
         # Enable event filter
         self.installEventFilter(self)
+
 
 
     def closeEvent(self, event):
@@ -111,6 +114,16 @@ class GwMainWindow(QMainWindow):
             return True
         return False
 
+
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            self.key_escape.emit()
+            return super().keyPressEvent(event)
+        if event.key() == QtCore.Qt.Key_Return or event.key() == QtCore.Qt.Key_Enter:
+            self.key_enter.emit()
+            return super().keyPressEvent(event)
+
+
 def get_ui_class(ui_file_name, subfolder='shared'):
     """ Get UI Python class from @ui_file_name """
 
@@ -133,16 +146,7 @@ class InfoCrossectUi(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('info_feature.ui', 'basic')
 class InfoFeatureUi(GwMainWindow, FORM_CLASS):
-    key_escape = QtCore.pyqtSignal()
-    key_enter = QtCore.pyqtSignal()
-
-    def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_Escape:
-            self.key_escape.emit()
-            return super(InfoFeatureUi, self).keyPressEvent(event)
-        elif event.key() == QtCore.Qt.Key_Enter:
-            self.key_enter.emit()
-            return super(InfoFeatureUi, self).keyPressEvent(event)
+    pass
 
 FORM_CLASS = get_ui_class('search.ui', 'basic')
 class SearchUi(GwDockWidget, FORM_CLASS):
@@ -182,12 +186,7 @@ class AuxPoint(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('dimensioning.ui', 'edit')
 class DimensioningUi(GwMainWindow, FORM_CLASS):
-    key_escape = QtCore.pyqtSignal()
-
-    def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_Escape:
-            self.key_escape.emit()
-            return super(DimensioningUi, self).keyPressEvent(event)
+    pass
 
 
 FORM_CLASS = get_ui_class('doc.ui', 'edit')

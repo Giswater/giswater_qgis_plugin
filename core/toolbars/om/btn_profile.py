@@ -102,6 +102,9 @@ class GwProfileButton(GwParentMapTool):
         self.dlg_draw_profile.dlg_closed.connect(partial(tools_gw.save_settings, self.dlg_draw_profile))
         self.dlg_draw_profile.dlg_closed.connect(partial(self.remove_selection, actionpan=True))
 
+        # Set shortcut keys
+        self.dlg_draw_profile.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_draw_profile))
+
         # Set calendar date as today
         tools_qt.set_calendar(self.dlg_draw_profile, "date", None)
 

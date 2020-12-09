@@ -199,6 +199,10 @@ class GwConfigButton(GwParentAction):
             chk_dma.stateChanged.connect(partial(self.check_child_to_parent, chk_dma, chk_expl))
             chk_expl.stateChanged.connect(partial(self.check_parent_to_child, chk_expl, chk_dma))
         tools_qt.hide_void_groupbox(self.dlg_config)
+
+        # Set shortcut keys
+        self.dlg_config.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_config))
+
         # Check user/role and remove tabs
         role_admin = tools_db.check_role_user("role_admin", cur_user)
         if not role_admin and cur_user not in super_users:

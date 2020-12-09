@@ -184,6 +184,9 @@ class GwMincut:
         action.triggered.connect(self.show_notified_list)
         self.show_notified = action
 
+        # Set shortcut keys
+        self.dlg_mincut.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_mincut))
+
         try:
             row = tools_gw.get_config('om_mincut_enable_alerts', 'value', 'config_param_system')
             if row:

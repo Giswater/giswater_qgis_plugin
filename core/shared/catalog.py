@@ -92,6 +92,9 @@ class GwCatalog:
         dnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id,
                                          pnom, dnom, id, feature_type, geom_type))
 
+        # Set shortcut keys
+        self.dlg_catalog.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_catalog))
+
         # Open form
         tools_gw.open_dialog(self.dlg_catalog, dlg_name='info_catalog')
 
