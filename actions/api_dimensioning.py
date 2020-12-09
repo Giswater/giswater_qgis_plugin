@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: latin-1 -*-
 from qgis.core import QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip
-from qgis.PyQt.QtCore import Qt, QTimer
+from qgis.PyQt.QtCore import QTimer, Qt
 from qgis.PyQt.QtWidgets import QAction, QCheckBox, QComboBox, QCompleter, QGridLayout, QLabel, QLineEdit, \
     QSizePolicy, QSpacerItem
 
@@ -70,6 +70,7 @@ class ApiDimensioning(ApiParent):
         self.dlg_dim.btn_cancel.clicked.connect(partial(self.cancel_dimensioning))
         self.dlg_dim.dlg_closed.connect(partial(self.cancel_dimensioning))
         self.dlg_dim.dlg_closed.connect(partial(self.save_settings, self.dlg_dim))
+        self.dlg_dim.key_escape.connect(partial(self.close_dialog, self.dlg_dim))
 
         self.create_map_tips()
         # when funcion is called from new feature
