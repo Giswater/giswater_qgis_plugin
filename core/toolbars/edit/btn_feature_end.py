@@ -230,8 +230,14 @@ class GwEndFeatureButton(GwParentAction):
 
         row = None
         if len(self.selected_list) > 0:
+            ids = tuple(self.selected_list)
+
+            # When converting it into a tuple, if it only has one element, remove the "," that is added at the end
+            if len(self.selected_list) == 1:
+                ids = f"{tuple(self.selected_list)}"[:-2] + ")"
+                
             sql = (f"SELECT * FROM v_ui_arc_x_relations "
-                   f"WHERE arc_id IN {tuple(self.selected_list)} AND arc_state = '1'")
+                   f"WHERE arc_id IN {ids} AND arc_state = '1'")
             row = tools_db.get_row(sql, log_sql=True)
 
         if row:
