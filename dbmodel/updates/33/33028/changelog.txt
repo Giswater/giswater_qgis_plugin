@@ -1,4 +1,0 @@
-3.3.028
-*************
-- Improve performance for getinfofromcoordinates function
-- Allow gw_trg_cat_feature to insert into *_type tables and create child views automatically

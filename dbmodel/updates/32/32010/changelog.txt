@@ -1,5 +1,0 @@
-3.2.010
-*******
-Improve view v_om_visit using feature's geometry when visit's geometry is null
-Add observ field for dimensions table
-Enhance config_param_system, sys_csv2pg_cat & audit_cat_function tables

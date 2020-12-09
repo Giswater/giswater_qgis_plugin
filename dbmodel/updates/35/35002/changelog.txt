@@ -1,5 +1,0 @@
-3.5.002
-*************
-- Drop table config_form_groupbox
-- New process to audit projecte (table audit_fid_log)
-- New function gw_fct_setendfeature (3004)

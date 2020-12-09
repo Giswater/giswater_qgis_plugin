@@ -1,4 +1,0 @@
-3.3.032
-*************
-- Enhance function schema_manage_triggers adding 'ALL' & 'CHECK' options when must be executed out of an automatic update
-- Deprecate values on typevalue table

@@ -1,5 +1,0 @@
-3.4.004
-*************
-- Enhance gw_fct_message managing also debug issues
-- Drop layout_id on config_param_system & audit_cat_param_user
-- Deprecate materialized view for workcat

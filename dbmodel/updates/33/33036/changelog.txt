@@ -1,5 +1,0 @@
-3.3.036
-*************
-- Bug fix for inp_times_duration
-- Enable possibility to manage separately material from catalogs on ud
-- Update review tables and views

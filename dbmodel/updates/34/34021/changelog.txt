@@ -1,3 +1,0 @@
-3.4.021
-*************
-- Bug fix from previous development

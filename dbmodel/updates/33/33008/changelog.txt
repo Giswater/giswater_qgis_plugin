@@ -1,5 +1,0 @@
-3.3.008
-*************
-- Update vnode views
-- Update samplepoint views
-- Create tables and configuration for raster data

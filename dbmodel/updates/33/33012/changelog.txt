@@ -1,3 +1,0 @@
-3.3.012
-*************
-- Bug fix on get api catalog function

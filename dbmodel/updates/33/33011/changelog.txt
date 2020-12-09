@@ -1,5 +1,0 @@
-3.3.011
-*************
-- Minor adjustment of role and permissions
-- Add new user variables to manage qml styles for temporal tables
-- Duplicate graf analytics function separating new functions using roles (om, master)

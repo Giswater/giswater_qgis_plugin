@@ -1,3 +1,0 @@
-3.3.025
-*************
-- Implement mincut 4G (using dynamic mapzones algorithm) and put ready to use mincut 5G (dynamic mapzones algorithm using minsector approach)

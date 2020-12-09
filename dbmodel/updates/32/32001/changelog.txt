@@ -1,5 +1,0 @@
-3.2.001
-*******
-Add column (node_id) on ext_rtc_scada
-Bug fix on vi status (ws)
-Set default:0 on minorloss for inp_pipe & inp_shortpipe (ws)
