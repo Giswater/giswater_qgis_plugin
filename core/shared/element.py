@@ -117,18 +117,14 @@ class GwElement:
             partial(tools_qgis.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_element, []))
-        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_add_element.element_id.textChanged.connect(
-            partial(tools_gw.exist_object, self.dlg_add_element, table_object, layers=self.layers,
-                    ids=self.ids, list_ids=self.list_ids))
-        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_add_element.btn_insert.clicked.connect(
-            partial(tools_gw.insert_feature, self.dlg_add_element, table_object, geom_type=geom_type, ids=self.ids,
-                    layers=self.layers, list_ids=self.list_ids))
-        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_add_element.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self.dlg_add_element, table_object, geom_type=geom_type, layers=self.layers,
-                    ids=self.ids, list_ids=self.list_ids))
+
+        self.dlg_add_element.element_id.textChanged.connect(lambda: setattr(self, 'ids, layers, list_ids',
+            tools_gw.exist_object(self.dlg_add_element, table_object, self.layers, self.ids, self.list_ids)))
+        self.dlg_add_element.btn_insert.clicked.connect(lambda: setattr(self, 'ids, layers, list_ids',
+            tools_gw.insert_feature(self.dlg_add_element, table_object, False, False, self.ids, self.layers, self.list_ids)))
+        self.dlg_add_element.btn_delete.clicked.connect(lambda: setattr(self, 'ids, layers, list_ids',
+            tools_gw.delete_records(self.dlg_add_element, table_object, False, self.layers, self.ids, self.list_ids,
+                                    None, None)))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self.dlg_add_element, table_object, False, None, self.layers))

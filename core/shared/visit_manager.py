@@ -757,10 +757,10 @@ class GwVisitManager(QObject):
         finally:
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
                 lambda: setattr(self, 'ids, layers, list_ids', tools_gw.insert_feature(self.dlg_add_visit, widget_table,
-                                False, False, self.geom_type, self.ids, self.layers, self.list_ids)))
+                                False, False, self.ids, self.layers, self.list_ids)))
             self.dlg_add_visit.btn_feature_delete.clicked.connect(
                 lambda: setattr(self, 'ids, layers, list_ids', tools_gw.delete_records(self.dlg_add_visit, widget_table,
-                                False, False, self.geom_type, self.layers, self.ids, self.list_ids, self.lazy_widget,
+                                False, self.layers, self.ids, self.list_ids, self.lazy_widget,
                                 self.lazy_init_function)))
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
@@ -1693,12 +1693,11 @@ class GwVisitManager(QObject):
         finally:
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
                 lambda: setattr(self, 'ids, layers, list_ids', tools_gw.insert_feature(self.dlg_add_visit, widget_table,
-                                False, False, self.geom_type, self.ids, self.layers, self.list_ids)))
+                                False, False, self.ids, self.layers, self.list_ids)))
 
             self.dlg_add_visit.btn_feature_delete.clicked.connect(
-                lambda: setattr(self, 'ids, layers, list_ids',tools_gw.delete_records(self.dlg_add_visit, widget_table,
-                                False, False, self.geom_type, self.layers, self.ids, self.list_ids,self.lazy_widget,
-                                self.lazy_init_function)))
+                lambda: setattr(self, 'ids, layers, list_ids', tools_gw.delete_records(self.dlg_add_visit, widget_table,
+                                False, self.layers, self.ids, self.list_ids, self.lazy_widget, self.lazy_init_function)))
 
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))

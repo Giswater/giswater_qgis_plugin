@@ -366,14 +366,12 @@ class GwPsector:
             self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
         self.dlg_plan_psector.btn_unselect.clicked.connect(partial(self.update_total,
             self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
-        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_plan_psector.btn_insert.clicked.connect(partial(tools_gw.insert_feature,
-            self.dlg_plan_psector, table_object, True, geom_type=self.geom_type, ids=self.ids, layers=self.layers,
-                                                                 list_ids=self.list_ids))
-        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_plan_psector.btn_delete.clicked.connect(partial(tools_gw.delete_records,
-            self.dlg_plan_psector, table_object, True, geom_type=self.geom_type, layers=self.layers,
-                                                                 ids=self.ids, list_ids=self.list_ids))
+
+        self.dlg_plan_psector.btn_insert.clicked.connect(lambda: setattr(self, 'ids, layers, list_ids',
+            tools_gw.insert_feature(self.dlg_plan_psector, table_object, True, True, self.ids, self.layers, self.list_ids)))
+        self.dlg_plan_psector.btn_delete.clicked.connect(lambda: setattr(self, 'ids, layers, list_ids',
+            tools_gw.delete_records(self.dlg_plan_psector, table_object, True, None, self.layers, self.ids,
+                                    self.list_ids, None, None)))
         self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_plan_psector.btn_snapping.clicked.connect(partial(tools_gw.selection_init,
@@ -397,7 +395,7 @@ class GwPsector:
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
         self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(tools_gw.document_delete, self.tbl_document))
         self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
-        self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(self.document_open, self.tbl_document, 'path'))
+        self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
         self.cmb_status.currentIndexChanged.connect(partial(self.show_status_warning))
 
         # Create list for completer QLineEdit
@@ -858,7 +856,7 @@ class GwPsector:
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
             psector_id = tools_qt.get_text(self.dlg_plan_psector, 'psector_id')
             expr = f"psector_id = '{psector_id}'"
-            message = tools_qt.fill_table_object(self.tbl_document, f"{self.schema_name}.{v_ui_doc_x_psector}", expr)
+            message = tools_qt.fill_table_object(self.tbl_document, f"{self.schema_name}.v_ui_doc_x_psector", expr)
             if message:
                 tools_gw.show_warning(message)
 

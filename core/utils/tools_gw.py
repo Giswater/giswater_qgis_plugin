@@ -2118,7 +2118,7 @@ def document_delete(qtable):
 
 def document_open(table, field_name):
 
-    message = tools_qt.document_open()
+    message = tools_qt.document_open(table, field_name)
     if message:
         show_warning(message)
 
@@ -2715,16 +2715,14 @@ def selection_changed(dialog, table_object, geom_type, query=False, layers=None,
     return ids, layers, list_ids
 
 
-def insert_feature(dialog, table_object, query=False, remove_ids=True, geom_type=None, ids=None, layers=None,
-                   list_ids=None, lazy_widget=None, lazy_init_function=None):
+def insert_feature(dialog, table_object, query=False, remove_ids=True, ids=None, layers=None, list_ids=None,
+                   lazy_widget=None, lazy_init_function=None):
     """ Select feature with entered id. Set a model with selected filter.
         Attach that model to selected table
     """
 
     tools_qgis.disconnect_signal_selection_changed()
-
-    if geom_type in ('all', None):
-        geom_type = get_signal_change_tab(dialog)
+    geom_type = get_signal_change_tab(dialog)
 
     # Clear list of ids
     if remove_ids:
@@ -3290,10 +3288,9 @@ def delete_feature_at_plan(dialog, geom_type, list_id):
     tools_db.execute_sql(sql)
 
 
-def delete_records(dialog, table_object, query=False, geom_type=None, layers=None, ids=None, list_ids=None,
-                   lazy_widget=None, lazy_init_function=None):
+def delete_records(dialog, table_object, query=False, layers=None, ids=None, list_ids=None, lazy_widget=None,
+                   lazy_init_function=None):
     """ Delete selected elements of the table """
-
     tools_qgis.disconnect_signal_selection_changed()
     geom_type = get_signal_change_tab(dialog)
     if type(table_object) is str:
