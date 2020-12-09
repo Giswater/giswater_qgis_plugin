@@ -182,7 +182,13 @@ class AuxPoint(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('dimensioning.ui', 'edit')
 class DimensioningUi(GwMainWindow, FORM_CLASS):
-    pass
+    key_escape = QtCore.pyqtSignal()
+
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            self.key_escape.emit()
+            return super(DimensioningUi, self).keyPressEvent(event)
+
 
 FORM_CLASS = get_ui_class('doc.ui', 'edit')
 class DocUi(GwDialog, FORM_CLASS):
