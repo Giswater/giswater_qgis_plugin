@@ -12,15 +12,14 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setendfeature(p_data json)
 $BODY$
 
 /* example
-
-	SELECT SCHEMA_NAME.gw_fct_setendfeature('{"client":{"device":4, "infoType":1, "lang":"ES"},
-			"feature":{"featureType":"Node",  "featureId":"1070,1044"}}')
-
+	SELECT SCHEMA_NAME.gw_fct_setendfeature($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+	"form":{}, "feature":{"featureType":"arc", "featureId":["113935", "2076", "2215"]}, 
+	"data":{"filterFields":{}, "pageInfo":{}, "state_type":"1", "workcat_id_end":"work1", 
+	"enddate":"2020/12/04", "workcat_date":"2017/12/06", "description":"Description work1"}}$$);
 */
 
 DECLARE
-
-v_id  character varying;
+v_id  text;
 v_version text;
 v_featuretype text;
 v_error_context text;
@@ -31,6 +30,9 @@ v_id_list text[];
 rec_id text;
 v_result_info text;
 v_projecttype text;
+v_state_type integer;
+v_workcat_id_end text;
+v_enddate date;
 
 BEGIN
 
@@ -46,8 +48,12 @@ BEGIN
 	-- Get input parameters:
 	v_featuretype := lower((p_data ->> 'feature')::json->> 'featureType');
 	v_id := (p_data ->> 'feature')::json->> 'featureId';
-	v_id_list = string_to_array(v_id,',');		
-		
+	v_state_type =  (p_data ->> 'data')::json->> 'state_type';
+	v_workcat_id_end =  (p_data ->> 'data')::json->> 'workcat_id_end';
+	v_enddate =  ((p_data ->> 'data')::json->> 'enddate')::date;
+
+	select array_agg(quote_literal(a)) into v_id_list from json_array_elements_text(v_id::json) a;
+
 	IF 	v_featuretype = 'arc' THEN 
 	
 		FOREACH rec_id IN ARRAY(v_id_list)
@@ -85,6 +91,11 @@ BEGIN
 			END IF;
 		END LOOP;
 	END IF;
+
+	FOREACH rec_id IN ARRAY(v_id_list) LOOP
+		EXECUTE 'UPDATE '||v_featuretype||' SET state = 0, state_type='||v_state_type||', workcat_id_end = '||quote_literal(v_workcat_id_end)||',
+		enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id =('||rec_id||')';
+	END LOOP;
 
 	v_version := COALESCE(v_version, '[]');
 	v_result_info := COALESCE(v_result_info, '[]');
