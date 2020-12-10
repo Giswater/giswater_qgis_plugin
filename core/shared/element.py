@@ -120,11 +120,11 @@ class GwElement:
 
         self.dlg_add_element.element_id.textChanged.connect(lambda: setattr(self, 'ids, layers, list_ids',
             tools_gw.exist_object(self.dlg_add_element, table_object, self.layers, self.ids, self.list_ids)))
-        self.dlg_add_element.btn_insert.clicked.connect(lambda: setattr(self, 'ids, layers, list_ids',
-            tools_gw.insert_feature(self.dlg_add_element, table_object, False, False, self.ids, self.layers, self.list_ids)))
-        self.dlg_add_element.btn_delete.clicked.connect(lambda: setattr(self, 'ids, layers, list_ids',
-            tools_gw.delete_records(self.dlg_add_element, table_object, False, self.layers, self.ids, self.list_ids,
-                                    None, None)))
+        self.dlg_add_element.btn_insert.clicked.connect(partial(tools_gw.insert_feature, self,
+              self.dlg_add_element, table_object, False, False, None, None))
+        self.dlg_add_element.btn_delete.clicked.connect(partial(tools_gw.delete_records, self,
+             self.dlg_add_element, table_object, False, None, None))
+
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_add_element.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self.dlg_add_element, table_object, False, None, self.layers))

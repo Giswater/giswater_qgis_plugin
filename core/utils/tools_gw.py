@@ -2715,18 +2715,18 @@ def selection_changed(dialog, table_object, geom_type, query=False, layers=None,
     return ids, layers, list_ids
 
 
-def insert_feature(dialog, table_object, query=False, remove_ids=True, ids=None, layers=None, list_ids=None,
-                   lazy_widget=None, lazy_init_function=None):
+
+def insert_feature(class_object, dialog, table_object, query=False, remove_ids=True, lazy_widget=None,
+                   lazy_init_function=None):
     """ Select feature with entered id. Set a model with selected filter.
         Attach that model to selected table
     """
 
     tools_qgis.disconnect_signal_selection_changed()
     geom_type = get_signal_change_tab(dialog)
-
     # Clear list of ids
     if remove_ids:
-        ids = []
+        class_object.ids = []
 
     field_id = f"{geom_type}_id"
     feature_id = tools_qt.get_text(dialog, "feature_id")
@@ -2738,7 +2738,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, ids=None,
         return None
 
     # Select features of layers applying @expr
-    tools_qgis.select_features_by_ids(geom_type, expr, layers=layers)
+    tools_qgis.select_features_by_ids(geom_type, expr, layers=class_object.layers)
 
     if feature_id == 'null':
         message = "You need to enter a feature id"
@@ -2746,23 +2746,23 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, ids=None,
         return
 
     # Iterate over all layers of the group
-    for layer in layers[geom_type]:
+    for layer in class_object.layers[geom_type]:
         if layer.selectedFeatureCount() > 0:
             # Get selected features of the layer
             features = layer.selectedFeatures()
             for feature in features:
                 # Append 'feature_id' into the list
                 selected_id = feature.attribute(field_id)
-                if selected_id not in ids:
-                    ids.append(selected_id)
-        if feature_id not in ids:
+                if selected_id not in class_object.ids:
+                    class_object.ids.append(selected_id)
+        if feature_id not in class_object.ids:
             # If feature id doesn't exist in list -> add
-            ids.append(str(feature_id))
+            class_object.ids.append(str(feature_id))
 
     # Set expression filter with features in the list
     expr_filter = f'"{field_id}" IN (  '
-    for i in range(len(ids)):
-        expr_filter += f"'{ids[i]}', "
+    for i in range(len(class_object.ids)):
+        expr_filter += f"'{class_object.ids[i]}', "
     expr_filter = expr_filter[:-2] + ")"
 
     # Check expression
@@ -2772,7 +2772,7 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, ids=None,
 
     # Select features with previous filter
     # Build a list of feature id's and select them
-    for layer in layers[geom_type]:
+    for layer in class_object.layers[geom_type]:
         it = layer.getFeatures(QgsFeatureRequest(expr))
         id_list = [i.id() for i in it]
         if len(id_list) > 0:
@@ -2780,20 +2780,20 @@ def insert_feature(dialog, table_object, query=False, remove_ids=True, ids=None,
 
     # Reload contents of table 'tbl_???_x_@geom_type'
     if query:
-        insert_feature_to_plan(dialog, geom_type, ids=ids)
-        layers = remove_selection()
+        insert_feature_to_plan(dialog, geom_type, ids=class_object.ids)
+        layers = remove_selection(True, class_object.layers)
+        class_object.layers = layers
     else:
         load_table(dialog, table_object, geom_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Update list
-    list_ids[geom_type] = ids
-    enable_feature_type(dialog, table_object, ids=ids)
+    class_object.list_ids[geom_type] = class_object.ids
+    enable_feature_type(dialog, table_object, ids=class_object.ids)
     connect_signal_selection_changed(dialog, table_object, geom_type)
 
-    tools_log.log_info(list_ids[geom_type])
+    tools_log.log_info(class_object.list_ids[geom_type])
 
-    return ids, layers, list_ids
 
 
 def remove_selection(remove_groups=True, layers=None):
@@ -3288,8 +3288,7 @@ def delete_feature_at_plan(dialog, geom_type, list_id):
     tools_db.execute_sql(sql)
 
 
-def delete_records(dialog, table_object, query=False, layers=None, ids=None, list_ids=None, lazy_widget=None,
-                   lazy_init_function=None):
+def delete_records(class_object, dialog, table_object, query=False, lazy_widget=None, lazy_init_function=None):
     """ Delete selected elements of the table """
     tools_qgis.disconnect_signal_selection_changed()
     geom_type = get_signal_change_tab(dialog)
@@ -3322,9 +3321,9 @@ def delete_records(dialog, table_object, query=False, layers=None, ids=None, lis
     if query:
         full_list = widget.model()
         for x in range(0, full_list.rowCount()):
-            ids.append(widget.model().record(x).value(f"{geom_type}_id"))
+            class_object.ids.append(widget.model().record(x).value(f"{geom_type}_id"))
     else:
-        ids = list_ids[geom_type]
+        class_object.ids = class_object.list_ids[geom_type]
 
     field_id = geom_type + "_id"
 
@@ -3344,18 +3343,18 @@ def delete_records(dialog, table_object, query=False, layers=None, ids=None, lis
     answer = tools_qt.ask_question(message, title, inf_text)
     if answer:
         for el in del_id:
-            ids.remove(el)
+            class_object.ids.remove(el)
     else:
         return
 
     expr_filter = None
     expr = None
-    if len(ids) > 0:
+    if len(class_object.ids) > 0:
 
         # Set expression filter with features in the list
         expr_filter = f'"{field_id}" IN ('
-        for i in range(len(ids)):
-            expr_filter += f"'{ids[i]}', "
+        for i in range(len(class_object.ids)):
+            expr_filter += f"'{class_object.ids[i]}', "
         expr_filter = expr_filter[:-2] + ")"
 
         # Check expression
@@ -3373,17 +3372,15 @@ def delete_records(dialog, table_object, query=False, layers=None, ids=None, lis
 
     # Select features with previous filter
     # Build a list of feature id's and select them
-    tools_qgis.select_features_by_ids(geom_type, expr, layers=layers)
+    tools_qgis.select_features_by_ids(geom_type, expr, layers=class_object.layers)
 
     if query:
-        layers = remove_selection(layers=layers)
+        class_object.layers = remove_selection(layers=class_object.layers)
 
     # Update list
-    list_ids[geom_type] = ids
-    enable_feature_type(dialog, table_object, ids=ids)
+    class_object.list_ids[geom_type] = class_object.ids
+    enable_feature_type(dialog, table_object, ids=class_object.ids)
     connect_signal_selection_changed(dialog, table_object, geom_type)
-
-    return ids, layers, list_ids
 
 
 def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=None, list_ids=None):

@@ -95,11 +95,12 @@ class GwEndFeatureButton(GwParentAction):
                                                    self.table_object, self.cur_active_layer, force_downgrade=True, show_warning=True))
         self.dlg_work_end.workcat_id_end.editTextChanged.connect(partial(self.fill_workids))
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self.new_workcat))
-        self.dlg_work_end.btn_insert.clicked.connect(lambda: setattr(self, 'ids, layers, list_ids',
-            tools_gw.insert_feature(self.dlg_work_end, self.table_object, False, False, self.ids, self.layers, self.list_ids)))
-        self.dlg_work_end.btn_delete.clicked.connect(lambda: setattr(self, 'ids, layers, list_ids',
-            tools_gw.delete_records(self.dlg_work_end,  self.table_object, False, self.layers, self.ids, self.list_ids,
-                                    None, None)))
+
+        self.dlg_work_end.btn_insert.clicked.connect(partial(tools_gw.insert_feature, self,
+              self.dlg_work_end, self.table_object, False, False, None, None))
+        self.dlg_work_end.btn_delete.clicked.connect(partial(tools_gw.delete_records, self,
+              self.dlg_work_end, self.table_object, False, None, None))
+
         # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
         self.dlg_work_end.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self.dlg_work_end, self.table_object, False, None, self.layers))

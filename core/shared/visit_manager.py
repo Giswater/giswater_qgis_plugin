@@ -755,13 +755,12 @@ class GwVisitManager(QObject):
         except Exception as e:
             tools_log.log_info(f"manage_geom_type_selected exception: {e}")
         finally:
-            self.dlg_add_visit.btn_feature_insert.clicked.connect(
-                lambda: setattr(self, 'ids, layers, list_ids', tools_gw.insert_feature(self.dlg_add_visit, widget_table,
-                                False, False, self.ids, self.layers, self.list_ids)))
-            self.dlg_add_visit.btn_feature_delete.clicked.connect(
-                lambda: setattr(self, 'ids, layers, list_ids', tools_gw.delete_records(self.dlg_add_visit, widget_table,
-                                False, self.layers, self.ids, self.list_ids, self.lazy_widget,
-                                self.lazy_init_function)))
+
+            self.dlg_add_visit.btn_feature_insert.clicked.connect(partial(tools_gw.insert_feature, self,
+                 self.dlg_add_visit, widget_table, False, False, None, None))
+            self.dlg_add_visit.btn_feature_delete.clicked.connect(partial(tools_gw.delete_records, self,
+                 self.dlg_add_visit, widget_table, False, self.lazy_widget, self.lazy_init_function))
+
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
@@ -1691,13 +1690,12 @@ class GwVisitManager(QObject):
         except Exception as e:
             tools_log.log_info(f"visit_tab_feature_changed exception: {e}")
         finally:
-            self.dlg_add_visit.btn_feature_insert.clicked.connect(
-                lambda: setattr(self, 'ids, layers, list_ids', tools_gw.insert_feature(self.dlg_add_visit, widget_table,
-                                False, False, self.ids, self.layers, self.list_ids)))
 
-            self.dlg_add_visit.btn_feature_delete.clicked.connect(
-                lambda: setattr(self, 'ids, layers, list_ids', tools_gw.delete_records(self.dlg_add_visit, widget_table,
-                                False, self.layers, self.ids, self.list_ids, self.lazy_widget, self.lazy_init_function)))
+            self.dlg_add_visit.btn_feature_insert.clicked.connect(partial(tools_gw.insert_feature, self,
+                 self.dlg_add_visit, widget_table, False, False))
+
+            self.dlg_add_visit.btn_feature_delete.clicked.connect(partial(tools_gw.delete_records, self,
+                 self.dlg_add_visit, widget_table, False, self.lazy_widget, self.lazy_init_function))
 
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self.feature_snapping_clicked, self.dlg_add_visit, widget_table))
