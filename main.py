@@ -94,9 +94,10 @@ class Giswater(QObject):
         global_vars.plugin_name = self.plugin_name
 
         # Check for developers options
-        comment = '  # If True: show all get_json log, if False: does not show any, if None: show python log_sql option'
-        self.check_developers_settings(comment=comment)
-        comment = '  # Integer or None'
+        comment = '# log_sql --> If True: show all get_json log, if False: does not show any, if None: ' \
+                  'show python log_sql option'
+        self.check_developers_settings('developers', 'log_sql', comment)
+        comment = '# show_message_durations --> Integer or None, if none: show python duration option'
         self.check_developers_settings('developers', 'show_message_durations', comment)
 
         # Set main information button (always visible)
@@ -113,7 +114,7 @@ class Giswater(QObject):
         """ Check if @section and @parameter exists in user settings file. If not add them = None """
         value = None
         try:
-            parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
+            parser = configparser.ConfigParser(comment_prefixes=('/',), inline_comment_prefixes=('/',), allow_no_value=True)
             main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
             path = main_folder + os.sep + "config" + os.sep + 'user.config'
             if not os.path.exists(path):
@@ -126,7 +127,8 @@ class Giswater(QObject):
 
             # Check if parameter exists in section, if not exist, create
             if parameter not in parser[section]:
-                parser[section][parameter] = f'None{comment}'
+                parser.set(section, comment)
+                parser.set(section, parameter, 'None')
                 with open(path, 'w') as configfile:
                     parser.write(configfile)
                     configfile.close()
