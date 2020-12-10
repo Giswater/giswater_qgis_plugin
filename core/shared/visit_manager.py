@@ -354,7 +354,7 @@ class GwVisitManager(QObject):
             widget_name = f'tbl_visit_x_{self.geom_type}'
             widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
             tools_qgis.disconnect_signal_selection_changed()
-            tools_gw.connect_signal_selection_changed(self.dlg_add_visit, widget_table, geom_type=self.geom_type)
+            tools_gw.connect_signal_selection_changed(self, self.dlg_add_visit, widget_table)
             tools_qgis.select_features_by_ids(self.geom_type, expr, self.layers)
             tools_qgis.disconnect_signal_selection_changed()
 
@@ -788,7 +788,6 @@ class GwVisitManager(QObject):
         """ Manage selection change in feature_type combo box.
         THis means that have to set completer for feature_id QTextLine and
         setup model for features to select table """
-
         # 1) set the model linked to selecte features
         # 2) check if there are features related to the current visit
         # 3) if so, select them => would appear in the table associated to the model
@@ -864,7 +863,7 @@ class GwVisitManager(QObject):
 
         # Do selection allowing @widget_table to be linked to canvas selectionChanged
         tools_qgis.disconnect_signal_selection_changed()
-        tools_gw.connect_signal_selection_changed(self.dlg_add_visit, widget_table, geom_type=geom_type)
+        tools_gw.connect_signal_selection_changed(self, self.dlg_add_visit, widget_table)
         tools_qgis.select_features_by_ids(geom_type, expr, self.layers)
         tools_qgis.disconnect_signal_selection_changed()
 
@@ -1702,10 +1701,7 @@ class GwVisitManager(QObject):
 
         # Adding auto-completion to a QLineEdit
         tools_gw.set_completer_widget(viewname, dialog.feature_id, str(self.geom_type) + "_id")
-        self.ids, self.layers, self.list_ids = tools_gw.selection_changed(dialog, widget_table, self.geom_type, False,
-                                                                 layers=self.layers, list_ids=self.list_ids,
-                                                                 lazy_widget=self.lazy_widget,
-                                                                 lazy_init_function=self.lazy_init_function)
+        tools_gw.selection_changed(self, dialog, widget_table, False, self.lazy_widget, self.lazy_init_function)
 
         try:
             self.iface.actionPan().trigger()
@@ -1715,7 +1711,7 @@ class GwVisitManager(QObject):
 
     def feature_snapping_clicked(self, dialog, table_object):
         self.previous_map_tool = global_vars.canvas.mapTool()
-        tools_gw.selection_init(dialog, table_object, False, None, self.layers)
+        tools_gw.selection_init(self, dialog, table_object, False)
 
 
     def manage_visit_multifeature(self):

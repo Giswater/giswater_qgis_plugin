@@ -367,15 +367,14 @@ class GwPsector:
         self.dlg_plan_psector.btn_unselect.clicked.connect(partial(self.update_total,
             self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
 
-        self.dlg_plan_psector.btn_insert.clicked.connect(partial(tools_gw.insert_feature, self,
-             self.dlg_plan_psector, table_object, True, True, None, None))
-        self.dlg_plan_psector.btn_delete.clicked.connect(partial(tools_gw.delete_records, self,
-             self.dlg_plan_psector, table_object, True, None, None))
-
         self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
-        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_plan_psector.btn_snapping.clicked.connect(partial(tools_gw.selection_init,
-            self.dlg_plan_psector, table_object, True, None, layers=self.layers))
+
+        self.dlg_plan_psector.btn_insert.clicked.connect(
+            partial(tools_gw.insert_feature, self, self.dlg_plan_psector, table_object, True, True, None, None))
+        self.dlg_plan_psector.btn_delete.clicked.connect(
+            partial(tools_gw.delete_records, self, self.dlg_plan_psector, table_object, True, None, None))
+        self.dlg_plan_psector.btn_snapping.clicked.connect(
+            partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, True))
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(partial(tools_gw.get_signal_change_tab,

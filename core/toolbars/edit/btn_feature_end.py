@@ -96,14 +96,13 @@ class GwEndFeatureButton(GwParentAction):
         self.dlg_work_end.workcat_id_end.editTextChanged.connect(partial(self.fill_workids))
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self.new_workcat))
 
-        self.dlg_work_end.btn_insert.clicked.connect(partial(tools_gw.insert_feature, self,
-              self.dlg_work_end, self.table_object, False, False, None, None))
-        self.dlg_work_end.btn_delete.clicked.connect(partial(tools_gw.delete_records, self,
-              self.dlg_work_end, self.table_object, False, None, None))
-
-        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
+        self.dlg_work_end.btn_insert.clicked.connect(
+            partial(tools_gw.insert_feature, self, self.dlg_work_end, self.table_object, False, False, None, None))
+        self.dlg_work_end.btn_delete.clicked.connect(
+            partial(tools_gw.delete_records, self, self.dlg_work_end, self.table_object, False, None, None))
         self.dlg_work_end.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self.dlg_work_end, self.table_object, False, None, self.layers))
+            partial(tools_gw.selection_init, self, self.dlg_work_end, self.table_object, False))
+
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_work_end, excluded_layers=["v_edit_element"]))

@@ -37,7 +37,7 @@ from ...lib.tools_qt import GwHyperLinkLabel
 
 class MultipleSelection(QgsMapTool):
 
-    def __init__(self, layers, geom_type, table_object=None, dialog=None, query=None):
+    def __init__(self, class_object, table_object=None, dialog=None, query=None):
         """
         Class constructor
         :param layers: dict of list of layers {'arc': [v_edit_node, ...]}
@@ -46,9 +46,7 @@ class MultipleSelection(QgsMapTool):
         :param dialog:
         :param query:
         """
-
-        self.layers = layers
-        self.geom_type = geom_type
+        self.class_object = class_object
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
         self.table_object = table_object
@@ -98,10 +96,9 @@ class MultipleSelection(QgsMapTool):
         tools_qgis.disconnect_signal_selection_changed()
 
 
-        for i, layer in enumerate(self.layers[self.geom_type]):
-            if i == len(self.layers[self.geom_type]) - 1:
-                connect_signal_selection_changed(self.dialog, self.table_object, query=self.query,
-                                                 geom_type=self.geom_type, layers=self.layers)
+        for i, layer in enumerate(self.class_object.layers[self.class_object.geom_type]):
+            if i == len(self.class_object.layers[self.class_object.geom_type]) - 1:
+                connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, query=self.query)
 
                 # Selection by rectangle
             if rectangle:
@@ -2651,30 +2648,29 @@ def manage_layer_manager(json_result, sql):
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
 
-def selection_init(dialog, table_object, query=False, geom_type=None, layers=None):
+def selection_init(class_object, dialog, table_object, query=False):
     """ Set canvas map tool to an instance of class 'MultipleSelection' """
-    if geom_type is None:
-        geom_type = get_signal_change_tab(dialog)
-        if geom_type in ('all', None):
-            geom_type = 'arc'
-    multiple_selection = MultipleSelection(layers, geom_type, table_object=table_object, dialog=dialog, query=query)
+    print(f"class_object.geom_type -->{class_object.geom_type}")
+    class_object.geom_type = get_signal_change_tab(dialog)
+    if class_object.geom_type in ('all', None):
+        class_object.geom_type = 'arc'
+    print(f"class_object.geom_type -->{class_object.geom_type}")
+    multiple_selection = MultipleSelection(class_object, table_object, dialog, query)
     global_vars.canvas.setMapTool(multiple_selection)
     cursor = get_cursor_multiple_selection()
     global_vars.canvas.setCursor(cursor)
 
 
-def selection_changed(dialog, table_object, geom_type, query=False, layers=None,
-                      list_ids={"arc":[], "node":[], "connec":[], "gully":[], "element":[]}, lazy_widget=None,
-                      lazy_init_function=None):
+def selection_changed(class_object, dialog, table_object, query=False, lazy_widget=None, lazy_init_function=None):
     """ Slot function for signal 'canvas.selectionChanged' """
     tools_qgis.disconnect_signal_selection_changed()
-    field_id = f"{geom_type}_id"
+    field_id = f"{class_object.geom_type}_id"
 
     ids = []
-    if layers is None: return
+    if class_object.layers is None: return
 
     # Iterate over all layers of the group
-    for layer in layers[geom_type]:
+    for layer in class_object.layers[class_object.geom_type]:
         if layer.selectedFeatureCount() > 0:
             # Get selected features of the layer
             features = layer.selectedFeatures()
@@ -2684,7 +2680,7 @@ def selection_changed(dialog, table_object, geom_type, query=False, layers=None,
                 if selected_id not in ids:
                     ids.append(selected_id)
 
-    list_ids[geom_type] = ids
+    class_object.list_ids[class_object.geom_type] = ids
 
     expr_filter = None
     if len(ids) > 0:
@@ -2699,22 +2695,19 @@ def selection_changed(dialog, table_object, geom_type, query=False, layers=None,
         if not is_valid:
             return
 
-        tools_qgis.select_features_by_ids(geom_type, expr, layers=layers)
+        tools_qgis.select_features_by_ids(class_object.geom_type, expr, class_object.layers)
 
     # Reload contents of table 'tbl_@table_object_x_@geom_type'
     if query:
-        insert_feature_to_plan(dialog, geom_type, ids=ids)
-        layers = remove_selection()
-        reload_qtable(dialog, geom_type)
+        insert_feature_to_plan(dialog, class_object.geom_type, ids=ids)
+        class_object.layers = remove_selection()
+        reload_qtable(dialog, class_object.geom_type)
     else:
-        load_table(dialog, table_object, geom_type, expr_filter)
+        load_table(dialog, table_object, class_object.geom_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     enable_feature_type(dialog, table_object, ids=ids)
-
-    return ids, layers, list_ids
-
-
+    class_object.ids = ids
 
 def insert_feature(class_object, dialog, table_object, query=False, remove_ids=True, lazy_widget=None,
                    lazy_init_function=None):
@@ -2790,7 +2783,7 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
     # Update list
     class_object.list_ids[geom_type] = class_object.ids
     enable_feature_type(dialog, table_object, ids=class_object.ids)
-    connect_signal_selection_changed(dialog, table_object, geom_type)
+    connect_signal_selection_changed(class_object, dialog, table_object, geom_type)
 
     tools_log.log_info(class_object.list_ids[geom_type])
 
@@ -2848,14 +2841,14 @@ def insert_feature_to_plan(dialog, geom_type, ids=None):
         reload_qtable(dialog, geom_type)
 
 
-def connect_signal_selection_changed(dialog, table_object, query=False, geom_type=None, layers=None):
+def connect_signal_selection_changed(class_object, dialog, table_object, query=False):
     """ Connect signal selectionChanged """
 
     try:
-        if geom_type in ('all', None):
+        if class_object.geom_type in ('all', None):
             geom_type = 'arc'
         global_vars.canvas.selectionChanged.connect(
-            partial(selection_changed, dialog, table_object, geom_type, query, layers=layers))
+            partial(selection_changed, class_object, dialog, table_object, query))
     except Exception as e:
         tools_log.log_info(f"connect_signal_selection_changed: {e}")
 
@@ -3380,7 +3373,7 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
     # Update list
     class_object.list_ids[geom_type] = class_object.ids
     enable_feature_type(dialog, table_object, ids=class_object.ids)
-    connect_signal_selection_changed(dialog, table_object, geom_type)
+    connect_signal_selection_changed(class_object, dialog, table_object, geom_type)
 
 
 def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=None, list_ids=None):

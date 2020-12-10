@@ -123,15 +123,13 @@ class GwDocument:
         self.dlg_add_doc.doc_id.textChanged.connect(lambda: setattr(self, 'ids, layers, list_ids',
             tools_gw.exist_object(self.dlg_add_doc, table_object, self.layers, self.ids, self.list_ids)))
 
-        self.dlg_add_doc.btn_insert.clicked.connect(partial(tools_gw.insert_feature, self, self.dlg_add_doc,
-             table_object, False, False, None, None))
+        self.dlg_add_doc.btn_insert.clicked.connect(
+            partial(tools_gw.insert_feature, self, self.dlg_add_doc, table_object, False, False, None, None))
+        self.dlg_add_doc.btn_delete.clicked.connect(
+            partial(tools_gw.delete_records, self, self.dlg_add_doc,  table_object, False, None, None))
+        self.dlg_add_doc.btn_snapping.clicked.connect(
+            partial(tools_gw.selection_init, self, self.dlg_add_doc, table_object, False))
 
-        self.dlg_add_doc.btn_delete.clicked.connect(partial(tools_gw.delete_records, self, self.dlg_add_doc,
-             table_object, False, None, None))
-
-        # TODO: Set variables self.ids, self.layers, self.list_ids using return parameters
-        self.dlg_add_doc.btn_snapping.clicked.connect(partial(tools_gw.selection_init, self.dlg_add_doc, table_object,
-                                                              False, None, self.layers))
         if feature:
             self.dlg_add_doc.tabWidget.currentChanged.connect(
                 partial(self.fill_table_doc, self.dlg_add_doc, geom_type, feature[geom_type + "_id"]))
