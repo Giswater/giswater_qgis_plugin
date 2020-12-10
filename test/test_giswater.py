@@ -37,7 +37,7 @@ class TestGiswater(QObject):
         # Initialize plugin directory
         self.plugin_dir = os.path.dirname(os.path.dirname(__file__))
         self.plugin_name = self.get_plugin_metadata('name', 'giswater')
-        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'shared' + os.sep
+        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
 
         # Check if config file exists
         setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
