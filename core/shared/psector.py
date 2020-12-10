@@ -334,7 +334,7 @@ class GwPsector:
                         layer.removeSelection()
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
-            message = tools_qt.fill_table_object(self.tbl_document, f"{self.schema_name}.{v_ui_doc_x_psector}", filter_)
+            message = tools_qt.fill_table_object(self.tbl_document, f"v_ui_doc_x_psector", filter_)
             if message:
                 tools_gw.show_warning(message)
             self.tbl_document.doubleClicked.connect(partial(tools_gw.document_open, self.tbl_document, 'path'))
