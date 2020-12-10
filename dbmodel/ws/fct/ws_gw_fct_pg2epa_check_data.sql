@@ -274,13 +274,8 @@ BEGIN
 	
 	SELECT count(*) INTO v_count FROM anl_node WHERE fid = 170 AND cur_user=current_user;
 	IF v_count > 0 THEN
-<<<<<<< HEAD
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, '170',concat('WARNING-170: There is/are ', v_count,' valve(s) without to_arc value according with the two closest arcs. Take a look on temporal table to know details.'),v_count);
-=======
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ', v_count,' valve(s) without to_arc value according with the two closest arcs. Take a look on temporal table to know details.'));
->>>>>>> 938d1e9b7... Adjusment of warning an error messages for go2epa check functions
+		VALUES (v_fid, v_result_id, 3, '170',concat('ERROR-170: There is/are ', v_count,' valve(s) without to_arc value according with the two closest arcs. Take a look on temporal table to know details.'),v_count);
 	ELSE 
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '170',
@@ -369,13 +364,9 @@ BEGIN
 	
 	SELECT count(*) INTO v_count FROM anl_node WHERE fid = 171 AND cur_user=current_user;
 	IF v_count > 0 THEN
-<<<<<<< HEAD
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id,error_message, fcount)
-		VALUES (v_fid, v_result_id, 2, '171', concat('WARNING-171: There is/are ', v_count,' pump(s) without to_arc value according with closest arcs. Take a look on temporal table to know details.'),v_count);
-=======
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ', v_count,' pump(s) without to_arc value according with closest arcs. Take a look on temporal table to know details.'));
->>>>>>> 938d1e9b7... Adjusment of warning an error messages for go2epa check functions
+		VALUES (v_fid, v_result_id, 3, '171', concat('ERROR-171: There is/are ', v_count,' pump(s) without to_arc value according with closest arcs. Take a look on temporal table to know details.'),v_count);
+
 	ELSE 
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id,error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '171',
