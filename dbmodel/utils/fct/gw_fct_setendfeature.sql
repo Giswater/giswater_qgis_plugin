@@ -59,12 +59,13 @@ BEGIN
 		FOREACH rec_id IN ARRAY(v_id_list)
 		LOOP
 			--remove links related to arc
-			DELETE FROM link 
-			WHERE link_id IN (SELECT link_id FROM link l JOIN connec c ON c.connec_id = l.feature_id WHERE c.arc_id = rec_id);
-			UPDATE connec SET arc_id = NULL WHERE arc_id = rec_id;
+			EXECUTE 'DELETE FROM link 
+			WHERE link_id IN (SELECT link_id FROM link l JOIN connec c ON c.connec_id = l.feature_id WHERE c.arc_id = '|| rec_id||');';
+			
+			EXECUTE 'UPDATE connec SET arc_id = NULL WHERE arc_id = '|| rec_id||';';
 
 			IF v_projecttype = 'UD' THEN
-				UPDATE gully SET arc_id = NULL WHERE arc_id = rec_id;
+				EXECUTE 'UPDATE gully SET arc_id = NULL WHERE arc_id = '|| rec_id||';';
 			END IF;
 			
 		END LOOP;
@@ -74,16 +75,18 @@ BEGIN
 	--check if node is involved into psector
 		FOREACH rec_id IN ARRAY(v_id_list)
 		LOOP
-			SELECT count(arc.arc_id) INTO v_num_feature FROM arc WHERE (node_1=rec_id OR node_2=rec_id) AND arc.state = 2;
+			EXECUTE 'SELECT count(arc.arc_id)  FROM arc WHERE (node_1='|| rec_id||' OR node_2='|| rec_id||') AND arc.state = 2;'
+			INTO v_num_feature;
 
 			IF v_num_feature > 0 THEN
 				
-				SELECT string_agg(name::text, ', '), string_agg(psector_id::text, ', ') INTO v_psector_list, v_psector_id
+				EXECUTE 'SELECT string_agg(name::text, ', '), string_agg(psector_id::text, ', ')
 				FROM plan_psector_x_arc JOIN plan_psector USING (psector_id) where arc_id IN 
-				(SELECT arc.arc_id FROM arc WHERE (node_1=rec_id OR node_2=rec_id) AND arc.state = 2);
+				(SELECT arc.arc_id FROM arc WHERE (node_1='|| rec_id||' OR node_2='|| rec_id||') AND arc.state = 2);'
+				INTO v_psector_list, v_psector_id;
 
 				IF v_psector_id IS NOT NULL THEN 
-					EXECUTE 'DELETE FROM plan_psector_x_node WHERE node_id = '||quote_literal(rec_id)||' AND psector_id IN ('||v_psector_id||');';
+					EXECUTE 'DELETE FROM plan_psector_x_node WHERE node_id = '||rec_id||' AND psector_id IN ('||v_psector_id||');';
 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3142", "function":"3004","debug_msg":"'||v_psector_list||'"}}$$);';
@@ -94,7 +97,7 @@ BEGIN
 
 	FOREACH rec_id IN ARRAY(v_id_list) LOOP
 		EXECUTE 'UPDATE '||v_featuretype||' SET state = 0, state_type='||v_state_type||', workcat_id_end = '||quote_literal(v_workcat_id_end)||',
-		enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id =('||rec_id||')';
+		enddate = '||quote_literal(v_enddate)||' WHERE '||v_featuretype||'_id ='||rec_id||'';
 	END LOOP;
 
 	v_version := COALESCE(v_version, '[]');
