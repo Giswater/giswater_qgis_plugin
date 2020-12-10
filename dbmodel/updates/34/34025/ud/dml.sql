@@ -16,3 +16,6 @@ UPDATE cat_grate SET active = TRUE WHERE active IS NULL;
 UPDATE cat_node_shape SET active = TRUE WHERE active IS NULL;
 
 UPDATE inp_typevalue SET idval = 'RECT_CLOSED' WHERE typevalue = 'inp_value_orifice' AND idval = 'RECT-CLOSED';
+
+UPDATE sys_param_user SET id='edit_gullyrotation_disable', descript='If true, the automatic rotation calculation on the gullys is disabled. Used for an absolute manual update of rotation field',
+label='Disable automatic gully rotation:', project_type='ud' WHERE id='edit_noderotation_disable_update';

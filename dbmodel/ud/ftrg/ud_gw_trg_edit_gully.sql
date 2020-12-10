@@ -49,6 +49,7 @@ v_psector_vdefault integer;
 v_arc_id text;
 v_streetaxis text;
 v_streetaxis2 text;
+v_autorotation_disabled boolean;
     
 BEGIN
 
@@ -62,6 +63,7 @@ BEGIN
 
 	-- get values
 	v_promixity_buffer = (SELECT "value" FROM config_param_system WHERE "parameter"='edit_feature_buffer_on_mapzone');
+	v_autorotation_disabled = (SELECT value::boolean FROM config_param_user WHERE "parameter"='edit_gullyrotation_disable' AND cur_user=current_user);
 	v_unitsfactor = (SELECT value::float FROM config_param_user WHERE "parameter"='edit_gully_doublegeom' AND cur_user=current_user);
 	IF v_unitsfactor IS NULL THEN
 		v_doublegeometry = FALSE;
@@ -402,8 +404,12 @@ BEGIN
 		ELSE
 			v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,v_linelocatepoint), st_lineinterpolatepoint(v_thegeom,v_linelocatepoint+0.01));
 		END IF;
-
-		NEW.rotation = v_rotation*180/pi();
+        
+        -- use automatic rotation only on INSERT. On update it's only posible manual rotation update 
+		IF v_autorotation_disabled IS NULL OR v_autorotation_disabled IS FALSE THEN
+			NEW.rotation = v_rotation*180/pi();
+		END IF;
+		
 		v_rotation = -(v_rotation - pi()/2);
 
 		-- double geometry
@@ -595,11 +601,6 @@ BEGIN
 	    IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
 	      	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3036", "function":"1206","debug_msg":"'||NEW.state::text||'"}}$$);'; 
-	    END IF;		
-
-		-- rotation
-		IF NEW.rotation != OLD.rotation THEN
-			UPDATE gully SET rotation=NEW.rotation WHERE gully_id = OLD.gully_id;
 		END IF;		
 		
 		--link_path
@@ -607,6 +608,7 @@ BEGIN
 		IF v_link_path IS NOT NULL THEN
 			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
+
 
 		-- double geometry rotation update
 		IF v_doublegeometry AND ST_equals(NEW.the_geom, OLD.the_geom) IS FALSE THEN
@@ -621,7 +623,6 @@ BEGIN
 				v_rotation = st_azimuth (st_lineinterpolatepoint(v_thegeom,v_linelocatepoint), st_lineinterpolatepoint(v_thegeom,v_linelocatepoint+0.01));
 			END IF;
 
-			NEW.rotation = v_rotation*180/pi();
 			v_rotation = -(v_rotation - pi()/2);
 		END IF;
 
