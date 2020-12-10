@@ -147,5 +147,4 @@ UPDATE exploitation SET active = TRUE WHERE active IS NULL;
 UPDATE om_visit_cat SET active = TRUE WHERE active IS NULL;
 UPDATE sys_addfields SET active = TRUE WHERE active IS NULL;
 UPDATE sys_foreignkey SET active = TRUE WHERE active IS NULL;
-UPDATE sys_function SET active = TRUE WHERE active IS NULL;
 UPDATE sys_style SET active = TRUE WHERE active IS NULL;
