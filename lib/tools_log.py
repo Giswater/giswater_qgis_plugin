@@ -129,11 +129,11 @@ def set_logger(logger_name=None):
         if logger_name is None:
             logger_name = 'plugin'
 
-        global_vars.min_log_level = int(global_vars.settings.value('status/log_level'))
+        global_vars.session_vars['min_log_level'] = int(global_vars.settings.value('status/log_level'))
         log_suffix = global_vars.settings.value('status/log_suffix')
-        global_vars.logger = Logger(logger_name, global_vars.min_log_level, log_suffix)
+        global_vars.logger = Logger(logger_name, global_vars.session_vars['min_log_level'], log_suffix)
         values = {10: 0, 20: 0, 30: 1, 40: 2}
-        global_vars.min_message_level = values.get(global_vars.min_log_level, 0)
+        global_vars.session_vars['min_message_level'] = values.get(global_vars.session_vars['min_log_level'], 0)
 
 
 def qgis_log_message(text=None, message_level=0, context_name=None, parameter=None, tab_name=None):
@@ -149,7 +149,7 @@ def qgis_log_message(text=None, message_level=0, context_name=None, parameter=No
 
     if tab_name is None:
         tab_name = global_vars.plugin_name
-    if message_level >= global_vars.min_message_level:
+    if message_level >= global_vars.session_vars['min_message_level']:
         QgsMessageLog.logMessage(msg, tab_name, message_level)
 
     return msg

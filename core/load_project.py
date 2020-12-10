@@ -89,7 +89,7 @@ class LoadProject(QObject):
         if status is False:
             return
 
-        global_vars.gw_infotools = GwInfoTools()
+        global_vars.session_vars['gw_infotools'] = GwInfoTools()
 
         # Get water software from table 'version'
         self.project_type = tools_gw.get_project_type()
@@ -114,7 +114,7 @@ class LoadProject(QObject):
         # Create a thread to listen selected database channels
         if global_vars.settings.value('system_variables/use_notify').upper() == 'TRUE':
             self.notify = GwNotifyTools()
-            list_channels = ['desktop', global_vars.current_user]
+            list_channels = ['desktop', global_vars.session_vars['current_user']]
             self.notify.start_listening(list_channels)
 
         # Open automatically 'search docker' depending its value in user settings
@@ -151,15 +151,15 @@ class LoadProject(QObject):
         """ Set new database connection. If force_commit=True then force commit before opening project """
 
         try:
-            if global_vars.dao and force_commit:
+            if global_vars.session_vars['dao'] and force_commit:
                 tools_log.log_info("Force commit")
-                global_vars.dao.commit()
+                global_vars.session_vars['dao'].commit()
         except Exception as e:
             tools_log.log_info(str(e))
         finally:
             self.connection_status, not_version, layer_source = tools_db.set_database_connection()
             if not self.connection_status or not_version:
-                message = global_vars.last_error
+                message = global_vars.session_vars['last_error']
                 if show_warning:
                     if message:
                         tools_gw.show_warning(message, 15)

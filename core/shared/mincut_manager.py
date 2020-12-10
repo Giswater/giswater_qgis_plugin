@@ -376,7 +376,7 @@ class GwMincutManager:
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel(db=global_vars.db)
+        model = QSqlTableModel(db=global_vars.session_vars['db'])
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.sort(0, 1)

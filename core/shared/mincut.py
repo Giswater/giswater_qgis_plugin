@@ -131,7 +131,7 @@ class GwMincut:
 
         tools_qt.double_validator(self.distance, 0, 9999999, 3)
         tools_qt.double_validator(self.depth, 0, 9999999, 3)
-        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.txt_exec_user, global_vars.current_user)
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.txt_exec_user, global_vars.session_vars['current_user'])
 
         # Fill ComboBox type
         sql = ("SELECT id, descript "
@@ -212,7 +212,7 @@ class GwMincut:
 
     def set_signals(self):
 
-        if global_vars.dlg_docker:
+        if global_vars.session_vars['dlg_docker']:
             self.dlg_mincut.dlg_closed.connect(tools_gw.close_docker)
 
         self.dlg_mincut.btn_accept.clicked.connect(self.accept_save_data)
@@ -328,7 +328,7 @@ class GwMincut:
     def manage_docker(self):
 
         tools_gw.init_docker('qgis_form_docker')
-        if global_vars.dlg_docker:
+        if global_vars.session_vars['dlg_docker']:
             tools_gw.dock_dialog(self.dlg_mincut)
         else:
             tools_gw.open_dialog(self.dlg_mincut, dlg_name='mincut')
@@ -364,7 +364,7 @@ class GwMincut:
 
         # Rollback transaction
         else:
-            global_vars.dao.rollback()
+            global_vars.session_vars['dao'].rollback()
 
         # Close dialog, save dialog position, and disconnect snapping
         tools_gw.close_dialog(self.dlg_mincut)
@@ -520,7 +520,7 @@ class GwMincut:
         received_date = received_day.toString('yyyy-MM-dd') + " " + received_time.toString('HH:mm:ss')
 
         assigned_to = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.assigned_to, 0)
-        cur_user = global_vars.current_user
+        cur_user = global_vars.session_vars['current_user']
         appropiate_status = tools_qt.isChecked(self.dlg_mincut, "appropiate")
 
         check_data = [str(mincut_result_state), str(anl_cause), str(received_date),

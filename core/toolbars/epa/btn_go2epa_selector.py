@@ -122,7 +122,7 @@ class GwGo2EpaSelectorButton(GwParentAction):
         """ Update current values to the table """
 
         # Set project user
-        user = global_vars.current_user
+        user = global_vars.session_vars['current_user']
 
         # Delete previous values
         sql = (f"DELETE FROM selector_rpt_main WHERE cur_user = '{user}';\n"

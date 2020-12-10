@@ -342,7 +342,7 @@ class GwInfoTools:
 
     def open_url(self, widget):
         """ Function called in def add_hyperlink(field): -->
-                widget.clicked.connect(partial(getattr(global_vars.gw_infotools, func_name), widget)) """
+                widget.clicked.connect(partial(getattr(global_vars.session_vars['gw_infotools'], func_name), widget)) """
         tools_os.open_url(widget)
 
 
@@ -493,12 +493,12 @@ def export_layer_to_db(layer, crs):
     sql = f'DROP TABLE "{layer.name()}";'
     tools_db.execute_sql(sql)
 
-    schema_name = global_vars.credentials['schema'].replace('"', '')
+    schema_name = global_vars.session_vars['credentials']['schema'].replace('"', '')
     uri = set_uri()
     uri.setDataSource(schema_name, layer.name(), None, "", layer.name())
 
     error = QgsVectorLayerExporter.exportLayer(
-        layer, uri.uri(), global_vars.credentials['user'], crs, False)
+        layer, uri.uri(), global_vars.session_vars['credentials']['user'], crs, False)
     if error[0] != 0:
         tools_log.log_info(F"ERROR --> {error[1]}")
 
@@ -509,9 +509,9 @@ def set_uri():
     """
 
     uri = QgsDataSourceUri()
-    uri.setConnection(global_vars.credentials['host'], global_vars.credentials['port'],
-                           global_vars.credentials['db'], global_vars.credentials['user'],
-                           global_vars.credentials['password'])
+    uri.setConnection(global_vars.session_vars['credentials']['host'], global_vars.session_vars['credentials']['port'],
+                           global_vars.session_vars['credentials']['db'], global_vars.session_vars['credentials']['user'],
+                           global_vars.session_vars['credentials']['password'])
     return uri
 
 

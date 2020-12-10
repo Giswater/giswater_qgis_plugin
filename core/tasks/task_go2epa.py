@@ -63,7 +63,7 @@ class GwGo2EpaTask(QgsTask):
         self.function_failed = False
         self.complet_result = None
 
-        global_vars.show_db_exception = False
+        global_vars.session_vars['show_db_exception'] = False
         status = True
 
         if not self.exec_function_pg2epa():
@@ -83,7 +83,7 @@ class GwGo2EpaTask(QgsTask):
 
     def finished(self, result):
 
-        global_vars.show_db_exception = True
+        global_vars.session_vars['show_db_exception'] = True
 
         self.close_file()
 
@@ -127,13 +127,13 @@ class GwGo2EpaTask(QgsTask):
             raise self.exception
 
         # If Database exception, show dialog after task has finished
-        if global_vars.last_error:
-            global_vars.dlg_info.show()
+        if global_vars.session_vars['last_error']:
+            global_vars.session_vars['dlg_info'].show()
 
 
     def cancel(self):
 
-        global_vars.show_db_exception = True
+        global_vars.session_vars['show_db_exception'] = True
         tools_gw.show_info(f"Task canceled - {self.description()}")
         self.close_file()
         super().cancel()

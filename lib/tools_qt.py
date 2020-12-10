@@ -579,7 +579,7 @@ def fill_table(widget, table_name, expr_filter=None, set_edit_strategy=QSqlTable
         table_name = global_vars.schema_name + "." + table_name
 
     # Set model
-    model = QSqlTableModel(db=global_vars.db)
+    model = QSqlTableModel(db=global_vars.session_vars['db'])
     model.setTable(table_name)
     model.setEditStrategy(set_edit_strategy)
     model.setSort(0, 0)
@@ -631,7 +631,7 @@ def fill_table_object(widget, table_name, expr_filter=None):
         table_name = global_vars.schema_name + "." + table_name
 
     # Set model
-    model = QSqlTableModel(db=global_vars.db)
+    model = QSqlTableModel(db=global_vars.session_vars['db'])
     model.setTable(table_name)
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
     model.sort(0, 1)
@@ -679,7 +679,7 @@ def set_model_to_table(widget, table_name, expr_filter=None, edit_strategy=QSqlT
         table_name = global_vars.schema_name + "." + table_name
 
     # Set model
-    model = QSqlTableModel(db=global_vars.db)
+    model = QSqlTableModel(db=global_vars.session_vars['db'])
     model.setTable(table_name)
     model.setEditStrategy(edit_strategy)
     if expr_filter:
@@ -876,7 +876,7 @@ def fill_table_by_expr(qtable, table_name, expr):
     if global_vars.schema_name not in table_name:
         table_name = global_vars.schema_name + "." + table_name
 
-    model = QSqlTableModel(db=global_vars.db)
+    model = QSqlTableModel(db=global_vars.session_vars['db'])
     model.setTable(table_name)
     model.setFilter(expr)
     model.setEditStrategy(QSqlTableModel.OnFieldChange)
@@ -1221,21 +1221,21 @@ def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_inc
 def show_exceptions_msg(title=None, msg="", window_title="Information about exception", pattern=None):
     """ Show exception message in dialog """
 
-    global_vars.dlg_info = DialogTextUi()
-    global_vars.dlg_info.btn_accept.setVisible(False)
-    global_vars.dlg_info.btn_close.clicked.connect(lambda: global_vars.dlg_info.close())
-    global_vars.dlg_info.setWindowTitle(window_title)
+    global_vars.session_vars['dlg_info'] = DialogTextUi()
+    global_vars.session_vars['dlg_info'].btn_accept.setVisible(False)
+    global_vars.session_vars['dlg_info'].btn_close.clicked.connect(lambda: global_vars.session_vars['dlg_info'].close())
+    global_vars.session_vars['dlg_info'].setWindowTitle(window_title)
     if title:
-        global_vars.dlg_info.lbl_text.setText(title)
-    set_widget_text(global_vars.dlg_info, global_vars.dlg_info.txt_infolog, msg)
-    global_vars.dlg_info.setWindowFlags(Qt.WindowStaysOnTopHint)
+        global_vars.session_vars['dlg_info'].lbl_text.setText(title)
+    set_widget_text(global_vars.session_vars['dlg_info'], global_vars.session_vars['dlg_info'].txt_infolog, msg)
+    global_vars.session_vars['dlg_info'].setWindowFlags(Qt.WindowStaysOnTopHint)
     if pattern is None:
         pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:|Description|Schema name"
-    set_text_bold(global_vars.dlg_info.txt_infolog, pattern)
+    set_text_bold(global_vars.session_vars['dlg_info'].txt_infolog, pattern)
 
     # Show dialog only if we are not in a task process
-    if global_vars.show_db_exception:
-        global_vars.dlg_info.show()
+    if global_vars.session_vars['show_db_exception']:
+        global_vars.session_vars['dlg_info'].show()
 
 
 def manage_exception(title=None, description=None, sql=None, schema_name=None):
@@ -1268,7 +1268,7 @@ def manage_exception(title=None, description=None, sql=None, schema_name=None):
     tools_log.log_warning(msg)
 
     # Show exception message only if we are not in a task process
-    if global_vars.show_db_exception:
+    if global_vars.session_vars['show_db_exception']:
         show_exceptions_msg(title, msg)
 
 

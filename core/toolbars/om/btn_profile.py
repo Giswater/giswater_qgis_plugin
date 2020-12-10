@@ -116,7 +116,7 @@ class GwProfileButton(GwParentMapTool):
 
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
-        if global_vars.dlg_docker:
+        if global_vars.session_vars['dlg_docker']:
             tools_gw.dock_dialog(self.dlg_draw_profile)
         else:
             tools_gw.open_dialog(self.dlg_draw_profile)

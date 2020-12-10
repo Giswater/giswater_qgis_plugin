@@ -895,7 +895,7 @@ def insert_pg_layer(tablename=None, the_geom="the_geom", field_id="id", child_la
     """
 
     uri = tools_pgdao.get_uri()
-    schema_name = global_vars.credentials['schema'].replace('"', '')
+    schema_name = global_vars.session_vars['credentials']['schema'].replace('"', '')
     if child_layers is not None:
         for layer in child_layers:
             if layer[0] != 'Load all':
@@ -1769,7 +1769,7 @@ def add_textarea(field):
 
 
 def add_hyperlink(field):
-    """ functions called in -> widget.clicked.connect(partial(getattr(global_vars.gw_infotools, func_name), widget))
+    """ functions called in -> widget.clicked.connect(partial(getattr(global_vars.session_vars['gw_infotools'], func_name), widget))
             def open_url(self, widget)"""
 
     widget = GwHyperLinkLabel()
@@ -1785,7 +1785,7 @@ def add_hyperlink(field):
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             func_name = field['widgetfunction']
-            exist = check_python_function(global_vars.gw_infotools, func_name)
+            exist = check_python_function(global_vars.session_vars['gw_infotools'], func_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
                 show_message(msg, 2)
@@ -1797,7 +1797,7 @@ def add_hyperlink(field):
         message = "Parameter not found"
         show_message(message, 2, parameter='widgetfunction')
     # Call function-->func_name(widget) or def no_function_associated(self, widget=None, message_level=1)
-    widget.clicked.connect(partial(getattr(global_vars.gw_infotools, func_name), widget))
+    widget.clicked.connect(partial(getattr(global_vars.session_vars['gw_infotools'], func_name), widget))
 
     return widget
 
@@ -2084,7 +2084,7 @@ def get_actions_from_json(json_result, sql):
             try:
                 function_name = action['funcName']
                 params = action['params']
-                getattr(global_vars.gw_infotools, f"{function_name}")(**params)
+                getattr(global_vars.session_vars['gw_infotools'], f"{function_name}")(**params)
             except AttributeError as e:
                 # If function_name not exist as python function
                 tools_log.log_warning(f"Exception error: {e}")
@@ -2231,7 +2231,7 @@ def manage_exception_api(json_result, sql=None, stack_level=2, stack_level_incre
                 msg = "Key on returned json from ddbb is missed"
             if is_notify is True:
                 tools_log.log_info(msg, parameter=parameter, level=level)
-            elif not is_notify and global_vars.show_db_exception:
+            elif not is_notify and global_vars.session_vars['show_db_exception']:
                 # Show exception message only if we are not in a task process
                 show_message(msg, level, parameter=parameter)
 
@@ -2260,7 +2260,7 @@ def manage_exception_api(json_result, sql=None, stack_level=2, stack_level_incre
 
             tools_log.log_warning(msg, stack_level_increase=2)
             # Show exception message only if we are not in a task process
-            if global_vars.show_db_exception:
+            if global_vars.session_vars['show_db_exception']:
                 tools_qt.show_exceptions_msg(title, msg)
 
     except Exception:
@@ -2477,12 +2477,12 @@ def get_restriction(qgis_project_role):
     super_users = global_vars.settings.value('system_variables/super_users')
 
     # Manage user 'postgres'
-    if global_vars.current_user == 'postgres' or global_vars.current_user == 'gisadmin':
+    if global_vars.session_vars['current_user'] == 'postgres' or global_vars.session_vars['current_user'] == 'gisadmin':
         role_master = True
 
     # Manage super_user
     if super_users is not None:
-        if global_vars.current_user in super_users:
+        if global_vars.session_vars['current_user'] in super_users:
             role_master = True
 
     if role_basic or qgis_project_role == 'role_basic':
@@ -2860,10 +2860,10 @@ def dock_dialog(dialog):
     positions = {8: Qt.BottomDockWidgetArea, 4: Qt.TopDockWidgetArea,
                  2: Qt.RightDockWidgetArea, 1: Qt.LeftDockWidgetArea}
     try:
-        global_vars.dlg_docker.setWindowTitle(dialog.windowTitle())
-        global_vars.dlg_docker.setWidget(dialog)
-        global_vars.dlg_docker.setWindowFlags(Qt.WindowContextHelpButtonHint)
-        global_vars.iface.addDockWidget(positions[global_vars.dlg_docker.position], global_vars.dlg_docker)
+        global_vars.session_vars['dlg_docker'].setWindowTitle(dialog.windowTitle())
+        global_vars.session_vars['dlg_docker'].setWidget(dialog)
+        global_vars.session_vars['dlg_docker'].setWindowFlags(Qt.WindowContextHelpButtonHint)
+        global_vars.iface.addDockWidget(positions[global_vars.session_vars['dlg_docker'].position], global_vars.session_vars['dlg_docker'])
     except RuntimeError as e:
         tools_log.log_warning(f"{type(e).__name__} --> {e}")
 
@@ -2871,7 +2871,7 @@ def dock_dialog(dialog):
 def init_docker(docker_param='qgis_info_docker'):
     """ Get user config parameter @docker_param """
 
-    global_vars.show_docker = True
+    global_vars.session_vars['show_docker'] = True
     if docker_param == 'qgis_main_docker':
         # Show 'main dialog' in docker depending its value in user settings
         qgis_main_docker = tools_config.get_user_setting_value(docker_param, 'true')
@@ -2880,30 +2880,30 @@ def init_docker(docker_param='qgis_info_docker'):
         # Show info or form in docker?
         row = get_config(docker_param)
         if not row:
-            global_vars.dlg_docker = None
-            global_vars.docker_type = None
+            global_vars.session_vars['dlg_docker'] = None
+            global_vars.session_vars['docker_type'] = None
             return None
         value = row[0].lower()
 
     # Check if docker has dialog of type 'form' or 'main'
     if docker_param == 'qgis_info_docker':
-        if global_vars.dlg_docker:
-            if global_vars.docker_type:
-                if global_vars.docker_type != 'qgis_info_docker':
-                    global_vars.show_docker = False
+        if global_vars.session_vars['dlg_docker']:
+            if global_vars.session_vars['docker_type']:
+                if global_vars.session_vars['docker_type'] != 'qgis_info_docker':
+                    global_vars.session_vars['show_docker'] = False
                     return None
 
     if value == 'true':
         close_docker()
-        global_vars.docker_type = docker_param
-        global_vars.dlg_docker = DockerUi()
-        global_vars.dlg_docker.dlg_closed.connect(close_docker)
+        global_vars.session_vars['docker_type'] = docker_param
+        global_vars.session_vars['dlg_docker'] = DockerUi()
+        global_vars.session_vars['dlg_docker'].dlg_closed.connect(close_docker)
         manage_docker_options()
     else:
-        global_vars.dlg_docker = None
-        global_vars.docker_type = None
+        global_vars.session_vars['dlg_docker'] = None
+        global_vars.session_vars['docker_type'] = None
 
-    return global_vars.dlg_docker
+    return global_vars.session_vars['dlg_docker']
 
 
 def close_docker():
@@ -2911,21 +2911,21 @@ def close_docker():
         remove from iface and del class
     """
     try:
-        if global_vars.dlg_docker:
-            if not global_vars.dlg_docker.isFloating():
-                docker_pos = global_vars.iface.mainWindow().dockWidgetArea(global_vars.dlg_docker)
-                widget = global_vars.dlg_docker.widget()
+        if global_vars.session_vars['dlg_docker']:
+            if not global_vars.session_vars['dlg_docker'].isFloating():
+                docker_pos = global_vars.iface.mainWindow().dockWidgetArea(global_vars.session_vars['dlg_docker'])
+                widget = global_vars.session_vars['dlg_docker'].widget()
                 if widget:
                     widget.close()
                     del widget
-                    global_vars.dlg_docker.setWidget(None)
-                    global_vars.docker_type = None
+                    global_vars.session_vars['dlg_docker'].setWidget(None)
+                    global_vars.session_vars['docker_type'] = None
                     set_config_parser('docker_info', 'position', f'{docker_pos}')
-                global_vars.iface.removeDockWidget(global_vars.dlg_docker)
-                global_vars.dlg_docker = None
+                global_vars.iface.removeDockWidget(global_vars.session_vars['dlg_docker'])
+                global_vars.session_vars['dlg_docker'] = None
     except AttributeError:
-        global_vars.docker_type = None
-        global_vars.dlg_docker = None
+        global_vars.session_vars['docker_type'] = None
+        global_vars.session_vars['dlg_docker'] = None
 
 
 def manage_docker_options():
@@ -2935,11 +2935,11 @@ def manage_docker_options():
     try:
         # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
         pos = int(get_config_parser('docker_info', 'position'))
-        global_vars.dlg_docker.position = 2
+        global_vars.session_vars['dlg_docker'].position = 2
         if pos in (1, 2, 4, 8):
-            global_vars.dlg_docker.position = pos
+            global_vars.session_vars['dlg_docker'].position = pos
     except:
-        global_vars.dlg_docker.position = 2
+        global_vars.session_vars['dlg_docker'].position = 2
 
 
 def set_table_model(dialog, table_object, geom_type, expr_filter):
@@ -2964,7 +2964,7 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
         table_name = global_vars.schema_name + "." + table_name
 
     # Set the model
-    model = QSqlTableModel(db=global_vars.db)
+    model = QSqlTableModel(db=global_vars.session_vars['db'])
     model.setTable(table_name)
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
     model.select()

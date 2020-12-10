@@ -67,7 +67,7 @@ class GwAdmin:
         if set_database_connection:
             connection_status, not_version, layer_source = tools_db.set_database_connection()
         else:
-            connection_status = global_vars.logged
+            connection_status = global_vars.session_vars['logged']
 
         if not connection_status:
             self.create_credentials_form(set_connection=default_connection)
@@ -346,7 +346,7 @@ class GwAdmin:
 
         try:
             tools_gw.init_docker('qgis_main_docker')
-            if global_vars.dlg_docker:
+            if global_vars.session_vars['dlg_docker']:
                 tools_gw.dock_dialog(self.dlg_readsql)
                 self.dlg_readsql.dlg_closed.connect(tools_gw.close_docker)
             else:
@@ -1638,7 +1638,7 @@ class GwAdmin:
         status = (self.error_count == 0)
         self.manage_result_message(status, parameter="Create project")
         if status:
-            global_vars.dao.commit()
+            global_vars.session_vars['dao'].commit()
             self.close_dialog_admin(self.dlg_readsql_create_project)
             if not is_test:
                 self.populate_data_schema_name(self.cmb_project_type)
@@ -1646,7 +1646,7 @@ class GwAdmin:
                     tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
                     self.set_info_project()
         else:
-            global_vars.dao.rollback()
+            global_vars.session_vars['dao'].rollback()
             # Reset count error variable to 0
             self.error_count = 0
 
@@ -1696,13 +1696,13 @@ class GwAdmin:
         status = (self.error_count == 0)
         self.manage_result_message(status, parameter="Rename project")
         if status:
-            global_vars.dao.commit()
+            global_vars.session_vars['dao'].commit()
             self.event_change_connection()
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
             if close_dlg_rename:
                 self.close_dialog_admin(self.dlg_readsql_rename)
         else:
-            global_vars.dao.rollback()
+            global_vars.session_vars['dao'].rollback()
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1720,9 +1720,9 @@ class GwAdmin:
         status = (self.error_count == 0)
         self.manage_result_message(status, parameter="Load custom SQL files")
         if status:
-            global_vars.dao.commit()
+            global_vars.session_vars['dao'].commit()
         else:
-            global_vars.dao.rollback()
+            global_vars.session_vars['dao'].rollback()
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1751,10 +1751,10 @@ class GwAdmin:
         status = (self.error_count == 0)
         self.manage_result_message(status, parameter="Update project")
         if status:
-            global_vars.dao.commit()
+            global_vars.session_vars['dao'].commit()
             self.close_dialog_admin(self.dlg_readsql_show_info)
         else:
-            global_vars.dao.rollback()
+            global_vars.session_vars['dao'].rollback()
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1794,9 +1794,9 @@ class GwAdmin:
             status = (self.error_count == 0)
             self.manage_result_message(status, parameter="Load updates")
             if status:
-                global_vars.dao.commit()
+                global_vars.session_vars['dao'].commit()
             else:
-                global_vars.dao.rollback()
+                global_vars.session_vars['dao'].rollback()
 
             # Reset count error variable to 0
             self.error_count = 0
@@ -2136,7 +2136,7 @@ class GwAdmin:
 
         # Populate Table
         self.model_srid = QSqlQueryModel()
-        self.model_srid.setQuery(sql, db=global_vars.db)
+        self.model_srid.setQuery(sql, db=global_vars.session_vars['db'])
         self.tbl_srid.setModel(self.model_srid)
         self.tbl_srid.show()
 
@@ -2221,9 +2221,9 @@ class GwAdmin:
         status = (self.error_count == 0)
         self.manage_result_message(status, parameter="Reload")
         if status:
-            global_vars.dao.commit()
+            global_vars.session_vars['dao'].commit()
         else:
-            global_vars.dao.rollback()
+            global_vars.session_vars['dao'].rollback()
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -2413,9 +2413,9 @@ class GwAdmin:
                 if status is False:
                     self.error_count = self.error_count + 1
                     tools_log.log_info(str("read_execute_file error"), parameter=filepath)
-                    tools_log.log_info(str('Message: ' + str(global_vars.last_error)))
+                    tools_log.log_info(str('Message: ' + str(global_vars.session_vars['last_error'])))
                     if self.dev_commit == 'TRUE':
-                        global_vars.dao.rollback()
+                        global_vars.session_vars['dao'].rollback()
                     return False
 
         except Exception as e:
@@ -2423,7 +2423,7 @@ class GwAdmin:
             tools_log.log_info(str("read_execute_file exception"), parameter=file)
             tools_log.log_info(str(e))
             if self.dev_commit == 'TRUE':
-                global_vars.dao.rollback()
+                global_vars.session_vars['dao'].rollback()
             status = False
         finally:
             if f:
@@ -2498,12 +2498,12 @@ class GwAdmin:
         status = (self.error_count == 0)
         self.manage_result_message(status, parameter="Copy project")
         if status:
-            global_vars.dao.commit()
+            global_vars.session_vars['dao'].commit()
             self.event_change_connection()
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(new_schema_name))
             self.close_dialog_admin(self.dlg_readsql_copy)
         else:
-            global_vars.dao.rollback()
+            global_vars.session_vars['dao'].rollback()
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -2576,7 +2576,7 @@ class GwAdmin:
                 if  complet_result[0]['status'] == 'Failed':
                     msg = "The importation process have been failed"
                     tools_qt.show_info_box(msg, "Info")
-                    global_vars.dao.rollback()
+                    global_vars.session_vars['dao'].rollback()
                     self.error_count = 0
 
                     # Close dialog
@@ -2593,7 +2593,7 @@ class GwAdmin:
         else:
             msg = "A rollback on schema will be done."
             tools_qt.show_info_box(msg, "Info")
-            global_vars.dao.rollback()
+            global_vars.session_vars['dao'].rollback()
             self.error_count = 0
 
         # Close dialog
@@ -3053,7 +3053,7 @@ class GwAdmin:
 
         # Populate table update
         qtable = self.dlg_manage_sys_fields.findChild(QTableView, "tbl_update")
-        self.model_update_table = QSqlTableModel(db=global_vars.db)
+        self.model_update_table = QSqlTableModel(db=global_vars.session_vars['db'])
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
         expr_filter = "cat_feature_id = '" + form_name + "'"
         self.fill_table(qtable, 've_config_sysfields', self.model_update_table, expr_filter)
@@ -3074,7 +3074,7 @@ class GwAdmin:
 
         # Populate table update
         qtable = dialog.findChild(QTableView, "tbl_update")
-        self.model_update_table = QSqlTableModel(db=global_vars.db)
+        self.model_update_table = QSqlTableModel(db=global_vars.session_vars['db'])
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         if self.chk_multi_insert:

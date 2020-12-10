@@ -199,7 +199,7 @@ class Table(object):
         """ Execute UPSERT sentence """
 
         # Check PostgreSQL version
-        if not global_vars.postgresql_version:
+        if not global_vars.session_vars['postgresql_version']:
             tools_db.get_postgresql_version()
 
         # Set SQL for INSERT
@@ -234,11 +234,11 @@ class Table(object):
 
         # Execute UPSERT
         tools_log.log_info(sql, stack_level_increase=1)
-        result = global_vars.dao.execute_sql(sql, commit)
-        global_vars.last_error = global_vars.dao.last_error
+        result = global_vars.session_vars['dao'].execute_sql(sql, commit)
+        global_vars.session_vars['last_error'] = global_vars.session_vars['dao'].last_error
         if not result:
             # Check if any error has been raised
-            if global_vars.last_error:
-                tools_qt.manage_exception_db(global_vars.last_error, sql, schema_name=global_vars.schema_name)
+            if global_vars.session_vars['last_error']:
+                tools_qt.manage_exception_db(global_vars.session_vars['last_error'], sql, schema_name=global_vars.schema_name)
 
         return result

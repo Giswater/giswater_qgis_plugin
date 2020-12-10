@@ -89,7 +89,7 @@ def check_role_user(role_name, username=None):
         return False
 
     if username is None:
-        username = global_vars.current_user
+        username = global_vars.session_vars['current_user']
 
     if not check_role(username):
         return False
@@ -105,15 +105,15 @@ def check_role_user(role_name, username=None):
 def get_current_user():
     """ Get current user connected to database """
 
-    if global_vars.current_user:
-        return global_vars.current_user
+    if global_vars.session_vars['current_user']:
+        return global_vars.session_vars['current_user']
 
     sql = "SELECT current_user"
     row = get_row(sql)
     cur_user = ""
     if row:
         cur_user = str(row[0])
-    global_vars.current_user = cur_user
+    global_vars.session_vars['current_user'] = cur_user
     return cur_user
 
 
@@ -152,10 +152,10 @@ def set_database_connection():
     """ Set database connection """
 
     # Initialize variables
-    global_vars.dao = None
-    global_vars.last_error = None
-    global_vars.logged = False
-    global_vars.current_user = None
+    global_vars.session_vars['dao'] = None
+    global_vars.session_vars['last_error'] = None
+    global_vars.session_vars['logged'] = False
+    global_vars.session_vars['current_user'] = None
 
     layer_source, not_version = get_layer_source_from_credentials('disable')
     if layer_source:
@@ -166,7 +166,7 @@ def set_database_connection():
     else:
         return False, not_version, layer_source
 
-    global_vars.logged = True
+    global_vars.session_vars['logged'] = True
 
     return True, not_version, layer_source
 
@@ -176,11 +176,11 @@ def check_db_connection():
 
     opened = True
     try:
-        opened = global_vars.db.isOpen()
+        opened = global_vars.session_vars['db'].isOpen()
         if not opened:
-            opened = global_vars.db.open()
+            opened = global_vars.session_vars['db'].open()
             if not opened:
-                details = global_vars.db.lastError().databaseText()
+                details = global_vars.session_vars['db'].lastError().databaseText()
                 tools_log.log_warning(f"check_db_connection not opened: {details}")
     except Exception as e:
         tools_log.log_warning(f"check_db_connection Exception: {e}")
@@ -191,13 +191,13 @@ def check_db_connection():
 def get_postgresql_version():
     """ Get PostgreSQL version (integer value) """
 
-    global_vars.postgresql_version = None
+    global_vars.session_vars['postgresql_version'] = None
     sql = "SELECT current_setting('server_version_num');"
     row = get_row(sql)
     if row:
-        global_vars.postgresql_version = row[0]
+        global_vars.session_vars['postgresql_version'] = row[0]
 
-    return global_vars.postgresql_version
+    return global_vars.session_vars['postgresql_version']
 
 
 def connect_to_database(host, port, db, user, pwd, sslmode):
@@ -208,36 +208,36 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
     # Check if selected parameters is correct
     if None in (host, port, db, user, pwd):
         message = "Database connection error. Please check your connection parameters."
-        global_vars.last_error = tools_qt.tr(message, aux_context='ui_message')
+        global_vars.session_vars['last_error'] = tools_qt.tr(message, aux_context='ui_message')
         return False
 
     # Update current user
-    global_vars.current_user = user
+    global_vars.session_vars['current_user'] = user
 
     # We need to create this connections for Table Views
-    global_vars.db = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
-    global_vars.db.setHostName(host)
+    global_vars.session_vars['db'] = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
+    global_vars.session_vars['db'].setHostName(host)
     if port != '':
-        global_vars.db.setPort(int(port))
-    global_vars.db.setDatabaseName(db)
-    global_vars.db.setUserName(user)
-    global_vars.db.setPassword(pwd)
-    status = global_vars.db.open()
+        global_vars.session_vars['db'].setPort(int(port))
+    global_vars.session_vars['db'].setDatabaseName(db)
+    global_vars.session_vars['db'].setUserName(user)
+    global_vars.session_vars['db'].setPassword(pwd)
+    status = global_vars.session_vars['db'].open()
     if not status:
         message = "Database connection error. Please open plugin log file to get more details"
-        global_vars.last_error = tools_qt.tr(message, aux_context='ui_message')
-        details = global_vars.db.lastError().databaseText()
+        global_vars.session_vars['last_error'] = tools_qt.tr(message, aux_context='ui_message')
+        details = global_vars.session_vars['db'].lastError().databaseText()
         tools_log.log_warning(str(details))
         return False
 
     # Connect to Database
-    global_vars.dao = tools_pgdao.PgDao()
-    global_vars.dao.set_params(host, port, db, user, pwd, sslmode)
-    status = global_vars.dao.init_db()
+    global_vars.session_vars['dao'] = tools_pgdao.PgDao()
+    global_vars.session_vars['dao'].set_params(host, port, db, user, pwd, sslmode)
+    status = global_vars.session_vars['dao'].init_db()
     if not status:
         message = "Database connection error. Please open plugin log file to get more details"
-        global_vars.last_error = tools_qt.tr(message, aux_context='ui_message')
-        tools_log.log_warning(str(global_vars.dao.last_error))
+        global_vars.session_vars['last_error'] = tools_qt.tr(message, aux_context='ui_message')
+        tools_log.log_warning(str(global_vars.session_vars['dao'].last_error))
         return False
 
     return status
@@ -254,24 +254,24 @@ def connect_to_database_service(service, sslmode=None):
     tools_log.log_info(f"connect_to_database_service: {conn_string}")
 
     # We need to create this connections for Table Views
-    global_vars.db = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
-    global_vars.db.setConnectOptions(conn_string)
-    status = global_vars.db.open()
+    global_vars.session_vars['db'] = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
+    global_vars.session_vars['db'].setConnectOptions(conn_string)
+    status = global_vars.session_vars['db'].open()
     if not status:
         message = "Database connection error (QSqlDatabase). Please open plugin log file to get more details"
-        global_vars.last_error = tools_qt.tr(message, aux_context='ui_message')
-        details = global_vars.db.lastError().databaseText()
+        global_vars.session_vars['last_error'] = tools_qt.tr(message, aux_context='ui_message')
+        details = global_vars.session_vars['db'].lastError().databaseText()
         tools_log.log_warning(str(details))
         return False
 
     # Connect to Database
-    global_vars.dao = tools_pgdao.PgDao()
-    global_vars.dao.set_conn_string(conn_string)
-    status = global_vars.dao.init_db()
+    global_vars.session_vars['dao'] = tools_pgdao.PgDao()
+    global_vars.session_vars['dao'].set_conn_string(conn_string)
+    status = global_vars.session_vars['dao'].init_db()
     if not status:
         message = "Database connection error (PgDao). Please open plugin log file to get more details"
-        global_vars.last_error = tools_qt.tr(message, aux_context='ui_message')
-        tools_log.log_warning(str(global_vars.dao.last_error))
+        global_vars.session_vars['last_error'] = tools_qt.tr(message, aux_context='ui_message')
+        tools_log.log_warning(str(global_vars.session_vars['dao'].last_error))
         return False
 
     return status
@@ -282,7 +282,7 @@ def get_postgis_version():
 
     postgis_version = None
     sql = "SELECT postgis_lib_version()"
-    row = global_vars.dao.get_row(sql)
+    row = global_vars.session_vars['dao'].get_row(sql)
     if row:
         postgis_version = row[0]
 
@@ -293,7 +293,7 @@ def get_sql(sql, log_sql=False, params=None):
     """ Generate SQL with params. Useful for debugging """
 
     if params:
-        sql = global_vars.dao.mogrify(sql, params)
+        sql = global_vars.session_vars['dao'].mogrify(sql, params)
     if log_sql:
         tools_log.log_info(sql, stack_level_increase=2)
 
@@ -304,13 +304,13 @@ def get_row( sql, log_info=True, log_sql=False, commit=True, params=None):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
     sql = get_sql(sql, log_sql, params)
-    row = global_vars.dao.get_row(sql, commit)
-    global_vars.last_error = global_vars.dao.last_error
+    row = global_vars.session_vars['dao'].get_row(sql, commit)
+    global_vars.session_vars['last_error'] = global_vars.session_vars['dao'].last_error
     if not row:
         # Check if any error has been raised
-        if global_vars.last_error:
-            tools_qt.manage_exception_db(global_vars.last_error, sql)
-        elif global_vars.last_error is None and log_info:
+        if global_vars.session_vars['last_error']:
+            tools_qt.manage_exception_db(global_vars.session_vars['last_error'], sql)
+        elif global_vars.session_vars['last_error'] is None and log_info:
             tools_log.log_info("Any record found", parameter=sql, stack_level_increase=1)
 
     return row
@@ -321,13 +321,13 @@ def get_rows(sql, log_info=True, log_sql=False, commit=True, params=None, add_em
 
     sql = get_sql(sql, log_sql, params)
     rows = None
-    rows2 = global_vars.dao.get_rows(sql, commit)
-    global_vars.last_error = global_vars.dao.last_error
+    rows2 = global_vars.session_vars['dao'].get_rows(sql, commit)
+    global_vars.session_vars['last_error'] = global_vars.session_vars['dao'].last_error
     if not rows2:
         # Check if any error has been raised
-        if global_vars.last_error:
-            tools_qt.manage_exception_db(global_vars.last_error, sql)
-        elif global_vars.last_error is None and log_info:
+        if global_vars.session_vars['last_error']:
+            tools_qt.manage_exception_db(global_vars.session_vars['last_error'], sql)
+        elif global_vars.session_vars['last_error'] is None and log_info:
             tools_log.log_info("Any record found", parameter=sql, stack_level_increase=1)
     else:
         if add_empty_row:
@@ -344,12 +344,12 @@ def execute_sql(sql, log_sql=False, log_error=False, commit=True, filepath=None)
 
     if log_sql:
         tools_log.log_info(sql, stack_level_increase=1)
-    result = global_vars.dao.execute_sql(sql, commit)
-    global_vars.last_error = global_vars.dao.last_error
+    result = global_vars.session_vars['dao'].execute_sql(sql, commit)
+    global_vars.session_vars['last_error'] = global_vars.session_vars['dao'].last_error
     if not result:
         if log_error:
             tools_log.log_info(sql, stack_level_increase=1)
-        tools_qt.manage_exception_db(global_vars.last_error, sql, filepath=filepath)
+        tools_qt.manage_exception_db(global_vars.session_vars['last_error'], sql, filepath=filepath)
         return False
 
     return True
@@ -360,12 +360,12 @@ def execute_returning(sql, log_sql=False, log_error=False, commit=True):
 
     if log_sql:
         tools_log.log_info(sql, stack_level_increase=1)
-    value = global_vars.dao.execute_returning(sql, commit)
-    global_vars.last_error = global_vars.dao.last_error
+    value = global_vars.session_vars['dao'].execute_returning(sql, commit)
+    global_vars.session_vars['last_error'] = global_vars.session_vars['dao'].last_error
     if not value:
         if log_error:
             tools_log.log_info(sql, stack_level_increase=1)
-        tools_qt.manage_exception_db(global_vars.last_error, sql)
+        tools_qt.manage_exception_db(global_vars.session_vars['last_error'], sql)
         return False
 
     return value
@@ -376,7 +376,7 @@ def set_search_path(schema_name):
 
     sql = f"SET search_path = {schema_name}, public;"
     execute_sql(sql)
-    global_vars.dao.set_search_path = sql
+    global_vars.session_vars['dao'].set_search_path = sql
 
 
 def check_function(function_name, schema_name=None, commit=True):
@@ -429,7 +429,7 @@ def get_layer_source_from_credentials(sslmode_value, layer_name='v_edit_node'):
     if layer is None and settings is None:
         not_version = False
         tools_log.log_warning(f"Layer '{layer_name}' is None and settings is None")
-        global_vars.last_error = f"Layer not found: '{layer_name}'"
+        global_vars.session_vars['last_error'] = f"Layer not found: '{layer_name}'"
         return None, not_version
 
     # Get sslmode from user config file
@@ -447,7 +447,7 @@ def get_layer_source_from_credentials(sslmode_value, layer_name='v_edit_node'):
         status, credentials = connect_to_database_credentials(credentials, conn_info)
         if not status:
             tools_log.log_warning("Error connecting to database (layer)")
-            global_vars.last_error = tools_qt.tr("Error connecting to database", aux_context='ui_message')
+            global_vars.session_vars['last_error'] = tools_qt.tr("Error connecting to database", aux_context='ui_message')
             return None, not_version
 
         # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
@@ -474,12 +474,12 @@ def get_layer_source_from_credentials(sslmode_value, layer_name='v_edit_node'):
             status, credentials = connect_to_database_credentials(credentials, max_attempts=0)
             if not status:
                 tools_log.log_warning("Error connecting to database (settings)")
-                global_vars.last_error = tools_qt.tr("Error connecting to database", aux_context='ui_message')
+                global_vars.session_vars['last_error'] = tools_qt.tr("Error connecting to database", aux_context='ui_message')
                 return None, not_version
         else:
             tools_log.log_warning("Error getting default connection (settings)")
-            global_vars.last_error = tools_qt.tr("Error getting default connection", aux_context='ui_message')
+            global_vars.session_vars['last_error'] = tools_qt.tr("Error getting default connection", aux_context='ui_message')
             return None, not_version
 
-    global_vars.credentials = credentials
+    global_vars.session_vars['credentials'] = credentials
     return credentials, not_version
