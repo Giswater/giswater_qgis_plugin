@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import csv
+import json
 import os
 from functools import partial
 
@@ -248,49 +249,44 @@ class GwCSVButton(GwParentAction):
 
     def insert_into_db(self, dialog, csvfile, delimiter, _unicode):
 
-        sql = ""
         progress = 0
         dialog.progressBar.setVisible(True)
         dialog.progressBar.setValue(progress)
-        # counts rows in csvfile, using var "row_count" to do progressbar
-        # noinspection PyUnusedLocal
+        # Counts rows in csvfile, using var "row_count" to do progressbar
         row_count = sum(1 for rows in csvfile)
         if row_count > 20:
-            row_count -= 20
-        dialog.progressBar.setMaximum(row_count)  # -20 for see 100% complete progress
+            row_count -= 20  # -20 for see 100% complete progress
+        dialog.progressBar.setMaximum(100)
         csvfile.seek(0)  # Position the cursor at position 0 of the file
-        reader = csv.reader(csvfile, delimiter=delimiter)
+        reader = csv.reader(csvfile, delimiter=delimiter,)
         fid_aux = tools_qt.get_combo_value(dialog, dialog.cmb_import_type, 0)
         readheader = tools_qt.get_combo_value(dialog, dialog.cmb_import_type, 4)
+        fields = []
+        cont = 1
         for row in reader:
+            field = {'fid': fid_aux}
             if readheader is False:
                 readheader = True
                 continue
-            if len(row) > 0:
-                sql += "INSERT INTO temp_csv (fid, "
-                values = f"VALUES({fid_aux}, "
-                for x in range(0, len(row)):
-                    sql += f"csv{x + 1}, "
-                    value = f"$$" + row[x].strip().replace("\n", "") + "$$, "
-                    value = str(value)
-                    values += value.replace("$$$$", "null")
-                sql = sql[:-2] + ") "
-                values = values[:-2] + ");\n"
-                sql += values
-                progress += 1
+
+            for x in range(0, len(row)):
+                value = row[x].strip().replace("\n", "")
+                field[f"csv{x + 1}"] = f"{value}"
+            fields.append(field)
+            cont += 1
+            progress = (100*cont)/row_count
             dialog.progressBar.setValue(progress)
+        dialog.progressBar.setValue(100)
+        if not fields: return False
 
-            if progress % 500 == 0:
-                status = tools_db.execute_sql(sql)
-                if not status:
-                    return False
-                sql = ""
-        if sql != "":
-            status = tools_db.execute_sql(sql)
-            if not status:
-                return False
+        values = f'"values":{(json.dumps(fields, ensure_ascii=False).encode(_unicode)).decode()}'
+        body = tools_gw.create_body(extras=values)
+        result = tools_gw.get_json('gw_fct_copy_to_temp_csv', body)
 
-        return True
+        if 'status' in result and result['status'] == 'Accepted':
+            return True
+
+        return False
 
 
     def get_path(self, dialog):
