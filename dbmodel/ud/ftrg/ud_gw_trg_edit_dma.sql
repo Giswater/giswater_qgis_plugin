@@ -50,7 +50,8 @@ BEGIN
 		IF (NEW.muni_id IS NULL) THEN
 			NEW.muni_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_municipality_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.muni_id IS NULL) THEN
-				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
+				NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) 
+				AND active IS TRUE LIMIT 1);
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"2024", "function":"1212","debug_msg":null}}$$);'; 
 			END IF;

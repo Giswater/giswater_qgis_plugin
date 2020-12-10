@@ -212,7 +212,7 @@ BEGIN
 		IF (NEW.muni_id IS NULL) THEN
 			
 			-- control error without any mapzones defined on the table of mapzone
-			IF ((SELECT COUNT(*) FROM ext_municipality) = 0) THEN
+			IF ((SELECT COUNT(*) FROM ext_municipality WHERE active IS TRUE ) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"3110", "function":"1202","debug_msg":null}}$$);';
 			END IF;
@@ -226,7 +226,8 @@ BEGIN
 			IF (NEW.muni_id IS NULL) THEN
 				SELECT count(*)into v_count FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001);
 				IF v_count = 1 THEN
-					NEW.muni_id = (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
+					NEW.muni_id = (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) 
+						AND active IS TRUE LIMIT 1);
 				ELSE
 					NEW.muni_id =(SELECT muni_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_promixity_buffer) 
 					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);

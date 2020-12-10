@@ -48,7 +48,8 @@ BEGIN
 	        END IF;
 
 	        IF NEW.muni_id IS NULL THEN
-	          NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) LIMIT 1);
+	          NEW.muni_id := (SELECT muni_id FROM ext_municipality WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, ext_municipality.the_geom,0.001) 
+	          	AND active IS TRUE LIMIT 1);
 	        END IF;
 
 			INSERT INTO ext_streetaxis(id, code, type, name, text, the_geom, expl_id, muni_id)

@@ -398,7 +398,8 @@ BEGIN
 		v_macrosector_id := (SELECT macrosector_id FROM sector WHERE sector_id=v_sector_id);
 	
 		-- Municipality 
-		v_muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(p_reduced_geometry, ext_municipality.the_geom,0.001) LIMIT 1); 
+		v_muni_id := (SELECT muni_id FROM ext_municipality WHERE ST_DWithin(p_reduced_geometry, ext_municipality.the_geom,0.001) 
+		AND active IS TRUE LIMIT 1); 
 
 	ELSIF p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN
 
