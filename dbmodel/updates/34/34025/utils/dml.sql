@@ -148,3 +148,6 @@ UPDATE om_visit_cat SET active = TRUE WHERE active IS NULL;
 UPDATE sys_addfields SET active = TRUE WHERE active IS NULL;
 UPDATE sys_foreignkey SET active = TRUE WHERE active IS NULL;
 UPDATE sys_style SET active = TRUE WHERE active IS NULL;
+
+update ext_municipality set active = true where active IS NULL and (select value::boolean
+from config_param_system where parameter='admin_utils_schema') is false;
