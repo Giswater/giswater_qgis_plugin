@@ -66,7 +66,7 @@ class Giswater(QObject):
         global_vars.plugin_dir = self.plugin_dir
         global_vars.iface = self.iface
         self.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater')
-        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'shared' + os.sep
+        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
 
         global_vars.init_global(self.iface, self.iface.mapCanvas(), self.plugin_dir, self.plugin_name)
 

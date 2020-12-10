@@ -74,7 +74,7 @@ class GwAdmin:
             return
 
         # Set label status connection
-        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'shared' + os.sep
+        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
         self.status_ok = QPixmap(self.icon_folder + 'status_ok.png')
         self.status_ko = QPixmap(self.icon_folder + 'status_ko.png')
         self.status_no_update = QPixmap(self.icon_folder + 'status_not_updated.png')

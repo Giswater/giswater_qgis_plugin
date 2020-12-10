@@ -414,8 +414,8 @@ class GwInfo(QObject):
 
         # Set actions icon
         tools_gw.add_icon(action_edit, "101")
-        tools_gw.add_icon(action_copy_paste, "107b")
-        tools_gw.add_icon(action_rotation, "107c")
+        tools_gw.add_icon(action_copy_paste, "107b", "24x24")
+        tools_gw.add_icon(action_rotation, "107c", "24x24")
         tools_gw.add_icon(action_catalog, "195")
         tools_gw.add_icon(action_workcat, "193")
         tools_gw.add_icon(action_mapzone, "213")
@@ -432,23 +432,23 @@ class GwInfo(QObject):
 
         # Set buttons icon
         # tab elements
-        tools_gw.add_icon(self.dlg_cf.btn_insert, "111b")
-        tools_gw.add_icon(self.dlg_cf.btn_delete, "112b")
-        tools_gw.add_icon(self.dlg_cf.btn_new_element, "131b")
-        tools_gw.add_icon(self.dlg_cf.btn_open_element, "134b")
+        tools_gw.add_icon(self.dlg_cf.btn_insert, "111b", "24x24")
+        tools_gw.add_icon(self.dlg_cf.btn_delete, "112b", "24x24")
+        tools_gw.add_icon(self.dlg_cf.btn_new_element, "131b", "24x24")
+        tools_gw.add_icon(self.dlg_cf.btn_open_element, "134b", "24x24")
         # tab hydrometer
-        tools_gw.add_icon(self.dlg_cf.btn_link, "70b")
+        tools_gw.add_icon(self.dlg_cf.btn_link, "70", "24x24")
         # tab om
-        tools_gw.add_icon(self.dlg_cf.btn_open_visit, "65b")
-        tools_gw.add_icon(self.dlg_cf.btn_new_visit, "64b")
-        tools_gw.add_icon(self.dlg_cf.btn_open_gallery, "136b")
-        tools_gw.add_icon(self.dlg_cf.btn_open_visit_doc, "170b")
-        tools_gw.add_icon(self.dlg_cf.btn_open_visit_event, "134b")
+        tools_gw.add_icon(self.dlg_cf.btn_open_visit, "65", "24x24")
+        tools_gw.add_icon(self.dlg_cf.btn_new_visit, "64", "24x24")
+        tools_gw.add_icon(self.dlg_cf.btn_open_gallery, "136b", "24x24")
+        tools_gw.add_icon(self.dlg_cf.btn_open_visit_doc, "170b", "24x24")
+        tools_gw.add_icon(self.dlg_cf.btn_open_visit_event, "134b", "24x24")
         # tab doc
-        tools_gw.add_icon(self.dlg_cf.btn_doc_insert, "111b")
-        tools_gw.add_icon(self.dlg_cf.btn_doc_delete, "112b")
-        tools_gw.add_icon(self.dlg_cf.btn_doc_new, "131b")
-        tools_gw.add_icon(self.dlg_cf.btn_open_doc, "170b")
+        tools_gw.add_icon(self.dlg_cf.btn_doc_insert, "111b", "24x24")
+        tools_gw.add_icon(self.dlg_cf.btn_doc_delete, "112b", "24x24")
+        tools_gw.add_icon(self.dlg_cf.btn_doc_new, "131b", "24x24")
+        tools_gw.add_icon(self.dlg_cf.btn_open_doc, "170b", "24x24")
 
         # Get feature type as geom_type (node, arc, connec, gully)
         self.geom_type = str(complet_result[0]['body']['feature']['featureType'])

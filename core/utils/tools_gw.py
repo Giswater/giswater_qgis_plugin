@@ -755,7 +755,7 @@ def refresh_legend():
 def get_cursor_multiple_selection():
     """ Set cursor for multiple selection """
 
-    path_cursor = os.path.join(global_vars.plugin_dir, f"icons{os.sep}shared", '201.png')
+    path_cursor = os.path.join(global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}20x20", '201.png')
     if os.path.exists(path_cursor):
         cursor = QCursor(QPixmap(path_cursor))
     else:
@@ -3048,11 +3048,11 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
     return widget
 
 
-def add_icon(widget, icon):
+def add_icon(widget, icon, sub_folder="20x20"):
     """ Set @icon to selected @widget """
 
     # Get icons folder
-    icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}shared")
+    icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}{sub_folder}")
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
     if os.path.exists(icon_path):
         widget.setIcon(QIcon(icon_path))

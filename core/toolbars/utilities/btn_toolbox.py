@@ -535,7 +535,7 @@ class GwToolBoxButton(GwParentAction):
         font.setPointSize(8)
         main_parent.setFont(font)
 
-        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'shared'
+        self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
         path_icon_blue = self.icon_folder + os.sep + '36.png'
         path_icon_red = self.icon_folder + os.sep + '100.png'
         if os.path.exists(path_icon_blue):
