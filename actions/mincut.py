@@ -738,8 +738,8 @@ class MincutParent(ParentAction):
         qtabwidget = self.dlg_mincut.findChild(QTabWidget, 'mainTab')
         qtabwidget.widget(0).setEnabled(False)  # Tab plan
         qtabwidget.widget(1).setEnabled(True)   # Tab Exec
-        qtabwidget.widget(2).setEnabled(False)  # Tab Hydro
-        qtabwidget.widget(3).setEnabled(False)  # Tab Log
+        qtabwidget.widget(2).setEnabled(True)   # Tab hydro
+        qtabwidget.widget(3).setEnabled(True)  # Tab Log
 
         self.dlg_mincut.closeMainWin = False
         self.dlg_mincut.mincutCanceled = True
@@ -1901,7 +1901,7 @@ class MincutParent(ParentAction):
         body = self.create_body(extras=extras)
         result = self.controller.get_json('gw_fct_getmincut', body)
         self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, False, disable_tabs=False)
-        self.dlg_mincut.txt_infolog.setEnabled(False)
+        #self.dlg_mincut.txt_infolog.setEnabled(False)
 
         # Manage location
         utils_giswater.set_combo_itemData(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
