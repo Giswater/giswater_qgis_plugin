@@ -663,8 +663,8 @@ class GwMincut:
         qtabwidget = self.dlg_mincut.findChild(QTabWidget, 'mainTab')
         qtabwidget.widget(0).setEnabled(False)  # Tab plan
         qtabwidget.widget(1).setEnabled(True)   # Tab Exec
-        qtabwidget.widget(2).setEnabled(True)   # Tab Hydro
-        qtabwidget.widget(3).setEnabled(False)  # Tab Log
+        qtabwidget.widget(2).setEnabled(True)   # Tab hydro
+        qtabwidget.widget(3).setEnabled(True)  # Tab Log
 
         self.dlg_mincut.closeMainWin = False
         self.dlg_mincut.mincutCanceled = True
@@ -1800,7 +1800,7 @@ class GwMincut:
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.get_json('gw_fct_getmincut', body)
         tools_gw.add_temp_layer(self.dlg_mincut, result['body']['data'], None, False, disable_tabs=False)
-        self.dlg_mincut.txt_infolog.setEnabled(False)
+        #self.dlg_mincut.txt_infolog.setEnabled(False)
 
         # Manage location
         tools_qt.set_combo_value(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
