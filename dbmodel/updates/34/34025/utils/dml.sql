@@ -135,3 +135,17 @@ UPDATE sys_table SET sys_role = 'role_basic' WHERE sys_role IS NULL;
 
 DELETE FROM sys_table WHERE id = 'ext_cat_scada';
 DELETE FROM sys_table WHERE id = 'ext_rtc_scada';
+
+UPDATE cat_manager SET active = TRUE WHERE active IS NULL;
+UPDATE config_csv SET active = TRUE WHERE active IS NULL;
+UPDATE config_file SET active = TRUE WHERE active IS NULL;
+UPDATE config_toolbox SET active = TRUE WHERE active IS NULL;
+UPDATE config_user_x_expl SET active = TRUE WHERE active IS NULL;
+UPDATE config_visit_class_x_feature SET active = TRUE WHERE active IS NULL;
+UPDATE config_visit_class_x_parameter SET active = TRUE WHERE active IS NULL;
+UPDATE exploitation SET active = TRUE WHERE active IS NULL;
+UPDATE om_visit_cat SET active = TRUE WHERE active IS NULL;
+UPDATE sys_addfields SET active = TRUE WHERE active IS NULL;
+UPDATE sys_foreignkey SET active = TRUE WHERE active IS NULL;
+UPDATE sys_function SET active = TRUE WHERE active IS NULL;
+UPDATE sys_style SET active = TRUE WHERE active IS NULL;
