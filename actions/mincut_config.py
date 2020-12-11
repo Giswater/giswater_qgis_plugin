@@ -187,15 +187,6 @@ class MincutConfig(ParentAction):
             # Call script
             result = subprocess.call([path, _cause, from_date, to_date, list_clients])
 
-            _date_sended = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
-            sql = ("UPDATE " + self.schema_name + ".om_mincut ")
-            if row[4] is None:
-                sql += f"SET notified = ('[{{\"code\":\"{result[0]}\",\"date\":\"{_date_sended}\",\"avisats\":\"{result[1]}\",\"afectats\":\"{result[2]}\"}}]') "
-            else:
-                sql += f"SET notified= concat(replace(notified::text,']',','),'{{\"code\":\"{result[0]}\",\"date\":\"{_date_sended}\",\"avisats\":\"{result[1]}\",\"afectats\":\"{result[2]}\"}}]')::json "
-            sql += f"WHERE id = '{id_}'"
-            row = self.controller.execute_sql(sql)
-
             # Set a model with selected filter. Attach that model to selected table
             self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
             self.set_table_columns(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut", sort_order=1)
