@@ -63,10 +63,10 @@ class GwDimensioning:
             json_result = tools_gw.get_json(function_name, body)
             if json_result is None or json_result['status'] == 'Failed':
                 return False
-            db_return = [json_result]
+            db_return = json_result
 
         # get id from db response
-        self.fid = db_return[0]['body']['feature']['id']
+        self.fid = db_return['body']['feature']['id']
 
         # ACTION SIGNALS
         actionSnapping = self.dlg_dim.findChild(QAction, "actionSnapping")
@@ -83,8 +83,8 @@ class GwDimensioning:
         self.layer_dimensions.editingStopped.connect(lambda: actionSnapping.setEnabled(False))
         self.layer_dimensions.editingStarted.connect(lambda: actionOrientation.setEnabled(True))
         self.layer_dimensions.editingStopped.connect(lambda: actionOrientation.setEnabled(False))
-        self.layer_dimensions.editingStarted.connect(partial(tools_gw.enable_all, self.dlg_dim, db_return[0]['body']['data']))
-        self.layer_dimensions.editingStopped.connect(partial(tools_gw.disable_widgets, self.dlg_dim, db_return[0]['body']['data'], False))
+        self.layer_dimensions.editingStarted.connect(partial(tools_gw.enable_all, self.dlg_dim, db_return['body']['data']))
+        self.layer_dimensions.editingStopped.connect(partial(tools_gw.disable_widgets, self.dlg_dim, db_return['body']['data'], False))
 
         # WIDGETS SIGNALS
         self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, qgis_feature, layer))
@@ -97,7 +97,7 @@ class GwDimensioning:
         self.create_map_tips()
 
         layout_list = []
-        for field in db_return[0]['body']['data']['fields']:
+        for field in db_return['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
 
@@ -133,11 +133,11 @@ class GwDimensioning:
             if self.layer_dimensions.isEditable():
                 actionSnapping.setEnabled(True)
                 actionOrientation.setEnabled(True)
-                tools_gw.enable_all(self.dlg_dim, db_return[0]['body']['data'])
+                tools_gw.enable_all(self.dlg_dim, db_return['body']['data'])
             else:
                 actionSnapping.setEnabled(False)
                 actionOrientation.setEnabled(False)
-                tools_gw.disable_widgets(self.dlg_dim, db_return[0]['body']['data'], False)
+                tools_gw.disable_widgets(self.dlg_dim, db_return['body']['data'], False)
 
         title = f"DIMENSIONING - {self.fid}"
         tools_gw.open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)

@@ -179,35 +179,34 @@ class GwInfo(QObject):
         if json_result is None:
             return False, None
 
-        row = [json_result]
-        if not row or row[0] is False:
+        if json_result in (None, False):
             return False, None
 
         # When insert feature failed
-        if 'status' in row[0] and row[0]['status'] == 'Failed':
+        if 'status' in json_result and json_result['status'] == 'Failed':
             return False, None
 
         # When something is wrong
-        if 'message' in row[0] and row[0]['message']:
+        if 'message' in json_result and json_result['message']:
             level = 1
-            if 'level' in row[0]['message']:
-                level = int(row[0]['message']['level'])
-            tools_gw.show_message(row[0]['message']['text'], level)
+            if 'level' in json_result['message']:
+                level = int(json_result['message']['level'])
+            tools_gw.show_message(json_result['message']['text'], level)
             return False, None
 
         # Control fail when insert new feature
-        if 'status' in row[0]['body']['data']['fields']:
-            if row[0]['body']['data']['fields']['status'].lower() == 'failed':
-                msg = row[0]['body']['data']['fields']['message']['text']
+        if 'status' in json_result['body']['data']['fields']:
+            if json_result['body']['data']['fields']['status'].lower() == 'failed':
+                msg = json_result['body']['data']['fields']['message']['text']
                 level = 1
-                if 'level' in row[0]['body']['data']['fields']['message']:
-                    level = int(row[0]['body']['data']['fields']['message']['level'])
+                if 'level' in json_result['body']['data']['fields']['message']:
+                    level = int(json_result['body']['data']['fields']['message']['level'])
                 tools_gw.show_message(msg, message_level=level)
                 return False, None
 
-        self.complet_result = row
+        self.complet_result = json_result
         try:
-            template = self.complet_result[0]['body']['form']['template']
+            template = self.complet_result['body']['form']['template']
         except Exception as e:
             tools_log.log_info(str(e))
             return False, None
@@ -223,7 +222,7 @@ class GwInfo(QObject):
             self.lyr_dim = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning=True)
             if self.lyr_dim:
                 self.api_dim = GwDimensioning()
-                feature_id = self.complet_result[0]['body']['feature']['id']
+                feature_id = self.complet_result['body']['feature']['id']
                 result, dialog = self.api_dim.open_dimensioning_form(None, self.lyr_dim, self.complet_result, feature_id, self.rubber_band)
                 return result, dialog
 
@@ -234,14 +233,14 @@ class GwInfo(QObject):
                     sub_tag = 'arc'
                 else:
                     sub_tag = 'node'
-            feature_id = self.complet_result[0]['body']['feature']['id']
+            feature_id = self.complet_result['body']['feature']['id']
             result, dialog = self.open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker, new_feature=new_feature)
             if feature_cat is not None:
                 self.manage_new_feature(self.complet_result, dialog)
             return result, dialog
 
         elif template == 'visit':
-            visit_id = self.complet_result[0]['body']['feature']['id']
+            visit_id = self.complet_result['body']['feature']['id']
             manage_visit = GwVisitManager()
             manage_visit.manage_visit(visit_id=visit_id, tag='info')
 
@@ -262,7 +261,7 @@ class GwInfo(QObject):
 
     def manage_new_feature(self, complet_result, dialog):
 
-        result = complet_result[0]['body']['data']
+        result = complet_result['body']['data']
         for field in result['fields']:
             if 'hidden' in field and field['hidden']: continue
             if 'layoutname' in field and field['layoutname'] == 'lyt_none': continue
@@ -294,7 +293,7 @@ class GwInfo(QObject):
         tools_gw.load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
-        field_id = str(self.complet_result[0]['body']['feature']['idName'])
+        field_id = str(self.complet_result['body']['feature']['idName'])
         result = tools_gw.fill_basic_info(self.hydro_info_dlg, complet_result, field_id, self.my_json,
                  new_feature_id=self.new_feature_id, new_feature=self.new_feature, layer_new_feature=self.layer_new_feature,
                  feature_id=self.feature_id, feature_type=self.feature_type, layer=self.layer)
@@ -316,10 +315,11 @@ class GwInfo(QObject):
 
         # If in the get_json function we have received a rubberband, it is not necessary to redraw it.
         # But if it has not been received, it is drawn
+        # Using variable exist_rb for check if alredy exist rubberband
         try:
-            exist_rb = complet_result[0]['body']['returnManager']['style']['ruberband']
+            exist_rb = complet_result['body']['returnManager']['style']['ruberband']
         except KeyError:
-            tools_gw.draw_by_json(complet_result[0], self.rubber_band)
+            tools_gw.draw_by_json(complet_result, self.rubber_band)
 
         if feature_id:
             self.dlg_cf.setGeometry(self.dlg_cf.pos().x() + 25, self.dlg_cf.pos().y() + 25, self.dlg_cf.width(),
@@ -346,14 +346,14 @@ class GwInfo(QObject):
         tools_qt.set_qtv_config(self.tbl_document)
 
         # Get table name
-        self.tablename = complet_result[0]['body']['feature']['tableName']
+        self.tablename = complet_result['body']['feature']['tableName']
 
         # Get feature type (Junction, manhole, valve, fountain...)
-        self.feature_type = complet_result[0]['body']['feature']['childType']
+        self.feature_type = complet_result['body']['feature']['childType']
 
         # Get tableParent and select layer
-        self.table_parent = str(complet_result[0]['body']['feature']['tableParent'])
-        schema_name = str(complet_result[0]['body']['feature']['schemaName'])
+        self.table_parent = str(complet_result['body']['feature']['tableParent'])
+        schema_name = str(complet_result['body']['feature']['schemaName'])
         self.layer = tools_qgis.get_layer_by_tablename(self.table_parent, False, False, schema_name)
         if self.layer is None:
             tools_gw.show_message("Layer not found: " + self.table_parent, 2)
@@ -363,8 +363,8 @@ class GwInfo(QObject):
         tabs_to_show = []
 
         # Get field id name and feature id
-        self.field_id = str(complet_result[0]['body']['feature']['idName'])
-        self.feature_id = complet_result[0]['body']['feature']['id']
+        self.field_id = str(complet_result['body']['feature']['idName'])
+        self.feature_id = complet_result['body']['feature']['id']
 
         # Get the start point and end point of the feature
         list_points = None
@@ -374,8 +374,8 @@ class GwInfo(QObject):
             feature = tools_qt.get_feature_by_id(self.layer, self.feature_id, self.field_id)
             list_points = tools_qgis.get_points_from_geometry(self.layer, feature)
 
-        if 'visibleTabs' in complet_result[0]['body']['form']:
-            for tab in complet_result[0]['body']['form']['visibleTabs']:
+        if 'visibleTabs' in complet_result['body']['form']:
+            for tab in complet_result['body']['form']['visibleTabs']:
                 tabs_to_show.append(tab['tabName'])
 
         for x in range(self.tab_main.count() - 1, 0, -1):
@@ -408,7 +408,7 @@ class GwInfo(QObject):
         self.show_actions(self.dlg_cf, 'tab_data')
 
         try:
-            action_edit.setEnabled(self.complet_result[0]['body']['feature']['permissions']['isEditable'])
+            action_edit.setEnabled(self.complet_result['body']['feature']['permissions']['isEditable'])
         except KeyError:
             pass
 
@@ -451,20 +451,20 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.dlg_cf.btn_open_doc, "170b", "24x24")
 
         # Get feature type as geom_type (node, arc, connec, gully)
-        self.geom_type = str(complet_result[0]['body']['feature']['featureType'])
+        self.geom_type = str(complet_result['body']['feature']['featureType'])
         if str(self.geom_type) in ('', '[]'):
             if 'feature_cat' in globals():
                 parent_layer = self.feature_cat.parent_layer
             else:
-                parent_layer = str(complet_result[0]['body']['feature']['tableParent'])
+                parent_layer = str(complet_result['body']['feature']['tableParent'])
             sql = f"SELECT lower(feature_type) FROM cat_feature WHERE parent_layer = '{parent_layer}' LIMIT 1"
             result = tools_db.get_row(sql)
             if result:
                 self.geom_type = result[0]
 
-        result = complet_result[0]['body']['data']
+        result = complet_result['body']['data']
         layout_list = []
-        for field in complet_result[0]['body']['data']['fields']:
+        for field in complet_result['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
             label, widget = self.set_widgets(self.dlg_cf, complet_result, field, new_feature)
@@ -499,22 +499,22 @@ class GwInfo(QObject):
                             self.feature_type, self.tablename, self.field_id))
 
         # Set variables
-        self.filter = str(complet_result[0]['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
+        self.filter = str(complet_result['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
         dlg_cf = self.dlg_cf
         layer = self.layer
         fid = self.feature_id
         my_json = self.my_json
         if layer:
             if layer.isEditable():
-                tools_gw.enable_all(dlg_cf, self.complet_result[0]['body']['data'])
+                tools_gw.enable_all(dlg_cf, self.complet_result['body']['data'])
             else:
-                tools_gw.disable_widgets(dlg_cf, self.complet_result[0]['body']['data'], False)
+                tools_gw.disable_widgets(dlg_cf, self.complet_result['body']['data'], False)
 
 
         # We assign the function to a global variable,
         # since as it receives parameters we will not be able to disconnect the signals
         self.fct_block_action_edit = lambda: self.block_action_edit(dlg_cf, action_edit, result, layer, fid, my_json, new_feature)
-        self.fct_start_editing = lambda: self.start_editing(dlg_cf, action_edit, complet_result[0]['body']['data'], layer)
+        self.fct_start_editing = lambda: self.start_editing(dlg_cf, action_edit, complet_result['body']['data'], layer)
         self.fct_stop_editing = lambda: self.stop_editing(dlg_cf, action_edit, layer, fid, self.my_json, new_feature)
         self.connect_signals()
 
@@ -542,7 +542,7 @@ class GwInfo(QObject):
 
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
-        title = f"{complet_result[0]['body']['feature']['childType']} - {self.feature_id}"
+        title = f"{complet_result['body']['feature']['childType']} - {self.feature_id}"
 
         if global_vars.session_vars['dlg_docker'] and is_docker and global_vars.session_vars['show_docker']:
             # Delete last form from memory
@@ -682,7 +682,7 @@ class GwInfo(QObject):
 
         global_vars.canvas.setMapTool(ep)
         # We redraw the selected feature because self.canvas.setMapTool(emit_point) erases it
-        tools_gw.draw_by_json(complet_result[0], self.rubber_band, None, False)
+        tools_gw.draw_by_json(complet_result, self.rubber_band, None, False)
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options
@@ -1104,7 +1104,7 @@ class GwInfo(QObject):
         try:
             # Widgets in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2')
             other_widgets = []
-            for field in self.complet_result[0]['body']['data']['fields']:
+            for field in self.complet_result['body']['data']['fields']:
                 if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                     widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
                     if widget:
@@ -1130,7 +1130,7 @@ class GwInfo(QObject):
             self.get_last_value()
             if str(self.my_json) == '{}':
                 tools_qt.set_action_checked(action_edit, False)
-                tools_gw.disable_widgets(dialog, self.complet_result[0]['body']['data'], False)
+                tools_gw.disable_widgets(dialog, self.complet_result['body']['data'], False)
                 self.enable_actions(dialog, False)
                 return
             save = self.ask_for_save(action_edit, fid)
@@ -1144,7 +1144,7 @@ class GwInfo(QObject):
                     tools_gw.close_dialog(dialog)
         else:
             tools_qt.set_action_checked(action_edit, True)
-            tools_gw.enable_all(dialog, self.complet_result[0]['body']['data'])
+            tools_gw.enable_all(dialog, self.complet_result['body']['data'])
             self.enable_actions(dialog, True)
 
 
@@ -1159,10 +1159,10 @@ class GwInfo(QObject):
 
     def manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg):
         self.get_last_value()
-        status = self.accept(dialog, self.complet_result[0], my_json, close_dlg=close_dlg, new_feature=new_feature)
+        status = self.accept(dialog, self.complet_result, my_json, close_dlg=close_dlg, new_feature=new_feature)
         if status is True:  # Commit succesfull and dialog keep opened
             tools_qt.set_action_checked(action_edit, False)
-            tools_gw.disable_widgets(dialog, self.complet_result[0]['body']['data'], False)
+            tools_gw.disable_widgets(dialog, self.complet_result['body']['data'], False)
             self.enable_actions(dialog, False)
 
 
@@ -1173,7 +1173,7 @@ class GwInfo(QObject):
             layer.commitChanges()
             self.connect_signals()
             tools_qt.set_action_checked(action_edit, False)
-            tools_gw.disable_widgets(dialog, self.complet_result[0]['body']['data'], False)
+            tools_gw.disable_widgets(dialog, self.complet_result['body']['data'], False)
             self.enable_actions(dialog, False)
             self.connect_signals()
         else:
@@ -1188,7 +1188,7 @@ class GwInfo(QObject):
         self.disconnect_signals()
         self.iface.setActiveLayer(layer)
         tools_qt.set_action_checked(action_edit, True)
-        tools_gw.enable_all(dialog, self.complet_result[0]['body']['data'])
+        tools_gw.enable_all(dialog, self.complet_result['body']['data'])
         self.enable_actions(dialog, True)
         layer.startEditing()
         self.connect_signals()
@@ -1746,7 +1746,7 @@ class GwInfo(QObject):
                 widget.editingFinished.connect(partial(self.clean_my_json, widget))
                 widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.editingFinished.connect(
-                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False, new_feature=new_feature))
+                    partial(self.accept, dialog, self.complet_result, _json, widget, True, False, new_feature=new_feature))
             else:
                 widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
 
@@ -1767,7 +1767,7 @@ class GwInfo(QObject):
                 widget.textChanged.connect(partial(self.clean_my_json, widget))
                 widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.textChanged.connect(
-                    partial(self.accept, dialog, self.complet_result[0], _json, widget, True, False, new_feature))
+                    partial(self.accept, dialog, self.complet_result, _json, widget, True, False, new_feature))
             else:
                 widget.textChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
 
@@ -1830,7 +1830,7 @@ class GwInfo(QObject):
                 widget.currentIndexChanged.connect(partial(self.clean_my_json, widget))
                 widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.currentIndexChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature))
+                    self.accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
                 widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
 
@@ -1845,7 +1845,7 @@ class GwInfo(QObject):
                 widget.dateChanged.connect(partial(self.clean_my_json, widget))
                 widget.dateChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.dateChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature))
+                    self.accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
                 widget.dateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
 
@@ -1860,7 +1860,7 @@ class GwInfo(QObject):
                 widget.valueChanged.connect(partial(self.clean_my_json, widget))
                 widget.valueChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.valueChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature))
+                    self.accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
                 widget.valueChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
 
@@ -1875,7 +1875,7 @@ class GwInfo(QObject):
                 widget.stateChanged.connect(partial(self.clean_my_json, widget))
                 widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
                 widget.stateChanged.connect(partial(
-                    self.accept, dialog, self.complet_result[0], _json, None, True, False, new_feature))
+                    self.accept, dialog, self.complet_result, _json, None, True, False, new_feature))
             else:
                 widget.stateChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
         return widget
@@ -1902,10 +1902,10 @@ class GwInfo(QObject):
         for action in actions_list:
             action.setVisible(False)
 
-        if not 'visibleTabs' in self.complet_result[0]['body']['form']:
+        if not 'visibleTabs' in self.complet_result['body']['form']:
             return
 
-        for tab in self.complet_result[0]['body']['form']['visibleTabs']:
+        for tab in self.complet_result['body']['form']['visibleTabs']:
             if tab['tabName'] == tab_name:
                 if tab['tabactions'] is not None:
                     for act in tab['tabactions']:
@@ -2208,7 +2208,7 @@ class GwInfo(QObject):
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        tools_gw.draw_by_json(complet_result[0], self.rubber_band, margin)
+        tools_gw.draw_by_json(complet_result, self.rubber_band, margin)
 
 
     """ FUNCTIONS RELATED WITH TAB CONNECTIONS """
@@ -2252,7 +2252,7 @@ class GwInfo(QObject):
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        tools_gw.draw_by_json(complet_result[0], self.rubber_band, margin)
+        tools_gw.draw_by_json(complet_result, self.rubber_band, margin)
 
 
     """ FUNCTIONS RELATED WITH TAB HYDROMETER"""
@@ -3013,7 +3013,7 @@ class GwInfo(QObject):
 
         # Put widgets into layout
         widget_list = []
-        for field in complet_list[0]['body']['data']['fields']:
+        for field in complet_list['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
             label, widget = self.set_widgets(dialog, complet_list, field, new_feature)
@@ -3032,7 +3032,7 @@ class GwInfo(QObject):
                     rpt_layout1.addWidget(widget, 1, field['layoutorder'])
 
             # Find combo parents:
-            for field in complet_list[0]['body']['data']['fields'][0]:
+            for field in complet_list['body']['data']['fields'][0]:
                 if 'isparent' in field:
                     if field['isparent']:
                         widget = dialog.findChild(QComboBox, field['widgetname'])
@@ -3069,14 +3069,14 @@ class GwInfo(QObject):
     def get_list(self, complet_result, form_name='', tab_name='', filter_fields=''):
 
         form = f'"formName":"{form_name}", "tabName":"{tab_name}"'
-        id_name = complet_result[0]['body']['feature']['idName']
+        id_name = complet_result['body']['feature']['idName']
         feature = f'"tableName":"{self.tablename}", "idName":"{id_name}", "id":"{self.feature_id}"'
         body = tools_gw.create_body(form, feature, filter_fields)
         function_name = 'gw_fct_getlist'
         json_result = tools_gw.get_json(function_name, body)
         if json_result is None or json_result['status'] == 'Failed':
             return False
-        complet_list = [json_result]
+        complet_list = json_result
         if not complet_list:
             return False
 
@@ -3092,7 +3092,7 @@ class GwInfo(QObject):
         if complet_list is False:
             return False
 
-        for field in complet_list[0]['body']['data']['fields']:
+        for field in complet_list['body']['data']['fields']:
             if field['widgettype'] == "tableview":
                 qtable = dialog.findChild(QTableView, field['widgetname'])
                 if qtable:
@@ -3135,7 +3135,7 @@ class GwInfo(QObject):
 
         index = selected_list[0]
         row = index.row()
-        table_name = complet_list[0]['body']['feature']['tableName']
+        table_name = complet_list['body']['feature']['tableName']
         column_index = tools_qt.get_col_index_by_col_name(qtable, 'sys_id')
         feature_id = index.sibling(row, column_index).data()
 
@@ -3147,7 +3147,7 @@ class GwInfo(QObject):
             return
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        tools_gw.draw_by_json(complet_result[0], self.rubber_band, margin)
+        tools_gw.draw_by_json(complet_result, self.rubber_band, margin)
 
 
     """ FUNCTIONS RELATED WITH TAB PLAN """
@@ -3160,7 +3160,7 @@ class GwInfo(QObject):
             index_tab = self.tab_main.currentIndex()
             tab_name = self.tab_main.widget(index_tab).objectName()
             form = f'"tabName":"{tab_name}"'
-            feature = f'"featureType":"{complet_result[0]["body"]["feature"]["featureType"]}", '
+            feature = f'"featureType":"{complet_result["body"]["feature"]["featureType"]}", '
             feature += f'"tableName":"{self.tablename}", '
             feature += f'"idName":"{self.field_id}", '
             feature += f'"id":"{self.feature_id}"'
@@ -3231,7 +3231,7 @@ class GwInfo(QObject):
         dlg_generic.rejected.connect(partial(tools_gw.close_dialog, dlg_generic))
         dlg_generic.btn_accept.clicked.connect(partial(self.set_catalog, dlg_generic, form_name, table_name))
 
-        tools_gw.fill_basic_info(dlg_generic, [json_result], field_id)
+        tools_gw.fill_basic_info(dlg_generic, json_result, field_id)
 
         # Open dialog
         dlg_generic.setWindowTitle(f"{(form_name.lower()).capitalize().replace('_', ' ')}")

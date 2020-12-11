@@ -41,7 +41,7 @@ class GwCatalog:
             tools_gw.show_message("NOT ROW FOR: " + sql, 2)
             return
 
-        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+        complet_list = json.loads(row[0], object_pairs_hook=OrderedDict)
         groupBox_1 = QGroupBox("Filter")
         self.filter_form = QGridLayout()
 
@@ -51,7 +51,7 @@ class GwCatalog:
         self.dlg_catalog.btn_accept.clicked.connect(partial(self.fill_geomcat_id, previous_dialog, widget_name))
 
         main_layout = self.dlg_catalog.widget.findChild(QGridLayout, 'main_layout')
-        result = complet_list[0]['body']['data']
+        result = complet_list['body']['data']
         for field in result['fields']:
             label = QLabel()
             label.setObjectName('lbl_' + field['label'])
@@ -117,12 +117,12 @@ class GwCatalog:
         body = tools_gw.create_body(form=form, feature=feature, extras=extras)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
         row = tools_db.get_row(sql)
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        if complet_result[0]['status'] == "Failed":
-            tools_log.log_warning(complet_result[0])
+        complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
+        if complet_result['status'] == "Failed":
+            tools_log.log_warning(complet_result)
             return False
-        if complet_result[0]['status'] == "Accepted":
-            result = complet_result[0]['body']['data']
+        if complet_result['status'] == "Accepted":
+            result = complet_result['body']['data']
             for field in result['fields']:
                 if field['columnname'] == 'id':
                     self.fill_combo(id, field)
@@ -139,8 +139,8 @@ class GwCatalog:
         body = tools_gw.create_body(form=form, feature=feature, extras=extras)
         sql = f"SELECT gw_fct_getcatalog({body})::text"
         row = tools_db.get_row(sql)
-        complet_list = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        result = complet_list[0]['body']['data']
+        complet_list = json.loads(row[0], object_pairs_hook=OrderedDict)
+        result = complet_list['body']['data']
         for field in result['fields']:
             if field['columnname'] == 'pnom':
                 self.fill_combo(pnom, field)

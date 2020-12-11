@@ -2571,9 +2571,9 @@ class GwAdmin:
             QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
             if row:
-                complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-                self.set_log_text(self.dlg_import_inp, complet_result[0]['body']['data'])
-                if  complet_result[0]['status'] == 'Failed':
+                complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
+                self.set_log_text(self.dlg_import_inp, complet_result['body']['data'])
+                if  complet_result['status'] == 'Failed':
                     msg = "The importation process have been failed"
                     tools_qt.show_info_box(msg, "Info")
                     global_vars.session_vars['dao'].rollback()

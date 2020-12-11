@@ -278,7 +278,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                 tools_gw.close_dialog(dialog, global_vars.plugin_name)
                 return
 
-            complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
+            complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
             message = "Feature replaced successfully"
             tools_gw.show_info(message)
 
@@ -316,8 +316,8 @@ class GwFeatureReplaceButton(GwParentMapTool):
                 tools_gw.show_info(message)
 
             # Fill tab 'Info log'
-            if complet_result and complet_result[0]['status'] == "Accepted":
-                tools_gw.fill_log(self.dlg_replace, complet_result[0]['body']['data'])
+            if complet_result and complet_result['status'] == "Accepted":
+                tools_gw.fill_log(self.dlg_replace, complet_result['body']['data'])
 
             # Refresh canvas
             self.refresh_map_canvas()

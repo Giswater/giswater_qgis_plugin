@@ -201,8 +201,8 @@ class GwSearch:
             # self.Api CF.get_info_from_id (...) in turn ends up calling self.open_custom_form (...) which will draw the
             # line on the feature but not zoom. Here, with draw we redraw simply to zoom and so that there are not two
             # ruberbands (the one from self.open_custom_form (...) and this one) we delete these
-            margin = float(complet_result[0]['body']['feature']['zoomCanvasMargin']['mts'])
-            tools_gw.draw_by_json(complet_result[0], self.rubber_band, margin)
+            margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
+            tools_gw.draw_by_json(complet_result, self.rubber_band, margin)
             self.rubber_band.reset()
 
         # Tab 'address' (streets)
@@ -431,7 +431,7 @@ class GwSearch:
         json_result = tools_gw.get_json(function_name, body)
         if json_result is None or json_result['status'] == 'Failed':
             return
-        result = [json_result]
+        result = json_result
 
         self.hydro_info_dlg = InfoGenericUi()
         tools_gw.load_settings(self.hydro_info_dlg)
@@ -439,7 +439,7 @@ class GwSearch:
         self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(self.rubber_band.reset)
-        field_id = str(result[0]['body']['feature']['idName'])
+        field_id = str(result['body']['feature']['idName'])
         tools_gw.fill_basic_info(self.hydro_info_dlg, result, field_id)
 
         tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
@@ -807,7 +807,7 @@ class GwSearch:
         complet_result, dialog = self.ApiCF.get_info_from_id(table_name=table_name, feature_id=feature_id, tab_type='data')
 
         # Get list of all coords in field geometry
-        list_coord = re.search('\((.*)\)', str(complet_result[0]['body']['feature']['geometry']['st_astext']))
+        list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
         max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
         tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, 1)
 

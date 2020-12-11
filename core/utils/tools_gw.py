@@ -1445,7 +1445,7 @@ def manage_feature_cat():
 def fill_basic_info(dialog, result, field_id, my_json=None, new_feature_id=None, new_feature=None,
                         layer_new_feature=None, feature_id=None, feature_type=None, layer=None):
 
-    fields = result[0]['body']['data']
+    fields = result['body']['data']
     if 'fields' not in fields:
         return
     grid_layout = dialog.findChild(QGridLayout, 'gridLayout')

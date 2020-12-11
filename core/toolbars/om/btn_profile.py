@@ -490,8 +490,8 @@ class GwProfileButton(GwParentMapTool):
 
         for arc in arcs:
             self.gis_length.append(arc['length'])
-            self.arc_dimensions.append([json.loads(arc['descript'], object_pairs_hook=OrderedDict)][0]['dimensions'])
-            self.arc_catalog.append([json.loads(arc['descript'], object_pairs_hook=OrderedDict)][0]['catalog'])
+            self.arc_dimensions.append(json.loads(arc['descript'], object_pairs_hook=OrderedDict)['dimensions'])
+            self.arc_catalog.append(json.loads(arc['descript'], object_pairs_hook=OrderedDict)['catalog'])
 
         # Calculate start_point (coordinates) of drawing for each node
         n = len(self.gis_length)
@@ -514,7 +514,7 @@ class GwProfileButton(GwParentMapTool):
             parameters.elev = node['elev']
             parameters.node_id = node['node_id']
             parameters.geom = node['cat_geom1']
-            parameters.descript = [json.loads(node['descript'], object_pairs_hook=OrderedDict)][0]
+            parameters.descript = json.loads(node['descript'], object_pairs_hook=OrderedDict)
             parameters.sys_type = node['sys_type']
 
             self.nodes.append(parameters)
@@ -525,10 +525,10 @@ class GwProfileButton(GwParentMapTool):
         for terrain in terrains:
             parameters = NodeData()
             parameters.start_point = terrain['total_x']
-            parameters.top_elev = [json.loads(terrain['label_n1'], object_pairs_hook=OrderedDict)][0]['top_elev']
+            parameters.top_elev = json.loads(terrain['label_n1'], object_pairs_hook=OrderedDict)['top_elev']
             parameters.node_id = terrain['top_n1']
             parameters.geom = terrain['top_n2']
-            parameters.descript = [json.loads(terrain['label_n1'], object_pairs_hook=OrderedDict)][0]
+            parameters.descript = json.loads(terrain['label_n1'], object_pairs_hook=OrderedDict)
 
             self.links.append(parameters)
             n = n + 1

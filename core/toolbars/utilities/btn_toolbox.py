@@ -401,8 +401,8 @@ class GwToolBoxButton(GwParentAction):
             tools_gw.show_message(f"Function: {function_name} executed with no result ", 3)
             return True
 
-        complet_result = [json.loads(row[0], object_pairs_hook=OrderedDict)]
-        tools_gw.add_temp_layer(dialog, complet_result[0]['body']['data'], self.alias_function)
+        complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
+        tools_gw.add_temp_layer(dialog, complet_result['body']['data'], self.alias_function)
         dialog.progressBar.setFormat(f"Function {function_name} has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
 
