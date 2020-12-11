@@ -8,6 +8,8 @@ or (at your option) any later version.
 from ..parent_dialog import GwParentAction
 from ...load_project_check import GwProjectCheck
 
+from ....lib import tools_qgis
+
 
 class GwProjectCheckButton(GwParentAction):
 
