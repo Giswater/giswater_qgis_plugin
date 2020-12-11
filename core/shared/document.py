@@ -79,7 +79,6 @@ class GwDocument:
             layer = self.iface.activeLayer()
             layer.selectByIds([feature.id()])
 
-
         # Set icons
         tools_gw.add_icon(self.dlg_add_doc.btn_insert, "111")
         tools_gw.add_icon(self.dlg_add_doc.btn_delete, "112")
@@ -120,9 +119,8 @@ class GwDocument:
                     layers=self.layers)))
         self.dlg_add_doc.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, excluded_layers=["v_edit_element"]))
-        self.dlg_add_doc.doc_id.textChanged.connect(lambda: setattr(self, 'ids, layers, list_ids',
-            tools_gw.exist_object(self.dlg_add_doc, table_object, self.layers, self.ids, self.list_ids)))
 
+        self.dlg_add_doc.doc_id.textChanged.connect(partial(tools_gw.exist_object, self, table_object, None))
         self.dlg_add_doc.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_add_doc, table_object, False, False, None, None))
         self.dlg_add_doc.btn_delete.clicked.connect(

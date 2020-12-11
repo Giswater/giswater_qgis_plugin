@@ -31,7 +31,7 @@ class GwElement:
         self.snapper_manager = SnappingConfigManager(self.iface)
 
 
-    def manage_element(self, new_element_id=True, feature=None, geom_type=None):
+    def manage_element(self, new_element_id=True, feature=None, geom_type=None, selected_object_id=None):
         """ Button 33: Add element """
 
         self.new_element_id = new_element_id
@@ -71,6 +71,7 @@ class GwElement:
         self.layers['node'] = tools_gw.get_group_layers('node')
         self.layers['connec'] = tools_gw.get_group_layers('connec')
         self.layers['element'] = tools_gw.get_group_layers('element')
+        self.point_xy = {"x": None, "y": None}
 
         # Remove 'gully' for 'WS'
         self.project_type = tools_gw.get_project_type()
@@ -112,14 +113,14 @@ class GwElement:
         self.dlg_add_element.btn_cancel.clicked.connect(
             partial(tools_qgis.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.rejected.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_element,
-            table_object, cur_active_layer, excluded_layers=[],layers=self.layers)))
+            table_object, cur_active_layer, excluded_layers=[], layers=self.layers)))
         self.dlg_add_element.rejected.connect(
             partial(tools_qgis.set_layer_visible, layer_element, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_element, []))
 
-        self.dlg_add_element.element_id.textChanged.connect(lambda: setattr(self, 'ids, layers, list_ids',
-            tools_gw.exist_object(self.dlg_add_element, table_object, self.layers, self.ids, self.list_ids)))
+        self.dlg_add_element.element_id.textChanged.connect(
+            partial(tools_gw.exist_object, self, self.dlg_add_element, table_object, None))
         self.dlg_add_element.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_add_element, table_object, False, False, None, None))
         self.dlg_add_element.btn_delete.clicked.connect(
@@ -127,7 +128,7 @@ class GwElement:
         self.dlg_add_element.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_add_element, table_object, False))
 
-        self.point_xy = self.dlg_add_element.btn_add_geom.clicked.connect(partial(self.snapper_manager.add_point, self.vertex_marker))
+        self.dlg_add_element.btn_add_geom.clicked.connect(self.get_point_xy)
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
 
         # Fill combo boxes of the form and related events
@@ -182,7 +183,6 @@ class GwElement:
         self.filter_elementcat_id()
 
         if self.new_element_id:
-
             # Set default values
             self.set_default_values()
 
@@ -206,14 +206,20 @@ class GwElement:
         if self.new_element_id is True:
             tools_qt.set_widget_text(self.dlg_add_element, 'num_elements', '1')
 
+
         self.update_location_cmb()
         if not self.new_element_id:
-            self.ids, self.layers, self.list_ids = tools_gw.exist_object(self.dlg_add_element, 'element', layers=self.layers,
-                                                                ids=self.ids, list_ids=self.list_ids)
+            tools_qt.set_widget_text(self.dlg_add_element, 'element_id', selected_object_id)
+            tools_gw.exist_object(self, self.dlg_add_element, 'element', None)
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_add_element, dlg_name='element', maximize_button=False)
         return self.dlg_add_element
+
+
+    def get_point_xy(self):
+        self.snapper_manager.add_point(self.vertex_marker)
+        self.point_xy = self.snapper_manager.point_xy
 
 
     def set_default_values(self):
@@ -373,7 +379,7 @@ class GwElement:
             else:
                 sql_values += ", null"
 
-            if str(self.point_xy['x']) != "":
+            if str(self.point_xy['x']) not in ("", None):
                 sql_values += f", ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
                 self.point_xy['x'] = ""
             else:
@@ -529,8 +535,8 @@ class GwElement:
         # Close this dialog and open selected object
         dialog.close()
 
-        self.manage_element(new_element_id=False)
-        tools_qt.set_widget_text(self.dlg_add_element, widget_id, selected_object_id)
+        self.manage_element(new_element_id=False, selected_object_id=selected_object_id)
+
 
 
     def check_date(self, widget, button=None, regex_type=1):

@@ -189,6 +189,7 @@ class SnappingConfigManager(object):
         self.canvas = self.iface.mapCanvas()
         self.previous_snapping = None
         self.is_valid = False
+        self.point_xy = {}
 
         # Snapper
         self.snapping_config = self.get_snapping_options()
@@ -509,9 +510,6 @@ class SnappingConfigManager(object):
     def add_point(self, vertex_marker):
         """ Create the appropriate map tool and connect to the corresponding signal """
 
-        # Declare return variable
-        return_point = {}
-
         active_layer = global_vars.iface.activeLayer()
         if active_layer is None:
             active_layer = tools_qgis.get_layer_by_tablename('version')
@@ -527,9 +525,7 @@ class SnappingConfigManager(object):
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
         global_vars.canvas.setMapTool(emit_point)
         global_vars.canvas.xyCoordinates.connect(partial(self.mouse_move, vertex_marker))
-        emit_point.canvasClicked.connect(partial(self.get_xy, vertex_marker, return_point, emit_point))
-
-        return return_point
+        emit_point.canvasClicked.connect(partial(self.get_xy, vertex_marker, emit_point))
 
 
     def mouse_move(self, vertex_marker, point):
@@ -546,12 +542,12 @@ class SnappingConfigManager(object):
             vertex_marker.hide()
 
 
-    def get_xy(self, vertex_marker, return_point, emit_point, point):
+    def get_xy(self, vertex_marker, emit_point, point):
         """ Get coordinates of selected point """
 
         # Setting x, y coordinates from point
-        return_point['x'] = point.x()
-        return_point['y'] = point.y()
+        self.point_xy['x'] = point.x()
+        self.point_xy['y'] = point.y()
 
         message = "Geometry has been added!"
         show_info(message)
@@ -2378,7 +2374,7 @@ def manage_return_manager(json_result, sql, rubber_band=None):
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
 
-def get_rows_by_feature_type(dialog, table_object, geom_type, ids=None, list_ids=None, layers=None):
+def get_rows_by_feature_type(class_object, dialog, table_object, geom_type):
     """ Get records of @geom_type associated to selected @table_object """
 
     object_id = tools_qt.get_text(dialog, table_object + "_id")
@@ -2388,7 +2384,7 @@ def get_rows_by_feature_type(dialog, table_object, geom_type, ids=None, list_ids
     exists = tools_db.check_table(table_relation)
     if not exists:
         tools_log.log_info(f"Not found: {table_relation}")
-        return ids, layers, list_ids
+        return
 
     sql = (f"SELECT {geom_type}_id "
            f"FROM {table_relation} "
@@ -2396,13 +2392,11 @@ def get_rows_by_feature_type(dialog, table_object, geom_type, ids=None, list_ids
     rows = tools_db.get_rows(sql, log_info=False)
     if rows:
         for row in rows:
-            list_ids[geom_type].append(str(row[0]))
-            ids.append(str(row[0]))
+            class_object.list_ids[geom_type].append(str(row[0]))
+            class_object.ids.append(str(row[0]))
 
-        expr_filter = get_expression_filter(geom_type, list_ids=list_ids, layers=layers)
+        expr_filter = get_expression_filter(geom_type, class_object.list_ids, class_object.layers)
         set_table_model(dialog, widget_name, geom_type, expr_filter)
-
-    return ids, layers, list_ids
 
 
 def get_project_type(schemaname=None):
@@ -2650,11 +2644,10 @@ def manage_layer_manager(json_result, sql):
 
 def selection_init(class_object, dialog, table_object, query=False):
     """ Set canvas map tool to an instance of class 'MultipleSelection' """
-    print(f"class_object.geom_type -->{class_object.geom_type}")
+
     class_object.geom_type = get_signal_change_tab(dialog)
     if class_object.geom_type in ('all', None):
         class_object.geom_type = 'arc'
-    print(f"class_object.geom_type -->{class_object.geom_type}")
     multiple_selection = MultipleSelection(class_object, table_object, dialog, query)
     global_vars.canvas.setMapTool(multiple_selection)
     cursor = get_cursor_multiple_selection()
@@ -3376,11 +3369,11 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
     connect_signal_selection_changed(class_object, dialog, table_object, geom_type)
 
 
-def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=None, list_ids=None):
+def exist_object(class_object, dialog, table_object, single_tool_mode=None):
     """ Check if selected object (document or element) already exists """
 
     # Reset list of selected records
-    reset_feature_list(ids, list_ids)
+    reset_feature_list(class_object.ids, class_object.list_ids)
 
     field_object_id = "id"
     if table_object == "element":
@@ -3405,9 +3398,9 @@ def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=N
                       'edit_workcat_vdefault', field_id='id', field_name='id')
 
         if single_tool_mode is not None:
-            layers = remove_selection(single_tool_mode, layers=layers)
+            class_object.layers = remove_selection(single_tool_mode, class_object.layers)
         else:
-            layers = remove_selection(True, layers=layers)
+            class_object.layers = remove_selection(True, class_object.layers)
         tools_qt.reset_model(dialog, table_object, "arc")
         tools_qt.reset_model(dialog, table_object, "node")
         tools_qt.reset_model(dialog, table_object, "connec")
@@ -3415,28 +3408,22 @@ def exist_object(dialog, table_object, single_tool_mode=None, layers=None, ids=N
         if global_vars.project_type == 'ud':
             tools_qt.reset_model(dialog, table_object, "gully")
 
-        return layers, ids, list_ids
+        return
 
     # Fill input widgets with data of the @row
     fill_widgets(dialog, table_object, row)
 
     # Check related 'arcs'
-    ids, layers, list_ids = get_rows_by_feature_type(dialog, table_object, "arc", ids=ids, list_ids=list_ids, layers=layers)
-
+    get_rows_by_feature_type(class_object, dialog, table_object, "arc")
     # Check related 'nodes'
-    ids, layers, list_ids = get_rows_by_feature_type(dialog, table_object, "node", ids=ids, list_ids=list_ids, layers=layers)
-
+    get_rows_by_feature_type(class_object, dialog, table_object, "node")
     # Check related 'connecs'
-    ids, layers, list_ids = get_rows_by_feature_type(dialog, table_object, "connec", ids=ids, list_ids=list_ids, layers=layers)
-
+    get_rows_by_feature_type(class_object, dialog, table_object, "connec")
     # Check related 'elements'
-    ids, layers, list_ids = get_rows_by_feature_type(dialog, table_object, "element", ids=ids, list_ids=list_ids, layers=layers)
-
+    get_rows_by_feature_type(class_object, dialog, table_object, "element")
     # Check related 'gullys'
     if global_vars.project_type == 'ud':
-        ids, layers, list_ids = get_rows_by_feature_type(dialog, table_object, "gully", ids=ids, list_ids=list_ids, layers=layers)
-
-    return layers, ids, list_ids
+        get_rows_by_feature_type(class_object, dialog, table_object, "gully")
 
 
 def reset_widgets(dialog, table_object):

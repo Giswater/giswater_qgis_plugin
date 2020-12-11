@@ -28,6 +28,7 @@ class GwDockWidget(QDockWidget):
         self.dlg_closed.emit()
         return super().closeEvent(event)
 
+
 class GwDialog(QDialog):
 
     def __init__(self, subtag=None):
@@ -65,6 +66,7 @@ class GwDialog(QDialog):
 
         return False
 
+
 class GwMainWindow(QMainWindow):
 
     dlg_closed = QtCore.pyqtSignal()
@@ -77,7 +79,6 @@ class GwMainWindow(QMainWindow):
         self.subtag = subtag
         # Enable event filter
         self.installEventFilter(self)
-
 
 
     def closeEvent(self, event):

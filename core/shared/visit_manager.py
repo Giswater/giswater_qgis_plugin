@@ -46,6 +46,7 @@ class GwVisitManager(QObject):
         self.iface = global_vars.iface
 
         self.geom_type = None
+        self.layers = None
         self.event_parameter_id = None
         self.event_feature_type = None
 
@@ -321,7 +322,8 @@ class GwVisitManager(QObject):
 
     def add_feature_clicked(self):
         self.previous_map_tool = global_vars.canvas.mapTool()
-        self.point_xy = self.snapper_manager.add_point(self.vertex_marker)
+        self.snapper_manager.add_point(self.vertex_marker)
+        self.point_xy = self.snapper_manager.point_xy
 
 
     def set_locked_relation(self):
