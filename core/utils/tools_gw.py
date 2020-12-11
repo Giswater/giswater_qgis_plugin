@@ -2781,7 +2781,6 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
     tools_log.log_info(class_object.list_ids[geom_type])
 
 
-
 def remove_selection(remove_groups=True, layers=None):
     """ Remove all previous selections """
 
@@ -2838,8 +2837,6 @@ def connect_signal_selection_changed(class_object, dialog, table_object, query=F
     """ Connect signal selectionChanged """
 
     try:
-        if class_object.geom_type in ('all', None):
-            geom_type = 'arc'
         global_vars.canvas.selectionChanged.connect(
             partial(selection_changed, class_object, dialog, table_object, query))
     except Exception as e:
@@ -3241,7 +3238,8 @@ def set_columns_config(widget, table_name, sort_order=0, isQStandardItemModel=Fa
 
 def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[], single_tool_mode=None, layers=None):
     """ Close dialog and disconnect snapping """
-
+    tools_qgis.disconnect_snapping()
+    tools_qgis.disconnect_signal_selection_changed()
     if cur_active_layer:
         global_vars.iface.setActiveLayer(cur_active_layer)
     # some tools can work differently if standalone or integrated in
@@ -3250,7 +3248,6 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
         layers = remove_selection(single_tool_mode, layers=layers)
     else:
         layers = remove_selection(True, layers=layers)
-
     tools_qt.reset_model(dialog, table_object, "arc")
     tools_qt.reset_model(dialog, table_object, "node")
     tools_qt.reset_model(dialog, table_object, "connec")
@@ -3259,8 +3256,6 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
         tools_qt.reset_model(dialog, table_object, "gully")
     close_dialog(dialog)
     hide_parent_layers(excluded_layers=excluded_layers)
-    tools_qgis.disconnect_snapping()
-    tools_qgis.disconnect_signal_selection_changed()
 
     return layers
 
@@ -3366,7 +3361,7 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
     # Update list
     class_object.list_ids[geom_type] = class_object.ids
     enable_feature_type(dialog, table_object, ids=class_object.ids)
-    connect_signal_selection_changed(class_object, dialog, table_object, geom_type)
+    connect_signal_selection_changed(class_object, dialog, table_object, query)
 
 
 def exist_object(class_object, dialog, table_object, single_tool_mode=None):

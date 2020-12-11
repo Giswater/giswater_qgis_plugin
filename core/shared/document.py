@@ -75,6 +75,7 @@ class GwDocument:
         # Remove all previous selections
         if self.single_tool_mode:
             self.layers = tools_gw.remove_selection(True, layers=self.layers)
+
         if feature is not None:
             layer = self.iface.activeLayer()
             layer.selectByIds([feature.id()])
@@ -120,7 +121,7 @@ class GwDocument:
         self.dlg_add_doc.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, excluded_layers=["v_edit_element"]))
 
-        self.dlg_add_doc.doc_id.textChanged.connect(partial(tools_gw.exist_object, self, table_object, None))
+        self.dlg_add_doc.doc_id.textChanged.connect(partial(tools_gw.exist_object, self, self.dlg_add_doc, table_object, None))
         self.dlg_add_doc.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_add_doc, table_object, False, False, None, None))
         self.dlg_add_doc.btn_delete.clicked.connect(
@@ -357,7 +358,7 @@ class GwDocument:
         # Close this dialog and open selected object
         dialog.close()
 
-        self.manage_document(row=widget.model().record(row), feature=widget.model().record(row))
+        self.manage_document(row=widget.model().record(row))
         tools_qt.set_widget_text(self.dlg_add_doc, widget_id, selected_object_id)
 
 
