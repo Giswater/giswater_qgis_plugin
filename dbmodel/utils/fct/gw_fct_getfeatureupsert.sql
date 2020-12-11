@@ -448,6 +448,7 @@ BEGIN
 			null AS widgetfunction, 
 			null AS linkedaction, 
 			FALSE AS isautoupdate,
+			FAlSE AS ismandatory, 
 			''lyt_data_1'' AS layoutname, 
 			null as widgetcontrols,
 			FALSE as hidden
