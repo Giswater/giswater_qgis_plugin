@@ -19,3 +19,13 @@ UPDATE inp_typevalue SET idval = 'RECT_CLOSED' WHERE typevalue = 'inp_value_orif
 
 UPDATE sys_param_user SET id='edit_gullyrotation_disable', descript='If true, the automatic rotation calculation on the gullys is disabled. Used for an absolute manual update of rotation field',
 label='Disable automatic gully rotation:', project_type='ud' WHERE id='edit_noderotation_disable_update';
+
+UPDATE config_form_tabs SET config_form_tabs = '[{"disabled": false, "actionName": "actionEdit", "actionTooltip": "Edit"}, 
+{"disabled": false, "actionName": "actionZoom", "actionTooltip": "Zoom In"}, 
+{"disabled": false, "actionName": "actionCentered", "actionTooltip": "Center"}, 
+{"disabled": false, "actionName": "actionZoomOut", "actionTooltip": "Zoom Out"}, 
+{"disabled": false, "actionName": "actionCatalog", "actionTooltip": "Change Catalog"}, 
+{"disabled": false, "actionName": "actionWorkcat", "actionTooltip": "Add Workcat"}, 
+{"disabled": false, "actionName": "actionCopyPaste", "actionTooltip": "Copy Paste"}, 
+{"disabled": false, "actionName": "actionLink", "actionTooltip": "Open Link"}, 
+{"disabled": false, "actionName": "actionHelp", "actionTooltip": "Help"}]' WHERE formname ='v_edit_node';

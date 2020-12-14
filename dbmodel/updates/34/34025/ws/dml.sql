@@ -118,3 +118,19 @@ INSERT INTO inp_arc_type VALUES ('VALVE-IMPORTINP');
 INSERT INTO inp_arc_type VALUES ('PUMP-IMPORTINP');
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM inp_arc_type WHERE id NOT LIKE ''%IMPORT%''' 
 WHERE columnname = 'epa_type' AND formname like '%_arc%';
+
+UPDATE config_form_tabs
+SET tabactions='[{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},
+{"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false},
+{"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},
+{"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false},
+{"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},
+{"actionName":"actionWorkcat", "actionTooltip":"Add Workcat",  "disabled":false},
+{"actionName":"actionCopyPaste", "actionTooltip":"Copy Paste",  "disabled":false},
+{"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false},
+{"actionName":"actionHelp", "actionTooltip":"Help",  "disabled":false},
+{"actionName":"actionMapZone", "actionTooltip":"Add Mapzone",  "disabled":false},
+{"actionName":"actionSetToArc", "actionTooltip":"Set to_arc",  "disabled":false},
+{"actionName":"actionGetParentId", "actionTooltip":"Set parent_id",  "disabled":false},
+{"actionName": "actionRotation", "actionTooltip": "Rotation","disabled": false}]'
+WHERE formname ='v_edit_node';
