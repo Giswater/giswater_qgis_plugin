@@ -9,14 +9,14 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2020/12/14
-ALTER TABLE cat_dwf_scenario ADD COLUMN active boolean;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_dwf_scenario", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 ALTER TABLE cat_dwf_scenario ALTER COLUMN active SET DEFAULT TRUE;
 
-ALTER TABLE cat_hydrology ADD COLUMN active boolean;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_hydrology", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 ALTER TABLE cat_hydrology ALTER COLUMN active SET DEFAULT TRUE;
 
-ALTER TABLE cat_mat_grate ADD COLUMN active boolean;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_mat_grate", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 ALTER TABLE cat_mat_grate ALTER COLUMN active SET DEFAULT TRUE;
 
-ALTER TABLE cat_mat_gully ADD COLUMN active boolean;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_mat_gully", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 ALTER TABLE cat_mat_gully ALTER COLUMN active SET DEFAULT TRUE;
