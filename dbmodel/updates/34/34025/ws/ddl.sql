@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2020/11/20
-ALTER TABLE inp_valve RENAME diameter TO custom_dint;
+ALTER TABLE IF EXISTS inp_valve RENAME diameter TO custom_dint;
 
 -- 2020/03/12
 ALTER TABLE config_mincut_checkvalve ALTER COLUMN active SET DEFAULT TRUE;

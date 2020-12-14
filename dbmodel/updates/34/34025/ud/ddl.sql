@@ -13,9 +13,9 @@ ALTER TABLE cat_grate ALTER COLUMN active SET DEFAULT TRUE;
 ALTER TABLE cat_node_shape ALTER COLUMN active SET DEFAULT TRUE;
 
 -- 2020/12/04
-ALTER TABLE inp_label RENAME to _inp_label_;
+ALTER TABLE IF EXISTS inp_label RENAME to _inp_label_;
 
-CREATE TABLE inp_label
+CREATE TABLE IF NOT EXISTS inp_label
 (
   label text primary key,
   xcoord numeric(18,6),

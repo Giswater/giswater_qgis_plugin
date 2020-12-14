@@ -9,11 +9,11 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2020/11/20
-ALTER TABLE ext_cat_scada RENAME TO _ext_cat_scada_;
-ALTER TABLE ext_rtc_scada RENAME TO _ext_rtc_scada_;
+ALTER TABLE IF EXISTS ext_cat_scada RENAME TO _ext_cat_scada_;
+ALTER TABLE IF EXISTS ext_rtc_scada RENAME TO _ext_rtc_scada_;
 
 
-CREATE TABLE ext_arc(
+CREATE TABLE IF NOT EXISTS ext_arc(
   id serial8 PRIMARY KEY,
   fid int4, 
   arc_id varchar(16),
@@ -23,7 +23,7 @@ CREATE TABLE ext_arc(
   cur_user text);
 
 
-CREATE TABLE ext_node(
+CREATE TABLE IF NOT EXISTS ext_node(
   id serial8 PRIMARY KEY,
   fid int4, 
   node_id varchar(16),
