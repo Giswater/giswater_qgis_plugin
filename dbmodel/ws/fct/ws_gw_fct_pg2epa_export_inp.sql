@@ -85,13 +85,13 @@ BEGIN
 			num_column = 2;
 		ELSE 
 			INSERT INTO temp_csv (fid,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13)
-			SELECT v_fid,rpad(concat(';',c1),20),rpad(c2,20),rpad(c3,20),rpad(c4,20),rpad(c5,20),rpad(c6,20),rpad(c7,20),rpad(c8,20),rpad(c9,20),rpad(c10,20),
-			rpad(c11,20),rpad(c12,20),rpad(c13,20)
-			FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''SCHEMA_NAME'' and table_name='''||
+			SELECT v_fid,rpad(concat(';',c1),22),rpad(c2,22),rpad(c3,22),rpad(c4,22),rpad(c5,22),rpad(c6,22),rpad(c7,22),rpad(c8,22),rpad(c9,22),rpad(c10,22),
+			rpad(c11,22),rpad(c12,22),rpad(c13,22)
+			FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''ws_sample'' and table_name='''||
 			rec_table.tablename||'''::text') 
 			AS rpt(table_name text, c1 text, c2 text, c3 text, c4 text, c5 text, c6 text, c7 text, c8 text, c9 text, c10 text, c11 text, c12 text, c13 text);
 
-			SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='SCHEMA_NAME';
+			SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='ws_sample';
 		END IF;
 	
 		INSERT INTO temp_csv (fid) VALUES (141) RETURNING id INTO id_last;
@@ -100,9 +100,9 @@ BEGIN
 		FOR num_col_rec IN 1..num_column
 		LOOP
 			IF num_col_rec=1 then
-				EXECUTE 'UPDATE temp_csv set csv1=rpad('';-------'',20) WHERE id='||id_last||';';
+				EXECUTE 'UPDATE temp_csv set csv1=rpad('';-------'',22) WHERE id='||id_last||';';
 			ELSE
-				EXECUTE 'UPDATE temp_csv SET csv'||num_col_rec||'=rpad(''-------'',20) WHERE id='||id_last||';';
+				EXECUTE 'UPDATE temp_csv SET csv'||num_col_rec||'=rpad(''-------'',22) WHERE id='||id_last||';';
 			END IF;
 		END LOOP;
 
@@ -120,7 +120,7 @@ BEGIN
 			FOR num_col_rec IN 1..num_column::integer
 			LOOP
 				IF num_col_rec < num_column::integer THEN
-					EXECUTE 'UPDATE temp_csv SET csv'||num_col_rec||'=rpad(csv'||num_col_rec||',20) WHERE source='''||rec_table.tablename||''';';
+					EXECUTE 'UPDATE temp_csv SET csv'||num_col_rec||'=rpad(csv'||num_col_rec||',22) WHERE source='''||rec_table.tablename||''';';
 				END IF;
 			END LOOP;
 		END IF;
@@ -136,15 +136,15 @@ BEGIN
 	select (array_to_json(array_agg(row_to_json(row))))::json  -- spacer-19 it's used because a rare bug reading epanet when spacer=20 on target [PATTERNS]????
 	into v_return 
 		from ( select text from
-		(select id, concat(rpad(csv1,18), ' ', csv2)as text from temp_csv where fid  = 141 and cur_user = current_user and source is null
+		(select id, concat(rpad(csv1,22), ' ', csv2)as text from temp_csv where fid  = 141 and cur_user = current_user and source is null
 		union
-		select id, concat(rpad(csv1,18), ' ', csv2)as text from temp_csv where fid  = 141 and cur_user = current_user and source in ('header')
+		select id, concat(rpad(csv1,22), ' ', csv2)as text from temp_csv where fid  = 141 and cur_user = current_user and source in ('header')
 		union
 		select id, csv1 as text from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_controls','vi_rules', 'vi_backdrop')
 		union
-		select id, concat(rpad(csv1,18),' ',rpad(csv2,18),' ', rpad(csv3,18),' ',rpad(csv4,18),' ',rpad(csv5,18),' ',rpad(csv6,18),' ',rpad(csv7,18),' ',
-		rpad(csv8,18),' ',rpad(csv9,18),' ',rpad(csv10,18),' ',rpad(csv11,18),' ',rpad(csv12,18),' ',rpad(csv13,18),' ',rpad(csv14,18),' ',rpad(csv15,18),' ',
-		rpad(csv15,18),' ',rpad(csv16,18),' ',rpad(csv17,18),' ', rpad(csv18,18), ' ', rpad(csv19,18),' ',rpad(csv20,18)) as text
+		select id, concat(rpad(csv1,22),' ',rpad(csv2,22),' ', rpad(csv3,22),' ',rpad(csv4,22),' ',rpad(csv5,22),' ',rpad(csv6,22),' ',rpad(csv7,22),' ',
+		rpad(csv8,22),' ',rpad(csv9,22),' ',rpad(csv10,22),' ',rpad(csv11,22),' ',rpad(csv12,22),' ',rpad(csv13,22),' ',rpad(csv14,22),' ',rpad(csv15,22),' ',
+		rpad(csv15,22),' ',rpad(csv16,22),' ',rpad(csv17,22),' ', rpad(csv18,22), ' ', rpad(csv19,22),' ',rpad(csv20,22)) as text
 		from temp_csv where source not in ('header','vi_controls','vi_rules', 'vi_backdrop')
 		order by id)a )row;
 	
