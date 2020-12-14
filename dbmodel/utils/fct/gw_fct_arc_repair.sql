@@ -14,13 +14,23 @@ $BODY$
 
 -- fid: 103, 104
 
-SELECT SCHEMA_NAME.gw_fct_arc_repair($${
+-- MODE 1: individual
+SELECT gw_fct_arc_repair($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, "feature":{"tableName":"v_edit_arc",
 "featureType":"ARC", "id":["2094"]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection",
 "parameters":{}}}$$);
 
+-- MODE 2: massive using id as array
+SELECT gw_fct_arc_repair($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
+"SELECT array_to_json(array_agg(arc_id::text)) FROM arc WHERE expl_id='||v_expl||' AND (node_1 IS NULL OR node_2 IS NULL)"},
+"data":{}}$$);';
+
+-- MODE 3: massive usign pure SQL
+SELECT gw_fct_arc_repair(concat('
+{"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "feature":{"tableName":"v_edit_arc","featureType":"ARC", "id":["',arc_id,'"]},
+"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}')::json) FROM arc WHERE expl_id=v_expl AND (node_1 IS NULL OR node_2 IS NULL);
 
 */
 
