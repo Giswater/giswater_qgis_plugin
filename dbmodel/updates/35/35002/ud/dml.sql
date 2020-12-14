@@ -8,9 +8,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
---2020/09/30
-ALTER SEQUENCE inp_cat_mat_roughness_id_seq RENAME TO cat_mat_roughness_id_seq;
-ALTER TABLE cat_mat_roughness ALTER COLUMN id SET DEFAULT nextval('cat_mat_roughness_id_seq'); 
-
-ALTER TABLE cat_mat_roughness ADD COLUMN active boolean;
-ALTER TABLE cat_mat_roughness ALTER COLUMN active SET DEFAULT TRUE;
+--2020/12/14
+UPDATE cat_dwf_scenario SET active = TRUE WHERE active IS NULL;
+UPDATE cat_hydrology SET active = TRUE WHERE active IS NULL;
+UPDATE cat_mat_grate SET active = TRUE WHERE active IS NULL;
+UPDATE cat_mat_gully SET active = TRUE WHERE active IS NULL;

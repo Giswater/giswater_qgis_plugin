@@ -37,3 +37,34 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_fpr
 
 --2020/11/25
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector", "column":"sector_id"}}$$);
+
+--2020/12/14
+ALTER TABLE cat_brand ADD COLUMN active boolean;
+ALTER TABLE cat_brand ALTER COLUMN active SET DEFAULT TRUE;
+
+ALTER TABLE cat_brand_model ADD COLUMN active boolean;
+ALTER TABLE cat_brand_model ALTER COLUMN active SET DEFAULT TRUE;
+
+ALTER TABLE cat_builder ADD COLUMN active boolean;
+ALTER TABLE cat_builder ALTER COLUMN active SET DEFAULT TRUE;
+
+ALTER TABLE cat_mat_arc ADD COLUMN active boolean;
+ALTER TABLE cat_mat_arc ALTER COLUMN active SET DEFAULT TRUE;
+
+ALTER TABLE cat_mat_node ADD COLUMN active boolean;
+ALTER TABLE cat_mat_node ALTER COLUMN active SET DEFAULT TRUE;
+
+ALTER TABLE cat_mat_element ADD COLUMN active boolean;
+ALTER TABLE cat_mat_element ALTER COLUMN active SET DEFAULT TRUE;
+
+ALTER TABLE cat_owner ADD COLUMN active boolean;
+ALTER TABLE cat_owner ALTER COLUMN active SET DEFAULT TRUE;
+
+ALTER TABLE cat_pavement ADD COLUMN active boolean;
+ALTER TABLE cat_pavement ALTER COLUMN active SET DEFAULT TRUE;
+
+ALTER TABLE cat_soil ADD COLUMN active boolean;
+ALTER TABLE cat_soil ALTER COLUMN active SET DEFAULT TRUE;
+
+ALTER TABLE cat_work ADD COLUMN active boolean;
+ALTER TABLE cat_work ALTER COLUMN active SET DEFAULT TRUE;

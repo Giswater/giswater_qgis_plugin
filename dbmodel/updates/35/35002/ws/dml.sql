@@ -10,3 +10,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2020/09/30
 UPDATE sys_table SET sys_sequence = 'cat_mat_roughness_id_seq' where id = 'cat_mat_roughness';
+
+--2020/12/14
+UPDATE cat_mat_roughness SET active = TRUE WHERE active IS NULL;

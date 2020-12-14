@@ -153,3 +153,15 @@ UPDATE config_typevalue set id='open_url', idval='open_url' where typevalue='wid
 
 --2020/12/10
 INSERT INTO sys_function VALUES (3014, 'gw_fct_copy_to_temp_csv','utils','function','json','json','Insert values into temp_csv','role_edit', NULL);
+
+--2020/12/14
+UPDATE cat_brand SET active = TRUE WHERE active IS NULL;
+UPDATE cat_brand_model SET active = TRUE WHERE active IS NULL;
+UPDATE cat_builder SET active = TRUE WHERE active IS NULL;
+UPDATE cat_mat_arc SET active = TRUE WHERE active IS NULL;
+UPDATE cat_mat_node SET active = TRUE WHERE active IS NULL;
+UPDATE cat_mat_element SET active = TRUE WHERE active IS NULL;
+UPDATE cat_owner SET active = TRUE WHERE active IS NULL;
+UPDATE cat_pavement SET active = TRUE WHERE active IS NULL;
+UPDATE cat_soil SET active = TRUE WHERE active IS NULL;
+UPDATE cat_work SET active = TRUE WHERE active IS NULL;
