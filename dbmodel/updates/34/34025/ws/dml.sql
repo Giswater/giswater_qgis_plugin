@@ -113,9 +113,9 @@ descript = concat(descript,'. Only this widget is editable on options dialogs be
 WHERE id = 'inp_report_f_factor';
 
 DELETE FROM inp_arc_type WHERE id IN('PUMP','VALVE');
-INSERT INTO inp_arc_type values ('VIRTUALVALVE');
-INSERT INTO inp_arc_type VALUES ('VALVE-IMPORTINP');
-INSERT INTO inp_arc_type VALUES ('PUMP-IMPORTINP');
+INSERT INTO inp_arc_type values ('VIRTUALVALVE') ON CONFLICT (id) DO NOTHING;
+INSERT INTO inp_arc_type VALUES ('VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+INSERT INTO inp_arc_type VALUES ('PUMP-IMPORTINP') ON CONFLICT (id) DO NOTHING;
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM inp_arc_type WHERE id NOT LIKE ''%IMPORT%''' 
 WHERE columnname = 'epa_type' AND formname like '%_arc%';
 
