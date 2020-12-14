@@ -262,3 +262,6 @@ on conflict (fid) do nothing;
 --2020/10/19
 INSERT INTO config_fprocess(fid, tablename, target, fields, orderby, addparam)
 SELECT 239, tablename, target, fields,orderby, addparam FROM config_fprocess WHERE fid2 = 239 ON CONFLICT (fid, tablename, target) DO NOTHING;
+
+--2020/12/14
+DELETE FROM sys_param_user WHERE isdeprecated IS TRUE;

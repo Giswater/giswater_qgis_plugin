@@ -68,3 +68,5 @@ ALTER TABLE cat_soil ALTER COLUMN active SET DEFAULT TRUE;
 
 ALTER TABLE cat_work ADD COLUMN active boolean;
 ALTER TABLE cat_work ALTER COLUMN active SET DEFAULT TRUE;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_param_user", "column":"isdeprecated"}}$$);
