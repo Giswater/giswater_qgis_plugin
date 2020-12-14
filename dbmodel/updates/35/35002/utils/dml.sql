@@ -14,10 +14,10 @@ UPDATE sys_param_user SET layoutorder = layoutorder+1 WHERE layoutorder > 17 AND
 
 
 INSERT INTO sys_param_user(id, formname, descript, sys_role,  label, isenabled, layoutorder, project_type, isparent, 
-isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable,  isdeprecated)
+isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable)
 VALUES ('edit_update_elevation_from_dem', 'config', 'If true, the the elevation will be automatically updated from the DEM raster',
 'role_edit', 'Update elevation from DEM:', TRUE, 18, 'utils', FALSE, FALSE, 'boolean', 'check', FALSE, 'lyt_other',
-TRUE, FALSE) ON CONFLICT (id) DO NOTHING;
+TRUE) ON CONFLICT (id) DO NOTHING;
 
 
 DELETE FROM sys_table WHERE id = 'config_form_groupbox';
