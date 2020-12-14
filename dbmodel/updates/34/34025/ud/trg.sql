@@ -27,3 +27,11 @@ CREATE TRIGGER gw_trg_vi_groundwater
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_vi('vi_infiltration');
 
+
+CREATE TRIGGER gw_trg_vi_labels
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON vi_labels
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_vi('vi_labels');
+
+
