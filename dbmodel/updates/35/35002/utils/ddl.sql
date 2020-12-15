@@ -70,3 +70,19 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_work", 
 ALTER TABLE cat_work ALTER COLUMN active SET DEFAULT TRUE;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_param_user", "column":"isdeprecated"}}$$);
+
+--2020/12/15
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+ALTER TABLE dma ALTER COLUMN active SET DEFAULT TRUE;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodma", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+ALTER TABLE macrodma ALTER COLUMN active SET DEFAULT TRUE;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrosector", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+ALTER TABLE macrosector ALTER COLUMN active SET DEFAULT TRUE;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macroexploitation", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+ALTER TABLE macroexploitation ALTER COLUMN active SET DEFAULT TRUE;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+ALTER TABLE sector ALTER COLUMN active SET DEFAULT TRUE;

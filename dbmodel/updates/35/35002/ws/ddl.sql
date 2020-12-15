@@ -14,3 +14,13 @@ ALTER TABLE cat_mat_roughness ALTER COLUMN id SET DEFAULT nextval('cat_mat_rough
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_mat_roughness", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 ALTER TABLE cat_mat_roughness ALTER COLUMN active SET DEFAULT TRUE;
+
+--2020/12/15
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+ALTER TABLE dqa ALTER COLUMN active SET DEFAULT TRUE;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodqa", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+ALTER TABLE macrodqa ALTER COLUMN active SET DEFAULT TRUE;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+ALTER TABLE presszone ALTER COLUMN active SET DEFAULT TRUE;
