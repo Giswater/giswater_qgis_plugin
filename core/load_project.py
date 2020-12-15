@@ -58,7 +58,6 @@ class LoadProject(QObject):
         layer_source = tools_qgis.get_layer_source(self.layer_node)
         self.schema_name = layer_source['schema']
         self.schema_name = self.schema_name.replace('"', '')
-        tools_gw.set_config_parser('load_project', 'schema_name', f'{self.schema_name}')
         global_vars.schema_name = self.schema_name
 
         # TEMP

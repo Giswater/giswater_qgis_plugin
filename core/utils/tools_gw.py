@@ -2173,7 +2173,7 @@ def get_json(function_name, parameters=None, schema_name=None, commit=True, log_
     sql += f");"
 
     # Check log_sql for developers
-    dev_log_sql = get_config_parser('developers', 'log_sql')
+    dev_log_sql = get_config_parser('system', 'log_sql')
     if dev_log_sql not in (None, "None", "none"):
         log_sql = tools_os.cast_boolean(dev_log_sql)
 
@@ -2522,7 +2522,7 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
     message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)} """
 
     # Check duration message for developers
-    dev_duration = get_config_parser('developers', 'show_message_durations')
+    dev_duration = get_config_parser('system', 'show_message_durations')
     if dev_duration not in (None, "None"):
         duration = int(duration)
 
@@ -2912,7 +2912,7 @@ def close_docker():
                     del widget
                     global_vars.session_vars['dlg_docker'].setWidget(None)
                     global_vars.session_vars['docker_type'] = None
-                    set_config_parser('docker_info', 'position', f'{docker_pos}')
+                    set_config_parser('docker', 'position', f'{docker_pos}')
                 global_vars.iface.removeDockWidget(global_vars.session_vars['dlg_docker'])
                 global_vars.session_vars['dlg_docker'] = None
     except AttributeError:
@@ -2926,7 +2926,7 @@ def manage_docker_options():
     # Load last docker position
     try:
         # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
-        pos = int(get_config_parser('docker_info', 'position'))
+        pos = int(get_config_parser('docker', 'position'))
         global_vars.session_vars['dlg_docker'].position = 2
         if pos in (1, 2, 4, 8):
             global_vars.session_vars['dlg_docker'].position = pos

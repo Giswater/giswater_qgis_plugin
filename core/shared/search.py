@@ -560,7 +560,7 @@ class GwSearch:
     def get_current_selectors(self):
         """ Take the current selector_expl and selector_state to restore them at the end of the operation """
 
-        current_tab = tools_gw.get_config_parser('last_tabs', 'dlg_selector_basic')
+        current_tab = tools_gw.get_config_parser('dialogs_tab', 'selector_basic')
         form = f'"currentTab":"{current_tab}"'
         extras = f'"selectorType":"selector_basic", "filterText":""'
         body = tools_gw.create_body(form=form, extras=extras)

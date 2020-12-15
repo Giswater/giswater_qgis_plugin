@@ -96,9 +96,9 @@ class Giswater(QObject):
         # Check for developers options
         comment = '# log_sql --> If True: show all get_json log, if False: does not show any, if None: ' \
                   'show python log_sql option'
-        self.check_developers_settings('developers', 'log_sql', 'None', comment)
+        self.check_developers_settings('system', 'log_sql', 'None', comment)
         comment = '# show_message_durations --> Integer or None, if none: show python duration option'
-        self.check_developers_settings('developers', 'show_message_durations', 'None', comment)
+        self.check_developers_settings('system', 'show_message_durations', 'None', comment)
 
         # Set main information button (always visible)
         self.set_info_button()
