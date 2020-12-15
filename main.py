@@ -96,9 +96,9 @@ class Giswater(QObject):
         # Check for developers options
         comment = '# log_sql --> If True: show all get_json log, if False: does not show any, if None: ' \
                   'show python log_sql option'
-        self.check_developers_settings('developers', 'log_sql', comment)
+        self.check_developers_settings('developers', 'log_sql', 'None', comment)
         comment = '# show_message_durations --> Integer or None, if none: show python duration option'
-        self.check_developers_settings('developers', 'show_message_durations', comment)
+        self.check_developers_settings('developers', 'show_message_durations', 'None', comment)
 
         # Set main information button (always visible)
         self.set_info_button()
@@ -110,32 +110,15 @@ class Giswater(QObject):
         self.manage_section_toolbars()
 
 
-    def check_developers_settings(self, section='developers', parameter='log_sql', comment=None):
+    def check_developers_settings(self, section, parameter, value, comment=None):
         """ Check if @section and @parameter exists in user settings file. If not add them = None """
-        value = None
         try:
-            parser = configparser.ConfigParser(comment_prefixes=('/',), inline_comment_prefixes=('/',), allow_no_value=True)
-            main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
-            path = main_folder + os.sep + "config" + os.sep + 'user.config'
-            if not os.path.exists(path):
-                return value
-            parser.read(path)
-
-            # Check if section exists in file
-            if section not in parser:
-                parser.add_section(section)
-
-            # Check if parameter exists in section, if not exist, create
-            if parameter not in parser[section]:
-                parser.set(section, comment)
-                parser.set(section, parameter, 'None')
-                with open(path, 'w') as configfile:
-                    parser.write(configfile)
-                    configfile.close()
-            value = parser[section][parameter]
-        except:
-            return value
-        return value
+            value_ = tools_gw.get_config_parser(section, parameter)
+            if value_ is not None: return
+            tools_gw.set_config_parser(section, parameter, value, comment)
+        except Exception as e:
+            tools_log.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
+            pass
 
 
     def set_signals(self):

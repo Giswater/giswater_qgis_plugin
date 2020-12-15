@@ -434,7 +434,7 @@ def get_layer_source_from_credentials(sslmode_value, layer_name='v_edit_node'):
 
     # Get sslmode from user config file
     tools_config.manage_user_config_file()
-    sslmode = tools_config.get_user_setting_value('sslmode', sslmode_value)
+    sslmode = tools_config.get_user_setting_value('system', 'sslmode', sslmode_value)
 
     credentials = None
     not_version = True

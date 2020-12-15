@@ -12,7 +12,7 @@ from . import tools_log
 from .. import global_vars
 
 
-def check_user_settings(parameter, value=None, section='system'):
+def check_user_settings(section, parameter, value=None,):
     """ Check if @section and @parameter exists in user settings file. If not add them with @value """
 
     # Check if @section exists
@@ -27,26 +27,26 @@ def check_user_settings(parameter, value=None, section='system'):
         save_user_settings()
 
 
-def get_user_setting_value(parameter, default_value=None, section='system'):
+def get_user_setting_value(section, parameter, default_value=None):
     """ Get value from user settings file of selected @parameter located in @section """
 
     value = default_value
     if global_vars.session_vars['user_settings'] is None:
         return value
 
-    check_user_settings(parameter, value)
+    check_user_settings(section, parameter, value)
     value = global_vars.session_vars['user_settings'].get(section, parameter).lower()
 
     return value
 
 
-def set_user_settings_value(parameter, value, section='system'):
+def set_user_settings_value(section, parameter, value):
     """ Set @value from user settings file of selected @parameter located in @section """
 
     if global_vars.session_vars['user_settings'] is None:
         return value
 
-    check_user_settings(parameter, value)
+    check_user_settings(section, parameter, value)
     global_vars.session_vars['user_settings'].set(section, parameter, value)
     save_user_settings()
 

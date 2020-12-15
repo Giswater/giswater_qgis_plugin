@@ -611,7 +611,7 @@ def get_config_parser(section: str, parameter: str) -> str:
     return value
 
 
-def set_config_parser(section: str, parameter: str, value: str):
+def set_config_parser(section: str, parameter: str, value: str, comment=None):
     """  Save simple parser value """
     try:
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
@@ -621,15 +621,17 @@ def set_config_parser(section: str, parameter: str, value: str):
             os.makedirs(config_folder)
         path = config_folder + 'user.config'
         parser.read(path)
-
         # Check if section dialogs_position exists in file
         if section not in parser:
             parser.add_section(section)
-        parser[section][parameter] = value
+        if comment is not None:
+            parser.set(section, comment)
+        parser.set(section, parameter, value)
         with open(path, 'w') as configfile:
             parser.write(configfile)
             configfile.close()
     except Exception as e:
+        tools_log.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
         return None
 
 
@@ -2864,7 +2866,7 @@ def init_docker(docker_param='qgis_info_docker'):
     global_vars.session_vars['show_docker'] = True
     if docker_param == 'qgis_main_docker':
         # Show 'main dialog' in docker depending its value in user settings
-        qgis_main_docker = tools_config.get_user_setting_value(docker_param, 'true')
+        qgis_main_docker = tools_config.get_user_setting_value('btn_search', docker_param, 'true')
         value = qgis_main_docker.lower()
     else:
         # Show info or form in docker?

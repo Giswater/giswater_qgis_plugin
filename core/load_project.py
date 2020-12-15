@@ -118,7 +118,7 @@ class LoadProject(QObject):
             self.notify.start_listening(list_channels)
 
         # Open automatically 'search docker' depending its value in user settings
-        open_search = tools_config.get_user_setting_value('open_search', 'true')
+        open_search = tools_config.get_user_setting_value('btn_search', 'open_search', 'true')
         if open_search == 'true':
             GwSearch().api_search(load_project=True)
 
