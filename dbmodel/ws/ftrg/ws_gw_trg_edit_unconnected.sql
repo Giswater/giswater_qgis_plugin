@@ -46,13 +46,13 @@ BEGIN
     
         -- Dma ID
         IF (NEW.dma_id IS NULL) THEN
-            IF ((SELECT COUNT(*) FROM dma) = 0) THEN
+            IF ((SELECT COUNT(*) FROM dma WHERE active IS TRUE ) = 0) THEN
 
                --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				--"data":{"message":"1012", "function":"1330","debug_msg":null, "variables":null}}$$);
                 RETURN NULL;                         
             END IF;
-            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) LIMIT 1);
+            NEW.dma_id := (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) AND active IS TRUE  LIMIT 1);
 			IF (NEW.dma_id IS NULL) THEN
 				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"());
 			END IF; 
