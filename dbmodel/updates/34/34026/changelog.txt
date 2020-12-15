@@ -1,3 +1,4 @@
 3.4.026
 *************
 - Add v_plan_psector_* to show network which will be obsolete by a psector
+- Refactorize v_plan_psector integrating auxiliar views v_plan_psector_x_*
