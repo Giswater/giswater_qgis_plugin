@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>workcat_search</class>
- <widget class="QDialog" name="workcat_search">
+ <class>dlg_search_workcat</class>
+ <widget class="QDialog" name="dlg_search_workcat">
   <property name="geometry">
    <rect>
     <x>0</x>

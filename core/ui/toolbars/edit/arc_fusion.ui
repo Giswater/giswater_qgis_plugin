@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>arc_fusion</class>
- <widget class="QDialog" name="arc_fusion">
+ <class>dlg_arc_fusion</class>
+ <widget class="QDialog" name="dlg_arc_fusion">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>314</width>
-    <height>165</height>
+    <height>171</height>
    </rect>
   </property>
   <property name="windowTitle">

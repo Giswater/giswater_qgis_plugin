@@ -31,7 +31,7 @@ class GwInfoButton(GwParentMapTool):
         self.tab_type = None
         # Used when the signal 'signal_activate' is emitted from the info, do not open another form
         self.block_signal = False
-        self.previous_api_cf = None
+        self.previous_info_feature = None
         self.action_name = action_name
 
 
@@ -86,13 +86,13 @@ class GwInfoButton(GwParentMapTool):
             if point is False:
                 return
             tools_gw.init_docker()
-            api_cf = GwInfo(self.tab_type)
-            api_cf.signal_activate.connect(self.reactivate_map_tool)
-            api_cf.get_info_from_coordinates(point, tab_type=self.tab_type)
+            info_feature = GwInfo(self.tab_type)
+            info_feature.signal_activate.connect(self.reactivate_map_tool)
+            info_feature.get_info_from_coordinates(point, tab_type=self.tab_type)
             # Remove previous rubberband when open new docker
-            if isinstance(self.previous_api_cf, GwInfo) and global_vars.session_vars['dlg_docker'] is not None:
-                self.previous_api_cf.rubber_band.reset()
-            self.previous_api_cf = api_cf
+            if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dlg_docker'] is not None:
+                self.previous_info_feature.rubber_band.reset()
+            self.previous_info_feature = info_feature
 
         elif event.button() == Qt.RightButton:
             point = self.create_point(event)
@@ -123,7 +123,7 @@ class GwInfoButton(GwParentMapTool):
         if hasattr(self, 'rubberband_list'):
             for rb in self.rubberband_list:
                 rb.reset()
-        if hasattr(self, 'api_cf'):
+        if hasattr(self, 'dlg_info_feature'):
             self.rubber_band.reset()
 
         super().deactivate()
@@ -240,13 +240,13 @@ class GwInfoButton(GwParentMapTool):
             layer_source = tools_qgis.get_layer_source(layer)
             self.iface.setActiveLayer(layer)
             tools_gw.init_docker()
-            api_cf = GwInfo(self.tab_type)
-            api_cf.signal_activate.connect(self.reactivate_map_tool)
-            api_cf.get_info_from_id(table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type)
+            info_feature = GwInfo(self.tab_type)
+            info_feature.signal_activate.connect(self.reactivate_map_tool)
+            info_feature.get_info_from_id(table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type)
             # Remove previous rubberband when open new docker
-            if isinstance(self.previous_api_cf, GwInfo) and global_vars.session_vars['dlg_docker'] is not None:
-                self.previous_api_cf.rubber_band.reset()
-            self.previous_api_cf = api_cf
+            if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dlg_docker'] is not None:
+                self.previous_info_feature.rubber_band.reset()
+            self.previous_info_feature = info_feature
 
 
 

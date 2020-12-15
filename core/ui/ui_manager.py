@@ -324,8 +324,8 @@ FORM_CLASS = get_ui_class('config.ui', 'utilities')
 class ConfigUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('csv.ui', 'utilities')
-class CsvUi(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('csv2pg.ui', 'utilities')
+class Csv2pgUi(GwDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('fastprint.ui', 'utilities')

@@ -546,7 +546,7 @@ class GwInfo(QObject):
 
         if global_vars.session_vars['dlg_docker'] and is_docker and global_vars.session_vars['show_docker']:
             # Delete last form from memory
-            last_info = global_vars.session_vars['dlg_docker'].findChild(GwMainWindow, 'api_cf')
+            last_info = global_vars.session_vars['dlg_docker'].findChild(GwMainWindow, 'dlg_info_feature')
             if last_info:
                 last_info.setParent(None)
                 del last_info
@@ -2201,8 +2201,8 @@ class GwInfo(QObject):
             tools_gw.show_message(message, parameter=table_name)
             return
 
-        api_cf = GwInfo(self.tab_type)
-        complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
+        info_feature = GwInfo(self.tab_type)
+        complet_result, dialog = info_feature.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             tools_log.log_info("FAIL open_relation")
             return
@@ -2245,8 +2245,8 @@ class GwInfo(QObject):
         row = selected_list[0].row()
         table_name = qtable.model().record(row).value("sys_table_id")
         feature_id = qtable.model().record(row).value("feature_id")
-        api_cf = GwInfo(self.tab_type)
-        complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
+        info_feature = GwInfo(self.tab_type)
+        complet_result, dialog = info_feature.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             tools_log.log_info("FAIL open_up_down_stream")
             return
@@ -2285,8 +2285,8 @@ class GwInfo(QObject):
         feature_id = index.sibling(row, column_index).data()
 
         # return
-        api_cf = GwInfo(self.tab_type)
-        complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
+        info_feature = GwInfo(self.tab_type)
+        complet_result, dialog = info_feature.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             tools_log.log_info("FAIL open_selected_hydro")
             return
@@ -3140,8 +3140,8 @@ class GwInfo(QObject):
         feature_id = index.sibling(row, column_index).data()
 
         # return
-        api_cf = GwInfo(self.tab_type)
-        complet_result, dialog = api_cf.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
+        info_feature = GwInfo(self.tab_type)
+        complet_result, dialog = info_feature.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:
             tools_log.log_info("FAIL open_rpt_result")
             return
@@ -3513,8 +3513,8 @@ class GwInfo(QObject):
         global is_inserting
         is_inserting = True
 
-        self.api_cf = GwInfo('data')
-        result, dialog = self.api_cf.get_feature_insert(point=list_points, feature_cat=self.feature_cat,
+        self.info_feature = GwInfo('data')
+        result, dialog = self.info_feature.get_feature_insert(point=list_points, feature_cat=self.feature_cat,
                                                         new_feature_id=feature_id, layer_new_feature=self.info_layer,
                                                         tab_type='data', new_feature=feature)
 

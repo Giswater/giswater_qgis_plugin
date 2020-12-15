@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>plan_psector</class>
- <widget class="QDialog" name="plan_psector">
+ <class>dlg_plan_psector</class>
+ <widget class="QDialog" name="dlg_plan_psector">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -720,8 +720,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>620</width>
-              <height>484</height>
+              <width>146</width>
+              <height>122</height>
              </rect>
             </property>
             <attribute name="label">

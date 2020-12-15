@@ -34,8 +34,8 @@ class GwGo2EpaOptions:
         self.epa_options_list = []
 
         # Create dialog
-        self.dlg_options = Go2EpaOptionsUi()
-        tools_gw.load_settings(self.dlg_options)
+        self.dlg_go2epa_options = Go2EpaOptionsUi()
+        tools_gw.load_settings(self.dlg_go2epa_options)
 
         form = '"formName":"epaoptions"'
         body = tools_gw.create_body(form=form)
@@ -44,8 +44,8 @@ class GwGo2EpaOptions:
             return False
 
         tools_gw.construct_form_param_user(
-            self.dlg_options, json_result['body']['form']['formTabs'], 0, self.epa_options_list)
-        grbox_list = self.dlg_options.findChildren(QGroupBox)
+            self.dlg_go2epa_options, json_result['body']['form']['formTabs'], 0, self.epa_options_list)
+        grbox_list = self.dlg_go2epa_options.findChildren(QGroupBox)
         for grbox in grbox_list:
             widget_list = grbox.findChildren(QWidget)
             if len(widget_list) == 0:
@@ -58,10 +58,10 @@ class GwGo2EpaOptions:
 
         # Event on change from combo parent
         self.get_event_combo_parent(json_result)
-        self.dlg_options.btn_accept.clicked.connect(partial(self.update_values, self.epa_options_list))
-        self.dlg_options.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_options))
+        self.dlg_go2epa_options.btn_accept.clicked.connect(partial(self.update_values, self.epa_options_list))
+        self.dlg_go2epa_options.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_options))
 
-        tools_gw.open_dialog(self.dlg_options, dlg_name='go2epa_options')
+        tools_gw.open_dialog(self.dlg_go2epa_options, dlg_name='go2epa_options')
 
 
     def update_values(self, _json):
@@ -77,16 +77,16 @@ class GwGo2EpaOptions:
         message = "Values has been updated"
         tools_gw.show_info(message)
         # Close dialog
-        tools_gw.close_dialog(self.dlg_options)
+        tools_gw.close_dialog(self.dlg_go2epa_options)
 
 
     def get_event_combo_parent(self, complet_result):
 
         for field in complet_result['body']['form']['formTabs'][0]["fields"]:
             if field['isparent']:
-                widget = self.dlg_options.findChild(QComboBox, field['widgetname'])
+                widget = self.dlg_go2epa_options.findChild(QComboBox, field['widgetname'])
                 if widget:
-                    widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_options, widget))
+                    widget.currentIndexChanged.connect(partial(self.fill_child, self.dlg_go2epa_options, widget))
 
 
     def fill_child(self, dialog, widget):

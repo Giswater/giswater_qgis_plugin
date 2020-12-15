@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_dimensioning</class>
- <widget class="QMainWindow" name="dlg_dimensioning">
+ <class>dlg_profile</class>
+ <widget class="QMainWindow" name="dlg_profile">
   <property name="geometry">
    <rect>
     <x>0</x>

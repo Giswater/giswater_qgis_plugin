@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_lot_visitmanager</class>
- <widget class="QDialog" name="dlg_lot_visitmanager">
+ <class>dlg_visit_manager</class>
+ <widget class="QDialog" name="dlg_visit_manager">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -90,15 +90,15 @@
           </item>
           <item>
            <widget class="QDateEdit" name="date_event_from">
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
             <property name="date">
              <date>
               <year>2016</year>
               <month>1</month>
               <day>1</day>
              </date>
+            </property>
+            <property name="calendarPopup">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -135,15 +135,15 @@
           </item>
           <item>
            <widget class="QDateEdit" name="date_event_to">
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
             <property name="date">
              <date>
               <year>2017</year>
               <month>1</month>
               <day>1</day>
              </date>
+            </property>
+            <property name="calendarPopup">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -230,7 +230,7 @@
   <connection>
    <sender>btn_box</sender>
    <signal>accepted()</signal>
-   <receiver>dlg_lot_visitmanager</receiver>
+   <receiver>dlg_visit_manager</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -246,7 +246,7 @@
   <connection>
    <sender>btn_box</sender>
    <signal>rejected()</signal>
-   <receiver>dlg_lot_visitmanager</receiver>
+   <receiver>dlg_visit_manager</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

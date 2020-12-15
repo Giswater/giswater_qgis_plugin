@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>date_selector</class>
- <widget class="QDialog" name="date_selector">
+ <class>dlg_selector_date</class>
+ <widget class="QDialog" name="dlg_selector_date">
   <property name="geometry">
    <rect>
     <x>0</x>

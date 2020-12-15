@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>api_cf</class>
- <widget class="QMainWindow" name="api_cf">
+ <class>dlg_info_feature</class>
+ <widget class="QMainWindow" name="dlg_info_feature">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -72,8 +72,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>100</width>
-             <height>30</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">

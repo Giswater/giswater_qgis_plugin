@@ -26,7 +26,7 @@ class GwAddLineButton(GwParentAction):
 
         self.feature_cat = tools_gw.manage_feature_cat()
 
-        self.api_cf = GwInfo('data')
+        self.info_feature = GwInfo('data')
 
         # Get list of different node and arc types
         menu = QMenu()
@@ -41,7 +41,7 @@ class GwAddLineButton(GwParentAction):
                 except:
                     pass
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.api_cf.edit_add_feature, feature_cat))
+                obj_action.triggered.connect(partial(self.info_feature.edit_add_feature, feature_cat))
 
         self.action.setMenu(menu)
         toolbar.addAction(self.action)

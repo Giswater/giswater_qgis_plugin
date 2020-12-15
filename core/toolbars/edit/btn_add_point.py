@@ -28,7 +28,7 @@ class GwAddPointButton(GwParentAction):
 
         project_type = tools_gw.get_project_type()
 
-        self.api_cf = GwInfo('data')
+        self.info_feature = GwInfo('data')
 
         # Get list of different node and arc types
         menu = QMenu()
@@ -43,7 +43,7 @@ class GwAddPointButton(GwParentAction):
                 except:
                     pass
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.api_cf.edit_add_feature, feature_cat))
+                obj_action.triggered.connect(partial(self.info_feature.edit_add_feature, feature_cat))
         menu.addSeparator()
 
         list_feature_cat = tools_os.get_values_from_dictionary(self.feature_cat)
@@ -56,7 +56,7 @@ class GwAddPointButton(GwParentAction):
                 except:
                     pass
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.api_cf.edit_add_feature, feature_cat))
+                obj_action.triggered.connect(partial(self.info_feature.edit_add_feature, feature_cat))
         menu.addSeparator()
 
         list_feature_cat = tools_os.get_values_from_dictionary(self.feature_cat)
@@ -69,7 +69,7 @@ class GwAddPointButton(GwParentAction):
                 except:
                     pass
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.api_cf.edit_add_feature, feature_cat))
+                obj_action.triggered.connect(partial(self.info_feature.edit_add_feature, feature_cat))
         menu.addSeparator()
 
 
