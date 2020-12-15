@@ -1039,7 +1039,7 @@ def manage_translation(context_name, dialog=None, log_info=False):
     except AttributeError:
         locale = "en"
 
-    locales = {'en': 'en', 'es_es': 'es', 'es_ca': 'ca', 'en_us': 'en'}
+    locales = {'en': 'en','en_us': 'en', 'es':'es', 'es_es': 'es', 'es_ca': 'ca'}
 
     # If user locale file not found, set English one by default
     locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'{global_vars.plugin_name}_{locales.get(locale,"en")}.qm')
