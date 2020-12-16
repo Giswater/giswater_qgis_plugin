@@ -8,13 +8,13 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
--- 2020/12/15
+-- 2020/12/16
 CREATE OR REPLACE VIEW v_plan_psector_arc AS
 SELECT arc.arc_id,
 plan_psector_x_arc.psector_id,
 arc.code, 
 arc.arccat_id,
-cat_arc.arc_type,
+cat_arc.arctype_id,
 cat_feature.system_id,
 arc.state AS original_state,
 arc.state_type AS original_state_type,
@@ -25,7 +25,7 @@ arc.the_geom
 FROM selector_psector, arc
 JOIN plan_psector_x_arc USING (arc_id)
 JOIN cat_arc ON cat_arc.id=arc.arccat_id
-JOIN cat_feature ON cat_feature.id=cat_arc.arc_type
+JOIN cat_feature ON cat_feature.id=cat_arc.arctype_id
 WHERE plan_psector_x_arc.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
 
 
@@ -35,7 +35,7 @@ SELECT node.node_id,
 plan_psector_x_node.psector_id,
 node.code, 
 node.nodecat_id,
-cat_node.node_type,
+cat_node.nodetype_id,
 cat_feature.system_id,
 node.state AS original_state,
 node.state_type AS original_state_type,
@@ -45,7 +45,7 @@ node.the_geom
 FROM selector_psector, node
 JOIN plan_psector_x_node USING (node_id)
 JOIN cat_node ON cat_node.id=node.nodecat_id
-JOIN cat_feature ON cat_feature.id=cat_node.node_type
+JOIN cat_feature ON cat_feature.id=cat_node.nodetype_id
 WHERE plan_psector_x_node.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
 
 
@@ -55,7 +55,7 @@ SELECT connec.connec_id,
 plan_psector_x_connec.psector_id,
 connec.code, 
 connec.connecat_id,
-cat_connec.connec_type,
+cat_connec.connectype_id,
 cat_feature.system_id,
 connec.state AS original_state,
 connec.state_type AS original_state_type,
@@ -65,34 +65,15 @@ connec.the_geom
 FROM selector_psector, connec
 JOIN plan_psector_x_connec USING (connec_id)
 JOIN cat_connec ON cat_connec.id=connec.connecat_id
-JOIN cat_feature ON cat_feature.id=cat_connec.connec_type
+JOIN cat_feature ON cat_feature.id=cat_connec.connectype_id
 WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
 
-
-
-CREATE OR REPLACE VIEW v_plan_psector_gully AS
-SELECT gully.gully_id,
-plan_psector_x_gully.psector_id,
-gully.code, 
-gully.gratecat_id,
-cat_grate.gully_type,
-cat_feature.system_id,
-gully.state AS original_state,
-gully.state_type AS original_state_type,
-plan_psector_x_gully.state AS plan_state,
-plan_psector_x_gully.doable,
-gully.the_geom
-FROM selector_psector, gully
-JOIN plan_psector_x_gully USING (gully_id)
-JOIN cat_grate ON cat_grate.id=gully.gratecat_id
-JOIN cat_feature ON cat_feature.id=cat_grate.gully_type
-WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW v_plan_psector_link AS 
 SELECT link.link_id,
 plan_psector_x_connec.psector_id,
-connec.connec_id AS feature_id,
+connec.connec_id,
 connec.state AS original_state,
 connec.state_type AS original_state_type,
 plan_psector_x_connec.state AS plan_state,
@@ -101,17 +82,4 @@ link.the_geom
 FROM selector_psector,connec
 JOIN plan_psector_x_connec USING (connec_id)
 JOIN link ON link.feature_id=connec.connec_id
-WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text
-UNION 
-SELECT link.link_id,
-plan_psector_x_gully.psector_id,
-gully.gully_id AS feature_id,
-gully.state AS original_state,
-gully.state_type AS original_state_type,
-plan_psector_x_gully.state AS plan_state,
-plan_psector_x_gully.doable,
-link.the_geom
-FROM selector_psector,gully
-JOIN plan_psector_x_gully USING (gully_id)
-JOIN link ON link.feature_id=gully.gully_id
-WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;

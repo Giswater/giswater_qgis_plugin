@@ -12,3 +12,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 INSERT INTO sys_table VALUES ('v_plan_psector_arc', 'View to show arcs related to psectors. Useful to show arcs which will be obsolete in psectors', 'role_basic', 0, 'role_master', 2, 'Cannot view related arcs to psectors') ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_table VALUES ('v_plan_psector_node', 'View to show nodes related to psectors. Useful to show nodes which will be obsolete in psectors', 'role_basic', 0, 'role_master', 2, 'Cannot view related nodes to psectors') ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_table VALUES ('v_plan_psector_connec', 'View to show connecs related to psectors. Useful to show connecs which will be obsolete in psectors', 'role_basic', 0, 'role_master', 2, 'Cannot view related connecs to psectors') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_table VALUES ('v_plan_psector_link', 'View to show links related to psectors. Useful to show links which will be obsolete in psectors', 'role_basic', 0, 'role_master', 2, 'Cannot view related links to psectors') ON CONFLICT (id) DO NOTHING;
+
+
+DELETE FROM sys_table WHERE id='v_plan_psector_x_arc';
+DELETE FROM sys_table WHERE id='v_plan_psector_x_node';
+DELETE FROM sys_table WHERE id='v_plan_psector_x_other';
