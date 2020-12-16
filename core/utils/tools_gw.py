@@ -707,10 +707,10 @@ def close_dialog(dlg):
         # If selected map tool is from the plugin, set 'Pan' as current one
         if map_tool.toolName() == '':
             global_vars.iface.actionPan().trigger()
-    except AttributeError:
+    except Exception:
         pass
-
-    global_vars.schema = None
+    finally:
+        global_vars.schema = None
 
 
 def create_body(form='', feature='', filter_fields='', extras=None):
