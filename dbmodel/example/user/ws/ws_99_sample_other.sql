@@ -577,12 +577,12 @@ WHERE parameter  = 'basic_search_exploitation';
 
 UPDATE config_info_layer SET addparam = '{"forceWhenActive":true}' WHERE layer_id IN ('v_edit_dimensions','v_edit_om_visit');
 
-UPDATE config_param_system SET value = json_object_set_key(value, 'manageConflict', 'true');
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'manageConflict', 'false'::text) WHERE parameter = 'utils_grafanalytics_status';
 
-INSERT INTO presszone (presszone_id, name, expl_id) VALUES (11,'Conflict mapzone',1, '{"status":"useWhenConflict"}');
-INSERT INTO presszone (presszone_id, name, expl_id) VALUES (12,'Conflict mapzone',2, '{"status":"useWhenConflict"}');
-INSERT INTO dma VALUES (dma_id, name, expl_id) (11,'Conflict mapzone',1, '{"status":"useWhenConflict"}');
-INSERT INTO dma VALUES (dma_id, name, expl_id) (12,'Conflict mapzone',2, '{"status":"useWhenConflict"}');
-INSERT INTO dqa VALUES (dqa_id, name, expl_id) (11,'Conflict mapzone',1, '{"status":"useWhenConflict"}');
-INSERT INTO dqa VALUES (dqa_id, name, expl_id) (12,'Conflict mapzone',2, '{"status":"useWhenConflict"}');
-INSERT INTO sector VALUES (sector_id, name) (11,'Conflict mapzone', '{"status":"useWhenConflict"}');
+INSERT INTO presszone (presszone_id, name, expl_id, grafconfig) VALUES (11,'Conflict mapzone',1, '{"status":"useWhenConflict"}');
+INSERT INTO presszone (presszone_id, name, expl_id, grafconfig) VALUES (12,'Conflict mapzone',2, '{"status":"useWhenConflict"}');
+INSERT INTO dma (dma_id, name, expl_id, grafconfig) VALUES (11,'Conflict mapzone',1, '{"status":"useWhenConflict"}');
+INSERT INTO dma (dma_id, name, expl_id, grafconfig) VALUES (12,'Conflict mapzone',2, '{"status":"useWhenConflict"}');
+INSERT INTO dqa (dqa_id, name, expl_id, grafconfig) VALUES (11,'Conflict mapzone',1, '{"status":"useWhenConflict"}');
+INSERT INTO dqa (dqa_id, name, expl_id, grafconfig) VALUES (12,'Conflict mapzone',2, '{"status":"useWhenConflict"}');
+INSERT INTO sector (sector_id, name, grafconfig) VALUES (11,'Conflict mapzone', '{"status":"useWhenConflict"}');

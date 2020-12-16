@@ -9,5 +9,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2020/12/15
-UPDATE config_param_system SET value = json_object_set_key(value, 'manageConflict', 'false');
+UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'manageConflict', 'false'::text) WHERE parameter = 'utils_grafanalytics_status';
 
