@@ -46,6 +46,7 @@ class MultipleSelection(QgsMapTool):
         :param dialog:
         :param query:
         """
+
         self.class_object = class_object
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
@@ -767,26 +768,13 @@ def hide_parent_layers(excluded_layers=[]):
     """ Hide generic layers """
 
     layers_changed = {}
-    layer = tools_qgis.get_layer_by_tablename("v_edit_arc")
-    if layer and "v_edit_arc" not in excluded_layers:
-        layers_changed[layer] = tools_qgis.is_layer_visible(layer)
-        tools_qgis.set_layer_visible(layer)
-    layer = tools_qgis.get_layer_by_tablename("v_edit_node")
-    if layer and "v_edit_node" not in excluded_layers:
-        layers_changed[layer] = tools_qgis.is_layer_visible(layer)
-        tools_qgis.set_layer_visible(layer)
-    layer = tools_qgis.get_layer_by_tablename("v_edit_connec")
-    if layer and "v_edit_connec" not in excluded_layers:
-        layers_changed[layer] = tools_qgis.is_layer_visible(layer)
-        tools_qgis.set_layer_visible(layer)
-    layer = tools_qgis.get_layer_by_tablename("v_edit_element")
-    if layer and "v_edit_element" not in excluded_layers:
-        layers_changed[layer] = tools_qgis.is_layer_visible(layer)
-        tools_qgis.set_layer_visible(layer)
-
+    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element"]
     if global_vars.project_type == 'ud':
-        layer = tools_qgis.get_layer_by_tablename("v_edit_gully")
-        if layer and "v_edit_gully" not in excluded_layers:
+        list_layers.append("v_edit_gully")
+
+    for layer_name in list_layers:
+        layer = tools_qgis.get_layer_by_tablename(layer_name)
+        if layer and layer_name not in excluded_layers:
             layers_changed[layer] = tools_qgis.is_layer_visible(layer)
             tools_qgis.set_layer_visible(layer)
 
@@ -1946,9 +1934,10 @@ def manage_child(dialog, combo_parent, combo_child):
         if 'widgetcontrols' not in combo_child or not combo_child['widgetcontrols'] or \
                 'enableWhenParent' not in combo_child['widgetcontrols']:
             return
-        #
-        if (str(tools_qt.get_combo_value(dialog, combo_parent, 0)) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
-                and (tools_qt.get_combo_value(dialog, combo_parent, 0) not in (None, '')):
+
+        combo_value = tools_qt.get_combo_value(dialog, combo_parent, 0)
+        if (str(combo_value) in str(combo_child['widgetcontrols']['enableWhenParent'])) \
+                and (combo_value not in (None, '')):
             # The keepDisbled property is used to keep the edition enabled or disabled,
             # when we activate the layer and call the "enable_all" function
             child.setProperty('keepDisbled', False)
@@ -2406,8 +2395,8 @@ def get_restriction(qgis_project_role):
                     role_basic = tools_db.check_role_user("role_basic")
     super_users = global_vars.settings.value('system_variables/super_users')
 
-    # Manage user 'postgres'
-    if global_vars.session_vars['current_user'] == 'postgres' or global_vars.session_vars['current_user'] == 'gisadmin':
+    # Manage user 'postgres', 'gisadmin'
+    if global_vars.session_vars['current_user'] in ('postgres', 'gisadmin'):
         role_master = True
 
     # Manage super_user
@@ -2721,38 +2710,19 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
 def remove_selection(remove_groups=True, layers=None):
     """ Remove all previous selections """
 
-    layer = tools_qgis.get_layer_by_tablename("v_edit_arc")
-    if layer:
-        layer.removeSelection()
-    layer = tools_qgis.get_layer_by_tablename("v_edit_node")
-    if layer:
-        layer.removeSelection()
-    layer = tools_qgis.get_layer_by_tablename("v_edit_connec")
-    if layer:
-        layer.removeSelection()
-    layer = tools_qgis.get_layer_by_tablename("v_edit_element")
-    if layer:
-        layer.removeSelection()
-
+    list_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element"]
     if global_vars.project_type == 'ud':
-        layer = tools_qgis.get_layer_by_tablename("v_edit_gully")
+        list_layers.append("v_edit_gully")
+
+    for layer_name in list_layers:
+        layer = tools_qgis.get_layer_by_tablename(layer_name)
         if layer:
             layer.removeSelection()
 
-    try:
-        if remove_groups:
-            for layer in layers['arc']:
+    if remove_groups and layers is not None:
+        for key, elems in layers.items():
+            for layer in layers[key]:
                 layer.removeSelection()
-            for layer in layers['node']:
-                layer.removeSelection()
-            for layer in layers['connec']:
-                layer.removeSelection()
-            for layer in layers['gully']:
-                layer.removeSelection()
-            for layer in layers['element']:
-                layer.removeSelection()
-    except:
-        pass
 
     global_vars.canvas.refresh()
 
@@ -3188,12 +3158,13 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
         layers = remove_selection(single_tool_mode, layers=layers)
     else:
         layers = remove_selection(True, layers=layers)
-    tools_qt.reset_model(dialog, table_object, "arc")
-    tools_qt.reset_model(dialog, table_object, "node")
-    tools_qt.reset_model(dialog, table_object, "connec")
-    tools_qt.reset_model(dialog, table_object, "element")
+
+    list_geom_type = ['arc', 'node', 'connec', 'element']
     if global_vars.project_type == 'ud':
-        tools_qt.reset_model(dialog, table_object, "gully")
+        list_geom_type.append('gully')
+    for geom_type in list_geom_type:
+        tools_qt.reset_model(dialog, table_object, "geom_type")
+
     close_dialog(dialog)
     hide_parent_layers(excluded_layers=excluded_layers)
 
@@ -3311,6 +3282,10 @@ def exist_object(class_object, dialog, table_object, single_tool_mode=None):
     # Reset list of selected records
     reset_feature_list(class_object.ids, class_object.list_ids)
 
+    list_geom_type = ['arc', 'node', 'connec', 'element']
+    if global_vars.project_type == 'ud':
+        list_geom_type.append('gully')
+
     field_object_id = "id"
     if table_object == "element":
         field_object_id = table_object + "_id"
@@ -3337,53 +3312,33 @@ def exist_object(class_object, dialog, table_object, single_tool_mode=None):
             class_object.layers = remove_selection(single_tool_mode, class_object.layers)
         else:
             class_object.layers = remove_selection(True, class_object.layers)
-        tools_qt.reset_model(dialog, table_object, "arc")
-        tools_qt.reset_model(dialog, table_object, "node")
-        tools_qt.reset_model(dialog, table_object, "connec")
-        tools_qt.reset_model(dialog, table_object, "element")
-        if global_vars.project_type == 'ud':
-            tools_qt.reset_model(dialog, table_object, "gully")
+
+        for geom_type in list_geom_type:
+            tools_qt.reset_model(dialog, table_object, geom_type)
 
         return
 
     # Fill input widgets with data of the @row
     fill_widgets(dialog, table_object, row)
 
-    # Check related 'arcs'
-    get_rows_by_feature_type(class_object, dialog, table_object, "arc")
-    # Check related 'nodes'
-    get_rows_by_feature_type(class_object, dialog, table_object, "node")
-    # Check related 'connecs'
-    get_rows_by_feature_type(class_object, dialog, table_object, "connec")
-    # Check related 'elements'
-    get_rows_by_feature_type(class_object, dialog, table_object, "element")
-    # Check related 'gullys'
-    if global_vars.project_type == 'ud':
-        get_rows_by_feature_type(class_object, dialog, table_object, "gully")
+    # Check related @geom_type
+    for geom_type in list_geom_type:
+        get_rows_by_feature_type(class_object, dialog, table_object, geom_type)
 
 
 def reset_widgets(dialog, table_object):
     """ Clear contents of input widgets """
 
+    widgets = None
     if table_object == "doc":
-        tools_qt.set_widget_text(dialog, "doc_type", "")
-        tools_qt.set_widget_text(dialog, "observ", "")
-        tools_qt.set_widget_text(dialog, "path", "")
+        widgets = ["doc_type", "observ", "path"]
     elif table_object == "element":
-        tools_qt.set_widget_text(dialog, "elementcat_id", "")
-        tools_qt.set_widget_text(dialog, "state", "")
-        tools_qt.set_widget_text(dialog, "expl_id", "")
-        tools_qt.set_widget_text(dialog, "ownercat_id", "")
-        tools_qt.set_widget_text(dialog, "location_type", "")
-        tools_qt.set_widget_text(dialog, "buildercat_id", "")
-        tools_qt.set_widget_text(dialog, "workcat_id", "")
-        tools_qt.set_widget_text(dialog, "workcat_id_end", "")
-        tools_qt.set_widget_text(dialog, "comment", "")
-        tools_qt.set_widget_text(dialog, "observ", "")
-        tools_qt.set_widget_text(dialog, "path", "")
-        tools_qt.set_widget_text(dialog, "rotation", "")
-        tools_qt.set_widget_text(dialog, "verified", "")
-        tools_qt.set_widget_text(dialog, dialog.num_elements, "")
+        widgets = ["elementcat_id", "state", "expl_id", "ownercat_id", "location_type", "buildercat_id", "workcat_id",
+                   "workcat_id_end", "comment", "observ", "path", "rotation", "verified", "num_elements"]
+
+    if widgets:
+        for widget_name in widgets:
+            tools_qt.set_widget_text(dialog, widget_name, "")
 
 
 def fill_widgets(dialog, table_object, row):
@@ -3420,22 +3375,13 @@ def fill_widgets(dialog, table_object, row):
         if row_type:
             tools_qt.set_widget_text(dialog, "element_type", row_type[0])
 
-        tools_qt.set_widget_text(dialog, "elementcat_id", row['elementcat_id'])
-        tools_qt.set_widget_text(dialog, "num_elements", row['num_elements'])
-        tools_qt.set_widget_text(dialog, "state", state)
+        widgets = ["elementcat_id", "state", "expl_id", "ownercat_id", "location_type", "buildercat_id", "workcat_id",
+                   "workcat_id_end", "comment", "observ", "link", "rotation", "verified", "num_elements"]
+        for widget_name in widgets:
+            tools_qt.set_widget_text(dialog, widget_name, row[widget_name])
+
         tools_qt.set_combo_value(dialog.state_type, f"{row['state_type']}", 0)
-        tools_qt.set_widget_text(dialog, "expl_id", expl_id)
-        tools_qt.set_widget_text(dialog, "ownercat_id", row['ownercat_id'])
-        tools_qt.set_widget_text(dialog, "location_type", row['location_type'])
-        tools_qt.set_widget_text(dialog, "buildercat_id", row['buildercat_id'])
         tools_qt.set_widget_text(dialog, "builtdate", row['builtdate'])
-        tools_qt.set_widget_text(dialog, "workcat_id", row['workcat_id'])
-        tools_qt.set_widget_text(dialog, "workcat_id_end", row['workcat_id_end'])
-        tools_qt.set_widget_text(dialog, "comment", row['comment'])
-        tools_qt.set_widget_text(dialog, "observ", row['observ'])
-        tools_qt.set_widget_text(dialog, "link", row['link'])
-        tools_qt.set_widget_text(dialog, "verified", row['verified'])
-        tools_qt.set_widget_text(dialog, "rotation", row['rotation'])
         if str(row['undelete']) == 'True':
             dialog.undelete.setChecked(True)
 
