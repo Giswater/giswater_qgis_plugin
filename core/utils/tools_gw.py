@@ -18,14 +18,14 @@ from collections import OrderedDict
 from functools import partial
 
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QPoint, QDate, QSettings
+from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QPoint, QDate
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
     QToolButton, QWidget, QApplication
-from qgis.core import QgsProject, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
-    QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
-    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest, QgsDataSourceUri, QgsCredentials, QgsRectangle
+from qgis.core import QgsProject, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
+    QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
+    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest, QgsRectangle
 from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint, QgsDateTimeEdit, QgsMapTool, QgsRubberBand
 
 from ..models.sys_feature_cat import SysFeatureCat
@@ -95,7 +95,6 @@ class MultipleSelection(QgsMapTool):
         # Disconnect signal to enhance process
         # We will reconnect it when processing last layer of the group
         tools_qgis.disconnect_signal_selection_changed()
-
 
         for i, layer in enumerate(self.class_object.layers[self.class_object.geom_type]):
             if i == len(self.class_object.layers[self.class_object.geom_type]) - 1:
@@ -707,10 +706,10 @@ def close_dialog(dlg):
         # If selected map tool is from the plugin, set 'Pan' as current one
         if map_tool.toolName() == '':
             global_vars.iface.actionPan().trigger()
-    except AttributeError:
+    except Exception:
         pass
-
-    global_vars.schema = None
+    finally:
+        global_vars.schema = None
 
 
 def create_body(form='', feature='', filter_fields='', extras=None):
@@ -1598,7 +1597,7 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             function_name = field['widgetfunction']
-            exist = check_python_function(module, function_name)
+            exist = tools_os.check_python_function(module, function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
                 show_message(msg, 2)
@@ -1726,7 +1725,7 @@ def add_hyperlink(field):
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             func_name = field['widgetfunction']
-            exist = check_python_function(global_vars.session_vars['gw_infotools'], func_name)
+            exist = tools_os.check_python_function(global_vars.session_vars['gw_infotools'], func_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
                 show_message(msg, 2)
@@ -1852,7 +1851,7 @@ def add_tableview(complet_result, field):
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             function_name = field['widgetfunction']
-            exist = check_python_function(sys.modules[__name__], function_name)
+            exist = tools_os.check_python_function(sys.modules[__name__], function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
                 show_message(msg, 2)
@@ -2035,12 +2034,6 @@ def get_actions_from_json(json_result, sql):
                 tools_log.log_debug(f"{type(e).__name__}: {e}")
     except Exception as e:
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
-
-
-def check_python_function(object_, function_name):
-
-    object_functions = [method_name for method_name in dir(object_) if callable(getattr(object_, method_name))]
-    return function_name in object_functions
 
 
 def document_delete(qtable):
@@ -3034,37 +3027,19 @@ def reload_qtable(dialog, geom_type):
     tools_qgis.refresh_map_canvas()
 
 
-def set_completer_object(dialog, table_object, field_object_id="id"):
+def set_completer_object(dialog, tablename, field_id="id"):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object
     """
 
-    widget = tools_qt.get_widget(dialog, table_object + "_id")
+    widget = tools_qt.get_widget(dialog, tablename + "_id")
     if not widget:
         return
 
-    # Set SQL
-    if table_object == "element":
-        field_object_id = table_object + "_id"
-    sql = (f"SELECT DISTINCT({field_object_id})"
-           f" FROM {table_object}"
-           f" ORDER BY {field_object_id}")
+    if tablename == "element":
+        field_id = tablename + "_id"
 
-    rows = tools_db.get_rows(sql)
-    if rows is None:
-        return
-
-    for i in range(0, len(rows)):
-        aux = rows[i]
-        rows[i] = str(aux[0])
-
-    # Set completer and model: add autocomplete in the widget
-    completer = QCompleter()
-    completer.setCaseSensitivity(Qt.CaseInsensitive)
-    widget.setCompleter(completer)
-    model = QStringListModel()
-    model.setStringList(rows)
-    completer.setModel(model)
+    set_completer_widget(tablename, widget, field_id)
 
 
 def set_completer_widget(tablename, widget, field_id):
@@ -3075,22 +3050,11 @@ def set_completer_widget(tablename, widget, field_id):
     if not widget:
         return
 
-    # Set SQL
     sql = (f"SELECT DISTINCT({field_id})"
            f" FROM {tablename}"
            f" ORDER BY {field_id}")
-    row = tools_db.get_rows(sql)
-    for i in range(0, len(row)):
-        aux = row[i]
-        row[i] = str(aux[0])
-
-    # Set completer and model: add autocomplete in the widget
-    completer = QCompleter()
-    completer.setCaseSensitivity(Qt.CaseInsensitive)
-    widget.setCompleter(completer)
-    model = QStringListModel()
-    model.setStringList(row)
-    completer.setModel(model)
+    rows = tools_db.get_rows(sql)
+    tools_qt.set_completer_rows(widget, rows)
 
 
 def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):

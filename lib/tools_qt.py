@@ -753,6 +753,28 @@ def set_completer_lineedit(qlineedit, list_items):
     completer.setModel(model)
 
 
+def set_completer_rows(widget, rows):
+    """ Set a completer into a widget
+    :param widget: Object where to set the completer (QLineEdit)
+    :param rows: rows to set into the completer (List)["item1","item2","..."]
+    """
+
+    if rows is None:
+        return
+
+    list_values = []
+    for row in rows:
+        list_values.append(str(row[0]))
+
+    # Set completer and model: add autocomplete in the widget
+    completer = QCompleter()
+    completer.setCaseSensitivity(Qt.CaseInsensitive)
+    widget.setCompleter(completer)
+    model = QStringListModel()
+    model.setStringList(list_values)
+    completer.setModel(model)
+
+
 def put_combobox(qtable, rows, field, widget_pos, combo_values):
     """ Set one column of a QtableView as QComboBox with values from database.
     :param qtable: QTableView to fill
@@ -1078,6 +1100,7 @@ def add_translator(locale_path, log_info=False):
 
 def translate_form(dialog, context_name, aux_context='ui_message'):
     """ Translate widgets of the form to current language """
+
     type_widget_list = [QCheckBox, QGroupBox, QLabel, QPushButton, QRadioButton, QTabWidget]
     for widget_type in type_widget_list:
         widget_list = dialog.findChildren(widget_type)

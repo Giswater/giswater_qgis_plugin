@@ -12,7 +12,7 @@ from qgis.PyQt.QtCore import Qt, QDate
 from ..parent_maptool import GwParentMapTool
 from ...ui.ui_manager import ArcFusionUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_db
+from ....lib import tools_qt, tools_db, tools_qgis
 
 
 class GwArcFusionButton(GwParentMapTool):
