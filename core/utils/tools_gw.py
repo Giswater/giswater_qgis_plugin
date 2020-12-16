@@ -3034,37 +3034,19 @@ def reload_qtable(dialog, geom_type):
     tools_qgis.refresh_map_canvas()
 
 
-def set_completer_object(dialog, table_object, field_object_id="id"):
+def set_completer_object(dialog, tablename, field_id="id"):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object
     """
 
-    widget = tools_qt.get_widget(dialog, table_object + "_id")
+    widget = tools_qt.get_widget(dialog, tablename + "_id")
     if not widget:
         return
 
-    # Set SQL
-    if table_object == "element":
-        field_object_id = table_object + "_id"
-    sql = (f"SELECT DISTINCT({field_object_id})"
-           f" FROM {table_object}"
-           f" ORDER BY {field_object_id}")
+    if tablename == "element":
+        field_id = tablename + "_id"
 
-    rows = tools_db.get_rows(sql)
-    if rows is None:
-        return
-
-    for i in range(0, len(rows)):
-        aux = rows[i]
-        rows[i] = str(aux[0])
-
-    # Set completer and model: add autocomplete in the widget
-    completer = QCompleter()
-    completer.setCaseSensitivity(Qt.CaseInsensitive)
-    widget.setCompleter(completer)
-    model = QStringListModel()
-    model.setStringList(rows)
-    completer.setModel(model)
+    set_completer_widget(tablename, widget, field_id)
 
 
 def set_completer_widget(tablename, widget, field_id):
@@ -3075,22 +3057,11 @@ def set_completer_widget(tablename, widget, field_id):
     if not widget:
         return
 
-    # Set SQL
     sql = (f"SELECT DISTINCT({field_id})"
            f" FROM {tablename}"
            f" ORDER BY {field_id}")
-    row = tools_db.get_rows(sql)
-    for i in range(0, len(row)):
-        aux = row[i]
-        row[i] = str(aux[0])
-
-    # Set completer and model: add autocomplete in the widget
-    completer = QCompleter()
-    completer.setCaseSensitivity(Qt.CaseInsensitive)
-    widget.setCompleter(completer)
-    model = QStringListModel()
-    model.setStringList(row)
-    completer.setModel(model)
+    rows = tools_db.get_rows(sql)
+    tools_qt.set_completer_rows(widget, rows)
 
 
 def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
