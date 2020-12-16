@@ -155,6 +155,8 @@ v_parameters json;
 v_usepsector boolean;
 v_error boolean = false;
 v_nodemapzone text;
+v_conflict text[];
+v_manageconflict boolean;
 
 BEGIN
 	-- Search path
@@ -178,6 +180,9 @@ BEGIN
 	v_debug = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'debug');
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
 	v_parameters = (SELECT ((p_data::json->>'data')::json->>'parameters'));
+
+	-- get config_param_system
+	v_manageconflict := (SELECT value::json->>'manageConflict' FROM config_param_system WHERE parameter = 'utils_grafanalytics_status')::boolean;
 
 	IF v_floodfromnode = '' THEN v_floodfromnode = NULL; END IF;
 
@@ -305,7 +310,11 @@ BEGIN
 
 		-- start build log message
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('MAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('----------------------------------------------------------'));
+		IF upper(v_class) ='PRESSZONE' THEN
+			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('------------------------------------------------------------------'));
+		ELSE
+			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('----------------------------------------------------------'));
+		END IF;
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Use psectors: ', upper(v_usepsector::text)));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Mapzone constructor method: ', upper(v_updatemapzgeom::text)));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('Update feature mapzone attributes: ', upper(v_updatetattributes::text)));
@@ -327,7 +336,7 @@ BEGIN
 
 			-- start build log message
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, 'ERRORS');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, '--------------');
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, '-----------');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, 'WARNINGS');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, '--------------');
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, 'INFO');
@@ -353,6 +362,10 @@ BEGIN
 					EXECUTE v_querytext;
 				END IF;
 			END IF;
+
+			-- reset mapzone geometry
+			v_querytext = 'UPDATE '||quote_ident(v_table)||' SET the_geom = null WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)';
+			EXECUTE v_querytext;
 
 			-- fill the graf table
 			INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
@@ -516,7 +529,7 @@ BEGIN
 						-- insert node results into audit table
 						EXECUTE 'INSERT INTO anl_node (fid, nodecat_id, node_id, the_geom, descript)
 							SELECT DISTINCT ON (node_id) '||v_fid||', nodecat_id, b.node_id, the_geom, '||(v_featureid)||' FROM (SELECT node_1 as node_id
-							FROM temp_anlgraf WHERE water >0)a
+							FROM temp_anlgraf WHERE water > 0 )a
 							JOIN node b ON a.node_id::integer=b.node_id::integer';
 
 						-- message
@@ -562,7 +575,7 @@ BEGIN
 					-- update node table without graf nodes using node with from v_edit_arc because the exploitation filter. Row before do not needed because table anl_* is filtered by process
 					v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM v_edit_arc a WHERE a.arc_id=node.arc_id';
 					EXECUTE v_querytext;
-
+							
 					-- update node table with graf nodes
 					v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = b.'||quote_ident(v_fieldmp)||' 
 							FROM anl_node a join (SELECT  '||quote_ident(v_fieldmp)||', json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' 
@@ -570,6 +583,14 @@ BEGIN
 							||quote_ident(v_table)||') b ON  nodeparent = descript WHERE fid='||v_fid||' AND a.node_id=node.node_id
 							AND cur_user=current_user';
 					EXECUTE v_querytext;
+
+					-- in case of conflict it is profilactic to set this update
+					EXECUTE 'UPDATE node SET '||v_field||' = a.'||v_field||' FROM
+					(WITH arcparent AS (SELECT '||v_field||', json_array_elements_text((json_array_elements_text((grafconfig->>''use'')::json)::json->>''toArc'')::json) as arc_id FROM '||v_table||')
+					SELECT node_1 as node_id, arc.'||v_field||' FROM arc JOIN arcparent USING (arc_id)
+					UNION
+					SELECT node_2, arc.'||v_field||' FROM arc JOIN arcparent USING (arc_id)	
+					) a WHERE a.node_id=node.node_id';
 
 					-- used connec using v_edit_arc because the exploitation filter (same before)
 					v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||' FROM v_edit_arc a WHERE a.arc_id=connec.arc_id';
@@ -643,6 +664,47 @@ BEGIN
 					VALUES (v_fid, 1, concat('SELECT * FROM anl_arc WHERE fid = (XX) AND cur_user=current_user;'));
 					INSERT INTO audit_check_data (fid ,criticity, error_message)
 					VALUES (v_fid, 1, concat('SELECT * FROM anl_node WHERE fid = (XX) AND cur_user=current_user;'));
+				END IF;
+
+
+				-- check for intercomunicated mapzones (select if at least one node header has different mazpones from what is configured)
+				EXECUTE 'SELECT array_agg(n.'||v_field||') FROM v_edit_node n JOIN 
+					(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id, '||v_field||', name FROM '||v_table||') mpz
+					USING (node_id)
+					WHERE n.'||v_field||' != mpz.'||v_field
+					INTO v_conflict;
+
+				-- in case of EXECUTE RETURNS some value, if means it exists conflict
+				IF v_conflict IS NOT NULL THEN
+				
+					-- show log
+					EXECUTE 'INSERT INTO audit_check_data (fid,  criticity, error_message)
+					SELECT '||v_fid||', 3, concat(''OVERLAPED '||v_class||'''''s, '' , mpz.name ,'' AND '',mpz2.name,'' has conflict'') FROM v_edit_node n
+					JOIN 
+					(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id, '||v_field||', name FROM '||v_table||') mpz
+					USING (node_id)
+					JOIN '||v_table||' mpz2 ON n.'||v_field||'= mpz2.'||v_field||'
+					WHERE n.'||v_field||' != mpz.'||v_field||'';
+
+					IF v_manageconflict IS FALSE THEN
+
+						INSERT INTO audit_check_data (fid,  criticity, error_message)
+						VALUES (v_fid, 1, 'INFO: For more information, please configure your system (utils_grafanalytics_status.manageConflictOnExpl = true and define one conflict mapzone for each exploitation)');
+
+					ELSE
+						v_querytext = (SELECT unnest(v_conflict));
+
+						-- update features
+						EXECUTE 'UPDATE arc a SET '||v_field||' = m.'||v_field||' FROM (SELECT '||v_field||', expl_id FROM '||v_table||' WHERE grafconfig->>''status'' = ''useWhenConflict'')m 
+						WHERE a.'||v_field||'::integer IN ('||v_querytext||') AND m.expl_id = a.expl_id';
+
+						EXECUTE 'UPDATE node a SET '||v_field||' = m.'||v_field||' FROM (SELECT '||v_field||', expl_id FROM '||v_table||' WHERE grafconfig->>''status'' = ''useWhenConflict'')m 
+						WHERE a.'||v_field||'::integer IN ('||v_querytext||') AND m.expl_id = a.expl_id';
+
+						EXECUTE 'UPDATE connec a SET '||v_field||' = m.'||v_field||' FROM (SELECT '||v_field||', expl_id FROM '||v_table||' WHERE grafconfig->>''status'' = ''useWhenConflict'')m 
+						WHERE a.'||v_field||'::integer IN ('||v_querytext||') AND m.expl_id = a.expl_id';
+					END IF;
+
 				END IF;
 
 				-- update geometry of mapzones
@@ -765,15 +827,6 @@ BEGIN
 
 					EXECUTE v_querytext;
 				END IF;
-
-				-- check for intercomunicated mapzones (select if at least one node header has different mazpones from what is configured)
-				EXECUTE 'INSERT INTO audit_check_data (fid,  criticity, error_message)
-				SELECT '||v_fid||', 3, concat(''OVERLAPED '||v_class||'s: Node '', mpz.node_id ,'' is header of '||v_class||''',''-'', mpz.'||
-				v_field||', '' ('',mpz.name,'') but it is assigned to '||v_class||' '', ''-'', n.'||v_field||','' ('',mpz.name,'')'') FROM v_edit_node n
-				JOIN 
-				(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id, '||v_field||', name FROM '||v_table||') mpz
-				USING (node_id)
-				WHERE n.'||v_field||' != mpz.'||v_field||'';	
 					
 				IF v_updatemapzgeom > 0 THEN
 					-- message
