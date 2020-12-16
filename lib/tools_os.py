@@ -88,3 +88,9 @@ def open_file_path(msg="Select file", filter_="All (*.*)"):
     path, filter_ = QFileDialog.getOpenFileName(None, msg, "", filter_)
     return path, filter_
 
+
+def check_python_function(object_, function_name):
+
+    object_functions = [method_name for method_name in dir(object_) if callable(getattr(object_, method_name))]
+    return function_name in object_functions
+

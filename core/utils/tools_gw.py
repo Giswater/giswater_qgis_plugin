@@ -18,14 +18,14 @@ from collections import OrderedDict
 from functools import partial
 
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QPoint, QDate, QSettings
+from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QPoint, QDate
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
     QToolButton, QWidget, QApplication
-from qgis.core import QgsProject, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, \
-    QgsSymbol, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
-    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest, QgsDataSourceUri, QgsCredentials, QgsRectangle
+from qgis.core import QgsProject, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
+    QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
+    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest, QgsRectangle
 from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint, QgsDateTimeEdit, QgsMapTool, QgsRubberBand
 
 from ..models.sys_feature_cat import SysFeatureCat
@@ -95,7 +95,6 @@ class MultipleSelection(QgsMapTool):
         # Disconnect signal to enhance process
         # We will reconnect it when processing last layer of the group
         tools_qgis.disconnect_signal_selection_changed()
-
 
         for i, layer in enumerate(self.class_object.layers[self.class_object.geom_type]):
             if i == len(self.class_object.layers[self.class_object.geom_type]) - 1:
@@ -1598,7 +1597,7 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             function_name = field['widgetfunction']
-            exist = check_python_function(module, function_name)
+            exist = tools_os.check_python_function(module, function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
                 show_message(msg, 2)
@@ -1726,7 +1725,7 @@ def add_hyperlink(field):
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             func_name = field['widgetfunction']
-            exist = check_python_function(global_vars.session_vars['gw_infotools'], func_name)
+            exist = tools_os.check_python_function(global_vars.session_vars['gw_infotools'], func_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
                 show_message(msg, 2)
@@ -1852,7 +1851,7 @@ def add_tableview(complet_result, field):
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             function_name = field['widgetfunction']
-            exist = check_python_function(sys.modules[__name__], function_name)
+            exist = tools_os.check_python_function(sys.modules[__name__], function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
                 show_message(msg, 2)
@@ -2035,12 +2034,6 @@ def get_actions_from_json(json_result, sql):
                 tools_log.log_debug(f"{type(e).__name__}: {e}")
     except Exception as e:
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
-
-
-def check_python_function(object_, function_name):
-
-    object_functions = [method_name for method_name in dir(object_) if callable(getattr(object_, method_name))]
-    return function_name in object_functions
 
 
 def document_delete(qtable):
