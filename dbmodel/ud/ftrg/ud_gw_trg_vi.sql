@@ -251,11 +251,11 @@ BEGIN
 			UPDATE inp_conduit SET kentry=NEW.kentry,kexit=NEW.kexit, kavg=NEW.kavg, flap=NEW.flap, seepage=NEW.seepage WHERE arc_id=NEW.arc_id;
 			
 		ELSIF v_view='vi_transects' THEN 
-			INSERT INTO inp_transects_id (id) SELECT split_part(NEW.text,' ',1) WHERE split_part(NEW.text,' ',1)  NOT IN (SELECT id from inp_transects_id);
+			INSERT INTO inp_transects (id) SELECT split_part(NEW.text,' ',1) WHERE split_part(NEW.text,' ',1)  NOT IN (SELECT id from inp_transects);
 			IF split_part(NEW.text,' ',1)='X1' THEN
-				INSERT INTO inp_transects_id (id) SELECT split_part(NEW.text,' ',2) WHERE split_part(NEW.text,' ',2)  NOT IN (SELECT id from inp_transects_id);			
+				INSERT INTO inp_transects (id) SELECT split_part(NEW.text,' ',2) WHERE split_part(NEW.text,' ',2)  NOT IN (SELECT id from inp_transects);			
 			END IF;
-			INSERT INTO inp_transects (tsect_id,text) VALUES (split_part(NEW.text,' ',1),NEW.text);
+			INSERT INTO inp_transects_value (tsect_id,text) VALUES (split_part(NEW.text,' ',1),NEW.text);
 			
 		ELSIF v_view='vi_controls' THEN
 			INSERT INTO inp_controls_importinp (text) VALUES (NEW.text);
@@ -332,25 +332,25 @@ BEGIN
 			
 		ELSIF v_view='vi_timeseries' THEN 
 			IF NEW.other1 ilike 'FILE' THEN
-				IF NEW.timser_id NOT IN (SELECT id FROM inp_timser_id) THEN
-					INSERT INTO inp_timser_id(id,times_type) VALUES (NEW.timser_id,'FILE') ;
+				IF NEW.timser_id NOT IN (SELECT id FROM inp_timeseries) THEN
+					INSERT INTO inp_timeseries(id,times_type) VALUES (NEW.timser_id,'FILE') ;
 				END IF;
-				INSERT INTO inp_timeseries (timser_id,fname) VALUES (NEW.timser_id, NEW.other2);
+				INSERT INTO inp_timeseries_value (timser_id,fname) VALUES (NEW.timser_id, NEW.other2);
 				
 			ELSIF  NEW.other1 ilike '%:%'  THEN
-				IF NEW.timser_id NOT IN (SELECT id FROM inp_timser_id) THEN
-					INSERT INTO inp_timser_id(id,times_type) VALUES (NEW.timser_id,'RELATIVE');
+				IF NEW.timser_id NOT IN (SELECT id FROM inp_timeseries) THEN
+					INSERT INTO inp_timeseries(id,times_type) VALUES (NEW.timser_id,'RELATIVE');
 				END IF;
-				IF (SELECT times_type FROM inp_timser_id WHERE id = NEW.timser_id) = 'ABSOLUTE' THEN
-					INSERT INTO inp_timeseries (timser_id, date, hour, value) VALUES (NEW.timser_id, '', NEW.other1, NEW.other2::numeric);				
+				IF (SELECT times_type FROM inp_timeseries WHERE id = NEW.timser_id) = 'ABSOLUTE' THEN
+					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, '', NEW.other1, NEW.other2::numeric);				
 				ELSE
-					INSERT INTO inp_timeseries (timser_id, "time", value)  VALUES (NEW.timser_id, NEW.other1, NEW.other2::numeric);
+					INSERT INTO inp_timeseries_value (timser_id, "time", value)  VALUES (NEW.timser_id, NEW.other1, NEW.other2::numeric);
 				END IF;				
 			ELSE	
-				IF NEW.timser_id NOT IN (SELECT id FROM inp_timser_id) THEN
-					INSERT INTO inp_timser_id(id,times_type) VALUES (NEW.timser_id,'ABSOLUTE');
+				IF NEW.timser_id NOT IN (SELECT id FROM inp_timeseries) THEN
+					INSERT INTO inp_timeseries(id,times_type) VALUES (NEW.timser_id,'ABSOLUTE');
 				END IF;
-				INSERT INTO inp_timeseries (timser_id, date, hour, value) VALUES (NEW.timser_id, NEW.other1::date, NEW.other2, NEW.other3::numeric);
+				INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES (NEW.timser_id, NEW.other1::date, NEW.other2, NEW.other3::numeric);
 			END IF;
 			
 		ELSIF v_view='vi_lid_controls' THEN 
