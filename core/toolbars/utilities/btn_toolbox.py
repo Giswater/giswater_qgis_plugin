@@ -74,10 +74,10 @@ class GwToolBoxButton(GwParentAction):
 
         self.is_paramtetric = True
         # this '0' refers to the index of the item in the selected row (alias in this case)
-        self.alias_function = index.sibling(index.row(), 0).data()
+        self.function_selected = index.sibling(index.row(), 0).data()
 
         # Control no clickable items
-        if self.alias_function in self.no_clickable_items:
+        if self.function_selected in self.no_clickable_items:
             return
 
         self.dlg_functions = ToolboxUi()
@@ -90,18 +90,18 @@ class GwToolBoxButton(GwParentAction):
         self.dlg_functions.rbt_layer.toggled.connect(partial(self.rbt_state, self.dlg_functions.rbt_layer))
         self.dlg_functions.rbt_layer.setChecked(True)
 
-        extras = f'"filterText":"{self.alias_function}"'
+        extras = f'"filterText":"{self.function_selected}"'
         extras += ', "isToolbox":true'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.get_json('gw_fct_gettoolbox', body)
+        json_result = tools_gw.get_json('gw_fct_gettoolbox', body, log_sql=True)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
         status = self.populate_functions_dlg(self.dlg_functions, json_result['body']['data'])
         if not status:
-            self.alias_function = index.sibling(index.row(), 1).data()
+            self.function_selected = index.sibling(index.row(), 1).data()
             message = "Function not found"
-            tools_gw.show_message(message, parameter=self.alias_function)
+            tools_gw.show_message(message, parameter=self.function_selected)
             return
 
         self.dlg_functions.btn_run.clicked.connect(partial(self.execute_function, self.dlg_functions,
@@ -173,11 +173,9 @@ class GwToolBoxButton(GwParentAction):
             if type(widget) in (QCheckBox, QRadioButton):
                 value = tools_gw.get_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}")
                 tools_qt.set_checked(dialog, widget, value)
-
             elif type(widget) is QComboBox:
-                if widget.property('selectedId') in (None, '', 'NULL'):
-                    value = tools_gw.get_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}")
-                else:
+                value = tools_gw.get_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}")
+                if value in (None, '', 'NULL') and widget.property('selectedId') not in (None, '', 'NULL'):
                     value = widget.property('selectedId')
                 tools_qt.set_combo_value(widget, value, 0)
             elif type(widget) in (QLineEdit, QSpinBox):
@@ -402,7 +400,7 @@ class GwToolBoxButton(GwParentAction):
             return True
 
         complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
-        tools_gw.add_temp_layer(dialog, complet_result['body']['data'], self.alias_function)
+        tools_gw.add_temp_layer(dialog, complet_result['body']['data'], self.function_selected)
         dialog.progressBar.setFormat(f"Function {function_name} has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
 
