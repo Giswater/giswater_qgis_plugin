@@ -559,6 +559,7 @@ class SnappingConfigManager(object):
 
 def load_settings(dialog):
     """ Load user UI settings related with dialog position and size """
+
     # Get user UI config file
     try:
         x = get_config_parser('dialogs_position', f"{dialog.objectName()}_x")
@@ -586,17 +587,19 @@ def load_settings(dialog):
 
 def save_settings(dialog):
     """ Save user UI related with dialog position and size """
+
     try:
         set_config_parser('dialogs_position', f"{dialog.objectName()}_width", f"{dialog.property('width')}")
         set_config_parser('dialogs_position', f"{dialog.objectName()}_height", f"{dialog.property('height')}")
         set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{dialog.pos().x() + 8}")
         set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{dialog.pos().y() + 31}")
-    except Exception as e:
+    except Exception:
         pass
 
 
 def get_config_parser(section: str, parameter: str) -> str:
     """ Load a simple parser value """
+
     value = None
     try:
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
@@ -612,7 +615,8 @@ def get_config_parser(section: str, parameter: str) -> str:
 
 
 def set_config_parser(section: str, parameter: str, value: str, comment=None):
-    """  Save simple parser value """
+    """ Save simple parser value """
+
     try:
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
@@ -641,6 +645,7 @@ def save_current_tab(dialog, tab_widget, selector_name):
     :param tab_widget: QTabWidget
     :param selector_name: Name of the selector (String)
     """
+
     try:
         index = tab_widget.currentIndex()
         tab = tab_widget.widget(index)
@@ -648,8 +653,7 @@ def save_current_tab(dialog, tab_widget, selector_name):
             tab_name = tab.objectName()
             dlg_name = dialog.objectName()
             set_config_parser('last_tabs', f"{dlg_name}_{selector_name}", f"{tab_name}")
-
-    except Exception as e:
+    except Exception:
         pass
 
 
@@ -834,14 +838,6 @@ def reset_feature_list(ids, list_ids):
     return ids, list_ids
 
 
-def reset_feature_layers(layers):
-    """ Reset list of layers """
-
-    layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
-
-    return layers
-
-
 def get_signal_change_tab(dialog, excluded_layers=[]):
     """ Set geom_type and layer depending selected tab """
 
@@ -863,8 +859,10 @@ def set_completer_feature_id(widget, geom_type, viewname):
     """ Set autocomplete of widget 'feature_id'
         getting id's from selected @viewname
     """
+
     if geom_type == '':
         return
+
     # Adding auto-completion to a QLineEdit
     completer = QCompleter()
     completer.setCaseSensitivity(Qt.CaseInsensitive)
@@ -913,6 +911,7 @@ def insert_pg_layer(tablename=None, the_geom="the_geom", field_id="id", child_la
                         if 'style' in style['body']['styles']:
                             qml = style['body']['styles']['style']
                             tools_qgis.create_qml(vlayer, qml)
+
     else:
         uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
         vlayer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
@@ -928,6 +927,7 @@ def insert_pg_layer(tablename=None, the_geom="the_geom", field_id="id", child_la
                 if 'style' in style['body']['styles']:
                     qml = style['body']['styles']['style']
                     tools_qgis.create_qml(vlayer, qml)
+
     global_vars.iface.mapCanvas().refresh()
 
 
@@ -1185,54 +1185,6 @@ def get_multi_coordinates(feature):
     return coordinates
 
 
-def populate_vlayer_old(virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
-    """
-    :param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
-    :param data: Json
-    :param layer_type: point, line, polygon...(string)
-    :param counter: control if json have values (integer)
-    :param group: group to which we want to add the layer (string)
-    :return:
-    """
-
-    prov = virtual_layer.dataProvider()
-
-    # Enter editing mode
-    virtual_layer.startEditing()
-    if counter > 0:
-        for key, value in list(data[layer_type]['values'][0].items()):
-            # add columns
-            if str(key) != 'the_geom':
-                prov.addAttributes([QgsField(str(key), QVariant.String)])
-
-    # Add features
-    for item in data[layer_type]['values']:
-        attributes = []
-        fet = QgsFeature()
-
-        for k, v in list(item.items()):
-            if str(k) != 'the_geom':
-                attributes.append(v)
-            if str(k) in 'the_geom':
-                sql = f"SELECT St_AsText('{v}')"
-                row = tools_db.get_row(sql, log_sql=False)
-                if row and row[0]:
-                    geometry = QgsGeometry.fromWkt(str(row[0]))
-                    fet.setGeometry(geometry)
-        fet.setAttributes(attributes)
-        prov.addFeatures([fet])
-
-    # Commit changes
-    virtual_layer.commitChanges()
-    QgsProject.instance().addMapLayer(virtual_layer, False)
-    root = QgsProject.instance().layerTreeRoot()
-    my_group = root.findGroup(group)
-    if my_group is None:
-        my_group = root.insertGroup(0, group)
-
-    my_group.insertLayer(0, virtual_layer)
-
-
 def disable_widgets(dialog, result, enable):
 
     try:
@@ -1254,11 +1206,12 @@ def disable_widgets(dialog, result, enable):
                             widget.setEnabled(field['iseditable'])
                     break
 
-    except RuntimeError as e:
+    except RuntimeError:
         pass
 
 
 def enable_all(dialog, result):
+
     try:
         widget_list = dialog.findChildren(QWidget)
         for widget in widget_list:
@@ -1621,16 +1574,13 @@ def get_values_changed_param_user(dialog, chk, widget, field, list, value=None):
     # of the widget
     if type(widget) in (QSpinBox, QDoubleSpinBox):
         value = round(value, 4)
-    # if chk is None:
-    #     elem[widget.objectName()] = value
+
     elem['widget'] = str(widget.objectName())
     elem['value'] = value
     if chk is not None:
         if chk.isChecked():
-            # elem['widget'] = str(widget.objectName())
             elem['chk'] = str(chk.objectName())
             elem['isChecked'] = str(tools_qt.isChecked(dialog, chk))
-            # elem['value'] = value
 
     if 'sys_role_id' in field:
         elem['sys_role_id'] = str(field['sys_role_id'])
@@ -1646,6 +1596,7 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
     :param module: Module where find 'function_name', if 'function_name' is not in this module
     :return: (QWidget)
     """
+
     widget = QPushButton()
     widget.setObjectName(field['widgetname'])
 
@@ -1668,7 +1619,8 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
             message = "Parameter button_function is null for button"
             show_message(message, 2, parameter=widget.objectName())
 
-    kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name, 'temp_layers_added': temp_layers_added}
+    kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name,
+              'temp_layers_added': temp_layers_added}
     widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
@@ -1724,6 +1676,7 @@ def get_values(dialog, widget, _json=None):
         _json[str(widget.property('columnname'))] = str(value)
     return _json
 
+
 def add_checkbox(field):
 
     widget = QCheckBox()
@@ -1767,8 +1720,10 @@ def add_textarea(field):
 
 
 def add_hyperlink(field):
-    """ functions called in -> widget.clicked.connect(partial(getattr(global_vars.session_vars['gw_infotools'], func_name), widget))
-            def open_url(self, widget)"""
+    """ functions called in:
+        widget.clicked.connect(partial(getattr(global_vars.session_vars['gw_infotools'], func_name), widget))
+        def open_url(self, widget)
+    """
 
     widget = GwHyperLinkLabel()
     widget.setObjectName(field['widgetname'])
@@ -1794,6 +1749,7 @@ def add_hyperlink(field):
     else:
         message = "Parameter not found"
         show_message(message, 2, parameter='widgetfunction')
+
     # Call function-->func_name(widget) or def no_function_associated(self, widget=None, message_level=1)
     widget.clicked.connect(partial(getattr(global_vars.session_vars['gw_infotools'], func_name), widget))
 
@@ -1933,7 +1889,6 @@ def add_frame(field, x=None):
     return widget
 
 
-
 def add_combo(field):
 
     widget = QComboBox()
@@ -1982,6 +1937,7 @@ def fill_combo_child(dialog, combo_child):
 
 
 def manage_child(dialog, combo_parent, combo_child):
+
     child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
     if child:
         child.setEnabled(True)
@@ -2126,27 +2082,6 @@ def document_open(table, field_name):
 
 # TODO tools_gw_db
 
-def connect_to_database_credentials(credentials, conn_info=None, max_attempts=2):
-    """ Connect to database with selected database @credentials """
-
-    # Check if credential parameter 'service' is set
-    if 'service' in credentials and credentials['service']:
-        logged = tools_db.connect_to_database_service(credentials['service'], credentials['sslmode'])
-        return logged, credentials
-
-    attempt = 0
-    logged = False
-    while not logged and attempt <= max_attempts:
-        attempt += 1
-        if conn_info and attempt > 1:
-            (success, credentials['user'], credentials['password']) = \
-                QgsCredentials.instance().get(conn_info, credentials['user'], credentials['password'])
-        logged = tools_db.connect_to_database(credentials['host'], credentials['port'], credentials['db'],
-            credentials['user'], credentials['password'], credentials['sslmode'])
-
-    return logged, credentials
-
-
 def get_json(function_name, parameters=None, schema_name=None, commit=True, log_sql=False,
              log_result=False, json_loads=False, is_notify=False, rubber_band=None):
     """ Manage execution API function
@@ -2208,7 +2143,6 @@ def get_json(function_name, parameters=None, schema_name=None, commit=True, log_
         pass
 
     return json_result
-
 
 
 def manage_exception_api(json_result, sql=None, stack_level=2, stack_level_increase=0, is_notify=False):
@@ -2413,7 +2347,7 @@ def get_project_type(schemaname=None):
     tablename = "sys_version"
     exists = tools_db.check_table(tablename, schemaname)
     if exists:
-        sql = ("SELECT lower(project_type) FROM " + schemaname + "." + tablename + " ORDER BY id ASC LIMIT 1")
+        sql = f"SELECT lower(project_type) FROM {schemaname}.{tablename} ORDER BY id ASC LIMIT 1"
         row = tools_db.get_row(sql)
         if row:
             project_type = row[0]
@@ -2421,7 +2355,7 @@ def get_project_type(schemaname=None):
         tablename = "version"
         exists = tools_db.check_table(tablename, schemaname)
         if exists:
-            sql = ("SELECT lower(wsoftware) FROM " + schemaname + "." + tablename + " ORDER BY id ASC LIMIT 1")
+            sql = f"SELECT lower(wsoftware) FROM {schemaname}.{tablename} ORDER BY id ASC LIMIT 1"
             row = tools_db.get_row(sql)
             if row:
                 project_type = row[0]
@@ -2438,12 +2372,12 @@ def get_group_layers(geom_type):
     """ Get layers of the group @geom_type """
 
     list_items = []
-    sql = ("SELECT child_layer "
-           "FROM cat_feature "
-           "WHERE upper(feature_type) = '" + geom_type.upper() + "' "
-           "UNION SELECT DISTINCT parent_layer "
-           "FROM cat_feature "
-           "WHERE upper(feature_type) = '" + geom_type.upper() + "';")
+    sql = (f"SELECT child_layer "
+           f"FROM cat_feature "
+           f"WHERE upper(feature_type) = '{geom_type.upper()}' "
+           f"UNION SELECT DISTINCT parent_layer "
+           f"FROM cat_feature "
+           f"WHERE upper(feature_type) = '{geom_type.upper()}';")
     rows = tools_db.get_rows(sql)
     if rows:
         for row in rows:
@@ -2532,7 +2466,6 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
         if parameter:
             msg += ": " + str(parameter)
     try:
-
         global_vars.iface.messageBar().pushMessage(title, msg, message_level, duration)
     except AttributeError:
         pass
@@ -2658,6 +2591,7 @@ def selection_init(class_object, dialog, table_object, query=False):
 
 def selection_changed(class_object, dialog, table_object, query=False, lazy_widget=None, lazy_init_function=None):
     """ Slot function for signal 'canvas.selectionChanged' """
+
     tools_qgis.disconnect_signal_selection_changed()
     field_id = f"{class_object.geom_type}_id"
 
@@ -2703,6 +2637,7 @@ def selection_changed(class_object, dialog, table_object, query=False, lazy_widg
 
     enable_feature_type(dialog, table_object, ids=ids)
     class_object.ids = ids
+
 
 def insert_feature(class_object, dialog, table_object, query=False, remove_ids=True, lazy_widget=None,
                    lazy_init_function=None):
@@ -2855,7 +2790,8 @@ def dock_dialog(dialog):
         global_vars.session_vars['dlg_docker'].setWindowTitle(dialog.windowTitle())
         global_vars.session_vars['dlg_docker'].setWidget(dialog)
         global_vars.session_vars['dlg_docker'].setWindowFlags(Qt.WindowContextHelpButtonHint)
-        global_vars.iface.addDockWidget(positions[global_vars.session_vars['dlg_docker'].position], global_vars.session_vars['dlg_docker'])
+        global_vars.iface.addDockWidget(positions[global_vars.session_vars['dlg_docker'].position],
+            global_vars.session_vars['dlg_docker'])
     except RuntimeError as e:
         tools_log.log_warning(f"{type(e).__name__} --> {e}")
 
@@ -2902,6 +2838,7 @@ def close_docker():
     """ Save QDockWidget position (1=Left, 2=Right, 4=Top, 8=Bottom),
         remove from iface and del class
     """
+
     try:
         if global_vars.session_vars['dlg_docker']:
             if not global_vars.session_vars['dlg_docker'].isFloating():
@@ -2952,6 +2889,7 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
         table_name = geom_type
     else:
         table_name = f"v_edit_{geom_type}"
+
     if global_vars.schema_name not in table_name:
         table_name = global_vars.schema_name + "." + table_name
 
@@ -3054,7 +2992,7 @@ def add_headers(widget, field):
     widget.setModel(model)
     widget.horizontalHeader().setStretchLastSection(True)
 
-    # # Get headers
+    # Get headers
     headers = []
     for x in field['value'][0]:
         headers.append(x)
@@ -3240,12 +3178,12 @@ def set_columns_config(widget, table_name, sort_order=0, isQStandardItemModel=Fa
 
 def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[], single_tool_mode=None, layers=None):
     """ Close dialog and disconnect snapping """
+
     tools_qgis.disconnect_snapping()
     tools_qgis.disconnect_signal_selection_changed()
     if cur_active_layer:
         global_vars.iface.setActiveLayer(cur_active_layer)
-    # some tools can work differently if standalone or integrated in
-    # another tool
+    # some tools can work differently if standalone or integrated in another tool
     if single_tool_mode is not None:
         layers = remove_selection(single_tool_mode, layers=layers)
     else:
@@ -3273,6 +3211,7 @@ def delete_feature_at_plan(dialog, geom_type, list_id):
 
 def delete_records(class_object, dialog, table_object, query=False, lazy_widget=None, lazy_init_function=None):
     """ Delete selected elements of the table """
+
     tools_qgis.disconnect_signal_selection_changed()
     geom_type = get_signal_change_tab(dialog)
     if type(table_object) is str:
@@ -3510,23 +3449,4 @@ def set_combo_from_param_user(dialog, widget, table_name, parameter, field_id='i
     row = tools_db.get_row(sql)
     if row:
         tools_qt.set_widget_text(dialog, widget, row[0])
-
-
-def show_warning_detail(text, detail_text, context_name=None):
-    """ Show warning message with a button to show more details """
-
-    inf_text = "Press 'Show Me' button to get more details..."
-    widget = global_vars.iface.messageBar().createMessage(tools_qt.tr(text, context_name, aux_context='ui_message'), tools_qt.tr(inf_text, aux_context='ui_message'))
-    button = QPushButton(widget)
-    button.setText(tools_qt.tr("Show Me", aux_context='ui_message'))
-    button.clicked.connect(partial(tools_qt.show_details, detail_text, tools_qt.tr('Warning details', aux_context='ui_message')))
-    widget.layout().addWidget(button)
-    global_vars.iface.messageBar().pushWidget(widget, 1)
-
-    if global_vars.logger:
-        global_vars.logger.warning(text + "\n" + detail_text)
-
-
-
-
 
