@@ -13,7 +13,7 @@ ALTER TABLE inp_outfall DROP CONSTRAINT inp_outfall_timser_id_fkey;
 ALTER TABLE inp_inflows_pol_x_node DROP CONSTRAINT inp_inflows_pol_x_node_timser_id_fkey;
 ALTER TABLE inp_timeseries_value DROP CONSTRAINT inp_timeseries_pkey;
 ALTER TABLE inp_timeseries_value DROP CONSTRAINT inp_timeseries_timser_id_fkey;
-ALTER TABLE inp_timeseries DROP CONSTRAINT inp_timser_id_pkey;
+ALTER TABLE inp_timeseries DROP CONSTRAINT inp_timser_id_pkey CASCADE;
 
 ALTER TABLE cat_arc DROP CONSTRAINT cat_arc_tsect_id_fkey;
 ALTER TABLE cat_arc_shape DROP CONSTRAINT cat_arc_shape_tsect_id_fkey;
