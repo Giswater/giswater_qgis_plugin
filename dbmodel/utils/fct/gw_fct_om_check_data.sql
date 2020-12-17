@@ -355,7 +355,7 @@ BEGIN
 		WHERE  feature_id=0 AND type = ''NODE'' ');
 			
 		IF v_project_type = 'UD' THEN
-			EXECUTE concat ('INSERT INTO anl_connec (fid, node_id, nodecat_id, descript, the_geom)
+			EXECUTE concat ('INSERT INTO anl_connec (fid, connec_id, connecat_id, descript, the_geom)
 			SELECT 202, feature_id, featurecat, ''Gullies with id which is not an integer'', the_geom FROM ', v_querytext,' 
 			WHERE feature_id=0 AND type = ''GULLY'' ');
 		END IF;
