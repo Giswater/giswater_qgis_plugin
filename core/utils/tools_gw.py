@@ -564,8 +564,8 @@ def load_settings(dialog):
     try:
         x = get_config_parser('dialogs_position', f"{dialog.objectName()}_x")
         y = get_config_parser('dialogs_position', f"{dialog.objectName()}_y")
-        width = get_config_parser('dialogs_position', f"{dialog.objectName()}_width")
-        height = get_config_parser('dialogs_position', f"{dialog.objectName()}_height")
+        width = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_width")
+        height = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_height")
 
         v_screens = ctypes.windll.user32
         screen_x = v_screens.GetSystemMetrics(78)  # Width of virtual screen
@@ -589,22 +589,27 @@ def save_settings(dialog):
     """ Save user UI related with dialog position and size """
 
     try:
-        set_config_parser('dialogs_position', f"{dialog.objectName()}_width", f"{dialog.property('width')}")
-        set_config_parser('dialogs_position', f"{dialog.objectName()}_height", f"{dialog.property('height')}")
+        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", f"{dialog.property('width')}")
+        set_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", f"{dialog.property('height')}")
         set_config_parser('dialogs_position', f"{dialog.objectName()}_x", f"{dialog.pos().x() + 8}")
         set_config_parser('dialogs_position', f"{dialog.objectName()}_y", f"{dialog.pos().y() + 31}")
     except Exception:
         pass
 
 
-def get_config_parser(section: str, parameter: str) -> str:
+def get_config_parser(section: str, parameter: str, config_type="user", file_name="sessions") -> str:
     """ Load a simple parser value """
 
     value = None
+
     try:
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
-        main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
-        path = main_folder + os.sep + "config" + os.sep + 'user.config'
+        if config_type in ("user"):
+            path_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
+        elif config_type in ("project"):
+            path_folder = global_vars.plugin_dir
+        path = path_folder + os.sep + "config" + os.sep + f'{file_name}.config'
+
         if not os.path.exists(path):
             return value
         parser.read(path)
@@ -614,16 +619,20 @@ def get_config_parser(section: str, parameter: str) -> str:
     return value
 
 
-def set_config_parser(section: str, parameter: str, value: str, comment=None):
+def set_config_parser(section: str, parameter: str, value: str, comment=None, config_type="user", file_name="sessions"):
     """ Save simple parser value """
 
     try:
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
-        main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
-        config_folder = main_folder + os.sep + "config" + os.sep
+        if config_type in ("user"):
+            path_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
+        elif config_type in ("project"):
+            path_folder = global_vars.plugin_dir
+
+        config_folder = path_folder + os.sep + "config" + os.sep
         if not os.path.exists(config_folder):
             os.makedirs(config_folder)
-        path = config_folder + 'user.config'
+        path = config_folder + f"{file_name}.config"
         parser.read(path)
         # Check if section dialogs_position exists in file
         if section not in parser:
@@ -2386,7 +2395,7 @@ def get_restriction(qgis_project_role):
                 role_om = tools_db.check_role_user("role_om")
                 if not role_om:
                     role_basic = tools_db.check_role_user("role_basic")
-    super_users = global_vars.settings.value('system_variables/super_users')
+    super_users = get_config_parser('system', 'super_users', "project", "init")
 
     # Manage user 'postgres', 'gisadmin'
     if global_vars.session_vars['current_user'] in ('postgres', 'gisadmin'):
@@ -2763,18 +2772,13 @@ def init_docker(docker_param='qgis_info_docker'):
     """ Get user config parameter @docker_param """
 
     global_vars.session_vars['show_docker'] = True
-    if docker_param == 'qgis_main_docker':
-        # Show 'main dialog' in docker depending its value in user settings
-        qgis_main_docker = tools_config.get_user_setting_value('btn_search', docker_param, 'true')
-        value = qgis_main_docker.lower()
-    else:
-        # Show info or form in docker?
-        row = get_config(docker_param)
-        if not row:
-            global_vars.session_vars['dlg_docker'] = None
-            global_vars.session_vars['docker_type'] = None
-            return None
-        value = row[0].lower()
+    # Show info or form in docker?
+    row = get_config(docker_param)
+    if not row:
+        global_vars.session_vars['dlg_docker'] = None
+        global_vars.session_vars['docker_type'] = None
+        return None
+    value = row[0].lower()
 
     # Check if docker has dialog of type 'form' or 'main'
     if docker_param == 'qgis_info_docker':

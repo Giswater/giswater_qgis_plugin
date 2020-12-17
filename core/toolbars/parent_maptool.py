@@ -15,6 +15,7 @@ from qgis.PyQt.QtWidgets import QAction
 
 from ..utils.tools_gw import SnappingConfigManager
 from ... import global_vars
+from ..utils import tools_gw
 
 
 class GwParentMapTool(QgsMapTool):
@@ -28,7 +29,7 @@ class GwParentMapTool(QgsMapTool):
         self.plugin_dir = global_vars.plugin_dir
         self.project_type = global_vars.project_type
 
-        self.show_help = bool(int(self.settings.value('status/show_help', 1)))
+        self.show_help = tools_gw.get_config_parser('system', 'show_help', "project", "init")
         self.layer_arc = None
         self.layer_connec = None
         self.layer_gully = None

@@ -82,9 +82,10 @@ class Giswater(QObject):
         global_vars.init_qgis_settings(self.plugin_name)
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
-        # python_enable_console = global_vars.settings.value('system_variables/enable_python_console', 'FALSE').upper()
-        # if python_enable_console == 'TRUE':
-        #     enable_python_console()
+        python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', "project",
+                                                        "init")
+        if python_enable_console == 'TRUE':
+            tools_qgis.enable_python_console()
 
         # Define signals
         self.set_signals()
@@ -113,11 +114,10 @@ class Giswater(QObject):
     def check_developers_settings(self, section, parameter, value, comment=None):
         """ Check if @section and @parameter exists in user settings file. If not add them = None """
         try:
-            value_ = tools_gw.get_config_parser(section, parameter)
+            value_ = tools_gw.get_config_parser(section, parameter, "config", "user")
             if value_ is not None: return
-            tools_gw.set_config_parser(section, parameter, value, comment)
-        except Exception as e:
-            tools_log.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
+            tools_gw.set_config_parser(section, parameter, value, comment, "config", "user")
+        except Exception:
             pass
 
 
@@ -223,18 +223,10 @@ class Giswater(QObject):
 
     def save_toolbars_position(self):
 
-        parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
-        main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
-        config_folder = main_folder + os.sep + "config" + os.sep
-        if not os.path.exists(config_folder):
-            os.makedirs(config_folder)
-        path = config_folder + 'user.config'
-        parser.read(path)
-
-        # Get all QToolBar
+        # # Get all QToolBar
         widget_list = self.iface.mainWindow().findChildren(QToolBar)
-        x = 0
         own_toolbars = []
+
         # Get a list with own QToolBars
         for w in widget_list:
             if w.property('gw_name'):
@@ -244,19 +236,10 @@ class Giswater(QObject):
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
         if len(own_toolbars) == 0:
             return
-
         sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
+        sorted_toolbar_ids = ",".join(sorted_toolbar_ids)
 
-        # Check if section toolbars_position exists in file
-        if 'toolbars_position' not in parser:
-            parser = configparser.RawConfigParser()
-            parser.add_section('toolbars_position')
-
-        parser['toolbars_position']['toolbars_order'] = ",".join(sorted_toolbar_ids)
-
-        with open(path, 'w') as configfile:
-            parser.write(configfile)
-            configfile.close()
+        tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids),  config_type="config", file_name="user")
 
 
     def unload(self, remove_modules=True):
@@ -275,7 +258,7 @@ class Giswater(QObject):
 
         try:
             # Unlisten notify channel and stop thread
-            if global_vars.settings.value('system_variables/use_notify').upper() == 'TRUE' and hasattr(self, 'notify'):
+            if tools_gw.get_config_parser('system', 'use_notify', "project", "init").upper() == 'TRUE' and hasattr(self, 'notify'):
                 list_channels = ['desktop', global_vars.session_vars['current_user']]
                 self.notify.stop_listening(list_channels)
 

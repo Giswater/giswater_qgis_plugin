@@ -115,7 +115,7 @@ class GwAdmin:
 
         # Manage super users
         self.super_users = []
-        super_users = self.settings.value('system_variables/super_users')
+        super_users = tools_gw.get_config_parser('system', 'super_users', "project", "init")
         for super_user in super_users:
             self.super_users.append(str(super_user))
 
@@ -155,9 +155,8 @@ class GwAdmin:
         self.folderApi = self.sql_dir + os.sep + 'api' + os.sep
 
         # Check if user have dev permissions
-        self.dev_user = self.settings.value('system_variables/devoloper_mode').upper()
-        self.read_all_updates = self.settings.value('system_variables/read_all_updates').upper()
-        self.dev_commit = self.settings.value('system_variables/dev_commit').upper()
+        self.dev_user = tools_gw.get_config_parser('system', 'dev_mode', "project", "dev")
+        self.dev_commit = tools_gw.get_config_parser('system', 'dev_commit', "project", "dev")
 
         # Create dialog object
         self.dlg_readsql = MainUi()
@@ -168,13 +167,16 @@ class GwAdmin:
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "schema_manager")
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "api_manager")
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "custom")
-            self.project_types = self.settings.value('system_variables/project_types')
+            self.project_types = tools_gw.get_config_parser('system', 'project_types', "project","init")
+
         else:
-            self.project_types = self.settings.value('system_variables/project_types_dev')
+            self.project_types = tools_gw.get_config_parser('system', 'project_types_dev', "project", "init")
+
+
 
         # Populate combo types
         self.cmb_project_type.clear()
-        for aux in self.project_types:
+        for aux in self.project_types.split(','):
             self.cmb_project_type.addItem(str(aux))
 
         # Get widgets form
@@ -345,7 +347,7 @@ class GwAdmin:
     def manage_docker(self):
 
         try:
-            tools_gw.init_docker('qgis_main_docker')
+            tools_gw.init_docker('qgis_form_docker')
             if global_vars.session_vars['dlg_docker']:
                 tools_gw.dock_dialog(self.dlg_readsql)
                 self.dlg_readsql.dlg_closed.connect(tools_gw.close_docker)
@@ -638,7 +640,7 @@ class GwAdmin:
                 sub_folders = sorted(os.listdir(self.folderUpdates + folder))
                 for sub_folder in sub_folders:
                     if new_project:
-                        if self.read_all_updates == 'TRUE':
+                        if self.dev_commit == 'TRUE':
                             if str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep):
                                     status = self.load_sql(self.folderUpdates + folder + os.sep +
@@ -686,7 +688,7 @@ class GwAdmin:
                                         return False
 
                     else:
-                        if self.read_all_updates == 'TRUE':
+                        if self.dev_commit == 'TRUE':
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
                                     status = self.load_sql(self.folderUpdates + folder + os.sep +
@@ -751,7 +753,7 @@ class GwAdmin:
                                      os.sep + os.sep + 'updates' + os.sep + folder))
                 for sub_folder in sub_folders:
                     if new_project:
-                        if self.read_all_updates == 'TRUE':
+                        if self.dev_commit == 'TRUE':
                             if str(sub_folder) > '31100':
                                 if self.process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), '') is True:
                                     status = self.executeFiles(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep +
@@ -784,7 +786,7 @@ class GwAdmin:
                                         return False
 
                     else:
-                        if self.read_all_updates == 'TRUE':
+                        if self.dev_commit == 'TRUE':
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
                                 if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
                                     status = self.load_sql(self.folderUpdates + folder + os.sep +
@@ -1144,7 +1146,7 @@ class GwAdmin:
             sub_folders = sorted(os.listdir(self.folderUpdatesApi + folder))
             for sub_folder in sub_folders:
                 if new_api:
-                    if self.read_all_updates == 'TRUE':
+                    if self.dev_commit == 'TRUE':
                         if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, '') is True:
                             status = self.executeFiles(self.folderUpdatesApi + folder +
                                                        os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
@@ -1219,7 +1221,7 @@ class GwAdmin:
                                     return False
 
                 else:
-                    if self.read_all_updates == 'TRUE':
+                    if self.dev_commit == 'TRUE':
                         if str(sub_folder) > str(self.project_version).replace('.', ''):
                             if self.process_folder(self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep, '') is True:
                                 status = self.executeFiles(self.folderUpdatesApi + folder +
@@ -2625,9 +2627,11 @@ class GwAdmin:
             self.dev_settings.setIniCodec(sys.getfilesystemencoding())
 
             # Get values
-            self.folder_path = self.dev_settings.value('general_dev/folder_path')
-            self.text_replace_labels = self.dev_settings.value('text_replace/labels')
-            self.xml_set_labels = self.dev_settings.value('xml_set/labels')
+            self.folder_path = tools_gw.get_config_parser('system', 'folder_path', "project", "dev")
+
+            self.text_replace_labels = tools_gw.get_config_parser('qgis_project_text_replace', 'labels',
+                                                                  "project", "dev")
+            self.xml_set_labels = tools_gw.get_config_parser('qgis_project_xml_set', 'labels', "project", "dev")
             if not os.path.exists(self.folder_path):
                 message = "Folder not found"
                 tools_gw.show_warning(message, parameter=self.folder_path)
@@ -2649,12 +2653,14 @@ class GwAdmin:
 
                     # Replace into template text
                     for text_replace in self.text_replace_labels:
-                        self.text_replace = self.dev_settings.value('text_replace/' + text_replace)
+                        self.text_replace = tools_gw.get_config_parser('qgis_project_text_replace', text_replace,
+                                                                       "project", "dev")
                         tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
                         f_to_read = re.sub(str(self.text_replace[0]), str(self.text_replace[1]), f_to_read)
 
                     for text_replace in self.xml_set_labels:
-                        self.text_replace = self.dev_settings.value('xml_set/' + text_replace)
+                        self.text_replace = tools_gw.get_config_parser('qgis_project_xml_set', text_replace,
+                                                                       "project", "dev")
                         tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
                         f_to_read = re.sub(str(self.text_replace[0]), str(self.text_replace[1]), f_to_read)
 

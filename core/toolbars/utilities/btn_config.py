@@ -29,7 +29,7 @@ class GwConfigButton(GwParentAction):
     def clicked_event(self):
 
         # Get user and role
-        super_users = self.settings.value('system_variables/super_users')
+        super_users = tools_gw.get_config_parser('system', 'super_users', "project", "init")
         cur_user = tools_db.get_current_user()
 
         self.list_update = []

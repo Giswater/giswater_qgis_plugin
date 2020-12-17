@@ -111,13 +111,13 @@ class LoadProject(QObject):
         self.check_user_roles()
 
         # Create a thread to listen selected database channels
-        if global_vars.settings.value('system_variables/use_notify').upper() == 'TRUE':
+        if tools_gw.get_config_parser('system', 'use_notify', "project", "init").upper() == 'TRUE':
             self.notify = GwNotifyTools()
             list_channels = ['desktop', global_vars.session_vars['current_user']]
             self.notify.start_listening(list_channels)
 
         # Open automatically 'search docker' depending its value in user settings
-        open_search = tools_config.get_user_setting_value('btn_search', 'open_search', 'true')
+        open_search = tools_gw.get_config_parser('btn_search', 'open_search', 'true')
         if open_search == 'true':
             GwSearch().api_search(load_project=True)
 
@@ -232,9 +232,11 @@ class LoadProject(QObject):
 
         # Get user UI config file
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
-        main_folder = os.path.join(os.path.expanduser("~"), self.plugin_name)
-        path = main_folder + os.sep + "config" + os.sep + 'user.config'
-
+        main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
+        config_folder = main_folder + os.sep + "config" + os.sep
+        if not os.path.exists(config_folder):
+            os.makedirs(config_folder)
+        path = config_folder + 'user.config'
         # If file not found or file found and section not exists
         if not os.path.exists(path):
             parser = self.init_user_config_file(path, toolbar_names)
@@ -245,10 +247,6 @@ class LoadProject(QObject):
         parser.read(path)
 
         toolbars_order = parser['toolbars_position']['toolbars_order'].split(',')
-
-        # Check if both arrays contain the same elements regardless of the order
-        if Counter(toolbars_order) != Counter(toolbar_names):
-            toolbars_order = toolbar_names
 
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
         for tb in toolbars_order:
