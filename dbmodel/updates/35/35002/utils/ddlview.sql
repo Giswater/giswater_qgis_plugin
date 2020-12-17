@@ -79,21 +79,24 @@ CREATE OR REPLACE VIEW v_plan_psector AS
             ELSE c.suma
         END)::double precision)::numeric(14,2) AS pca,
     plan_psector.the_geom
-   FROM selector_psector,
-    plan_psector
-     LEFT JOIN ( SELECT sum(v_plan_psector_x_arc.total_budget) AS suma,
-            v_plan_psector_x_arc.psector_id
-           FROM v_plan_psector_x_arc
-          GROUP BY v_plan_psector_x_arc.psector_id) a ON a.psector_id = plan_psector.psector_id
-     LEFT JOIN ( SELECT sum(v_plan_psector_x_node.total_budget) AS suma,
-            v_plan_psector_x_node.psector_id
-           FROM v_plan_psector_x_node
-          GROUP BY v_plan_psector_x_node.psector_id) b ON b.psector_id = plan_psector.psector_id
-     LEFT JOIN ( SELECT sum(v_plan_psector_x_other.total_budget) AS suma,
-            v_plan_psector_x_other.psector_id
-           FROM v_plan_psector_x_other
-          GROUP BY v_plan_psector_x_other.psector_id) c ON c.psector_id = plan_psector.psector_id
-  WHERE plan_psector.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+   FROM selector_psector, plan_psector
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_arc.total_budget) AS suma, v_plan_psector_x_arc.psector_id FROM (
+        SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,v_plan_arc.*, plan_psector_x_arc.* FROM v_plan_arc JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text 
+        JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_arc.psector_id ORDER BY plan_psector_x_arc.psector_id) 
+        v_plan_psector_x_arc GROUP BY v_plan_psector_x_arc.psector_id) a 
+        ON a.psector_id = plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_node.budget) AS suma, v_plan_psector_x_node.psector_id FROM (
+        SELECT row_number() OVER (ORDER BY v_plan_node.node_id) AS rid, v_plan_node.*, plan_psector_x_node.* FROM v_plan_node JOIN plan_psector_x_node ON plan_psector_x_node.node_id::text = v_plan_node.node_id::text
+        JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_node.psector_id ORDER BY plan_psector_x_node.psector_id
+        ) v_plan_psector_x_node GROUP BY v_plan_psector_x_node.psector_id) b 
+        ON b.psector_id = plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_other.total_budget) AS suma, v_plan_psector_x_other.psector_id FROM ( 
+        SELECT plan_psector_x_other.id, plan_psector_x_other.psector_id,  plan_psector.psector_type, v_price_compost.id AS price_id, v_price_compost.descript, v_price_compost.price, plan_psector_x_other.measurement,
+        (plan_psector_x_other.measurement * v_price_compost.price)::numeric(14,2) AS total_budget FROM plan_psector_x_other JOIN v_price_compost ON v_price_compost.id::text = plan_psector_x_other.price_id::text 
+        JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_other.psector_id ORDER BY plan_psector_x_other.psector_id
+        ) v_plan_psector_x_other GROUP BY v_plan_psector_x_other.psector_id) c 
+        ON c.psector_id = plan_psector.psector_id
+     WHERE plan_psector.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
 
 
 
@@ -199,21 +202,23 @@ CREATE OR REPLACE VIEW v_plan_psector_all AS
             ELSE c.suma
         END)::double precision)::numeric(14,2) AS pca,
     plan_psector.the_geom
-   FROM plan_psector
-     LEFT JOIN ( SELECT sum(v_plan_psector_x_arc.total_budget) AS suma,
-            v_plan_psector_x_arc.psector_id
-           FROM v_plan_psector_x_arc
-          WHERE v_plan_psector_x_arc.doable IS TRUE
-          GROUP BY v_plan_psector_x_arc.psector_id) a ON a.psector_id = plan_psector.psector_id
-     LEFT JOIN ( SELECT sum(v_plan_psector_x_node.total_budget) AS suma,
-            v_plan_psector_x_node.psector_id
-           FROM v_plan_psector_x_node
-          WHERE v_plan_psector_x_node.doable IS TRUE
-          GROUP BY v_plan_psector_x_node.psector_id) b ON b.psector_id = plan_psector.psector_id
-     LEFT JOIN ( SELECT sum(v_plan_psector_x_other.total_budget) AS suma,
-            v_plan_psector_x_other.psector_id
-           FROM v_plan_psector_x_other
-          GROUP BY v_plan_psector_x_other.psector_id) c ON c.psector_id = plan_psector.psector_id;
+    FROM selector_psector, plan_psector
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_arc.total_budget) AS suma, v_plan_psector_x_arc.psector_id FROM (
+        SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,v_plan_arc.*, plan_psector_x_arc.* FROM v_plan_arc JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text 
+        JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_arc.psector_id ORDER BY plan_psector_x_arc.psector_id) 
+        v_plan_psector_x_arc GROUP BY v_plan_psector_x_arc.psector_id) a 
+        ON a.psector_id = plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_node.budget) AS suma, v_plan_psector_x_node.psector_id FROM (
+        SELECT row_number() OVER (ORDER BY v_plan_node.node_id) AS rid, v_plan_node.*, plan_psector_x_node.* FROM v_plan_node JOIN plan_psector_x_node ON plan_psector_x_node.node_id::text = v_plan_node.node_id::text
+        JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_node.psector_id ORDER BY plan_psector_x_node.psector_id
+        ) v_plan_psector_x_node GROUP BY v_plan_psector_x_node.psector_id) b 
+        ON b.psector_id = plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_other.total_budget) AS suma, v_plan_psector_x_other.psector_id FROM ( 
+        SELECT plan_psector_x_other.id, plan_psector_x_other.psector_id,  plan_psector.psector_type, v_price_compost.id AS price_id, v_price_compost.descript, v_price_compost.price, plan_psector_x_other.measurement,
+        (plan_psector_x_other.measurement * v_price_compost.price)::numeric(14,2) AS total_budget FROM plan_psector_x_other JOIN v_price_compost ON v_price_compost.id::text = plan_psector_x_other.price_id::text 
+        JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_other.psector_id ORDER BY plan_psector_x_other.psector_id
+        ) v_plan_psector_x_other GROUP BY v_plan_psector_x_other.psector_id) c 
+        ON c.psector_id = plan_psector.psector_id;
 
 
 
@@ -327,22 +332,23 @@ CREATE OR REPLACE VIEW v_plan_current_psector AS
             ELSE c.suma
         END)::numeric(14,2) AS pca,
     plan_psector.the_geom
-   FROM plan_psector
-     JOIN selector_plan_psector ON plan_psector.psector_id = selector_plan_psector.psector_id
-     LEFT JOIN ( SELECT sum(v_plan_psector_x_arc.total_budget) AS suma,
-            v_plan_psector_x_arc.psector_id
-           FROM v_plan_psector_x_arc
-          WHERE v_plan_psector_x_arc.doable IS TRUE
-          GROUP BY v_plan_psector_x_arc.psector_id) a ON a.psector_id = plan_psector.psector_id
-     LEFT JOIN ( SELECT sum(v_plan_psector_x_node.total_budget) AS suma,
-            v_plan_psector_x_node.psector_id
-           FROM v_plan_psector_x_node
-          WHERE v_plan_psector_x_node.doable IS TRUE
-          GROUP BY v_plan_psector_x_node.psector_id) b ON b.psector_id = plan_psector.psector_id
-     LEFT JOIN ( SELECT sum(v_plan_psector_x_other.total_budget) AS suma,
-            v_plan_psector_x_other.psector_id
-           FROM v_plan_psector_x_other
-          GROUP BY v_plan_psector_x_other.psector_id) c ON c.psector_id = plan_psector.psector_id
-  WHERE selector_plan_psector.cur_user = "current_user"()::text;
-
+    FROM plan_psector
+    JOIN selector_plan_psector ON plan_psector.psector_id = selector_plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_arc.total_budget) AS suma, v_plan_psector_x_arc.psector_id FROM (
+        SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,v_plan_arc.*, plan_psector_x_arc.* FROM v_plan_arc JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text 
+        JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_arc.psector_id ORDER BY plan_psector_x_arc.psector_id) 
+        v_plan_psector_x_arc GROUP BY v_plan_psector_x_arc.psector_id) a 
+        ON a.psector_id = plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_node.budget) AS suma, v_plan_psector_x_node.psector_id FROM (
+        SELECT row_number() OVER (ORDER BY v_plan_node.node_id) AS rid, v_plan_node.*, plan_psector_x_node.* FROM v_plan_node JOIN plan_psector_x_node ON plan_psector_x_node.node_id::text = v_plan_node.node_id::text
+        JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_node.psector_id ORDER BY plan_psector_x_node.psector_id
+        ) v_plan_psector_x_node GROUP BY v_plan_psector_x_node.psector_id) b 
+        ON b.psector_id = plan_psector.psector_id
+     LEFT JOIN ( SELECT sum(v_plan_psector_x_other.total_budget) AS suma, v_plan_psector_x_other.psector_id FROM ( 
+        SELECT plan_psector_x_other.id, plan_psector_x_other.psector_id,  plan_psector.psector_type, v_price_compost.id AS price_id, v_price_compost.descript, v_price_compost.price, plan_psector_x_other.measurement,
+        (plan_psector_x_other.measurement * v_price_compost.price)::numeric(14,2) AS total_budget FROM plan_psector_x_other JOIN v_price_compost ON v_price_compost.id::text = plan_psector_x_other.price_id::text 
+        JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_other.psector_id ORDER BY plan_psector_x_other.psector_id
+        ) v_plan_psector_x_other GROUP BY v_plan_psector_x_other.psector_id) c 
+        ON c.psector_id = plan_psector.psector_id
+    WHERE selector_plan_psector.cur_user = "current_user"()::text;
 
