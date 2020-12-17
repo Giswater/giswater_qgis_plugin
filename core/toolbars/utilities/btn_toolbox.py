@@ -36,7 +36,8 @@ class GwToolBoxButton(GwParentAction):
 
 
     def clicked_event(self):
-
+        
+        self.no_clickable_items = ['Giswater']
         function_name = "gw_fct_gettoolbox"
         row = tools_db.check_function(function_name)
         if not row:
