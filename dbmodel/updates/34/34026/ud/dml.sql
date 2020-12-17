@@ -22,3 +22,7 @@ UPDATE sys_table SET id='inp_transects' WHERE id='inp_transects_id';
 
 UPDATE config_form_fields SET dv_querytext=replace(dv_querytext, 'inp_transects_id', 'inp_transects') WHERE dv_querytext LIKE '%inp_transects%';
 UPDATE config_form_fields SET dv_querytext=replace(dv_querytext, 'inp_timser_id', 'inp_timeseries') WHERE dv_querytext LIKE '%inp_timser%';
+
+ALTER TABLE sys_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+DELETE FROM sys_foreignkey WHERE target_table = 'inp_timser_id';
+ALTER TABLE sys_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
