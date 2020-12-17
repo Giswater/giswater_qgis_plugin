@@ -24,3 +24,14 @@ UPDATE config_form_fields SET dv_querytext=replace(dv_querytext, 'inp_transects_
 UPDATE config_form_fields SET dv_querytext=replace(dv_querytext, 'inp_timser_id', 'inp_timeseries') WHERE dv_querytext LIKE '%inp_timser%';
 
 UPDATE sys_foreignkey SET target_table = 'inp_timeseries' WHERE target_table = 'inp_timser_id';
+
+UPDATE config_form_tabs SET tabactions = '[{"disabled": false, "actionName": "actionEdit", "actionTooltip": "Edit"}, 
+{"disabled": false, "actionName": "actionZoom", "actionTooltip": "Zoom In"}, 
+{"disabled": false, "actionName": "actionCentered", "actionTooltip": "Center"}, 
+{"disabled": false, "actionName": "actionZoomOut", "actionTooltip": "Zoom Out"}, 
+{"disabled": false, "actionName": "actionCatalog", "actionTooltip": "Change Catalog"}, 
+{"disabled": false, "actionName": "actionWorkcat", "actionTooltip": "Add Workcat"}, 
+{"disabled": false, "actionName": "actionCopyPaste", "actionTooltip": "Copy Paste"}, 
+{"disabled": false, "actionName": "actionLink", "actionTooltip": "Open Link"},
+{"actionName":"actionGetArcId", "actionTooltip":"Set arc_id",  "disabled":false},
+{"disabled": false, "actionName": "actionHelp", "actionTooltip": "Help"}]' WHERE formname ='v_edit_node';
