@@ -35,13 +35,18 @@ class GwMincutManager:
         self.settings = global_vars.settings
 
 
+    def set_dialog(self, dialog=MincutManagerUi()):
+        self.dlg_min_edit=dialog
+        self.mg_mincut_management()
+
+
     def mg_mincut_management(self):
         """ Button 27: Mincut management """
 
         self.action = "mg_mincut_management"
 
         # Create the dialog and signals
-        self.dlg_min_edit = MincutManagerUi()
+
         tools_gw.load_settings(self.dlg_min_edit)
         tools_gw.set_dates_from_to(self.dlg_min_edit.date_from, self.dlg_min_edit.date_to, 'om_mincut',
             'forecast_start, exec_start', 'forecast_end, exec_end')

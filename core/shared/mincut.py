@@ -1764,10 +1764,11 @@ class GwMincut:
                 break
 
 
-    def mg_mincut_management(self):
+    def mg_mincut_management(self, dialog=None):
         """ Button 27: Mincut management """
 
         self.action = "mg_mincut_management"
+        self.mincut_config.set_dialog(dialog)
         self.mincut_config.mg_mincut_management()
 
 
