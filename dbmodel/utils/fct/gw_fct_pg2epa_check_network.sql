@@ -88,7 +88,7 @@ BEGIN
 	
 	-- Header
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 4, 'CHECK RESULT NETWORK ACORDING EPA RULES');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 4, '-------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 4, '---------------------------------------------------------');
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 3, 'CRITICAL ERRORS');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (139, v_result_id, 3, '----------------------');
@@ -119,7 +119,7 @@ BEGIN
 		' node''s orphan on this result. Some inconsistency may have been generated because state_type (228).'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, result_id, error_message, count)
-		VALUES (v_fid, v_result_id, 1, 'INFO: No node(s) orphan found on this result.', v_count);
+		VALUES (v_fid, v_result_id, 1, 'INFO: No orphan node(s) found on this result. ', v_count);
 	END IF;
 
 	RAISE NOTICE '2 - Check result duplicated nodes on rpt tables (fid:  290)';
@@ -136,7 +136,7 @@ BEGIN
 		' node(s) duplicated on this result. It means that there is a topological jump on that point (state 0-1-2). Please check your network'));
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 1, 'INFO: No node(s) orphan found on this result.');
+		VALUES (v_fid, v_result_id, 1, 'INFO: No duplicated node(s) found on this result.');
 	END IF;
 
 	
