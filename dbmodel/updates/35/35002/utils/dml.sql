@@ -179,3 +179,31 @@ WHERE columnname IN ('brand', 'model','buildercat_id', 'cat_matcat_id', 'ownerca
 AND (formname ilike 've_arc%' OR formname ilike 've_node%' OR formname ilike 've_connec%' OR formname ilike 've_gully%' 
 OR formname in ('v_edit_element','v_edit_node','v_edit_arc','v_edit_connec','v_edit_gully')) and dv_querytext is not null;
 
+UPDATE sys_param_user set dv_querytext = concat(dv_querytext, ' AND active IS TRUE ')
+WHERE id IN ('basic_search_exploitation_vdefault','basic_search_municipality_vdefault','edit_arccat_vdefault', 'edit_connecat_vdefault',
+'edit_dma_vdefault','edit_elementcat_vdefault','edit_exploitation_vdefault','edit_feature_category_vdefault','edit_feature_fluid_vdefault',
+'edit_feature_function_vdefault','edit_feature_location_vdefault','edit_municipality_vdefault','edit_nodecat_vdefault','edit_ownercat_vdefault',
+'edit_pavementcat_vdefault','edit_presszone_vdefault','edit_sector_vdefault','edit_soilcat_vdefault','edit_workcat_end_vdefault',
+'edit_workcat_vdefault','edit_pavement_vdefault');
+
+UPDATE sys_param_user set dv_querytext = concat(dv_querytext, ' AND cat_node.active IS TRUE ')
+FROM cat_feature WHERE upper(cat_feature.id) = upper(replace(replace(sys_param_user.id,'feat_'::text,''::text),'_vdefault',''))
+AND feature_type = 'NODE';
+
+UPDATE sys_param_user set dv_querytext = concat(dv_querytext, ' AND cat_arc.active IS TRUE ')
+FROM cat_feature WHERE upper(cat_feature.id) = upper(replace(replace(sys_param_user.id,'feat_'::text,''::text),'_vdefault',''))
+AND feature_type = 'ARC';
+
+UPDATE sys_param_user set dv_querytext = concat(dv_querytext, ' AND cat_connec.active IS TRUE ')
+FROM cat_feature WHERE upper(cat_feature.id) = upper(replace(replace(sys_param_user.id,'feat_'::text,''::text),'_vdefault',''))
+AND feature_type = 'CONNEC';
+
+UPDATE man_type_location SET active = TRUE WHERE active IS NULL;
+UPDATE man_type_fluid SET active = TRUE WHERE active IS NULL;
+UPDATE man_type_category SET active = TRUE WHERE active IS NULL;
+UPDATE man_type_function SET active = TRUE WHERE active IS NULL;
+
+UPDATE config_form_fields SET dv_querytext = concat(REPLACE(dv_querytext, 'WHERE ', 'WHERE ('),') AND active IS TRUE ')
+WHERE columnname IN ('location_type', 'category_type','fluid_type', 'function_type') 
+AND (formname ilike 've_arc%' OR formname ilike 've_node%' OR formname ilike 've_connec%' OR formname ilike 've_gully%' 
+OR formname in ('v_edit_element','v_edit_node','v_edit_arc','v_edit_connec','v_edit_gully')) and dv_querytext is not null;
