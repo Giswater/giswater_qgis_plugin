@@ -115,3 +115,74 @@ FROM selector_psector,gully
 JOIN plan_psector_x_gully USING (gully_id)
 JOIN link ON link.feature_id=gully.gully_id
 WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+
+
+
+CREATE OR REPLACE VIEW v_edit_inp_junction AS 
+ SELECT node.node_id,
+    node.top_elev,
+    node.custom_top_elev,
+    node.ymax,
+    node.custom_ymax,
+    node.elev,
+    node.custom_elev,
+    node.elev AS sys_elev,
+    node.nodecat_id,
+    node.sector_id,
+    macrosector_id,
+    node.state,
+    node.state_type,
+    node.annotation,
+    node.expl_id,
+    inp_junction.y0,
+    inp_junction.ysur,
+    inp_junction.apond,
+    inp_junction.outfallparam::text AS outfallparam,
+    node.the_geom
+   FROM selector_sector,
+    node
+     JOIN inp_junction USING (node_id)
+     JOIN vi_parent_arc a ON node_1 = node_id
+
+  WHERE node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
+UNION
+ SELECT node.node_id,
+    node.top_elev,
+    node.custom_top_elev,
+    node.ymax,
+    node.custom_ymax,
+    node.elev,
+    node.custom_elev,
+    node.elev AS sys_elev,
+    node.nodecat_id,
+    node.sector_id,
+    macrosector_id,
+    node.state,
+    node.state_type,
+    node.annotation,
+    node.expl_id,
+    inp_junction.y0,
+    inp_junction.ysur,
+    inp_junction.apond,
+    inp_junction.outfallparam::text AS outfallparam,
+    node.the_geom
+   FROM selector_sector,
+    node
+     JOIN inp_junction USING (node_id)
+     JOIN vi_parent_arc a ON node_2 = node_id
+  WHERE node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

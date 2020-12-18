@@ -83,3 +83,61 @@ FROM selector_psector,connec
 JOIN plan_psector_x_connec USING (connec_id)
 JOIN link ON link.feature_id=connec.connec_id
 WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+
+
+
+CREATE OR REPLACE VIEW v_edit_inp_junction AS 
+ SELECT n.node_id,
+    n.elevation,
+    n.depth,
+    n.nodecat_id,
+    n.sector_id,
+    a.macrosector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    inp_junction.demand,
+    inp_junction.pattern_id,
+    n.the_geom
+   FROM selector_sector,
+    node n
+     JOIN inp_junction USING (node_id)
+     JOIN vi_parent_arc a ON node_1 = node_id
+  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
+  UNION
+   SELECT n.node_id,
+    n.elevation,
+    n.depth,
+    n.nodecat_id,
+    n.sector_id,
+    a.macrosector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    inp_junction.demand,
+    inp_junction.pattern_id,
+    n.the_geom
+   FROM selector_sector,
+    node n
+     JOIN inp_junction USING (node_id)
+     JOIN vi_parent_arc a ON node_2 = node_id
+  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
