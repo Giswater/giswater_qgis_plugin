@@ -386,7 +386,10 @@ def set_combo_value(combo, value, item1):
         if value == str(elem[item1]):
             combo.setCurrentIndex(i)
             return True
+    combo.addItem(f"({value})", f"({value})")
+    combo.setCurrentIndex(combo.count() - 1)
     return False
+
 
 
 def fill_combo_values(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True, sort_by=1, add_empty=False):
