@@ -2429,10 +2429,15 @@ def manage_layer_manager(json_result, sql):
 
 def selection_init(class_object, dialog, table_object, query=False):
     """ Set canvas map tool to an instance of class 'GwSelectManager' """
+    try:
+        class_object.geom_type = get_signal_change_tab(dialog)
+    except AttributeError:
+        # In case the dialog has no tab
+        pass
 
-    class_object.geom_type = get_signal_change_tab(dialog)
     if class_object.geom_type in ('all', None):
         class_object.geom_type = 'arc'
+
     select_manager = GwSelectManager(class_object, table_object, dialog, query)
     global_vars.canvas.setMapTool(select_manager)
     cursor = get_cursor_multiple_selection()
