@@ -20,7 +20,6 @@ from .core.utils import tools_gw
 from .lib import tools_log, tools_qgis
 
 
-
 class Giswater(QObject):
 
     def __init__(self, iface):
@@ -82,8 +81,7 @@ class Giswater(QObject):
         global_vars.init_qgis_settings(self.plugin_name)
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
-        python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', "project",
-                                                        "init")
+        python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', "project", "init")
         if python_enable_console == 'TRUE':
             tools_qgis.enable_python_console()
 
@@ -91,7 +89,7 @@ class Giswater(QObject):
         self.set_signals()
 
         # Set logger (no database connection yet)
-        tools_log.set_logger('pluggin')
+        tools_log.set_logger('plugin')
         global_vars.plugin_name = self.plugin_name
 
         # Check for developers options
