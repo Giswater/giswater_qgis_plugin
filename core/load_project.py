@@ -228,7 +228,7 @@ class LoadProject(QObject):
         """
 
         # Dynamically get list of toolbars from config file
-        toolbar_names = global_vars.settings.value(f"toolbars/list_toolbars")
+        toolbar_names = (tools_gw.get_config_parser('toolbars', 'list_toolbars', file_name='user').replace(' ', '')).split(',')
 
         # Get user UI config file
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
@@ -258,9 +258,7 @@ class LoadProject(QObject):
             ag = QActionGroup(parent)
             ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
-
-                button_def = global_vars.settings.value(f"buttons_def/{index_action}")
-
+                button_def = tools_gw.get_config_parser('buttons_def', str(index_action), file_name='user')
                 if button_def:
                     text = self.translate(f'{index_action}_text')
                     icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
@@ -270,11 +268,11 @@ class LoadProject(QObject):
 
         # Disable buttons which are project type exclusive
         if self.project_type == 'ud':
-            for index in self.settings.value("project_exclusive/ws"):
+            for index in (tools_gw.get_config_parser('project_exclusive', 'ws', file_name='user').replace(' ', '')).split(','):
                 self.hide_button(index)
 
         if self.project_type == 'ws':
-            for index in self.settings.value("project_exclusive/ud"):
+            for index in (tools_gw.get_config_parser('project_exclusive', 'ud', file_name='user').replace(' ', '')).split(','):
                 self.hide_button(index)
 
         # Hide buttons from buttons_to_hide
@@ -292,7 +290,7 @@ class LoadProject(QObject):
 
     def create_toolbar(self, toolbar_id):
 
-        list_actions = self.settings.value(f"toolbars/{toolbar_id}")
+        list_actions = (tools_gw.get_config_parser('toolbars', str(toolbar_id), file_name='user').replace(' ', '')).split(',')
 
         if list_actions is None:
             return
