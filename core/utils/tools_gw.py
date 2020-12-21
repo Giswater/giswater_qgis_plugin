@@ -30,154 +30,13 @@ from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint, QgsDate
 
 from ..models.sys_feature_cat import SysFeatureCat
 from ..ui.ui_manager import GwDialog, GwMainWindow, DockerUi
+from ..utils.tools_gw_select_manager import GwSelectManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_pgdao, tools_qt, tools_log, tools_config, tools_os, tools_db
 from ...lib.tools_qt import GwHyperLinkLabel
 
 
-class MultipleSelection(QgsMapTool):
 
-    def __init__(self, class_object, table_object=None, dialog=None, query=None):
-        """
-        Class constructor
-        :param layers: dict of list of layers {'arc': [v_edit_node, ...]}
-        :param geom_type:
-        :param table_object:
-        :param dialog:
-        :param query:
-        """
-
-        self.class_object = class_object
-        self.iface = global_vars.iface
-        self.canvas = global_vars.canvas
-        self.table_object = table_object
-        self.dialog = dialog
-        self.query = query
-
-        # Call superclass constructor and set current action
-        QgsMapTool.__init__(self, self.canvas)
-
-        self.rubber_band = QgsRubberBand(self.canvas, 2)
-        self.rubber_band.setColor(QColor(255, 100, 255))
-        self.rubber_band.setFillColor(QColor(254, 178, 76, 63))
-        self.rubber_band.setWidth(1)
-        self.reset()
-        self.selected_features = []
-
-
-    def reset(self):
-
-        self.start_point = self.end_point = None
-        self.is_emitting_point = False
-        self.reset_rubber_band()
-
-
-    def canvasPressEvent(self, event):
-
-        if event.button() == Qt.LeftButton:
-            self.start_point = self.toMapCoordinates(event.pos())
-            self.end_point = self.start_point
-            self.is_emitting_point = True
-            self.show_rect(self.start_point, self.end_point)
-
-
-    def canvasReleaseEvent(self, event):
-
-        self.is_emitting_point = False
-        rectangle = self.get_rectangle()
-        selected_rectangle = None
-        key = QApplication.keyboardModifiers()
-
-        if event.button() != Qt.LeftButton:
-            self.rubber_band.hide()
-            return
-
-        # Disconnect signal to enhance process
-        # We will reconnect it when processing last layer of the group
-        tools_qgis.disconnect_signal_selection_changed()
-
-        for i, layer in enumerate(self.class_object.layers[self.class_object.geom_type]):
-            if i == len(self.class_object.layers[self.class_object.geom_type]) - 1:
-                connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, query=self.query)
-
-                # Selection by rectangle
-            if rectangle:
-                if selected_rectangle is None:
-                    selected_rectangle = self.canvas.mapSettings().mapToLayerCoordinates(layer, rectangle)
-                # If Ctrl+Shift clicked: remove features from selection
-                if key == (Qt.ControlModifier | Qt.ShiftModifier):
-                    layer.selectByRect(selected_rectangle, layer.RemoveFromSelection)
-                # If Ctrl clicked: add features to selection
-                elif key == Qt.ControlModifier:
-                    layer.selectByRect(selected_rectangle, layer.AddToSelection)
-                # If Ctrl not clicked: add features to selection
-                else:
-                    layer.selectByRect(selected_rectangle, layer.AddToSelection)
-
-            # Selection one by one
-            else:
-                event_point = self.get_event_point(event)
-                result = self.snap_to_background_layers(event_point)
-                if result.isValid():
-                    # Get the point. Leave selection
-                    self.get_snapped_feature(result, True)
-
-        self.rubber_band.hide()
-
-
-    def canvasMoveEvent(self, event):
-
-        if not self.is_emitting_point:
-            return
-
-        self.end_point = self.toMapCoordinates(event.pos())
-        self.show_rect(self.start_point, self.end_point)
-
-
-    def show_rect(self, start_point, end_point):
-
-        self.reset_rubber_band()
-        if start_point.x() == end_point.x() or start_point.y() == end_point.y():
-            return
-
-        point1 = QgsPointXY(start_point.x(), start_point.y())
-        point2 = QgsPointXY(start_point.x(), end_point.y())
-        point3 = QgsPointXY(end_point.x(), end_point.y())
-        point4 = QgsPointXY(end_point.x(), start_point.y())
-
-        self.rubber_band.addPoint(point1, False)
-        self.rubber_band.addPoint(point2, False)
-        self.rubber_band.addPoint(point3, False)
-        self.rubber_band.addPoint(point4, True)
-        self.rubber_band.show()
-
-
-    def get_rectangle(self):
-
-        if self.start_point is None or self.end_point is None:
-            return None
-        elif self.start_point.x() == self.end_point.x() or self.start_point.y() == self.end_point.y():
-            return None
-
-        return QgsRectangle(self.start_point, self.end_point)
-
-
-    def deactivate(self):
-
-        self.rubber_band.hide()
-        QgsMapTool.deactivate(self)
-
-
-    def activate(self):
-        pass
-
-
-    def reset_rubber_band(self):
-
-        try:
-            self.rubber_band.reset(2)
-        except:
-            pass
 
 
 class SnappingConfigManager(object):
@@ -2569,13 +2428,13 @@ def manage_layer_manager(json_result, sql):
 
 
 def selection_init(class_object, dialog, table_object, query=False):
-    """ Set canvas map tool to an instance of class 'MultipleSelection' """
+    """ Set canvas map tool to an instance of class 'GwSelectManager' """
 
     class_object.geom_type = get_signal_change_tab(dialog)
     if class_object.geom_type in ('all', None):
         class_object.geom_type = 'arc'
-    multiple_selection = MultipleSelection(class_object, table_object, dialog, query)
-    global_vars.canvas.setMapTool(multiple_selection)
+    select_manager = GwSelectManager(class_object, table_object, dialog, query)
+    global_vars.canvas.setMapTool(select_manager)
     cursor = get_cursor_multiple_selection()
     global_vars.canvas.setCursor(cursor)
 

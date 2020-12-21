@@ -28,7 +28,7 @@ from ..utils.tools_gw import SnappingConfigManager
 from ..ui.ui_manager import DialogTextUi, Mincut, MincutComposer, MincutConnec, MincutEndUi, MincutHydrometer
 from ... import global_vars
 from ...lib import tools_qt, tools_qgis, tools_log, tools_db
-from ..utils.tools_gw import MultipleSelection
+from ..utils.tools_gw_select_manager import GwSelectManager
 
 
 class GwMincut:
@@ -833,8 +833,8 @@ class GwMincut:
     def snapping_init_hydro(self):
         """ Snap also to connec (hydrometers has no geometry) """
         self.geom_type = 'connec'
-        multiple_snapping = MultipleSelection(self)
-        self.canvas.setMapTool(multiple_snapping)
+        select_manager = GwSelectManager(self)
+        self.canvas.setMapTool(select_manager)
         self.canvas.selectionChanged.connect(partial(self.snapping_selection_hydro))
         cursor = tools_gw.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)

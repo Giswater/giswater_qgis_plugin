@@ -155,7 +155,7 @@ class GwDeleteFeatureButton(GwParentAction):
 
 
     def selection_init(self):
-        """ Set canvas map tool to an instance of class 'MultipleSelection' """
+        """ Set canvas map tool to an instance of class 'GwSelectManager' """
 
         tools_qgis.disconnect_signal_selection_changed()
         self.iface.actionSelect().trigger()
