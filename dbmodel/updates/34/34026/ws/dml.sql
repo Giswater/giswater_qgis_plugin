@@ -26,3 +26,7 @@ UPDATE config_form_tabs SET tabactions =
 {"actionName":"actionGetParentId", "actionTooltip":"Set parent_id",  "disabled":false},
 {"actionName":"actionGetArcId", "actionTooltip":"Set arc_id",  "disabled":false},
 {"actionName": "actionRotation", "actionTooltip": "Rotation","disabled": false}]' WHERE formname = 'v_edit_node';
+
+DELETE FROM sys_function WHERE id = 2638;
+
+DROP FUNCTION IF EXISTS gw_fct_utils_update_dma_hydroval();
