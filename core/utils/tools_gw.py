@@ -421,10 +421,10 @@ def load_settings(dialog):
 
     # Get user UI config file
     try:
-        x = get_config_parser('dialogs_position', f"{dialog.objectName()}_x")
-        y = get_config_parser('dialogs_position', f"{dialog.objectName()}_y")
-        width = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_width")
-        height = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_height")
+        x = get_config_parser('dialogs_position', f"{dialog.objectName()}_x", "user", "sessions")
+        y = get_config_parser('dialogs_position', f"{dialog.objectName()}_y", "user", "sessions")
+        width = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", "user", "sessions")
+        height = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", "user", "sessions")
 
         v_screens = ctypes.windll.user32
         screen_x = v_screens.GetSystemMetrics(78)  # Width of virtual screen
@@ -456,11 +456,11 @@ def save_settings(dialog):
         pass
 
 
-def get_config_parser(section: str, parameter: str, config_type="user", file_name="sessions") -> str:
+def get_config_parser(section: str, parameter: str, config_type, file_name) -> str:
     """ Load a simple parser value """
 
     value = None
-
+    path_folder = None
     try:
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         if config_type in ("user"):
@@ -468,12 +468,13 @@ def get_config_parser(section: str, parameter: str, config_type="user", file_nam
         elif config_type in ("project"):
             path_folder = global_vars.plugin_dir
         path = path_folder + os.sep + "config" + os.sep + f'{file_name}.config'
-
         if not os.path.exists(path):
             return value
+
         parser.read(path)
         value = parser[section][parameter]
-    except:
+    except Exception as e:
+        tools_log.log_warning(str(e))
         return value
     return value
 
@@ -481,12 +482,16 @@ def get_config_parser(section: str, parameter: str, config_type="user", file_nam
 def set_config_parser(section: str, parameter: str, value: str, comment=None, config_type="user", file_name="sessions"):
     """ Save simple parser value """
 
+
     try:
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
-        if config_type in ("user"):
+        if config_type in "user":
             path_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
-        elif config_type in ("project"):
+        elif config_type in "project":
             path_folder = global_vars.plugin_dir
+        else:
+            tools_log.log_warning(f"EXCEPTION: Reference config_type = {config_type} it is not managed")
+            return None
 
         config_folder = path_folder + os.sep + "config" + os.sep
         if not os.path.exists(config_folder):
@@ -520,7 +525,7 @@ def save_current_tab(dialog, tab_widget, selector_name):
         if tab:
             tab_name = tab.objectName()
             dlg_name = dialog.objectName()
-            set_config_parser('last_tabs', f"{dlg_name}_{selector_name}", f"{tab_name}")
+            set_config_parser('dialogs_tab', f"{dlg_name}_{selector_name}", f"{tab_name}")
     except Exception:
         pass
 
@@ -1924,6 +1929,14 @@ def document_open(table, field_name):
         show_warning(message)
 
 
+def check_config_settings(section, parameter, value, comment=None, config_type="user", file_name="user"):
+    """ Check if @section and @parameter exists in user settings file. If not add them = None """
+
+    result = get_config_parser(section, parameter, config_type, file_name)
+    if result is not None: return result
+    set_config_parser(section, parameter, value, comment, config_type, file_name)
+
+
 # TODO End Generic Section
 
 
@@ -1958,7 +1971,7 @@ def get_json(function_name, parameters=None, schema_name=None, commit=True, log_
     sql += f");"
 
     # Check log_sql for developers
-    dev_log_sql = get_config_parser('system', 'log_sql')
+    dev_log_sql = get_config_parser('system', 'log_sql', "user", "user")
     if dev_log_sql not in (None, "None", "none"):
         log_sql = tools_os.cast_boolean(dev_log_sql)
 
@@ -2306,7 +2319,7 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
     message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)} """
 
     # Check duration message for developers
-    dev_duration = get_config_parser('system', 'show_message_durations')
+    dev_duration = get_config_parser('system', 'show_message_durations', "user", "user")
     if dev_duration not in (None, "None"):
         duration = int(duration)
 
@@ -2694,7 +2707,7 @@ def manage_docker_options():
     # Load last docker position
     try:
         # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
-        pos = int(get_config_parser('docker', 'position'))
+        pos = int(get_config_parser('docker', 'position', "user", "sessions"))
         global_vars.session_vars['dlg_docker'].position = 2
         if pos in (1, 2, 4, 8):
             global_vars.session_vars['dlg_docker'].position = pos

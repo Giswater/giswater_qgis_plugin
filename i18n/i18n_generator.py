@@ -377,12 +377,12 @@ class GwI18NGenerator:
         :return: Dictionary with values
         """
 
-        host = tools_gw.get_config_parser('i18n_generator', 'qm_lang_host')
-        port = tools_gw.get_config_parser('i18n_generator', 'qm_lang_port')
-        db = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db')
-        user = tools_gw.get_config_parser('i18n_generator', 'qm_lang_user')
-        py_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_py_msg')
-        db_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db_msg')
+        host = tools_gw.get_config_parser('i18n_generator', 'qm_lang_host', "user", "user")
+        port = tools_gw.get_config_parser('i18n_generator', 'qm_lang_port', "user", "user")
+        db = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db', "user", "user")
+        user = tools_gw.get_config_parser('i18n_generator', 'qm_lang_user', "user", "user")
+        py_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_py_msg', "user", "user")
+        db_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db_msg', "user", "user")
         tools_qt.set_widget_text(self.dlg_qm, 'txt_host', host)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_port', port)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_db', db)

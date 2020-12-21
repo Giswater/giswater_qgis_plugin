@@ -60,7 +60,7 @@ class GwSearch:
 
     def api_search(self, dlg_mincut=None, load_project=False):
         # If search is open, dont let user open another one
-        open_search = tools_gw.get_config_parser('btn_search', 'open_search', 'false')
+        open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "sessions")
         if open_search in ("True", "true", True) and dlg_mincut is None and load_project is False:
             return
         form = ""
@@ -472,7 +472,7 @@ class GwSearch:
         self.items_dialog.btn_state1.setEnabled(False)
         self.items_dialog.btn_state0.setEnabled(False)
 
-        search_csv_path = tools_gw.get_config_parser('search', 'search_csv_path')
+        search_csv_path = tools_gw.get_config_parser('search', 'search_csv_path', "user", "user")
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_init, f"Filter by: {field_id}")
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_end, f"Filter by: {field_id}")
@@ -559,7 +559,7 @@ class GwSearch:
     def get_current_selectors(self):
         """ Take the current selector_expl and selector_state to restore them at the end of the operation """
 
-        current_tab = tools_gw.get_config_parser('dialogs_tab', 'selector_basic')
+        current_tab = tools_gw.get_config_parser('dialogs_tab', 'selector_basic', "user", "sessions")
         form = f'"currentTab":"{current_tab}"'
         extras = f'"selectorType":"selector_basic", "filterText":""'
         body = tools_gw.create_body(form=form, extras=extras)

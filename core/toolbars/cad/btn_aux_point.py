@@ -50,7 +50,7 @@ class GwAuxPointButton(GwParentMapTool):
         self.dlg_create_point.btn_accept.clicked.connect(partial(self.get_values, point_1, point_2))
         self.dlg_create_point.btn_cancel.clicked.connect(self.cancel)
 
-        if tools_gw.get_config_parser('cadtools', f"{self.dlg_create_point.rb_left.objectName()}") == 'True':
+        if tools_gw.get_config_parser('cadtools', f"{self.dlg_create_point.rb_left.objectName()}", "user", "user") == 'True':
             self.dlg_create_point.rb_left.setChecked(True)
         else:
             self.dlg_create_point.rb_right.setChecked(True)

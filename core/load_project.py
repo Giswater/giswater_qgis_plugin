@@ -111,13 +111,16 @@ class LoadProject(QObject):
         self.check_user_roles()
 
         # Create a thread to listen selected database channels
-        if tools_gw.get_config_parser('system', 'use_notify', "project", "init").upper() == 'TRUE':
+        use_notify = tools_gw.check_config_settings('system', 'use_notify', 'FALSE', config_type="project",
+                                                    file_name="init")
+        if use_notify:
             self.notify = GwNotifyTools()
             list_channels = ['desktop', global_vars.session_vars['current_user']]
             self.notify.start_listening(list_channels)
 
         # Open automatically 'search docker' depending its value in user settings
-        open_search = tools_gw.get_config_parser('btn_search', 'open_search', 'true')
+        open_search = tools_gw.check_config_settings('btn_search', 'open_search', 'false', config_type="user",
+                                                     file_name="sessions")
         if open_search == 'true':
             GwSearch().api_search(load_project=True)
 
@@ -228,8 +231,10 @@ class LoadProject(QObject):
         """
 
         # Dynamically get list of toolbars from config file
-        toolbar_names = (tools_gw.get_config_parser('toolbars', 'list_toolbars', file_name='user').replace(' ', '')).split(',')
-
+        toolbar_names = tools_gw.check_config_settings('toolbars', 'list_toolbars',
+                                                       'basic, om, edit, cad, epa, plan, utilities, toc',
+                                                       config_type="project", file_name="giswater")
+        toolbar_names = toolbar_names.replace(' ', '').split(',')
         # Get user UI config file
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
@@ -258,7 +263,8 @@ class LoadProject(QObject):
             ag = QActionGroup(parent)
             ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
-                button_def = tools_gw.get_config_parser('buttons_def', str(index_action), file_name='user')
+                button_def = tools_gw.check_config_settings('buttons_def', str(index_action), 'None', config_type="user",
+                                                             file_name="user")
                 if button_def:
                     text = self.translate(f'{index_action}_text')
                     icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
@@ -267,13 +273,12 @@ class LoadProject(QObject):
                     self.buttons[index_action] = button
 
         # Disable buttons which are project type exclusive
-        if self.project_type == 'ud':
-            for index in (tools_gw.get_config_parser('project_exclusive', 'ws', file_name='user').replace(' ', '')).split(','):
-                self.hide_button(index)
+        project_esclusive = tools_gw.check_config_settings('project_exclusive', str(self.project_type), 'None',
+                                                           config_type="user", file_name="user")
+        project_esclusive = project_esclusive.replace(' ', '').split(',')
 
-        if self.project_type == 'ws':
-            for index in (tools_gw.get_config_parser('project_exclusive', 'ud', file_name='user').replace(' ', '')).split(','):
-                self.hide_button(index)
+        for index in project_esclusive:
+            self.hide_button(index)
 
         # Hide buttons from buttons_to_hide
         for button_id in self.buttons_to_hide:
@@ -290,8 +295,9 @@ class LoadProject(QObject):
 
     def create_toolbar(self, toolbar_id):
 
-        list_actions = (tools_gw.get_config_parser('toolbars', str(toolbar_id), file_name='user').replace(' ', '')).split(',')
-
+        list_actions = tools_gw.check_config_settings('toolbars', str(toolbar_id), 'None',
+                                                           config_type="project", file_name="giswater")
+        list_actions = list_actions.replace(' ', '').split(',')
         if list_actions is None:
             return
 

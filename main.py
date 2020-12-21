@@ -97,9 +97,9 @@ class Giswater(QObject):
         # Check for developers options
         comment = '# log_sql --> If True: show all get_json log, if False: does not show any, if None: ' \
                   'show python log_sql option'
-        self.check_developers_settings('system', 'log_sql', 'None', comment)
+        tools_gw.check_config_settings('system', 'log_sql', 'None', comment, "user", "user")
         comment = '# show_message_durations --> Integer or None, if none: show python duration option'
-        self.check_developers_settings('system', 'show_message_durations', 'None', comment)
+        tools_gw.check_config_settings('system', 'show_message_durations', 'None', comment, "user", "user")
 
         # Set main information button (always visible)
         self.set_info_button()
@@ -109,16 +109,6 @@ class Giswater(QObject):
 
         # Manage section 'toolbars' of config file
         self.manage_section_toolbars()
-
-
-    def check_developers_settings(self, section, parameter, value, comment=None):
-        """ Check if @section and @parameter exists in user settings file. If not add them = None """
-        try:
-            value_ = tools_gw.get_config_parser(section, parameter, "config", "user")
-            if value_ is not None: return
-            tools_gw.set_config_parser(section, parameter, value, comment, "config", "user")
-        except Exception:
-            pass
 
 
     def set_signals(self):
@@ -226,20 +216,17 @@ class Giswater(QObject):
         # # Get all QToolBar
         widget_list = self.iface.mainWindow().findChildren(QToolBar)
         own_toolbars = []
-
         # Get a list with own QToolBars
         for w in widget_list:
             if w.property('gw_name'):
                 own_toolbars.append(w)
-
         # Order list of toolbar in function of X position
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
         if len(own_toolbars) == 0:
             return
         sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
         sorted_toolbar_ids = ",".join(sorted_toolbar_ids)
-
-        tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids),  config_type="config", file_name="user")
+        tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids),  config_type="user", file_name="user")
 
 
     def unload(self, remove_modules=True):
@@ -249,12 +236,6 @@ class Giswater(QObject):
 
         # Remove Giswater dockers
         self.remove_dockers()
-
-        # Save toolbar position after unload plugin
-        try:
-            self.save_toolbars_position()
-        except Exception as e:
-            tools_log.log_warning(str(e))
 
         try:
             # Unlisten notify channel and stop thread

@@ -333,12 +333,12 @@ class GwAdmin:
             tools_qt.dis_enable_dialog(self.dlg_readsql, True)
 
         # Load last schema name selected and project type
-        if tools_gw.get_config_parser('btn_admin', 'project_type') not in ('', None):
+        if tools_gw.get_config_parser('btn_admin', 'project_type', "user", "user") not in ('', None):
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
-                                   tools_gw.get_config_parser('btn_admin', 'project_type'))
-        if tools_gw.get_config_parser('btn_admin', 'schema_name') not in ('', None):
+                                   tools_gw.get_config_parser('btn_admin', 'project_type', "user", "user"))
+        if tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "sessions") not in ('', None):
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name,
-                                   tools_gw.get_config_parser('btn_admin', 'schema_name'))
+                                   tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "user"))
 
         if show_dialog:
             self.manage_docker()
@@ -2253,13 +2253,13 @@ class GwAdmin:
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
 
         # Load user values
-        self.project_name.setText(tools_gw.get_config_parser('btn_admin', 'project_name_schema'))
-        self.project_descript.setText(tools_gw.get_config_parser('btn_admin', 'project_descript'))
-        create_schema_type = tools_gw.get_config_parser('btn_admin', 'create_schema_type')
+        self.project_name.setText(tools_gw.get_config_parser('btn_admin', 'project_name_schema', "user", "user"))
+        self.project_descript.setText(tools_gw.get_config_parser('btn_admin', 'project_descript', "user", "user"))
+        create_schema_type = tools_gw.get_config_parser('btn_admin', 'create_schema_type', "user", "user")
         if create_schema_type == 'True':
             tools_qt.set_checked(self.dlg_readsql_create_project, str(create_schema_type))
-        if tools_gw.get_config_parser('btn_admin', 'inp_file_path') not in ('null', None):
-            self.data_file.setText(tools_gw.get_config_parser('btn_admin', 'inp_file_path'))
+        if tools_gw.get_config_parser('btn_admin', 'inp_file_path', "user", "user") not in ('null', None):
+            self.data_file.setText(tools_gw.get_config_parser('btn_admin', 'inp_file_path', "user", "user"))
 
         # TODO: do and call listener for buton + table -> temp_csv
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
