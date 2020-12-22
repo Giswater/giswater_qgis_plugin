@@ -384,12 +384,9 @@ class GwPsector:
         self.dlg_plan_psector.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg_plan_psector,
             self.dlg_plan_psector.txt_name, self.dlg_plan_psector.all_rows, 'v_price_compost', viewname, "id"))
 
-        self.dlg_plan_psector.gexpenses.returnPressed.connect(partial(self.calulate_percents,
-            'plan_psector', 'gexpenses'))
-        self.dlg_plan_psector.vat.returnPressed.connect(partial(self.calulate_percents,
-            'plan_psector', 'vat'))
-        self.dlg_plan_psector.other.returnPressed.connect(partial(self.calulate_percents,
-            'plan_psector', 'other'))
+        self.dlg_plan_psector.gexpenses.returnPressed.connect(partial(self.calculate_percents, 'plan_psector', 'gexpenses'))
+        self.dlg_plan_psector.vat.returnPressed.connect(partial(self.calculate_percents, 'plan_psector', 'vat'))
+        self.dlg_plan_psector.other.returnPressed.connect(partial(self.calculate_percents, 'plan_psector', 'other'))
 
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
         self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(tools_qt.delete_rows_qtv, self.tbl_document))
@@ -773,12 +770,12 @@ class GwPsector:
         tools_qt.set_widget_text(dialog, 'pca_pecvat', res)
 
 
-    def calulate_percents(self, tablename, psector_id, field):
-        psector_id = tools_qt.get_text(self.dlg_plan_psector, "psector_id")
+    def calculate_percents(self, tablename, field):
 
-        sql = ("UPDATE " + tablename + " "
-               " SET " + field + " = '" + tools_qt.get_text(self.dlg_plan_psector, field) + "'"
-               " WHERE psector_id = '" + str(psector_id) + "'")
+        psector_id = tools_qt.get_text(self.dlg_plan_psector, "psector_id")
+        sql = (f"UPDATE {tablename} "
+               f"SET {field} = '{tools_qt.get_text(self.dlg_plan_psector, field)}' "
+               f"WHERE psector_id = '{psector_id}'")
         tools_db.execute_sql(sql)
         self.populate_budget(self.dlg_plan_psector, psector_id)
 
@@ -795,6 +792,7 @@ class GwPsector:
 
 
     def enable_tabs(self, enabled):
+
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, enabled)
         self.dlg_plan_psector.tabWidget.setTabEnabled(2, enabled)
         self.dlg_plan_psector.tabWidget.setTabEnabled(3, enabled)
