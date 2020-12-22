@@ -172,11 +172,11 @@ class GwAdmin:
         else:
             self.project_types = tools_gw.get_config_parser('system', 'project_types_dev', "project", "init")
 
-
+        self.project_types = self.project_types.split(',')
 
         # Populate combo types
         self.cmb_project_type.clear()
-        for aux in self.project_types.split(','):
+        for aux in self.project_types:
             self.cmb_project_type.addItem(str(aux))
 
         # Get widgets form
