@@ -43,7 +43,7 @@ class GwPsector:
     def new_psector(self, psector_id=None, is_api=False):
         """ Buttons 45 and 81: New psector """
 
-        row = tools_gw.get_config(parameter='admin_currency', columns='value::text', table='config_param_system')
+        row = tools_gw.get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
         if row:
             self.sys_currency = json.loads(row[0], object_pairs_hook=OrderedDict)
 
@@ -81,11 +81,11 @@ class GwPsector:
         self.layers['element'] = []
 
 
-        self.layers['arc'] = tools_gw.get_group_layers('arc')
-        self.layers['node'] = tools_gw.get_group_layers('node')
-        self.layers['connec'] = tools_gw.get_group_layers('connec')
+        self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
+        self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
+        self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         if self.project_type.upper() == 'UD':
-            self.layers['gully'] = tools_gw.get_group_layers('gully')
+            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
         else:
             tools_qt.remove_tab(self.dlg_plan_psector.tab_feature, 'tab_gully')
 
@@ -570,7 +570,7 @@ class GwPsector:
             self.dlg_psector_rapport.lbl_composer_disabled.setText('')
             tools_qt.fill_combo_values(self.dlg_psector_rapport.cmb_templates, records, 1)
 
-        row = tools_gw.get_config(f'composer_plan_vdefault')
+        row = tools_gw.get_config_value(f'composer_plan_vdefault')
         if row:
             tools_qt.set_combo_value(self.dlg_psector_rapport.cmb_templates, row[0], 1)
 
@@ -886,7 +886,7 @@ class GwPsector:
 
         project_vars = global_vars.project_vars
         role = project_vars['role']
-        role = tools_gw.get_restriction(role)
+        role = tools_gw.get_role_permissions(role)
         if role in restriction:
             widget_list = dialog.findChildren(QWidget)
             for widget in widget_list:
@@ -1071,7 +1071,7 @@ class GwPsector:
             new_psector_id = tools_db.execute_returning(sql)
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id:
-                row = tools_gw.get_config('plan_psector_vdefault')
+                row = tools_gw.get_config_value('plan_psector_vdefault')
                 if row:
                     sql = (f"UPDATE config_param_user "
                            f" SET value = $${new_psector_id[0]}$$ "
@@ -1352,7 +1352,7 @@ class GwPsector:
 
 
     def show_status_warning(self):
-        mode = tools_gw.get_config('plan_psector_execute_action', table='config_param_system')
+        mode = tools_gw.get_config_value('plan_psector_execute_action', table='config_param_system')
         if mode is None: return
 
         mode = json.loads(mode[0])
@@ -1539,7 +1539,7 @@ class GwPsector:
             message = "Any record selected"
             tools_qgis.show_warning(message)
             return
-        cur_psector = tools_gw.get_config('plan_psector_vdefault')
+        cur_psector = tools_gw.get_config_value('plan_psector_vdefault')
         inf_text = ""
         list_id = ""
         for i in range(0, len(selected_list)):

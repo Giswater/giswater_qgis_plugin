@@ -18,7 +18,7 @@ from collections import OrderedDict
 from functools import partial
 
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QPoint, QDate
+from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QPersistentModelIndex, QDate
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
@@ -854,12 +854,12 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None):
                         if field['widgetcontrols']['regexpControl'] is not None:
                             pass
                 widget.editingFinished.connect(
-                    partial(get_values_changed_param_user, dialog, None, widget, field, _json))
+                    partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'combo':
                 widget = add_combo(field)
                 widget.currentIndexChanged.connect(
-                    partial(get_values_changed_param_user, dialog, None, widget, field, _json))
+                    partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'check':
                 widget = QCheckBox()
@@ -867,7 +867,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None):
                     widget.setChecked(True)
                 else:
                     widget.setChecked(False)
-                widget.stateChanged.connect(partial(get_values_changed_param_user,
+                widget.stateChanged.connect(partial(get_dialog_changed_values,
                                             dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             elif field['widgettype'] == 'datetime':
@@ -879,7 +879,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None):
                 if 'value' in field and field['value'] not in ('', None, 'null'):
                     date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
                 widget.setDate(date)
-                widget.dateChanged.connect(partial(get_values_changed_param_user,
+                widget.dateChanged.connect(partial(get_dialog_changed_values,
                                            dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'spinbox':
@@ -889,7 +889,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None):
                 if 'value' in field and field['value'] not in (None, ""):
                     value = float(str(field['value']))
                     widget.setValue(value)
-                widget.valueChanged.connect(partial(get_values_changed_param_user,
+                widget.valueChanged.connect(partial(get_dialog_changed_values,
                                             dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'button':
@@ -927,7 +927,7 @@ def add_widget(dialog, field, lbl, widget):
     layout.setColumnStretch(2, 1)
 
 
-def get_values_changed_param_user(dialog, chk, widget, field, list, value=None):
+def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
 
     elem = {}
     if type(widget) is QLineEdit:
@@ -1498,12 +1498,12 @@ def get_json(function_name, parameters=None, schema_name=None, commit=True, log_
 
     # If failed, manage exception
     if 'status' in json_result and json_result['status'] == 'Failed':
-        manage_exception_api(json_result, sql, is_notify=is_notify)
+        manage_json_exception(json_result, sql, is_notify=is_notify)
         return json_result
 
     try:
         # Layer styles
-        manage_return_manager(json_result, sql, rubber_band)
+        manage_json_return(json_result, sql, rubber_band)
         manage_layer_manager(json_result, sql)
         get_actions_from_json(json_result, sql)
     except Exception:
@@ -1512,7 +1512,7 @@ def get_json(function_name, parameters=None, schema_name=None, commit=True, log_
     return json_result
 
 
-def manage_exception_api(json_result, sql=None, stack_level=2, stack_level_increase=0, is_notify=False):
+def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_increase=0, is_notify=False):
     """ Manage exception in JSON database queries and show information to the user """
 
     try:
@@ -1566,7 +1566,7 @@ def manage_exception_api(json_result, sql=None, stack_level=2, stack_level_incre
         tools_qt.manage_exception("Unhandled Error")
 
 
-def manage_return_manager(json_result, sql, rubber_band=None):
+def manage_json_return(json_result, sql, rubber_band=None):
     """
     Manage options for layers (active, visible, zoom and indexing)
     :param json_result: Json result of a query (Json)
@@ -1735,7 +1735,7 @@ def get_project_type(schemaname=None):
     return project_type
 
 
-def get_group_layers(geom_type):
+def get_layers_from_feature_type(geom_type):
     """ Get layers of the group @geom_type """
 
     list_items = []
@@ -1755,7 +1755,7 @@ def get_group_layers(geom_type):
     return list_items
 
 
-def get_restriction(qgis_project_role):
+def get_role_permissions(qgis_project_role):
 
     role_edit = False
     role_om = False
@@ -1796,7 +1796,7 @@ def get_restriction(qgis_project_role):
         return 'role_basic'
 
 
-def get_config(parameter='', columns='value', table='config_param_user', sql_added=None, log_info=True):
+def get_config_value(parameter='', columns='value', table='config_param_user', sql_added=None, log_info=True):
 
     sql = f"SELECT {columns} FROM {table} WHERE parameter = '{parameter}' "
     if sql_added:
@@ -2079,7 +2079,7 @@ def connect_signal_selection_changed(class_object, dialog, table_object, query=F
         tools_log.log_info(f"connect_signal_selection_changed: {e}")
 
 
-def dock_dialog(dialog):
+def docker_dialog(dialog):
 
     positions = {8: Qt.BottomDockWidgetArea, 4: Qt.TopDockWidgetArea,
                  2: Qt.RightDockWidgetArea, 1: Qt.LeftDockWidgetArea}
@@ -2098,7 +2098,7 @@ def init_docker(docker_param='qgis_info_docker'):
 
     global_vars.session_vars['show_docker'] = True
     # Show info or form in docker?
-    row = get_config(docker_param)
+    row = get_config_value(docker_param)
     if not row:
         global_vars.session_vars['dlg_docker'] = None
         global_vars.session_vars['docker_type'] = None

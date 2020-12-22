@@ -551,7 +551,7 @@ class GwInfo(QObject):
                 last_info.setParent(None)
                 del last_info
 
-            tools_gw.dock_dialog(dlg_cf)
+            tools_gw.docker_dialog(dlg_cf)
             global_vars.session_vars['dlg_docker'].dlg_closed.connect(self.manage_docker_close)
             global_vars.session_vars['dlg_docker'].setWindowTitle(title)
             btn_cancel.clicked.connect(self.manage_docker_close)
@@ -567,7 +567,7 @@ class GwInfo(QObject):
 
         # Set title
         toolbox_cf = self.dlg_cf.findChild(QWidget, 'toolBox')
-        row = tools_gw.get_config('admin_customform_param', 'value', 'config_param_system')
+        row = tools_gw.get_config_value('admin_customform_param', 'value', 'config_param_system')
         if row:
             results = json.loads(row[0], object_pairs_hook=OrderedDict)
             for result in results['custom_form_tab_labels']:
@@ -1616,7 +1616,7 @@ class GwInfo(QObject):
             tools_qgis.show_message(msg, message_level=3)
             self.reload_fields(dialog, json_result, p_widget)
         elif "Failed" in json_result['status']:
-            # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
+            # If json_result['status'] is Failed message from database is showed user by get_json-->manage_json_exception
             self.connect_signals()
             return False
 

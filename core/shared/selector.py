@@ -36,7 +36,7 @@ class Selector:
         self.get_selector(dlg_selector, selector_type, current_tab=current_tab, selector_vars=selector_vars)
 
         if global_vars.session_vars['dlg_docker']:
-            tools_gw.dock_dialog(dlg_selector)
+            tools_gw.docker_dialog(dlg_selector)
             dlg_selector.btn_close.clicked.connect(tools_gw.close_docker)
         else:
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_selector))

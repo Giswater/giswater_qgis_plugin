@@ -109,12 +109,12 @@ class GwVisitManager(QObject):
         self.layers['gully'] = []
         self.layers['element'] = []
 
-        self.layers['arc'] = tools_gw.get_group_layers('arc')
-        self.layers['node'] = tools_gw.get_group_layers('node')
-        self.layers['connec'] = tools_gw.get_group_layers('connec')
-        self.layers['element'] = tools_gw.get_group_layers('element')
+        self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
+        self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
+        self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
         if tools_gw.get_project_type() == 'ud':
-            self.layers['gully'] = tools_gw.get_group_layers('gully')
+            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         # Remove 'gully' for 'WS'
         if tools_gw.get_project_type() == 'ws':
@@ -169,19 +169,19 @@ class GwVisitManager(QObject):
 
         # Check the default dates, if it does not exist force today
         _date = QDate.currentDate()
-        date_string = tools_gw.get_config('om_visit_startdate_vdefault')
+        date_string = tools_gw.get_config_value('om_visit_startdate_vdefault')
         if date_string:
             _date = datetime.strptime(date_string[0], '%Y/%m/%d')
         self.dlg_add_visit.startdate.setDate(_date)
 
         # Check the default dates, if it does not exist force today
         _date = QDate.currentDate()
-        date_string = tools_gw.get_config('om_visit_startdate_vdefault')
+        date_string = tools_gw.get_config_value('om_visit_startdate_vdefault')
         if date_string:
             _date = datetime.strptime(date_string[0], '%Y/%m/%d')
         self.dlg_add_visit.startdate.setDate(_date)
 
-        date_string = tools_gw.get_config('om_visit_enddate_vdefault')
+        date_string = tools_gw.get_config_value('om_visit_enddate_vdefault')
         if date_string is not None:
             _date = datetime.strptime(date_string[0], '%Y/%m/%d')
         self.dlg_add_visit.enddate.setDate(_date)
@@ -654,7 +654,7 @@ class GwVisitManager(QObject):
         self.current_tab_index = index
 
         # Set user devault parameter
-        parameter_id = tools_gw.get_config('om_visit_parameter_vdefault')
+        parameter_id = tools_gw.get_config_value('om_visit_parameter_vdefault')
         if parameter_id:
             tools_qt.set_combo_value(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
 
@@ -674,7 +674,7 @@ class GwVisitManager(QObject):
             tools_qt.fill_combo_values(dialog.parameter_id, rows, 1)
 
         # Set user devault parameter
-        parameter_id = tools_gw.get_config('om_visit_parameter_vdefault')
+        parameter_id = tools_gw.get_config_value('om_visit_parameter_vdefault')
         if parameter_id:
             tools_qt.set_combo_value(self.dlg_add_visit.parameter_id, parameter_id[0], 0)
 
@@ -974,7 +974,7 @@ class GwVisitManager(QObject):
         if self.visitcat_ids:
             tools_qt.fill_combo_values(self.dlg_add_visit.visitcat_id, self.visitcat_ids, 1)
             # now get default value to be show in visitcat_id
-            row = tools_gw.get_config('om_visit_cat_vdefault')
+            row = tools_gw.get_config_value('om_visit_cat_vdefault')
             if row:
                 # if int then look for default row ans set it
                 try:
@@ -1003,7 +1003,7 @@ class GwVisitManager(QObject):
         rows = self.get_values_from_catalog('om_typevalue', 'visit_status')
         if rows:
             tools_qt.fill_combo_values(self.dlg_add_visit.status, rows, 1, sort_combo=True)
-            status = tools_gw.get_config('om_visit_status_vdefault')
+            status = tools_gw.get_config_value('om_visit_status_vdefault')
             if status:
                 tools_qt.set_combo_value(self.dlg_add_visit.status, str(status[0]), 0)
 
@@ -1031,7 +1031,7 @@ class GwVisitManager(QObject):
         tools_qt.fill_combo_values(self.dlg_add_visit.parameter_type_id, parameter_type_ids, 1)
 
         # now get default value to be show in parameter_type_id
-        row = tools_gw.get_config('om_param_type_vdefault', log_info=False)
+        row = tools_gw.get_config_value('om_param_type_vdefault', log_info=False)
         if row:
             tools_qt.set_combo_value(self.dlg_add_visit.parameter_type_id, row[0], 0)
 
@@ -1144,7 +1144,7 @@ class GwVisitManager(QObject):
 
         # form_type event_ud_arc_rehabit dont have widget value
         if form_type != 'event_ud_arc_rehabit':
-            val = tools_gw.get_config('om_visit_paramvalue_vdefault')
+            val = tools_gw.get_config_value('om_visit_paramvalue_vdefault')
             if val:
                 tools_qt.set_widget_text(self.dlg_event, self.dlg_event.value, val[0])
 

@@ -62,13 +62,13 @@ class GwFeatureReplaceButton(GwParentMapTool):
             tools_qt.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
             tools_qt.set_autocompleter(self.dlg_replace.workcat_id_end)
 
-        row = tools_gw.get_config('edit_workcat_vdefault')
+        row = tools_gw.get_config_value('edit_workcat_vdefault')
         if row:
             edit_workcat_vdefault = self.dlg_replace.workcat_id_end.findText(row[0])
             self.dlg_replace.workcat_id_end.setCurrentIndex(edit_workcat_vdefault)
 
 
-        row = tools_gw.get_config('edit_enddate_vdefault')
+        row = tools_gw.get_config_value('edit_enddate_vdefault')
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:
@@ -141,7 +141,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
     def update_date(self):
 
-        row = tools_gw.get_config('edit_enddate_vdefault')
+        row = tools_gw.get_config_value('edit_enddate_vdefault')
         if row:
             self.enddate_aux = self.manage_dates(row[0]).date()
         else:

@@ -114,7 +114,7 @@ class GwGo2EpaTask(QgsTask):
             return
 
         if self.function_failed:
-            tools_gw.manage_exception_api(self.complet_result)
+            tools_gw.manage_json_exception(self.complet_result)
 
         if self.error_msg:
             title = f"Task aborted - {self.description()}"

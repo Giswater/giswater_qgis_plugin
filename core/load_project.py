@@ -208,7 +208,7 @@ class LoadProject(QObject):
 
         try:
             # db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
-            row = tools_gw.get_config('qgis_toolbar_hidebuttons')
+            row = tools_gw.get_config_value('qgis_toolbar_hidebuttons')
             if not row: return
             json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
             self.buttons_to_hide = [str(x) for x in json_list['action_index']]
@@ -334,7 +334,7 @@ class LoadProject(QObject):
     def check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
 
-        restriction = tools_gw.get_restriction(self.project_vars['role'])
+        restriction = tools_gw.get_role_permissions(self.project_vars['role'])
 
         if restriction == 'role_basic':
             pass

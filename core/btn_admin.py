@@ -349,7 +349,7 @@ class GwAdmin:
         try:
             tools_gw.init_docker('qgis_form_docker')
             if global_vars.session_vars['dlg_docker']:
-                tools_gw.dock_dialog(self.dlg_readsql)
+                tools_gw.docker_dialog(self.dlg_readsql)
                 self.dlg_readsql.dlg_closed.connect(tools_gw.close_docker)
             else:
                 tools_gw.open_dialog(self.dlg_readsql, dlg_name='main_ui')

@@ -67,10 +67,10 @@ class GwElement:
         self.layers['gully'] = []
         self.layers['element'] = []
 
-        self.layers['arc'] = tools_gw.get_group_layers('arc')
-        self.layers['node'] = tools_gw.get_group_layers('node')
-        self.layers['connec'] = tools_gw.get_group_layers('connec')
-        self.layers['element'] = tools_gw.get_group_layers('element')
+        self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
+        self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
+        self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
         self.point_xy = {"x": None, "y": None}
 
         # Remove 'gully' for 'WS'
@@ -78,7 +78,7 @@ class GwElement:
         if self.project_type == 'ws':
             tools_qt.remove_tab(self.dlg_add_element.tab_feature, 'tab_gully')
         else:
-            self.layers['gully'] = tools_gw.get_group_layers('gully')
+            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         # Set icons
         tools_gw.add_icon(self.dlg_add_element.btn_add_geom, "133")
@@ -238,7 +238,7 @@ class GwElement:
 
     def manage_combo(self, combo, parameter):
 
-        row = tools_gw.get_config(parameter)
+        row = tools_gw.get_config_value(parameter)
         if row:
             tools_qt.set_combo_value(combo, row[0], 0)
 

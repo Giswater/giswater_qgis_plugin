@@ -207,7 +207,7 @@ class GwAuxPointButton(GwParentMapTool):
 
         # Check for default base layer
         self.vdefault_layer = None
-        row = tools_gw.get_config('edit_cadtools_baselayer_vdefault')
+        row = tools_gw.get_config_value('edit_cadtools_baselayer_vdefault')
         if row:
             self.snap_to_selected_layer = True
             self.vdefault_layer = tools_qgis.get_layer_by_tablename(row[0], True)

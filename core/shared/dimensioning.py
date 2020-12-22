@@ -360,7 +360,7 @@ class GwDimensioning:
     def create_map_tips(self):
         """ Create MapTips on the map """
 
-        row = tools_gw.get_config('qgis_dim_tooltip')
+        row = tools_gw.get_config_value('qgis_dim_tooltip')
         if not row or row[0].lower() != 'true':
             return
 

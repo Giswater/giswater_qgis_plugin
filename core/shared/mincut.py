@@ -87,7 +87,7 @@ class GwMincut:
         self.remove_selection()
 
         # Parametrize list of layers
-        self.layers['connec'] = tools_gw.get_group_layers('connec')
+        self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         self.layers_connec = self.layers['connec']
 
         self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
@@ -188,7 +188,7 @@ class GwMincut:
         self.dlg_mincut.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_mincut))
 
         try:
-            row = tools_gw.get_config('om_mincut_enable_alerts', 'value', 'config_param_system')
+            row = tools_gw.get_config_value('om_mincut_enable_alerts', 'value', 'config_param_system')
             if row:
                 custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
                 self.show_notified.setVisible(custom_action_sms['show_sms_info'])
@@ -329,7 +329,7 @@ class GwMincut:
 
         tools_gw.init_docker('qgis_form_docker')
         if global_vars.session_vars['dlg_docker']:
-            tools_gw.dock_dialog(self.dlg_mincut)
+            tools_gw.docker_dialog(self.dlg_mincut)
         else:
             tools_gw.open_dialog(self.dlg_mincut, dlg_name='mincut')
 
@@ -1536,7 +1536,7 @@ class GwMincut:
         layer = self.snapper_manager.get_snapped_layer(result)
 
         # Check feature
-        layers_arc = tools_gw.get_group_layers('arc')
+        layers_arc = tools_gw.get_layers_from_feature_type('arc')
         self.layernames_arc = []
         for layer in layers_arc:
             self.layernames_arc.append(layer.name())
@@ -2006,7 +2006,7 @@ class GwMincut:
 
         # Check if path exist
         template_folder = ""
-        row = tools_gw.get_config('qgis_composers_folderpath')
+        row = tools_gw.get_config_value('qgis_composers_folderpath')
         if row:
             template_folder = row[0]
 
@@ -2054,7 +2054,7 @@ class GwMincut:
 
         # Check if template file exists
         template_path = ""
-        row = tools_gw.get_config('qgis_composers_folderpath')
+        row = tools_gw.get_config_value('qgis_composers_folderpath')
         if row:
             template_path = row[0] + f'{os.sep}{self.template}.qpt'
 

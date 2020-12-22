@@ -118,7 +118,7 @@ class GwConfigButton(GwParentAction):
         self.addfields_form = QGridLayout()
 
         # Construct form for config and admin
-        self.construct_form_param_user(json_result['body']['form']['formTabs'], 0)
+        self.build_dialog_options(json_result['body']['form']['formTabs'], 0)
         self.construct_form_param_system(json_result['body']['form']['formTabs'], 1)
 
         groupBox_1.setLayout(self.basic_form)
@@ -253,7 +253,7 @@ class GwConfigButton(GwParentAction):
 
 
     # noinspection PyUnresolvedReferences
-    def construct_form_param_user(self, row, pos):
+    def build_dialog_options(self, row, pos):
 
         widget = None
         for field in row[pos]['fields']:
@@ -276,21 +276,21 @@ class GwConfigButton(GwParentAction):
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                     widget = QLineEdit()
                     widget.setText(field['value'])
-                    widget.editingFinished.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    widget.editingFinished.connect(partial(self.get_dialog_changed_values, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'textarea':
                     widget = QTextEdit()
                     widget.setText(field['value'])
-                    widget.editingFinished.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    widget.editingFinished.connect(partial(self.get_dialog_changed_values, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = QComboBox()
                     self.fill_combo(widget, field)
-                    widget.currentIndexChanged.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    widget.currentIndexChanged.connect(partial(self.get_dialog_changed_values, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'check':
                     widget = chk
-                    widget.stateChanged.connect(partial(self.get_values_changed_param_user, chk, chk, field))
+                    widget.stateChanged.connect(partial(self.get_dialog_changed_values, chk, chk, field))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datetime':
                     widget = QgsDateTimeEdit()
@@ -305,14 +305,14 @@ class GwConfigButton(GwParentAction):
                         widget.setDate(date)
                     else:
                         widget.clear()
-                    widget.dateChanged.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    widget.dateChanged.connect(partial(self.get_dialog_changed_values, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'spinbox':
                     widget = QDoubleSpinBox()
                     if 'value' in field and field['value'] is not None:
                         value = float(str(field['value']))
                         widget.setValue(value)
-                    widget.valueChanged.connect(partial(self.get_values_changed_param_user, chk, widget, field))
+                    widget.valueChanged.connect(partial(self.get_dialog_changed_values, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 else:
                     pass
@@ -468,7 +468,7 @@ class GwConfigButton(GwParentAction):
                 tools_qt.set_combo_value(widget, field['value'], 0)
 
 
-    def get_values_changed_param_user(self, chk, widget, field, value=None):
+    def get_dialog_changed_values(self, chk, widget, field, value=None):
 
         elem = {}
         if type(widget) is QLineEdit:

@@ -46,9 +46,9 @@ class GwEndFeatureButton(GwParentAction):
         self.layers['gully'] = []
         self.layers['element'] = []
 
-        self.layers['arc'] = tools_gw.get_group_layers('arc')
-        self.layers['node'] = tools_gw.get_group_layers('node')
-        self.layers['connec'] = tools_gw.get_group_layers('connec')
+        self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
+        self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
+        self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         self.layers['element'] = [tools_qgis.get_layer_by_tablename('v_edit_element')]
 
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
@@ -74,7 +74,7 @@ class GwEndFeatureButton(GwParentAction):
         if self.project_type == 'ws':
             tools_qt.remove_tab(self.dlg_work_end.tab_feature, 'tab_gully')
         else:
-            self.layers['gully'] = tools_gw.get_group_layers('gully')
+            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         # Set icons
         tools_gw.add_icon(self.dlg_work_end.btn_insert, "111")
@@ -125,7 +125,7 @@ class GwEndFeatureButton(GwParentAction):
     def set_edit_arc_downgrade_force(self, value):
 
         # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
-        row = tools_gw.get_config('edit_arc_downgrade_force')
+        row = tools_gw.get_config_value('edit_arc_downgrade_force')
         if row:
             sql = (f"UPDATE config_param_user "
                    f"SET value = '{value}' "
@@ -143,10 +143,10 @@ class GwEndFeatureButton(GwParentAction):
         sql = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0'
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_work_end.cmb_statetype_end, rows, 1)
-        row = tools_gw.get_config('edit_statetype_0_vdefault')
+        row = tools_gw.get_config_value('edit_statetype_0_vdefault')
         if row:
             tools_qt.set_combo_value(self.dlg_work_end.cmb_statetype_end, row[0], 0)
-        row = tools_gw.get_config('edit_enddate_vdefault')
+        row = tools_gw.get_config_value('edit_enddate_vdefault')
 
         if row:
             enddate = self.manage_dates(row[0]).date()
@@ -159,7 +159,7 @@ class GwEndFeatureButton(GwParentAction):
         rows = tools_db.get_rows(sql)
         tools_qt.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         tools_qt.set_autocompleter(self.dlg_work_end.workcat_id_end)
-        row = tools_gw.get_config('edit_workcat_vdefault')
+        row = tools_gw.get_config_value('edit_workcat_vdefault')
         if row:
             tools_qt.set_widget_text(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 

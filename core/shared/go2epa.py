@@ -72,7 +72,7 @@ class GwGo2Epa:
         self.check_result_id()
         if global_vars.session_vars['dlg_docker']:
             tools_qt.manage_translation('go2epa', self.dlg_go2epa)
-            tools_gw.dock_dialog(self.dlg_go2epa)
+            tools_gw.docker_dialog(self.dlg_go2epa)
             self.dlg_go2epa.btn_cancel.clicked.disconnect()
             self.dlg_go2epa.btn_cancel.clicked.connect(tools_gw.close_docker)
         else:
