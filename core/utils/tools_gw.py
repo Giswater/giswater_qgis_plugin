@@ -80,7 +80,6 @@ def get_config_parser(section: str, parameter: str, config_type, file_name) -> s
     """ Load a simple parser value """
 
     value = None
-    path_folder = None
     try:
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         if config_type in "user":
@@ -96,6 +95,12 @@ def get_config_parser(section: str, parameter: str, config_type, file_name) -> s
             return None
 
         parser.read(path)
+        if not parser.has_section(section):
+            tools_log.log_warning(f"Section '{section}' not found")
+            return None
+        if not parser.has_option(section, parameter):
+            tools_log.log_warning(f"Parameter '{parameter}' not found in section '{section}'")
+            return None
         value = parser[section][parameter]
     except Exception as e:
         tools_log.log_warning(str(e))

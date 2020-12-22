@@ -203,8 +203,6 @@ def get_postgresql_version():
 def connect_to_database(host, port, db, user, pwd, sslmode):
     """ Connect to database with selected parameters """
 
-    # tools_log.log_info(f"connect_to_database - sslmode: {sslmode}")
-
     # Check if selected parameters is correct
     if None in (host, port, db, user, pwd):
         message = "Database connection error. Please check your connection parameters."
@@ -460,7 +458,7 @@ def get_layer_source_from_credentials(sslmode_value, layer_name='v_edit_node'):
         credentials = {'db': None, 'schema': None, 'table': None, 'service': None,
                        'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
         if default_connection:
-            settings.beginGroup("PostgreSQL/connections/" + default_connection)
+            settings.beginGroup(f"PostgreSQL/connections/{default_connection}")
             if settings.value('host') in (None, ""):
                 credentials['host'] = 'localhost'
             else:
