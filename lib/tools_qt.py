@@ -835,11 +835,12 @@ def document_open(qtable, field_name):
     selected_list = qtable.selectionModel().selectedRows(field_index)
     if not selected_list:
         message = "Any record selected"
-        return message
     elif len(selected_list) > 1:
         message = "More then one document selected. Select just one document."
-        return message
 
+    if message:
+        tools_qgis.show_warning(message)
+        return
     path = selected_list[0].data()
     # Check if file exist
     if os.path.exists(path):
@@ -851,9 +852,6 @@ def document_open(qtable, field_name):
             subprocess.call([opener, path])
     else:
         webbrowser.open(path)
-    if message:
-        tools_qgis.show_warning(message)
-    return message
 
 
 def delete_rows_qtv(qtable):

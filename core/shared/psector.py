@@ -337,7 +337,7 @@ class GwPsector:
             message = tools_qt.fill_table_object(self.tbl_document, f"v_ui_doc_x_psector", filter_)
             if message:
                 tools_qgis.show_warning(message)
-            self.tbl_document.doubleClicked.connect(partial(tools_gw.document_open, self.tbl_document, 'path'))
+            self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
 
         else:
 

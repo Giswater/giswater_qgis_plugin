@@ -308,8 +308,8 @@ class GwVisitManager(QObject):
         self.dlg_add_visit.btn_doc_insert.clicked.connect(self.document_insert)
         self.dlg_add_visit.btn_doc_delete.clicked.connect(partial(tools_qt.delete_rows_qtv, self.tbl_document))
         self.dlg_add_visit.btn_doc_new.clicked.connect(self.manage_document)
-        self.dlg_add_visit.btn_open_doc.clicked.connect(partial(tools_gw.document_open, self.tbl_document, 'path'))
-        self.tbl_document.doubleClicked.connect(partial(tools_gw.document_open, self.tbl_document, 'path'))
+        self.dlg_add_visit.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
+        self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
         self.dlg_add_visit.btn_add_geom.clicked.connect(self.add_feature_clicked)
 
         # Fill combo boxes of the form and related events

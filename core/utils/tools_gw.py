@@ -1419,13 +1419,6 @@ def get_actions_from_json(json_result, sql):
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
 
-def document_open(table, field_name):
-
-    message = tools_qt.document_open(table, field_name)
-    if message:
-        tools_qgis.show_warning(message)
-
-
 def check_config_settings(section, parameter, value, comment=None, config_type="user", file_name="user"):
     """ Check if @section and @parameter exists in file @file_name. If not add them = None """
 
