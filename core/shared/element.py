@@ -615,8 +615,9 @@ class GwElement:
 
 
     def fill_dialog_element(self, dialog, table_object, single_tool_mode=None):
+
         # Reset list of selected records
-        tools_gw.reset_feature_list(self.ids, self.list_ids)
+        self.ids, self.list_ids = tools_gw.reset_feature_list()
 
         list_geom_type = ['arc', 'node', 'connec', 'element']
         if global_vars.project_type == 'ud':

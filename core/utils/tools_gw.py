@@ -312,7 +312,7 @@ def enable_feature_type(dialog, widget_name='tbl_relation', ids=None):
             feature_type.setEnabled(True)
 
 
-def reset_feature_list(ids, list_ids):
+def reset_feature_list():
     """ Reset list of selected records """
 
     ids = []

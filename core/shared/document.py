@@ -378,6 +378,7 @@ class GwDocument:
 
     def get_file_dialog(self, dialog, widget):
         """ Get file dialog """
+
         # Check if selected file exists. Set default value if necessary
         file_path = tools_qt.get_text(dialog, widget)
         if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
@@ -400,8 +401,9 @@ class GwDocument:
 
 
     def fill_dialog_document(self, dialog, table_object, single_tool_mode=None):
+
         # Reset list of selected records
-        tools_gw.reset_feature_list(self.ids, self.list_ids)
+        self.ids, self.list_ids = tools_gw.reset_feature_list()
 
         list_geom_type = ['arc', 'node', 'connec', 'element']
         if global_vars.project_type == 'ud':
