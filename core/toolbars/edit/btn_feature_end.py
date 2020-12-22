@@ -223,7 +223,7 @@ class GwEndFeatureButton(GwParentAction):
 
         if self.workcat_id_end in ('null', None):
             message = "Please select a workcat id end"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
@@ -327,7 +327,7 @@ class GwEndFeatureButton(GwParentAction):
 
         # Check for errors
         if self.model.lastError().isValid():
-            tools_gw.show_warning(self.model.lastError().text())
+            tools_qgis.show_warning(self.model.lastError().text())
 
         # Attach model to table view
         widget.setModel(self.model)
@@ -339,7 +339,7 @@ class GwEndFeatureButton(GwParentAction):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         row = selected_list[0].row()
@@ -368,7 +368,7 @@ class GwEndFeatureButton(GwParentAction):
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = "Expression Error"
-            tools_gw.show_warning(message, parameter=expr.parserErrorString())
+            tools_qgis.show_warning(message, parameter=expr.parserErrorString())
             return
 
         id_list = None
@@ -449,7 +449,7 @@ class GwEndFeatureButton(GwParentAction):
 
         # Check for errors
         if model.lastError().isValid():
-            tools_gw.show_warning(model.lastError().text())
+            tools_qgis.show_warning(model.lastError().text())
 
         # Attach model to table view
         widget.setModel(model)

@@ -50,7 +50,7 @@ class GwArcDivideButton(GwParentMapTool):
 
         else:
             message = "Move node: Error updating geometry"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
 
         # Rubberband reset
         self.reset()
@@ -105,7 +105,7 @@ class GwArcDivideButton(GwParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again"
-            tools_gw.show_info(message)
+            tools_qgis.show_info(message)
 
 
     def deactivate(self):

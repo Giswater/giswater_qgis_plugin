@@ -191,7 +191,7 @@ class GwInfo(QObject):
             level = 1
             if 'level' in json_result['message']:
                 level = int(json_result['message']['level'])
-            tools_gw.show_message(json_result['message']['text'], level)
+            tools_qgis.show_message(json_result['message']['text'], level)
             return False, None
 
         # Control fail when insert new feature
@@ -201,7 +201,7 @@ class GwInfo(QObject):
                 level = 1
                 if 'level' in json_result['body']['data']['fields']['message']:
                     level = int(json_result['body']['data']['fields']['message']['level'])
-                tools_gw.show_message(msg, message_level=level)
+                tools_qgis.show_message(msg, message_level=level)
                 return False, None
 
         self.complet_result = json_result
@@ -278,7 +278,7 @@ class GwInfo(QObject):
             else:
                 if widget is None:
                     msg = f"Widget {field['columnname']} is not configured or have a bad config"
-                    tools_gw.show_message(msg)
+                    tools_qgis.show_message(msg)
 
             if str(value) not in ('', None, -1, "None") and widget.property('columnname'):
                 self.my_json[str(widget.property('columnname'))] = str(value)
@@ -356,7 +356,7 @@ class GwInfo(QObject):
         schema_name = str(complet_result['body']['feature']['schemaName'])
         self.layer = tools_qgis.get_layer_by_tablename(self.table_parent, False, False, schema_name)
         if self.layer is None:
-            tools_gw.show_message("Layer not found: " + self.table_parent, 2)
+            tools_qgis.show_message("Layer not found: " + self.table_parent, 2)
             return False, self.dlg_cf
 
         # Remove unused tabs
@@ -606,7 +606,7 @@ class GwInfo(QObject):
                 os.system(pdf_path)
             else:
                 message = "File not found"
-                tools_gw.show_warning(message, parameter=pdf_path)
+                tools_qgis.show_warning(message, parameter=pdf_path)
 
 
     def block_action_edit(self, dialog, action_edit, result, layer, fid, my_json, new_feature):
@@ -720,14 +720,14 @@ class GwInfo(QObject):
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10, is_new=True)
                     rb_interpolate.append(rb)
                     dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
-                    tools_gw.show_message(message, message_level=0, parameter=self.node1)
+                    tools_qgis.show_message(message, message_level=0, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(
                         0, 150, 55, 100), width=10, is_new=True)
                     rb_interpolate.append(rb)
                     dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
-                    tools_gw.show_message(message, message_level=0, parameter=self.node2)
+                    tools_qgis.show_message(message, message_level=0, parameter=self.node2)
 
         if self.node1 and self.node2:
             global_vars.canvas.xyCoordinates.disconnect()
@@ -862,7 +862,7 @@ class GwInfo(QObject):
         if row:
             tools_qt.set_widget_text(dialog, "data_hemisphere", str(row[0]))
             message = "Hemisphere of the node has been updated. Value is"
-            tools_gw.show_info(message, parameter=str(row[0]))
+            tools_qgis.show_info(message, parameter=str(row[0]))
 
         # Disable Rotation
         action_widget = dialog.findChild(QAction, "actionRotation")
@@ -952,7 +952,7 @@ class GwInfo(QObject):
         expr = QgsExpression(aux)
         if expr.hasParserError():
             message = "Expression Error"
-            tools_gw.show_warning(message, parameter=expr.parserErrorString())
+            tools_qgis.show_warning(message, parameter=expr.parserErrorString())
             self.api_disable_copy_paste(dialog, emit_point)
             return
 
@@ -1056,7 +1056,7 @@ class GwInfo(QObject):
         expr = QgsExpression(expr_filter)
         if expr.hasParserError():
             message = f"{expr.parserErrorString()}: {expr_filter}"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         it = layer.getFeatures(QgsFeatureRequest(expr))
@@ -1258,7 +1258,7 @@ class GwInfo(QObject):
         if 'widgettype' in field and not field['widgettype']:
             message = "The field widgettype is not configured for"
             msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
-            tools_gw.show_message(message, 2, parameter=msg)
+            tools_qgis.show_message(message, 2, parameter=msg)
             return label, widget
 
         try:
@@ -1266,7 +1266,7 @@ class GwInfo(QObject):
             widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
         except Exception as e:
             msg = f"{type(e).__name__}: {e}"
-            tools_gw.show_message(msg, 2)
+            tools_qgis.show_message(msg, 2)
             return label, widget
 
         return label, widget
@@ -1551,7 +1551,7 @@ class GwInfo(QObject):
 
         if list_mandatory:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
-            tools_gw.show_warning(msg)
+            tools_qgis.show_warning(msg)
             tools_qt.set_action_checked("actionEdit", True, dialog)
             self.connect_signals()
             return False
@@ -1613,7 +1613,7 @@ class GwInfo(QObject):
 
         if "Accepted" in json_result['status']:
             msg = "OK"
-            tools_gw.show_message(msg, message_level=3)
+            tools_qgis.show_message(msg, message_level=3)
             self.reload_fields(dialog, json_result, p_widget)
         elif "Failed" in json_result['status']:
             # If json_result['status'] is Failed message from database is showed user by get_json-->manage_exception_api
@@ -1815,7 +1815,7 @@ class GwInfo(QObject):
                     widget.setStyleSheet("border: 2px solid #3ED396")
             elif "message" in field:
                 level = field['message']['level'] if 'level' in field['message'] else 0
-                tools_gw.show_message(field['message']['text'], level)
+                tools_qgis.show_message(field['message']['text'], level)
 
 
     def enabled_accept(self, dialog):
@@ -1995,7 +1995,7 @@ class GwInfo(QObject):
         # Set model of selected widget
         message = tools_qt.set_model_to_table(widget, table_name, expr_filter)
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "element"
@@ -2009,7 +2009,7 @@ class GwInfo(QObject):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         element_id = ""
@@ -2029,7 +2029,7 @@ class GwInfo(QObject):
         object_id = tools_qt.get_text(self.dlg_cf, table_object + "_id")
         if object_id == 'null':
             message = "You need to insert data"
-            tools_gw.show_warning(message, parameter=table_object + "_id")
+            tools_qgis.show_warning(message, parameter=table_object + "_id")
             return
 
         # Check if this object exists
@@ -2038,7 +2038,7 @@ class GwInfo(QObject):
                " WHERE " + field_object_id + " = '" + object_id + "'")
         row = tools_db.get_row(sql)
         if not row:
-            tools_gw.show_warning("Object id not found", parameter=object_id)
+            tools_qgis.show_warning("Object id not found", parameter=object_id)
             return
 
         # Check if this object is already associated to current feature
@@ -2053,7 +2053,7 @@ class GwInfo(QObject):
         # If object already exist show warning message
         if row:
             message = "Object already associated with this feature"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
 
         # If object not exist perform an INSERT
         else:
@@ -2076,7 +2076,7 @@ class GwInfo(QObject):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         inf_text = ""
@@ -2160,7 +2160,7 @@ class GwInfo(QObject):
         table_relations = f"v_ui_{self.geom_type}_x_relations"
         message = tools_qt.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
         tools_gw.set_columns_config(self.tbl_relations, table_relations)
         self.tbl_relations.doubleClicked.connect(partial(self.open_relation, str(self.field_id)))
 
@@ -2171,7 +2171,7 @@ class GwInfo(QObject):
         selected_list = self.tbl_relations.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         row = selected_list[0].row()
@@ -2198,7 +2198,7 @@ class GwInfo(QObject):
 
         if not layer:
             message = "Layer not found"
-            tools_gw.show_message(message, parameter=table_name)
+            tools_qgis.show_message(message, parameter=table_name)
             return
 
         info_feature = GwInfo(self.tab_type)
@@ -2220,13 +2220,13 @@ class GwInfo(QObject):
         table_name = f"{self.schema_name}.v_ui_node_x_connection_upstream"
         message= tools_qt.fill_table(self.dlg_cf.tbl_upstream, table_name, filter_)
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
         tools_gw.set_columns_config(self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
 
         table_name = f"{self.schema_name}.v_ui_node_x_connection_downstream"
         message = tools_qt.fill_table(self.dlg_cf.tbl_downstream, table_name, filter_)
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
         tools_gw.set_columns_config(self.dlg_cf.tbl_downstream, "v_ui_node_x_connection_downstream")
 
         self.dlg_cf.tbl_upstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
@@ -2239,7 +2239,7 @@ class GwInfo(QObject):
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         row = selected_list[0].row()
@@ -2274,7 +2274,7 @@ class GwInfo(QObject):
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         index = selected_list[0]
@@ -2298,7 +2298,7 @@ class GwInfo(QObject):
         selected_list = self.tbl_hydrometer.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         row = selected_list[0].row()
@@ -2325,7 +2325,7 @@ class GwInfo(QObject):
         # Set model of selected widget
         message = tools_qt.set_model_to_table(qtable, f"{self.schema_name}.{table_name}", filter)
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
 
 
     """ FUNCTIONS RELATED WITH TAB HYDROMETER VALUES"""
@@ -2380,7 +2380,7 @@ class GwInfo(QObject):
         edit_strategy = QSqlTableModel.OnFieldChange
         message = tools_qt.set_model_to_table(qtable, f"{self.schema_name}.{table_name}", filter_, edit_strategy)
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
         tools_gw.set_columns_config(self.tbl_hydrometer_value, table_name)
 
 
@@ -2469,7 +2469,7 @@ class GwInfo(QObject):
 
         message = tools_qt.set_model_to_table(widget, table_name)
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
         self.set_filter_table_event(widget)
 
 
@@ -2621,7 +2621,7 @@ class GwInfo(QObject):
         date_to = visit_end.toString('yyyyMMdd 23:59:59')
         if date_from > date_to:
             message = "Selected date interval is not valid"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         # Cascade filter
@@ -2674,7 +2674,7 @@ class GwInfo(QObject):
         date_to = visit_end.toString('yyyyMMdd 23:59:59')
         if date_from > date_to:
             message = "Selected date interval is not valid"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         format_low = 'yyyy-MM-dd 00:00:00.000'
@@ -2724,7 +2724,7 @@ class GwInfo(QObject):
         expl_id = tools_qt.get_combo_value(self.dlg_cf, self.tab_type + '_expl_id', 0)
         if expl_id == -1:
             msg = "Widget expl_id not found"
-            tools_gw.show_warning(msg)
+            tools_qgis.show_warning(msg)
             return
 
         manage_visit = GwVisitManager()
@@ -2782,7 +2782,7 @@ class GwInfo(QObject):
                 # If its not URL ,check if file exist
                 if not os.path.exists(path):
                     message = "File not found"
-                    tools_gw.show_warning(message, parameter=path)
+                    tools_qgis.show_warning(message, parameter=path)
                 else:
                     # Open the document
                     os.startfile(path)
@@ -2812,7 +2812,7 @@ class GwInfo(QObject):
         # Selected item from list
         if self.tbl_list_doc.currentItem() is None:
             msg = "No document selected."
-            tools_gw.show_message(msg, 1)
+            tools_qgis.show_message(msg, 1)
             return
 
         selected_document = self.tbl_list_doc.currentItem().text()
@@ -2838,7 +2838,7 @@ class GwInfo(QObject):
             # If its not URL ,check if file exist
             if not os.path.exists(path):
                 message = "File not found"
-                tools_gw.show_warning(message, parameter=path)
+                tools_qgis.show_warning(message, parameter=path)
             else:
                 # Open the document
                 os.startfile(path)
@@ -2875,7 +2875,7 @@ class GwInfo(QObject):
         # Set model of selected widget
         message = tools_qt.set_model_to_table(widget, f"{self.schema_name}.{table_name}", expr_filter)
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
 
         # Set signals
         doc_type.currentIndexChanged.connect(partial(self.set_filter_table_man, widget))
@@ -2910,7 +2910,7 @@ class GwInfo(QObject):
         date_to = self.date_document_to.date()
         if date_from > date_to:
             message = "Selected date interval is not valid"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         # Create interval dates
@@ -2939,11 +2939,11 @@ class GwInfo(QObject):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
         elif len(selected_list) > 1:
             message = "Select just one document"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         # Get document path (can be relative or absolute)
@@ -3130,7 +3130,7 @@ class GwInfo(QObject):
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         index = selected_list[0]
@@ -3171,7 +3171,7 @@ class GwInfo(QObject):
 
             result = json_result['body']['data']
             if 'fields' not in result:
-                tools_gw.show_message("No listValues for: " + json_result['body']['data'], 2)
+                tools_qgis.show_message("No listValues for: " + json_result['body']['data'], 2)
             else:
                 for field in json_result['body']['data']['fields']:
                     label = QLabel()
@@ -3252,7 +3252,7 @@ class GwInfo(QObject):
                 tools_qt.set_stylesheet(widget, "border: 2px solid red")
         if missing_mandatory:
             message = "Mandatory field is missing. Please, set a value"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         # Get widgets values
@@ -3404,7 +3404,7 @@ class GwInfo(QObject):
                 level = 1
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
-                tools_gw.show_message(json_result['message']['text'], level)
+                tools_qgis.show_message(json_result['message']['text'], level)
 
 
     def cancel_snapping_tool(self, dialog, action):
@@ -3445,7 +3445,7 @@ class GwInfo(QObject):
         global is_inserting
         if is_inserting:
             msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
-            tools_gw.show_message(msg)
+            tools_qgis.show_message(msg)
             return
 
         # Store user snapping configuration
@@ -3476,7 +3476,7 @@ class GwInfo(QObject):
             self.info_layer.featureAdded.connect(self.open_new_feature)
         else:
             message = "Layer not found"
-            tools_gw.show_warning(message, parameter=feature_cat.parent_layer)
+            tools_qgis.show_warning(message, parameter=feature_cat.parent_layer)
 
 
     def action_is_checked(self):

@@ -276,7 +276,7 @@ class GwVisitManager(QObject):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         row = selected_list[0].row()
@@ -475,7 +475,7 @@ class GwVisitManager(QObject):
         table_name = f"{self.schema_name}.v_ui_om_event"
         message = tools_qt.fill_table_object(self.tbl_event, table_name, self.filter)
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
         self.set_configuration(dialog, self.tbl_event, table_name)
         self.manage_events_changed()
 
@@ -483,7 +483,7 @@ class GwVisitManager(QObject):
         table_name = f"{self.schema_name}.v_ui_doc_x_visit"
         message = tools_qt.fill_table_object(self.tbl_document, table_name, self.filter)
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
         self.set_configuration(dialog, self.tbl_document, table_name)
 
         # E) load all related Relations in the relative table
@@ -886,7 +886,7 @@ class GwVisitManager(QObject):
             expr_filter = ""
             message = tools_qt.fill_table_object(self.dlg_man.tbl_visit, f"{self.schema_name}.{table_object}")
             if message:
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
             tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_visit, table_object)
         else:
             # Set a model with selected filter. Attach that model to selected table
@@ -897,7 +897,7 @@ class GwVisitManager(QObject):
             # Refresh model with selected filter
             message = tools_qt.fill_table_object(self.dlg_man.tbl_visit, f"{self.schema_name}.{table_object}", expr_filter)
             if message:
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
             tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_visit, table_object)
 
         # manage save and rollback when closing the dialog
@@ -937,7 +937,7 @@ class GwVisitManager(QObject):
         visit_end = dialog.date_event_to.date()
         if visit_start > visit_end:
             message = "Selected date interval is not valid"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         # Create interval dates
@@ -1398,7 +1398,7 @@ class GwVisitManager(QObject):
 
         elif len(selected_list) > 1:
             message = "More then one event selected. Select just one"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         # fetch the record
@@ -1571,11 +1571,11 @@ class GwVisitManager(QObject):
         # do the action
         if not event.delete(pks=selected_id):
             message = "Error deleting records"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         message = "Records deleted"
-        tools_gw.show_info(message)
+        tools_qgis.show_info(message)
 
         # update Table
         self.tbl_event.model().select()
@@ -1589,11 +1589,11 @@ class GwVisitManager(QObject):
         visit_id = self.visit_id.text()
         if not doc_id:
             message = "You need to insert doc_id"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
         if not visit_id:
             message = "You need to insert visit_id"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         # Insert into new table
@@ -1602,7 +1602,7 @@ class GwVisitManager(QObject):
         status = tools_db.execute_sql(sql)
         if status:
             message = "Document inserted successfully"
-            tools_gw.show_info(message)
+            tools_qgis.show_info(message)
 
         self.dlg_add_visit.tbl_document.model().select()
 

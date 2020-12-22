@@ -11,7 +11,7 @@ from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import Go2EpaSelectorUi
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qt, tools_db
+from ....lib import tools_qt, tools_db, tools_qgis
 
 
 class GwGo2EpaSelectorButton(GwParentAction):
@@ -174,7 +174,7 @@ class GwGo2EpaSelectorButton(GwParentAction):
 
         # Show message to user
         message = "Values has been updated"
-        tools_gw.show_info(message)
+        tools_qgis.show_info(message)
         tools_gw.close_dialog(self.dlg_go2epa_result)
 
 

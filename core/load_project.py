@@ -73,7 +73,7 @@ class LoadProject(QObject):
         # Check if schema exists
         self.schema_exists = self.check_schema(self.schema_name)
         if not self.schema_exists:
-            tools_gw.show_warning("Selected schema not found", parameter=self.schema_name)
+            tools_qgis.show_warning("Selected schema not found", parameter=self.schema_name)
 
         # Get SRID from table node
         srid = tools_db.get_srid('v_edit_node', self.schema_name)
@@ -143,7 +143,7 @@ class LoadProject(QObject):
             if layer_arc or layer_connec:
                 title = "Giswater plugin cannot be loaded"
                 msg = "QGIS project seems to be a Giswater project, but layer 'v_edit_node' is missing"
-                tools_gw.show_warning(msg, 20, title=title)
+                tools_qgis.show_warning(msg, 20, title=title)
                 return False
 
         return True
@@ -164,7 +164,7 @@ class LoadProject(QObject):
                 message = global_vars.session_vars['last_error']
                 if show_warning:
                     if message:
-                        tools_gw.show_warning(message, 15)
+                        tools_qgis.show_warning(message, 15)
                     tools_log.log_warning(str(layer_source))
                 return False
 

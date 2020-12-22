@@ -79,7 +79,7 @@ class GwProjectCheck:
         plugin_version, message = tools_qgis.get_plugin_version()
         if plugin_version is None:
             if message:
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
 
         extras = f'"version":"{plugin_version}"'
         extras += f', "fid":101'

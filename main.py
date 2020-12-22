@@ -168,7 +168,7 @@ class Giswater(QObject):
             if list_values:
                 self.dict_actions[key] = list_values
             else:
-                tools_gw.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
+                tools_qgis.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
 
         # Get list of actions not checkable (normally because they open a form)
         aux = []
@@ -195,7 +195,7 @@ class Giswater(QObject):
                     list_values = [list_values]
                 self.dict_toolbars[key] = list_values
             else:
-                tools_gw.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
+                tools_qgis.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
 
 
     def project_new(self):

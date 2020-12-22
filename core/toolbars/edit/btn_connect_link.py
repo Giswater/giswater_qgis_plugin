@@ -169,7 +169,7 @@ class GwConnectLinkButton(GwParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Right click to use current selection, select connec points by clicking or dragging (selection box)"
-            tools_gw.show_info(message)
+            tools_qgis.show_info(message)
 
 
     def deactivate(self):
@@ -183,7 +183,7 @@ class GwConnectLinkButton(GwParentMapTool):
         number_features = layer.selectedFeatureCount()
         if number_features == 0:
             message = "You have to select at least one feature!"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         # Get selected features from layers of selected @geom_type

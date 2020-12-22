@@ -94,7 +94,7 @@ class GwGo2Epa:
 
         if file_inp is None:
             msg = "Select valid INP file"
-            tools_gw.show_warning(msg, parameter=str(file_inp))
+            tools_qgis.show_warning(msg, parameter=str(file_inp))
             return False
 
 
@@ -110,13 +110,13 @@ class GwGo2Epa:
 
             if file_rpt is None:
                 msg = "Select valid RPT file"
-                tools_gw.show_warning(msg, parameter=str(file_rpt))
+                tools_qgis.show_warning(msg, parameter=str(file_rpt))
                 return False
 
             if not tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
                 if not os.path.exists(file_inp):
                     msg = "File INP not found"
-                    tools_gw.show_warning(msg, parameter=str(file_rpt))
+                    tools_qgis.show_warning(msg, parameter=str(file_rpt))
                     return False
 
 
@@ -149,12 +149,12 @@ class GwGo2Epa:
         if tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result):
             if file_rpt is None:
                 msg = "Select valid RPT file"
-                tools_gw.show_warning(msg, parameter=str(file_rpt))
+                tools_qgis.show_warning(msg, parameter=str(file_rpt))
                 return False
             if not tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
                 if not os.path.exists(file_rpt):
                     msg = "File RPT not found"
-                    tools_gw.show_warning(msg, parameter=str(file_rpt))
+                    tools_qgis.show_warning(msg, parameter=str(file_rpt))
                     return False
             else:
                 if self.check_rpt() is False:
@@ -267,7 +267,7 @@ class GwGo2Epa:
         rows = tools_db.get_rows(sql)
         if not rows:
             message = "Any data found in table"
-            tools_gw.show_warning(message, parameter='cat_hydrology')
+            tools_qgis.show_warning(message, parameter='cat_hydrology')
             return False
 
         tools_qt.fill_combo_values(self.dlg_hydrology_selector.hydrology, rows)
@@ -301,7 +301,7 @@ class GwGo2Epa:
         tools_db.execute_sql(sql)
 
         message = "Values has been update"
-        tools_gw.show_info(message)
+        tools_qgis.show_info(message)
         tools_gw.close_dialog(self.dlg_hydrology_selector)
 
 
@@ -324,7 +324,7 @@ class GwGo2Epa:
         rows = tools_db.get_rows(sql)
         if not rows:
             message = "Check the table 'cat_hydrology' "
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return False
         tools_qt.fill_combo_values(widgetcbx, rows)
         self.update_labels()
@@ -459,7 +459,7 @@ class GwGo2Epa:
         row = tools_db.get_row(sql)
         if not row:
             message = "Any data found in table"
-            tools_gw.show_warning(message, parameter=tablename)
+            tools_qgis.show_warning(message, parameter=tablename)
             return None
 
         # Iterate over all columns and populate its corresponding widget
@@ -593,7 +593,7 @@ class GwGo2Epa:
         selected_list = qtable_right.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
         expl_id = []
         for i in range(0, len(selected_list)):
@@ -636,7 +636,7 @@ class GwGo2Epa:
 
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
         expl_id = []
         curuser_list = []
@@ -691,7 +691,7 @@ class GwGo2Epa:
 
         # Check for errors
         if model.lastError().isValid():
-            tools_gw.show_warning(model.lastError().text())
+            tools_qgis.show_warning(model.lastError().text())
 
 
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l,

@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QRegExpValidator
 from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import EpaManager
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_db
+from ....lib import tools_qt, tools_db, tools_qgis
 
 
 class GwGo2EpaManagerButton(GwParentAction):
@@ -38,7 +38,7 @@ class GwGo2EpaManagerButton(GwParentAction):
         self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectRows)
         message = tools_qt.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
 
         # Set signals
@@ -73,7 +73,7 @@ class GwGo2EpaManagerButton(GwParentAction):
         else:
             message = tools_qt.fill_table(table, tablename)
             if message:
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
 
 
     def multi_rows_delete(self, widget, table_name, column_id):
@@ -87,7 +87,7 @@ class GwGo2EpaManagerButton(GwParentAction):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         inf_text = ""

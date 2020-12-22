@@ -15,7 +15,7 @@ from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGrou
 from ..utils import tools_gw
 from ..ui.ui_manager import InfoCatalogUi
 from ... import global_vars
-from ...lib import tools_qt, tools_log, tools_db
+from ...lib import tools_qt, tools_log, tools_db, tools_qgis
 
 
 class GwCatalog:
@@ -38,7 +38,7 @@ class GwCatalog:
         sql = f"SELECT gw_fct_getcatalog({body})::text"
         row = tools_db.get_row(sql)
         if not row:
-            tools_gw.show_message("NOT ROW FOR: " + sql, 2)
+            tools_qgis.show_message("NOT ROW FOR: " + sql, 2)
             return
 
         complet_list = json.loads(row[0], object_pairs_hook=OrderedDict)
@@ -229,7 +229,7 @@ class GwCatalog:
             widget.setFocus()
         else:
             message = "Widget not found"
-            tools_gw.show_message(message, 2, parameter=str(widget_name))
+            tools_qgis.show_message(message, 2, parameter=str(widget_name))
 
         tools_gw.close_dialog(self.dlg_catalog)
 

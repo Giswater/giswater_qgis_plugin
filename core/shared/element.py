@@ -276,7 +276,7 @@ class GwElement:
         table_name = f"{self.schema_name}.v_edit_{geom_type}"
         message = tools_qt.set_model_to_table(widget, table_name, expr_filter)
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
 
         # Adding auto-completion to a QLineEdit
         self.table_object = "element"
@@ -308,15 +308,15 @@ class GwElement:
         # Check mandatory fields
         message = "You need to insert value for field"
         if elementcat_id == '':
-            tools_gw.show_warning(message, parameter="elementcat_id")
+            tools_qgis.show_warning(message, parameter="elementcat_id")
             return
         num_elements = tools_qt.get_text(self.dlg_add_element, "num_elements", return_string_null=False)
         if num_elements == '':
-            tools_gw.show_warning(message, parameter="num_elements")
+            tools_qgis.show_warning(message, parameter="num_elements")
             return
         state = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.state)
         if state == '':
-            tools_gw.show_warning(message, parameter="state_id")
+            tools_qgis.show_warning(message, parameter="state_id")
             return
 
         state_type = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.state_type)
@@ -499,7 +499,7 @@ class GwElement:
         # Set a model with selected filter. Attach that model to selected table
         message = tools_qt.fill_table_object(self.dlg_man.tbl_element, f"{self.schema_name}.{table_object}")
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_element, table_object)
 
         # Set signals
@@ -521,7 +521,7 @@ class GwElement:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         row = selected_list[0].row()

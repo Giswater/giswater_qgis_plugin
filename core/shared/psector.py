@@ -240,7 +240,7 @@ class GwPsector:
                        f" ON CONFLICT DO NOTHING;")
                 tools_db.execute_sql(sql)
                 msg = "Your exploitation selector has been updated"
-                tools_gw.show_warning(msg, 1)
+                tools_qgis.show_warning(msg, 1)
 
             tools_qt.set_checked(self.dlg_plan_psector, "active", row['active'])
             self.fill_widget(self.dlg_plan_psector, "name", row)
@@ -336,7 +336,7 @@ class GwPsector:
             filter_ = "psector_id = '" + str(psector_id) + "'"
             message = tools_qt.fill_table_object(self.tbl_document, f"v_ui_doc_x_psector", filter_)
             if message:
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
             self.tbl_document.doubleClicked.connect(partial(tools_gw.document_open, self.tbl_document, 'path'))
 
         else:
@@ -595,7 +595,7 @@ class GwPsector:
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_composer_path')
             if file_name is None or file_name == 'null':
                 message = "File name is required"
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
             if file_name.find('.pdf') is False:
                 file_name += '.pdf'
             path = folder_path + '/' + file_name
@@ -607,7 +607,7 @@ class GwPsector:
             viewname = f"v_plan_current_psector_budget_detail"
             if file_name is None or file_name == 'null':
                 message = "Price list csv file name is required"
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
             if file_name.find('.csv') is False:
                 file_name += '.csv'
             path = folder_path + '/' + file_name
@@ -619,7 +619,7 @@ class GwPsector:
             viewname = f"v_plan_current_psector_budget"
             if file_name is None or file_name == 'null':
                 message = "Price list csv file name is required"
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
             if file_name.find('.csv') is False:
                 file_name += '.csv'
             path = folder_path + '/' + file_name
@@ -652,19 +652,19 @@ class GwPsector:
                 exporter.exportToPdf(path, QgsLayoutExporter.PdfExportSettings())
                 if os.path.exists(path):
                     message = "Document PDF created in"
-                    tools_gw.show_info(message, parameter=path)
+                    tools_qgis.show_info(message, parameter=path)
                     os.startfile(path)
                 else:
                     message = "Cannot create file, check if its open"
-                    tools_gw.show_warning(message, parameter=path)
+                    tools_qgis.show_warning(message, parameter=path)
             except Exception as e:
                 tools_log.log_warning(str(e))
                 msg = "Cannot create file, check if selected composer is the correct composer"
-                tools_gw.show_warning(msg, parameter=path)
+                tools_qgis.show_warning(msg, parameter=path)
             finally:
                 designer_window.close()
         else:
-            tools_gw.show_warning("Layout not found", parameter=layout_name)
+            tools_qgis.show_warning("Layout not found", parameter=layout_name)
 
 
     def generate_csv(self, path, viewname):
@@ -679,7 +679,7 @@ class GwPsector:
 
         if not rows or rows is None or rows == '':
             message = "CSV not generated. Check fields from table or view"
-            tools_gw.show_warning(message, parameter=viewname)
+            tools_qgis.show_warning(message, parameter=viewname)
             return
         for i in range(0, len(rows)):
             column_name = rows[i]
@@ -857,7 +857,7 @@ class GwPsector:
             expr = f"psector_id = '{psector_id}'"
             message = tools_qt.fill_table_object(self.tbl_document, f"{self.schema_name}.v_ui_doc_x_psector", expr)
             if message:
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
 
         sql = (f"SELECT other, gexpenses, vat"
                f" FROM plan_psector "
@@ -978,7 +978,7 @@ class GwPsector:
         psector_name = tools_qt.get_text(self.dlg_plan_psector, "name", return_string_null=False)
         if psector_name == "":
             message = "Mandatory field is missing. Please, set a value"
-            tools_gw.show_warning(message, parameter='Name')
+            tools_qgis.show_warning(message, parameter='Name')
             return
 
         rotation = tools_qt.get_text(self.dlg_plan_psector, "rotation", return_string_null=False)
@@ -988,7 +988,7 @@ class GwPsector:
         name_exist = self.check_name(psector_name)
         if name_exist and not self.update:
             message = "The name is current in use"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
         else:
             self.enable_tabs(True)
@@ -1002,7 +1002,7 @@ class GwPsector:
         rows = tools_db.get_rows(sql)
         if not rows or rows is None or rows == '':
             message = "Check fields from table or view"
-            tools_gw.show_warning(message, parameter=viewname)
+            tools_qgis.show_warning(message, parameter=viewname)
             return
 
         columns = []
@@ -1145,7 +1145,7 @@ class GwPsector:
         selected_list = tbl_all_rows.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
         expl_id = []
         for i in range(0, len(selected_list)):
@@ -1207,7 +1207,7 @@ class GwPsector:
         selected_list = tbl_selected_rows.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
         expl_id = []
         for i in range(0, len(selected_list)):
@@ -1254,7 +1254,7 @@ class GwPsector:
 
         # Check for errors
         if model.lastError().isValid():
-            tools_gw.show_warning(model.lastError().text())
+            tools_qgis.show_warning(model.lastError().text())
 
 
     def fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
@@ -1282,7 +1282,7 @@ class GwPsector:
 
         # Check for errors
         if model.lastError().isValid():
-            tools_gw.show_warning(model.lastError().text())
+            tools_qgis.show_warning(model.lastError().text())
         # Attach model to table view
         if expr:
             widget.setModel(model)
@@ -1313,11 +1313,11 @@ class GwPsector:
         psector_id = self.psector_id.text()
         if not doc_id:
             message = "You need to insert doc_id"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
         if not psector_id:
             message = "You need to insert psector_id"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         # Check if document already exist
@@ -1327,7 +1327,7 @@ class GwPsector:
         row = tools_db.get_row(sql)
         if row:
             msg = "Document already exist"
-            tools_gw.show_warning(msg)
+            tools_qgis.show_warning(msg)
             return
 
         # Insert into new table
@@ -1336,7 +1336,7 @@ class GwPsector:
         status = tools_db.execute_sql(sql)
         if status:
             message = "Document inserted successfully"
-            tools_gw.show_info(message)
+            tools_qgis.show_info(message)
 
         self.dlg_plan_psector.tbl_document.model().select()
 
@@ -1440,7 +1440,7 @@ class GwPsector:
         selected_list = qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
@@ -1449,7 +1449,7 @@ class GwPsector:
         self.upsert_config_param_user(dialog, aux_widget, "plan_psector_vdefault")
 
         message = "Values has been updated"
-        tools_gw.show_info(message)
+        tools_qgis.show_info(message)
 
         self.fill_table(dialog, qtbl_psm, "v_ui_plan_psector")
         tools_gw.set_tablemodel_config(dialog, qtbl_psm, "v_ui_plan_psector")
@@ -1519,7 +1519,7 @@ class GwPsector:
         selected_list = qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
         row = selected_list[0].row()
         psector_id = qtbl_psm.model().record(row).value("psector_id")
@@ -1537,7 +1537,7 @@ class GwPsector:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
         cur_psector = tools_gw.get_config('plan_psector_vdefault')
         inf_text = ""
@@ -1621,7 +1621,7 @@ class GwPsector:
         selected_list = self.dlg_merm.tbl_om_result_cat.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
         row = selected_list[0].row()
         price_name = self.dlg_merm.tbl_om_result_cat.model().record(row).value("name")
@@ -1633,7 +1633,7 @@ class GwPsector:
         status = tools_db.execute_sql(sql)
         if status:
             message = "Values has been updated"
-            tools_gw.show_info(message)
+            tools_qgis.show_info(message)
 
         # Refresh canvas
         self.iface.mapCanvas().refreshAllLayers()
@@ -1657,7 +1657,7 @@ class GwPsector:
         selected_list = self.qtbl_psm.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
         row = selected_list[0].row()
         psector_id = self.qtbl_psm.model().record(row).value("psector_id")

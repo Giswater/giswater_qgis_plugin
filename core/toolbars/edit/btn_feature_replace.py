@@ -247,7 +247,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         # Check null values
         if self.workcat_id_end_aux in (None, 'null'):
             message = "Mandatory field is missing. Please, set a value"
-            tools_gw.show_warning(message, parameter='Workcat_id')
+            tools_qgis.show_warning(message, parameter='Workcat_id')
             return
 
         feature_type_new = tools_qt.get_text(dialog, dialog.feature_type_new)
@@ -272,7 +272,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             row = tools_db.get_row(sql)
             if not row:
                 message = "Error replacing feature"
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
                 self.deactivate()
                 self.set_action_pan()
                 tools_gw.close_dialog(dialog, global_vars.plugin_name)
@@ -280,7 +280,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
             complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
             message = "Feature replaced successfully"
-            tools_gw.show_info(message)
+            tools_qgis.show_info(message)
 
             # Force user to manage with state = 1 features
             current_user = global_vars.session_vars['current_user']
@@ -313,7 +313,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                         tools_db.execute_sql(sql)
 
                 message = "Values has been updated"
-                tools_gw.show_info(message)
+                tools_qgis.show_info(message)
 
             # Fill tab 'Info log'
             if complet_result and complet_result['status'] == "Accepted":
@@ -428,7 +428,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Select the feature by clicking on it and it will be replaced"
-            tools_gw.show_info(message)
+            tools_qgis.show_info(message)
 
 
     def deactivate(self):

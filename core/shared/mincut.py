@@ -244,7 +244,7 @@ class GwMincut:
         tools_qt.set_qtv_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
         message = tools_qt.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_mincut, self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer')
 
 
@@ -360,7 +360,7 @@ class GwMincut:
                 sql = (f"DELETE FROM om_mincut"
                        f" WHERE id = {result_mincut_id}")
                 tools_db.execute_sql(sql)
-                tools_gw.show_info("Mincut canceled!")
+                tools_qgis.show_info("Mincut canceled!")
 
         # Rollback transaction
         else:
@@ -528,7 +528,7 @@ class GwMincut:
         for data in check_data:
             if data == '':
                 message = "Mandatory field is missing. Please, set a value"
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
                 return
 
         if self.is_new:
@@ -600,11 +600,11 @@ class GwMincut:
         status = tools_db.execute_sql(sql, log_error=True)
         if status:
             message = "Values has been updated"
-            tools_gw.show_info(message)
+            tools_qgis.show_info(message)
             self.update_result_selector(result_mincut_id)
         else:
             message = "Error updating element in table, you need to review data"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
 
         # Close dialog and disconnect snapping
         tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
@@ -676,7 +676,7 @@ class GwMincut:
                 polygon = polygon.split(',')
                 if polygon[0] == '':
                     message = "Error on create auto mincut, you need to review data"
-                    tools_gw.show_warning(message)
+                    tools_qgis.show_warning(message)
                     tools_qgis.restore_cursor()
                     self.task1.setProgress(100)
                     return
@@ -707,7 +707,7 @@ class GwMincut:
         status = tools_db.execute_sql(sql, commit)
         if not status:
             message = "Error updating table"
-            tools_gw.show_warning(message, parameter='selector_mincut_result')
+            tools_qgis.show_warning(message, parameter='selector_mincut_result')
 
 
     def real_end_accept(self):
@@ -1238,7 +1238,7 @@ class GwMincut:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         del_id = []
@@ -1292,7 +1292,7 @@ class GwMincut:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         del_id = []
@@ -1524,7 +1524,7 @@ class GwMincut:
         status = tools_db.execute_sql(sql)
         if status:
             message = "Real location has been updated"
-            tools_gw.show_info(message)
+            tools_qgis.show_info(message)
 
         # Snapping
         result = self.snapper_manager.snap_to_background_layers(event_point)
@@ -1584,7 +1584,7 @@ class GwMincut:
                 tools_qt.show_info_box(message, parameter=complet_result['mincutOverlap'])
             else:
                 message = "Mincut done successfully"
-                tools_gw.show_info(message)
+                tools_qgis.show_info(message)
 
             # Zoom to rectangle (zoom to mincut)
             polygon = complet_result['body']['data']['geometry']
@@ -1592,7 +1592,7 @@ class GwMincut:
             polygon = polygon.split(',')
             if polygon[0] == '':
                 message = "Error on create auto mincut, you need to review data"
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
                 tools_qgis.restore_cursor()
                 self.task1.setProgress(100)
                 return
@@ -1610,7 +1610,7 @@ class GwMincut:
             self.task1.setProgress(50)
             if not status:
                 message = "Error updating element in table, you need to review data"
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
                 tools_qgis.restore_cursor()
                 self.task1.setProgress(100)
                 return
@@ -1744,7 +1744,7 @@ class GwMincut:
             result = tools_gw.get_json('gw_fct_setmincut', body, log_sql=True)
             if result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
-                tools_gw.show_message(result['message']['text'], level)
+                tools_qgis.show_message(result['message']['text'], level)
 
         # Disconnect snapping and related signals
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
@@ -1832,7 +1832,7 @@ class GwMincut:
         tools_qt.set_qtv_config(self.dlg_mincut.tbl_hydro)
         message = tools_qt.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
 
         # Depend of mincut_state and mincut_clase desable/enable widgets
         # Current_state == '0': Planified
@@ -2014,7 +2014,7 @@ class GwMincut:
             template_files = os.listdir(template_folder)
         except FileNotFoundError:
             message = "Your composer's path is bad configured. Please, modify it and try again."
-            tools_gw.show_message(message, 1)
+            tools_qgis.show_message(message, 1)
             return
 
         # Set dialog add_connec
@@ -2049,7 +2049,7 @@ class GwMincut:
         # Check if template is selected
         if str(self.dlg_comp.cbx_template.currentText()) == "":
             message = "You need to select a template"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         # Check if template file exists
@@ -2060,7 +2060,7 @@ class GwMincut:
 
         if not os.path.exists(template_path):
             message = "File not found"
-            tools_gw.show_warning(message, parameter=template_path)
+            tools_qgis.show_warning(message, parameter=template_path)
             return
 
         # Check if composer exist

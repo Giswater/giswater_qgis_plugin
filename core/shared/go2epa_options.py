@@ -13,7 +13,7 @@ from qgis.PyQt.QtWidgets import QGroupBox, QSpacerItem, QSizePolicy, QGridLayout
 from ..utils import tools_gw
 from ..ui.ui_manager import Go2EpaOptionsUi
 from ... import global_vars
-from ...lib import tools_qt
+from ...lib import tools_qt, tools_qgis
 
 
 class GwGo2EpaOptions:
@@ -75,7 +75,7 @@ class GwGo2EpaOptions:
             return False
 
         message = "Values has been updated"
-        tools_gw.show_info(message)
+        tools_qgis.show_info(message)
         # Close dialog
         tools_gw.close_dialog(self.dlg_go2epa_options)
 

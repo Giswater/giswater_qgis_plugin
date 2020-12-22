@@ -14,7 +14,7 @@ from qgis.core import QgsTask
 
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_log, tools_qt, tools_db
+from ...lib import tools_log, tools_qt, tools_db, tools_qgis
 
 
 class GwGo2EpaTask(QgsTask):
@@ -107,7 +107,7 @@ class GwGo2EpaTask(QgsTask):
                         self.message = self.rpt_result['message']['text']
 
             if self.common_msg != "":
-                tools_gw.show_info(self.common_msg)
+                tools_qgis.show_info(self.common_msg)
             if self.message is not None:
                 tools_qt.show_info_box(self.message)
             self.go2epa.check_result_id()
@@ -134,7 +134,7 @@ class GwGo2EpaTask(QgsTask):
     def cancel(self):
 
         global_vars.session_vars['show_db_exception'] = True
-        tools_gw.show_info(f"Task canceled - {self.description()}")
+        tools_qgis.show_info(f"Task canceled - {self.description()}")
         self.close_file()
         super().cancel()
 

@@ -12,7 +12,7 @@ import sqlite3
 from qgis.PyQt.QtCore import QSettings
 
 from .utils import tools_gw
-from ..lib import tools_log, tools_qt, tools_db
+from ..lib import tools_log, tools_qt, tools_db, tools_qgis
 
 
 class GwAdminGisProject:
@@ -63,7 +63,7 @@ class GwAdminGisProject:
 
         template_path = f"{gis_locale_path}{os.sep}{project_type}_{roletype}.{gis_extension}"
         if not os.path.exists(template_path):
-            tools_gw.show_warning("Template GIS file not found", parameter=template_path, duration=20)
+            tools_qgis.show_warning("Template GIS file not found", parameter=template_path, duration=20)
             return False, None
 
         # Manage default parameters
@@ -123,7 +123,7 @@ class GwAdminGisProject:
         try:
             with open(qgs_path, "w") as f:
                 f.write(content)
-            tools_gw.show_info("GIS file generated successfully", parameter=qgs_path)
+            tools_qgis.show_info("GIS file generated successfully", parameter=qgs_path)
             message = "Do you want to open GIS project?"
             answer = tools_qt.ask_question(message, "GIS file generated successfully")
             if answer:
@@ -131,7 +131,7 @@ class GwAdminGisProject:
             return False, qgs_path
         except IOError:
             message = "File cannot be created. Check if it is already opened"
-            tools_gw.show_warning(message, parameter=qgs_path)
+            tools_qgis.show_warning(message, parameter=qgs_path)
 
 
     def get_database_parameters(self, schema):
@@ -139,7 +139,7 @@ class GwAdminGisProject:
 
         layer_source, not_version = tools_db.get_layer_source_from_credentials('disable')
         if layer_source is None:
-            tools_gw.show_warning("Error getting database parameters")
+            tools_qgis.show_warning("Error getting database parameters")
             return False
 
         self.set_database_parameters(layer_source['host'], layer_source['port'], layer_source['db'], layer_source['user'],

@@ -41,7 +41,7 @@ class GwToolBoxButton(GwParentAction):
         function_name = "gw_fct_gettoolbox"
         row = tools_db.check_function(function_name)
         if not row:
-            tools_gw.show_warning("Function not found in database", parameter=function_name)
+            tools_qgis.show_warning("Function not found in database", parameter=function_name)
             return
 
         self.dlg_toolbox_doc = ToolboxDockerUi()
@@ -102,7 +102,7 @@ class GwToolBoxButton(GwParentAction):
         if not status:
             self.function_selected = index.sibling(index.row(), 1).data()
             message = "Function not found"
-            tools_gw.show_message(message, parameter=self.function_selected)
+            tools_qgis.show_message(message, parameter=self.function_selected)
             return
 
         self.dlg_functions.btn_run.clicked.connect(partial(self.execute_function, self.dlg_functions,
@@ -145,7 +145,7 @@ class GwToolBoxButton(GwParentAction):
         layer_name = tools_qt.get_combo_value(dialog, combo, 1)
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         if layer is None:
-            tools_gw.show_warning("Layer not found", parameter=layer_name)
+            tools_qgis.show_warning("Layer not found", parameter=layer_name)
             return None
         self.iface.setActiveLayer(layer)
         return layer
@@ -335,7 +335,7 @@ class GwToolBoxButton(GwParentAction):
 
         if widget_is_void:
             message = "This param is mandatory. Please, set a value"
-            tools_gw.show_warning(message, parameter='')
+            tools_qgis.show_warning(message, parameter='')
             dialog.progressBar.setVisible(False)
             dialog.progressBar.setMinimum(0)
             dialog.progressBar.setMaximum(1)
@@ -397,7 +397,7 @@ class GwToolBoxButton(GwParentAction):
         sql = f"SELECT {function_name}()::text"
         row = tools_db.get_row(sql)
         if not row or row[0] in (None, ''):
-            tools_gw.show_message(f"Function: {function_name} executed with no result ", 3)
+            tools_qgis.show_message(f"Function: {function_name} executed with no result ", 3)
             return True
 
         complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)

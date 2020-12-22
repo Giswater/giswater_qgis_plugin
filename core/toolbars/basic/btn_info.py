@@ -105,7 +105,7 @@ class GwInfoButton(GwParentMapTool):
     def activate(self):
         if info.is_inserting:
             msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
-            tools_gw.show_message(msg)
+            tools_qgis.show_message(msg)
             super().deactivate()
             return
 

@@ -190,7 +190,7 @@ class GwAuxPointButton(GwParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Click two points over canvas and draw a line"
-            tools_gw.show_info(message)
+            tools_qgis.show_info(message)
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
@@ -200,7 +200,7 @@ class GwAuxPointButton(GwParentMapTool):
 
         self.layer_points = tools_qgis.get_layer_by_tablename('v_edit_cad_auxpoint')
         if self.layer_points is None:
-            tools_gw.show_warning("Layer not found", parameter='v_edit_cad_auxpoint')
+            tools_qgis.show_warning("Layer not found", parameter='v_edit_cad_auxpoint')
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
             return

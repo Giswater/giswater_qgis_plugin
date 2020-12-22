@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
 from ..utils import tools_gw
 from ..ui.ui_manager import DocUi, DocManager
 from ... import global_vars
-from ...lib import tools_qt, tools_db
+from ...lib import tools_qt, tools_db, tools_qgis
 
 
 class GwDocument:
@@ -178,7 +178,7 @@ class GwDocument:
         table_name = f"{self.schema_name}.v_edit_{geom_type}"
         message = tools_qt.set_model_to_table(widget, table_name, expr_filter)
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
 
 
     def manage_document_accept(self, table_object, tablename=None, qtable=None, item_id=None):
@@ -193,7 +193,7 @@ class GwDocument:
 
         if doc_type in (None, ''):
             message = "You need to insert doc_type"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         # Check if this document already exists
@@ -305,7 +305,7 @@ class GwDocument:
             expr = f"{tablename}_id = '{item_id}'"
             message = tools_qt.fill_table_object(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr)
             if message:
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
 
 
     def edit_document(self):
@@ -323,7 +323,7 @@ class GwDocument:
         # Set a model with selected filter. Attach that model to selected table
         message = tools_qt.fill_table_object(self.dlg_man.tbl_document, f"{self.schema_name}.{table_object}")
         if message:
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, table_object)
 
         # Set dignals
@@ -345,7 +345,7 @@ class GwDocument:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         row = selected_list[0].row()

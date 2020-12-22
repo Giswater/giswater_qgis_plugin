@@ -17,7 +17,7 @@ from ..parent_dialog import GwParentAction
 from ...ui.ui_manager import Csv2pgUi
 from ...utils import tools_gw
 from .... import global_vars
-from ....lib import tools_qt, tools_log, tools_db
+from ....lib import tools_qt, tools_log, tools_db, tools_qgis
 
 
 class GwCSVButton(GwParentAction):
@@ -116,7 +116,7 @@ class GwCSVButton(GwParentAction):
                 csvfile.close()
                 del csvfile
         except Exception as e:
-            tools_gw.show_warning("EXCEPTION: " + str(e))
+            tools_qgis.show_warning("EXCEPTION: " + str(e))
 
         if insert_status is False:
             return
@@ -184,7 +184,7 @@ class GwCSVButton(GwParentAction):
             with open(path, "r", encoding=_unicode) as file_input:
                 self.read_csv_file(model, file_input, delimiter, _unicode)
         except Exception as e:
-            tools_gw.show_warning(str(e))
+            tools_qgis.show_warning(str(e))
 
 
     def load_settings_values(self):
@@ -295,11 +295,11 @@ class GwCSVButton(GwParentAction):
         path = tools_qt.get_text(dialog, dialog.txt_file_csv)
         if path is None or path == 'null' or not os.path.exists(path):
             message = "Please choose a valid path"
-            tools_gw.show_message(message, message_level=0)
+            tools_qgis.show_message(message, message_level=0)
             return None
         if path.find('.csv') == -1:
             message = "Please choose a csv file"
-            tools_gw.show_message(message, message_level=0)
+            tools_qgis.show_message(message, message_level=0)
             return None
 
         return path

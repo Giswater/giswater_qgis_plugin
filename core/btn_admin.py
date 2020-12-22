@@ -108,7 +108,7 @@ class GwAdmin:
         folder_name = os.path.dirname(os.path.abspath(__file__))
         self.sql_dir = os.path.normpath(os.path.normpath(folder_name + os.sep + os.pardir)) + os.sep + 'dbmodel'
         if not os.path.exists(self.sql_dir):
-            tools_gw.show_message("SQL folder not found", parameter=self.sql_dir)
+            tools_qgis.show_message("SQL folder not found", parameter=self.sql_dir)
             return
 
         self.project_version = '0'
@@ -283,7 +283,7 @@ class GwAdmin:
 
         if connection_status is False:
             msg = "Connection Failed. Please, check connection parameters"
-            tools_gw.show_message(msg, 1)
+            tools_qgis.show_message(msg, 1)
             tools_qt.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', msg)
@@ -311,7 +311,7 @@ class GwAdmin:
         role_admin = tools_db.check_role_user("role_admin", self.username)
         if not role_admin and self.username not in self.super_users:
             msg = "You don't have permissions to administrate project schemas on this connection"
-            tools_gw.show_message(msg, 1)
+            tools_qgis.show_message(msg, 1)
             tools_qt.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
@@ -384,12 +384,12 @@ class GwAdmin:
         # Get gis folder, gis file, project type and schema
         gis_folder = tools_qt.get_text(self.dlg_create_gis_project, 'txt_gis_folder')
         if gis_folder is None or gis_folder == 'null':
-            tools_gw.show_warning("GIS folder not set")
+            tools_qgis.show_warning("GIS folder not set")
             return
 
         gis_file = tools_qt.get_text(self.dlg_create_gis_project, 'txt_gis_file')
         if gis_file is None or gis_file == 'null':
-            tools_gw.show_warning("GIS file name not set")
+            tools_qgis.show_warning("GIS file name not set")
             return
 
         project_type = tools_qt.get_text(self.dlg_readsql, 'cmb_project_type')
@@ -632,7 +632,7 @@ class GwAdmin:
         if str(project_type) in ('ws', 'ud'):
 
             if not os.path.exists(self.folderUpdates):
-                tools_gw.show_message("The update folder was not found in sql folder.", 1)
+                tools_qgis.show_message("The update folder was not found in sql folder")
                 self.error_count = self.error_count + 1
                 return
             folders = sorted(os.listdir(self.folderUpdates + ''))
@@ -871,7 +871,7 @@ class GwAdmin:
         if str(project_type) == 'ws' or str(project_type) == 'ud':
 
             if not os.path.exists(self.folderUpdates):
-                tools_gw.show_message("The update folder was not found in sql folder.", 1)
+                tools_qgis.show_message("The update folder was not found in sql folder")
                 self.error_count = self.error_count + 1
                 return True
 
@@ -2034,7 +2034,7 @@ class GwAdmin:
     def read_info_version(self):
 
         if not os.path.exists(self.folderUpdates):
-            tools_gw.show_message("The updates folder was not found in sql folder.", 1)
+            tools_qgis.show_message("The update folder was not found in sql folder")
             return
 
         folders = sorted(os.listdir(self.folderUpdates + ''))
@@ -2620,7 +2620,7 @@ class GwAdmin:
             setting_file = os.path.join(self.plugin_dir, 'config', 'system.config')
             if not os.path.exists(setting_file):
                 message = "File not found"
-                tools_gw.show_warning(message, parameter=setting_file)
+                tools_qgis.show_warning(message, parameter=setting_file)
                 return
 
             # Set plugin settings
@@ -2635,7 +2635,7 @@ class GwAdmin:
             self.xml_set_labels = tools_gw.get_config_parser('qgis_project_xml_set', 'labels', "project", "dev")
             if not os.path.exists(self.folder_path):
                 message = "Folder not found"
-                tools_gw.show_warning(message, parameter=self.folder_path)
+                tools_qgis.show_warning(message, parameter=self.folder_path)
                 return
 
             # Set wait cursor
@@ -2937,7 +2937,7 @@ class GwAdmin:
 
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         # Create the dialog and signals
@@ -2987,7 +2987,7 @@ class GwAdmin:
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
             return
 
         # Create the dialog and signals
@@ -3317,7 +3317,7 @@ class GwAdmin:
 
         # Check for errors
         if model.lastError().isValid():
-            tools_gw.show_warning(model.lastError().text())
+            tools_qgis.show_warning(model.lastError().text())
         # Attach model to table view
         qtable.setModel(model)
 
@@ -3458,7 +3458,7 @@ class GwAdmin:
             else:
                 msg = "Key on returned json from ddbb is missed"
 
-            tools_gw.show_message(msg, level, parameter=parameter, title=title)
+            tools_qgis.show_message(msg, level, parameter=parameter, title=title)
 
 
     def save_selection(self):

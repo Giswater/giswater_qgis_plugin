@@ -247,7 +247,7 @@ class GwI18NGenerator:
         plugin_version, message = tools_qgis.get_plugin_version()
         if plugin_version is None:
             if message:
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
             return
 
         ver = plugin_version.split('.')

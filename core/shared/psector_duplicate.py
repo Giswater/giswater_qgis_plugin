@@ -12,7 +12,7 @@ from qgis.PyQt.QtCore import pyqtSignal, QObject
 from ..ui.ui_manager import PsectorDuplicate
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_qt, tools_db
+from ...lib import tools_qt, tools_db, tools_qgis
 
 
 class GwPsectorDuplicate(QObject):
@@ -61,7 +61,7 @@ class GwPsectorDuplicate(QObject):
         complet_result = tools_gw.get_json('gw_fct_psector_duplicate', body)
         if not complet_result or complet_result['status'] == 'Failed':
             message = 'Function gw_fct_psector_duplicate executed with no result'
-            tools_gw.show_message(message, 3)
+            tools_qgis.show_message(message, 3)
             return
 
         # Populate tab info

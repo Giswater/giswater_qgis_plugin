@@ -69,16 +69,16 @@ class GwNodeTypeChangeButton(GwParentMapTool):
                 if layer:
                     self.iface.setActiveLayer(layer)
                 message = "Values has been updated"
-                tools_gw.show_info(message)
+                tools_qgis.show_info(message)
 
             else:
                 message = "Field catalog_id required!"
-                tools_gw.show_warning(message)
+                tools_qgis.show_warning(message)
                 return
 
         else:
             message = "The node has not been updated because no catalog has been selected"
-            tools_gw.show_warning(message)
+            tools_qgis.show_warning(message)
 
         # Close form
         tools_gw.close_dialog(self.dlg_chg_node_type)
@@ -210,7 +210,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
         # Show help message when action is activated
         if self.show_help:
             message = "Select the node inside a pipe by clicking on it and it will be changed"
-            tools_gw.show_info(message)
+            tools_qgis.show_info(message)
 
 
     def deactivate(self):
