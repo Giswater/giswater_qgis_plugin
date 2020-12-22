@@ -1419,19 +1419,6 @@ def get_actions_from_json(json_result, sql):
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
 
-def document_delete(qtable):
-
-    status = tools_qt.delete_rows_qtv(qtable)
-    if not status:
-        error = qtable.model().lastError().text()
-        message = "Error deleting data"
-        tools_qgis.show_warning(message, parameter=error)
-    else:
-        message = "Document deleted"
-        tools_qgis.show_info(message)
-        qtable.model().select()
-
-
 def document_open(table, field_name):
 
     message = tools_qt.document_open(table, field_name)

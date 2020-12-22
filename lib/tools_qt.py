@@ -25,7 +25,7 @@ from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleS
 from qgis.core import QgsExpression, QgsProject
 from qgis.gui import QgsDateTimeEdit
 
-from . import tools_log, tools_os
+from . import tools_log, tools_os, tools_qgis
 from .. import global_vars
 from .ui.ui_manager import DialogTextUi
 
@@ -851,7 +851,8 @@ def document_open(qtable, field_name):
             subprocess.call([opener, path])
     else:
         webbrowser.open(path)
-
+    if message:
+        tools_qgis.show_warning(message)
     return message
 
 
@@ -886,7 +887,14 @@ def delete_rows_qtv(qtable):
         # Return original editStrategy
         qtable.model().setEditStrategy(edit_strategy)
 
-        return status
+        if not status:
+            error = qtable.model().lastError().text()
+            message = "Error deleting data"
+            tools_qgis.show_warning(message, parameter=error)
+        else:
+            msg = "Record deleted"
+            tools_qgis.show_info(msg)
+            qtable.model().select()
 
 
 def reset_model(dialog, table_object, geom_type):
