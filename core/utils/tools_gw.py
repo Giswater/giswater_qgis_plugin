@@ -1556,8 +1556,10 @@ def check_config_settings(section, parameter, value, comment=None, config_type="
     """ Check if @section and @parameter exists in file @file_name. If not add them = None """
 
     result = get_config_parser(section, parameter, config_type, file_name)
-    if result is not None: return result
+    if result is not None:
+        return result
     set_config_parser(section, parameter, value, comment, config_type, file_name)
+    return value
 
 
 def get_json(function_name, parameters=None, schema_name=None, commit=True, log_sql=False,

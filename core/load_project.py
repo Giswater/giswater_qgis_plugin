@@ -21,7 +21,7 @@ from .utils import tools_gw
 from .utils.backend_functions import GwInfoTools
 from .utils.notify import GwNotifyTools
 from .. import global_vars
-from ..lib import tools_qgis, tools_config, tools_log, tools_db, tools_qt
+from ..lib import tools_qgis, tools_config, tools_log, tools_db, tools_qt, tools_os
 
 
 class LoadProject(QObject):
@@ -121,7 +121,7 @@ class LoadProject(QObject):
         # Open automatically 'search docker' depending its value in user settings
         open_search = tools_gw.check_config_settings('btn_search', 'open_search', 'false', config_type="user",
                                                      file_name="sessions")
-        if open_search == 'true':
+        if tools_os.cast_boolean(open_search):
             GwSearch().api_search(load_project=True)
 
         # call dynamic mapzones repaint
@@ -234,6 +234,8 @@ class LoadProject(QObject):
         toolbar_names = tools_gw.check_config_settings('toolbars', 'list_toolbars',
                                                        'basic, om, edit, cad, epa, plan, utilities, toc',
                                                        config_type="project", file_name="init")
+        if toolbar_names in (None, 'None'): return
+
         toolbar_names = toolbar_names.replace(' ', '').split(',')
         # Get user UI config file
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
@@ -265,7 +267,8 @@ class LoadProject(QObject):
             for index_action in plugin_toolbar.list_actions:
                 button_def = tools_gw.check_config_settings('buttons_def', str(index_action), 'None',
                                                             config_type="project", file_name="init")
-                if button_def:
+
+                if button_def not in (None, 'None'):
                     text = self.translate(f'{index_action}_text')
                     icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
                     button = getattr(buttons, button_def)(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
@@ -274,7 +277,8 @@ class LoadProject(QObject):
         # Disable buttons which are project type exclusive
         project_exclusive = tools_gw.check_config_settings('project_exclusive', str(self.project_type), 'None',
                                                            config_type="project", file_name="init")
-        if project_exclusive:
+
+        if project_exclusive not in (None, 'None'):
             project_exclusive = project_exclusive.replace(' ', '').split(',')
             for index in project_exclusive:
                 self.hide_button(index)
@@ -295,11 +299,13 @@ class LoadProject(QObject):
 
     def create_toolbar(self, toolbar_id):
 
-        list_actions = tools_gw.check_config_settings('toolbars', str(toolbar_id), 'None',
-                                                           config_type="project", file_name="init")
-        list_actions = list_actions.replace(' ', '').split(',')
-        if list_actions is None:
+        list_actions = tools_gw.check_config_settings('toolbars', str(toolbar_id), 'None', config_type="project",
+                                                      file_name="init")
+
+        if list_actions in (None, 'None'):
             return
+
+        list_actions = list_actions.replace(' ', '').split(',')
 
         if type(list_actions) != list:
             list_actions = [list_actions]

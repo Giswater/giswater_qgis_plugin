@@ -77,7 +77,7 @@ def cast_boolean(param):
     :return: Boolean value, True if param not in bool_dict
     """
 
-    bool_dict = {"True": True, "true": True, "False": False, "false": False}
+    bool_dict = {"TRUE": True, "True": True, "true": True, "FALSE":False, "False": False, "false": False}
 
     return bool_dict.get(param, True)
 
