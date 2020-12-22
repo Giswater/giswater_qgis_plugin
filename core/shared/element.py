@@ -120,7 +120,7 @@ class GwElement:
             partial(tools_gw.get_signal_change_tab, self.dlg_add_element, []))
 
         self.dlg_add_element.element_id.textChanged.connect(
-            partial(tools_gw.exist_object, self, self.dlg_add_element, table_object, None))
+            partial(self.fill_dialog_element, self.dlg_add_element, table_object, None))
         self.dlg_add_element.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_add_element, table_object, False, False, None, None))
         self.dlg_add_element.btn_delete.clicked.connect(
@@ -210,7 +210,7 @@ class GwElement:
         self.update_location_cmb()
         if not self.new_element_id:
             tools_qt.set_widget_text(self.dlg_add_element, 'element_id', selected_object_id)
-            tools_gw.exist_object(self, self.dlg_add_element, 'element', None)
+            self.fill_dialog_element(self.dlg_add_element, 'element', None)
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_add_element, dlg_name='element', maximize_button=False)
@@ -617,3 +617,65 @@ class GwElement:
                 button.setEnabled(True)
 
 
+    def fill_dialog_element(self, dialog, table_object, single_tool_mode=None):
+        # Reset list of selected records
+        tools_gw.reset_feature_list(self.ids, self.list_ids)
+
+        list_geom_type = ['arc', 'node', 'connec', 'element']
+        if global_vars.project_type == 'ud':
+            list_geom_type.append('gully')
+
+        object_id = tools_qt.get_text(dialog, table_object + "_id")
+
+        # Check if we already have data with selected object_id
+        sql = (f"SELECT * "
+               f" FROM {table_object}"
+               f" WHERE {table_object}_id = '{object_id}'")
+        row = tools_db.get_row(sql, log_info=False)
+
+        # If object_id not found: Clear data
+        if not row:
+            # Reset widgets
+            widgets = ["elementcat_id", "state", "expl_id", "ownercat_id", "location_type", "buildercat_id",
+                       "workcat_id",  "workcat_id_end", "comment", "observ", "path", "rotation", "verified",
+                       "num_elements"]
+            for widget_name in widgets:
+                tools_qt.set_widget_text(dialog, widget_name, "")
+
+            tools_gw.set_combo_from_param_user(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
+            tools_gw.set_combo_from_param_user(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
+                      field_id='expl_id', field_name='name')
+            tools_gw.set_calendar_from_user_param(dialog, 'builtdate', 'config_param_user', 'value', 'edit_builtdate_vdefault')
+            tools_gw.set_combo_from_param_user(dialog, 'workcat_id', 'cat_work',
+                      'edit_workcat_vdefault', field_id='id', field_name='id')
+            if single_tool_mode is not None:
+                self.layers = tools_gw.remove_selection(single_tool_mode, self.layers)
+            else:
+                self.layers = tools_gw.remove_selection(True, self.layers)
+
+            for geom_type in list_geom_type:
+                tools_qt.reset_model(dialog, table_object, geom_type)
+
+            return
+
+        tools_qt.set_widget_text(dialog, "code", row['code'])
+        sql = (f"SELECT elementtype_id FROM cat_element"
+               f" WHERE id = '{row['elementcat_id']}'")
+        row_type = tools_db.get_row(sql)
+        if row_type:
+            tools_qt.set_widget_text(dialog, "element_type", f"{row_type[0]}")
+
+        # Fill input widgets with data of the @row
+        widgets = ["elementcat_id", "state", "expl_id", "ownercat_id", "location_type", "buildercat_id", "workcat_id",
+                   "workcat_id_end", "comment", "observ", "link", "rotation", "verified", "num_elements"]
+        for widget_name in widgets:
+            tools_qt.set_widget_text(dialog, widget_name, f"{row[widget_name]}")
+
+        tools_qt.set_combo_value(dialog.state_type, f"{row['state_type']}", 0)
+        tools_qt.set_widget_text(dialog, "builtdate", row['builtdate'])
+        if str(row['undelete']) == 'True':
+            dialog.undelete.setChecked(True)
+
+        # Check related @geom_type
+        for geom_type in list_geom_type:
+            tools_gw.get_rows_by_feature_type(self, dialog, table_object, geom_type)

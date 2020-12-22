@@ -121,7 +121,8 @@ class GwDocument:
         self.dlg_add_doc.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, excluded_layers=["v_edit_element"]))
 
-        self.dlg_add_doc.doc_id.textChanged.connect(partial(tools_gw.exist_object, self, self.dlg_add_doc, table_object, None))
+        self.dlg_add_doc.doc_id.textChanged.connect(
+            partial(self.fill_dialog_document, self.dlg_add_doc, table_object, None))
         self.dlg_add_doc.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_add_doc, table_object, False, False, None, None))
         self.dlg_add_doc.btn_delete.clicked.connect(
@@ -396,3 +397,47 @@ class GwDocument:
         if files_path:
             tools_qt.set_widget_text(dialog, widget, str(file_text))
         return files_path
+
+
+    def fill_dialog_document(self, dialog, table_object, single_tool_mode=None):
+        # Reset list of selected records
+        tools_gw.reset_feature_list(self.ids, self.list_ids)
+
+        list_geom_type = ['arc', 'node', 'connec', 'element']
+        if global_vars.project_type == 'ud':
+            list_geom_type.append('gully')
+
+        object_id = tools_qt.get_text(dialog, table_object + "_id")
+
+        # Check if we already have data with selected object_id
+        sql = (f"SELECT * "
+               f" FROM {table_object}"
+               f" WHERE id = '{object_id}'")
+        row = tools_db.get_row(sql, log_info=False)
+
+        # If object_id not found: Clear data
+        if not row:
+            # Reset widgets
+            widgets = ["doc_type", "observ", "path"]
+            if widgets:
+                for widget_name in widgets:
+                    tools_qt.set_widget_text(dialog, widget_name, "")
+
+            if single_tool_mode is not None:
+                self.layers = tools_gw.remove_selection(single_tool_mode, self.layers)
+            else:
+                self.layers = tools_gw.remove_selection(True, self.layers)
+
+            for geom_type in list_geom_type:
+                tools_qt.reset_model(dialog, table_object, geom_type)
+
+            return
+
+        # Fill input widgets with data of the @row
+        tools_qt.set_widget_text(dialog, "doc_type", row["doc_type"])
+        tools_qt.set_widget_text(dialog, "observ", row["observ"])
+        tools_qt.set_widget_text(dialog, "path", row["path"])
+
+        # Check related @geom_type
+        for geom_type in list_geom_type:
+            tools_gw.get_rows_by_feature_type(self, dialog, table_object, geom_type)

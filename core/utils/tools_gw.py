@@ -2234,7 +2234,7 @@ def fill_tableview_rows(widget, field):
     return widget
 
 
-def set_calendar_by_user_param(dialog, widget, table_name, value, parameter):
+def set_calendar_from_user_param(dialog, widget, table_name, value, parameter):
     """ Executes query and set QDateEdit """
 
     sql = (f"SELECT {value} FROM {table_name}"
@@ -2459,116 +2459,6 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
     class_object.list_ids[geom_type] = class_object.ids
     enable_feature_type(dialog, table_object, ids=class_object.ids)
     connect_signal_selection_changed(class_object, dialog, table_object, query)
-
-
-def exist_object(class_object, dialog, table_object, single_tool_mode=None):
-    """ Check if selected object (document or element) already exists """
-
-    # Reset list of selected records
-    reset_feature_list(class_object.ids, class_object.list_ids)
-
-    list_geom_type = ['arc', 'node', 'connec', 'element']
-    if global_vars.project_type == 'ud':
-        list_geom_type.append('gully')
-
-    field_object_id = "id"
-    if table_object == "element":
-        field_object_id = table_object + "_id"
-    object_id = tools_qt.get_text(dialog, table_object + "_id")
-
-    # Check if we already have data with selected object_id
-    sql = (f"SELECT * "
-           f" FROM {table_object}"
-           f" WHERE {field_object_id} = '{object_id}'")
-    row = tools_db.get_row(sql, log_info=False)
-
-    # If object_id not found: Clear data
-    if not row:
-        reset_widgets(dialog, table_object)
-        if table_object == 'element':
-            set_combo_from_param_user(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
-            set_combo_from_param_user(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
-                      field_id='expl_id', field_name='name')
-            set_calendar_by_user_param(dialog, 'builtdate', 'config_param_user', 'value', 'edit_builtdate_vdefault')
-            set_combo_from_param_user(dialog, 'workcat_id', 'cat_work',
-                      'edit_workcat_vdefault', field_id='id', field_name='id')
-
-        if single_tool_mode is not None:
-            class_object.layers = remove_selection(single_tool_mode, class_object.layers)
-        else:
-            class_object.layers = remove_selection(True, class_object.layers)
-
-        for geom_type in list_geom_type:
-            tools_qt.reset_model(dialog, table_object, geom_type)
-
-        return
-
-    # Fill input widgets with data of the @row
-    fill_widgets(dialog, table_object, row)
-
-    # Check related @geom_type
-    for geom_type in list_geom_type:
-        get_rows_by_feature_type(class_object, dialog, table_object, geom_type)
-
-
-def reset_widgets(dialog, table_object):
-    """ Clear contents of input widgets """
-
-    widgets = None
-    if table_object == "doc":
-        widgets = ["doc_type", "observ", "path"]
-    elif table_object == "element":
-        widgets = ["elementcat_id", "state", "expl_id", "ownercat_id", "location_type", "buildercat_id", "workcat_id",
-                   "workcat_id_end", "comment", "observ", "path", "rotation", "verified", "num_elements"]
-
-    if widgets:
-        for widget_name in widgets:
-            tools_qt.set_widget_text(dialog, widget_name, "")
-
-
-def fill_widgets(dialog, table_object, row):
-    """ Fill input widgets with data int he @row """
-
-    if table_object == "doc":
-
-        tools_qt.set_widget_text(dialog, "doc_type", row["doc_type"])
-        tools_qt.set_widget_text(dialog, "observ", row["observ"])
-        tools_qt.set_widget_text(dialog, "path", row["path"])
-
-    elif table_object == "element":
-
-        state = ""
-        if row['state']:
-            sql = (f"SELECT name FROM value_state"
-                   f" WHERE id = '{row['state']}'")
-            row_aux = tools_db.get_row(sql)
-            if row_aux:
-                state = row_aux[0]
-
-        expl_id = ""
-        if row['expl_id']:
-            sql = (f"SELECT name FROM exploitation"
-                   f" WHERE expl_id = '{row['expl_id']}'")
-            row_aux = tools_db.get_row(sql)
-            if row_aux:
-                expl_id = row_aux[0]
-
-        tools_qt.set_widget_text(dialog, "code", row['code'])
-        sql = (f"SELECT elementtype_id FROM cat_element"
-               f" WHERE id = '{row['elementcat_id']}'")
-        row_type = tools_db.get_row(sql)
-        if row_type:
-            tools_qt.set_widget_text(dialog, "element_type", row_type[0])
-
-        widgets = ["elementcat_id", "state", "expl_id", "ownercat_id", "location_type", "buildercat_id", "workcat_id",
-                   "workcat_id_end", "comment", "observ", "link", "rotation", "verified", "num_elements"]
-        for widget_name in widgets:
-            tools_qt.set_widget_text(dialog, widget_name, row[widget_name])
-
-        tools_qt.set_combo_value(dialog.state_type, f"{row['state_type']}", 0)
-        tools_qt.set_widget_text(dialog, "builtdate", row['builtdate'])
-        if str(row['undelete']) == 'True':
-            dialog.undelete.setChecked(True)
 
 
 def set_combo_from_param_user(dialog, widget, table_name, parameter, field_id='id', field_name='id'):
