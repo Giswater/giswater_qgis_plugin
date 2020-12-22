@@ -631,20 +631,22 @@ class GwInfo(QObject):
 
 
     def disconnect_signals(self):
+
         try:
             self.layer.editingStarted.disconnect(self.fct_start_editing)
-        except Exception as e:
+        except Exception:
             pass
 
         try:
             self.layer.editingStopped.disconnect(self.fct_stop_editing)
-        except Exception as e:
+        except Exception:
             pass
 
         try:
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').toggled.disconnect(self.fct_block_action_edit)
-        except Exception as e:
+        except Exception:
             pass
+
         self.connected = False
         global is_inserting
         is_inserting = False

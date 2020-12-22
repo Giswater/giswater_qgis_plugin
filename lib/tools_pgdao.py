@@ -82,12 +82,9 @@ class PgDao(object):
 
     def get_poll(self):
 
-        status = True
         try:
             if self.check_cursor():
                 self.conn.poll()
-            else:
-                status = False
         except psycopg2.InterfaceError:
             self.reset_db()
         except psycopg2.OperationalError:

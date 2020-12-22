@@ -1510,7 +1510,8 @@ class GwMincut:
             self.iface.zoomToActiveLayer()
 
 
-    def snapping_node_arc_real_location(self, point, btn):  # @UnusedVariable
+    # noinspection PyUnusedLocal
+    def snapping_node_arc_real_location(self, point, btn):
 
         # Get coordinates
         event_point = self.snapper_manager.get_event_point(point=point)
@@ -1707,6 +1708,7 @@ class GwMincut:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
+    # noinspection PyUnusedLocal
     def custom_mincut_snapping(self, action, point, btn):
         """ Custom mincut snapping function """
 

@@ -205,7 +205,7 @@ class GwInfoTools:
         try:
             # Set field editability
             config.setReadOnly(field_index, not field['iseditable'])
-        except KeyError as e:
+        except KeyError:
             # Control if key 'iseditable' not exist
             pass
         finally:
