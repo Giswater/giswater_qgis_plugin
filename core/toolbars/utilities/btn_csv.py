@@ -253,6 +253,7 @@ class GwCSVButton(GwParentAction):
         dialog.progressBar.setVisible(True)
         dialog.progressBar.setValue(progress)
         # Counts rows in csvfile, using var "row_count" to do progressbar
+        # noinspection PyUnusedLocal
         row_count = sum(1 for rows in csvfile)
         if row_count > 20:
             row_count -= 20  # -20 for see 100% complete progress

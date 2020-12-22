@@ -339,7 +339,7 @@ class MainFields(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('main_credentials.ui', 'utilities')
 class Credentials(GwDialog, FORM_CLASS):
 
-    def __init__(self, subtag=None):
+    def __init__(self):
 
         super().__init__()
         self.txt_pass.setClearButtonEnabled(True)
@@ -454,7 +454,7 @@ class InfoWorkcatUi(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('main_qtdialog.ui')
 class MainQtDialogUi(GwDialog, FORM_CLASS):
 
-    def __init__(self, subtag=None):
+    def __init__(self):
 
         super().__init__()
         self.txt_pass.setClearButtonEnabled(True)

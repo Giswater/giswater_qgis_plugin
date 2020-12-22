@@ -1091,7 +1091,7 @@ class GwVisitManager(QObject):
         self.completer.setModel(model)
 
 
-    def manage_document(self, qtable):
+    def manage_document(self):
         """Access GUI to manage documents e.g Execute action of button 34 """
 
         visit_id = tools_qt.get_text(self.dlg_add_visit, self.dlg_add_visit.visit_id)
@@ -1124,7 +1124,6 @@ class GwVisitManager(QObject):
                f" WHERE id = '{parameter_id}'")
         row = tools_db.get_row(sql)
         form_type = str(row[0])
-        dlg_name = None
         if form_type in ('event_ud_arc_standard', 'event_standard'):
             self.dlg_event = VisitEvent()
             tools_gw.load_settings(self.dlg_event)

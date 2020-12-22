@@ -290,7 +290,8 @@ class GwGo2EpaTask(QgsTask):
         target = "null"
         col40 = "null"
         json_rpt = ""
-        row_count = sum(1 for rows in full_file)  # @UnusedVariable
+        # noinspection PyUnusedLocal
+        row_count = sum(1 for rows in full_file)
 
         for line_number, row in enumerate(full_file):
 

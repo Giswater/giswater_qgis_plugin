@@ -381,6 +381,7 @@ def set_combo_value(combo, value, item1):
         @item1: element to compare
         @item2: element to show
     """
+
     for i in range(0, combo.count()):
         elem = combo.itemData(i)
         if value == str(elem[item1]):
@@ -396,7 +397,6 @@ def set_combo_value(combo, value, item1):
     combo.addItem(new_elem[1], new_elem)
     combo.setCurrentIndex(combo.count() - 1)
     return False
-
 
 
 def fill_combo_values(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True, sort_by=1, add_empty=False):
@@ -596,9 +596,8 @@ def fill_table(widget, table_name, expr_filter=None, set_edit_strategy=QSqlTable
     model.select()
 
     # Check for errors
-    message = None
     if model.lastError().isValid():
-        message = model.lastError().text()
+        tools_log(f"fill_table: {model.lastError().text()}")
 
     # Attach model to table view
     widget.setModel(model)
@@ -650,9 +649,8 @@ def fill_table_object(widget, table_name, expr_filter=None):
     model.select()
 
     # Check for errors
-    message = None
     if model.lastError().isValid():
-        message = model.lastError().text()
+        tools_log(f"fill_table_object: {model.lastError().text()}")
 
     # Attach model to table view
     widget.setModel(model)
@@ -697,9 +695,8 @@ def set_model_to_table(widget, table_name, expr_filter=None, edit_strategy=QSqlT
     model.select()
 
     # Check for errors
-    message = None
     if model.lastError().isValid():
-        message = model.lastError().text()
+        tools_log(f"set_model_to_table: {model.lastError().text()}")
 
     # Attach model to table view
     if widget:

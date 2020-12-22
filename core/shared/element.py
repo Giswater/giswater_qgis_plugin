@@ -527,16 +527,13 @@ class GwElement:
         row = selected_list[0].row()
 
         # Get object_id from selected row
-        widget_id = table_object + "_id"
         field_object_id = table_object + "_id"
-
         selected_object_id = widget.model().record(row).value(field_object_id)
 
         # Close this dialog and open selected object
         dialog.close()
 
         self.manage_element(new_element_id=False, selected_object_id=selected_object_id)
-
 
 
     def check_date(self, widget, button=None, regex_type=1):
