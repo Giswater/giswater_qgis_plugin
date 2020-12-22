@@ -738,7 +738,7 @@ def delete_selected_rows(widget, table_object):
     selected_list = widget.selectionModel().selectedRows()
     if len(selected_list) == 0:
         message = "Any record selected"
-        show_warning(message)
+        tools_qgis.show_warning(message)
         return
 
     inf_text = ""
@@ -875,7 +875,7 @@ def manage_feature_cat():
     feature_cat = OrderedDict(sorted(feature_cat.items(), key=lambda t: t[0]))
 
     if msg != "Field child_layer of id: ":
-        show_warning(msg + "is not defined in table cat_feature")
+        tools_qgis.show_warning(msg + "is not defined in table cat_feature")
 
     return feature_cat
 
@@ -1096,11 +1096,11 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
             exist = tools_os.check_python_function(module, function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
-                show_message(msg, 2)
+                tools_qgis.show_message(msg, 2)
                 return widget
         else:
             message = "Parameter button_function is null for button"
-            show_message(message, 2, parameter=widget.objectName())
+            tools_qgis.show_message(message, 2, parameter=widget.objectName())
 
     kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name,
               'temp_layers_added': temp_layers_added}
@@ -1224,14 +1224,14 @@ def add_hyperlink(field):
             exist = tools_os.check_python_function(global_vars.session_vars['gw_infotools'], func_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
-                show_message(msg, 2)
+                tools_qgis.show_message(msg, 2)
                 return widget
         else:
             message = "Parameter widgetfunction is null for widget"
-            show_message(message, 2, parameter=real_name)
+            tools_qgis.show_message(message, 2, parameter=real_name)
     else:
         message = "Parameter not found"
-        show_message(message, 2, parameter='widgetfunction')
+        tools_qgis.show_message(message, 2, parameter='widgetfunction')
 
     # Call function-->func_name(widget) or def no_function_associated(self, widget=None, message_level=1)
     widget.clicked.connect(partial(getattr(global_vars.session_vars['gw_infotools'], func_name), widget))
@@ -1350,7 +1350,7 @@ def add_tableview(complet_result, field):
             exist = tools_os.check_python_function(sys.modules[__name__], function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
-                show_message(msg, 2)
+                tools_qgis.show_message(msg, 2)
                 return widget
 
     # Call def gw_api_open_rpt_result(widget, complet_result) of class ApiCf
@@ -1538,10 +1538,10 @@ def document_delete(qtable):
     if not status:
         error = qtable.model().lastError().text()
         message = "Error deleting data"
-        show_warning(message, parameter=error)
+        tools_qgis.show_warning(message, parameter=error)
     else:
         message = "Document deleted"
-        show_info(message)
+        tools_qgis.show_info(message)
         qtable.model().select()
 
 
@@ -1549,7 +1549,7 @@ def document_open(table, field_name):
 
     message = tools_qt.document_open(table, field_name)
     if message:
-        show_warning(message)
+        tools_qgis.show_warning(message)
 
 
 def check_config_settings(section, parameter, value, comment=None, config_type="user", file_name="user"):
@@ -1573,7 +1573,7 @@ def get_json(function_name, parameters=None, schema_name=None, commit=True, log_
     # Check if function exists
     row = tools_db.check_function(function_name, schema_name, commit)
     if row in (None, ''):
-        show_warning("Function not found in database", parameter=function_name)
+        tools_qgis.show_warning("Function not found in database", parameter=function_name)
         return None
 
     # Execute function. If failed, always log it
@@ -1643,7 +1643,7 @@ def manage_exception_api(json_result, sql=None, stack_level=2, stack_level_incre
                 tools_log.log_info(msg, parameter=parameter, level=level)
             elif not is_notify and global_vars.session_vars['show_db_exception']:
                 # Show exception message only if we are not in a task process
-                show_message(msg, level, parameter=parameter)
+                tools_qgis.show_message(msg, level, parameter=parameter)
 
         else:
 
@@ -1917,34 +1917,6 @@ def get_config(parameter='', columns='value', table='config_param_user', sql_add
     sql += ";"
     row = tools_db.get_row(sql, log_info=log_info)
     return row
-
-
-def show_message(text, message_level=1, duration=10, context_name=None, parameter=None, title=""):
-    """ Show message to the user with selected message level
-    message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)} """
-
-    # Check duration message for developers
-    dev_duration = get_config_parser('system', 'show_message_durations', "user", "user")
-    if dev_duration not in (None, "None"):
-        duration = int(duration)
-
-
-def show_info(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
-    """ Show information message to the user """
-
-    tools_qgis.show_message(text, 0, duration, context_name, parameter, title, logger_file)
-
-
-def show_warning(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
-    """ Show warning message to the user """
-
-    tools_qgis.show_message(text, 1, duration, context_name, parameter, title, logger_file)
-
-
-def show_critical(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
-    """ Show warning critical to the user """
-
-    tools_qgis.show_message(text, 2, duration, context_name, parameter, title, logger_file)
 
 
 def manage_layer_manager(json_result, sql):
@@ -2330,7 +2302,7 @@ def set_table_model(dialog, table_object, geom_type, expr_filter):
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
     model.select()
     if model.lastError().isValid():
-        show_warning(model.lastError().text())
+        tools_qgis.tools_qgis.show_warning(model.lastError().text())
         return expr
 
     # Attach model to selected widget
@@ -2490,7 +2462,7 @@ def reload_qtable(dialog, geom_type):
     qtable = tools_qt.get_widget(dialog, f'tbl_psector_x_{geom_type}')
     message = tools_qt.fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
     if message:
-        show_warning(message)
+        tools_qgis.tools_qgis.show_warning(message)
     set_tablemodel_config(dialog, qtable, f"plan_psector_x_{geom_type}")
     tools_qgis.refresh_map_canvas()
 
@@ -2622,7 +2594,7 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
         widget = tools_qt.get_widget(dialog, widget_name)
         if not widget:
             message = "Widget not found"
-            show_warning(message, parameter=widget_name)
+            tools_qgis.tools_qgis.show_warning(message, parameter=widget_name)
             return
     elif type(table_object) is QTableView:
         widget = table_object
