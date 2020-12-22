@@ -1533,6 +1533,12 @@ class GwAdmin:
         if not self.check_project_name(project_name_schema, project_descript):
             return
 
+        msg = "This process will take time (few minutes). Are you sure to continue?"
+        title = "Create example"
+        answer = tools_qt.ask_question(msg, title)
+        if not answer:
+            return
+        
         tools_log.log_info(f"Create schema of type '{project_type}': '{project_name_schema}'")
 
         if not is_test:
