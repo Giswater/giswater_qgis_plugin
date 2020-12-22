@@ -21,6 +21,9 @@ from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
 from . import tools_log
 from .. import global_vars
 
+# List of user parameters (optionals)
+user_parameters = {'log_sql': None, 'show_message_durations': None, 'aux_context': 'ui_message'}
+
 
 def get_visible_layers(as_list=False):
     """ Return string as {...} or [...] with name of table in DB of all visible layer in TOC """
@@ -104,7 +107,7 @@ def get_project_variables():
 
 
 def enable_python_console():
-    """ Enable Python console and Log Messages panel if parameter 'enable_python_console' = True """
+    """ Enable Python console and Log Messages panel """
 
     # Manage Python console
     python_console = global_vars.iface.mainWindow().findChild(QDockWidget, 'PythonConsole')

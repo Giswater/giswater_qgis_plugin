@@ -95,9 +95,15 @@ class Giswater(QObject):
         # Check for developers options
         comment = '# log_sql --> If True: show all get_json log, if False: does not show any, if None: ' \
                   'show python log_sql option'
-        tools_gw.check_config_settings('system', 'log_sql', 'None', comment, "user", "user")
+        value = tools_gw.check_config_settings('system', 'log_sql', 'None', comment)
+        tools_qgis.user_parameters['log_sql'] = value
         comment = '# show_message_durations --> Integer or None, if none: show python duration option'
-        tools_gw.check_config_settings('system', 'show_message_durations', 'None', comment, "user", "user")
+        value = tools_gw.check_config_settings('system', 'show_message_durations', 'None', comment)
+        tools_qgis.user_parameters['show_message_durations'] = value
+
+        # Log values of system user parameters located in 'user.config'
+        for parameter, value in tools_qgis.user_parameters.items():
+            tools_log.log_info(f"parameter '{parameter}': {value}")
 
         # Set main information button (always visible)
         self.set_info_button()
