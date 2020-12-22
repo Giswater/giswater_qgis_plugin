@@ -8,6 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2020/06/26
+DROP VIEW IF EXISTS v_ui_om_visitman_x_arc;
 CREATE OR REPLACE VIEW v_ui_om_visitman_x_arc AS 
 SELECT DISTINCT ON (v_ui_om_visit_x_arc.visit_id) v_ui_om_visit_x_arc.visit_id,
     v_ui_om_visit_x_arc.code,
@@ -22,7 +23,7 @@ SELECT DISTINCT ON (v_ui_om_visit_x_arc.visit_id) v_ui_om_visit_x_arc.visit_id,
     FROM v_ui_om_visit_x_arc
     LEFT JOIN om_visit_cat ON om_visit_cat.id = v_ui_om_visit_x_arc.visitcat_id;
 	
-	
+DROP VIEW IF EXISTS v_ui_om_visitman_x_node;
 CREATE OR REPLACE VIEW v_ui_om_visitman_x_node AS 
 SELECT DISTINCT ON (v_ui_om_visit_x_node.visit_id) v_ui_om_visit_x_node.visit_id,
     v_ui_om_visit_x_node.code,
@@ -37,7 +38,7 @@ SELECT DISTINCT ON (v_ui_om_visit_x_node.visit_id) v_ui_om_visit_x_node.visit_id
     FROM v_ui_om_visit_x_node
     LEFT JOIN om_visit_cat ON om_visit_cat.id = v_ui_om_visit_x_node.visitcat_id;
 	
-
+DROP VIEW IF EXISTS v_ui_om_visitman_x_connec;
 CREATE OR REPLACE VIEW v_ui_om_visitman_x_connec AS 
  SELECT DISTINCT ON (v_ui_om_visit_x_connec.visit_id) v_ui_om_visit_x_connec.visit_id,
     v_ui_om_visit_x_connec.code,

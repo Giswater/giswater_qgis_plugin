@@ -60,7 +60,6 @@ DROP VIEW IF EXISTS v_edit_inp_valve;
 DROP VIEW IF EXISTS vp_basic_arc;
 DROP VIEW IF EXISTS vi_parent_dma;
 DROP VIEW IF EXISTS vi_parent_arc;
-DROP VIEW IF EXISTS v_edit_arc;
 DROP VIEW IF EXISTS ve_arc;
 
 DROP VIEW IF EXISTS v_edit_man_varc;
@@ -79,6 +78,7 @@ DROP VIEW IF EXISTS v_plan_arc;
 DROP VIEW IF EXISTS v_plan_aux_arc_cost;
 DROP VIEW IF EXISTS v_plan_aux_arc_ml;
 DROP VIEW IF EXISTS v_ui_arc_x_node;
+DROP VIEW IF EXISTS v_edit_arc;
 DROP VIEW IF EXISTS v_arc;
 DROP VIEW IF EXISTS vu_arc;
 

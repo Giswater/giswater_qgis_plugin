@@ -47,7 +47,7 @@ INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_
 VALUES (98, 'Tanks with null mandatory values', 'EPA', 'Tanks with null mandatory values','ws') ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_fprocess_cat(id, fprocess_name, context, fprocess_i18n, project_type)
-VALUES (99, 'Mincut process', 'om', 'Mincut process', 'ws');
+VALUES (99, 'Mincut process', 'om', 'Mincut process', 'ws') ON CONFLICT (id) DO NOTHING;
 
 
 --20/11/2019
