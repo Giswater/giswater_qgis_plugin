@@ -473,11 +473,11 @@ class GwPsector:
         psector_id = tools_qt.get_text(self.dlg_plan_psector, "psector_id")
         sql = f"SELECT gw_fct_plan_psector_enableall({value}, '{psector_id}')"
         tools_db.execute_sql(sql)
-        tools_gw.reload_qtable(self.dlg_plan_psector, 'arc')
-        tools_gw.reload_qtable(self.dlg_plan_psector, 'node')
-        tools_gw.reload_qtable(self.dlg_plan_psector, 'connec')
+        tools_gw.reload_tableview_psector(self.dlg_plan_psector, 'arc')
+        tools_gw.reload_tableview_psector(self.dlg_plan_psector, 'node')
+        tools_gw.reload_tableview_psector(self.dlg_plan_psector, 'connec')
         if self.project_type.upper() == 'UD':
-            tools_gw.reload_qtable(self.dlg_plan_psector, 'gully')
+            tools_gw.reload_tableview_psector(self.dlg_plan_psector, 'gully')
 
         sql = (f"UPDATE plan_psector "
                f"SET enable_all = '{value}' "

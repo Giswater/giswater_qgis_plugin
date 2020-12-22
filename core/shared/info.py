@@ -1467,11 +1467,11 @@ class GwInfo(QObject):
         """
         complet_result = kwargs['complet_result']
         field = kwargs['field']
-
+        dialog = kwargs['dialog']
         widget = tools_gw.add_tableview(complet_result, field)
-        widget = tools_gw.add_headers(widget, field)
-        widget = tools_gw.fill_standard_item_model(widget, field)
-        widget = tools_gw.set_columns_config(widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
+        widget = tools_gw.add_tableview_header(widget, field)
+        widget = tools_gw.fill_tableview_rows(widget, field)
+        widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
         tools_qt.set_qtv_config(widget)
         return widget
 
@@ -1969,7 +1969,7 @@ class GwInfo(QObject):
 
         table_element = "v_ui_element_x_" + self.geom_type
         self.fill_tbl_element_man(self.dlg_cf, self.tbl_element, table_element, self.filter)
-        tools_gw.set_columns_config(self.tbl_element, table_element)
+        tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_element, table_element)
 
 
     def fill_tbl_element_man(self, dialog, widget, table_name, expr_filter):
@@ -2161,7 +2161,7 @@ class GwInfo(QObject):
         message = tools_qt.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
         if message:
             tools_qgis.show_warning(message)
-        tools_gw.set_columns_config(self.tbl_relations, table_relations)
+        tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_relations, table_relations)
         self.tbl_relations.doubleClicked.connect(partial(self.open_relation, str(self.field_id)))
 
 
@@ -2221,13 +2221,13 @@ class GwInfo(QObject):
         message= tools_qt.fill_table(self.dlg_cf.tbl_upstream, table_name, filter_)
         if message:
             tools_qgis.show_warning(message)
-        tools_gw.set_columns_config(self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
+        tools_gw.set_tablemodel_config(self.dlg_cf, self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
 
         table_name = f"{self.schema_name}.v_ui_node_x_connection_downstream"
         message = tools_qt.fill_table(self.dlg_cf.tbl_downstream, table_name, filter_)
         if message:
             tools_qgis.show_warning(message)
-        tools_gw.set_columns_config(self.dlg_cf.tbl_downstream, "v_ui_node_x_connection_downstream")
+        tools_gw.set_tablemodel_config(self.dlg_cf, self.dlg_cf.tbl_downstream, "v_ui_node_x_connection_downstream")
 
         self.dlg_cf.tbl_upstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_upstream))
         self.dlg_cf.tbl_downstream.doubleClicked.connect(partial(self.open_up_down_stream, self.tbl_downstream))
@@ -2263,7 +2263,7 @@ class GwInfo(QObject):
         table_hydro = "v_ui_hydrometer"
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
         self.fill_tbl_hydrometer(self.tbl_hydrometer, table_hydro)
-        tools_gw.set_columns_config(self.tbl_hydrometer, table_hydro)
+        tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_hydrometer, table_hydro)
         txt_hydrometer_id.textChanged.connect(partial(self.fill_tbl_hydrometer, self.tbl_hydrometer, table_hydro))
         self.tbl_hydrometer.doubleClicked.connect(partial(self.open_selected_hydro, self.tbl_hydrometer))
         self.dlg_cf.findChild(QPushButton, "btn_link").clicked.connect(self.check_url)
@@ -2357,7 +2357,7 @@ class GwInfo(QObject):
         tools_qt.fill_combo_values(self.dlg_cf.cmb_hyd_customer_code, rows_list, 1)
 
         self.fill_tbl_hydrometer_values(self.tbl_hydrometer_value, table_hydro_value)
-        tools_gw.set_columns_config(self.tbl_hydrometer_value, table_hydro_value)
+        tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_hydrometer_value, table_hydro_value)
 
         self.dlg_cf.cmb_cat_period_id_filter.currentIndexChanged.connect(
             partial(self.fill_tbl_hydrometer_values, self.tbl_hydrometer_value, table_hydro_value))
@@ -2381,7 +2381,7 @@ class GwInfo(QObject):
         message = tools_qt.set_model_to_table(qtable, f"{self.schema_name}.{table_name}", filter_, edit_strategy)
         if message:
             tools_qgis.show_warning(message)
-        tools_gw.set_columns_config(self.tbl_hydrometer_value, table_name)
+        tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_hydrometer_value, table_name)
 
 
     def set_filter_hydrometer_values(self, widget):
@@ -2407,7 +2407,7 @@ class GwInfo(QObject):
         table_event_geom = "v_ui_event_x_" + geom_type
         self.fill_tbl_event(self.tbl_event_cf, table_event_geom, self.filter)
         self.tbl_event_cf.doubleClicked.connect(self.open_visit_event)
-        tools_gw.set_columns_config(self.tbl_event_cf, table_event_geom)
+        tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_event_cf, table_event_geom)
 
 
     def fill_tbl_event(self, widget, table_name, filter_):
@@ -2851,7 +2851,7 @@ class GwInfo(QObject):
 
         table_document = "v_ui_doc_x_" + self.geom_type
         self.fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
-        tools_gw.set_columns_config(self.tbl_document, table_document)
+        tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_document, table_document)
 
 
     def fill_tbl_document_man(self, dialog, widget, table_name, expr_filter):
@@ -3096,8 +3096,8 @@ class GwInfo(QObject):
             if field['widgettype'] == "tableview":
                 qtable = dialog.findChild(QTableView, field['widgetname'])
                 if qtable:
-                    tools_gw.add_headers(qtable, field)
-                    tools_gw.fill_standard_item_model(qtable, field)
+                    tools_gw.add_tableview_header(qtable, field)
+                    tools_gw.fill_tableview_rows(qtable, field)
 
         return complet_list
 

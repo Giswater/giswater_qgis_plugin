@@ -1948,7 +1948,7 @@ def selection_changed(class_object, dialog, table_object, query=False, lazy_widg
     if query:
         insert_feature_to_plan(dialog, class_object.geom_type, ids=ids)
         class_object.layers = remove_selection()
-        reload_qtable(dialog, class_object.geom_type)
+        reload_tableview_psector(dialog, class_object.geom_type)
     else:
         load_table(dialog, table_object, class_object.geom_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -2066,7 +2066,7 @@ def insert_feature_to_plan(dialog, geom_type, ids=None):
         sql = f"INSERT INTO plan_psector_x_{geom_type} ({geom_type}_id, psector_id) "
         sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"
         tools_db.execute_sql(sql)
-        reload_qtable(dialog, geom_type)
+        reload_tableview_psector(dialog, geom_type)
 
 
 def connect_signal_selection_changed(class_object, dialog, table_object, query=False):
@@ -2248,7 +2248,8 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
             if width is None:
                 width = 100
             widget.setColumnWidth(row['columnindex'] - 1, width)
-            widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
+            if row['alias'] is not None:
+                widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
 
     # Set order
     if isQStandardItemModel:
@@ -2275,7 +2276,7 @@ def add_icon(widget, icon, sub_folder="20x20"):
         tools_log.log_info("File not found", parameter=icon_path)
 
 
-def add_headers(widget, field):
+def add_tableview_header(widget, field):
 
     model = widget.model()
     if model is None:
@@ -2294,7 +2295,7 @@ def add_headers(widget, field):
     return widget
 
 
-def fill_standard_item_model(widget, field):
+def fill_tableview_rows(widget, field):
 
     model = widget.model()
     for item in field['value']:
@@ -2343,7 +2344,7 @@ def load_table(dialog, table_object, geom_type, expr_filter):
     return expr
 
 
-def reload_qtable(dialog, geom_type):
+def reload_tableview_psector(dialog, geom_type):
     """ Reload QtableView """
 
     value = tools_qt.get_text(dialog, dialog.psector_id)
@@ -2351,7 +2352,7 @@ def reload_qtable(dialog, geom_type):
     qtable = tools_qt.get_widget(dialog, f'tbl_psector_x_{geom_type}')
     message = tools_qt.fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
     if message:
-        tools_qgis.tools_qgis.show_warning(message)
+        tools_qgis.show_warning(message)
     set_tablemodel_config(dialog, qtable, f"plan_psector_x_{geom_type}")
     tools_qgis.refresh_map_canvas()
 
@@ -2402,41 +2403,6 @@ def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
             widget_to.setDate(row[1])
         else:
             widget_to.setDate(current_date)
-
-
-def set_columns_config(widget, table_name, sort_order=0, isQStandardItemModel=False):
-    """ Configuration of tables. Set visibility and width of columns """
-
-    # Set width and alias of visible columns
-    columns_to_delete = []
-    sql = (f"SELECT columnindex, width, alias, status FROM config_form_tableview"
-           f" WHERE tablename = '{table_name}' ORDER BY columnindex")
-    rows = tools_db.get_rows(sql, log_info=True)
-    if not rows:
-        return widget
-
-    for row in rows:
-        if not row['status']:
-            columns_to_delete.append(row['columnindex'] - 1)
-        else:
-            width = row['width']
-            if width is None:
-                width = 100
-            widget.setColumnWidth(row['columnindex'] - 1, width)
-            if row['alias'] is not None:
-                widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
-
-    # Set order
-    if isQStandardItemModel:
-        widget.model().sort(sort_order, Qt.AscendingOrder)
-    else:
-        widget.model().setSort(sort_order, Qt.AscendingOrder)
-        widget.model().select()
-    # Delete columns
-    for column in columns_to_delete:
-        widget.hideColumn(column)
-
-    return widget
 
 
 def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[], single_tool_mode=None, layers=None):
@@ -2551,7 +2517,7 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
     # Update model of the widget with selected expr_filter
     if query:
         delete_feature_at_plan(dialog, geom_type, list_id)
-        reload_qtable(dialog, geom_type)
+        reload_tableview_psector(dialog, geom_type)
     else:
         load_table(dialog, table_object, geom_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
