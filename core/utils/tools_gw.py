@@ -2461,13 +2461,4 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
     connect_signal_selection_changed(class_object, dialog, table_object, query)
 
 
-def set_combo_from_param_user(dialog, widget, table_name, parameter, field_id='id', field_name='id'):
-    """ Executes query and set combo box """
-
-    sql = (f"SELECT t1.{field_name} FROM {table_name} as t1"
-           f" INNER JOIN config_param_user as t2 ON t1.{field_id}::text = t2.value::text"
-           f" WHERE parameter = '{parameter}' AND cur_user = current_user")
-    row = tools_db.get_row(sql)
-    if row:
-        tools_qt.set_widget_text(dialog, widget, row[0])
 

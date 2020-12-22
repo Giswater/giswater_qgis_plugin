@@ -642,11 +642,11 @@ class GwElement:
             for widget_name in widgets:
                 tools_qt.set_widget_text(dialog, widget_name, "")
 
-            tools_gw.set_combo_from_param_user(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
-            tools_gw.set_combo_from_param_user(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
+            self.set_combo_from_param_user(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
+            self.set_combo_from_param_user(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
                       field_id='expl_id', field_name='name')
             tools_gw.set_calendar_from_user_param(dialog, 'builtdate', 'config_param_user', 'value', 'edit_builtdate_vdefault')
-            tools_gw.set_combo_from_param_user(dialog, 'workcat_id', 'cat_work',
+            self.set_combo_from_param_user(dialog, 'workcat_id', 'cat_work',
                       'edit_workcat_vdefault', field_id='id', field_name='id')
             if single_tool_mode is not None:
                 self.layers = tools_gw.remove_selection(single_tool_mode, self.layers)
@@ -679,3 +679,15 @@ class GwElement:
         # Check related @geom_type
         for geom_type in list_geom_type:
             tools_gw.get_rows_by_feature_type(self, dialog, table_object, geom_type)
+
+
+    def set_combo_from_param_user(self, dialog, widget, table_name, parameter, field_id='id', field_name='id'):
+        """ Executes query and set combo box """
+
+        sql = (f"SELECT t1.{field_name} FROM {table_name} as t1"
+               f" INNER JOIN config_param_user as t2 ON t1.{field_id}::text = t2.value::text"
+               f" WHERE parameter = '{parameter}' AND cur_user = current_user")
+        row = tools_db.get_row(sql)
+        if row:
+            tools_qt.set_widget_text(dialog, widget, row[0])
+
