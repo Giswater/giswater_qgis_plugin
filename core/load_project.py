@@ -233,7 +233,7 @@ class LoadProject(QObject):
         # Dynamically get list of toolbars from config file
         toolbar_names = tools_gw.check_config_settings('toolbars', 'list_toolbars',
                                                        'basic, om, edit, cad, epa, plan, utilities, toc',
-                                                       config_type="project", file_name="giswater")
+                                                       config_type="project", file_name="init")
         toolbar_names = toolbar_names.replace(' ', '').split(',')
         # Get user UI config file
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
@@ -263,7 +263,8 @@ class LoadProject(QObject):
             ag = QActionGroup(parent)
             ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
-                button_def = tools_gw.check_config_settings('buttons_def', str(index_action), 'None')
+                button_def = tools_gw.check_config_settings('buttons_def', str(index_action), 'None',
+                                                            config_type="project", file_name="init")
                 if button_def:
                     text = self.translate(f'{index_action}_text')
                     icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
@@ -271,11 +272,13 @@ class LoadProject(QObject):
                     self.buttons[index_action] = button
 
         # Disable buttons which are project type exclusive
-        project_exclusive = tools_gw.check_config_settings('project_exclusive', str(self.project_type), 'None', 'None')
+        project_exclusive = tools_gw.check_config_settings('project_exclusive', str(self.project_type), 'None',
+                                                           config_type="project", file_name="init")
         if project_exclusive:
             project_exclusive = project_exclusive.replace(' ', '').split(',')
             for index in project_exclusive:
                 self.hide_button(index)
+
 
         # Hide buttons from buttons_to_hide
         for button_id in self.buttons_to_hide:
@@ -293,7 +296,7 @@ class LoadProject(QObject):
     def create_toolbar(self, toolbar_id):
 
         list_actions = tools_gw.check_config_settings('toolbars', str(toolbar_id), 'None',
-                                                           config_type="project", file_name="giswater")
+                                                           config_type="project", file_name="init")
         list_actions = list_actions.replace(' ', '').split(',')
         if list_actions is None:
             return
