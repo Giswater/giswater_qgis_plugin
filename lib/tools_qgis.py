@@ -411,7 +411,7 @@ def disconnect_signal_selection_changed():
 
     try:
         global_vars.canvas.selectionChanged.disconnect()
-    except Exception as e:
+    except Exception:
         pass
     finally:
         global_vars.iface.actionPan().trigger()
@@ -555,7 +555,7 @@ def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=Non
         # entry for the list of category items
         categories.append(category)
 
-        # create renderer object
+    # create renderer object
     renderer = QgsCategorizedSymbolRenderer(cat_field, categories)
 
     # assign the created renderer to the layer
@@ -755,7 +755,7 @@ def get_geometry_from_json(feature):
         return None
 
 
-# Region private functions
+#region Private functions
 def get_vertex_from_point(feature):
     """ Manage feature geometry when is Point
     :param feature: feature to get geometry type and coordinates (GeoJson)
@@ -845,4 +845,5 @@ def get_multi_coordinates(feature):
     coordinates = coordinates[:-2] + ")"
     return coordinates
 
-# End region
+#endregion
+
