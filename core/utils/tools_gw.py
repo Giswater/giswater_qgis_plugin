@@ -2323,7 +2323,7 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
     if global_vars.project_type == 'ud':
         list_geom_type.append('gully')
     for geom_type in list_geom_type:
-        tools_qt.reset_model(dialog, table_object, "geom_type")
+        tools_qt.reset_model(dialog, table_object, geom_type)
 
     close_dialog(dialog)
     hide_parent_layers(excluded_layers=excluded_layers)
