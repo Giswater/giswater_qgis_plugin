@@ -63,7 +63,6 @@ def load_settings(dialog):
     except:
         pass
 
-# TODO Start Generic Section
 
 def save_settings(dialog):
     """ Save user UI related with dialog position and size """
@@ -84,13 +83,17 @@ def get_config_parser(section: str, parameter: str, config_type, file_name) -> s
     path_folder = None
     try:
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
-        if config_type in ("user"):
+        if config_type in "user":
             path_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
-        elif config_type in ("project"):
+        elif config_type in "project":
             path_folder = global_vars.plugin_dir
+        else:
+            tools_log.log_warning(f"get_config_parser: Reference config_type = '{config_type}' it is not managed")
+            return None
+
         path = path_folder + os.sep + "config" + os.sep + f'{file_name}.config'
         if not os.path.exists(path):
-            return value
+            return None
 
         parser.read(path)
         value = parser[section][parameter]
@@ -103,7 +106,6 @@ def get_config_parser(section: str, parameter: str, config_type, file_name) -> s
 def set_config_parser(section: str, parameter: str, value: str, comment=None, config_type="user", file_name="sessions"):
     """ Save simple parser value """
 
-
     try:
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         if config_type in "user":
@@ -111,7 +113,7 @@ def set_config_parser(section: str, parameter: str, value: str, comment=None, co
         elif config_type in "project":
             path_folder = global_vars.plugin_dir
         else:
-            tools_log.log_warning(f"EXCEPTION: Reference config_type = {config_type} it is not managed")
+            tools_log.log_warning(f"set_config_parser: Reference config_type = '{config_type}' it is not managed")
             return None
 
         config_folder = path_folder + os.sep + "config" + os.sep
@@ -119,7 +121,7 @@ def set_config_parser(section: str, parameter: str, value: str, comment=None, co
             os.makedirs(config_folder)
         path = config_folder + f"{file_name}.config"
         parser.read(path)
-        # Check if section dialogs_position exists in file
+        # Check if section exists in file
         if section not in parser:
             parser.add_section(section)
         if comment is not None:
@@ -1551,20 +1553,12 @@ def document_open(table, field_name):
 
 
 def check_config_settings(section, parameter, value, comment=None, config_type="user", file_name="user"):
-    """ Check if @section and @parameter exists in user settings file. If not add them = None """
+    """ Check if @section and @parameter exists in file @file_name. If not add them = None """
 
     result = get_config_parser(section, parameter, config_type, file_name)
     if result is not None: return result
     set_config_parser(section, parameter, value, comment, config_type, file_name)
 
-
-# TODO End Generic Section
-
-
-# TODO tools_gw_config
-
-
-# TODO tools_gw_db
 
 def get_json(function_name, parameters=None, schema_name=None, commit=True, log_sql=False,
              log_result=False, json_loads=False, is_notify=False, rubber_band=None):
@@ -1924,16 +1918,6 @@ def get_config(parameter='', columns='value', table='config_param_user', sql_add
     row = tools_db.get_row(sql, log_info=log_info)
     return row
 
-# TODO tools_gw_log
-
-
-# TODO tools_gw_os
-
-
-# TODO tools_gw_pgdao
-
-
-# TODO tools_gw_qgis
 
 def show_message(text, message_level=1, duration=10, context_name=None, parameter=None, title=""):
     """ Show message to the user with selected message level
@@ -2249,8 +2233,6 @@ def connect_signal_selection_changed(class_object, dialog, table_object, query=F
     except Exception as e:
         tools_log.log_info(f"connect_signal_selection_changed: {e}")
 
-
-# TODO tools_gw_qt
 
 def dock_dialog(dialog):
 
