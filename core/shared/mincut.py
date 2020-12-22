@@ -1215,7 +1215,7 @@ class GwMincut:
     def reload_table_connec(self, expr_filter=None):
         """ Reload contents of table 'connec' with selected @expr_filter """
 
-        expr = tools_gw.set_table_model(self.dlg_connec, 'tbl_mincut_connec', "connec", expr_filter)
+        expr = tools_qt.set_table_model(self.dlg_connec, 'tbl_mincut_connec', "connec", expr_filter)
         tools_gw.set_tablemodel_config(self.dlg_connec, 'tbl_mincut_connec', 'v_edit_connec')
         return expr
 
@@ -1223,7 +1223,7 @@ class GwMincut:
     def reload_table_hydro(self, expr_filter=None):
         """ Reload contents of table 'hydro' """
 
-        expr = tools_gw.set_table_model(self.dlg_hydro, "tbl_hydro", "v_rtc_hydrometer", expr_filter)
+        expr = tools_qt.set_table_model(self.dlg_hydro, "tbl_hydro", "v_rtc_hydrometer", expr_filter)
         tools_gw.set_tablemodel_config(self.dlg_hydro, "tbl_hydro", 'v_rtc_hydrometer')
         return expr
 

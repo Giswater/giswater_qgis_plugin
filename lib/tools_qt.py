@@ -1322,3 +1322,53 @@ def populate_cmb_unicodes(combo):
 
     if sorted_list:
         set_autocompleter(combo, sorted_list)
+
+
+def set_table_model(dialog, table_object, table_name, expr_filter):
+    """ Sets a TableModel to @widget_name attached to
+        @table_name and filter @expr_filter
+    """
+
+    expr = None
+    if expr_filter:
+        # Check expression
+        (is_valid, expr) = check_expression_filter(expr_filter)  # @UnusedVariable
+        if not is_valid:
+            return expr
+
+    # Set a model with selected filter expression
+
+    if global_vars.schema_name not in table_name:
+        table_name = global_vars.schema_name + "." + table_name
+
+    # Set the model
+    model = QSqlTableModel(db=global_vars.session_vars['db'])
+    model.setTable(table_name)
+    model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+    model.select()
+    if model.lastError().isValid():
+        tools_qgis.show_warning(model.lastError().text())
+        return expr
+
+    # Attach model to selected widget
+    if type(table_object) is str:
+        widget = get_widget(dialog, table_object)
+        if not widget:
+            message = "Widget not found"
+            tools_log.log_info(message, parameter=table_object)
+            return expr
+    elif type(table_object) is QTableView:
+        widget = table_object
+    else:
+        msg = "Table_object is not a table name or QTableView"
+        tools_log.log_info(msg)
+        return expr
+
+    if expr_filter:
+        widget.setModel(model)
+        widget.model().setFilter(expr_filter)
+        widget.model().select()
+    else:
+        widget.setModel(None)
+
+    return expr
