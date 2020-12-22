@@ -15,7 +15,7 @@ from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsRubberBand, QgsVertexMar
 
 from ..utils import tools_gw
 from ..ui.ui_manager import DimensioningUi
-from ..utils.tools_gw import SnappingConfigManager
+from ..utils.tools_gw_snap_manager import GwSnapManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt
 
@@ -31,7 +31,7 @@ class GwDimensioning:
         self.canvas = global_vars.canvas
         self.points = None
         self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager = GwSnapManager(self.iface)
 
 
     def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None, rubber_band=None):

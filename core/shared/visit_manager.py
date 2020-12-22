@@ -28,7 +28,7 @@ from ..models.om_visit_x_gully import OmVisitXGully
 from ..models.om_visit_parameter import OmVisitParameter
 from ..ui.ui_manager import VisitUi, VisitEvent, VisitEventRehab, VisitManagerUi
 from ..utils import tools_gw
-from ..utils.tools_gw import SnappingConfigManager
+from ..utils.tools_gw_snap_manager import GwSnapManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_db
 
@@ -55,7 +55,7 @@ class GwVisitManager(QObject):
         self.lazy_widget = None
         self.lazy_init_function = None
 
-        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager = GwSnapManager(self.iface)
 
 
     def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,

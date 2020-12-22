@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView
 
 from ..utils import tools_gw
 from ..ui.ui_manager import ElementUi, ElementManager
-from ..utils.tools_gw import SnappingConfigManager
+from ..utils.tools_gw_snap_manager import GwSnapManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_db
 
@@ -28,7 +28,7 @@ class GwElement:
         self.schema_name = global_vars.schema_name
 
         self.vertex_marker = QgsVertexMarker(global_vars.canvas)
-        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager = GwSnapManager(self.iface)
 
 
     def manage_element(self, new_element_id=True, feature=None, geom_type=None, selected_object_id=None):

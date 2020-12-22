@@ -13,9 +13,9 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor, QColor, QIcon
 from qgis.PyQt.QtWidgets import QAction
 
-from ..utils.tools_gw import SnappingConfigManager
-from ... import global_vars
 from ..utils import tools_gw
+from ..utils.tools_gw_snap_manager import GwSnapManager
+from ... import global_vars
 
 
 class GwParentMapTool(QgsMapTool):
@@ -35,7 +35,7 @@ class GwParentMapTool(QgsMapTool):
         self.layer_gully = None
         self.layer_node = None
 
-        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager = GwSnapManager(self.iface)
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         super().__init__(self.canvas)

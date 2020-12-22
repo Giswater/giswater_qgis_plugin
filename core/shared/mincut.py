@@ -24,11 +24,11 @@ from .mincut_manager import GwMincutManager
 from .search import GwSearch
 from ..tasks.parent_task import GwTask
 from ..utils import tools_gw
-from ..utils.tools_gw import SnappingConfigManager
 from ..ui.ui_manager import DialogTextUi, Mincut, MincutComposer, MincutConnec, MincutEndUi, MincutHydrometer
 from ... import global_vars
 from ...lib import tools_qt, tools_qgis, tools_log, tools_db
 from ..utils.tools_gw_select_manager import GwSelectManager
+from ..utils.tools_gw_snap_manager import GwSnapManager
 
 
 class GwMincut:
@@ -1388,7 +1388,7 @@ class GwMincut:
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         # Snapper
-        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager = GwSnapManager(self.iface)
         self.snapper = self.snapper_manager.get_snapper()
 
         self.init_mincut_canvas()

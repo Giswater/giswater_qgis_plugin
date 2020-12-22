@@ -32,7 +32,7 @@ from .element import GwElement
 from .visit_gallery import GwVisitGallery
 from .visit_manager import GwVisitManager
 from ..utils import tools_gw
-from ..utils.tools_gw import SnappingConfigManager
+from ..utils.tools_gw_snap_manager import GwSnapManager
 from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
 from ... import global_vars
@@ -63,7 +63,7 @@ class GwInfo(QObject):
         self.tab_type = tab_type
         self.connected = False
         self.rubber_band = QgsRubberBand(self.canvas, 0)
-        self.snapper_manager = SnappingConfigManager(self.iface)
+        self.snapper_manager = GwSnapManager(self.iface)
         self.snapper_manager.set_snapping_layers()
         self.suppres_form = None
 
