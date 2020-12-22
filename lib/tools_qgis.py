@@ -25,6 +25,52 @@ from .. import global_vars
 user_parameters = {'log_sql': None, 'show_message_durations': None, 'aux_context': 'ui_message'}
 
 
+def show_message(text, message_level=1, duration=10, context_name=None, parameter=None, title="", logger_file=True):
+    """ Show message to the user with selected message level
+    message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)} """
+
+    global user_parameters
+
+    # Get optional parameter 'show_message_durations'
+    dev_duration = None
+    if 'show_message_durations' in user_parameters:
+        dev_duration = user_parameters['show_message_durations']
+    # If is set, use this value
+    if dev_duration not in (None, "None"):
+        duration = int(dev_duration)
+
+    msg = None
+    if text:
+        msg = tools_qt.tr(text, context_name, user_parameters['aux_context'])
+        if parameter:
+            msg += f": {parameter}"
+
+    # Show message
+    global_vars.iface.messageBar().pushMessage(title, msg, message_level, duration)
+
+    # Check if logger to file
+    if global_vars.logger and logger_file:
+        global_vars.logger.info(text)
+
+
+def show_info(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
+    """ Show information message to the user """
+
+    show_message(text, 0, duration, context_name, parameter, title, logger_file)
+
+
+def show_warning(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
+    """ Show warning message to the user """
+
+    show_message(text, 1, duration, context_name, parameter, title, logger_file)
+
+
+def show_critical(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
+    """ Show critical message to the user """
+
+    show_message(text, 2, duration, context_name, parameter, title, logger_file)
+
+
 def get_visible_layers(as_list=False):
     """ Return string as {...} or [...] with name of table in DB of all visible layer in TOC """
 

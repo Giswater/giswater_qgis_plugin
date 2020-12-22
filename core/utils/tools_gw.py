@@ -1928,39 +1928,23 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
     if dev_duration not in (None, "None"):
         duration = int(duration)
 
-    msg = None
-    if text:
-        msg = tools_qt.tr(text, context_name, aux_context='ui_message')
-        if parameter:
-            msg += ": " + str(parameter)
-    try:
-        global_vars.iface.messageBar().pushMessage(title, msg, message_level, duration)
-    except AttributeError:
-        pass
 
-
-def show_info( text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
+def show_info(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
     """ Show information message to the user """
 
-    show_message(text, 0, duration, context_name, parameter, title)
-    if global_vars.logger and logger_file:
-        global_vars.logger.info(text)
+    tools_qgis.show_message(text, 0, duration, context_name, parameter, title, logger_file)
 
 
 def show_warning(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
     """ Show warning message to the user """
 
-    show_message(text, 1, duration, context_name, parameter, title)
-    if global_vars.logger and logger_file:
-        global_vars.logger.warning(text)
+    tools_qgis.show_message(text, 1, duration, context_name, parameter, title, logger_file)
 
 
 def show_critical(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
-    """ Show warning message to the user """
+    """ Show warning critical to the user """
 
-    show_message(text, 2, duration, context_name, parameter, title)
-    if global_vars.logger and logger_file:
-        global_vars.logger.critical(text)
+    tools_qgis.show_message(text, 2, duration, context_name, parameter, title, logger_file)
 
 
 def manage_layer_manager(json_result, sql):
