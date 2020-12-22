@@ -117,7 +117,7 @@ class LoadProject(QObject):
 
         # Open automatically 'search docker' depending its value in user settings
         open_search = tools_gw.check_config_settings('btn_search', 'open_search', 'false', config_type="user",
-                                                     file_name="sessions")
+                                                     file_name="giswater")
         if tools_os.cast_boolean(open_search):
             GwSearch().api_search(load_project=True)
 

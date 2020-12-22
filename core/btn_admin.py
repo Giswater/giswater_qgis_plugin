@@ -336,7 +336,7 @@ class GwAdmin:
         if tools_gw.get_config_parser('btn_admin', 'project_type', "user", "user") not in ('', None):
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
                                    tools_gw.get_config_parser('btn_admin', 'project_type', "user", "user"))
-        if tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "sessions") not in ('', None):
+        if tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "giswater") not in ('', None):
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name,
                                    tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "user"))
 

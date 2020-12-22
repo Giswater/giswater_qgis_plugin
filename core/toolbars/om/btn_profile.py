@@ -110,9 +110,9 @@ class GwProfileButton(GwParentMapTool):
 
         # Set last parameters
         tools_qt.set_widget_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance,
-                               tools_gw.get_config_parser('btn_profile', 'minDistanceProfile', "user", "sessions"))
+                               tools_gw.get_config_parser('btn_profile', 'minDistanceProfile', "user", "giswater"))
         tools_qt.set_widget_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title,
-                               tools_gw.get_config_parser('btn_profile', 'titleProfile', "user", "sessions"))
+                               tools_gw.get_config_parser('btn_profile', 'titleProfile', "user", "giswater"))
 
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')

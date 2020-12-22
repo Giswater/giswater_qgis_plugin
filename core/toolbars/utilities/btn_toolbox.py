@@ -172,15 +172,15 @@ class GwToolBoxButton(GwParentAction):
             if type(widget) not in (QCheckBox, QComboBox, QLineEdit, QRadioButton):
                 continue
             if type(widget) in (QCheckBox, QRadioButton):
-                value = tools_gw.get_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}", "user", "sessions")
+                value = tools_gw.get_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}", "user", "giswater")
                 tools_qt.set_checked(dialog, widget, value)
             elif type(widget) is QComboBox:
-                value = tools_gw.get_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}", "user", "sessions")
+                value = tools_gw.get_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}", "user", "giswater")
                 if value in (None, '', 'NULL') and widget.property('selectedId') not in (None, '', 'NULL'):
                     value = widget.property('selectedId')
                 tools_qt.set_combo_value(widget, value, 0)
             elif type(widget) in (QLineEdit, QSpinBox):
-                value = tools_gw.get_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}", "user", "sessions")
+                value = tools_gw.get_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}", "user", "giswater")
                 tools_qt.set_widget_text(dialog, widget, value)
 
 
@@ -206,17 +206,17 @@ class GwToolBoxButton(GwParentAction):
 
         function_name = function[0]['functionname']
         if dialog.cmb_geom_type.property('selectedId') in (None, '', 'NULL'):
-            geom_type = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_cmb_geom_type", "user", "sessions")
+            geom_type = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_cmb_geom_type", "user", "giswater")
         else:
             geom_type = dialog.cmb_geom_type.property('selectedId')
         tools_qt.set_combo_value(dialog.cmb_geom_type, geom_type, 0)
         if dialog.cmb_layers.property('selectedId') in (None, '', 'NULL'):
-            layer = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_cmb_layers", "user", "sessions")
+            layer = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_cmb_layers", "user", "giswater")
         else:
             layer = dialog.cmb_layers.property('selectedId')
         tools_qt.set_combo_value(dialog.cmb_layers, layer, 0)
 
-        if tools_gw.get_config_parser('btn_toolbox', f"{function_name}_rbt_previous", "user", "sessions") == 'True':
+        if tools_gw.get_config_parser('btn_toolbox', f"{function_name}_rbt_previous", "user", "giswater") == 'True':
             tools_qt.set_checked(dialog, 'rbt_previous', True)
         else:
             tools_qt.set_checked(dialog, 'rbt_layer', True)

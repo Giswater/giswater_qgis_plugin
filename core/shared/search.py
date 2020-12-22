@@ -60,7 +60,7 @@ class GwSearch:
 
     def api_search(self, dlg_mincut=None, load_project=False):
         # If search is open, dont let user open another one
-        open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "sessions")
+        open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "giswater")
         if open_search in ("True", "true", True) and dlg_mincut is None and load_project is False:
             return
         form = ""
@@ -559,7 +559,7 @@ class GwSearch:
     def get_current_selectors(self):
         """ Take the current selector_expl and selector_state to restore them at the end of the operation """
 
-        current_tab = tools_gw.get_config_parser('dialogs_tab', 'selector_basic', "user", "sessions")
+        current_tab = tools_gw.get_config_parser('dialogs_tab', 'selector_basic', "user", "giswater")
         form = f'"currentTab":"{current_tab}"'
         extras = f'"selectorType":"selector_basic", "filterText":""'
         body = tools_gw.create_body(form=form, extras=extras)

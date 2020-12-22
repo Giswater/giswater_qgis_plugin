@@ -190,21 +190,21 @@ class GwCSVButton(GwParentAction):
     def load_settings_values(self):
         """ Load QGIS settings related with csv options """
 
-        value = tools_gw.get_config_parser('btn_csv2pg', 'cmb_import_type', "user", "sessions")
+        value = tools_gw.get_config_parser('btn_csv2pg', 'cmb_import_type', "user", "giswater")
         tools_qt.set_combo_value(self.dlg_csv.cmb_import_type, value, 0)
 
-        value = tools_gw.get_config_parser('btn_csv2pg', 'txt_import', "user", "sessions")
+        value = tools_gw.get_config_parser('btn_csv2pg', 'txt_import', "user", "giswater")
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.txt_import, value)
 
-        value = tools_gw.get_config_parser('btn_csv2pg', 'txt_file_csv', "user", "sessions")
+        value = tools_gw.get_config_parser('btn_csv2pg', 'txt_file_csv', "user", "giswater")
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.txt_file_csv, value)
 
-        unicode = tools_gw.get_config_parser('btn_csv2pg', 'cmb_unicode_list', "user", "sessions")
+        unicode = tools_gw.get_config_parser('btn_csv2pg', 'cmb_unicode_list', "user", "giswater")
         if not unicode:
             unicode = 'latin1'
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.cmb_unicode_list, unicode)
 
-        if tools_gw.get_config_parser('btn_csv2pg', 'rb_semicolon', "user", "sessions") == 'True':
+        if tools_gw.get_config_parser('btn_csv2pg', 'rb_semicolon', "user", "giswater") == 'True':
             self.dlg_csv.rb_semicolon.setChecked(True)
         else:
             self.dlg_csv.rb_comma.setChecked(True)
