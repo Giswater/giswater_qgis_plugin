@@ -70,7 +70,7 @@ class Giswater(QObject):
         global_vars.init_global(self.iface, self.iface.mapCanvas(), self.plugin_dir, self.plugin_name)
 
         # Check if config file exists
-        setting_file = os.path.join(self.plugin_dir, 'config', self.plugin_name + '.config')
+        setting_file = os.path.join(self.plugin_dir, 'config', 'init.config')
         if not os.path.exists(setting_file):
             message = f"Config file not found at: {setting_file}"
             self.iface.messageBar().pushMessage("", message, 1, 20)
