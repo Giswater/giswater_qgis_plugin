@@ -209,7 +209,7 @@ class GwConnectLinkButton(GwParentMapTool):
                 self.dlg_dtext.setWindowTitle('Connect to network')
                 self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
                 self.dlg_dtext.rejected.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
-                tools_gw.fill_log(self.dlg_dtext, result['body']['data'], False)
+                tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False)
                 tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 
             layer.removeSelection()

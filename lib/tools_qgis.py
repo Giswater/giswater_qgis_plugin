@@ -9,6 +9,7 @@ import configparser
 import console
 import os.path
 import shlex
+import sys
 from random import randrange
 
 from qgis.PyQt.QtCore import Qt, QTimer
@@ -730,3 +731,118 @@ def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, du
     # wait to simulate a flashing effect
     if duration_time is not None:
         QTimer.singleShot(duration_time, rubber_band.reset)
+
+
+def get_geometry_from_json(feature):
+    """ Get coordinates from GeoJson and return QGsGeometry
+    :param feature: feature to get geometry type and coordinates (GeoJson)
+    :return: Geometry of the feature (QgsGeometry)
+    functions  called in -> getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
+        def get_vertex_from_point(feature)
+        get_vertex_from_linestring(feature)
+        get_vertex_from_multilinestring(feature)
+        get_vertex_from_polygon(feature)
+        get_vertex_from_multipolygon(feature)
+    """
+
+    try:
+        coordinates = getattr(sys.modules[__name__], f"get_vertex_from_{feature['geometry']['type'].lower()}")(feature)
+        type_ = feature['geometry']['type']
+        geometry = f"{type_}{coordinates}"
+        return QgsGeometry.fromWkt(geometry)
+    except AttributeError as e:
+        tools_log.log_info(f"{type(e).__name__} --> {e}")
+        return None
+
+
+# Region private functions
+def get_vertex_from_point(feature):
+    """ Manage feature geometry when is Point
+    :param feature: feature to get geometry type and coordinates (GeoJson)
+    :return: Coordinates of the feature (String)
+    This function is called in def get_geometry_from_json(feature)
+          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
+    """
+    return f"({feature['geometry']['coordinates'][0]} {feature['geometry']['coordinates'][1]})"
+
+
+def get_vertex_from_linestring(feature):
+    """ Manage feature geometry when is LineString
+    :param feature: feature to get geometry type and coordinates (GeoJson)
+    :return: Coordinates of the feature (String)
+    This function is called in def get_geometry_from_json(feature)
+          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
+    """
+    return get_vertex_from_points(feature)
+
+
+def get_vertex_from_multilinestring(feature):
+    """ Manage feature geometry when is MultiLineString
+    :param feature: feature to get geometry type and coordinates (GeoJson)
+    :return: Coordinates of the feature (String)
+    This function is called in def get_geometry_from_json(feature)
+          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
+    """
+    return get_multi_coordinates(feature)
+
+
+def get_vertex_from_polygon(feature):
+    """ Manage feature geometry when is Polygon
+    :param feature: feature to get geometry type and coordinates (GeoJson)
+    :return: Coordinates of the feature (String)
+    This function is called in def get_geometry_from_json(feature)
+          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
+    """
+    return get_multi_coordinates(feature)
+
+
+def get_vertex_from_multipolygon(feature):
+    """ Manage feature geometry when is MultiPolygon
+    :param feature: feature to get geometry type and coordinates (GeoJson)
+    :return: Coordinates of the feature (String)
+    This function is called in def get_geometry_from_json(feature)
+          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
+    """
+
+    coordinates = "("
+    for coords in feature['geometry']['coordinates']:
+        coordinates += "("
+        for cc in coords:
+            coordinates += "("
+            for c in cc:
+                coordinates += f"{c[0]} {c[1]}, "
+            coordinates = coordinates[:-2] + "), "
+        coordinates = coordinates[:-2] + "), "
+    coordinates = coordinates[:-2] + ")"
+    return coordinates
+
+
+def get_vertex_from_points(feature):
+    """ Get coordinates of the received feature, to be a point
+    :param feature: Json with the information of the received feature (geoJson)
+    :return: Coordinates of the feature received (String)
+    """
+
+    coordinates = "("
+    for coords in feature['geometry']['coordinates']:
+        coordinates += f"{coords[0]} {coords[1]}, "
+    coordinates = coordinates[:-2] + ")"
+    return coordinates
+
+
+def get_multi_coordinates(feature):
+    """ Get coordinates of the received feature, can be a line
+    :param feature: Json with the information of the received feature (geoJson)
+    :return: Coordinates of the feature received (String)
+    """
+
+    coordinates = "("
+    for coords in feature['geometry']['coordinates']:
+        coordinates += "("
+        for c in coords:
+            coordinates += f"{c[0]} {c[1]}, "
+        coordinates = coordinates[:-2] + "), "
+    coordinates = coordinates[:-2] + ")"
+    return coordinates
+
+# End region

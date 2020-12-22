@@ -637,7 +637,7 @@ class GwMincut:
                 self.dlg_dtext.btn_accept.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
                 self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
 
-                tools_gw.fill_log(self.dlg_dtext, result['body']['data'], False)
+                tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False)
                 tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
 
         self.iface.actionPan().trigger()
@@ -657,7 +657,7 @@ class GwMincut:
     def mincut_ok(self, result):
 
         # Manage result and force tab log
-        tools_gw.fill_log(self.dlg_mincut, result['body']['data'], True, True, tab_idx=3)
+        tools_gw.fill_tab_log(self.dlg_mincut, result['body']['data'], True, True, tab_idx=3)
 
         # Set tabs enabled(True/False)
         qtabwidget = self.dlg_mincut.findChild(QTabWidget, 'mainTab')
@@ -1800,7 +1800,7 @@ class GwMincut:
         extras = f'"mincutId":"{result_mincut_id}"'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.get_json('gw_fct_getmincut', body)
-        tools_gw.add_temp_layer(self.dlg_mincut, result['body']['data'], None, False, disable_tabs=False)
+        tools_gw.add_layer_temp(self.dlg_mincut, result['body']['data'], None, False, disable_tabs=False)
         #self.dlg_mincut.txt_infolog.setEnabled(False)
 
         # Manage location

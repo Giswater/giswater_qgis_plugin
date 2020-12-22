@@ -69,7 +69,7 @@ class GwPsectorDuplicate(QObject):
         data = complet_result['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
-                text, change_tab = tools_gw.fill_log(self.dlg_duplicate_psector, data)
+                text, change_tab = tools_gw.fill_tab_log(self.dlg_duplicate_psector, data)
 
         # Close dialog
         if not change_tab:

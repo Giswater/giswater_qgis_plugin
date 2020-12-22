@@ -145,7 +145,7 @@ class GwDeleteFeatureButton(GwParentAction):
         data = complet_result['body']['data']
         for k, v in list(data.items()):
             if str(k) == "info":
-                change_tab = tools_gw.fill_log(self.dlg_feature_delete, data)
+                change_tab = tools_gw.fill_tab_log(self.dlg_feature_delete, data)
 
         self.dlg_feature_delete.btn_cancel.setText('Accept')
 

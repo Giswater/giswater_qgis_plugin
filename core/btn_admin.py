@@ -3418,7 +3418,7 @@ class GwAdmin:
                 dialog.setWindowTitle(function[0]['alias'])
                 dialog.txt_info.setText(str(function[0]['descript']))
                 self.function_list = []
-                tools_gw.construct_form_param_user(dialog, function, 0, self.function_list)
+                tools_gw.build_dialog_options(dialog, function, 0, self.function_list)
                 status = True
                 break
 
@@ -3429,7 +3429,7 @@ class GwAdmin:
 
         for k, v in list(data.items()):
             if str(k) == "info":
-                tools_gw.fill_log(dialog, data)
+                tools_gw.fill_tab_log(dialog, data)
 
 
     def manage_result_message(self, status, msg_ok=None, msg_error=None, parameter=None):

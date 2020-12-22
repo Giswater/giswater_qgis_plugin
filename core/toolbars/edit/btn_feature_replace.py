@@ -317,7 +317,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
 
             # Fill tab 'Info log'
             if complet_result and complet_result['status'] == "Accepted":
-                tools_gw.fill_log(self.dlg_replace, complet_result['body']['data'])
+                tools_gw.fill_tab_log(self.dlg_replace, complet_result['body']['data'])
 
             # Refresh canvas
             self.refresh_map_canvas()

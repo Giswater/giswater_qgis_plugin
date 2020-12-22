@@ -294,7 +294,7 @@ class GwInfo(QObject):
         self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         field_id = str(self.complet_result['body']['feature']['idName'])
-        result = tools_gw.fill_basic_info(self.hydro_info_dlg, complet_result, field_id, self.my_json,
+        result = tools_gw.build_dialog_info(self.hydro_info_dlg, complet_result, field_id, self.my_json,
                  new_feature_id=self.new_feature_id, new_feature=self.new_feature, layer_new_feature=self.layer_new_feature,
                  feature_id=self.feature_id, feature_type=self.feature_type, layer=self.layer)
 
@@ -742,7 +742,7 @@ class GwInfo(QObject):
             extras += f'"node2":"{self.node2}"}}'
             body = tools_gw.create_body(extras=extras)
             self.interpolate_result = tools_gw.get_json('gw_fct_node_interpolate', body)
-            tools_gw.fill_log(dlg_dtext, self.interpolate_result['body']['data'])
+            tools_gw.fill_tab_log(dlg_dtext, self.interpolate_result['body']['data'])
 
 
     def chek_for_existing_values(self, dlg_dtext):
@@ -3231,7 +3231,7 @@ class GwInfo(QObject):
         dlg_generic.rejected.connect(partial(tools_gw.close_dialog, dlg_generic))
         dlg_generic.btn_accept.clicked.connect(partial(self.set_catalog, dlg_generic, form_name, table_name))
 
-        tools_gw.fill_basic_info(dlg_generic, json_result, field_id)
+        tools_gw.build_dialog_info(dlg_generic, json_result, field_id)
 
         # Open dialog
         dlg_generic.setWindowTitle(f"{(form_name.lower()).capitalize().replace('_', ' ')}")

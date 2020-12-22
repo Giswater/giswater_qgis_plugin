@@ -353,7 +353,7 @@ class GwToolBoxButton(GwParentAction):
         body = tools_gw.create_body(feature=feature_field, extras=extras)
         json_result = tools_gw.get_json(function_name, body)
         if json_result['status'] == 'Failed': return
-        tools_gw.fill_log(dialog, json_result['body']['data'], True, True, 1, True)
+        tools_gw.fill_tab_log(dialog, json_result['body']['data'], True, True, 1, True)
 
         dialog.progressBar.setAlignment(Qt.AlignCenter)
         dialog.progressBar.setMinimum(0)
@@ -401,7 +401,7 @@ class GwToolBoxButton(GwParentAction):
             return True
 
         complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
-        tools_gw.add_temp_layer(dialog, complet_result['body']['data'], self.function_selected)
+        tools_gw.add_layer_temp(dialog, complet_result['body']['data'], self.function_selected)
         dialog.progressBar.setFormat(f"Function {function_name} has finished.")
         dialog.progressBar.setAlignment(Qt.AlignCenter)
 
@@ -438,7 +438,7 @@ class GwToolBoxButton(GwParentAction):
                     self.populate_cmb_type(feature_types)
                     self.dlg_functions.cmb_geom_type.currentIndexChanged.connect(partial(self.populate_layer_combo))
                     self.populate_layer_combo()
-                tools_gw.construct_form_param_user(dialog, function, 0, self.function_list, self.temp_layers_added)
+                tools_gw.build_dialog_options(dialog, function, 0, self.function_list, self.temp_layers_added)
                 self.load_settings_values(dialog, function)
                 self.load_parametric_values(dialog, function)
                 status = True

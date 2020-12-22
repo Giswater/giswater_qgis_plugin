@@ -117,7 +117,7 @@ class GwProjectCheck:
 
         # Populate info_log and missing layers
         critical_level = 0
-        text_result = tools_gw.add_temp_layer(self.dlg_audit_project, result['body']['data'],
+        text_result = tools_gw.add_layer_temp(self.dlg_audit_project, result['body']['data'],
             'gw_fct_setcheckproject_result', True, False, 0, True, disable_tabs=False)
 
         if 'missingLayers' in result['body']['data']:
@@ -198,7 +198,7 @@ class GwProjectCheck:
                 group = layer_info['group_layer'] if layer_info['group_layer'] is not None else 'GW Layers'
                 style_id = layer_info['style_id']
 
-                tools_gw.insert_pg_layer(layer_info['layer'], geom_field, pkey_field, None, group=group)
+                tools_gw.add_layer_database(layer_info['layer'], geom_field, pkey_field, None, group=group)
                 layer = None
                 qml = None
                 if style_id is not None:

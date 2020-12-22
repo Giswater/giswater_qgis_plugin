@@ -362,8 +362,7 @@ def set_completer_feature_id(widget, geom_type, viewname):
         completer.setModel(model)
 
 
-def insert_pg_layer(tablename=None, the_geom="the_geom", field_id="id", child_layers=None,
-                         group="GW Layers", style_id="-1"):
+def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child_layers=None, group="GW Layers", style_id="-1"):
     """ Put selected layer into TOC
     :param tablename: Postgres table name (String)
     :param the_geom: Geometry field of the table (String)
@@ -414,7 +413,7 @@ def insert_pg_layer(tablename=None, the_geom="the_geom", field_id="id", child_la
     global_vars.iface.mapCanvas().refresh()
 
 
-def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
+def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
                    group='GW Temporal Layers', disable_tabs=True):
     """ Add QgsVectorLayer into TOC
     :param dialog: Dialog where to find the tab to be displayed and the textedit to be filled (QDialog or QMainWindow)
@@ -434,7 +433,7 @@ def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     srid = global_vars.srid
     for k, v in list(data.items()):
         if str(k) == "info":
-            text_result, change_tab = fill_log(dialog, data, force_tab, reset_text, tab_idx, disable_tabs)
+            text_result, change_tab = fill_tab_log(dialog, data, force_tab, reset_text, tab_idx, disable_tabs)
         elif k in ('point', 'line', 'polygon'):
             if 'features' not in data[k]: continue
             counter = len(data[k]['features'])
@@ -451,7 +450,7 @@ def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                 v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
                 layer_name = None
                 # This function already works with GeoJson
-                populate_vlayer(v_layer, data, k, counter, group)
+                fill_layer_temp(v_layer, data, k, counter, group)
                 if 'qmlPath' in data[k] and data[k]['qmlPath']:
                     qml_path = data[k]['qmlPath']
                     tools_qgis.load_qml(v_layer, qml_path)
@@ -474,7 +473,7 @@ def add_temp_layer(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
 
 
-def fill_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_disable_tabs=True):
+def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_disable_tabs=True):
     """ Populate txt_infolog QTextEdit widget
     :param dialog: QDialog
     :param data: Json
@@ -510,7 +509,7 @@ def fill_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_disa
     return text, change_tab
 
 
-def populate_vlayer(virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
+def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal Layers'):
     """
     :param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
     :param data: Json
@@ -532,7 +531,7 @@ def populate_vlayer(virtual_layer, data, layer_type, counter, group='GW Temporal
             prov.addAttributes([QgsField(str(key), QVariant.String)])
 
     for feature in data[layer_type]['features']:
-        geometry = get_geometry_from_json(feature)
+        geometry = tools_qgis.get_geometry_from_json(feature)
         if not geometry:
             continue
         attributes = []
@@ -554,118 +553,6 @@ def populate_vlayer(virtual_layer, data, layer_type, counter, group='GW Temporal
     if my_group is None:
         my_group = root.insertGroup(0, group)
     my_group.insertLayer(0, virtual_layer)
-
-
-def get_geometry_from_json(feature):
-    """ Get coordinates from GeoJson and return QGsGeometry
-    :param feature: feature to get geometry type and coordinates (GeoJson)
-    :return: Geometry of the feature (QgsGeometry)
-    functions  called in -> getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
-        def get_vertex_from_point(feature)
-        get_vertex_from_linestring(feature)
-        get_vertex_from_multilinestring(feature)
-        get_vertex_from_polygon(feature)
-        get_vertex_from_multipolygon(feature)
-    """
-
-    try:
-        coordinates = getattr(sys.modules[__name__], f"get_vertex_from_{feature['geometry']['type'].lower()}")(feature)
-        type_ = feature['geometry']['type']
-        geometry = f"{type_}{coordinates}"
-        return QgsGeometry.fromWkt(geometry)
-    except AttributeError as e:
-        tools_log.log_info(f"{type(e).__name__} --> {e}")
-        return None
-
-
-def get_vertex_from_point(feature):
-    """ Manage feature geometry when is Point
-    :param feature: feature to get geometry type and coordinates (GeoJson)
-    :return: Coordinates of the feature (String)
-    This function is called in def get_geometry_from_json(feature)
-          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
-    """
-    return f"({feature['geometry']['coordinates'][0]} {feature['geometry']['coordinates'][1]})"
-
-
-def get_vertex_from_linestring(feature):
-    """ Manage feature geometry when is LineString
-    :param feature: feature to get geometry type and coordinates (GeoJson)
-    :return: Coordinates of the feature (String)
-    This function is called in def get_geometry_from_json(feature)
-          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
-    """
-    return get_vertex_from_points(feature)
-
-
-def get_vertex_from_multilinestring(feature):
-    """ Manage feature geometry when is MultiLineString
-    :param feature: feature to get geometry type and coordinates (GeoJson)
-    :return: Coordinates of the feature (String)
-    This function is called in def get_geometry_from_json(feature)
-          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
-    """
-    return get_multi_coordinates(feature)
-
-
-def get_vertex_from_polygon(feature):
-    """ Manage feature geometry when is Polygon
-    :param feature: feature to get geometry type and coordinates (GeoJson)
-    :return: Coordinates of the feature (String)
-    This function is called in def get_geometry_from_json(feature)
-          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
-    """
-    return get_multi_coordinates(feature)
-
-
-def get_vertex_from_multipolygon(feature):
-    """ Manage feature geometry when is MultiPolygon
-    :param feature: feature to get geometry type and coordinates (GeoJson)
-    :return: Coordinates of the feature (String)
-    This function is called in def get_geometry_from_json(feature)
-          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
-    """
-
-    coordinates = "("
-    for coords in feature['geometry']['coordinates']:
-        coordinates += "("
-        for cc in coords:
-            coordinates += "("
-            for c in cc:
-                coordinates += f"{c[0]} {c[1]}, "
-            coordinates = coordinates[:-2] + "), "
-        coordinates = coordinates[:-2] + "), "
-    coordinates = coordinates[:-2] + ")"
-    return coordinates
-
-
-def get_vertex_from_points(feature):
-    """ Get coordinates of the received feature, to be a point
-    :param feature: Json with the information of the received feature (geoJson)
-    :return: Coordinates of the feature received (String)
-    """
-
-    coordinates = "("
-    for coords in feature['geometry']['coordinates']:
-        coordinates += f"{coords[0]} {coords[1]}, "
-    coordinates = coordinates[:-2] + ")"
-    return coordinates
-
-
-def get_multi_coordinates(feature):
-    """ Get coordinates of the received feature, can be a line
-    :param feature: Json with the information of the received feature (geoJson)
-    :return: Coordinates of the feature received (String)
-    """
-
-    coordinates = "("
-    for coords in feature['geometry']['coordinates']:
-        coordinates += "("
-        for c in coords:
-            coordinates += f"{c[0]} {c[1]}, "
-        coordinates = coordinates[:-2] + "), "
-    coordinates = coordinates[:-2] + ")"
-    return coordinates
 
 
 def disable_widgets(dialog, result, enable):
@@ -880,7 +767,7 @@ def manage_feature_cat():
     return feature_cat
 
 
-def fill_basic_info(dialog, result, field_id, my_json=None, new_feature_id=None, new_feature=None,
+def build_dialog_info(dialog, result, field_id, my_json=None, new_feature_id=None, new_feature=None,
                         layer_new_feature=None, feature_id=None, feature_type=None, layer=None):
 
     fields = result['body']['data']
@@ -932,7 +819,7 @@ def fill_basic_info(dialog, result, field_id, my_json=None, new_feature_id=None,
     return result
 
 
-def construct_form_param_user(dialog, row, pos, _json, temp_layers_added=None):
+def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None):
 
     field_id = ''
     if 'fields' in row[pos]:
@@ -1735,7 +1622,7 @@ def manage_return_manager(json_result, sql, rubber_band=None):
                     geometry_type = json_result['body']['data'][key]['geometryType']
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
 
-                    populate_vlayer(v_layer, json_result['body']['data'], key, counter)
+                    fill_layer_temp(v_layer, json_result['body']['data'], key, counter)
 
                     # Get values for set layer style
                     opacity = 100
@@ -1948,7 +1835,7 @@ def manage_layer_manager(json_result, sql):
                     else:
                         group = "GW Layers"
                     style_id = lyr[layer_name]['style_id']
-                    insert_pg_layer(layer_name, the_geom, field_id, group=group, style_id=style_id)
+                    add_layer_database(layer_name, the_geom, field_id, group=group, style_id=style_id)
                 tools_qgis.set_layer_visible(layer)
 
         # force reload dataProvider in order to reindex.
