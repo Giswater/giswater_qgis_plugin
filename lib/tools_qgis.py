@@ -18,7 +18,7 @@ from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
     QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry
 
-from . import tools_log
+from . import tools_log, tools_qt
 from .. import global_vars
 
 # List of user parameters (optionals)
