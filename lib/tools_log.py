@@ -14,7 +14,7 @@ from qgis.core import QgsMessageLog
 
 from .. import global_vars
 from . import tools_qt
-
+from ..core.utils import tools_gw
 
 class Logger(object):
 
@@ -24,7 +24,7 @@ class Logger(object):
 
         # Create logger
         self.logger_file = logging.getLogger(log_name)
-        self.logger_file.setLevel(log_level)
+        self.logger_file.setLevel(int(log_level))
 
         # Define log folder in users folder
         main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
@@ -129,9 +129,10 @@ def set_logger(logger_name=None):
         if logger_name is None:
             logger_name = 'plugin'
 
-        global_vars.session_vars['min_log_level'] = int(global_vars.settings.value('status/log_level'))
-        log_suffix = global_vars.settings.value('status/log_suffix')
-        global_vars.logger = Logger(logger_name, global_vars.session_vars['min_log_level'], log_suffix)
+        global_vars.session_vars['min_log_level'] = tools_gw.check_config_settings('system', 'log_level', '20', 'user', 'user')
+
+        log_suffix = tools_gw.check_config_settings('system', 'log_suffix', '%Y%m%d', 'user', 'user')
+        global_vars.logger = Logger(logger_name, global_vars.session_vars['min_log_level'], str(log_suffix))
         values = {10: 0, 20: 0, 30: 1, 40: 2}
         global_vars.session_vars['min_message_level'] = values.get(global_vars.session_vars['min_log_level'], 0)
 
