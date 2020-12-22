@@ -263,22 +263,19 @@ class LoadProject(QObject):
             ag = QActionGroup(parent)
             ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
-                button_def = tools_gw.check_config_settings('buttons_def', str(index_action), 'None', config_type="user",
-                                                             file_name="user")
+                button_def = tools_gw.check_config_settings('buttons_def', str(index_action), 'None')
                 if button_def:
                     text = self.translate(f'{index_action}_text')
                     icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
                     button = getattr(buttons, button_def)(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
-
                     self.buttons[index_action] = button
 
         # Disable buttons which are project type exclusive
-        project_esclusive = tools_gw.check_config_settings('project_exclusive', str(self.project_type), 'None',
-                                                           config_type="user", file_name="user")
-        project_esclusive = project_esclusive.replace(' ', '').split(',')
-
-        for index in project_esclusive:
-            self.hide_button(index)
+        project_exclusive = tools_gw.check_config_settings('project_exclusive', str(self.project_type), 'None', 'None')
+        if project_exclusive:
+            project_exclusive = project_exclusive.replace(' ', '').split(',')
+            for index in project_exclusive:
+                self.hide_button(index)
 
         # Hide buttons from buttons_to_hide
         for button_id in self.buttons_to_hide:
