@@ -100,4 +100,4 @@ class GwGo2EpaOptions:
 
         for combo_child in json_result['fields']:
             if combo_child is not None:
-                tools_gw.manage_child(dialog, widget, combo_child)
+                tools_gw.manage_combo_child(dialog, widget, combo_child)

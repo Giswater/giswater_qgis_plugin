@@ -1306,7 +1306,7 @@ def fill_combo_child(dialog, combo_child):
         fill_combo(child, combo_child)
 
 
-def manage_child(dialog, combo_parent, combo_child):
+def manage_combo_child(dialog, combo_parent, combo_child):
 
     child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
     if child:
@@ -1328,31 +1328,6 @@ def manage_child(dialog, combo_parent, combo_child):
             child.setProperty('keepDisbled', True)
             child.setEnabled(False)
 
-
-def get_child(dialog, widget, feature_type, tablename, field_id):
-    """ Find QComboBox child and populate it
-    :param dialog: QDialog
-    :param widget: QComboBox parent
-    :param feature_type: PIPE, ARC, JUNCTION, VALVE...
-    :param tablename: view of DB
-    :param field_id: Field id of tablename
-    """
-
-    combo_parent = widget.property('columnname')
-    combo_id = tools_qt.get_combo_value(dialog, widget)
-
-    feature = f'"featureType":"{feature_type}", '
-    feature += f'"tableName":"{tablename}", '
-    feature += f'"idName":"{field_id}"'
-    extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
-    body = create_body(feature=feature, extras=extras)
-    result = get_json('gw_fct_getchilds', body)
-    if not result or result['status'] == 'Failed':
-        return False
-
-    for combo_child in result['body']['data']:
-        if combo_child is not None:
-            manage_child(dialog, widget, combo_child)
 
 
 def fill_child(dialog, widget, action, geom_type=''):

@@ -495,7 +495,7 @@ class GwInfo(QObject):
                 if field['widgettype'] == 'combo':
                     widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
                     if widget is not None:
-                        widget.currentIndexChanged.connect(partial(tools_gw.get_child, self.dlg_cf, widget,
+                        widget.currentIndexChanged.connect(partial(self.get_combo_child, self.dlg_cf, widget,
                             self.feature_type, self.tablename, self.field_id))
 
         # Set variables
@@ -3036,7 +3036,7 @@ class GwInfo(QObject):
                 if 'isparent' in field:
                     if field['isparent']:
                         widget = dialog.findChild(QComboBox, field['widgetname'])
-                        widget.currentIndexChanged.connect(partial(tools_gw.get_child, dialog, widget,
+                        widget.currentIndexChanged.connect(partial(self.get_combo_child, dialog, widget,
                                                            self.feature_type, self.tablename, self.field_id))
 
         return complet_list, widget_list
@@ -3527,3 +3527,29 @@ class GwInfo(QObject):
             self.info_layer.deleteFeature(feature.id())
             self.iface.actionRollbackEdits().trigger()
             is_inserting = False
+
+
+    def get_combo_child(self, dialog, widget, feature_type, tablename, field_id):
+        """ Find QComboBox child and populate it
+        :param dialog: QDialog
+        :param widget: QComboBox parent
+        :param feature_type: PIPE, ARC, JUNCTION, VALVE...
+        :param tablename: view of DB
+        :param field_id: Field id of tablename
+        """
+
+        combo_parent = widget.property('columnname')
+        combo_id = tools_qt.get_combo_value(dialog, widget)
+
+        feature = f'"featureType":"{feature_type}", '
+        feature += f'"tableName":"{tablename}", '
+        feature += f'"idName":"{field_id}"'
+        extras = f'"comboParent":"{combo_parent}", "comboId":"{combo_id}"'
+        body = tools_gw.create_body(feature=feature, extras=extras)
+        result = tools_gw.get_json('gw_fct_getchilds', body)
+        if not result or result['status'] == 'Failed':
+            return False
+
+        for combo_child in result['body']['data']:
+            if combo_child is not None:
+                tools_gw.manage_combo_child(dialog, widget, combo_child)
