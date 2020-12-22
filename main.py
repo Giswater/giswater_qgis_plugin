@@ -243,7 +243,7 @@ class Giswater(QObject):
 
         try:
             # Unlisten notify channel and stop thread
-            if tools_gw.get_config_parser('system', 'use_notify', "project", "init").upper() == 'TRUE' and hasattr(self, 'notify'):
+            if hasattr(self, 'notify'):
                 list_channels = ['desktop', global_vars.session_vars['current_user']]
                 self.notify.stop_listening(list_channels)
 
