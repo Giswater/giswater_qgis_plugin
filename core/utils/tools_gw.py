@@ -119,7 +119,7 @@ def set_config_parser(section: str, parameter: str, value: str, comment=None, co
             path_folder = global_vars.plugin_dir
         else:
             tools_log.log_warning(f"set_config_parser: Reference config_type = '{config_type}' it is not managed")
-            return None
+            return
 
         config_folder = path_folder + os.sep + "config" + os.sep
         if not os.path.exists(config_folder):
@@ -136,8 +136,8 @@ def set_config_parser(section: str, parameter: str, value: str, comment=None, co
             parser.write(configfile)
             configfile.close()
     except Exception as e:
-        tools_log.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
-        return None
+        tools_log.log_warning(f"set_config_parser exception [{type(e).__name__}]: {e}")
+        return
 
 
 def save_current_tab(dialog, tab_widget, selector_name):

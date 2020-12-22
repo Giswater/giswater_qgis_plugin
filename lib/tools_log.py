@@ -16,6 +16,7 @@ from .. import global_vars
 from . import tools_qt
 from ..core.utils import tools_gw
 
+
 class Logger(object):
 
     def __init__(self, log_name, log_level, log_suffix, folder_has_tstamp=False, file_has_tstamp=True,
@@ -84,7 +85,7 @@ class Logger(object):
             header = "{" + file_name + " | Line " + str(function_line) + " (" + str(function_name) + ")}"
             text = header
             if msg:
-                text += "\n" + str(msg)
+                text += f"\n{msg}"
             self.logger_file.log(log_level, text)
 
         except Exception as e:
@@ -129,9 +130,10 @@ def set_logger(logger_name=None):
         if logger_name is None:
             logger_name = 'plugin'
 
-        global_vars.session_vars['min_log_level'] = tools_gw.check_config_settings('system', 'log_level', '20', 'user', 'user')
+        global_vars.session_vars['min_log_level'] = \
+            tools_gw.check_config_settings('system', 'log_level', '20', 'user', 'user')
 
-        log_suffix = tools_gw.check_config_settings('system', 'log_suffix', '%Y%m%d', 'user', 'user')
+        log_suffix = '%Y%m%d'
         global_vars.logger = Logger(logger_name, global_vars.session_vars['min_log_level'], str(log_suffix))
         values = {10: 0, 20: 0, 30: 1, 40: 2}
         global_vars.session_vars['min_message_level'] = values.get(global_vars.session_vars['min_log_level'], 0)
@@ -146,7 +148,7 @@ def qgis_log_message(text=None, message_level=0, context_name=None, parameter=No
     if text:
         msg = tools_qt.tr(text, context_name, aux_context='ui_message')
         if parameter:
-            msg += ": " + str(parameter)
+            msg += f": {parameter}"
 
     if tab_name is None:
         tab_name = global_vars.plugin_name
