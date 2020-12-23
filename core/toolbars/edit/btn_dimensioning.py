@@ -61,7 +61,7 @@ class GwDimensioningButton(GwParentMapTool):
         # Check button
         self.action.setChecked(True)
 
-        self.layer = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning=True)
+        self.layer = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning_=True)
         if self.layer:
             # Get user values (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
             # and set True

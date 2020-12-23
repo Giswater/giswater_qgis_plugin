@@ -165,7 +165,7 @@ class GwVisitManager(QObject):
 
         widget_list = self.dlg_add_visit.findChildren(QTableView)
         for widget in widget_list:
-            tools_qt.set_qtv_config(widget)
+            tools_qt.set_tableview_config(widget)
 
         # Check the default dates, if it does not exist force today
         _date = QDate.currentDate()
@@ -306,7 +306,7 @@ class GwVisitManager(QObject):
         self.tabs.currentChanged.connect(partial(self.manage_tab_changed, self.dlg_add_visit))
         self.visit_id.textChanged.connect(partial(self.manage_visit_id_change, self.dlg_add_visit))
         self.dlg_add_visit.btn_doc_insert.clicked.connect(self.document_insert)
-        self.dlg_add_visit.btn_doc_delete.clicked.connect(partial(tools_qt.delete_rows_qtv, self.tbl_document))
+        self.dlg_add_visit.btn_doc_delete.clicked.connect(partial(tools_qt.delete_rows_tableview, self.tbl_document))
         self.dlg_add_visit.btn_doc_new.clicked.connect(self.manage_document)
         self.dlg_add_visit.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
         self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
@@ -473,7 +473,7 @@ class GwVisitManager(QObject):
         # C) load all related events in the relative table
         self.filter = f"visit_id = '{text}'"
         table_name = f"{self.schema_name}.v_ui_om_event"
-        message = tools_qt.fill_table_object(self.tbl_event, table_name, self.filter)
+        message = tools_qt.fill_table(self.tbl_event, table_name, self.filter)
         if message:
             tools_qgis.show_warning(message)
         self.set_configuration(dialog, self.tbl_event, table_name)
@@ -481,7 +481,7 @@ class GwVisitManager(QObject):
 
         # D) load all related documents in the relative table
         table_name = f"{self.schema_name}.v_ui_doc_x_visit"
-        message = tools_qt.fill_table_object(self.tbl_document, table_name, self.filter)
+        message = tools_qt.fill_table(self.tbl_document, table_name, self.filter)
         if message:
             tools_qgis.show_warning(message)
         self.set_configuration(dialog, self.tbl_document, table_name)
@@ -884,7 +884,7 @@ class GwVisitManager(QObject):
             filed_to_filter = "ext_code"
             table_object = "v_ui_om_visit"
             expr_filter = ""
-            message = tools_qt.fill_table_object(self.dlg_man.tbl_visit, f"{self.schema_name}.{table_object}")
+            message = tools_qt.fill_table(self.dlg_man.tbl_visit, f"{self.schema_name}.{table_object}")
             if message:
                 tools_qgis.show_warning(message)
             tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_visit, table_object)
@@ -895,7 +895,7 @@ class GwVisitManager(QObject):
             table_object = "v_ui_om_visitman_x_" + str(geom_type)
             expr_filter = f"{geom_type}_id = '{feature_id}'"
             # Refresh model with selected filter
-            message = tools_qt.fill_table_object(self.dlg_man.tbl_visit, f"{self.schema_name}.{table_object}", expr_filter)
+            message = tools_qt.fill_table(self.dlg_man.tbl_visit, f"{self.schema_name}.{table_object}", expr_filter)
             if message:
                 tools_qgis.show_warning(message)
             tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_visit, table_object)
@@ -1022,7 +1022,7 @@ class GwVisitManager(QObject):
                "WHERE classlevel = 1 OR classlevel = 2"
                "ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fillComboBox(self.dlg_add_visit, "feature_type", rows, False)
+        tools_qt.fill_combo_box(self.dlg_add_visit, "feature_type", rows, False)
 
         # Event tab
         # Fill ComboBox parameter_type_id
@@ -1148,7 +1148,7 @@ class GwVisitManager(QObject):
                 tools_qt.set_widget_text(self.dlg_event, self.dlg_event.value, val[0])
 
         # Manage QTableView docx_x_event
-        tools_qt.set_qtv_config(self.dlg_event.tbl_docs_x_event)
+        tools_qt.set_tableview_config(self.dlg_event.tbl_docs_x_event)
         self.dlg_event.tbl_docs_x_event.doubleClicked.connect(self.open_file)
         self.populate_tbl_docs_x_event()
 
@@ -1478,7 +1478,7 @@ class GwVisitManager(QObject):
                 tools_qt.set_widget_text(self.dlg_event, self.dlg_event.text, text)
 
         # Manage QTableView docx_x_event
-        tools_qt.set_qtv_config(self.dlg_event.tbl_docs_x_event)
+        tools_qt.set_tableview_config(self.dlg_event.tbl_docs_x_event)
         self.dlg_event.tbl_docs_x_event.doubleClicked.connect(self.open_file)
         self.dlg_event.btn_add_file.clicked.connect(partial(self.get_added_files, event.visit_id, event.id, save=True))
         self.dlg_event.btn_delete_file.clicked.connect(

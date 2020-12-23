@@ -72,8 +72,8 @@ class GwI18NGenerator:
 
 
     def check_translate_options(self):
-        py_msg = tools_qt.isChecked(self.dlg_qm, self.dlg_qm.chk_py_msg)
-        db_msg = tools_qt.isChecked(self.dlg_qm, self.dlg_qm.chk_db_msg)
+        py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
+        db_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_msg)
         self.dlg_qm.lbl_info.clear()
         msg = ''
 
@@ -361,8 +361,8 @@ class GwI18NGenerator:
         db = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_db, return_string_null=False)
         user = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_user, return_string_null=False)
         language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
-        py_msg = tools_qt.isChecked(self.dlg_qm, self.dlg_qm.chk_py_msg)
-        db_msg = tools_qt.isChecked(self.dlg_qm, self.dlg_qm.chk_db_msg)
+        py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
+        db_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_msg)
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_host', f"{host}")
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_port', f"{port}")
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_db', f"{db}")

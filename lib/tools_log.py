@@ -20,7 +20,7 @@ from ..core.utils import tools_gw
 class Logger(object):
 
     def __init__(self, log_name, log_level, log_suffix, folder_has_tstamp=False, file_has_tstamp=True,
-            remove_previous=False):
+                 remove_previous=False):
         """ Class constructor """
 
         # Create logger

@@ -77,7 +77,7 @@ def cast_boolean(param):
     :return: Boolean value, True if param not in bool_dict
     """
 
-    bool_dict = {"TRUE": True, "True": True, "true": True, "FALSE":False, "False": False, "false": False}
+    bool_dict = {"TRUE": True, "True": True, "true": True, "FALSE": False, "False": False, "false": False}
 
     return bool_dict.get(param, True)
 
@@ -93,4 +93,3 @@ def check_python_function(object_, function_name):
 
     object_functions = [method_name for method_name in dir(object_) if callable(getattr(object_, method_name))]
     return function_name in object_functions
-

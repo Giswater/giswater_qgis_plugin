@@ -15,7 +15,7 @@ import webbrowser
 from functools import partial
 from encodings.aliases import aliases
 
-from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal, \
+from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal,\
     QPersistentModelIndex, QCoreApplication, QTranslator, QSettings
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -55,7 +55,7 @@ class GwHyperLinkLabel(QLabel):
         self.setStyleSheet("QLabel{color:purple; text-decoration: underline;}")
 
 
-def fillComboBox(dialog, widget, rows, allow_nulls=True, clear_combo=True):
+def fill_combo_box(dialog, widget, rows, allow_nulls=True, clear_combo=True):
 
     if rows is None:
         return
@@ -82,7 +82,7 @@ def fillComboBox(dialog, widget, rows, allow_nulls=True, clear_combo=True):
                 widget.addItem(str(elem), user_data)
 
 
-def fillComboBoxList(dialog, widget, list_object, allow_nulls=True, clear_combo=True):
+def fill_combo_box_list(dialog, widget, list_object, allow_nulls=True, clear_combo=True):
 
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QComboBox, widget)
@@ -227,7 +227,7 @@ def set_widget_text(dialog, widget, text):
         set_checked(dialog, widget, text)
 
 
-def isChecked(dialog, widget):
+def is_checked(dialog, widget):
 
     if type(widget) is str:
         widget = dialog.findChild(QCheckBox, widget)
@@ -254,7 +254,7 @@ def set_checked(dialog, widget, checked=True):
         widget.setChecked(bool(checked))
 
 
-def getSelectedItem(dialog, widget, return_string_null=True):
+def get_selected_item(dialog, widget, return_string_null=True):
 
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QComboBox, widget)
@@ -476,7 +476,7 @@ def remove_tab(tab_widget, tab_name):
             break
 
 
-def enable_disable_tab_by_tabName(tab_widget, tab_name, action):
+def enable_disable_tab_by_tab_name(tab_widget, tab_name, action):
     """ Look in @tab_widget for a tab with @tab_name and remove it """
 
     for x in range(0, tab_widget.count()):
@@ -508,7 +508,7 @@ def dis_enable_dialog(dialog, enable, ignore_widgets=['', None]):
                 widget.setEnabled(enable)
 
 
-def set_qtv_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=QTableView.NoEditTriggers):
+def set_tableview_config(widget, selection=QAbstractItemView.SelectRows, edit_triggers=QTableView.NoEditTriggers):
     """ Set QTableView configurations """
 
     widget.setSelectionBehavior(selection)
@@ -581,7 +581,8 @@ def check_expression_filter(expr_filter, log_info=False):
     return True, expr
 
 
-def fill_table(widget, table_name, expr_filter=None, set_edit_strategy=QSqlTableModel.OnManualSubmit):
+def fill_table(widget, table_name, expr_filter=None, set_edit_strategy=QSqlTableModel.OnManualSubmit,
+               sort_order=Qt.AscendingOrder):
     """ Set a model with selected filter.
     Attach that model to selected table """
 
@@ -592,12 +593,12 @@ def fill_table(widget, table_name, expr_filter=None, set_edit_strategy=QSqlTable
     model = QSqlTableModel(db=global_vars.session_vars['db'])
     model.setTable(table_name)
     model.setEditStrategy(set_edit_strategy)
-    model.setSort(0, 0)
+    model.setSort(0, sort_order)
     model.select()
 
     # Check for errors
     if model.lastError().isValid():
-        tools_log(f"fill_table: {model.lastError().text()}")
+        tools_log.log_warning(f"fill_table: {model.lastError().text()}")
 
     # Attach model to table view
     widget.setModel(model)
@@ -633,29 +634,6 @@ def set_lazy_init(widget, lazy_widget=None, lazy_init_function=None):
     lazy_init_function(lazy_widget)
 
 
-def fill_table_object(widget, table_name, expr_filter=None):
-    """ Set a model with selected filter. Attach that model to selected table """
-
-    if global_vars.schema_name not in table_name:
-        table_name = global_vars.schema_name + "." + table_name
-
-    # Set model
-    model = QSqlTableModel(db=global_vars.session_vars['db'])
-    model.setTable(table_name)
-    model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-    model.sort(0, 1)
-    if expr_filter:
-        model.setFilter(expr_filter)
-    model.select()
-
-    # Check for errors
-    if model.lastError().isValid():
-        tools_log(f"fill_table_object: {model.lastError().text()}")
-
-    # Attach model to table view
-    widget.setModel(model)
-
-
 def filter_by_id(dialog, widget_table, widget_txt, table_object):
 
     field_object_id = "id"
@@ -668,10 +646,10 @@ def filter_by_id(dialog, widget_table, widget_txt, table_object):
         widget_table.model().setFilter(expr)
         widget_table.model().select()
     else:
-        fill_table_object(widget_table, global_vars.schema_name + "." + table_object)
+        fill_table(widget_table, global_vars.schema_name + "." + table_object)
 
 
-def set_selectionbehavior(dialog):
+def set_selection_behavior(dialog):
 
     # Get objects of type: QTableView
     widget_list = dialog.findChildren(QTableView)
@@ -696,7 +674,7 @@ def set_model_to_table(widget, table_name, expr_filter=None, edit_strategy=QSqlT
 
     # Check for errors
     if model.lastError().isValid():
-        tools_log(f"set_model_to_table: {model.lastError().text()}")
+        tools_log.log_warning(f"set_model_to_table: {model.lastError().text()}")
 
     # Attach model to table view
     if widget:
@@ -782,7 +760,7 @@ def set_completer_rows(widget, rows):
     completer.setModel(model)
 
 
-def put_combobox(qtable, rows, field, widget_pos, combo_values):
+def put_combobox_into_tableview(qtable, rows, field, widget_pos, combo_values):
     """ Set one column of a QtableView as QComboBox with values from database.
     :param qtable: QTableView to fill
     :param rows: List of items to set QComboBox (["..", "..."])
@@ -809,7 +787,7 @@ def put_combobox(qtable, rows, field, widget_pos, combo_values):
 def set_status(qtable, combo, pos_x, combo_pos, col_update):
     """ Update values from QComboBox to QTableView
     :param qtable: QTableView Where update values
-     :param combo: QComboBox from which we will take the value
+    :param combo: QComboBox from which we will take the value
     :param pos_x: Position of the row where we want to update value (integer)
     :param combo_pos: Position of the column where we want to put the QComboBox (integer)
     :param col_update: Column to update into QTableView.Model() (integer)
@@ -851,7 +829,7 @@ def document_open(qtable, field_name):
         webbrowser.open(path)
 
 
-def delete_rows_qtv(qtable):
+def delete_rows_tableview(qtable):
     """ Delete record from selected rows in a QTableView """
 
     # Get selected rows. 0 is the column of the pk 0 'id'
@@ -1025,8 +1003,8 @@ def set_text_bold(widget, pattern):
     """
 
     cursor = widget.textCursor()
-    format = QTextCharFormat()
-    format.setFontWeight(QFont.Bold)
+    format_ = QTextCharFormat()
+    format_.setFontWeight(QFont.Bold)
     regex = QRegExp(pattern)
     pos = 0
     index = regex.indexIn(widget.toPlainText(), pos)
@@ -1037,7 +1015,7 @@ def set_text_bold(widget, pattern):
         # Set cursor at end of match
         cursor.setPosition(pos, 1)
         # Select the matched text and apply the desired format
-        cursor.mergeCharFormat(format)
+        cursor.mergeCharFormat(format_)
         # Move to the next match
         index = regex.indexIn(widget.toPlainText(), pos)
 
@@ -1282,7 +1260,6 @@ def manage_exception(title=None, description=None, sql=None, schema_name=None):
     exc_type, exc_obj, exc_tb = sys.exc_info()
     path = exc_tb.tb_frame.f_code.co_filename
     file_name = os.path.split(path)[1]
-    #folder_name = os.path.dirname(path)
 
     # Set exception message details
     msg = ""
@@ -1329,7 +1306,7 @@ def set_table_model(dialog, table_object, table_name, expr_filter):
     expr = None
     if expr_filter:
         # Check expression
-        (is_valid, expr) = check_expression_filter(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = check_expression_filter(expr_filter)
         if not is_valid:
             return expr
 

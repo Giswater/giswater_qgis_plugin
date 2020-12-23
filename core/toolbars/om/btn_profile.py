@@ -83,7 +83,7 @@ class GwProfileButton(GwParentMapTool):
         self.composers_path = self.dlg_draw_profile.findChild(QLineEdit, "composers_path")
 
         # Set layer_node
-        self.layer_node = tools_qgis.get_layer_by_tablename('v_edit_node', show_warning=False)
+        self.layer_node = tools_qgis.get_layer_by_tablename('v_edit_node', show_warning_=False)
 
         # Toolbar actions
         action = self.dlg_draw_profile.findChild(QAction, "actionProfile")
@@ -110,9 +110,9 @@ class GwProfileButton(GwParentMapTool):
 
         # Set last parameters
         tools_qt.set_widget_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance,
-                               tools_gw.get_config_parser('btn_profile', 'minDistanceProfile', "user", "giswater"))
+                                 tools_gw.get_config_parser('btn_profile', 'minDistanceProfile', "user", "giswater"))
         tools_qt.set_widget_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title,
-                               tools_gw.get_config_parser('btn_profile', 'titleProfile', "user", "giswater"))
+                                 tools_gw.get_config_parser('btn_profile', 'titleProfile', "user", "giswater"))
 
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')

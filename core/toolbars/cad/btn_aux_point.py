@@ -69,7 +69,7 @@ class GwAuxPointButton(GwParentMapTool):
         if not self.dist_y:
             self.dist_y = 0
 
-        self.delete_prev = tools_qt.isChecked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
+        self.delete_prev = tools_qt.is_checked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
         if self.layer_points:
             self.layer_points.startEditing()
             tools_gw.close_dialog(self.dlg_create_point)

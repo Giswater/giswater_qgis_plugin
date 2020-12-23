@@ -49,7 +49,7 @@ class GwDocument:
 
         widget_list = self.dlg_add_doc.findChildren(QTableView)
         for widget in widget_list:
-            tools_qt.set_qtv_config(widget)
+            tools_qt.set_tableview_config(widget)
 
         # Get layers of every geom_type
 
@@ -152,7 +152,7 @@ class GwDocument:
                f" FROM {table_name}"
                f" ORDER BY {field_name}")
         rows = tools_db.get_rows(sql)
-        tools_qt.fillComboBox(dialog, widget, rows)
+        tools_qt.fill_combo_box(dialog, widget, rows)
         if rows:
             tools_qt.set_current_index(dialog, widget, 0)
 
@@ -304,7 +304,7 @@ class GwDocument:
                    f" VALUES('{doc_id}', '{item_id}')")
             tools_db.execute_sql(sql)
             expr = f"{tablename}_id = '{item_id}'"
-            message = tools_qt.fill_table_object(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr)
+            message = tools_qt.fill_table(qtable, f"{self.schema_name}.v_ui_doc_x_{tablename}", expr)
             if message:
                 tools_qgis.show_warning(message)
 
@@ -322,7 +322,7 @@ class GwDocument:
         tools_gw.set_completer_object(self.dlg_man, table_object)
 
         # Set a model with selected filter. Attach that model to selected table
-        message = tools_qt.fill_table_object(self.dlg_man.tbl_document, f"{self.schema_name}.{table_object}")
+        message = tools_qt.fill_table(self.dlg_man.tbl_document, f"{self.schema_name}.{table_object}")
         if message:
             tools_qgis.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_document, table_object)

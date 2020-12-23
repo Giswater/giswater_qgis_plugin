@@ -13,8 +13,8 @@ import sys
 from random import randrange
 
 from qgis.PyQt.QtCore import Qt, QTimer
-from qgis.PyQt.QtGui import QColor, QCursor, QPixmap
-from qgis.PyQt.QtWidgets import QDockWidget, QApplication, QPushButton
+from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtWidgets import QDockWidget, QApplication
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
     QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry
@@ -274,7 +274,7 @@ def get_primary_key(layer=None):
     return uri_pk
 
 
-def get_layer_by_tablename(tablename, show_warning=False, log_info=False, schema_name=None):
+def get_layer_by_tablename(tablename, show_warning_=False, log_info=False, schema_name=None):
     """ Iterate over all layers and get the one with selected @tablename """
 
     # Check if we have any layer loaded
@@ -294,7 +294,7 @@ def get_layer_by_tablename(tablename, show_warning=False, log_info=False, schema
             layer = cur_layer
             break
 
-    if layer is None and show_warning:
+    if layer is None and show_warning_:
         pass
         #self.show_warning("Layer not found", parameter=tablename)
 
@@ -505,7 +505,7 @@ def get_geometry_vertex(list_coord=None):
     return points
 
 
-def resetRubberbands(rubber_band):
+def reset_rubber_band(rubber_band):
 
     rubber_band.reset()
 
@@ -755,7 +755,7 @@ def get_geometry_from_json(feature):
         return None
 
 
-#region Private functions
+# region private functions
 def get_vertex_from_point(feature):
     """ Manage feature geometry when is Point
     :param feature: feature to get geometry type and coordinates (GeoJson)
@@ -845,5 +845,5 @@ def get_multi_coordinates(feature):
     coordinates = coordinates[:-2] + ")"
     return coordinates
 
-#endregion
+# endregion
 

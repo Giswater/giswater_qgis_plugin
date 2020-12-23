@@ -476,7 +476,7 @@ class GwConfigButton(GwParentAction):
         elif type(widget) is QComboBox:
             value = tools_qt.get_combo_value(self.dlg_config, widget, 0)
         elif type(widget) is QCheckBox:
-            value = tools_qt.isChecked(self.dlg_config, chk)
+            value = tools_qt.is_checked(self.dlg_config, chk)
         elif type(widget) is QDateEdit:
             value = tools_qt.get_calendar_date(self.dlg_config, widget)
         elif type(widget) is QgsDateTimeEdit:
@@ -484,7 +484,7 @@ class GwConfigButton(GwParentAction):
         if chk.isChecked():
             elem['widget'] = str(widget.objectName())
             elem['chk'] = str(chk.objectName())
-            elem['isChecked'] = str(tools_qt.isChecked(self.dlg_config, chk))
+            elem['isChecked'] = str(tools_qt.is_checked(self.dlg_config, chk))
             elem['value'] = value
 
             self.list_update.append(elem)
@@ -504,7 +504,7 @@ class GwConfigButton(GwParentAction):
             value = tools_qt.get_combo_value(self.dlg_config, widget, 0)
             elem['widget_type'] = 'combo'
         elif type(widget) is QCheckBox:
-            value = tools_qt.isChecked(self.dlg_config, chk)
+            value = tools_qt.is_checked(self.dlg_config, chk)
             elem['widget_type'] = 'check'
         elif type(widget) is QDateEdit:
             value = tools_qt.get_calendar_date(self.dlg_config, widget)
@@ -513,7 +513,7 @@ class GwConfigButton(GwParentAction):
             value = tools_qt.get_calendar_date(self.dlg_config, widget)
             elem['widget_type'] = 'datetime'
 
-        elem['isChecked'] = str(tools_qt.isChecked(self.dlg_config, chk))
+        elem['isChecked'] = str(tools_qt.is_checked(self.dlg_config, chk))
         elem['value'] = value
 
         self.list_update.append(elem)
@@ -528,7 +528,7 @@ class GwConfigButton(GwParentAction):
         elif type(widget) is QComboBox:
             value = tools_qt.get_combo_value(self.dlg_config, widget, 0)
         elif type(widget) is QCheckBox:
-            value = tools_qt.isChecked(self.dlg_config, widget)
+            value = tools_qt.is_checked(self.dlg_config, widget)
         elif type(widget) is QDateEdit:
             value = tools_qt.get_calendar_date(self.dlg_config, widget)
 

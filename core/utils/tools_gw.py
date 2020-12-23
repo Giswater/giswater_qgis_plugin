@@ -940,7 +940,7 @@ def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
     elif type(widget) is QComboBox:
         value = tools_qt.get_combo_value(dialog, widget, 0)
     elif type(widget) is QCheckBox:
-        value = tools_qt.isChecked(dialog, widget)
+        value = tools_qt.is_checked(dialog, widget)
     elif type(widget) is QDateEdit:
         value = tools_qt.get_calendar_date(dialog, widget)
 
@@ -955,7 +955,7 @@ def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
     if chk is not None:
         if chk.isChecked():
             elem['chk'] = str(chk.objectName())
-            elem['isChecked'] = str(tools_qt.isChecked(dialog, chk))
+            elem['isChecked'] = str(tools_qt.is_checked(dialog, chk))
 
     if 'sys_role_id' in field:
         elem['sys_role_id'] = str(field['sys_role_id'])
@@ -1041,7 +1041,7 @@ def get_values(dialog, widget, _json=None):
     elif type(widget) is QComboBox and widget.isEnabled():
         value = tools_qt.get_combo_value(dialog, widget, 0)
     elif type(widget) is QCheckBox and widget.isEnabled():
-        value = tools_qt.isChecked(dialog, widget)
+        value = tools_qt.is_checked(dialog, widget)
     elif type(widget) is QgsDateTimeEdit and widget.isEnabled():
         value = tools_qt.get_calendar_date(dialog, widget)
 

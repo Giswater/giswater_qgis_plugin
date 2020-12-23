@@ -55,7 +55,7 @@ class GwArcFusionButton(GwParentMapTool):
             # Fill ComboBox workcat_id_end
             sql = "SELECT id FROM cat_work ORDER BY id"
             rows = tools_db.get_rows(sql)
-            tools_qt.fillComboBox(self.dlg_fusion, "workcat_id_end", rows, False)
+            tools_qt.fill_combo_box(self.dlg_fusion, "workcat_id_end", rows, False)
 
             # Set QDateEdit to current date
             current_date = QDate.currentDate()

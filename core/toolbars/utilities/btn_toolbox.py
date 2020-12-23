@@ -324,7 +324,7 @@ class GwToolBoxButton(GwParentAction):
                             value = tools_qt.get_combo_value(dialog, widget, 0)
                             extras += f'"{param_name}":"{value}", '
                         elif type(widget) in ('', QCheckBox):
-                            value = tools_qt.isChecked(dialog, widget)
+                            value = tools_qt.is_checked(dialog, widget)
                             extras += f'"{param_name}":"{str(value).lower()}", '
                         elif type(widget) in ('', QgsDateTimeEdit):
                             value = tools_qt.get_calendar_date(dialog, widget)

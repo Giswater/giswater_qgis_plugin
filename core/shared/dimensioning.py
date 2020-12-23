@@ -170,7 +170,7 @@ class GwDimensioning:
         list_widgets = self.dlg_dim.findChildren(QCheckBox)
         for widget in list_widgets:
             widget_name = widget.property('columnname')
-            widget_value = f'"{tools_qt.isChecked(self.dlg_dim, widget)}"'
+            widget_value = f'"{tools_qt.is_checked(self.dlg_dim, widget)}"'
             if widget_value == 'null':
                 continue
             fields += f'"{widget_name}":{widget_value},'
@@ -453,7 +453,7 @@ class GwDimensioning:
             widget = tools_gw.add_tableview_header(widget, field)
             widget = tools_gw.fill_tableview_rows(widget, field)
             widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
-            tools_qt.set_qtv_config(widget)
+            tools_qt.set_tableview_config(widget)
         widget.setObjectName(widget.property('columnname'))
 
         return label, widget

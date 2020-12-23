@@ -59,7 +59,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         sql = "SELECT id FROM cat_work ORDER BY id"
         rows = tools_db.get_rows(sql)
         if rows:
-            tools_qt.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
+            tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
             tools_qt.set_autocompleter(self.dlg_replace.workcat_id_end)
 
         row = tools_gw.get_config_value('edit_workcat_vdefault')
@@ -97,11 +97,11 @@ class GwFeatureReplaceButton(GwParentMapTool):
             if self.geom_type in ('node', 'connec'):
                 sql = f"SELECT DISTINCT(id) FROM {self.cat_table} ORDER BY id"
                 rows = tools_db.get_rows(sql)
-                tools_qt.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
+                tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
             elif self.geom_type in 'gully':
                 sql = f"SELECT DISTINCT(id) FROM cat_grate ORDER BY id"
                 rows = tools_db.get_rows(sql)
-                tools_qt.fillComboBox(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
+                tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
         self.dlg_replace.feature_type.setText(feature_type)
         self.dlg_replace.feature_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
@@ -113,7 +113,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                f"AND active is True "
                f"ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fillComboBox(self.dlg_replace, "feature_type_new", rows)
+        tools_qt.fill_combo_box(self.dlg_replace, "feature_type_new", rows)
 
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self.new_workcat))
         self.dlg_replace.btn_accept.clicked.connect(partial(self.get_values, self.dlg_replace))
@@ -229,7 +229,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                     sql = "SELECT id FROM cat_work ORDER BY id"
                     rows = tools_db.get_rows(sql)
                     if rows:
-                        tools_qt.fillComboBox(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
+                        tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.workcat_id_end, rows)
                         current_index = self.dlg_replace.workcat_id_end.findText(str(cat_work_id))
                         self.dlg_replace.workcat_id_end.setCurrentIndex(current_index)
 
@@ -263,7 +263,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
             extras = f'"old_feature_id":"{self.feature_id}"'
             extras += f', "workcat_id_end":"{self.workcat_id_end_aux}"'
             extras += f', "enddate":"{self.enddate_aux}"'
-            extras += f', "keep_elements":"{tools_qt.isChecked(dialog, "keep_elements")}"'
+            extras += f', "keep_elements":"{tools_qt.is_checked(dialog, "keep_elements")}"'
             body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute SQL function and show result to the user
@@ -455,5 +455,5 @@ class GwFeatureReplaceButton(GwParentMapTool):
                    f"FROM {self.cat_table} "
                    f"WHERE {self.feature_type_ws} = '{feature_type_new}'")
             rows = tools_db.get_rows(sql)
-            tools_qt.fillComboBox(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
+            tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
 

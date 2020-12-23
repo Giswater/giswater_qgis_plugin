@@ -241,7 +241,7 @@ class GwMincut:
 
         result_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
         expr_filter = f"result_id={result_mincut_id}"
-        tools_qt.set_qtv_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
+        tools_qt.set_tableview_config(self.dlg_mincut.tbl_hydro, edit_triggers=QTableView.DoubleClicked)
         message = tools_qt.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
         if message:
             tools_qgis.show_warning(message)
@@ -340,7 +340,7 @@ class GwMincut:
 
         tools_qgis.restore_user_layer('v_edit_node', self.user_current_layer)
         self.remove_selection()
-        tools_qgis.resetRubberbands(self.api_search.rubber_band)
+        tools_qgis.reset_rubber_band(self.api_search.rubber_band)
 
         # If client don't touch nothing just rejected dialog or press cancel
         if not self.dlg_mincut.closeMainWin and self.dlg_mincut.mincutCanceled:
@@ -429,7 +429,7 @@ class GwMincut:
                "FROM cat_users "
                "ORDER BY name")
         rows = tools_db.get_rows(sql)
-        tools_qt.fillComboBox(self.dlg_fin, "exec_user", rows, False)
+        tools_qt.fill_combo_box(self.dlg_fin, "exec_user", rows, False)
         assigned_to = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.assigned_to, 1)
         tools_qt.set_widget_text(self.dlg_fin, "exec_user", str(assigned_to))
 
@@ -521,7 +521,7 @@ class GwMincut:
 
         assigned_to = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.assigned_to, 0)
         cur_user = global_vars.session_vars['current_user']
-        appropiate_status = tools_qt.isChecked(self.dlg_mincut, "appropiate")
+        appropiate_status = tools_qt.is_checked(self.dlg_mincut, "appropiate")
 
         check_data = [str(mincut_result_state), str(anl_cause), str(received_date),
                       str(forecast_start_predict), str(forecast_end_predict)]
@@ -691,7 +691,7 @@ class GwMincut:
         self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.restore_user_layer, 'v_edit_node', self.user_current_layer))
         self.dlg_mincut.btn_cancel.clicked.connect(partial(self.remove_selection))
         # TODO: Check this class doesn't have rubber_band
-        self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.resetRubberbands, self.api_search.rubber_band))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.reset_rubber_band, self.api_search.rubber_band))
         self.refresh_tab_hydro()
 
         self.action_mincut.setEnabled(False)
@@ -1831,7 +1831,7 @@ class GwMincut:
             mincut_class_status = str(row[0])
 
         expr_filter = f"result_id={result_mincut_id}"
-        tools_qt.set_qtv_config(self.dlg_mincut.tbl_hydro)
+        tools_qt.set_tableview_config(self.dlg_mincut.tbl_hydro)
         message = tools_qt.fill_table(self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer', expr_filter=expr_filter)
         if message:
             tools_qgis.show_warning(message)

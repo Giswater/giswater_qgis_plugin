@@ -148,6 +148,7 @@ def get_srid(tablename, schemaname=None):
 
     return srid
 
+
 def set_database_connection():
     """ Set database connection """
 
@@ -159,9 +160,9 @@ def set_database_connection():
 
     layer_source, not_version = get_layer_source_from_credentials('disable')
     if layer_source:
-        if layer_source['service'] is None and (layer_source['db'] is None
-                or layer_source['host'] is None or layer_source['user'] is None
-                or layer_source['password'] is None or layer_source['port'] is None):
+        if layer_source['service'] is None and (layer_source['db'] is None or layer_source['host'] is None or
+                                                layer_source['user'] is None or layer_source['password'] is None or
+                                                layer_source['port'] is None):
             return False, not_version, layer_source
     else:
         return False, not_version, layer_source
@@ -298,7 +299,7 @@ def get_sql(sql, log_sql=False, params=None):
     return sql
 
 
-def get_row( sql, log_info=True, log_sql=False, commit=True, params=None):
+def get_row(sql, log_info=True, log_sql=False, commit=True, params=None):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
     sql = get_sql(sql, log_sql, params)
@@ -408,7 +409,7 @@ def connect_to_database_credentials(credentials, conn_info=None, max_attempts=2)
             (success, credentials['user'], credentials['password']) = \
                 QgsCredentials.instance().get(conn_info, credentials['user'], credentials['password'])
         logged = connect_to_database(credentials['host'], credentials['port'], credentials['db'],
-            credentials['user'], credentials['password'], credentials['sslmode'])
+                                     credentials['user'], credentials['password'], credentials['sslmode'])
 
     return logged, credentials
 
@@ -445,7 +446,7 @@ def get_layer_source_from_credentials(sslmode_value, layer_name='v_edit_node'):
         status, credentials = connect_to_database_credentials(credentials, conn_info)
         if not status:
             tools_log.log_warning("Error connecting to database (layer)")
-            global_vars.session_vars['last_error'] = tools_qt.tr("Error connecting to database", aux_context='ui_message')
+            global_vars.session_vars['last_error'] = tools_qt.tr("Error connecting to database", None, 'ui_message')
             return None, not_version
 
         # Put the credentials back (for yourself and the provider), as QGIS removes it when you "get" it
@@ -472,11 +473,11 @@ def get_layer_source_from_credentials(sslmode_value, layer_name='v_edit_node'):
             status, credentials = connect_to_database_credentials(credentials, max_attempts=0)
             if not status:
                 tools_log.log_warning("Error connecting to database (settings)")
-                global_vars.session_vars['last_error'] = tools_qt.tr("Error connecting to database", aux_context='ui_message')
+                global_vars.session_vars['last_error'] = tools_qt.tr("Error connecting to database", None, 'ui_message')
                 return None, not_version
         else:
             tools_log.log_warning("Error getting default connection (settings)")
-            global_vars.session_vars['last_error'] = tools_qt.tr("Error getting default connection", aux_context='ui_message')
+            global_vars.session_vars['last_error'] = tools_qt.tr("Error getting default connection", None, 'ui_message')
             return None, not_version
 
     global_vars.session_vars['credentials'] = credentials

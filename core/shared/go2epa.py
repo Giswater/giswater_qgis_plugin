@@ -104,7 +104,7 @@ class GwGo2Epa:
         file_rpt = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
 
         # Control execute epa software
-        if tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
+        if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
             if self.check_inp_chk(file_inp) is False:
                 return False
 
@@ -113,7 +113,7 @@ class GwGo2Epa:
                 tools_qgis.show_warning(msg, parameter=str(file_rpt))
                 return False
 
-            if not tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
+            if not tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
                 if not os.path.exists(file_inp):
                     msg = "File INP not found"
                     tools_qgis.show_warning(msg, parameter=str(file_rpt))
@@ -127,9 +127,9 @@ class GwGo2Epa:
         result_name = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
 
         # Check if at least one process is selected
-        export_checked = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
-        exec_checked = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)
-        import_result_checked = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)
+        export_checked = tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
+        exec_checked = tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)
+        import_result_checked = tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)
 
         if not export_checked and not exec_checked and not import_result_checked:
             msg = "You need to select at least one process"
@@ -137,7 +137,7 @@ class GwGo2Epa:
             return False
 
         # Control export INP
-        if tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
+        if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
             if self.check_inp_chk(file_inp) is False:
                 return False
 
@@ -146,12 +146,12 @@ class GwGo2Epa:
             return False
 
         # Control import result
-        if tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result):
+        if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result):
             if file_rpt is None:
                 msg = "Select valid RPT file"
                 tools_qgis.show_warning(msg, parameter=str(file_rpt))
                 return False
-            if not tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
+            if not tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec):
                 if not os.path.exists(file_rpt):
                     msg = "File RPT not found"
                     tools_qgis.show_warning(msg, parameter=str(file_rpt))
@@ -212,15 +212,15 @@ class GwGo2Epa:
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_FILE_RPT',
                                    f"{tools_qt.get_text(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False)}")
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_NETWORK_GEOM',
-                                   f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)}")
+                                   f"{tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)}")
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_INP',
-                                   f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)}")
+                                   f"{tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export)}")
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_UD',
-                                   f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)}")
+                                   f"{tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)}")
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_EPA',
-                                   f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)}")
+                                   f"{tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)}")
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_RPT',
-                                   f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)}")
+                                   f"{tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)}")
 
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right, aql=""):
@@ -344,7 +344,7 @@ class GwGo2Epa:
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = tools_qt.tr("Select INP file", aux_context='ui_message')
-        widget_is_checked = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
+        widget_is_checked = tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
         if widget_is_checked:
             self.file_inp, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.inp')
         else:
@@ -365,7 +365,7 @@ class GwGo2Epa:
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
         message = tools_qt.tr("Select RPT file", aux_context='ui_message')
-        widget_is_checked = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
+        widget_is_checked = tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
         if widget_is_checked:
             self.file_rpt, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
         else:
@@ -387,13 +387,13 @@ class GwGo2Epa:
 
         # Get widgets values
         self.result_name = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, False, False)
-        self.net_geom = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)
-        self.export_inp = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
-        self.export_subcatch = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)
+        self.net_geom = tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)
+        self.export_inp = tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
+        self.export_subcatch = tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)
         self.file_inp = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
-        self.exec_epa = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)
+        self.exec_epa = tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)
         self.file_rpt = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt)
-        self.import_result = tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)
+        self.import_result = tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)
 
         # Check for sector selector
         if self.export_inp:

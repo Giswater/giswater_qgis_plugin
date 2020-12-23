@@ -53,7 +53,7 @@ class GwAuxCircleButton(GwParentMapTool):
         self.radius = self.dlg_create_circle.radius.text()
         if not self.radius:
             self.radius = 0.1
-        self.delete_prev = tools_qt.isChecked(self.dlg_create_circle, self.dlg_create_circle.chk_delete_prev)
+        self.delete_prev = tools_qt.is_checked(self.dlg_create_circle, self.dlg_create_circle.chk_delete_prev)
 
         if self.layer_circle:
             self.layer_circle.startEditing()

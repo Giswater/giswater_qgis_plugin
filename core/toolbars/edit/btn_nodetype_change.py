@@ -138,7 +138,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
         sql = ("SELECT DISTINCT(id) FROM cat_feature WHERE active is True "
                "AND feature_type = 'NODE' ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fillComboBox(self.dlg_chg_node_type, "node_node_type_new", rows)
+        tools_qt.fill_combo_box(self.dlg_chg_node_type, "node_node_type_new", rows)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_chg_node_type, dlg_name='nodetype_change', maximize_button=False)

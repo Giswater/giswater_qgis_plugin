@@ -219,7 +219,7 @@ class GwInfo(QObject):
             return result, dialog
 
         elif template == 'dimensioning':
-            self.lyr_dim = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning=True)
+            self.lyr_dim = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning_=True)
             if self.lyr_dim:
                 self.api_dim = GwDimensioning()
                 feature_id = self.complet_result['body']['feature']['id']
@@ -272,7 +272,7 @@ class GwInfo(QObject):
             elif type(widget) is QComboBox:
                 value = tools_qt.get_combo_value(dialog, widget, 0)
             elif type(widget) is QCheckBox:
-                value = tools_qt.isChecked(dialog, widget)
+                value = tools_qt.is_checked(dialog, widget)
             elif type(widget) is QgsDateTimeEdit:
                 value = tools_qt.get_calendar_date(dialog, widget)
             else:
@@ -329,21 +329,21 @@ class GwInfo(QObject):
         self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
         self.tab_main.currentChanged.connect(partial(self.tab_activation, self.dlg_cf, new_feature))
         self.tbl_element = self.dlg_cf.findChild(QTableView, "tbl_element")
-        tools_qt.set_qtv_config(self.tbl_element)
+        tools_qt.set_tableview_config(self.tbl_element)
         self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
-        tools_qt.set_qtv_config(self.tbl_relations)
+        tools_qt.set_tableview_config(self.tbl_relations)
         self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
-        tools_qt.set_qtv_config(self.tbl_upstream)
+        tools_qt.set_tableview_config(self.tbl_upstream)
         self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
-        tools_qt.set_qtv_config(self.tbl_downstream)
+        tools_qt.set_tableview_config(self.tbl_downstream)
         self.tbl_hydrometer = self.dlg_cf.findChild(QTableView, "tbl_hydrometer")
-        tools_qt.set_qtv_config(self.tbl_hydrometer)
+        tools_qt.set_tableview_config(self.tbl_hydrometer)
         self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
-        tools_qt.set_qtv_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems, QTableView.CurrentChanged)
+        tools_qt.set_tableview_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems, QTableView.CurrentChanged)
         self.tbl_event_cf = self.dlg_cf.findChild(QTableView, "tbl_event_cf")
-        tools_qt.set_qtv_config(self.tbl_event_cf)
+        tools_qt.set_tableview_config(self.tbl_event_cf)
         self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
-        tools_qt.set_qtv_config(self.tbl_document)
+        tools_qt.set_tableview_config(self.tbl_document)
 
         # Get table name
         self.tablename = complet_result['body']['feature']['tableName']
@@ -1474,7 +1474,7 @@ class GwInfo(QObject):
         widget = tools_gw.add_tableview_header(widget, field)
         widget = tools_gw.fill_tableview_rows(widget, field)
         widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
-        tools_qt.set_qtv_config(widget)
+        tools_qt.set_tableview_config(widget)
         return widget
 
 
@@ -2522,7 +2522,7 @@ class GwInfo(QObject):
                                  " color: rgb(100, 100, 100)}")
         self.dlg_event_full.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_event_full))
         self.dlg_event_full.tbl_docs_x_event.doubleClicked.connect(self.open_file)
-        tools_qt.set_qtv_config(self.dlg_event_full.tbl_docs_x_event)
+        tools_qt.set_tableview_config(self.dlg_event_full.tbl_docs_x_event)
         tools_gw.open_dialog(self.dlg_event_full, 'visit_event_full')
 
 

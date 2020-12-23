@@ -233,10 +233,10 @@ class Selector:
 
         if widget_all is None or (widget_all is not None and widget.objectName() != widget_all.objectName()):
             extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", '
-                      f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{tools_qt.isChecked(dialog, widget)}", '
+                      f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{tools_qt.is_checked(dialog, widget)}", '
                       f'"addSchema":"{qgis_project_add_schema}"')
         else:
-            check_all = tools_qt.isChecked(dialog, widget_all)
+            check_all = tools_qt.is_checked(dialog, widget_all)
             extras = f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "checkAll":"{check_all}",  ' \
                      f'"addSchema":"{qgis_project_add_schema}"'
 
@@ -306,7 +306,7 @@ class Selector:
     def manage_all(self, dialog, widget_all, selector_vars):
 
         key_modifier = QApplication.keyboardModifiers()
-        status = tools_qt.isChecked(dialog, widget_all)
+        status = tools_qt.is_checked(dialog, widget_all)
         index = dialog.main_tab.currentIndex()
         widget_list = dialog.main_tab.widget(index).findChildren(QCheckBox)
         if key_modifier == Qt.ShiftModifier:

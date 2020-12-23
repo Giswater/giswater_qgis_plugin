@@ -67,7 +67,7 @@ class GwEndFeatureButton(GwParentAction):
 
         widget_list = self.dlg_work_end.findChildren(QTableView)
         for widget in widget_list:
-            tools_qt.set_qtv_config(widget)
+            tools_qt.set_tableview_config(widget)
 
         # Remove 'gully' for 'WS'
         self.project_type = tools_gw.get_project_type()
@@ -157,7 +157,7 @@ class GwEndFeatureButton(GwParentAction):
 
         sql = "SELECT id FROM cat_work"
         rows = tools_db.get_rows(sql)
-        tools_qt.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
+        tools_qt.fill_combo_box(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows, allow_nulls=False)
         tools_qt.set_autocompleter(self.dlg_work_end.workcat_id_end)
         row = tools_gw.get_config_value('edit_workcat_vdefault')
         if row:
@@ -565,7 +565,7 @@ class GwEndFeatureButton(GwParentAction):
                 sql = "SELECT id FROM cat_work ORDER BY id"
                 rows = tools_db.get_rows(sql)
                 if rows:
-                    tools_qt.fillComboBox(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows)
+                    tools_qt.fill_combo_box(self.dlg_work_end, self.dlg_work_end.workcat_id_end, rows)
                     aux = self.dlg_work_end.workcat_id_end.findText(str(cat_work_id))
                     self.dlg_work_end.workcat_id_end.setCurrentIndex(aux)
 

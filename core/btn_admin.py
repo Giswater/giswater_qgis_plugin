@@ -397,7 +397,7 @@ class GwAdmin:
 
         # Get roletype and export password
         roletype = tools_qt.get_text(self.dlg_create_gis_project, 'cmb_roletype')
-        export_passwd = tools_qt.isChecked(self.dlg_create_gis_project, 'chk_export_passwd')
+        export_passwd = tools_qt.is_checked(self.dlg_create_gis_project, 'chk_export_passwd')
         sample = self.dlg_create_gis_project.chk_is_sample.isChecked()
 
         if export_passwd:
@@ -2167,7 +2167,7 @@ class GwAdmin:
         if schema_name is None:
             schema_name = 'Nothing to select'
             self.project_version = "Version not found"
-            tools_qt.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
+            tools_qt.enable_disable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
 
         # Set label schema name
         self.lbl_schema_name.setText(str(schema_name))
@@ -2797,10 +2797,10 @@ class GwAdmin:
 
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
-            tools_qt.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
+            tools_qt.enable_disable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
             return
         else:
-            tools_qt.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
+            tools_qt.enable_disable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", True)
 
         # Control if schema_version is updated to 3.2
         if str(self.project_version).replace('.', '') < str(self.plugin_version).replace('.', ''):
@@ -2845,7 +2845,7 @@ class GwAdmin:
         # Create body
         feature = '"catFeature":"' + form_name + '"'
         extras = '"multi_create":' + str(
-            tools_qt.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_create)).lower() + ''
+            tools_qt.is_checked(self.dlg_readsql, self.dlg_readsql.chk_multi_create)).lower() + ''
         body = tools_gw.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
 
@@ -2902,7 +2902,7 @@ class GwAdmin:
                     self.dlg_manage_fields.tab_add_fields, self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
         form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
-        self.chk_multi_insert = tools_qt.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
+        self.chk_multi_insert = tools_qt.is_checked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
 
         window_title = ""
         if action == 'create':
@@ -2997,7 +2997,7 @@ class GwAdmin:
         self.model_update_table = None
 
         form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
-        self.chk_multi_insert = tools_qt.isChecked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
+        self.chk_multi_insert = tools_qt.is_checked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
         self.dlg_manage_fields.column_id.setEnabled(False)
 
         # Set listeners
@@ -3080,10 +3080,10 @@ class GwAdmin:
 
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
-            tools_qt.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
+            tools_qt.enable_disable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
             return
         else:
-            tools_qt.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
+            tools_qt.enable_disable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", True)
 
         # Populate table update
         qtable = dialog.findChild(QTableView, "tbl_update")
@@ -3103,10 +3103,10 @@ class GwAdmin:
 
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
-            tools_qt.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", False)
+            tools_qt.enable_disable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
             return
         else:
-            tools_qt.enable_disable_tab_by_tabName(self.dlg_readsql.tab_main, "others", True)
+            tools_qt.enable_disable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", True)
 
         # Populate widgettype combo
         if self.chk_multi_insert:
@@ -3147,7 +3147,7 @@ class GwAdmin:
                 elif type(widget) is QComboBox:
                     value = tools_qt.get_combo_value(self.dlg_manage_sys_fields, widget, 0)
                 elif type(widget) is QCheckBox:
-                    value = tools_qt.isChecked(self.dlg_manage_sys_fields, widget)
+                    value = tools_qt.is_checked(self.dlg_manage_sys_fields, widget)
                 elif type(widget) is QgsDateTimeEdit:
                     value = tools_qt.get_calendar_date(self.dlg_manage_sys_fields, widget)
                 elif type(widget) is QPlainTextEdit:
@@ -3212,7 +3212,7 @@ class GwAdmin:
                     elif type(widget) is QComboBox:
                         value = tools_qt.get_combo_value(self.dlg_manage_fields, widget, 0)
                     elif type(widget) is QCheckBox:
-                        value = tools_qt.isChecked(self.dlg_manage_fields, widget)
+                        value = tools_qt.is_checked(self.dlg_manage_fields, widget)
                     elif type(widget) is QgsDateTimeEdit:
                         value = tools_qt.get_calendar_date(self.dlg_manage_fields, widget)
                     elif type(widget) is QPlainTextEdit:
@@ -3253,7 +3253,7 @@ class GwAdmin:
                     elif type(widget) is QComboBox:
                         value = tools_qt.get_combo_value(self.dlg_manage_fields, widget, 0)
                     elif type(widget) is QCheckBox:
-                        value = tools_qt.isChecked(self.dlg_manage_fields, widget)
+                        value = tools_qt.is_checked(self.dlg_manage_fields, widget)
                     elif type(widget) is QgsDateTimeEdit:
                         value = tools_qt.get_calendar_date(self.dlg_manage_fields, widget)
                     elif type(widget) is QPlainTextEdit:

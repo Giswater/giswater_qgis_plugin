@@ -55,7 +55,7 @@ class GwPsector:
         cur_active_layer = self.iface.activeLayer()
         widget_list = self.dlg_plan_psector.findChildren(QTableView)
         for widget in widget_list:
-            tools_qt.set_qtv_config(widget)
+            tools_qt.set_tableview_config(widget)
         self.project_type = tools_gw.get_project_type()
 
         # Get layers of every geom_type
@@ -299,7 +299,7 @@ class GwPsector:
             layer = None
             if not is_api:
                 layername = f'v_edit_plan_psector'
-                layer = tools_qgis.get_layer_by_tablename(layername, show_warning=False)
+                layer = tools_qgis.get_layer_by_tablename(layername, show_warning_=False)
 
             if layer:
 
@@ -334,7 +334,7 @@ class GwPsector:
                         layer.removeSelection()
 
             filter_ = "psector_id = '" + str(psector_id) + "'"
-            message = tools_qt.fill_table_object(self.tbl_document, f"v_ui_doc_x_psector", filter_)
+            message = tools_qt.fill_table(self.tbl_document, f"v_ui_doc_x_psector", filter_)
             if message:
                 tools_qgis.show_warning(message)
             self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
@@ -389,7 +389,7 @@ class GwPsector:
         self.dlg_plan_psector.other.returnPressed.connect(partial(self.calculate_percents, 'plan_psector', 'other'))
 
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
-        self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(tools_qt.delete_rows_qtv, self.tbl_document))
+        self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(tools_qt.delete_rows_tableview, self.tbl_document))
         self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
         self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
         self.cmb_status.currentIndexChanged.connect(partial(self.show_status_warning))
@@ -466,7 +466,7 @@ class GwPsector:
 
     def enable_all(self):
 
-        value = tools_qt.isChecked(self.dlg_plan_psector, "chk_enable_all")
+        value = tools_qt.is_checked(self.dlg_plan_psector, "chk_enable_all")
         psector_id = tools_qt.get_text(self.dlg_plan_psector, "psector_id")
         sql = f"SELECT gw_fct_plan_psector_enableall({value}, '{psector_id}')"
         tools_db.execute_sql(sql)
@@ -576,11 +576,11 @@ class GwPsector:
         tools_gw.set_config_parser('psector_rapport', 'psector_rapport_path',
                                    f"{tools_qt.get_text(self.dlg_psector_rapport, 'txt_path')}")
         tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_composer',
-                                   f"{tools_qt.isChecked(self.dlg_psector_rapport, 'chk_composer')}")
+                                   f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_composer')}")
         tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_csv_detail',
-                                   f"{tools_qt.isChecked(self.dlg_psector_rapport, 'chk_csv_detail')}")
+                                   f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv_detail')}")
         tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_csv',
-                                   f"{tools_qt.isChecked(self.dlg_psector_rapport, 'chk_csv')}")
+                                   f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv')}")
 
         folder_path = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
@@ -588,7 +588,7 @@ class GwPsector:
             folder_path = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
 
         # Generate Composer
-        if tools_qt.isChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer):
+        if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_composer):
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_composer_path')
             if file_name is None or file_name == 'null':
                 message = "File name is required"
@@ -599,7 +599,7 @@ class GwPsector:
             self.generate_composer(path)
 
         # Generate csv detail
-        if tools_qt.isChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail):
+        if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv_detail):
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_path')
             viewname = f"v_plan_current_psector_budget_detail"
             if file_name is None or file_name == 'null':
@@ -611,7 +611,7 @@ class GwPsector:
             self.generate_csv(path, viewname)
 
         # Generate csv
-        if tools_qt.isChecked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv):
+        if tools_qt.is_checked(self.dlg_psector_rapport, self.dlg_psector_rapport.chk_csv):
             file_name = tools_qt.get_text(self.dlg_psector_rapport, 'txt_csv_detail_path')
             viewname = f"v_plan_current_psector_budget"
             if file_name is None or file_name == 'null':
@@ -853,7 +853,7 @@ class GwPsector:
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
             psector_id = tools_qt.get_text(self.dlg_plan_psector, 'psector_id')
             expr = f"psector_id = '{psector_id}'"
-            message = tools_qt.fill_table_object(self.tbl_document, f"{self.schema_name}.v_ui_doc_x_psector", expr)
+            message = tools_qt.fill_table(self.tbl_document, f"{self.schema_name}.v_ui_doc_x_psector", expr)
             if message:
                 tools_qgis.show_warning(message)
 
@@ -1014,7 +1014,7 @@ class GwPsector:
                     if column_name != 'psector_id':
                         widget_type = tools_qt.get_widget_type(self.dlg_plan_psector, column_name)
                         if widget_type is QCheckBox:
-                            value = tools_qt.isChecked(self.dlg_plan_psector, column_name)
+                            value = tools_qt.is_checked(self.dlg_plan_psector, column_name)
                         elif widget_type is QDateEdit:
                             date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
                             value = date.dateTime().toString('yyyy-MM-dd HH:mm:ss')
@@ -1043,7 +1043,7 @@ class GwPsector:
                         if widget_type is not None:
                             value = None
                             if widget_type is QCheckBox:
-                                value = str(tools_qt.isChecked(self.dlg_plan_psector, column_name)).upper()
+                                value = str(tools_qt.is_checked(self.dlg_plan_psector, column_name)).upper()
                             elif widget_type is QDateEdit:
                                 date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
                                 values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss') + ", "
@@ -1597,7 +1597,7 @@ class GwPsector:
         # Tables
         tablename = 'plan_result_cat'
         self.tbl_om_result_cat = self.dlg_merm.findChild(QTableView, "tbl_om_result_cat")
-        tools_qt.set_qtv_config(self.tbl_om_result_cat)
+        tools_qt.set_tableview_config(self.tbl_om_result_cat)
 
         # Set signals
         self.dlg_merm.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_merm))

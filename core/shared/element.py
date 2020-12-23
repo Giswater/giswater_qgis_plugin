@@ -46,7 +46,7 @@ class GwElement:
 
         widget_list = self.dlg_add_element.findChildren(QTableView)
         for widget in widget_list:
-            tools_qt.set_qtv_config(widget)
+            tools_qt.set_tableview_config(widget)
 
         # Get layers of every geom_type
 
@@ -501,7 +501,7 @@ class GwElement:
         tools_gw.set_completer_object(self.dlg_man, table_object)
 
         # Set a model with selected filter. Attach that model to selected table
-        message = tools_qt.fill_table_object(self.dlg_man.tbl_element, f"{self.schema_name}.{table_object}")
+        message = tools_qt.fill_table(self.dlg_man.tbl_element, f"{self.schema_name}.{table_object}")
         if message:
             tools_qgis.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_element, table_object)
