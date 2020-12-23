@@ -131,7 +131,7 @@ def set_logger(logger_name=None):
             logger_name = 'plugin'
 
         global_vars.session_vars['min_log_level'] = \
-            tools_gw.check_config_settings('system', 'log_level', '20', 'user', 'user')
+            tools_gw.check_config_settings('system', 'log_level', '20', None, 'user', 'user')
 
         log_suffix = '%Y%m%d'
         global_vars.logger = Logger(logger_name, global_vars.session_vars['min_log_level'], str(log_suffix))
