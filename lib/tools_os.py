@@ -89,7 +89,7 @@ def open_file_path(msg="Select file", filter_="All (*.*)"):
     return path, filter_
 
 
-def check_python_function(object_, function_name):
-
-    object_functions = [method_name for method_name in dir(object_) if callable(getattr(object_, method_name))]
+def check_python_function(module, function_name):
+    """ Check if function exist in @module """
+    object_functions = [method_name for method_name in dir(module) if callable(getattr(module, method_name))]
     return function_name in object_functions

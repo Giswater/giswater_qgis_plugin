@@ -28,7 +28,7 @@ user_parameters = {'log_sql': None, 'show_message_durations': None, 'aux_context
 
 def show_message(text, message_level=1, duration=10, context_name=None, parameter=None, title="", logger_file=True):
     """ Show message to the user with selected message level
-    message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)} """
+    @message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)} """
 
     global user_parameters
 
@@ -295,8 +295,7 @@ def get_layer_by_tablename(tablename, show_warning_=False, log_info=False, schem
             break
 
     if layer is None and show_warning_:
-        pass
-        #self.show_warning("Layer not found", parameter=tablename)
+        show_warning("Layer not found", parameter=tablename)
 
     if layer is None and log_info:
         tools_log.log_info("Layer not found", parameter=tablename)
@@ -437,7 +436,7 @@ def select_features_by_expr(layer, expr):
 
 def get_max_rectangle_from_coords(list_coord):
     """ Returns the minimum rectangle(x1, y1, x2, y2) of a series of coordinates
-    :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
+    :param list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
     """
 
     coords = list_coord.group(1)
@@ -462,13 +461,14 @@ def get_max_rectangle_from_coords(list_coord):
 
 
 def zoom_to_rectangle(x1, y1, x2, y2, margin=5):
-
+    """ Generate an extension on the canvas according to the received coordinates """
     rect = QgsRectangle(float(x1) + margin, float(y1) + margin, float(x2) - margin, float(y2) - margin)
     global_vars.canvas.setExtent(rect)
     global_vars.canvas.refresh()
 
 
 def get_composers_list():
+    """ Returns the list of project composer """
 
     layour_manager = QgsProject.instance().layoutManager().layouts()
     active_composers = [layout for layout in layour_manager]
@@ -476,6 +476,7 @@ def get_composers_list():
 
 
 def get_composer_index(name):
+    """ Returns the index of the selected composer name"""
 
     index = 0
     composers = get_composers_list()
@@ -506,11 +507,12 @@ def get_geometry_vertex(list_coord=None):
 
 
 def reset_rubber_band(rubber_band):
-
+    """ Reset QgsRubberBand """
     rubber_band.reset()
 
 
 def restore_user_layer(layer_name, user_current_layer=None):
+    """ Set active layer, preferably @user_current_layer else @layer_name """
 
     if user_current_layer:
         global_vars.iface.setActiveLayer(user_current_layer)
@@ -567,8 +569,7 @@ def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=Non
 
 
 def remove_layer_from_toc(layer_name, group_name):
-    """ Delete layer from toc if exist
-
+    """ Remove layer from toc if exist
      :param layer_name: Name's layer (string)
      :param group_name: Name's group (string)
     """
@@ -593,13 +594,14 @@ def remove_layer_from_toc(layer_name, group_name):
 
 
 def plugin_settings_value(key, default_value=""):
-
+    """ Get @value of QSettings located in @key """
     key = global_vars.plugin_name + "/" + key
     value = global_vars.qgis_settings.value(key, default_value)
     return value
 
 
 def plugin_settings_set_value(key, value):
+    """ Set @value to QSettings of selected @value located in @key """
     global_vars.qgis_settings.setValue(global_vars.plugin_name + "/" + key, value)
 
 
@@ -617,7 +619,7 @@ def get_layer_by_layername(layername, log_info=False):
 
 
 def is_layer_visible(layer):
-    """ Is layer visible """
+    """ Return is @layer is visible or not """
 
     visible = False
     if layer:
@@ -627,7 +629,13 @@ def is_layer_visible(layer):
 
 
 def set_layer_visible(layer, recursive=True, visible=True):
-    """ Set layer visible """
+    """ Set layer visible
+    :param layer: layer to se visible (QgsVectorLayer)
+    :param recursive: Whether it affects just the layer or all of its parents (Boolean)
+    :param visible: (Boolean)
+    :return:
+    """
+
 
     if layer:
         if recursive:
@@ -670,7 +678,7 @@ def load_qml(layer, qml_path):
 
 
 def set_margin(layer, margin):
-
+    """ Generates a margin around the layer so that it is fully visible on the canvas """
     if layer.extent().isNull():
         return
 
@@ -687,7 +695,7 @@ def set_margin(layer, margin):
 
 
 def create_qml(layer, style):
-
+    """ Generates a qml file through a json of styles (@style) and puts it in the received @layer """
     main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
     config_folder = main_folder + os.sep + "temp" + os.sep
     if not os.path.exists(config_folder):
@@ -700,9 +708,13 @@ def create_qml(layer, style):
     load_qml(layer, path_temp_file)
 
 
-def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, duration_time=None, is_new=False):
-    """
-    :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, duration_time=None):
+    """ Draw a point on the canvas
+    :param point: (QgsPointXY)
+    :param rubber_band: (QgsRubberBand)
+    :param color: Color of the point (QColor)
+    :param width: width of the point (integer)
+    :param duration_time: Time in milliseconds that the point will be visible. Ex: 3000 for 3 seconds (integer)
     """
 
     rubber_band.reset(0)
@@ -718,7 +730,11 @@ def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, d
 
 def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
     """ Draw 'line' over canvas following list of points
-     :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+    :param points: list of QgsPointXY (points[QgsPointXY_1, QgsPointXY_2, ..., QgsPointXY_x])
+    :param rubber_band: (QgsRubberBand)
+    :param color: Color of the point (QColor)
+    :param width: width of the point (integer)
+    :param duration_time: Time in milliseconds that the point will be visible. Ex: 3000 for 3 seconds (integer)
      """
 
     rubber_band.setIconSize(20)

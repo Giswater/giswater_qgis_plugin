@@ -1310,12 +1310,10 @@ def set_table_model(dialog, table_object, table_name, expr_filter):
         if not is_valid:
             return expr
 
-    # Set a model with selected filter expression
-
     if global_vars.schema_name not in table_name:
         table_name = global_vars.schema_name + "." + table_name
 
-    # Set the model
+    # Set a model with selected filter expression
     model = QSqlTableModel(db=global_vars.session_vars['db'])
     model.setTable(table_name)
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)

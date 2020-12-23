@@ -81,7 +81,7 @@ class PgDao(object):
 
 
     def get_poll(self):
-
+        """ Check if the connection is established """
         try:
             if self.check_cursor():
                 self.conn.poll()
@@ -110,12 +110,12 @@ class PgDao(object):
 
 
     def set_conn_string(self, conn_string):
-
+        """ Set connection string """
         self.conn_string = conn_string
 
 
     def set_service(self, service, sslmode=None):
-
+        """ Set service """
         self.conn_string = f"service={service}"
         if sslmode:
             self.conn_string += f" sslmode={sslmode}"
