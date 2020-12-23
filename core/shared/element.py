@@ -100,6 +100,10 @@ class GwElement:
         if layer_element:
             layer_is_visible = tools_qgis.is_layer_visible(layer_element)
 
+        recursive = False
+        if layer_is_visible:
+            recursive = True
+
         # Adding auto-completion to a QLineEdit
         table_object = "element"
         tools_gw.set_completer_object(self.dlg_add_element, table_object)
@@ -107,15 +111,15 @@ class GwElement:
         # Set signals
         self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
         self.dlg_add_element.btn_accept.clicked.connect(
-            partial(tools_qgis.set_layer_visible, layer_element, layer_is_visible))
+            partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.btn_cancel.clicked.connect(lambda: setattr(self, 'layers',
             tools_gw.manage_close(self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[],layers=self.layers)))
         self.dlg_add_element.btn_cancel.clicked.connect(
-            partial(tools_qgis.set_layer_visible, layer_element, layer_is_visible))
+            partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.rejected.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_element,
             table_object, cur_active_layer, excluded_layers=[], layers=self.layers)))
         self.dlg_add_element.rejected.connect(
-            partial(tools_qgis.set_layer_visible, layer_element, layer_is_visible))
+            partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_element, []))
 
