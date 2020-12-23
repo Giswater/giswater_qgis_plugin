@@ -72,6 +72,10 @@ class ManageElement(ParentManage):
         if layer_element:
             layer_is_visible = self.controller.is_layer_visible(layer_element)
 
+        recursive = False
+        if layer_is_visible:
+            recursive = True
+
         # Adding auto-completion to a QLineEdit
         table_object = "element"
         self.set_completer_object(self.dlg_add_element, table_object)
@@ -79,15 +83,15 @@ class ManageElement(ParentManage):
         # Set signals
         self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
         self.dlg_add_element.btn_accept.clicked.connect(
-            partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
+            partial(self.controller.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.btn_cancel.clicked.connect(
             partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[]))
         self.dlg_add_element.btn_cancel.clicked.connect(
-            partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
+            partial(self.controller.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.rejected.connect(
             partial(self.manage_close, self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[]))
         self.dlg_add_element.rejected.connect(
-            partial(self.controller.set_layer_visible, layer_element, layer_is_visible))
+            partial(self.controller.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
             partial(self.tab_feature_changed, self.dlg_add_element, table_object, []))
         self.dlg_add_element.element_id.textChanged.connect(
