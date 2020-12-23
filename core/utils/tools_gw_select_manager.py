@@ -89,7 +89,7 @@ class GwSelectManager(QgsMapTool):
             pass
 
 
-# region QgsMapTools inherited
+    # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
     def canvasPressEvent(self, event):
 
@@ -161,7 +161,8 @@ class GwSelectManager(QgsMapTool):
 
     def activate(self):
         pass
-# endregion
+
+    # endregion
 
 
 
