@@ -60,7 +60,7 @@ class GwAuxPointButton(GwParentMapTool):
 
     def get_values(self, point_1, point_2):
         tools_gw.set_config_parser('cadtools', f"{self.dlg_create_point.rb_left.objectName()}",
-                         f"{self.dlg_create_point.rb_left.isChecked()}")
+                                   f"{self.dlg_create_point.rb_left.isChecked()}")
 
         self.dist_x = self.dlg_create_point.dist_x.text()
         if not self.dist_x:
@@ -102,7 +102,7 @@ class GwAuxPointButton(GwParentMapTool):
     def cancel(self):
 
         tools_gw.set_config_parser('cadtools', f"{self.dlg_create_point.rb_left.objectName()}",
-                         f"{self.dlg_create_point.rb_left.isChecked()}")
+                                   f"{self.dlg_create_point.rb_left.isChecked()}")
 
         tools_gw.close_dialog(self.dlg_create_point)
         self.iface.setActiveLayer(self.current_layer)

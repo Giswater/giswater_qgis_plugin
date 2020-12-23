@@ -116,8 +116,7 @@ class LoadProject(QObject):
         self.notify.start_listening(list_channels)
 
         # Open automatically 'search docker' depending its value in user settings
-        open_search = tools_gw.check_config_settings('btn_search', 'open_search', 'false', config_type="user",
-                                                     file_name="giswater")
+        open_search = tools_gw.check_config_settings('btn_search', 'open_search', 'false', "user", "giswater")
         if tools_os.cast_boolean(open_search):
             GwSearch().api_search(load_project=True)
 
@@ -230,7 +229,7 @@ class LoadProject(QObject):
         # Dynamically get list of toolbars from config file
         toolbar_names = tools_gw.check_config_settings('toolbars', 'list_toolbars',
                                                        'basic, om, edit, cad, epa, plan, utilities, toc',
-                                                       config_type="project", file_name="init")
+                                                       "project", "init")
         if toolbar_names in (None, 'None'): return
 
         toolbar_names = toolbar_names.replace(' ', '').split(',')
@@ -263,7 +262,7 @@ class LoadProject(QObject):
             ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
                 button_def = tools_gw.check_config_settings('buttons_def', str(index_action), 'None',
-                                                            config_type="project", file_name="init")
+                                                            "project",  "init")
 
                 if button_def not in (None, 'None'):
                     text = self.translate(f'{index_action}_text')
@@ -273,7 +272,7 @@ class LoadProject(QObject):
 
         # Disable buttons which are project type exclusive
         project_exclusive = tools_gw.check_config_settings('project_exclusive', str(self.project_type), 'None',
-                                                           config_type="project", file_name="init")
+                                                           "project", "init")
 
         if project_exclusive not in (None, 'None'):
             project_exclusive = project_exclusive.replace(' ', '').split(',')
@@ -296,8 +295,7 @@ class LoadProject(QObject):
 
     def create_toolbar(self, toolbar_id):
 
-        list_actions = tools_gw.check_config_settings('toolbars', str(toolbar_id), 'None', config_type="project",
-                                                      file_name="init")
+        list_actions = tools_gw.check_config_settings('toolbars', str(toolbar_id), 'None', "project", "init")
 
         if list_actions in (None, 'None'):
             return

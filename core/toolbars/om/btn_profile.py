@@ -171,7 +171,7 @@ class GwProfileButton(GwParentMapTool):
         # Save profile values
         tools_gw.set_config_parser('btn_profile', 'minDistanceProfile', f'{links_distance}')
         tools_gw.set_config_parser('btn_profile', 'titleProfile',
-                         f'{tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)}')
+                                   f'{tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)}')
 
         # Maximize window (after drawing)
         self.plot.show()

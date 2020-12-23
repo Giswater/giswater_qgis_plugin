@@ -206,21 +206,21 @@ class GwGo2Epa:
         """ Save QGIS settings related with file_manager """
 
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_RESULT_NAME',
-                         f"{tools_qt.get_text(self.dlg_go2epa, 'txt_result_name', return_string_null=False)}")
+                                   f"{tools_qt.get_text(self.dlg_go2epa, 'txt_result_name', return_string_null=False)}")
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_FILE_INP',
-                         f"{tools_qt.get_text(self.dlg_go2epa, 'txt_file_inp', return_string_null=False)}")
+                                   f"{tools_qt.get_text(self.dlg_go2epa, 'txt_file_inp', return_string_null=False)}")
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_FILE_RPT',
-                         f"{tools_qt.get_text(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False)}")
+                                   f"{tools_qt.get_text(self.dlg_go2epa, 'txt_file_rpt', return_string_null=False)}")
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_NETWORK_GEOM',
-                         f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)}")
+                                   f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check)}")
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_INP',
-                         f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)}")
+                                   f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export)}")
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_UD',
-                         f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)}")
+                                   f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch)}")
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_EPA',
-                         f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)}")
+                                   f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_exec)}")
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_RPT',
-                         f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)}")
+                                   f"{tools_qt.isChecked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)}")
 
 
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right, aql=""):

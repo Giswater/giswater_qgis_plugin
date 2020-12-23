@@ -574,13 +574,13 @@ class GwPsector:
 
     def generate_rapports(self):
         tools_gw.set_config_parser('psector_rapport', 'psector_rapport_path',
-                         f"{tools_qt.get_text(self.dlg_psector_rapport, 'txt_path')}")
+                                   f"{tools_qt.get_text(self.dlg_psector_rapport, 'txt_path')}")
         tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_composer',
-                         f"{tools_qt.isChecked(self.dlg_psector_rapport, 'chk_composer')}")
+                                   f"{tools_qt.isChecked(self.dlg_psector_rapport, 'chk_composer')}")
         tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_csv_detail',
-                         f"{tools_qt.isChecked(self.dlg_psector_rapport, 'chk_csv_detail')}")
+                                   f"{tools_qt.isChecked(self.dlg_psector_rapport, 'chk_csv_detail')}")
         tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_csv',
-                         f"{tools_qt.isChecked(self.dlg_psector_rapport, 'chk_csv')}")
+                                   f"{tools_qt.isChecked(self.dlg_psector_rapport, 'chk_csv')}")
 
         folder_path = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):

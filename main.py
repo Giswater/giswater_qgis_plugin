@@ -95,10 +95,10 @@ class Giswater(QObject):
         # Check for developers options
         comment = '# log_sql --> If True: show all get_json log, if False: does not show any, if None: ' \
                   'show python log_sql option'
-        value = tools_gw.check_config_settings('system', 'log_sql', 'None', comment)
+        value = tools_gw.check_config_settings('system', 'log_sql', 'None', comment=comment)
         tools_qgis.user_parameters['log_sql'] = value
         comment = '# show_message_durations --> Integer or None, if none: show python duration option'
-        value = tools_gw.check_config_settings('system', 'show_message_durations', 'None', comment)
+        value = tools_gw.check_config_settings('system', 'show_message_durations', 'None', comment=comment)
         tools_qgis.user_parameters['show_message_durations'] = value
 
         # Log values of system user parameters located in 'user.config'
@@ -230,7 +230,7 @@ class Giswater(QObject):
             return
         sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
         sorted_toolbar_ids = ",".join(sorted_toolbar_ids)
-        tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids),  config_type="user", file_name="user")
+        tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids),  "user", "user")
 
 
     def unload(self, remove_modules=True):
