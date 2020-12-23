@@ -168,8 +168,10 @@ UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = '
 
 -- config_info_layer_x_type
 ALTER TABLE config_info_layer_x_type DROP CONSTRAINT IF EXISTS config_api_tableinfo_x_infotype_pkey;
-ALTER TABLE config_info_layer_x_type ADD CONSTRAINT config_info_layer_x_type_pkey PRIMARY KEY(tableinfo_id, infotype_id);
+ALTER TABLE config_info_layer_x_type DROP CONSTRAINT IF EXISTS config_info_layer_x_type_pkey;
+ALTER TABLE config_info_layer_x_type DROP CONSTRAINT IF EXISTS config_api_tableinfo_x_infotype_tableinfo_id_unique;
 ALTER TABLE config_info_layer_x_type DROP COLUMN id;
+ALTER TABLE config_info_layer_x_type ADD CONSTRAINT config_info_layer_x_type_pkey PRIMARY KEY(tableinfo_id, infotype_id);
 UPDATE sys_table SET sys_sequence = null, sys_sequence_field = null WHERE id = 'config_info_layer_x_type';
 
 
