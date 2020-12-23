@@ -21,11 +21,10 @@ class GwSelectManager(QgsMapTool):
     def __init__(self, class_object, table_object=None, dialog=None, query=None):
         """
         Class constructor
-        :param layers: dict of list of layers {'arc': [v_edit_node, ...]}
-        :param geom_type:
-        :param table_object:
-        :param dialog:
-        :param query:
+         :param table_object: Class where we will look for @layers, @geom_type, @list_ids, etc
+        :param table_object: (String)
+        :param dialog: (QDialog)
+        :param query: Used only for psectors
         """
 
         self.class_object = class_object
@@ -47,13 +46,51 @@ class GwSelectManager(QgsMapTool):
 
 
     def reset_selection(self):
-
+        """ Reset values """
         self.start_point = None
         self.end_point = None
         self.is_emitting_point = False
         self.reset_rubber_band()
 
 
+    def show_rectangle(self, start_point, end_point):
+
+        self.reset_rubber_band()
+        if start_point.x() == end_point.x() or start_point.y() == end_point.y():
+            return
+
+        point1 = QgsPointXY(start_point.x(), start_point.y())
+        point2 = QgsPointXY(start_point.x(), end_point.y())
+        point3 = QgsPointXY(end_point.x(), end_point.y())
+        point4 = QgsPointXY(end_point.x(), start_point.y())
+
+        self.rubber_band.addPoint(point1, False)
+        self.rubber_band.addPoint(point2, False)
+        self.rubber_band.addPoint(point3, False)
+        self.rubber_band.addPoint(point4, True)
+        self.rubber_band.show()
+
+
+    def get_rectangle(self):
+
+        if self.start_point is None or self.end_point is None:
+            return None
+        elif self.start_point.x() == self.end_point.x() or self.start_point.y() == self.end_point.y():
+            return None
+
+        return QgsRectangle(self.start_point, self.end_point)
+
+
+    def reset_rubber_band(self):
+
+        try:
+            self.rubber_band.reset(2)
+        except:
+            pass
+
+
+# region QgsMapTools inherited
+    """ QgsMapTools inherited event functions """
     def canvasPressEvent(self, event):
 
         if event.button() == Qt.LeftButton:
@@ -116,34 +153,6 @@ class GwSelectManager(QgsMapTool):
         self.show_rectangle(self.start_point, self.end_point)
 
 
-    def show_rectangle(self, start_point, end_point):
-
-        self.reset_rubber_band()
-        if start_point.x() == end_point.x() or start_point.y() == end_point.y():
-            return
-
-        point1 = QgsPointXY(start_point.x(), start_point.y())
-        point2 = QgsPointXY(start_point.x(), end_point.y())
-        point3 = QgsPointXY(end_point.x(), end_point.y())
-        point4 = QgsPointXY(end_point.x(), start_point.y())
-
-        self.rubber_band.addPoint(point1, False)
-        self.rubber_band.addPoint(point2, False)
-        self.rubber_band.addPoint(point3, False)
-        self.rubber_band.addPoint(point4, True)
-        self.rubber_band.show()
-
-
-    def get_rectangle(self):
-
-        if self.start_point is None or self.end_point is None:
-            return None
-        elif self.start_point.x() == self.end_point.x() or self.start_point.y() == self.end_point.y():
-            return None
-
-        return QgsRectangle(self.start_point, self.end_point)
-
-
     def deactivate(self):
 
         self.rubber_band.hide()
@@ -152,11 +161,8 @@ class GwSelectManager(QgsMapTool):
 
     def activate(self):
         pass
+# endregion
 
 
-    def reset_rubber_band(self):
 
-        try:
-            self.rubber_band.reset(2)
-        except:
-            pass
+
