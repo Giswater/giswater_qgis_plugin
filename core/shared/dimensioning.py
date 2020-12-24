@@ -227,6 +227,7 @@ class GwDimensioning:
         self.snapper_manager.remove_marker(self.vertex_marker)
         self.previous_snapping = self.snapper_manager.get_snapping_options()
         self.snapper_manager.enable_snapping()
+        self.snapper_manager.set_snapping_layers()
         self.snapper_manager.snap_to_node()
         self.snapper_manager.snap_to_connec()
         self.snapper_manager.snap_to_gully()
