@@ -155,7 +155,7 @@ class GwConnectLinkButton(GwParentMapTool):
             if not self.dragging:
 
                 # Snap to connec or gully
-                result = self.snapper_manager.snap_to_background_layers(event_point)
+                result = self.snapper_manager.snap_to_project_config_layers(event_point)
                 if not result.isValid():
                     return
 
@@ -245,11 +245,11 @@ class GwConnectLinkButton(GwParentMapTool):
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.enable_snapping()
+        self.snapper_manager.set_snapping_status()
 
         # Set snapping to 'connec' and 'gully'
-        self.snapper_manager.snap_to_connec()
-        self.snapper_manager.snap_to_gully()
+        self.snapper_manager.config_snap_to_connec()
+        self.snapper_manager.config_snap_to_gully()
 
         # Change cursor
         cursor = tools_gw.get_cursor_multiple_selection()

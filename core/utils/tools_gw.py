@@ -1831,7 +1831,7 @@ def manage_layer_manager(json_result, sql):
                 layer = tools_qgis.get_layer_by_tablename(layer_name)
                 if layer:
                     QgsProject.instance().blockSignals(True)
-                    layer_settings = snapper_manager.snap_to_layer(layer, QgsPointLocator.All, True)
+                    layer_settings = snapper_manager.config_snap_to_layer(layer, QgsPointLocator.All, True)
                     if layer_settings:
                         layer_settings.setType(2)
                         layer_settings.setTolerance(15)

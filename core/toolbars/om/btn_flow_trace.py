@@ -74,10 +74,10 @@ class GwFlowTraceButton(GwParentMapTool):
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.enable_snapping()
+        self.snapper_manager.set_snapping_status()
 
         # Set snapping to node
-        self.snapper_manager.snap_to_node()
+        self.snapper_manager.config_snap_to_node()
 
         # Change cursor
         self.canvas.setCursor(self.cursor)

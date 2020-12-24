@@ -116,7 +116,7 @@ class GwAuxCircleButton(GwParentMapTool):
         if self.snap_to_selected_layer:
             result = self.snapper_manager.snap_to_current_layer(event_point)
         else:
-            result = self.snapper_manager.snap_to_background_layers(event_point)
+            result = self.snapper_manager.snap_to_project_config_layers(event_point)
 
         # Add marker
         self.snapper_manager.add_marker(result, self.vertex_marker)
@@ -132,7 +132,7 @@ class GwAuxCircleButton(GwParentMapTool):
             event_point = self.snapper_manager.get_event_point(event)
 
             # Create point with snap reference
-            result = self.snapper_manager.snap_to_background_layers(event_point)
+            result = self.snapper_manager.snap_to_project_config_layers(event_point)
             point = self.snapper_manager.get_snapped_point(result)
 
             # Create point with mouse cursor reference

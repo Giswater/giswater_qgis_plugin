@@ -1529,7 +1529,7 @@ class GwMincut:
             tools_qgis.show_info(message)
 
         # Snapping
-        result = self.snapper_manager.snap_to_background_layers(event_point)
+        result = self.snapper_manager.snap_to_project_config_layers(event_point)
         if not result.isValid():
             return
 

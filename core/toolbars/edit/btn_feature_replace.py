@@ -375,7 +375,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping layers 'v_edit_'
-        result = self.snapper_manager.snap_to_background_layers(event_point)
+        result = self.snapper_manager.snap_to_project_config_layers(event_point)
         if result.isValid():
             layer = self.snapper_manager.get_snapped_layer(result)
             tablename = tools_qgis.get_layer_source_table_name(layer)
@@ -392,7 +392,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
         event_point = self.snapper_manager.get_event_point(event)
 
         # Snapping
-        result = self.snapper_manager.snap_to_background_layers(event_point)
+        result = self.snapper_manager.snap_to_project_config_layers(event_point)
         if not result.isValid():
             return
 
@@ -432,14 +432,14 @@ class GwFeatureReplaceButton(GwParentMapTool):
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Disable snapping
-        self.snapper_manager.enable_snapping()
+        self.snapper_manager.set_snapping_status()
 
         # Set snapping to 'node', 'connec' and 'gully'
         self.snapper_manager.set_snapping_layers()
 
-        self.snapper_manager.snap_to_node()
-        self.snapper_manager.snap_to_connec()
-        self.snapper_manager.snap_to_gully()
+        self.snapper_manager.config_snap_to_node()
+        self.snapper_manager.config_snap_to_connec()
+        self.snapper_manager.config_snap_to_gully()
 
         self.snapper_manager.set_snap_mode()
 

@@ -227,11 +227,11 @@ class GwDimensioning:
 
         self.snapper_manager.remove_marker(self.vertex_marker)
         self.previous_snapping = self.snapper_manager.get_snapping_options()
-        self.snapper_manager.enable_snapping()
+        self.snapper_manager.set_snapping_status()
         self.snapper_manager.set_snapping_layers()
-        self.snapper_manager.snap_to_node()
-        self.snapper_manager.snap_to_connec()
-        self.snapper_manager.snap_to_gully()
+        self.snapper_manager.config_snap_to_node()
+        self.snapper_manager.config_snap_to_connec()
+        self.snapper_manager.config_snap_to_gully()
         self.snapper_manager.set_snap_mode()
 
         self.dlg_dim.actionOrientation.setChecked(False)
@@ -247,7 +247,7 @@ class GwDimensioning:
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        result = self.snapper_manager.snap_to_background_layers(event_point)
+        result = self.snapper_manager.snap_to_project_config_layers(event_point)
         if result.isValid():
             layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
@@ -273,7 +273,7 @@ class GwDimensioning:
         event_point = self.snapper_manager.get_event_point(point=point)
 
         # Snapping
-        result = self.snapper_manager.snap_to_background_layers(event_point)
+        result = self.snapper_manager.snap_to_project_config_layers(event_point)
         if result.isValid():
 
             layer = self.snapper_manager.get_snapped_layer(result)
@@ -328,10 +328,10 @@ class GwDimensioning:
 
         self.snapper_manager.remove_marker(self.vertex_marker)
         self.previous_snapping = self.snapper_manager.get_snapping_options()
-        self.snapper_manager.enable_snapping()
-        self.snapper_manager.snap_to_node()
-        self.snapper_manager.snap_to_connec()
-        self.snapper_manager.snap_to_gully()
+        self.snapper_manager.set_snapping_status()
+        self.snapper_manager.config_snap_to_node()
+        self.snapper_manager.config_snap_to_connec()
+        self.snapper_manager.config_snap_to_gully()
         self.snapper_manager.set_snap_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)

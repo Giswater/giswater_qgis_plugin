@@ -888,11 +888,11 @@ class GwInfo(QObject):
         self.previous_snapping = self.snapper_manager.get_snapping_options
 
         # Clear snapping
-        self.snapper_manager.enable_snapping()
+        self.snapper_manager.set_snapping_status()
 
         # Set snapping
         layer = global_vars.iface.activeLayer()
-        self.snapper_manager.snap_to_layer(layer)
+        self.snapper_manager.config_snap_to_layer(layer)
 
         # Set marker
         color = QColor(255, 100, 255)
@@ -3312,13 +3312,13 @@ class GwInfo(QObject):
         self.snapper_manager.store_snapping_options()
 
         # Disable snapping
-        self.snapper_manager.enable_snapping()
+        self.snapper_manager.set_snapping_status()
 
         # if we are doing info over connec or over node
         if option in ('arc', 'set_to_arc'):
-            self.snapper_manager.snap_to_arc()
+            self.snapper_manager.config_snap_to_arc()
         elif option == 'node':
-            self.snapper_manager.snap_to_node()
+            self.snapper_manager.config_snap_to_node()
         # Set signals
         self.canvas.xyCoordinates.connect(partial(self.mouse_moved, layer))
         emit_point = QgsMapToolEmitPoint(self.canvas)
@@ -3452,10 +3452,10 @@ class GwInfo(QObject):
         self.snapper_manager.store_snapping_options()
 
         # Set snapping to 'node', 'connec' and 'gully'
-        self.snapper_manager.snap_to_arc()
-        self.snapper_manager.snap_to_node()
-        self.snapper_manager.snap_to_connec()
-        self.snapper_manager.snap_to_gully()
+        self.snapper_manager.config_snap_to_arc()
+        self.snapper_manager.config_snap_to_node()
+        self.snapper_manager.config_snap_to_connec()
+        self.snapper_manager.config_snap_to_gully()
         self.snapper_manager.set_snap_mode()
         self.iface.actionAddFeature().toggled.connect(self.action_is_checked)
 

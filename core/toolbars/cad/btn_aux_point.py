@@ -134,7 +134,7 @@ class GwAuxPointButton(GwParentMapTool):
         if self.snap_to_selected_layer:
             result = self.snapper_manager.snap_to_current_layer(event_point)
         else:
-            result = self.snapper_manager.snap_to_background_layers(event_point)
+            result = self.snapper_manager.snap_to_project_config_layers(event_point)
 
         if result.isValid():
             # Get the point and add marker on it
@@ -151,7 +151,7 @@ class GwAuxPointButton(GwParentMapTool):
             event_point = self.snapper_manager.get_event_point(event)
 
             # Create point with snap reference
-            result = self.snapper_manager.snap_to_background_layers(event_point)
+            result = self.snapper_manager.snap_to_project_config_layers(event_point)
             point = None
             if result.isValid():
                 point = self.snapper_manager.get_snapped_point(result)

@@ -13,7 +13,6 @@ from qgis.core import QgsProject, QgsPointXY,  QgsVectorLayer, QgsPointLocator, 
     QgsTolerance, QgsFeatureRequest
 from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint
 
-from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_qgis
 
@@ -72,7 +71,7 @@ class GwSnapManager(object):
         self.previous_snapping = self.get_snapping_options()
 
 
-    def enable_snapping(self, enable=False):
+    def set_snapping_status(self, enable=False):
         """ Enable/Disable snapping of all layers """
 
         QgsProject.instance().blockSignals(True)
@@ -104,12 +103,12 @@ class GwSnapManager(object):
             QgsProject.instance().snappingConfigChanged.emit(snapping_options)
 
 
-    def snap_to_arc(self):
+    def config_snap_to_arc(self):
         """ Set snapping to 'arc' """
 
         QgsProject.instance().blockSignals(True)
         self.set_snapping_layers()
-        layer_settings = self.snap_to_layer(self.layer_arc, QgsPointLocator.All, True)
+        layer_settings = self.config_snap_to_layer(self.layer_arc, QgsPointLocator.All, True)
         if layer_settings:
             layer_settings.setType(2)
             layer_settings.setTolerance(15)
@@ -120,11 +119,11 @@ class GwSnapManager(object):
         self.restore_snap_options(self.snapping_config)
 
 
-    def snap_to_node(self):
+    def config_snap_to_node(self):
         """ Set snapping to 'node' """
 
         QgsProject.instance().blockSignals(True)
-        layer_settings = self.snap_to_layer(self.layer_node, QgsPointLocator.Vertex, True)
+        layer_settings = self.config_snap_to_layer(self.layer_node, QgsPointLocator.Vertex, True)
         if layer_settings:
             layer_settings.setType(1)
             layer_settings.setTolerance(15)
@@ -135,12 +134,12 @@ class GwSnapManager(object):
         self.restore_snap_options(self.snapping_config)
 
 
-    def snap_to_connec(self):
+    def config_snap_to_connec(self):
         """ Set snapping to 'connec' and 'gully' """
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
-        layer_settings = self.snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_connec'), QgsPointLocator.Vertex, True)
+        layer_settings = self.config_snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_connec'), QgsPointLocator.Vertex, True)
         if layer_settings:
             layer_settings.setType(1)
             layer_settings.setTolerance(15)
@@ -151,11 +150,11 @@ class GwSnapManager(object):
         self.restore_snap_options(self.snapping_config)
 
 
-    def snap_to_gully(self):
+    def config_snap_to_gully(self):
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
-        layer_settings = self.snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_gully'), QgsPointLocator.Vertex, True)
+        layer_settings = self.config_snap_to_layer(tools_qgis.get_layer_by_tablename('v_edit_gully'), QgsPointLocator.Vertex, True)
         if layer_settings:
             layer_settings.setType(1)
             layer_settings.setTolerance(15)
@@ -166,7 +165,7 @@ class GwSnapManager(object):
         self.restore_snap_options(self.snapping_config)
 
 
-    def snap_to_layer(self, layer, point_locator=QgsPointLocator.All, set_settings=False):
+    def config_snap_to_layer(self, layer, point_locator=QgsPointLocator.All, set_settings=False):
         """ Set snapping to @layer """
 
         if layer is None:
@@ -222,7 +221,7 @@ class GwSnapManager(object):
         return result
 
 
-    def snap_to_background_layers(self, event_point, vertex_marker=None):
+    def snap_to_project_config_layers(self, event_point, vertex_marker=None):
 
         self.is_valid = False
         if event_point is None:
@@ -373,7 +372,7 @@ class GwSnapManager(object):
         event_point = self.get_event_point(point=point)
 
         # Snapping
-        result = self.snap_to_background_layers(event_point)
+        result = self.snap_to_project_config_layers(event_point)
         if result.isValid():
             self.add_marker(result, vertex_marker)
         else:

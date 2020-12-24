@@ -101,7 +101,7 @@ class GwParentMapTool(QgsMapTool):
         self.snapper_manager.restore_snap_options(self.previous_snapping)
 
         # Enable snapping
-        self.snapper_manager.enable_snapping(True)
+        self.snapper_manager.set_snapping_status(True)
 
         # Recover cursor
         self.canvas.setCursor(self.std_cursor)

@@ -104,7 +104,7 @@ class GwArcFusionButton(GwParentMapTool):
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Clear snapping
-        self.snapper_manager.enable_snapping()
+        self.snapper_manager.set_snapping_status()
 
         # Set active layer to 'v_edit_node'
         self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")

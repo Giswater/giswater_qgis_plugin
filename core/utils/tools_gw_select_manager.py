@@ -136,7 +136,7 @@ class GwSelectManager(QgsMapTool):
             # Selection one by one
             else:
                 event_point = self.get_event_point(event)
-                result = self.snap_to_background_layers(event_point)
+                result = self.snap_to_project_config_layers(event_point)
                 if result.isValid():
                     # Get the point. Leave selection
                     self.get_snapped_feature(result, True)
