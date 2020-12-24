@@ -30,8 +30,9 @@ class GwDimensioning:
         self.plugin_dir = global_vars.plugin_dir
         self.canvas = global_vars.canvas
         self.points = None
-        self.vertex_marker = QgsVertexMarker(self.canvas)
         self.snapper_manager = GwSnapManager(self.iface)
+        self.vertex_marker = self.snapper_manager.vertex_marker
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
 
 
     def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None, rubber_band=None):
