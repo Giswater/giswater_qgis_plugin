@@ -77,7 +77,8 @@ class GwInfo(QObject):
 
 
     def get_feature_insert(self, point, feature_cat, new_feature_id, layer_new_feature, tab_type, new_feature):
-        return self.open_form(point=point, feature_cat=feature_cat, new_feature_id=new_feature_id, layer_new_feature=layer_new_feature, tab_type=tab_type, new_feature=new_feature)
+        return self.open_form(point=point, feature_cat=feature_cat, new_feature_id=new_feature_id,
+                              layer_new_feature=layer_new_feature, tab_type=tab_type, new_feature=new_feature)
 
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None,
@@ -267,7 +268,7 @@ class GwInfo(QObject):
             if 'layoutname' in field and field['layoutname'] == 'lyt_none': continue
             widget = dialog.findChild(QWidget, field['widgetname'])
             value = None
-            if type(widget) in(QLineEdit, QPushButton, QSpinBox, QDoubleSpinBox):
+            if type(widget) in (QLineEdit, QPushButton, QSpinBox, QDoubleSpinBox):
                 value = tools_qt.get_text(dialog, widget, return_string_null=False)
             elif type(widget) is QComboBox:
                 value = tools_qt.get_combo_value(dialog, widget, 0)
@@ -294,9 +295,7 @@ class GwInfo(QObject):
         self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         field_id = str(self.complet_result['body']['feature']['idName'])
-        result = tools_gw.build_dialog_info(self.hydro_info_dlg, complet_result, field_id, self.my_json,
-                 new_feature_id=self.new_feature_id, new_feature=self.new_feature, layer_new_feature=self.layer_new_feature,
-                 feature_id=self.feature_id, feature_type=self.feature_type, layer=self.layer)
+        result = tools_gw.build_dialog_info(self.hydro_info_dlg, complet_result, self.my_json)
 
         # Disable button accept for info on generic form
         self.hydro_info_dlg.btn_accept.setEnabled(False)
@@ -495,8 +494,8 @@ class GwInfo(QObject):
                 if field['widgettype'] == 'combo':
                     widget = self.dlg_cf.findChild(QComboBox, field['widgetname'])
                     if widget is not None:
-                        widget.currentIndexChanged.connect(partial(self.get_combo_child, self.dlg_cf, widget,
-                            self.feature_type, self.tablename, self.field_id))
+                        widget.currentIndexChanged.connect(partial(
+                            self.get_combo_child, self.dlg_cf, widget, self.feature_type, self.tablename, self.field_id))
 
         # Set variables
         self.filter = str(complet_result['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
@@ -1617,7 +1616,7 @@ class GwInfo(QObject):
             tools_qgis.show_message(msg, message_level=3)
             self.reload_fields(dialog, json_result, p_widget)
         elif "Failed" in json_result['status']:
-            # If json_result['status'] is Failed message from database is showed user by get_json-->manage_json_exception
+            # If json_result['status'] is Failed message from database is showed user by get_json->manage_json_exception
             self.connect_signals()
             return False
 
@@ -1903,7 +1902,7 @@ class GwInfo(QObject):
         for action in actions_list:
             action.setVisible(False)
 
-        if not 'visibleTabs' in self.complet_result['body']['form']:
+        if 'visibleTabs' not in self.complet_result['body']['form']:
             return
 
         for tab in self.complet_result['body']['form']['visibleTabs']:
@@ -2219,7 +2218,7 @@ class GwInfo(QObject):
 
         filter_ = f"node_id='{self.feature_id}'"
         table_name = f"{self.schema_name}.v_ui_node_x_connection_upstream"
-        message= tools_qt.fill_table(self.dlg_cf.tbl_upstream, table_name, filter_)
+        message = tools_qt.fill_table(self.dlg_cf.tbl_upstream, table_name, filter_)
         if message:
             tools_qgis.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_cf, self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
@@ -3022,8 +3021,8 @@ class GwInfo(QObject):
                 if (type(widget)) == QSpacerItem:
                     rpt_layout1.addItem(widget, 1, field['layoutorder'])
                 elif (type(widget)) == QTableView:
-                    gridLayout_7 = self.dlg_cf.findChild(QGridLayout, "gridLayout_7")
-                    gridLayout_7.addWidget(widget, 2, field['layoutorder'])
+                    lyt = self.dlg_cf.findChild(QGridLayout, "gridLayout_7")
+                    lyt.addWidget(widget, 2, field['layoutorder'])
                     widget_list.append(widget)
                 else:
                     widget.setMaximumWidth(150)
@@ -3033,10 +3032,10 @@ class GwInfo(QObject):
                     rpt_layout1.addWidget(widget, 1, field['layoutorder'])
 
             # Find combo parents:
-            for field in complet_list['body']['data']['fields'][0]:
-                if 'isparent' in field:
-                    if field['isparent']:
-                        widget = dialog.findChild(QComboBox, field['widgetname'])
+            for field_ in complet_list['body']['data']['fields'][0]:
+                if 'isparent' in field_:
+                    if field_['isparent']:
+                        widget = dialog.findChild(QComboBox, field_['widgetname'])
                         widget.currentIndexChanged.connect(partial(self.get_combo_child, dialog, widget,
                                                            self.feature_type, self.tablename, self.field_id))
 
@@ -3232,7 +3231,7 @@ class GwInfo(QObject):
         dlg_generic.rejected.connect(partial(tools_gw.close_dialog, dlg_generic))
         dlg_generic.btn_accept.clicked.connect(partial(self.set_catalog, dlg_generic, form_name, table_name))
 
-        tools_gw.build_dialog_info(dlg_generic, json_result, field_id)
+        tools_gw.build_dialog_info(dlg_generic, json_result)
 
         # Open dialog
         dlg_generic.setWindowTitle(f"{(form_name.lower()).capitalize().replace('_', ' ')}")
@@ -3435,7 +3434,7 @@ class GwInfo(QObject):
         feature_id = tools_qt.get_text(dialog, widget)
         self.ApiCF = GwInfo(self.tab_type)
         complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=feature_id,
-            tab_type=self.tab_type, is_docker=False)
+                                                      tab_type=self.tab_type, is_docker=False)
         if not complet_result:
             tools_log.log_info("FAIL open_node")
             return
@@ -3516,8 +3515,8 @@ class GwInfo(QObject):
 
         self.info_feature = GwInfo('data')
         result, dialog = self.info_feature.get_feature_insert(point=list_points, feature_cat=self.feature_cat,
-                                                        new_feature_id=feature_id, layer_new_feature=self.info_layer,
-                                                        tab_type='data', new_feature=feature)
+                                                              new_feature_id=feature_id, new_feature=feature,
+                                                              layer_new_feature=self.info_layer, tab_type='data')
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)

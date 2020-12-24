@@ -74,11 +74,11 @@ class GwConfigLayerTask(QgsTask):
 
         schema_name = self.schema_name.replace('"', '')
         sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
-              f"UNION "
-              f"SELECT DISTINCT(child_layer) FROM cat_feature "
-              f"WHERE child_layer IN ("
-              f"     SELECT table_name FROM information_schema.tables"
-              f"     WHERE table_schema = '{schema_name}')")
+               f"UNION "
+               f"SELECT DISTINCT(child_layer) FROM cat_feature "
+               f"WHERE child_layer IN ("
+               f"     SELECT table_name FROM information_schema.tables"
+               f"     WHERE table_schema = '{schema_name}')")
         rows = tools_db.get_rows(sql)
         self.available_layers = [layer[0] for layer in rows]
 
@@ -132,14 +132,14 @@ class GwConfigLayerTask(QgsTask):
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = self.create_body(feature=feature, extras=extras)
             complet_result = tools_gw.get_json('gw_fct_getinfofromid', body, log_sql=False)
-            if not complet_result  or complet_result['status'] == 'Failed':
+            if not complet_result or complet_result['status'] == 'Failed':
                 continue
 
             # tools_log.log_info(str(complet_result))
-            if not 'body' in complet_result:
+            if 'body' not in complet_result:
                 tools_log.log_info("Not 'body'")
                 continue
-            if not 'data' in complet_result['body']:
+            if 'data' not in complet_result['body']:
                 tools_log.log_info("Not 'data'")
                 continue
 
@@ -148,7 +148,7 @@ class GwConfigLayerTask(QgsTask):
                 valuemap_values = {}
 
                 # Get column index
-                fieldIndex = layer.fields().indexFromName(field['columnname'])
+                field_index = layer.fields().indexFromName(field['columnname'])
 
                 # Hide selected fields according table config_api_form_fields.hidden
                 if 'hidden' in field:
@@ -156,11 +156,11 @@ class GwConfigLayerTask(QgsTask):
 
                 # Set alias column
                 if field['label']:
-                    layer.setFieldAlias(fieldIndex, field['label'])
+                    layer.setFieldAlias(field_index, field['label'])
 
                 # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
                 if field['widgettype'] == 'text':
-                    self.set_column_multiline(layer, field, fieldIndex)
+                    self.set_column_multiline(layer, field, field_index)
 
                 # widgetcontrols
                 if 'widgetcontrols' in field:
@@ -168,21 +168,21 @@ class GwConfigLayerTask(QgsTask):
                     # Set field constraints
                     if field['widgetcontrols'] and 'setQgisConstraints' in field['widgetcontrols']:
                         if field['widgetcontrols']['setQgisConstraints'] is True:
-                            layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
-                                QgsFieldConstraints.ConstraintStrengthSoft)
-                            layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintUnique,
-                                QgsFieldConstraints.ConstraintStrengthHard)
+                            layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
+                                                     QgsFieldConstraints.ConstraintStrengthSoft)
+                            layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintUnique,
+                                                     QgsFieldConstraints.ConstraintStrengthHard)
 
                 if 'ismandatory' in field and not field['ismandatory']:
-                    layer.setFieldConstraint(fieldIndex, QgsFieldConstraints.ConstraintNotNull,
-                        QgsFieldConstraints.ConstraintStrengthSoft)
+                    layer.setFieldConstraint(field_index, QgsFieldConstraints.ConstraintNotNull,
+                                             QgsFieldConstraints.ConstraintStrengthSoft)
 
                 # Manage editability
-                self.set_read_only(layer, field, fieldIndex)
+                self.set_read_only(layer, field, field_index)
 
                 # delete old values on ValueMap
                 editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
-                layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
                 # Manage new values in ValueMap
                 if field['widgettype'] == 'combo':
@@ -192,11 +192,11 @@ class GwConfigLayerTask(QgsTask):
                             valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
                     # Set values into valueMap
                     editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
-                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
                 elif field['widgettype'] == 'check':
                     config = {'CheckedState': 'true', 'UncheckedState': 'false'}
                     editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
-                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
                 elif field['widgettype'] == 'datetime':
                     config = {'allow_null': True,
                               'calendar_popup': True,
@@ -204,10 +204,10 @@ class GwConfigLayerTask(QgsTask):
                               'field_format': 'yyyy-MM-dd',
                               'field_iso_format': False}
                     editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
-                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
                 else:
                     editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
-                    layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
         if msg_failed != "":
             tools_qt.show_exceptions_msg("Execute failed.", msg_failed)
@@ -246,14 +246,14 @@ class GwConfigLayerTask(QgsTask):
         layer.setAttributeTableConfig(config)
 
 
-    def set_column_multiline(self, layer, field, fieldIndex):
+    def set_column_multiline(self, layer, field, field_index):
         """ Set multiline selected fields according table config_api_form_fields.widgetcontrols['setQgisMultiline'] """
 
         if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
             editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
         else:
             editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': False})
-        layer.setEditorWidgetSetup(fieldIndex, editor_widget_setup)
+        layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
 
     def create_body(self, form='', feature='', filter_fields='', extras=None):

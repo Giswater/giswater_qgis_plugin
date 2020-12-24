@@ -113,7 +113,7 @@ class GwElement:
         self.dlg_add_element.btn_accept.clicked.connect(
             partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.btn_cancel.clicked.connect(lambda: setattr(self, 'layers',
-            tools_gw.manage_close(self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[],layers=self.layers)))
+            tools_gw.manage_close(self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[], layers=self.layers)))
         self.dlg_add_element.btn_cancel.clicked.connect(
             partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.rejected.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_element,
@@ -194,8 +194,8 @@ class GwElement:
         tools_gw.set_completer_widget("v_edit_arc", self.dlg_add_element.feature_id, "arc_id", )
 
         if feature:
-            self.dlg_add_element.tabWidget.currentChanged.connect(partial(self.fill_tbl_new_element,
-                self.dlg_add_element, geom_type, feature[geom_type + "_id"]))
+            self.dlg_add_element.tabWidget.currentChanged.connect(partial(
+                self.fill_tbl_new_element, self.dlg_add_element, geom_type, feature[geom_type + "_id"]))
 
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
@@ -339,19 +339,19 @@ class GwElement:
             # If object not exist perform an INSERT
             if element_id == '':
                 sql = ("INSERT INTO v_edit_element (elementcat_id,  num_elements, state, state_type"
-                       ", expl_id, rotation, comment, observ, link, undelete, builtdate"
-                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
+                       ", expl_id, rotation, comment, observ, link, undelete, builtdate, ownercat_id"
+                       ", location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
                 sql_values = (f" VALUES ('{elementcat_id}', '{num_elements}', '{state}', '{state_type}', "
                               f"'{expl_id}', '{rotation}', '{comment}', '{observ}', "
                               f"'{link}', '{undelete}'")
             else:
                 sql = ("INSERT INTO v_edit_element (element_id, elementcat_id, num_elements, state, state_type"
-                       ", expl_id, rotation, comment, observ, link, undelete, builtdate"
-                       ", ownercat_id, location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
+                       ", expl_id, rotation, comment, observ, link, undelete, builtdate, ownercat_id"
+                       ", location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
 
-                sql_values = (f" VALUES ('{element_id}', '{elementcat_id}', '{num_elements}',  '{state}', '{state_type}', "
-                              f"'{expl_id}', '{rotation}', '{comment}', '{observ}', "
-                              f"'{link}', '{undelete}'")
+                sql_values = (f" VALUES ('{element_id}', '{elementcat_id}', '{num_elements}',  '{state}', "
+                              f"'{state_type}', '{expl_id}', '{rotation}', '{comment}', '{observ}', '{link}', "
+                              f"'{undelete}'")
 
             if builtdate:
                 sql_values += f", '{builtdate}'"
@@ -452,11 +452,11 @@ class GwElement:
 
         # Manage records in tables @table_object_x_@geom_type
         sql += (f"\nDELETE FROM element_x_node"
-               f" WHERE element_id = '{element_id}';")
+                f" WHERE element_id = '{element_id}';")
         sql += (f"\nDELETE FROM element_x_arc"
-               f" WHERE element_id = '{element_id}';")
+                f" WHERE element_id = '{element_id}';")
         sql += (f"\nDELETE FROM element_x_connec"
-               f" WHERE element_id = '{element_id}';")
+                f" WHERE element_id = '{element_id}';")
 
         if self.list_ids['arc']:
             for feature_id in self.list_ids['arc']:
@@ -465,7 +465,7 @@ class GwElement:
         if self.list_ids['node']:
             for feature_id in self.list_ids['node']:
                 sql += (f"\nINSERT INTO element_x_node (element_id, node_id)"
-                       f" VALUES ('{element_id}', '{feature_id}');")
+                        f" VALUES ('{element_id}', '{feature_id}');")
         if self.list_ids['connec']:
             for feature_id in self.list_ids['connec']:
                 sql += (f"\nINSERT INTO element_x_connec (element_id, connec_id)"
@@ -507,14 +507,14 @@ class GwElement:
         tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_element, table_object)
 
         # Set signals
-        self.dlg_man.element_id.textChanged.connect(partial(tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_element,
-            self.dlg_man.element_id, table_object))
-        self.dlg_man.tbl_element.doubleClicked.connect(partial(self.open_selected_object_element, self.dlg_man,
-            self.dlg_man.tbl_element, table_object))
+        self.dlg_man.element_id.textChanged.connect(partial(
+            tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))
+        self.dlg_man.tbl_element.doubleClicked.connect(partial(
+            self.open_selected_object_element, self.dlg_man, self.dlg_man.tbl_element, table_object))
         self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))
         self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))
-        self.dlg_man.btn_delete.clicked.connect(partial(tools_gw.delete_selected_rows, self.dlg_man.tbl_element,
-            table_object))
+        self.dlg_man.btn_delete.clicked.connect(partial(
+            tools_gw.delete_selected_rows, self.dlg_man.tbl_element, table_object))
 
         # Open form
         tools_gw.open_dialog(self.dlg_man, dlg_name='element_manager')
@@ -646,10 +646,10 @@ class GwElement:
 
             self.set_combo_from_param_user(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
             self.set_combo_from_param_user(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
-                      field_id='expl_id', field_name='name')
+                                           field_id='expl_id', field_name='name')
             tools_gw.set_calendar_from_user_param(dialog, 'builtdate', 'config_param_user', 'value', 'edit_builtdate_vdefault')
-            self.set_combo_from_param_user(dialog, 'workcat_id', 'cat_work',
-                      'edit_workcat_vdefault', field_id='id', field_name='id')
+            self.set_combo_from_param_user(dialog, 'workcat_id', 'cat_work', 'edit_workcat_vdefault',
+                                           field_id='id', field_name='id')
             if single_tool_mode is not None:
                 self.layers = tools_gw.remove_selection(single_tool_mode, self.layers)
             else:

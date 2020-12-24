@@ -98,7 +98,7 @@ class GwConnectLinkButton(GwParentMapTool):
         self.selected_rectangle = QgsRectangle(ll, ur)
 
 
-    def select_multiple_features(self, selectGeometry):
+    def select_multiple_features(self, select_geometry):
 
         key = QApplication.keyboardModifiers()
 
@@ -115,11 +115,11 @@ class GwConnectLinkButton(GwParentMapTool):
         # Selection for all connec and gully layers
         layer = tools_qgis.get_layer_by_tablename('v_edit_connec')
         if layer:
-            layer.selectByRect(selectGeometry, behaviour)
+            layer.selectByRect(select_geometry, behaviour)
 
         layer = tools_qgis.get_layer_by_tablename('v_edit_gully')
         if layer:
-            layer.selectByRect(selectGeometry, behaviour)
+            layer.selectByRect(select_geometry, behaviour)
 
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """

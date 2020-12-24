@@ -49,7 +49,7 @@ class GwMincutManager:
 
         tools_gw.load_settings(self.dlg_min_edit)
         tools_gw.set_dates_from_to(self.dlg_min_edit.date_from, self.dlg_min_edit.date_to, 'om_mincut',
-            'forecast_start, exec_start', 'forecast_end, exec_end')
+                                   'forecast_start, exec_start', 'forecast_end, exec_end')
         self.dlg_min_edit.date_from.setEnabled(False)
         self.dlg_min_edit.date_to.setEnabled(False)
         tools_gw.add_icon(self.dlg_min_edit.btn_selector_mincut, "191")
@@ -106,7 +106,7 @@ class GwMincutManager:
         self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
         tools_gw.set_tablemodel_config(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut", sort_order=1)
 
-        #self.mincut.tools_gw.set_tablemodel_config(self.tbl_mincut_edit, "v_ui_mincut")
+        # self.mincut.tools_gw.set_tablemodel_config(self.tbl_mincut_edit, "v_ui_mincut")
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_min_edit, dlg_name='mincut_manager')

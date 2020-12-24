@@ -23,7 +23,7 @@ from qgis.gui import QgsRubberBand
 
 from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate
-from ..ui.ui_manager import Plan_psector, PsectorRapportUi, PsectorManagerUi, PriceManagerUi
+from ..ui.ui_manager import PlanPsector, PsectorRapportUi, PsectorManagerUi, PriceManagerUi
 from ..utils import tools_gw
 from ...lib import tools_db, tools_qgis, tools_qt, tools_log
 
@@ -48,7 +48,7 @@ class GwPsector:
             self.sys_currency = json.loads(row[0], object_pairs_hook=OrderedDict)
 
         # Create the dialog and signals
-        self.dlg_plan_psector = Plan_psector()
+        self.dlg_plan_psector = PlanPsector()
         tools_gw.load_settings(self.dlg_plan_psector)
 
         # Capture the current layer to return it at the end of the operation
@@ -195,13 +195,13 @@ class GwPsector:
             if row:
                 self.dlg_plan_psector.chk_enable_all.setChecked(row[0])
             self.fill_table(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc",
-                set_edit_triggers=QTableView.DoubleClicked)
+                            set_edit_triggers=QTableView.DoubleClicked)
             tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc")
             self.fill_table(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node",
-                set_edit_triggers=QTableView.DoubleClicked)
+                            set_edit_triggers=QTableView.DoubleClicked)
             tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node")
             self.fill_table(self.dlg_plan_psector, self.qtbl_connec, "plan_psector_x_connec",
-                set_edit_triggers=QTableView.DoubleClicked)
+                            set_edit_triggers=QTableView.DoubleClicked)
             tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_connec, "plan_psector_x_connec")
             if self.project_type.upper() == 'UD':
                 self.fill_table(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully",
@@ -274,15 +274,15 @@ class GwPsector:
             expr = " psector_id = " + str(psector_id)
             self.qtbl_connec.model().setFilter(expr)
             self.qtbl_connec.model().select()
-            self.qtbl_connec.clicked.connect(
-                partial(self.hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
+            self.qtbl_connec.clicked.connect(partial(
+                self.hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
 
             if self.project_type.upper() == 'UD':
                 expr = " psector_id = " + str(psector_id)
                 self.qtbl_gully.model().setFilter(expr)
                 self.qtbl_gully.model().select()
-                self.qtbl_gully.clicked.connect(
-                    partial(self.hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
+                self.qtbl_gully.clicked.connect(partial(
+                    self.hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
 
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
@@ -312,9 +312,9 @@ class GwPsector:
 
                 # Get canvas extend in order to create a QgsRectangle
                 ext = self.canvas.extent()
-                startPoint = QgsPointXY(ext.xMinimum(), ext.yMaximum())
-                endPoint = QgsPointXY(ext.xMaximum(), ext.yMinimum())
-                canvas_rec = QgsRectangle(startPoint, endPoint)
+                start_point = QgsPointXY(ext.xMinimum(), ext.yMaximum())
+                end_point = QgsPointXY(ext.xMaximum(), ext.yMinimum())
+                canvas_rec = QgsRectangle(start_point, end_point)
                 canvas_width = ext.xMaximum() - ext.xMinimum()
                 canvas_height = ext.yMaximum() - ext.yMinimum()
                 # Get boundingBox(QgsRectangle) from selected feature
@@ -362,10 +362,10 @@ class GwPsector:
 
         self.lbl_descript = self.dlg_plan_psector.findChild(QLabel, "lbl_descript")
         self.dlg_plan_psector.all_rows.clicked.connect(partial(self.show_description))
-        self.dlg_plan_psector.btn_select.clicked.connect(partial(self.update_total,
-            self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
-        self.dlg_plan_psector.btn_unselect.clicked.connect(partial(self.update_total,
-            self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
+        self.dlg_plan_psector.btn_select.clicked.connect(
+            partial(self.update_total, self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
+        self.dlg_plan_psector.btn_unselect.clicked.connect(
+            partial(self.update_total, self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
 
         self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
 
@@ -377,12 +377,13 @@ class GwPsector:
             partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, True))
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
-        self.dlg_plan_psector.tab_feature.currentChanged.connect(partial(tools_gw.get_signal_change_tab,
-            self.dlg_plan_psector, excluded_layers=["v_edit_element"]))
+        self.dlg_plan_psector.tab_feature.currentChanged.connect(
+            partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, excluded_layers=["v_edit_element"]))
         self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
         viewname = 'v_edit_plan_psector_x_other'
-        self.dlg_plan_psector.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg_plan_psector,
-            self.dlg_plan_psector.txt_name, self.dlg_plan_psector.all_rows, 'v_price_compost', viewname, "id"))
+        self.dlg_plan_psector.txt_name.textChanged.connect(
+            partial(self.query_like_widget_text, self.dlg_plan_psector, self.dlg_plan_psector.txt_name,
+                    self.dlg_plan_psector.all_rows, 'v_price_compost', viewname, "id"))
 
         self.dlg_plan_psector.gexpenses.returnPressed.connect(partial(self.calculate_percents, 'plan_psector', 'gexpenses'))
         self.dlg_plan_psector.vat.returnPressed.connect(partial(self.calculate_percents, 'plan_psector', 'vat'))
@@ -515,8 +516,8 @@ class GwPsector:
 
         self.dlg_psector_rapport.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_psector_rapport))
         self.dlg_psector_rapport.btn_ok.clicked.connect(partial(self.generate_rapports))
-        self.dlg_psector_rapport.btn_path.clicked.connect(partial(tools_qt.get_folder_path, self.dlg_psector_rapport,
-            self.dlg_psector_rapport.txt_path))
+        self.dlg_psector_rapport.btn_path.clicked.connect(
+            partial(tools_qt.get_folder_path, self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path))
 
         value = tools_gw.get_config_parser('psector_rapport', 'psector_rapport_path', "user", "user")
         tools_qt.set_widget_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path, value)
@@ -726,12 +727,12 @@ class GwPsector:
 
     def calc_pec_pem(self, dialog):
 
-        if tools_qt.get_text(dialog, 'pec') not in('null', None):
+        if tools_qt.get_text(dialog, 'pec') not in ('null', None):
             pec = float(tools_qt.get_text(dialog, 'pec'))
         else:
             pec = 0
 
-        if tools_qt.get_text(dialog, 'pem') not in('null', None):
+        if tools_qt.get_text(dialog, 'pem') not in ('null', None):
             pem = float(tools_qt.get_text(dialog, 'pem'))
         else:
             pem = 0
@@ -742,12 +743,12 @@ class GwPsector:
 
     def calc_pecvat_pec(self, dialog):
 
-        if tools_qt.get_text(dialog, 'pec_vat') not in('null', None):
+        if tools_qt.get_text(dialog, 'pec_vat') not in ('null', None):
             pec_vat = float(tools_qt.get_text(dialog, 'pec_vat'))
         else:
             pec_vat = 0
 
-        if tools_qt.get_text(dialog, 'pec') not in('null', None):
+        if tools_qt.get_text(dialog, 'pec') not in ('null', None):
             pec = float(tools_qt.get_text(dialog, 'pec'))
         else:
             pec = 0
@@ -757,12 +758,12 @@ class GwPsector:
 
     def calc_pca_pecvat(self, dialog):
 
-        if tools_qt.get_text(dialog, 'pca') not in('null', None):
+        if tools_qt.get_text(dialog, 'pca') not in ('null', None):
             pca = float(tools_qt.get_text(dialog, 'pca'))
         else:
             pca = 0
 
-        if tools_qt.get_text(dialog, 'pec_vat') not in('null', None):
+        if tools_qt.get_text(dialog, 'pec_vat') not in ('null', None):
             pec_vat = float(tools_qt.get_text(dialog, 'pec_vat'))
         else:
             pec_vat = 0
@@ -1120,18 +1121,19 @@ class GwPsector:
         tools_gw.set_tablemodel_config(dialog, tbl_selected_rows, tableright)
 
         # Button select
-        dialog.btn_select.clicked.connect(partial(self.rows_selector, dialog, tbl_all_rows, tbl_selected_rows, 'id',
-            tableright, "price_id", 'id'))
-        tbl_all_rows.doubleClicked.connect(partial(self.rows_selector, dialog, tbl_all_rows, tbl_selected_rows, 'id',
-            tableright, "price_id", 'id'))
+        dialog.btn_select.clicked.connect(
+            partial(self.rows_selector, dialog, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id", 'id'))
+        tbl_all_rows.doubleClicked.connect(
+            partial(self.rows_selector, dialog, tbl_all_rows, tbl_selected_rows, 'id', tableright, "price_id", 'id'))
 
         # Button unselect
-        dialog.btn_unselect.clicked.connect(partial(self.rows_unselector, dialog, tbl_selected_rows,
-            tableright, field_id_right))
+        dialog.btn_unselect.clicked.connect(
+            partial(self.rows_unselector, dialog, tbl_selected_rows, tableright, field_id_right))
 
 
     def rows_selector(self, dialog, tbl_all_rows, tbl_selected_rows, id_ori, tableright, id_des, field_id):
         """
+            :param dialog: (QDialog)
             :param tbl_all_rows: QTableView origin
             :param tbl_selected_rows: QTableView destini
             :param id_ori: Refers to the id of the source table
@@ -1420,9 +1422,8 @@ class GwPsector:
         self.dlg_psector_mng.btn_update_psector.clicked.connect(
             partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
-        self.dlg_psector_mng.txt_name.textChanged.connect(
-            partial(self.filter_by_text, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name,
-                    table_name))
+        self.dlg_psector_mng.txt_name.textChanged.connect(partial(
+            self.filter_by_text, self.dlg_psector_mng, self.qtbl_psm, self.dlg_psector_mng.txt_name, table_name))
         self.dlg_psector_mng.tbl_psm.doubleClicked.connect(partial(self.charge_psector, self.qtbl_psm))
         self.fill_table(self.dlg_psector_mng, self.qtbl_psm, table_name)
         tools_gw.set_tablemodel_config(self.dlg_psector_mng, self.qtbl_psm, table_name)
@@ -1527,6 +1528,7 @@ class GwPsector:
 
     def multi_rows_delete(self, dialog, widget, table_name, column_id, label, action):
         """ Delete selected elements of the table
+        :param dialog: (QDialog)
         :param QTableView widget: origin
         :param table_name: table origin
         :param column_id: Refers to the id of the source table

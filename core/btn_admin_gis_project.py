@@ -142,8 +142,9 @@ class GwAdminGisProject:
             tools_qgis.show_warning("Error getting database parameters")
             return False
 
-        self.set_database_parameters(layer_source['host'], layer_source['port'], layer_source['db'], layer_source['user'],
-            layer_source['password'],tools_db.get_srid('v_edit_node', schema))
+        self.set_database_parameters(layer_source['host'], layer_source['port'], layer_source['db'],
+                                     layer_source['user'], layer_source['password'],
+                                     tools_db.get_srid('v_edit_node', schema))
 
         return True
 

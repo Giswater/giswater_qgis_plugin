@@ -1804,7 +1804,7 @@ class GwMincut:
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.get_json('gw_fct_getmincut', body)
         tools_gw.add_layer_temp(self.dlg_mincut, result['body']['data'], None, False, disable_tabs=False)
-        #self.dlg_mincut.txt_infolog.setEnabled(False)
+        # self.dlg_mincut.txt_infolog.setEnabled(False)
 
         # Manage location
         tools_qt.set_combo_value(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)

@@ -11,7 +11,7 @@ import random
 import re
 import subprocess
 import sys
-import xml.etree.cElementTree as ET
+import xml.etree.cElementTree as et
 from collections import OrderedDict
 from functools import partial
 from time import sleep
@@ -167,7 +167,7 @@ class GwAdmin:
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "schema_manager")
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "api_manager")
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "custom")
-            self.project_types = tools_gw.get_config_parser('system', 'project_types', "project","init")
+            self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "init")
 
         else:
             self.project_types = tools_gw.get_config_parser('system', 'project_types_dev', "project", "init")
@@ -319,12 +319,12 @@ class GwAdmin:
             if str(self.plugin_version) > str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                    '(Schema version is lower than plugin version, please update schema)')
+                                         '(Schema version is lower than plugin version, please update schema)')
                 self.dlg_readsql.btn_info.setEnabled(True)
             elif str(self.plugin_version) < str(self.project_version):
                 self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                    '(Schema version is higher than plugin version, please update plugin)')
+                                         '(Schema version is higher than plugin version, please update plugin)')
                 self.dlg_readsql.btn_info.setEnabled(True)
             else:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
@@ -335,10 +335,10 @@ class GwAdmin:
         # Load last schema name selected and project type
         if tools_gw.get_config_parser('btn_admin', 'project_type', "user", "user") not in ('', None):
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
-                                   tools_gw.get_config_parser('btn_admin', 'project_type', "user", "user"))
+                                     tools_gw.get_config_parser('btn_admin', 'project_type', "user", "user"))
         if tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "giswater") not in ('', None):
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name,
-                                   tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "user"))
+                                     tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "user"))
 
         if show_dialog:
             self.manage_docker()
@@ -409,12 +409,12 @@ class GwAdmin:
 
 
     def generate_qgis_project(self, gis_folder, gis_file, project_type, schema_name, export_passwd, roletype, sample,
-            get_database_parameters=True):
+                              get_database_parameters=True):
         """ Generate QGIS project """
 
         gis = GwAdminGisProject(self.plugin_dir)
         result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
-            roletype, sample, get_database_parameters)
+                                                    roletype, sample, get_database_parameters)
 
         self.close_dialog_admin(self.dlg_create_gis_project)
         self.close_dialog_admin(self.dlg_readsql)
@@ -702,9 +702,8 @@ class GwAdmin:
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + self.project_type_selected + os.sep)
                                     if status is False:
                                         return False
-                                if self.process_folder(
-                                        self.folderUpdates + folder + os.sep + sub_folder +
-                                    os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
+                                if self.process_folder(self.folderUpdates + folder + os.sep + sub_folder +
+                                                       os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
                                         '') is True:
                                     status = self.executeFiles(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
@@ -2209,10 +2208,10 @@ class GwAdmin:
             self.dlg_readsql.btn_info.setEnabled(False)
 
 
-    def process_folder(self, folderPath, filePattern):
+    def process_folder(self, folderpath, filepattern):
 
         try:
-            os.listdir(folderPath + filePattern)
+            os.listdir(folderpath + filepattern)
             return True
         except Exception:
             return False
@@ -2744,8 +2743,8 @@ class GwAdmin:
         if not row:
             return
 
-        data = ET.Element(str(row[0]))
-        data = ET.tostring(data)
+        data = et.Element(str(row[0]))
+        data = et.tostring(data)
         data = data.decode('utf-8')
 
         file_ui = open(tpath, "w")

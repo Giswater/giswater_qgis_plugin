@@ -50,8 +50,7 @@ class GwPsectorDuplicate(QObject):
     def duplicate_psector(self):
 
         id_psector = tools_qt.get_combo_value(self.dlg_duplicate_psector, self.dlg_duplicate_psector.duplicate_psector, 0)
-        new_psector_name = tools_qt.get_text(self.dlg_duplicate_psector,
-                                                  self.dlg_duplicate_psector.new_psector_name)
+        new_psector_name = tools_qt.get_text(self.dlg_duplicate_psector, self.dlg_duplicate_psector.new_psector_name)
 
         # Create body
         feature = '"type":"PSECTOR"'

@@ -917,7 +917,7 @@ class GwVisitManager(QObject):
 
         # set timeStart and timeEnd as the min/max dave values get from model
         tools_gw.set_dates_from_to(self.dlg_man.date_event_from, self.dlg_man.date_event_to,
-                          'om_visit', 'startdate', 'enddate')
+                                   'om_visit', 'startdate', 'enddate')
 
         # set date events
         self.dlg_man.date_event_from.dateChanged.connect(partial(self.filter_visit, self.dlg_man,
@@ -1691,8 +1691,8 @@ class GwVisitManager(QObject):
             tools_log.log_info(f"visit_tab_feature_changed exception: {e}")
         finally:
 
-            self.dlg_add_visit.btn_feature_insert.clicked.connect(partial(tools_gw.insert_feature, self,
-                 self.dlg_add_visit, widget_table, False, False))
+            self.dlg_add_visit.btn_feature_insert.clicked.connect(
+                partial(tools_gw.insert_feature, self, self.dlg_add_visit, widget_table, False, False))
 
             self.dlg_add_visit.btn_feature_delete.clicked.connect(partial(tools_gw.delete_records, self,
                  self.dlg_add_visit, widget_table, False, self.lazy_widget, self.lazy_init_function))

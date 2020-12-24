@@ -10,6 +10,7 @@ from ...shared.selector import Selector
 
 from ....core.utils import tools_gw
 
+
 class GwSelectorButton(GwParentAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):

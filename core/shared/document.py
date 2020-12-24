@@ -116,7 +116,7 @@ class GwDocument:
                     table_object, cur_active_layer, excluded_layers=["v_edit_element"],
                     single_tool_mode=self.single_tool_mode, layers=self.layers)))
         self.dlg_add_doc.rejected.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_doc, table_object,
-                    cur_active_layer, excluded_layers=["v_edit_element"],single_tool_mode=self.single_tool_mode,
+                    cur_active_layer, excluded_layers=["v_edit_element"], single_tool_mode=self.single_tool_mode,
                     layers=self.layers)))
         self.dlg_add_doc.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, excluded_layers=["v_edit_element"]))
@@ -295,7 +295,7 @@ class GwDocument:
         if status:
             self.doc_id = doc_id
             tools_gw.manage_close(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"],
-                         single_tool_mode=self.single_tool_mode, layers=self.layers)
+                                  single_tool_mode=self.single_tool_mode, layers=self.layers)
 
         if tablename is None:
             return

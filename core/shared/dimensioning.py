@@ -52,7 +52,7 @@ class GwDimensioning:
                     return feature
             qgis_feature = feature
 
-        #qgis_feature = self.get_feature_by_id(self.layer_dimensions, fid, 'id')
+        # qgis_feature = self.get_feature_by_id(self.layer_dimensions, fid, 'id')
 
         # when funcion is called from new feature
         if db_return is None:
@@ -69,20 +69,20 @@ class GwDimensioning:
         self.fid = db_return['body']['feature']['id']
 
         # ACTION SIGNALS
-        actionSnapping = self.dlg_dim.findChild(QAction, "actionSnapping")
-        actionSnapping.triggered.connect(partial(self.snapping, actionSnapping))
-        tools_gw.add_icon(actionSnapping, "103")
+        action_snapping = self.dlg_dim.findChild(QAction, "actionSnapping")
+        action_snapping.triggered.connect(partial(self.snapping, action_snapping))
+        tools_gw.add_icon(action_snapping, "103")
 
-        actionOrientation = self.dlg_dim.findChild(QAction, "actionOrientation")
-        actionOrientation.triggered.connect(partial(self.orientation, actionOrientation))
-        tools_gw.add_icon(actionOrientation, "133")
+        action_orientation = self.dlg_dim.findChild(QAction, "actionOrientation")
+        action_orientation.triggered.connect(partial(self.orientation, action_orientation))
+        tools_gw.add_icon(action_orientation, "133")
 
 
         # LAYER SIGNALS
-        self.layer_dimensions.editingStarted.connect(lambda: actionSnapping.setEnabled(True))
-        self.layer_dimensions.editingStopped.connect(lambda: actionSnapping.setEnabled(False))
-        self.layer_dimensions.editingStarted.connect(lambda: actionOrientation.setEnabled(True))
-        self.layer_dimensions.editingStopped.connect(lambda: actionOrientation.setEnabled(False))
+        self.layer_dimensions.editingStarted.connect(lambda: action_snapping.setEnabled(True))
+        self.layer_dimensions.editingStopped.connect(lambda: action_snapping.setEnabled(False))
+        self.layer_dimensions.editingStarted.connect(lambda: action_orientation.setEnabled(True))
+        self.layer_dimensions.editingStopped.connect(lambda: action_orientation.setEnabled(False))
         self.layer_dimensions.editingStarted.connect(partial(tools_gw.enable_all, self.dlg_dim, db_return['body']['data']))
         self.layer_dimensions.editingStopped.connect(partial(tools_gw.disable_widgets, self.dlg_dim, db_return['body']['data'], False))
 
@@ -131,12 +131,12 @@ class GwDimensioning:
         if self.layer_dimensions:
             self.iface.setActiveLayer(self.layer_dimensions)
             if self.layer_dimensions.isEditable():
-                actionSnapping.setEnabled(True)
-                actionOrientation.setEnabled(True)
+                action_snapping.setEnabled(True)
+                action_orientation.setEnabled(True)
                 tools_gw.enable_all(self.dlg_dim, db_return['body']['data'])
             else:
-                actionSnapping.setEnabled(False)
-                actionOrientation.setEnabled(False)
+                action_snapping.setEnabled(False)
+                action_orientation.setEnabled(False)
                 tools_gw.disable_widgets(self.dlg_dim, db_return['body']['data'], False)
 
         title = f"DIMENSIONING - {self.fid}"

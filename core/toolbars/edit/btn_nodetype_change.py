@@ -103,8 +103,8 @@ class GwNodeTypeChangeButton(GwParentMapTool):
         if features[0]:
             self.ApiCF = GwInfo(tab_type='data')
             self.ApiCF.user_current_layer = self.current_layer
-            complet_result, dialog = self.ApiCF.get_info_from_id(table_name='v_edit_node', feature_id=features[0]["node_id"],
-                                                                 tab_type='data')
+            complet_result, dialog = self.ApiCF.get_info_from_id(table_name='v_edit_node', tab_type='data',
+                                                                 feature_id=features[0]["node_id"])
             if not complet_result:
                 return
 
@@ -146,8 +146,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
 
     def filter_catalog(self):
 
-        node_node_type_new = tools_qt.get_text(self.dlg_chg_node_type,
-                                                    self.dlg_chg_node_type.node_node_type_new)
+        node_node_type_new = tools_qt.get_text(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
 
         if node_node_type_new == "null":
             return

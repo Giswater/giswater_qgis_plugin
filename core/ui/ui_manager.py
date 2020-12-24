@@ -138,9 +138,7 @@ def get_ui_class(ui_file_name, subfolder='shared'):
     return uic.loadUiType(ui_file_path)[0]
 
 
-
-# BASIC
-
+# region BASIC
 FORM_CLASS = get_ui_class('info_crossect.ui', 'basic')
 class InfoCrossectUi(GwDialog, FORM_CLASS):
     pass
@@ -168,11 +166,10 @@ class Gallery(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('visit_gallery_zoom.ui', 'basic')
 class GalleryZoom(GwDialog, FORM_CLASS):
     pass
+# endregion
 
 
-
-# EDIT
-
+# region EDIT
 FORM_CLASS = get_ui_class('arc_fusion.ui', 'edit')
 class ArcFusionUi(GwDialog, FORM_CLASS):
     pass
@@ -188,7 +185,6 @@ class AuxPoint(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('dimensioning.ui', 'edit')
 class DimensioningUi(GwMainWindow, FORM_CLASS):
     pass
-
 
 FORM_CLASS = get_ui_class('doc.ui', 'edit')
 class DocUi(GwDialog, FORM_CLASS):
@@ -225,12 +221,10 @@ class FeatureReplace(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('nodetype_change.ui', 'edit')
 class NodeTypeChange(GwDialog, FORM_CLASS):
     pass
+# end region
 
 
-
-
-# EPA
-
+# region EPA
 FORM_CLASS = get_ui_class('go2epa.ui', 'epa')
 class Go2EpaUI(GwDialog, FORM_CLASS):
     pass
@@ -251,9 +245,10 @@ class Go2EpaOptionsUi(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('hydrology_selector.ui', 'epa')
 class HydrologySelector(GwDialog, FORM_CLASS):
     pass
+# endregion
 
-# OM
 
+# region OM
 FORM_CLASS = get_ui_class('mincut.ui', 'om')
 class Mincut(GwMainWindow, FORM_CLASS):
 
@@ -293,11 +288,12 @@ class ProfilesList(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('selector_date.ui', 'om')
 class SelectorDate(GwDialog, FORM_CLASS):
     pass
+# endregion
 
-# PLAN
 
+# region PLAN
 FORM_CLASS = get_ui_class('plan_psector.ui', 'plan')
-class Plan_psector(GwDialog, FORM_CLASS):
+class PlanPsector(GwDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('price_manager.ui', 'plan')
@@ -316,10 +312,10 @@ class PsectorManagerUi(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('psector_rapport.ui', 'plan')
 class PsectorRapportUi(GwDialog, FORM_CLASS):
     pass
+# endregion
 
 
-# UTILITIES
-
+# region UTILITIES
 FORM_CLASS = get_ui_class('config.ui', 'utilities')
 class ConfigUi(GwMainWindow, FORM_CLASS):
     pass
@@ -418,19 +414,18 @@ class ToolboxUi(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('project_check.ui', 'utilities')
 class ProjectCheckUi(GwDialog, FORM_CLASS):
     pass
+# endregion
 
 
-
-# TOC
-
-
-
-# CUSTOM
+# region TOC
+# endregion
 
 
+# region CUSTOM
+# endregion
 
-# SHARED
 
+# region SHARED
 FORM_CLASS = get_ui_class('dialog_text.ui')
 class DialogTextUi(GwDialog, FORM_CLASS):
     pass
@@ -485,7 +480,7 @@ class MainQtDialogUi(GwDialog, FORM_CLASS):
             self.action.setText(text)
 
 FORM_CLASS = get_ui_class('multirow_selector.ui')
-class Multirow_selector(GwDialog, FORM_CLASS):
+class MultirowSelector(GwDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('selector.ui')
@@ -511,3 +506,4 @@ class VisitEvent(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('visit_manager.ui')
 class VisitManagerUi(GwDialog, FORM_CLASS):
     pass
+# endregion

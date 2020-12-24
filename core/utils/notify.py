@@ -61,9 +61,9 @@ class GwNotifyTools:
                 tools_log.log_info(msg)
             else:
                 tools_log.log_info('Task {name} completed\n'
-                    'Total: {total} (with {iterations} '
-                    'iterations)'.format(name=result['task'], total=result['total'],
-                                         iterations=result['iterations']))
+                                   'Total: {total} (with {iterations} '
+                                   'iterations)'.format(name=result['task'], total=result['total'],
+                                                        iterations=result['iterations']))
         else:
             tools_log.log_info("Exception: {}".format(exception))
             raise exception

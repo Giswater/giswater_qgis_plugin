@@ -678,8 +678,8 @@ class GwProfileButton(GwParentMapTool):
 
         c = (self.fix_x * Decimal(0.25)) / 2
         plt.text(-(c + self.fix_x * Decimal(0.74)),
-                 self.min_top_elev - Decimal(2) * self.height_row - self.height_row * 3 / 2, legend['ordinates'], fontsize=7.5,
-                 rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                 self.min_top_elev - Decimal(2) * self.height_row - self.height_row * 3 / 2, legend['ordinates'],
+                 fontsize=7.5, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         plt.text(-self.fix_x * Decimal(0.70), self.min_top_elev - Decimal(1.85) * self.height_row - self.height_row / 2,
                  legend['topelev'], fontsize=7.5, verticalalignment='center')
@@ -816,20 +816,19 @@ class GwProfileButton(GwParentMapTool):
                 # Fill y_max
                 plt.annotate(' ' + '\n' + str(round(self.nodes[0].descript['ymax'], 2)) + '\n' + str(round(self.nodes[0].y2, 2)),
                              xy=(Decimal(0 + start_point),
-                                 self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)), fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                                self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)),
+                             fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
                 # Fill elevation
                 plt.annotate(' ' + '\n' + str(round(self.nodes[0].descript['elev'], 2)) + '\n' + str(round(self.nodes[0].elev2, 2)),
                              xy=(Decimal(0 + start_point),
-                                 self.min_top_elev - Decimal(self.height_row * Decimal(3.40) + self.height_row / 2)), fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                                 self.min_top_elev - Decimal(self.height_row * Decimal(3.40) + self.height_row / 2)),
+                             fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
                 # Fill total length
                 plt.annotate(str(round(self.nodes[indx].descript['total_distance'], 2)),
                              xy=(Decimal(0 + start_point),
                                  self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
-                             fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                             fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Last node : y_max,y1 and top_elev, elev1
             elif indx == self.n - 1:
@@ -853,8 +852,7 @@ class GwProfileButton(GwParentMapTool):
                 plt.annotate(str(round(self.nodes[indx].descript['total_distance'], 2)),
                              xy=(Decimal(0 + start_point),
                                  self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
-                             fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                             fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
             else:
                 # Fill y_max
                 plt.annotate(
@@ -877,8 +875,7 @@ class GwProfileButton(GwParentMapTool):
                 plt.annotate(str(round(self.nodes[indx].descript['total_distance'], 2)),
                              xy=(Decimal(0 + start_point),
                                  self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
-                             fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                             fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         else:
             # Fill y_max and elevation
@@ -901,8 +898,7 @@ class GwProfileButton(GwParentMapTool):
                              xy=(Decimal(0 + start_point),
                                  self.min_top_elev - Decimal(
                                      self.height_row * Decimal(4.20) + self.height_row / 2)),
-                             fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                             fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Last node : y_max,y1 and top_elev, elev1
             elif indx == self.n - 1:
@@ -926,8 +922,7 @@ class GwProfileButton(GwParentMapTool):
                 plt.annotate(str(round(self.nodes[indx].descript['total_distance'], 2)),
                              xy=(Decimal(0 + start_point),
                                  self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
-                             fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                             fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Nodes between 1st and last node : y_max,y1,y2 and top_elev, elev1, elev2
             else:
@@ -952,8 +947,7 @@ class GwProfileButton(GwParentMapTool):
                 plt.annotate(str(round(self.nodes[indx].descript['total_distance'], 2)),
                              xy=(Decimal(0 + start_point),
                                  self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
-                             fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                             fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         # Fill diameter and slope / length for all nodes except last node
         if indx != self.n - 1:
@@ -998,7 +992,7 @@ class GwProfileButton(GwParentMapTool):
 
             # Fill total length
             plt.annotate(str(round(self.links[indx].descript['total_distance'], 2)),
-                 xy=(Decimal(0 + start_point),
+                xy=(Decimal(0 + start_point),
                      self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
                 fontsize=6,
                 rotation='vertical', horizontalalignment='center', verticalalignment='center')
@@ -1021,8 +1015,7 @@ class GwProfileButton(GwParentMapTool):
             plt.annotate(str(round(self.links[indx].descript['total_distance'], 2)),
                  xy=(Decimal(0 + start_point),
                      self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
-                fontsize=6,
-                rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
 
     def draw_last_node(self, node, prev_node, index):
@@ -1219,7 +1212,7 @@ class GwProfileButton(GwParentMapTool):
 
             # values right x_ordinate_all
             plt.annotate(str(i) + '\n' + ' ', xy=(i, int(math.ceil(self.max_top_elev) + 1)),
-                fontsize=6.5, horizontalalignment='center')
+                         fontsize=6.5, horizontalalignment='center')
 
 
     def draw_ground(self):

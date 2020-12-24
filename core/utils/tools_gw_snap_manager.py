@@ -17,6 +17,7 @@ from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_qgis
 
+
 class GwSnapManager(object):
 
     def __init__(self, iface):

@@ -581,9 +581,9 @@ class GwToolBoxButton(GwParentAction):
             trv_widget.expandAll()
 
 
-    def sort_list(self, json):
+    def sort_list(self, json_):
 
         try:
-            return json['alias'].upper()
+            return json_['alias'].upper()
         except KeyError:
             return 0

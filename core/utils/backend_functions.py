@@ -215,9 +215,7 @@ class GwInfoTools:
 
     def load_qml(self, **kwargs):
         """ Apply QML style located in @qml_path in @layer
-        :param params:[{"funcName": "load_qml",
-                        "params": {"layerName": "v_edit_arc",
-                        "qmlPath": "C:\\xxxx\\xxxx\\xxxx\\qml_file.qml"}}]
+        :param kwargs:{"layerName": "v_edit_arc", "qmlPath": "C:\\xxxx\\xxxx\\xxxx\\qml_file.qml"}
         :return: Boolean value
         """
 
@@ -243,8 +241,15 @@ class GwInfoTools:
         return True
 
 
-    #  TODO unused functions atm
+    def open_url(self, widget):
+        """ Function called in def add_hyperlink(field): -->
+                widget.clicked.connect(partial(getattr(global_vars.session_vars['gw_infotools'], func_name), widget))"""
+        tools_os.open_url(widget)
+
+
+    # region unused functions atm
     def show_message(self, **kwargs):
+
         """
         PERFORM pg_notify(current_user,
                   '{"functionAction":{"functions":[{"name":"show_message","parameters":
@@ -254,12 +259,14 @@ class GwInfoTools:
         functions called in -> getattr(self, function_name)(**params):
         Show message in console log,
         :param kwargs: dict with all needed
-        :param kwargs['message']: message to show
-        :param kwargs['tabName']: tab where the info will be displayed
-        :param kwargs['styleSheet']:  define text format (message type, color, and bold), 0 = Info(black), 1 = Warning(orange), 2 = Critical(red), 3 = Success(blue), 4 = None(black)
-        :param kwargs['styleSheet']['level']: 0 = Info(black), 1 = Warning(orange), 2 = Critical(red), 3 = Success(blue), 4 = None(black)
-        :param kwargs['styleSheet']['color']: can be like "red", "green", "orange", "pink"...typical html colors
-        :param kwargs['styleSheet']['bold']: if is true, then print as bold
+            kwargs: ['message']: message to show
+            kwargs: ['tabName']: tab where the info will be displayed
+            kwargs: ['styleSheet']:  define text format (message type, color, and bold), 0 = Info(black),
+                         1 = Warning(orange), 2 = Critical(red), 3 = Success(blue), 4 = None(black)
+            kwargs: ['styleSheet']['level']: 0 = Info(black), 1 = Warning(orange), 2 = Critical(red), 3 = Success(blue),
+                        4 = None(black)
+            kwargs: ['styleSheet']['color']: can be like "red", "green", "orange", "pink"...typical html colors
+            kwargs: ['styleSheet']['bold']: if is true, then print as bold
         :return:
         """
 
@@ -339,11 +346,7 @@ class GwInfoTools:
             else:
                 self.get_all_layers(child)
 
-
-    def open_url(self, widget):
-        """ Function called in def add_hyperlink(field): -->
-                widget.clicked.connect(partial(getattr(global_vars.session_vars['gw_infotools'], func_name), widget)) """
-        tools_os.open_url(widget)
+    # endregion
 
 
 def gw_function_dxf(**kwargs):
@@ -370,6 +373,7 @@ def gw_function_dxf(**kwargs):
 
 def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=True):
     """ Select a dxf file and add layers into toc
+    :param dialog: (QDialog)
     :param dxf_path: path of dxf file
     :param export_to_db: Export layers to database
     :param toc: insert layers into TOC

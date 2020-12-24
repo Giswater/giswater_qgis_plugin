@@ -267,7 +267,7 @@ class GwI18NGenerator:
             os.makedirs(cfg_path, exist_ok=True)
 
         # Get db messages values
-        sql = (f"SELECT source, project_type, context, formname, formtype, lb_enen, lb_{db_lang}, tt_enen, tt_{db_lang} "
+        sql = (f"SELECT source, project_type, context, formname, formtype, lb_enen, lb_{db_lang}, tt_enen, tt_{db_lang}"
                f" FROM i18n.dbdialog "
                f" ORDER BY context, formname;")
         rows = self.get_rows(sql)

@@ -75,16 +75,16 @@ class GwGo2EpaSelectorButton(GwParentAction):
                 rows = tools_db.get_rows(sql, add_empty_row=True)
                 tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_sel_time, rows)
 
-            self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(self.populate_date_time,
-                                                                                              self.dlg_go2epa_result.cmb_sel_date))
+            self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(
+                partial(self.populate_date_time, self.dlg_go2epa_result.cmb_sel_date))
 
-            self.dlg_go2epa_result.cmb_sel_date.currentIndexChanged.connect(partial(self.populate_time,
-                                                                                    self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_sel_time))
-
+            self.dlg_go2epa_result.cmb_sel_date.currentIndexChanged.connect(
+                partial(self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id,
+                        self.dlg_go2epa_result.cmb_sel_time))
 
             # Populate GroupBox Selector compare
             result_id_to_comp = tools_qt.get_combo_value(self.dlg_go2epa_result,
-                                                       self.dlg_go2epa_result.rpt_selector_result_id, 0)
+                                                         self.dlg_go2epa_result.rpt_selector_result_id, 0)
             sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
                    f"WHERE result_id = '{result_id_to_comp}' "
                    f"ORDER BY resultdate ")
@@ -101,8 +101,8 @@ class GwGo2EpaSelectorButton(GwParentAction):
 
             self.dlg_go2epa_result.rpt_selector_compare_id.currentIndexChanged.connect(partial(
                 self.populate_date_time, self.dlg_go2epa_result.cmb_com_date))
-            self.dlg_go2epa_result.cmb_com_date.currentIndexChanged.connect(partial(self.populate_time,
-                                                                                    self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_com_time))
+            self.dlg_go2epa_result.cmb_com_date.currentIndexChanged.connect(partial(
+                self.populate_time, self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_com_time))
 
         # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "SELECT result_id FROM selector_rpt_main"

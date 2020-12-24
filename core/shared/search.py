@@ -192,8 +192,8 @@ class GwSearch:
         # Tab 'network or add_network'
         if tab_selected == 'network' or tab_selected == 'add_network':
             self.ApiCF = GwInfo(tab_type='data')
-            complet_result, dialog = self.ApiCF.get_info_from_id(table_name=item['sys_table_id'], feature_id=item['sys_id'],
-                                   tab_type='data', is_add_schema=is_add_schema)
+            complet_result, dialog = self.ApiCF.get_info_from_id(table_name=item['sys_table_id'], tab_type='data',
+                                                                 feature_id=item['sys_id'], is_add_schema=is_add_schema)
             if not complet_result:
                 return
 
@@ -439,7 +439,7 @@ class GwSearch:
         self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(self.rubber_band.reset)
         field_id = str(result['body']['feature']['idName'])
-        tools_gw.build_dialog_info(self.hydro_info_dlg, result, field_id)
+        tools_gw.build_dialog_info(self.hydro_info_dlg, result)
 
         tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 
@@ -458,7 +458,7 @@ class GwSearch:
         current_selectors = self.get_current_selectors()
         self.force_expl(workcat_id)
         # TODO ZOOM TO SELECTED WORKCAT
-        #self.zoom_to_polygon(workcat_id, layer_name, field_id)
+        # self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
         self.items_dialog = SearchWorkcat()
         self.items_dialog.setWindowTitle(f'Workcat: {display_name}')
@@ -518,10 +518,12 @@ class GwSearch:
             partial(self.export_to_csv, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end,
                     self.items_dialog.txt_path))
 
-        self.items_dialog.txt_name.textChanged.connect(partial
-            (self.workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.txt_name, table_name, workcat_id, field_id))
-        self.items_dialog.txt_name_end.textChanged.connect(partial
-            (self.workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm_end, self.items_dialog.txt_name_end, table_name_end, workcat_id, field_id))
+        self.items_dialog.txt_name.textChanged.connect(partial(
+            self.workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.txt_name,
+            table_name, workcat_id, field_id))
+        self.items_dialog.txt_name_end.textChanged.connect(partial(
+            self.workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm_end,
+            self.items_dialog.txt_name_end, table_name_end, workcat_id, field_id))
         self.items_dialog.tbl_psm.doubleClicked.connect(partial(self.open_feature_form, self.items_dialog.tbl_psm))
         self.items_dialog.tbl_psm_end.doubleClicked.connect(
             partial(self.open_feature_form, self.items_dialog.tbl_psm_end))

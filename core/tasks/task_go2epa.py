@@ -95,7 +95,7 @@ class GwGo2EpaTask(QgsTask):
                         if 'body' in self.complet_result:
                             if 'data' in self.complet_result['body']:
                                 tools_gw.add_layer_temp(self.dlg_go2epa, self.complet_result['body']['data'],
-                                    'INP results', True, True, 1, False, disable_tabs=False)
+                                                        'INP results', True, True, 1, False, disable_tabs=False)
 
             if self.import_result and self.rpt_result:
                 if 'status' in self.rpt_result:
@@ -103,7 +103,7 @@ class GwGo2EpaTask(QgsTask):
                         if 'body' in self.rpt_result:
                             if 'data' in self.rpt_result['body']:
                                 tools_gw.add_layer_temp(self.dlg_go2epa, self.rpt_result['body']['data'],
-                                    'RPT results', True, True, 1, False, disable_tabs=False)
+                                                        'RPT results', True, True, 1, False, disable_tabs=False)
                         self.message = self.rpt_result['message']['text']
 
             if self.common_msg != "":

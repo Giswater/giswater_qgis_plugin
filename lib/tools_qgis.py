@@ -324,7 +324,7 @@ def select_features_by_ids(geom_type, expr, layers=None):
 
     if layers is None: return
 
-    if not geom_type in layers: return
+    if geom_type not in layers: return
 
     # Build a list of feature id's and select them
     for layer in layers[geom_type]:

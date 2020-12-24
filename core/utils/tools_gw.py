@@ -17,23 +17,22 @@ if 'nt' in sys.builtin_module_names:
 from collections import OrderedDict
 from functools import partial
 
-from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QPersistentModelIndex, QDate
+from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant,  QDate
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication
-from qgis.core import QgsProject, QgsPointXY, QgsGeometry, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
+    QToolButton, QWidget
+from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, QgsFeatureRequest, \
     QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer,  QgsPointLocator, \
-    QgsSnappingConfig, QgsSnappingUtils, QgsTolerance, QgsFeatureRequest, QgsRectangle
-from qgis.gui import QgsVertexMarker, QgsMapCanvas, QgsMapToolEmitPoint, QgsDateTimeEdit, QgsMapTool, QgsRubberBand
+    QgsSnappingConfig
+from qgis.gui import QgsDateTimeEdit
 
 from ..models.sys_feature_cat import SysFeatureCat
 from ..ui.ui_manager import GwDialog, GwMainWindow, DockerUi
 from ..utils.tools_gw_select_manager import GwSelectManager
 from ..utils.tools_gw_snap_manager import GwSnapManager
 from ... import global_vars
-from ...lib import tools_qgis, tools_pgdao, tools_qt, tools_log, tools_config, tools_os, tools_db
+from ...lib import tools_qgis, tools_pgdao, tools_qt, tools_log, tools_os, tools_db
 from ...lib.tools_qt import GwHyperLinkLabel
 
 
@@ -244,8 +243,8 @@ def refresh_legend():
         if layer:
             ltl = QgsProject.instance().layerTreeRoot().findLayer(layer.id())
             ltm = global_vars.iface.layerTreeView().model()
-            legendNodes = ltm.layerLegendNodes(ltl)
-            for ln in legendNodes:
+            legend_nodes = ltm.layerLegendNodes(ltl)
+            for ln in legend_nodes:
                 current_state = ln.data(Qt.CheckStateRole)
                 ln.setData(Qt.Unchecked, Qt.CheckStateRole)
                 ln.setData(Qt.Checked, Qt.CheckStateRole)
@@ -419,7 +418,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
 
 
 def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
-                   group='GW Temporal Layers', disable_tabs=True):
+                   group='GW Temporal Layers', disable_tabs_=True):
     """ Add QgsVectorLayer into TOC
     :param dialog: Dialog where to find the tab to be displayed and the textedit to be filled (QDialog or QMainWindow)
     :param data: Json with information
@@ -429,7 +428,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     :param tab_idx: Log tab index (Integer)
     :param del_old_layers:Delete layers added in previous operations (Boolean)
     :param group: Name of the group to which we want to add the layer (String)
-    :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean).
+    :param disable_tabs_: set all tabs, except the last, enabled or disabled (boolean).
     :return: Dictionary with text as result of previuos data (String), and list of layers added (QgsVectorLayer).
     """
 
@@ -438,7 +437,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     srid = global_vars.srid
     for k, v in list(data.items()):
         if str(k) == "info":
-            text_result, change_tab = fill_tab_log(dialog, data, force_tab, reset_text, tab_idx, disable_tabs)
+            text_result, change_tab = fill_tab_log(dialog, data, force_tab, reset_text, tab_idx, disable_tabs_)
         elif k in ('point', 'line', 'polygon'):
             if 'features' not in data[k]: continue
             counter = len(data[k]['features'])
@@ -679,6 +678,7 @@ def disable_tabs(dialog):
 
 
 def set_style_mapzones():
+    """ Puts the received styles, in the received layers in the json sent by the gw_fct_getstylemapzones function """
 
     extras = f'"mapzones":""'
     body = create_body(extras=extras)
@@ -772,8 +772,7 @@ def manage_feature_cat():
     return feature_cat
 
 
-def build_dialog_info(dialog, result, field_id, my_json=None, new_feature_id=None, new_feature=None,
-                        layer_new_feature=None, feature_id=None, feature_type=None, layer=None):
+def build_dialog_info(dialog, result, my_json=None):
 
     fields = result['body']['data']
     if 'fields' not in fields:
@@ -781,7 +780,6 @@ def build_dialog_info(dialog, result, field_id, my_json=None, new_feature_id=Non
     grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
 
     for x, field in enumerate(fields["fields"]):
-
         label = QLabel()
         label.setObjectName('lbl_' + field['label'])
         label.setText(field['label'].capitalize())
@@ -799,7 +797,6 @@ def build_dialog_info(dialog, result, field_id, my_json=None, new_feature_id=Non
             widget = set_data_type(field, widget)
             if field['widgettype'] == 'typeahead':
                 widget = set_typeahead(field, dialog, widget, completer)
-
         elif field['widgettype'] == 'datetime':
             widget = add_calendar(dialog, field)
         elif field['widgettype'] == 'hyperlink':
@@ -818,8 +815,8 @@ def build_dialog_info(dialog, result, field_id, my_json=None, new_feature_id=Non
         grid_layout.addWidget(label, x, 0)
         grid_layout.addWidget(widget, x, 1)
 
-    verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-    grid_layout.addItem(verticalSpacer1)
+    vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+    grid_layout.addItem(vertical_spacer1)
 
     return result
 
@@ -1377,6 +1374,7 @@ def get_actions_from_json(json_result, sql):
     """
     Manage options for layers (active, visible, zoom and indexing)
     :param json_result: Json result of a query (Json)
+    :param sql: query executed (String)
     :return: None
     """
 
@@ -1773,6 +1771,7 @@ def manage_layer_manager(json_result, sql):
     """
     Manage options for layers (active, visible, zoom and indexing)
     :param json_result: Json result of a query (Json)
+    :param sql: query executed (String)
     :return: None
     """
 
@@ -2049,7 +2048,7 @@ def docker_dialog(dialog):
         global_vars.session_vars['dlg_docker'].setWidget(dialog)
         global_vars.session_vars['dlg_docker'].setWindowFlags(Qt.WindowContextHelpButtonHint)
         global_vars.iface.addDockWidget(positions[global_vars.session_vars['dlg_docker'].position],
-            global_vars.session_vars['dlg_docker'])
+                                        global_vars.session_vars['dlg_docker'])
     except RuntimeError as e:
         tools_log.log_warning(f"{type(e).__name__} --> {e}")
 

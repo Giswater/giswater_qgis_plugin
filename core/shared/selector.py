@@ -232,13 +232,13 @@ class Selector:
         widget_all = dialog.findChild(QCheckBox, f'chk_all_{tab_name}')
 
         if widget_all is None or (widget_all is not None and widget.objectName() != widget_all.objectName()):
-            extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", '
-                      f'"id":"{widget.objectName()}", "isAlone":"{is_alone}", "value":"{tools_qt.is_checked(dialog, widget)}", '
+            extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "id":"{widget.objectName()}", '
+                      f'"isAlone":"{is_alone}", "value":"{tools_qt.is_checked(dialog, widget)}", '
                       f'"addSchema":"{qgis_project_add_schema}"')
         else:
             check_all = tools_qt.is_checked(dialog, widget_all)
-            extras = f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "checkAll":"{check_all}",  ' \
-                     f'"addSchema":"{qgis_project_add_schema}"'
+            extras = (f'"selectorType":"{selector_type}", "tabName":"{tab_name}", "checkAll":"{check_all}", '
+                      f'"addSchema":"{qgis_project_add_schema}"')
 
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.get_json('gw_fct_setselectors', body)

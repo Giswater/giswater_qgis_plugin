@@ -118,11 +118,10 @@ class GwProjectCheck:
         # Populate info_log and missing layers
         critical_level = 0
         text_result = tools_gw.add_layer_temp(self.dlg_audit_project, result['body']['data'],
-            'gw_fct_setcheckproject_result', True, False, 0, True, disable_tabs=False)
+                                              'gw_fct_setcheckproject_result', True, False, 0, True, disable_tabs=False)
 
         if 'missingLayers' in result['body']['data']:
-            critical_level = self.get_missing_layers(self.dlg_audit_project,
-                result['body']['data']['missingLayers'], critical_level)
+            critical_level = self.get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'], critical_level)
 
         hide_void_groupbox(self.dlg_audit_project)
 

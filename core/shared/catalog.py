@@ -42,7 +42,7 @@ class GwCatalog:
             return
 
         complet_list = json.loads(row[0], object_pairs_hook=OrderedDict)
-        groupBox_1 = QGroupBox("Filter")
+        group_box_1 = QGroupBox("Filter")
         self.filter_form = QGridLayout()
 
         self.dlg_catalog = InfoCatalogUi()
@@ -63,10 +63,10 @@ class GwCatalog:
                 self.filter_form.addWidget(label, field['layoutorder'], 0)
                 self.filter_form.addWidget(widget, field['layoutorder'], 1)
 
-        groupBox_1.setLayout(self.filter_form)
-        main_layout.addWidget(groupBox_1)
-        verticalSpacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        main_layout.addItem(verticalSpacer1)
+        group_box_1.setLayout(self.filter_form)
+        main_layout.addWidget(group_box_1)
+        vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        main_layout.addItem(vertical_spacer1)
 
         matcat_id = self.dlg_catalog.findChild(QComboBox, 'matcat_id')
 

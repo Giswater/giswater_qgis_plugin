@@ -75,8 +75,7 @@ class GwDateSelectorButton(GwParentAction):
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if from_date >= to_date:
             to_date = self.widget_date_from.date().addDays(1).toString('yyyy-MM-dd')
-            tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_to,
-                                     datetime.strptime(to_date, '%Y-%m-%d'))
+            tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_to, datetime.strptime(to_date, '%Y-%m-%d'))
 
 
     def update_date_from(self):
@@ -86,8 +85,7 @@ class GwDateSelectorButton(GwParentAction):
         to_date = self.widget_date_to.date().toString('yyyy-MM-dd')
         if to_date <= from_date:
             from_date = self.widget_date_to.date().addDays(-1).toString('yyyy-MM-dd')
-            tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_from,
-                                     datetime.strptime(from_date, '%Y-%m-%d'))
+            tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_from, datetime.strptime(from_date, '%Y-%m-%d'))
 
 
     def get_default_dates(self):
