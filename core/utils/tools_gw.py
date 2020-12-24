@@ -1908,7 +1908,7 @@ def selection_changed(class_object, dialog, table_object, query=False, lazy_widg
     # Reload contents of table 'tbl_@table_object_x_@geom_type'
     if query:
         insert_feature_to_plan(dialog, class_object.geom_type, ids=ids)
-        class_object.layers = remove_selection()
+        remove_selection()
         reload_tableview_psector(dialog, class_object.geom_type)
     else:
         load_table(dialog, table_object, class_object.geom_type, expr_filter)
