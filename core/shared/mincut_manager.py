@@ -35,8 +35,8 @@ class GwMincutManager:
         self.settings = global_vars.settings
 
 
-    def set_dialog(self, dialog=MincutManagerUi()):
-        self.dlg_min_edit=dialog
+    def set_dialog(self, dialog):
+        self.dlg_min_edit = dialog
         self.mg_mincut_management()
 
 

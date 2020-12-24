@@ -24,7 +24,8 @@ from .mincut_manager import GwMincutManager
 from .search import GwSearch
 from ..tasks.parent_task import GwTask
 from ..utils import tools_gw
-from ..ui.ui_manager import DialogTextUi, Mincut, MincutComposer, MincutConnec, MincutEndUi, MincutHydrometer
+from ..ui.ui_manager import DialogTextUi, Mincut, MincutComposer, MincutConnec, MincutEndUi, MincutHydrometer, \
+    MincutManagerUi
 from ... import global_vars
 from ...lib import tools_qt, tools_qgis, tools_log, tools_db
 from ..utils.tools_gw_select_manager import GwSelectManager
@@ -1766,7 +1767,7 @@ class GwMincut:
                 break
 
 
-    def mg_mincut_management(self, dialog=None):
+    def mg_mincut_management(self, dialog=MincutManagerUi()):
         """ Button 27: Mincut management """
 
         self.action = "mg_mincut_management"
