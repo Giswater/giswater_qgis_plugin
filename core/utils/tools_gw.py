@@ -2256,7 +2256,7 @@ def reload_tableview_psector(dialog, geom_type):
     value = tools_qt.get_text(dialog, dialog.psector_id)
     expr = f"psector_id = '{value}'"
     qtable = tools_qt.get_widget(dialog, f'tbl_psector_x_{geom_type}')
-    message = tools_qt.fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
+    message = tools_qt.fill_table(qtable, f"plan_psector_x_{geom_type}", expr)
     if message:
         tools_qgis.show_warning(message)
     set_tablemodel_config(dialog, qtable, f"plan_psector_x_{geom_type}")

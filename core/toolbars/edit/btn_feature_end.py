@@ -261,7 +261,7 @@ class GwEndFeatureButton(GwParentAction):
             filter_ = filter_[:-3] + ""
             filter_ += " AND arc_state = '1' "
 
-            self.fill_table(self.tbl_arc_x_relations, table_relations, filter_)
+            tools_qt.fill_table(self.tbl_arc_x_relations, table_relations, filter_)
             self.tbl_arc_x_relations.doubleClicked.connect(
                 partial(self.open_selected_object, self.tbl_arc_x_relations))
 
@@ -307,30 +307,6 @@ class GwEndFeatureButton(GwParentAction):
         extras += f'"enddate":"{self.enddate}", "workcat_date":"{self.workcatdate}", "description":"{self.description}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
         tools_gw.get_json('gw_fct_setendfeature', body, log_sql=True)
-
-
-    def fill_table(self, widget, table_name, filter_):
-        """ Set a model with selected filter.
-        Attach that model to selected table """
-
-        if self.schema_name not in table_name:
-            table_name = self.schema_name + "." + table_name
-
-        # Set model
-        self.model = QSqlTableModel(db=global_vars.session_vars['db'])
-        self.model.setTable(table_name)
-        self.model.setEditStrategy(QSqlTableModel.OnManualSubmit)
-        if filter_:
-            self.model.setFilter(filter_)
-        self.model.setSort(0, 0)
-        self.model.select()
-
-        # Check for errors
-        if self.model.lastError().isValid():
-            tools_qgis.show_warning(self.model.lastError().text())
-
-        # Attach model to table view
-        widget.setModel(self.model)
 
 
     def open_selected_object(self, widget):

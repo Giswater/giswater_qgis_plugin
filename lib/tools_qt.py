@@ -581,10 +581,16 @@ def check_expression_filter(expr_filter, log_info=False):
     return True, expr
 
 
-def fill_table(widget, table_name, expr_filter=None, edit_strategy=QSqlTableModel.OnManualSubmit,
+def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableModel.OnManualSubmit,
                sort_order=Qt.AscendingOrder):
-    """ Set a model with selected filter.
-    Attach that model to selected table """
+    """ Set a model with selected filter. Attach that model to selected table
+    :param qtable: tableview where set the model (QTableView)
+    :param table_name: data base table name or view name (String)
+    :param expr_filter: expression to filter the model (String)
+    :param edit_strategy: (QSqlTableModel.OnFieldChange, QSqlTableModel.OnManualSubmit, QSqlTableModel.OnRowChange)
+    :param sort_order: can be 0 or 1 (Qt.AscendingOrder or Qt.AscendingOrder)
+    :return:
+    """
 
     if global_vars.schema_name not in table_name:
         table_name = global_vars.schema_name + "." + table_name
@@ -600,10 +606,10 @@ def fill_table(widget, table_name, expr_filter=None, edit_strategy=QSqlTableMode
     if model.lastError().isValid():
         tools_log.log_warning(f"fill_table: {model.lastError().text()}")
 
-    # Attach model to table view
-    widget.setModel(model)
+    # Attach model to tableview
+    qtable.setModel(model)
     if expr_filter:
-        widget.model().setFilter(expr_filter)
+        qtable.model().setFilter(expr_filter)
 
 
 def add_layer_to_toc(layer, group=None):
@@ -852,32 +858,6 @@ def reset_model(dialog, table_object, geom_type):
     widget = get_widget(dialog, widget_name)
     if widget:
         widget.setModel(None)
-
-
-def fill_table_by_expr(qtable, table_name, expr):
-    """
-    :param qtable: QTableView to show
-    :param expr: expression to set model
-    """
-
-    if global_vars.schema_name not in table_name:
-        table_name = global_vars.schema_name + "." + table_name
-
-    model = QSqlTableModel(db=global_vars.session_vars['db'])
-    model.setTable(table_name)
-    model.setFilter(expr)
-    model.setEditStrategy(QSqlTableModel.OnFieldChange)
-    qtable.setEditTriggers(QTableView.DoubleClicked)
-    model.select()
-    qtable.setModel(model)
-    qtable.show()
-
-    # Check for errors
-    message = None
-    if model.lastError().isValid():
-        message = model.lastError().text()
-
-    return message
 
 
 def get_feature_by_id(layer, id, field_id=None):
