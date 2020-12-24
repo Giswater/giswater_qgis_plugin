@@ -275,7 +275,7 @@ class GwFeatureReplaceButton(GwParentMapTool):
                 tools_qgis.show_warning(message)
                 self.deactivate()
                 self.set_action_pan()
-                tools_gw.close_dialog(dialog, global_vars.plugin_name)
+                tools_gw.close_dialog(dialog)
                 return
 
             complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
