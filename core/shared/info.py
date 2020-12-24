@@ -1994,7 +1994,7 @@ class GwInfo(QObject):
         btn_new_element.clicked.connect(partial(self.manage_element, dialog, feature=self.feature))
 
         # Set model of selected widget
-        message = tools_qt.set_model_to_table(widget, table_name, expr_filter)
+        message = tools_qt.fill_table(widget, table_name, expr_filter)
         if message:
             tools_qgis.show_warning(message)
 
@@ -2324,7 +2324,7 @@ class GwInfo(QObject):
         filter += f" AND hydrometer_customer_code ILIKE '%{txt_hydrometer_id.text()}%'"
 
         # Set model of selected widget
-        message = tools_qt.set_model_to_table(qtable, f"{self.schema_name}.{table_name}", filter)
+        message = tools_qt.fill_table(qtable, f"{self.schema_name}.{table_name}", filter)
         if message:
             tools_qgis.show_warning(message)
 
@@ -2379,7 +2379,7 @@ class GwInfo(QObject):
 
         # Set model of selected widget
         edit_strategy = QSqlTableModel.OnFieldChange
-        message = tools_qt.set_model_to_table(qtable, f"{self.schema_name}.{table_name}", filter_, edit_strategy)
+        message = tools_qt.fill_table(qtable, f"{self.schema_name}.{table_name}", filter_, edit_strategy)
         if message:
             tools_qgis.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_hydrometer_value, table_name)
@@ -2468,7 +2468,7 @@ class GwInfo(QObject):
             rows.append(['', ''])
             tools_qt.fill_combo_values(self.dlg_cf.event_type, rows)
 
-        message = tools_qt.set_model_to_table(widget, table_name)
+        message = tools_qt.fill_table(widget, table_name)
         if message:
             tools_qgis.show_warning(message)
         self.set_filter_table_event(widget)
@@ -2874,7 +2874,7 @@ class GwInfo(QObject):
         tools_gw.set_dates_from_to(self.date_document_from, self.date_document_to, table_name, 'date', 'date')
 
         # Set model of selected widget
-        message = tools_qt.set_model_to_table(widget, f"{self.schema_name}.{table_name}", expr_filter)
+        message = tools_qt.fill_table(widget, f"{self.schema_name}.{table_name}", expr_filter)
         if message:
             tools_qgis.show_warning(message)
 

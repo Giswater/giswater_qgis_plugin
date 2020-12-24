@@ -1606,7 +1606,6 @@ class GwPsector:
         self.dlg_merm.btn_update_result.clicked.connect(partial(self.update_price_vdefault))
         self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm, tablename))
 
-        # set_edit_strategy = QSqlTableModel.OnManualSubmit
         self.fill_table(self.dlg_merm, self.tbl_om_result_cat, tablename)
         tools_gw.set_tablemodel_config(self.tbl_om_result_cat, self.dlg_merm.tbl_om_result_cat, tablename)
 

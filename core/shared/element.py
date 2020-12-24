@@ -278,7 +278,7 @@ class GwElement:
 
         # Set model of selected widget
         table_name = f"{self.schema_name}.v_edit_{geom_type}"
-        message = tools_qt.set_model_to_table(widget, table_name, expr_filter)
+        message = tools_qt.fill_table(widget, table_name, expr_filter)
         if message:
             tools_qgis.show_warning(message)
 

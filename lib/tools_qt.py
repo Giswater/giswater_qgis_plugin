@@ -581,7 +581,7 @@ def check_expression_filter(expr_filter, log_info=False):
     return True, expr
 
 
-def fill_table(widget, table_name, expr_filter=None, set_edit_strategy=QSqlTableModel.OnManualSubmit,
+def fill_table(widget, table_name, expr_filter=None, edit_strategy=QSqlTableModel.OnManualSubmit,
                sort_order=Qt.AscendingOrder):
     """ Set a model with selected filter.
     Attach that model to selected table """
@@ -592,7 +592,7 @@ def fill_table(widget, table_name, expr_filter=None, set_edit_strategy=QSqlTable
     # Set model
     model = QSqlTableModel(db=global_vars.session_vars['db'])
     model.setTable(table_name)
-    model.setEditStrategy(set_edit_strategy)
+    model.setEditStrategy(edit_strategy)
     model.setSort(0, sort_order)
     model.select()
 
@@ -655,32 +655,6 @@ def set_selection_behavior(dialog):
     widget_list = dialog.findChildren(QTableView)
     for widget in widget_list:
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-
-def set_model_to_table(widget, table_name, expr_filter=None, edit_strategy=QSqlTableModel.OnManualSubmit):
-    """ Set a model with selected filter.
-    Attach that model to selected table """
-
-    if global_vars.schema_name not in table_name:
-        table_name = global_vars.schema_name + "." + table_name
-
-    # Set model
-    model = QSqlTableModel(db=global_vars.session_vars['db'])
-    model.setTable(table_name)
-    model.setEditStrategy(edit_strategy)
-    if expr_filter:
-        model.setFilter(expr_filter)
-    model.select()
-
-    # Check for errors
-    if model.lastError().isValid():
-        tools_log.log_warning(f"set_model_to_table: {model.lastError().text()}")
-
-    # Attach model to table view
-    if widget:
-        widget.setModel(model)
-    else:
-        tools_log.log_info("set_model_to_table: widget not found")
 
 
 def get_folder_path(dialog, widget):

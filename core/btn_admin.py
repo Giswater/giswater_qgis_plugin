@@ -3300,7 +3300,7 @@ class GwAdmin:
             self.open_manage_field('update')
 
 
-    def fill_table(self, qtable, table_name, model, expr_filter, set_edit_strategy=QSqlTableModel.OnManualSubmit):
+    def fill_table(self, qtable, table_name, model, expr_filter, edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
         Attach that model to selected table """
 
@@ -3310,7 +3310,7 @@ class GwAdmin:
 
         # Set model
         model.setTable(table_name)
-        model.setEditStrategy(set_edit_strategy)
+        model.setEditStrategy(edit_strategy)
         if expr_filter is not None:
             model.setFilter(expr_filter)
         model.select()
