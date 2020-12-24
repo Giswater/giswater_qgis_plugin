@@ -63,7 +63,7 @@ class GwArcDivideButton(GwParentMapTool):
         self.set_action_pan()
 
 
-
+    # region QgsMapTools inherited
     """ QgsMapTool inherited event functions """
 
     def keyPressEvent(self, event):
@@ -236,3 +236,4 @@ class GwArcDivideButton(GwParentMapTool):
         elif event.button() == Qt.RightButton:
             self.cancel_map_tool()
 
+    # endregion

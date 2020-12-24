@@ -41,6 +41,8 @@ class GwDimensioningButton(GwParentMapTool):
         self.api_dim.open_dimensioning_form(qgis_feature=feature, layer=self.layer)
         super().deactivate()
 
+
+    # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
     def canvasMoveEvent(self, event):
         pass
@@ -93,3 +95,5 @@ class GwDimensioningButton(GwParentMapTool):
 
         # Call parent method
         super().deactivate()
+
+    # endregion

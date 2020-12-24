@@ -335,7 +335,30 @@ class GwFeatureReplaceButton(GwParentMapTool):
             self.dlg_replace.btn_accept.setEnabled(False)
 
 
+    def edit_change_elem_type_get_value(self, index):
+        """ Just select item to 'real' combo 'featurecat_id' (that is hidden) """
 
+        if index == -1:
+            return
+
+        # Get selected value from 2nd combobox
+        feature_type_new = tools_qt.get_text(self.dlg_replace, "feature_type_new")
+
+        # When value is selected, enabled 3rd combo box
+        if feature_type_new == 'null':
+            return
+
+        if self.project_type == 'ws':
+            # Fill 3rd combo_box-catalog_id
+            tools_qt.set_widget_enabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
+            sql = (f"SELECT DISTINCT(id) "
+                   f"FROM {self.cat_table} "
+                   f"WHERE {self.feature_type_ws} = '{feature_type_new}'")
+            rows = tools_db.get_rows(sql)
+            tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
+
+
+    # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
     def keyPressEvent(self, event):
@@ -434,26 +457,6 @@ class GwFeatureReplaceButton(GwParentMapTool):
     def deactivate(self):
         super().deactivate()
 
+    # endregion
 
-    def edit_change_elem_type_get_value(self, index):
-        """ Just select item to 'real' combo 'featurecat_id' (that is hidden) """
-
-        if index == -1:
-            return
-
-        # Get selected value from 2nd combobox
-        feature_type_new = tools_qt.get_text(self.dlg_replace, "feature_type_new")
-
-        # When value is selected, enabled 3rd combo box
-        if feature_type_new == 'null':
-            return
-
-        if self.project_type == 'ws':
-            # Fill 3rd combo_box-catalog_id
-            tools_qt.set_widget_enabled(self.dlg_replace, self.dlg_replace.featurecat_id, True)
-            sql = (f"SELECT DISTINCT(id) "
-                   f"FROM {self.cat_table} "
-                   f"WHERE {self.feature_type_ws} = '{feature_type_new}'")
-            rows = tools_db.get_rows(sql)
-            tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
 

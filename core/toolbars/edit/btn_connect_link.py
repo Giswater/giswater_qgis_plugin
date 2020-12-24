@@ -32,7 +32,96 @@ class GwConnectLinkButton(GwParentMapTool):
         self.select_rect = QRect()
 
 
+    def link_selected_features(self, geom_type, layer):
+        """ Link selected @geom_type to the pipe """
 
+        # Check features selected
+        number_features = layer.selectedFeatureCount()
+        if number_features == 0:
+            message = "You have to select at least one feature!"
+            tools_qgis.show_warning(message)
+            return
+
+        # Get selected features from layers of selected @geom_type
+        aux = "["
+        field_id = geom_type + "_id"
+
+        if layer.selectedFeatureCount() > 0:
+            # Get selected features of the layer
+            features = layer.selectedFeatures()
+            for feature in features:
+                feature_id = feature.attribute(field_id)
+                aux += str(feature_id) + ", "
+            list_feature_id = aux[:-2] + "]"
+            feature_id = f'"id":"{list_feature_id}"'
+            extras = f'"feature_type":"{geom_type.upper()}"'
+            body = tools_gw.create_body(feature=feature_id, extras=extras)
+            # Execute SQL function and show result to the user
+            result = tools_gw.get_json('gw_fct_setlinktonetwork ', body)
+            if result:
+                self.dlg_dtext = DialogTextUi()
+                tools_gw.load_settings(self.dlg_dtext)
+                self.dlg_dtext.btn_accept.hide()
+                self.dlg_dtext.setWindowTitle('Connect to network')
+                self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
+                self.dlg_dtext.rejected.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
+                tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False)
+                tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
+
+            layer.removeSelection()
+
+        # Refresh map canvas
+        self.rubber_band.reset()
+        self.refresh_map_canvas()
+        self.iface.actionPan().trigger()
+
+
+    def set_rubber_band(self):
+
+        # Coordinates transform
+        transform = self.canvas.getCoordinateTransform()
+
+        # Coordinates
+        ll = transform.toMapCoordinates(self.select_rect.left(), self.select_rect.bottom())
+        lr = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.bottom())
+        ul = transform.toMapCoordinates(self.select_rect.left(), self.select_rect.top())
+        ur = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.top())
+
+        # Rubber band
+        self.rubber_band.reset(2)
+        self.rubber_band.addPoint(ll, False)
+        self.rubber_band.addPoint(lr, False)
+        self.rubber_band.addPoint(ur, False)
+        self.rubber_band.addPoint(ul, False)
+        self.rubber_band.addPoint(ll, True)
+
+        self.selected_rectangle = QgsRectangle(ll, ur)
+
+
+    def select_multiple_features(self, selectGeometry):
+
+        key = QApplication.keyboardModifiers()
+
+        # If Ctrl+Shift clicked: remove features from selection
+        if key == (Qt.ControlModifier | Qt.ShiftModifier):
+            behaviour = QgsVectorLayer.RemoveFromSelection
+        # If Ctrl clicked: add features to selection
+        elif key == Qt.ControlModifier:
+            behaviour = QgsVectorLayer.AddToSelection
+        # If Ctrl not clicked: add features to selection
+        else:
+            behaviour = QgsVectorLayer.AddToSelection
+
+        # Selection for all connec and gully layers
+        layer = tools_qgis.get_layer_by_tablename('v_edit_connec')
+        if layer:
+            layer.selectByRect(selectGeometry, behaviour)
+
+        layer = tools_qgis.get_layer_by_tablename('v_edit_gully')
+        if layer:
+            layer.selectByRect(selectGeometry, behaviour)
+
+    # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
     def canvasMoveEvent(self, event):
@@ -48,7 +137,7 @@ class GwConnectLinkButton(GwParentMapTool):
             self.set_rubber_band()
 
 
-    def canvasPressEvent(self, event):  # @UnusedVariable
+    def canvasPressEvent(self, event):
 
         self.select_rect.setRect(0, 0, 0, 0)
         self.rubber_band.reset(2)
@@ -175,93 +264,6 @@ class GwConnectLinkButton(GwParentMapTool):
     def deactivate(self):
         super().deactivate()
 
+    # end region
 
-    def link_selected_features(self, geom_type, layer):
-        """ Link selected @geom_type to the pipe """
-
-        # Check features selected
-        number_features = layer.selectedFeatureCount()
-        if number_features == 0:
-            message = "You have to select at least one feature!"
-            tools_qgis.show_warning(message)
-            return
-
-        # Get selected features from layers of selected @geom_type
-        aux = "["
-        field_id = geom_type + "_id"
-
-        if layer.selectedFeatureCount() > 0:
-            # Get selected features of the layer
-            features = layer.selectedFeatures()
-            for feature in features:
-                feature_id = feature.attribute(field_id)
-                aux += str(feature_id) + ", "
-            list_feature_id = aux[:-2] + "]"
-            feature_id = f'"id":"{list_feature_id}"'
-            extras = f'"feature_type":"{geom_type.upper()}"'
-            body = tools_gw.create_body(feature=feature_id, extras=extras)
-            # Execute SQL function and show result to the user
-            result = tools_gw.get_json('gw_fct_setlinktonetwork ', body)
-            if result:
-                self.dlg_dtext = DialogTextUi()
-                tools_gw.load_settings(self.dlg_dtext)
-                self.dlg_dtext.btn_accept.hide()
-                self.dlg_dtext.setWindowTitle('Connect to network')
-                self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
-                self.dlg_dtext.rejected.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
-                tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False)
-                tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
-
-            layer.removeSelection()
-
-        # Refresh map canvas
-        self.rubber_band.reset()
-        self.refresh_map_canvas()
-        self.iface.actionPan().trigger()
-
-
-    def set_rubber_band(self):
-
-        # Coordinates transform
-        transform = self.canvas.getCoordinateTransform()
-
-        # Coordinates
-        ll = transform.toMapCoordinates(self.select_rect.left(), self.select_rect.bottom())
-        lr = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.bottom())
-        ul = transform.toMapCoordinates(self.select_rect.left(), self.select_rect.top())
-        ur = transform.toMapCoordinates(self.select_rect.right(), self.select_rect.top())
-
-        # Rubber band
-        self.rubber_band.reset(2)
-        self.rubber_band.addPoint(ll, False)
-        self.rubber_band.addPoint(lr, False)
-        self.rubber_band.addPoint(ur, False)
-        self.rubber_band.addPoint(ul, False)
-        self.rubber_band.addPoint(ll, True)
-
-        self.selected_rectangle = QgsRectangle(ll, ur)
-
-
-    def select_multiple_features(self, selectGeometry):
-
-        key = QApplication.keyboardModifiers()
-
-        # If Ctrl+Shift clicked: remove features from selection
-        if key == (Qt.ControlModifier | Qt.ShiftModifier):
-            behaviour = QgsVectorLayer.RemoveFromSelection
-        # If Ctrl clicked: add features to selection
-        elif key == Qt.ControlModifier:
-            behaviour = QgsVectorLayer.AddToSelection
-        # If Ctrl not clicked: add features to selection
-        else:
-            behaviour = QgsVectorLayer.AddToSelection
-
-        # Selection for all connec and gully layers
-        layer = tools_qgis.get_layer_by_tablename('v_edit_connec')
-        if layer:
-            layer.selectByRect(selectGeometry, behaviour)
-
-        layer = tools_qgis.get_layer_by_tablename('v_edit_gully')
-        if layer:
-            layer.selectByRect(selectGeometry, behaviour)
 

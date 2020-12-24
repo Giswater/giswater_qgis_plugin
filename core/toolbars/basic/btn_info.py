@@ -55,80 +55,6 @@ class GwInfoButton(GwParentMapTool):
         info_action.trigger()
 
 
-    """ QgsMapTools inherited event functions """
-
-    def keyPressEvent(self, event):
-
-        if event.key() == Qt.Key_Escape:
-            for rb in self.rubberband_list:
-                rb.reset()
-            self.rubber_band.reset()
-            self.action.trigger()
-            return
-
-
-    def canvasMoveEvent(self, event):
-        pass
-
-
-    def canvasReleaseEvent(self, event):
-
-        for rb in self.rubberband_list:
-            rb.reset()
-
-        if self.block_signal:
-            self.block_signal = False
-            return
-
-        if event.button() == Qt.LeftButton:
-
-            point = self.create_point(event)
-            if point is False:
-                return
-            tools_gw.init_docker()
-            info_feature = GwInfo(self.tab_type)
-            info_feature.signal_activate.connect(self.reactivate_map_tool)
-            info_feature.get_info_from_coordinates(point, tab_type=self.tab_type)
-            # Remove previous rubberband when open new docker
-            if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dlg_docker'] is not None:
-                self.previous_info_feature.rubber_band.reset()
-            self.previous_info_feature = info_feature
-
-        elif event.button() == Qt.RightButton:
-            point = self.create_point(event)
-            if point is False:
-                return
-
-            self.get_layers_from_coordinates(point, self.rubberband_list, self.tab_type)
-
-
-    def activate(self):
-        if info.is_inserting:
-            msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
-            tools_qgis.show_message(msg)
-            super().deactivate()
-            return
-
-        # Check button
-        self.action.setChecked(True)
-        # Change map tool cursor
-        self.cursor = QCursor()
-        self.cursor.setShape(Qt.WhatsThisCursor)
-        self.canvas.setCursor(self.cursor)
-        self.rubberband_list = []
-        self.tab_type = 'data'
-
-
-    def deactivate(self):
-        if hasattr(self, 'rubberband_list'):
-            for rb in self.rubberband_list:
-                rb.reset()
-        if hasattr(self, 'dlg_info_feature'):
-            self.rubber_band.reset()
-
-        super().deactivate()
-
-
     def get_layers_from_coordinates(self, point, rb_list, tab_type=None):
 
         cursor = QCursor()
@@ -247,6 +173,84 @@ class GwInfoButton(GwParentMapTool):
             if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dlg_docker'] is not None:
                 self.previous_info_feature.rubber_band.reset()
             self.previous_info_feature = info_feature
+
+
+    # region QgsMapTools inherited
+    """ QgsMapTools inherited event functions """
+
+    def keyPressEvent(self, event):
+
+        if event.key() == Qt.Key_Escape:
+            for rb in self.rubberband_list:
+                rb.reset()
+            self.rubber_band.reset()
+            self.action.trigger()
+            return
+
+
+    def canvasMoveEvent(self, event):
+        pass
+
+
+    def canvasReleaseEvent(self, event):
+
+        for rb in self.rubberband_list:
+            rb.reset()
+
+        if self.block_signal:
+            self.block_signal = False
+            return
+
+        if event.button() == Qt.LeftButton:
+
+            point = self.create_point(event)
+            if point is False:
+                return
+            tools_gw.init_docker()
+            info_feature = GwInfo(self.tab_type)
+            info_feature.signal_activate.connect(self.reactivate_map_tool)
+            info_feature.get_info_from_coordinates(point, tab_type=self.tab_type)
+            # Remove previous rubberband when open new docker
+            if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dlg_docker'] is not None:
+                self.previous_info_feature.rubber_band.reset()
+            self.previous_info_feature = info_feature
+
+        elif event.button() == Qt.RightButton:
+            point = self.create_point(event)
+            if point is False:
+                return
+
+            self.get_layers_from_coordinates(point, self.rubberband_list, self.tab_type)
+
+
+    def activate(self):
+        if info.is_inserting:
+            msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
+            tools_qgis.show_message(msg)
+            super().deactivate()
+            return
+
+        # Check button
+        self.action.setChecked(True)
+        # Change map tool cursor
+        self.cursor = QCursor()
+        self.cursor.setShape(Qt.WhatsThisCursor)
+        self.canvas.setCursor(self.cursor)
+        self.rubberband_list = []
+        self.tab_type = 'data'
+
+
+    def deactivate(self):
+        if hasattr(self, 'rubberband_list'):
+            for rb in self.rubberband_list:
+                rb.reset()
+        if hasattr(self, 'dlg_info_feature'):
+            self.rubber_band.reset()
+
+        super().deactivate()
+
+    # endregion
+
 
 
 

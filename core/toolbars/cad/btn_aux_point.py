@@ -113,6 +113,7 @@ class GwAuxPointButton(GwParentMapTool):
         self.cancel_map_tool()
 
 
+    # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
     def keyPressEvent(self, event):
@@ -227,3 +228,4 @@ class GwAuxPointButton(GwParentMapTool):
         super().deactivate()
         self.iface.setActiveLayer(self.current_layer)
 
+    # endregion

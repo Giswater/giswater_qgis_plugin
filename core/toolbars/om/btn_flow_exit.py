@@ -22,6 +22,7 @@ class GwFlowExitButton(GwParentMapTool):
         self.layers_added = []
 
 
+    # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
     def canvasMoveEvent(self, event):
@@ -98,4 +99,6 @@ class GwFlowExitButton(GwParentMapTool):
 
         # Call parent method
         super().deactivate()
+
+    # enregion
 

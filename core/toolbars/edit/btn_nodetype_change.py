@@ -158,6 +158,7 @@ class GwNodeTypeChangeButton(GwParentMapTool):
         tools_qt.fill_combo_values(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
 
+    # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
     def keyPressEvent(self, event):
@@ -216,3 +217,5 @@ class GwNodeTypeChangeButton(GwParentMapTool):
     def deactivate(self):
         # Call parent method
         super().deactivate()
+
+    # endregion

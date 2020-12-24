@@ -95,6 +95,7 @@ class GwAuxCircleButton(GwParentMapTool):
         self.iface.setActiveLayer(self.current_layer)
 
 
+    # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
     def keyPressEvent(self, event):
@@ -200,3 +201,4 @@ class GwAuxCircleButton(GwParentMapTool):
         super().deactivate()
         self.iface.setActiveLayer(self.current_layer)
 
+    # endregion

@@ -23,6 +23,33 @@ class GwArcFusionButton(GwParentMapTool):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
 
+    def exec_fusion(self):
+
+        workcat_id_end = self.dlg_fusion.workcat_id_end.currentText()
+        enddate = self.dlg_fusion.enddate.date()
+        enddate_str = enddate.toString('yyyy-MM-dd')
+        feature_id = f'"id":["{self.node_id}"]'
+        extras = f'"workcat_id_end":"{workcat_id_end}", "enddate":"{enddate_str}"'
+        body = tools_gw.create_body(feature=feature_id, extras=extras)
+        # Execute SQL function and show result to the user
+        result = tools_gw.get_json('gw_fct_setarcfusion', body)
+        if not result or result['status'] == 'Failed':
+            return
+
+        text_result, change_tab = tools_gw.fill_tab_log(self.dlg_fusion, result['body']['data'], True, True, 1)
+
+        if not text_result:
+            self.dlg_fusion.close()
+        # Refresh map canvas
+        self.refresh_map_canvas()
+
+        # Deactivate map tool
+        self.deactivate()
+
+        self.set_action_pan()
+
+
+    # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
     def keyPressEvent(self, event):
@@ -68,32 +95,6 @@ class GwArcFusionButton(GwParentMapTool):
             tools_gw.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
 
 
-    def exec_fusion(self):
-
-        workcat_id_end = self.dlg_fusion.workcat_id_end.currentText()
-        enddate = self.dlg_fusion.enddate.date()
-        enddate_str = enddate.toString('yyyy-MM-dd')
-        feature_id = f'"id":["{self.node_id}"]'
-        extras = f'"workcat_id_end":"{workcat_id_end}", "enddate":"{enddate_str}"'
-        body = tools_gw.create_body(feature=feature_id, extras=extras)
-        # Execute SQL function and show result to the user
-        result = tools_gw.get_json('gw_fct_setarcfusion', body)
-        if not result or result['status'] == 'Failed':
-            return
-
-        text_result, change_tab = tools_gw.fill_tab_log(self.dlg_fusion, result['body']['data'], True, True, 1)
-
-        if not text_result:
-            self.dlg_fusion.close()
-        # Refresh map canvas
-        self.refresh_map_canvas()
-
-        # Deactivate map tool
-        self.deactivate()
-
-        self.set_action_pan()
-
-
     def activate(self):
 
         # Check button
@@ -122,4 +123,7 @@ class GwArcFusionButton(GwParentMapTool):
 
         # Call parent method
         super().deactivate()
+
+    # endregion
+
 
