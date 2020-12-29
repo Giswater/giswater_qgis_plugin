@@ -47,7 +47,8 @@ class NodeData:
         self.node_2 = None
         self.total_distance = None
         self.descript = None
-        self.sys_type = None
+        self.data_type = None
+        self.surface_type = None
 
 
 class DrawProfiles(ParentMapTool):
@@ -63,7 +64,7 @@ class DrawProfiles(ParentMapTool):
         self.nodes = []
         self.links = []
         self.rotation_vd_exist = False
-
+        self.lastnode_datatype = 'REAL'
 
     def activate(self):
 
@@ -88,9 +89,6 @@ class DrawProfiles(ParentMapTool):
         action.triggered.connect(partial(self.activate_snapping_node))
         self.set_icon(action, "131b")
         self.action_profile = action
-
-        # Declare draw style lines dict
-        self.dict_style = {"TOP-REAL": "solid", "TOP-ESTIM": "dashed", "BOTTOM": "solid"}
 
         # Triggers
         self.dlg_draw_profile.btn_draw_profile.clicked.connect(partial(self.get_profile))
@@ -161,7 +159,7 @@ class DrawProfiles(ParentMapTool):
             return
 
         # Execute draw profile
-        self.paint_event(self.profile_json['body']['data']['arc'], self.profile_json['body']['data']['node'],
+        self.draw_profile(self.profile_json['body']['data']['arc'], self.profile_json['body']['data']['node'],
                          self.profile_json['body']['data']['terrain'])
 
         # Save profile values
@@ -394,53 +392,49 @@ class DrawProfiles(ParentMapTool):
             self.controller.log_info(f"{type(e).__name__} --> {e}")
 
 
-    def paint_event(self, arcs, nodes, terrains):
+    def draw_profile(self, arcs, nodes, terrains):
         """ Parent function - Draw profiles """
 
         # Clear plot
         plt.gcf().clear()
 
-        # Set main parameters and catch and save the data
-        self.set_parameters(arcs, nodes, terrains)
-        self.fill_memory(arcs, nodes, terrains)
-        self.set_table_parameters()
+        # Set main parameters
+        self.set_profile_variables(arcs, nodes, terrains)
+        self.fill_profile_variables(arcs, nodes, terrains)
+        self.set_guitar_parameters()
 
-        # Start drawing
-        # Draw first | start node
-        self.draw_first_node(self.nodes[0])
+        # Draw start node
+        self.draw_start_node(self.nodes[0])
 
-        # Draw nodes between first and last node
+        # Draw nodes and precedessor arcs between start and end nodes
         for i in range(1, self.n - 1):
             self.draw_nodes(self.nodes[i], self.nodes[i - 1], i)
-        # Draw ground first node and nodes between first and last node
+
+        # Draw terrain
         for i in range(1, self.t):
+
+            # define variables
             self.first_top_x = self.links[i - 1].start_point # start_point = total_x
             self.node_top_x = self.links[i].start_point  # start_point = total_x
             self.first_top_y = self.links[i - 1].node_id  # node_id = top_n1
             self.node_top_y = self.links[i - 1].geom  # geom = top_n2
-            self.draw_ground()
 
-            # DRAW TABLE-MARKS
-            self.draw_marks(self.node_top_x, first_vl=False)
-            # Fill table
+            # Draw terrain
+            self.draw_terrain(i)
 
-            self.fill_link_data(self.node_top_x, i, self.reverse)
+            # Fill text terrain
+            self.fill_guitar_text_terrain(self.node_top_x, i)
+            self.draw_guitar_auxiliar_lines(self.node_top_x, first_vl=False)
 
-        # Draw ground last nodes
-        self.first_top_x = self.links[-1].start_point
-        self.node_top_x = self.nodes[-1].start_point
-        self.first_top_y = self.node_top_y
-        self.node_top_y = self.nodes[-1].top_elev
-        self.draw_ground()
+        # Draw last node and precedessor arc
+        self.draw_end_node(self.nodes[self.n - 1], self.nodes[self.n - 2], self.n - 1)
 
-        # Draw last node
-        self.draw_last_node(self.nodes[self.n - 1], self.nodes[self.n - 2], self.n - 1)
-
-        # Manage properties from table
-        self.draw_table_horizontals()
-        self.set_properties()
-        self.draw_coordinates()
+        # Draw guitar & grid
+        self.draw_guitar_horitzontal_lines()
         self.draw_grid()
+
+        # Manage layout and plot
+        self.set_profile_layout()
         self.plot = plt
 
         # If file profile.png exist overwrite
@@ -457,7 +451,7 @@ class DrawProfiles(ParentMapTool):
         plt.savefig(img_path, dpi=300)
 
 
-    def set_properties(self):
+    def set_profile_layout(self):
         """ Set properties of main window """
 
         # Set window name
@@ -475,7 +469,7 @@ class DrawProfiles(ParentMapTool):
         self.rect.set_facecolor('white')
 
        
-    def set_parameters(self, arcs, nodes, terrains):
+    def set_profile_variables(self, arcs, nodes, terrains):
         """ Get and calculate parameters and values for drawing """
 
         # Declare list elements
@@ -486,6 +480,7 @@ class DrawProfiles(ParentMapTool):
         # Populate list nodes
         for node in nodes:
             self.list_of_selected_nodes.append(node)
+
         # Populate list terrains
         for terrain in terrains:
             self.list_of_selected_terrains.append(terrain)
@@ -511,8 +506,7 @@ class DrawProfiles(ParentMapTool):
             self.start_point.append(x)
             i += 1
 
-
-    def fill_memory(self, arcs, nodes, terrains):
+    def fill_profile_variables(self, arcs, nodes, terrains):
         """ Get parameters from data base. Fill self.nodes with parameters postgres """
 
         # Get parameters and fill the nodes
@@ -526,7 +520,9 @@ class DrawProfiles(ParentMapTool):
             parameters.node_id = node['node_id']
             parameters.geom = node['cat_geom1']
             parameters.descript = [json.loads(node['descript'], object_pairs_hook=OrderedDict)][0]
-            parameters.sys_type = node['sys_type']
+            parameters.data_type = node['data_type']
+            parameters.surface_type = node['surface_type']
+
 
             self.nodes.append(parameters)
             n = n + 1
@@ -540,6 +536,7 @@ class DrawProfiles(ParentMapTool):
             parameters.node_id = terrain['top_n1']
             parameters.geom = terrain['top_n2']
             parameters.descript = [json.loads(terrain['label_n1'], object_pairs_hook=OrderedDict)][0]
+            parameters.surface_type = terrain['surface_type']
 
             self.links.append(parameters)
             n = n + 1
@@ -555,22 +552,14 @@ class DrawProfiles(ParentMapTool):
             self.nodes[n].elev2 = arc['elev2']
             self.nodes[n].y1 = arc['y1']
             self.nodes[n].y2 = arc['y2']
-            # TODO:: Send SLOPE for arc
             self.nodes[n].slope = 1
             self.nodes[n].node_1 = arc['node_1']
             self.nodes[n].node_2 = arc['node_2']
             n += 1
 
 
-    def draw_first_node(self, node):
+    def draw_start_node(self, node):
         """ Draw first node """
-
-        if node.node_id == node.node_1:
-            z = node.z1
-            self.reverse = False
-        else:
-            z = node.z2
-            self.reverse = True
 
         # Get superior points
         s1x = -node.geom / 2
@@ -578,7 +567,7 @@ class DrawProfiles(ParentMapTool):
         s2x = node.geom / 2
         s2y = node.top_elev
         s3x = node.geom / 2
-        s3y = node.top_elev - node.ymax + z + node.cat_geom
+        s3y = node.top_elev - node.ymax + node.z1 + node.cat_geom
 
         # Get inferior points
         i1x = -node.geom / 2
@@ -586,7 +575,7 @@ class DrawProfiles(ParentMapTool):
         i2x = node.geom / 2
         i2y = node.top_elev - node.ymax
         i3x = node.geom / 2
-        i3y = node.top_elev - node.ymax + z
+        i3y = node.top_elev - node.ymax + node.z1
 
         # Create list points
         xinf = [s1x, i1x, i2x, i3x]
@@ -594,17 +583,22 @@ class DrawProfiles(ParentMapTool):
         xsup = [s1x, s2x, s3x]
         ysup = [s1y, s2y, s3y]
 
-        # Set color for infra draw
-        plt.plot(xinf, yinf, self.profile_json['body']['data']['stylesheet']['infra']['color'], zorder=100,
-                 linestyle=self.dict_style[node.sys_type])
-        plt.plot(xsup, ysup, self.profile_json['body']['data']['stylesheet']['infra']['color'], zorder=100,
-                 linestyle=self.dict_style[node.sys_type])
+        # draw first node bottom line
+        plt.plot(xinf, yinf,
+                 zorder=100,
+                 linestyle=self.get_stylesheet(node.data_type)[0],
+                 color=self.get_stylesheet(node.data_type)[1],
+                 linewidth=self.get_stylesheet(node.data_type)[2])
+
+        # draw first node upper line
+        plt.plot(xsup, ysup,
+                 zorder=100,
+                 linestyle=self.get_stylesheet(node.data_type)[0],
+                 color=self.get_stylesheet(node.data_type)[1],
+                 linewidth=self.get_stylesheet(node.data_type)[2])
 
         self.first_top_x = 0
         self.first_top_y = node.top_elev
-
-        # Draw fixed part of table
-        self.draw_fix_table(node.start_point, self.reverse)
 
         # Save last points for first node
         self.slast = [s3x, s3y]
@@ -614,137 +608,164 @@ class DrawProfiles(ParentMapTool):
         self.slast2 = [s3x, s3y]
         self.ilast2 = [i3x, i3y]
 
+        # Fill table with start node values
+        self.fill_guitar_text_node(0, 0)
 
-    def draw_fix_table(self, start_point, reverse):
+        # Draw header
+        self.draw_guitar_vertical_lines(node.start_point)
+        self.fill_guitar_text_legend(node.start_point)
+        self.draw_guitar_auxiliar_lines(0)
+
+
+    def draw_guitar_vertical_lines(self, start_point):
         """ Draw fixed part of table """
 
-        # DRAW TABLE - FIXED PART
-        # Draw fixed part of table
-        self.draw_marks(0)
+        # Get stylesheet
+        line_color = self.profile_json['body']['data']['stylesheet']['guitar']['lines']['color']
+        line_style = self.profile_json['body']['data']['stylesheet']['guitar']['lines']['style']
+        line_width = self.profile_json['body']['data']['stylesheet']['guitar']['lines']['width']
 
         # Vertical line [-1,0]
-        x = [start_point - self.fix_x * Decimal(0.2), start_point - self.fix_x * Decimal(0.2)]
-        y = [self.min_top_elev - 1 * self.height_row, self.min_top_elev - Decimal(5.85) * self.height_row]
-        plt.plot(x, y, 'black', zorder=100)
+        # x = [start_point - self.fix_x * Decimal(0.2), start_point - self.fix_x * Decimal(0.2)]
+        # y = [self.min_top_elev - 1 * self.height_row, self.min_top_elev - Decimal(5.85) * self.height_row]
+        # plt.plot(x, y, linestyle=line_style, color=line_color, linewidth=line_width, zorder=100)
 
         # Vertical line [-2,0]
         x = [start_point - self.fix_x * Decimal(0.75), start_point - self.fix_x * Decimal(0.75)]
         y = [self.min_top_elev - Decimal(1.9) * self.height_row, self.min_top_elev - Decimal(5.10) * self.height_row]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, linestyle=line_style, color=line_color, linewidth=line_width, zorder=100)
 
         # Vertical line [-3,0]
         x = [start_point - self.fix_x, start_point - self.fix_x]
         y = [self.min_top_elev - 1 * self.height_row, self.min_top_elev - Decimal(5.85) * self.height_row]
-        plt.plot(x, y, 'black', zorder=100)
-
-        # Fill the fixed part of table with data - draw text
-        # Called just with first node
-        self.data_fix_table(start_point, reverse)
+        plt.plot(x, y, linestyle=line_style, color=line_color, linewidth=line_width, zorder=100)
 
 
-    def draw_marks(self, start_point, first_vl=True):
+    def draw_guitar_auxiliar_lines(self, start_point, first_vl=True):
         """ Draw marks for each node """
 
-        if first_vl:
+        # Get stylesheet
+        auxline_color = self.profile_json['body']['data']['stylesheet']['guitar']['auxiliarlines']['color']
+        auxline_style = self.profile_json['body']['data']['stylesheet']['guitar']['auxiliarlines']['style']
+        auxline_width = self.profile_json['body']['data']['stylesheet']['guitar']['auxiliarlines']['width']
+
+        if first_vl: # separator for first slope / length (only for nodes)
             # Vertical line [0,0]
             x = [start_point, start_point]
             y = [self.min_top_elev - 1 * self.height_row,
-                 self.min_top_elev - Decimal(1.9) * self.height_row - Decimal(0.15) * self.height_row]
-            plt.plot(x, y, 'black', zorder=100)
+                 self.min_top_elev - Decimal(1.9) * self.height_row]
+            plt.plot(x, y, linestyle=auxline_style, color=auxline_color, linewidth=auxline_width, zorder=100)
 
-        # Vertical lines [0,0] - marks
+        # Vertical lines
+        x = [start_point, start_point]
+        y = [self.min_top_elev - Decimal(1.90) * self.height_row, self.min_top_elev - Decimal(2.05) * self.height_row]
+        plt.plot(x, y, linestyle=auxline_style, color=auxline_color, linewidth=auxline_width, zorder=100)
+
         x = [start_point, start_point]
         y = [self.min_top_elev - Decimal(2.60) * self.height_row, self.min_top_elev - Decimal(2.85) * self.height_row]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, linestyle=auxline_style, color=auxline_color, linewidth=auxline_width, zorder=100)
 
         x = [start_point, start_point]
         y = [self.min_top_elev - Decimal(3.4) * self.height_row, self.min_top_elev - Decimal(3.65) * self.height_row]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, linestyle=auxline_style, color=auxline_color, linewidth=auxline_width, zorder=100)
 
         x = [start_point, start_point]
         y = [self.min_top_elev - Decimal(4.20) * self.height_row, self.min_top_elev - Decimal(4.45) * self.height_row]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, linestyle=auxline_style, color=auxline_color, linewidth=auxline_width, zorder=100)
 
         x = [start_point, start_point]
         y = [self.min_top_elev - Decimal(5) * self.height_row, self.min_top_elev - Decimal(5.25) * self.height_row]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, linestyle=auxline_style, color=auxline_color, linewidth=auxline_width, zorder=100)
 
         x = [start_point, start_point]
         y = [self.min_top_elev - Decimal(5.85) * self.height_row, self.min_top_elev - Decimal(5.7) * self.height_row]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, linestyle=auxline_style, color=auxline_color, linewidth=auxline_width, zorder=100)
 
 
-    def data_fix_table(self, start_point, reverse):  # @UnusedVariable
-        """ FILL THE FIXED PART OF TABLE WITH DATA - DRAW TEXT """
+    def fill_guitar_text_legend(self, start_point):
+
+        # Get stylesheet values
+        text_color = self.profile_json['body']['data']['stylesheet']['guitar']['text']['color']
+        text_weight = self.profile_json['body']['data']['stylesheet']['guitar']['text']['weight']
+        title_color = self.profile_json['body']['data']['stylesheet']['title']['text']['color']
+        title_weight = self.profile_json['body']['data']['stylesheet']["title"]['text']['weight']
+        title_size = self.profile_json['body']['data']['stylesheet']["title"]['text']['size']
 
         legend = self.profile_json['body']['data']['legend']
         c = (self.fix_x - self.fix_x * Decimal(0.2)) / 2
         plt.text(-(c + self.fix_x * Decimal(0.2)),
-                 self.min_top_elev - 1 * self.height_row - Decimal(0.35) * self.height_row, 'DIAMETER', fontsize=7.5,
+                 self.min_top_elev - 1 * self.height_row - Decimal(0.35) * self.height_row, legend['catalog'],
+                 fontsize=7.5,
+                 color=text_color, fontweight=text_weight,
                  horizontalalignment='center')
 
         plt.text(-(c + self.fix_x * Decimal(0.2)),
                  self.min_top_elev - 1 * self.height_row - Decimal(0.68) * self.height_row, legend['dimensions'],
                  fontsize=7.5,
+                 color=text_color, fontweight=text_weight,
                  horizontalalignment='center')
 
         c = (self.fix_x * Decimal(0.25)) / 2
         plt.text(-(c + self.fix_x * Decimal(0.74)),
-                 self.min_top_elev - Decimal(2) * self.height_row - self.height_row * 3 / 2, legend['ordinates'], fontsize=7.5,
+                 self.min_top_elev - Decimal(2) * self.height_row - self.height_row * 3 / 2, legend['ordinates'],
+                 fontsize=7.5,
+                 color=text_color, fontweight=text_weight,
                  rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
         plt.text(-self.fix_x * Decimal(0.70), self.min_top_elev - Decimal(1.85) * self.height_row - self.height_row / 2,
-                 legend['topelev'], fontsize=7.5, verticalalignment='center')
+                 legend['topelev'], fontsize=7.5,
+                 color=text_color, fontweight=text_weight,
+                 verticalalignment='center')
+
         plt.text(-self.fix_x * Decimal(0.70), self.min_top_elev - Decimal(2.65) * self.height_row - self.height_row / 2,
-                 legend['ymax'], fontsize=7.5, verticalalignment='center')
+                 legend['ymax'], fontsize=7.5,
+                 color=text_color, fontweight=text_weight,
+                 verticalalignment='center')
+
         plt.text(-self.fix_x * Decimal(0.70), self.min_top_elev - Decimal(3.45) * self.height_row - self.height_row / 2,
-                 legend['elev'], fontsize=7.5, verticalalignment='center')
+                 legend['elev'], fontsize=7.5,
+                 color=text_color, fontweight=text_weight,
+                 verticalalignment='center')
+
         plt.text(-self.fix_x * Decimal(0.70), self.min_top_elev - Decimal(4.25) * self.height_row - self.height_row / 2,
-                 'TOTAL LENGTH', fontsize=7.5, verticalalignment='center')
+                 legend['distance'], fontsize=7.5,
+                 color=text_color, fontweight=text_weight,
+                 verticalalignment='center')
 
         c = (self.fix_x - self.fix_x * Decimal(0.2)) / 2
         plt.text(-(c + self.fix_x * Decimal(0.2)),
-                 self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2), legend['code'], fontsize=7.5,
+                 self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2), legend['code'],
+                 fontsize=7.5,
+                 color=text_color, fontweight=text_weight,
                  horizontalalignment='center', verticalalignment='center')
 
-        scale = self.profile_json['body']['data']['scale']
+        # print title
         title = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
         if title in (None, 'null'):
             title = ''
-
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(5.75) * self.height_row - self.height_row / 2,
-                 title.upper(), fontsize=11, verticalalignment='center')
-        plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(6) * self.height_row - self.height_row / 2,
-                 "(" + str(utils_giswater.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date)) + ")",
+                 title.upper(), fontsize=title_size,
+                 color=title_color, fontweight=title_weight,
                  verticalalignment='center')
-
-        # Fill table with values
-        self.fill_data(0, 0, reverse)
-
+        plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(6) * self.height_row - self.height_row / 2,
+                 "" + str(utils_giswater.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date)) + "",
+                 fontsize=title_size*0.7,
+                 color=title_color, fontweight=title_weight,
+                 verticalalignment='center')
 
     def draw_nodes(self, node, prev_node, index):
         """ Draw nodes between first and last node """
 
-        z1 = 0
-        if node.node_id == prev_node.node_2:
-            z1 = prev_node.z2
-            self.reverse = False
-        else:
-            z1 = prev_node.z1
-            self.reverse = True
+        z1 = prev_node.z2
+        z2 = node.z1
 
         if node.node_1 is None:
             return
 
-        z2 = 0
-        if node.node_id == node.node_1:
-            z2 = node.z1
-        else:
-            z2 = node.z2
-
         # Get superior points
         s1x = self.slast[0]
         s1y = self.slast[1]
+
         if node.geom is None:
             node.geom = 0
 
@@ -769,290 +790,274 @@ class DrawProfiles(ParentMapTool):
         i5x = node.start_point + node.geom / 2
         i5y = node.top_elev - node.ymax + z2
 
-        # Create list points
-        xinf = [i1x, i2x, i3x, i4x, i5x]
-        yinf = [i1y, i2y, i3y, i4y, i5y]
-        xsup = [s1x, s2x]
-        ysup = [s1y, s2y]
-        xsup_up = [s2x, s3x, s4x, s5x]
-        ysup_up = [s2y, s3y, s4y, s5y]
+        # Create arc list points
+        xainf = [i1x, i2x]
+        yainf = [i1y, i2y]
+        xasup = [s1x, s2x]
+        yasup = [s1y, s2y]
 
+        # Create node list points
+        xninf = [i2x, i3x, i4x, i5x]
+        yninf = [i2y, i3y, i4y, i5y]
 
-        plt.plot(xinf, yinf, self.profile_json['body']['data']['stylesheet']['infra']['color'], zorder=100,
-                 linestyle='solid')
-        plt.plot(xsup, ysup, self.profile_json['body']['data']['stylesheet']['infra']['color'], zorder=100,
-                 linestyle='solid')
-        if node.sys_type == 'BOTTOM':
-            xsup_up = [s2x, s3x, s5x]
-            ysup_up = [s2y, s5y, s5y]
-        plt.plot(xsup_up, ysup_up, self.profile_json['body']['data']['stylesheet']['infra']['color'], zorder=100,
-                 linestyle=self.dict_style[node.sys_type])
+        if node.surface_type == 'TOP':
+          xnsup = [s2x, s3x, s4x, s5x]
+          ynsup = [s2y, s3y, s4y, s5y]
+        else:
+          xnsup = [s2x, s5x]
+          ynsup = [s2y, s5y]
+
+        # draw node bottom line
+        plt.plot(xninf, yninf,
+                 zorder=100,
+                 linestyle=self.get_stylesheet(node.data_type)[0],
+                 color=self.get_stylesheet(node.data_type)[1],
+                 linewidth=self.get_stylesheet(node.data_type)[2])
+
+        # draw node upper line
+        plt.plot(xnsup, ynsup,
+                 zorder=100,
+                 linestyle=self.get_stylesheet(node.data_type)[0],
+                 color=self.get_stylesheet(node.data_type)[1],
+                 linewidth=self.get_stylesheet(node.data_type)[2])
+
+        if self.lastnode_datatype == 'INTERPOLATED' or node.data_type == 'INTERPOLATED':
+            data_type = 'INTERPOLATED'
+        else:
+            data_type = 'REAL'
+
+        # draw arc bottom line
+        plt.plot(xainf, yainf,
+                 zorder=100,
+                 linestyle=self.get_stylesheet(data_type)[0],
+                 color=self.get_stylesheet(data_type)[1],
+                 linewidth=self.get_stylesheet(data_type)[2])
+
+        # draw arc upper line
+        plt.plot(xasup, yasup,
+                 zorder=100,
+                 linestyle=self.get_stylesheet(data_type)[0],
+                 color=self.get_stylesheet(data_type)[1],
+                 linewidth=self.get_stylesheet(data_type)[2])
 
         self.node_top_x = node.start_point
         self.node_top_y = node.top_elev
         self.first_top_x = prev_node.start_point
         self.first_top_y = prev_node.top_elev
 
-        # DRAW TABLE-MARKS
-        self.draw_marks(node.start_point)
+        # Draw guitar auxiliar lines
+        self.draw_guitar_auxiliar_lines(node.start_point)
 
         # Fill table
-        self.fill_data(node.start_point, index, self.reverse)
+        self.fill_guitar_text_node(node.start_point, index)
 
         # Save last points before the last node
         self.slast = [s5x, s5y]
         self.ilast = [i5x, i5y]
-
+        self.lastnode_datatype = node.data_type
 
         # Save last points for draw ground
         self.slast2 = [s3x, s3y]
         self.ilast2 = [i3x, i3y]
 
 
-    def fill_data(self, start_point, indx, reverse=False):
+    def fill_guitar_text_node(self, start_point, index):
 
-        # Fill top_elevation and node_id for all nodes
-        plt.annotate(' ' + '\n' + str(round(self.nodes[indx].descript['top_elev'], 2)) + '\n' + ' ',
+        # Get stylesheet values
+        text_color = self.profile_json['body']['data']['stylesheet']['guitar']['text']['color']
+        text_weight = self.profile_json['body']['data']['stylesheet']['guitar']['text']['weight']
+
+        # Fill top_elevation
+        plt.annotate(' ' + '\n' + str(self.nodes[index].descript['top_elev']) + '\n' + ' ',
                      xy=(Decimal(start_point), self.min_top_elev - \
                          Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
-                     fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-        # Draw node_id
+                     fontsize=6,
+                     color=text_color, fontweight=text_weight,
+                     rotation='vertical', horizontalalignment='center', verticalalignment='center')
+        # Fill code
         plt.text(0 + start_point, self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2),
-                 self.nodes[indx].descript['code'], fontsize=7.5,
+                 self.nodes[index].descript['code'], fontsize=7.5,
+                 color=text_color, fontweight=text_weight,
                  horizontalalignment='center', verticalalignment='center')
 
-        # Manage variables elev and y (elev1, elev2, y1, y2) acoording flow trace
-        if reverse:
-            # Fill y_max and elevation
-            # 1st node : y_max,y2 and top_elev, elev2
-            if indx == 0:
-                # # Fill y_max
-                plt.annotate(' ' + '\n' + str(round(self.nodes[0].descript['ymax'], 2)) + '\n' + str(round(self.nodes[0].y2, 2)),
-                             xy=(Decimal(0 + start_point),
-                                 self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)), fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
-                # Fill elevation
-                plt.annotate(' ' + '\n' + str(round(self.nodes[0].descript['elev'], 2)) + '\n' + str(round(self.nodes[0].elev2, 2)),
-                             xy=(Decimal(0 + start_point),
-                                 self.min_top_elev - Decimal(self.height_row * Decimal(3.40) + self.height_row / 2)), fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
+        # Node init
+        if index == 0:
 
-                # Fill total length
-                plt.annotate(str(round(self.nodes[indx].descript['total_distance'], 2)),
-                             xy=(Decimal(0 + start_point),
-                                 self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
-                             fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
+            y1 = self.nodes[0].y1
+            elev1 = self.nodes[0].elev1
 
-            # Last node : y_max,y1 and top_elev, elev1
-            elif indx == self.n - 1:
-                pass
-                # Fill y_max
-                plt.annotate(
-                    str(round(self.nodes[indx - 1].y1, 2)) + '\n' + str(
-                        round(self.nodes[indx].descript['ymax'], 2)) + '\n' + ' ',
-                    xy=(Decimal(0 + start_point),
-                        self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)), fontsize=6,
-                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
-                # Fill elevation
-                plt.annotate(
-                    str(round(self.nodes[indx - 1].elev1, 2)) + '\n' + str(
-                        round(self.nodes[indx].descript['elev'], 2)) + '\n' + ' ',
-                    xy=(Decimal(0 + start_point),
-                        self.min_top_elev - Decimal(self.height_row * Decimal(3.40) + self.height_row / 2)), fontsize=6,
-                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-                # Fill total length
-                plt.annotate(str(round(self.nodes[indx].descript['total_distance'], 2)),
-                             xy=(Decimal(0 + start_point),
-                                 self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
-                             fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
-            else:
-                # Fill y_max
-                plt.annotate(
-                    str(round(self.nodes[indx - 1].y1, 2)) + '\n' + str(
-                        round(self.nodes[indx].descript['ymax'], 2)) + '\n' + str(
-                        round(self.nodes[indx].y1, 2)),
-                    xy=(Decimal(0 + start_point),
-                        self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)), fontsize=6,
-                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
-                # Fill elevation
-                plt.annotate(
-                    str(round(self.nodes[indx - 1].elev1, 2)) + '\n' + str(
-                        round(self.nodes[indx].descript['elev'], 2)) + '\n' + str(
-                        round(self.nodes[indx].elev1, 2)),
-                    xy=(Decimal(0 + start_point),
-                        self.min_top_elev - Decimal(self.height_row * Decimal(3.40) + self.height_row / 2)), fontsize=6,
-                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-                # Fill total length
-                plt.annotate(str(round(self.nodes[indx].descript['total_distance'], 2)),
-                             xy=(Decimal(0 + start_point),
-                                 self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
-                             fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-        else:
-            # Fill y_max and elevation
-            # 1st node : y_max,y2 and top_elev, elev2
-            if indx == 0:
-                # Fill y_max
-                plt.annotate(' ' + '\n' + str(round(self.nodes[0].descript['ymax'], 2)) + '\n' + str(round(self.nodes[0].y1, 2)),
-                             xy=(Decimal(0 + start_point),
-                                 self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)), fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-                # Fill elevation
-                plt.annotate(' ' + '\n' + str(round(self.nodes[0].descript['elev'], 2)) + '\n' + str(round(self.nodes[0].elev1, 2)),
-                             xy=(Decimal(0 + start_point),
-                                 self.min_top_elev - Decimal(self.height_row * Decimal(3.40) + self.height_row / 2)), fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-                # Fill total length
-                plt.annotate(str(round(self.nodes[indx].descript['total_distance'], 2)),
-                             xy=(Decimal(0 + start_point),
-                                 self.min_top_elev - Decimal(
-                                     self.height_row * Decimal(4.20) + self.height_row / 2)),
-                             fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-            # Last node : y_max,y1 and top_elev, elev1
-            elif indx == self.n - 1:
-                pass
-                # Fill y_max
-                plt.annotate(
-                    str(round(self.nodes[indx - 1].y2, 2)) + '\n' + str(round(self.nodes[indx].descript['ymax'], 2)) + '\n' + ' ',
-                    xy=(Decimal(0 + start_point),
-                        self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)), fontsize=6,
-                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-                # Fill elevation
-                plt.annotate(
-                    str(round(self.nodes[indx - 1].elev2, 2)) + '\n' + str(
-                        round(self.nodes[indx].descript['elev'], 2)) + '\n' + ' ',
-                    xy=(Decimal(0 + start_point),
-                        self.min_top_elev - Decimal(self.height_row * Decimal(3.40) + self.height_row / 2)), fontsize=6,
-                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-                # Fill total length
-                plt.annotate(str(round(self.nodes[indx].descript['total_distance'], 2)),
-                             xy=(Decimal(0 + start_point),
-                                 self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
-                             fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-            # Nodes between 1st and last node : y_max,y1,y2 and top_elev, elev1, elev2
-            else:
-                # Fill y_max
-                plt.annotate(
-                    str(round(self.nodes[indx - 1].y2, 2)) + '\n' + str(round(self.nodes[indx].descript['ymax'], 2)) + '\n' + str(
-                        round(self.nodes[indx].y1, 2)),
-                    xy=(Decimal(0 + start_point),
-                        self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)), fontsize=6,
-                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-                # Fill elevation
-                plt.annotate(
-                    str(round(self.nodes[indx - 1].elev2, 2)) + '\n' + str(
-                        round(self.nodes[indx].descript['elev'], 2)) + '\n' + str(
-                        round(self.nodes[indx].elev1, 2)),
-                    xy=(Decimal(0 + start_point),
-                        self.min_top_elev - Decimal(self.height_row * Decimal(3.40) + self.height_row / 2)), fontsize=6,
-                    rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-                # Fill total length
-                plt.annotate(str(round(self.nodes[indx].descript['total_distance'], 2)),
-                             xy=(Decimal(0 + start_point),
-                                 self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
-                             fontsize=6,
-                             rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-        # Fill diameter and slope / length for all nodes except last node
-        if indx != self.n - 1:
-            # Draw diameter
-            center = self.gis_length[indx + 1] / 2
-            plt.text(center + start_point, self.min_top_elev - 1 * self.height_row - Decimal(0.35) * self.height_row,
-                     self.arc_catalog[indx],
-                     fontsize=7.5, horizontalalignment='center')  # PUT IN THE MIDDLE PARAMETRIZATION
-
-            # Draw slope / length
-            plt.text(center + start_point, self.min_top_elev - 1 * self.height_row - Decimal(0.68) * self.height_row,
-                     self.arc_dimensions[indx],
-                     fontsize=7.5, horizontalalignment='center')  # PUT IN THE MIDDLE PARAMETRIZATION
-
-
-    def fill_link_data(self, start_point, indx, reverse=False):
-
-        # Fill top_elevation and node_id for all nodes
-        plt.annotate(' ' + '\n' + str(round(self.links[indx].descript['top_elev'], 2)) + '\n' + ' ',
-                     xy=(Decimal(start_point), self.min_top_elev - \
-                         Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
-                     fontsize=6, rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
-        # Draw node_id
-        plt.text(0 + start_point, self.min_top_elev - Decimal(self.height_row * Decimal(5) + self.height_row / 2),
-                 self.links[indx].descript['code'], fontsize=7.5,
-                 horizontalalignment='center', verticalalignment='center')
-        # return
-        # Manage variables elev and y (elev1, elev2, y1, y2) acoording flow trace
-        if reverse:
-            # # Fill y_max
-            plt.annotate(str(round(self.links[indx].descript['ymax'], 2)),
-                 xy=(Decimal(0 + start_point),
-                     self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)), fontsize=6,
-                rotation='vertical', horizontalalignment='center', verticalalignment='center')
+            # Fill y_max
+            plt.annotate(' ' + '\n' + str(self.nodes[0].descript['ymax']) + '\n' + str(y1),
+                         xy=(Decimal(0 + start_point),
+                             self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)),
+                         fontsize=6,
+                         color=text_color, fontweight=text_weight,
+                         rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Fill elevation
-            plt.annotate(str(round(self.links[indx].descript['elev'], 2)),
-                 xy=(Decimal(0 + start_point),
-                     self.min_top_elev - Decimal(self.height_row * Decimal(3.40) + self.height_row / 2)), fontsize=6,
-                rotation='vertical', horizontalalignment='center', verticalalignment='center')
+            plt.annotate(' ' + '\n' + str(self.nodes[0].descript['elev']) + '\n' + str(elev1),
+                         xy=(Decimal(0 + start_point),
+                             self.min_top_elev - Decimal(self.height_row * Decimal(3.40) + self.height_row / 2)),
+                         fontsize=6,
+                         color=text_color, fontweight=text_weight,
+                         rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Fill total length
-            plt.annotate(str(round(self.links[indx].descript['total_distance'], 2)),
-                 xy=(Decimal(0 + start_point),
-                     self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
-                fontsize=6,
-                rotation='vertical', horizontalalignment='center', verticalalignment='center')
-        else:
+            plt.annotate(str(self.nodes[index].descript['total_distance']),
+                         xy=(Decimal(0 + start_point),
+                             self.min_top_elev - Decimal(
+                                 self.height_row * Decimal(4.20) + self.height_row / 2)),
+                         fontsize=6,
+                         color=text_color, fontweight=text_weight,
+                         rotation='vertical', horizontalalignment='center', verticalalignment='center')
+
+        # Nodes between init and end
+        elif index < self.n-1:
+
+            # defining variables
+            y2_prev = self.nodes[index-1].y2
+            elev2_prev = self.nodes[index-1].elev2
+            y1 = self.nodes[0].y1
+            elev1 = self.nodes[0].elev1
+
             # Fill y_max
             plt.annotate(
-                str(round(self.links[indx].descript['ymax'], 2)),
+                str(y2_prev) + '\n' + str(self.nodes[index].descript['ymax']) + '\n' + str(y1),
                 xy=(Decimal(0 + start_point),
-                    self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)), fontsize=6,
+                    self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)),
+                fontsize=6,
+                color=text_color, fontweight=text_weight,
                 rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Fill elevation
             plt.annotate(
-                str(round(self.links[indx].descript['elev'], 2)),
+                str(elev2_prev) + '\n' + str(self.nodes[index].descript['elev']) + '\n' + str(elev1),
                 xy=(Decimal(0 + start_point),
-                    self.min_top_elev - Decimal(self.height_row * Decimal(3.40) + self.height_row / 2)), fontsize=6,
+                    self.min_top_elev - Decimal(self.height_row * Decimal(3.40) + self.height_row / 2)),
+                fontsize=6,
+                color=text_color, fontweight=text_weight,
                 rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
             # Fill total length
-            plt.annotate(str(round(self.links[indx].descript['total_distance'], 2)),
+            plt.annotate(str(self.nodes[index].descript['total_distance']),
+                         xy=(Decimal(0 + start_point),
+                         self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
+                         fontsize=6,
+                         color=text_color, fontweight=text_weight,
+                         rotation='vertical', horizontalalignment='center', verticalalignment='center')
+        # Node end
+        elif index == self.n-1:
+
+            # Fill y_max
+            plt.annotate(
+                str(self.nodes[index - 1].y2) + '\n' + str(self.nodes[index].descript['ymax']),
+                xy=(Decimal(0 + start_point),
+                    self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)),
+                fontsize=6,
+                color=text_color, fontweight=text_weight,
+                rotation='vertical', horizontalalignment='center', verticalalignment='center')
+
+            # Fill elevation
+            plt.annotate(
+                str(self.nodes[index - 1].elev2) + '\n' + str(self.nodes[index].descript['elev']),
+                xy=(Decimal(0 + start_point),
+                    self.min_top_elev - Decimal(self.height_row * Decimal(3.40) + self.height_row / 2)),
+                fontsize=6,
+                color=text_color, fontweight=text_weight,
+                rotation='vertical', horizontalalignment='center', verticalalignment='center')
+
+            # Fill total length
+            plt.annotate(str(self.nodes[index].descript['total_distance']),
+                         xy=(Decimal(0 + start_point),
+                         self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
+                         fontsize=6,
+                         color=text_color, fontweight=text_weight,
+                         rotation='vertical', horizontalalignment='center', verticalalignment='center')
+
+
+        # Fill diameter and slope / length
+        if index != self.n - 1:
+
+            # Fill diameter
+            center = self.gis_length[index + 1] / 2
+            plt.text(center + start_point, self.min_top_elev - 1 * self.height_row - Decimal(0.35) * self.height_row,
+                     self.arc_catalog[index],
+                     fontsize=7.5,
+                     color=text_color, fontweight=text_weight,
+                     horizontalalignment='center')  # PUT IN THE MIDDLE PARAMETRIZATION
+
+            # Fill slope / length
+            plt.text(center + start_point, self.min_top_elev - 1 * self.height_row - Decimal(0.68) * self.height_row,
+                     self.arc_dimensions[index],
+                     fontsize=7.5,
+                     color=text_color, fontweight=text_weight,
+                     horizontalalignment='center')  # PUT IN THE MIDDLE PARAMETRIZATION
+
+
+    def fill_guitar_text_terrain(self, start_point, index):
+
+        if str(self.links[index].surface_type) == 'VNODE':
+
+            # Get stylesheet values
+            text_color = self.profile_json['body']['data']['stylesheet']['guitar']['text']['color']
+            text_weight = self.profile_json['body']['data']['stylesheet']['guitar']['text']['weight']
+
+            # Fill top_elevation
+            plt.annotate(' ' + '\n' + str(self.links[index].descript['top_elev']) + '\n' + ' ',
+                         xy=(Decimal(start_point), self.min_top_elev - \
+                             Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
+                         fontsize=6,
+                         color=text_color, fontweight=text_weight,
+                         rotation='vertical', horizontalalignment='center', verticalalignment='center')
+
+            # Fill code
+            plt.text(0 + start_point, self.min_top_elev - Decimal(self.height_row * Decimal(5) + self.height_row / 2),
+                     self.links[index].descript['code'],
+                     fontsize=7.5,
+                     color=text_color, fontweight=text_weight,
+                     horizontalalignment='center', verticalalignment='center')
+
+             # Fill y_max
+            plt.annotate(
+                str(self.links[index].descript['ymax']),
+                xy=(Decimal(0 + start_point),
+                    self.min_top_elev - Decimal(self.height_row * Decimal(2.60) + self.height_row / 2)),
+                fontsize=6,
+                color=text_color, fontweight=text_weight,
+                rotation='vertical', horizontalalignment='center', verticalalignment='center')
+
+            # Fill elevation
+            plt.annotate(
+                str(self.links[index].descript['elev']),
+                xy=(Decimal(0 + start_point),
+                    self.min_top_elev - Decimal(self.height_row * Decimal(3.40) + self.height_row / 2)),
+                fontsize=6,
+                color=text_color, fontweight=text_weight,
+                rotation='vertical', horizontalalignment='center', verticalalignment='center')
+
+            # Fill total length
+            plt.annotate(str(self.links[index].descript['total_distance']),
                  xy=(Decimal(0 + start_point),
                      self.min_top_elev - Decimal(self.height_row * Decimal(4.20) + self.height_row / 2)),
                 fontsize=6,
+                color=text_color, fontweight=text_weight,
                 rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
 
-    def draw_last_node(self, node, prev_node, index):
-
-        if node.node_id == prev_node.node_2:
-            z = prev_node.z2
-            self.reverse = False
-        else:
-            z = prev_node.z1
-            self.reverse = True
+    def draw_end_node(self, node, prev_node, index):
+        """
+        draws last arc and nodes of profile
+        :param node:
+        :param prev_node:
+        :param index:
+        :return:
+        """
 
         s1x = self.slast[0]
         s1y = self.slast[1]
 
         s2x = node.start_point - node.geom / 2
-        s2y = node.top_elev - node.ymax + z + prev_node.cat_geom
+        s2y = node.top_elev - node.ymax + prev_node.z2 + prev_node.cat_geom
         s3x = node.start_point - node.geom / 2
         s3y = node.top_elev
         s4x = node.start_point + node.geom / 2
@@ -1062,28 +1067,51 @@ class DrawProfiles(ParentMapTool):
         i1x = self.ilast[0]
         i1y = self.ilast[1]
         i2x = node.start_point - node.geom / 2
-        i2y = node.top_elev - node.ymax + z
+        i2y = node.top_elev - node.ymax + prev_node.z2
         i3x = node.start_point - node.geom / 2
         i3y = node.top_elev - node.ymax
         i4x = node.start_point + node.geom / 2
         i4y = node.top_elev - node.ymax
 
-        # Create list points
-        xinf = [i1x, i2x, i3x, i4x]
-        yinf = [i1y, i2y, i3y, i4y]
-        xsup = [s1x, s2x]
-        ysup = [s1y, s2y]
-        xsup_up = [s2x, s3x, s4x, i4x]
-        ysup_up = [s2y, s3y, s4y, i4y]
+        # Create arc list points
+        xainf = [i1x, i2x]
+        yainf = [i1y, i2y]
+        xasup = [s1x, s2x]
+        yasup = [s1y, s2y]
 
-        # Set color for infra draw
-        plt.plot(xinf, yinf, self.profile_json['body']['data']['stylesheet']['infra']['color'], zorder=100,
-                 linestyle='solid')
-        plt.plot(xsup, ysup, self.profile_json['body']['data']['stylesheet']['infra']['color'], zorder=100,
-                 linestyle='solid')
-        plt.plot(xsup_up, ysup_up, self.profile_json['body']['data']['stylesheet']['infra']['color'], zorder=100,
-                 linestyle=self.dict_style[node.sys_type])
+        # Create node list points
+        xninf = [i2x, i3x, i4x]
+        yninf = [i2y, i3y, i4y]
+        xnsup = [s2x, s3x, s4x, i4x]
+        ynsup = [s2y, s3y, s4y, i4y]
 
+        # draw node bottom line
+        plt.plot(xninf, yninf,
+                 zorder=100,
+                 linestyle=self.get_stylesheet(node.data_type)[0],
+                 color=self.get_stylesheet(node.data_type)[1],
+                 linewidth=self.get_stylesheet(node.data_type)[2])
+
+        # draw node upper line
+        plt.plot(xnsup, ynsup,
+                 zorder=100,
+                 linestyle=self.get_stylesheet(node.data_type)[0],
+                 color=self.get_stylesheet(node.data_type)[1],
+                 linewidth=self.get_stylesheet(node.data_type)[2])
+
+        # draw arc bottom line
+        plt.plot(xainf, yainf,
+                 zorder=100,
+                 linestyle=self.get_stylesheet(self.lastnode_datatype)[0],
+                 color=self.get_stylesheet(self.lastnode_datatype)[1],
+                 linewidth=self.get_stylesheet(self.lastnode_datatype)[2])
+
+        # draw arc upper line
+        plt.plot(xasup, yasup,
+                 zorder=100,
+                 linestyle=self.get_stylesheet(self.lastnode_datatype)[0],
+                 color=self.get_stylesheet(self.lastnode_datatype)[1],
+                 linewidth=self.get_stylesheet(self.lastnode_datatype)[2])
 
         self.first_top_x = self.slast2[0]
         self.first_top_y = self.slast2[1]
@@ -1091,24 +1119,29 @@ class DrawProfiles(ParentMapTool):
         self.node_top_x = node.start_point
         self.node_top_y = node.top_elev
 
-        # DRAW TABLE
-        # DRAW TABLE-MARKS
-        self.draw_marks(node.start_point)
+        # Draw table-marks
+        self.draw_guitar_auxiliar_lines(node.start_point)
 
         # Fill table
-        self.fill_data(node.start_point, index, self.reverse)
+        self.fill_guitar_text_node(node.start_point, index)
+
+        # Reset lastnode_datatype
+        self.lastnode_datatype = 'REAL'
 
 
-    def set_table_parameters(self):
+    def set_guitar_parameters(self):
+        """
+        Define parameters of table
+        :return:
+        """
 
         # Search y coordinate min_top_elev ( top_elev- ymax)
         self.min_top_elev = Decimal(self.nodes[0].top_elev - self.nodes[0].ymax)
-        self.min_top_elev_descript = Decimal(self.nodes[0].descript['top_elev'] - self.nodes[0].descript['ymax'])
+
+        #self.min_top_elev_descript = Decimal(self.nodes[0].descript['top_elev'] - self.nodes[0].descript['ymax'])
         for i in range(1, self.n):
             if (self.nodes[i].top_elev - self.nodes[i].ymax) < self.min_top_elev:
                 self.min_top_elev = Decimal(self.nodes[i].top_elev - self.nodes[i].ymax)
-            if (self.nodes[i].descript['top_elev'] - self.nodes[i].descript ['ymax']) < self.min_top_elev_descript:
-                self.min_top_elev_descript = Decimal(self.nodes[i].descript['top_elev'] - self.nodes[i].descript ['ymax'])
 
         # Search y coordinate max_top_elev
         self.max_top_elev = self.nodes[0].top_elev
@@ -1116,9 +1149,6 @@ class DrawProfiles(ParentMapTool):
         for i in range(1, self.n):
             if self.nodes[i].top_elev > self.max_top_elev:
                 self.max_top_elev = self.nodes[i].top_elev
-            if self.nodes[i].descript['top_elev'] > self.max_top_elev_descript:
-                self.max_top_elev_descript = self.nodes[i].descript['top_elev']
-
 
         # Calculating dimensions of x-fixed part of table
         self.fix_x = Decimal(Decimal(0.15) * Decimal(self.nodes[self.n - 1].start_point))
@@ -1132,57 +1162,84 @@ class DrawProfiles(ParentMapTool):
         self.height_y = Decimal(self.z * 2)
 
 
-    def draw_table_horizontals(self):
+    def draw_guitar_horitzontal_lines(self):
+        """
+        Draw horitzontal lines of table
+        :return:
+        """
+        line_color = self.profile_json['body']['data']['stylesheet']['guitar']['lines']['color']
+        line_style = self.profile_json['body']['data']['stylesheet']['guitar']['lines']['style']
+        line_width = self.profile_json['body']['data']['stylesheet']['guitar']['lines']['width']
 
-        self.set_table_parameters()
+        self.set_guitar_parameters()
 
-        # DRAWING TABLE
-        # Draw horizontal lines
+        # Draw upper horizontal lines (long ones)
         x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - self.height_row, self.min_top_elev - self.height_row]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, color=line_color, linestyle=line_style, linewidth=line_width, zorder=100)
 
         x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - Decimal(1.9) * self.height_row, self.min_top_elev - Decimal(1.9) * self.height_row]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, color=line_color, linestyle=line_style, linewidth=line_width, zorder=100)
 
-        # Draw horizontal(shorter) lines
+        # Draw middle horizontal lines (short ones)
         x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x * Decimal(0.75)]
         y = [self.min_top_elev - Decimal(2.70) * self.height_row, self.min_top_elev - Decimal(2.70) * self.height_row]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, color=line_color, linestyle=line_style, linewidth=line_width, zorder=100)
         x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x * Decimal(0.75)]
         y = [self.min_top_elev - Decimal(3.50) * self.height_row, self.min_top_elev - Decimal(3.50) * self.height_row]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, color=line_color, linestyle=line_style, linewidth=line_width, zorder=100)
         x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x * Decimal(0.75)]
         y = [self.min_top_elev - Decimal(4.30) * self.height_row, self.min_top_elev - Decimal(4.30) * self.height_row]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, color=line_color, linestyle=line_style, linewidth=line_width, zorder=100)
 
-        # Last two lines
+        # Draw lower horizontal lines (long ones)
         x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - Decimal(5.10) * self.height_row, self.min_top_elev - Decimal(5.10) * self.height_row]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, color=line_color, linestyle=line_style, linewidth=line_width, zorder=100)
         x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - Decimal(5.85) * self.height_row, self.min_top_elev - Decimal(5.85) * self.height_row]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, color=line_color, linestyle=line_style, linewidth=line_width, zorder=100)
 
 
-    def draw_coordinates(self):
+    def draw_grid(self):
+
+        # get values for lines
+        line_color = self.profile_json['body']['data']['stylesheet']['grid']['lines']['color']
+        line_style = self.profile_json['body']['data']['stylesheet']['grid']['lines']['style']
+        line_width = self.profile_json['body']['data']['stylesheet']['grid']['lines']['width']
+
+        # get values for boundary
+        boundary_color = self.profile_json['body']['data']['stylesheet']['grid']['boundary']['color']
+        boundary_style = self.profile_json['body']['data']['stylesheet']['grid']['boundary']['style']
+        boundary_width = self.profile_json['body']['data']['stylesheet']['grid']['boundary']['width']
+
+        # get values for text
+        text_color = self.profile_json['body']['data']['stylesheet']['grid']['text']['color']
+        text_weight = self.profile_json['body']['data']['stylesheet']['grid']['text']['weight']
 
         start_point = self.nodes[self.n - 1].start_point
         geom1 = self.nodes[self.n - 1].geom
 
-        # Draw coocrdinates
+        # Draw main text
+        plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(0.5) * self.height_row - self.height_row / 2,
+                 'REFERENCE: ' + str(round(self.min_top_elev - 1 * self.height_row, 2)) + '\n' + ' ',
+                 fontsize=8.5,
+                 color=text_color, fontweight=text_weight,
+                 verticalalignment='center')
+
+        # Draw boundary
         x = [0, 0]
         y = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1)]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, color=boundary_color, linestyle=boundary_style, linewidth=boundary_width, zorder=100)
         x = [start_point, start_point]
         y = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1)]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, color=boundary_color, linestyle=boundary_style, linewidth=boundary_width, zorder=100)
         x = [0, start_point]
         y = [int(math.ceil(self.max_top_elev) + 1), int(math.ceil(self.max_top_elev) + 1)]
-        plt.plot(x, y, 'black', zorder=100)
+        plt.plot(x, y, color=boundary_color, linestyle=boundary_style, linewidth=boundary_width, zorder=100)
 
-        # Loop till self.max_top_elev + height_row
+        # Draw horitzontal lines
         y = int(math.ceil(self.min_top_elev - 1 * self.height_row))
         x = int(math.floor(self.max_top_elev))
         if x % 2 == 0:
@@ -1198,53 +1255,53 @@ class DrawProfiles(ParentMapTool):
                 i = i + 1
                 x1 = [0, start_point]
                 y1 = [i, i]
-            plt.plot(x1, y1, 'lightgray', zorder=1)
-            # Values left y_ordinate_all
-            plt.text(0 - Decimal(geom1) * Decimal(1.5), i, str(i), fontsize=7.5,
+
+            # set line
+            plt.plot(x1, y1, color=line_color, linestyle=line_style, linewidth=line_width, zorder=1)
+
+            # set texts
+            plt.text(0 - Decimal(geom1) * Decimal(1.5), i, str(i),
+                     fontsize=7.5,
+                     color=text_color, fontweight=text_weight,
                      horizontalalignment='right', verticalalignment='center')
-            plt.text(Decimal(start_point) + Decimal(geom1) * Decimal(1.5), i, str(i), fontsize=7.5,
+            plt.text(Decimal(start_point) + Decimal(geom1) * Decimal(1.5), i, str(i),
+                     fontsize=7.5,
+                     color=text_color, fontweight=text_weight,
                      horizontalalignment='left', verticalalignment='center')
 
-
-    def draw_grid(self):
-
-        # Values right y_ordinate_max
-        start_point = self.nodes[self.n - 1].start_point
-        plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(0.5) * self.height_row - self.height_row / 2,
-                 'P.C. ' + str(round(self.min_top_elev - 1 * self.height_row, 2)) + '\n' + ' ',
-                 verticalalignment='center', fontsize=6.5)
-
-        # Values right x_ordinate_min
-        plt.annotate('0' + '\n' + ' ',
-                     xy=(0, int(math.ceil(self.max_top_elev) + 1)),
-                     fontsize=6.5, horizontalalignment='center')
-
-        # Values right x_ordinate_max
-        plt.annotate(str(round(start_point, 2)) + '\n' + ' ',
-                     xy=(start_point, int(math.ceil(self.max_top_elev) + 1)),
-                     fontsize=6.5, horizontalalignment='center')
-
-        # Loop from 0 to start_point(of last node)
+        # Draw vertical lines
         x = int(math.floor(start_point))
-        # First after 0 (first is drawn ,start from i(0)+1)
         for i in range(50, x, 50):
             x1 = [i, i]
             y1 = [self.min_top_elev - 1 * self.height_row, int(math.ceil(self.max_top_elev) + 1)]
-            plt.plot(x1, y1, 'lightgray', zorder=1)
 
-            # values right x_ordinate_all
+            # set line
+            plt.plot(x1, y1,  color=line_color, linestyle=line_style, linewidth=line_width, zorder=1)
+
+            # set texts
             plt.annotate(str(i) + '\n' + ' ', xy=(i, int(math.ceil(self.max_top_elev) + 1)),
-                fontsize=6.5, horizontalalignment='center')
+                fontsize=6.5,
+                color=text_color, fontweight=text_weight,
+                horizontalalignment='center')
 
 
-    def draw_ground(self):
+    def draw_terrain(self, index):
 
-        # Green triangle
-        plt.plot(self.first_top_x, self.first_top_y, 'g^', linewidth=3.5)
-        plt.plot(self.node_top_x, self.node_top_y, 'g^', linewidth=3.5)
+        # getting variables
+        line_color = self.profile_json['body']['data']['stylesheet']['terrain']['color']
+        line_style = self.profile_json['body']['data']['stylesheet']['terrain']['style']
+        line_width = self.profile_json['body']['data']['stylesheet']['terrain']['width']
+
+        # Draw marker
+        if index == 1:
+            plt.plot(self.first_top_x, self.first_top_y, marker='|', color=line_color)
+        else:
+            plt.plot(self.node_top_x, self.node_top_y, marker='|', color=line_color)
+
+        # Draw line
         x = [self.first_top_x, self.node_top_x]
         y = [self.first_top_y, self.node_top_y]
-        plt.plot(x, y, self.profile_json['body']['data']['stylesheet']['ground']['color'], linestyle='dashed')
+        plt.plot(x, y, color=line_color, linewidth=line_width, linestyle=line_style)
 
 
     def clear_profile(self):
@@ -1299,3 +1356,15 @@ class DrawProfiles(ParentMapTool):
         if actionpan:
             self.iface.actionPan().trigger()
 
+
+    def get_stylesheet(self, data_type='REAL'):
+        # getting stylesheet
+        if data_type=='REAL':
+            line_style = self.profile_json['body']['data']['stylesheet']['infra']['real']['style']
+            line_color = self.profile_json['body']['data']['stylesheet']['infra']['real']['color']
+            line_width = self.profile_json['body']['data']['stylesheet']['infra']['real']['width']
+        elif data_type=='INTERPOLATED':
+            line_style = self.profile_json['body']['data']['stylesheet']['infra']['interpolated']['style']
+            line_color = self.profile_json['body']['data']['stylesheet']['infra']['interpolated']['color']
+            line_width = self.profile_json['body']['data']['stylesheet']['infra']['interpolated']['width']
+        return line_style, line_color, line_width
