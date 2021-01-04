@@ -44,7 +44,7 @@ class GwGo2EpaTask(QgsTask):
         self.result_name = self.go2epa.result_name
         self.file_inp = self.go2epa.file_inp
         self.file_rpt = self.go2epa.file_rpt
-        self.export_inp = self.go2epa.export_inp
+        self.go2epa_export_inp = self.go2epa.export_inp
         self.exec_epa = self.go2epa.exec_epa
         self.import_result = self.go2epa.import_result
         self.project_type = self.go2epa.project_type
@@ -69,7 +69,7 @@ class GwGo2EpaTask(QgsTask):
         if not self.exec_function_pg2epa():
             return False
 
-        if self.export_inp:
+        if self.go2epa_export_inp:
             status = self.export_inp()
 
         if status and self.exec_epa:
@@ -89,7 +89,7 @@ class GwGo2EpaTask(QgsTask):
 
         if result:
 
-            if self.export_inp and self.complet_result:
+            if self.go2epa_export_inp and self.complet_result:
                 if 'status' in self.complet_result:
                     if self.complet_result['status'] == "Accepted":
                         if 'body' in self.complet_result:

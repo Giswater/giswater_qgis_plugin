@@ -418,7 +418,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
 
 
 def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
-                   group='GW Temporal Layers', disable_tabs_=True):
+                   group='GW Temporal Layers', disable_tabs=True):
     """ Add QgsVectorLayer into TOC
     :param dialog: Dialog where to find the tab to be displayed and the textedit to be filled (QDialog or QMainWindow)
     :param data: Json with information
@@ -428,7 +428,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     :param tab_idx: Log tab index (Integer)
     :param del_old_layers:Delete layers added in previous operations (Boolean)
     :param group: Name of the group to which we want to add the layer (String)
-    :param disable_tabs_: set all tabs, except the last, enabled or disabled (boolean).
+    :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean).
     :return: Dictionary with text as result of previuos data (String), and list of layers added (QgsVectorLayer).
     """
 
@@ -437,7 +437,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     srid = global_vars.srid
     for k, v in list(data.items()):
         if str(k) == "info":
-            text_result, change_tab = fill_tab_log(dialog, data, force_tab, reset_text, tab_idx, disable_tabs_)
+            text_result, change_tab = fill_tab_log(dialog, data, force_tab, reset_text, tab_idx, disable_tabs)
         elif k in ('point', 'line', 'polygon'):
             if 'features' not in data[k]: continue
             counter = len(data[k]['features'])
