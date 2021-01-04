@@ -38,20 +38,54 @@ v_mincutversion integer;
 
 BEGIN
 
-    -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+	-- Search path
+	SET search_path = "SCHEMA_NAME", public;
 
-    -- Get debug variable
-    SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
-    SELECT value::int2 INTO v_mincutversion FROM config_param_system WHERE parameter='om_mincut_version';
+	-- Get debug variable
+	SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
+	SELECT value::int2 INTO v_mincutversion FROM config_param_system WHERE parameter='om_mincut_version';
 	
-    -- Starting process
-    SELECT * INTO mincut_rec FROM om_mincut WHERE id=result_id_arg;
-    SELECT macroexpl_id INTO v_macroexpl FROM exploitation WHERE expl_id=mincut_rec.expl_id;
-	
-    -- Loop for all the proposed valves
-    FOR rec_valve IN SELECT node_id FROM om_mincut_valve WHERE result_id=result_id_arg AND proposed=TRUE
-    LOOP
+	-- Starting process
+	SELECT * INTO mincut_rec FROM om_mincut WHERE id=result_id_arg;
+	SELECT macroexpl_id INTO v_macroexpl FROM exploitation WHERE expl_id=mincut_rec.expl_id;
+
+	TRUNCATE temp_mincut;
+
+	-- Create the matrix to work with pgrouting
+	INSERT INTO temp_mincut 
+	SELECT a.id, a.source, a.target,
+		(case when (a.id = b.id and a.source::text = b.source::text) then -1 else cost end) as cost, 			-- close especial case of config_mincut_checkvalve only direct sense
+		(case when (a.id = b.id and a.source::text != b.source::text) then -1 else reverse_cost end) as reverse_cost  	-- close especial case of config_mincut_checkvalve only reverse sense
+		FROM (
+			SELECT v_edit_arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
+			(case when a.closed=true then -1 else 1 end) as cost,
+			(case when a.closed=true then -1 else 1 end) as reverse_cost
+			FROM v_edit_arc 
+			JOIN exploitation ON v_edit_arc.expl_id=exploitation.expl_id
+			LEFT JOIN (
+				SELECT arc_id, true as closed FROM v_edit_arc JOIN exploitation ON v_edit_arc.expl_id=exploitation.expl_id
+				WHERE 
+				(node_1 IN (SELECT node_id FROM om_mincut_valve WHERE ((proposed=TRUE) AND result_id=1))
+				AND arc_id IN(SELECT arc_id FROM om_mincut_arc WHERE result_id=1))
+						
+				OR (node_2 IN (SELECT node_id FROM om_mincut_valve WHERE ((proposed=TRUE) AND result_id=1))
+				AND arc_id IN(SELECT arc_id FROM om_mincut_arc WHERE result_id=1)) 
+
+				OR (node_1 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id=1))
+						
+				OR (node_2 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id=1))	
+				UNION
+				SELECT json_array_elements_text((parameters->>'inletArc')::json) as arc_id, true as closed FROM config_mincut_inlet
+				)a 
+			ON a.arc_id=v_edit_arc.arc_id
+			WHERE node_1 is not null and node_2 is not null
+		)a	
+		LEFT JOIN (SELECT to_arc::int8 AS id, node_id::int8 AS source FROM config_mincut_checkvalve)b USING (id);
+
+
+	-- Loop for all the proposed valves
+	FOR rec_valve IN SELECT node_id FROM om_mincut_valve WHERE result_id=result_id_arg AND proposed=TRUE
+	LOOP
 		IF v_debug THEN
 			RAISE NOTICE 'Starting flow analysis process for valve: %', rec_valve.node_id;
 		END IF;
@@ -72,41 +106,8 @@ BEGIN
 				2) Arcs out of the proposed sector with node1 or node2 as (closed valves and not proposed valves)
 			*/
 
-			query_text:= 'SELECT * FROM pgr_dijkstra( 
-				''			
-				SELECT
-				a.id,
-				a.source,
-				a.target,
-				(case when (a.id = b.id and a.source::text = b.source::text) then -1 else cost end) as cost, 			-- close especial case of config_checkvalve only direct sense
-				(case when (a.id = b.id and a.source::text != b.source::text) then -1 else reverse_cost end) as reverse_cost  	-- close especial case of config_checkvalve only reverse sense
-				FROM (
-					SELECT v_edit_arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
-					(case when a.closed=true then -1 else 1 end) as cost,
-					(case when a.closed=true then -1 else 1 end) as reverse_cost
-					FROM v_edit_arc 
-					JOIN exploitation ON v_edit_arc.expl_id=exploitation.expl_id
-					LEFT JOIN (
-							SELECT arc_id, true as closed FROM v_edit_arc JOIN exploitation ON v_edit_arc.expl_id=exploitation.expl_id
-							WHERE 
-							(node_1 IN (SELECT node_id FROM om_mincut_valve WHERE ((proposed=TRUE) AND result_id='||result_id_arg||'))
-							AND arc_id IN(SELECT arc_id FROM om_mincut_arc WHERE result_id='||result_id_arg||'))
-						
-							OR (node_2 IN (SELECT node_id FROM om_mincut_valve WHERE ((proposed=TRUE) AND result_id='||result_id_arg||'))
-							AND arc_id IN(SELECT arc_id FROM om_mincut_arc WHERE result_id='||result_id_arg||')) 
-	
-							OR (node_1 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id='||result_id_arg||'))
-						
-							OR (node_2 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id='||result_id_arg||'))	
-							UNION
-							SELECT json_array_elements_text((parameters->>''''inletArc'''')::json) as arc_id, true as closed FROM config_mincut_inlet
-						)a 
-						ON a.arc_id=v_edit_arc.arc_id
-					WHERE node_1 is not null and node_2 is not null
-					)a	
-				LEFT JOIN (SELECT to_arc::int8 AS id, node_id::int8 AS source FROM config_checkvalve WHERE active IS TRUE )b USING (id)'',
-
-				'||rec_valve.node_id||'::int8, '||rec_tank.node_id||'::int8)';
+			query_text:= 'SELECT * FROM pgr_dijkstra( ''SELECT id, source, target, cost, reverse_cost 
+							FROM temp_mincut'','||rec_valve.node_id||'::int8, '||rec_tank.node_id||'::int8)';
 
 			IF query_text IS NOT NULL THEN	
 				IF (select value::boolean from config_param_system where parameter='om_mincut_valve2tank_traceability') IS TRUE THEN 
@@ -210,11 +211,9 @@ BEGIN
 		END IF;
 	
 	END LOOP;
-	
+
 	RETURN 1;
-   
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
