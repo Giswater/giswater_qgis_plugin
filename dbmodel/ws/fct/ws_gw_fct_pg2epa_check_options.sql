@@ -26,7 +26,7 @@ v_result_id text;
 v_networkmode integer;
 v_patternmethod integer;
 v_error_context text;
-v_return text = '{"status":"accepted"}';
+v_return json = '{"status":"accepted"}';
 
 BEGIN
 

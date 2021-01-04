@@ -25,7 +25,7 @@ v_count	integer;
 v_count_2 integer;
 v_result_id text;
 v_error_context text;
-v_return text = '{"status":"accepted"}';
+v_return json = '{"status":"accepted"}';
 
 BEGIN
 
