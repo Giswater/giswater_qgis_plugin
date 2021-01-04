@@ -389,13 +389,14 @@ def set_combo_value(combo, value, item1):
             return True
 
     # Add new value if @value not in combo
-    new_elem = []
-    for x in range(len(combo.itemData(0))):
-        new_elem.append("")
-    new_elem[0] = value
-    new_elem[1] = f"({value})"
-    combo.addItem(new_elem[1], new_elem)
-    combo.setCurrentIndex(combo.count() - 1)
+    if value not in ("", None, 'None', 'none'):
+        new_elem = []
+        for x in range(len(combo.itemData(0))):
+            new_elem.append("")
+        new_elem[0] = value
+        new_elem[1] = f"({value})"
+        combo.addItem(new_elem[1], new_elem)
+        combo.setCurrentIndex(combo.count() - 1)
     return False
 
 
