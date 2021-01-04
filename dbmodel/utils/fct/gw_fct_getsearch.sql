@@ -108,12 +108,8 @@ BEGIN
 		WHERE parameter like '%basic_search_network%'ORDER BY ((value)::json->>'orderby'))a;
 		comboType := gw_fct_json_object_set_key(comboType, 'comboIds', combo_json);
 
-		-- Add default
-		IF combo_json IS NOT NULL THEN
-			comboType := gw_fct_json_object_set_key(comboType, 'selectedId', 0);
-		ELSE
-			comboType := gw_fct_json_object_set_key(comboType, 'selectedId', to_json(''::text));        
-		END IF;
+		-- Set selectedId
+		comboType := gw_fct_json_object_set_key(comboType, 'selectedId', to_json(''::text));
 	    
 		-- Get Names for type combo
 		SELECT array_to_json(array_agg(id)) INTO combo_json FROM (SELECT ((value)::json->'alias') AS id FROM config_param_system 
@@ -166,12 +162,8 @@ BEGIN
 		
 		comboType := gw_fct_json_object_set_key(comboType, 'comboIds', combo_json);
 
-		-- Add default
-		IF combo_json IS NOT NULL THEN
-			comboType := gw_fct_json_object_set_key(comboType, 'selectedId', 0);
-		ELSE
-			comboType := gw_fct_json_object_set_key(comboType, 'selectedId', to_json(''::text));        
-		END IF;
+		-- Set selectedId
+		comboType := gw_fct_json_object_set_key(comboType, 'selectedId', to_json(''::text)); 
 
 		-- Get Names for type combo
 		EXECUTE 'SELECT array_to_json(array_agg(id)) FROM (SELECT ((value)::json->''alias'') AS id FROM '||v_addschema||'.config_param_system  
