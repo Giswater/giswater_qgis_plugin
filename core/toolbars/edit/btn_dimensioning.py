@@ -36,9 +36,9 @@ class GwDimensioningButton(GwMaptoolButton):
 
         self.recover_previus_maptool()
 
-        self.api_dim = GwDimensioning()
-        self.api_dim.points = list_points
-        self.api_dim.open_dimensioning_form(qgis_feature=feature, layer=self.layer)
+        self.dimensioning = GwDimensioning()
+        self.dimensioning.points = list_points
+        self.dimensioning.open_dimensioning_form(qgis_feature=feature, layer=self.layer)
         super().deactivate()
 
 
@@ -87,7 +87,7 @@ class GwDimensioningButton(GwMaptoolButton):
             self.snapper_manager.config_snap_to_node()
             self.snapper_manager.set_snap_mode()
 
-            # Manage new api tool
+            # Manage new tool
             self.layer.featureAdded.connect(self.open_new_dimensioning)
 
 

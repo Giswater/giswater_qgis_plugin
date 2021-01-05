@@ -86,7 +86,7 @@ class GwDeleteFeatureButton(GwDialogButton):
             model.setStringList([''])
             return
 
-        tools_qt.set_completer_object_api(completer, model, widget, rows_typeahead)
+        tools_qt.set_completer_object(completer, model, widget, rows_typeahead)
         self.dlg_feature_delete.feature_id.setStyleSheet(None)
 
 

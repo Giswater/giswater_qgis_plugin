@@ -25,7 +25,7 @@ class GwCatalog:
         pass
 
 
-    def api_catalog(self, previous_dialog, widget_name, geom_type, feature_type):
+    def open_catalog(self, previous_dialog, widget_name, geom_type, feature_type):
 
         # Manage if geom_type is gully and set grate
         if geom_type == 'gully':
@@ -81,15 +81,15 @@ class GwCatalog:
 
         id = self.dlg_catalog.findChild(QComboBox, 'id')
 
-        # Call get_api_catalog first time
-        self.get_api_catalog(matcat_id, pnom, dnom, id, feature_type, geom_type)
+        # Call get_catalog first time
+        self.get_catalog(matcat_id, pnom, dnom, id, feature_type, geom_type)
 
         # Set Listeners
         matcat_id.currentIndexChanged.connect(
             partial(self.populate_pn_dn, matcat_id, pnom, dnom, feature_type, geom_type))
-        pnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id,
+        pnom.currentIndexChanged.connect(partial(self.get_catalog, matcat_id,
                                          pnom, dnom, id, feature_type, geom_type))
-        dnom.currentIndexChanged.connect(partial(self.get_api_catalog, matcat_id,
+        dnom.currentIndexChanged.connect(partial(self.get_catalog, matcat_id,
                                          pnom, dnom, id, feature_type, geom_type))
 
         # Set shortcut keys
@@ -99,7 +99,7 @@ class GwCatalog:
         tools_gw.open_dialog(self.dlg_catalog, dlg_name='info_catalog')
 
 
-    def get_api_catalog(self, matcat_id, pnom, dnom, id, feature_type, geom_type):
+    def get_catalog(self, matcat_id, pnom, dnom, id, feature_type, geom_type):
 
         matcat_id_value = tools_qt.get_combo_value(self.dlg_catalog, matcat_id)
         pn_value = tools_qt.get_combo_value(self.dlg_catalog, pnom)

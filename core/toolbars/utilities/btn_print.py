@@ -56,7 +56,7 @@ class GwPrintButton(GwDialogButton):
 
         if json_result['formTabs']:
             fields = json_result['formTabs'][0]
-            # This dialog is created from config_api_form_fieds
+            # This dialog is created from config_form_fieds
             # where formname == 'print' and formtype == 'utils'
             # At the moment, u can set column widgetfunction with 'gw_fct_setprint' or open_composer
             self.create_dialog(self.dlg_composer, fields)

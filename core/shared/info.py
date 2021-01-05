@@ -44,7 +44,7 @@ is_inserting = False
 
 class GwInfo(QObject):
 
-    # :var signal_activate: emitted from def cancel_snapping_tool(self, dialog, action) in order to re-start CadApiInfo
+    # :var signal_activate: emitted from def cancel_snapping_tool(self, dialog, action) in order to re-start CadInfo
     signal_activate = pyqtSignal()
 
     def __init__(self, tab_type):
@@ -222,9 +222,9 @@ class GwInfo(QObject):
         elif template == 'dimensioning':
             self.lyr_dim = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning_=True)
             if self.lyr_dim:
-                self.api_dim = GwDimensioning()
+                self.dimensioning = GwDimensioning()
                 feature_id = self.complet_result['body']['feature']['id']
-                result, dialog = self.api_dim.open_dimensioning_form(None, self.lyr_dim, self.complet_result, feature_id, self.rubber_band)
+                result, dialog = self.dimensioning.open_dimensioning_form(None, self.lyr_dim, self.complet_result, feature_id, self.rubber_band)
                 return result, dialog
 
         elif template == 'info_feature':
@@ -528,10 +528,10 @@ class GwInfo(QObject):
         action_set_to_arc.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_set_to_arc, 'v_edit_arc', 'set_to_arc', None))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id,  'v_edit_arc', 'arc', 'data_arc_id'))
         action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_parent_id, 'v_edit_node', 'node', 'data_parent_id'))
-        action_zoom_in.triggered.connect(partial(self.api_action_zoom_in, self.canvas, self.layer))
-        action_centered.triggered.connect(partial(self.api_action_centered, self.canvas, self.layer))
-        action_zoom_out.triggered.connect(partial(self.api_action_zoom_out, self.canvas, self.layer))
-        action_copy_paste.triggered.connect(partial(self.api_action_copy_paste, self.dlg_cf, self.geom_type, tab_type))
+        action_zoom_in.triggered.connect(partial(self.manage_action_zoom_in, self.canvas, self.layer))
+        action_centered.triggered.connect(partial(self.manage_action_centered, self.canvas, self.layer))
+        action_zoom_out.triggered.connect(partial(self.manage_action_zoom_out, self.canvas, self.layer))
+        action_copy_paste.triggered.connect(partial(self.manage_action_copy_paste, self.dlg_cf, self.geom_type, tab_type))
         action_rotation.triggered.connect(partial(self.change_hemisphere, self.dlg_cf, action_rotation))
         action_link.triggered.connect(lambda: webbrowser.open('http://www.giswater.org'))
         action_section.triggered.connect(partial(self.open_section_form))
@@ -874,14 +874,14 @@ class GwInfo(QObject):
             tools_log.log_info(f"{type(e).__name__} --> {e}")
         self.cancel_snapping_tool(dialog, action)
 
-    def api_action_copy_paste(self, dialog, geom_type, tab_type=None):
+    def manage_action_copy_paste(self, dialog, geom_type, tab_type=None):
         """ Copy some fields from snapped feature to current feature """
 
         # Set map tool emit point and signals
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
         global_vars.canvas.setMapTool(emit_point)
-        global_vars.canvas.xyCoordinates.connect(self.api_action_copy_paste_mouse_move)
-        emit_point.canvasClicked.connect(partial(self.api_action_copy_paste_canvas_clicked, dialog, tab_type, emit_point))
+        global_vars.canvas.xyCoordinates.connect(self.manage_action_copy_paste_mouse_move)
+        emit_point.canvasClicked.connect(partial(self.manage_action_copy_paste_canvas_clicked, dialog, tab_type, emit_point))
         self.geom_type = geom_type
 
         # Store user snapping configuration
@@ -906,7 +906,7 @@ class GwInfo(QObject):
         self.vertex_marker.setPenWidth(3)
 
 
-    def api_action_copy_paste_mouse_move(self, point):
+    def manage_action_copy_paste_mouse_move(self, point):
         """ Slot function when mouse is moved in the canvas.
             Add marker if any feature is snapped
         """
@@ -924,11 +924,11 @@ class GwInfo(QObject):
         self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
-    def api_action_copy_paste_canvas_clicked(self, dialog, tab_type, emit_point, point, btn):
+    def manage_action_copy_paste_canvas_clicked(self, dialog, tab_type, emit_point, point, btn):
         """ Slot function when canvas is clicked """
 
         if btn == Qt.RightButton:
-            self.api_disable_copy_paste(dialog, emit_point)
+            self.manage_disable_copy_paste(dialog, emit_point)
             return
 
         # Get clicked point
@@ -937,7 +937,7 @@ class GwInfo(QObject):
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if not result.isValid():
-            self.api_disable_copy_paste(dialog, emit_point)
+            self.manage_disable_copy_paste(dialog, emit_point)
             return
 
         layer = global_vars.iface.activeLayer()
@@ -953,7 +953,7 @@ class GwInfo(QObject):
         if expr.hasParserError():
             message = "Expression Error"
             tools_qgis.show_warning(message, parameter=expr.parserErrorString())
-            self.api_disable_copy_paste(dialog, emit_point)
+            self.manage_disable_copy_paste(dialog, emit_point)
             return
 
         fields = layer.dataProvider().fields()
@@ -961,7 +961,7 @@ class GwInfo(QObject):
         it = layer.getFeatures(QgsFeatureRequest(expr))
         feature_list = [i for i in it]
         if not feature_list:
-            self.api_disable_copy_paste(dialog, emit_point)
+            self.manage_disable_copy_paste(dialog, emit_point)
             return
 
         # Select only first element of the feature list
@@ -1008,10 +1008,10 @@ class GwInfo(QObject):
                 elif tools_qt.get_widget_type(dialog, widget) is QComboBox:
                     tools_qt.set_combo_value(widget, str(snapped_feature_attr_aux[i]), 0)
 
-        self.api_disable_copy_paste(dialog, emit_point)
+        self.manage_disable_copy_paste(dialog, emit_point)
 
 
-    def api_disable_copy_paste(self, dialog, emit_point):
+    def manage_disable_copy_paste(self, dialog, emit_point):
         """ Disable actionCopyPaste and set action 'Identify' """
 
         action_widget = dialog.findChild(QAction, "actionCopyPaste")
@@ -1067,7 +1067,7 @@ class GwInfo(QObject):
         return False
 
 
-    def api_action_zoom_in(self, canvas, layer):
+    def manage_action_zoom_in(self, canvas, layer):
         """ Zoom in """
 
         if not self.feature:
@@ -1077,7 +1077,7 @@ class GwInfo(QObject):
         canvas.zoomIn()
 
 
-    def api_action_centered(self, canvas, layer):
+    def manage_action_centered(self, canvas, layer):
         """ Center map to current feature """
 
         if not self.feature:
@@ -1086,7 +1086,7 @@ class GwInfo(QObject):
         canvas.zoomToSelected(layer)
 
 
-    def api_action_zoom_out(self, canvas, layer):
+    def manage_action_zoom_out(self, canvas, layer):
         """ Zoom out """
 
         if not self.feature:
@@ -1890,7 +1890,7 @@ class GwInfo(QObject):
             widget = f'{tab_type}_{self.geom_type}at_id'
         else:
             widget = f'{tab_type}_{self.geom_type}cat_id'
-        self.catalog.api_catalog(self.dlg_cf, widget, self.geom_type, feature_type)
+        self.catalog.open_catalog(self.dlg_cf, widget, self.geom_type, feature_type)
 
 
     def show_actions(self, dialog, tab_name):
@@ -3275,7 +3275,7 @@ class GwInfo(QObject):
         for field in result['body']['data']['fields']:
             widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
             if widget.property('typeahead'):
-                tools_qt.set_completer_object_api(QCompleter(), QStringListModel(), widget, field['comboIds'])
+                tools_qt.set_completer_object(QCompleter(), QStringListModel(), widget, field['comboIds'])
                 tools_qt.set_widget_text(self.dlg_cf, widget, field['selectedId'])
                 self.my_json[str(widget.property('columnname'))] = field['selectedId']
             elif type(widget) == QComboBox:
@@ -3425,15 +3425,15 @@ class GwInfo(QObject):
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
     def get_info_node(self, **kwargs):
-        """ Function called in class ApiParent.add_button(...) -->
+        """ Function called in class tools_gw.add_button(...) -->
                 widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
 
         dialog = kwargs['dialog']
         widget = kwargs['widget']
 
         feature_id = tools_qt.get_text(dialog, widget)
-        self.ApiCF = GwInfo(self.tab_type)
-        complet_result, dialog = self.ApiCF.open_form(table_name='v_edit_node', feature_id=feature_id,
+        self.customForm = GwInfo(self.tab_type)
+        complet_result, dialog = self.customForm.open_form(table_name='v_edit_node', feature_id=feature_id,
                                                       tab_type=self.tab_type, is_docker=False)
         if not complet_result:
             tools_log.log_info("FAIL open_node")

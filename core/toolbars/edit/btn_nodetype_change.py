@@ -40,7 +40,7 @@ class GwNodeTypeChangeButton(GwMaptoolButton):
             tools_qt.show_info_box(msg, "Info")
             return
         self.catalog = GwCatalog()
-        self.catalog.api_catalog(self.dlg_chg_node_type, 'node_nodecat_id', 'node', feature_type)
+        self.catalog.open_catalog(self.dlg_chg_node_type, 'node_nodecat_id', 'node', feature_type)
 
 
     def edit_change_elem_type_accept(self):
@@ -101,9 +101,9 @@ class GwNodeTypeChangeButton(GwMaptoolButton):
         it = layer.getFeatures(QgsFeatureRequest(expr))
         features = [i for i in it]
         if features[0]:
-            self.ApiCF = GwInfo(tab_type='data')
-            self.ApiCF.user_current_layer = self.current_layer
-            complet_result, dialog = self.ApiCF.get_info_from_id(table_name='v_edit_node', tab_type='data',
+            self.customForm = GwInfo(tab_type='data')
+            self.customForm.user_current_layer = self.current_layer
+            complet_result, dialog = self.customForm.get_info_from_id(table_name='v_edit_node', tab_type='data',
                                                                  feature_id=features[0]["node_id"])
             if not complet_result:
                 return

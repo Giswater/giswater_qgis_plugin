@@ -217,7 +217,7 @@ class LoadProject(QObject):
             # Control if json have a correct format
             pass
         finally:
-            # TODO remove this line when do you want enabled api info for epa
+            # TODO remove this line when do you want enabled info for epa
             self.buttons_to_hide.append('199')
 
 

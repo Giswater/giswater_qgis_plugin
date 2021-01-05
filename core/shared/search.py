@@ -58,7 +58,7 @@ class GwSearch:
         self.dlg_search.dlg_closed.connect(self.close_search)
 
 
-    def api_search(self, dlg_mincut=None, load_project=False):
+    def open_search(self, dlg_mincut=None, load_project=False):
         # If search is open, dont let user open another one
         open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "sessions")
         if open_search in ("True", "true", True) and dlg_mincut is None and load_project is False:
@@ -191,13 +191,13 @@ class GwSearch:
 
         # Tab 'network or add_network'
         if tab_selected == 'network' or tab_selected == 'add_network':
-            self.ApiCF = GwInfo(tab_type='data')
-            complet_result, dialog = self.ApiCF.get_info_from_id(table_name=item['sys_table_id'], tab_type='data',
+            self.customForm = GwInfo(tab_type='data')
+            complet_result, dialog = self.customForm.get_info_from_id(table_name=item['sys_table_id'], tab_type='data',
                                                                  feature_id=item['sys_id'], is_add_schema=is_add_schema)
             if not complet_result:
                 return
 
-            # self.Api CF.get_info_from_id (...) in turn ends up calling self.open_custom_form (...) which will draw the
+            # self.customForm.get_info_from_id (...) in turn ends up calling self.open_custom_form (...) which will draw the
             # line on the feature but not zoom. Here, with draw we redraw simply to zoom and so that there are not two
             # ruberbands (the one from self.open_custom_form (...) and this one) we delete these
             margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
@@ -348,7 +348,7 @@ class GwSearch:
             display_list = []
             for data in self.result_data['data']:
                 display_list.append(data['display_name'])
-            tools_qt.set_completer_object_api(completer, model, widget, display_list)
+            tools_qt.set_completer_object(completer, model, widget, display_list)
 
         if len(line_list) == 2:
             line_edit_add = line_list[1]
@@ -367,7 +367,7 @@ class GwSearch:
                 display_list = []
                 for data in self.result_data['data']:
                     display_list.append(data['display_name'])
-                tools_qt.set_completer_object_api(completer, model, line_edit_add, display_list)
+                tools_qt.set_completer_object(completer, model, line_edit_add, display_list)
 
 
     def clear_line_edit_add(self, line_list):
@@ -804,8 +804,8 @@ class GwSearch:
 
         feature_id = qtable.model().record(row).value('feature_id')
 
-        self.ApiCF = GwInfo(tab_type='data')
-        complet_result, dialog = self.ApiCF.get_info_from_id(table_name=table_name, feature_id=feature_id, tab_type='data')
+        self.customForm = GwInfo(tab_type='data')
+        complet_result, dialog = self.customForm.get_info_from_id(table_name=table_name, feature_id=feature_id, tab_type='data')
 
         # Get list of all coords in field geometry
         list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))

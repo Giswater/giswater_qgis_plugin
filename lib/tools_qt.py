@@ -527,7 +527,7 @@ def get_col_index_by_col_name(qtable, column_name):
     return column_index
 
 
-def set_completer_object_api(completer, model, widget, list_items, max_visible=10):
+def set_completer_object(completer, model, widget, list_items, max_visible=10):
     """ Set autocomplete of widget @table_object + "_id"
         getting id's from selected @table_object.
         WARNING: Each QLineEdit needs their own QCompleter and their own QStringListModel!!!

@@ -112,10 +112,10 @@ class GwMincut:
         tools_gw.load_settings(self.dlg_mincut)
         self.dlg_mincut.setWindowFlags(Qt.WindowStaysOnTopHint)
 
-        self.api_search = GwSearch()
-        self.api_search.api_search(self.dlg_mincut)
+        self.search = GwSearch()
+        self.search.open_search(self.dlg_mincut)
 
-        # These widgets are put from the api, mysteriously if we do something like:
+        # These widgets are put from the database, mysteriously if we do something like:
         # self.dlg_mincut.address_add_muni.text() or self.dlg_mincut.address_add_muni.setDiabled(True) etc...
         # it doesn't count them, and that's why we have to force them
         self.dlg_mincut.address_add_muni = tools_qt.get_widget(self.dlg_mincut, 'address_add_muni')
@@ -341,7 +341,7 @@ class GwMincut:
 
         tools_qgis.restore_user_layer('v_edit_node', self.user_current_layer)
         self.remove_selection()
-        tools_qgis.reset_rubber_band(self.api_search.rubber_band)
+        tools_qgis.reset_rubber_band(self.search.rubber_band)
 
         # If client don't touch nothing just rejected dialog or press cancel
         if not self.dlg_mincut.closeMainWin and self.dlg_mincut.mincutCanceled:
@@ -401,10 +401,10 @@ class GwMincut:
         self.dlg_fin = MincutEndUi()
         tools_gw.load_settings(self.dlg_fin)
 
-        api_search = GwSearch()
-        api_search.api_search(self.dlg_fin)
+        search = GwSearch()
+        search.open_search(self.dlg_fin)
 
-        # These widgets are put from the api, mysteriously if we do something like:
+        # These widgets are put from the database, mysteriously if we do something like:
         # self.dlg_mincut.address_add_muni.text() or self.dlg_mincut.address_add_muni.setDiabled(True) etc...
         # it doesn't count them, and that's why we have to force them
         self.dlg_fin.address_add_muni = tools_qt.get_widget(self.dlg_fin, 'address_add_muni')
@@ -692,7 +692,7 @@ class GwMincut:
         self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.restore_user_layer, 'v_edit_node', self.user_current_layer))
         self.dlg_mincut.btn_cancel.clicked.connect(partial(self.remove_selection))
         # TODO: Check this class doesn't have rubber_band
-        self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.reset_rubber_band, self.api_search.rubber_band))
+        self.dlg_mincut.btn_cancel.clicked.connect(partial(tools_qgis.reset_rubber_band, self.search.rubber_band))
         self.refresh_tab_hydro()
 
         self.action_mincut.setEnabled(False)

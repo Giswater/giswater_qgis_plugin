@@ -150,7 +150,7 @@ class GwConfigLayerTask(QgsTask):
                 # Get column index
                 field_index = layer.fields().indexFromName(field['columnname'])
 
-                # Hide selected fields according table config_api_form_fields.hidden
+                # Hide selected fields according table config_form_fields.hidden
                 if 'hidden' in field:
                     self.set_column_visibility(layer, field['columnname'], field['hidden'])
 
@@ -219,7 +219,7 @@ class GwConfigLayerTask(QgsTask):
 
 
     def set_read_only(self, layer, field, field_index):
-        """ Set field readOnly according to client configuration into config_api_form_fields (field 'iseditable') """
+        """ Set field readOnly according to client configuration into config_form_fields (field 'iseditable') """
 
         # Get layer config
         config = layer.editFormConfig()
@@ -234,7 +234,7 @@ class GwConfigLayerTask(QgsTask):
 
 
     def set_column_visibility(self, layer, col_name, hidden):
-        """ Hide selected fields according table config_api_form_fields.hidden """
+        """ Hide selected fields according table config_form_fields.hidden """
 
         config = layer.attributeTableConfig()
         columns = config.columns()
@@ -247,7 +247,7 @@ class GwConfigLayerTask(QgsTask):
 
 
     def set_column_multiline(self, layer, field, field_index):
-        """ Set multiline selected fields according table config_api_form_fields.widgetcontrols['setQgisMultiline'] """
+        """ Set multiline selected fields according table config_form_fields.widgetcontrols['setQgisMultiline'] """
 
         if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
             editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})

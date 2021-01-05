@@ -71,12 +71,12 @@ class GwInfoTools:
                 # Get column index
                 field_idx = layer.fields().indexFromName(field['columnname'])
 
-                # Hide selected fields according table config_api_form_fields.hidden
+                # Hide selected fields according table config_form_fields.hidden
                 if 'hidden' in field:
                     kwargs = {"layer": layer, "field": field['columnname'], "hidden": field['hidden']}
                     self.set_column_visibility(**kwargs)
 
-                # Set multiline fields according table config_api_form_fields.widgetcontrols['setQgisMultiline']
+                # Set multiline fields according table config_form_fields.widgetcontrols['setQgisMultiline']
                 if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
                     kwargs = {"layer": layer, "field": field, "fieldIndex": field_idx}
                     self.set_column_multiline(**kwargs)
@@ -146,7 +146,7 @@ class GwInfoTools:
 
 
     def set_column_visibility(self, **kwargs):
-        """ Hide selected fields according table config_api_form_fields.hidden """
+        """ Hide selected fields according table config_form_fields.hidden """
 
         try:
             layer = kwargs["layer"]
@@ -169,7 +169,7 @@ class GwInfoTools:
 
 
     def set_column_multiline(self, **kwargs):
-        """ Set multiline selected fields according table config_api_form_fields.widgetcontrols['setQgisMultiline'] """
+        """ Set multiline selected fields according table config_form_fields.widgetcontrols['setQgisMultiline'] """
 
         try:
             field = kwargs["field"]
@@ -189,7 +189,7 @@ class GwInfoTools:
 
 
     def set_read_only(self, **kwargs):
-        """ Set field readOnly according to client configuration into config_api_form_fields (field 'iseditable') """
+        """ Set field readOnly according to client configuration into config_form_fields (field 'iseditable') """
 
         try:
             field = kwargs["field"]
@@ -254,7 +254,7 @@ class GwInfoTools:
         PERFORM pg_notify(current_user,
                   '{"functionAction":{"functions":[{"name":"show_message","parameters":
                   {"message":"line 1 \n line 2","tabName":"Notify channel",
-                  "styleSheet":{"level":1,"color":"red","bold":true}}}]},"user":"postgres","schema":"api_ws_sample"}');
+                  "styleSheet":{"level":1,"color":"red","bold":true}}}]},"user":"postgres","schema":"ws_sample"}');
 
         functions called in -> getattr(self, function_name)(**params):
         Show message in console log,

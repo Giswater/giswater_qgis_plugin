@@ -330,16 +330,16 @@ class GwI18NGenerator:
                          f'"tooltip":{{"column":"tooltip", "value":"{tt_value}"}}')
 
             # Clause WHERE for each context
-            if row['context'] == 'config_api_form_fields':
+            if row['context'] == 'config_form_fields':
                 line += (f', "clause":"WHERE columnname = \'{source}\' '
                          f'AND formname = \'{form_name}\' AND formtype = \'{form_type}\'"')
-            elif row['context'] == 'config_api_form_tabs':
+            elif row['context'] == 'config_form_tabs':
                 line += (f', "clause":"WHERE formname = \'{form_name}\' '
                          f'AND columnname = \'{source}\' AND formtype = \'{form_type}\'"')
-            elif row['context'] == 'config_api_form_groupbox':
+            elif row['context'] == 'config_form_groupbox':
                 line += (f', "clause":"WHERE formname = \'{form_name}\' '
                          f'AND layout_id  = \'{source}\'"')
-            elif row['context'] == 'config_api_form_actions':
+            elif row['context'] == 'config_form_actions':
                 line += f', "clause":"WHERE actioname  = \'{source}\''
             elif row['context'] == 'config_param_system':
                 line += f', "clause":"WHERE parameter = \'{source}\'"'

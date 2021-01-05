@@ -574,7 +574,7 @@ def disable_widgets(dialog, result, enable):
                         widget.setStyleSheet("QWidget {color: rgb(0, 0, 0)}")
                     elif type(widget) is QPushButton:
                         # Manage the clickability of the buttons according to the configuration
-                        # in the table config_api_form_fields simultaneously with the edition,
+                        # in the table config_form_fields simultaneously with the edition,
                         # but giving preference to the configuration when iseditable is True
                         if not field['iseditable']:
                             widget.setEnabled(field['iseditable'])
@@ -1186,7 +1186,7 @@ def fill_typeahead(completer, model, field, dialog, widget):
     list_items = []
     for field in complet_list['body']['data']:
         list_items.append(field['idval'])
-    tools_qt.set_completer_object_api(completer, model, widget, list_items)
+    tools_qt.set_completer_object(completer, model, widget, list_items)
 
 
 def set_data_type(field, widget):
@@ -1242,7 +1242,7 @@ def add_tableview(complet_result, field):
                 tools_qgis.show_message(msg, 2)
                 return widget
 
-    # Call def gw_api_open_rpt_result(widget, complet_result) of class ApiCf
+    # Call def gw_api_open_rpt_result(widget, complet_result) of class customForm
     # noinspection PyUnresolvedReferences
     widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), widget, complet_result))
 
@@ -1409,7 +1409,7 @@ def check_config_settings(section, parameter, value, config_type="user", file_na
 
 def get_json(function_name, parameters=None, schema_name=None, commit=True, log_sql=False,
              log_result=False, json_loads=False, is_notify=False, rubber_band=None):
-    """ Manage execution API function
+    """ Manage execution database function
     :param function_name: Name of function to call (text)
     :param parameters: Parameters for function (json) or (query parameters)
     :param commit: Commit sql (bool)
@@ -1501,7 +1501,7 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
             function_name = inspect.stack()[stack_level][3]
 
             # Set exception message details
-            title = "Database API execution failed"
+            title = "Database execution failed"
             msg = ""
             msg += f"File name: {file_name}\n"
             msg += f"Function name: {function_name}\n"

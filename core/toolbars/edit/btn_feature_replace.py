@@ -136,7 +136,7 @@ class GwFeatureReplaceButton(GwMaptoolButton):
         row = tools_db.get_row(sql)
 
         self.catalog = GwCatalog()
-        self.catalog.api_catalog(self.dlg_replace, 'featurecat_id', row[0], feature_type)
+        self.catalog.open_catalog(self.dlg_replace, 'featurecat_id', row[0], feature_type)
 
 
     def update_date(self):

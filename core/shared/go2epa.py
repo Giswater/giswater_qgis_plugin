@@ -245,7 +245,7 @@ class GwGo2Epa:
 
 
     def epa_options(self):
-        """ Open dialog api_epa_options.ui.ui """
+        """ Open dialog epa_options.ui.ui """
 
         self.g2epa_opt.go2epa_options()
         return

@@ -51,7 +51,7 @@ class Selector:
     def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None,
                      is_setselector=None, selector_vars={}):
         """ Ask to DB for selectors and make dialog
-        :param dialog: Is a standard dialog, from file api_selectors.ui, where put widgets
+        :param dialog: Is a standard dialog, from file selector.ui, where put widgets
         :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
         """
 
