@@ -5,10 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-/*
-------------------
-api_epa_options.ui
-------------------
 Dynamic based layout build for ud/ws projects
 
 utils 	- grl_general_1
