@@ -10,13 +10,13 @@ from functools import partial
 from qgis.PyQt.QtCore import QStringListModel
 from qgis.PyQt.QtWidgets import QCompleter
 
-from ..parent_dialog import GwParentAction
+from ..dialog_button import GwDialogButton
 from ...ui.ui_manager import FeatureDelete
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_qt, tools_db
 
 
-class GwDeleteFeatureButton(GwParentAction):
+class GwDeleteFeatureButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

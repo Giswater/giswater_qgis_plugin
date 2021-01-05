@@ -9,13 +9,13 @@ from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QDate
 
-from ..parent_maptool import GwParentMapTool
+from ..maptool_button import GwMaptoolButton
 from ...ui.ui_manager import ArcFusionUi
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_db, tools_qgis
 
 
-class GwArcFusionButton(GwParentMapTool):
+class GwArcFusionButton(GwMaptoolButton):
     """ Button 17: User select one node. Execute SQL function: 'gw_fct_delete_node' """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):

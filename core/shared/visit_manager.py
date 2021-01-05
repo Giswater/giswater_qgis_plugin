@@ -28,7 +28,7 @@ from ..models.om_visit_x_gully import OmVisitXGully
 from ..models.om_visit_parameter import OmVisitParameter
 from ..ui.ui_manager import VisitUi, VisitEvent, VisitEventRehab, VisitManagerUi
 from ..utils import tools_gw
-from ..utils.tools_gw_snap_manager import GwSnapManager
+from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_db
 

@@ -29,8 +29,8 @@ from qgis.gui import QgsDateTimeEdit
 
 from ..models.sys_feature_cat import SysFeatureCat
 from ..ui.ui_manager import GwDialog, GwMainWindow, DockerUi
-from ..utils.tools_gw_select_manager import GwSelectManager
-from ..utils.tools_gw_snap_manager import GwSnapManager
+from ..utils.select_manager import GwSelectManager
+from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_pgdao, tools_qt, tools_log, tools_os, tools_db
 from ...lib.tools_qt import GwHyperLinkLabel

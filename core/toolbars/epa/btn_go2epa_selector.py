@@ -7,14 +7,14 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 
-from ..parent_dialog import GwParentAction
+from ..dialog_button import GwDialogButton
 from ...ui.ui_manager import Go2EpaSelectorUi
 from ...utils import tools_gw
 from .... import global_vars
 from ....lib import tools_qt, tools_db, tools_qgis
 
 
-class GwGo2EpaSelectorButton(GwParentAction):
+class GwGo2EpaSelectorButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

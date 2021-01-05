@@ -28,8 +28,8 @@ from ..ui.ui_manager import DialogTextUi, Mincut, MincutComposer, MincutConnec, 
     MincutManagerUi
 from ... import global_vars
 from ...lib import tools_qt, tools_qgis, tools_log, tools_db
-from ..utils.tools_gw_select_manager import GwSelectManager
-from ..utils.tools_gw_snap_manager import GwSnapManager
+from ..utils.select_manager import GwSelectManager
+from ..utils.snap_manager import GwSnapManager
 
 
 class GwMincut:

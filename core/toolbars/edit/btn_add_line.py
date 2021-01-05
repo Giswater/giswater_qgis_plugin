@@ -10,13 +10,13 @@ from functools import partial
 from qgis.PyQt.QtGui import QKeySequence
 from qgis.PyQt.QtWidgets import QAction, QMenu
 
-from ..parent_dialog import GwParentAction
+from ..dialog_button import GwDialogButton
 from ...shared.info import GwInfo
 from ...utils import tools_gw
 from ....lib import tools_os
 
 
-class GwAddLineButton(GwParentAction):
+class GwAddLineButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

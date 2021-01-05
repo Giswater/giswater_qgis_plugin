@@ -5,13 +5,13 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ..parent_dialog import GwParentAction
+from ..dialog_button import GwDialogButton
 from ...load_project_check import GwProjectCheck
 
 from ....lib import tools_qgis
 
 
-class GwProjectCheckButton(GwParentAction):
+class GwProjectCheckButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

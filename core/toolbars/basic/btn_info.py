@@ -16,13 +16,13 @@ from qgis.core import QgsGeometry, QgsMapToPixel, QgsPointXY
 from qgis.gui import QgsRubberBand
 from ...shared import info
 from ...shared.info import GwInfo
-from ...toolbars.parent_maptool import GwParentMapTool
+from ...toolbars.maptool_button import GwMaptoolButton
 from ...utils import tools_gw
 from .... import global_vars
 from ....lib import tools_qgis
 
 
-class GwInfoButton(GwParentMapTool):
+class GwInfoButton(GwMaptoolButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

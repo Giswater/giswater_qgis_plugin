@@ -16,14 +16,14 @@ from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit
 from qgis.core import QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel, QgsLayoutExporter
 from qgis.gui import QgsRubberBand
 
-from ..parent_dialog import GwParentAction
+from ..dialog_button import GwDialogButton
 from ...ui.ui_manager import FastPrintUi
 from ...utils import tools_gw
 from .... import global_vars
 from ....lib import tools_qgis, tools_qt
 
 
-class GwPrintButton(GwParentAction):
+class GwPrintButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

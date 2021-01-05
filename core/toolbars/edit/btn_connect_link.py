@@ -11,13 +11,13 @@ from qgis.PyQt.QtCore import QRect, Qt
 from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsVectorLayer, QgsRectangle
 
-from ..parent_maptool import GwParentMapTool
+from ..maptool_button import GwMaptoolButton
 from ...ui.ui_manager import DialogTextUi
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_qt
 
 
-class GwConnectLinkButton(GwParentMapTool):
+class GwConnectLinkButton(GwMaptoolButton):
     """ Button 20: User select connections from layer 'connec'
     Execute SQL function: 'gw_fct_setlinktonetwork ' """
 

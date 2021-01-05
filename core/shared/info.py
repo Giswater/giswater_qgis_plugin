@@ -32,7 +32,7 @@ from .element import GwElement
 from .visit_gallery import GwVisitGallery
 from .visit_manager import GwVisitManager
 from ..utils import tools_gw
-from ..utils.tools_gw_snap_manager import GwSnapManager
+from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
     DialogTextUi
 from ... import global_vars

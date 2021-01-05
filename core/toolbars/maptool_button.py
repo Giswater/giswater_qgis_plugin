@@ -14,11 +14,11 @@ from qgis.PyQt.QtGui import QCursor, QColor, QIcon
 from qgis.PyQt.QtWidgets import QAction
 
 from ..utils import tools_gw
-from ..utils.tools_gw_snap_manager import GwSnapManager
+from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
 
 
-class GwParentMapTool(QgsMapTool):
+class GwMaptoolButton(QgsMapTool):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

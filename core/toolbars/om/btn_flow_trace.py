@@ -7,12 +7,12 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import Qt
 
-from ..parent_maptool import GwParentMapTool
+from ..maptool_button import GwMaptoolButton
 from ...utils import tools_gw
 from ....lib import tools_qgis
 
 
-class GwFlowTraceButton(GwParentMapTool):
+class GwFlowTraceButton(GwMaptoolButton):
     """ Button 56: Flow trace """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):

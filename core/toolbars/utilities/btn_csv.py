@@ -13,14 +13,14 @@ from functools import partial
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QFileDialog
 
-from ..parent_dialog import GwParentAction
+from ..dialog_button import GwDialogButton
 from ...ui.ui_manager import Csv2pgUi
 from ...utils import tools_gw
 from .... import global_vars
 from ....lib import tools_qt, tools_log, tools_db, tools_qgis
 
 
-class GwCSVButton(GwParentAction):
+class GwCSVButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

@@ -9,14 +9,14 @@ from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 
-from ..parent_maptool import GwParentMapTool
+from ..maptool_button import GwMaptoolButton
 from ...ui.ui_manager import DialogTextUi
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_qgis, tools_db
 from .... import global_vars
 
 
-class GwArcDivideButton(GwParentMapTool):
+class GwArcDivideButton(GwMaptoolButton):
     """ Button 16. Move node
     Execute SQL function: 'gw_fct_node2arc' """
 

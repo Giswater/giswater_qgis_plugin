@@ -10,7 +10,7 @@ from functools import partial
 from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsFeatureRequest
 
-from ..parent_maptool import GwParentMapTool
+from ..maptool_button import GwMaptoolButton
 from ...shared.catalog import GwCatalog
 from ...shared.info import GwInfo
 from ...ui.ui_manager import NodeTypeChange
@@ -18,7 +18,7 @@ from ...utils import tools_gw
 from ....lib import tools_qgis, tools_qt, tools_db
 
 
-class GwNodeTypeChangeButton(GwParentMapTool):
+class GwNodeTypeChangeButton(GwMaptoolButton):
     """ Button 28: User select one node. A form is opened showing current node_type.type
             Combo to select new node_type.type
             Combo to select new node_type.id

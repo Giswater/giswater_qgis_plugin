@@ -11,13 +11,13 @@ from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtWidgets import QAbstractItemView
 from qgis.PyQt.QtGui import QRegExpValidator
 
-from ..parent_dialog import GwParentAction
+from ..dialog_button import GwDialogButton
 from ...ui.ui_manager import EpaManager
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_db, tools_qgis
 
 
-class GwGo2EpaManagerButton(GwParentAction):
+class GwGo2EpaManagerButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

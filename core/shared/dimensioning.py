@@ -15,7 +15,7 @@ from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsRubberBand, QgsVertexMar
 
 from ..utils import tools_gw
 from ..ui.ui_manager import DimensioningUi
-from ..utils.tools_gw_snap_manager import GwSnapManager
+from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt
 

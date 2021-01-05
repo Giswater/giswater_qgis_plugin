@@ -19,7 +19,7 @@ from qgis.PyQt.QtWidgets import QListWidgetItem, QLineEdit, QAction
 from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsExpression
 from qgis.gui import QgsMapToolEmitPoint
 
-from ..parent_maptool import GwParentMapTool
+from ..maptool_button import GwMaptoolButton
 from ...ui.ui_manager import Profile, ProfilesList
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_log, tools_qgis
@@ -53,7 +53,7 @@ class NodeData:
         self.surface_type = None
 
 
-class GwProfileButton(GwParentMapTool):
+class GwProfileButton(GwMaptoolButton):
     """ Button 43: Draw_profiles """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
