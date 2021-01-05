@@ -230,7 +230,7 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
         return False
 
     # Connect to Database
-    global_vars.session_vars['dao'] = tools_pgdao.PgDao()
+    global_vars.session_vars['dao'] = tools_pgdao.GwPgDao()
     global_vars.session_vars['dao'].set_params(host, port, db, user, pwd, sslmode)
     status = global_vars.session_vars['dao'].init_db()
     if not status:
@@ -264,7 +264,7 @@ def connect_to_database_service(service, sslmode=None):
         return False
 
     # Connect to Database
-    global_vars.session_vars['dao'] = tools_pgdao.PgDao()
+    global_vars.session_vars['dao'] = tools_pgdao.GwPgDao()
     global_vars.session_vars['dao'].set_conn_string(conn_string)
     status = global_vars.session_vars['dao'].init_db()
     if not status:

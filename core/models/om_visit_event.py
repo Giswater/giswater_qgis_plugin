@@ -17,7 +17,7 @@ __revision__ = '$Format:%H$'
 from .table import Table, GenericDescriptor
 
 
-class OmVisitEvent(Table):
+class GwOmVisitEvent(Table):
     """ Class to serialize table 'om_visit_event' """
 
     id = GenericDescriptor(-1)

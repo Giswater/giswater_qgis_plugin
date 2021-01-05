@@ -13,7 +13,7 @@ from qgis.core import QgsDataSourceUri
 from .. import global_vars
 
 
-class PgDao(object):
+class GwPgDao(object):
 
     def __init__(self):
 
