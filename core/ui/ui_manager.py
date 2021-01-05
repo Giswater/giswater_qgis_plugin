@@ -155,15 +155,15 @@ FORM_CLASS = get_ui_class('search_workcat.ui', 'basic')
 class SearchWorkcat(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('visit_event_full.ui', 'basic')
+FORM_CLASS = get_ui_class('visit_event_full.ui')
 class VisitEventFull(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('visit_gallery.ui', 'basic')
+FORM_CLASS = get_ui_class('visit_gallery.ui')
 class Gallery(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('visit_gallery_zoom.ui', 'basic')
+FORM_CLASS = get_ui_class('visit_gallery_zoom.ui')
 class GalleryZoom(GwDialog, FORM_CLASS):
     pass
 # endregion
