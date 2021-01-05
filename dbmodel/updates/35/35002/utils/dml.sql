@@ -207,3 +207,5 @@ UPDATE config_form_fields SET dv_querytext = concat(REPLACE(dv_querytext, 'WHERE
 WHERE columnname IN ('location_type', 'category_type','fluid_type', 'function_type') 
 AND (formname ilike 've_arc%' OR formname ilike 've_node%' OR formname ilike 've_connec%' OR formname ilike 've_gully%' 
 OR formname in ('v_edit_element','v_edit_node','v_edit_arc','v_edit_connec','v_edit_gully')) and dv_querytext is not null;
+
+UPDATE sys_function SET function_name = 'gw_fct_setnodefromarc' WHERE id = 2118;
