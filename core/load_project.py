@@ -362,7 +362,6 @@ class LoadProject(QObject):
             self.enable_toolbar("cad")
             self.enable_toolbar("epa")
             self.enable_toolbar("plan")
-            self.enable_toolbar("custom")
 
 
     def enable_toolbars(self, visible=True):
