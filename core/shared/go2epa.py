@@ -17,7 +17,7 @@ from qgis.core import QgsApplication
 
 from .go2epa_options import GwGo2EpaOptions
 from ..btn_admin import GwAdmin
-from ..tasks.task_go2epa import GwGo2EpaTask
+from ..tasks.go2epa_task import GwGo2EpaTask
 from ..utils import tools_gw
 from ..ui.ui_manager import Go2EpaUI, HydrologySelectorUi, MultirowSelectorUi
 from ... import global_vars
@@ -406,9 +406,9 @@ class GwGo2Epa:
 
         # Set background task 'Go2Epa'
         description = f"Go2Epa"
-        self.task_go2epa = GwGo2EpaTask(description, self)
-        QgsApplication.taskManager().addTask(self.task_go2epa)
-        QgsApplication.taskManager().triggerTask(self.task_go2epa)
+        self.go2epa_task = GwGo2EpaTask(description, self)
+        QgsApplication.taskManager().addTask(self.go2epa_task)
+        QgsApplication.taskManager().triggerTask(self.go2epa_task)
 
 
     def set_completer_result(self, widget, viewname, field_name):

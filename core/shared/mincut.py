@@ -22,7 +22,7 @@ from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 
 from .mincut_manager import GwMincutManager
 from .search import GwSearch
-from ..tasks.parent_task import GwTask
+from ..tasks.task import GwTask
 from ..utils import tools_gw
 from ..ui.ui_manager import DialogTextUi, MincutUi, MincutComposerUi, MincutConnecUi, MincutEndUi, MincutHydrometerUi, \
     MincutManagerUi
