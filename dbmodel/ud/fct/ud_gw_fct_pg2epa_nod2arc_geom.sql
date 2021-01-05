@@ -20,14 +20,14 @@ rec_arc record;
 rec_new_arc record;
 rec_flowreg record;
 
-v_nodarc_geom geometry;
-v_nodarc_node_1_geom geometry;
-v_nodarc_node_2_geom geometry;
-v_arc_reduced_geom geometry;
+v_nodarc_geom public.geometry;
+v_nodarc_node_1_geom public.geometry;
+v_nodarc_node_2_geom public.geometry;
+v_arc_reduced_geom public.geometry;
 v_arc text;
 v_node_1 text;
 v_node_2 text;
-v_geom geometry;
+v_geom public.geometry;
 v_node_yinit double precision;
     
 

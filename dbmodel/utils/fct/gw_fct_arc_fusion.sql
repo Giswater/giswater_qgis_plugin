@@ -30,7 +30,7 @@ v_exists_node_id varchar;
 v_new_record SCHEMA_NAME.v_edit_arc;
 v_my_record1 SCHEMA_NAME.v_edit_arc;
 v_my_record2 SCHEMA_NAME.v_edit_arc;
-v_arc_geom geometry;
+v_arc_geom public.geometry;
 v_project_type text;
 rec_addfield1 record;
 rec_addfield2 record;

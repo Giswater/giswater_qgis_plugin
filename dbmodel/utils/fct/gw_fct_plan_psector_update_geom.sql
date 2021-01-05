@@ -12,7 +12,7 @@ $BODY$
 
 DECLARE 
 
-v_pol geometry;
+v_pol public.geometry;
 x1 double precision;
 y1 double precision;
 x2 double precision;

@@ -47,7 +47,7 @@ v_activelayer text;
 v_visiblelayer text;
 v_zoomratio double precision; 
 v_device integer;  
-v_point geometry;
+v_point public.geometry;
 v_sensibility float;
 v_sensibility_f float;
 v_id varchar;

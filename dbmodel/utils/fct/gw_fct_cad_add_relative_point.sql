@@ -15,12 +15,12 @@ $BODY$
 
 DECLARE
 
-v_geom geometry;
+v_geom public.geometry;
 v_percent float;
-v_point geometry;
-v_point1 geometry;
-v_point2 geometry;
-v_point_result geometry;
+v_point public.geometry;
+v_point1 public.geometry;
+v_point2 public.geometry;
+v_point_result public.geometry;
 v_angle float;
 v_xcoord float;
 v_ycoord float;

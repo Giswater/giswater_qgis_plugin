@@ -47,7 +47,7 @@ v_value text;
 text text;
 v_columntype character varying;
 v_newid integer;
-v_geometry geometry;
+v_geometry public.geometry;
 v_id integer;
 
 BEGIN

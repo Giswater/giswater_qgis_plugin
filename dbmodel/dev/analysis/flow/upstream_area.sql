@@ -13,7 +13,7 @@ $BODY$DECLARE
 	node_id_var varchar(16);
 	arc_id_var varchar(16);
 	index_point integer;
-	point_aux geometry;
+	point_aux public.geometry;
 	num_row integer = 0;
 	area_node double precision;
 	total_capacity double precision;

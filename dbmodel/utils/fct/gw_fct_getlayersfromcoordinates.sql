@@ -24,7 +24,7 @@ SELECT SCHEMA_NAME.gw_fct_getlayersfromcoordinates($${
 
 DECLARE
 
-v_point geometry;
+v_point public.geometry;
 v_sensibility float;
 v_sensibility_f float;
 v_ids json[];

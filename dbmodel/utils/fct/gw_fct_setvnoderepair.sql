@@ -41,10 +41,10 @@ v_tolerance double precision;
 v_vnodes record;
 v integer = 0;
 v_fid integer;
-v_geom geometry;
+v_geom public.geometry;
 v_loop record;
 v_node record;
-v_end_point geometry;
+v_end_point public.geometry;
 
 BEGIN 
 
