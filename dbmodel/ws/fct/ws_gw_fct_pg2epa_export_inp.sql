@@ -135,8 +135,10 @@ BEGIN
 	-- build return
 	select (array_to_json(array_agg(row_to_json(row))))::json  -- spacer-19 it's used because a rare bug reading epanet when spacer=20 on target [PATTERNS]????
 	into v_return 
-		from ( select text from
-		(select id, concat(rpad(csv1,22), ' ', csv2)as text from temp_csv where fid  = 141 and cur_user = current_user and source is null
+		from ( select text from (
+		select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', rpad(csv3,20), ' ', rpad(csv4,20), ' ', rpad(csv5,20), ' ', rpad(csv6,20), ' ', rpad(csv7,20), ' ', 
+		rpad(csv8,20), ' ' , rpad(csv9,20), ' ', rpad(csv10,20), ' ', rpad(csv11,20), ' ', rpad(csv12,20)) 
+		as text from temp_csv where fid = 141 and cur_user = current_user and source is null
 		union
 		select id, concat(rpad(csv1,22), ' ', csv2)as text from temp_csv where fid  = 141 and cur_user = current_user and source in ('header')
 		union
