@@ -1491,7 +1491,7 @@ class UpdateSQL(ApiParent):
 
         msg = "This process will take time (few minutes). Are you sure to continue?"
         title = "Create example"
-        answer = tools_qt.ask_question(msg, title)
+        answer = self.controller.ask_question(msg, title)
         if not answer:
             return
 
