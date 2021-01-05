@@ -1436,7 +1436,9 @@ def get_json(function_name, parameters=None, schema_name=None, commit=True, log_
     sql += f");"
 
     # Check log_sql for developers
-    dev_log_sql = get_config_parser('system', 'log_sql', "user", "init")
+    comment = '# log_sql --> If True: show all get_json log, if False: does not show any, if None: ' \
+              'show python log_sql option'
+    dev_log_sql = check_config_settings('system', 'log_sql', 'None', "user", "init", comment=comment)
     if dev_log_sql not in (None, "None", "none"):
         log_sql = tools_os.cast_boolean(dev_log_sql)
 
