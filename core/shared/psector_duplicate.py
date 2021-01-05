@@ -9,7 +9,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import pyqtSignal, QObject
 
-from ..ui.ui_manager import PsectorDuplicate
+from ..ui.ui_manager import PsectorDuplicateUi
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_qt, tools_db, tools_qgis
@@ -28,7 +28,7 @@ class GwPsectorDuplicate(QObject):
     def manage_duplicate_psector(self, psector_id=None):
 
         # Create the dialog and signals
-        self.dlg_duplicate_psector = PsectorDuplicate()
+        self.dlg_duplicate_psector = PsectorDuplicateUi()
         tools_gw.load_settings(self.dlg_duplicate_psector)
 
         # Populate combo duplicate psector

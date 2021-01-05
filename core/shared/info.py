@@ -33,7 +33,7 @@ from .visit_gallery import GwVisitGallery
 from .visit_manager import GwVisitManager
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
-from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFull, GwMainWindow, VisitDocument, InfoCrossectUi, \
+from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFullUi, GwMainWindow, VisitDocumentUi, InfoCrossectUi, \
     DialogTextUi
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_db
@@ -2477,7 +2477,7 @@ class GwInfo(QObject):
         """ Open event of selected record of the table """
 
         # Open dialog event_standard
-        self.dlg_event_full = VisitEventFull()
+        self.dlg_event_full = VisitEventFullUi()
         tools_gw.load_settings(self.dlg_event_full)
         self.dlg_event_full.rejected.connect(partial(tools_gw.close_dialog, self.dlg_event_full))
         # Get all data for one visit
@@ -2789,7 +2789,7 @@ class GwInfo(QObject):
 
         else:
             # If more then one document is attached open dialog with list of documents
-            self.dlg_load_doc = VisitDocument()
+            self.dlg_load_doc = VisitDocumentUi()
             tools_gw.load_settings(self.dlg_load_doc)
             self.dlg_load_doc.rejected.connect(partial(tools_gw.close_dialog, self.dlg_load_doc))
             btn_open_doc = self.dlg_load_doc.findChild(QPushButton, "btn_open")

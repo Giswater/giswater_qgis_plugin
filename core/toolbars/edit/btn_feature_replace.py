@@ -13,7 +13,7 @@ from functools import partial
 from qgis.PyQt.QtCore import QDate, Qt
 
 from ..maptool_button import GwMaptoolButton
-from ...ui.ui_manager import FeatureReplace, InfoWorkcatUi
+from ...ui.ui_manager import FeatureReplaceUi, InfoWorkcatUi
 from ...shared.catalog import GwCatalog
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_log, tools_qgis, tools_db
@@ -53,7 +53,7 @@ class GwFeatureReplaceButton(GwMaptoolButton):
     def init_replace_feature_form(self, feature):
 
         # Create the dialog and signals
-        self.dlg_replace = FeatureReplace()
+        self.dlg_replace = FeatureReplaceUi()
         tools_gw.load_settings(self.dlg_replace)
 
         sql = "SELECT id FROM cat_work ORDER BY id"

@@ -12,7 +12,7 @@ from functools import partial
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog
 
 from ..utils import tools_gw
-from ..ui.ui_manager import DocUi, DocManager
+from ..ui.ui_manager import DocUi, DocManagerUi
 from ... import global_vars
 from ...lib import tools_qt, tools_db, tools_qgis
 
@@ -313,7 +313,7 @@ class GwDocument:
         """ Button 66: Edit document """
 
         # Create the dialog
-        self.dlg_man = DocManager()
+        self.dlg_man = DocManagerUi()
         tools_gw.load_settings(self.dlg_man)
         self.dlg_man.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
 

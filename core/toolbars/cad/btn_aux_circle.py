@@ -13,7 +13,7 @@ from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 
 from ..maptool_button import GwMaptoolButton
-from ...ui.ui_manager import AuxCircle
+from ...ui.ui_manager import AuxCircleUi
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_qt
 
@@ -34,7 +34,7 @@ class GwAuxCircleButton(GwMaptoolButton):
     def init_create_circle_form(self, point):
 
         # Create the dialog and signals
-        self.dlg_create_circle = AuxCircle()
+        self.dlg_create_circle = AuxCircleUi()
         tools_gw.load_settings(self.dlg_create_circle)
         self.cancel_circle = False
         validator = QDoubleValidator(0.00, 999.00, 3)

@@ -26,7 +26,7 @@ from ..models.om_visit_x_connec import GwOmVisitXConnec
 from ..models.om_visit_x_node import GwOmVisitXNode
 from ..models.om_visit_x_gully import GwOmVisitXGully
 from ..models.om_visit_parameter import GwOmVisitParameter
-from ..ui.ui_manager import VisitUi, VisitEvent, VisitEventRehab, VisitManagerUi
+from ..ui.ui_manager import VisitUi, VisitEventUi, VisitEventRehabUi, VisitManagerUi
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
@@ -1125,12 +1125,12 @@ class GwVisitManager(QObject):
         row = tools_db.get_row(sql)
         form_type = str(row[0])
         if form_type in ('event_ud_arc_standard', 'event_standard'):
-            self.dlg_event = VisitEvent()
+            self.dlg_event = VisitEventUi()
             tools_gw.load_settings(self.dlg_event)
             self.populate_position_id()
             dlg_name = 'visit_event'
         elif form_type == 'event_ud_arc_rehabit':
-            self.dlg_event = VisitEventRehab()
+            self.dlg_event = VisitEventRehabUi()
             tools_gw.load_settings(self.dlg_event)
             self.populate_position_id()
             dlg_name = 'visit_event_rehab'
@@ -1417,7 +1417,7 @@ class GwVisitManager(QObject):
             _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
             position_value = self.dlg_add_visit.tbl_event.model().record(0).value('position_value')
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
-            self.dlg_event = VisitEvent()
+            self.dlg_event = VisitEventUi()
             tools_gw.load_settings(self.dlg_event)
             self.populate_position_id()
             dlg_name = 'visit_event'
@@ -1441,7 +1441,7 @@ class GwVisitManager(QObject):
             geom2 = self.dlg_add_visit.tbl_event.model().record(0).value('geom2')
             geom3 = self.dlg_add_visit.tbl_event.model().record(0).value('geom3')
             text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
-            self.dlg_event = VisitEventRehab()
+            self.dlg_event = VisitEventRehabUi()
             tools_gw.load_settings(self.dlg_event)
             self.populate_position_id()
             dlg_name = 'visit_event_rehab'
@@ -1468,7 +1468,7 @@ class GwVisitManager(QObject):
             column_index = tools_qt.get_col_index_by_col_name(self.dlg_add_visit.tbl_event, 'text')
             text = index.sibling(row, column_index).data()
 
-            self.dlg_event = VisitEvent()
+            self.dlg_event = VisitEventUi()
             tools_gw.load_settings(self.dlg_event)
             if event_code not in ('NULL', None):
                 tools_qt.set_widget_text(self.dlg_event, self.dlg_event.event_code, event_code)

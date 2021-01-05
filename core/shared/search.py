@@ -23,7 +23,7 @@ from .document import GwDocument
 from .info import GwInfo
 from .psector import GwPsector
 from .visit_manager import GwVisitManager
-from ..ui.ui_manager import SearchUi, InfoGenericUi, SearchWorkcat
+from ..ui.ui_manager import SearchUi, InfoGenericUi, SearchWorkcatUi
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_db, tools_qgis, tools_qt, tools_config
@@ -460,7 +460,7 @@ class GwSearch:
         # TODO ZOOM TO SELECTED WORKCAT
         # self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
-        self.items_dialog = SearchWorkcat()
+        self.items_dialog = SearchWorkcatUi()
         self.items_dialog.setWindowTitle(f'Workcat: {display_name}')
 
         tools_gw.add_icon(self.items_dialog.btn_doc_insert, "111")

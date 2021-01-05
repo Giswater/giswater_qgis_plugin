@@ -29,7 +29,7 @@ from qgis.utils import reloadPlugin
 from .btn_admin_gis_project import GwAdminGisProject
 from .tasks.parent_task import GwTask
 from .ui.ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjectInfoUi, \
-    MainGisProjectUi, MainImportUi, MainFields, MainVisitClass, MainSysFields, Credentials
+    MainGisProjectUi, MainImportUi, MainFieldsUi, MainVisitClassUi, MainSysFieldsUi, CredentialsUi
 from .utils import tools_gw
 from .. import global_vars
 from ..i18n.i18n_generator import GwI18NGenerator
@@ -1941,7 +1941,7 @@ class GwAdmin:
     def create_visit_class(self):
 
         # Create the dialog and signals
-        self.dlg_manage_visit_class = MainVisitClass()
+        self.dlg_manage_visit_class = MainVisitClassUi()
         tools_gw.load_settings(self.dlg_manage_visit_class)
 
         # Manage widgets
@@ -1964,7 +1964,7 @@ class GwAdmin:
 
         """
         # Create the dialog and signals
-        self.dlg_manage_visit_param = MainVisitParam()
+        self.dlg_manage_visit_param = MainVisitParamUi()
         tools_gw.load_settings(self.dlg_manage_visit_param)
 
         # Manage widgets
@@ -2857,7 +2857,7 @@ class GwAdmin:
     def update_sys_fields(self):
 
         # Create the dialog and signals
-        self.dlg_manage_sys_fields = MainSysFields()
+        self.dlg_manage_sys_fields = MainSysFieldsUi()
         tools_gw.load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
         self.chk_multi_insert = None
@@ -2890,7 +2890,7 @@ class GwAdmin:
     def open_manage_field(self, action):
 
         # Create the dialog and signals
-        self.dlg_manage_fields = MainFields()
+        self.dlg_manage_fields = MainFieldsUi()
         tools_gw.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
@@ -2941,7 +2941,7 @@ class GwAdmin:
 
         # Create the dialog and signals
         self.close_dialog_admin(self.dlg_manage_sys_fields)
-        self.dlg_manage_sys_fields = MainSysFields()
+        self.dlg_manage_sys_fields = MainSysFieldsUi()
         tools_gw.load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
 
@@ -2991,7 +2991,7 @@ class GwAdmin:
 
         # Create the dialog and signals
         self.close_dialog_admin(self.dlg_manage_fields)
-        self.dlg_manage_fields = MainFields()
+        self.dlg_manage_fields = MainFieldsUi()
         tools_gw.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
@@ -3471,7 +3471,7 @@ class GwAdmin:
 
     def create_credentials_form(self, set_connection):
 
-        self.dlg_credentials = Credentials()
+        self.dlg_credentials = CredentialsUi()
 
         if str(self.list_connections) != '[]':
             tools_qt.fill_combo_values(self.dlg_credentials.cmb_connection, self.list_connections, 1)

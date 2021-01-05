@@ -13,7 +13,7 @@ from qgis.PyQt.QtGui import QRegExpValidator
 from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView
 
 from ..utils import tools_gw
-from ..ui.ui_manager import ElementUi, ElementManager
+from ..ui.ui_manager import ElementUi, ElementManagerUi
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_db
@@ -492,7 +492,7 @@ class GwElement:
         """ Button 67: Edit element """
 
         # Create the dialog
-        self.dlg_man = ElementManager()
+        self.dlg_man = ElementManagerUi()
         tools_gw.load_settings(self.dlg_man)
         self.dlg_man.tbl_element.setSelectionBehavior(QAbstractItemView.SelectRows)
 

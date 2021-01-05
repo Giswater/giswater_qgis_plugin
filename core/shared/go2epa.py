@@ -19,7 +19,7 @@ from .go2epa_options import GwGo2EpaOptions
 from ..btn_admin import GwAdmin
 from ..tasks.task_go2epa import GwGo2EpaTask
 from ..utils import tools_gw
-from ..ui.ui_manager import Go2EpaUI, HydrologySelector, MultirowSelector
+from ..ui.ui_manager import Go2EpaUI, HydrologySelectorUi, MultirowSelectorUi
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_db
 
@@ -226,7 +226,7 @@ class GwGo2Epa:
     def sector_selection(self, tableleft, tableright, field_id_left, field_id_right, aql=""):
         """ Load the tables in the selection form """
 
-        dlg_psector_sel = MultirowSelector('dscenario')
+        dlg_psector_sel = MultirowSelectorUi('dscenario')
         tools_gw.load_settings(dlg_psector_sel)
         dlg_psector_sel.btn_ok.clicked.connect(dlg_psector_sel.close)
 
@@ -254,7 +254,7 @@ class GwGo2Epa:
     def ud_hydrology_selector(self):
         """ Dialog hydrology_selector.ui """
 
-        self.dlg_hydrology_selector = HydrologySelector()
+        self.dlg_hydrology_selector = HydrologySelectorUi()
         tools_gw.load_settings(self.dlg_hydrology_selector)
 
         self.dlg_hydrology_selector.btn_accept.clicked.connect(self.save_hydrology)

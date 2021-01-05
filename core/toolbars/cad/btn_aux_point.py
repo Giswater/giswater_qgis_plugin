@@ -13,7 +13,7 @@ from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 
 from ..maptool_button import GwMaptoolButton
-from ...ui.ui_manager import AuxPoint
+from ...ui.ui_manager import AuxPointUi
 from ...utils import tools_gw
 from .... import global_vars
 from ....lib import tools_qgis, tools_qt, tools_db
@@ -37,7 +37,7 @@ class GwAuxPointButton(GwMaptoolButton):
     def init_create_point_form(self, point_1=None, point_2=None):
 
         # Create the dialog and signals
-        self.dlg_create_point = AuxPoint()
+        self.dlg_create_point = AuxPointUi()
         tools_gw.load_settings(self.dlg_create_point)
 
         validator = QDoubleValidator(-99999.99, 99999.999, 3)

@@ -24,7 +24,7 @@ from .mincut_manager import GwMincutManager
 from .search import GwSearch
 from ..tasks.parent_task import GwTask
 from ..utils import tools_gw
-from ..ui.ui_manager import DialogTextUi, Mincut, MincutComposer, MincutConnec, MincutEndUi, MincutHydrometer, \
+from ..ui.ui_manager import DialogTextUi, MincutUi, MincutComposerUi, MincutConnecUi, MincutEndUi, MincutHydrometerUi, \
     MincutManagerUi
 from ... import global_vars
 from ...lib import tools_qt, tools_qgis, tools_log, tools_db
@@ -108,7 +108,7 @@ class GwMincut:
         tools_qgis.remove_layer_from_toc('Other mincuts which overlaps', 'GW Temporal Layers')
         tools_qgis.remove_layer_from_toc('Overlap affected connecs', 'GW Temporal Layers')
 
-        self.dlg_mincut = Mincut()
+        self.dlg_mincut = MincutUi()
         tools_gw.load_settings(self.dlg_mincut)
         self.dlg_mincut.setWindowFlags(Qt.WindowStaysOnTopHint)
 
@@ -770,7 +770,7 @@ class GwMincut:
         self.action_add_hydrometer.setDisabled(True)
 
         # Set dialog add_connec
-        self.dlg_connec = MincutConnec()
+        self.dlg_connec = MincutConnecUi()
         self.dlg_connec.setWindowTitle("Connec management")
         tools_gw.load_settings(self.dlg_connec)
         self.dlg_connec.tbl_mincut_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -934,7 +934,7 @@ class GwMincut:
         self.action_add_connec.setDisabled(True)
 
         # Set dialog MincutHydrometer
-        self.dlg_hydro = MincutHydrometer()
+        self.dlg_hydro = MincutHydrometerUi()
         tools_gw.load_settings(self.dlg_hydro)
         self.dlg_hydro.setWindowTitle("Hydrometer management")
         self.dlg_hydro.tbl_hydro.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -2021,7 +2021,7 @@ class GwMincut:
             return
 
         # Set dialog add_connec
-        self.dlg_comp = MincutComposer()
+        self.dlg_comp = MincutComposerUi()
         tools_gw.load_settings(self.dlg_comp)
 
         # Fill ComboBox cbx_template with templates *.qpt

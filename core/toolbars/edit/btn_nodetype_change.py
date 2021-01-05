@@ -13,7 +13,7 @@ from qgis.core import QgsFeatureRequest
 from ..maptool_button import GwMaptoolButton
 from ...shared.catalog import GwCatalog
 from ...shared.info import GwInfo
-from ...ui.ui_manager import NodeTypeChange
+from ...ui.ui_manager import NodeTypeChangeUi
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_qt, tools_db
 
@@ -114,7 +114,7 @@ class GwNodeTypeChangeButton(GwMaptoolButton):
     def change_elem_type(self, feature):
 
         # Create the dialog, fill node_type and define its signals
-        self.dlg_chg_node_type = NodeTypeChange()
+        self.dlg_chg_node_type = NodeTypeChangeUi()
         tools_gw.load_settings(self.dlg_chg_node_type)
 
         # Get nodetype_id from current node
