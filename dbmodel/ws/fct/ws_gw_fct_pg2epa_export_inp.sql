@@ -144,9 +144,10 @@ BEGIN
 		union
 		select id, csv1 as text from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_controls','vi_rules', 'vi_backdrop')
 		union
-		select id, concat(rpad(csv1,22),' ',rpad(csv2,22),' ', rpad(csv3,22),' ',rpad(csv4,22),' ',rpad(csv5,22),' ',rpad(csv6,22),' ',rpad(csv7,22),' ',
-		rpad(csv8,22),' ',rpad(csv9,22),' ',rpad(csv10,22),' ',rpad(csv11,22),' ',rpad(csv12,22),' ',rpad(csv13,22),' ',rpad(csv14,22),' ',rpad(csv15,22),' ',
-		rpad(csv15,22),' ',rpad(csv16,22),' ',rpad(csv17,22),' ', rpad(csv18,22), ' ', rpad(csv19,22),' ',rpad(csv20,22)) as text
+		select id, concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),
+		' ',rpad(coalesce(csv6,''),20),	' ',rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20),' ',rpad(coalesce(csv9,''),20),' ',rpad(coalesce(csv10,''),20),
+		' ',rpad(coalesce(csv11,''),20),' ',rpad(coalesce(csv12,''),20),' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20),' ', rpad(csv15,20),' ',
+		rpad(csv16,20),	' ',rpad(csv17,20),' ', rpad(csv20,20), ' ', rpad(csv19,20),' ',rpad(csv20,20)) as text
 		from temp_csv where source not in ('header','vi_controls','vi_rules', 'vi_backdrop')
 		order by id)a )row;
 	

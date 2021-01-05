@@ -73,12 +73,7 @@ BEGIN
 		END LOOP;
 	
 		-- insert values
-	--	CASE WHEN rec_table.tablename='vi_options' and (SELECT value FROM vi_options WHERE parameter='hydraulics') is null THEN
-			--EXECUTE 'INSERT INTO temp_csv SELECT nextval(''temp_csv_id_seq''::regclass),'||v_fid||',current_user,'''||rec_table.tablename::text||''',*  FROM '||rec_table.tablename||' WHERE parameter!=''hydraulics'';';
-	--	ELSE
-			EXECUTE 'INSERT INTO temp_csv SELECT nextval(''temp_csv_id_seq''::regclass),'||v_fid||',current_user,'''||rec_table.tablename::text||''',*  FROM '||rec_table.tablename||';';
-	--	END CASE;
-	
+		EXECUTE 'INSERT INTO temp_csv SELECT nextval(''temp_csv_id_seq''::regclass),'||v_fid||',current_user,'''||rec_table.tablename::text||''',*  FROM '||rec_table.tablename||';';
 
 		IF p_path IS NOT NULL THEN
 			--add formating - spaces
@@ -112,12 +107,13 @@ BEGIN
 		union
 		select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', csv3)as text from temp_csv where fid = 141 and cur_user = current_user and source in ('vi_files')
 		union
-		select id, concat(rpad(csv1,20),' ',rpad(csv2,20),' ', rpad(csv3,20),' ',rpad(csv4,20),' ',rpad(csv5,20),' ',rpad(csv6,20),' ',rpad(csv7,20),' ',
-		rpad(csv8,20),' ',rpad(csv9,20),' ',rpad(csv10,20),' ',rpad(csv11,20),' ',rpad(csv12,20),' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20),' ',
-		rpad(csv15,20),' ',rpad(csv16,20),' ',rpad(csv17,20),' ', rpad(csv20,20), ' ', rpad(csv19,20),' ',rpad(csv20,20)) as text
+		select id, concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),' ',rpad(coalesce(csv6,''),20),
+		' ',rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20),' ',rpad(coalesce(csv9,''),20),' ',rpad(coalesce(csv10,''),20),' ',rpad(coalesce(csv11,''),20),' ',rpad(coalesce(csv12,''),20),
+		' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20),' ', rpad(csv15,20),' ',rpad(csv16,20),' ',rpad(csv17,20),' ', rpad(csv20,20), ' ', rpad(csv19,20),' ',rpad(csv20,20)) as text
 		from temp_csv where source not in
 		('header','vi_controls','vi_rules', 'vi_backdrop', 'vi_adjustments','vi_evaporation', 'vi_files','vi_hydrographs','vi_polygons','vi_temperature','vi_transects')
-		order by id)a )row;
+		order by id
+		)a )row;
 	
 	RETURN v_return;
         
