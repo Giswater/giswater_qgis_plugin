@@ -28,8 +28,8 @@ from qgis.utils import reloadPlugin
 
 from .btn_admin_gis_project import GwAdminGisProject
 from .tasks.task import GwTask
-from .ui.ui_manager import MainUi, MainDbProjectUi, MainRenameProjUi, MainProjectInfoUi, \
-    MainGisProjectUi, MainImportUi, MainFieldsUi, MainVisitClassUi, MainSysFieldsUi, CredentialsUi
+from .ui.ui_manager import GwMainUi, GwMainDbProjectUi, GwMainRenameProjUi, GwMainProjectInfoUi, \
+    GwMainGisProjectUi, GwMainImportUi, GwMainFieldsUi, GwMainVisitClassUi, GwMainSysFieldsUi, GwCredentialsUi
 from .utils import tools_gw
 from .. import global_vars
 from ..i18n.i18n_generator import GwI18NGenerator
@@ -159,7 +159,7 @@ class GwAdmin:
         self.dev_commit = tools_gw.get_config_parser('system', 'dev_commit', "project", "dev")
 
         # Create dialog object
-        self.dlg_readsql = MainUi()
+        self.dlg_readsql = GwMainUi()
         tools_gw.load_settings(self.dlg_readsql)
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
@@ -441,7 +441,7 @@ class GwAdmin:
             return
 
         # Create GIS project dialog
-        self.dlg_create_gis_project = MainGisProjectUi()
+        self.dlg_create_gis_project = GwMainGisProjectUi()
         tools_gw.load_settings(self.dlg_create_gis_project)
 
         # Set default values
@@ -1306,7 +1306,7 @@ class GwAdmin:
     def execute_import_data(self, schema_type=''):
 
         # Create dialog
-        self.dlg_import_inp = MainImportUi()
+        self.dlg_import_inp = GwMainImportUi()
         tools_gw.load_settings(self.dlg_import_inp)
 
         # Hide widgets
@@ -1941,7 +1941,7 @@ class GwAdmin:
     def create_visit_class(self):
 
         # Create the dialog and signals
-        self.dlg_manage_visit_class = MainVisitClassUi()
+        self.dlg_manage_visit_class = GwMainVisitClassUi()
         tools_gw.load_settings(self.dlg_manage_visit_class)
 
         # Manage widgets
@@ -2006,7 +2006,7 @@ class GwAdmin:
     def open_update_info(self):
 
         # Create dialog
-        self.dlg_readsql_show_info = MainProjectInfoUi()
+        self.dlg_readsql_show_info = GwMainProjectInfoUi()
         tools_gw.load_settings(self.dlg_readsql_show_info)
 
         info_updates = self.dlg_readsql_show_info.findChild(QTextEdit, 'info_updates')
@@ -2240,7 +2240,7 @@ class GwAdmin:
     def init_dialog_create_project(self, project_type=None):
         """ Initialize dialog (only once) """
 
-        self.dlg_readsql_create_project = MainDbProjectUi()
+        self.dlg_readsql_create_project = GwMainDbProjectUi()
         tools_gw.load_settings(self.dlg_readsql_create_project)
 
         # Find Widgets in form
@@ -2343,7 +2343,7 @@ class GwAdmin:
             return
 
         # Create dialog
-        self.dlg_readsql_rename = MainRenameProjUi()
+        self.dlg_readsql_rename = GwMainRenameProjUi()
         tools_gw.load_settings(self.dlg_readsql_rename)
 
         schema = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -2459,7 +2459,7 @@ class GwAdmin:
     def copy_schema(self):
 
         # Create dialog
-        self.dlg_readsql_copy = MainRenameProjUi()
+        self.dlg_readsql_copy = GwMainRenameProjUi()
         tools_gw.load_settings(self.dlg_readsql_copy)
 
         schema = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
@@ -2857,7 +2857,7 @@ class GwAdmin:
     def update_sys_fields(self):
 
         # Create the dialog and signals
-        self.dlg_manage_sys_fields = MainSysFieldsUi()
+        self.dlg_manage_sys_fields = GwMainSysFieldsUi()
         tools_gw.load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
         self.chk_multi_insert = None
@@ -2890,7 +2890,7 @@ class GwAdmin:
     def open_manage_field(self, action):
 
         # Create the dialog and signals
-        self.dlg_manage_fields = MainFieldsUi()
+        self.dlg_manage_fields = GwMainFieldsUi()
         tools_gw.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
@@ -2941,7 +2941,7 @@ class GwAdmin:
 
         # Create the dialog and signals
         self.close_dialog_admin(self.dlg_manage_sys_fields)
-        self.dlg_manage_sys_fields = MainSysFieldsUi()
+        self.dlg_manage_sys_fields = GwMainSysFieldsUi()
         tools_gw.load_settings(self.dlg_manage_sys_fields)
         self.model_update_table = None
 
@@ -2991,7 +2991,7 @@ class GwAdmin:
 
         # Create the dialog and signals
         self.close_dialog_admin(self.dlg_manage_fields)
-        self.dlg_manage_fields = MainFieldsUi()
+        self.dlg_manage_fields = GwMainFieldsUi()
         tools_gw.load_settings(self.dlg_manage_fields)
         self.model_update_table = None
 
@@ -3471,7 +3471,7 @@ class GwAdmin:
 
     def create_credentials_form(self, set_connection):
 
-        self.dlg_credentials = CredentialsUi()
+        self.dlg_credentials = GwCredentialsUi()
 
         if str(self.list_connections) != '[]':
             tools_qt.fill_combo_values(self.dlg_credentials.cmb_connection, self.list_connections, 1)

@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QFileDialog
 
 from ..dialog_button import GwDialogButton
-from ...ui.ui_manager import Csv2pgUi
+from ...ui.ui_manager import GwCsv2pgUi
 from ...utils import tools_gw
 from .... import global_vars
 from ....lib import tools_qt, tools_log, tools_db, tools_qgis
@@ -29,7 +29,7 @@ class GwCSVButton(GwDialogButton):
     def clicked_event(self):
 
         self.func_name = None
-        self.dlg_csv = Csv2pgUi()
+        self.dlg_csv = GwCsv2pgUi()
         tools_gw.load_settings(self.dlg_csv)
 
         # Get roles from BD

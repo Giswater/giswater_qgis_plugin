@@ -12,7 +12,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtWidgets import QLabel, QPushButton, QLineEdit
 
-from ..ui.ui_manager import GalleryUi, GalleryZoomUi
+from ..ui.ui_manager import GwGalleryUi, GwGalleryZoomUi
 from ..utils import tools_gw
 from ...lib import tools_db
 from ...lib.tools_qt import GwExtendedQLabel
@@ -29,7 +29,7 @@ class GwVisitGallery:
     def manage_gallery(self):
 
         # Create the dialog and signals
-        self.dlg_gallery = GalleryUi()
+        self.dlg_gallery = GwGalleryUi()
         tools_gw.load_settings(self.dlg_gallery)
 
 
@@ -205,7 +205,7 @@ class GwVisitGallery:
 
         handeler_index = i
 
-        self.dlg_gallery_zoom = GalleryZoomUi()
+        self.dlg_gallery_zoom = GwGalleryZoomUi()
         tools_gw.load_settings(self.dlg_gallery_zoom)
         self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom")
 

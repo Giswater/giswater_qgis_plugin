@@ -14,7 +14,7 @@ from functools import partial
 
 from .. import global_vars
 from ..lib import tools_qt, tools_qgis, tools_db
-from ..core.ui.ui_manager import MainQtDialogUi
+from ..core.ui.ui_manager import GwMainQtDialogUi
 from ..core.utils import tools_gw
 
 
@@ -25,7 +25,7 @@ class GwI18NGenerator:
 
 
     def init_dialog(self):
-        self.dlg_qm = MainQtDialogUi()
+        self.dlg_qm = GwMainQtDialogUi()
         tools_gw.load_settings(self.dlg_qm)
         self.load_user_values()
 

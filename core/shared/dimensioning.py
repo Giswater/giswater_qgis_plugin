@@ -14,7 +14,7 @@ from qgis.core import QgsPointXY
 from qgis.gui import QgsMapToolEmitPoint, QgsMapTip, QgsRubberBand, QgsVertexMarker
 
 from ..utils import tools_gw
-from ..ui.ui_manager import DimensioningUi
+from ..ui.ui_manager import GwDimensioningUi
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt
@@ -36,7 +36,7 @@ class GwDimensioning:
 
 
     def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None, rubber_band=None):
-        self.dlg_dim = DimensioningUi()
+        self.dlg_dim = GwDimensioningUi()
         tools_gw.load_settings(self.dlg_dim)
 
         self.user_current_layer = self.iface.activeLayer()

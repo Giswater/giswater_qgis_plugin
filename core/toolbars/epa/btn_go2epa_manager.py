@@ -12,7 +12,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView
 from qgis.PyQt.QtGui import QRegExpValidator
 
 from ..dialog_button import GwDialogButton
-from ...ui.ui_manager import EpaManagerUi
+from ...ui.ui_manager import GwEpaManagerUi
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_db, tools_qgis
 
@@ -26,7 +26,7 @@ class GwGo2EpaManagerButton(GwDialogButton):
     def clicked_event(self):
 
         # Create the dialog
-        self.dlg_manager = EpaManagerUi()
+        self.dlg_manager = GwEpaManagerUi()
         tools_gw.load_settings(self.dlg_manager)
 
         # Manage widgets

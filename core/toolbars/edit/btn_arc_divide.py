@@ -10,7 +10,7 @@ from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 
 from ..maptool_button import GwMaptoolButton
-from ...ui.ui_manager import DialogTextUi
+from ...ui.ui_manager import GwDialogTextUi
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_qgis, tools_db
 from .... import global_vars
@@ -42,7 +42,7 @@ class GwArcDivideButton(GwMaptoolButton):
             if not result or result['status'] == 'Failed':
                 return
             if 'hideForm' not in result['body']['actions'] or not result['body']['actions']['hideForm']:
-                self.dlg_dtext = DialogTextUi()
+                self.dlg_dtext = GwDialogTextUi()
                 self.dlg_dtext.btn_accept.hide()
                 self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
                 tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, True, 1)

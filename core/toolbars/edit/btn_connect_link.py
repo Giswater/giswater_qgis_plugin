@@ -12,7 +12,7 @@ from qgis.PyQt.QtWidgets import QApplication
 from qgis.core import QgsVectorLayer, QgsRectangle
 
 from ..maptool_button import GwMaptoolButton
-from ...ui.ui_manager import DialogTextUi
+from ...ui.ui_manager import GwDialogTextUi
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_qt
 
@@ -59,7 +59,7 @@ class GwConnectLinkButton(GwMaptoolButton):
             # Execute SQL function and show result to the user
             result = tools_gw.get_json('gw_fct_setlinktonetwork ', body)
             if result:
-                self.dlg_dtext = DialogTextUi()
+                self.dlg_dtext = GwDialogTextUi()
                 tools_gw.load_settings(self.dlg_dtext)
                 self.dlg_dtext.btn_accept.hide()
                 self.dlg_dtext.setWindowTitle('Connect to network')

@@ -8,7 +8,7 @@ or (at your option) any later version.
 from functools import partial
 
 from ..dialog_button import GwDialogButton
-from ...ui.ui_manager import Go2EpaSelectorUi
+from ...ui.ui_manager import GwGo2EpaSelectorUi
 from ...utils import tools_gw
 from .... import global_vars
 from ....lib import tools_qt, tools_db, tools_qgis
@@ -26,7 +26,7 @@ class GwGo2EpaSelectorButton(GwDialogButton):
         """ Button 29: Epa result selector """
 
         # Create the dialog and signals
-        self.dlg_go2epa_result = Go2EpaSelectorUi()
+        self.dlg_go2epa_result = GwGo2EpaSelectorUi()
         tools_gw.load_settings(self.dlg_go2epa_result)
         if self.project_type == 'ud':
             tools_qt.remove_tab(self.dlg_go2epa_result.tabWidget, "tab_time")

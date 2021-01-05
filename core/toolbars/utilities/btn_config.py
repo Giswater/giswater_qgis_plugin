@@ -15,7 +15,7 @@ from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox,
 from qgis.gui import QgsDateTimeEdit
 
 from ..dialog_button import GwDialogButton
-from ...ui.ui_manager import ConfigUi
+from ...ui.ui_manager import GwConfigUi
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_db, tools_qgis
 
@@ -42,7 +42,7 @@ class GwConfigButton(GwDialogButton):
         if not json_result or json_result['status'] == 'Failed':
             return False
 
-        self.dlg_config = ConfigUi()
+        self.dlg_config = GwConfigUi()
         tools_gw.load_settings(self.dlg_config)
         self.dlg_config.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_config))
         self.dlg_config.btn_accept.clicked.connect(partial(self.update_values))

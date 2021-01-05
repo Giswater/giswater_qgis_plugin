@@ -17,7 +17,7 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QTableView, QPushButton, QLineEdit, QCompleter, QAbstractItemView
 
 from ..shared.selector import Selector
-from ..ui.ui_manager import SelectorUi, MincutManagerUi
+from ..ui.ui_manager import GwSelectorUi, GwMincutManagerUi
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_db
@@ -248,7 +248,7 @@ class GwMincutManager:
         mincut_selector = Selector()
 
 
-        self.dlg_selector = SelectorUi()
+        self.dlg_selector = GwSelectorUi()
         tools_gw.load_settings(self.dlg_selector)
         current_tab = tools_gw.get_config_parser('dialogs_tab', f"{self.dlg_selector.objectName()}_mincut", "user", "sessions")
         self.dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_selector))

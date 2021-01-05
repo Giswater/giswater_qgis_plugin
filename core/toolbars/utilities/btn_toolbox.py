@@ -18,7 +18,7 @@ from qgis.core import QgsProject
 from qgis.gui import QgsDateTimeEdit
 
 from ..dialog_button import GwDialogButton
-from ...ui.ui_manager import ToolboxDockerUi, ToolboxUi
+from ...ui.ui_manager import GwToolboxDockerUi, GwToolboxUi
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_qgis, tools_db
 
@@ -44,7 +44,7 @@ class GwToolBoxButton(GwDialogButton):
             tools_qgis.show_warning("Function not found in database", parameter=function_name)
             return
 
-        self.dlg_toolbox_doc = ToolboxDockerUi()
+        self.dlg_toolbox_doc = GwToolboxDockerUi()
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dlg_toolbox_doc)
         self.dlg_toolbox_doc.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.dlg_toolbox_doc.trv.setHeaderHidden(True)
@@ -81,7 +81,7 @@ class GwToolBoxButton(GwDialogButton):
         if self.function_selected in self.no_clickable_items:
             return
 
-        self.dlg_functions = ToolboxUi()
+        self.dlg_functions = GwToolboxUi()
         tools_gw.load_settings(self.dlg_functions)
         self.dlg_functions.progressBar.setVisible(False)
 

@@ -10,7 +10,7 @@ from functools import partial
 from qgis.PyQt.QtCore import Qt, QDate
 
 from ..maptool_button import GwMaptoolButton
-from ...ui.ui_manager import ArcFusionUi
+from ...ui.ui_manager import GwArcFusionUi
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_db, tools_qgis
 
@@ -76,7 +76,7 @@ class GwArcFusionButton(GwMaptoolButton):
 
         if snapped_feat:
             self.node_id = snapped_feat.attribute('node_id')
-            self.dlg_fusion = ArcFusionUi()
+            self.dlg_fusion = GwArcFusionUi()
             tools_gw.load_settings(self.dlg_fusion)
 
             # Fill ComboBox workcat_id_end

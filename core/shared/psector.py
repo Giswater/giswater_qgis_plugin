@@ -23,7 +23,7 @@ from qgis.gui import QgsRubberBand
 
 from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate
-from ..ui.ui_manager import PlanPsectorUi, PsectorRapportUi, PsectorManagerUi, PriceManagerUi
+from ..ui.ui_manager import GwPlanPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi
 from ..utils import tools_gw
 from ...lib import tools_db, tools_qgis, tools_qt, tools_log
 
@@ -48,7 +48,7 @@ class GwPsector:
             self.sys_currency = json.loads(row[0], object_pairs_hook=OrderedDict)
 
         # Create the dialog and signals
-        self.dlg_plan_psector = PlanPsectorUi()
+        self.dlg_plan_psector = GwPlanPsectorUi()
         tools_gw.load_settings(self.dlg_plan_psector)
 
         # Capture the current layer to return it at the end of the operation
@@ -507,7 +507,7 @@ class GwPsector:
 
         default_file_name = tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.name)
 
-        self.dlg_psector_rapport = PsectorRapportUi()
+        self.dlg_psector_rapport = GwPsectorRapportUi()
         tools_gw.load_settings(self.dlg_psector_rapport)
 
         tools_qt.set_widget_text(self.dlg_psector_rapport, 'txt_composer_path', default_file_name + " comp.pdf")
@@ -1404,7 +1404,7 @@ class GwPsector:
         """ Button 46: Psector management """
 
         # Create the dialog and signals
-        self.dlg_psector_mng = PsectorManagerUi()
+        self.dlg_psector_mng = GwPsectorManagerUi()
 
         tools_gw.load_settings(self.dlg_psector_mng)
         table_name = "v_ui_plan_psector"
@@ -1586,7 +1586,7 @@ class GwPsector:
         """ Button 50: Plan estimate result manager """
 
         # Create the dialog and signals
-        self.dlg_merm = PriceManagerUi()
+        self.dlg_merm = GwPriceManagerUi()
         tools_gw.load_settings(self.dlg_merm)
 
         # Set current value

@@ -23,7 +23,7 @@ from .document import GwDocument
 from .info import GwInfo
 from .psector import GwPsector
 from .visit_manager import GwVisitManager
-from ..ui.ui_manager import SearchUi, InfoGenericUi, SearchWorkcatUi
+from ..ui.ui_manager import GwSearchUi, GwInfoGenericUi, GwSearchWorkcatUi
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_db, tools_qgis, tools_qt, tools_config
@@ -52,7 +52,7 @@ class GwSearch:
     def init_dialog(self):
         """ Initialize dialog. Make it dockable in left dock widget area """
 
-        self.dlg_search = SearchUi()
+        self.dlg_search = GwSearchUi()
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
         self.dlg_search.dlg_closed.connect(self.reset_rubber_band)
         self.dlg_search.dlg_closed.connect(self.close_search)
@@ -432,7 +432,7 @@ class GwSearch:
             return
         result = json_result
 
-        self.hydro_info_dlg = InfoGenericUi()
+        self.hydro_info_dlg = GwInfoGenericUi()
         tools_gw.load_settings(self.hydro_info_dlg)
 
         self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
@@ -460,7 +460,7 @@ class GwSearch:
         # TODO ZOOM TO SELECTED WORKCAT
         # self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
-        self.items_dialog = SearchWorkcatUi()
+        self.items_dialog = GwSearchWorkcatUi()
         self.items_dialog.setWindowTitle(f'Workcat: {display_name}')
 
         tools_gw.add_icon(self.items_dialog.btn_doc_insert, "111")

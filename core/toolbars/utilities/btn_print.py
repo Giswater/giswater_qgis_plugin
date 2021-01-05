@@ -17,7 +17,7 @@ from qgis.core import QgsLayoutItemMap, QgsPrintLayout, QgsLayoutItemLabel, QgsL
 from qgis.gui import QgsRubberBand
 
 from ..dialog_button import GwDialogButton
-from ...ui.ui_manager import FastPrintUi
+from ...ui.ui_manager import GwFastPrintUi
 from ...utils import tools_gw
 from .... import global_vars
 from ....lib import tools_qgis, tools_qt
@@ -44,7 +44,7 @@ class GwPrintButton(GwDialogButton):
 
         self.initial_rotation = self.iface.mapCanvas().rotation()
 
-        self.dlg_composer = FastPrintUi()
+        self.dlg_composer = GwFastPrintUi()
         tools_gw.load_settings(self.dlg_composer)
 
         # Create and populate dialog

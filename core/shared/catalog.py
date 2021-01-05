@@ -13,7 +13,7 @@ from functools import partial
 from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGroupBox, QSpacerItem, QSizePolicy, QWidget
 
 from ..utils import tools_gw
-from ..ui.ui_manager import InfoCatalogUi
+from ..ui.ui_manager import GwInfoCatalogUi
 from ... import global_vars
 from ...lib import tools_qt, tools_log, tools_db, tools_qgis
 
@@ -45,7 +45,7 @@ class GwCatalog:
         group_box_1 = QGroupBox("Filter")
         self.filter_form = QGridLayout()
 
-        self.dlg_catalog = InfoCatalogUi()
+        self.dlg_catalog = GwInfoCatalogUi()
         tools_gw.load_settings(self.dlg_catalog)
         self.dlg_catalog.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_catalog))
         self.dlg_catalog.btn_accept.clicked.connect(partial(self.fill_geomcat_id, previous_dialog, widget_name))

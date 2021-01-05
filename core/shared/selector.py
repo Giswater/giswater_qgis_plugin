@@ -11,7 +11,7 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTabWidget,\
     QWidget, QApplication
 
-from ..ui.ui_manager import SelectorUi
+from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt
@@ -27,7 +27,7 @@ class Selector:
         """
         :param selector_type:This parameter must be a string between double quotes. Example: '"selector_basic"'
         """
-        dlg_selector = SelectorUi()
+        dlg_selector = GwSelectorUi()
         tools_gw.load_settings(dlg_selector)
 
         # Get the name of the last tab used by the user

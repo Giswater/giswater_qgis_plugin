@@ -11,7 +11,7 @@ from qgis.PyQt.QtCore import QStringListModel
 from qgis.PyQt.QtWidgets import QCompleter
 
 from ..dialog_button import GwDialogButton
-from ...ui.ui_manager import FeatureDeleteUi
+from ...ui.ui_manager import GwFeatureDeleteUi
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_qt, tools_db
 
@@ -26,7 +26,7 @@ class GwDeleteFeatureButton(GwDialogButton):
     def clicked_event(self):
 
         # Create the dialog and signals
-        self.dlg_feature_delete = FeatureDeleteUi()
+        self.dlg_feature_delete = GwFeatureDeleteUi()
         tools_gw.load_settings(self.dlg_feature_delete)
 
         # Populate combo feature type

@@ -20,7 +20,7 @@ from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsExpression
 from qgis.gui import QgsMapToolEmitPoint
 
 from ..maptool_button import GwMaptoolButton
-from ...ui.ui_manager import ProfileUi, ProfilesListUi
+from ...ui.ui_manager import GwProfileUi, GwProfilesListUi
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_log, tools_qgis
 import global_vars
@@ -76,7 +76,7 @@ class GwProfileButton(GwMaptoolButton):
         self.remove_selection()
 
         # Set dialog
-        self.dlg_draw_profile = ProfileUi()
+        self.dlg_draw_profile = GwProfileUi()
         tools_gw.load_settings(self.dlg_draw_profile)
         self.dlg_draw_profile.setWindowFlags(Qt.WindowStaysOnTopHint)
 
@@ -212,7 +212,7 @@ class GwProfileButton(GwMaptoolButton):
     def open_profile(self):
         """ Open dialog profile_list.ui """
 
-        self.dlg_load = ProfilesListUi()
+        self.dlg_load = GwProfilesListUi()
         tools_gw.load_settings(self.dlg_load)
 
         # Get profils on database

@@ -12,7 +12,7 @@ from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QSizePolicy
 from qgis.core import Qgis
 
 from .utils import tools_gw
-from .ui.ui_manager import ProjectCheckUi
+from .ui.ui_manager import GwProjectCheckUi
 from .. import global_vars
 from ..lib import tools_qgis, tools_log, tools_db, tools_qt
 from ..lib.tools_qt import hide_void_groupbox
@@ -111,7 +111,7 @@ class GwProjectCheck:
         """ Show dialog with audit check project result """
 
         # Create dialog
-        self.dlg_audit_project = ProjectCheckUi()
+        self.dlg_audit_project = GwProjectCheckUi()
         tools_gw.load_settings(self.dlg_audit_project)
         self.dlg_audit_project.rejected.connect(partial(tools_gw.save_settings, self.dlg_audit_project))
 

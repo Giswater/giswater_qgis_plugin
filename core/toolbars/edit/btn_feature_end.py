@@ -14,7 +14,7 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 from qgis.core import QgsExpression, QgsFeatureRequest
 
 from ...toolbars.dialog_button import GwDialogButton
-from ...ui.ui_manager import FeatureEndUi, InfoWorkcatUi, FeatureEndConnecUi
+from ...ui.ui_manager import GwFeatureEndUi, GwInfoWorkcatUi, GwFeatureEndConnecUi
 from ...utils import tools_gw
 from .... import global_vars
 from ....lib import tools_qgis, tools_qt, tools_log, tools_db
@@ -54,7 +54,7 @@ class GwEndFeatureButton(GwDialogButton):
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
         # Create the dialog and signals
-        self.dlg_work_end = FeatureEndUi()
+        self.dlg_work_end = GwFeatureEndUi()
         tools_gw.load_settings(self.dlg_work_end)
         self.set_edit_arc_downgrade_force('True')
 
@@ -241,7 +241,7 @@ class GwEndFeatureButton(GwDialogButton):
             row = tools_db.get_row(sql, log_sql=True)
 
         if row:
-            self.dlg_work = FeatureEndConnecUi()
+            self.dlg_work = GwFeatureEndConnecUi()
             tools_gw.load_settings(self.dlg_work)
 
             self.dlg_work.btn_cancel.clicked.connect(partial(self.close_dialog_workcat_list, self.dlg_work))
@@ -473,7 +473,7 @@ class GwEndFeatureButton(GwDialogButton):
 
     def new_workcat(self):
 
-        self.dlg_new_workcat = InfoWorkcatUi()
+        self.dlg_new_workcat = GwInfoWorkcatUi()
         tools_gw.load_settings(self.dlg_new_workcat)
 
         tools_qt.set_calendar(self.dlg_new_workcat, self.dlg_new_workcat.builtdate, None, True)

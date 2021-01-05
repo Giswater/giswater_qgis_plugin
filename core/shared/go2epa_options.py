@@ -11,7 +11,7 @@ from functools import partial
 from qgis.PyQt.QtWidgets import QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QWidget, QComboBox
 
 from ..utils import tools_gw
-from ..ui.ui_manager import Go2EpaOptionsUi
+from ..ui.ui_manager import GwGo2EpaOptionsUi
 from ... import global_vars
 from ...lib import tools_qt, tools_qgis
 
@@ -34,7 +34,7 @@ class GwGo2EpaOptions:
         self.epa_options_list = []
 
         # Create dialog
-        self.dlg_go2epa_options = Go2EpaOptionsUi()
+        self.dlg_go2epa_options = GwGo2EpaOptionsUi()
         tools_gw.load_settings(self.dlg_go2epa_options)
 
         form = '"formName":"epaoptions"'

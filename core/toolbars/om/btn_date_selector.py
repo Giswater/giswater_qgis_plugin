@@ -12,7 +12,7 @@ from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtWidgets import QDateEdit, QPushButton
 
 from ..dialog_button import GwDialogButton
-from ...ui.ui_manager import SelectorDateUi
+from ...ui.ui_manager import GwSelectorDateUi
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_qt, tools_db
 import global_vars
@@ -26,7 +26,7 @@ class GwDateSelectorButton(GwDialogButton):
 
     def clicked_event(self):
 
-        self.dlg_selector_date = SelectorDateUi()
+        self.dlg_selector_date = GwSelectorDateUi()
         tools_gw.load_settings(self.dlg_selector_date)
         self.widget_date_from = self.dlg_selector_date.findChild(QDateEdit, "date_from")
         self.widget_date_to = self.dlg_selector_date.findChild(QDateEdit, "date_to")

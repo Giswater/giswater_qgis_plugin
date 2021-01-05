@@ -33,8 +33,8 @@ from .visit_gallery import GwVisitGallery
 from .visit_manager import GwVisitManager
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
-from ..ui.ui_manager import InfoGenericUi, InfoFeatureUi, VisitEventFullUi, GwMainWindowDialog, VisitDocumentUi, InfoCrossectUi, \
-    DialogTextUi
+from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindowDialog, GwVisitDocumentUi, GwInfoCrossectUi, \
+    GwDialogTextUi
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_db
 
@@ -290,7 +290,7 @@ class GwInfo(QObject):
     def open_generic_form(self, complet_result):
 
         tools_gw.draw_by_json(complet_result, self.rubber_band, zoom=False)
-        self.hydro_info_dlg = InfoGenericUi()
+        self.hydro_info_dlg = GwInfoGenericUi()
         tools_gw.load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
         self.hydro_info_dlg.rejected.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
@@ -309,7 +309,7 @@ class GwInfo(QObject):
     def open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None):
 
         # Dialog
-        self.dlg_cf = InfoFeatureUi(sub_tag)
+        self.dlg_cf = GwInfoFeatureUi(sub_tag)
         tools_gw.load_settings(self.dlg_cf)
 
         # If in the get_json function we have received a rubberband, it is not necessary to redraw it.
@@ -656,7 +656,7 @@ class GwInfo(QObject):
         rb_interpolate = []
         self.interpolate_result = None
         self.rubber_band.reset()
-        dlg_dtext = DialogTextUi()
+        dlg_dtext = GwDialogTextUi()
         tools_gw.load_settings(dlg_dtext)
 
         tools_qt.set_widget_text(dlg_dtext, dlg_dtext.txt_infolog, 'Interpolate tool')
@@ -1478,7 +1478,7 @@ class GwInfo(QObject):
 
     def open_section_form(self):
 
-        dlg_sections = InfoCrossectUi()
+        dlg_sections = GwInfoCrossectUi()
         tools_gw.load_settings(dlg_sections)
 
         # Set dialog not resizable
@@ -2477,7 +2477,7 @@ class GwInfo(QObject):
         """ Open event of selected record of the table """
 
         # Open dialog event_standard
-        self.dlg_event_full = VisitEventFullUi()
+        self.dlg_event_full = GwVisitEventFullUi()
         tools_gw.load_settings(self.dlg_event_full)
         self.dlg_event_full.rejected.connect(partial(tools_gw.close_dialog, self.dlg_event_full))
         # Get all data for one visit
@@ -2789,7 +2789,7 @@ class GwInfo(QObject):
 
         else:
             # If more then one document is attached open dialog with list of documents
-            self.dlg_load_doc = VisitDocumentUi()
+            self.dlg_load_doc = GwVisitDocumentUi()
             tools_gw.load_settings(self.dlg_load_doc)
             self.dlg_load_doc.rejected.connect(partial(tools_gw.close_dialog, self.dlg_load_doc))
             btn_open_doc = self.dlg_load_doc.findChild(QPushButton, "btn_open")
@@ -3223,7 +3223,7 @@ class GwInfo(QObject):
         if json_result is None:
             return
 
-        dlg_generic = InfoGenericUi()
+        dlg_generic = GwInfoGenericUi()
         tools_gw.load_settings(dlg_generic)
 
         # Set signals
