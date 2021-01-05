@@ -36,7 +36,7 @@ class GwI18NGenerator:
         self.dlg_qm.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_qm))
         self.dlg_qm.rejected.connect(self.save_user_values)
         self.dlg_qm.rejected.connect(self.close_db)
-        tools_gw.open_dialog(self.dlg_qm, dlg_name='main_qtdialog')
+        tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_translation')
 
 
     def check_connection(self):

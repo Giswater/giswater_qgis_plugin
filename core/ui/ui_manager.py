@@ -442,7 +442,7 @@ FORM_CLASS = get_ui_class('info_workcat.ui')
 class InfoWorkcatUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('main_qtdialog.ui')
+FORM_CLASS = get_ui_class('admin_translation.ui', 'admin')
 class MainQtDialogUi(GwDialog, FORM_CLASS):
 
     def __init__(self):
