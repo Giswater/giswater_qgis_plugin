@@ -16,7 +16,11 @@ class GwDockerDialog(QDockWidget):
 
     def __init__(self, subtag=None):
         super().__init__()
-        self.setupUi(self)
+        #TODO: Check try/catch. Strange error: "GwDockerDialog object has no attribute 'setupUi"
+        try:
+            self.setupUi(self)
+        except Exception:
+            pass
         self.subtag = subtag
 
 
