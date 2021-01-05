@@ -227,7 +227,7 @@ class GwFastPrintUi(GwBasicDialog, FORM_CLASS):
 
 # region ADMIN
 FORM_CLASS = get_ui_class('admin_addfields.ui', 'admin')
-class GwMainFieldsUi(GwBasicDialog, FORM_CLASS):
+class GwAdminFieldsUi(GwBasicDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('admin_credentials.ui', 'admin')
@@ -266,39 +266,39 @@ class GwCredentialsUi(GwBasicDialog, FORM_CLASS):
             self.action.setText(text)
 
 FORM_CLASS = get_ui_class('admin_dbproject.ui', 'admin')
-class GwMainDbProjectUi(GwMainWindowDialog, FORM_CLASS):
+class GwAdminDbProjectUi(GwMainWindowDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('admin_gisproject.ui', 'admin')
-class GwMainGisProjectUi(GwMainWindowDialog, FORM_CLASS):
+class GwAdminGisProjectUi(GwMainWindowDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('admin_importinp.ui', 'admin')
-class GwMainImportUi(GwBasicDialog, FORM_CLASS):
+class GwAdminImportUi(GwBasicDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('admin_projectinfo.ui', 'admin')
-class GwMainProjectInfoUi(GwMainWindowDialog, FORM_CLASS):
+class GwAdminProjectInfoUi(GwMainWindowDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('admin_renameproj.ui', 'admin')
-class GwMainRenameProjUi(GwMainWindowDialog, FORM_CLASS):
+class GwAdminRenameProjUi(GwMainWindowDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('admin_sysfields.ui', 'admin')
-class GwMainSysFieldsUi(GwBasicDialog, FORM_CLASS):
+class GwAdminSysFieldsUi(GwBasicDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('admin_ui.ui', 'admin')
-class GwMainUi(GwMainWindowDialog, FORM_CLASS):
+class GwAdminUi(GwMainWindowDialog, FORM_CLASS):
     dlg_closed = QtCore.pyqtSignal()
 
 FORM_CLASS = get_ui_class('admin_visitclass.ui', 'admin')
-class GwMainVisitClassUi(GwBasicDialog, FORM_CLASS):
+class GwAdminVisitClassUi(GwBasicDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('admin_visitparam.ui', 'admin')
-class GwMainVisitParamUi(GwBasicDialog, FORM_CLASS):
+class GwAdminVisitParamUi(GwBasicDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('toolbox_docker.ui', 'utilities')
