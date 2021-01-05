@@ -86,9 +86,11 @@ BEGIN
 	v_new_psector_name = ((p_data ->>'data')::json->>'new_psector_name')::text;
 
 	--copy psector definition, update plan selector and psector vdefault
- 	INSERT INTO plan_psector (name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale, sector_id, atlas_id, gexpenses, 
- 	vat, other, active, the_geom, enable_all, status, ext_code) SELECT v_new_psector_name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale, sector_id, atlas_id, gexpenses, 
- 	vat, other, active, the_geom, enable_all, status, ext_code FROM plan_psector WHERE psector_id=v_old_psector_id RETURNING psector_id INTO v_new_psector_id;
+ 	INSERT INTO plan_psector (name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale,  atlas_id, gexpenses, 
+ 	vat, other, active, the_geom, enable_all, status, ext_code, text3, text4, text5, text6, num_value) 
+ 	SELECT v_new_psector_name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale,  atlas_id, gexpenses, 
+ 	vat, other, active, the_geom, enable_all, status, ext_code, text3, text4, text5, text6, num_value 
+ 	FROM plan_psector WHERE psector_id=v_old_psector_id RETURNING psector_id INTO v_new_psector_id;
 
  	INSERT INTO selector_plan_psector(psector_id,cur_user) VALUES (v_new_psector_id, current_user);
 	
