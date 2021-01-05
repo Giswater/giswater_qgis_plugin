@@ -235,7 +235,7 @@ class GwGo2EpaTask(QgsTask):
         if self.project_type in 'ws':
             opener = f"{self.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}epanet{os.sep}ws_epanet20012.exe"
         elif self.project_type in 'ud':
-            opener = f"{self.plugin_dir}resources{os.sep}epa{os.sep}swmm{os.sep}ud_swmm50022.exe"
+            opener = f"{self.plugin_dir}{os.sep}resources{os.sep}epa{os.sep}swmm{os.sep}ud_swmm50022.exe"
 
         if opener is None:
             return False
