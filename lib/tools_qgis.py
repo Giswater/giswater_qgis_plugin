@@ -696,11 +696,10 @@ def set_margin(layer, margin):
 
 def create_qml(layer, style):
     """ Generates a qml file through a json of styles (@style) and puts it in the received @layer """
-    main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
-    config_folder = main_folder + os.sep + "temp" + os.sep
+    config_folder = os.path.join(global_vars.plugin_dir, f'resources{os.sep}templates{os.sep}qgisqml')
     if not os.path.exists(config_folder):
         os.makedirs(config_folder)
-    path_temp_file = config_folder + 'temp_qml.qml'
+    path_temp_file = config_folder + os.sep + 'temporal_layer.qml'
     file = open(path_temp_file, 'w')
     file.write(style)
     file.close()
