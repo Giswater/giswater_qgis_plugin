@@ -63,7 +63,7 @@ BEGIN
 	DELETE FROM temp_arc WHERE  result_id = '250';
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=250;	
 	
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (250, null, 4, concat('ARC CONSISTENCY ANALYSIS'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (250, null, 4, concat('SLOPE CONSISTENCY ANALYSIS'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (250, null, 4, '-------------------------------------------------------------');
 
 	-- Computing process
@@ -122,10 +122,10 @@ BEGIN
 
 	IF v_count = 0 THEN
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (250,  'There are no inconsistent arcs.', v_count);
+		VALUES (250,  'There are no slope inconsistencies.', v_count);
 	ELSE
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		VALUES (250,  concat ('There are ',v_count,' inconsistent arcs.'), v_count);
+		VALUES (250,  concat ('There are ',v_count,' arcs with slope inconsistency.'), v_count);
 
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
 		SELECT 250,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count 
