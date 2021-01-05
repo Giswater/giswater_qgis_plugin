@@ -34,3 +34,7 @@ WHERE id IN ('edit_connecarccat_vdefault','edit_gratecat_vdefault');
 UPDATE sys_param_user set dv_querytext = concat(dv_querytext, ' AND cat_grate.active IS TRUE ')
 FROM cat_feature WHERE upper(cat_feature.id) = upper(replace(replace(sys_param_user.id,'feat_'::text,''::text),'_vdefault',''))
 AND feature_type = 'GULLY';
+
+--2021/01/05
+UPDATE config_toolbox SET inputparams =NULL WHERE id = 2202;
+

@@ -15,7 +15,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_anl_arc_intersection($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_conduit", "id":["138","139"]},
-"data":{"selectionMode":"previousSelection", "parameters":{"saveOnDatabase":true}
+"data":{"selectionMode":"previousSelection", "parameters":{}
 }}$$)
 
 -- fid: 109
@@ -30,7 +30,6 @@ v_result_info json;
 v_result_line json;
 v_id json;
 v_selectionmode text;
-v_saveondatabase boolean;
 v_worklayer text;
 v_array text;
 v_error_context text;
@@ -47,7 +46,6 @@ BEGIN
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
-	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 
 	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
 
@@ -92,14 +90,9 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
 
-	IF v_saveondatabase IS FALSE THEN 
-		-- delete previous results
-		DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=109;
-	ELSE
-		-- set selector
-		DELETE FROM selector_audit WHERE fid=109 AND cur_user=current_user;
-		INSERT INTO selector_audit (fid,cur_user) VALUES (109,current_user);
-	END IF;
+	-- set selector
+	DELETE FROM selector_audit WHERE fid=109 AND cur_user=current_user;
+	INSERT INTO selector_audit (fid,cur_user) VALUES (109,current_user);
 		
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 

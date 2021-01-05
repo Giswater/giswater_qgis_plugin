@@ -16,7 +16,7 @@ SELECT SCHEMA_NAME.gw_fct_anl_node_orphan($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, "feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, 
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
-"parameters":{"isArcDivide":"true", "saveOnDatabase":"true"}}}$$)::text
+"parameters":{"isArcDivide":"true"}}}$$)::text
 
 -- fid: 107
 
@@ -29,7 +29,6 @@ rec_node record;
 v_closest_arc_id varchar;
 v_closest_arc_distance numeric;
 v_version text;
-v_saveondatabase boolean = true;
 v_result json;
 v_id json;
 v_result_info json;
@@ -54,7 +53,6 @@ BEGIN
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
-	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 	v_isarcdivide := (((p_data ->>'data')::json->>'parameters')::json->>'isArcDivide')::text;
 
 	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
@@ -118,15 +116,9 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point","features":',v_result, '}'); 
 
-
-	IF v_saveondatabase IS FALSE THEN 
-		-- delete previous results
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=107;
-	ELSE
-		-- set selector
-		DELETE FROM selector_audit WHERE fid=107 AND cur_user=current_user;
-		INSERT INTO selector_audit (fid,cur_user) VALUES (107, current_user);
-	END IF;
+	-- set selector
+	DELETE FROM selector_audit WHERE fid=107 AND cur_user=current_user;
+	INSERT INTO selector_audit (fid,cur_user) VALUES (107, current_user);
 		
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 

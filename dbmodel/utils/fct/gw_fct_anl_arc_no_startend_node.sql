@@ -17,7 +17,7 @@ SELECT SCHEMA_NAME.gw_fct_anl_arc_no_startend_node($${
 "feature":{"tableName":"v_edit_arc", 
 "featureType":"ARC", "id":[]}, 
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection",
-"parameters":{"arcSearchNodes":"0.1", "saveOnDatabase":"true"}}}$$)::text
+"parameters":{"arcSearchNodes":"0.1"}}}$$)::text
 
 WARNINGS: This function only works with node with state = 1
 
@@ -36,7 +36,6 @@ rec record;
 v_id json;
 v_selectionmode text;
 v_arcsearchnodes float;
-v_saveondatabase boolean;
 v_worklayer text;
 v_result json;
 v_result_info json;
@@ -59,7 +58,6 @@ BEGIN
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
-	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 	v_arcsearchnodes := ((p_data ->>'data')::json->>'parameters')::json->>'arcSearchNodes';
 
 	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
@@ -135,14 +133,9 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 
 
-	IF v_saveondatabase IS FALSE THEN 
-		-- delete previous results
-		DELETE FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid = 103;
-	ELSE
-		-- set selector
-		DELETE FROM selector_audit WHERE fid = 103 AND cur_user=current_user;
-		INSERT INTO selector_audit (fid,cur_user) VALUES (103, current_user);
-	END IF;
+	-- set selector
+	DELETE FROM selector_audit WHERE fid = 103 AND cur_user=current_user;
+	INSERT INTO selector_audit (fid,cur_user) VALUES (103, current_user);
 	
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 

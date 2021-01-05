@@ -209,3 +209,19 @@ AND (formname ilike 've_arc%' OR formname ilike 've_node%' OR formname ilike 've
 OR formname in ('v_edit_element','v_edit_node','v_edit_arc','v_edit_connec','v_edit_gully')) and dv_querytext is not null;
 
 UPDATE sys_function SET function_name = 'gw_fct_setnodefromarc' WHERE id = 2118;
+
+--2021/01/05
+UPDATE config_toolbox SET inputparams = '[{"widgetname":"arcSearchNodes", "label":"Start/end points buffer","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layoutorder":1, "value":"0.5"}]'
+WHERE id = 2102;
+
+UPDATE config_toolbox SET inputparams = '[{"widgetname":"connecTolerance", "label":"Node tolerance:", "widgettype":"spinbox","datatype":"float","layoutname":"grl_option_parameters","layoutorder":1,"value":0.01}]'
+WHERE id = 2106;
+
+UPDATE config_toolbox SET inputparams = '[{"widgetname":"nodeTolerance", "label":"Node tolerance:", "widgettype":"spinbox","datatype":"float","layoutname":"grl_option_parameters","layoutorder":1,"value":0.01}]'
+WHERE id = 2108;
+
+UPDATE config_toolbox SET inputparams = '[{"widgetname":"isArcDivide", "label":"Analyse nodes that divide arcs:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":1, "value":"FALSE"}]' 
+WHERE id = 2110;
+
+
+
