@@ -239,7 +239,7 @@ class LoadProject(QObject):
         config_folder = main_folder + os.sep + "config" + os.sep
         if not os.path.exists(config_folder):
             os.makedirs(config_folder)
-        path = config_folder + 'user.config'
+        path = config_folder + 'init.config'
         # If file not found or file found and section not exists
         if not os.path.exists(path):
             parser = self.init_user_config_file(path, toolbar_names)
@@ -421,7 +421,7 @@ class LoadProject(QObject):
 
         parser.set('toolbars_position', 'toolbars_order', ",".join(toolbar_names))
 
-        # Writing our configuration file to 'user.config'
+        # Writing our configuration file to 'init.config'
         with open(path, 'w') as configfile:
             parser.write(configfile)
             configfile.close()

@@ -71,7 +71,7 @@ def manage_user_config_file():
     global_vars.session_vars['user_settings'] = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
     main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
     config_folder = main_folder + os.sep + "config" + os.sep
-    global_vars.session_vars['user_settings_path'] = config_folder + 'user.config'
+    global_vars.session_vars['user_settings_path'] = config_folder + 'init.config'
     if not os.path.exists(global_vars.session_vars['user_settings_path']):
         tools_log.log_info(f"File not found: {global_vars.session_vars['user_settings_path']}")
         save_user_settings()

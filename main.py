@@ -101,7 +101,7 @@ class Giswater(QObject):
         value = tools_gw.check_config_settings('system', 'show_message_durations', 'None', comment=comment)
         tools_qgis.user_parameters['show_message_durations'] = value
 
-        # Log values of system user parameters located in 'user.config'
+        # Log values of system user parameters located in 'init.config'
         for parameter, value in tools_qgis.user_parameters.items():
             tools_log.log_info(f"parameter '{parameter}': {value}")
 

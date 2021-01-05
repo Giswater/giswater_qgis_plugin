@@ -475,7 +475,7 @@ class MainQtDialogUi(GwDialog, FORM_CLASS):
             self.action.setIcon(icon)
             self.action.setText(text)
 
-FORM_CLASS = get_ui_class('multirow_selector.ui')
+FORM_CLASS = get_ui_class('selector_multirow.ui')
 class MultirowSelector(GwDialog, FORM_CLASS):
     pass
 
