@@ -101,8 +101,11 @@ BEGIN
 		VALUES (109,  'There are no intersected arcs.', v_count);
 	ELSE
 		INSERT INTO audit_check_data(fid,  error_message, fcount)
-		SELECT 109,  concat ('There are ',v_count,' intersected arcs. Arc_id: ',string_agg(arc_id, ', ') , '.'), v_count 
-		FROM anl_arc WHERE cur_user="current_user"() AND fid=109;
+		VALUES (109,  concat ('There are ',v_count,' intersected arcs.'), v_count);
+
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		SELECT 113,  concat ('Arc_id: ',string_agg(node_id, ', '), '.' ), v_count 
+		FROM anl_node WHERE cur_user="current_user"() AND fid=109;
 	END IF;
 	
 	-- info

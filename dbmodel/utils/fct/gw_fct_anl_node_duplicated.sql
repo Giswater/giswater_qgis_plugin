@@ -30,6 +30,7 @@ v_result_point json;
 v_array text;
 v_version text;
 v_error_context text;
+v_count integer;
 
 BEGIN
 
@@ -49,7 +50,11 @@ BEGIN
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=106;
-		
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=106;	
+	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 4, concat('NODE DUPLICATED ANALYSIS'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (106, null, 4, '-------------------------------------------------------------');
+
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_node (node_id, nodecat_id, state, node_id_aux, nodecat_id_aux, state_aux, expl_id, fid, the_geom)
@@ -65,13 +70,11 @@ BEGIN
 				WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 > 0 AND a.state2 > 0';
 	END IF;
 
-	-- get results
-	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=106 order by id) row;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	-- set selector
+	DELETE FROM selector_audit WHERE fid=106 AND cur_user=current_user;
+	INSERT INTO selector_audit (fid,cur_user) VALUES (106, current_user);
 
+	-- get results
 	--points
 	v_result = null;
 	SELECT jsonb_agg(features.feature) INTO v_result
@@ -87,10 +90,27 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
 
-	-- set selector
-	DELETE FROM selector_audit WHERE fid=106 AND cur_user=current_user;
-	INSERT INTO selector_audit (fid,cur_user) VALUES (106, current_user);
+	SELECT count(*)/2 INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=106;
 
+	IF v_count = 0 THEN
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		VALUES (106,  'There are no duplicated nodes.', v_count);
+	ELSE
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		VALUES (106,  concat ('There are ',v_count,' duplicated nodes.'), v_count);
+
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		SELECT 106,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count 
+		FROM anl_node WHERE cur_user="current_user"() AND fid=106;
+
+	END IF;
+	
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=106 order by  id asc) row;
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 

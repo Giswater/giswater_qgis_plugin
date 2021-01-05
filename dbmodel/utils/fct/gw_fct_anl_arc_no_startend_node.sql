@@ -46,6 +46,7 @@ v_partcount integer = 0;
 v_totcount integer = 0;
 v_version text;
 v_error_context text;
+v_count integer;
 
 BEGIN
 
@@ -63,7 +64,11 @@ BEGIN
 	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
 	-- Reset values
     DELETE FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid = 103;
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=103;	
 	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (103, null, 4, concat('ARC WITHOUT END NODES ANALYSIS'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (103, null, 4, '-------------------------------------------------------------');
+
 	-- Init counter
 	EXECUTE 'SELECT count(*) FROM '||v_worklayer
 		INTO v_totcount;
@@ -92,14 +97,12 @@ BEGIN
 		RAISE NOTICE 'Progress %', (v_partcount::float*100/v_totcount::float)::numeric (5,2);
 		
 	END LOOP;
-	
-	-- get results
-	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 103 order by id) row;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
+	-- set selector
+	DELETE FROM selector_audit WHERE fid = 103 AND cur_user=current_user;
+	INSERT INTO selector_audit (fid,cur_user) VALUES (103, current_user);
+
+	-- get results
 	--points
 	v_result = null;
 
@@ -133,10 +136,26 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 
 
-	-- set selector
-	DELETE FROM selector_audit WHERE fid = 103 AND cur_user=current_user;
-	INSERT INTO selector_audit (fid,cur_user) VALUES (103, current_user);
+	SELECT count(*) INTO v_count FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid=103;
+
+	IF v_count = 0 THEN
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		VALUES (103,  'There are no arcs without final nodes.', v_count);
+	ELSE
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		VALUES (103,  concat ('There are ',v_count,' arcs without final nodes.'), v_count);
+
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		SELECT 103,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count 
+		FROM anl_arc_x_node WHERE cur_user="current_user"() AND fid=103;
+	END IF;
 	
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=103 order by  id asc) row;
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 

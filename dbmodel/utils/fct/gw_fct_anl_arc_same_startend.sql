@@ -14,7 +14,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_anl_arc_same_startend($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_pipe", "id":["1004","1005"]},
-"data":{"selectionMode":"previousSelection","parameters":{"saveOnDatabase":true}}}$$)
+"data":{"selectionMode":"previousSelection","parameters":{}}}$$)
 
 -- fid: 104
 
@@ -25,7 +25,6 @@ DECLARE
 v_id json;
 v_selectionmode	text;
 v_connectolerance float;
-v_saveondatabase boolean;
 v_worklayer text;
 v_result json;
 v_result_info json;
@@ -33,6 +32,7 @@ v_result_line json;
 v_array text;
 v_version text;
 v_error_context text;
+v_count integer;
 
 BEGIN
 
@@ -45,12 +45,15 @@ BEGIN
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
-	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 
 	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
 	-- Reset values
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid = 104;
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=104;	
 	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (104, null, 4, concat('ARC WITH SAME START - END NODE ANALYSIS'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (104, null, 4, '-------------------------------------------------------------');
+
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_arc (arc_id, state, expl_id, fid, the_geom, arccat_id)
@@ -62,12 +65,11 @@ BEGIN
 				FROM '||v_worklayer||' WHERE node_1::text=node_2::text;';
 	END IF;
 
-	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 104 order by id) row;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	-- set selector
+	DELETE FROM selector_audit WHERE fid = 104 AND cur_user=current_user;
+	INSERT INTO selector_audit (fid,cur_user) VALUES (104, current_user);
 
+	-- get results
 	--lines
 	v_result = null;
 	SELECT jsonb_agg(features.feature) INTO v_result
@@ -82,16 +84,28 @@ BEGIN
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 
+	
+	SELECT count(*) INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=104;
 
-	IF v_saveondatabase IS FALSE THEN 
-		-- delete previous results
-		DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid = 104;
+	IF v_count = 0 THEN
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		VALUES (104,  'There are no arcs with same start - end node.', v_count);
 	ELSE
-		-- set selector
-		DELETE FROM selector_audit WHERE fid = 104 AND cur_user=current_user;
-		INSERT INTO selector_audit (fid,cur_user) VALUES (104, current_user);
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		VALUES (104,  concat ('There are ',v_count,' arcs with same start - end nodes.'), v_count);
+
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		SELECT 104,  concat ('Arc_id: ',string_agg(arc_id, ', '), '.' ), v_count 
+		FROM anl_arc WHERE cur_user="current_user"() AND fid=104;
 	END IF;
-		
+	
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=104 order by  id asc) row;
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
+
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 

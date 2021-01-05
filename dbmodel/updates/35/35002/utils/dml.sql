@@ -223,5 +223,5 @@ WHERE id = 2108;
 UPDATE config_toolbox SET inputparams = '[{"widgetname":"isArcDivide", "label":"Analyse nodes that divide arcs:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":1, "value":"FALSE"}]' 
 WHERE id = 2110;
 
-
+UPDATE config_toolbox SET inputparams =NULL WHERE id = 2202;
 
