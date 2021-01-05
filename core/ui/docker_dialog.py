@@ -10,7 +10,7 @@ from qgis.PyQt import QtCore
 from qgis.PyQt.QtWidgets import QDockWidget
 
 
-class GwDockWidget(QDockWidget):
+class GwDockerDialog(QDockWidget):
     dlg_closed = QtCore.pyqtSignal()
 
 
