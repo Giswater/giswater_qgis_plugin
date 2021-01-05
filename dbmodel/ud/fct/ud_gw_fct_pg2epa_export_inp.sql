@@ -24,7 +24,6 @@ id_last integer;
 num_col_rec record;
 num_column text;
 result_id_aux varchar;
-title_aux varchar;
 v_fid integer = 141;
 v_return json;
 
@@ -37,15 +36,20 @@ BEGIN
 	TRUNCATE temp_csv;
       
 	SELECT result_id INTO result_id_aux FROM selector_inp_result where cur_user=current_user;
-	SELECT title INTO title_aux FROM inp_project_id where author=current_user;
 
+	-- build header of inp file
 	INSERT INTO temp_csv (source, csv1,fid) VALUES ('header','[TITLE]',v_fid);
-	INSERT INTO temp_csv (source, csv1,fid) VALUES ('header',';Created by Giswater, the water management open source tool',v_fid);
-	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Project name: ',title_aux, v_fid);
+	INSERT INTO temp_csv (source, csv1,fid) VALUES ('header',concat(';Created by Giswater'),v_fid);
+	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Giswater version: ',(SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1), v_fid);
+	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Project name: ',(SELECT title FROM inp_project_id where author=current_user), v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Result name: ',p_result_id,v_fid);
+	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Hydrology scenario: ',(SELECT name FROM selector_inp_hydrology JOIN cat_hydrology USING (hydrology_id) WHERE cur_user = current_user), v_fid);
+	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';DWF scenario: ',(SELECT idval FROM config_param_user JOIN cat_dwf_scenario c ON value = c.id::text WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user), v_fid);
+	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Default values: ',(SELECT value FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user), v_fid);
+	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Advanced settings: ',(SELECT value FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user = current_user), v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Datetime: ',left((date_trunc('second'::text, now()))::text, 19),v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';User: ',current_user, v_fid);
-
+	
 	--node
 	FOR rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid order by orderby
 	LOOP
