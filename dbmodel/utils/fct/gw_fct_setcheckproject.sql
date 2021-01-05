@@ -154,7 +154,7 @@ BEGIN
 	
 	-- Starting process
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'AUDIT CHECK PROJECT');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '-------------------------------------------------------------');
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '------------------------------');
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 3, 'CRITICAL ERRORS');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 3, '----------------------');

@@ -104,9 +104,16 @@ BEGIN
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 187, node_id, nodecat_id, ''nodes
 		with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
+<<<<<<< HEAD
 		INSERT INTO audit_check_data (fid, result_id,  criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 2, '187', concat('WARNING-187: There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your
 		data before continue. ()'),v_count);
+=======
+		INSERT INTO audit_check_data (fid, result_id,  criticity, error_message)
+		VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue. ()'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 2, concat('SELECT * FROM anl_node WHERE fid=187 AND cur_user=current_user'));
+>>>>>>> 11cc47b06... Minor bug on sql file
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '187', 'INFO: No nodes with state > 0 AND state_type.is_operative on FALSE found.',v_count);
@@ -120,9 +127,16 @@ BEGIN
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom) SELECT 188, arc_id, arccat_id, ''arcs with state_type
 		isoperative = false'', the_geom FROM (', v_querytext,')a');
+<<<<<<< HEAD
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 2, '188', concat('WARNING-188: There is/are ',v_count,' arc(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before
 		continue'),v_count);
+=======
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' arc(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue'));
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 2, concat('SELECT * FROM anl_arc WHERE fid=188 AND cur_user=current_user'));
+>>>>>>> 11cc47b06... Minor bug on sql file
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '188', 'INFO: No arcs with state > 0 AND state_type.is_operative on FALSE found.',v_count);
