@@ -33,6 +33,7 @@ v_selectionmode text;
 v_worklayer text;
 v_array text;
 v_error_context text;
+v_count integer;
 
 
 BEGIN
@@ -51,7 +52,11 @@ BEGIN
 
 	-- Reset values
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=109;
-	    
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=109;	
+	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (109, null, 4, concat('ARC INTERSECTION ANALYSIS'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (109, null, 4, '-------------------------------------------------------------');
+
 	-- Computing process
 	IF v_selectionmode = 'previousSelection' THEN
 		EXECUTE 'INSERT INTO anl_arc (arc_id, expl_id, fid, arc_id_aux, the_geom_p, the_geom, arccat_id, state)
@@ -69,12 +74,11 @@ BEGIN
 		AND a.the_geom is not null and b.the_geom is not null;';
 	END IF;
 
-	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=109 order by id) row;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	-- set selector
+	DELETE FROM selector_audit WHERE fid=109 AND cur_user=current_user;
+	INSERT INTO selector_audit (fid,cur_user) VALUES (109,current_user);
 
+	-- get results
 	--lines
 	v_result = null;
 	SELECT jsonb_agg(features.feature) INTO v_result
@@ -90,10 +94,23 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
 
-	-- set selector
-	DELETE FROM selector_audit WHERE fid=109 AND cur_user=current_user;
-	INSERT INTO selector_audit (fid,cur_user) VALUES (109,current_user);
-		
+	SELECT count(*) INTO v_count FROM anl_arc WHERE cur_user="current_user"() AND fid=109;
+
+	IF v_count = 0 THEN
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		VALUES (109,  'There are no intersected arcs.', v_count);
+	ELSE
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		SELECT 109,  concat ('There are ',v_count,' intersected arcs. Arc_id: ',string_agg(arc_id, ', ') , '.'), v_count 
+		FROM anl_arc WHERE cur_user="current_user"() AND fid=109;
+	END IF;
+	
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=109 order by  id asc) row;
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 

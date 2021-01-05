@@ -15,7 +15,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_anl_node_flowregulator($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"v_edit_man_manhole", "id":["138","139"]},
-"data":{"selectionMode":"previousSelection",  "parameters":{"saveOnDatabase":true}
+"data":{"selectionMode":"previousSelection",  "parameters":{}
 	}}$$)
 	
 -- fid: 122
@@ -26,7 +26,6 @@ SELECT SCHEMA_NAME.gw_fct_anl_node_flowregulator($${
 DECLARE
 
 v_version text;
-v_saveondatabase boolean;
 v_result json;
 v_result_info json;
 v_result_point json;
@@ -35,6 +34,7 @@ v_selectionmode text;
 v_worklayer text;
 v_array text;
 v_error_context text;
+v_count integer;
 
 BEGIN
 	SET search_path = "SCHEMA_NAME", public;
@@ -44,12 +44,15 @@ BEGIN
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=112;
-    
+    DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=112;	
+	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (112, null, 4, concat('NODE FLOW REGULATOR ANALYSIS'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (112, null, 4, '-------------------------------------------------------------');
+
     -- getting input data 	
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
-	v_saveondatabase :=  (((p_data ->>'data')::json->>'parameters')::json->>'saveOnDatabase')::boolean;
 
 	select string_agg(quote_literal(a),',') into v_array from json_array_elements_text(v_id) a;
 
@@ -72,13 +75,11 @@ BEGIN
 				ORDER BY 2 desc;';
 	END IF;
 
+	-- set selector
+	DELETE FROM selector_audit WHERE fid=112 AND cur_user=current_user;
+	INSERT INTO selector_audit (fid,cur_user) VALUES (112, current_user);
+	
 	-- get results
-	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=112 order by id) row;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-
 	--points
 	v_result = null;
 	SELECT jsonb_agg(features.feature) INTO v_result
@@ -94,15 +95,27 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
 
-	IF v_saveondatabase IS FALSE THEN 
-		-- delete previous results
-		DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=112;
+	SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=112;
+
+	IF v_count = 0 THEN
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		VALUES (112,  'There are no flow regulator nodes.', v_count);
 	ELSE
-		-- set selector
-		DELETE FROM selector_audit WHERE fid=112 AND cur_user=current_user;
-		INSERT INTO selector_audit (fid,cur_user) VALUES (112, current_user);
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		VALUES (112,  concat ('There are ',v_count,' flow regulator nodes.'), v_count);
+
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		SELECT 112,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count 
+		FROM anl_node WHERE cur_user="current_user"() AND fid=112;
+
 	END IF;
-		
+	
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=112 order by  id asc) row;
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
