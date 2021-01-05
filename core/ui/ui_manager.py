@@ -45,7 +45,10 @@ class SearchUi(GwDockWidget, FORM_CLASS):
 FORM_CLASS = get_ui_class('search_workcat.ui', 'basic')
 class SearchWorkcatUi(GwDialog, FORM_CLASS):
     pass
+# endregion
 
+
+# region OM
 FORM_CLASS = get_ui_class('visit_event_full.ui')
 class VisitEventFullUi(GwDialog, FORM_CLASS):
     pass
@@ -56,6 +59,46 @@ class GalleryUi(GwDialog, FORM_CLASS):
 
 FORM_CLASS = get_ui_class('visit_gallery_zoom.ui')
 class GalleryZoomUi(GwDialog, FORM_CLASS):
+    pass
+	
+FORM_CLASS = get_ui_class('mincut.ui', 'om')
+class MincutUi(GwMainWindow, FORM_CLASS):
+
+    def __init__(self):
+        self.closeMainWin = False
+        self.mincutCanceled = True
+        super().__init__()
+
+FORM_CLASS = get_ui_class('mincut_connec.ui', 'om')
+class MincutConnecUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = get_ui_class('mincut_hydrometer.ui', 'om')
+class MincutHydrometerUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = get_ui_class('mincut_composer.ui', 'om')
+class MincutComposerUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = get_ui_class('mincut_manager.ui', 'om')
+class MincutManagerUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = get_ui_class('mincut_end.ui', 'om')
+class MincutEndUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = get_ui_class('profile.ui', 'om')
+class ProfileUi(GwMainWindow, FORM_CLASS):
+    pass
+
+FORM_CLASS = get_ui_class('profile_list.ui', 'om')
+class ProfilesListUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = get_ui_class('selector_date.ui', 'om')
+class SelectorDateUi(GwDialog, FORM_CLASS):
     pass
 # endregion
 
@@ -139,48 +182,6 @@ class HydrologySelectorUi(GwDialog, FORM_CLASS):
 # endregion
 
 
-# region OM
-FORM_CLASS = get_ui_class('mincut.ui', 'om')
-class MincutUi(GwMainWindow, FORM_CLASS):
-
-    def __init__(self):
-        self.closeMainWin = False
-        self.mincutCanceled = True
-        super().__init__()
-
-FORM_CLASS = get_ui_class('mincut_connec.ui', 'om')
-class MincutConnecUi(GwDialog, FORM_CLASS):
-    pass
-
-FORM_CLASS = get_ui_class('mincut_hydrometer.ui', 'om')
-class MincutHydrometerUi(GwDialog, FORM_CLASS):
-    pass
-
-FORM_CLASS = get_ui_class('mincut_composer.ui', 'om')
-class MincutComposerUi(GwDialog, FORM_CLASS):
-    pass
-
-FORM_CLASS = get_ui_class('mincut_manager.ui', 'om')
-class MincutManagerUi(GwDialog, FORM_CLASS):
-    pass
-
-FORM_CLASS = get_ui_class('mincut_end.ui', 'om')
-class MincutEndUi(GwDialog, FORM_CLASS):
-    pass
-
-FORM_CLASS = get_ui_class('profile.ui', 'om')
-class ProfileUi(GwMainWindow, FORM_CLASS):
-    pass
-
-FORM_CLASS = get_ui_class('profile_list.ui', 'om')
-class ProfilesListUi(GwDialog, FORM_CLASS):
-    pass
-
-FORM_CLASS = get_ui_class('selector_date.ui', 'om')
-class SelectorDateUi(GwDialog, FORM_CLASS):
-    pass
-# endregion
-
 
 # region PLAN
 FORM_CLASS = get_ui_class('plan_psector.ui', 'plan')
@@ -218,7 +219,13 @@ class Csv2pgUi(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('fastprint.ui', 'utilities')
 class FastPrintUi(GwDialog, FORM_CLASS):
     pass
+	
 
+# region TOC
+# endregion
+
+
+# region ADMIN
 FORM_CLASS = get_ui_class('admin_addfields.ui', 'admin')
 class MainFieldsUi(GwDialog, FORM_CLASS):
     pass
@@ -307,9 +314,6 @@ class ProjectCheckUi(GwDialog, FORM_CLASS):
     pass
 # endregion
 
-
-# region TOC
-# endregion
 
 
 # region SHARED
