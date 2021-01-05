@@ -129,7 +129,7 @@ def get_ui_class(ui_file_name, subfolder='shared'):
     """ Get UI Python class from @ui_file_name """
 
     # Folder that contains UI files
-    if subfolder in ('basic', 'edit', 'epa', 'om', 'plan', 'utilities', 'toc', 'custom'):
+    if subfolder in ('basic', 'edit', 'epa', 'om', 'plan', 'utilities', 'toc'):
         ui_folder_path = os.path.dirname(__file__) + os.sep + 'toolbars' + os.sep + subfolder
     else:
         ui_folder_path = os.path.dirname(__file__) + os.sep + subfolder
@@ -328,11 +328,11 @@ FORM_CLASS = get_ui_class('fastprint.ui', 'utilities')
 class FastPrintUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('main_addfields.ui', 'utilities')
+FORM_CLASS = get_ui_class('admin_addfields.ui', 'admin')
 class MainFields(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('main_credentials.ui', 'utilities')
+FORM_CLASS = get_ui_class('admin_credentials.ui', 'admin')
 class Credentials(GwDialog, FORM_CLASS):
 
     def __init__(self):
@@ -367,39 +367,39 @@ class Credentials(GwDialog, FORM_CLASS):
             self.action.setIcon(icon)
             self.action.setText(text)
 
-FORM_CLASS = get_ui_class('main_dbproject.ui', 'utilities')
+FORM_CLASS = get_ui_class('admin_dbproject.ui', 'admin')
 class MainDbProjectUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('main_gisproject.ui', 'utilities')
+FORM_CLASS = get_ui_class('admin_gisproject.ui', 'admin')
 class MainGisProjectUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('main_importinp.ui', 'utilities')
+FORM_CLASS = get_ui_class('admin_importinp.ui', 'admin')
 class MainImportUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('main_projectinfo.ui', 'utilities')
+FORM_CLASS = get_ui_class('admin_projectinfo.ui', 'admin')
 class MainProjectInfoUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('main_renameproj.ui', 'utilities')
+FORM_CLASS = get_ui_class('admin_renameproj.ui', 'admin')
 class MainRenameProjUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('main_sysfields.ui', 'utilities')
+FORM_CLASS = get_ui_class('admin_sysfields.ui', 'admin')
 class MainSysFields(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('main_ui.ui', 'utilities')
+FORM_CLASS = get_ui_class('admin_ui.ui', 'admin')
 class MainUi(GwMainWindow, FORM_CLASS):
     dlg_closed = QtCore.pyqtSignal()
 
-FORM_CLASS = get_ui_class('main_visitclass.ui', 'utilities')
+FORM_CLASS = get_ui_class('admin_visitclass.ui', 'admin')
 class MainVisitClass(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('main_visitparam.ui', 'utilities')
+FORM_CLASS = get_ui_class('admin_visitparam.ui', 'admin')
 class MainVisitParam(GwDialog, FORM_CLASS):
     pass
 
@@ -418,10 +418,6 @@ class ProjectCheckUi(GwDialog, FORM_CLASS):
 
 
 # region TOC
-# endregion
-
-
-# region CUSTOM
 # endregion
 
 

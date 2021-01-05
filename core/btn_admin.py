@@ -288,7 +288,7 @@ class GwAdmin:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', msg)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
-            tools_gw.open_dialog(self.dlg_readsql, dlg_name='main_ui')
+            tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
             return
 
         # Create extension postgis if not exist
@@ -352,7 +352,7 @@ class GwAdmin:
                 tools_gw.docker_dialog(self.dlg_readsql)
                 self.dlg_readsql.dlg_closed.connect(tools_gw.close_docker)
             else:
-                tools_gw.open_dialog(self.dlg_readsql, dlg_name='main_ui')
+                tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
         except RuntimeError as e:
             tools_log.log_info(str(e))
 
@@ -469,7 +469,7 @@ class GwAdmin:
         self.dlg_create_gis_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_create_gis_project))
 
         # Open MainWindow
-        tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='main_gisproject')
+        tools_gw.open_dialog(self.dlg_create_gis_project, dlg_name='admin_gisproject')
 
 
     def sample_state_changed(self):
@@ -1336,7 +1336,7 @@ class GwAdmin:
         self.dlg_import_inp.btn_close.clicked.connect(partial(self.execute_import_inp, accepted=False))
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_import_inp, dlg_name='main_importinp')
+        tools_gw.open_dialog(self.dlg_import_inp, dlg_name='admin_importinp')
 
 
     def execute_last_process(self, new_project=False, schema_name='', schema_type='', locale=False, srid=None):
@@ -1956,7 +1956,7 @@ class GwAdmin:
         # Set listeners
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_manage_visit_class, dlg_name='main_visitclass')
+        tools_gw.open_dialog(self.dlg_manage_visit_class, dlg_name='admin_visitclass')
         return
 
 
@@ -1987,7 +1987,7 @@ class GwAdmin:
         # Set listeners
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_manage_visit_param, dlg_name='main_visitparam')
+        tools_gw.open_dialog(self.dlg_manage_visit_param, dlg_name='admin_visitparam')
         """
 
         return
@@ -2027,7 +2027,7 @@ class GwAdmin:
         self.dlg_readsql_show_info.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_show_info))
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_readsql_show_info, dlg_name='main_projectinfo')
+        tools_gw.open_dialog(self.dlg_readsql_show_info, dlg_name='admin_projectinfo')
 
 
     def read_info_version(self):
@@ -2331,7 +2331,7 @@ class GwAdmin:
 
         # Open dialog
         self.dlg_readsql_create_project.setWindowTitle(f"Create Project - {self.connection_name}")
-        tools_gw.open_dialog(self.dlg_readsql_create_project, dlg_name='main_dbproject')
+        tools_gw.open_dialog(self.dlg_readsql_create_project, dlg_name='admin_dbproject')
 
 
     def open_rename(self):
@@ -2357,7 +2357,7 @@ class GwAdmin:
 
         # Open dialog
         self.dlg_readsql_rename.setWindowTitle(f'Rename project - {schema}')
-        tools_gw.open_dialog(self.dlg_readsql_rename, dlg_name='main_renameproj')
+        tools_gw.open_dialog(self.dlg_readsql_rename, dlg_name='admin_renameproj')
 
 
     def executeFiles(self, filedir, i18n=False, no_ct=False, log_folder=True, log_files=False):
@@ -2473,7 +2473,7 @@ class GwAdmin:
 
         # Open dialog
         self.dlg_readsql_copy.setWindowTitle('Copy project - ' + schema)
-        tools_gw.open_dialog(self.dlg_readsql_copy, dlg_name='main_renameproj')
+        tools_gw.open_dialog(self.dlg_readsql_copy, dlg_name='admin_renameproj')
 
 
     def copy_project_data_schema(self, schema):
@@ -2923,7 +2923,7 @@ class GwAdmin:
         self.dlg_manage_fields.btn_open.clicked.connect(
             partial(self.update_selected_addfild, self.dlg_manage_fields.tbl_update))
 
-        tools_gw.open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
+        tools_gw.open_dialog(self.dlg_manage_fields, dlg_name='admin_addfields')
         self.dlg_manage_fields.setWindowTitle(window_title)
 
 
@@ -3028,7 +3028,7 @@ class GwAdmin:
                 value = None
             tools_qt.set_widget_text(self.dlg_manage_fields, result, value)
 
-        tools_gw.open_dialog(self.dlg_manage_fields, dlg_name='main_addfields')
+        tools_gw.open_dialog(self.dlg_manage_fields, dlg_name='admin_addfields')
 
 
     def manage_create_field(self, form_name):
@@ -3485,7 +3485,7 @@ class GwAdmin:
         self.dlg_credentials.btn_accept.clicked.connect(partial(self.set_credentials, self.dlg_credentials))
         self.dlg_credentials.cmb_connection.currentIndexChanged.connect(
             partial(self.set_credentials, self.dlg_credentials, new_connection=True))
-        tools_gw.open_dialog(self.dlg_credentials, dlg_name='main_credentials', maximize_button=False)
+        tools_gw.open_dialog(self.dlg_credentials, dlg_name='admin_credentials', maximize_button=False)
 
 
     def manage_user_params(self):
