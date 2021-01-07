@@ -18,8 +18,8 @@ from .shared.search import GwSearch
 from .toolbars import buttons
 from .ui.ui_manager import GwDialogTextUi
 from .utils import tools_gw
-from .utils.backend_functions import GwInfoTools
-from .utils.notify import GwNotifyTools
+from .utils.tools_backend_calls import GwInfoTools
+from .utils.notify import GwNotify
 from .. import global_vars
 from ..lib import tools_qgis, tools_config, tools_log, tools_db, tools_qt, tools_os
 
@@ -111,7 +111,7 @@ class LoadProject(QObject):
         self.check_user_roles()
 
         # Create a thread to listen selected database channels
-        self.notify = GwNotifyTools()
+        self.notify = GwNotify()
         list_channels = ['desktop', global_vars.session_vars['current_user']]
         self.notify.start_listening(list_channels)
 

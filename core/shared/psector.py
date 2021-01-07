@@ -23,7 +23,7 @@ from qgis.gui import QgsRubberBand
 
 from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate
-from ..ui.ui_manager import GwPlanPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi
+from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi
 from ..utils import tools_gw
 from ...lib import tools_db, tools_qgis, tools_qt, tools_log
 
@@ -48,7 +48,7 @@ class GwPsector:
             self.sys_currency = json.loads(row[0], object_pairs_hook=OrderedDict)
 
         # Create the dialog and signals
-        self.dlg_plan_psector = GwPlanPsectorUi()
+        self.dlg_plan_psector = GwPsectorUi()
         tools_gw.load_settings(self.dlg_plan_psector)
 
         # Capture the current layer to return it at the end of the operation

@@ -13,7 +13,7 @@ from ... import global_vars
 from ...lib import tools_log, tools_db
 
 
-class GwNotifyTools:
+class GwNotify:
     # :var conn_failed: some times, when user click so fast 2 actions, LISTEN channel is stopped, and we need to
     #                   re-LISTEN all channels
 

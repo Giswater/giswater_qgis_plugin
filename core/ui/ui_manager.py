@@ -184,8 +184,8 @@ class GwHydrologySelectorUi(GwBasicDialog, FORM_CLASS):
 
 
 # region PLAN
-FORM_CLASS = get_ui_class('plan_psector.ui', 'plan')
-class GwPlanPsectorUi(GwBasicDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('psector.ui', 'plan')
+class GwPsectorUi(GwBasicDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('price_manager.ui', 'plan')
@@ -212,12 +212,12 @@ FORM_CLASS = get_ui_class('config.ui', 'utilities')
 class GwConfigUi(GwMainWindowDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('csv2pg.ui', 'utilities')
-class GwCsv2pgUi(GwBasicDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('csv.ui', 'utilities')
+class GwCsvUi(GwBasicDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('fastprint.ui', 'utilities')
-class GwFastPrintUi(GwBasicDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('print.ui', 'utilities')
+class GwPrintUi(GwBasicDialog, FORM_CLASS):
     pass
 	
 
@@ -338,7 +338,7 @@ class GwInfoWorkcatUi(GwBasicDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('admin_translation.ui', 'admin')
-class GwMainQtDialogUi(GwBasicDialog, FORM_CLASS):
+class GwAdminTranslationUi(GwBasicDialog, FORM_CLASS):
 
     def __init__(self):
 
