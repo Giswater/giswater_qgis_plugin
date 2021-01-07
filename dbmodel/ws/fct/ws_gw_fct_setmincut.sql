@@ -50,7 +50,7 @@ v_error_context text;
 BEGIN
 
 	-- Search path
-	SET search_path = "ws_sample", public;
+	SET search_path = "SCHEMA_NAME", public;
 	SELECT giswater INTO v_version FROM sys_version order by id desc limit 1;
 
 	-- delete previous

@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 3014
 
 
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_copy_to_temp_csv(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_copy_to_temp_csv(p_data json)
   RETURNS json AS
 $BODY$
 
