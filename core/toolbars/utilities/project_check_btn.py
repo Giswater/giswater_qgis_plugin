@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from ..dialog_button import GwDialogButton
-from ...load_project_check import GwProjectCheck
+from ...load_project_check import GwLoadProjectCheck
 
 from ....lib import tools_qgis
 
@@ -25,5 +25,5 @@ class GwProjectCheckButton(GwDialogButton):
         # Return layers in the same order as listed in TOC
         layers = tools_qgis.get_project_layers()
 
-        check_project_result = GwProjectCheck()
+        check_project_result = GwLoadProjectCheck()
         check_project_result.populate_audit_check_project(layers, "false")

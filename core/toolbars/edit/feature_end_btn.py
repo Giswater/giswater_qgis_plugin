@@ -20,7 +20,7 @@ from .... import global_vars
 from ....lib import tools_qgis, tools_qt, tools_log, tools_db
 
 
-class GwEndFeatureButton(GwDialogButton):
+class GwFeatureEndButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

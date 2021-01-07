@@ -9,7 +9,7 @@ from ..dialog_button import GwDialogButton
 from ...shared.visit_manager import GwVisitManager
 
 
-class GwAddVisitButton(GwDialogButton):
+class GwVisitButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

@@ -19,8 +19,8 @@ from .om.flow_trace_btn import GwFlowTraceButton
 from .om.flow_exit_btn import GwFlowExitButton
 
 from .om.profile_btn import GwProfileButton
-from .om.visit_btn import GwAddVisitButton
-from .om.visit_manager_btn import GwManageVisitButton
+from .om.visit_btn import GwVisitButton
+from .om.visit_manager_btn import GwVisitManagerButton
 from .om.date_selector_btn import GwDateSelectorButton
 
 # Edit
@@ -31,17 +31,17 @@ from .edit.arc_divide_btn import GwArcDivideButton
 from .edit.arc_fusion_btn import GwArcFusionButton
 from .edit.nodetype_change_btn import GwNodeTypeChangeButton
 from .edit.connect_link_btn import GwConnectLinkButton
-from .edit.feature_end_btn import GwEndFeatureButton
-from .edit.feature_delete_btn import GwDeleteFeatureButton
+from .edit.feature_end_btn import GwFeatureEndButton
+from .edit.feature_delete_btn import GwFeatureDeleteButton
 from .edit.dimensioning_btn import GwDimensioningButton
-from .edit.document_btn import GwAddDocumentButton
-from .edit.document_manager_btn import GwEditDocumentButton
-from .edit.element_btn import GwAddElementButton
-from .edit.element_manager_btn import GwEditElementButton
+from .edit.document_btn import GwDocumentButton
+from .edit.document_manager_btn import GwDocumentManagerButton
+from .edit.element_btn import GwElementButton
+from .edit.element_manager_btn import GwElementManagerButton
 
 # Cad
-from .cad.aux_circle_add import GwAuxCircleButton
-from .cad.aux_point_add import GwAuxPointButton
+from .cad.aux_circle_add import GwAuxCircleAddButton
+from .cad.aux_point_add import GwAuxPointAddButton
 
 # Epa
 from .epa.go2epa_btn import GwGo2EpaButton

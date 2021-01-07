@@ -18,7 +18,7 @@ from ..lib import tools_qgis, tools_log, tools_db, tools_qt
 from ..lib.tools_qt import hide_void_groupbox
 
 
-class GwProjectCheck:
+class GwLoadProjectCheck:
 
     def __init__(self):
         """ Class to control Composer button """

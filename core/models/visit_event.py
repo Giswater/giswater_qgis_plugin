@@ -17,7 +17,7 @@ __revision__ = '$Format:%H$'
 from .table import GwTable, GwGenericDescriptor
 
 
-class GwOmVisitEvent(GwTable):
+class GwVisitEvent(GwTable):
     """ Class to serialize table 'om_visit_event' """
 
     id = GwGenericDescriptor(-1)

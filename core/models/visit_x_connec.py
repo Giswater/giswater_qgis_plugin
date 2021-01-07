@@ -17,20 +17,15 @@ __revision__ = '$Format:%H$'
 from .table import GwTable, GwGenericDescriptor
 
 
-class GwOmVisitParameter(GwTable):
-    """ Class to serialize table 'config_visit_parameter' """
+class GwVisitXConnec(GwTable):
+    """ Class to serialize table 'om_visit_x_connec' """
 
-    id = GwGenericDescriptor(None)
-    code = GwGenericDescriptor(None)
-    parameter_type = GwGenericDescriptor(None)
-    feature_type = GwGenericDescriptor(None)
-    data_type = GwGenericDescriptor(None)
-    criticity = GwGenericDescriptor(None)
-    descript = GwGenericDescriptor(None)
-    form_type = GwGenericDescriptor(None)
-    vdefault = GwGenericDescriptor(None)
+    id = GwGenericDescriptor(-1)
+    visit_id = GwGenericDescriptor(None)
+    connec_id = GwGenericDescriptor(None)
+    is_last = GwGenericDescriptor(None)
 
     def __init__(self):
         """ Class constructor """
-        GwTable.__init__(self, 'config_visit_parameter', 'id')
+        GwTable.__init__(self, 'om_visit_x_connec', 'id')
 

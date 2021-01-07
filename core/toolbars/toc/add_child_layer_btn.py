@@ -12,7 +12,7 @@ from qgis.PyQt.QtWidgets import QAction, QApplication, QMenu
 from qgis.PyQt.QtGui import QCursor
 
 from ..dialog_button import GwDialogButton
-from ...load_project_check import GwProjectCheck
+from ...load_project_check import GwLoadProjectCheck
 from ...tasks.layers_config_task import GwConfigLayerTask
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_log, tools_db
@@ -149,7 +149,7 @@ class GwAddChildLayerButton(GwDialogButton):
 
         if self.project_type in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
-            self.check_project_result = GwProjectCheck()
+            self.check_project_result = GwLoadProjectCheck()
 
             # check project
             status, result = self.check_project_result.populate_audit_check_project(layers, "true")
