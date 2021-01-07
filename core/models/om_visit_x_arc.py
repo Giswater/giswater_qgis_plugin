@@ -14,18 +14,18 @@ __copyright__ = '(C) 2018, Luigi Pirelli'
 
 __revision__ = '$Format:%H$'
 
-from .table import Table, GenericDescriptor
+from .table import GwTable, GwGenericDescriptor
 
 
-class GwOmVisitXArc(Table):
+class GwOmVisitXArc(GwTable):
     """ Class to serialize table 'om_visit_x_arc' """
 
-    id = GenericDescriptor(-1)
-    visit_id = GenericDescriptor(None)
-    arc_id = GenericDescriptor(None)
-    is_last = GenericDescriptor(None)
+    id = GwGenericDescriptor(-1)
+    visit_id = GwGenericDescriptor(None)
+    arc_id = GwGenericDescriptor(None)
+    is_last = GwGenericDescriptor(None)
 
     def __init__(self):
         """ Class constructor """
-        Table.__init__(self, 'om_visit_x_arc', 'id')
+        GwTable.__init__(self, 'om_visit_x_arc', 'id')
 

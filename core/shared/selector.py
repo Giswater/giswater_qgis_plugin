@@ -17,7 +17,7 @@ from ... import global_vars
 from ...lib import tools_qgis, tools_qt
 
 
-class Selector:
+class GwSelector:
     def __init__(self):
         """ Class constructor """
         pass

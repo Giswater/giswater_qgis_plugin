@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from ..dialog_button import GwDialogButton
-from ...shared.selector import Selector
+from ...shared.selector import GwSelector
 
 from ....core.utils import tools_gw
 
@@ -22,5 +22,5 @@ class GwSelectorButton(GwDialogButton):
 
         # Show form in docker?
         tools_gw.init_docker('qgis_form_docker')
-        selector = Selector()
+        selector = GwSelector()
         selector.open_selector(selector_type)

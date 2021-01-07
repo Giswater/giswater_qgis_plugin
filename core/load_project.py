@@ -13,7 +13,7 @@ from collections import OrderedDict, Counter
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
 
-from .models.plugin_toolbar import PluginToolbar
+from .models.plugin_toolbar import GwPluginToolbar
 from .shared.search import GwSearch
 from .toolbars import buttons
 from .ui.ui_manager import GwDialogTextUi
@@ -24,7 +24,7 @@ from .. import global_vars
 from ..lib import tools_qgis, tools_config, tools_log, tools_db, tools_qt, tools_os
 
 
-class LoadProject(QObject):
+class GwLoadProject(QObject):
 
     def __init__(self):
         """ Class to manage layers. Refactor code from main.py """
@@ -306,7 +306,7 @@ class LoadProject(QObject):
             list_actions = [list_actions]
 
         toolbar_name = self.translate(f'toolbar_{toolbar_id}_name')
-        plugin_toolbar = PluginToolbar(toolbar_id, toolbar_name, True)
+        plugin_toolbar = GwPluginToolbar(toolbar_id, toolbar_name, True)
 
         # If the toolbar is ToC, add it to the Layes docker toolbar, else create a new toolbar
         if toolbar_id == "toc":

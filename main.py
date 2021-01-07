@@ -15,7 +15,7 @@ from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton
 
 from . import global_vars
 from .core.btn_admin import GwAdmin
-from .core.load_project import LoadProject
+from .core.load_project import GwLoadProject
 from .core.utils import tools_gw
 from .lib import tools_log, tools_qgis
 
@@ -211,7 +211,7 @@ class Giswater(QObject):
         self.unload(False)
 
         # Create class to manage code that performs project configuration
-        self.load_project = LoadProject()
+        self.load_project = GwLoadProject()
         self.load_project.project_read(show_warning)
 
 

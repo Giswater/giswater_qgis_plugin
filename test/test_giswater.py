@@ -18,7 +18,7 @@ from ..lib import tools_log
 
 
 
-class TestGiswater(QObject):
+class GwTest(QObject):
 
     def __init__(self, iface):
         """ Constructor
@@ -28,7 +28,7 @@ class TestGiswater(QObject):
         :type iface: QgsInterface
         """
 
-        super(TestGiswater, self).__init__()
+        super(GwTest, self).__init__()
 
         # Initialize instance attributes
         self.iface = iface

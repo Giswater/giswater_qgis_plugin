@@ -8,13 +8,13 @@ or (at your option) any later version.
 from qgis.PyQt.QtWidgets import QDialog
 from qgis.core import QgsApplication, QgsProviderRegistry
 
-from .test_giswater import TestGiswater
+from .test_giswater import GwTest
 from ..core.btn_admin_gis_project import GwAdminGisProject
 from .. import global_vars
 from ..lib import tools_db
 
 # dummy instance to replace qgis.utils.iface
-class QgisInterfaceDummy(object):
+class GwQgisInterfaceDummy(object):
 
     def __getattr__(self, name):
         # return an function that accepts any arguments and does nothing
@@ -25,11 +25,11 @@ class QgisInterfaceDummy(object):
         return dummy
 
 
-class TestQgis:
+class GwTestQgis:
 
     def __init__(self):
 
-        super(TestQgis, self).__init__()
+        super(GwTestQgis, self).__init__()
         self.service_name = "localhost_giswater"
         self.user = "gisadmin"
 
@@ -38,7 +38,7 @@ class TestQgis:
         """ Load main plugin class """
 
         self.init_config()
-        self.test_giswater = TestGiswater(self.iface)
+        self.test_giswater = GwTest(self.iface)
         self.test_giswater.init_plugin(schema_name)
 
         return True
@@ -51,7 +51,7 @@ class TestQgis:
         QgsApplication.setPrefixPath('/usr', True)
         self.qgs = QgsApplication([], True)
         self.qgs.initQgis()
-        self.iface = QgisInterfaceDummy()
+        self.iface = GwQgisInterfaceDummy()
 
         aux = len(QgsProviderRegistry.instance().providerList())
         if aux == 0:
@@ -176,31 +176,31 @@ class TestQgis:
 
 
 def test_create_project():
-    test = TestQgis()
+    test = GwTestQgis()
     status = test.create_project()
     print(status)
 
 
 def test_update_project():
-    test = TestQgis()
+    test = GwTestQgis()
     status = test.update_project('ud')
     print(status)
 
 
 def test_create_gis_project():
-    test = TestQgis()
+    test = GwTestQgis()
     status = test.create_gis_project('ud')
     print(status)
 
 
 def test_manage_visit():
-    test = TestQgis()
+    test = GwTestQgis()
     status = test.manage_visit()
     print(status)
 
 
 if __name__ == '__main__':
     print("MAIN")
-    test = TestQgis()
+    test = GwTestQgis()
     test.create_project('ws', 'ws_dev34')
 

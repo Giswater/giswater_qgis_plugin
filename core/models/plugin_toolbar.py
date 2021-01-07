@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 
-class PluginToolbar(object):
+class GwPluginToolbar(object):
     """ Keep data related with every toolbar of the plugin """
 
     def __init__(self, toolbar_id, name, enabled, toolbar=None, list_actions=[]):

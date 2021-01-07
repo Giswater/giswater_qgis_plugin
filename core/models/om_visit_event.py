@@ -14,33 +14,33 @@ __copyright__ = '(C) 2018, Luigi Pirelli'
 
 __revision__ = '$Format:%H$'
 
-from .table import Table, GenericDescriptor
+from .table import GwTable, GwGenericDescriptor
 
 
-class GwOmVisitEvent(Table):
+class GwOmVisitEvent(GwTable):
     """ Class to serialize table 'om_visit_event' """
 
-    id = GenericDescriptor(-1)
-    event_code = GenericDescriptor(None)
-    visit_id = GenericDescriptor(None)
-    position_id = GenericDescriptor(None)
-    position_value = GenericDescriptor(None)
-    parameter_id = GenericDescriptor(None)
-    value = GenericDescriptor(None)
-    value1 = GenericDescriptor(None)
-    value2 = GenericDescriptor(None)
-    geom1 = GenericDescriptor(None)
-    geom2 = GenericDescriptor(None)
-    geom3 = GenericDescriptor(None)
-    xcoord = GenericDescriptor(None)
-    ycoord = GenericDescriptor(None)
-    compass = GenericDescriptor(None)
-    tstamp = GenericDescriptor(None)
-    text = GenericDescriptor(None)
-    index_val = GenericDescriptor(None)
-    is_last = GenericDescriptor(None)
+    id = GwGenericDescriptor(-1)
+    event_code = GwGenericDescriptor(None)
+    visit_id = GwGenericDescriptor(None)
+    position_id = GwGenericDescriptor(None)
+    position_value = GwGenericDescriptor(None)
+    parameter_id = GwGenericDescriptor(None)
+    value = GwGenericDescriptor(None)
+    value1 = GwGenericDescriptor(None)
+    value2 = GwGenericDescriptor(None)
+    geom1 = GwGenericDescriptor(None)
+    geom2 = GwGenericDescriptor(None)
+    geom3 = GwGenericDescriptor(None)
+    xcoord = GwGenericDescriptor(None)
+    ycoord = GwGenericDescriptor(None)
+    compass = GwGenericDescriptor(None)
+    tstamp = GwGenericDescriptor(None)
+    text = GwGenericDescriptor(None)
+    index_val = GwGenericDescriptor(None)
+    is_last = GwGenericDescriptor(None)
 
     def __init__(self):
         """ Class constructor """
-        Table.__init__(self, 'om_visit_event', 'id')
+        GwTable.__init__(self, 'om_visit_event', 'id')
 

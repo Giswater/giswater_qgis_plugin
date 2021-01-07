@@ -14,23 +14,23 @@ __copyright__ = '(C) 2018, Luigi Pirelli'
 
 __revision__ = '$Format:%H$'
 
-from .table import Table, GenericDescriptor
+from .table import GwTable, GwGenericDescriptor
 
 
-class GwOmVisitParameter(Table):
+class GwOmVisitParameter(GwTable):
     """ Class to serialize table 'config_visit_parameter' """
 
-    id = GenericDescriptor(None)
-    code = GenericDescriptor(None)
-    parameter_type = GenericDescriptor(None)
-    feature_type = GenericDescriptor(None)
-    data_type = GenericDescriptor(None)
-    criticity = GenericDescriptor(None)
-    descript = GenericDescriptor(None)
-    form_type = GenericDescriptor(None)
-    vdefault = GenericDescriptor(None)
+    id = GwGenericDescriptor(None)
+    code = GwGenericDescriptor(None)
+    parameter_type = GwGenericDescriptor(None)
+    feature_type = GwGenericDescriptor(None)
+    data_type = GwGenericDescriptor(None)
+    criticity = GwGenericDescriptor(None)
+    descript = GwGenericDescriptor(None)
+    form_type = GwGenericDescriptor(None)
+    vdefault = GwGenericDescriptor(None)
 
     def __init__(self):
         """ Class constructor """
-        Table.__init__(self, 'config_visit_parameter', 'id')
+        GwTable.__init__(self, 'config_visit_parameter', 'id')
 

@@ -16,8 +16,8 @@ from qgis.PyQt.QtCore import QStringListModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QTableView, QPushButton, QLineEdit, QCompleter, QAbstractItemView
 
-from ..shared.selector import Selector
-from ..ui.ui_manager import GwSelectorUi, GwMincutManagerUi
+from ..shared.selector import GwSelector
+from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_db
@@ -245,7 +245,7 @@ class GwMincutManager:
             tools_qgis.show_message(msg)
             return
         selector_values = f'"selector_mincut", "ids":{selected_mincuts}'
-        mincut_selector = Selector()
+        mincut_selector = GwSelector()
 
 
         self.dlg_selector = GwSelectorUi()

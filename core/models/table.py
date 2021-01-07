@@ -19,7 +19,7 @@ from ... import global_vars
 from ...lib import tools_db, tools_log, tools_qt, tools_qgis
 
 
-class GenericDescriptor(object):
+class GwGenericDescriptor(object):
     """A descriptor that set getter and setter. class example from:
     http://nbviewer.jupyter.org/urls/gist.github.com/ChrisBeaumont/5758381/raw/descriptor_writeup.ipynb"""
 
@@ -40,7 +40,7 @@ class GenericDescriptor(object):
         self.data[instance] = value
 
 
-class Table(object):
+class GwTable(object):
     """Base class representing a table. Assume it have to be used as a pure virtual."""
 
     def __init__(self, table_name, pk):

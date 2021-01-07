@@ -26,7 +26,7 @@ from ....lib import tools_qt, tools_log, tools_qgis
 import global_vars
 
 
-class NodeData:
+class GwNodeData:
 
     def __init__(self):
 
@@ -522,7 +522,7 @@ class GwProfileButton(GwMaptoolButton):
         # Get parameters and fill the nodes
         n = 0
         for node in nodes:
-            parameters = NodeData()
+            parameters = GwNodeData()
             parameters.start_point = self.start_point[n]
             parameters.top_elev = node['top_elev']
             parameters.ymax = node['ymax']
@@ -539,7 +539,7 @@ class GwProfileButton(GwMaptoolButton):
         # Get parameters and fill the links
         n = 0
         for terrain in terrains:
-            parameters = NodeData()
+            parameters = GwNodeData()
             parameters.start_point = terrain['total_x']
             parameters.top_elev = json.loads(terrain['label_n1'], object_pairs_hook=OrderedDict)['top_elev']
             parameters.node_id = terrain['top_n1']

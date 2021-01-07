@@ -14,25 +14,25 @@ __copyright__ = '(C) 2018, Luigi Pirelli'
 
 __revision__ = '$Format:%H$'
 
-from .table import Table, GenericDescriptor
+from .table import GwTable, GwGenericDescriptor
 
 
-class GwOmVisit(Table):
+class GwOmVisit(GwTable):
     """ Class to serialize table 'om_visit' """
 
-    id = GenericDescriptor(-1)
-    visitcat_id = GenericDescriptor(None)
-    ext_code = GenericDescriptor(None)
-    startdate = GenericDescriptor(None)
-    enddate = GenericDescriptor(None)
-    user_name = GenericDescriptor(None)
-    webclient_id = GenericDescriptor(None)
-    expl_id = GenericDescriptor(None)
-    the_geom = GenericDescriptor(None)
-    descript = GenericDescriptor(None)
-    status = GenericDescriptor(None)
+    id = GwGenericDescriptor(-1)
+    visitcat_id = GwGenericDescriptor(None)
+    ext_code = GwGenericDescriptor(None)
+    startdate = GwGenericDescriptor(None)
+    enddate = GwGenericDescriptor(None)
+    user_name = GwGenericDescriptor(None)
+    webclient_id = GwGenericDescriptor(None)
+    expl_id = GwGenericDescriptor(None)
+    the_geom = GwGenericDescriptor(None)
+    descript = GwGenericDescriptor(None)
+    status = GwGenericDescriptor(None)
 
     def __init__(self):
         """ Class constructor """
-        Table.__init__(self, 'om_visit', 'id')
+        GwTable.__init__(self, 'om_visit', 'id')
 
