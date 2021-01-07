@@ -116,7 +116,7 @@ class GwFeatureReplaceButton(GwMaptoolButton):
         tools_qt.fill_combo_box(self.dlg_replace, "feature_type_new", rows)
 
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self.new_workcat))
-        self.dlg_replace.btn_accept.clicked.connect(partial(self.get_values, self.dlg_replace))
+        self.dlg_replace.btn_accept.clicked.connect(partial(self.replace_feature, self.dlg_replace))
         self.dlg_replace.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_replace))
         self.dlg_replace.rejected.connect(self.cancel_map_tool)
         # Open dialog
@@ -239,7 +239,7 @@ class GwFeatureReplaceButton(GwMaptoolButton):
                     tools_qt.show_info_box(msg, "Warning")
 
 
-    def get_values(self, dialog):
+    def replace_feature(self, dialog):
 
         self.workcat_id_end_aux = tools_qt.get_text(dialog, dialog.workcat_id_end)
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')

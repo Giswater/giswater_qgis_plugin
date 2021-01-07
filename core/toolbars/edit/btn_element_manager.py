@@ -17,4 +17,4 @@ class GwEditElementButton(GwDialogButton):
 
 
     def clicked_event(self):
-        self.element.edit_element()
+        self.element.manage_elements()

@@ -31,7 +31,10 @@ class GwAddChildLayerButton(GwDialogButton):
 
 
     def clicked_event(self):
+        self.add_child_layer()
 
+
+    def add_child_layer(self):
         # Create main menu and get cursor click position
         main_menu = QMenu()
         cursor = QCursor()

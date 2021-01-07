@@ -167,7 +167,10 @@ class GwNodeTypeChangeButton(GwMaptoolButton):
 
 
     def canvasReleaseEvent(self, event):
+        self.nodetype_change(event)
 
+
+    def nodetype_change(self, event):
         self.node_id = None
 
         # With left click the digitizing is finished

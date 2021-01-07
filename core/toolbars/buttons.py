@@ -24,8 +24,8 @@ from .om.btn_visit_manager import GwManageVisitButton
 from .om.btn_date_selector import GwDateSelectorButton
 
 # Edit
-from .edit.btn_add_point import GwAddPointButton
-from .edit.btn_add_line import GwAddLineButton
+from .edit.btn_point_add import GwPointAddButton
+from .edit.btn_arc_add import GwArcAddButton
 from .edit.btn_feature_replace import GwFeatureReplaceButton
 from .edit.btn_arc_divide import GwArcDivideButton
 from .edit.btn_arc_fusion import GwArcFusionButton
@@ -40,8 +40,8 @@ from .edit.btn_element import GwAddElementButton
 from .edit.btn_element_manager import GwEditElementButton
 
 # Cad
-from .cad.btn_aux_circle import GwAuxCircleButton
-from .cad.btn_aux_point import GwAuxPointButton
+from .cad.aux_circle_add import GwAuxCircleButton
+from .cad.aux_point_add import GwAuxPointButton
 
 # Epa
 from .epa.btn_go2epa import GwGo2EpaButton

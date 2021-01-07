@@ -36,7 +36,10 @@ class GwToolBoxButton(GwDialogButton):
 
 
     def clicked_event(self):
-        
+        self.open_toolbox()
+
+
+    def open_toolbox(self):
         self.no_clickable_items = ['Giswater']
         function_name = "gw_fct_gettoolbox"
         row = tools_db.check_function(function_name)

@@ -180,7 +180,10 @@ class GwArcDivideButton(GwMaptoolButton):
 
     def canvasReleaseEvent(self, event):
         """ Mouse release event """
+        self.get_arc_divide(event)
 
+
+    def get_arc_divide(self, event):
         if event.button() == Qt.LeftButton:
 
             event_point = self.snapper_manager.get_event_point(event)

@@ -17,4 +17,4 @@ class GwEditDocumentButton(GwDialogButton):
 
 
     def clicked_event(self):
-        self.document.edit_document()
+        self.document.manage_documents()

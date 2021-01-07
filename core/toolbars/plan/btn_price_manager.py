@@ -13,9 +13,9 @@ class GwPriceManagerButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.plan = GwPsector()
+        self.psector = GwPsector()
 
 
     def clicked_event(self):
-        self.plan.master_estimate_result_manager()
+        self.psector.manage_prices()
 

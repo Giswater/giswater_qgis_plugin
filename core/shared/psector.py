@@ -40,7 +40,7 @@ class GwPsector:
         self.rubber_band = QgsRubberBand(self.canvas)
 
 
-    def new_psector(self, psector_id=None, is_api=False):
+    def get_psector(self, psector_id=None, is_api=False):
         """ Buttons 45 and 81: New psector """
 
         row = tools_gw.get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
@@ -1346,7 +1346,7 @@ class GwPsector:
 
         psector_id = tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
         manage_document = GwDocument(single_tool=False)
-        dlg_docman = manage_document.manage_document(tablename='psector', qtable=qtable, item_id=psector_id)
+        dlg_docman = manage_document.get_document(tablename='psector', qtable=qtable, item_id=psector_id)
         dlg_docman.btn_accept.clicked.connect(partial(tools_gw.set_completer_object, dlg_docman, 'doc'))
         tools_qt.remove_tab(dlg_docman.tabWidget, 'tab_rel')
 
@@ -1397,10 +1397,10 @@ class GwPsector:
 
     def master_new_psector(self, psector_id=None):
         """ Button 45: New psector """
-        self.new_psector(psector_id, 'plan')
+        self.get_psector(psector_id, 'plan')
 
 
-    def master_psector_mangement(self):
+    def manage_psectors(self):
         """ Button 46: Psector management """
 
         # Create the dialog and signals
@@ -1582,7 +1582,7 @@ class GwPsector:
         widget.model().select()
 
 
-    def master_estimate_result_manager(self):
+    def manage_prices(self):
         """ Button 50: Plan estimate result manager """
 
         # Create the dialog and signals
@@ -1639,14 +1639,14 @@ class GwPsector:
 
 
     def delete_merm(self, dialog):
-        """ Delete selected row from 'master_estimate_result_manager' dialog from selected tab """
+        """ Delete selected row from 'manage_prices' dialog from selected tab """
 
         self.multi_rows_delete(dialog, dialog.tbl_om_result_cat, 'plan_result_cat',
                                'result_id', 'lbl_vdefault_price', 'price')
 
 
     def filter_merm(self, dialog, tablename):
-        """ Filter rows from 'master_estimate_result_manager' dialog from selected tab """
+        """ Filter rows from 'manage_prices' dialog from selected tab """
         self.filter_by_text(dialog, dialog.tbl_om_result_cat, dialog.txt_name, tablename)
 
 

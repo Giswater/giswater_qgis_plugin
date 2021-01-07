@@ -24,7 +24,10 @@ class GwGo2EpaSelectorButton(GwDialogButton):
 
     def clicked_event(self):
         """ Button 29: Epa result selector """
+        self.open_go2epa_selector()
 
+
+    def open_go2epa_selector(self):
         # Create the dialog and signals
         self.dlg_go2epa_result = GwGo2EpaSelectorUi()
         tools_gw.load_settings(self.dlg_go2epa_result)

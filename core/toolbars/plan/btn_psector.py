@@ -17,5 +17,5 @@ class GwPsectorButton(GwDialogButton):
 
 
     def clicked_event(self):
-        self.psector.new_psector()
+        self.psector.get_psector()
 

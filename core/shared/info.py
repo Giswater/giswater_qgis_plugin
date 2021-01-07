@@ -243,7 +243,7 @@ class GwInfo(QObject):
         elif template == 'visit':
             visit_id = self.complet_result['body']['feature']['id']
             manage_visit = GwVisitManager()
-            manage_visit.manage_visit(visit_id=visit_id, tag='info')
+            manage_visit.get_visit(visit_id=visit_id, tag='info')
 
         else:
             tools_log.log_warning(f"template not managed: {template}")
@@ -2110,7 +2110,7 @@ class GwInfo(QObject):
         """ Execute action of button 33 """
 
         elem = GwElement()
-        elem.manage_element(True, feature, self.geom_type)
+        elem.get_element(True, feature, self.geom_type)
         elem.dlg_add_element.accepted.connect(partial(self.manage_element_new, dialog, elem))
         elem.dlg_add_element.rejected.connect(partial(self.manage_element_new, dialog, elem))
 
@@ -2704,7 +2704,7 @@ class GwInfo(QObject):
 
         manage_visit = GwVisitManager()
         manage_visit.visit_added.connect(self.update_visit_table)
-        manage_visit.edit_visit(self.geom_type, self.feature_id)
+        manage_visit.manage_visits(self.geom_type, self.feature_id)
 
 
     # creat the new visit GUI
@@ -2734,7 +2734,7 @@ class GwInfo(QObject):
         # so the workaroud is to do a unuseful query to have the dao active
         sql = "SELECT id FROM om_visit LIMIT 1"
         tools_db.get_rows(sql)
-        manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.feature_id, expl_id=expl_id, is_new_from_cf=True)
+        manage_visit.get_visit(geom_type=self.geom_type, feature_id=self.feature_id, expl_id=expl_id, is_new_from_cf=True)
 
 
     def open_gallery(self):
@@ -2966,7 +2966,7 @@ class GwInfo(QObject):
         """ Execute action of button 34 """
 
         doc = GwDocument()
-        doc.manage_document(feature=feature, geom_type=self.geom_type)
+        doc.get_document(feature=feature, geom_type=self.geom_type)
         doc.dlg_add_doc.accepted.connect(partial(self.manage_document_new, dialog, doc))
         doc.dlg_add_doc.rejected.connect(partial(self.manage_document_new, dialog, doc))
 
@@ -3440,7 +3440,7 @@ class GwInfo(QObject):
             return
 
 
-    def edit_add_feature(self, feature_cat):
+    def add_feature(self, feature_cat):
         """ Button 01, 02: Add 'node' or 'arc' """
         global is_inserting
         if is_inserting:

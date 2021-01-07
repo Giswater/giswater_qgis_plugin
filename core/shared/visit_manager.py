@@ -58,7 +58,7 @@ class GwVisitManager(QObject):
         self.snapper_manager = GwSnapManager(self.iface)
 
 
-    def manage_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
+    def get_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
                      open_dlg=True, is_new_from_cf=False):
 
         """ Button 64. Add visit.
@@ -291,7 +291,7 @@ class GwVisitManager(QObject):
         dialog.close()
 
         if table_object == "v_ui_om_visit" or "v_ui_om_visitman_x_" in table_object:
-            self.manage_visit(visit_id=selected_object_id)
+            self.get_visit(visit_id=selected_object_id)
 
 
     def set_signals(self):
@@ -870,7 +870,7 @@ class GwVisitManager(QObject):
         tools_qgis.disconnect_signal_selection_changed()
 
 
-    def edit_visit(self, geom_type=None, feature_id=None):
+    def manage_visits(self, geom_type=None, feature_id=None):
         """ Button 65: Edit visit """
 
         # Create the dialog
@@ -1096,7 +1096,7 @@ class GwVisitManager(QObject):
 
         visit_id = tools_qt.get_text(self.dlg_add_visit, self.dlg_add_visit.visit_id)
         manage_document = GwDocument(single_tool=False)
-        dlg_docman = manage_document.manage_document(
+        dlg_docman = manage_document.get_document(
             tablename='visit', qtable=self.dlg_add_visit.tbl_document, item_id=visit_id)
         tools_qt.remove_tab(dlg_docman.tabWidget, 'tab_rel')
         dlg_docman.btn_accept.clicked.connect(partial(tools_gw.set_completer_object, dlg_docman, 'doc'))

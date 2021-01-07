@@ -27,7 +27,10 @@ class GwCSVButton(GwDialogButton):
 
 
     def clicked_event(self):
+        self.open_csv()
 
+
+    def open_csv(self):
         self.func_name = None
         self.dlg_csv = GwCsvUi()
         tools_gw.load_settings(self.dlg_csv)

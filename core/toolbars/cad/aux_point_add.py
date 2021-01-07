@@ -142,7 +142,9 @@ class GwAuxPointButton(GwMaptoolButton):
 
 
     def canvasReleaseEvent(self, event):
+        self.add_aux_point(event)
 
+    def add_aux_point(self, event):
         if event.button() == Qt.LeftButton:
 
             # Get coordinates

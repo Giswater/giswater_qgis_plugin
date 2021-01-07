@@ -34,7 +34,10 @@ class GwPrintButton(GwDialogButton):
 
 
     def clicked_event(self):
+        self.open_print()
 
+
+    def open_print(self):
         self.my_json = {}
         composers_list = self.get_composer()
         if composers_list == '"{}"':

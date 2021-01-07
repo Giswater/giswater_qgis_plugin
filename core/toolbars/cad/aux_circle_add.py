@@ -123,7 +123,10 @@ class GwAuxCircleButton(GwMaptoolButton):
 
 
     def canvasReleaseEvent(self, event):
+        self.add_aux_circle(event)
 
+
+    def add_aux_circle(self, event):
         if event.button() == Qt.LeftButton:
 
             # Get coordinates

@@ -17,5 +17,5 @@ class GwMincutButton(GwDialogButton):
 
 
     def clicked_event(self):
-        self.mincut.mg_mincut()
+        self.mincut.get_mincut()
 

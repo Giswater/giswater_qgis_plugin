@@ -17,4 +17,4 @@ class GwAddDocumentButton(GwDialogButton):
 
 
     def clicked_event(self):
-        self.document.manage_document()
+        self.document.get_document()

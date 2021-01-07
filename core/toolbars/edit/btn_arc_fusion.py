@@ -23,7 +23,7 @@ class GwArcFusionButton(GwMaptoolButton):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
 
-    def exec_fusion(self):
+    def fusion_arc(self):
 
         workcat_id_end = self.dlg_fusion.workcat_id_end.currentText()
         enddate = self.dlg_fusion.enddate.date()
@@ -60,7 +60,10 @@ class GwArcFusionButton(GwMaptoolButton):
 
 
     def canvasReleaseEvent(self, event):
+        self.get_arc_fusion(event)
 
+
+    def get_arc_fusion(self, event):
         if event.button() == Qt.RightButton:
             self.cancel_map_tool()
             return
@@ -89,7 +92,7 @@ class GwArcFusionButton(GwMaptoolButton):
             tools_qt.set_calendar(self.dlg_fusion, "enddate", current_date)
 
             # Set signals
-            self.dlg_fusion.btn_accept.clicked.connect(self.exec_fusion)
+            self.dlg_fusion.btn_accept.clicked.connect(self.fusion_arc)
             self.dlg_fusion.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
 
             tools_gw.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')

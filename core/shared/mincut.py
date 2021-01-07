@@ -299,12 +299,12 @@ class GwMincut:
         tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id, str(result_mincut_id))
 
 
-    def mg_mincut(self):
+    def get_mincut(self):
         """ Button 26: New Mincut """
 
         self.is_new = True
         self.init_mincut_form()
-        self.action = "mg_mincut"
+        self.action = "get_mincut"
 
         # Get current date. Set all QDateEdit to current date
         date_start = QDate.currentDate()
@@ -352,7 +352,7 @@ class GwMincut:
         self.dlg_mincut.mincutCanceled = True
 
         # If id exists in data base on btn_cancel delete
-        if self.action == "mg_mincut":
+        if self.action == "get_mincut":
             result_mincut_id = self.dlg_mincut.result_mincut_id.text()
             sql = (f"SELECT id FROM om_mincut"
                    f" WHERE id = {result_mincut_id}")
@@ -1767,12 +1767,12 @@ class GwMincut:
                 break
 
 
-    def mg_mincut_management(self, dialog=GwMincutManagerUi()):
+    def manage_mincuts(self, dialog=GwMincutManagerUi()):
         """ Button 27: Mincut management """
 
-        self.action = "mg_mincut_management"
+        self.action = "manage_mincuts"
         self.mincut_config.set_dialog(dialog)
-        self.mincut_config.mg_mincut_management()
+        self.mincut_config.manage_mincuts()
 
 
     def load_mincut(self, result_mincut_id):

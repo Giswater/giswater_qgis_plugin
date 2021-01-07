@@ -16,7 +16,7 @@ from ...utils import tools_gw
 from ....lib import tools_os
 
 
-class GwAddPointButton(GwDialogButton):
+class GwPointAddButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
@@ -43,7 +43,7 @@ class GwAddPointButton(GwDialogButton):
                 except:
                     pass
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.info_feature.edit_add_feature, feature_cat))
+                obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
         menu.addSeparator()
 
         list_feature_cat = tools_os.get_values_from_dictionary(self.feature_cat)
@@ -56,7 +56,7 @@ class GwAddPointButton(GwDialogButton):
                 except:
                     pass
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.info_feature.edit_add_feature, feature_cat))
+                obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
         menu.addSeparator()
 
         list_feature_cat = tools_os.get_values_from_dictionary(self.feature_cat)
@@ -69,7 +69,7 @@ class GwAddPointButton(GwDialogButton):
                 except:
                     pass
                 menu.addAction(obj_action)
-                obj_action.triggered.connect(partial(self.info_feature.edit_add_feature, feature_cat))
+                obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
         menu.addSeparator()
 
 

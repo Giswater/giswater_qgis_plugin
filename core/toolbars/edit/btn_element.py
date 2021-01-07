@@ -17,4 +17,4 @@ class GwAddElementButton(GwDialogButton):
 
 
     def clicked_event(self):
-        self.element.manage_element()
+        self.element.get_element()

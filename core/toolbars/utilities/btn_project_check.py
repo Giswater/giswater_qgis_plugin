@@ -18,7 +18,10 @@ class GwProjectCheckButton(GwDialogButton):
 
 
     def clicked_event(self):
+        self.open_check_project()
 
+
+    def open_check_project(self):
         # Return layers in the same order as listed in TOC
         layers = tools_qgis.get_project_layers()
 

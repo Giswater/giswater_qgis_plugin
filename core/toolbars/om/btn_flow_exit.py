@@ -41,7 +41,10 @@ class GwFlowExitButton(GwMaptoolButton):
 
     def canvasReleaseEvent(self, event):
         """ With left click the digitizing is finished """
+        self.set_flow_exit(event)
 
+
+    def set_flow_exit(self, event):
         if event.button() == Qt.LeftButton and self.current_layer:
 
             # Execute SQL function

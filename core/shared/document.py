@@ -32,10 +32,10 @@ class GwDocument:
 
 
     def edit_add_file(self):
-        self.manage_document()
+        self.get_document()
 
 
-    def manage_document(self, tablename=None, qtable=None, item_id=None, feature=None, geom_type=None, row=None):
+    def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, geom_type=None, row=None):
         """ Button 34: Add document """
 
         # Create the dialog and signals
@@ -309,7 +309,7 @@ class GwDocument:
                 tools_qgis.show_warning(message)
 
 
-    def edit_document(self):
+    def manage_documents(self):
         """ Button 66: Edit document """
 
         # Create the dialog
@@ -359,7 +359,7 @@ class GwDocument:
         # Close this dialog and open selected object
         dialog.close()
 
-        self.manage_document(row=widget.model().record(row))
+        self.get_document(row=widget.model().record(row))
         tools_qt.set_widget_text(self.dlg_add_doc, widget_id, selected_object_id)
 
 

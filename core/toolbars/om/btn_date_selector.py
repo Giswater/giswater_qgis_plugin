@@ -25,7 +25,10 @@ class GwDateSelectorButton(GwDialogButton):
 
 
     def clicked_event(self):
+        self.open_date_selector()
 
+
+    def open_date_selector(self):
         self.dlg_selector_date = GwSelectorDateUi()
         tools_gw.load_settings(self.dlg_selector_date)
         self.widget_date_from = self.dlg_selector_date.findChild(QDateEdit, "date_from")

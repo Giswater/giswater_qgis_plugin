@@ -31,7 +31,7 @@ class GwElement:
         self.snapper_manager = GwSnapManager(self.iface)
 
 
-    def manage_element(self, new_element_id=True, feature=None, geom_type=None, selected_object_id=None):
+    def get_element(self, new_element_id=True, feature=None, geom_type=None, selected_object_id=None):
         """ Button 33: Add element """
 
         self.new_element_id = new_element_id
@@ -488,7 +488,7 @@ class GwElement:
         tools_qt.fill_combo_values(self.dlg_add_element.elementcat_id, rows, 1)
 
 
-    def edit_element(self):
+    def manage_elements(self):
         """ Button 67: Edit element """
 
         # Create the dialog
@@ -537,7 +537,7 @@ class GwElement:
         # Close this dialog and open selected object
         dialog.close()
 
-        self.manage_element(new_element_id=False, selected_object_id=selected_object_id)
+        self.get_element(new_element_id=False, selected_object_id=selected_object_id)
 
 
     def check_date(self, widget, button=None, regex_type=1):

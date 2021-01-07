@@ -252,7 +252,7 @@ class GwSearch:
         # Tab 'psector'
         elif tab_selected == 'psector':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
-            self.manage_new_psector.new_psector(item['sys_id'], 'plan', is_api=True)
+            self.manage_new_psector.get_psector(item['sys_id'], 'plan', is_api=True)
             self.manage_new_psector.dlg_plan_psector.rejected.connect(self.rubber_band.reset)
             if not list_coord:
                 msg = "Empty coordinate list"
@@ -276,7 +276,7 @@ class GwSearch:
             point = QgsPointXY(float(max_x), float(max_y))
             tools_qgis.draw_point(point, self.rubber_band)
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=100)
-            self.manage_visit.manage_visit(visit_id=item['sys_id'])
+            self.manage_visit.get_visit(visit_id=item['sys_id'])
             self.manage_visit.dlg_add_visit.rejected.connect(self.rubber_band.reset)
             return
 
@@ -553,7 +553,7 @@ class GwSearch:
         """ Access GUI to manage documents e.g Execute action of button 34 """
 
         manage_document = GwDocument(single_tool=False)
-        dlg_docman = manage_document.manage_document(tablename='workcat', qtable=qtable, item_id=item_id)
+        dlg_docman = manage_document.get_document(tablename='workcat', qtable=qtable, item_id=item_id)
         dlg_docman.btn_accept.clicked.connect(partial(tools_gw.set_completer_object, dlg_docman, 'doc'))
         tools_qt.remove_tab(dlg_docman.tabWidget, 'tab_rel')
 

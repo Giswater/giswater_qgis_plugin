@@ -193,7 +193,10 @@ class GwInfoButton(GwMaptoolButton):
 
 
     def canvasReleaseEvent(self, event):
+        self.get_info(event)
 
+
+    def get_info(self, event):
         for rb in self.rubberband_list:
             rb.reset()
 

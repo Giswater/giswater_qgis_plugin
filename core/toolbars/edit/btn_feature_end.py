@@ -88,7 +88,7 @@ class GwEndFeatureButton(GwDialogButton):
         tools_gw.set_completer_object(self.dlg_work_end, self.table_object)
 
         # Set signals
-        self.dlg_work_end.btn_accept.clicked.connect(partial(self.manage_workcat_end_accept))
+        self.dlg_work_end.btn_accept.clicked.connect(partial(self.end_feature))
         self.dlg_work_end.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_work_end, self.table_object,
                                                              self.cur_active_layer, force_downgrade=True))
         self.dlg_work_end.rejected.connect(partial(self.manage_close, self.dlg_work_end, self.table_object,
@@ -211,7 +211,7 @@ class GwEndFeatureButton(GwDialogButton):
 
 
 
-    def manage_workcat_end_accept(self):
+    def end_feature(self):
         """ Get elements from all the tables and update his data """
 
         # Setting values
@@ -377,7 +377,7 @@ class GwEndFeatureButton(GwDialogButton):
 
         self.canvas.refresh()
         self.dlg_work.close()
-        self.manage_workcat_end_accept()
+        self.end_feature()
 
 
     def set_completer(self):

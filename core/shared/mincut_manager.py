@@ -37,13 +37,13 @@ class GwMincutManager:
 
     def set_dialog(self, dialog):
         self.dlg_min_edit = dialog
-        self.mg_mincut_management()
+        self.manage_mincuts()
 
 
-    def mg_mincut_management(self):
+    def manage_mincuts(self):
         """ Button 27: Mincut management """
 
-        self.action = "mg_mincut_management"
+        self.action = "manage_mincuts"
 
         # Create the dialog and signals
 

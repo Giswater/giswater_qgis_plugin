@@ -24,7 +24,10 @@ class GwGo2EpaManagerButton(GwDialogButton):
 
 
     def clicked_event(self):
+        self.manage_go2epa()
 
+
+    def manage_go2epa(self):
         # Create the dialog
         self.dlg_manager = GwEpaManagerUi()
         tools_gw.load_settings(self.dlg_manager)

@@ -27,7 +27,10 @@ class GwConfigButton(GwDialogButton):
 
 
     def clicked_event(self):
+        self.open_config()
 
+
+    def open_config(self):
         # Get user and role
         super_users = tools_gw.get_config_parser('system', 'super_users', "project", "init")
         cur_user = tools_db.get_current_user()

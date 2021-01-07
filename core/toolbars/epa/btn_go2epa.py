@@ -17,5 +17,9 @@ class GwGo2EpaButton(GwDialogButton):
 
 
     def clicked_event(self):
+        self.open_go2epa()
+
+
+    def open_go2epa(self):
         self.go2epa.go2epa()
 

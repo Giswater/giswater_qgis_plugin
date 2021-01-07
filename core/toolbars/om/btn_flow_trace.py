@@ -40,7 +40,10 @@ class GwFlowTraceButton(GwMaptoolButton):
 
     def canvasReleaseEvent(self, event):
         """ With left click the digitizing is finished """
+        self.set_flow_trace(event)
 
+
+    def set_flow_trace(self, event):
         if event.button() == Qt.LeftButton and self.current_layer:
 
             # Execute SQL function
