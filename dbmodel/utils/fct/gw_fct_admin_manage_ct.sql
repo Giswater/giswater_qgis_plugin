@@ -28,6 +28,9 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_ct($${"client":{"lang":"ES"},
 SELECT SCHEMA_NAME.gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, 
 "data":{"action":"ENABLE TOPO-TRIGGERS"}}$$)
 
+SELECT SCHEMA_NAME.gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, 
+"data":{"action":"RENAME", "table":"cat_feature_arc", "oldName":"arc_type_type_fkey", "newName":"cat_feature_arc_type_fkey"}}$$)}}$$)
+
 -- fid: 136,137
 
 */
@@ -42,6 +45,10 @@ v_return json;
 v_36 integer=0;
 v_37 integer=0;
 v_projectype text;
+v_table text;
+v_oldname text;
+v_newname text;
+v_ctexists text;
 
 BEGIN
 
@@ -52,6 +59,9 @@ BEGIN
 	SELECT project_type INTO v_projectype FROM sys_version LIMIT 1;
 	
 	v_action = (p_data->>'data')::json->>'action';
+	v_table = (p_data->>'data')::json->>'table';
+	v_oldname = (p_data->>'data')::json->>'oldName';
+	v_newname = (p_data->>'data')::json->>'newName';
 
 	IF v_action = 'DROP' THEN
 
@@ -278,7 +288,17 @@ BEGIN
 
 
 		v_return = concat('{"constraints reloaded":"',v_36,'","notnull reloaded":"',v_37,'"}');
-		
+	
+	ELSIF v_action = 'RENAME' THEN
+		EXECUTE 'SELECT con.conname FROM pg_catalog.pg_constraint con INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
+            INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace 
+            WHERE nsp.nspname = '||quote_literal(v_schemaname)||' AND rel.relname = '||quote_literal(v_table)||' 
+            and con.conname='||quote_literal(v_oldname)||''
+        INTO v_ctexists;
+
+		IF v_ctexists IS NOT NULL THEN
+            EXECUTE 'ALTER TABLE '||v_table||' RENAME CONSTRAINT '||v_oldname||' TO '||v_newname||'';
+        END IF;
 	END IF;
 
 	RETURN v_return;
