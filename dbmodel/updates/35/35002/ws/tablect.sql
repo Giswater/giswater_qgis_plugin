@@ -24,77 +24,35 @@ ALTER TABLE cat_mat_roughness DROP CONSTRAINT IF EXISTS inp_cat_mat_roughness_pk
 ALTER TABLE cat_mat_roughness ADD CONSTRAINT cat_mat_roughness_pkey PRIMARY KEY(id);
 
 -- 2020/01/07
-ALTER TABLE om_mincut_cat_type RENAME CONSTRAINT anl_mincut_cat_type_pkey TO om_mincut_cat_type_pkey;
-ALTER TABLE om_mincut RENAME CONSTRAINT anl_mincut_result_cat_pkey TO om_mincut_pkey;
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_cat_type", "oldName":"anl_mincut_cat_type_pkey", "newName":"om_mincut_cat_type_pkey"}}$$);
 
-ALTER TABLE om_mincut DROP CONSTRAINT IF EXISTS anl_mincut_result_cat_anl_assigned_to_fkey;
-ALTER TABLE om_mincut ADD CONSTRAINT om_mincut_assigned_to_fkey FOREIGN KEY (assigned_to)
-REFERENCES cat_users (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut", "oldName":"anl_mincut_result_cat_pkey", "newName":"om_mincut_pkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut", "oldName":"anl_mincut_result_cat_anl_assigned_to_fkey", "newName":"om_mincut_assigned_to_fkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut", "oldName":"anl_mincut_result_cat_feature_type_fkey", "newName":"om_mincut_feature_type_fkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut", "oldName":"anl_mincut_result_cat_mincut_type_fkey", "newName":"om_mincut_mincut_type_fkey"}}$$);
 
-ALTER TABLE om_mincut DROP CONSTRAINT IF EXISTS anl_mincut_result_cat_feature_type_fkey;
-ALTER TABLE om_mincut ADD CONSTRAINT om_mincut_feature_type_fkey FOREIGN KEY (anl_feature_type)
-REFERENCES sys_feature_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_arc", "oldName":"anl_mincut_result_arc_pkey", "newName":"om_mincut_arc_pkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_arc", "oldName":"anl_mincut_result_arc_result_id_fkey", "newName":"om_mincut_arc_result_id_fkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_arc", "oldName":"anl_mincut_result_arc_unique_result_arc", "newName":"om_mincut_arc_unique_result_arc"}}$$);
 
-ALTER TABLE om_mincut DROP CONSTRAINT IF EXISTS anl_mincut_result_cat_mincut_type_fkey;
-ALTER TABLE om_mincut ADD CONSTRAINT om_mincut_mincut_type_fkey FOREIGN KEY (mincut_type)
-REFERENCES om_mincut_cat_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_node", "oldName":"anl_mincut_result_node_pkey", "newName":"om_mincut_node_pkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_node", "oldName":"anl_mincut_result_node_result_id_fkey", "newName":"om_mincut_node_result_id_fkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_node", "oldName":"anl_mincut_result_arc_unique_result_node", "newName":"om_mincut_node_unique_result_node"}}$$);
 
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_hydrometer", "oldName":"anl_mincut_result_hydrometer_pkey", "newName":"om_mincut_hydrometer_pkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_hydrometer", "oldName":"anl_mincut_result_hydrometer_result_id_fkey", "newName":"om_mincut_hydrometer_result_id_fkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_hydrometer", "oldName":"anl_mincut_result_hydrometer_unique_result_hydrometer", "newName":"om_mincut_hydrometer_unique_result_hydrometer"}}$$);
 
-ALTER TABLE om_mincut_arc DROP CONSTRAINT IF EXISTS anl_mincut_result_arc_pkey;
-ALTER TABLE om_mincut_arc ADD CONSTRAINT om_mincut_arc_pkey PRIMARY KEY(id);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_polygon", "oldName":"anl_mincut_result_polygon_pkey", "newName":"om_mincut_polygon_pkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_polygon", "oldName":"anl_mincut_result_polygon_result_id_fkey", "newName":"om_mincut_polygon_result_id_fkey"}}$$);
 
-ALTER TABLE om_mincut_arc DROP CONSTRAINT IF EXISTS anl_mincut_result_arc_result_id_fkey;
-ALTER TABLE om_mincut_arc ADD CONSTRAINT om_mincut_arc_result_id_fkey FOREIGN KEY (result_id)
-REFERENCES om_mincut (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_valve", "oldName":"anl_mincut_result_valve_pkey", "newName":"om_mincut_valve_pkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_valve", "oldName":"anl_mincut_result_valve_result_id_fkey", "newName":"om_mincut_valve_result_id_fkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_valve", "oldName":"anl_mincut_result_valve_unique_result_node", "newName":"om_mincut_valve_unique_result_node"}}$$);
 
-ALTER TABLE om_mincut_arc DROP CONSTRAINT IF EXISTS anl_mincut_result_arc_unique_result_arc;
-ALTER TABLE om_mincut_arc ADD CONSTRAINT om_mincut_arc_unique_result_arc UNIQUE(result_id, arc_id);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_valve_unaccess", "oldName":"anl_mincut_result_valve_unaccess_pkey", "newName":"om_mincut_valve_unaccess_pkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_valve_unaccess", "oldName":"anl_mincut_result_valve_unaccess_result_id_fkey", "newName":"om_mincut_valve_unaccess_result_id_fkey"}}$$);
 
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_mincut_inlet", "oldName":"anl_mincut_inlet_x_exploitation_expl_id_fkey", "newName":"config_mincut_inlet_expl_id_fkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_mincut_inlet", "oldName":"anl_mincut_inlet_x_exploitation_node_id_fkey", "newName":"config_mincut_inlet_node_id_fkey"}}$$);
 
-ALTER TABLE om_mincut_node DROP CONSTRAINT IF EXISTS anl_mincut_result_node_pkey;
-ALTER TABLE om_mincut_node ADD CONSTRAINT om_mincut_node_pkey PRIMARY KEY(id);
-
-ALTER TABLE om_mincut_node DROP CONSTRAINT IF EXISTS anl_mincut_result_node_result_id_fkey;
-ALTER TABLE om_mincut_node ADD CONSTRAINT om_mincut_node_result_id_fkey FOREIGN KEY (result_id)
-REFERENCES om_mincut (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE om_mincut_node DROP CONSTRAINT IF EXISTS anl_mincut_result_arc_unique_result_node;
-ALTER TABLE om_mincut_node ADD CONSTRAINT om_mincut_node_unique_result_node UNIQUE(result_id, node_id);
-
-
-ALTER TABLE om_mincut_hydrometer DROP CONSTRAINT IF EXISTS anl_mincut_result_hydrometer_pkey;
-ALTER TABLE om_mincut_hydrometer ADD CONSTRAINT om_mincut_hydrometer_pkey PRIMARY KEY(id);
-
-ALTER TABLE om_mincut_hydrometer DROP CONSTRAINT IF EXISTS anl_mincut_result_hydrometer_result_id_fkey;
-ALTER TABLE om_mincut_hydrometer ADD CONSTRAINT om_mincut_hydrometer_result_id_fkey FOREIGN KEY (result_id)
-REFERENCES om_mincut (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE om_mincut_hydrometer DROP CONSTRAINT IF EXISTS anl_mincut_result_hydrometer_unique_result_hydrometer;
-ALTER TABLE om_mincut_hydrometer ADD CONSTRAINT om_mincut_hydrometer_unique_result_hydrometer UNIQUE(result_id, hydrometer_id);
-
-
-ALTER TABLE om_mincut_polygon DROP CONSTRAINT IF EXISTS anl_mincut_result_polygon_pkey;
-ALTER TABLE om_mincut_polygon ADD CONSTRAINT om_mincut_polygon_pkey PRIMARY KEY(id);
-
-ALTER TABLE om_mincut_polygon DROP CONSTRAINT IF EXISTS anl_mincut_result_polygon_result_id_fkey;
-ALTER TABLE om_mincut_polygon ADD CONSTRAINT om_mincut_polygon_result_id_fkey FOREIGN KEY (result_id)
-REFERENCES om_mincut (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
-
-ALTER TABLE om_mincut_valve DROP CONSTRAINT IF EXISTS anl_mincut_result_valve_pkey;
-ALTER TABLE om_mincut_valve ADD CONSTRAINT om_mincut_valve_pkey PRIMARY KEY(id);
-
-ALTER TABLE om_mincut_valve DROP CONSTRAINT IF EXISTS anl_mincut_result_valve_result_id_fkey;
-ALTER TABLE om_mincut_valve ADD CONSTRAINT om_mincut_valve_result_id_fkey FOREIGN KEY (result_id)
-REFERENCES om_mincut (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE om_mincut_valve DROP CONSTRAINT IF EXISTS anl_mincut_result_valve_unique_result_node;
-ALTER TABLE om_mincut_valve ADD CONSTRAINT om_mincut_valve_unique_result_node UNIQUE(result_id, node_id);
-
-
-ALTER TABLE om_mincut_valve_unaccess DROP CONSTRAINT IF EXISTS anl_mincut_result_valve_unaccess_pkey;
-ALTER TABLE om_mincut_valve_unaccess ADD CONSTRAINT om_mincut_valve_unaccess_pkey PRIMARY KEY(id);
-
-ALTER TABLE om_mincut_valve_unaccess DROP CONSTRAINT IF EXISTS anl_mincut_result_valve_unaccess_result_id_fkey;
-ALTER TABLE om_mincut_valve_unaccess ADD CONSTRAINT om_mincut_valve_unaccess_result_id_fkey FOREIGN KEY (result_id)
-REFERENCES om_mincut (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
