@@ -3132,9 +3132,10 @@ class GwAdminButton:
 
     def manage_sys_update(self, form_name):
 
+        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         list_widgets = self.dlg_manage_sys_fields.tab_create.findChildren(QWidget)
-        column_id = tools_qt.get_text(self.dlg_manage_sys_fields, self.dlg_manage_sys_fields.column_id)
-        sql = f"UPDATE ve_config_sys_fields SET "
+        column_id = tools_qt.get_text(self.dlg_manage_sys_fields, self.dlg_manage_sys_fields.columnname)
+        sql = f"UPDATE {schema_name}.ve_config_sysfields SET "
         for widget in list_widgets:
             if type(widget) not in (
                     QScrollArea, QFrame, QWidget, QScrollBar, QLabel, QAbstractButton, QHeaderView, QListView,
@@ -3159,7 +3160,7 @@ class GwAdminButton:
                 sql += f" {widget.objectName()} = {value},"
 
         sql = sql[:-1]
-        sql += f" WHERE cat_feature_id = '{form_name}' and columname = '{column_id}'"
+        sql += f" WHERE cat_feature_id = '{form_name}' and columnname = '{column_id}'"
         tools_db.execute_sql(sql)
 
         # Close dialog
