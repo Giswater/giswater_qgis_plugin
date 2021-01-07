@@ -26,7 +26,7 @@ from qgis.core import QgsProject, QgsTask, QgsApplication
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 
-from .btn_admin_gis_project import GwAdminGisProject
+from .admin_gis_project_btn import GwAdminGisProjectButton
 from .tasks.task import GwTask
 from .ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
     GwAdminGisProjectUi, GwAdminImportUi, GwAdminFieldsUi, GwAdminVisitClassUi, GwAdminSysFieldsUi, GwCredentialsUi
@@ -36,7 +36,7 @@ from ..i18n.i18n_generator import GwI18NGenerator
 from ..lib import tools_qt, tools_qgis, tools_log, tools_db
 
 
-class GwAdmin:
+class GwAdminButton:
 
     def __init__(self):
         """ Class to control toolbar 'om_ws' """
@@ -412,7 +412,7 @@ class GwAdmin:
                               get_database_parameters=True):
         """ Generate QGIS project """
 
-        gis = GwAdminGisProject(self.plugin_dir)
+        gis = GwAdminGisProjectButton(self.plugin_dir)
         result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
                                                     roletype, sample, get_database_parameters)
 

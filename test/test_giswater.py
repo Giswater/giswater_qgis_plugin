@@ -11,7 +11,7 @@ import sys
 
 from qgis.PyQt.QtCore import QObject, QSettings
 
-from ..core.btn_admin import GwAdmin
+from ..core.admin_btn import GwAdminButton
 from ..core.shared.visit_manager import GwVisitManager
 from .. import global_vars
 from ..lib import tools_log
@@ -69,7 +69,7 @@ class GwTest(QObject):
             global_vars.schema_name = schema_name
 
         # Set test classes
-        self.gw_admin = GwAdmin()
+        self.gw_admin = GwAdminButton()
         self.visit_manager = GwVisitManager()
 
 

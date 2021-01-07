@@ -16,7 +16,7 @@ from qgis.PyQt.QtWidgets import QWidget, QCheckBox, QDateEdit, QTimeEdit, QCombo
 from qgis.core import QgsApplication
 
 from .go2epa_options import GwGo2EpaOptions
-from ..btn_admin import GwAdmin
+from ..admin_btn import GwAdminButton
 from ..tasks.go2epa_task import GwGo2EpaTask
 from ..utils import tools_gw
 from ..ui.ui_manager import GwGo2EpaUI, GwHydrologySelectorUi, GwMultirowSelectorUi
@@ -497,7 +497,7 @@ class GwGo2Epa:
 
 
     def update_sql(self):
-        usql = GwAdmin()
+        usql = GwAdminButton()
         usql.init_sql()
 
 

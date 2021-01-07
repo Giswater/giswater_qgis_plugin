@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton
 
 from . import global_vars
-from .core.btn_admin import GwAdmin
+from .core.admin_btn import GwAdminButton
 from .core.load_project import GwLoadProject
 from .core.utils import tools_gw
 from .lib import tools_log, tools_qgis
@@ -140,7 +140,7 @@ class Giswater(QObject):
             self.action = QAction("Show info", self.iface.mainWindow())
 
         self.toolButton.setDefaultAction(self.action)
-        self.update_sql = GwAdmin()
+        self.update_sql = GwAdminButton()
         self.action.triggered.connect(self.update_sql.init_sql)
 
 

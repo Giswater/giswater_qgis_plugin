@@ -7,58 +7,58 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 # Basic
-from .basic.btn_info import GwInfoButton
-from .basic.btn_search import GwSearchButton
-from .basic.btn_selector import GwSelectorButton
+from .basic.info_btn import GwInfoButton
+from .basic.search_btn import GwSearchButton
+from .basic.selector_btn import GwSelectorButton
 
 # Om
-from .om.btn_mincut import GwMincutButton
-from .om.btn_mincut_manager import GwMincutManagerButton
+from .om.mincut_btn import GwMincutButton
+from .om.mincut_manager_btn import GwMincutManagerButton
 
-from .om.btn_flow_trace import GwFlowTraceButton
-from .om.btn_flow_exit import GwFlowExitButton
+from .om.flow_trace_btn import GwFlowTraceButton
+from .om.flow_exit_btn import GwFlowExitButton
 
-from .om.btn_profile import GwProfileButton
-from .om.btn_visit import GwAddVisitButton
-from .om.btn_visit_manager import GwManageVisitButton
-from .om.btn_date_selector import GwDateSelectorButton
+from .om.profile_btn import GwProfileButton
+from .om.visit_btn import GwAddVisitButton
+from .om.visit_manager_btn import GwManageVisitButton
+from .om.date_selector_btn import GwDateSelectorButton
 
 # Edit
-from .edit.btn_point_add import GwPointAddButton
-from .edit.btn_arc_add import GwArcAddButton
-from .edit.btn_feature_replace import GwFeatureReplaceButton
-from .edit.btn_arc_divide import GwArcDivideButton
-from .edit.btn_arc_fusion import GwArcFusionButton
-from .edit.btn_nodetype_change import GwNodeTypeChangeButton
-from .edit.btn_connect_link import GwConnectLinkButton
-from .edit.btn_feature_end import GwEndFeatureButton
-from .edit.btn_feature_delete import GwDeleteFeatureButton
-from .edit.btn_dimensioning import GwDimensioningButton
-from .edit.btn_document import GwAddDocumentButton
-from .edit.btn_document_manager import GwEditDocumentButton
-from .edit.btn_element import GwAddElementButton
-from .edit.btn_element_manager import GwEditElementButton
+from .edit.point_add_btn import GwPointAddButton
+from .edit.arc_add_btn import GwArcAddButton
+from .edit.feature_replace_btn import GwFeatureReplaceButton
+from .edit.arc_divide_btn import GwArcDivideButton
+from .edit.arc_fusion_btn import GwArcFusionButton
+from .edit.nodetype_change_btn import GwNodeTypeChangeButton
+from .edit.connect_link_btn import GwConnectLinkButton
+from .edit.feature_end_btn import GwEndFeatureButton
+from .edit.feature_delete_btn import GwDeleteFeatureButton
+from .edit.dimensioning_btn import GwDimensioningButton
+from .edit.document_btn import GwAddDocumentButton
+from .edit.document_manager_btn import GwEditDocumentButton
+from .edit.element_btn import GwAddElementButton
+from .edit.element_manager_btn import GwEditElementButton
 
 # Cad
 from .cad.aux_circle_add import GwAuxCircleButton
 from .cad.aux_point_add import GwAuxPointButton
 
 # Epa
-from .epa.btn_go2epa import GwGo2EpaButton
-from .epa.btn_go2epa_manager import GwGo2EpaManagerButton
-from .epa.btn_go2epa_selector import GwGo2EpaSelectorButton
+from .epa.go2epa_btn import GwGo2EpaButton
+from .epa.go2epa_manager_btn import GwGo2EpaManagerButton
+from .epa.go2epa_selector_btn import GwGo2EpaSelectorButton
 
 # Plan
-from .plan.btn_psector import GwPsectorButton
-from .plan.btn_psector_manager import GwPsectorManagerButton
-from .plan.btn_price_manager import GwPriceManagerButton
+from .plan.psector_btn import GwPsectorButton
+from .plan.psector_manager_btn import GwPsectorManagerButton
+from .plan.price_manager_btn import GwPriceManagerButton
 
 # Utilities
-from .utilities.btn_toolbox import GwToolBoxButton
-from .utilities.btn_config import GwConfigButton
-from .utilities.btn_csv import GwCSVButton
-from .utilities.btn_print import GwPrintButton
-from .utilities.btn_project_check import GwProjectCheckButton
+from .utilities.toolbox_btn import GwToolBoxButton
+from .utilities.config_btn import GwConfigButton
+from .utilities.csv_btn import GwCSVButton
+from .utilities.print_btn import GwPrintButton
+from .utilities.project_check_btn import GwProjectCheckButton
 
 # ToC
-from .toc.btn_add_child_layer import GwAddChildLayerButton
+from .toc.add_child_layer_btn import GwAddChildLayerButton
