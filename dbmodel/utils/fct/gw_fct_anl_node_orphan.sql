@@ -40,7 +40,8 @@ v_projectype text;
 v_partialquery text;
 v_isarcdivide text;
 v_error_context text;
-	
+v_count integer;
+
 BEGIN
 
 	-- Search path
@@ -59,6 +60,10 @@ BEGIN
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=107;
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=107;	
+	
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (107, null, 4, concat('NODE ORPHAN ANALYSIS'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (107, null, 4, '-------------------------------------------------------------');
 
 	-- built partial query
 	IF v_projectype = 'WS' THEN
@@ -93,13 +98,11 @@ BEGIN
 		END LOOP;
 	END IF;
 
-	-- get results
-	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=107 order by id) row;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	-- set selector
+	DELETE FROM selector_audit WHERE fid=107 AND cur_user=current_user;
+	INSERT INTO selector_audit (fid,cur_user) VALUES (107, current_user);
 
+	-- get results
 	--points
 	v_result = null;
 	
@@ -116,10 +119,27 @@ BEGIN
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_point = concat ('{"geometryType":"Point","features":',v_result, '}'); 
 
-	-- set selector
-	DELETE FROM selector_audit WHERE fid=107 AND cur_user=current_user;
-	INSERT INTO selector_audit (fid,cur_user) VALUES (107, current_user);
-		
+	SELECT count(*) INTO v_count FROM anl_node WHERE cur_user="current_user"() AND fid=107;
+
+	IF v_count = 0 THEN
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		VALUES (107,  'There are no orphan nodes.', v_count);
+	ELSE
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		VALUES (107,  concat ('There are ',v_count,' orphan nodes.'), v_count);
+
+		INSERT INTO audit_check_data(fid,  error_message, fcount)
+		SELECT 107,  concat ('Node_id: ',string_agg(node_id, ', '), '.' ), v_count 
+		FROM anl_node WHERE cur_user="current_user"() AND fid=107;
+
+	END IF;
+	
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=107 order by  id asc) row;
+	v_result := COALESCE(v_result, '{}'); 
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+
 	--    Control nulls
 	v_result_info := COALESCE(v_result_info, '{}'); 
 	v_result_point := COALESCE(v_result_point, '{}'); 
