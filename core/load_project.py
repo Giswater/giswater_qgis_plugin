@@ -16,7 +16,7 @@ from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
 from .models.plugin_toolbar import PluginToolbar
 from .shared.search import GwSearch
 from .toolbars import buttons
-from .ui.ui_manager import DialogTextUi
+from .ui.ui_manager import GwDialogTextUi
 from .utils import tools_gw
 from .utils.backend_functions import GwInfoTools
 from .utils.notify import GwNotifyTools
@@ -118,7 +118,7 @@ class LoadProject(QObject):
         # Open automatically 'search docker' depending its value in user settings
         open_search = tools_gw.check_config_settings('btn_search', 'open_search', 'false', "user", "giswater")
         if tools_os.cast_boolean(open_search):
-            GwSearch().api_search(load_project=True)
+            GwSearch().open_search(load_project=True)
 
         # call dynamic mapzones repaint
         tools_gw.set_style_mapzones()
@@ -183,7 +183,7 @@ class LoadProject(QObject):
 
         if len(repeated_layers) > 1:
             if self.project_vars['main_schema'] is None or self.project_vars['add_schema'] is None:
-                self.dlg_dtext = DialogTextUi()
+                self.dlg_dtext = GwDialogTextUi()
                 self.dlg_dtext.btn_accept.hide()
                 self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
                 msg = "QGIS project has more than one layer v_edit_node comming from differents schemas. " \
