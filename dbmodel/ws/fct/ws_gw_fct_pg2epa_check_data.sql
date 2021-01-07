@@ -158,7 +158,7 @@ BEGIN
 			WHERE b.node_id IS NULL AND state >0 AND epa_type !=''NOT DEFINED'') a';
 
 
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext) INTO v_count;
+	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 3, '272',concat('ERROR-272: There is/are ',v_count,' missed features on inp tables. Please, check your data before continue'),v_count);
