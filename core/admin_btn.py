@@ -2997,7 +2997,7 @@ class GwAdminButton:
 
         form_name_fields = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_formname_fields)
         self.chk_multi_insert = tools_qt.is_checked(self.dlg_readsql, self.dlg_readsql.chk_multi_insert)
-        self.dlg_manage_fields.column_id.setEnabled(False)
+        self.dlg_manage_fields.columnname.setEnabled(False)
 
         # Set listeners
         self.dlg_manage_fields.btn_accept.clicked.connect(
@@ -3026,7 +3026,7 @@ class GwAdminButton:
             value = str(widget.model().data(index))
             if value == 'NULL':
                 value = None
-            tools_qt.set_widget_text(self.dlg_manage_fields, result, value)
+            tools_qt.set_widget_text(self.dlg_manage_fields, result, str(value))
 
         tools_gw.open_dialog(self.dlg_manage_fields, dlg_name='admin_addfields')
 
@@ -3181,9 +3181,9 @@ class GwAdminButton:
         if action == 'create':
 
             # Control mandatory widgets
-            if tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.column_id) is 'null' or \
+            if tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.columnname) is 'null' or \
                     tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.label) is 'null':
-                msg = "Column_id and Label fields mandatory. Please set correctly value."
+                msg = "Column name and Label fields are mandatory. Please set correct value."
                 tools_qt.show_info_box(msg, "Info")
                 return
 
