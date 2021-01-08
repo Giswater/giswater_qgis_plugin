@@ -16,7 +16,7 @@ from qgis.PyQt.QtWidgets import QWidget, QCheckBox, QDateEdit, QTimeEdit, QCombo
 from qgis.core import QgsApplication
 
 from .go2epa_options import GwGo2EpaOptions
-from ..admin_btn import GwAdminButton
+from ..admin.admin_btn import GwAdminButton
 from ..tasks.go2epa_task import GwGo2EpaTask
 from ..utils import tools_gw
 from ..ui.ui_manager import GwGo2EpaUI, GwHydrologySelectorUi, GwMultirowSelectorUi

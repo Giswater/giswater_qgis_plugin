@@ -9,7 +9,7 @@ from qgis.PyQt.QtWidgets import QDialog
 from qgis.core import QgsApplication, QgsProviderRegistry
 
 from .test_giswater import GwTest
-from ..core.admin_gis_project_btn import GwAdminGisProjectButton
+from ..core.admin.admin_gis_project_btn import GwAdminGisProjectButton
 from .. import global_vars
 from ..lib import tools_db
 

@@ -11,8 +11,7 @@ import sqlite3
 
 from qgis.PyQt.QtCore import QSettings
 
-from .utils import tools_gw
-from ..lib import tools_log, tools_qt, tools_db, tools_qgis
+from ...lib import tools_log, tools_qt, tools_db, tools_qgis
 
 
 class GwAdminGisProjectButton:

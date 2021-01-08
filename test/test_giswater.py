@@ -11,7 +11,7 @@ import sys
 
 from qgis.PyQt.QtCore import QObject, QSettings
 
-from ..core.admin_btn import GwAdminButton
+from ..core.admin.admin_btn import GwAdminButton
 from ..core.shared.visit_manager import GwVisitManager
 from .. import global_vars
 from ..lib import tools_log

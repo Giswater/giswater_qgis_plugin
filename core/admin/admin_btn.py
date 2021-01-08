@@ -27,13 +27,13 @@ from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 
 from .admin_gis_project_btn import GwAdminGisProjectButton
-from .tasks.task import GwTask
-from .ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
+from ..tasks.task import GwTask
+from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
     GwAdminGisProjectUi, GwAdminImportUi, GwAdminFieldsUi, GwAdminVisitClassUi, GwAdminSysFieldsUi, GwCredentialsUi
-from .utils import tools_gw
-from .. import global_vars
-from ..i18n.i18n_generator import GwI18NGenerator
-from ..lib import tools_qt, tools_qgis, tools_log, tools_db
+from ..utils import tools_gw
+from ... import global_vars
+from ...i18n.i18n_generator import GwI18NGenerator
+from ...lib import tools_qt, tools_qgis, tools_log, tools_db
 
 
 class GwAdminButton:
@@ -106,7 +106,8 @@ class GwAdminButton:
 
         # Get SQL folder and check if exists
         folder_name = os.path.dirname(os.path.abspath(__file__))
-        self.sql_dir = os.path.normpath(os.path.normpath(folder_name + os.sep + os.pardir)) + os.sep + 'dbmodel'
+        self.sql_dir = os.path.normpath(os.path.normpath(folder_name + os.sep + os.pardir)) + os.sep +'..' + os.sep +  \
+                       'dbmodel'
         if not os.path.exists(self.sql_dir):
             tools_qgis.show_message("SQL folder not found", parameter=self.sql_dir)
             return
