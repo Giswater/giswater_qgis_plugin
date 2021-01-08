@@ -311,10 +311,8 @@ BEGIN
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 3,
-				concat('ERROR: There is/are ',v_count, ' subcatchment(s) with null values on mandatory columns of curve number infiltartion method (curveno, conduct_2, drytime_2).'));
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3,
-				concat(' Acording EPA SWMM user''s manual, conduct_2 is deprecated, but anywat need to be informed. Any value is valid because always will be ignored by SWMM.'));
+				concat('ERROR: There is/are ',v_count, ' subcatchment(s) with null values on mandatory columns of curve number infiltartion method (curveno, conduct_2, drytime_2).',
+				'Acording EPA SWMM user''s manual, conduct_2 is deprecated, but is mandatory to fill it. Any value is valid because it will be ignored by SWMM.'));
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)

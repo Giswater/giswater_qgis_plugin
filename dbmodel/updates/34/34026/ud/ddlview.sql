@@ -173,6 +173,19 @@ UNION
   WHERE node.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
 
+-- 2021/01/08
+CREATE OR REPLACE VIEW vi_curves AS 
+ SELECT inp_curve_value.curve_id,
+    CASE WHEN inp_curve_value.id = (( SELECT min(sub.id) AS min FROM inp_curve_value sub  
+	WHERE sub.curve_id::text = inp_curve_value.curve_id::text)) THEN inp_typevalue.idval ELSE NULL::character varying 
+	END AS curve_type,
+    inp_curve_value.x_value,
+    inp_curve_value.y_value
+   FROM moliba.inp_curve_value
+     JOIN inp_curve ON inp_curve.id::text = inp_curve_value.curve_id::text
+     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_curve.curve_type::text
+  WHERE inp_typevalue.typevalue::text = 'inp_value_curve'::text
+  ORDER BY inp_curve_value.id;
 
 
 
