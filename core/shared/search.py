@@ -84,7 +84,7 @@ class GwSearch:
             extras = f'"addSchema":"{qgis_project_add_schema}"'
             body = tools_gw.create_body(form=form, extras=extras)
         function_name = "gw_fct_getsearch"
-        complet_list = tools_gw.get_json(function_name, body)
+        complet_list = tools_gw.execute_procedure(function_name, body)
         if not complet_list or complet_list['status'] == 'Failed':
             return False
 
@@ -325,7 +325,7 @@ class GwSearch:
             extras_search += f'"addSchema":"{qgis_project_add_schema}"'
             extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
             body = tools_gw.create_body(form=form_search, extras=extras_search)
-            result = tools_gw.get_json('gw_fct_setsearch', body, rubber_band=self.rubber_band)
+            result = tools_gw.execute_procedure('gw_fct_setsearch', body, rubber_band=self.rubber_band)
             if not result or result['status'] == 'Failed':
                 return False
 
@@ -358,7 +358,7 @@ class GwSearch:
 
             extras_search_add += f', "{line_edit_add.property("columnname")}":{{"text":"{value}"}}'
             body = tools_gw.create_body(form=form_search_add, extras=extras_search_add)
-            result = tools_gw.get_json('gw_fct_setsearchadd', body, rubber_band=self.rubber_band)
+            result = tools_gw.execute_procedure('gw_fct_setsearchadd', body, rubber_band=self.rubber_band)
             if not result or result['status'] == 'Failed':
                 return False
 
@@ -427,7 +427,7 @@ class GwSearch:
         extras = f'"infoType":"{qgis_project_infotype}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
         function_name = 'gw_fct_getinfofromid'
-        json_result = tools_gw.get_json(function_name, body)
+        json_result = tools_gw.execute_procedure(function_name, body)
         if json_result is None or json_result['status'] == 'Failed':
             return
         result = json_result
@@ -565,7 +565,7 @@ class GwSearch:
         form = f'"currentTab":"{current_tab}"'
         extras = f'"selectorType":"selector_basic", "filterText":""'
         body = tools_gw.create_body(form=form, extras=extras)
-        json_result = tools_gw.get_json('gw_fct_getselectors', body)
+        json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
         return json_result
 
 
@@ -588,7 +588,7 @@ class GwSearch:
                           f'"id":"{_id}", "isAlone":"False", "value":"{field["value"]}", '
                           f'"addSchema":"{qgis_project_add_schema}"')
                 body = tools_gw.create_body(extras=extras)
-                tools_gw.get_json('gw_fct_setselectors', body)
+                tools_gw.execute_procedure('gw_fct_setselectors', body)
         tools_qgis.refresh_map_canvas()
 
 

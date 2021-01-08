@@ -128,7 +128,7 @@ class GwCSVButton(GwDialogButton):
         extras += f', "fid":"{fid_aux}"'
         body = tools_gw.create_body(extras=extras)
 
-        result = tools_gw.get_json(self.func_name, body)
+        result = tools_gw.execute_procedure(self.func_name, body)
         if not result:
             return
         else:
@@ -285,7 +285,7 @@ class GwCSVButton(GwDialogButton):
 
         values = f'"values":{(json.dumps(fields, ensure_ascii=False).encode(_unicode)).decode()}'
         body = tools_gw.create_body(extras=values)
-        result = tools_gw.get_json('gw_fct_copy_to_temp_csv', body)
+        result = tools_gw.execute_procedure('gw_fct_copy_to_temp_csv', body)
 
         if 'status' in result and result['status'] == 'Accepted':
             return True

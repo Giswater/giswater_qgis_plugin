@@ -53,7 +53,7 @@ class GwPrintButton(GwDialogButton):
         # Create and populate dialog
         extras = '"composers":' + str(composers_list)
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.get_json('gw_fct_getprint', body)
+        json_result = tools_gw.execute_procedure('gw_fct_getprint', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
@@ -261,7 +261,7 @@ class GwPrintButton(GwDialogButton):
         feature = '"feature":{''}, '
         data = '"data":' + str(my_json)
         body = "$${" + client + form + feature + data + "}$$"
-        json_result = tools_gw.get_json('gw_fct_setprint', body)
+        json_result = tools_gw.execute_procedure('gw_fct_setprint', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 

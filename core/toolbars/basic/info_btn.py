@@ -70,7 +70,7 @@ class GwInfoButton(GwMaptoolButton):
         extras += f'"visibleLayers":{visible_layers}, '
         extras += f'"zoomScale":{scale_zoom} '
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.get_json('gw_fct_getlayersfromcoordinates', body, rubber_band=self.rubber_band)
+        json_result = tools_gw.execute_procedure('gw_fct_getlayersfromcoordinates', body, rubber_band=self.rubber_band)
         if not json_result or json_result['status'] == 'Failed':
             return False
 

@@ -306,7 +306,7 @@ class GwFeatureEndButton(GwDialogButton):
         extras = f'"state_type":"{self.statetype_id_end}", "workcat_id_end":"{self.workcat_id_end}", '
         extras += f'"enddate":"{self.enddate}", "workcat_date":"{self.workcatdate}", "description":"{self.description}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
-        tools_gw.get_json('gw_fct_setendfeature', body, log_sql=True)
+        tools_gw.execute_procedure('gw_fct_setendfeature', body, log_sql=True)
 
 
     def open_selected_object(self, widget):

@@ -63,7 +63,7 @@ class GwInfoTools:
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = tools_gw.create_body(feature=feature, extras=extras)
-            result = tools_gw.get_json('gw_fct_getinfofromid', body, is_notify=True)
+            result = tools_gw.execute_procedure('gw_fct_getinfofromid', body, is_notify=True)
             if not result:
                 continue
             for field in result['body']['data']['fields']:
@@ -454,7 +454,7 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
         extras += f'"{widget_name}":"{value}", '
     extras = extras[:-2]
     body = tools_gw.create_body(extras)
-    result = tools_gw.get_json('gw_fct_check_importdxf', None)
+    result = tools_gw.execute_procedure('gw_fct_check_importdxf', None)
     if not result or result['status'] == 'Failed':
         return False
 

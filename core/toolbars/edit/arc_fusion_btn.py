@@ -32,7 +32,7 @@ class GwArcFusionButton(GwMaptoolButton):
         extras = f'"workcat_id_end":"{workcat_id_end}", "enddate":"{enddate_str}"'
         body = tools_gw.create_body(feature=feature_id, extras=extras)
         # Execute SQL function and show result to the user
-        result = tools_gw.get_json('gw_fct_setarcfusion', body)
+        result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)
         if not result or result['status'] == 'Failed':
             return
 

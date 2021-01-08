@@ -150,7 +150,7 @@ class GwProfileButton(GwMaptoolButton):
         body = tools_gw.create_body(extras=extras)
 
         # Execute query
-        self.profile_json = tools_gw.get_json('gw_fct_getprofilevalues', body)
+        self.profile_json = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
         if self.profile_json['status'] == 'Failed': return
         # Manage level and message from query result
         if self.profile_json['message']:
@@ -203,7 +203,7 @@ class GwProfileButton(GwMaptoolButton):
             f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, ' \
             f'"ev":1000}}, "title":"{title}", "date":"{date}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.get_json('gw_fct_setprofile', body)
+        result = tools_gw.execute_procedure('gw_fct_setprofile', body)
         if result is None or result['status'] == 'Failed': return
         message = f"{result['message']}"
         tools_qgis.show_info(message)
@@ -217,7 +217,7 @@ class GwProfileButton(GwMaptoolButton):
 
         # Get profils on database
         body = tools_gw.create_body()
-        result_profile = tools_gw.get_json('gw_fct_getprofile', body)
+        result_profile = tools_gw.execute_procedure('gw_fct_getprofile', body)
         if not result_profile or result_profile['status'] == 'Failed':
             return
         message = f"{result_profile['message']}"
@@ -348,7 +348,7 @@ class GwProfileButton(GwMaptoolButton):
                     # Populate list arcs
                     extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
                     body = tools_gw.create_body(extras=extras)
-                    result = tools_gw.get_json('gw_fct_getprofilevalues', body)
+                    result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
                     if result['status'] == 'Failed': return
                     self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
                     self.remove_selection()
@@ -1346,7 +1346,7 @@ class GwProfileButton(GwMaptoolButton):
 
         extras = f'"profile_id":"{profile_id}", "action":"delete"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.get_json('gw_fct_setprofile', body)
+        result = tools_gw.execute_procedure('gw_fct_setprofile', body)
         message = f"{result['message']}"
         tools_qgis.show_info(message)
 

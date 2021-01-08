@@ -394,7 +394,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
                 style_id = layer[3]
                 if style_id is not None:
                     body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-                    style = get_json('gw_fct_getstyle', body)
+                    style = execute_procedure('gw_fct_getstyle', body)
                     if style['status'] == 'Failed': return
                     if 'styles' in style['body']:
                         if 'style' in style['body']['styles']:
@@ -410,7 +410,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
         # therefore, we define it with "-1"
         if style_id not in (None, "-1"):
             body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-            style = get_json('gw_fct_getstyle', body)
+            style = execute_procedure('gw_fct_getstyle', body)
             if style['status'] == 'Failed': return
             if 'styles' in style['body']:
                 if 'style' in style['body']['styles']:
@@ -685,7 +685,7 @@ def set_style_mapzones():
 
     extras = f'"mapzones":""'
     body = create_body(extras=extras)
-    json_return = get_json('gw_fct_getstylemapzones', body)
+    json_return = execute_procedure('gw_fct_getstylemapzones', body)
     if not json_return or json_return['status'] == 'Failed':
         return False
 
@@ -1183,7 +1183,7 @@ def fill_typeahead(completer, model, field, dialog, widget):
     extras += f', "parentValue":"{tools_qt.get_text(dialog, "data_" + str(field["parentId"]))}"'
     extras += f', "textToSearch":"{tools_qt.get_text(dialog, widget)}"'
     body = create_body(extras=extras)
-    complet_list = get_json('gw_fct_gettypeahead', body)
+    complet_list = execute_procedure('gw_fct_gettypeahead', body)
     if not complet_list or complet_list['status'] == 'Failed':
         return False
 
@@ -1341,7 +1341,7 @@ def fill_child(dialog, widget, action, geom_type=''):
     combo_parent = widget.objectName()
     combo_id = tools_qt.get_combo_value(dialog, widget)
     # TODO cambiar por gw_fct_getchilds then unified with get_child if posible
-    json_result = get_json('gw_fct_getcombochilds', f"'{action}' ,'' ,'' ,'{combo_parent}', '{combo_id}','{geom_type}'")
+    json_result = execute_procedure('gw_fct_getcombochilds', f"'{action}' ,'' ,'' ,'{combo_parent}', '{combo_id}','{geom_type}'")
     for combo_child in json_result['fields']:
         if combo_child is not None:
             fill_combo_child(dialog, combo_child)
@@ -1411,8 +1411,8 @@ def check_config_settings(section, parameter, value, config_type="user", file_na
     return value
 
 
-def get_json(function_name, parameters=None, schema_name=None, commit=True, log_sql=False,
-             log_result=False, json_loads=False, is_notify=False, rubber_band=None):
+def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False,
+                      log_result=False, json_loads=False, is_notify=False, rubber_band=None):
     """ Manage execution database function
     :param function_name: Name of function to call (text)
     :param parameters: Parameters for function (json) or (query parameters)
@@ -1615,7 +1615,7 @@ def manage_json_return(json_result, sql, rubber_band=None):
                         style_id = style_type[key]['id']
                         extras = f'"style_id":"{style_id}"'
                         body = create_body(extras=extras)
-                        style = get_json('gw_fct_getstyle', body)
+                        style = execute_procedure('gw_fct_getstyle', body)
                         if style['status'] == 'Failed': return
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:

@@ -93,7 +93,7 @@ class GwLoadProjectCheck:
         extras += f', "osVersion":"{platform.system()} {platform.release()}"'
         extras += f', {fields_to_insert}'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.get_json('gw_fct_setcheckproject', body)
+        result = tools_gw.execute_procedure('gw_fct_setcheckproject', body)
         try:
             if not result or (result['body']['variables']['hideForm'] == True):
                 return result
@@ -205,7 +205,7 @@ class GwLoadProjectCheck:
                     if layer:
                         extras = f'"style_id":"{style_id}"'
                         body = tools_gw.create_body(extras=extras)
-                        style = tools_gw.get_json('gw_fct_getstyle', body)
+                        style = tools_gw.execute_procedure('gw_fct_getstyle', body)
                         if style['status'] == 'Failed': return
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:

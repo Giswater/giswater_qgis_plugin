@@ -132,7 +132,7 @@ class GwConfigLayerTask(GwTask):
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = self.create_body(feature=feature, extras=extras)
-            complet_result = tools_gw.get_json('gw_fct_getinfofromid', body, log_sql=False)
+            complet_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body, log_sql=False)
             if not complet_result or complet_result['status'] == 'Failed':
                 continue
 

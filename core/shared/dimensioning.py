@@ -61,7 +61,7 @@ class GwDimensioning:
             extras = f'"coordinates":{{{self.points}}}'
             body = tools_gw.create_body(extras=extras)
             function_name = 'gw_fct_getdimensioning'
-            json_result = tools_gw.get_json(function_name, body)
+            json_result = tools_gw.execute_procedure(function_name, body)
             if json_result is None or json_result['status'] == 'Failed':
                 return False
             db_return = json_result
@@ -192,7 +192,7 @@ class GwDimensioning:
         feature += f'"id":"{self.fid}"'
         extras = f'"fields":{{{fields}}}'
         body = tools_gw.create_body(feature=feature, extras=extras)
-        tools_gw.get_json('gw_fct_setdimensioning', body)
+        tools_gw.execute_procedure('gw_fct_setdimensioning', body)
 
         # Close dialog
         tools_gw.close_dialog(self.dlg_dim)

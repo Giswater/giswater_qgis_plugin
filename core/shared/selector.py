@@ -77,7 +77,7 @@ class GwSelector:
             form = f'"currentTab":"{current_tab}"'
             extras = f'"selectorType":{selector_type}, "filterText":"{text_filter}"'
             body = tools_gw.create_body(form=form, extras=extras)
-            json_result = tools_gw.get_json('gw_fct_getselectors', body)
+            json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
         else:
             json_result = is_setselector
             for x in range(dialog.main_tab.count() - 1, -1, -1):
@@ -241,7 +241,7 @@ class GwSelector:
                       f'"addSchema":"{qgis_project_add_schema}"')
 
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.get_json('gw_fct_setselectors', body)
+        json_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
         if json_result['status'] == 'Failed': return
         if str(tab_name) == 'tab_exploitation':
             try:

@@ -52,7 +52,7 @@ class GwToolBoxButton(GwDialogButton):
         self.dlg_toolbox.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.get_json('gw_fct_gettoolbox', body)
+        json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
@@ -73,7 +73,7 @@ class GwToolBoxButton(GwDialogButton):
 
         extras = f'"filterText":"{text}"'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.get_json('gw_fct_gettoolbox', body)
+        json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
@@ -103,7 +103,7 @@ class GwToolBoxButton(GwDialogButton):
         extras = f'"filterText":"{self.function_selected}"'
         extras += ', "isToolbox":true'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.get_json('gw_fct_gettoolbox', body, log_sql=True)
+        json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body, log_sql=True)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
@@ -360,7 +360,7 @@ class GwToolBoxButton(GwDialogButton):
             extras += '}'
 
         body = tools_gw.create_body(feature=feature_field, extras=extras)
-        json_result = tools_gw.get_json(function_name, body)
+        json_result = tools_gw.execute_procedure(function_name, body)
         if json_result['status'] == 'Failed': return
         tools_gw.fill_tab_log(dialog, json_result['body']['data'], True, True, 1, True)
 
