@@ -17,15 +17,20 @@ __revision__ = '$Format:%H$'
 from .models_manager import GwTable, GwGenericDescriptor
 
 
-class GwVisitXGully(GwTable):
-    """ Class to serialize table 'om_visit_x_gully' """
+class GwConfigVisitParameter(GwTable):
+    """ Class to serialize table 'config_visit_parameter' """
 
-    id = GwGenericDescriptor(-1)
-    visit_id = GwGenericDescriptor(None)
-    gully_id = GwGenericDescriptor(None)
-    is_last = GwGenericDescriptor(None)
+    id = GwGenericDescriptor(None)
+    code = GwGenericDescriptor(None)
+    parameter_type = GwGenericDescriptor(None)
+    feature_type = GwGenericDescriptor(None)
+    data_type = GwGenericDescriptor(None)
+    criticity = GwGenericDescriptor(None)
+    descript = GwGenericDescriptor(None)
+    form_type = GwGenericDescriptor(None)
+    vdefault = GwGenericDescriptor(None)
 
     def __init__(self):
         """ Class constructor """
-        GwTable.__init__(self, 'om_visit_x_gully', 'id')
+        GwTable.__init__(self, 'config_visit_parameter', 'id')
 

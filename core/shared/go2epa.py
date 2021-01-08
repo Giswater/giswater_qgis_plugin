@@ -17,7 +17,7 @@ from qgis.core import QgsApplication
 
 from .go2epa_options import GwGo2EpaOptions
 from ..admin.admin_btn import GwAdminButton
-from ..tasks.go2epa_task import GwGo2EpaTask
+from ..tasks.epa_file_manager import GwEpaFileManager
 from ..utils import tools_gw
 from ..ui.ui_manager import GwGo2EpaUI, GwHydrologySelectorUi, GwMultirowSelectorUi
 from ... import global_vars
@@ -406,7 +406,7 @@ class GwGo2Epa:
 
         # Set background task 'Go2Epa'
         description = f"Go2Epa"
-        self.go2epa_task = GwGo2EpaTask(description, self)
+        self.go2epa_task = GwEpaFileManager(description, self)
         QgsApplication.taskManager().addTask(self.go2epa_task)
         QgsApplication.taskManager().triggerTask(self.go2epa_task)
 

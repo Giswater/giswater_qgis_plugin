@@ -13,7 +13,7 @@ from qgis.PyQt.QtGui import QCursor
 
 from ..dialog_button import GwDialogButton
 from ...load_project_check import GwLoadProjectCheck
-from ...tasks.layers_config_task import GwConfigLayerTask
+from ...tasks.project_layers_config import GwProjectLayersConfig
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_log, tools_db
 
@@ -132,7 +132,7 @@ class GwAddChildLayerButton(GwDialogButton):
         # Set project layers with gw_fct_getinfofromid: This process takes time for user
         # Set background task 'ConfigLayerFields'
         description = f"ConfigLayerFields"
-        task_get_layers = GwConfigLayerTask(description)
+        task_get_layers = GwProjectLayersConfig(description)
         task_get_layers.set_params(self.project_type, self.schema_name, self.qgis_project_infotype)
         # QgsApplication.taskManager().addTask(task_get_layers)
         # QgsApplication.taskManager().triggerTask(task_get_layers)

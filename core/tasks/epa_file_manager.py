@@ -18,7 +18,7 @@ from ...lib import tools_log, tools_qt, tools_db, tools_qgis
 from .task import GwTask
 
 
-class GwGo2EpaTask(GwTask):
+class GwEpaFileManager(GwTask):
     """ This shows how to subclass QgsTask """
 
     fake_progress = pyqtSignal()

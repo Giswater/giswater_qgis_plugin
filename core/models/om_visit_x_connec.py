@@ -17,15 +17,15 @@ __revision__ = '$Format:%H$'
 from .models_manager import GwTable, GwGenericDescriptor
 
 
-class GwVisitXNode(GwTable):
-    """ Class to serialize table 'om_visit_x_node' """
+class GwOmVisitXConnec(GwTable):
+    """ Class to serialize table 'om_visit_x_connec' """
 
     id = GwGenericDescriptor(-1)
     visit_id = GwGenericDescriptor(None)
-    node_id = GwGenericDescriptor(None)
+    connec_id = GwGenericDescriptor(None)
     is_last = GwGenericDescriptor(None)
 
     def __init__(self):
         """ Class constructor """
-        GwTable.__init__(self, 'om_visit_x_node', 'id')
+        GwTable.__init__(self, 'om_visit_x_connec', 'id')
 

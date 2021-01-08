@@ -19,13 +19,13 @@ from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter,
     QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit
 
 from .document import GwDocument
-from ..models.visit import GwVisit
-from ..models.visit_event import GwVisitEvent
-from ..models.visit_x_arc import GwVisitXArc
-from ..models.visit_x_connec import GwVisitXConnec
-from ..models.visit_x_node import GwVisitXNode
-from ..models.visit_x_gully import GwVisitXGully
-from ..models.visit_parameter import GwVisitParameter
+from ..models.om_visit import GwOmVisit
+from ..models.om_visit_event import GwOmVisitEvent
+from ..models.om_visit_x_arc import GwOmVisitXArc
+from ..models.om_visit_x_connec import GwOmVisitXConnec
+from ..models.om_visit_x_node import GwOmVisitXNode
+from ..models.om_visit_x_gully import GwOmVisitXGully
+from ..models.config_visit_parameter import GwConfigVisitParameter
 from ..ui.ui_manager import GwVisitUi, GwVisitEventUi, GwVisitEventRehabUi, GwVisitManagerUi
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
@@ -33,7 +33,7 @@ from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_db
 
 
-class GwVisitManager(QObject):
+class GwVisit(QObject):
 
     # event emitted when a new Visit is added when GUI is closed/accepted
     visit_added = pyqtSignal(int)
@@ -79,7 +79,7 @@ class GwVisitManager(QObject):
         self.locked_feature_id = feature_id
 
         # Create the dialog and signals and related ORM Visit class
-        self.current_visit = GwVisit()
+        self.current_visit = GwOmVisit()
         self.dlg_add_visit = GwVisitUi(tag)
         tools_gw.load_settings(self.dlg_add_visit)
         layers_visibility = tools_gw.hide_parent_layers(['v_edit_element'])
@@ -577,13 +577,13 @@ class GwVisitManager(QObject):
 
         db_record = None
         if geom_type == 'arc':
-            db_record = GwVisitXArc()
+            db_record = GwOmVisitXArc()
         elif geom_type == 'node':
-            db_record = GwVisitXNode()
+            db_record = GwOmVisitXNode()
         elif geom_type == 'connec':
-            db_record = GwVisitXConnec()
+            db_record = GwOmVisitXConnec()
         elif geom_type == 'gully':
-            db_record = GwVisitXGully()
+            db_record = GwOmVisitXGully()
 
         # remove all actual saved records related with visit_id
         where_clause = f"visit_id = '{self.visit_id.text()}'"
@@ -613,13 +613,13 @@ class GwVisitManager(QObject):
 
         db_record = None
         if geom_type == 'arc':
-            db_record = GwVisitXArc()
+            db_record = GwOmVisitXArc()
         elif geom_type == 'node':
-            db_record = GwVisitXNode()
+            db_record = GwOmVisitXNode()
         elif geom_type == 'connec':
-            db_record = GwVisitXConnec()
+            db_record = GwOmVisitXConnec()
         elif geom_type == 'gully':
-            db_record = GwVisitXGully()
+            db_record = GwOmVisitXGully()
 
         if db_record:
             for row in range(widget.model().rowCount()):
@@ -1156,7 +1156,7 @@ class GwVisitManager(QObject):
         self.dlg_event.parameter_id.setText(parameter_text)
 
         # create an empty Event
-        event = GwVisitEvent()
+        event = GwOmVisitEvent()
         event.id = event.max_pk() + 1
         event.parameter_id = parameter_id
         event.visit_id = int(self.visit_id.text())
@@ -1401,13 +1401,13 @@ class GwVisitManager(QObject):
             return
 
         # fetch the record
-        event = GwVisitEvent()
+        event = GwOmVisitEvent()
         event.id = selected_list[0].data()
         if not event.fetch():
             return
 
         # get parameter_id code to select the widget useful to edit the event
-        om_event_parameter = GwVisitParameter()
+        om_event_parameter = GwConfigVisitParameter()
         om_event_parameter.id = event.parameter_id
         if not om_event_parameter.fetch():
             return
@@ -1538,7 +1538,7 @@ class GwVisitManager(QObject):
             return
 
         # a fake event to get some ancyllary data
-        event = GwVisitEvent()
+        event = GwOmVisitEvent()
 
         # Get selected rows
         # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent

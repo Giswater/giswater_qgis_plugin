@@ -12,7 +12,7 @@ import sys
 from qgis.PyQt.QtCore import QObject, QSettings
 
 from ..core.admin.admin_btn import GwAdminButton
-from ..core.shared.visit_manager import GwVisitManager
+from ..core.shared.visit import GwVisit
 from .. import global_vars
 from ..lib import tools_log
 
@@ -70,7 +70,7 @@ class GwTest(QObject):
 
         # Set test classes
         self.gw_admin = GwAdminButton()
-        self.visit_manager = GwVisitManager()
+        self.visit_manager = GwVisit()
 
 
     def get_plugin_metadata(self, parameter, default_value):

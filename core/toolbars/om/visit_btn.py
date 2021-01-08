@@ -6,14 +6,14 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from ..dialog_button import GwDialogButton
-from ...shared.visit_manager import GwVisitManager
+from ...shared.visit import GwVisit
 
 
 class GwVisitButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.visit_manager = GwVisitManager()
+        self.visit_manager = GwVisit()
 
 
     def clicked_event(self):

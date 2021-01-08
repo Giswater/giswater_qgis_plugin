@@ -30,7 +30,7 @@ from .dimensioning import GwDimensioning
 from .document import GwDocument
 from .element import GwElement
 from .visit_gallery import GwVisitGallery
-from .visit_manager import GwVisitManager
+from .visit import GwVisit
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindowDialog, GwVisitDocumentUi, GwInfoCrossectUi, \
@@ -242,7 +242,7 @@ class GwInfo(QObject):
 
         elif template == 'visit':
             visit_id = self.complet_result['body']['feature']['id']
-            manage_visit = GwVisitManager()
+            manage_visit = GwVisit()
             manage_visit.get_visit(visit_id=visit_id, tag='info')
 
         else:
@@ -2702,7 +2702,7 @@ class GwInfo(QObject):
     def open_visit(self):
         """ Call button 65: om_visit_management """
 
-        manage_visit = GwVisitManager()
+        manage_visit = GwVisit()
         manage_visit.visit_added.connect(self.update_visit_table)
         manage_visit.manage_visits(self.geom_type, self.feature_id)
 
@@ -2727,7 +2727,7 @@ class GwInfo(QObject):
             tools_qgis.show_warning(msg)
             return
 
-        manage_visit = GwVisitManager()
+        manage_visit = GwVisit()
         manage_visit.visit_added.connect(self.update_visit_table)
         # TODO: the following query fix a (for me) misterious bug
         # the DB connection is not available during manage_visit.manage_visit first call

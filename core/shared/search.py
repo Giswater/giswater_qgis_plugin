@@ -22,11 +22,11 @@ from qgis.gui import QgsRubberBand
 from .document import GwDocument
 from .info import GwInfo
 from .psector import GwPsector
-from .visit_manager import GwVisitManager
+from .visit import GwVisit
 from ..ui.ui_manager import GwSearchUi, GwInfoGenericUi, GwSearchWorkcatUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...lib import tools_db, tools_qgis, tools_qt, tools_config
+from ...lib import tools_db, tools_qgis, tools_qt
 
 
 class GwSearch:
@@ -35,7 +35,7 @@ class GwSearch:
         """ Class constructor """
 
         self.manage_new_psector = GwPsector()
-        self.manage_visit = GwVisitManager()
+        self.manage_visit = GwVisit()
         self.iface = global_vars.iface
         self.project_type = global_vars.project_type
         self.canvas = global_vars.canvas
