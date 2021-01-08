@@ -321,9 +321,9 @@ FORM_CLASS = get_ui_class('dialog_text.ui')
 class GwDialogTextUi(GwBasicDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('docker.ui')
-class GwDockerUi(GwDockerDialog, FORM_CLASS):
-    pass
+# FORM_CLASS = get_ui_class('docker.ui')
+# class GwDockerUi(GwDockerDialog, FORM_CLASS):
+#     pass
 
 FORM_CLASS = get_ui_class('info_catalog.ui')
 class GwInfoCatalogUi(GwMainWindowDialog, FORM_CLASS):

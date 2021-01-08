@@ -27,7 +27,7 @@ from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeatu
     QgsSnappingConfig
 from qgis.gui import QgsDateTimeEdit
 
-from ..models.sys_feature_cat import GwSysFeatureCat
+from ..models.cat_feature import GwCatFeature
 from ..ui.basic_dialog import GwBasicDialog
 from ..ui.main_window_dialog import GwMainWindowDialog
 from ..ui.docker_dialog import GwDockerDialog
@@ -763,8 +763,9 @@ def manage_feature_cat():
         if not tablename:
             msg += f"{row['id']}, "
             continue
-        elem = GwSysFeatureCat(row['id'], row['system_id'], row['feature_type'], row['shortcut_key'],
-                               row['parent_layer'], row['child_layer'])
+        elem = GwCatFeature(row['id'], row['system_id'], row['feature_type'], row['shortcut_key'],
+                            row['parent_layer'], row['child_layer'])
+
         feature_cat[tablename] = elem
 
     feature_cat = OrderedDict(sorted(feature_cat.items(), key=lambda t: t[0]))

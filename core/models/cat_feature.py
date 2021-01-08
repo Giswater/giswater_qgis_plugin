@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 
-class GwSysFeatureCat(object):
+class GwCatFeature(object):
     """ Class to serialize table 'cat_feature' """
 
     def __init__(self, id_, system_id, feature_type, shortcut_key, parent_layer, child_layer):

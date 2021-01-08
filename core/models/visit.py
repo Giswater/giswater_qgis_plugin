@@ -14,7 +14,7 @@ __copyright__ = '(C) 2018, Luigi Pirelli'
 
 __revision__ = '$Format:%H$'
 
-from .table import GwTable, GwGenericDescriptor
+from .models_manager import GwTable, GwGenericDescriptor
 
 
 class GwVisit(GwTable):
