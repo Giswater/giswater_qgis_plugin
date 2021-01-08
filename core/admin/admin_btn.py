@@ -26,7 +26,7 @@ from qgis.core import QgsProject, QgsTask, QgsApplication
 from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 
-from .admin_gis_project_btn import GwAdminGisProjectButton
+from .gis_file_create import GwGisFileCreate
 from ..tasks.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
     GwAdminGisProjectUi, GwAdminImportUi, GwAdminFieldsUi, GwAdminVisitClassUi, GwAdminSysFieldsUi, GwCredentialsUi
@@ -413,7 +413,7 @@ class GwAdminButton:
                               get_database_parameters=True):
         """ Generate QGIS project """
 
-        gis = GwAdminGisProjectButton(self.plugin_dir)
+        gis = GwGisFileCreate(self.plugin_dir)
         result, qgs_path = gis.gis_project_database(gis_folder, gis_file, project_type, schema_name, export_passwd,
                                                     roletype, sample, get_database_parameters)
 

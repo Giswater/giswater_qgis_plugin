@@ -14,7 +14,7 @@ from qgis.PyQt.QtCore import QSettings
 from ...lib import tools_log, tools_qt, tools_db, tools_qgis
 
 
-class GwAdminGisProjectButton:
+class GwGisFileCreate:
 
     def __init__(self, plugin_dir):
 
