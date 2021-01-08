@@ -1072,17 +1072,19 @@ class DaoController(object):
         # Get dbname, host, port, user and password
         uri = layer.dataProvider().dataSourceUri()
 
-        # split with quoted substrings preservation
-        splt = shlex.split(uri)
-
-        splt_dct = dict([tuple(v.split('=')) for v in splt if '=' in v])
-        splt_dct['db'] = splt_dct['dbname']
-        splt_dct['schema'], splt_dct['table'] = splt_dct['table'].split('.')
-
-        for key in layer_source.keys():
-            layer_source[key] = splt_dct.get(key)
-
-        return layer_source
+        try:
+            # Split 'uri' with quoted substrings preservation
+            splt = shlex.split(uri)
+            splt_dct = dict([tuple(v.split('=')) for v in splt if '=' in v])
+            splt_dct['db'] = splt_dct['dbname']
+            splt_dct['schema'], splt_dct['table'] = splt_dct['table'].split('.')
+            for key in layer_source.keys():
+                layer_source[key] = splt_dct.get(key)
+        except Exception as e:
+            msg = f"get_layer_source exception in layer '{layer.name()}': {str(e)}"
+            self.log_warning(msg)
+        finally:
+            return layer_source
 
 
     def get_layer_source_table_name(self, layer):
