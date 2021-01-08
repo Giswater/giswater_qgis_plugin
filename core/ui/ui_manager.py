@@ -301,12 +301,12 @@ FORM_CLASS = get_ui_class('admin_visitparam.ui', 'admin')
 class GwAdminVisitParamUi(GwBasicDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('toolbox_docker.ui', 'utilities')
-class GwToolboxDockerUi(GwDockerDialog, FORM_CLASS):
-    pass
-
 FORM_CLASS = get_ui_class('toolbox.ui', 'utilities')
 class GwToolboxUi(GwBasicDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = get_ui_class('toolbox_manager.ui', 'utilities')
+class GwToolboxManagerUi(GwBasicDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = get_ui_class('project_check.ui', 'utilities')

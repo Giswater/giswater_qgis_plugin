@@ -18,10 +18,10 @@ from qgis.core import QgsProject
 from qgis.gui import QgsDateTimeEdit
 
 from ..dialog_button import GwDialogButton
-from ...ui.ui_manager import GwToolboxDockerUi, GwToolboxUi
+from ...ui.ui_manager import GwToolboxUi, GwToolboxManagerUi
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_qgis, tools_db
-
+from .... import global_vars
 
 class GwToolBoxButton(GwDialogButton):
 
@@ -47,20 +47,26 @@ class GwToolBoxButton(GwDialogButton):
             tools_qgis.show_warning("Function not found in database", parameter=function_name)
             return
 
-        self.dlg_toolbox_doc = GwToolboxDockerUi()
-        self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dlg_toolbox_doc)
-        self.dlg_toolbox_doc.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.dlg_toolbox_doc.trv.setHeaderHidden(True)
+        self.dlg_toolbox = GwToolboxUi()
+        self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.dlg_toolbox.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.get_json('gw_fct_gettoolbox', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 
-        self.populate_trv(self.dlg_toolbox_doc.trv, json_result['body']['data'])
-        self.dlg_toolbox_doc.txt_filter.textChanged.connect(partial(self.filter_functions))
-        self.dlg_toolbox_doc.trv.doubleClicked.connect(partial(self.open_function))
-        tools_qt.manage_translation('toolbox_docker', self.dlg_toolbox_doc)
+        # Show form in docker
+        tools_gw.init_docker('qgis_form_docker')
+        if global_vars.session_vars['dlg_docker']:
+            tools_gw.docker_dialog(self.dlg_toolbox)
+        else:
+            tools_gw.open_dialog(self.dlg_toolbox)
+
+        self.populate_trv(self.dlg_toolbox.trv, json_result['body']['data'])
+        self.dlg_toolbox.txt_filter.textChanged.connect(partial(self.filter_functions))
+        self.dlg_toolbox.trv.doubleClicked.connect(partial(self.open_function))
+        tools_qt.manage_translation('toolbox_docker', self.dlg_toolbox)
 
 
     def filter_functions(self, text):
@@ -71,7 +77,7 @@ class GwToolBoxButton(GwDialogButton):
         if not json_result or json_result['status'] == 'Failed':
             return False
 
-        self.populate_trv(self.dlg_toolbox_doc.trv, json_result['body']['data'], expand=True)
+        self.populate_trv(self.dlg_toolbox.trv, json_result['body']['data'], expand=True)
 
 
     def open_function(self, index):
@@ -84,7 +90,7 @@ class GwToolBoxButton(GwDialogButton):
         if self.function_selected in self.no_clickable_items:
             return
 
-        self.dlg_functions = GwToolboxUi()
+        self.dlg_functions = GwToolboxManagerUi()
         tools_gw.load_settings(self.dlg_functions)
         self.dlg_functions.progressBar.setVisible(False)
 
