@@ -188,6 +188,13 @@ CREATE OR REPLACE VIEW vi_curves AS
   ORDER BY inp_curve_value.id;
 
 
+-- 2021/01/09
+CREATE OR REPLACE VIEW vi_files AS 
+ SELECT inp_files.actio_type,
+    inp_files.file_type,
+    inp_files.fname
+   FROM inp_files
+   where active is true;
 
 
 

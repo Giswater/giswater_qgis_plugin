@@ -24,3 +24,6 @@ DROP TRIGGER gw_trg_topocontrol_node ON node;
 CREATE TRIGGER gw_trg_topocontrol_node AFTER INSERT OR UPDATE OF 
 the_geom, state, top_elev, ymax, elev, custom_top_elev, custom_ymax, custom_elev ON node 
 FOR EACH ROW EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_topocontrol_node();
+
+-- 2021/01/09
+ALTER TABLE inp_files ADD COLUMN active boolean;

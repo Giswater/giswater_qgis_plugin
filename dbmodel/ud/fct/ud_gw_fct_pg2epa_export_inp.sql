@@ -70,9 +70,9 @@ BEGIN
 		FOR num_col_rec IN 1..num_column
 		LOOP
 			IF num_col_rec=1 then
-				EXECUTE 'UPDATE temp_csv set csv1=rpad('';;-------'',20) WHERE id='||id_last||';';
+				EXECUTE 'UPDATE temp_csv set csv1=rpad('';;----------'',20) WHERE id='||id_last||';';
 			ELSE
-				EXECUTE 'UPDATE temp_csv SET csv'||num_col_rec||'=rpad(''-------'',20) WHERE id='||id_last||';';
+				EXECUTE 'UPDATE temp_csv SET csv'||num_col_rec||'=rpad(''----------'',20) WHERE id='||id_last||';';
 			END IF;
 		END LOOP;
 	
@@ -112,13 +112,13 @@ BEGIN
 			select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', csv3)as text from temp_csv where fid = 141 and cur_user = current_user and source in ('vi_files')
 		union
 			select id, 
-			case when  substring(csv2,0,5) = 'FILE' THEN concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),255))
+			case when  substring(csv2,0,5) = 'FILE' THEN concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),length(csv2)+2))
 					ELSE concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20), rpad(coalesce(csv4,''),20),' ', rpad(coalesce(csv5,''),20)) END 
 			from temp_csv 
 			where fid = 141 and cur_user = current_user and source in ('vi_timeseries')	
 		union
 			select id, 
-			case when csv5 = 'FILE' THEN concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),' ',rpad(coalesce(csv6,''),255),
+			case when csv5 = 'FILE' THEN concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),' ',rpad(coalesce(csv6,''),length(csv6)+2),
 					' ',rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20)) 
 					ELSE concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),' ',rpad(coalesce(csv6,''),20),
 					' ',rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20)) END 

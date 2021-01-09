@@ -103,9 +103,9 @@ BEGIN
 		FOR num_col_rec IN 1..num_column
 		LOOP
 			IF num_col_rec=1 then
-				EXECUTE 'UPDATE temp_csv set csv1=rpad('';-------'',22) WHERE id='||id_last||';';
+				EXECUTE 'UPDATE temp_csv set csv1=rpad('';----------'',22) WHERE id='||id_last||';';
 			ELSE
-				EXECUTE 'UPDATE temp_csv SET csv'||num_col_rec||'=rpad(''-------'',22) WHERE id='||id_last||';';
+				EXECUTE 'UPDATE temp_csv SET csv'||num_col_rec||'=rpad(''----------'',22) WHERE id='||id_last||';';
 			END IF;
 		END LOOP;
 
