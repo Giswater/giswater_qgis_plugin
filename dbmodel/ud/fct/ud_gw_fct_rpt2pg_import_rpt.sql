@@ -38,14 +38,19 @@ v_version text;
 v_path text;
 v_result_id text;
 v_error_context text;
+v_epaversion text;
 
 BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
+
 	-- get system parameters
 	SELECT giswater  INTO v_version FROM sys_version order by 1 desc limit 1;
+
+	-- get user parameters
+	SELECT value INTO v_epaversion FROM config_param_user WHERE cur_user = current_user AND parameter = 'inp_options_epaversion';
 
 	-- get input data
 	v_result_id := ((p_data ->>'data')::json->>'resultId')::text;
@@ -178,10 +183,21 @@ BEGIN
 			rpt_rec.csv6,' ',rpt_rec.csv7));
 
 		ELSIF rpt_rec.csv1 IN (SELECT subc_id FROM inp_subcatchment) AND type_aux='rpt_subcathrunoff_sum' then 
-			INSERT INTO rpt_subcathrunoff_sum(result_id, subc_id, tot_precip, tot_runon, tot_evap, tot_infil,tot_runoff, tot_runofl, peak_runof, runoff_coe, vxmax, vymax, depth, vel, vhmax) 
-			VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6::numeric,
-			rpt_rec.csv7::numeric,rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10::numeric,rpt_rec.csv11::numeric,rpt_rec.csv12::numeric,
-			rpt_rec.csv13::numeric,rpt_rec.csv14::numeric);
+
+			IF v_epaversion = '5.1' then
+
+				INSERT INTO rpt_subcathrunoff_sum(result_id, subc_id, tot_precip, tot_runon, tot_evap, tot_infil, tot_runoff, tot_runofl, peak_runof, runoff_coe, vxmax, vymax, depth, vel, vhmax) 
+				VALUES (v_result_id, rpt_rec.csv1, rpt_rec.csv2::numeric, rpt_rec.csv3::numeric, rpt_rec.csv4::numeric, rpt_rec.csv5::numeric, rpt_rec.csv8::numeric,
+				rpt_rec.csv9::numeric,rpt_rec.csv10::numeric,rpt_rec.csv11::numeric,rpt_rec.csv12::numeric,rpt_rec.csv13::numeric,rpt_rec.csv14::numeric,
+				rpt_rec.csv15::numeric,rpt_rec.csv16::numeric);
+
+			ELSE
+				INSERT INTO rpt_subcathrunoff_sum(result_id, subc_id, tot_precip, tot_runon, tot_evap, tot_infil,tot_runoff, tot_runofl, peak_runof, runoff_coe, vxmax, vymax, depth, vel, vhmax) 
+				VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6::numeric,
+				rpt_rec.csv7::numeric,rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10::numeric,rpt_rec.csv11::numeric,rpt_rec.csv12::numeric,
+				rpt_rec.csv13::numeric,rpt_rec.csv14::numeric);
+
+			END IF;
 
 		ELSIF rpt_rec.csv1 IN (SELECT node_id FROM rpt_inp_node) AND type_aux='rpt_nodedepth_sum' then
 			INSERT INTO rpt_nodedepth_sum(result_id, node_id, swnod_type, aver_depth, max_depth, max_hgl,time_days, time_hour)
@@ -208,11 +224,22 @@ BEGIN
 			VALUES  (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric);
 		
 		ELSIF rpt_rec.csv1 IN (SELECT node_id FROM rpt_inp_node WHERE epa_type='STORAGE') AND type_aux='rpt_storagevol_sum' then
-			INSERT INTO rpt_storagevol_sum(result_id, node_id, aver_vol, avg_full, ei_loss, max_vol,
-			max_full, time_days, time_hour, max_out)
-			VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6::numeric,
-			rpt_rec.csv7,rpt_rec.csv8,rpt_rec.csv9::numeric);
 
+			IF v_epaversion = '5.1' then
+
+				INSERT INTO rpt_storagevol_sum(result_id, node_id, aver_vol, avg_full, ei_loss, max_vol,
+				max_full, time_days, time_hour, max_out)
+				VALUES (v_result_id, rpt_rec.csv1, rpt_rec.csv2::numeric, rpt_rec.csv3::numeric, (rpt_rec.csv4::numeric + rpt_rec.csv5::numeric), rpt_rec.csv6::numeric,
+				rpt_rec.csv7::numeric, rpt_rec.csv8, rpt_rec.csv9, rpt_rec.csv10::numeric);
+
+			ELSE
+				INSERT INTO rpt_storagevol_sum(result_id, node_id, aver_vol, avg_full, ei_loss, max_vol,
+				max_full, time_days, time_hour, max_out)
+				VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6::numeric,
+				rpt_rec.csv7,rpt_rec.csv8,rpt_rec.csv9::numeric);
+
+			END IF;
+				
 		ELSIF rpt_rec.csv1 IN (SELECT arc_id FROM rpt_inp_arc) AND type_aux='rpt_arcflow_sum' then
 			CASE WHEN rpt_rec.csv6='>50.00' THEN rpt_rec.csv6='50.00'; else end case;
 			INSERT INTO rpt_arcflow_sum(result_id, arc_id, arc_type, max_flow, time_days, time_hour, max_veloc, 
