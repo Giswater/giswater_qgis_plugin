@@ -477,12 +477,12 @@ def remove_tab(tab_widget, tab_name):
             break
 
 
-def enable_disable_tab_by_tab_name(tab_widget, tab_name, action):
+def enable_tab_by_tab_name(tab_widget, tab_name, enable):
     """ Look in @tab_widget for a tab with @tab_name and remove it """
 
     for x in range(0, tab_widget.count()):
         if tab_widget.widget(x).objectName() == tab_name:
-            tab_widget.setTabEnabled(x, action)
+            tab_widget.setTabEnabled(x, enable)
             break
 
 
@@ -493,7 +493,7 @@ def double_validator(widget, min_=-9999999, max_=9999999, decimals=2, notation=Q
     widget.setValidator(validator)
 
 
-def dis_enable_dialog(dialog, enable, ignore_widgets=['', None]):
+def enable_dialog(dialog, enable, ignore_widgets=['', None]):
 
     widget_list = dialog.findChildren(QWidget)
     for widget in widget_list:

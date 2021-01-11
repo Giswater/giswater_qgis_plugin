@@ -707,7 +707,7 @@ class GwVisit(QObject):
             tools_log.log_info(f"connect_signal_tab_feature_signal error: {e}")
 
 
-    def manage_tabs_enabled(self, disable_tabs=False):
+    def manage_tabs_enabled(self, enable_tabs=False):
         """ Enable/Disable tabs depending geom_type """
 
         if self.geom_type is None:
@@ -723,7 +723,7 @@ class GwVisit(QObject):
             return
 
         # Disable all tabs
-        if disable_tabs:
+        if enable_tabs:
             for i in range(self.dlg_add_visit.tab_feature.count()):
                 self.dlg_add_visit.tab_feature.setTabEnabled(i, False)
 

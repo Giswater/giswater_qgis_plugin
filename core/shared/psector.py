@@ -151,7 +151,7 @@ class GwPsector:
         other = self.dlg_plan_psector.findChild(QLineEdit, "other")
         tools_qt.double_validator(other)
 
-        self.enable_tabs(False)
+        self.set_tabs_enabled(False)
         self.enable_buttons(False)
 
         # Tables
@@ -184,7 +184,7 @@ class GwPsector:
 
         if psector_id is not None:
 
-            self.enable_tabs(True)
+            self.set_tabs_enabled(True)
             self.enable_buttons(True)
             self.dlg_plan_psector.name.setEnabled(True)
             self.dlg_plan_psector.chk_enable_all.setDisabled(False)
@@ -792,7 +792,7 @@ class GwPsector:
         tools_qt.set_widget_text(self.dlg_plan_psector, self.lbl_descript, des)
 
 
-    def enable_tabs(self, enabled):
+    def set_tabs_enabled(self, enabled):
 
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, enabled)
         self.dlg_plan_psector.tabWidget.setTabEnabled(2, enabled)
@@ -817,11 +817,11 @@ class GwPsector:
         rows = tools_db.get_rows(sql)
         if not rows:
             if self.dlg_plan_psector.name.text() != '':
-                self.enable_tabs(True)
+                self.set_tabs_enabled(True)
             else:
-                self.enable_tabs(False)
+                self.set_tabs_enabled(False)
         else:
-            self.enable_tabs(False)
+            self.set_tabs_enabled(False)
 
 
     def delete_psector_selector(self, tablename):
@@ -990,7 +990,7 @@ class GwPsector:
             tools_qgis.show_warning(message)
             return
         else:
-            self.enable_tabs(True)
+            self.set_tabs_enabled(True)
             self.enable_buttons(True)
 
         viewname = f"'v_edit_plan_psector'"

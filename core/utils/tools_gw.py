@@ -421,7 +421,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
 
 
 def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
-                   group='GW Temporal Layers', disable_tabs=True):
+                   group='GW Temporal Layers', call_set_tabs_enabled=True):
     """ Add QgsVectorLayer into TOC
     :param dialog: Dialog where to find the tab to be displayed and the textedit to be filled (QDialog or QMainWindow)
     :param data: Json with information
@@ -431,7 +431,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     :param tab_idx: Log tab index (Integer)
     :param del_old_layers:Delete layers added in previous operations (Boolean)
     :param group: Name of the group to which we want to add the layer (String)
-    :param disable_tabs: set all tabs, except the last, enabled or disabled (boolean).
+    :param call_set_tabs_enabled: set all tabs, except the last, enabled or disabled (boolean).
     :return: Dictionary with text as result of previuos data (String), and list of layers added (QgsVectorLayer).
     """
 
@@ -440,7 +440,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     srid = global_vars.srid
     for k, v in list(data.items()):
         if str(k) == "info":
-            text_result, change_tab = fill_tab_log(dialog, data, force_tab, reset_text, tab_idx, disable_tabs)
+            text_result, change_tab = fill_tab_log(dialog, data, force_tab, reset_text, tab_idx, call_set_tabs_enabled)
         elif k in ('point', 'line', 'polygon'):
             if 'features' not in data[k]: continue
             counter = len(data[k]['features'])
@@ -480,14 +480,14 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
 
 
-def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_disable_tabs=True):
+def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_set_tabs_enabled=True):
     """ Populate txt_infolog QTextEdit widget
     :param dialog: QDialog
     :param data: Json
     :param force_tab: Force show tab (boolean)
     :param reset_text: Reset(or not) text for each iteration (boolean)
     :param tab_idx: index of tab to force (integer)
-    :param call_disable_tabs: set all tabs, except the last, enabled or disabled (boolean)
+    :param call_set_tabs_enabled: set all tabs, except the last, enabled or disabled (boolean)
     :return: Text received from data (String)
     """
 
@@ -510,8 +510,8 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
     if qtabwidget is not None:
         if change_tab and qtabwidget is not None:
             qtabwidget.setCurrentIndex(tab_idx)
-        if call_disable_tabs:
-            disable_tabs(dialog)
+        if call_set_tabs_enabled:
+            set_tabs_enabled(dialog)
 
     return text, change_tab
 
@@ -562,7 +562,7 @@ def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal
     my_group.insertLayer(0, virtual_layer)
 
 
-def disable_widgets(dialog, result, enable):
+def enable_widgets(dialog, result, enable):
 
     try:
         widget_list = dialog.findChildren(QWidget)
@@ -661,7 +661,7 @@ def delete_selected_rows(widget, table_object):
         widget.model().select()
 
 
-def disable_tabs(dialog):
+def set_tabs_enabled(dialog):
     """ Disable all tabs in the dialog except the log one and change the state of the buttons
     :param dialog: Dialog where tabs are disabled (QDialog)
     :return:

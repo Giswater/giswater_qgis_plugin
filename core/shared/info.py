@@ -509,7 +509,7 @@ class GwInfo(QObject):
             if layer.isEditable():
                 tools_gw.enable_all(dlg_cf, self.complet_result['body']['data'])
             else:
-                tools_gw.disable_widgets(dlg_cf, self.complet_result['body']['data'], False)
+                tools_gw.enable_widgets(dlg_cf, self.complet_result['body']['data'], False)
 
 
         # We assign the function to a global variable,
@@ -1132,7 +1132,7 @@ class GwInfo(QObject):
             self.get_last_value()
             if str(self.my_json) == '{}':
                 tools_qt.set_action_checked(action_edit, False)
-                tools_gw.disable_widgets(dialog, self.complet_result['body']['data'], False)
+                tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
                 self.enable_actions(dialog, False)
                 return
             save = self.ask_for_save(action_edit, fid)
@@ -1164,7 +1164,7 @@ class GwInfo(QObject):
         status = self.accept(dialog, self.complet_result, my_json, close_dlg=close_dlg, new_feature=new_feature)
         if status is True:  # Commit succesfull and dialog keep opened
             tools_qt.set_action_checked(action_edit, False)
-            tools_gw.disable_widgets(dialog, self.complet_result['body']['data'], False)
+            tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
             self.enable_actions(dialog, False)
 
 
@@ -1175,7 +1175,7 @@ class GwInfo(QObject):
             layer.commitChanges()
             self.connect_signals()
             tools_qt.set_action_checked(action_edit, False)
-            tools_gw.disable_widgets(dialog, self.complet_result['body']['data'], False)
+            tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
             self.enable_actions(dialog, False)
             self.connect_signals()
         else:

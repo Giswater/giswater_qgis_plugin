@@ -85,7 +85,7 @@ class GwDimensioning:
         self.layer_dimensions.editingStarted.connect(lambda: action_orientation.setEnabled(True))
         self.layer_dimensions.editingStopped.connect(lambda: action_orientation.setEnabled(False))
         self.layer_dimensions.editingStarted.connect(partial(tools_gw.enable_all, self.dlg_dim, db_return['body']['data']))
-        self.layer_dimensions.editingStopped.connect(partial(tools_gw.disable_widgets, self.dlg_dim, db_return['body']['data'], False))
+        self.layer_dimensions.editingStopped.connect(partial(tools_gw.enable_widgets, self.dlg_dim, db_return['body']['data'], False))
 
         # WIDGETS SIGNALS
         self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, qgis_feature, layer))
@@ -138,7 +138,7 @@ class GwDimensioning:
             else:
                 action_snapping.setEnabled(False)
                 action_orientation.setEnabled(False)
-                tools_gw.disable_widgets(self.dlg_dim, db_return['body']['data'], False)
+                tools_gw.enable_widgets(self.dlg_dim, db_return['body']['data'], False)
 
         title = f"DIMENSIONING - {self.fid}"
         tools_gw.open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)

@@ -484,8 +484,8 @@ class GwSearch:
         self.items_dialog.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_document.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-        self.disable_qatable_by_state(self.items_dialog.tbl_psm, 1, self.items_dialog.btn_state1)
-        self.disable_qatable_by_state(self.items_dialog.tbl_psm_end, 0, self.items_dialog.btn_state0)
+        self.set_enable_qatable_by_state(self.items_dialog.tbl_psm, 1, self.items_dialog.btn_state1)
+        self.set_enable_qatable_by_state(self.items_dialog.tbl_psm_end, 0, self.items_dialog.btn_state0)
 
         # Create list for completer QLineEdit
         sql = "SELECT DISTINCT(id) FROM v_ui_document ORDER BY id"
@@ -628,7 +628,7 @@ class GwSearch:
         tools_db.execute_sql(sql)
 
 
-    def disable_qatable_by_state(self, qtable, _id, qbutton):
+    def set_enable_qatable_by_state(self, qtable, _id, qbutton):
 
         sql = (f"SELECT state_id FROM selector_state "
                f" WHERE cur_user = current_user AND state_id ='{_id}'")

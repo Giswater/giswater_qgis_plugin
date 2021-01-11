@@ -286,7 +286,7 @@ class GwAdminButton:
         if connection_status is False:
             msg = "Connection Failed. Please, check connection parameters"
             tools_qgis.show_message(msg, 1)
-            tools_qt.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+            tools_qt.enable_dialog(self.dlg_readsql, False, 'cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', msg)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
@@ -314,7 +314,7 @@ class GwAdminButton:
         if not role_admin and self.username not in self.super_users:
             msg = "You don't have permissions to administrate project schemas on this connection"
             tools_qgis.show_message(msg, 1)
-            tools_qt.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+            tools_qt.enable_dialog(self.dlg_readsql, False, 'cmb_connection')
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, msg)
         else:
@@ -332,7 +332,7 @@ class GwAdminButton:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
                 self.dlg_readsql.btn_info.setEnabled(False)
-            tools_qt.dis_enable_dialog(self.dlg_readsql, True)
+            tools_qt.enable_dialog(self.dlg_readsql, True)
 
         # Load last schema name selected and project type
         if tools_gw.get_config_parser('btn_admin', 'project_type', "user", "init") not in ('', None):
@@ -1877,7 +1877,7 @@ class GwAdminButton:
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
                 self.dlg_readsql.btn_info.setEnabled(False)
-            tools_qt.dis_enable_dialog(self.dlg_readsql, True)
+            tools_qt.enable_dialog(self.dlg_readsql, True)
 
             self.populate_data_schema_name(self.cmb_project_type)
             self.set_last_connection(connection_name)
@@ -1886,7 +1886,7 @@ class GwAdminButton:
             self.username = self.get_user_connection(self.get_last_connection())
             role_admin = tools_db.check_role_user("role_admin", self.username)
             if not role_admin and self.username not in self.super_users:
-                tools_qt.dis_enable_dialog(self.dlg_readsql, False, 'cmb_connection')
+                tools_qt.enable_dialog(self.dlg_readsql, False, 'cmb_connection')
                 self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
                 tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text',
                     "You don't have permissions to administrate project schemas on this connection")
@@ -2168,7 +2168,7 @@ class GwAdminButton:
         if schema_name is None:
             schema_name = 'Nothing to select'
             self.project_version = "Version not found"
-            tools_qt.enable_disable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
+            tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
 
         # Set label schema name
         self.lbl_schema_name.setText(str(schema_name))
@@ -2798,10 +2798,10 @@ class GwAdminButton:
 
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
-            tools_qt.enable_disable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
+            tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
             return
         else:
-            tools_qt.enable_disable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", True)
+            tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", True)
 
         # Control if schema_version is updated to 3.2
         if str(self.project_version).replace('.', '') < str(self.plugin_version).replace('.', ''):
@@ -3081,10 +3081,10 @@ class GwAdminButton:
 
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
-            tools_qt.enable_disable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
+            tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
             return
         else:
-            tools_qt.enable_disable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", True)
+            tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", True)
 
         # Populate table update
         qtable = dialog.findChild(QTableView, "tbl_update")
@@ -3104,10 +3104,10 @@ class GwAdminButton:
 
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
-            tools_qt.enable_disable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
+            tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
             return
         else:
-            tools_qt.enable_disable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", True)
+            tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", True)
 
         # Populate widgettype combo
         if self.chk_multi_insert:

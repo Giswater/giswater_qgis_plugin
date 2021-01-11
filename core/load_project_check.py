@@ -118,7 +118,8 @@ class GwLoadProjectCheck:
         # Populate info_log and missing layers
         critical_level = 0
         text_result = tools_gw.add_layer_temp(self.dlg_audit_project, result['body']['data'],
-                                              'gw_fct_setcheckproject_result', True, False, 0, True, disable_tabs=False)
+                                              'gw_fct_setcheckproject_result', True, False, 0, True,
+                                              call_set_tabs_enabled=False)
 
         if 'missingLayers' in result['body']['data']:
             critical_level = self.get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'], critical_level)
@@ -214,4 +215,3 @@ class GwLoadProjectCheck:
                 tools_qgis.set_layer_visible(layer)
 
         tools_gw.close_dialog(self.dlg_audit_project)
-

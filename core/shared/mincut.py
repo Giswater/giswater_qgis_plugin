@@ -1811,7 +1811,7 @@ class GwMincut:
         extras = f'"mincutId":"{result_mincut_id}"'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_getmincut', body)
-        tools_gw.add_layer_temp(self.dlg_mincut, result['body']['data'], None, False, disable_tabs=False)
+        tools_gw.add_layer_temp(self.dlg_mincut, result['body']['data'], None, False, call_set_tabs_enabled=False)
         # self.dlg_mincut.txt_infolog.setEnabled(False)
 
         # Manage location
