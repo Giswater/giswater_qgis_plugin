@@ -100,6 +100,9 @@ class GwMincut:
 
     def init_mincut_form(self):
         """ Custom form initial configuration """
+        # Setting lists
+        self.ids = []
+        self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
 
         self.mincut_class = 1
         self.user_current_layer = self.iface.activeLayer()
