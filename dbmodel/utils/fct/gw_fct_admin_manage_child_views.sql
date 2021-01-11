@@ -229,11 +229,11 @@ BEGIN
 					"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
 				END IF;
 
-				v_return_status = 'Accepted';
-				v_return_msg = 'Process finished successfully';
-
 			END LOOP;
 			
+			v_return_status = 'Accepted';
+			v_return_msg = 'Process finished successfully';
+
 		ELSIF v_multi_create IS NOT TRUE AND v_project_type IS NOT NULL THEN 
 		
 			raise notice 'SIMPLE';
