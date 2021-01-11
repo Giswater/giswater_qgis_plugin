@@ -117,6 +117,7 @@ class GwAdminButton:
         # Manage super users
         self.super_users = []
         super_users = tools_gw.get_config_parser('system', 'super_users', "project", "init")
+        super_users = super_users.split(',')
         for super_user in super_users:
             self.super_users.append(str(super_user))
 
