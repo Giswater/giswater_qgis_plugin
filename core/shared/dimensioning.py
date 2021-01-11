@@ -329,13 +329,25 @@ class GwDimensioning:
         self.snapper_manager.remove_marker(self.vertex_marker)
         self.previous_snapping = self.snapper_manager.get_snapping_options()
         self.snapper_manager.set_snapping_status()
+        self.snapper_manager.set_snapping_layers()
         self.snapper_manager.config_snap_to_node()
         self.snapper_manager.config_snap_to_connec()
         self.snapper_manager.config_snap_to_gully()
         self.snapper_manager.set_snap_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)
+        self.canvas.xyCoordinates.connect(self.canvas_move_event)
         emit_point.canvasClicked.connect(partial(self.click_button_orientation, action, emit_point))
+
+
+    def canvas_move_event(self, point):
+
+        # Get clicked point
+        self.vertex_marker.hide()
+        event_point = self.snapper_manager.get_event_point(point=point)
+        result = self.snapper_manager.snap_to_project_config_layers(event_point)
+        if self.snapper_manager.result_is_valid():
+            self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def click_button_orientation(self, action, emit_point, point, btn):
