@@ -305,7 +305,7 @@ FORM_CLASS = get_ui_class('toolbox.ui', 'utilities')
 class GwToolboxUi(GwBasicDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('toolbox_manager.ui', 'utilities')
+FORM_CLASS = get_ui_class('toolbox_tool.ui', 'utilities')
 class GwToolboxManagerUi(GwBasicDialog, FORM_CLASS):
     pass
 
