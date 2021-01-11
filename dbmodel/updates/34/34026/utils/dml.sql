@@ -52,3 +52,6 @@ UPDATE sys_param_user SET vdefault = gw_fct_json_object_delete_keys(vdefault::js
 -- 2021/01/08
 INSERT INTO sys_message VALUES (3168, 'Before set isparent=TRUE, other field has to have related dv_parent_id', NULL, 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_message VALUES (3170, 'Before delete dv_parent_id, you must set isparent=FALSE to the parent field', NULL, 2, TRUE, 'utils') ON CONFLICT (id) DO NOTHING;
+
+-- 2021/01/11
+DELETE FROM config_form_tabs WHERE tabname='tab_visit';
