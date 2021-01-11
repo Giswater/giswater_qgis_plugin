@@ -244,6 +244,8 @@ class GwInfo(QObject):
             visit_id = self.complet_result['body']['feature']['id']
             manage_visit = GwVisit()
             manage_visit.get_visit(visit_id=visit_id, tag='info')
+            dlg_add_visit = manage_visit.get_visit_dialog()
+            dlg_add_visit.rejected.connect(lambda: self.rubber_band.reset())
 
         else:
             tools_log.log_warning(f"template not managed: {template}")
