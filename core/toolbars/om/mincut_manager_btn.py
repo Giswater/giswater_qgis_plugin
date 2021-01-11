@@ -6,15 +6,15 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from ..dialog_button import GwDialogButton
-from ...shared.mincut import GwMincut
+from ...shared.mincut_manager import GwMincutManager
 
 
 class GwMincutManagerButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.mincut = GwMincut()
+        self.mincut_manager = GwMincutManager(self)
 
 
     def clicked_event(self):
-        self.mincut.manage_mincuts()
+        self.mincut_manager.manage_mincuts()
