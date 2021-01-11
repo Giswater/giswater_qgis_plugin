@@ -364,7 +364,8 @@ BEGIN
 			END IF;
 
 			-- reset mapzone geometry
-			v_querytext = 'UPDATE '||quote_ident(v_table)||' SET the_geom = null WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)';
+			v_querytext = 'UPDATE '||quote_ident(v_table)||' SET the_geom = null 
+			WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND active IS TRUE';
 			EXECUTE v_querytext;
 
 			-- fill the graf table
@@ -376,7 +377,8 @@ BEGIN
 			WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 
 			-- set boundary conditions of graf table (flag=1 it means water is disabled to flow)
-			v_text = 'SELECT ((json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'')::integer as node_id from '||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL';
+			v_text = 'SELECT ((json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'')::integer as node_id 
+			FROM '||quote_ident(v_table)||' WHERE grafconfig IS NOT NULL AND active IS TRUE';
 
 			-- close boundary conditions setting flag=1 for all nodes that fits on graf delimiters and closed valves
 			v_querytext  = 'UPDATE temp_anlgraf SET flag=1 WHERE 
