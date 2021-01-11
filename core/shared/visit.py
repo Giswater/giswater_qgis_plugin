@@ -873,67 +873,67 @@ class GwVisit(QObject):
         tools_qgis.disconnect_signal_selection_changed()
 
 
-    def manage_visits(self, geom_type=None, feature_id=None):
-        """ Button 65: Edit visit """
+    def manage_visits(self, geom_type=None, feature_id=None, dialog=GwVisitManagerUi()):
+        """ Button 65: manage visits """
 
         # Create the dialog
-        self.dlg_man = GwVisitManagerUi()
-        tools_gw.load_settings(self.dlg_man)
-        self.dlg_man.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.dlg_visit_manager = dialog
+        tools_gw.load_settings(self.dlg_visit_manager)
+        self.dlg_visit_manager.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         if geom_type is None:
             # Set a model with selected filter. Attach that model to selected table
-            tools_qt.set_widget_text(self.dlg_man, self.dlg_man.lbl_filter, 'Filter by ext_code')
+            tools_qt.set_widget_text(self.dlg_visit_manager, self.dlg_visit_manager.lbl_filter, 'Filter by ext_code')
             filed_to_filter = "ext_code"
             table_object = "v_ui_om_visit"
             expr_filter = ""
-            message = tools_qt.fill_table(self.dlg_man.tbl_visit, f"{self.schema_name}.{table_object}")
+            message = tools_qt.fill_table(self.dlg_visit_manager.tbl_visit, f"{self.schema_name}.{table_object}")
             if message:
                 tools_qgis.show_warning(message)
-            tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_visit, table_object)
+            tools_gw.set_tablemodel_config(self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, table_object)
         else:
             # Set a model with selected filter. Attach that model to selected table
-            tools_qt.set_widget_text(self.dlg_man, self.dlg_man.lbl_filter, 'Filter by code')
+            tools_qt.set_widget_text(self.dlg_visit_manager, self.dlg_visit_manager.lbl_filter, 'Filter by code')
             filed_to_filter = "code"
             table_object = "v_ui_om_visitman_x_" + str(geom_type)
             expr_filter = f"{geom_type}_id = '{feature_id}'"
             # Refresh model with selected filter
-            message = tools_qt.fill_table(self.dlg_man.tbl_visit, f"{self.schema_name}.{table_object}", expr_filter)
+            message = tools_qt.fill_table(self.dlg_visit_manager.tbl_visit, f"{self.schema_name}.{table_object}", expr_filter)
             if message:
                 tools_qgis.show_warning(message)
-            tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_visit, table_object)
+            tools_gw.set_tablemodel_config(self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, table_object)
 
         # manage save and rollback when closing the dialog
-        self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))
-        self.dlg_man.accepted.connect(partial(self.open_selected_object_visit, self.dlg_man,
-                                      self.dlg_man.tbl_visit, table_object))
+        self.dlg_visit_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_visit_manager))
+        self.dlg_visit_manager.accepted.connect(partial(self.open_selected_object_visit, self.dlg_visit_manager,
+                                      self.dlg_visit_manager.tbl_visit, table_object))
 
         # Set signals
-        self.dlg_man.tbl_visit.doubleClicked.connect(
-            partial(self.open_selected_object_visit, self.dlg_man, self.dlg_man.tbl_visit, table_object))
-        self.dlg_man.btn_open.clicked.connect(
-            partial(self.open_selected_object_visit, self.dlg_man, self.dlg_man.tbl_visit, table_object))
-        self.dlg_man.btn_delete.clicked.connect(
-            partial(tools_gw.delete_selected_rows, self.dlg_man.tbl_visit, table_object))
-        self.dlg_man.txt_filter.textChanged.connect(partial(self.filter_visit, self.dlg_man, self.dlg_man.tbl_visit,
-            self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
+        self.dlg_visit_manager.tbl_visit.doubleClicked.connect(
+            partial(self.open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, table_object))
+        self.dlg_visit_manager.btn_open.clicked.connect(
+            partial(self.open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, table_object))
+        self.dlg_visit_manager.btn_delete.clicked.connect(
+            partial(tools_gw.delete_selected_rows, self.dlg_visit_manager.tbl_visit, table_object))
+        self.dlg_visit_manager.txt_filter.textChanged.connect(partial(self.filter_visit, self.dlg_visit_manager,
+            self.dlg_visit_manager.tbl_visit, self.dlg_visit_manager.txt_filter, table_object, expr_filter, filed_to_filter))
 
         # set timeStart and timeEnd as the min/max dave values get from model
-        tools_gw.set_dates_from_to(self.dlg_man.date_event_from, self.dlg_man.date_event_to,
+        tools_gw.set_dates_from_to(self.dlg_visit_manager.date_event_from, self.dlg_visit_manager.date_event_to,
                                    'om_visit', 'startdate', 'enddate')
 
         # set date events
-        self.dlg_man.date_event_from.dateChanged.connect(partial(self.filter_visit, self.dlg_man,
-            self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
-        self.dlg_man.date_event_to.dateChanged.connect(partial(self.filter_visit, self.dlg_man,
-            self.dlg_man.tbl_visit, self.dlg_man.txt_filter, table_object, expr_filter, filed_to_filter))
+        self.dlg_visit_manager.date_event_from.dateChanged.connect(partial(self.filter_visit, self.dlg_visit_manager,
+            self.dlg_visit_manager.tbl_visit, self.dlg_visit_manager.txt_filter, table_object, expr_filter, filed_to_filter))
+        self.dlg_visit_manager.date_event_to.dateChanged.connect(partial(self.filter_visit, self.dlg_visit_manager,
+            self.dlg_visit_manager.tbl_visit, self.dlg_visit_manager.txt_filter, table_object, expr_filter, filed_to_filter))
 
         # Open form
-        tools_gw.open_dialog(self.dlg_man, dlg_name="lot_visitmanager")
+        tools_gw.open_dialog(self.dlg_visit_manager, dlg_name="lot_visitmanager")
 
 
     def filter_visit(self, dialog, widget_table, widget_txt, table_object, expr_filter, filed_to_filter):
-        """ Filter om_visit in self.dlg_man.tbl_visit based on (id AND text AND between dates) """
+        """ Filter om_visit in self.dlg_visit_manager.tbl_visit based on (id AND text AND between dates) """
 
         object_id = tools_qt.get_text(dialog, widget_txt)
         visit_start = dialog.date_event_from.date()
