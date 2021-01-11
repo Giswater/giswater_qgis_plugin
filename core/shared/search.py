@@ -252,7 +252,7 @@ class GwSearch:
         # Tab 'psector'
         elif tab_selected == 'psector':
             list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
-            self.manage_new_psector.get_psector(item['sys_id'], 'plan', is_api=True)
+            self.manage_new_psector.get_psector(item['sys_id'], is_api=True)
             self.manage_new_psector.dlg_plan_psector.rejected.connect(self.rubber_band.reset)
             if not list_coord:
                 msg = "Empty coordinate list"
