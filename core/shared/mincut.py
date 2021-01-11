@@ -20,7 +20,7 @@ from qgis.core import QgsApplication,  QgsFeatureRequest, QgsPrintLayout, QgsPro
     QgsVectorLayer
 from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
 
-from .mincut_manager import GwMincutManager
+from .mincut_tools import GwMincutTools
 from .search import GwSearch
 from ..tasks.task import GwTask
 from ..utils import tools_gw
@@ -44,7 +44,7 @@ class GwMincut:
         self.schema_name = global_vars.schema_name
 
         # Create separate class to manage 'actionConfig'
-        self.mincut_config = GwMincutManager(self)
+        self.mincut_tools = GwMincutTools(self)
 
         # Get layers of node, arc, connec group
         self.node_group = []
@@ -1779,8 +1779,8 @@ class GwMincut:
         """ Button 27: Mincut management """
 
         self.action = "manage_mincuts"
-        self.mincut_config.set_dialog(dialog)
-        self.mincut_config.manage_mincuts()
+        self.mincut_tools.set_dialog(dialog)
+        self.mincut_tools.get_mincut_manager()
 
 
     def load_mincut(self, result_mincut_id):
