@@ -874,7 +874,7 @@ class GwInfo(QObject):
             emit_point.canvasClicked.disconnect()
         except Exception as e:
             tools_log.log_info(f"{type(e).__name__} --> {e}")
-        self.cancel_snapping_tool(dialog, action)
+
 
     def manage_action_copy_paste(self, dialog, geom_type, tab_type=None):
         """ Copy some fields from snapped feature to current feature """
