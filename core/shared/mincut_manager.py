@@ -17,7 +17,7 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QTableView, QPushButton, QLineEdit, QCompleter, QAbstractItemView
 
 from ..shared.selector import GwSelector
-from ..ui.ui_manager import GwSelectorUi, GwMincutManagerUi
+from ..ui.ui_manager import GwSelectorUi
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_db
@@ -35,23 +35,27 @@ class GwMincutManager:
         self.settings = global_vars.settings
 
 
-    def manage_mincuts(self, dialog=GwMincutManagerUi()):
+    def set_dialog(self, dialog):
+        self.dlg_min_edit = dialog
+        self.manage_mincuts()
+
+
+    def manage_mincuts(self):
         """ Button 27: Mincut management """
 
         self.action = "manage_mincuts"
-        self.dlg_mincut_manager = dialog
 
         # Create the dialog and signals
 
-        tools_gw.load_settings(self.dlg_mincut_manager)
-        tools_gw.set_dates_from_to(self.dlg_mincut_manager.date_from, self.dlg_mincut_manager.date_to, 'om_mincut',
+        tools_gw.load_settings(self.dlg_min_edit)
+        tools_gw.set_dates_from_to(self.dlg_min_edit.date_from, self.dlg_min_edit.date_to, 'om_mincut',
                                    'forecast_start, exec_start', 'forecast_end, exec_end')
-        self.dlg_mincut_manager.date_from.setEnabled(False)
-        self.dlg_mincut_manager.date_to.setEnabled(False)
-        tools_gw.add_icon(self.dlg_mincut_manager.btn_selector_mincut, "191")
+        self.dlg_min_edit.date_from.setEnabled(False)
+        self.dlg_min_edit.date_to.setEnabled(False)
+        tools_gw.add_icon(self.dlg_min_edit.btn_selector_mincut, "191")
 
-        self.tbl_mincut_edit = self.dlg_mincut_manager.findChild(QTableView, "tbl_mincut_edit")
-        self.txt_mincut_id = self.dlg_mincut_manager.findChild(QLineEdit, "txt_mincut_id")
+        self.tbl_mincut_edit = self.dlg_min_edit.findChild(QTableView, "tbl_mincut_edit")
+        self.txt_mincut_id = self.dlg_min_edit.findChild(QLineEdit, "txt_mincut_id")
         self.tbl_mincut_edit.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Adding auto-completion to a QLineEdit
@@ -69,22 +73,22 @@ class GwMincutManager:
         model.setStringList(values)
         self.completer.setModel(model)
         self.txt_mincut_id.textChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
-        self.dlg_mincut_manager.date_from.dateChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
-        self.dlg_mincut_manager.date_to.dateChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
-        self.dlg_mincut_manager.cmb_expl.currentIndexChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
-        self.dlg_mincut_manager.spn_next_days.setRange(-9999, 9999)
-        self.dlg_mincut_manager.btn_next_days.clicked.connect(self.filter_by_days)
-        self.dlg_mincut_manager.spn_next_days.valueChanged.connect(self.filter_by_days)
-        self.dlg_mincut_manager.btn_cancel_mincut.clicked.connect(self.set_state_cancel_mincut)
-        self.dlg_mincut_manager.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
-        self.dlg_mincut_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_mincut_manager))
-        self.dlg_mincut_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_mincut_manager))
-        self.dlg_mincut_manager.btn_delete.clicked.connect(partial(
+        self.dlg_min_edit.date_from.dateChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
+        self.dlg_min_edit.date_to.dateChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
+        self.dlg_min_edit.cmb_expl.currentIndexChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
+        self.dlg_min_edit.spn_next_days.setRange(-9999, 9999)
+        self.dlg_min_edit.btn_next_days.clicked.connect(self.filter_by_days)
+        self.dlg_min_edit.spn_next_days.valueChanged.connect(self.filter_by_days)
+        self.dlg_min_edit.btn_cancel_mincut.clicked.connect(self.set_state_cancel_mincut)
+        self.dlg_min_edit.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
+        self.dlg_min_edit.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_min_edit))
+        self.dlg_min_edit.rejected.connect(partial(tools_gw.close_dialog, self.dlg_min_edit))
+        self.dlg_min_edit.btn_delete.clicked.connect(partial(
             self.delete_mincut_management, self.tbl_mincut_edit, "om_mincut", "id"))
-        self.dlg_mincut_manager.btn_selector_mincut.clicked.connect(partial(
+        self.dlg_min_edit.btn_selector_mincut.clicked.connect(partial(
             self.mincut_selector, self.tbl_mincut_edit, 'id'))
-        self.btn_notify = self.dlg_mincut_manager.findChild(QPushButton, "btn_notify")
-        self.btn_notify.clicked.connect(partial(self.get_clients_codes, self.dlg_mincut_manager.tbl_mincut_edit))
+        self.btn_notify = self.dlg_min_edit.findChild(QPushButton, "btn_notify")
+        self.btn_notify.clicked.connect(partial(self.get_clients_codes, self.dlg_min_edit.tbl_mincut_edit))
         tools_gw.add_icon(self.btn_notify, "307")
 
         try:
@@ -96,16 +100,16 @@ class GwMincutManager:
             self.btn_notify.setVisible(False)
 
         self.populate_combos()
-        self.dlg_mincut_manager.state_edit.activated.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
+        self.dlg_min_edit.state_edit.activated.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
 
         # Set a model with selected filter. Attach that model to selected table
         self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
-        tools_gw.set_tablemodel_config(self.dlg_mincut_manager, self.tbl_mincut_edit, "v_ui_mincut", sort_order=1)
+        tools_gw.set_tablemodel_config(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut", sort_order=1)
 
         # self.mincut.tools_gw.set_tablemodel_config(self.tbl_mincut_edit, "v_ui_mincut")
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_mincut_manager, dlg_name='mincut_manager')
+        tools_gw.open_dialog(self.dlg_min_edit, dlg_name='mincut_manager')
 
 
     def get_clients_codes(self, qtable):
@@ -197,7 +201,7 @@ class GwMincutManager:
 
             # Set a model with selected filter. Attach that model to selected table
             self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
-            tools_gw.set_tablemodel_config(self.dlg_mincut_manager, self.tbl_mincut_edit, "v_ui_mincut", sort_order=1)
+            tools_gw.set_tablemodel_config(self.dlg_min_edit, self.tbl_mincut_edit, "v_ui_mincut", sort_order=1)
 
 
     def set_state_cancel_mincut(self):
@@ -264,12 +268,12 @@ class GwMincutManager:
                "FROM om_typevalue WHERE typevalue = 'mincut_state' "
                "ORDER BY id")
         rows = tools_db.get_rows(sql, add_empty_row=True)
-        tools_qt.fill_combo_values(self.dlg_mincut_manager.state_edit, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_min_edit.state_edit, rows, 1)
 
         # Fill ComboBox exploitation
         sql = "SELECT expl_id, name FROM exploitation WHERE expl_id > 0 ORDER BY name"
         rows = tools_db.get_rows(sql, add_empty_row=True)
-        tools_qt.fill_combo_values(self.dlg_mincut_manager.cmb_expl, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_min_edit.cmb_expl, rows, 1)
 
 
     def open_mincut(self):
@@ -287,7 +291,7 @@ class GwMincutManager:
         result_mincut_id = self.tbl_mincut_edit.model().record(row).value("id")
 
         # Close this dialog and open selected mincut
-        tools_gw.close_dialog(self.dlg_mincut_manager)
+        tools_gw.close_dialog(self.dlg_min_edit)
         self.mincut.is_new = False
         self.mincut.init_mincut_form()
         self.mincut.load_mincut(result_mincut_id)
@@ -298,7 +302,7 @@ class GwMincutManager:
     def filter_by_days(self):
 
         date_from = datetime.datetime.now()
-        days_added = self.dlg_mincut_manager.spn_next_days.text()
+        days_added = self.dlg_min_edit.spn_next_days.text()
         date_to = datetime.datetime.now()
         date_to += datetime.timedelta(days=int(days_added))
 
@@ -320,21 +324,21 @@ class GwMincutManager:
     def filter_by_id(self, qtable):
 
         expr = ""
-        id_ = tools_qt.get_text(self.dlg_mincut_manager, self.dlg_mincut_manager.txt_mincut_id, False, False)
-        state_id = tools_qt.get_combo_value(self.dlg_mincut_manager, self.dlg_mincut_manager.state_edit, 0)
-        state_text = tools_qt.get_combo_value(self.dlg_mincut_manager, self.dlg_mincut_manager.state_edit, 1)
-        expl = tools_qt.get_combo_value(self.dlg_mincut_manager, self.dlg_mincut_manager.cmb_expl, 1)
+        id_ = tools_qt.get_text(self.dlg_min_edit, self.dlg_min_edit.txt_mincut_id, False, False)
+        state_id = tools_qt.get_combo_value(self.dlg_min_edit, self.dlg_min_edit.state_edit, 0)
+        state_text = tools_qt.get_combo_value(self.dlg_min_edit, self.dlg_min_edit.state_edit, 1)
+        expl = tools_qt.get_combo_value(self.dlg_min_edit, self.dlg_min_edit.cmb_expl, 1)
         dates_filter = ""
         if state_id == '':
-            self.dlg_mincut_manager.date_from.setEnabled(False)
-            self.dlg_mincut_manager.date_to.setEnabled(False)
+            self.dlg_min_edit.date_from.setEnabled(False)
+            self.dlg_min_edit.date_to.setEnabled(False)
         else:
-            self.dlg_mincut_manager.date_from.setEnabled(True)
-            self.dlg_mincut_manager.date_to.setEnabled(True)
+            self.dlg_min_edit.date_from.setEnabled(True)
+            self.dlg_min_edit.date_to.setEnabled(True)
 
             # Get selected dates
-            visit_start = self.dlg_mincut_manager.date_from.date()
-            visit_end = self.dlg_mincut_manager.date_to.date()
+            visit_start = self.dlg_min_edit.date_from.date()
+            visit_end = self.dlg_min_edit.date_to.date()
             date_from = visit_start.toString('yyyyMMdd 00:00:00')
             date_to = visit_end.toString('yyyyMMdd 23:59:59')
             if date_from > date_to:
@@ -347,16 +351,16 @@ class GwMincutManager:
             format_high = 'yyyy-MM-dd 23:59:59.999'
             interval = f"'{visit_start.toString(format_low)}'::timestamp AND '{visit_end.toString(format_high)}'::timestamp"
             if str(state_id) in ('0', '3'):
-                tools_qt.set_widget_text(self.dlg_mincut_manager, self.dlg_mincut_manager.lbl_date_from, 'Date from: forecast_start')
-                tools_qt.set_widget_text(self.dlg_mincut_manager, self.dlg_mincut_manager.lbl_date_to, 'Date to: forecast_end')
+                tools_qt.set_widget_text(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: forecast_start')
+                tools_qt.set_widget_text(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: forecast_end')
                 dates_filter = f"AND (forecast_start BETWEEN {interval}) AND (forecast_end BETWEEN {interval})"
             elif str(state_id) in ('1', '2'):
-                tools_qt.set_widget_text(self.dlg_mincut_manager, self.dlg_mincut_manager.lbl_date_from, 'Date from: exec_start')
-                tools_qt.set_widget_text(self.dlg_mincut_manager, self.dlg_mincut_manager.lbl_date_to, 'Date to: exec_end')
+                tools_qt.set_widget_text(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from: exec_start')
+                tools_qt.set_widget_text(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to: exec_end')
                 dates_filter = f"AND (exec_start BETWEEN {interval}) AND (exec_end BETWEEN {interval})"
             else:
-                tools_qt.set_widget_text(self.dlg_mincut_manager, self.dlg_mincut_manager.lbl_date_from, 'Date from:')
-                tools_qt.set_widget_text(self.dlg_mincut_manager, self.dlg_mincut_manager.lbl_date_to, 'Date to:')
+                tools_qt.set_widget_text(self.dlg_min_edit, self.dlg_min_edit.lbl_date_from, 'Date from:')
+                tools_qt.set_widget_text(self.dlg_min_edit, self.dlg_min_edit.lbl_date_to, 'Date to:')
 
         expr += f" (id::text ILIKE '%{id_}%'"
         expr += f" OR work_order::text ILIKE '%{id_}%')"
