@@ -369,7 +369,11 @@ class GwMincut:
 
         # Close dialog, save dialog position, and disconnect snapping
         tools_gw.close_dialog(self.dlg_mincut)
-        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+
+        emit_point = None
+        if hasattr(self, 'emit_point'):
+            emit_point = self.emit_point
+        tools_qgis.disconnect_snapping(True, emit_point, self.vertex_marker)
         self.remove_selection()
         tools_qgis.refresh_map_canvas()
 
