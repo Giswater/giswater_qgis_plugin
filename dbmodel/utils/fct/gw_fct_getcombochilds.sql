@@ -53,8 +53,18 @@ BEGIN
     EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(p_table_id) || ' AND column_name = $2'
             USING schemas_array[1], p_idname
             INTO v_column_type;
+    IF (p_table_id = 'config') and p_comboparent in ('edit_feature_category_vdefault', 'edit_feature_fluid_vdefault',
+    	'edit_feature_function_vdefault','edit_feature_location_vdefault') THEN
+    	--  Combo rows child CONFIG
+		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id as columnname, widgettype, datatype, id as widgetname,
+		concat(dv_querytext, '' AND '''||quote_literal(p_combovalue::text)||''' = ANY(featurecat_id::text[])'') as dv_querytext, isparent, dv_parent_id, 
+		row_number()over(ORDER BY layoutname, layoutorder) AS orderby , null as  dv_querytext_filterc, isautoupdate, widgetcontrols
+		FROM sys_param_user WHERE dv_parent_id='||quote_literal(p_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
+		INTO v_combo_rows_child;
+		v_combo_rows_child := COALESCE(v_combo_rows_child, '{}');
+		v_formtype='config';
 
-	IF (p_table_id = 'config') OR (p_table_id = 'epaoptions') THEN
+	ELSIF (p_table_id = 'config') OR (p_table_id = 'epaoptions') THEN
 
 		--  Combo rows child CONFIG
 		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT id as columnname, widgettype, datatype, id as widgetname,

@@ -55,3 +55,21 @@ INSERT INTO sys_message VALUES (3170, 'Before delete dv_parent_id, you must set 
 
 -- 2021/01/11
 DELETE FROM config_form_tabs WHERE tabname='tab_visit';
+
+-- 2021/01/12
+ALTER TABLE man_type_location DROP CONSTRAINT IF EXISTS man_type_location_featurecat_id_fkey;
+ALTER TABLE man_type_fluid DROP CONSTRAINT IF EXISTS man_type_fluid_featurecat_id_fkey;
+ALTER TABLE man_type_category DROP CONSTRAINT IF EXISTS man_type_category_featurecat_id_fkey;
+ALTER TABLE man_type_function DROP CONSTRAINT IF EXISTS man_type_function_featurecat_id_fkey;
+
+UPDATE config_form_fields set dv_querytext = concat(replace(dv_querytext,'OR featurecat_id =','OR'),'= ANY(featurecat_id::text[]) ') WHERE 
+dv_querytext ILIKE '%OR featurecat_id =%' and columnname IN ('fluid_type', 'category_type','function_type', 'location_type');
+
+UPDATE man_type_function SET featurecat_id = concat('{',featurecat_id,'}') where featurecat_id is not null AND featurecat_id NOT ILIKE '{%}';
+UPDATE man_type_fluid SET featurecat_id = concat('{',featurecat_id,'}') where featurecat_id is not null AND featurecat_id NOT ILIKE '{%}';
+UPDATE man_type_category SET featurecat_id = concat('{',featurecat_id,'}') where featurecat_id is not null AND featurecat_id NOT ILIKE '{%}';
+UPDATE man_type_location SET featurecat_id = concat('{',featurecat_id,'}') where featurecat_id is not null AND featurecat_id NOT ILIKE '{%}';
+
+UPDATE sys_param_user SET dv_querytext_filterc = null, feature_field_id = null WHERE id IN ('edit_featureval_category_vdefault',
+'edit_featureval_fluid_vdefault','edit_featureval_function_vdefault','edit_featureval_location_vdefault');
+
