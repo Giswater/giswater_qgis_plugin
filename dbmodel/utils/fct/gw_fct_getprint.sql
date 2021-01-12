@@ -77,7 +77,7 @@ BEGIN
 			raise notice 'asg';
 			v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'comboIds', COALESCE (combo_json,'[]') );
 			v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'comboNames', COALESCE (combo_json,'[]') );
-			v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', '1'::text );
+			v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', combo_json->0::text );
 		END IF;		
 	END LOOP;			
 	
