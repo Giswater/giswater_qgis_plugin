@@ -825,7 +825,7 @@ def build_dialog_info(dialog, result, my_json=None):
     return result
 
 
-def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None):
+def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module=sys.modules[__name__]):
 
     field_id = ''
     if 'fields' in row[pos]:
@@ -899,7 +899,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None):
                                             dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'button':
-                widget = add_button(dialog, field, temp_layers_added)
+                widget = add_button(dialog, field, temp_layers_added, module)
                 widget = set_widget_size(widget, field)
 
             # Set editable/readonly

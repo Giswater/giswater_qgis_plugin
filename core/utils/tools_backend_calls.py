@@ -349,9 +349,9 @@ class GwInfoTools:
     # endregion
 
 
-def gw_function_dxf(**kwargs):
+def import_dxf(**kwargs):
     """ Function called in def add_button(self, dialog, field): -->
-            widget.clicked.connect(partial(getattr(self, function_name), dialog, widget)) """
+            widget.clicked.connect(partial(getattr(module, function_name), **kwargs)) """
 
     path, filter_ = tools_os.open_file_path("Select DXF file", "DXF Files (*.dxf)")
     if not path:
@@ -397,10 +397,9 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
         # Create layer
         uri = f"{dxf_path}|layername=entities|geometrytype={type_}"
         dxf_layer = QgsVectorLayer(uri, f"{dxf_output_filename}_{type_}", 'ogr')
-
         # Set crs to layer
-        crs = dxf_layer.crs()
-        crs.createFromId(srid)
+        crs = dxf_layer.sourceCrs()
+        crs.createFromString(srid)
         dxf_layer.setCrs(crs)
 
         if not dxf_layer.hasFeatures():
