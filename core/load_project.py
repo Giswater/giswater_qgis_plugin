@@ -229,25 +229,9 @@ class GwLoadProject(QObject):
                                                        "project", "init")
         if toolbar_names in (None, 'None'): return
 
-        toolbar_names = toolbar_names.replace(' ', '').split(',')
-        # Get user UI config file
-        parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
-        main_folder = os.path.join(tools_os.get_datadir(), global_vars.roaming_user_dir)
-
-        config_folder = main_folder + os.sep + "config" + os.sep
-        if not os.path.exists(config_folder):
-            os.makedirs(config_folder)
-        path = config_folder + 'init.config'
-        # If file not found or file found and section not exists
-        if not os.path.exists(path):
-            parser = self.init_user_config_file(path, toolbar_names)
-        else:
-            parser.read(path)
-            if not parser.has_section("toolbars_position") or not parser.has_option('toolbars_position', 'toolbars_order'):
-                parser = self.init_user_config_file(path, toolbar_names)
-        parser.read(path)
-
-        toolbars_order = parser['toolbars_position']['toolbars_order'].split(',')
+        toolbars_order = tools_gw.check_config_settings('toolbars_position', 'toolbars_order', toolbar_names,
+                                                        'user', 'init')
+        toolbars_order = toolbars_order.replace(' ', '').split(',')
 
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
         for tb in toolbars_order:
@@ -406,26 +390,6 @@ class GwLoadProject(QObject):
         key = str(button_id).zfill(2)
         if key in self.buttons:
             self.buttons[key].action.setVisible(not hide)
-
-
-    def init_user_config_file(self, path, toolbar_names):
-        """ Initialize UI config file with default values """
-
-        tools_log.log_info(f"init_user_config_file: {path}")
-
-        # Create file and configure section 'toolbars_position'
-        parser = configparser.RawConfigParser()
-        parser.add_section('toolbars_position')
-
-        parser.set('toolbars_position', 'toolbars_order', ",".join(toolbar_names))
-
-        # Writing our configuration file to 'init.config'
-        with open(path, 'w') as configfile:
-            parser.write(configfile)
-            configfile.close()
-            del configfile
-
-        return parser
 
 
     def check_schema(self, schemaname=None):
