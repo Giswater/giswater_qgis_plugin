@@ -22,7 +22,7 @@ from qgis.gui import QgsMapToolEmitPoint
 from ..maptool_button import GwMaptoolButton
 from ...ui.ui_manager import GwProfileUi, GwProfilesListUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_log, tools_qgis
+from ....lib import tools_qt, tools_log, tools_qgis, tools_os
 import global_vars
 
 
@@ -440,8 +440,8 @@ class GwProfileButton(GwMaptoolButton):
         self.plot = plt
 
         # If file profile.png exist overwrite
-        plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater')
-        main_folder = os.path.join(os.path.expanduser("~"), plugin_name)
+        main_folder = os.path.join(tools_os.get_datadir(), global_vars.roaming_user_dir)
+
         temp_folder = main_folder + os.sep + "temp"
         img_path = temp_folder + os.sep + "profile.png"
         if not os.path.exists(img_path):

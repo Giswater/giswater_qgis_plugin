@@ -13,7 +13,7 @@ import time
 from qgis.core import QgsMessageLog
 
 from .. import global_vars
-from . import tools_qt
+from . import tools_qt, tools_os
 from ..core.utils import tools_gw
 
 
@@ -28,7 +28,7 @@ class GwLogger(object):
         self.logger_file.setLevel(int(log_level))
 
         # Define log folder in users folder
-        main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
+        main_folder = os.path.join(tools_os.get_datadir(), global_vars.roaming_user_dir)
         log_folder = main_folder + os.sep + "log" + os.sep
         if folder_has_tstamp:
             tstamp = str(time.strftime(log_suffix))

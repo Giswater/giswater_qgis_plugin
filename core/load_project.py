@@ -232,7 +232,8 @@ class GwLoadProject(QObject):
         toolbar_names = toolbar_names.replace(' ', '').split(',')
         # Get user UI config file
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
-        main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
+        main_folder = os.path.join(tools_os.get_datadir(), global_vars.roaming_user_dir)
+
         config_folder = main_folder + os.sep + "config" + os.sep
         if not os.path.exists(config_folder):
             os.makedirs(config_folder)

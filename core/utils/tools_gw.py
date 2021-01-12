@@ -86,7 +86,8 @@ def get_config_parser(section: str, parameter: str, config_type, file_name) -> s
     try:
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         if config_type in "user":
-            path_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
+            path_folder = os.path.join(tools_os.get_datadir(), global_vars.roaming_user_dir)
+
         elif config_type in "project":
             path_folder = global_vars.plugin_dir
         else:
@@ -117,7 +118,7 @@ def set_config_parser(section: str, parameter: str, value: str, config_type="use
     try:
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         if config_type in "user":
-            path_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
+            path_folder = os.path.join(tools_os.get_datadir(), global_vars.roaming_user_dir)
         elif config_type in "project":
             path_folder = global_vars.plugin_dir
         else:

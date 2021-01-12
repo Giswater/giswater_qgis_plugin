@@ -8,7 +8,7 @@ or (at your option) any later version.
 import configparser
 import os
 
-from . import tools_log
+from . import tools_log, tools_os
 from .. import global_vars
 
 
@@ -69,7 +69,7 @@ def manage_user_config_file():
         return
 
     global_vars.session_vars['user_settings'] = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
-    main_folder = os.path.join(os.path.expanduser("~"), global_vars.plugin_name)
+    main_folder = os.path.join(tools_os.get_datadir(), global_vars.roaming_user_dir)
     config_folder = main_folder + os.sep + "config" + os.sep
     global_vars.session_vars['user_settings_path'] = config_folder + 'init.config'
     if not os.path.exists(global_vars.session_vars['user_settings_path']):

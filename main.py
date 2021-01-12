@@ -16,7 +16,7 @@ from . import global_vars
 from .core.admin.admin_btn import GwAdminButton
 from .core.load_project import GwLoadProject
 from .core.utils import tools_gw
-from .lib import tools_log, tools_qgis
+from .lib import tools_log, tools_qgis, tools_os
 
 
 class Giswater(QObject):
@@ -65,8 +65,8 @@ class Giswater(QObject):
         global_vars.iface = self.iface
         self.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
-
-        global_vars.init_global(self.iface, self.iface.mapCanvas(), self.plugin_dir, self.plugin_name)
+        roaming_user_dir = f'{tools_os.get_datadir()}{os.sep}{self.plugin_name}{os.sep}giswater35'
+        global_vars.init_global(self.iface, self.iface.mapCanvas(), self.plugin_dir, self.plugin_name, roaming_user_dir)
 
         # Check if config file exists
         setting_file = os.path.join(self.plugin_dir, 'config', 'init.config')

@@ -19,7 +19,7 @@ from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
     QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry
 
-from . import tools_log, tools_qt
+from . import tools_log, tools_qt, tools_os
 from .. import global_vars
 
 # List of user parameters (optionals)
@@ -696,7 +696,7 @@ def set_margin(layer, margin):
 
 def create_qml(layer, style):
     """ Generates a qml file through a json of styles (@style) and puts it in the received @layer """
-    config_folder = os.path.join(global_vars.plugin_dir, f'resources{os.sep}templates{os.sep}qgisqml')
+    config_folder = os.path.join(tools_os.get_datadir(), f'{global_vars.roaming_user_dir}{os.sep}temp')
     if not os.path.exists(config_folder):
         os.makedirs(config_folder)
     path_temp_file = config_folder + os.sep + 'temporal_layer.qml'
