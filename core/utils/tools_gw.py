@@ -112,7 +112,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name) -> s
     return value
 
 
-def set_config_parser(section: str, parameter: str, value: str, config_type="user", file_name="giswater", comment=None):
+def set_config_parser(section: str, parameter: str, value: str, config_type="user", file_name="sessions", comment=None):
     """ Save simple parser value """
 
     try:
@@ -1410,7 +1410,7 @@ def get_actions_from_json(json_result, sql):
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
 
-def check_config_settings(section, parameter, value, config_type="user", file_name="user", comment=None):
+def check_config_settings(section, parameter, value, config_type="user", file_name="init", comment=None):
     """ Check if @section and @parameter exists in file @file_name. If not add them = None """
 
     result = get_config_parser(section, parameter, config_type, file_name)

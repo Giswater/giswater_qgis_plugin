@@ -113,7 +113,7 @@ class GwLoadProject(QObject):
         self.notify.start_listening(list_channels)
 
         # Open automatically 'search docker' depending its value in user settings
-        open_search = tools_gw.check_config_settings('btn_search', 'open_search', 'false', "user", "giswater")
+        open_search = tools_gw.check_config_settings('btn_search', 'open_search', 'false', "user", "sessions")
         if tools_os.cast_boolean(open_search):
             GwSearch().open_search(load_project=True)
 
