@@ -18,7 +18,6 @@ from .shared.search import GwSearch
 from .toolbars import buttons
 from .ui.ui_manager import GwDialogTextUi
 from .utils import tools_gw
-from .utils.tools_backend_calls import GwInfoTools
 from .utils.notify import GwNotify
 from .. import global_vars
 from ..lib import tools_qgis, tools_config, tools_log, tools_db, tools_qt, tools_os
@@ -87,8 +86,6 @@ class GwLoadProject(QObject):
         status = self.check_layers_from_distinct_schema()
         if status is False:
             return
-
-        global_vars.session_vars['gw_infotools'] = GwInfoTools()
 
         # Get water software from table 'version'
         self.project_type = tools_gw.get_project_type()

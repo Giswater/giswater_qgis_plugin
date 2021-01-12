@@ -32,6 +32,7 @@ from ..ui.basic_dialog import GwBasicDialog
 from ..ui.main_window_dialog import GwMainWindowDialog
 from ..ui.docker_dialog import GwDockerDialog
 
+from . import tools_backend_calls
 from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
@@ -971,6 +972,9 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
     :param temp_layers_added: List of layers added to the toc
     :param module: Module where find 'function_name', if 'function_name' is not in this module
     :return: (QWidget)
+
+    functions called in -> widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
+        module = tools_backend_calls -> def import_dxf(**kwargs)
     """
 
     widget = QPushButton()
@@ -997,6 +1001,7 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
 
     kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name,
               'temp_layers_added': temp_layers_added}
+
     widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
@@ -1096,9 +1101,10 @@ def add_textarea(field):
 
 
 def add_hyperlink(field):
-    """ functions called in:
-        widget.clicked.connect(partial(getattr(global_vars.session_vars['gw_infotools'], func_name), widget))
-        def open_url(self, widget)
+    """
+    functions called in -> widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget))
+        module = tools_backend_calls -> def open_url(self, widget)
+
     """
 
     widget = GwHyperLinkLabel()
@@ -1114,7 +1120,7 @@ def add_hyperlink(field):
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             func_name = field['widgetfunction']
-            exist = tools_os.check_python_function(global_vars.session_vars['gw_infotools'], func_name)
+            exist = tools_os.check_python_function(tools_backend_calls, func_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
                 tools_qgis.show_message(msg, 2)
@@ -1127,7 +1133,7 @@ def add_hyperlink(field):
         tools_qgis.show_message(message, 2, parameter='widgetfunction')
 
     # Call function-->func_name(widget) or def no_function_associated(self, widget=None, message_level=1)
-    widget.clicked.connect(partial(getattr(global_vars.session_vars['gw_infotools'], func_name), widget))
+    widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget))
 
     return widget
 
@@ -1228,8 +1234,11 @@ def add_lineedit(field):
     return widget
 
 
-def add_tableview(complet_result, field):
-    """ Add widgets QTableView type """
+def add_tableview(complet_result, field, module=sys.modules[__name__]):
+    """ Add widgets QTableView type.
+    Function called in -> widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), widget, complet_result))
+        module = class GwInfo(QObject) -> gw_api_open_rpt_result(widget, complet_result)
+    """
 
     widget = QTableView()
     widget.setObjectName(field['widgetname'])
@@ -1246,9 +1255,8 @@ def add_tableview(complet_result, field):
                 tools_qgis.show_message(msg, 2)
                 return widget
 
-    # Call def gw_api_open_rpt_result(widget, complet_result) of class customForm
     # noinspection PyUnresolvedReferences
-    widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), widget, complet_result))
+    widget.doubleClicked.connect(partial(getattr(module, function_name), widget, complet_result))
 
     return widget
 
@@ -1391,7 +1399,7 @@ def get_actions_from_json(json_result, sql):
             try:
                 function_name = action['funcName']
                 params = action['params']
-                getattr(global_vars.session_vars['gw_infotools'], f"{function_name}")(**params)
+                getattr(tools_backend_calls, f"{function_name}")(**params)
             except AttributeError as e:
                 # If function_name not exist as python function
                 tools_log.log_warning(f"Exception error: {e}")

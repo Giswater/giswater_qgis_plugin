@@ -1470,7 +1470,7 @@ class GwInfo(QObject):
         complet_result = kwargs['complet_result']
         field = kwargs['field']
         dialog = kwargs['dialog']
-        widget = tools_gw.add_tableview(complet_result, field)
+        widget = tools_gw.add_tableview(complet_result, field, self)
         widget = tools_gw.add_tableview_header(widget, field)
         widget = tools_gw.fill_tableview_rows(widget, field)
         widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)

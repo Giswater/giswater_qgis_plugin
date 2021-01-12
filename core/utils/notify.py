@@ -11,7 +11,7 @@ from collections import OrderedDict
 
 from ... import global_vars
 from ...lib import tools_log, tools_db
-
+from . import tools_backend_calls
 
 class GwNotify:
     # :var conn_failed: some times, when user click so fast 2 actions, LISTEN channel is stopped, and we need to
@@ -115,7 +115,7 @@ class GwNotify:
 
     def execute_functions(self, complet_result):
         """
-        functions called in -> getattr(global_vars.session_vars['gw_infotools'], function_name)(**params)
+        functions called in -> getattr(tools_backend_calls, function_name)(**params)
             def set_layer_index(self, **kwargs)
             def refresh_attribute_table(self, **kwargs)
             def refresh_canvas(self, **kwargs)
@@ -127,8 +127,7 @@ class GwNotify:
             function_name = function['name']
             params = function['parameters']
             try:
-                # getattr(self, function_name)(**params)
-                getattr(global_vars.session_vars['gw_infotools'], function_name)(**params)
+                getattr(tools_backend_calls, function_name)(**params)
             except AttributeError as e:
                 # If function_name not exist as python function
                 tools_log.log_warning(f"Exception error: {e}")

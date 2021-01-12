@@ -293,6 +293,10 @@ class GwPrintButton(GwDialogButton):
 
 
     def set_widgets_into_composer(self, dialog, field, my_json=None):
+        """
+        functions called in -> widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json))
+            def set_print(self, dialog, my_json)
+        """
 
         widget = None
         label = None
@@ -319,7 +323,6 @@ class GwPrintButton(GwDialogButton):
             if 'widgetfunction' in field:
                 if field['widgetfunction'] is not None:
                     function_name = field['widgetfunction']
-                    # Call def set_print(self, dialog, my_json): of the class ApiManageComposer
                     widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json))
 
         return label, widget
