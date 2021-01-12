@@ -352,3 +352,9 @@ CREATE OR REPLACE VIEW v_plan_current_psector AS
         ON c.psector_id = plan_psector.psector_id
     WHERE selector_plan_psector.cur_user = "current_user"()::text;
 
+--2021/01/12
+CREATE OR REPLACE VIEW v_edit_cad_auxpoint AS 
+ SELECT temp_table.id,
+    temp_table.geom_point
+   FROM ws_sample35.temp_table
+  WHERE temp_table.cur_user = "current_user"()::text AND temp_table.fid = 127;
