@@ -480,24 +480,16 @@ def show_messagebox(**kwargs):
     msg_box.setDefaultButton(QMessageBox.Ok)
     msg_box.open()
 
+
 def raise_notice(**kwargs):
-    """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params)
-        Used to show raise notices sent by postgresql
+    """ Used to show raise notices sent by postgresql
+    Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params)
+
     """
 
     msg_list = kwargs['msg']
     for msg in msg_list:
         tools_log.log_info(f"{msg}")
-
-
-def refreshCanvas(**kwargs):
-
-    all_layers = []
-    root = QgsProject.instance().layerTreeRoot()
-    get_all_layers(root, all_layers)
-    for layer_name in all_layers:
-        layer = tools_qgis.get_layer_by_tablename(layer_name)
-        layer.triggerRepaint()
 
 
 def get_all_layers(group, all_layers):
