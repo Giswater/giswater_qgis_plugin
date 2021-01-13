@@ -39,6 +39,7 @@ v_master_fields json;
 v_admin_fields json;
 v_isepa boolean = false;
 v_epa_user text;
+rec record;
 v_querytext text;
 v_querytext_mod text;
 v_queryresult text;
@@ -51,6 +52,9 @@ v_return2 text;
 v_nodetype text;
 v_nodecat text;
 v_function integer;
+v_arrayresult text[];
+v_selectedid text;
+v_rec_replace json;
 
 BEGIN
 
@@ -162,32 +166,63 @@ BEGIN
 		USING v_filter
 		INTO v_admin_fields;
 
-	-- refactor dvquerytext		
-	FOR v_querytext in select distinct querytext from (
-	SELECT id, json_array_elements_text (inputparams::json)::json->>'widgetname' as widgetname, json_array_elements_text (inputparams::json)::json->>'dvQueryText'
-	as querytext FROM sys_function JOIN config_toolbox USING (id) 
-	WHERE alias = v_filter  AND config_toolbox.active IS TRUE AND (project_type=v_projectype OR project_type='utils'))a
-	WHERE querytext is not null
-		
+	-- refactor dvquerytext			
+	FOR rec IN SELECT json_array_elements(inputparams::json) as inputparams
+	FROM sys_function JOIN config_toolbox USING (id) 
+	WHERE alias = v_filter  AND config_toolbox.active IS TRUE AND (project_type=v_projectype OR project_type='utils')
 	LOOP
-		IF v_querytext ilike '%$userNodetype%' THEN
-			v_querytext_mod = REPLACE (v_querytext::text, '$userNodetype', quote_literal(v_nodetype));
-		ELSE 
-			v_querytext_mod = v_querytext;
+
+		v_querytext = rec.inputparams::json->>'dvQueryText';
+		IF v_querytext IS NOT NULL THEN
+
+			IF v_querytext ilike '%$userNodetype%' THEN
+				v_querytext_mod = REPLACE (v_querytext::text, '$userNodetype', quote_literal(v_nodetype));
+			ELSE 
+				v_querytext_mod = v_querytext;
+			END IF;
+		
+		v_selectedid = rec.inputparams::json->>'selectedId';
+
+		IF v_selectedid ~ '^[0-9]+$'THEN
+			
+			v_querytext='SELECT array_agg(id::text) FROM ('||v_querytext_mod||')a';
+			EXECUTE v_querytext INTO v_arrayresult;
+			
+			v_selectedid = concat('"selectedId":"',v_arrayresult[v_selectedid::integer],'"');
+
+		ELSIF v_selectedid ilike '$user%' then
+
+			IF v_selectedid = '$userExploitation' THEN
+				v_selectedid = concat('"selectedId":"',v_expl,'"');
+			ELSIF v_selectedid = '$userState' THEN
+				v_selectedid = concat('"selectedId":"',v_state,'"');
+			ELSIF v_selectedid = '$userInpResult' THEN
+				v_selectedid = concat('"selectedId":"',v_inp_result,'"');
+			ELSIF v_selectedid = '$userRptResult' THEN
+				v_selectedid = concat('"selectedId":"',v_rpt_result,'"');
+			ELSIF v_selectedid = '$userNodetype' THEN
+				v_selectedid = concat('"selectedId":"',v_nodetype,'"');
+			ELSIF v_selectedid = '$userNodecat' THEN
+				v_selectedid = concat('"selectedId":"',v_nodecat,'"');
+			END IF;
+			
 		END IF;
-
-		v_querytext_mod =  'SELECT concat (''"comboIds":'',array_to_json(array_agg(to_json(id::text))) , '', 
+	
+		v_querytext =  'SELECT concat (''"comboIds":'',array_to_json(array_agg(to_json(id::text))) , '', 
 		"comboNames":'',array_to_json(array_agg(to_json(idval::text)))) FROM ('||v_querytext_mod||')a';
-		EXECUTE v_querytext_mod INTO v_queryresult;
-
-		v_om_fields = (REPLACE(v_om_fields::text, concat('"dvQueryText":"', v_querytext,'"') , v_queryresult))::json;
-		v_edit_fields = (REPLACE(v_edit_fields::text, concat('"dvQueryText":"', v_querytext,'"') , v_queryresult))::json;
-		v_epa_fields = (REPLACE(v_epa_fields::text, concat('"dvQueryText":"', v_querytext,'"') , v_queryresult))::json;
-		v_master_fields = (REPLACE(v_master_fields::text, concat('"dvQueryText":"', v_querytext,'"') , v_queryresult))::json;
-		v_admin_fields = (REPLACE(v_admin_fields::text, concat('"dvQueryText":"', v_querytext,'"') , v_queryresult))::json;
-
+		EXECUTE v_querytext INTO v_queryresult;		
+		
+		v_rec_replace = (REPLACE(rec.inputparams::text, concat('"dvQueryText":"', rec.inputparams::json->>'dvQueryText','"') , v_queryresult))::json;
+		v_rec_replace = (REPLACE(v_rec_replace::text, concat('"selectedId":"', rec.inputparams::json->>'selectedId','"'), v_selectedid))::json;
+				
+		v_om_fields = (REPLACE(v_om_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
+		v_edit_fields = (REPLACE(v_edit_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
+		v_epa_fields = (REPLACE(v_epa_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
+		v_master_fields = (REPLACE(v_master_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
+		v_admin_fields = (REPLACE(v_admin_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
+		
+		END IF;
 	END LOOP;
-
 
 	--    Control NULL's
 	v_om_fields := COALESCE(v_om_fields, '[]');
