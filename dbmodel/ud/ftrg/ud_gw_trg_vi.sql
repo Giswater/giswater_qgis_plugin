@@ -110,10 +110,7 @@ BEGIN
 			UPDATE inp_groundwater set fl_eq_lat=split_part(NEW.fl_eq_lat,';',2),fl_eq_deep=split_part(NEW.fl_eq_deep,';',2) WHERE subc_id=NEW.subc_id;
 			
 		ELSIF v_view='vi_junction' THEN
-			INSERT INTO node (node_id, elev, ymax,node_type,nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
-			VALUES (NEW.node_id, NEW.elev, NEW.ymax,'EPAMANH','EPAMANH-CAT','JUNCTION',1,1,1,1,2);
-			INSERT INTO man_manhole (node_id) VALUES (NEW.node_id);
-			INSERT INTO inp_junction(node_id, y0, ysur, apond) VALUES (NEW.node_id, NEW.y0, NEW.ysur, NEW.apond);
+			-- code is improved using directy gw_fct_import_swmm_inp function			
 			
 		ELSIF v_view='vi_outfalls' THEN
 			INSERT INTO node (node_id, elev,node_type,nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
@@ -170,21 +167,7 @@ BEGIN
 			
 		ELSIF v_view='vi_conduits' THEN 
 
-			v_linkoffsets = (SELECT value FROM config_param_user WHERE parameter='inp_options_link_offsets' AND cur_user=current_user);
-
-			IF v_linkoffsets ='ELEVATION' THEN
-				INSERT INTO arc (arc_id, node_1,node_2, sys_elev1, sys_elev2, custom_length, arc_type, epa_type, matcat_id, sector_id, dma_id, expl_id, state, state_type) 
-				VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, NEW.z1, NEW.z2, NEW.length, 'EPACOND', 'CONDUIT', NEW.n, 1, 1, 1, 1, 2);
-			ELSE
-				v_y1 = (SELECT ymax FROM node WHERE node_id=NEW.node_1 LIMIT 1)-NEW.z1;
-				v_y2 = (SELECT ymax FROM node WHERE node_id=NEW.node_1 LIMIT 1)-NEW.z1;
-				INSERT INTO arc (arc_id, node_1,node_2, sys_elev1, sys_elev2, custom_length, arc_type, epa_type, matcat_id, sector_id, dma_id, expl_id, state, state_type) 
-				VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, v_y1, v_y2, NEW.length, 'EPACOND', 'CONDUIT', NEW.n, 1, 1, 1, 1, 2);
-			END IF;
-
-			INSERT INTO man_conduit(arc_id) VALUES (NEW.arc_id);
-			INSERT INTO inp_conduit (arc_id,custom_n, q0, qmax) VALUES (NEW.arc_id,NEW.n, NEW.q0, NEW.qmax); 
-			
+			-- code is improved using directy gw_fct_import_swmm_inp function			
 			
 		ELSIF v_view='vi_pumps' THEN 
 			INSERT INTO arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 

@@ -257,8 +257,8 @@ BEGIN
 	-- enable temporary the constraint in order to use ON CONFLICT on insert
 	ALTER TABLE config_param_user ADD CONSTRAINT config_param_user_parameter_cur_user_unique UNIQUE(parameter, cur_user);
 
-	-- improve velocity for junctions using directy tables in spite of vi_junctions view
-	INSERT INTO node (node_id, code, top_elev, ymax, node_type, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
+	-- improve velocity for junctions using directly tables in spite of vi_junctions view
+	INSERT INTO node (node_id, code, elev, ymax, node_type, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
 	SELECT csv1, csv1, csv2::numeric(12,3), csv3::numeric(12,3), 'EPAMANH', 'EPAMANH-CAT', 'JUNCTION', 1, 1, 1, 1, 2 
 	FROM temp_csv where source='[JUNCTIONS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 	INSERT INTO inp_junction (node_id, y0, ysur, apond) 
@@ -266,7 +266,7 @@ BEGIN
 	INSERT INTO man_manhole 
 	SELECT csv1 FROM temp_csv where source='[JUNCTIONS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
-	-- improve velocity for conduits using directy tables in spite of vi_conduits view
+	-- improve velocity for conduits using directly tables in spite of vi_conduits view
 	INSERT INTO arc (arc_id, code, node_1,node_2, custom_length, sys_elev1, sys_elev2, arc_type, epa_type, arccat_id, matcat_id, sector_id, dma_id, expl_id, state, state_type) 
 	SELECT csv1, csv1, csv2, csv3, csv4::numeric(12,3), csv6::numeric(12,3), csv7::numeric(12,3), 'EPACOND', 'CONDUIT', csv5, csv5, 1, 1, 1, 1, 2 
 	FROM temp_csv where source='[CONDUITS]' AND fid = v_fid  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
@@ -308,7 +308,7 @@ BEGIN
 	ALTER TABLE config_param_user DROP CONSTRAINT config_param_user_parameter_cur_user_unique;
 
 	RAISE NOTICE 'step 4/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING: Values of options / times / report are not updated. Default values of Giswater are keeped');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING: Values of options / times / report are updated WITH swmm model: Check mainstream parameters as inp_options_links_offsets');
 	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Inserting data into tables using vi_* views -> Done');
 	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING: Controls and rules have been stored on inp_controls_importinp table. This is a temporary table. Data need to be moved to inp_controls_x_arc table to be used later');
 
@@ -372,11 +372,11 @@ BEGIN
 						UPDATE inp_subcatchment SET the_geom=ST_Multi(ST_Polygon(v_line_geom,v_epsg)) where subc_id=v_data.subc_id;
 						INSERT INTO temp_table (geom_line) VALUES (v_line_geom);
 					ELSE
-						RAISE NOTICE 'The polygon cant be created because the geometry is not closed. Subc_id: ,%', v_data.subc_id;
+						RAISE NOTICE 'The polygon can not be created because the geometry is not closed. Subc_id: ,%', v_data.subc_id;
 					END IF;
 				END IF;
 			ELSE 
-				RAISE NOTICE 'The polygonn cant be created because it has less than 4 vertexes. Subc_id: ,%', v_data.subc_id;
+				RAISE NOTICE 'Polygon can not be created because it has less than 4 vertexes. Subc_id: ,%', v_data.subc_id;
 			END IF;
 		END LOOP;
 	END IF;
