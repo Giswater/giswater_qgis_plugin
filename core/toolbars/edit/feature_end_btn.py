@@ -367,7 +367,7 @@ class GwFeatureEndButton(GwDialogButton):
 
         message = "Are you sure you want to disconnect this elements?"
         title = "Disconnect elements"
-        answer = tools_qt.ask_question(message, title)
+        answer = tools_qt.show_question(message, title)
         if not answer:
             return
 

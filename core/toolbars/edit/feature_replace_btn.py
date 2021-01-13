@@ -255,7 +255,7 @@ class GwFeatureReplaceButton(GwMaptoolButton):
 
         # Ask question before executing
         message = "Are you sure you want to replace selected feature with a new one?"
-        answer = tools_qt.ask_question(message, "Replace feature")
+        answer = tools_qt.show_question(message, "Replace feature")
         if answer:
 
             # Get function input parameters

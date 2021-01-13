@@ -79,7 +79,7 @@ class GwGisFileCreate:
         qgs_path = folder_path + os.sep + filename + "." + gis_extension
         if os.path.exists(qgs_path):
             message = "Do you want to overwrite file?"
-            answer = tools_qt.ask_question(message, "overwrite file")
+            answer = tools_qt.show_question(message, "overwrite file")
             if not answer:
                 return False, qgs_path
 
@@ -124,7 +124,7 @@ class GwGisFileCreate:
                 f.write(content)
             tools_qgis.show_info("GIS file generated successfully", parameter=qgs_path)
             message = "Do you want to open GIS project?"
-            answer = tools_qt.ask_question(message, "GIS file generated successfully")
+            answer = tools_qt.show_question(message, "GIS file generated successfully")
             if answer:
                 return True, qgs_path
             return False, qgs_path

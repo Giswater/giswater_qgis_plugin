@@ -248,11 +248,11 @@ class GwPgDao(object):
         self.conn.rollback()
 
 
-    def copy_expert(self, sql, csv_file):
+    def export_to_csv(self, sql, csv_file):
         """ Dumps contents of the query to selected CSV file """
 
         try:
-            self.cursor.copy_expert(sql, csv_file)
+            self.cursor.export_to_csv(sql, csv_file)
             return None
         except Exception as e:
             return e

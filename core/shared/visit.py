@@ -1356,7 +1356,7 @@ class GwVisit(QObject):
 
         message = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.ask_question(message, title, list_values)
+        answer = tools_qt.show_question(message, title, list_values)
         if answer:
             sql = (f"DELETE FROM om_visit_event_photo "
                    f"WHERE visit_id='{visit_id}' "
@@ -1566,7 +1566,7 @@ class GwVisit(QObject):
         if any_docs:
             message += "\nSome events have documents"
         title = "Delete records"
-        answer = tools_qt.ask_question(message, title, list_id)
+        answer = tools_qt.show_question(message, title, list_id)
         if not answer:
             return
 

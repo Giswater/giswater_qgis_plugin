@@ -51,7 +51,7 @@ def refresh_attribute_table(**kwargs):
             continue
 
         # Get sys variale
-        qgis_project_infotype = tools_qgis.plugin_settings_value('infoType')
+        qgis_project_infotype = tools_qgis.get_plugin_settings_value('infoType')
 
         feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
         extras = f'"infoType":"{qgis_project_infotype}"'
@@ -251,7 +251,7 @@ def import_dxf(**kwargs):
     dialog = kwargs['dialog']
     widget = kwargs['widget']
     temp_layers_added = kwargs['temp_layers_added']
-    complet_result = manage_dxf(dialog, path, False, True)
+    complet_result = _manage_dxf(dialog, path, False, True)
 
     for layer in complet_result['temp_layers_added']:
         temp_layers_added.append(layer)
@@ -262,7 +262,10 @@ def import_dxf(**kwargs):
     dialog.btn_cancel.setEnabled(True)
 
 
-def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=True):
+# region private functions
+
+
+def _manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=True):
     """ Select a dxf file and add layers into toc
     :param dialog: (QDialog)
     :param dxf_path: path of dxf file
@@ -272,7 +275,7 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
     :return:
     """
 
-    srid = tools_qgis.plugin_settings_value('srid')
+    srid = tools_qgis.get_plugin_settings_value('srid')
     # Block the signals so that the window does not appear asking for crs / srid and / or alert message
     global_vars.iface.mainWindow().blockSignals(True)
     dialog.txt_infolog.clear()
@@ -310,7 +313,7 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
                     sql += f'"{att}":null , '
                 else:
                     sql += f'"{att}":"{feature[att]}" , '
-            geometry = manage_geometry(feature.geometry())
+            geometry = _manage_geometry(feature.geometry())
             sql = sql[:-2] + f"}}', (SELECT ST_GeomFromText('{geometry}', {srid})));\n"
             if count != 0 and count % 500 == 0:
                 status = tools_db.execute_sql(sql)
@@ -324,14 +327,14 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
                 return False
 
         if export_to_db:
-            export_layer_to_db(dxf_layer, crs)
+            _export_layer_to_db(dxf_layer, crs)
 
         if del_old_layers:
             tools_qgis.remove_layer_from_toc(dxf_layer.name(), 'GW Temporal Layers')
 
         if toc:
             if dxf_layer.isValid():
-                from_dxf_to_toc(dxf_layer, dxf_output_filename)
+                _add_layer_toc_from_dxf(dxf_layer, dxf_output_filename)
                 temp_layers_added.append(dxf_layer)
 
     # Unlock signals
@@ -351,7 +354,7 @@ def manage_dxf(dialog, dxf_path, export_to_db=False, toc=False, del_old_layers=T
     return {"path": dxf_path, "result": result, "temp_layers_added": temp_layers_added}
 
 
-def from_dxf_to_toc(dxf_layer, dxf_output_filename):
+def _add_layer_toc_from_dxf(dxf_layer, dxf_output_filename):
     """  Read a dxf file and put result into TOC
     :param dxf_layer: (QgsVectorLayer)
     :param dxf_output_filename: Name of layer into TOC (string)
@@ -368,7 +371,7 @@ def from_dxf_to_toc(dxf_layer, dxf_output_filename):
     return dxf_layer
 
 
-def manage_geometry(geometry):
+def _manage_geometry(geometry):
     """ Get QgsGeometry and return as text
      :param geometry: (QgsGeometry)
      :return: (String)
@@ -378,7 +381,7 @@ def manage_geometry(geometry):
     return geometry
 
 
-def export_layer_to_db(layer, crs):
+def _export_layer_to_db(layer, crs):
     """ Export layer to postgres database
     :param layer: (QgsVectorLayer)
     :param crs: QgsVectorLayer.crs() (crs)
@@ -388,7 +391,7 @@ def export_layer_to_db(layer, crs):
     tools_db.execute_sql(sql)
 
     schema_name = global_vars.session_vars['credentials']['schema'].replace('"', '')
-    uri = set_uri()
+    uri = _set_uri()
     uri.setDataSource(schema_name, layer.name(), None, "", layer.name())
 
     error = QgsVectorLayerExporter.exportLayer(
@@ -397,7 +400,7 @@ def export_layer_to_db(layer, crs):
         tools_log.log_info(F"ERROR --> {error[1]}")
 
 
-def set_uri():
+def _set_uri():
     """ Set the component parts of a RDBMS data source URI
     :return: QgsDataSourceUri() with the connection established according to the parameters of the credentials.
     """
@@ -408,6 +411,8 @@ def set_uri():
                            global_vars.session_vars['credentials']['password'])
     return uri
 
+
+# endregion
 
 
 # region unused functions atm

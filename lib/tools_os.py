@@ -93,7 +93,7 @@ def open_url(widget):
         webbrowser.open(path)
 
 
-def cast_boolean(param):
+def set_boolean(param):
     """ Receives a string and returns a bool
     :param param: String to cast
     :return: Boolean value, True if param not in bool_dict

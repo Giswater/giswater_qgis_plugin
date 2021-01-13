@@ -122,7 +122,7 @@ class GwAdminButton:
             self.super_users.append(str(super_user))
 
         # Get locale of QGIS application
-        self.locale = tools_qgis.plugin_settings_value('locale/userLocale', 'en_us').lower()
+        self.locale = tools_qgis.get_plugin_settings_value('locale/userLocale', 'en_us').lower()
         if self.locale == 'es_es':
             self.locale = 'ES'
         elif self.locale == 'es_ca':
@@ -1475,7 +1475,7 @@ class GwAdminButton:
                 i = 0
                 msg = "This 'Project_name' is already exist. Do you want rename old schema to '" + str(
                     project_name) + "_bk_" + str(i) + "' ?"
-                result = tools_qt.ask_question(msg, "Info")
+                result = tools_qt.show_question(msg, "Info")
                 if result:
                     while available is False:
                         # TODO: Check this!
@@ -1484,7 +1484,7 @@ class GwAdminButton:
                                str(project_name) + "_bk_" + str(i) == str(row[0]):
                                 msg = "This 'Project_name' is already exist. Do you want rename old schema to '" + str(
                                     project_name) + "_bk_" + str(i + 1) + "' ?"
-                                result = tools_qt.ask_question(msg, "Info")
+                                result = tools_qt.show_question(msg, "Info")
                                 i = i + 1
                             else:
                                 available = True
@@ -1531,7 +1531,7 @@ class GwAdminButton:
 
         msg = "This process will take time (few minutes). Are you sure to continue?"
         title = "Create example"
-        answer = tools_qt.ask_question(msg, title)
+        answer = tools_qt.show_question(msg, title)
         if not answer:
             return
         
@@ -1553,7 +1553,7 @@ class GwAdminButton:
             if self.locale != 'EN' or self.project_epsg != '25831':
                 msg = ("This functionality is only allowed with the locality 'EN' and SRID 25831."
                        "\nDo you want change it and continue?")
-                result = tools_qt.ask_question(msg, "Info Message")
+                result = tools_qt.show_question(msg, "Info Message")
                 if result:
                     self.project_epsg = '25831'
                     self.locale = 'EN'
@@ -1744,7 +1744,7 @@ class GwAdminButton:
     def update(self, project_type):
 
         msg = "Are you sure to update the project schema to last version?"
-        result = tools_qt.ask_question(msg, "Info")
+        result = tools_qt.show_question(msg, "Info")
         if result:
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
@@ -2528,7 +2528,7 @@ class GwAdminButton:
             return
 
         msg = f"Are you sure you want delete schema '{project_name}' ?"
-        result = tools_qt.ask_question(msg, "Info")
+        result = tools_qt.show_question(msg, "Info")
         if result:
             sql = f'DROP SCHEMA {project_name} CASCADE;'
             status = tools_db.execute_sql(sql)
@@ -2615,7 +2615,7 @@ class GwAdminButton:
 
         msg = ("Warning: Are you sure to continue?. This button will update your plugin qgis templates file replacing "
                "all strings defined on the config/system.config file. Be sure your config file is OK before continue")
-        result = tools_qt.ask_question(msg, "Info")
+        result = tools_qt.show_question(msg, "Info")
         if result:
             # Get dev config file
             setting_file = os.path.join(self.plugin_dir, 'config', 'system.config')
@@ -2759,7 +2759,7 @@ class GwAdminButton:
         del file_ui
         msg = ("Exported data into '" + str(tpath) + "' successfully."
                "\nDo you want to open the UI form?")
-        result = tools_qt.ask_question(msg, "Info")
+        result = tools_qt.show_question(msg, "Info")
         if result:
             opener = "C:\OSGeo4W64/bin/designer.exe"
             subprocess.Popen([opener, tpath])

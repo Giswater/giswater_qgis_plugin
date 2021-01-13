@@ -227,7 +227,7 @@ class GwArcDivideButton(GwMaptoolButton):
                            "Please ensure that features has no undelete value on true.\n"
                            "On the other hand you must know that traceability table will storage precedent information.")
                 title = "Info"
-                answer = tools_qt.ask_question(message, title)
+                answer = tools_qt.show_question(message, title)
                 if answer:
                     self.move_node(node_id, point)
                     tools_qgis.set_layer_index('v_edit_arc')

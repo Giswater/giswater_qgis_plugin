@@ -397,7 +397,7 @@ class GwPsector:
 
         # Create list for completer QLineEdit
         sql = "SELECT DISTINCT(id) FROM v_ui_document ORDER BY id"
-        list_items = tools_db.make_list_for_completer(sql)
+        list_items = tools_db.create_list_for_completer(sql)
         tools_qt.set_completer_lineedit(self.dlg_plan_psector.doc_id, list_items)
 
         if psector_id is not None:
@@ -471,11 +471,11 @@ class GwPsector:
         psector_id = tools_qt.get_text(self.dlg_plan_psector, "psector_id")
         sql = f"SELECT gw_fct_plan_psector_enableall({value}, '{psector_id}')"
         tools_db.execute_sql(sql)
-        tools_gw.reload_tableview_psector(self.dlg_plan_psector, 'arc')
-        tools_gw.reload_tableview_psector(self.dlg_plan_psector, 'node')
-        tools_gw.reload_tableview_psector(self.dlg_plan_psector, 'connec')
+        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'arc')
+        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'node')
+        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'connec')
         if self.project_type.upper() == 'UD':
-            tools_gw.reload_tableview_psector(self.dlg_plan_psector, 'gully')
+            tools_gw.load_tableview_psector(self.dlg_plan_psector, 'gully')
 
         sql = (f"UPDATE plan_psector "
                f"SET enable_all = '{value}' "
@@ -1548,7 +1548,7 @@ class GwPsector:
             if cur_psector is not None and (str(id_) == str(cur_psector[0])):
                 message = ("You are trying to delete your current psector. "
                            "Please, change your current psector before delete.")
-                tools_qt.show_exceptions_msg('Current psector', tools_qt.tr(message, aux_context='ui_message'))
+                tools_qt.show_exception_message('Current psector', tools_qt.tr(message, aux_context='ui_message'))
                 return
             inf_text += f'"{id_}", '
             list_id += f'"{id_}", '
@@ -1561,7 +1561,7 @@ class GwPsector:
             result = tools_gw.execute_procedure('gw_fct_getcheckdelete', body, log_sql=True)
             if result['status'] == "Accepted":
                 if result['message']:
-                    answer = tools_qt.ask_question(result['message']['text'])
+                    answer = tools_qt.show_question(result['message']['text'])
                     if answer:
                         feature += f', "tableName":"{table_name}", "idName":"{column_id}"'
                         body = tools_gw.create_body(feature=feature)
@@ -1569,7 +1569,7 @@ class GwPsector:
 
         elif action == 'price':
             message = "Are you sure you want to delete these records?"
-            answer = tools_qt.ask_question(message, "Delete records", inf_text)
+            answer = tools_qt.show_question(message, "Delete records", inf_text)
             if answer:
                 sql = "DELETE FROM selector_plan_result WHERE result_id in ("
                 if list_id != '':

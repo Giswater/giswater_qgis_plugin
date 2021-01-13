@@ -320,7 +320,7 @@ class GwSearch:
             if str(value) == '':
                 return
 
-            qgis_project_add_schema = tools_qgis.plugin_settings_value('gwAddSchema')
+            qgis_project_add_schema = tools_qgis.get_plugin_settings_value('gwAddSchema')
             extras_search += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}, '
             extras_search += f'"addSchema":"{qgis_project_add_schema}"'
             extras_search_add += f'"{line_edit.property("columnname")}":{{"text":"{value}"}}'
@@ -421,7 +421,7 @@ class GwSearch:
     def open_hydrometer_dialog(self, table_name=None, feature_id=None):
 
         # get sys variale
-        qgis_project_infotype = tools_qgis.plugin_settings_value('infoType')
+        qgis_project_infotype = tools_qgis.get_plugin_settings_value('infoType')
 
         feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
         extras = f'"infoType":"{qgis_project_infotype}"'
@@ -489,7 +489,7 @@ class GwSearch:
 
         # Create list for completer QLineEdit
         sql = "SELECT DISTINCT(id) FROM v_ui_document ORDER BY id"
-        list_items = tools_db.make_list_for_completer(sql)
+        list_items = tools_db.create_list_for_completer(sql)
         tools_qt.set_completer_lineedit(self.items_dialog.doc_id, list_items)
 
         table_name = "v_ui_workcat_x_feature"
@@ -571,7 +571,7 @@ class GwSearch:
 
     def restore_selectors(self, current_selectors):
         """ Restore selector_expl and selector_state to how the user had it """
-        qgis_project_add_schema = tools_qgis.plugin_settings_value('gwAddSchema')
+        qgis_project_add_schema = tools_qgis.get_plugin_settings_value('gwAddSchema')
         for form_tab in current_selectors['body']['form']['formTabs']:
             if form_tab['tableName'] not in ('selector_expl', 'selector_state'):
                 continue
@@ -722,7 +722,7 @@ class GwSearch:
         try:
             if os.path.exists(folder_path):
                 msg = "Are you sure you want to overwrite this file?"
-                answer = tools_qt.ask_question(msg, "Overwrite")
+                answer = tools_qt.show_question(msg, "Overwrite")
                 if answer:
                     self.write_to_csv(dialog, folder_path, all_rows)
             else:

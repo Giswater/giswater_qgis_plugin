@@ -114,7 +114,7 @@ class GwLoadProject(QObject):
 
         # Open automatically 'search docker' depending its value in user settings
         open_search = tools_gw.check_config_settings('btn_search', 'open_search', 'false', "user", "sessions")
-        if tools_os.cast_boolean(open_search):
+        if tools_os.set_boolean(open_search):
             GwSearch().open_search(load_project=True)
 
         # call dynamic mapzones repaint

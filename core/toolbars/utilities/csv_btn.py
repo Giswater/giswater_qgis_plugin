@@ -38,7 +38,7 @@ class GwCSVButton(GwDialogButton):
         # Get roles from BD
         roles = self.get_rolenames()
         temp_tablename = 'temp_csv'
-        tools_qt.populate_cmb_unicodes(self.dlg_csv.cmb_unicode_list)
+        tools_qt.fill_combo_unicodes(self.dlg_csv.cmb_unicode_list)
         self.populate_combos(self.dlg_csv.cmb_import_type, 'fid',
                              'alias, config_csv.descript, functionname, readheader, orderby', 'config_csv', roles)
 

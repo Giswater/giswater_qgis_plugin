@@ -13,7 +13,7 @@ from .. import global_vars
 from . import tools_log, tools_qt, tools_qgis, tools_config, tools_pgdao
 
 
-def make_list_for_completer(sql):
+def create_list_for_completer(sql):
     """ Prepare a list with the necessary items for the completer
     :param sql: Query to be executed, where will we get the list of items (string)
     :return list_items: List with the result of the query executed (List) ["item1","item2","..."]
@@ -288,21 +288,10 @@ def get_postgis_version():
     return postgis_version
 
 
-def get_sql(sql, log_sql=False, params=None):
-    """ Generate SQL with params. Useful for debugging """
-
-    if params:
-        sql = global_vars.session_vars['dao'].mogrify(sql, params)
-    if log_sql:
-        tools_log.log_info(sql, stack_level_increase=2)
-
-    return sql
-
-
 def get_row(sql, log_info=True, log_sql=False, commit=True, params=None):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
-    sql = get_sql(sql, log_sql, params)
+    sql = _get_sql(sql, log_sql, params)
     row = global_vars.session_vars['dao'].get_row(sql, commit)
     global_vars.session_vars['last_error'] = global_vars.session_vars['dao'].last_error
     if not row:
@@ -318,7 +307,7 @@ def get_row(sql, log_info=True, log_sql=False, commit=True, params=None):
 def get_rows(sql, log_info=True, log_sql=False, commit=True, params=None, add_empty_row=False):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
-    sql = get_sql(sql, log_sql, params)
+    sql = _get_sql(sql, log_sql, params)
     rows = None
     rows2 = global_vars.session_vars['dao'].get_rows(sql, commit)
     global_vars.session_vars['last_error'] = global_vars.session_vars['dao'].last_error
@@ -481,3 +470,20 @@ def get_layer_source_from_credentials(sslmode_value, layer_name='v_edit_node'):
 
     global_vars.session_vars['credentials'] = credentials
     return credentials, not_version
+
+
+# region private functions
+
+
+def _get_sql(sql, log_sql=False, params=None):
+    """ Generate SQL with params. Useful for debugging """
+
+    if params:
+        sql = global_vars.session_vars['dao'].mogrify(sql, params)
+    if log_sql:
+        tools_log.log_info(sql, stack_level_increase=2)
+
+    return sql
+
+
+# endregion

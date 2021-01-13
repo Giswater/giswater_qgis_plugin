@@ -67,7 +67,7 @@ class GwI18NGenerator:
         rows = self.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows, 0)
         cur_user = tools_db.get_current_user()
-        language = tools_qgis.plugin_settings_value('qm_lang_language' + cur_user)
+        language = tools_qgis.get_plugin_settings_value('qm_lang_language' + cur_user)
         tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0)
 
 
@@ -129,7 +129,7 @@ class GwI18NGenerator:
         # Check if file exist
         if os.path.exists(ts_path):
             msg = "Are you sure you want to overwrite this file?"
-            answer = tools_qt.ask_question(msg, "Overwrite", parameter=f"\n\n{ts_path}")
+            answer = tools_qt.show_question(msg, "Overwrite", parameter=f"\n\n{ts_path}")
             if not answer:
                 return None
         ts_file = open(ts_path, "w")
@@ -260,7 +260,7 @@ class GwI18NGenerator:
         # Check if file exist
         if os.path.exists(cfg_path + file_name):
             msg = "Are you sure you want to overwrite this file?"
-            answer = tools_qt.ask_question(msg, "Overwrite", parameter=f"\n\n{cfg_path}{file_name}")
+            answer = tools_qt.show_question(msg, "Overwrite", parameter=f"\n\n{cfg_path}{file_name}")
             if not answer:
                 return
         else:

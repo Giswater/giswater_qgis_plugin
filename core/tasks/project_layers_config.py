@@ -211,10 +211,10 @@ class GwProjectLayersConfig(GwTask):
                     layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
         if msg_failed != "":
-            tools_qt.show_exceptions_msg("Execute failed.", msg_failed)
+            tools_qt.show_exception_message("Execute failed.", msg_failed)
 
         if msg_key != "":
-            tools_qt.show_exceptions_msg("Key on returned json from ddbb is missed.", msg_key)
+            tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg_key)
 
         tools_log.log_info("Finish set_layer_config")
 

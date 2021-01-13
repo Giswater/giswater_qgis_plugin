@@ -206,7 +206,7 @@ class GwConnectLinkButton(GwMaptoolButton):
             if number_features > 0:
                 message = "Number of features selected in the group of"
                 title = "Interpolate value - Do you want to update values"
-                answer = tools_qt.ask_question(message, title, parameter='connec: ' + str(number_features))
+                answer = tools_qt.show_question(message, title, parameter='connec: ' + str(number_features))
                 if answer:
                     # Create link
                     self.link_selected_features('connec', layer)
@@ -221,7 +221,7 @@ class GwConnectLinkButton(GwMaptoolButton):
                 if number_features > 0:
                     message = "Number of features selected in the group of"
                     title = "Interpolate value - Do you want to update values"
-                    answer = tools_qt.ask_question(message, title, parameter='gully: ' + str(number_features))
+                    answer = tools_qt.show_question(message, title, parameter='gully: ' + str(number_features))
                     if answer:
                         # Create link
                         self.link_selected_features('gully', layer)

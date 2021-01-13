@@ -756,7 +756,7 @@ class GwInfo(QObject):
                 text = tools_qt.get_text(self.dlg_cf, widget, False, False)
                 if text:
                     msg = "Do you want to overwrite custom values?"
-                    answer = tools_qt.ask_question(msg, "Overwrite values")
+                    answer = tools_qt.show_question(msg, "Overwrite values")
                     if answer:
                         self.set_values(dlg_dtext)
                     break
@@ -993,7 +993,7 @@ class GwInfo(QObject):
             msg += f"{fields_aux[i]}: {snapped_feature_attr_aux[i]}\n"
 
         # Ask confirmation question showing fields that will be copied
-        answer = tools_qt.ask_question(msg, "Update records", None)
+        answer = tools_qt.show_question(msg, "Update records", None)
         if answer:
             for i in range(0, len(fields)):
                 for x in range(0, len(fields_aux)):
@@ -1199,7 +1199,7 @@ class GwInfo(QObject):
     def ask_for_save(self, action_edit, fid):
 
         msg = 'Are you sure to save this feature?'
-        answer = tools_qt.ask_question(msg, "Save feature", None, parameter=fid)
+        answer = tools_qt.show_question(msg, "Save feature", None, parameter=fid)
         if not answer:
             tools_qt.set_action_checked(action_edit, True)
             return False
@@ -2099,7 +2099,7 @@ class GwInfo(QObject):
         list_object_id = list_object_id[:-2]
         list_id = list_id[:-2]
         message = "Are you sure you want to delete these records?"
-        answer = tools_qt.ask_question(message, "Delete records", list_object_id)
+        answer = tools_qt.show_question(message, "Delete records", list_object_id)
         if answer:
             sql = ("DELETE FROM " + table_name + ""
                    " WHERE id::integer IN (" + list_id + ")")

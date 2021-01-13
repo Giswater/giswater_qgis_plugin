@@ -655,7 +655,7 @@ def delete_selected_rows(widget, table_object):
     list_id = list_id[:-2]
     message = "Are you sure you want to delete these records?"
     title = "Delete records"
-    answer = tools_qt.ask_question(message, title, inf_text)
+    answer = tools_qt.show_question(message, title, inf_text)
     if answer:
         sql = (f"DELETE FROM {table_object} "
                f"WHERE {field_object_id} IN ({list_id})")
@@ -1450,7 +1450,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
               'show python log_sql option'
     dev_log_sql = check_config_settings('system', 'log_sql', 'None', "user", "init", comment=comment)
     if dev_log_sql not in (None, "None", "none"):
-        log_sql = tools_os.cast_boolean(dev_log_sql)
+        log_sql = tools_os.set_boolean(dev_log_sql)
 
     row = tools_db.get_row(sql, commit=commit, log_sql=log_sql)
     if not row or not row[0]:
@@ -1533,7 +1533,7 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
             tools_log.log_warning(msg, stack_level_increase=2)
             # Show exception message only if we are not in a task process
             if global_vars.session_vars['show_db_exception']:
-                tools_qt.show_exceptions_msg(title, msg)
+                tools_qt.show_exception_message(title, msg)
 
     except Exception:
         tools_qt.manage_exception("Unhandled Error")
@@ -1921,11 +1921,11 @@ def selection_changed(class_object, dialog, table_object, query=False, lazy_widg
 
     # Reload contents of table 'tbl_@table_object_x_@geom_type'
     if query:
-        insert_feature_to_plan(dialog, class_object.geom_type, ids=ids)
+        _insert_feature_psector(dialog, class_object.geom_type, ids=ids)
         remove_selection()
-        reload_tableview_psector(dialog, class_object.geom_type)
+        load_tableview_psector(dialog, class_object.geom_type)
     else:
-        load_table(dialog, table_object, class_object.geom_type, expr_filter)
+        load_tablename(dialog, table_object, class_object.geom_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     enable_feature_type(dialog, table_object, ids=ids)
@@ -1996,11 +1996,11 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
 
     # Reload contents of table 'tbl_???_x_@geom_type'
     if query:
-        insert_feature_to_plan(dialog, geom_type, ids=class_object.ids)
+        _insert_feature_psector(dialog, geom_type, ids=class_object.ids)
         layers = remove_selection(True, class_object.layers)
         class_object.layers = layers
     else:
-        load_table(dialog, table_object, geom_type, expr_filter)
+        load_tablename(dialog, table_object, geom_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Update list
@@ -2031,17 +2031,6 @@ def remove_selection(remove_groups=True, layers=None):
     global_vars.canvas.refresh()
 
     return layers
-
-
-def insert_feature_to_plan(dialog, geom_type, ids=None):
-    """ Insert features_id to table plan_@geom_type_x_psector """
-
-    value = tools_qt.get_text(dialog, dialog.psector_id)
-    for i in range(len(ids)):
-        sql = f"INSERT INTO plan_psector_x_{geom_type} ({geom_type}_id, psector_id) "
-        sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"
-        tools_db.execute_sql(sql)
-        reload_tableview_psector(dialog, geom_type)
 
 
 def connect_signal_selection_changed(class_object, dialog, table_object, query=False):
@@ -2243,7 +2232,7 @@ def set_calendar_from_user_param(dialog, widget, table_name, value, parameter):
     tools_qt.set_calendar(dialog, widget, date)
 
 
-def load_table(dialog, table_object, geom_type, expr_filter):
+def load_tablename(dialog, table_object, geom_type, expr_filter):
     """ Reload @widget with contents of @tablename applying selected @expr_filter """
 
     if type(table_object) is str:
@@ -2264,7 +2253,7 @@ def load_table(dialog, table_object, geom_type, expr_filter):
     return expr
 
 
-def reload_tableview_psector(dialog, geom_type):
+def load_tableview_psector(dialog, geom_type):
     """ Reload QtableView """
 
     value = tools_qt.get_text(dialog, dialog.psector_id)
@@ -2350,15 +2339,6 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
     return layers
 
 
-def delete_feature_at_plan(dialog, geom_type, list_id):
-    """ Delete features_id to table plan_@geom_type_x_psector"""
-
-    value = tools_qt.get_text(dialog, dialog.psector_id)
-    sql = (f"DELETE FROM plan_psector_x_{geom_type} "
-           f"WHERE {geom_type}_id IN ({list_id}) AND psector_id = '{value}'")
-    tools_db.execute_sql(sql)
-
-
 def delete_records(class_object, dialog, table_object, query=False, lazy_widget=None, lazy_init_function=None):
     """ Delete selected elements of the table """
 
@@ -2412,7 +2392,7 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
     list_id = list_id[:-2]
     message = "Are you sure you want to delete these records?"
     title = "Delete records"
-    answer = tools_qt.ask_question(message, title, inf_text)
+    answer = tools_qt.show_question(message, title, inf_text)
     if answer:
         for el in del_id:
             class_object.ids.remove(el)
@@ -2436,10 +2416,10 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
 
     # Update model of the widget with selected expr_filter
     if query:
-        delete_feature_at_plan(dialog, geom_type, list_id)
-        reload_tableview_psector(dialog, geom_type)
+        _delete_feature_psector(dialog, geom_type, list_id)
+        load_tableview_psector(dialog, geom_type)
     else:
-        load_table(dialog, table_object, geom_type, expr_filter)
+        load_tablename(dialog, table_object, geom_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Select features with previous filter
@@ -2455,4 +2435,27 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
     connect_signal_selection_changed(class_object, dialog, table_object, query)
 
 
+# region private functions
 
+
+def _insert_feature_psector(dialog, geom_type, ids=None):
+    """ Insert features_id to table plan_@geom_type_x_psector """
+
+    value = tools_qt.get_text(dialog, dialog.psector_id)
+    for i in range(len(ids)):
+        sql = f"INSERT INTO plan_psector_x_{geom_type} ({geom_type}_id, psector_id) "
+        sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"
+        tools_db.execute_sql(sql)
+        load_tableview_psector(dialog, geom_type)
+
+
+def _delete_feature_psector(dialog, geom_type, list_id):
+    """ Delete features_id to table plan_@geom_type_x_psector"""
+
+    value = tools_qt.get_text(dialog, dialog.psector_id)
+    sql = (f"DELETE FROM plan_psector_x_{geom_type} "
+           f"WHERE {geom_type}_id IN ({list_id}) AND psector_id = '{value}'")
+    tools_db.execute_sql(sql)
+
+
+# endregion

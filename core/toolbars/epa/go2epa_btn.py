@@ -180,7 +180,7 @@ class GwGo2EpaButton(GwDialogButton):
         row = tools_db.get_row(sql)
         if row:
             msg = "Result name already exists, do you want overwrite?"
-            answer = tools_qt.ask_question(msg, title="Alert")
+            answer = tools_qt.show_question(msg, title="Alert")
             if not answer:
                 return False
 

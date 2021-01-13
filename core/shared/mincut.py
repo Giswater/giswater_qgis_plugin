@@ -1263,7 +1263,7 @@ class GwMincut:
         inf_text = inf_text[:-2]
         message = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.ask_question(message, title, inf_text)
+        answer = tools_qt.show_question(message, title, inf_text)
 
         if not answer:
             return
@@ -1315,7 +1315,7 @@ class GwMincut:
         inf_text = inf_text[:-2]
         message = "Are you sure you want to delete these records?"
         title = "Delete records"
-        answer = tools_qt.ask_question(message, title, inf_text)
+        answer = tools_qt.show_question(message, title, inf_text)
 
         if not answer:
             return

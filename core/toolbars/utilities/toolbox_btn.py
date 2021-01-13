@@ -392,7 +392,7 @@ class GwToolBoxButton(GwDialogButton):
             msg += f"<b>key container: </b>'body/data/ <br>"
             msg += f"<b>Python file: </b>{__name__} <br>"
             msg += f"<b>Python function:</b> {self.execute_function.__name__} <br>"
-            tools_qt.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
+            tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
 
         self.remove_layers()
 
