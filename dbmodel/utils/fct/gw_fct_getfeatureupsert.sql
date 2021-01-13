@@ -193,10 +193,6 @@ BEGIN
 
 	EXECUTE v_active_feature INTO v_catfeature;
 
-	-- profilactic control when is not feature
-	IF v_catfeature.feature_type IS NULL THEN
-		v_catfeature.feature_type = '';
-	END IF;
 
 	--  Starting control process
 	----------------------------
@@ -217,7 +213,7 @@ BEGIN
 		END IF;
 
 		-- topology control (enabled without state topocontrol. Does not make sense to activate this because in this phase of workflow
-		IF v_topocontrol IS TRUE THEN 
+		IF v_topocontrol IS TRUE AND v_catfeature.feature_type IS NOT NULL THEN 
 	
 			IF upper(v_catfeature.feature_type) ='NODE' THEN
 			
@@ -503,12 +499,12 @@ BEGIN
 		SELECT (a->>'vdef'), (a->>'param') INTO v_catalog, v_catalogtype FROM json_array_elements(v_values_array) AS a 
 			WHERE (a->>'param') = 'arccat_id' OR (a->>'param') = 'nodecat_id' OR (a->>'param') = 'connecat_id' OR (a->>'param') = 'gratecat_id';
 
-		IF v_project_type ='WS' AND v_catfeature.feature_type != '' THEN 
+		IF v_project_type ='WS' AND v_catfeature.feature_type IS NOT NULL THEN 
 			EXECUTE 'SELECT pnom::integer, dnom::integer, matcat_id FROM cat_'||lower(v_catfeature.feature_type)||' WHERE id=$1'
 				USING v_catalog
 				INTO v_pnom, v_dnom, v_matcat_id;
 				
-		ELSIF v_project_type ='UD' AND v_catfeature.feature_type != '' THEN 
+		ELSIF v_project_type ='UD' AND v_catfeature.feature_type IS NOT NULL THEN 
 			IF (v_catfeature.feature_type) ='GULLY' THEN
 				EXECUTE 'SELECT matcat_id FROM cat_grate WHERE id=$1'
 					USING v_catalog
@@ -525,7 +521,7 @@ BEGIN
 	v_node2 = COALESCE (v_node2, '');
 	
 	-- gettingf minvalue & maxvalues for widgetcontrols
-	IF v_project_type = 'UD' THEN
+	IF v_project_type = 'UD' AND v_catfeature.feature_type IS NOT NULL THEN
 
 		v_input = '{"client":{"device":4,"infoType":1,"lang":"es"}, "feature":{"featureType":"'||v_catfeature.feature_type||'", "id":"'||p_id||'"}, "data":{"tgOp":"'||
 		p_tg_op||'", "node1":"'||v_node1||'", "node2":"'||v_node2||'"}}';
