@@ -98,3 +98,6 @@ ALTER TABLE man_type_fluid ALTER COLUMN active SET DEFAULT TRUE;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_type_function", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 ALTER TABLE man_type_function ALTER COLUMN active SET DEFAULT TRUE;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer_x_data", "column":"value_type", "dataType":"integer", "isUtils":"False"}}$$);
+
