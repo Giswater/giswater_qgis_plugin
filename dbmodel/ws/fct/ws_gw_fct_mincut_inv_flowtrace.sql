@@ -65,15 +65,15 @@ BEGIN
 			LEFT JOIN (
 				SELECT arc_id, true as closed FROM v_edit_arc JOIN exploitation ON v_edit_arc.expl_id=exploitation.expl_id
 				WHERE 
-				(node_1 IN (SELECT node_id FROM om_mincut_valve WHERE ((proposed=TRUE) AND result_id=1))
-				AND arc_id IN(SELECT arc_id FROM om_mincut_arc WHERE result_id=1))
+				(node_1 IN (SELECT node_id FROM om_mincut_valve WHERE ((proposed=TRUE) AND result_id=result_id_arg))
+				AND arc_id IN(SELECT arc_id FROM om_mincut_arc WHERE result_id=result_id_arg))
 						
-				OR (node_2 IN (SELECT node_id FROM om_mincut_valve WHERE ((proposed=TRUE) AND result_id=1))
-				AND arc_id IN(SELECT arc_id FROM om_mincut_arc WHERE result_id=1)) 
+				OR (node_2 IN (SELECT node_id FROM om_mincut_valve WHERE ((proposed=TRUE) AND result_id=result_id_arg))
+				AND arc_id IN(SELECT arc_id FROM om_mincut_arc WHERE result_id=result_id_arg)) 
 
-				OR (node_1 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id=1))
+				OR (node_1 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id=result_id_arg))
 						
-				OR (node_2 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id=1))	
+				OR (node_2 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id=result_id_arg))	
 				UNION
 				SELECT json_array_elements_text((parameters->>'inletArc')::json) as arc_id, true as closed FROM config_mincut_inlet
 				)a 
