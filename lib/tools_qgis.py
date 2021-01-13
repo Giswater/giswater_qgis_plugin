@@ -72,11 +72,15 @@ def show_critical(text, duration=10, context_name=None, parameter=None, logger_f
     show_message(text, 2, duration, context_name, parameter, title, logger_file)
 
 
-def get_visible_layers(as_list=False):
-    """ Return string as {...} or [...] with name of table in DB of all visible layer in TOC """
-
+def get_visible_layers(as_str_list=False, as_list=False):
+    """ Return string as {...} or [...] or list with name of table in DB of all visible layer in TOC
+        False, False --> return str like {"name1", "name2", "..."}
+        True, False --> return str like ["name1", "name2", "..."]
+        xxxx, True --> return list like ['name1', 'name2', '...']
+    """
+    layers_name = []
     visible_layer = '{'
-    if as_list is True:
+    if as_str_list is True:
         visible_layer = '['
     layers = get_project_layers()
     for layer in layers:
@@ -86,9 +90,11 @@ def get_visible_layers(as_list=False):
             # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
             if 'SELECT row_number() over ()' in str(table) or 'srid' not in str(table):
                 continue
-
+            layers_name.append(table_name)
             visible_layer += f'"{table_name}", '
     visible_layer = visible_layer[:-2]
+
+    if as_list == True: return layers_name
 
     if as_list is True:
         visible_layer += ']'
