@@ -73,3 +73,9 @@ UPDATE man_type_location SET featurecat_id = concat('{',featurecat_id,'}') where
 UPDATE sys_param_user SET dv_querytext_filterc = null, feature_field_id = null WHERE id IN ('edit_featureval_category_vdefault',
 'edit_featureval_fluid_vdefault','edit_featureval_function_vdefault','edit_featureval_location_vdefault');
 
+
+INSERT INTO inp_typevalue VALUES ('inp_pjoint_type', 'NODE', 'NODE') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO inp_typevalue VALUES ('inp_pjoint_type', 'VNODE', 'VNODE') ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO config_param_system VALUES ('admin_config_control_trigger', 'TRUE', 'Enable or disable trigger related to config tables. If true, is enabled', 'Config control trigger:', NULL, NULL, FALSE, NULL, 'utils', NULL, NULL, 'boolean') ON CONFLICT (parameter) DO NOTHING;
+

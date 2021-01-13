@@ -12,6 +12,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 INSERT INTO sys_table VALUES ('v_plan_psector_gully', 'View to show gullys related to psectors. Useful to show gullys which will be obsolete in psectors', 'role_basic', 0, 'role_master', 2, 'Cannot view related gullys to psectors') ON CONFLICT (id) DO NOTHING;
 
 -- 2020/12/16
+UPDATE config_param_system SET value='FALSE' WHERE parameter='admin_config_control_trigger';
 UPDATE config_form_fields SET formname='inp_timeseries_value' WHERE formname='inp_timeseries';
 UPDATE config_form_fields SET formname='inp_transects_value' WHERE formname='inp_transects';
 
@@ -22,6 +23,7 @@ UPDATE sys_table SET id='inp_transects' WHERE id='inp_transects_id';
 
 UPDATE config_form_fields SET dv_querytext=replace(dv_querytext, 'inp_transects_id', 'inp_transects') WHERE dv_querytext LIKE '%inp_transects%';
 UPDATE config_form_fields SET dv_querytext=replace(dv_querytext, 'inp_timser_id', 'inp_timeseries') WHERE dv_querytext LIKE '%inp_timser%';
+UPDATE config_param_system SET value='TRUE' WHERE parameter='admin_config_control_trigger';
 
 UPDATE sys_foreignkey SET target_table = 'inp_timeseries' WHERE target_table = 'inp_timser_id';
 
