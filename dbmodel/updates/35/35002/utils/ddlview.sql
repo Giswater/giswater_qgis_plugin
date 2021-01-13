@@ -356,5 +356,5 @@ CREATE OR REPLACE VIEW v_plan_current_psector AS
 CREATE OR REPLACE VIEW v_edit_cad_auxpoint AS 
  SELECT temp_table.id,
     temp_table.geom_point
-   FROM ws_sample35.temp_table
+   FROM SCHEMA_NAME.temp_table
   WHERE temp_table.cur_user = "current_user"()::text AND temp_table.fid = 127;
