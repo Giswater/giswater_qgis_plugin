@@ -213,7 +213,7 @@ BEGIN
 		v_table_parent = v_tablename;
 		IF v_id IS NOT NULL THEN 
 			IF v_table_parent='v_edit_node' THEN
-				EXECUTE 'SELECT nodetype_id FROM '||v_table_parent||' WHERE node_id = '||quote_literal(v_id)||';'
+				EXECUTE 'SELECT node_type FROM '||v_table_parent||' WHERE node_id = '||quote_literal(v_id)||';'
 				INTO v_nodetype;
 				IF (SELECT isarcdivide FROM cat_feature_node WHERE id=v_nodetype) IS FALSE THEN
 					v_isarcdivide = FALSE;
