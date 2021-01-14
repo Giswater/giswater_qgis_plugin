@@ -96,7 +96,7 @@ def get_visible_layers(as_str_list=False, as_list=False):
 
     if as_list == True: return layers_name
 
-    if as_list is True:
+    if as_str_list is True:
         visible_layer += ']'
     else:
         visible_layer += '}'

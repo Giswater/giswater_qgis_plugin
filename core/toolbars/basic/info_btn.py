@@ -62,7 +62,7 @@ class GwInfoButton(GwMaptoolButton):
         y = cursor.pos().y()
         click_point = QPoint(x + 5, y + 5)
 
-        visible_layers = tools_qgis.get_visible_layers(as_list=True)
+        visible_layers = tools_qgis.get_visible_layers(as_str_list=True)
         scale_zoom = self.iface.mapCanvas().scale()
 
         # Get layers under mouse clicked

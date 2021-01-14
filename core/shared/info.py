@@ -149,7 +149,7 @@ class GwInfo(QObject):
 
         # Click over canvas
         elif point:
-            visible_layer = tools_qgis.get_visible_layers(as_list=True)
+            visible_layer = tools_qgis.get_visible_layers(as_str_list=True)
             scale_zoom = self.iface.mapCanvas().scale()
             extras += f', "activeLayer":"{active_layer}"'
             extras += f', "visibleLayer":{visible_layer}'
