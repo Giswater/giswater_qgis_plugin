@@ -304,7 +304,7 @@ class GwMincut:
 
 
     def get_mincut(self):
-        """ Button 26: New Mincut """
+        """ Button 26: Mincut """
 
         self.is_new = True
         self.init_mincut_form()
