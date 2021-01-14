@@ -897,7 +897,7 @@ class ApiCF(ApiParent, QObject):
             my_json = json.dumps(_json)
             feature = f'"featureType":"{self.feature_type}", '
             feature += f'"tableName":"{p_table_id}", '
-            feature += f'"id":"{feature_id}"'
+            feature += f'"id":"{self.feature_id}"'
             extras = f'"fields":{my_json}, "reload":"{fields_reload}"'
             body = self.create_body(feature=feature, extras=extras)
             sql = f"SELECT gw_api_setfields($${{{body}}}$$)::text;"
