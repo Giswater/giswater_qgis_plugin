@@ -173,6 +173,9 @@ UPDATE macrosector SET active = TRUE WHERE active IS NULL;
 UPDATE macroexploitation SET active = TRUE WHERE active IS NULL;
 UPDATE sector SET active = TRUE WHERE active IS NULL;
 
+UPDATE config_form_fields SET isparent = false  WHERE (formname = 've_arc' OR formname='v_edit_arc' 
+OR formname in (select child_layer FROM cat_feature where feature_type='ARC')) AND columnname='arccat_id';
+
 UPDATE config_form_fields SET dv_querytext = concat(dv_querytext, ' AND active IS TRUE ')
 WHERE columnname IN ('brand', 'model','buildercat_id', 'cat_matcat_id', 'ownercat_id','soilcat_id', 'workcat_id', 'workcat_id_end',
 'muni_id', 'dma_id','macrodma_id','macrosector_id','macroexpl_id', 'sector_id','nodecat_id','arccat_id','connecat_id', 'elementcat_id' ) 
