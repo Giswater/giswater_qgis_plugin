@@ -13,7 +13,7 @@ from qgis.PyQt.QtGui import QCursor
 
 from ..dialog_button import GwDialogButton
 from ...load_project_check import GwLoadProjectCheck
-from ...tasks.project_layers_config import GwProjectLayersConfig
+from ...threads.project_layers_config import GwProjectLayersConfig
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_log, tools_db
 

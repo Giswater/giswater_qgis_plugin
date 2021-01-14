@@ -7,8 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import json
-import configparser
-from collections import OrderedDict, Counter
+from collections import OrderedDict
 
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
@@ -18,9 +17,9 @@ from .shared.search import GwSearch
 from .toolbars import buttons
 from .ui.ui_manager import GwDialogTextUi
 from .utils import tools_gw
-from .utils.notify import GwNotify
+from .threads.notify import GwNotify
 from .. import global_vars
-from ..lib import tools_qgis, tools_config, tools_log, tools_db, tools_qt, tools_os
+from ..lib import tools_qgis, tools_log, tools_db, tools_qt, tools_os
 
 
 class GwLoadProject(QObject):

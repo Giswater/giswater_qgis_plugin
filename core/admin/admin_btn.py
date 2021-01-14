@@ -27,7 +27,7 @@ from qgis.gui import QgsDateTimeEdit
 from qgis.utils import reloadPlugin
 
 from .gis_file_create import GwGisFileCreate
-from ..tasks.task import GwTask
+from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
     GwAdminGisProjectUi, GwAdminImportUi, GwAdminFieldsUi, GwAdminVisitClassUi, GwAdminSysFieldsUi, GwCredentialsUi
 from ..utils import tools_gw

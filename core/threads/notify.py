@@ -9,9 +9,10 @@ import json
 import threading
 from collections import OrderedDict
 
+from ..utils import tools_backend_calls
 from ... import global_vars
 from ...lib import tools_log, tools_db
-from . import tools_backend_calls
+
 
 class GwNotify:
     # :var conn_failed: some times, when user click so fast 2 actions, LISTEN channel is stopped, and we need to
