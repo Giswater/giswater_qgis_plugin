@@ -53,6 +53,7 @@ v_parent text;
 v_parentvalue text; 
 v_textosearch text;
 v_fieldtosearch text; 
+v_position integer;
 
 BEGIN
 
@@ -84,7 +85,18 @@ BEGIN
 	IF v_parent IS NULL OR v_querytextparent IS NULL OR v_parentvalue IS NULL OR v_querytextparent = '' THEN
 		v_querytext = v_querytext;
 	ELSE
-		v_querytext = concat (v_querytext, ' ', v_querytextparent, ' = ' ,quote_literal(v_parentvalue)); 
+
+		v_position = position('AND' in v_querytextparent);
+		
+		IF v_position > 0 and v_position <3 THEN
+			v_querytextparent =overlay(v_querytextparent placing 'AND(' from v_position for 3);
+			
+			v_querytext = concat (v_querytext, ' ', v_querytextparent, ' = ' ,quote_literal(v_parentvalue),')'); 
+			
+		ELSE
+			v_querytext = concat (v_querytext, ' ', v_querytextparent, ' = ' ,quote_literal(v_parentvalue)); 
+		END IF;
+
 	END IF;
 	v_querytext = concat ('SELECT array_to_json(array_agg(row_to_json(a))) FROM ( SELECT * FROM (', (v_querytext), ')a WHERE idval ILIKE ''%', v_textosearch, '%'' LIMIT 10)a');
 
