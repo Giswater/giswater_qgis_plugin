@@ -31,7 +31,6 @@ class GwToolBoxButton(GwDialogButton):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.function_list = []
         self.rbt_checked = {}
-        self.is_paramtetric = True
         self.no_clickable_items = ['Giswater']
         self.temp_layers_added = []
 
@@ -83,7 +82,6 @@ class GwToolBoxButton(GwDialogButton):
 
     def open_function(self, index):
 
-        self.is_paramtetric = True
         # this '0' refers to the index of the item in the selected row (alias in this case)
         self.function_selected = index.sibling(index.row(), 0).data()
 
@@ -184,7 +182,7 @@ class GwToolBoxButton(GwDialogButton):
             if type(widget) in (QCheckBox, QRadioButton):
                 value = tools_gw.get_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}", "user", "sessions")
                 tools_qt.set_checked(dialog, widget, value)
-            elif type(widget) is QComboBox:
+            elif type(widget) is QComboBox and widget.property('selectedId') is None:
                 value = tools_gw.get_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}", "user", "sessions")
                 if value in (None, '', 'NULL') and widget.property('selectedId') not in (None, '', 'NULL'):
                     value = widget.property('selectedId')
@@ -265,14 +263,6 @@ class GwToolBoxButton(GwDialogButton):
         if function_name is None:
             return
 
-        # If function is not parametrized, call function(old) without json
-        if self.is_paramtetric is False:
-            self.execute_no_parametric(dialog, function_name)
-            dialog.progressBar.setVisible(False)
-            dialog.progressBar.setMinimum(0)
-            dialog.progressBar.setMaximum(1)
-            dialog.progressBar.setValue(1)
-            return
 
         if function[0]['input_params']['featureType']:
             layer = None
@@ -425,21 +415,7 @@ class GwToolBoxButton(GwDialogButton):
             if len(function) != 0:
                 dialog.setWindowTitle(function[0]['alias'])
                 dialog.txt_info.setText(str(function[0]['descript']))
-                if str(function[0]['isparametric']) in ('false', 'False', False, 'None', None, 'null'):
-                    self.is_paramtetric = False
-                    self.control_isparametric(dialog)
-                    self.load_settings_values(dialog, function)
-                    if str(function[0]['isnotparammsg']) is not None:
-                        layout = dialog.findChild(QGridLayout, 'grl_option_parameters')
-                        if layout is None:
-                            status = True
-                            break
-                        label = QLabel()
-                        label.setWordWrap(True)
-                        label.setText("Info: " + str(function[0]['isnotparammsg']))
-                        layout.addWidget(label, 0, 0)
-                    status = True
-                    break
+
                 if not function[0]['input_params']['featureType']:
                     dialog.grb_input_layer.setVisible(False)
                     dialog.grb_selection_type.setVisible(False)
@@ -486,29 +462,6 @@ class GwToolBoxButton(GwDialogButton):
                     list_items.append(elem)
 
         return list_items
-
-
-    def control_isparametric(self, dialog):
-        """ Control if the function is not parameterized whit a json, is old and we need disable all widgets """
-
-        widget_list = dialog.findChildren(QWidget)
-        for widget in widget_list:
-            if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
-                widget.setReadOnly(True)
-                widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
-            elif type(widget) in (QCheckBox, QComboBox, QRadioButton):
-                widget.setEnabled(False)
-
-        dialog.grb_input_layer.setVisible(False)
-        dialog.grb_selection_type.setVisible(False)
-        dialog.rbt_previous.setChecked(False)
-        dialog.rbt_layer.setChecked(True)
-
-        dialog.grb_parameters.setEnabled(False)
-        dialog.grb_parameters.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
-
-        dialog.txt_info.setReadOnly(True)
-        dialog.txt_info.setStyleSheet("QWidget { background: rgb(255, 255, 255); color: rgb(10, 10, 10)}")
 
 
     def populate_layer_combo(self):

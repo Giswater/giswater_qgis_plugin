@@ -861,13 +861,11 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     if 'regexpControl' in field['widgetcontrols']:
                         if field['widgetcontrols']['regexpControl'] is not None:
                             pass
-                widget.editingFinished.connect(
-                    partial(get_dialog_changed_values, dialog, None, widget, field, _json))
+                widget.editingFinished.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'combo':
                 widget = add_combo(field)
-                widget.currentIndexChanged.connect(
-                    partial(get_dialog_changed_values, dialog, None, widget, field, _json))
+                widget.currentIndexChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'check':
                 widget = QCheckBox()
@@ -875,8 +873,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     widget.setChecked(True)
                 else:
                     widget.setChecked(False)
-                widget.stateChanged.connect(partial(get_dialog_changed_values,
-                                            dialog, None, widget, field, _json))
+                widget.stateChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             elif field['widgettype'] == 'datetime':
                 widget = QgsDateTimeEdit()
