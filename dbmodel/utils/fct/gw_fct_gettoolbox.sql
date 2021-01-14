@@ -98,11 +98,12 @@ BEGIN
 		v_nodetype = (SELECT nodetype_id FROM cat_node JOIN config_param_user ON cat_node.id = config_param_user.value
 		WHERE cur_user = current_user AND parameter = 'edit_nodecat_vdefault');
 		IF v_nodetype IS NULL OR (SELECT id FROM cat_node WHERE nodetype_id = v_nodetype limit 1) IS NULL THEN
-			v_nodetype = (SELECT id FROM cat_feature_node JOIN cat_feature USING  (id) WHERE active IS TRUE limit 1);
+			v_nodetype = (SELECT ctn.id FROM cat_feature_node ctn JOIN cat_feature USING  (id)
+			join cat_node cn ON cn.nodetype_id=ctn.id  WHERE cat_feature.active IS TRUE and cn.active IS TRUE limit 1);
 		END IF;
 	ELSE
 		v_nodetype = (SELECT value FROM config_param_user WHERE cur_user = current_user AND parameter = 'edit_nodetype_vdefault');
-		IF v_nodetype IS NULL OR (SELECT id FROM cat_node WHERE node_type = v_nodetype OR node_type IS NULL  limit 1) IS NULL THEN
+		IF v_nodetype IS NULL OR (SELECT id FROM cat_node WHERE node_type = v_nodetype OR node_type IS NULL limit 1) IS NULL THEN
 			v_nodetype = (SELECT id  FROM cat_feature_node JOIN cat_feature USING  (id) WHERE active IS TRUE limit 1);
 		END IF;
 	END IF;
@@ -110,7 +111,16 @@ BEGIN
 	v_nodecat = (SELECT value FROM config_param_user WHERE cur_user = current_user AND parameter = 'edit_nodecat_vdefault');
 
 	IF v_nodecat IS NULL THEN 
-		v_nodecat = (SELECT id FROM cat_node WHERE active IS true limit 1);
+		IF v_projectype = 'ws' THEN
+			v_nodecat = (SELECT id FROM cat_node WHERE active IS true AND nodetype_id = v_nodetype limit 1);
+		ELSIF  v_projectype = 'ud' THEN
+			v_nodecat = (SELECT id FROM cat_node WHERE active IS true AND node_type = v_nodetype limit 1);
+		END IF;
+
+		IF v_nodecat IS NULL and v_projectype = 'ud' THEN 
+			v_nodecat = (SELECT id FROM cat_node WHERE active IS true limit 1);
+		END IF;
+		
 	END IF;
 
 	-- get om toolbox parameters
@@ -182,11 +192,10 @@ BEGIN
 			END IF;
 		
 		v_selectedid = rec.inputparams::json->>'selectedId';
-
-		IF v_selectedid ~ '^[0-9]+$'THEN
+		v_querytext='SELECT array_agg(id::text) FROM ('||v_querytext_mod||')a';
+		EXECUTE v_querytext INTO v_arrayresult;
 			
-			v_querytext='SELECT array_agg(id::text) FROM ('||v_querytext_mod||')a';
-			EXECUTE v_querytext INTO v_arrayresult;
+		IF v_selectedid ~ '^[0-9]+$'THEN
 			
 			v_selectedid = concat('"selectedId":"',v_arrayresult[v_selectedid::integer],'"');
 
@@ -203,11 +212,16 @@ BEGIN
 			ELSIF v_selectedid = '$userNodetype' THEN
 				v_selectedid = concat('"selectedId":"',v_nodetype,'"');
 			ELSIF v_selectedid = '$userNodecat' THEN
-				v_selectedid = concat('"selectedId":"',v_nodecat,'"');
+				IF v_nodecat = any(v_arrayresult) THEN
+					v_selectedid = concat('"selectedId":"',v_nodecat,'"');
+				ELSE
+					v_selectedid = concat('"selectedId":"',v_arrayresult[1],'"');
+				END IF;
 			END IF;
 			
 		END IF;
-	
+	raise notice 'v_arrayresult,%',v_arrayresult;
+	raise notice 'v_selectedid,%',v_selectedid;
 		v_querytext =  'SELECT concat (''"comboIds":'',array_to_json(array_agg(to_json(id::text))) , '', 
 		"comboNames":'',array_to_json(array_agg(to_json(idval::text)))) FROM ('||v_querytext_mod||')a';
 		EXECUTE v_querytext INTO v_queryresult;		
