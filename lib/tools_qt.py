@@ -389,7 +389,7 @@ def set_combo_value(combo, value, item1):
             return True
 
     # Add new value if @value not in combo
-    if value not in ("", None, 'None', 'none'):
+    if value not in ("", None, 'None', 'none', '-1', -1):
         new_elem = []
         for x in range(len(combo.itemData(0))):
             new_elem.append("")
