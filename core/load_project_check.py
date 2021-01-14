@@ -26,8 +26,8 @@ class GwLoadProjectCheck:
         self.schema_name = global_vars.schema_name
 
 
-    def populate_audit_check_project(self, layers, init_project):
-        """ Fill table 'audit_check_project' with layers data """
+    def fill_check_project_table(self, layers, init_project):
+        """ Fill table 'audit_check_project' table with layers data """
 
         fields = '"fields":[  '
         for layer in layers:
@@ -61,12 +61,12 @@ class GwLoadProjectCheck:
         fields = fields[:-2] + ']'
         
         # Execute function 'gw_fct_setcheckproject'
-        result = self.execute_audit_check_project(init_project, fields)
+        result = self.execute_check_project_function(init_project, fields)
 
         return True, result
 
 
-    def execute_audit_check_project(self, init_project, fields_to_insert):
+    def execute_check_project_function(self, init_project, fields_to_insert):
         """ Execute function 'gw_fct_setcheckproject' """
 
         # get project variables
@@ -108,7 +108,7 @@ class GwLoadProjectCheck:
 
 
     def show_check_project_result(self, result):
-        """ Show dialog with audit check project result """
+        """ Show dialog with audit check project results """
 
         # Create dialog
         self.dlg_audit_project = GwProjectCheckUi()

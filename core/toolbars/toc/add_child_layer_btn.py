@@ -149,10 +149,10 @@ class GwAddChildLayerButton(GwDialogButton):
 
         if self.project_type in ('ws', 'ud'):
             QApplication.setOverrideCursor(Qt.ArrowCursor)
-            self.check_project_result = GwLoadProjectCheck()
+            self.check_project = GwLoadProjectCheck()
 
             # check project
-            status, result = self.check_project_result.populate_audit_check_project(layers, "true")
+            status, result = self.check_project.fill_check_project_table(layers, "true")
             try:
                 if 'actions' in result['body']:
                     if 'useGuideMap' in result['body']['actions']:

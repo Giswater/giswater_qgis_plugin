@@ -26,4 +26,4 @@ class GwProjectCheckButton(GwDialogButton):
         layers = tools_qgis.get_project_layers()
 
         check_project_result = GwLoadProjectCheck()
-        check_project_result.populate_audit_check_project(layers, "false")
+        check_project_result.fill_check_project_table(layers, "false")
