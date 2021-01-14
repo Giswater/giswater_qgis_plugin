@@ -61,6 +61,22 @@ class GwLoadProject(QObject):
         # TEMP
         global_vars.schema_name = self.schema_name
         global_vars.project_type = tools_gw.get_project_type()
+        # Set logger (no database connection yet)
+        tools_log.set_logger('plugin')
+        global_vars.plugin_name = self.plugin_name
+
+        # Check for developers options
+        comment = '# log_sql --> If True: show all get_json log, if False: does not show any, if None: ' \
+                  'show python log_sql option'
+        value = tools_gw.check_config_settings('system', 'log_sql', 'None', comment=comment)
+        tools_qgis.user_parameters['log_sql'] = value
+        comment = '# show_message_durations --> Integer or None, if none: show python duration option'
+        value = tools_gw.check_config_settings('system', 'show_message_durations', 'None', comment=comment)
+        tools_qgis.user_parameters['show_message_durations'] = value
+
+        # Log values of system user parameters located in 'init.config'
+        for parameter, value in tools_qgis.user_parameters.items():
+            tools_log.log_info(f"parameter '{parameter}': {value}")
 
         # Manage locale and corresponding 'i18n' file
         tools_qt.manage_translation(self.plugin_name)
