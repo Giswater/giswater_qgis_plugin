@@ -155,7 +155,7 @@ class GwFeatureReplaceUi(GwBasicDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('nodetype_change.ui', 'edit')
 class GwNodeTypeChangeUi(GwBasicDialog, FORM_CLASS):
     pass
-# end region
+# endregion
 
 
 # region EPA
@@ -314,7 +314,11 @@ class GwProjectCheckUi(GwBasicDialog, FORM_CLASS):
     pass
 # endregion
 
-
+# region Menu
+FORM_CLASS = get_ui_class('load_menu.ui', 'menu')
+class GwLoadMenuUi(GwBasicDialog, FORM_CLASS):
+    pass
+# endregion
 
 # region SHARED
 FORM_CLASS = get_ui_class('dialog_text.ui')

@@ -45,6 +45,7 @@ class GwMaptoolButton(QgsMapTool):
             icon = QIcon(icon_path)
 
         self.action = None
+
         if icon is None:
             self.action = QAction(text, action_group)
         else:
@@ -79,6 +80,9 @@ class GwMaptoolButton(QgsMapTool):
         self.reset()
 
         self.force_active_layer = True
+
+        if toolbar is None:
+            return
 
         toolbar.addAction(self.action)
         self.setAction(self.action)

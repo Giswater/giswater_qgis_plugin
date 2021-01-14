@@ -79,12 +79,12 @@ def save_settings(dialog):
         pass
 
 
-def get_config_parser(section: str, parameter: str, config_type, file_name) -> str:
+def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True) -> str:
     """ Load a simple parser value """
 
     value = None
     try:
-        if config_type == 'user':
+        if config_type == 'user' and prefix:
             parameter = f"{global_vars.project_type}_{parameter}"
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         if config_type in "user":
@@ -114,11 +114,12 @@ def get_config_parser(section: str, parameter: str, config_type, file_name) -> s
     return value
 
 
-def set_config_parser(section: str, parameter: str, value: str, config_type="user", file_name="sessions", comment=None):
+def set_config_parser(section: str, parameter: str, value: str, config_type="user", file_name="sessions", comment=None,
+                      prefix=True):
     """ Save simple parser value """
 
     try:
-        if config_type == 'user':
+        if config_type == 'user' and prefix:
             parameter = f"{global_vars.project_type}_{parameter}"
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         if config_type in "user":

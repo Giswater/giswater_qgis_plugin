@@ -264,6 +264,6 @@ class GwConnectLinkButton(GwMaptoolButton):
     def deactivate(self):
         super().deactivate()
 
-    # end region
+    # endregion
 
 

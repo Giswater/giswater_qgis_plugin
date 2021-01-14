@@ -39,6 +39,9 @@ class GwDialogButton:
         self.action.setCheckable(False)
         self.action.triggered.connect(self.clicked_event)
 
+        if toolbar is None:
+            return
+
         toolbar.addAction(self.action)
 
 

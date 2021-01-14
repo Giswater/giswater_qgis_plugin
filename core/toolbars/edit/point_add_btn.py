@@ -22,7 +22,8 @@ class GwPointAddButton(GwDialogButton):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
         # First add the menu before adding it to the toolbar
-        toolbar.removeAction(self.action)
+        if toolbar is not None:
+            toolbar.removeAction(self.action)
 
         self.feature_cat = tools_gw.manage_feature_cat()
 
@@ -72,9 +73,9 @@ class GwPointAddButton(GwDialogButton):
                 obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
         menu.addSeparator()
 
-
-        self.action.setMenu(menu)
-        toolbar.addAction(self.action)
+        if toolbar is not None:
+            self.action.setMenu(menu)
+            toolbar.addAction(self.action)
 
 
     def clicked_event(self):
