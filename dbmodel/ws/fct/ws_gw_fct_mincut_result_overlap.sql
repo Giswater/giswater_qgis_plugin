@@ -89,19 +89,22 @@ BEGIN
 	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('------------------------'));
 	INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat('Minimun cut have been checked looking for overlaps againts other mincuts'));
 
-	SELECT count(*) INTO v_count FROM selector_hydrometer WHERE cur_user = current_user;
-	SELECT array_agg(a.c) INTO v_selected FROM (SELECT concat(state_id,'-',name) as c FROM selector_hydrometer JOIN ext_rtc_hydrometer_state ON state_id = id order by state_id) a;
+
+	SELECT count(*) INTO v_count FROM selector_hydrometer JOIN ext_rtc_hydrometer_state ON state_id = id WHERE cur_user = current_user AND is_operative IS TRUE;
+	SELECT array_agg(a.c) INTO v_selected FROM (SELECT concat(state_id,'-',name) as c FROM selector_hydrometer 
+	JOIN ext_rtc_hydrometer_state ON state_id = id WHERE cur_user = current_user AND is_operative IS TRUE order by state_id) a;
+
 
 	-- log for hydrometer's state
 	IF v_count = 0 THEN
 		INSERT INTO audit_check_data (fid, error_message)
-		VALUES (216, concat ('WARNING: There are not values for hydrometer''s state choosed. As result no hydrometer have been attached to this mincut'));
+		VALUES (216, concat ('WARNING: There are not values selected for hydrometer''s state with is_operative True. As result no hydrometer have been attached to this mincut'));
 	ELSIF v_count = 1 THEN
 		INSERT INTO audit_check_data (fid, error_message)
-		VALUES (216, concat ('INFO: There is one value for hydrometer''s state selected ',v_selected,'.'));
+		VALUES (216, concat ('INFO: There is one value for hydrometer''s state selected with is_operative True: ',v_selected,'.'));
 	ELSIF v_count > 1 THEN
 		INSERT INTO audit_check_data (fid, error_message)
-		VALUES (216, concat ('WARNING: There are more than one hydrometer''s state selected ', v_selected,'.'));
+		VALUES (216, concat ('INFO: There are more than one hydrometer''s state selected with is_operative True: ', v_selected,'.'));
 	END IF;
 		
 	SELECT * INTO v_mincutrec FROM om_mincut WHERE id = v_mincutid;

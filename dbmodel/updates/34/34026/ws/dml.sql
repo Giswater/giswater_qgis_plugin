@@ -57,3 +57,8 @@ INSERT INTO config_form_fields VALUES ('v_edit_inp_connec', 'form_feature', 'pjo
 INSERT INTO config_form_fields VALUES ('v_edit_inp_connec', 'form_feature', 'demand', 14, 'double', 'text', 'demand', NULL, NULL, NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE);
 INSERT INTO config_form_fields VALUES ('v_edit_inp_connec', 'form_feature', 'pattern_id', 15, 'string', 'combo', 'pattern_id', NULL, NULL, NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT DISTINCT (pattern_id) AS id,  pattern_id  AS idval FROM inp_pattern WHERE pattern_id IS NOT NULL', TRUE, TRUE, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_1', NULL, FALSE);
 UPDATE config_param_system SET value='TRUE' WHERE parameter='admin_config_control_trigger';
+
+--2021/01/14
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer_state", "column":"is_operative", "dataType":"boolean"}}$$);
+
+UPDATE ext_rtc_hydrometer_state SET is_operative=TRUE;
