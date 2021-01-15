@@ -35,7 +35,7 @@ class GwLoadProject(QObject):
         self.plugin_dir = global_vars.plugin_dir
         self.plugin_toolbars = {}
         self.buttons_to_hide = []
-        self.plugin_name = os.path.dirname(os.path.dirname(__file__))
+        self.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater')
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'toolbars' + os.sep
 
         self.buttons = {}
