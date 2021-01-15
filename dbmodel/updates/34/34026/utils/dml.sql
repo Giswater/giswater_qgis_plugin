@@ -80,3 +80,14 @@ INSERT INTO inp_typevalue VALUES ('inp_pjoint_type', 'VNODE', 'VNODE') ON CONFLI
 INSERT INTO config_param_system VALUES ('admin_config_control_trigger', 'TRUE', 'Enable or disable trigger related to config tables. If true, is enabled', 'Config control trigger:', NULL, NULL, FALSE, NULL, 'utils', NULL, NULL, 'boolean') ON CONFLICT (parameter) DO NOTHING;
 
 UPDATE config_form_fields SET dv_parent_id = 'feature_id', dv_querytext = 'SELECT id, idval FROM (SELECT node_1 AS id, node_1 AS idval FROM arc UNION SELECT DISTINCT node_2 AS id, node_2 AS idval FROM arc)c WHERE id IS NOT NULL' WHERE formname = 'visit_singlevent' AND columnname = 'position_id';
+
+UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM config_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role_id IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))' 
+WHERE formname IN ('visit_singlevent','visit_multievent') AND columnname = 'class_id';
+
+UPDATE config_form_fields SET isparent = false WHERE formname IN ('v_edit_dimensions', 'v_edit_samplepoint') AND columnname = 'state';
+
+UPDATE config_form_fields SET dv_parent_id = 'muni_id' WHERE formname IN ('v_ext_address', 'v_ext_plot','v_edit_samplepoint') 
+AND columnname in ('streetname','streetname2');
+
+DELETE  FROM config_form_fields WHERE columnname = 'lot_id';
+
