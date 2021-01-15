@@ -123,7 +123,7 @@ CREATE OR REPLACE VIEW v_edit_inp_junction AS
     node n
      JOIN inp_junction USING (node_id)
      JOIN vi_parent_arc a ON node_2 = node_id
-  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
+  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
 
 CREATE OR REPLACE VIEW v_rtc_hydrometer AS 
