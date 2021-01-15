@@ -48,8 +48,8 @@ BEGIN
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version order by 1 desc limit 1;
 	
 	-- dissable temporary trigger to manage control_config
-	UPDATE config_param_user SET value=FALSE WHERE cur_user = current_user AND parameter  = 'config_control';
-		
+	ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+	
 	-- get input parameters
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_view_name = ((p_data ->>'data')::json->>'view_name')::text;
@@ -175,8 +175,8 @@ BEGIN
 	END LOOP;
 
 	-- enable trigger to manage control_config
-	UPDATE config_param_user SET value=TRUE WHERE cur_user = current_user AND parameter  = 'config_control';
-	
+	ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
