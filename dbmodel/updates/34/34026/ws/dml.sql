@@ -63,3 +63,6 @@ UPDATE ext_rtc_hydrometer_state SET is_operative=TRUE;
 
 INSERT INTO om_typevalue VALUES ('mincut_state','4','On planning')
 ON CONFLICT (typevalue, id) DO NOTHING;
+
+UPDATE config_param_system SET value  = $${"arc":"SELECT arc_id AS arc_id, (case when dext IS NOT NULL THEN concat(v_edit_arc.cat_matcat_id,'-Ø',(c.dext)::integer) ELSE  concat(v_edit_arc.cat_matcat_id,'-Ø',(c.dint)::integer) END) as catalog, concat('None / ',gis_length::numeric(12,2),'m') as dimensions , arc_id as code FROM v_edit_arc JOIN cat_arc c ON id = arccat_id"}$$ 
+WHERE parameter = 'om_profile_guitartext';

@@ -37,3 +37,6 @@ UPDATE config_form_tabs SET tabactions = '[{"disabled": false, "actionName": "ac
 {"disabled": false, "actionName": "actionLink", "actionTooltip": "Open Link"},
 {"actionName":"actionGetArcId", "actionTooltip":"Set arc_id",  "disabled":false},
 {"disabled": false, "actionName": "actionHelp", "actionTooltip": "Help"}]' WHERE formname ='v_edit_node';
+
+UPDATE config_param_system SET value  = $${"arc":"SELECT arc_id AS arc_id, concat(v_edit_arc.matcat_id,'-Ø',(c.geom1*100)::integer) as catalog, (case when slope is not null then concat((100*slope)::numeric(12,2),' / ',gis_length::numeric(12,2),'m') else concat('None / ',gis_length::numeric(12,2),'m') end) as dimensions , arc_id as code FROM v_edit_arc JOIN cat_arc c ON id = arccat_id"}$$ 
+WHERE parameter = 'om_profile_guitartext';

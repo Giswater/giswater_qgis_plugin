@@ -21,9 +21,6 @@ DELETE FROM sys_table WHERE id='v_plan_psector_x_other';
 
 
 --2020/12/28
-UPDATE config_param_system SET value  = $${"arc":"SELECT arc_id AS arc_id, concat(v_edit_arc.matcat_id,'-Ø',(c.geom1*100)::integer) as catalog, (case when slope is not null then concat((100*slope)::numeric(12,2),' / ',gis_length::numeric(12,2),'m') else concat('None / ',gis_length::numeric(12,2),'m') end) as dimensions , arc_id as code FROM v_edit_arc JOIN cat_arc c ON id = arccat_id"}$$ 
-WHERE parameter = 'om_profile_guitartext';
-
 UPDATE config_param_system SET value  = $${"catalog":"CATALOG", "vs":"VS", "hs":"HS", "referencePlane":"REFERENCE",  "dimensions":"SLOPE / LENGTH", "ordinates": "ORDINATES", "topelev":"TOP ELEV", "ymax":"YMAX", "elev": "ELEV", "code":"CODE", "distance":"DISTANCE"}$$ 
 WHERE parameter = 'om_profile_guitarlegend';
 
