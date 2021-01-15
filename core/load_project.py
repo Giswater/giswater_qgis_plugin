@@ -45,11 +45,11 @@ class GwLoadProject(QObject):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
         # Check if loaded project is valid for Giswater
-        if not self.check_project(show_warning):
+        if not self._check_project(show_warning):
             return
 
         # Force commit before opening project and set new database connection
-        if not self.check_database_connection(show_warning):
+        if not self._check_database_connection(show_warning):
             return
 
         # Manage schema name
@@ -87,7 +87,7 @@ class GwLoadProject(QObject):
         tools_db.set_search_path(layer_source['schema'])
 
         # Check if schema exists
-        self.schema_exists = self.check_schema(self.schema_name)
+        self.schema_exists = self._check_schema(self.schema_name)
         if not self.schema_exists:
             tools_qgis.show_warning("Selected schema not found", parameter=self.schema_name)
 
@@ -100,7 +100,7 @@ class GwLoadProject(QObject):
         global_vars.project_vars = self.project_vars
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
-        status = self.check_layers_from_distinct_schema()
+        status = self._check_layers_from_distinct_schema()
         if status is False:
             return
 
@@ -110,19 +110,19 @@ class GwLoadProject(QObject):
             return
 
         # Initialize toolbars
-        self.get_buttons_to_hide()
+        self._get_buttons_to_hide()
 
         # Manage records from table 'cat_feature'
         self.feature_cat = tools_gw.manage_feature_cat()
 
         # Manage snapping layers
-        self.manage_snapping_layers()
+        self._manage_snapping_layers()
 
         # Manage actions of the different plugin_toolbars
-        self.manage_toolbars()
+        self._manage_toolbars()
 
         # Check roles of this user to show or hide toolbars
-        self.check_user_roles()
+        self._check_user_roles()
 
         # Create a thread to listen selected database channels
         self.notify = GwNotify()
@@ -145,9 +145,13 @@ class GwLoadProject(QObject):
         message = "Project read successfully"
         tools_log.log_info(message)
 
+    def translate(self, message):
+        return tools_qt.tr(message, aux_context='ui_message')
 
-    def check_project(self, show_warning):
-        """ # Check if loaded project is valid for Giswater """
+    # region private functions
+    
+    def _check_project(self, show_warning):
+        """ Check if loaded project is valid for Giswater """
 
         # Check if table 'v_edit_node' is loaded
         self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
@@ -161,9 +165,8 @@ class GwLoadProject(QObject):
                 return False
 
         return True
-
-
-    def check_database_connection(self, show_warning, force_commit=False):
+    
+    def _check_database_connection(self, show_warning, force_commit=False):
         """ Set new database connection. If force_commit=True then force commit before opening project """
 
         try:
@@ -184,12 +187,13 @@ class GwLoadProject(QObject):
 
             return True
 
+    def _check_layers_from_distinct_schema(self):
+        """
+            Checks if there are duplicate layers in any of the defined schemas from project_vars.
 
-    def translate(self, message):
-        return tools_qt.tr(message, aux_context='ui_message')
-
-
-    def check_layers_from_distinct_schema(self):
+            :returns: False if there are duplicate layers and project_vars main_schema or add_schema
+            haven't been set.
+        """
 
         layers = tools_qgis.get_project_layers()
         repeated_layers = {}
@@ -204,9 +208,9 @@ class GwLoadProject(QObject):
                 self.dlg_dtext = GwDialogTextUi()
                 self.dlg_dtext.btn_accept.hide()
                 self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
-                msg = "QGIS project has more than one layer v_edit_node comming from differents schemas. " \
-                      "If you are looking for manage two schemas, it is mandatory to define wich is the master and " \
-                      "wich is the other one. To do this yo need to configure the  QGIS project setting this project " \
+                msg = "QGIS project has more than one v_edit_node layer coming from different schemas. " \
+                      "If you are looking to manage two schemas, it is mandatory to define which is the master and " \
+                      "which isn't. To do this, you need to configure the QGIS project setting this project's " \
                       "variables: gwMainSchema and gwAddSchema."
 
                 self.dlg_dtext.txt_infolog.setText(msg)
@@ -219,29 +223,33 @@ class GwLoadProject(QObject):
             global_vars.schema_name = self.project_vars['main_schema']
 
         return True
-
-
-    def get_buttons_to_hide(self):
+    
+    def _get_buttons_to_hide(self):
+        """
+            Populates the buttons_to_hide list.
+        """
 
         try:
             # db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
             row = tools_gw.get_config_value('qgis_toolbar_hidebuttons')
-            if not row: return
+            if not row:
+                return
+
             json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
             self.buttons_to_hide = [str(x) for x in json_list['action_index']]
         except KeyError:
             pass
         except json.JSONDecodeError:
-            # Control if json have a correct format
+            # TODO: Control if json have a correct format
             pass
         finally:
-            # TODO remove this line when do you want enabled info for epa
+            # TODO remove this line if you want enabled info for epa
             self.buttons_to_hide.append('199')
-
-
-    def manage_toolbars(self):
-        """ Manage actions of the custom plugin toolbars.
-        project_type in ('ws', 'ud')
+    
+    def _manage_toolbars(self):
+        """
+            Manage actions of the custom plugin toolbars.
+            project_type in ('ws', 'ud')
         """
 
         # Dynamically get list of toolbars from config file
@@ -256,7 +264,7 @@ class GwLoadProject(QObject):
 
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
         for tb in toolbars_order:
-            self.create_toolbar(tb)
+            self._create_toolbar(tb)
 
         # Manage action group of every toolbar
         parent = self.iface.mainWindow()
@@ -280,24 +288,21 @@ class GwLoadProject(QObject):
         if project_exclusive not in (None, 'None'):
             project_exclusive = project_exclusive.replace(' ', '').split(',')
             for index in project_exclusive:
-                self.hide_button(index)
-
+                self._hide_button(index)
 
         # Hide buttons from buttons_to_hide
         for button_id in self.buttons_to_hide:
-            self.hide_button(button_id)
+            self._hide_button(button_id)
 
         # Disable and hide all plugin_toolbars and actions
-        self.enable_toolbars(False)
+        self._enable_toolbars(False)
 
         # Enable toolbar 'basic' and 'utils'
-        self.enable_toolbar("basic")
-        self.enable_toolbar("utilities")
-        self.enable_toolbar("toc")
+        self._enable_toolbar("basic")
+        self._enable_toolbar("utilities")
+        self._enable_toolbar("toc")
 
-
-    def create_toolbar(self, toolbar_id):
-
+    def _create_toolbar(self, toolbar_id):
         list_actions = tools_gw.check_config_settings('toolbars', str(toolbar_id), 'None', "project", "init")
 
         if list_actions in (None, 'None'):
@@ -311,7 +316,7 @@ class GwLoadProject(QObject):
         toolbar_name = self.translate(f'toolbar_{toolbar_id}_name')
         plugin_toolbar = GwPluginToolbar(toolbar_id, toolbar_name, True)
 
-        # If the toolbar is ToC, add it to the Layes docker toolbar, else create a new toolbar
+        # If the toolbar is ToC, add it to the Layers docker toolbar, if not, create a new toolbar
         if toolbar_id == "toc":
             plugin_toolbar.toolbar = self.iface.mainWindow().findChild(QDockWidget, 'Layers').findChildren(QToolBar)[0]
         else:
@@ -322,8 +327,7 @@ class GwLoadProject(QObject):
         plugin_toolbar.list_actions = list_actions
         self.plugin_toolbars[toolbar_id] = plugin_toolbar
 
-
-    def manage_snapping_layers(self):
+    def _manage_snapping_layers(self):
         """ Manage snapping of layers """
 
         tools_qgis.manage_snapping_layer('v_edit_arc', snapping_type=2)
@@ -331,8 +335,7 @@ class GwLoadProject(QObject):
         tools_qgis.manage_snapping_layer('v_edit_node', snapping_type=0)
         tools_qgis.manage_snapping_layer('v_edit_gully', snapping_type=0)
 
-
-    def check_user_roles(self):
+    def _check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
 
         restriction = tools_gw.get_role_permissions(self.project_vars['role'])
@@ -341,37 +344,36 @@ class GwLoadProject(QObject):
             pass
 
         elif restriction == 'role_om':
-            self.enable_toolbar("om")
+            self._enable_toolbar("om")
 
         elif restriction == 'role_edit':
-            self.enable_toolbar("om")
-            self.enable_toolbar("edit")
-            self.enable_toolbar("cad")
+            self._enable_toolbar("om")
+            self._enable_toolbar("edit")
+            self._enable_toolbar("cad")
 
         elif restriction == 'role_epa':
-            self.enable_toolbar("om")
-            self.enable_toolbar("edit")
-            self.enable_toolbar("cad")
-            self.enable_toolbar("epa")
-            self.enable_toolbar("plan")
-            self.hide_button(38)
-            self.hide_button(47)
-            self.hide_button(49)
-            self.hide_button(50)
+            self._enable_toolbar("om")
+            self._enable_toolbar("edit")
+            self._enable_toolbar("cad")
+            self._enable_toolbar("epa")
+            self._enable_toolbar("plan")
+            self._hide_button(38)
+            self._hide_button(47)
+            self._hide_button(49)
+            self._hide_button(50)
 
         elif restriction == 'role_master':
-            self.enable_toolbar("om")
-            self.enable_toolbar("edit")
-            self.enable_toolbar("cad")
-            self.enable_toolbar("epa")
-            self.enable_toolbar("plan")
+            self._enable_toolbar("om")
+            self._enable_toolbar("edit")
+            self._enable_toolbar("cad")
+            self._enable_toolbar("epa")
+            self._enable_toolbar("plan")
 
-
-    def enable_toolbars(self, visible=True):
+    def _enable_toolbars(self, visible=True):
         """ Enable/disable all plugin toolbars from QGIS GUI """
 
         # Enable/Disable actions
-        self.enable_all_buttons(visible)
+        self._enable_all_buttons(visible)
         try:
             for plugin_toolbar in list(self.plugin_toolbars.values()):
                 if plugin_toolbar.enabled:
@@ -379,41 +381,27 @@ class GwLoadProject(QObject):
         except Exception as e:
             tools_log.log_warning(str(e))
 
-
-    def enable_toolbar(self, toolbar_id, enable=True):
-        """ Enable/Disable toolbar. Normally because user has no permission """
-
-        if toolbar_id in self.plugin_toolbars:
-            plugin_toolbar = self.plugin_toolbars[toolbar_id]
-            plugin_toolbar.toolbar.setVisible(enable)
-            for index_action in plugin_toolbar.list_actions:
-                self.enable_button(index_action, enable)
-
-
-    def enable_all_buttons(self, enable=True):
+    def _enable_all_buttons(self, enable=True):
         """ Utility to enable/disable all buttons """
 
         for index in self.buttons.keys():
-            self.enable_button(index, enable)
+            self._enable_button(index, enable)
 
-
-    def enable_button(self, button_id, enable=True):
+    def _enable_button(self, button_id, enable=True):
         """ Enable/disable selected button """
 
         key = str(button_id).zfill(2)
         if key in self.buttons:
             self.buttons[key].action.setEnabled(enable)
 
-
-    def hide_button(self, button_id, hide=True):
+    def _hide_button(self, button_id, hide=True):
         """ Enable/disable selected action """
 
         key = str(button_id).zfill(2)
         if key in self.buttons:
             self.buttons[key].action.setVisible(not hide)
 
-
-    def check_schema(self, schemaname=None):
+    def _check_schema(self, schemaname=None):
         """ Check if selected schema exists """
 
         if schemaname is None:
@@ -424,4 +412,14 @@ class GwLoadProject(QObject):
         params = [schemaname]
         row = tools_db.get_row(sql, params=params)
         return row
+    
+    def _enable_toolbar(self, toolbar_id, enable=True):
+        """ Enable/Disable toolbar. Normally because user has no permission """
 
+        if toolbar_id in self.plugin_toolbars:
+            plugin_toolbar = self.plugin_toolbars[toolbar_id]
+            plugin_toolbar.toolbar.setVisible(enable)
+            for index_action in plugin_toolbar.list_actions:
+                self._enable_button(index_action, enable)
+
+    # endregion
