@@ -616,8 +616,7 @@ BEGIN
 				WHEN 'category_type' THEN	
 					IF (SELECT (a->>'vdef') FROM json_array_elements(v_values_array) AS a
 					WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = 'edit_feature_category_vdefault'))=v_catfeature.id THEN
-						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a
-						WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = 'edit_featureval_category_vdefault');
+						SELECT value INTO field_value FROM config_param_user WHERE parameter = 'edit_featureval_category_vdefault' and cur_user=current_user;
 					ELSE
 						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a
 						WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = concat('edit_', lower(v_catfeature.feature_type), '_category_vdefault'));
@@ -626,8 +625,7 @@ BEGIN
 				WHEN 'fluid_type' THEN
 					IF (SELECT (a->>'vdef') FROM json_array_elements(v_values_array) AS a
 					WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = 'edit_feature_fluid_vdefault'))=v_catfeature.id THEN
-						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a
-						WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = 'edit_featureval_fluid_vdefault');
+						SELECT value INTO field_value FROM config_param_user WHERE parameter = 'edit_featureval_fluid_vdefault' and cur_user=current_user;
 					ELSE
 						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a
 						WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = concat('edit_', lower(v_catfeature.feature_type), '_fluid_vdefault'));
@@ -636,8 +634,7 @@ BEGIN
 				WHEN 'function_type' THEN	
 					IF (SELECT (a->>'vdef') FROM json_array_elements(v_values_array) AS a
 					WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = 'edit_feature_function_vdefault'))=v_catfeature.id THEN
-						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a
-						WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = 'edit_featureval_function_vdefault');
+						SELECT value INTO field_value FROM config_param_user WHERE parameter = 'edit_featureval_function_vdefault' and cur_user=current_user;
 					ELSE
 						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a
 						WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = concat('edit_', lower(v_catfeature.feature_type), '_function_vdefault'));
@@ -646,8 +643,7 @@ BEGIN
 				WHEN 'location_type' THEN	
 					IF (SELECT (a->>'vdef') FROM json_array_elements(v_values_array) AS a
 					WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = 'edit_feature_location_vdefault'))=v_catfeature.id THEN
-						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a
-						WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = 'edit_featureval_location_vdefault');
+						SELECT value INTO field_value FROM config_param_user WHERE parameter = 'edit_featureval_location_vdefault' and cur_user=current_user;
 					ELSE
 						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a
 						WHERE ((a->>'param') = (aux_json->>'columnname') AND a->>'parameter' = concat('edit_', lower(v_catfeature.feature_type), '_location_vdefault'));
