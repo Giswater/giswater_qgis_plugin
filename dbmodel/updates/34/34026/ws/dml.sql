@@ -59,6 +59,7 @@ INSERT INTO config_form_fields VALUES ('v_edit_inp_connec', 'form_feature', 'pat
 UPDATE config_param_system SET value='TRUE' WHERE parameter='admin_config_control_trigger';
 
 --2021/01/14
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer_state", "column":"is_operative", "dataType":"boolean"}}$$);
-
 UPDATE ext_rtc_hydrometer_state SET is_operative=TRUE;
+
+INSERT INTO om_typevalue VALUES ('mincut_state','4','On planning')
+ON CONFLICT (typevalue, id) DO NOTHING;
