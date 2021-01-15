@@ -502,7 +502,7 @@ class MincutParent(ParentAction):
 
         # Manage 'address'
         address_exploitation_id = utils_giswater.get_item_data(self.dlg_mincut, self.dlg_mincut.address_add_muni)
-        address_street = utils_giswater.getWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
+        address_street = self.dlg_mincut.address_add_street.property('id_')
         address_number = utils_giswater.getWidgetText(
             self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
 

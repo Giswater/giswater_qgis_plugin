@@ -167,12 +167,17 @@ class ApiSearch(ApiParent):
 
         # Get text from selected row
         _key = completer.completionModel().index(row, 0).data()
+
         # Search text into self.result_data: this variable contains all matching objects in the function "make_list()"
         item = None
         for data in self.result_data['data']:
             if _key == data['display_name']:
                 item = data
                 break
+
+        for line_edit in line_list:
+            if 'id' in item:
+                line_edit.setProperty('id_', item['id'])
 
         # Show info in docker?
         if self.is_mincut is False:
