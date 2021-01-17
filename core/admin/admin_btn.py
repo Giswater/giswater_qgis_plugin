@@ -2825,12 +2825,18 @@ class GwAdminButton:
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(True)
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(True)
 
-            sql = (f"SELECT cat_feature.child_layer, cat_feature.child_layer FROM {schema_name}.cat_feature "
+            if not tools_db.check_table('cat_feature'):
+                tools_log.log_warning(f"Table not found: 'cat_feature'")
+                return
+
+            sql = (f"SELECT cat_feature.child_layer, cat_feature.child_layer "
+                   f"FROM {schema_name}.cat_feature "
                    f" ORDER BY id")
             rows = tools_db.get_rows(sql)
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_ui, rows, 1)
 
-            sql = (f"SELECT cat_feature.id, cat_feature.id FROM {schema_name}.cat_feature "
+            sql = (f"SELECT cat_feature.id, cat_feature.id "
+                   f"FROM {schema_name}.cat_feature "
                    f" ORDER BY id")
             rows = tools_db.get_rows(sql)
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_fields, rows, 1)
