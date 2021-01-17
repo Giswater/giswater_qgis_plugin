@@ -117,9 +117,10 @@ class GwAdminButton:
         # Manage super users
         self.super_users = []
         super_users = tools_gw.get_config_parser('system', 'super_users', "project", "init")
+        if super_users:
         super_users = super_users.split(',')
         for super_user in super_users:
-            self.super_users.append(str(super_user))
+                self.super_users.append(str(super_user).strip())
 
         # Get locale of QGIS application
         self.locale = tools_qgis.get_plugin_settings_value('locale/userLocale', 'en_us').lower()
