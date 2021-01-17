@@ -114,23 +114,23 @@ class I18NGenerator(ParentAction):
         py_language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
         xml_language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 2)
         py_file = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
-        key_lbl = f'lb_{py_language}'
+        key_msg = f'ms_{py_language}'
+		key_lbl = f'lb_{py_language}'
         key_tooltip = f'tt_{py_language}'
 
         # Get python messages values
-        sql = f"SELECT source, {py_language} FROM i18n.pymessage;"
+        sql = f"SELECT source, {key_msg} FROM i18n.pymessage;"
         py_messages = self.get_rows(sql)
 
         # Get python toolbars and buttons values
-        sql = f"SELECT source, enen, {py_language} FROM i18n.pytoolbar;"
+        sql = f"SELECT source, lb_en_en, {key_lbl} FROM i18n.pytoolbar;"
         py_toolbars = self.get_rows(sql)
 
-        # Get ui messages values
-        sql = (f"SELECT dialog_name, source, lb_enen, {key_lbl}, tt_eses, {key_tooltip} "
+        # Get ui values
+        sql = (f"SELECT dialog_name, source, lb_en_en, {key_lbl}, tt_en_en, {key_tooltip} "
                f" FROM i18n.pydialog "
                f" ORDER BY dialog_name;")
         py_dialogs = self.get_rows(sql)
-
 
         ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{py_file}.ts'
         # Check if file exist
@@ -156,8 +156,8 @@ class I18NGenerator(ParentAction):
             line = f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_tlb['source']}</source>\n"
             if py_tlb[py_language] is None:
-                py_tlb[py_language] = py_tlb['enen']
-                if py_tlb['enen'] is None:
+                py_tlb[py_language] = py_tlb['en_en']
+                if py_tlb['en_en'] is None:
                     py_tlb[py_language] = py_tlb['source']
 
             line += f"\t\t\t<translation>{py_tlb[py_language]}</translation>\n"
@@ -206,7 +206,7 @@ class I18NGenerator(ParentAction):
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_dlg['source']}</source>\n"
             if py_dlg[key_lbl] is None:
-                py_dlg[key_lbl] = py_dlg['lb_enen']
+                py_dlg[key_lbl] = py_dlg['lb_en_en']
 
             line += f"\t\t\t<translation>{py_dlg[key_lbl]}</translation>\n"
             line += f"\t\t</message>\n"
@@ -215,7 +215,7 @@ class I18NGenerator(ParentAction):
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>tooltip_{py_dlg['source']}</source>\n"
             if py_dlg[key_lbl] is None:
-                py_dlg[key_tooltip] = py_dlg['lb_enen']
+                py_dlg[key_tooltip] = py_dlg['lb_en_en']
             line += f"\t\t\t<translation>{py_dlg[key_tooltip]}</translation>\n"
             line += f"\t\t</message>\n"
 
@@ -241,7 +241,7 @@ class I18NGenerator(ParentAction):
             if py['source'] == f'dlg_{name}':
                 title = py[key_lbl]
                 if not title:
-                    title = py['lb_enen']
+                    title = py['lb_en_en']
                 return title
         return title
 
@@ -255,8 +255,9 @@ class I18NGenerator(ParentAction):
         ver = version_metadata.split('.')
         plugin_version = f'{ver[0]}{ver[1]}'
         plugin_release = version_metadata.replace('.', '')
+		
         # Get db messages values
-        sql = (f"SELECT source, project_type, context, formname, formtype, lb_enen, lb_{db_lang}, tt_enen, tt_{db_lang} "
+        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_en, lb_{db_lang}, tt_en_en, tt_{db_lang} "
                f" FROM i18n.dbdialog "
                f" WHERE context in ('config_param_system', 'sys_param_user')"
                f" ORDER BY formname;")
@@ -266,6 +267,7 @@ class I18NGenerator(ParentAction):
         cfg_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'updates' + os.sep + f'{plugin_version}' + ''
                     + os.sep + f"{plugin_release}" + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
         file_name = f'dml.sql'
+		
         # Check if file exist
         if os.path.exists(cfg_path + file_name):
             msg = "Are you sure you want to overwrite this file?"
@@ -290,7 +292,7 @@ class I18NGenerator(ParentAction):
         plugin_release = version_metadata.replace('.', '')
 
         # Get db messages values
-        sql = (f"SELECT source, project_type, context, formname, formtype, lb_enen, lb_{db_lang}, tt_enen, tt_{db_lang} "
+        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_en, lb_{db_lang}, tt_en_en, tt_{db_lang} "
                f" FROM i18n.dbdialog "
                f" WHERE context not in ('config_param_system', 'sys_param_user')"
                f" ORDER BY formname;")
@@ -337,14 +339,14 @@ class I18NGenerator(ParentAction):
             form_name = row['formname']
             form_type = row['formtype']
             source = row['source']
-            lbl_value = row[f'lb_{db_lang}'] if row[f'lb_{db_lang}'] is not None else row['lb_enen']
+            lbl_value = row[f'lb_{db_lang}'] if row[f'lb_{db_lang}'] is not None else row['lb_en_en']
 
             if row[f'tt_{db_lang}'] is not None:
                 tt_value = row[f'tt_{db_lang}']
-            elif row[f'tt_enen'] is not None:
-                tt_value = row[f'tt_enen']
+            elif row[f'tt_en_en'] is not None:
+                tt_value = row[f'tt_en_en']
             else:
-                tt_value = row['lb_enen']
+                tt_value = row['lb_en_en']
 
             line = f'SELECT gw_fct_admin_schema_i18n($$'
             if row['context'] in ('config_param_system', 'sys_param_user'):
