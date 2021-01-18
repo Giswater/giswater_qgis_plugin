@@ -1789,11 +1789,10 @@ class GwMincut:
         self.is_new = False
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
-
-        sql = (f"SELECT om_mincut.*, cat_users.name AS assigned_to_name"
+        sql = (f"SELECT om_mincut.*, cat_users.name AS assigned_to_name, v_ext_streetaxis.descript AS street_name"
                f" FROM om_mincut"
-               f" INNER JOIN cat_users"
-               f" ON cat_users.id = om_mincut.assigned_to"
+               f" INNER JOIN cat_users ON cat_users.id = om_mincut.assigned_to"
+               f" INNER JOIN v_ext_streetaxis ON v_ext_streetaxis.id = om_mincut.streetaxis_id"
                f" WHERE om_mincut.id = '{result_mincut_id}'")
         row = tools_db.get_row(sql)
         if not row:
@@ -1816,7 +1815,7 @@ class GwMincut:
 
         # Manage location
         tools_qt.set_combo_value(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
-        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.address_add_street, str(row['streetaxis_id']))
+        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.address_add_street, str(row['street_name']))
         tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, str(row['postnumber']))
 
         # Manage dates
