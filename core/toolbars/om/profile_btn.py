@@ -260,7 +260,8 @@ class GwProfileButton(GwMaptoolButton):
                 self.dlg_draw_profile.txt_profile_id.setText(str(profile_id))
                 list_arcs = profile['values']['listArcs']
                 self.dlg_draw_profile.tbl_list_arc.clear()
-                for arc in list_arcs:
+
+                for arc in list_arcs.strip('][').split(', '):
                     item_arc = QListWidgetItem(str(arc))
                     self.dlg_draw_profile.tbl_list_arc.addItem(item_arc)
                 self.dlg_draw_profile.txt_min_distance.setText(str(profile['values']['linksDistance']))
@@ -271,9 +272,9 @@ class GwProfileButton(GwMaptoolButton):
 
                 self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
                 self.remove_selection()
-                list_arcs = profile['values']['listArcs']
+
                 expr_filter = "\"arc_id\" IN ("
-                for arc in list_arcs:
+                for arc in list_arcs.strip('][').split(', '):
                     expr_filter += f"'{arc}', "
                 expr_filter = expr_filter[:-2] + ")"
                 expr = QgsExpression(expr_filter)
