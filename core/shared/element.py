@@ -229,15 +229,15 @@ class GwElement:
     def set_default_values(self):
         """ Set default values """
 
-        self.manage_combo(self.dlg_add_element.element_type, 'elementcat_vdefault')
-        self.manage_combo(self.dlg_add_element.elementcat_id, 'elementcat_vdefault')
-        self.manage_combo(self.dlg_add_element.state, 'state_vdefault')
-        self.manage_combo(self.dlg_add_element.state_type, 'statetype_1_vdefault')
-        self.manage_combo(self.dlg_add_element.ownercat_id, 'ownercat_vdefault')
-        self.manage_combo(self.dlg_add_element.builtdate, 'builtdate_vdefault')
-        self.manage_combo(self.dlg_add_element.workcat_id, 'workcat_vdefault')
-        self.manage_combo(self.dlg_add_element.workcat_id_end, 'workcat_id_end_vdefault')
-        self.manage_combo(self.dlg_add_element.verified, 'verified_vdefault')
+        self.manage_combo(self.dlg_add_element.element_type, 'edit_elementcat_vdefault')
+        self.manage_combo(self.dlg_add_element.elementcat_id, 'edit_elementcat_vdefault')
+        self.manage_combo(self.dlg_add_element.state, 'edit_state_vdefault')
+        self.manage_combo(self.dlg_add_element.state_type, 'edit_statetype_1_vdefault')
+        self.manage_combo(self.dlg_add_element.ownercat_id, 'edit_ownercat_vdefault')
+        self.manage_combo(self.dlg_add_element.builtdate, 'edit_builtdate_vdefault')
+        self.manage_combo(self.dlg_add_element.workcat_id, 'edit_workcat_vdefault')
+        self.manage_combo(self.dlg_add_element.workcat_id_end, 'edit_workcat_id_end_vdefault')
+        self.manage_combo(self.dlg_add_element.verified, 'edit_verified_vdefault')
 
 
     def manage_combo(self, combo, parameter):
