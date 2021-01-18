@@ -147,10 +147,17 @@ def get_plugin_version():
 
 
 def get_higher_version(default_version='3.5'):
-    """ Get plugin version from metadata.txt file """
-    
+    """ Get plugin higher version from metadata.txt file """
+
     higher_version = get_plugin_metadata('version', default_version)[0:3]
     return higher_version
+
+
+def get_build_version():
+    """ Get plugin build version from metadata.txt file """
+
+    build_version = get_plugin_metadata('version').replace(".", "")
+    return build_version
 
 
 def get_project_variables():
