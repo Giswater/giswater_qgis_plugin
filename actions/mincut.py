@@ -1879,10 +1879,10 @@ class MincutParent(ParentAction):
         # Force fill form mincut
         self.result_mincut_id.setText(str(result_mincut_id))
 
-        sql = (f"SELECT om_mincut.*, cat_users.name AS assigned_to_name"
+        sql = (f"SELECT om_mincut.*, cat_users.name AS assigned_to_name, v_ext_streetaxis.descript AS street_name"
                f" FROM om_mincut"
-               f" INNER JOIN cat_users"
-               f" ON cat_users.id = om_mincut.assigned_to"
+               f" INNER JOIN cat_users ON cat_users.id = om_mincut.assigned_to"
+               f" INNER JOIN v_ext_streetaxis ON v_ext_streetaxis.id = om_mincut.streetaxis_id"
                f" WHERE om_mincut.id = '{result_mincut_id}'")
         row = self.controller.get_row(sql)
         if not row:
@@ -1899,13 +1899,13 @@ class MincutParent(ParentAction):
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.state, mincut_state_name)
         extras = f'"mincutId":"{result_mincut_id}"'
         body = self.create_body(extras=extras)
-        result = self.controller.get_json('gw_fct_getmincut', body)
+        result = self.controller.get_json('gw_fct_getmincut', body, log_sql=True)
         self.add_layer.add_temp_layer(self.dlg_mincut, result['body']['data'], None, False, disable_tabs=False)
-        #self.dlg_mincut.txt_infolog.setEnabled(False)
+
 
         # Manage location
         utils_giswater.set_combo_itemData(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
-        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, str(row['streetaxis_id']))
+        utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_street, str(row['street_name']))
         utils_giswater.setWidgetText(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, str(row['postnumber']))
 
         # Manage dates
