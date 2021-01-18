@@ -64,8 +64,9 @@ class Giswater(QObject):
         global_vars.plugin_dir = self.plugin_dir
         global_vars.iface = self.iface
         self.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater')
+        short_version = tools_qgis.get_plugin_metadata('version', 'giswater')[0:4]
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
-        roaming_user_dir = f'{tools_os.get_datadir()}{os.sep}{self.plugin_name}{os.sep}giswater35'
+        roaming_user_dir = f'{tools_os.get_datadir()}{os.sep}{self.plugin_name.capitalize()}{os.sep}{short_version}'
         global_vars.init_global(self.iface, self.iface.mapCanvas(), self.plugin_dir, self.plugin_name, roaming_user_dir)
 
         # Check if config file exists
