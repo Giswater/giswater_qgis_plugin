@@ -22,9 +22,13 @@ class GwI18NGenerator:
 
     def __init__(self):
         self.plugin_dir = global_vars.plugin_dir
+        self.language = None
+        self.lower_lang = None
 
-
-    def init_dialog(self):
+    def main(self, lang='mylang', ip=None, port='5433', db='giswater', user='myuser', pwd='mypss', version='3.5.001'):
+        self.language = lang
+        self.self.lower_lang = self.language.lower
+        self.version = version
         self.dlg_qm = GwAdminTranslationUi()
         tools_gw.load_settings(self.dlg_qm)
         self.load_user_values()
@@ -78,7 +82,7 @@ class GwI18NGenerator:
         msg = ''
 
         if py_msg:
-            status_py_msg = self.create_files_py_message()
+            status_py_msg = self.create_py_files()
             if status_py_msg is True:
                 msg += "Python translation successful\n"
             elif status_py_msg is False:
@@ -87,7 +91,7 @@ class GwI18NGenerator:
                 msg += "Python translation canceled\n"
 
         if db_msg:
-            status_cfg_msg = self.get_files_config_messages()
+            status_cfg_msg = self.create_db_files()
             if status_cfg_msg is True:
                 msg += "Data base translation successful\n"
             elif status_cfg_msg is False:
@@ -99,33 +103,31 @@ class GwI18NGenerator:
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
 
 
-    def create_files_py_message(self):
+    def create_py_files(self):
         """ Read the values of the database and generate the ts and qm files """
-        # In the database, the dialog_name column must match the name of the ui file (no extension).
+        # On the database, the dialog_name column must match the name of the ui file (no extension).
         # Also, open_dialog function must be called, passed as parameter dlg_name = 'ui_file_name_without_extension'
 
-        py_language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 1)
-        xml_language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 2)
-        py_file = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 3)
-        key_lbl = f'lb_{py_language}'
-        key_tooltip = f'tt_{py_language}'
+        key_label = f'lb_{self.lower_lang}'
+        key_tooltip = f'tt_{self.lower_lang}'
+        key_message = f'ms_{self.lower_lang}'
 
         # Get python messages values
-        sql = f"SELECT source, {py_language} FROM i18n.pymessage;"
+        sql = f"SELECT source, ms_en_en, {key_message} FROM i18n.pymessage;"
         py_messages = self.get_rows(sql)
 
         # Get python toolbars and buttons values
-        sql = f"SELECT source, enen, {py_language} FROM i18n.pytoolbar;"
+        sql = f"SELECT source, lb_en_en, {key_label} FROM i18n.pytoolbar;"
         py_toolbars = self.get_rows(sql)
 
-        # Get ui messages values
-        sql = (f"SELECT dialog_name, source, lb_enen, {key_lbl}, tt_eses, {key_tooltip} "
+        # Get python dialog values
+        sql = (f"SELECT dialog_name, source, lb_en_en, {key_label}, tt_en_en, {key_tooltip} "
                f" FROM i18n.pydialog "
                f" ORDER BY dialog_name;")
         py_dialogs = self.get_rows(sql)
 
+        ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{self.lower_lang}.ts'
 
-        ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{py_file}.ts'
         # Check if file exist
         if os.path.exists(ts_path):
             msg = "Are you sure you want to overwrite this file?"
@@ -137,7 +139,7 @@ class GwI18NGenerator:
         # Create header
         line = '<?xml version="1.0" encoding="utf-8"?>\n'
         line += '<!DOCTYPE TS>\n'
-        line += f'<TS version="2.0" language="{xml_language}">\n'
+        line += f'<TS version="2.0" language="{self.language}">\n'
         ts_file.write(line)
 
         # Create children for toolbars and actions
@@ -148,12 +150,12 @@ class GwI18NGenerator:
         for py_tlb in py_toolbars:
             line = f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_tlb['source']}</source>\n"
-            if py_tlb[py_language] is None:
-                py_tlb[py_language] = py_tlb['enen']
-                if py_tlb['enen'] is None:
-                    py_tlb[py_language] = py_tlb['source']
+            if py_tlb[self.lower_lang] is None:
+                py_tlb[self.lower_lang] = py_tlb['lb_en_en']
+                if py_tlb['lb_en_en'] is None:
+                    py_tlb[self.lower_lang] = py_tlb['source']
 
-            line += f"\t\t\t<translation>{py_tlb[py_language]}</translation>\n"
+            line += f"\t\t\t<translation>{py_tlb[self.lower_lang]}</translation>\n"
             line += f"\t\t</message>\n"
             line = line.replace("&", "")
             ts_file.write(line)
@@ -166,9 +168,9 @@ class GwI18NGenerator:
         for py_msg in py_messages:
             line = f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_msg['source']}</source>\n"
-            if py_msg[py_language] is None:
-                py_msg[py_language] = py_msg['source']
-            line += f"\t\t\t<translation>{py_msg[py_language]}</translation>\n"
+            if py_msg[self.lower_lang] is None:
+                py_msg[self.lower_lang] = py_msg['source']
+            line += f"\t\t\t<translation>{py_msg[key_message]}</translation>\n"
             line += f"\t\t</message>\n"
             line = line.replace("&", "")
             ts_file.write(line)
@@ -188,7 +190,7 @@ class GwI18NGenerator:
                 name = py_dlg['dialog_name']
                 line = '\t<context>\n'
                 line += f'\t\t<name>{name}</name>\n'
-                title = self.get_title(py_dialogs, name, key_lbl)
+                title = self.get_title(py_dialogs, name, key_label)
                 if title:
                     line += f'\t\t<message>\n'
                     line += f'\t\t\t<source>title</source>\n'
@@ -198,17 +200,17 @@ class GwI18NGenerator:
             # Create child for labels
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_dlg['source']}</source>\n"
-            if py_dlg[key_lbl] is None:
-                py_dlg[key_lbl] = py_dlg['lb_enen']
+            if py_dlg[key_label] is None:
+                py_dlg[key_label] = py_dlg['lb_en_en']
 
-            line += f"\t\t\t<translation>{py_dlg[key_lbl]}</translation>\n"
+            line += f"\t\t\t<translation>{py_dlg[key_label]}</translation>\n"
             line += f"\t\t</message>\n"
 
             # Create child for tooltip
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>tooltip_{py_dlg['source']}</source>\n"
-            if py_dlg[key_lbl] is None:
-                py_dlg[key_tooltip] = py_dlg['lb_enen']
+            if py_dlg[key_label] is None:
+                py_dlg[key_tooltip] = py_dlg['lb_en_en']
             line += f"\t\t\t<translation>{py_dlg[key_tooltip]}</translation>\n"
             line += f"\t\t</message>\n"
 
@@ -227,36 +229,28 @@ class GwI18NGenerator:
             return False
 
 
-    def get_title(self, py_dialogs, name, key_lbl):
+    def get_title(self, py_dialogs, name, key_label):
         title = None
         for py in py_dialogs:
             if py['source'] == f'dlg_{name}':
-                title = py[key_lbl]
+                title = py[key_label]
                 if not title:
-                    title = py['lb_enen']
+                    title = py['lb_en_en']
                 return title
         return title
 
 
-    def get_files_config_messages(self):
+    def create_db_files(self):
         """ Read the values of the database and update the i18n files """
 
-        db_lang = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 1)
-        file_lng = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 3)
+        ver = self.version.split('.')
+        ver_minor = f'{ver[0]}{ver[1]}'
+        ver_build = self.version.replace('.', '')
 
-        plugin_version, message = tools_qgis.get_plugin_version()
-        if plugin_version is None:
-            if message:
-                tools_qgis.show_warning(message)
-            return
-
-        ver = plugin_version.split('.')
-        plugin_version = f'{ver[0]}{ver[1]}'
-        plugin_release = plugin_version.replace('.', '')
-
-        cfg_path = (self.plugin_dir + os.sep + 'dbmodel' + os.sep + 'updates' + os.sep + f'{plugin_version}' + ''
-                    + os.sep + f"{plugin_release}" + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
+        cfg_path = (self.plugin_dir + os.sep + 'dbmodel' + os.sep + 'updates' + os.sep + f'{ver_minor}' + ''
+                    + os.sep + f"{ver_build}" + os.sep + 'i18n' + os.sep + f'{self.language}' + os.sep + '')
         file_name = f'dml.sql'
+
         # Check if file exist
         if os.path.exists(cfg_path + file_name):
             msg = "Are you sure you want to overwrite this file?"
@@ -267,7 +261,8 @@ class GwI18NGenerator:
             os.makedirs(cfg_path, exist_ok=True)
 
         # Get db messages values
-        sql = (f"SELECT source, project_type, context, formname, formtype, lb_enen, lb_{db_lang}, tt_enen, tt_{db_lang}"
+        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_en, lb_{self.lower_lang}, tt_en_en, "
+               f"tt_{self.lower_lang}"
                f" FROM i18n.dbdialog "
                f" ORDER BY context, formname;")
         rows = self.get_rows(sql)
@@ -299,21 +294,20 @@ class GwI18NGenerator:
 
 
         file = open(path, "a")
-        db_lang = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 1)
 
         for row in rows:
             table = row['context'] if row['context'] is not None else ""
             form_name = row['formname']if row['formname'] is not None else ""
             form_type = row['formtype']if row['formtype'] is not None else ""
             source = row['source']if row['source'] is not None else ""
-            lbl_value = row[f'lb_{db_lang}'] if row[f'lb_{db_lang}'] is not None else row['lb_enen']
+            lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None else row['lb_en_en']
             lbl_value = lbl_value if lbl_value is not None else ""
-            if row[f'tt_{db_lang}'] is not None:
-                tt_value = row[f'tt_{db_lang}']
-            elif row[f'tt_enen'] is not None:
-                tt_value = row[f'tt_enen']
+            if row[f'tt_{self.lower_lang}'] is not None:
+                tt_value = row[f'tt_{self.lower_lang}']
+            elif row[f'tt_en_en'] is not None:
+                tt_value = row[f'tt_en_en']
             else:
-                tt_value = row['lb_enen']
+                tt_value = row['lb_en_en']
             tt_value = tt_value if tt_value is not None else ""
             line = f'SELECT gw_fct_admin_schema_i18n($$'
             if row['context'] in ('config_param_system', 'sys_param_user'):
