@@ -9,13 +9,12 @@ import os
 import psycopg2
 import psycopg2.extras
 import subprocess
-
 from functools import partial
 
-from .. import global_vars
-from ..lib import tools_qt, tools_qgis, tools_db
-from ..core.ui.ui_manager import GwAdminTranslationUi
-from ..core.utils import tools_gw
+from ..ui.ui_manager import GwAdminTranslationUi
+from ..utils import tools_gw
+from ... import global_vars
+from ...lib import tools_qt, tools_qgis, tools_db
 
 
 class GwI18NGenerator:
@@ -27,7 +26,7 @@ class GwI18NGenerator:
 
     def main(self, lang='mylang', ip=None, port='5433', db='giswater', user='myuser', pwd='mypss', version='3.5.001'):
         self.language = lang
-        self.self.lower_lang = self.language.lower
+        self.lower_lang = self.language.lower
         self.version = version
         self.dlg_qm = GwAdminTranslationUi()
         tools_gw.load_settings(self.dlg_qm)
