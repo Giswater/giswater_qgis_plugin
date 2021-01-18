@@ -105,7 +105,7 @@ class GwMincut:
         """ Custom form initial configuration """
         # Setting lists
 
-        self.mincut_class = None
+        self.mincut_class = 1
         self.user_current_layer = self.iface.activeLayer()
         self.init_mincut_canvas()
         tools_qgis.remove_layer_from_toc('Overlap affected arcs', 'GW Temporal Layers')
