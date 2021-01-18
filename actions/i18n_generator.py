@@ -115,7 +115,7 @@ class I18NGenerator(ParentAction):
         xml_language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 2)
         py_file = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
         key_msg = f'ms_{py_language}'
-		key_lbl = f'lb_{py_language}'
+        key_lbl = f'lb_{py_language}'
         key_tooltip = f'tt_{py_language}'
 
         # Get python messages values
@@ -255,7 +255,7 @@ class I18NGenerator(ParentAction):
         ver = version_metadata.split('.')
         plugin_version = f'{ver[0]}{ver[1]}'
         plugin_release = version_metadata.replace('.', '')
-		
+
         # Get db messages values
         sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_en, lb_{db_lang}, tt_en_en, tt_{db_lang} "
                f" FROM i18n.dbdialog "
@@ -267,7 +267,7 @@ class I18NGenerator(ParentAction):
         cfg_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'updates' + os.sep + f'{plugin_version}' + ''
                     + os.sep + f"{plugin_release}" + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
         file_name = f'dml.sql'
-		
+
         # Check if file exist
         if os.path.exists(cfg_path + file_name):
             msg = "Are you sure you want to overwrite this file?"
@@ -351,10 +351,10 @@ class I18NGenerator(ParentAction):
             line = f'SELECT gw_fct_admin_schema_i18n($$'
             if row['context'] in ('config_param_system', 'sys_param_user'):
                 line += (f'{{"data":'
-                        f'{{"table":"{table}", '
-                        f'"formname":"{form_name}", '
-                        f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
-                        f'"tooltip":{{"column":"descript", "value":"{tt_value}"}}')
+                         f'{{"table":"{table}", '
+                         f'"formname":"{form_name}", '
+                         f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
+                         f'"tooltip":{{"column":"descript", "value":"{tt_value}"}}')
             elif row['context'] not in ('config_param_system', 'sys_param_user'):
                 line += (f'{{"data":'
                          f'{{"table":"{table}", '
