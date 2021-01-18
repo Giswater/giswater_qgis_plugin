@@ -1406,20 +1406,26 @@ class GwVisit(QObject):
         # fetch the record
         event = GwOmVisitEvent()
         event.id = selected_list[0].data()
+
         if not event.fetch():
             return
 
         # get parameter_id code to select the widget useful to edit the event
         om_event_parameter = GwConfigVisitParameter()
         om_event_parameter.id = event.parameter_id
+        parameter_id = event.parameter_id
+        
         if not om_event_parameter.fetch():
             return
+
         dlg_name = None
+        row = selected_list[0].row()
         if om_event_parameter.form_type in ('event_ud_arc_standard', 'event_standard'):
-            event_code = self.dlg_add_visit.tbl_event.model().record(0).value('event_code')
-            _value = self.dlg_add_visit.tbl_event.model().record(0).value('value')
-            position_value = self.dlg_add_visit.tbl_event.model().record(0).value('position_value')
-            text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
+
+            event_code = self.dlg_add_visit.tbl_event.model().record(row).value('event_code')
+            _value = self.dlg_add_visit.tbl_event.model().record(row).value('value')
+            position_value = self.dlg_add_visit.tbl_event.model().record(row).value('position_value')
+            text = self.dlg_add_visit.tbl_event.model().record(row).value('text')
             self.dlg_event = GwVisitEventUi()
             tools_gw.load_settings(self.dlg_event)
             self.populate_position_id()
@@ -1437,13 +1443,14 @@ class GwVisit(QObject):
             self.dlg_event.position_value.setEnabled(False)
 
         elif om_event_parameter.form_type == 'event_ud_arc_rehabit':
-            position_value = self.dlg_add_visit.tbl_event.model().record(0).value('position_value')
-            value1 = self.dlg_add_visit.tbl_event.model().record(0).value('value1')
-            value2 = self.dlg_add_visit.tbl_event.model().record(0).value('value2')
-            geom1 = self.dlg_add_visit.tbl_event.model().record(0).value('geom1')
-            geom2 = self.dlg_add_visit.tbl_event.model().record(0).value('geom2')
-            geom3 = self.dlg_add_visit.tbl_event.model().record(0).value('geom3')
-            text = self.dlg_add_visit.tbl_event.model().record(0).value('text')
+
+            position_value = self.dlg_add_visit.tbl_event.model().record(row).value('position_value')
+            value1 = self.dlg_add_visit.tbl_event.model().record(row).value('value1')
+            value2 = self.dlg_add_visit.tbl_event.model().record(row).value('value2')
+            geom1 = self.dlg_add_visit.tbl_event.model().record(row).value('geom1')
+            geom2 = self.dlg_add_visit.tbl_event.model().record(row).value('geom2')
+            geom3 = self.dlg_add_visit.tbl_event.model().record(row).value('geom3')
+            text = self.dlg_add_visit.tbl_event.model().record(row).value('text')
             self.dlg_event = GwVisitEventRehabUi()
             tools_gw.load_settings(self.dlg_event)
             self.populate_position_id()
@@ -1460,6 +1467,7 @@ class GwVisit(QObject):
             self.dlg_event.position_value.setEnabled(True)
 
         elif om_event_parameter.form_type == 'event_standard':
+
             index = selected_list[0]
             row = index.row()
             column_index = tools_qt.get_col_index_by_col_name(self.dlg_add_visit.tbl_event, 'parameter_id')
