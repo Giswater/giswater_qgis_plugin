@@ -15,13 +15,42 @@ select * from i18n.pydialog
 
 -- translate it
 
+
 -- btn_accept
-update i18n.dbdialog set lb_es_es = 'Aceptar' where source = 'btn_accept' and lb_ca_es is null;
-update i18n.dbdialog set tt_es_es = 'Aceptar' where source = 'btn_accept' and tt_es_es is null;
+update i18n.pydialog set lb_es_es = 'Aceptar' where source = 'btn_accept' and lb_es_es is null;
+update i18n.pydialog set tt_es_es = 'Aceptar' where source = 'btn_accept' and tt_es_es is null;
 
 -- btn_cancel
-update i18n.dbdialog set lb_es_es = 'Cancelar' where source = 'btn_cancel' and lb_ca_es is null;
-update i18n.dbdialog set tt_es_es = 'Cancelar' where source = 'btn_cancel' and tt_es_es is null;
+update i18n.pydialog set lb_es_es = 'Cancelar' where source = 'btn_cancel' and lb_es_es is null;
+update i18n.pydialog set tt_es_es = 'Cancelar' where source = 'btn_cancel' and tt_es_es is null;
+
+-- btn_close
+update i18n.pydialog set lb_es_es = 'Cerrar' where source = 'btn_close' and lb_es_es is null;
+update i18n.pydialog set tt_es_es = 'Cerrar' where source = 'btn_close' and tt_es_es is null;
+
+-- btn_delete
+update i18n.pydialog set lb_es_es = 'Eliminar' where source = 'btn_delete' and lb_es_es is null;
+update i18n.pydialog set tt_es_es = 'Eliminar' where source = 'btn_delete' and tt_es_es is null;
+
+-- btn_insert
+update i18n.pydialog set lb_es_es = 'Insertar' where source = 'btn_insert' and lb_es_es is null;
+update i18n.pydialog set tt_es_es = 'Insertar' where source = 'btn_insert' and tt_es_es is null;
+
+-- btn_snapping
+update i18n.pydialog set lb_es_es = 'Snapping' where source = 'btn_snapping' and lb_es_es is null;
+update i18n.pydialog set tt_es_es = 'Snapping' where source = 'btn_snapping' and tt_es_es is null;
+
+-- lbl_visit_id
+update i18n.pydialog set lb_es_es = 'Visita ID' where source = 'lbl_visit_id' and lb_es_es is null;
+update i18n.pydialog set tt_es_es = 'Visita ID' where source = 'lbl_visit_id' and tt_es_es is null;
+
+-- lbl_link
+update i18n.pydialog set lb_es_es = 'Enlace' where source = 'lbl_link' and lb_es_es is null;
+update i18n.pydialog set tt_es_es = 'Enlace' where source = 'lbl_link' and tt_es_es is null;
+
+-- tab_relations
+update i18n.pydialog set lb_es_es = 'Relaciones' where source = 'tab_relations' and lb_es_es is null;
+update i18n.pydialog set tt_es_es = 'Relaciones' where source = 'tab_relations' and tt_es_es is null;
 
 
 /* to develop

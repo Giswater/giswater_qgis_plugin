@@ -54,20 +54,20 @@ After that, inside the PostgreSQL database you will find six tables:
 		PL-SQL: 	dbdialog table
 					dbmessage table
 	
-	with columns related to your language. To update dialogs (both python and database) you can use SQL scripts stored on giswater_qgis_plugin/resources/i18n/:
-		- draft_dbdialog.sql
-		- draft_pydialog.sql
+	with columns related to your language. As well as pydialog and dbdialog tables has lots of rows, to update both, 
+	you can use SQL scripts stored on giswater_qgis_plugin/resources/i18n/:
+		- help4dbdialog.sql
+		- help4pydialog.sql
 		
 All your work will be checked before release and if proceed, released on new version of Giswater. But on the other hand, if you prefer do not wait for this new release, 
 you can implement by yourself, work done for you into your current version of Giswater. In order to do this:
 
-	Python: Use giswater_qgis_plugin/resources/i18n/i18n_generator.py, passing input parameters: (db_parameters, lang, 'tsfiles') to create ts files
-		After that you can use giswater_qgis_plugin/qm_creator.exe, to convert ts files to qm files
-			
-	PL-SQL: Use giswater_qgis_plugin/i18n_extractor.py, passing input parameters: (db_parameters, lang, 'sqlfiles') to create SQL i18n files
-		After that, script will create tree files: (ws.sql, utils.sql, ud.sql) ready to work on the folder: dbmodel/updates/XX/XXXXX/i18n/xx_XX
-				
-		Before finish, remember that when you update i18n database, gw_fct_admin_schema_i18n is executed under rule to overwrite (or not) managed 
+	Python: Use admin button of Giswater to create your ts and qm files, ready to work
+
+	PL-SQL: Use admin button to Giswater to create the tree SQL script files: (ws.sql, utils.sql, ud.sql) 
+		ready to work on the folder: dbmodel/updates/XX/XXXXX/i18n/xx_XX
+		That files will be read on next new project schema, or neeed to be executed using PgConsole in case of one existing schema
+		Remember that when you update i18n database, gw_fct_admin_schema_i18n is executed under rule to overwrite (or not) managed 
 		by system variable 'admin_i18n_update_mode' 
 					
 			0: update always owerwriting current values
