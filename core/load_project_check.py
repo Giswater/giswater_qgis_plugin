@@ -25,7 +25,6 @@ class GwLoadProjectCheck:
 
         self.schema_name = global_vars.schema_name
 
-
     def fill_check_project_table(self, layers, init_project):
         """ Fill table 'audit_check_project' table with layers data """
 
@@ -61,12 +60,13 @@ class GwLoadProjectCheck:
         fields = fields[:-2] + ']'
         
         # Execute function 'gw_fct_setcheckproject'
-        result = self.execute_check_project_function(init_project, fields)
+        result = self._execute_check_project_function(init_project, fields)
 
         return True, result
 
+    # region private functions
 
-    def execute_check_project_function(self, init_project, fields_to_insert):
+    def _execute_check_project_function(self, init_project, fields_to_insert):
         """ Execute function 'gw_fct_setcheckproject' """
 
         # get project variables
@@ -95,19 +95,18 @@ class GwLoadProjectCheck:
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_setcheckproject', body)
         try:
-            if not result or (result['body']['variables']['hideForm'] == True):
+            if not result or (result['body']['variables']['hideForm'] is True):
                 return result
         except KeyError as e:
             tools_log.log_warning(f"EXCEPTION: {type(e).__name__}, {e}")
             return result
 
         # Show dialog with audit check project result
-        self.show_check_project_result(result)
+        self._show_check_project_result(result)
 
         return result
-
-
-    def show_check_project_result(self, result):
+    
+    def _show_check_project_result(self, result):
         """ Show dialog with audit check project results """
 
         # Create dialog
@@ -122,18 +121,18 @@ class GwLoadProjectCheck:
                                               call_set_tabs_enabled=False)
 
         if 'missingLayers' in result['body']['data']:
-            critical_level = self.get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'], critical_level)
+            critical_level = self._get_missing_layers(self.dlg_audit_project, result['body']['data']['missingLayers'],
+                                                      critical_level)
 
         hide_void_groupbox(self.dlg_audit_project)
 
         if int(critical_level) > 0 or text_result:
-            self.dlg_audit_project.btn_accept.clicked.connect(partial(self.add_selected_layers, self.dlg_audit_project,
+            self.dlg_audit_project.btn_accept.clicked.connect(partial(self._add_selected_layers, self.dlg_audit_project,
                                                                       result['body']['data']['missingLayers']))
-            self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self.update_config))
+            self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self._update_config))
             tools_gw.open_dialog(self.dlg_audit_project, dlg_name='project_check')
 
-
-    def update_config(self, state):
+    def _update_config(self, state):
         """ Set qgis_form_initproject_hidden True or False into config_param_user """
 
         value = {0: "False", 2: "True"}
@@ -143,8 +142,7 @@ class GwLoadProjectCheck:
                f" DO UPDATE SET value='{value[state]}'")
         tools_db.execute_sql(sql)
 
-
-    def get_missing_layers(self, dialog, m_layers, critical_level):
+    def _get_missing_layers(self, dialog, m_layers, critical_level):
 
         grl_critical = dialog.findChild(QGridLayout, "grl_critical")
         grl_others = dialog.findChild(QGridLayout, "grl_others")
@@ -179,8 +177,7 @@ class GwLoadProjectCheck:
 
         return critical_level
 
-
-    def add_selected_layers(self, dialog, m_layers):
+    def _add_selected_layers(self, dialog, m_layers):
         """ Receive a list of layers, look for the checks associated with each layer and if they are checked,
             load the corresponding layer and put styles
         :param dialog: Dialog where to look for QCheckBox (QDialog)
@@ -189,7 +186,8 @@ class GwLoadProjectCheck:
         """
 
         for layer_info in m_layers:
-            if layer_info == {}: continue
+            if layer_info == {}:
+                continue
 
             check = dialog.findChild(QCheckBox, layer_info['layer'])
             if check.isChecked():
@@ -207,7 +205,8 @@ class GwLoadProjectCheck:
                         extras = f'"style_id":"{style_id}"'
                         body = tools_gw.create_body(extras=extras)
                         style = tools_gw.execute_procedure('gw_fct_getstyle', body)
-                        if style['status'] == 'Failed': return
+                        if style['status'] == 'Failed':
+                            return
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']
@@ -215,3 +214,5 @@ class GwLoadProjectCheck:
                 tools_qgis.set_layer_visible(layer)
 
         tools_gw.close_dialog(self.dlg_audit_project)
+
+    # endregion
