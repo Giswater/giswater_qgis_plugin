@@ -486,7 +486,7 @@ class GwMincut:
 
         # Manage 'address'
         address_exploitation_id = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.address_add_muni)
-        address_street = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.address_add_street, False, False)
+        address_street = self.dlg_mincut.address_add_street.property('id_')
         address_number = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, False, False)
 
         mincut_result_type = tools_qt.get_combo_value(self.dlg_mincut, self.dlg_mincut.type, 0)

@@ -178,6 +178,10 @@ class GwSearch:
                 item = data
                 break
 
+        for line_edit in line_list:
+            if 'id' in item:
+                line_edit.setProperty('id_', item['id'])
+
         # Show info in docker?
         if self.is_mincut is False:
             tools_gw.init_docker()
