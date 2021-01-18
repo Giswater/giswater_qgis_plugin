@@ -105,7 +105,7 @@ class GwMincut:
         """ Custom form initial configuration """
         # Setting lists
 
-        self.mincut_class = 1
+        self.mincut_class = None
         self.user_current_layer = self.iface.activeLayer()
         self.init_mincut_canvas()
         tools_qgis.remove_layer_from_toc('Overlap affected arcs', 'GW Temporal Layers')
@@ -1393,7 +1393,7 @@ class GwMincut:
 
     def auto_mincut(self):
         """ B1-126: Automatic mincut analysis """
-
+        self.mincut_class = 1
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
         # Snapper
