@@ -22,7 +22,7 @@ from ..lib import tools_os, tools_qt
 from .utils import tools_gw
 
 
-class GwLoadMenu(QObject):
+class GwMenuLoad(QObject):
 
     def __init__(self):
         """ Class to manage layers. Refactor code from main.py """
@@ -36,7 +36,7 @@ class GwLoadMenu(QObject):
         self.roaming_path_folder = os.path.join(tools_os.get_datadir(), global_vars.roaming_user_dir)
         self.list_values = []
 
-    def menu_read(self, show_warning=True):
+    def read_menu(self, show_warning=True):
         """  """
         main_menu = QMenu("&Giswater", self.iface.mainWindow().menuBar())
 

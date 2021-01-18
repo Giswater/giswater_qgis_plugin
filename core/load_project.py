@@ -17,7 +17,7 @@ from .shared.search import GwSearch
 from .toolbars import buttons
 from .ui.ui_manager import GwDialogTextUi
 from .utils import tools_gw
-from .load_project_menu import GwLoadMenu
+from .load_project_menu import GwMenuLoad
 from .threads.notify import GwNotify
 from .. import global_vars
 from ..lib import tools_qgis, tools_log, tools_db, tools_qt, tools_os
@@ -138,8 +138,8 @@ class GwLoadProject(QObject):
         tools_gw.set_style_mapzones()
 
         # Create menu
-        load_prject_menu = GwLoadMenu()
-        load_prject_menu.menu_read()
+        load_project_menu = GwMenuLoad()
+        load_project_menu.read_menu()
 
         # Log it
         message = "Project read successfully"
