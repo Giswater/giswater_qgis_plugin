@@ -244,7 +244,7 @@ class GwAdminButton:
     def manage_translations(self):
 
         qm_gen = GwI18NGenerator()
-        qm_gen.main()
+        qm_gen.init_dialog()
 
 
     def info_show_database(self, connection_status=True, username=None, show_dialog=False):

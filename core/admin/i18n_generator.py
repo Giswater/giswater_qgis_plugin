@@ -24,7 +24,8 @@ class GwI18NGenerator:
         self.language = None
         self.lower_lang = None
 
-    def main(self, lang='mylang', ip=None, port='5433', db='giswater', user='myuser', pwd='mypss', version='3.5.001'):
+
+    def init_dialog(self, lang='mylang', ip=None, port='5433', db='giswater', user='myuser', pwd='mypss', version='3.5.001'):
         self.language = lang
         self.lower_lang = self.language.lower
         self.version = version
