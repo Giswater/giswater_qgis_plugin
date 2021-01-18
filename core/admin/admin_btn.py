@@ -32,7 +32,7 @@ from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, 
     GwAdminGisProjectUi, GwAdminImportUi, GwAdminFieldsUi, GwAdminVisitClassUi, GwAdminSysFieldsUi, GwCredentialsUi
 from ..utils import tools_gw
 from ... import global_vars
-from ...i18n.i18n_generator import GwI18NGenerator
+# from ...i18n.i18n_generator import GwI18NGenerator
 from ...lib import tools_qt, tools_qgis, tools_log, tools_db
 
 

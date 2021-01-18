@@ -585,24 +585,24 @@ class GwInfo(QObject):
         """ Open PDF file with selected @project_type and @geom_type """
 
         # Get locale of QGIS application
-        locale = tools_qis.get_locale()
+        locale = tools_qgis.get_locale()
         	
         project_type = tools_gw.get_project_type()
         # Get PDF file
         pdf_folder = os.path.join(global_vars.plugin_dir, f'resources{os.sep}png')
         pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
 		
-		# Open PDF if exists. If not open Spanish version
-		if os.path.exists(pdf_path):
-			os.system(pdf_path)
-		else:
-			locale = "es_ES"
-			pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
-			if os.path.exists(pdf_path):
-				os.system(pdf_path)
-			else:
-				message = "No help file found"
-				tools_qgis.show_warning(message, parameter=pdf_path)
+        # Open PDF if exists. If not open Spanish version
+        if os.path.exists(pdf_path):
+            os.system(pdf_path)
+        else:
+            locale = "es_ES"
+            pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
+            if os.path.exists(pdf_path):
+                os.system(pdf_path)
+            else:
+                message = "No help file found"
+                tools_qgis.show_warning(message, parameter=pdf_path)
 
 
     def block_action_edit(self, dialog, action_edit, result, layer, fid, my_json, new_feature):

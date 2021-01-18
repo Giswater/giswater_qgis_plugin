@@ -12,7 +12,7 @@ import shlex
 import sys
 from random import randrange
 
-from qgis.PyQt.QtCore import Qt, QTimer
+from qgis.PyQt.QtCore import Qt, QTimer, QSettings
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtWidgets import QDockWidget, QApplication
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \

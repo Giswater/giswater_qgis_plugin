@@ -1002,8 +1002,8 @@ def manage_translation(context_name, dialog=None, log_info=False):
     """ Manage locale and corresponding 'i18n' file """
 
     # Get locale of QGIS application
-	locale = tools_qgis.get_locale()
-	
+    locale = tools_qgis.get_locale()
+
     locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'{global_vars.plugin_name}_{locale}.qm')
     if not os.path.exists(locale_path):
         if log_info:
