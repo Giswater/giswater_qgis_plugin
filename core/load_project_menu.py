@@ -36,8 +36,6 @@ class GwLoadMenu(QObject):
         self.roaming_path_folder = os.path.join(tools_os.get_datadir(), global_vars.roaming_user_dir)
         self.list_values = []
 
-
-
     def menu_read(self, show_warning=True):
         main_menu = QMenu("&Giswater", self.iface.mainWindow().menuBar())
 
@@ -47,7 +45,7 @@ class GwLoadMenu(QObject):
         # region Toolbars
         toolbars_menu = QMenu(f"Toolbars", self.iface.mainWindow().menuBar())
         icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep \
-                    + '20x20' + os.sep + '36.png'
+            + '20x20' + os.sep + '36.png'
         toolbars_icon = QIcon(icon_path)
         toolbars_menu.setIcon(toolbars_icon)
         main_menu.addMenu(toolbars_menu)
@@ -56,8 +54,8 @@ class GwLoadMenu(QObject):
             toolbars_menu.addMenu(toolbar_submenu)
             buttons_toolbar = global_vars.settings.value(f"toolbars/{toolbar}")
             for index_action in buttons_toolbar:
-                icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + 'icons' + os.sep + 'toolbars' + os.sep \
-                            + str(toolbar) + os.sep + str(index_action) + '.png'
+                icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + 'icons' + os.sep + 'toolbars'\
+                            + os.sep + str(toolbar) + os.sep + str(index_action) + '.png'
                 icon = QIcon(icon_path)
                 button_def = global_vars.settings.value(f"buttons_def/{index_action}")
                 text = ""
@@ -78,34 +76,31 @@ class GwLoadMenu(QObject):
         roaming_menu = QMenu(f"Roaming", self.iface.mainWindow().menuBar())
         main_menu.addMenu(roaming_menu)
         icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + 'icons' + os.sep + 'toolbars' + os.sep \
-                    + 'utilities' + os.sep + '99.png'
+            + 'utilities' + os.sep + '99.png'
         roaming_icon = QIcon(icon_path)
         roaming_menu.setIcon(roaming_icon)
         action_open_path = roaming_menu.addAction(f"Open folder")
-        action_open_path.triggered.connect(self.open_roaming_path)
+        action_open_path.triggered.connect(self._open_roaming_path)
 
         action_manage_file = roaming_menu.addAction(f"Manage Files")
-        action_manage_file.triggered.connect(self.open_manage_file)
+        action_manage_file.triggered.connect(self._open_manage_file)
         # endregion
 
         self.iface.mainWindow().menuBar().insertMenu(lastAction, main_menu)
 
-
     def clicked_event(self, action_function):
         action_function.clicked_event()
-
-
-    def open_roaming_path(self):
-        path = os.path.realpath(self.roaming_path_folder)
-        os.startfile(path)
-
 
     def translate(self, message):
         return tools_qt.tr(message, aux_context='ui_message')
 
+    # region private functions
 
+    def _open_roaming_path(self):
+        path = os.path.realpath(self.roaming_path_folder)
+        os.startfile(path)
 
-    def open_manage_file(self):
+    def _open_manage_file(self):
         """ Manage files dialog:: """
         self.dlg_manage_menu = GwLoadMenuUi()
 
@@ -121,27 +116,27 @@ class GwLoadMenu(QObject):
             self.cmb_config_files.addItem(f"{file}")
 
         # Get values
-        self.get_config_file_values()
+        self._get_config_file_values()
 
         # Fill table_config_files
-        self.fill_tbl_config_files(self.tbl_config_files)
+        self._fill_tbl_config_files(self.tbl_config_files)
 
         # Listeners
-        self.cmb_config_files.currentIndexChanged.connect(self.get_config_file_values)
-        self.cmb_config_files.currentIndexChanged.connect(partial(self.fill_tbl_config_files, self.tbl_config_files))
-        self.btn_save.clicked.connect(partial(self.save_config_files))
+        self.cmb_config_files.currentIndexChanged.connect(self._get_config_file_values)
+        self.cmb_config_files.currentIndexChanged.connect(partial(self._fill_tbl_config_files, self.tbl_config_files))
+        self.btn_save.clicked.connect(partial(self._save_config_files))
         self.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manage_menu))
 
         # Open dialog
         self.dlg_manage_menu.open()
-
-
-    def get_config_file_values(self):
+        
+    def _get_config_file_values(self):
 
         # Get values
         self.list_values = []
         values = {}
-        path = f"{self.roaming_path_folder}{os.sep}config{os.sep}{tools_qt.get_text(self.dlg_manage_menu, self.cmb_config_files)}"
+        path = f"{self.roaming_path_folder}{os.sep}config{os.sep}" \
+               f"{tools_qt.get_text(self.dlg_manage_menu, self.cmb_config_files)}"
 
         if not os.path.exists(path):
             return None
@@ -156,8 +151,7 @@ class GwLoadMenu(QObject):
                 self.list_values.append(values)
                 values = {}
 
-
-    def fill_tbl_config_files(self, table):
+    def _fill_tbl_config_files(self, table):
 
         row_count = (len(self.list_values))
         column_count = (len(self.list_values[0]))
@@ -172,8 +166,7 @@ class GwLoadMenu(QObject):
                 item = (list(self.list_values[row].values())[column])
                 table.setItem(row, column, QTableWidgetItem(item))
 
-
-    def save_config_files(self):
+    def _save_config_files(self):
 
         row_count = self.tbl_config_files.rowCount()
         filename = tools_qt.get_text(self.dlg_manage_menu, self.cmb_config_files).replace(".config", "")
@@ -182,6 +175,7 @@ class GwLoadMenu(QObject):
             parameter = self.tbl_config_files.item(row, 1).text()
             value = self.tbl_config_files.item(row, 2).text()
 
-            tools_gw.set_config_parser(f"{section}", f"{parameter}",f"{value}",
+            tools_gw.set_config_parser(f"{section}", f"{parameter}", f"{value}",
                                        file_name=filename, prefix=False)
 
+    # endregion
