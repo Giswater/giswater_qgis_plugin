@@ -37,6 +37,7 @@ class GwLoadMenu(QObject):
         self.list_values = []
 
     def menu_read(self, show_warning=True):
+        """  """
         main_menu = QMenu("&Giswater", self.iface.mainWindow().menuBar())
 
         actions = self.iface.mainWindow().menuBar().actions()
@@ -89,14 +90,17 @@ class GwLoadMenu(QObject):
         self.iface.mainWindow().menuBar().insertMenu(lastAction, main_menu)
 
     def clicked_event(self, action_function):
+        """  """
         action_function.clicked_event()
 
     def translate(self, message):
+        """ Calls on tools_qt to translate parameter message. """
         return tools_qt.tr(message, aux_context='ui_message')
 
     # region private functions
 
     def _open_roaming_path(self):
+        """ Opens the OS-specific Roaming directory. """
         path = os.path.realpath(self.roaming_path_folder)
         os.startfile(path)
 
@@ -110,7 +114,7 @@ class GwLoadMenu(QObject):
         self.btn_save = self.dlg_manage_menu.findChild(QPushButton, 'btn_save')
         self.btn_close = self.dlg_manage_menu.findChild(QPushButton, 'btn_close')
 
-        # Popualte cmb_config_files
+        # Populate cmb_config_files
         files = [f for f in os.listdir(f"{self.roaming_path_folder}{os.sep}config")]
         for file in files:
             self.cmb_config_files.addItem(f"{file}")
@@ -131,7 +135,7 @@ class GwLoadMenu(QObject):
         self.dlg_manage_menu.open()
         
     def _get_config_file_values(self):
-
+        """ Populates a variable with a list of values parsed from a configuration file. """
         # Get values
         self.list_values = []
         values = {}
@@ -152,6 +156,7 @@ class GwLoadMenu(QObject):
                 values = {}
 
     def _fill_tbl_config_files(self, table):
+        """ Fills a UI table with the local list of values variable. """
 
         row_count = (len(self.list_values))
         column_count = (len(self.list_values[0]))
@@ -167,6 +172,7 @@ class GwLoadMenu(QObject):
                 table.setItem(row, column, QTableWidgetItem(item))
 
     def _save_config_files(self):
+        """ Writes the list of values into a persistant configuration file. """
 
         row_count = self.tbl_config_files.rowCount()
         filename = tools_qt.get_text(self.dlg_manage_menu, self.cmb_config_files).replace(".config", "")
