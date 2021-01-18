@@ -31,20 +31,8 @@ class GwGisFileCreate:
                              export_passwd=False, roletype='admin', chk_sample=False, get_database_parameters=True):
 
         # Get locale of QGIS application
-        try:
-            locale = QSettings().value('locale/userLocale').lower()
-        except AttributeError:
-            locale = "en"
-
-        if locale == 'es_es' or locale == 'es':
-            locale = 'es'
-        elif locale == 'es_ca':
-            locale = 'ca'
-        elif locale == 'en_us':
-            locale = 'en'
-        else:
-            locale = "en"
-
+        locale = tools_qgis.get_locale()
+        
         # Get folder with QGS templates
         gis_extension = "qgs"
         gis_folder = self.plugin_dir + os.sep + "resources" + os.sep + "templates" + os.sep + "qgisproject"
@@ -53,7 +41,7 @@ class GwGisFileCreate:
         # If QGIS template locale folder not found, use English one
         if not os.path.exists(gis_locale_path):
             tools_log.log_info("Locale gis folder not found", parameter=gis_locale_path)
-            gis_locale_path = gis_folder + os.sep + "en"
+            gis_locale_path = gis_folder + os.sep + "en_EN"
 
         # Check if template_path and folder_path exists
         # Set default project for type sample

@@ -585,29 +585,24 @@ class GwInfo(QObject):
         """ Open PDF file with selected @project_type and @geom_type """
 
         # Get locale of QGIS application
-        locale = QSettings().value('locale/userLocale').lower()
-        if locale == 'es_es':
-            locale = 'es'
-        elif locale == 'es_ca':
-            locale = 'ca'
-        elif locale == 'en_us':
-            locale = 'en'
+        locale = tools_qis.get_locale()
+        	
         project_type = tools_gw.get_project_type()
         # Get PDF file
         pdf_folder = os.path.join(global_vars.plugin_dir, f'resources{os.sep}png')
         pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
-
-        # Open PDF if exists. If not open Spanish version
-        if os.path.exists(pdf_path):
-            os.system(pdf_path)
-        else:
-            locale = "es"
-            pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
-            if os.path.exists(pdf_path):
-                os.system(pdf_path)
-            else:
-                message = "File not found"
-                tools_qgis.show_warning(message, parameter=pdf_path)
+		
+		# Open PDF if exists. If not open Spanish version
+		if os.path.exists(pdf_path):
+			os.system(pdf_path)
+		else:
+			locale = "es_ES"
+			pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
+			if os.path.exists(pdf_path):
+				os.system(pdf_path)
+			else:
+				message = "No help file found"
+				tools_qgis.show_warning(message, parameter=pdf_path)
 
 
     def block_action_edit(self, dialog, action_edit, result, layer, fid, my_json, new_feature):
@@ -832,7 +827,7 @@ class GwInfo(QObject):
 
         existing_point_x = None
         existing_point_y = None
-        viewname = tools_qgis.get_layer_source_table_name(self.layer)
+        viewname = Rayer_source_table_name(self.layer)
         sql = (f"SELECT ST_X(the_geom), ST_Y(the_geom)"
                f" FROM {viewname}"
                f" WHERE node_id = '{self.feature_id}'")

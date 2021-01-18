@@ -1002,20 +1002,13 @@ def manage_translation(context_name, dialog=None, log_info=False):
     """ Manage locale and corresponding 'i18n' file """
 
     # Get locale of QGIS application
-    try:
-        locale = QSettings().value('locale/userLocale').lower()
-    except AttributeError:
-        locale = "en"
-
-    locales = {'en': 'en', 'en_us': 'en', 'es': 'es', 'es_es': 'es', 'es_ca': 'ca'}
-
-    # If user locale file not found, set English one by default
-    locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'{global_vars.plugin_name}_{locales.get(locale,"en")}.qm')
+	locale = tools_qgis.get_locale()
+	
+    locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'{global_vars.plugin_name}_{locale}.qm')
     if not os.path.exists(locale_path):
         if log_info:
             tools_log.log_info("Locale not found", parameter=locale_path)
-        locale_default = 'en'
-        locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'{global_vars.plugin_name}_{locale_default}.qm')
+        locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'{global_vars.plugin_name}_en_EN.qm')
         # If English locale file not found, exit function
         # It means that probably that form has not been translated yet
         if not os.path.exists(locale_path):
