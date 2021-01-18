@@ -1319,7 +1319,7 @@ def fill_combo(widget, field):
 def fill_combo_child(dialog, combo_child):
 
     child = dialog.findChild(QComboBox, str(combo_child['widgetname']))
-    if child:
+    if child is not None:
         fill_combo(child, combo_child)
 
 
