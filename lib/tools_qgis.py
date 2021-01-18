@@ -153,10 +153,10 @@ def get_higher_version(default_version='3.5'):
     return higher_version
 
 
-def get_build_version():
+def get_build_version(default_version='35001'):
     """ Get plugin build version from metadata.txt file """
 
-    build_version = get_plugin_metadata('version').replace(".", "")
+    build_version = get_plugin_metadata('version', default_version).replace(".", "")
     return build_version
 
 
