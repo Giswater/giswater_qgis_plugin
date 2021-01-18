@@ -444,7 +444,7 @@ class ApiConfig(ApiParent):
     def populate_child(self, combo_child):
 
         child = self.dlg_config.findChild(QComboBox, str(combo_child['widgetname']))
-        if child:
+        if child is not None:
             self.populate_combo(child, combo_child)
 
 
