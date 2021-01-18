@@ -146,6 +146,13 @@ def get_plugin_version():
     return plugin_version, message
 
 
+def get_higher_version(default_version='3.5'):
+    """ Get plugin version from metadata.txt file """
+    
+    higher_version = get_plugin_metadata('version', default_version)[0:3]
+    return higher_version
+
+
 def get_project_variables():
     """ Manage QGIS project variables """
 
