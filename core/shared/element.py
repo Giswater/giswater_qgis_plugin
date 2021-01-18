@@ -382,8 +382,7 @@ class GwElement:
                 sql_values += f", '{verified}'"
             else:
                 sql_values += ", null"
-
-            if str(self.point_xy['x']) not in ("", None):
+            if str(self.point_xy['x']) not in ("", None, "None"):
                 sql_values += f", ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
                 self.point_xy['x'] = ""
             else:
