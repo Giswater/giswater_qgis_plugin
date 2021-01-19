@@ -112,28 +112,26 @@ class I18NGenerator(ParentAction):
         # In the database, the dialog_name column must match the name of the ui file (no extension).
         # Also, open_dialog function must be called, passed as parameter dlg_name = 'ui_file_name_without_extension'
 
-        py_language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
-        xml_language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 2)
-        py_file = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
-        key_msg = f'ms_{py_language}'
-        key_lbl = f'lb_{py_language}'
-        key_tooltip = f'tt_{py_language}'
+        key_label = f'lb_{self.lower_lang}'
+        key_tooltip = f'tt_{self.lower_lang}'
+        key_message = f'ms_{self.lower_lang}'
 
         # Get python messages values
-        sql = f"SELECT source, {key_msg} FROM i18n.pymessage;"
+        sql = f"SELECT source, {key_message} FROM i18n.pymessage;"
         py_messages = self.get_rows(sql)
 
         # Get python toolbars and buttons values
-        sql = f"SELECT source, lb_en_en, {key_lbl} FROM i18n.pytoolbar;"
+        sql = f"SELECT source, lb_en_en, {key_label} FROM i18n.pytoolbar;"
         py_toolbars = self.get_rows(sql)
 
-        # Get ui values
-        sql = (f"SELECT dialog_name, source, lb_en_en, {key_lbl}, tt_en_en, {key_tooltip} "
+        # Get python dialog values
+        sql = (f"SELECT dialog_name, source, lb_en_en, {key_label}, tt_en_en, {key_tooltip} "
                f" FROM i18n.pydialog "
                f" ORDER BY dialog_name;")
         py_dialogs = self.get_rows(sql)
 
-        ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{py_file}.ts'
+        ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{self.language}.ts'
+
         # Check if file exist
         if os.path.exists(ts_path):
             msg = "Are you sure you want to overwrite this file?"
@@ -145,7 +143,7 @@ class I18NGenerator(ParentAction):
         # Create header
         line = '<?xml version="1.0" encoding="utf-8"?>\n'
         line += '<!DOCTYPE TS>\n'
-        line += f'<TS version="2.0" language="{xml_language}">\n'
+        line += f'<TS version="2.0" language="{self.language}">\n'
         ts_file.write(line)
 
         # Create children for toolbars and actions
@@ -156,12 +154,12 @@ class I18NGenerator(ParentAction):
         for py_tlb in py_toolbars:
             line = f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_tlb['source']}</source>\n"
-            if py_tlb[py_language] is None:
-                py_tlb[py_language] = py_tlb['en_en']
-                if py_tlb['en_en'] is None:
-                    py_tlb[py_language] = py_tlb['source']
+            if py_tlb[key_label] is None:
+                py_tlb[key_label] = py_tlb['lb_en_en']
+                if py_tlb['lb_en_en'] is None:
+                    py_tlb[key_label] = py_tlb['source']
 
-            line += f"\t\t\t<translation>{py_tlb[py_language]}</translation>\n"
+            line += f"\t\t\t<translation>{py_tlb[key_label]}</translation>\n"
             line += f"\t\t</message>\n"
             line = line.replace("&", "")
             ts_file.write(line)
@@ -174,9 +172,9 @@ class I18NGenerator(ParentAction):
         for py_msg in py_messages:
             line = f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_msg['source']}</source>\n"
-            if py_msg[py_language] is None:
-                py_msg[py_language] = py_msg['source']
-            line += f"\t\t\t<translation>{py_msg[py_language]}</translation>\n"
+            if py_msg[key_message] is None:
+                py_msg[key_message] = py_msg['source']
+            line += f"\t\t\t<translation>{py_msg[key_message]}</translation>\n"
             line += f"\t\t</message>\n"
             line = line.replace("&", "")
             ts_file.write(line)
@@ -196,7 +194,7 @@ class I18NGenerator(ParentAction):
                 name = py_dlg['dialog_name']
                 line = '\t<context>\n'
                 line += f'\t\t<name>{name}</name>\n'
-                title = self.get_title(py_dialogs, name, key_lbl)
+                title = self.get_title(py_dialogs, name, key_label)
                 if title:
                     line += f'\t\t<message>\n'
                     line += f'\t\t\t<source>title</source>\n'
@@ -206,16 +204,16 @@ class I18NGenerator(ParentAction):
             # Create child for labels
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_dlg['source']}</source>\n"
-            if py_dlg[key_lbl] is None:
-                py_dlg[key_lbl] = py_dlg['lb_en_en']
+            if py_dlg[key_label] is None:
+                py_dlg[key_label] = py_dlg['lb_en_en']
 
-            line += f"\t\t\t<translation>{py_dlg[key_lbl]}</translation>\n"
+            line += f"\t\t\t<translation>{py_dlg[key_label]}</translation>\n"
             line += f"\t\t</message>\n"
 
             # Create child for tooltip
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>tooltip_{py_dlg['source']}</source>\n"
-            if py_dlg[key_lbl] is None:
+            if py_dlg[key_label] is None:
                 py_dlg[key_tooltip] = py_dlg['lb_en_en']
             line += f"\t\t\t<translation>{py_dlg[key_tooltip]}</translation>\n"
             line += f"\t\t</message>\n"
@@ -316,7 +314,6 @@ class I18NGenerator(ParentAction):
         :return: (Boolean)
         """
         file = open(path, "w")
-        db_lang = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
         header = (f'/*\n'
                   f'This file is part of Giswater 3\n'
                   f'The program is free software: you can redistribute it and/or modify it under the terms of the GNU '
@@ -326,15 +323,19 @@ class I18NGenerator(ParentAction):
                   f'*/\n\n\n'
                   f'SET search_path = SCHEMA_NAME, public, pg_catalog;\n\n')
         file.write(header)
+        file.close()
+        del file
+
+        file = open(path, "a")
         for row in rows:
             table = row['context']
             form_name = row['formname']
             form_type = row['formtype']
             source = row['source']
-            lbl_value = row[f'lb_{db_lang}'] if row[f'lb_{db_lang}'] is not None else row['lb_en_en']
-
-            if row[f'tt_{db_lang}'] is not None:
-                tt_value = row[f'tt_{db_lang}']
+            lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None else row['lb_en_en']
+            lbl_value = lbl_value if lbl_value is not None else ""
+            if row[f'tt_{self.lower_lang}'] is not None:
+                tt_value = row[f'tt_{self.lower_lang}']
             elif row[f'tt_en_en'] is not None:
                 tt_value = row[f'tt_en_en']
             else:
