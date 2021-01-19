@@ -705,7 +705,7 @@ class GwAdminButton:
         default_connection = tools_qt.get_text(dialog, dialog.cmb_connection)
         settings.setValue('selected', default_connection)
         if new_connection:
-            connection_status, not_version, layer_source = tools_db.set_database_connection()
+            tools_db.set_database_connection()
         else:
             if default_connection:
                 settings.endGroup()
@@ -1861,7 +1861,7 @@ class GwAdminButton:
         tools_gw.set_config_parser('btn_admin', 'inp_file_path', f'{inp_file_path}')
 
         # Check if project name is valid
-        if not self.check_project_name(project_name_schema, project_descript):
+        if not self._check_project_name(project_name_schema, project_descript):
             return
 
         msg = "This process will take time (few minutes). Are you sure to continue?"
@@ -1899,51 +1899,51 @@ class GwAdminButton:
             self.task1.setProgress(0)
 
         # Common execution
-        status = self.load_base(project_type=project_type)
+        status = self._load_base(project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
-            self.manage_process_result(is_test=is_test)
+            self._manage_process_result(is_test=is_test)
             return
 
         if not is_test:
             self.task1.setProgress(10)
-        status = self.update_30to31(new_project=True, project_type=project_type)
+        status = self._update_30to31(new_project=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
-            self.manage_process_result(is_test=is_test)
+            self._manage_process_result(is_test=is_test)
             return
         if not is_test:
             self.task1.setProgress(20)
-        status = self.load_views(project_type=project_type)
+        status = self._load_views(project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
-            self.manage_process_result(is_test=is_test)
+            self._manage_process_result(is_test=is_test)
             return
         if not is_test:
             self.task1.setProgress(30)
-        status = self.load_trg(project_type=project_type)
+        status = self._load_trg(project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
-            self.manage_process_result(is_test=is_test)
+            self._manage_process_result(is_test=is_test)
             return
         if not is_test:
             self.task1.setProgress(40)
-        status = self.update_31to39(new_project=True, project_type=project_type)
+        status = self._update_31to39(new_project=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
-            self.manage_process_result(is_test=is_test)
+            self._manage_process_result(is_test=is_test)
             return
         if not is_test:
             self.task1.setProgress(50)
-        status = self.api(new_api=True, project_type=project_type)
+        status = self._api(new_api=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
-            self.manage_process_result(is_test=is_test)
+            self._manage_process_result(is_test=is_test)
             return
         if not is_test:
             self.task1.setProgress(60)
 
         status = True
         if exec_last_process:
-            status = self.execute_last_process(new_project=True, schema_name=project_name_schema,
+            status = self._execute_last_process(new_project=True, schema_name=project_name_schema,
                 schema_type=self.schema_type, locale=project_locale, srid=project_srid)
 
         if not status and self.dev_commit == 'FALSE':
-            self.manage_process_result(is_test=is_test)
+            self._manage_process_result(is_test=is_test)
             return
 
         # Custom execution
@@ -1955,26 +1955,26 @@ class GwAdminButton:
             msg = ("The sql files have been correctly executed."
                    "\nNow, a form will be opened to manage the import inp.")
             tools_qt.show_info_box(msg, "Info")
-            self.execute_import_data(schema_type=project_type)
+            self._execute_import_data(schema_type=project_type)
             return
         elif self.rdb_sample.isChecked() and example_data:
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample')
-            self.load_sample_data(project_type=project_type)
+            self._load_sample_data(project_type=project_type)
             if not is_test:
                 self.task1.setProgress(80)
         elif self.rdb_sample_dev.isChecked():
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_dev')
-            self.load_sample_data(project_type=project_type)
-            self.load_dev_data(project_type=project_type)
+            self._load_sample_data(project_type=project_type)
+            self._load_dev_data(project_type=project_type)
             if not is_test:
                 self.task1.setProgress(80)
         elif self.rdb_data.isChecked():
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_data')
 
-        self.manage_process_result(project_name_schema, is_test)
+        self._manage_process_result(project_name_schema, is_test)
 
         # Update composer path on config_param_user
-        self.manage_user_params()
+        self._manage_user_params()
 
     def _manage_process_result(self, schema_name=None, is_test=False):
         """"""
