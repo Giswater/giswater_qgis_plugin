@@ -185,7 +185,9 @@ BEGIN
 			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_23;
 			ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_24;	
 			ALTER TABLE config_mincut_inlet DROP COLUMN if exists _to_arc;	
-			
+		ELSE
+			ALTER TABLE cat_arc_shape DROP COLUMN if exists _tsect_id;	
+			ALTER TABLE cat_arc_shape DROP COLUMN if exists _curve_id;		
 		END IF;
 
 		ALTER TABLE sys_addfields DROP COLUMN if exists _default_value_;
