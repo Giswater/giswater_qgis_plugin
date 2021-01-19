@@ -36,7 +36,7 @@ class I18NGenerator(ParentAction):
         self.dlg_qm.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_qm))
         self.dlg_qm.rejected.connect(self.save_user_values)
         self.dlg_qm.rejected.connect(self.close_db)
-        self.open_dialog(self.dlg_qm, dlg_name='main_qtdialog')
+        self.open_dialog(self.dlg_qm, dlg_name='admin_translation')
 
 
     def check_connection(self):
@@ -50,6 +50,7 @@ class I18NGenerator(ParentAction):
         user = utils_giswater.getWidgetText(self.dlg_qm, self.dlg_qm.txt_user)
         password = utils_giswater.getWidgetText(self.dlg_qm, self.dlg_qm.txt_pass)
         status = self.init_db(host, port, db, user, password)
+
         if not status:
             self.dlg_qm.btn_translate.setEnabled(False)
             utils_giswater.setWidgetText(self.dlg_qm, 'lbl_info', self.last_error)
@@ -62,12 +63,12 @@ class I18NGenerator(ParentAction):
         self.dlg_qm.btn_translate.setEnabled(True)
         host = utils_giswater.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host)
         utils_giswater.setWidgetText(self.dlg_qm, 'lbl_info', f'Connected to {host}')
-        sql = "SELECT user_language, py_language, xml_language, py_file FROM i18n.cat_language"
+        sql = "SELECT id, idval FROM i18n.cat_language"
         rows = self.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_qm.cmb_language, rows, 0)
+        utils_giswater.set_item_data(self.dlg_qm.cmb_language, rows, 1)
         cur_user = self.controller.get_current_user()
         language = self.controller.plugin_settings_value('qm_lang_language' + cur_user)
-        utils_giswater.set_combo_itemData(self.dlg_qm.cmb_language, language, 0)
+        utils_giswater.set_combo_itemData(self.dlg_qm.cmb_language, language, 1)
 
 
     def check_translate_options(self):
@@ -75,9 +76,10 @@ class I18NGenerator(ParentAction):
         db_msg = utils_giswater.isChecked(self.dlg_qm, self.dlg_qm.chk_db_msg)
         self.dlg_qm.lbl_info.clear()
         msg = ''
-
+        self.language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 0)
+        self.lower_lang = self.language.lower()
         if py_msg:
-            status_py_msg = self.create_files_py_message()
+            status_py_msg = self.create_py_files()
             if status_py_msg is True:
                 msg += "Python translation successful\n"
             elif status_py_msg is False:
@@ -86,53 +88,43 @@ class I18NGenerator(ParentAction):
                 msg += "Python translation canceled\n"
 
         if db_msg:
-            status_db_msg = self.get_files_db_messages()
-            if status_db_msg is True:
-                msg += "Data base translation successful\n"
-            elif status_db_msg is False:
-                msg += "Data base translation failed\n"
-            elif status_db_msg is None:
-                msg += "Data base translation canceled\n"
-
-            status_cfg_msg = self.get_files_config_messages()
+            status_cfg_msg = self.create_db_files()
             if status_cfg_msg is True:
-                msg += "Data base config translation successful\n"
+                msg += "Data base translation successful\n"
             elif status_cfg_msg is False:
-                msg += "Data base config translation failed\n"
+                msg += "Data base translation failed\n"
             elif status_cfg_msg is None:
-                msg += "Data base config translation canceled\n"
+                msg += "Data base translation canceled\n"
 
         if msg != '':
             utils_giswater.setWidgetText(self.dlg_qm, 'lbl_info', msg)
 
 
-    def create_files_py_message(self):
+    def create_py_files(self):
         """ Read the values of the database and generate the ts and qm files """
         # In the database, the dialog_name column must match the name of the ui file (no extension).
         # Also, open_dialog function must be called, passed as parameter dlg_name = 'ui_file_name_without_extension'
 
-        py_language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
-        xml_language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 2)
-        py_file = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
-        key_msg = f'ms_{py_language}'
-        key_lbl = f'lb_{py_language}'
-        key_tooltip = f'tt_{py_language}'
+        key_label = f'lb_{self.lower_lang}'
+        key_tooltip = f'tt_{self.lower_lang}'
+        key_message = f'ms_{self.lower_lang}'
 
         # Get python messages values
-        sql = f"SELECT source, {key_msg} FROM i18n.pymessage;"
+        sql = f"SELECT source, {key_message} FROM i18n.pymessage;"
         py_messages = self.get_rows(sql)
 
         # Get python toolbars and buttons values
-        sql = f"SELECT source, lb_en_en, {key_lbl} FROM i18n.pytoolbar;"
+        sql = f"SELECT source, lb_en_en, {key_label} FROM i18n.pytoolbar;"
         py_toolbars = self.get_rows(sql)
 
-        # Get ui values
-        sql = (f"SELECT dialog_name, source, lb_en_en, {key_lbl}, tt_en_en, {key_tooltip} "
+        # Get python dialog values
+        sql = (f"SELECT dialog_name, source, lb_en_en, {key_label}, tt_en_en, {key_tooltip} "
                f" FROM i18n.pydialog "
                f" ORDER BY dialog_name;")
         py_dialogs = self.get_rows(sql)
 
-        ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{py_file}.ts'
+        ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{self.language}.ts'
+
         # Check if file exist
         if os.path.exists(ts_path):
             msg = "Are you sure you want to overwrite this file?"
@@ -144,7 +136,7 @@ class I18NGenerator(ParentAction):
         # Create header
         line = '<?xml version="1.0" encoding="utf-8"?>\n'
         line += '<!DOCTYPE TS>\n'
-        line += f'<TS version="2.0" language="{xml_language}">\n'
+        line += f'<TS version="2.0" language="{self.language}">\n'
         ts_file.write(line)
 
         # Create children for toolbars and actions
@@ -155,12 +147,12 @@ class I18NGenerator(ParentAction):
         for py_tlb in py_toolbars:
             line = f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_tlb['source']}</source>\n"
-            if py_tlb[py_language] is None:
-                py_tlb[py_language] = py_tlb['en_en']
-                if py_tlb['en_en'] is None:
-                    py_tlb[py_language] = py_tlb['source']
+            if py_tlb[key_label] is None:
+                py_tlb[key_label] = py_tlb['lb_en_en']
+                if py_tlb['lb_en_en'] is None:
+                    py_tlb[key_label] = py_tlb['source']
 
-            line += f"\t\t\t<translation>{py_tlb[py_language]}</translation>\n"
+            line += f"\t\t\t<translation>{py_tlb[key_label]}</translation>\n"
             line += f"\t\t</message>\n"
             line = line.replace("&", "")
             ts_file.write(line)
@@ -173,9 +165,9 @@ class I18NGenerator(ParentAction):
         for py_msg in py_messages:
             line = f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_msg['source']}</source>\n"
-            if py_msg[py_language] is None:
-                py_msg[py_language] = py_msg['source']
-            line += f"\t\t\t<translation>{py_msg[py_language]}</translation>\n"
+            if py_msg[key_message] is None:
+                py_msg[key_message] = py_msg['source']
+            line += f"\t\t\t<translation>{py_msg[key_message]}</translation>\n"
             line += f"\t\t</message>\n"
             line = line.replace("&", "")
             ts_file.write(line)
@@ -195,7 +187,7 @@ class I18NGenerator(ParentAction):
                 name = py_dlg['dialog_name']
                 line = '\t<context>\n'
                 line += f'\t\t<name>{name}</name>\n'
-                title = self.get_title(py_dialogs, name, key_lbl)
+                title = self.get_title(py_dialogs, name, key_label)
                 if title:
                     line += f'\t\t<message>\n'
                     line += f'\t\t\t<source>title</source>\n'
@@ -205,16 +197,16 @@ class I18NGenerator(ParentAction):
             # Create child for labels
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_dlg['source']}</source>\n"
-            if py_dlg[key_lbl] is None:
-                py_dlg[key_lbl] = py_dlg['lb_en_en']
+            if py_dlg[key_label] is None:
+                py_dlg[key_label] = py_dlg['lb_en_en']
 
-            line += f"\t\t\t<translation>{py_dlg[key_lbl]}</translation>\n"
+            line += f"\t\t\t<translation>{py_dlg[key_label]}</translation>\n"
             line += f"\t\t</message>\n"
 
             # Create child for tooltip
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>tooltip_{py_dlg['source']}</source>\n"
-            if py_dlg[key_lbl] is None:
+            if py_dlg[key_label] is None:
                 py_dlg[key_tooltip] = py_dlg['lb_en_en']
             line += f"\t\t\t<translation>{py_dlg[key_tooltip]}</translation>\n"
             line += f"\t\t</message>\n"
@@ -226,6 +218,7 @@ class I18NGenerator(ParentAction):
         ts_file.write(line)
         ts_file.close()
         del ts_file
+
         lrelease_path = self.plugin_dir + os.sep + 'resources' + os.sep + 'lrelease.exe'
         status = subprocess.call([lrelease_path, ts_path], shell=False)
         if status == 0:
@@ -234,86 +227,45 @@ class I18NGenerator(ParentAction):
             return False
 
 
-
-    def get_title(self, py_dialogs, name, key_lbl):
+    def get_title(self, py_dialogs, name, key_label):
         title = None
         for py in py_dialogs:
             if py['source'] == f'dlg_{name}':
-                title = py[key_lbl]
+                title = py[key_label]
                 if not title:
                     title = py['lb_en_en']
                 return title
         return title
 
 
-    def get_files_config_messages(self):
+    def create_db_files(self):
         """ Read the values of the database and update the i18n files """
-        db_lang = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
-        file_lng = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
 
-        version_metadata = self.get_plugin_version()
-        ver = version_metadata.split('.')
-        plugin_version = f'{ver[0]}{ver[1]}'
-        plugin_release = version_metadata.replace('.', '')
+        higher_version = self.get_higher_version().replace(".", "")
+        ver_build = self.get_build_version()
 
-        # Get db messages values
-        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_en, lb_{db_lang}, tt_en_en, tt_{db_lang} "
-               f" FROM i18n.dbdialog "
-               f" WHERE context in ('config_param_system', 'sys_param_user')"
-               f" ORDER BY formname;")
-        rows = self.get_rows(sql)
-        if not rows:
-            return False
-        cfg_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'updates' + os.sep + f'{plugin_version}' + ''
-                    + os.sep + f"{plugin_release}" + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
+        cfg_path = f"{self.plugin_dir}{os.sep}dbmodel{os.sep}updates{os.sep}{higher_version}{os.sep}{ver_build}" \
+                   f"{os.sep}i18n{os.sep}{self.language}{os.sep}"
         file_name = f'dml.sql'
 
         # Check if file exist
         if os.path.exists(cfg_path + file_name):
             msg = "Are you sure you want to overwrite this file?"
-            answer = self.controller.ask_question(msg, "Overwrite", parameter=f"\n\n{cfg_path}{os.sep}{file_name}")
+            answer = self.controller.ask_question(msg, "Overwrite", parameter=f"\n\n{cfg_path}{file_name}")
             if not answer:
                 return
         else:
             os.makedirs(cfg_path, exist_ok=True)
 
-        status = self.write_values(rows, cfg_path + file_name)
-        return status
-
-
-    def get_files_db_messages(self):
-        """ Read the values of the database and update the i18n api files """
-        db_lang = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
-        file_lng = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
-
-        version_metadata = self.get_plugin_version()
-        ver = version_metadata.split('.')
-        plugin_version = f'{ver[0]}{ver[1]}'
-        plugin_release = version_metadata.replace('.', '')
-
         # Get db messages values
-        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_en, lb_{db_lang}, tt_en_en, tt_{db_lang} "
+        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_en, lb_{self.lower_lang}, tt_en_en, "
+               f"tt_{self.lower_lang}"
                f" FROM i18n.dbdialog "
-               f" WHERE context not in ('config_param_system', 'sys_param_user')"
-               f" ORDER BY formname;")
+               f" ORDER BY context, formname;")
         rows = self.get_rows(sql)
         if not rows:
-            return
-
-        db_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'api' + os.sep + 'updates' + os.sep + f'{plugin_version}' + ''
-                + os.sep + f"{plugin_release}" + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
-        file_name = f'dml.sql'
-
-        # Check if file exist
-        if os.path.exists(db_path + file_name):
-            msg = "Are you sure you want to overwrite this file?"
-            answer = self.controller.ask_question(msg, "Overwrite", parameter=f"\n\n{db_path}{os.sep}{file_name}")
-            if not answer:
-                return False
-        else:
-            os.makedirs(db_path, exist_ok=True)
-
-        status = self.write_values(rows, db_path + file_name)
+            return False
+        status = self.write_values(rows, cfg_path + file_name)
         return status
 
 
@@ -324,7 +276,6 @@ class I18NGenerator(ParentAction):
         :return: (Boolean)
         """
         file = open(path, "w")
-        db_lang = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
         header = (f'/*\n'
                   f'This file is part of Giswater 3\n'
                   f'The program is free software: you can redistribute it and/or modify it under the terms of the GNU '
@@ -334,20 +285,26 @@ class I18NGenerator(ParentAction):
                   f'*/\n\n\n'
                   f'SET search_path = SCHEMA_NAME, public, pg_catalog;\n\n')
         file.write(header)
+        file.write(header)
+        file.close()
+        del file
+
+        file = open(path, "a")
+
         for row in rows:
             table = row['context']
             form_name = row['formname']
             form_type = row['formtype']
             source = row['source']
-            lbl_value = row[f'lb_{db_lang}'] if row[f'lb_{db_lang}'] is not None else row['lb_en_en']
-
-            if row[f'tt_{db_lang}'] is not None:
-                tt_value = row[f'tt_{db_lang}']
+            lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None else row['lb_en_en']
+            lbl_value = lbl_value if lbl_value is not None else ""
+            if row[f'tt_{self.lower_lang}'] is not None:
+                tt_value = row[f'tt_{self.lower_lang}']
             elif row[f'tt_en_en'] is not None:
                 tt_value = row[f'tt_en_en']
             else:
                 tt_value = row['lb_en_en']
-
+            tt_value = tt_value if tt_value is not None else ""
             line = f'SELECT gw_fct_admin_schema_i18n($$'
             if row['context'] in ('config_param_system', 'sys_param_user'):
                 line += (f'{{"data":'

@@ -613,3 +613,13 @@ def eval_regex(widget, reg_exp, button, placeholder, text):
         else:
             button.setEnabled(True)
 
+def set_boolean(param):
+    """ Receives a string and returns a bool
+    :param param: String to cast
+    :return: Boolean value, True if param not in bool_dict
+    """
+
+    bool_dict = {"TRUE": True, "True": True, "true": True, "FALSE": False, "False": False, "false": False}
+
+    return bool_dict.get(param, True)
+

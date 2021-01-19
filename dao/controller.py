@@ -1234,17 +1234,7 @@ class DaoController(object):
         """ Manage locale and corresponding 'i18n' file """
 
         # Get locale of QGIS application
-        try:
-            locale = QSettings().value('locale/userLocale').lower()
-        except AttributeError:
-            locale = "en"
-
-        if locale == 'es_es':
-            locale = 'es'
-        elif locale == 'es_ca':
-            locale = 'ca'
-        elif locale == 'en_us':
-            locale = 'en'
+        locale = self.get_locale()
 
         # If user locale file not found, set English one by default
         locale_path = os.path.join(self.plugin_dir, 'i18n', f'giswater_{locale}.qm')
@@ -2076,3 +2066,26 @@ class DaoController(object):
                         self.iface.setActiveLayer(prev_layer)
 
 
+    def get_locale(self):
+
+        # Get locale of QGIS application
+        override = QSettings().value('locale/overrideFlag')
+
+        locale = None
+        if utils_giswater.set_boolean(override) is True:
+            try:
+                locale = QSettings().value('locale/globalLocale')
+            except AttributeError as e:
+                locale = "en_EN"
+                self.log_info(f"{type(e).__name__} --> {e}")
+        elif utils_giswater.set_boolean(override) is False:
+            try:
+                locale = QSettings().value('locale/userLocale')
+            except AttributeError as e:
+                locale = "en_EN"
+                self.log_info(f"{type(e).__name__} --> {e}")
+
+        if locale is None:
+            locale = "en_EN"
+
+        return locale
