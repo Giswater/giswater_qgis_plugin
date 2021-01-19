@@ -13,8 +13,14 @@ version=3.4.026
 
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
 # End of mandatory metadata
-changelog=Version 3.4.026 (xx/xx/2020)
-   - 
+changelog=Version 3.4.026 (19/01/2020)
+   - Update qgis templates. Add v_plan_psector_* views, changes on inp_timeseries and inp_transects and add v_edit_cad_auxline
+   - Ask user before creating a sample schema
+   - Enhance profile tool
+   - Manage exceptions in function 'get_layer_source'
+   - Minor bug fix on mincut
+   - Minor bug fix: populate combo childs on config form
+
 
 # Tags are comma separated with spaces allowed
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
