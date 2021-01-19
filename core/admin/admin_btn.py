@@ -109,7 +109,8 @@ class GwAdminButton:
         if project_srid is None:
             project_srid = tools_qt.get_text(self.dlg_readsql_create_project, 'srid_id')
         if project_locale is None:
-            project_locale = tools_qt.get_text(self.dlg_readsql_create_project, 'cmb_locale')
+            project_locale = tools_qt.get_combo_value(self.dlg_readsql_create_project, self.cmb_locale, 0)
+
 
         # Set class variables
         self.schema = project_name_schema
@@ -378,12 +379,15 @@ class GwAdminButton:
         self.cmb_locale = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_locale')
 
         # Populate combo with all locales
-        # TODO: populate combo with init.config system variable [locale]
-        locales = sorted(os.listdir(self.sql_dir + os.sep + 'i18n' + os.sep))
+        list_locale = []
+        locales = tools_gw.get_config_parser('system', 'locale', "project", "init")
+        locales = locales.replace(" ", "").split(',')
+
         for locale in locales:
-            self.cmb_locale.addItem(locale)
-            if locale == 'en_EN':
-                tools_qt.set_widget_text(self.dlg_readsql_create_project, self.cmb_locale, 'en_EN')
+            elem = [locale, locale]
+            list_locale.append(elem)
+
+        tools_qt.fill_combo_values(self.cmb_locale, list_locale)
 
         # Set shortcut keys
         self.dlg_readsql_create_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_create_project))
@@ -938,7 +942,8 @@ class GwAdminButton:
             if not status and self.dev_commit == 'FALSE':
                 return False
 
-            cmb_locale = tools_qt.get_text(self.dlg_readsql, self.cmb_locale)
+            cmb_locale = tools_qt.get_combo_value(self.dlg_readsql_create_project, self.cmb_locale, 0)
+
             folder_i18n = self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n'
             if self._process_folder(folder_i18n + os.sep + self.locale + os.sep, '') is False:
                 if self._process_folder(folder_i18n + os.sep, 'en_EN') is False:
@@ -1706,8 +1711,7 @@ class GwAdminButton:
 
         # Get current locale
         if not locale:
-            locale = tools_qt.get_text(self.dlg_readsql_create_project,
-                                       self.dlg_readsql_create_project.cmb_locale)
+            locale = tools_qt.get_combo_value(self.dlg_readsql_create_project, self.cmb_locale, 0)
 
         client = '"client":{"device":4, "lang":"' + str(locale) + '"}, '
         data = '"data":{' + extras + '}'
@@ -1840,7 +1844,7 @@ class GwAdminButton:
         if project_srid is None:
             project_srid = tools_qt.get_text(self.dlg_readsql_create_project, 'srid_id')
         if project_locale is None:
-            project_locale = tools_qt.get_text(self.dlg_readsql_create_project, 'cmb_locale')
+            project_locale = tools_qt.get_combo_value(self.dlg_readsql_create_project, self.cmb_locale, 0)
 
         # Set class variables
         self.schema = project_name_schema
