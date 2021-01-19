@@ -5,12 +5,12 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-SET segullyh_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2021/01/18
 
-DROP VIEW ve_visit_gully_singlevent;
+DROP VIEW IF EXISTS ve_visit_gully_singlevent;
 CREATE OR REPLACE VIEW ve_visit_gully_singlevent AS 
  SELECT om_visit_x_gully.visit_id,
     om_visit_x_gully.gully_id,
