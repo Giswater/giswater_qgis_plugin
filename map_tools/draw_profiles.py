@@ -348,6 +348,14 @@ class DrawProfiles(ParentMapTool):
                     extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
                     body = self.create_body(extras=extras)
                     result = self.controller.get_json('gw_fct_getprofilevalues', body, log_sql=True)
+
+                    # Manage level and message from query result
+                    if result['message']:
+                        level = int(result['message']['level'])
+                        self.controller.show_message(result['message']['text'], level)
+                        if result['message']['level'] != 3:
+                            return
+
                     self.layer_arc = self.controller.get_layer_by_tablename("v_edit_arc")
                     self.remove_selection()
                     list_arcs = []
