@@ -352,6 +352,14 @@ class GwProfileButton(GwMaptoolButton):
                     result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
                     if result['status'] == 'Failed': return
                     self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
+					
+                    # Manage level and message from query result
+                    if result['message']:
+                        level = int(result['message']['level'])
+                        tools_qgis.show_message(result['message']['text'], level)
+                        if result['message']['level'] != 3:
+                            return
+							
                     self.remove_selection()
                     list_arcs = []
                     for arc in result['body']['data']['arc']:
