@@ -57,16 +57,15 @@ BEGIN
 	v_load_result_array := COALESCE(v_load_result_array, '{}'); 
 	v_load_result := array_to_json(v_load_result_array);
 	
-
-	--    Return
+	-- Return
 	RETURN ('{"status":"Accepted", "message":"'||v_message||'", "version":' || v_version ||
 	      ',"body":{"data":'||v_load_result||''||
 			'}'||
 		'}')::json;
 
-	--    Exception handling
-	--EXCEPTION WHEN OTHERS THEN 
-	--RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN 
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 
 END;
