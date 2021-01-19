@@ -17,6 +17,7 @@ DECLARE
     v_query_text text;
     visit_table text;
     v_visit_type integer;
+    v_pluginlot boolean;
     
 BEGIN
 
@@ -28,6 +29,7 @@ BEGIN
     --INFO: v_visit_type=1 (planned) v_visit_type=2(unexpected/incidencia)	
     v_visit_type=(SELECT visit_type FROM config_visit_class WHERE id=visit_class);
 
+    select value::json->>'lotManage'::boolean INTO v_pluginlot from config_param_system where parameter = 'plugin_lotmanage';
 
     IF TG_OP = 'INSERT' THEN
 
@@ -50,7 +52,7 @@ BEGIN
 	END IF;
 	
 	-- only for planified visits insert lot_id
-	IF v_visit_type=1 THEN
+	IF v_pluginlot AND v_visit_type=1 THEN
 		INSERT INTO om_visit(id, visitcat_id, ext_code, startdate, enddate, webclient_id, expl_id, the_geom, descript, is_done, class_id, lot_id, status) 
 		VALUES (NEW.visit_id, NEW.visitcat_id, NEW.ext_code, NEW.startdate::timestamp, NEW.enddate, NEW.webclient_id, NEW.expl_id, NEW.the_geom, NEW.descript, 
 		NEW.is_done, NEW.class_id, NEW.lot_id, NEW.status);
@@ -95,7 +97,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
      
  
-	IF v_visit_type=1 THEN
+	IF v_pluginlot AND v_visit_type=1 THEN
 		UPDATE om_visit SET  visitcat_id=NEW.visitcat_id, ext_code=NEW.ext_code, enddate=NEW.enddate, 
 		webclient_id=NEW.webclient_id, expl_id=NEW.expl_id, the_geom=NEW.the_geom, descript=NEW.descript, is_done=NEW.is_done, class_id=NEW.class_id,
 		lot_id=NEW.lot_id, status=NEW.status WHERE id=NEW.visit_id;

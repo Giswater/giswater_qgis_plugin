@@ -95,7 +95,6 @@ CREATE OR REPLACE VIEW ve_visit_noinfra AS
     om_visit.descript,
     om_visit.is_done,
     om_visit.class_id,
-    om_visit.lot_id,
     om_visit.status,
     a.param_1 AS incident_type,
     a.param_2 AS incident_comment
@@ -129,7 +128,6 @@ CREATE OR REPLACE VIEW ve_visit_arc_insp AS
     om_visit.descript,
     om_visit.is_done,
     om_visit.class_id,
-    om_visit.lot_id,
     om_visit.status,
     a.param_1 AS sediments_arc,
     a.param_2 AS defect_arc,
@@ -165,7 +163,6 @@ CREATE OR REPLACE VIEW ve_visit_arc_rehabit AS
     om_visit.descript,
     om_visit.is_done,
     om_visit.class_id,
-    om_visit.lot_id,
     om_visit.status,
     a.param_1 AS arc_rehabit_1,
     a.param_2 AS arc_rehabit_2
@@ -199,7 +196,6 @@ CREATE OR REPLACE VIEW ve_visit_node_insp AS
     om_visit.descript,
     om_visit.is_done,
     om_visit.class_id,
-    om_visit.lot_id,
     om_visit.status,
     a.param_1 AS sediments_node,
     a.param_2 AS defect_node,
@@ -235,7 +231,6 @@ CREATE OR REPLACE VIEW ve_visit_connec_insp AS
     om_visit.descript,
     om_visit.is_done,
     om_visit.class_id,
-    om_visit.lot_id,
     om_visit.status,
     a.param_1 AS sediments_connec,
     a.param_2 AS defect_connec,
@@ -271,7 +266,6 @@ CREATE OR REPLACE VIEW ve_visit_gully_insp AS
     om_visit.descript,
     om_visit.is_done,
     om_visit.class_id,
-    om_visit.lot_id,
     om_visit.status,
     a.param_1 AS clean_gully,
     a.param_2 AS smells_gully

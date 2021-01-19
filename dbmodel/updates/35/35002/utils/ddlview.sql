@@ -358,3 +358,126 @@ CREATE OR REPLACE VIEW v_edit_cad_auxpoint AS
     temp_table.geom_point
    FROM SCHEMA_NAME.temp_table
   WHERE temp_table.cur_user = "current_user"()::text AND temp_table.fid = 127;
+
+
+ --2021/01/18  
+DROP VIEW ve_visit_arc_singlevent;
+CREATE OR REPLACE VIEW ve_visit_arc_singlevent AS 
+ SELECT om_visit_x_arc.visit_id,
+    om_visit_x_arc.arc_id,
+    om_visit.visitcat_id,
+    om_visit.ext_code,
+    left (date_trunc('second', startdate)::text, 19)::timestamp as startdate,
+    left (date_trunc('second', enddate)::text, 19)::timestamp as enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    om_visit.expl_id,
+    om_visit.the_geom,
+    om_visit.descript,
+    om_visit.is_done,
+    om_visit.class_id,
+    om_visit.status,
+    om_visit_event.id AS event_id,
+    om_visit_event.event_code,
+    om_visit_event.position_id,
+    om_visit_event.position_value,
+    om_visit_event.parameter_id,
+    om_visit_event.value,
+    om_visit_event.value1,
+    om_visit_event.value2,
+    om_visit_event.geom1,
+    om_visit_event.geom2,
+    om_visit_event.geom3,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.tstamp,
+    om_visit_event.text,
+    om_visit_event.index_val,
+    om_visit_event.is_last
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_arc ON om_visit.id = om_visit_x_arc.visit_id
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
+  WHERE config_visit_class.ismultievent = false;
+  
+  
+DROP VIEW ve_visit_connec_singlevent;
+CREATE OR REPLACE VIEW ve_visit_connec_singlevent AS 
+ SELECT om_visit_x_connec.visit_id,
+    om_visit_x_connec.connec_id,
+    om_visit.visitcat_id,
+    om_visit.ext_code,
+    left (date_trunc('second', startdate)::text, 19)::timestamp as startdate,
+    left (date_trunc('second', enddate)::text, 19)::timestamp as enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    om_visit.expl_id,
+    om_visit.the_geom,
+    om_visit.descript,
+    om_visit.is_done,
+    om_visit.class_id,
+    om_visit.status,
+    om_visit_event.event_code,
+    om_visit_event.position_id,
+    om_visit_event.position_value,
+    om_visit_event.parameter_id,
+    om_visit_event.value,
+    om_visit_event.value1,
+    om_visit_event.value2,
+    om_visit_event.geom1,
+    om_visit_event.geom2,
+    om_visit_event.geom3,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.tstamp,
+    om_visit_event.text,
+    om_visit_event.index_val,
+    om_visit_event.is_last
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_connec ON om_visit.id = om_visit_x_connec.visit_id
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
+  WHERE config_visit_class.ismultievent = false;
+  
+   
+  
+DROP VIEW ve_visit_node_singlevent; 
+CREATE OR REPLACE VIEW ve_visit_node_singlevent AS 
+ SELECT om_visit_x_node.visit_id,
+    om_visit_x_node.node_id,
+    om_visit.visitcat_id,
+    om_visit.ext_code,
+    left (date_trunc('second', startdate)::text, 19)::timestamp as startdate,
+    left (date_trunc('second', enddate)::text, 19)::timestamp as enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    om_visit.expl_id,
+    om_visit.the_geom,
+    om_visit.descript,
+    om_visit.is_done,
+    om_visit.class_id,
+    om_visit.status,
+    om_visit_event.event_code,
+    om_visit_event.position_id,
+    om_visit_event.position_value,
+    om_visit_event.parameter_id,
+    om_visit_event.value,
+    om_visit_event.value1,
+    om_visit_event.value2,
+    om_visit_event.geom1,
+    om_visit_event.geom2,
+    om_visit_event.geom3,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.tstamp,
+    om_visit_event.text,
+    om_visit_event.index_val,
+    om_visit_event.is_last
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_node ON om_visit.id = om_visit_x_node.visit_id
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
+  WHERE config_visit_class.ismultievent = false;
