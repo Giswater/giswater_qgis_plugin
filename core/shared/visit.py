@@ -295,6 +295,10 @@ class GwVisit(QObject):
 
         if table_object == "v_ui_om_visit" or "v_ui_om_visitman_x_" in table_object:
             self.get_visit(visit_id=selected_object_id)
+            
+        # Disconnect open visit from table_visit once there opened
+        self.dlg_visit_manager.tbl_visit.doubleClicked.disconnect()
+        self.dlg_visit_manager.btn_open.clicked.disconnect()
 
 
     def set_signals(self):
