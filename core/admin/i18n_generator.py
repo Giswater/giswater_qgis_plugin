@@ -21,14 +21,10 @@ class GwI18NGenerator:
 
     def __init__(self):
         self.plugin_dir = global_vars.plugin_dir
-        self.language = None
-        self.lower_lang = None
 
 
-    def init_dialog(self, lang='mylang', ip=None, port='5433', db='giswater', user='myuser', pwd='mypss', version='3.5.001'):
-        self.language = lang
-        self.lower_lang = self.language.lower
-        self.version = version
+    def init_dialog(self):
+
         self.dlg_qm = GwAdminTranslationUi()
         tools_gw.load_settings(self.dlg_qm)
         self.load_user_values()
@@ -67,12 +63,12 @@ class GwI18NGenerator:
         self.dlg_qm.btn_translate.setEnabled(True)
         host = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f'Connected to {host}')
-        sql = "SELECT user_language, py_language, xml_language, py_file FROM i18n.cat_language"
+        sql = "SELECT id, idval FROM i18n.cat_language"
         rows = self.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows, 0)
+        tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows, 1)
         cur_user = tools_db.get_current_user()
         language = tools_qgis.get_plugin_settings_value('qm_lang_language' + cur_user)
-        tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0)
+        tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 1)
 
 
     def check_translate_options(self):
@@ -108,6 +104,9 @@ class GwI18NGenerator:
         # On the database, the dialog_name column must match the name of the ui file (no extension).
         # Also, open_dialog function must be called, passed as parameter dlg_name = 'ui_file_name_without_extension'
 
+        self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
+        self.lower_lang = self.language.lower()
+
         key_label = f'lb_{self.lower_lang}'
         key_tooltip = f'tt_{self.lower_lang}'
         key_message = f'ms_{self.lower_lang}'
@@ -126,7 +125,7 @@ class GwI18NGenerator:
                f" ORDER BY dialog_name;")
         py_dialogs = self.get_rows(sql)
 
-        ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{self.lower_lang}.ts'
+        ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{self.language}.ts'
 
         # Check if file exist
         if os.path.exists(ts_path):
@@ -150,12 +149,12 @@ class GwI18NGenerator:
         for py_tlb in py_toolbars:
             line = f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_tlb['source']}</source>\n"
-            if py_tlb[self.lower_lang] is None:
-                py_tlb[self.lower_lang] = py_tlb['lb_en_en']
+            if py_tlb[key_label] is None:
+                py_tlb[key_label] = py_tlb['lb_en_en']
                 if py_tlb['lb_en_en'] is None:
-                    py_tlb[self.lower_lang] = py_tlb['source']
+                    py_tlb[key_label] = py_tlb['source']
 
-            line += f"\t\t\t<translation>{py_tlb[self.lower_lang]}</translation>\n"
+            line += f"\t\t\t<translation>{py_tlb[key_label]}</translation>\n"
             line += f"\t\t</message>\n"
             line = line.replace("&", "")
             ts_file.write(line)
@@ -168,8 +167,8 @@ class GwI18NGenerator:
         for py_msg in py_messages:
             line = f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_msg['source']}</source>\n"
-            if py_msg[self.lower_lang] is None:
-                py_msg[self.lower_lang] = py_msg['source']
+            if py_msg[key_message] is None:
+                py_msg[key_message] = py_msg['source']
             line += f"\t\t\t<translation>{py_msg[key_message]}</translation>\n"
             line += f"\t\t</message>\n"
             line = line.replace("&", "")
@@ -221,7 +220,8 @@ class GwI18NGenerator:
         ts_file.write(line)
         ts_file.close()
         del ts_file
-        lrelease_path = self.plugin_dir + os.sep + 'resources' + os.sep + 'lrelease.exe'
+
+        lrelease_path = f"{self.plugin_dir}{os.sep}resources{os.sep}i18n{os.sep}lrelease.exe"
         status = subprocess.call([lrelease_path, ts_path], shell=False)
         if status == 0:
             return True
@@ -243,12 +243,11 @@ class GwI18NGenerator:
     def create_db_files(self):
         """ Read the values of the database and update the i18n files """
 
-        ver = self.version.split('.')
-        ver_minor = f'{ver[0]}{ver[1]}'
-        ver_build = self.version.replace('.', '')
+        higher_version = tools_qgis.get_higher_version().replace(".", "")
+        ver_build = tools_qgis.get_build_version()
 
-        cfg_path = (self.plugin_dir + os.sep + 'dbmodel' + os.sep + 'updates' + os.sep + f'{ver_minor}' + ''
-                    + os.sep + f"{ver_build}" + os.sep + 'i18n' + os.sep + f'{self.language}' + os.sep + '')
+        cfg_path = f"{self.plugin_dir}{os.sep}dbmodel{os.sep}updates{os.sep}{higher_version}{os.sep}{ver_build}" \
+                   f"{os.sep}i18n{os.sep}{self.language}{os.sep}"
         file_name = f'dml.sql'
 
         # Check if file exist
@@ -371,19 +370,19 @@ class GwI18NGenerator:
         :return: Dictionary with values
         """
 
-        host = tools_gw.get_config_parser('i18n_generator', 'qm_lang_host', "user", "init")
-        port = tools_gw.get_config_parser('i18n_generator', 'qm_lang_port', "user", "init")
-        db = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db', "user", "init")
-        user = tools_gw.get_config_parser('i18n_generator', 'qm_lang_user', "user", "init")
-        py_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_py_msg', "user", "init")
-        db_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db_msg', "user", "init")
+        host = tools_gw.get_config_parser('i18n_generator', 'qm_lang_host', "user", "init", False)
+        port = tools_gw.get_config_parser('i18n_generator', 'qm_lang_port', "user", "init", False)
+        db = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db', "user", "init", False)
+        user = tools_gw.get_config_parser('i18n_generator', 'qm_lang_user', "user", "init", False)
+        py_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_py_msg', "user", "init", False)
+        db_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db_msg', "user", "init", False)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_host', host)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_port', port)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_db', db)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_user', user)
         tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_py_msg, py_msg)
         tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_db_msg, db_msg)
-
+        
 
     def init_db(self, host, port, db, user, password):
         """ Initializes database connection """

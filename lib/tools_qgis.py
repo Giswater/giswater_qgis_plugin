@@ -792,23 +792,25 @@ def get_geometry_from_json(feature):
 
 def get_locale():
 
-    locale = None
-
     # Get locale of QGIS application
     override = QSettings().value('locale/overrideFlag')
 
-    if override is False:
+    locale = None
+    if tools_os.set_boolean(override) is True:
         try:
-            locale = QSettings().value('locale/gLobalLocale')
-        except AttributeError:
+            locale = QSettings().value('locale/globalLocale')
+        except AttributeError as e:
             locale = "en_EN"
-    elif override is True:
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
+    elif tools_os.set_boolean(override) is False:
         try:
             locale = QSettings().value('locale/userLocale')
-        except AttributeError:
+        except AttributeError as e:
             locale = "en_EN"
+            tools_log.log_info(f"{type(e).__name__} --> {e}")
+
     if locale is None:
-       locale = "en_EN"
+        locale = "en_EN"
 
     return locale
 
