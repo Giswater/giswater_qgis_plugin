@@ -198,7 +198,7 @@ BEGIN
 			IF (NEW.dma_id IS NULL) THEN
 				
 				-- control error without any mapzones defined on the table of mapzone
-				IF ((SELECT COUNT(*) FROM dma) = 0 WHERE active IS TRUE ) THEN
+				IF (SELECT COUNT(*) FROM dma WHERE active IS TRUE ) = 0 THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"1012", "function":"1320","debug_msg":null}}$$);';
 				END IF;
