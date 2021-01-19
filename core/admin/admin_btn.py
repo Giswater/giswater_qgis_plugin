@@ -1529,10 +1529,6 @@ class GwAdminButton:
         
         tools_log.log_info(f"Create schema of type '{project_type}': '{project_name_schema}'")
 
-        if not is_test:
-            self.task1 = GwTask('Manage schema')
-            QgsApplication.taskManager().addTask(self.task1)
-            self.task1.setProgress(0)
 
         if self.rdb_import_data.isChecked():
             self.file_inp = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file')
@@ -1553,6 +1549,11 @@ class GwAdminButton:
                     tools_qt.set_widget_text(self.dlg_readsql_create_project, 'cmb_locale', self.locale)
                 else:
                     return
+
+        if not is_test:
+            self.task1 = GwTask('Manage schema')
+            QgsApplication.taskManager().addTask(self.task1)
+            self.task1.setProgress(0)
 
         # Common execution
         status = self.load_base(project_type=project_type)
