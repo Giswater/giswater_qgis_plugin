@@ -1390,8 +1390,6 @@ class GwVisit(QObject):
             message = "Any record selected"
             tools_qt.show_info_box(message)
             return
-        # check a parameter_id is selected (can be that no value is available)
-        parameter_id = tools_qt.get_combo_value(self.dlg_add_visit, self.dlg_add_visit.parameter_id, 0)
 
         # Get selected rows
         # TODO: use tbl_event.model().fieldIndex(event.pk()) to be pk name independent
