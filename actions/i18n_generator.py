@@ -36,7 +36,7 @@ class I18NGenerator(ParentAction):
         self.dlg_qm.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_qm))
         self.dlg_qm.rejected.connect(self.save_user_values)
         self.dlg_qm.rejected.connect(self.close_db)
-        self.open_dialog(self.dlg_qm, dlg_name='main_qtdialog')
+        self.open_dialog(self.dlg_qm, dlg_name='admin_translation')
 
 
     def check_connection(self):
@@ -62,12 +62,12 @@ class I18NGenerator(ParentAction):
         self.dlg_qm.btn_translate.setEnabled(True)
         host = utils_giswater.getWidgetText(self.dlg_qm, self.dlg_qm.txt_host)
         utils_giswater.setWidgetText(self.dlg_qm, 'lbl_info', f'Connected to {host}')
-        sql = "SELECT user_language, py_language, xml_language, py_file FROM i18n.cat_language"
+        sql = "SELECT id, idval FROM i18n.cat_language"
         rows = self.get_rows(sql)
-        utils_giswater.set_item_data(self.dlg_qm.cmb_language, rows, 0)
+        utils_giswater.set_item_data(self.dlg_qm.cmb_language, rows, 1)
         cur_user = self.controller.get_current_user()
         language = self.controller.plugin_settings_value('qm_lang_language' + cur_user)
-        utils_giswater.set_combo_itemData(self.dlg_qm.cmb_language, language, 0)
+        utils_giswater.set_combo_itemData(self.dlg_qm.cmb_language, language, 1)
 
 
     def check_translate_options(self):
@@ -75,7 +75,8 @@ class I18NGenerator(ParentAction):
         db_msg = utils_giswater.isChecked(self.dlg_qm, self.dlg_qm.chk_db_msg)
         self.dlg_qm.lbl_info.clear()
         msg = ''
-
+        self.language = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 0)
+        self.lower_lang = self.language.lower()
         if py_msg:
             status_py_msg = self.create_files_py_message()
             if status_py_msg is True:
@@ -235,11 +236,11 @@ class I18NGenerator(ParentAction):
 
 
 
-    def get_title(self, py_dialogs, name, key_lbl):
+    def get_title(self, py_dialogs, name, key_label):
         title = None
         for py in py_dialogs:
             if py['source'] == f'dlg_{name}':
-                title = py[key_lbl]
+                title = py[key_label]
                 if not title:
                     title = py['lb_en_en']
                 return title
@@ -248,24 +249,12 @@ class I18NGenerator(ParentAction):
 
     def get_files_config_messages(self):
         """ Read the values of the database and update the i18n files """
-        db_lang = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
-        file_lng = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
 
-        version_metadata = self.get_plugin_version()
-        ver = version_metadata.split('.')
-        plugin_version = f'{ver[0]}{ver[1]}'
-        plugin_release = version_metadata.replace('.', '')
+        higher_version = self.get_higher_version().replace(".", "")
+        ver_build = self.get_build_version()
 
-        # Get db messages values
-        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_en, lb_{db_lang}, tt_en_en, tt_{db_lang} "
-               f" FROM i18n.dbdialog "
-               f" WHERE context in ('config_param_system', 'sys_param_user')"
-               f" ORDER BY formname;")
-        rows = self.get_rows(sql)
-        if not rows:
-            return False
-        cfg_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'updates' + os.sep + f'{plugin_version}' + ''
-                    + os.sep + f"{plugin_release}" + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
+        cfg_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'updates' + os.sep + f'{higher_version}' + ''
+                    + os.sep + f"{ver_build}" + os.sep + 'i18n' + os.sep + f'{self.language}' + os.sep + '')
         file_name = f'dml.sql'
 
         # Check if file exist
@@ -277,31 +266,25 @@ class I18NGenerator(ParentAction):
         else:
             os.makedirs(cfg_path, exist_ok=True)
 
+        # Get db messages values
+        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_en, lb_{self.lower_lang}, tt_en_en,"
+               f" tt_{self.lower_lang} "
+               f" FROM i18n.dbdialog "
+               f" WHERE context in ('config_param_system', 'sys_param_user')"
+               f" ORDER BY formname;")
+        rows = self.get_rows(sql)
+        if not rows:
+            return False
         status = self.write_values(rows, cfg_path + file_name)
         return status
 
 
     def get_files_db_messages(self):
         """ Read the values of the database and update the i18n api files """
-        db_lang = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 1)
-        file_lng = utils_giswater.get_item_data(self.dlg_qm, self.dlg_qm.cmb_language, 3)
-
-        version_metadata = self.get_plugin_version()
-        ver = version_metadata.split('.')
-        plugin_version = f'{ver[0]}{ver[1]}'
-        plugin_release = version_metadata.replace('.', '')
-
-        # Get db messages values
-        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_en, lb_{db_lang}, tt_en_en, tt_{db_lang} "
-               f" FROM i18n.dbdialog "
-               f" WHERE context not in ('config_param_system', 'sys_param_user')"
-               f" ORDER BY formname;")
-        rows = self.get_rows(sql)
-        if not rows:
-            return
-
-        db_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'api' + os.sep + 'updates' + os.sep + f'{plugin_version}' + ''
-                + os.sep + f"{plugin_release}" + os.sep + 'i18n' + os.sep + f'{file_lng}' + os.sep + '')
+        higher_version = self.get_higher_version().replace(".", "")
+        ver_build = self.get_build_version()
+        db_path = (self.plugin_dir + os.sep + 'sql' + os.sep + 'api' + os.sep + 'updates' + os.sep + f'{higher_version}' + ''
+                   + os.sep + f"{ver_build}" + os.sep + 'i18n' + os.sep + f'{self.language}' + os.sep + '')
         file_name = f'dml.sql'
 
         # Check if file exist
@@ -313,6 +296,15 @@ class I18NGenerator(ParentAction):
         else:
             os.makedirs(db_path, exist_ok=True)
 
+        # Get db messages values
+        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_en, lb_{self.lower_lang}, tt_en_en,"
+               f" tt_{self.lower_lang} "
+               f" FROM i18n.dbdialog "
+               f" WHERE context not in ('config_param_system', 'sys_param_user')"
+               f" ORDER BY formname;")
+        rows = self.get_rows(sql)
+        if not rows:
+            return
         status = self.write_values(rows, db_path + file_name)
         return status
 

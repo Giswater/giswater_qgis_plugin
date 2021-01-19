@@ -105,6 +105,20 @@ class ParentAction(object):
         return plugin_version
 
 
+    def get_higher_version(self):
+        """ Get plugin higher version from metadata.txt file """
+
+        higher_version = self.get_plugin_version()[0:3]
+        return higher_version
+
+
+    def get_build_version(self):
+        """ Get plugin build version from metadata.txt file """
+
+        build_version = self.get_plugin_version().replace(".", "")
+        return build_version
+
+
     def get_file_dialog(self, dialog, widget):
         """ Get file dialog """
 
