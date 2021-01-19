@@ -9,8 +9,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2021/01/15
-ALTER TABLE rtc_scada_node DROP CONSTRAINT rtc_scada_node_scada_id_fkey;
+ALTER TABLE rtc_scada_node DROP CONSTRAINT IF EXISTS rtc_scada_node_scada_id_fkey;
 
-ALTER TABLE rtc_scada_x_dma DROP CONSTRAINT rtc_scada_x_dma_scada_id_fkey;
+ALTER TABLE rtc_scada_x_dma DROP CONSTRAINT IF EXISTS rtc_scada_x_dma_scada_id_fkey;
 
-ALTER TABLE rtc_scada_x_sector DROP CONSTRAINT rtc_scada_x_sector_scada_id_fkey;
+ALTER TABLE rtc_scada_x_sector DROP CONSTRAINT IF EXISTS rtc_scada_x_sector_scada_id_fkey;
