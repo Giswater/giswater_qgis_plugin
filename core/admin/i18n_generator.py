@@ -76,7 +76,8 @@ class GwI18NGenerator:
         db_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_msg)
         self.dlg_qm.lbl_info.clear()
         msg = ''
-
+        self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
+        self.lower_lang = self.language.lower()
         if py_msg:
             status_py_msg = self.create_py_files()
             if status_py_msg is True:
@@ -103,9 +104,6 @@ class GwI18NGenerator:
         """ Read the values of the database and generate the ts and qm files """
         # On the database, the dialog_name column must match the name of the ui file (no extension).
         # Also, open_dialog function must be called, passed as parameter dlg_name = 'ui_file_name_without_extension'
-
-        self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
-        self.lower_lang = self.language.lower()
 
         key_label = f'lb_{self.lower_lang}'
         key_tooltip = f'tt_{self.lower_lang}'
