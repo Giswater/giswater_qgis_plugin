@@ -1307,9 +1307,6 @@ class GwAdminButton:
         tools_gw.load_settings(self.dlg_import_inp)
 
         # Hide widgets
-        self.dlg_import_inp.grb_input_layer.setVisible(False)
-        self.dlg_import_inp.grb_selection_type.setVisible(False)
-
         self.dlg_import_inp.progressBar.setVisible(False)
 
         if schema_type.lower() == 'ws':
