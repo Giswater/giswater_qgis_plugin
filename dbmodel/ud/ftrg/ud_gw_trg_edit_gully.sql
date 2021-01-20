@@ -547,27 +547,26 @@ BEGIN
 		-- Reconnect arc_id
 		IF (NEW.arc_id != OLD.arc_id) OR (NEW.arc_id IS NOT NULL AND OLD.arc_id IS NULL) OR (NEW.arc_id IS NULL AND OLD.arc_id IS NOT NULL) THEN
 
-			-- when arc_id comes from gully table
-			IF OLD.arc_id NOT IN (SELECT arc_id FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id) THEN 
-			
+			-- when arc_id comes from psector table
+			IF OLD.arc_id IN (SELECT arc_id FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id) THEN 
+				UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id=OLD.gully_id AND arc_id = OLD.arc_id;		
+
+			ELSE
+				-- when arc_id comes from gully table
 				UPDATE gully SET arc_id=NEW.arc_id where gully_id=NEW.gully_id;
 				
 				IF (SELECT link_id FROM link WHERE feature_id=NEW.gully_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL THEN
 
-					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
+					EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
+					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
 				
 				ELSIF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_gully_automatic_link' AND cur_user=current_user LIMIT 1) IS TRUE THEN
 
-					EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
-					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"CONNEC"}}$$)';
-				END IF;
-
-			-- when arc_id comes from plan psector tables
-			ELSIF (OLD.arc_id IN (SELECT arc_id FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id)) THEN
-				UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id=OLD.gully_id AND arc_id = OLD.arc_id;		
+					EXECUTE 'SELECT gw_fct_connect_to_network($${"client":{"device":4, "infoType":1, "lang":"ES"},
+					"feature":{"id":'|| array_to_json(array_agg(NEW.gully_id))||'},"data":{"feature_type":"GULLY"}}$$)';
+				END IF;		
 			END IF;
-		END IF;
+		END IF;	
 		
 		-- State_type
 		IF NEW.state=0 AND OLD.state=1 THEN

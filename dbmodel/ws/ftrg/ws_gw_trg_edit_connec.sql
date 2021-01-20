@@ -553,9 +553,11 @@ BEGIN
 		-- Reconnect arc_id
 		IF (NEW.arc_id != OLD.arc_id) OR (NEW.arc_id IS NOT NULL AND OLD.arc_id IS NULL) OR (NEW.arc_id IS NULL AND OLD.arc_id IS NOT NULL) THEN
 
-			-- when arc_id comes from connec table
-			IF OLD.arc_id NOT IN (SELECT arc_id FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id) THEN 
-			
+			-- when arc_id comes from plan psector tables
+			IF (OLD.arc_id IN (SELECT arc_id FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id)) THEN
+				UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id=OLD.connec_id AND arc_id = OLD.arc_id;		
+			ELSE
+				-- when arc_id comes from connec table
 				UPDATE connec SET arc_id=NEW.arc_id where connec_id=NEW.connec_id;
 				
 				IF (SELECT link_id FROM link WHERE feature_id=NEW.connec_id AND feature_type='CONNEC' LIMIT 1) IS NOT NULL THEN
@@ -577,10 +579,6 @@ BEGIN
 						NEW.dqa_id = (SELECT dqa_id FROM arc WHERE arc_id = NEW.arc_id);
 					END IF;
 				END IF;
-
-			-- when arc_id comes from plan psector tables
-			ELSIF (OLD.arc_id IN (SELECT arc_id FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id)) THEN
-				UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id=OLD.connec_id AND arc_id = OLD.arc_id;		
 			END IF;
 		END IF;
 
@@ -593,7 +591,7 @@ BEGIN
 				= 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
 			END IF;
 			IF NEW.state = 1 AND OLD.state=2 THEN
-				DELETE FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id;					
+				DELETE FROM plan_psector_x_connec WHERE connec_id=NEW.connec_id;
 			END IF;
 			UPDATE connec SET state=NEW.state WHERE connec_id = OLD.connec_id;
 			
@@ -607,7 +605,7 @@ BEGIN
 					NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-      	 				 "data":{"message":"2110", "function":"1318","debug_msg":null}}$$);';
+						"data":{"message":"2110", "function":"1318","debug_msg":null}}$$);';
 					END IF;
 				END IF;
 			END IF;
@@ -627,7 +625,7 @@ BEGIN
 				UPDATE connec SET state_type=NEW.state_type WHERE connec_id = OLD.connec_id;
 			END IF;
 		END IF;			
-       	
+
 		-- rotation
 		IF NEW.rotation != OLD.rotation THEN
 			UPDATE connec SET rotation=NEW.rotation WHERE connec_id = OLD.connec_id;
@@ -722,10 +720,10 @@ BEGIN
 					END IF;
 				
 				END LOOP;
-		    END IF;   
+		END IF;
 
-        RETURN NEW;
-    
+		RETURN NEW;
+
 
 	ELSIF TG_OP = 'DELETE' THEN
 	
@@ -752,10 +750,10 @@ BEGIN
 				DELETE FROM vnode WHERE vnode_id=v_record_link.exit_id::integer;
 			END IF;
 		END LOOP;
-        
+
 		--Delete addfields
-  		DELETE FROM man_addfields_value WHERE feature_id = OLD.connec_id  and parameter_id in 
-  		(SELECT id FROM sys_addfields WHERE cat_feature_id IS NULL OR cat_feature_id =OLD.connec_type);
+		DELETE FROM man_addfields_value WHERE feature_id = OLD.connec_id  and parameter_id in 
+		(SELECT id FROM sys_addfields WHERE cat_feature_id IS NULL OR cat_feature_id =OLD.connec_type);
 
 		RETURN NULL;
 
