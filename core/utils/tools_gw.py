@@ -140,8 +140,6 @@ def set_config_parser(section: str, parameter: str, value: str, config_type="use
             parser.add_section(section)
         if comment is not None:
             parser.set(section, comment)
-        if value == "":
-            value = None
         parser.set(section, parameter, value)
         with open(path, 'w') as configfile:
             parser.write(configfile)
