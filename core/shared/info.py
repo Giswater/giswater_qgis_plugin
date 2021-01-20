@@ -176,10 +176,7 @@ class GwInfo(QObject):
         if function_name is None:
             return False, None
 
-        json_result = tools_gw.execute_procedure(function_name, body, rubber_band=self.rubber_band, log_sql=False)
-        if json_result is None:
-            return False, None
-
+        json_result = tools_gw.execute_procedure(function_name, body, rubber_band=self.rubber_band)
         if json_result in (None, False):
             return False, None
 
@@ -739,6 +736,8 @@ class GwInfo(QObject):
             extras += f'"node2":"{self.node2}"}}'
             body = tools_gw.create_body(extras=extras)
             self.interpolate_result = tools_gw.execute_procedure('gw_fct_node_interpolate', body)
+            if not self.interpolate_result or self.interpolate_result['status'] == 'Failed':
+                return False
             tools_gw.fill_tab_log(dlg_dtext, self.interpolate_result['body']['data'])
 
 
@@ -3216,7 +3215,7 @@ class GwInfo(QObject):
         feature = f'"tableName":"{table_name}", "featureId":"{feature_id}", "feature_type":"{feature_type}"'
         extras = f'"coordinates":{{{list_points}}}'
         body = tools_gw.create_body(form, feature, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body, log_sql=True)
+        json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body)
         if json_result is None:
             return
 
@@ -3264,7 +3263,7 @@ class GwInfo(QObject):
         form = f'"formName":"{form_name}"'
         feature = f'"tableName":"{table_name}"'
         body = tools_gw.create_body(form, feature, extras=fields)
-        result = tools_gw.execute_procedure('gw_fct_setcatalog', body, log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_setcatalog', body)
         if result['status'] != 'Accepted':
             return
 
@@ -3395,7 +3394,7 @@ class GwInfo(QObject):
         extras = (f'"arcId":"{feat_id}", "dmaId":"{dma_id}", "presszoneId":"{presszone_id}", "sectorId":"{sector_id}", '
                   f'"dqaId":"{dqa_id}"')
         body = tools_gw.create_body(feature=feature, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_settoarc', body, log_sql=True)
+        json_result = tools_gw.execute_procedure('gw_fct_settoarc', body)
         if 'status' in json_result and json_result['status'] == 'Accepted':
             if json_result['message']:
                 level = 1

@@ -1100,7 +1100,7 @@ class GwPsector:
         # TODO: Check this
         extras = f'"psectorId":"{tools_qt.get_text(self.dlg_plan_psector, self.psector_id)}"'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_setplan', body, log_sql=True)
+        json_result = tools_gw.execute_procedure('gw_fct_setplan', body)
         return json_result
         
         
@@ -1558,14 +1558,14 @@ class GwPsector:
         if action == 'psector':
             feature = f'"id":[{inf_text}], "featureType":"PSECTOR"'
             body = tools_gw.create_body(feature=feature)
-            result = tools_gw.execute_procedure('gw_fct_getcheckdelete', body, log_sql=True)
+            result = tools_gw.execute_procedure('gw_fct_getcheckdelete', body)
             if result['status'] == "Accepted":
                 if result['message']:
                     answer = tools_qt.show_question(result['message']['text'])
                     if answer:
                         feature += f', "tableName":"{table_name}", "idName":"{column_id}"'
                         body = tools_gw.create_body(feature=feature)
-                        result = tools_gw.execute_procedure('gw_fct_setdelete', body, log_sql=True)
+                        result = tools_gw.execute_procedure('gw_fct_setdelete', body)
 
         elif action == 'price':
             message = "Are you sure you want to delete these records?"

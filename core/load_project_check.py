@@ -205,7 +205,7 @@ class GwLoadProjectCheck:
                         extras = f'"style_id":"{style_id}"'
                         body = tools_gw.create_body(extras=extras)
                         style = tools_gw.execute_procedure('gw_fct_getstyle', body)
-                        if style['status'] == 'Failed':
+                        if not style or style['status'] == 'Failed':
                             return
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:

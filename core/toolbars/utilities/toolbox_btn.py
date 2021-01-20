@@ -102,7 +102,7 @@ class GwToolBoxButton(GwDialogButton):
         extras = f'"filterText":"{self.function_selected}"'
         extras += ', "isToolbox":true'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body, log_sql=True)
+        json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
         if not json_result or json_result['status'] == 'Failed':
             return False
 

@@ -67,6 +67,7 @@ class GwProfileButton(GwMaptoolButton):
         self.rotation_vd_exist = False
         self.lastnode_datatype = 'REAL'
 
+
     def activate(self):
 
         self.action.setChecked(True)
@@ -151,6 +152,7 @@ class GwProfileButton(GwMaptoolButton):
         # Execute query
         self.profile_json = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
         if self.profile_json['status'] == 'Failed': return
+
         # Manage level and message from query result
         if self.profile_json['message']:
             level = int(self.profile_json['message']['level'])
@@ -163,7 +165,7 @@ class GwProfileButton(GwMaptoolButton):
 
         # Execute draw profile
         self.draw_profile(self.profile_json['body']['data']['arc'], self.profile_json['body']['data']['node'],
-                         self.profile_json['body']['data']['terrain'])
+                          self.profile_json['body']['data']['terrain'])
 
         # Save profile values
         tools_gw.set_config_parser('btn_profile', 'minDistanceProfile', f'{links_distance}')
@@ -351,14 +353,14 @@ class GwProfileButton(GwMaptoolButton):
                     result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
                     if result['status'] == 'Failed': return
                     self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
-					
+
                     # Manage level and message from query result
                     if result['message']:
                         level = int(result['message']['level'])
                         tools_qgis.show_message(result['message']['text'], level)
                         if result['message']['level'] != 3:
                             return
-							
+
                     self.remove_selection()
                     list_arcs = []
                     for arc in result['body']['data']['arc']:
@@ -1296,9 +1298,7 @@ class GwProfileButton(GwMaptoolButton):
 
             # set texts
             plt.annotate(str(i) + '\n' + ' ', xy=(i, int(math.ceil(self.max_top_elev) + 1)),
-                fontsize=6.5,
-                color=text_color, fontweight=text_weight,
-                horizontalalignment='center')
+                         fontsize=6.5, color=text_color, fontweight=text_weight, horizontalalignment='center')
 
 
     def draw_terrain(self, index):
@@ -1355,8 +1355,9 @@ class GwProfileButton(GwMaptoolButton):
         extras = f'"profile_id":"{profile_id}", "action":"delete"'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_setprofile', body)
-        message = f"{result['message']}"
-        tools_qgis.show_info(message)
+        if 'message' in result:
+            message = f"{result['message']}"
+            tools_qgis.show_info(message)
 
         # Remove profile from list
         self.dlg_load.tbl_profiles.takeItem(self.dlg_load.tbl_profiles.row(self.dlg_load.tbl_profiles.currentItem()))
@@ -1379,11 +1380,11 @@ class GwProfileButton(GwMaptoolButton):
         line_style = ''
         line_color = ''
         line_width = ''
-        if data_type=='REAL' or data_type=='TOP-REAL':
+        if data_type in ('REAL', 'TOP-REAL'):
             line_style = self.profile_json['body']['data']['stylesheet']['infra']['real']['style']
             line_color = self.profile_json['body']['data']['stylesheet']['infra']['real']['color']
             line_width = self.profile_json['body']['data']['stylesheet']['infra']['real']['width']
-        elif data_type=='INTERPOLATED':
+        elif data_type == 'INTERPOLATED':
             line_style = self.profile_json['body']['data']['stylesheet']['infra']['interpolated']['style']
             line_color = self.profile_json['body']['data']['stylesheet']['infra']['interpolated']['color']
             line_width = self.profile_json['body']['data']['stylesheet']['infra']['interpolated']['width']

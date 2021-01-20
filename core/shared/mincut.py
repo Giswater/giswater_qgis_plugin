@@ -656,7 +656,9 @@ class GwMincut:
         extras = f'"action":"mincutAccept", "mincutClass":{self.mincut_class}, "status":"continue", '
         extras += f'"mincutId":"{result_mincut_id_text}"'
         body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_setmincut', body, log_sql=True)
+        result = tools_gw.execute_procedure('gw_fct_setmincut', body)
+        if not result or result['status'] == 'Failed':
+            return
         self.mincut_ok(result)
 
 
@@ -1586,7 +1588,7 @@ class GwMincut:
         extras = f'"action":"mincutNetwork", '
         extras += f'"mincutId":"{real_mincut_id}", "arcId":"{elem_id}"'
         body = tools_gw.create_body(extras=extras)
-        complet_result = tools_gw.execute_procedure('gw_fct_setmincut', body, log_sql=True)
+        complet_result = tools_gw.execute_procedure('gw_fct_setmincut', body)
         if complet_result in (False, None) or ('status' in complet_result and complet_result['status'] == 'Failed'): return False
         if 'mincutOverlap' in complet_result or complet_result['status'] == 'Accepted':
             if 'mincutOverlap' in complet_result and complet_result['mincutOverlap'] != "":
@@ -1752,7 +1754,7 @@ class GwMincut:
         if result_mincut_id != 'null':
             extras = f'"action":"mincutValveUnaccess", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}"'
             body = tools_gw.create_body(extras=extras)
-            result = tools_gw.execute_procedure('gw_fct_setmincut', body, log_sql=True)
+            result = tools_gw.execute_procedure('gw_fct_setmincut', body)
             if result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 tools_qgis.show_message(result['message']['text'], level)
@@ -1810,7 +1812,8 @@ class GwMincut:
         extras = f'"mincutId":"{result_mincut_id}"'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_getmincut', body)
-        tools_gw.add_layer_temp(self.dlg_mincut, result['body']['data'], None, False, call_set_tabs_enabled=False)
+        if result and result['status'] == 'Accepted':
+            tools_gw.add_layer_temp(self.dlg_mincut, result['body']['data'], None, False, call_set_tabs_enabled=False)
         # self.dlg_mincut.txt_infolog.setEnabled(False)
 
         # Manage location

@@ -246,6 +246,7 @@ class Giswater(QObject):
         except Exception:
             pass
         finally:
+
             self.load_project = None
 
 
