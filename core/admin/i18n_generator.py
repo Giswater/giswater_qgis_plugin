@@ -257,6 +257,19 @@ class GwI18NGenerator:
         else:
             os.makedirs(cfg_path, exist_ok=True)
 
+        self.write_header(cfg_path + file_name)
+
+        rows = self.get_dbdialog_values()
+        status = self.write_dbdialog_values(rows, cfg_path + file_name)
+
+        rows = self.get_dbmessages_values()
+        status = self.write_dbmessages_values(rows, cfg_path + file_name)
+
+
+        return status
+
+
+    def get_dbdialog_values(self):
         # Get db messages values
         sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_en, lb_{self.lower_lang}, tt_en_en, "
                f"tt_{self.lower_lang}"
@@ -265,17 +278,21 @@ class GwI18NGenerator:
         rows = self.get_rows(sql)
         if not rows:
             return False
-        status = self.write_values(rows, cfg_path + file_name)
-        return status
+        return rows
 
 
-    def write_values(self, rows, path):
-        """ Generate a string and write into file
-        :param rows: List of values ([List][list])
-        :param path: Full destination path (String)
-        :return: (Boolean)
-        """
+    def get_dbmessages_values(self):
+        # Get db messages values
+        sql = (f"SELECT source, project_type, context, ms_en_en, ms_{self.lower_lang}, ht_en_en, ht_{self.lower_lang}"
+               f" FROM i18n.dbmessage "
+               f" ORDER BY context;")
+        rows = self.get_rows(sql)
+        if not rows:
+            return False
+        return rows
 
+
+    def write_header(self, path):
         file = open(path, "w")
         header = (f'/*\n'
                   f'This file is part of Giswater 3\n'
@@ -289,6 +306,13 @@ class GwI18NGenerator:
         file.close()
         del file
 
+
+    def write_dbdialog_values(self, rows, path):
+        """ Generate a string and write into file
+        :param rows: List of values ([List][list])
+        :param path: Full destination path (String)
+        :return: (Boolean)
+        """
 
         file = open(path, "a")
 
@@ -336,6 +360,39 @@ class GwI18NGenerator:
                 line += f', "clause":"WHERE parameter = \'{source}\'"'
             elif row['context'] == 'sys_param_user':
                 line += f', "clause":"WHERE id = \'{source}\'"'
+
+            line += f'}}}}$$);\n'
+            file.write(line)
+        file.close()
+        del file
+        return True
+
+    def write_dbmessages_values(self, rows, path):
+
+        """ Generate a string and write into file
+        :param rows: List of values ([List][list])
+        :param path: Full destination path (String)
+        :return: (Boolean)
+        """
+
+        file = open(path, "a")
+
+        for row in rows:
+            table = row['context'] if row['context'] is not None else ""
+            source = row['source'] if row['source'] is not None else ""
+            ms_value = row[f'ms_{self.lower_lang}'] if row[f'ms_{self.lower_lang}'] is not None else row['ms_en_en']
+            ht_value = ms_value if ms_value is not None else ""
+
+            line = f'SELECT gw_fct_admin_schema_i18n($$'
+            line += (f'{{"data":'
+                     f'{{"table":"{table}", '
+                     f'"formname":null, '
+                     f'"label":{{"column":"error_message", "value":"{ms_value}"}}, '
+                     f'"tooltip":{{"column":"hint_message", "value":"{ht_value}"}}')
+
+            # Clause WHERE for each context
+            if row['context'] == 'sys_message':
+                line += f', "clause":"WHERE id = \'{source}\' "'
 
             line += f'}}}}$$);\n'
             file.write(line)
