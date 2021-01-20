@@ -112,9 +112,9 @@ class GwProfileButton(GwMaptoolButton):
 
         # Set last parameters
         tools_qt.set_widget_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance,
-                                 tools_gw.get_config_parser('btn_profile', 'minDistanceProfile', "user", "sessions"))
+                                 tools_gw.get_config_parser('btn_profile', 'min_distance_profile', "user", "sessions"))
         tools_qt.set_widget_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title,
-                                 tools_gw.get_config_parser('btn_profile', 'titleProfile', "user", "sessions"))
+                                 tools_gw.get_config_parser('btn_profile', 'title_profile', "user", "sessions"))
 
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
@@ -144,12 +144,11 @@ class GwProfileButton(GwMaptoolButton):
         self.links = []
 
         # Get parameters
-        links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance)
+        links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance, False, False)
 
         # Create variable with all the content of the form
         extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", ' \
-            f'"linksDistance":{links_distance}, ' \
-            f'"scale":{{ "eh":1000, "ev":1000}}'
+            f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, "ev":1000}}'
 
         body = tools_gw.create_body(extras=extras)
 
@@ -172,9 +171,9 @@ class GwProfileButton(GwMaptoolButton):
                           self.profile_json['body']['data']['terrain'])
 
         # Save profile values
-        tools_gw.set_config_parser('btn_profile', 'minDistanceProfile', f'{links_distance}')
-        tools_gw.set_config_parser('btn_profile', 'titleProfile',
-                                   f'{tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)}')
+        tools_gw.set_config_parser('btn_profile', 'min_distance_profile', f'{links_distance}')
+        tools_gw.set_config_parser('btn_profile', 'title_profile',
+                                   f'{tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, False, False)}')
 
         # Maximize window (after drawing)
         self.plot.show()
