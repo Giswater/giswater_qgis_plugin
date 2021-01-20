@@ -13,411 +13,411 @@ select * from i18n.dbdialog
 -- translate it
 
 -- result_id
-update i18n.dbdialog set lb_es_es = 'Id resultado' where source = 'result_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Id resultado' where source = 'result_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'result_id - Identificador del resultado' where source = 'result_id' and tt_es_es is null;
 
 -- sector_id
-update i18n.dbdialog set lb_es_es = 'Id sector' where source = 'sector_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Id sector' where source = 'sector_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'sector_id - Identificador del sector' where source = 'sector_id' and tt_es_es is null;
 
 -- node_id
-update i18n.dbdialog set lb_es_es = 'Id nodo' where source = 'node_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Id nodo' where source = 'node_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'node_id - Identificador del nodo' where source = 'node_id' and tt_es_es is null;
 
 -- descript
-update i18n.dbdialog set lb_es_es = 'Descrip.' where source = 'descript' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Descrip.' where source = 'descript' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'descript - Descripción' where source = 'descript' and tt_es_es is null;
 
 -- arc_id
-update i18n.dbdialog set lb_es_es = 'Id arco' where source = 'arc_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Id arco' where source = 'arc_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'arc_id - Identificador del arco' where source = 'arc_id' and tt_es_es is null;
 
 -- expl_id
-update i18n.dbdialog set lb_es_es = 'Id expl.' where source = 'expl_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Id expl.' where source = 'expl_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'expl_id - Identificador de la explotación' where source = 'expl_id' and tt_es_es is null;
 
 -- state
-update i18n.dbdialog set lb_es_es = 'Estado' where source = 'state' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Estado' where source = 'state' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'state - Estado' where source = 'state' and tt_es_es is null;
 
 -- link
-update i18n.dbdialog set lb_es_es = 'Link' where source = 'link' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Link' where source = 'link' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'link - Link' where source = 'link' and tt_es_es is null;
 
 -- name
-update i18n.dbdialog set lb_es_es = 'Nombre' where source = 'name' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Nombre' where source = 'name' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'name - Nombre' where source = 'name' and tt_es_es is null;
 
 -- nodecat_id
-update i18n.dbdialog set lb_es_es = 'Cat. nodo' where source = 'nodecat_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Cat. nodo' where source = 'nodecat_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'nodecat_id - Identificador del catálogo de nodo' where source = 'nodecat_id' and tt_es_es is null;
 
 -- macrosector_id
-update i18n.dbdialog set lb_es_es = 'Id macrosector' where source = 'macrosector_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Id macrosector' where source = 'macrosector_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'macrosector_id - Identificador del del macrosector' where source = 'macrosector_id' and tt_es_es is null;
 
 -- text
-update i18n.dbdialog set lb_es_es = 'Texto' where source = 'text' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Texto' where source = 'text' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'text - Texto' where source = 'text' and tt_es_es is null;
 
 -- annotation
-update i18n.dbdialog set lb_es_es = 'Anotación' where source = 'annotation' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Anotación' where source = 'annotation' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'annotation - Anotación' where source = 'annotation' and tt_es_es is null;
 
 -- arccat_id
-update i18n.dbdialog set lb_es_es = 'Cat. arco' where source = 'arccat_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Cat. arco' where source = 'arccat_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'arccat_id - Catálogo de arco' where source = 'arccat_id' and tt_es_es is null;
 
 -- matcat_id
-update i18n.dbdialog set lb_es_es = 'Cat. mat.' where source = 'matcat_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Cat. mat.' where source = 'matcat_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'matcat_id - Identificador de catálogo de materiales' where source = 'matcat_id' and tt_es_es is null;
 
 -- node_type
-update i18n.dbdialog set lb_es_es = 'Tipo nodo' where source = 'node_type' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Tipo nodo' where source = 'node_type' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'node_type - Tipo de nodo' where source = 'node_type' and tt_es_es is null;
 
 -- enddate
-update i18n.dbdialog set lb_es_es = 'Data final' where source = 'enddate' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Data final' where source = 'enddate' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'enddate - Data final' where source = 'enddate' and tt_es_es is null;
 
 -- observ
-update i18n.dbdialog set lb_es_es = 'Observación' where source = 'observ' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Observación' where source = 'observ' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'observ - Observación' where source = 'observ' and tt_es_es is null;
 
 -- elevation
-update i18n.dbdialog set lb_es_es = 'Elevación' where source = 'elevation' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Elevación' where source = 'elevation' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'elevation - Elevación' where source = 'elevation' and tt_es_es is null;
 
 -- undelete
-update i18n.dbdialog set lb_es_es = 'Bloqueado' where source = 'undelete' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Bloqueado' where source = 'undelete' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'undelete - Bloqueado' where source = 'undelete' and tt_es_es is null;
 
 -- poll_id
-update i18n.dbdialog set lb_es_es = 'Id contaminante' where source = 'poll_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Id contaminante' where source = 'poll_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'poll_id - Identificador de contaminante' where source = 'poll_id' and tt_es_es is null;
 
 -- backbutton
-update i18n.dbdialog set lb_es_es = 'Atras' where source = 'backbutton' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Atras' where source = 'backbutton' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'backbutton - Botón de atrás' where source = 'backbutton' and tt_es_es is null;
 
 -- status
-update i18n.dbdialog set lb_es_es = 'Estado' where source = 'status' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Estado' where source = 'status' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'status - Estado' where source = 'status' and tt_es_es is null;
 
 -- curve_id
-update i18n.dbdialog set lb_es_es = 'Id curva' where source = 'curve_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Id curva' where source = 'curve_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'curve_id - Identificador de la curva' where source = 'curve_id' and tt_es_es is null;
 
 -- arc_type
-update i18n.dbdialog set lb_es_es = 'Tipo arco' where source = 'arc_type' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Tipo arco' where source = 'arc_type' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'arc_type - Tipo de arco' where source = 'arc_type' and tt_es_es is null;
 
 -- depth
-update i18n.dbdialog set lb_es_es = 'Profundidad' where source = 'depth' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Profundidad' where source = 'depth' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'depth - Profundidad del nodo' where source = 'depth' and tt_es_es is null;
 
 -- dma_id 
-update i18n.dbdialog set lb_es_es = 'Id dma' where source = 'dma_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Id dma' where source = 'dma_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'dma_id - Identificador de dma' where source = 'dma_id' and tt_es_es is null;
 
 -- muni_id 
-update i18n.dbdialog set lb_es_es = 'Id muni' where source = 'muni_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Id muni' where source = 'muni_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'muni_id - Identificador del municipio' where source = 'muni_id' and tt_es_es is null;
 
 -- macrodma_id 
-update i18n.dbdialog set lb_es_es = 'Id macrodma' where source = 'macrodma_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Id macrodma' where source = 'macrodma_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'macrodma_id - Identificador de macrodma' where source = 'macrodma_id' and tt_es_es is null;
 
 -- pattern_id 
-update i18n.dbdialog set lb_es_es = 'Id pattern' where source = 'pattern_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Id pattern' where source = 'pattern_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'pattern_id - Identificador de pattern' where source = 'pattern_id' and tt_es_es is null;
 
 -- active 
-update i18n.dbdialog set lb_es_es = 'Activo' where source = 'active' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Activo' where source = 'active' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'active - Activo' where source = 'active' and tt_es_es is null;
 
 -- code
-update i18n.dbdialog set lb_es_es = 'Código' where source = 'code' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Código' where source = 'code' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'code - Código' where source = 'code' and tt_es_es is null;
 
 -- class_id
-update i18n.dbdialog set lb_es_es = 'Id clase' where source = 'class_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Id clase' where source = 'class_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'class_id - Identificador de clase' where source = 'class_id' and tt_es_es is null;
 
 -- length
-update i18n.dbdialog set lb_es_es = 'Longitud' where source = 'length' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Longitud' where source = 'length' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'length - Longitud' where source = 'length' and tt_es_es is null;
 
 -- visit_id
-update i18n.dbdialog set lb_es_es = 'Id visita' where source = 'visit_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Id visita' where source = 'visit_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'visit_id - Identificador de visita' where source = 'visit_id' and tt_es_es is null;
 
 -- value
-update i18n.dbdialog set lb_es_es = 'Valor' where source = 'value' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Valor' where source = 'value' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'value - Valor' where source = 'value' and tt_es_es is null;
 
 -- svg
-update i18n.dbdialog set lb_es_es = 'Svg' where source = 'svg' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Svg' where source = 'svg' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'svg - Svg' where source = 'svg' and tt_es_es is null;
 
 -- builtdate
-update i18n.dbdialog set lb_es_es = 'Fecha cons.' where source = 'builtdate' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Fecha cons.' where source = 'builtdate' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'builtdate - Fecha de construcción' where source = 'builtdate' and tt_es_es is null;
 
 -- postcode
-update i18n.dbdialog set lb_es_es = 'Código postal' where source = 'postcode' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Código postal' where source = 'postcode' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'postcode - Código postal' where source = 'postcode' and tt_es_es is null;
 
 -- acceptbutton
-update i18n.dbdialog set lb_es_es = 'Aceptar' where source = 'acceptbutton' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Aceptar' where source = 'acceptbutton' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'acceptbutton - Botón de aceptado' where source = 'acceptbutton' and tt_es_es is null;
 
 -- streetname
-update i18n.dbdialog set lb_es_es = 'Nom. calle' where source = 'streetname' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Nom. calle' where source = 'streetname' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'streetname - Nombre de la calle' where source = 'streetname' and tt_es_es is null;
 
 -- postnumber
-update i18n.dbdialog set lb_es_es = 'Núm. post.' where source = 'postnumber' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Núm. post.' where source = 'postnumber' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'postnumber - Número postal' where source = 'postnumber' and tt_es_es is null;
 
 -- label
-update i18n.dbdialog set lb_es_es = 'Etiqueta' where source = 'label' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Etiqueta' where source = 'label' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'label - Etiqueta' where source = 'label' and tt_es_es is null;
 
 -- comment
-update i18n.dbdialog set lb_es_es = 'Coment.' where source = 'comment' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Coment.' where source = 'comment' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'comment - Comentario' where source = 'comment' and tt_es_es is null;
 
 -- ext_code
-update i18n.dbdialog set lb_es_es = 'Ext. code' where source = 'ext_code' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Ext. code' where source = 'ext_code' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'ext_code - Código externo' where source = 'ext_code' and tt_es_es is null;
 
 -- time_hour
-update i18n.dbdialog set lb_es_es = 'Time_hora' where source = 'time_hour' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Time_hora' where source = 'time_hour' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'time_hour - Horas' where source = 'time_hour' and tt_es_es is null;
 
 -- startdate
-update i18n.dbdialog set lb_es_es = 'Fecha in.' where source = 'startdate' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Fecha in.' where source = 'startdate' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'startdate - Fecha de inicio' where source = 'startdate' and tt_es_es is null;
 
 -- geom1
-update i18n.dbdialog set lb_es_es = 'Time_hora' where source = 'geom1' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Time_hora' where source = 'geom1' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'geom1 - Horas' where source = 'geom1' and tt_es_es is null;
 
 -- time_days
-update i18n.dbdialog set lb_es_es = 'Time_dia' where source = 'time_days' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Time_dia' where source = 'time_days' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'time_days - Días' where source = 'time_days' and tt_es_es is null;
 
 -- shape
-update i18n.dbdialog set lb_es_es = 'Forma' where source = 'shape' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Forma' where source = 'shape' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'shape - Forma' where source = 'shape' and tt_es_es is null;
 
 -- cont_error
-update i18n.dbdialog set lb_es_es = 'Cont_error' where source = 'cont_error' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Cont_error' where source = 'cont_error' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'cont_error - Error de continuidad' where source = 'cont_error' and tt_es_es is null;
 
 -- max_flow
-update i18n.dbdialog set lb_es_es = 'Max. caudal' where source = 'max_flow' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Max. caudal' where source = 'max_flow' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'max_flow - Caudal máximo' where source = 'max_flow' and tt_es_es is null;
 
 -- feature_id
-update i18n.dbdialog set lb_es_es = 'Feature' where source = 'feature_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Feature' where source = 'feature_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'feature_id - Identificador de Feature' where source = 'feature_id' and tt_es_es is null;
 
 -- time
-update i18n.dbdialog set lb_es_es = 'Tiempo' where source = 'time' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Tiempo' where source = 'time' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'time - Tiempo' where source = 'time' and tt_es_es is null;
 
 -- workcat_id
-update i18n.dbdialog set lb_es_es = 'Cat. trabajo' where source = 'workcat_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Cat. trabajo' where source = 'workcat_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'workcat_id - Identificador del catálogo de trabajo' where source = 'workcat_id' and tt_es_es is null;
 
 -- subc_id
-update i18n.dbdialog set lb_es_es = 'Subcon.' where source = 'subc_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Subcon.' where source = 'subc_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'subc_id - Identificador de subcuenca de drenaje' where source = 'subc_id' and tt_es_es is null;
 
 -- workcat_id_end
-update i18n.dbdialog set lb_es_es = 'Cat. trabajo' where source = 'workcat_id_end' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Cat. trabajo' where source = 'workcat_id_end' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'workcat_id_end - Identificador final del catálogo de trabajo' where source = 'workcat_id_end' and tt_es_es is null;
 
 -- node_1
-update i18n.dbdialog set lb_es_es = 'Nodo 1' where source = 'node_1' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Nodo 1' where source = 'node_1' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'node_1 - Nodo 1' where source = 'node_1' and tt_es_es is null;
 
 -- verified
-update i18n.dbdialog set lb_es_es = 'Verificado' where source = 'verified' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Verificado' where source = 'verified' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'verified - Verificado' where source = 'verified' and tt_es_es is null;
 
 -- to_arc
-update i18n.dbdialog set lb_es_es = 'to_arc' where source = 'to_arc' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'to_arc' where source = 'to_arc' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'to_arc - Arco destino' where source = 'to_arc' and tt_es_es is null;
 
 -- gis_length
-update i18n.dbdialog set lb_es_es = 'Long. gis' where source = 'gis_length' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Long. gis' where source = 'gis_length' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'gis_length - Longitud del gis' where source = 'gis_length' and tt_es_es is null;
 
 -- rotation
-update i18n.dbdialog set lb_es_es = 'Rotación' where source = 'rotation' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Rotación' where source = 'rotation' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'rotation - Rotación' where source = 'rotation' and tt_es_es is null;
 
 -- node_2
-update i18n.dbdialog set lb_es_es = 'Node 2' where source = 'node_2' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Node 2' where source = 'node_2' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'node_2 - Node 2' where source = 'node_2' and tt_es_es is null;
 
 -- inventory
-update i18n.dbdialog set lb_es_es = 'Inventario' where source = 'inventory' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Inventario' where source = 'inventory' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'inventory - Inventario' where source = 'inventory' and tt_es_es is null;
 
 -- model
-update i18n.dbdialog set lb_es_es = 'Modelo' where source = 'model' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Modelo' where source = 'model' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'model - Modelo' where source = 'model' and tt_es_es is null;
 
 -- y2
-update i18n.dbdialog set lb_es_es = 'Y2' where source = 'y2' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Y2' where source = 'y2' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'y2 - Y2' where source = 'y2' and tt_es_es is null;
 
 -- buildercat_id
-update i18n.dbdialog set lb_es_es = 'Cat. const' where source = 'buildercat_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Cat. const' where source = 'buildercat_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'buildercat_id - Identificador del catálogo de construcción' where source = 'buildercat_id' and tt_es_es is null;
 
 -- state_type
-update i18n.dbdialog set lb_es_es = 'Tipo estado' where source = 'state_type' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Tipo estado' where source = 'state_type' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'state_type - Tipo de estado' where source = 'state_type' and tt_es_es is null;
 
 -- publish
-update i18n.dbdialog set lb_es_es = 'Publicable' where source = 'publish' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Publicable' where source = 'publish' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'publish - Publicable' where source = 'publish' and tt_es_es is null;
 
 -- sander_depth
-update i18n.dbdialog set lb_es_es = 'Sorrer prof.' where source = 'sander_depth' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Sorrer prof.' where source = 'sander_depth' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'sander_depth - Profundidad del sorrer' where source = 'sander_depth' and tt_es_es is null;
 
 -- y1
-update i18n.dbdialog set lb_es_es = 'Y1' where source = 'y1' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Y1' where source = 'y1' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'y1 - Y1' where source = 'y1' and tt_es_es is null;
 
 -- category_type
-update i18n.dbdialog set lb_es_es = 'category_type.' where source = 'category_type' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'category_type.' where source = 'category_type' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'category_type - Tipo de categoria' where source = 'category_type' and tt_es_es is null;
 
 -- location_type
-update i18n.dbdialog set lb_es_es = 'location_type.' where source = 'location_type' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'location_type.' where source = 'location_type' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'location_type - Tipo de localización' where source = 'location_type' and tt_es_es is null;
 
 -- visitcat_id
-update i18n.dbdialog set lb_es_es = 'Cat. visit' where source = 'visitcat_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Cat. visit' where source = 'visitcat_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'visitcat_id - Identificador del catálogo de visita' where source = 'visitcat_id' and tt_es_es is null;
 
 -- postcomplement
-update i18n.dbdialog set lb_es_es = 'Comp. postal.' where source = 'postcomplement' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Comp. postal.' where source = 'postcomplement' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'postcomplement - Complemento postal' where source = 'postcomplement' and tt_es_es is null;
 
 -- postcomplement2
-update i18n.dbdialog set lb_es_es = 'Comp. postal.' where source = 'postcomplement2' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Comp. postal.' where source = 'postcomplement2' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'postcomplement2 - Complemento postal 2' where source = 'postcomplement2' and tt_es_es is null;
 
 -- brand
-update i18n.dbdialog set lb_es_es = 'Marca' where source = 'brand' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Marca' where source = 'brand' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'brand - Marca' where source = 'brand' and tt_es_es is null;
 
 -- streetname2
-update i18n.dbdialog set lb_es_es = 'Nom. calle 2' where source = 'streetname2' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Nom. calle 2' where source = 'streetname2' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'streetname2 - Nombre de la calle 2' where source = 'streetname2' and tt_es_es is null;
 
 -- postnumber2
-update i18n.dbdialog set lb_es_es = 'Núm. postal.' where source = 'postnumber2' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Núm. postal.' where source = 'postnumber2' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'postnumber2 - Número postal 2' where source = 'postnumber2' and tt_es_es is null;
 
 -- fluid_type
-update i18n.dbdialog set lb_es_es = 'Tipo fluido' where source = 'fluid_type' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Tipo fluido' where source = 'fluid_type' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'fluid_type - Tipo de fluido' where source = 'fluid_type' and tt_es_es is null;
 
 -- label_y
-update i18n.dbdialog set lb_es_es = 'Etiqueta y' where source = 'label_y' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Etiqueta y' where source = 'label_y' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'label_y - Etiqueta y' where source = 'label_y' and tt_es_es is null;
 
 -- label_x
-update i18n.dbdialog set lb_es_es = 'Etiqueta x' where source = 'label_x' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Etiqueta x' where source = 'label_x' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'label_x - Etiqueta x' where source = 'label_x' and tt_es_es is null;
 
 -- custom_length
-update i18n.dbdialog set lb_es_es = 'Long. pers.' where source = 'custom_length' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Long. pers.' where source = 'custom_length' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'custom_length - Longitud personalizada' where source = 'custom_length' and tt_es_es is null;
 
 -- soilcat_id
-update i18n.dbdialog set lb_es_es = 'Cat. tierra' where source = 'soilcat_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Cat. tierra' where source = 'soilcat_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'soilcat_id - Identificador del catàlogo de tierra' where source = 'soilcat_id' and tt_es_es is null;
 
 -- top_elev
-update i18n.dbdialog set lb_es_es = 'Elev. máx.' where source = 'top_elev' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Elev. máx.' where source = 'top_elev' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'top_elev - Elevación màxima' where source = 'top_elev' and tt_es_es is null;
 
 -- function_type
-update i18n.dbdialog set lb_es_es = 'Topo func.' where source = 'function_type' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Topo func.' where source = 'function_type' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'function_type - Tipo de función' where source = 'function_type' and tt_es_es is null;
 
 -- label_rotation
-update i18n.dbdialog set lb_es_es = 'Etiqueta rot.' where source = 'label_rotation' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Etiqueta rot.' where source = 'label_rotation' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'label_rotation - Etiqueta de rotación' where source = 'function_type' and tt_es_es is null;
 
 -- ownercat_id
-update i18n.dbdialog set lb_es_es = 'ownercat_id' where source = 'ownercat_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'ownercat_id' where source = 'ownercat_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'ownercat_id - Identificador del catálogo del propietario' where source = 'ownercat_id' and tt_es_es is null;
 
 -- elev
-update i18n.dbdialog set lb_es_es = 'Elevación' where source = 'elev' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Elevación' where source = 'elev' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'elev - Elevación' where source = 'elev' and tt_es_es is null;
 
 -- num_value
-update i18n.dbdialog set lb_es_es = 'Valor num.' where source = 'num_value' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Valor num.' where source = 'num_value' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'num_value - Valor numérico' where source = 'num_value' and tt_es_es is null;
 
 -- connec_id
-update i18n.dbdialog set lb_es_es = 'Topo func.' where source = 'connec_id' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Topo func.' where source = 'connec_id' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'connec_id - Tipo de función' where source = 'connec_id' and tt_es_es is null;
 
 -- lastupdate
-update i18n.dbdialog set lb_es_es = 'lastupdate' where source = 'lastupdate' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'lastupdate' where source = 'lastupdate' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'lastupdate - Última actulización' where source = 'lastupdate' and tt_es_es is null;
 
 -- demand
-update i18n.dbdialog set lb_es_es = 'Topo func.' where source = 'demand' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Topo func.' where source = 'demand' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'demand - Tipo de función' where source = 'demand' and tt_es_es is null;
 
 -- flap
-update i18n.dbdialog set lb_es_es = 'lastupdate' where source = 'flap' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'lastupdate' where source = 'flap' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'flap - Última actulización' where source = 'flap' and tt_es_es is null;
 
 -- epa_type
-update i18n.dbdialog set lb_es_es = '"lastupd. user"' where source = '"epa_type"' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = '"lastupd. user"' where source = '"epa_type"' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = '"epa_type" - Usuario de la útima actualización' where source = '"epa_type"' and tt_es_es is null;
 
 -- custom_elev1
-update i18n.dbdialog set lb_es_es = 'lastupdate' where source = 'custom_elev1' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'lastupdate' where source = 'custom_elev1' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'custom_elev1 - Última actulización' where source = 'custom_elev1' and tt_es_es is null;
 
 -- geom2
-update i18n.dbdialog set lb_es_es = 'lastupdate' where source = 'geom2' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'lastupdate' where source = 'geom2' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'geom2 - Última actulización' where source = 'geom2' and tt_es_es is null;
 
 -- cost
-update i18n.dbdialog set lb_es_es = 'Valor' where source = 'cost' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Valor' where source = 'cost' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'cost - Valor' where source = 'cost' and tt_es_es is null;
 
 -- offset
-update i18n.dbdialog set lb_es_es = 'Distancia' where source = 'offset' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Distancia' where source = 'offset' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'offset - Compensar' where source = 'offset' and tt_es_es is null;
 
 -- dnom
-update i18n.dbdialog set lb_es_es = 'dnom' where source = 'dnom' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'dnom' where source = 'dnom' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'dnom - Última actulización' where source = 'dnom' and tt_es_es is null;
 
 -- cost_unit
-update i18n.dbdialog set lb_es_es = 'Unidades' where source = 'cost_unit' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Unidades' where source = 'cost_unit' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'cost_unit - Unidades del coste' where source = 'cost_unit' and tt_es_es is null;
 
 -- demand
-update i18n.dbdialog set lb_es_es = 'Demand' where source = 'demand' and lb_ca_es is null;
+update i18n.dbdialog set lb_es_es = 'Demand' where source = 'demand' and lb_es_es is null;
 update i18n.dbdialog set tt_es_es = 'demand - Demanda de consumo' where source = 'demand' and tt_es_es is null;
 
 
