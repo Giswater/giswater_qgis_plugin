@@ -243,19 +243,6 @@ class Giswater(QObject):
                             plugin_toolbar.toolbar.setVisible(False)
                             del plugin_toolbar.toolbar
 
-            if remove_modules:
-                # Unset main information button (when plugin is disabled or reloaded)
-                self.unset_info_button()
-
-                # unload all loaded giswater related modules
-                for mod_name, mod in list(sys.modules.items()):
-                    if mod and hasattr(mod, '__file__') and mod.__file__:
-                        if self.plugin_dir in mod.__file__:
-                            del sys.modules[mod_name]
-
-            else:
-                self.set_info_button_visible()
-
         except Exception:
             pass
         finally:
