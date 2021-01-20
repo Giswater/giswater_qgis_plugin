@@ -17,6 +17,7 @@ v_count integer;
 v_widgettype text;
 v_message json;
 v_variables text;
+rec_feature text;
 
 BEGIN	
 
@@ -29,6 +30,32 @@ BEGIN
 
 		IF v_configtable = 'sys_param_user' THEN 
 		
+		ELSIF v_configtable IN ('man_type_category', 'man_type_fluid', 'man_type_function', 'man_type_location') THEN 
+			v_querytext='SELECT * FROM '||v_configtable||';';
+
+			--add parenthesis if new definition of featurecat doesn't have it
+	 		IF NEW.featurecat_id NOT ILIKE '{%}' AND NEW.featurecat_id IS NOT NULL THEN
+				EXECUTE 'UPDATE '||v_configtable||' SET featurecat_id = concat(''{'','||quote_literal(NEW.featurecat_id)||',''}'') WHERE id = '||NEW.id||';';
+			END IF;
+			
+			--check if all featurecat are present on table cat_feature
+			IF NEW.featurecat_id IS NOT NULL THEN
+				IF NEW.featurecat_id NOT ILIKE '{%}' THEN
+					NEW.featurecat_id = concat('{',NEW.featurecat_id,'}');
+					raise notice 'CHANGE,%',NEW.featurecat_id;
+				END IF;
+
+				FOREACH rec_feature IN array(NEW.featurecat_id::text[]) LOOP
+					IF rec_feature NOT IN (SELECT id FROM cat_feature) THEN
+						v_variables = concat('table: ',v_configtable,', featurecat: ',rec_feature);
+						v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3172",
+						"function":"2816", "debug":null, "variables":"',v_variables,'"}}');
+						PERFORM gw_fct_getmessage(v_message);
+					END IF;
+				END LOOP;
+
+			END IF;
+
 		ELSIF v_configtable = 'config_form_fields' THEN 
 		
 			IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
@@ -135,3 +162,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
