@@ -68,7 +68,7 @@ class GwI18NGenerator:
         tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows, 1)
         language = tools_gw.get_config_parser('i18n_generator', 'qm_lang_language', "user", "init")
 
-        tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 1)
+        tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0)
 
 
     def check_translate_options(self):
@@ -381,7 +381,7 @@ class GwI18NGenerator:
             table = row['context'] if row['context'] is not None else ""
             source = row['source'] if row['source'] is not None else ""
             ms_value = row[f'ms_{self.lower_lang}'] if row[f'ms_{self.lower_lang}'] is not None else row['ms_en_en']
-            ht_value = ms_value if ms_value is not None else ""
+            ht_value = row[f'ht_{self.lower_lang}'] if row[f'ht_{self.lower_lang}'] is not None else row['ht_en_en']
 
             line = f'SELECT gw_fct_admin_schema_i18n($$'
             line += (f'{{"data":'

@@ -88,8 +88,6 @@ class Giswater(QObject):
         # Define signals
         self.set_signals()
 
-
-
         # Set main information button (always visible)
         self.set_info_button()
 
