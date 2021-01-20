@@ -123,7 +123,7 @@ class GwAdminButton:
         # Save in settings
         tools_gw.set_config_parser('btn_admin', 'project_name_schema', f'{project_name_schema}')
         tools_gw.set_config_parser('btn_admin', 'project_descript', f'{project_descript}')
-        inp_file_path = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file')
+        inp_file_path = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file', False, False)
         tools_gw.set_config_parser('btn_admin', 'inp_file_path', f'{inp_file_path}')
 
         # Check if project name is valid
@@ -1857,7 +1857,7 @@ class GwAdminButton:
         # Save in settings
         tools_gw.set_config_parser('btn_admin', 'project_name_schema', f'{project_name_schema}')
         tools_gw.set_config_parser('btn_admin', 'project_descript', f'{project_descript}')
-        inp_file_path = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file')
+        inp_file_path = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file', False, False)
         tools_gw.set_config_parser('btn_admin', 'inp_file_path', f'{inp_file_path}')
 
         # Check if project name is valid
@@ -3573,7 +3573,7 @@ class GwAdminButton:
     def _save_selection(self):
         """"""
         # Save last Project schema name and type selected
-        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, False, False)
         project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         tools_gw.set_config_parser('btn_admin', 'project_type', f'{project_type}')
         tools_gw.set_config_parser('btn_admin', 'schema_name', f'{schema_name}')
