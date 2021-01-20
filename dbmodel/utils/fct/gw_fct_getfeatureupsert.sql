@@ -664,7 +664,15 @@ BEGIN
 					WHERE cur_user=current_user AND parameter = concat(''edit_statetype_'','||v_state_value||',''_vdefault'')';
 					
 					EXECUTE v_querytext INTO field_value;
-							
+				
+				-- builtdate
+				WHEN 'builtdate' THEN
+					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'columnname'); 
+					--if using automatic current builtdate and vdefault is null, set value to now
+					IF (SELECT value::boolean FROM config_param_system WHERE parameter='edit_feature_auto_builtdate') IS TRUE AND field_value IS NULL  THEN
+						EXECUTE 'SELECT date(now())' INTO field_value;
+					END IF;
+
 				-- rest (including addfields)
 				ELSE SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a WHERE (a->>'param') = (aux_json->>'columnname'); 
 				END CASE;
