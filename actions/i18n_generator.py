@@ -68,7 +68,7 @@ class I18NGenerator(ParentAction):
         utils_giswater.set_item_data(self.dlg_qm.cmb_language, rows, 1)
         cur_user = self.controller.get_current_user()
         language = self.controller.plugin_settings_value('qm_lang_language' + cur_user)
-        utils_giswater.set_combo_itemData(self.dlg_qm.cmb_language, language, 1)
+        utils_giswater.set_combo_itemData(self.dlg_qm.cmb_language, language, 0)
 
 
     def check_translate_options(self):
