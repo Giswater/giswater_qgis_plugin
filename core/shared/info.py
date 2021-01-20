@@ -583,12 +583,12 @@ class GwInfo(QObject):
 
         # Get locale of QGIS application
         locale = tools_qgis.get_locale()
-        	
+
         project_type = tools_gw.get_project_type()
         # Get PDF file
         pdf_folder = os.path.join(global_vars.plugin_dir, f'resources{os.sep}png')
         pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
-		
+
         # Open PDF if exists. If not open Spanish version
         if os.path.exists(pdf_path):
             os.system(pdf_path)
@@ -826,7 +826,7 @@ class GwInfo(QObject):
 
         existing_point_x = None
         existing_point_y = None
-        viewname = Rayer_source_table_name(self.layer)
+        viewname = tools_qgis.get_layer_source_table_name(self.layer)
         sql = (f"SELECT ST_X(the_geom), ST_Y(the_geom)"
                f" FROM {viewname}"
                f" WHERE node_id = '{self.feature_id}'")
