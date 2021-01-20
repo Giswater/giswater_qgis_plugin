@@ -17,6 +17,7 @@ from qgis.PyQt.QtCore import Qt, QDate
 from qgis.PyQt.QtWidgets import QListWidgetItem, QLineEdit, QAction
 from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsExpression
 from qgis.gui import QgsMapToolEmitPoint
+from qgis.PyQt.QtGui import QDoubleValidator
 
 from ..maptool_button import GwMaptoolButton
 from ...ui.ui_manager import GwProfileUi, GwProfilesListUi
@@ -91,6 +92,9 @@ class GwProfileButton(GwMaptoolButton):
         tools_gw.add_icon(action, "131")
         action.triggered.connect(partial(self.activate_snapping_node))
         self.action_profile = action
+
+        # Set validators
+        self.dlg_draw_profile.txt_min_distance.setValidator(QDoubleValidator())
 
         # Triggers
         self.dlg_draw_profile.btn_draw_profile.clicked.connect(partial(self.get_profile))
