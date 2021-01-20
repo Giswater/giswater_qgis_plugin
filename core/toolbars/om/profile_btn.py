@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import configparser
 import json
 import math
 import os
@@ -23,7 +22,7 @@ from ..maptool_button import GwMaptoolButton
 from ...ui.ui_manager import GwProfileUi, GwProfilesListUi
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_log, tools_qgis, tools_os
-import global_vars
+from .... import global_vars
 
 
 class GwNodeData:

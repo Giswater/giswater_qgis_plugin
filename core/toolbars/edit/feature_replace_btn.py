@@ -17,7 +17,7 @@ from ...ui.ui_manager import GwFeatureReplaceUi, GwInfoWorkcatUi
 from ...shared.catalog import GwCatalog
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_log, tools_qgis, tools_db
-import global_vars
+from .... import global_vars
 
 
 class GwFeatureReplaceButton(GwMaptoolButton):

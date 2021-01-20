@@ -15,7 +15,7 @@ from ..dialog_button import GwDialogButton
 from ...ui.ui_manager import GwSelectorDateUi
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_qt, tools_db
-import global_vars
+from .... import global_vars
 
 
 class GwDateSelectorButton(GwDialogButton):
