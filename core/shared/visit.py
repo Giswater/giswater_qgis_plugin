@@ -12,7 +12,6 @@ import webbrowser
 from datetime import datetime
 from functools import partial
 
-from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal, QDateTime, QObject
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
@@ -50,12 +49,11 @@ class GwVisit(QObject):
         self.event_parameter_id = None
         self.event_feature_type = None
 
-        self.vertex_marker = QgsVertexMarker(global_vars.canvas)
-
         self.lazy_widget = None
         self.lazy_init_function = None
 
         self.snapper_manager = GwSnapManager(self.iface)
+        self.vertex_marker = self.snapper_manager.vertex_marker
 
 
     def get_visit_dialog(self):

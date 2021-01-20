@@ -13,12 +13,10 @@ from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit
-from qgis.PyQt.QtGui import QColor
-from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsApplication,  QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext,\
     QgsVectorLayer
-from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
+from qgis.gui import QgsMapToolEmitPoint
 
 from .mincut_tools import GwMincutTools
 from .search import GwSearch
@@ -467,11 +465,7 @@ class GwMincut:
     def set_real_location(self):
 
         # Vertex marker
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 100, 255))
-        self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        self.vertex_marker.setPenWidth(3)
+        self.vertex_marker = self.snapper_manager.vertex_marker
 
         # Activate snapping of node and arcs
         self.canvas.xyCoordinates.connect(self.mouse_move_node_arc)
@@ -1407,11 +1401,7 @@ class GwMincut:
         self.dlg_mincut.canceled = False
 
         # Vertex marker
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 100, 255))
-        self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        self.vertex_marker.setPenWidth(3)
+        self.vertex_marker = self.snapper_manager.vertex_marker
 
         # On inserting work order
         self.action_add_connec.setDisabled(True)
@@ -1664,11 +1654,7 @@ class GwMincut:
         self.snapper_manager.store_snapping_options()
 
         # Set vertex marker propierties
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 100, 255))
-        self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
-        self.vertex_marker.setPenWidth(3)
+        self.vertex_marker = self.snapper_manager.vertex_marker
 
         # Set active and current layer
         self.layer = tools_qgis.get_layer_by_tablename("v_om_mincut_valve")

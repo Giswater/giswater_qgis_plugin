@@ -23,7 +23,7 @@ from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit
 from qgis.core import QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, QgsPointXY
-from qgis.gui import QgsDateTimeEdit, QgsVertexMarker, QgsMapToolEmitPoint, QgsRubberBand
+from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint, QgsRubberBand
 
 from .catalog import GwCatalog
 from .dimensioning import GwDimensioning
@@ -665,12 +665,8 @@ class GwInfo(QObject):
         tools_gw.open_dialog(dlg_dtext, dlg_name='dialog_text')
 
         # Set circle vertex marker
-        color = QColor(255, 100, 255)
-        self.vertex_marker = QgsVertexMarker(global_vars.canvas)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
-        self.vertex_marker.setColor(color)
-        self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setPenWidth(3)
+        self.vertex_marker = self.snapper_manager.vertex_marker
+        self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
 
         self.node1 = None
         self.node2 = None
@@ -891,15 +887,10 @@ class GwInfo(QObject):
         self.snapper_manager.config_snap_to_layer(layer)
 
         # Set marker
-        color = QColor(255, 100, 255)
-        self.vertex_marker = QgsVertexMarker(global_vars.canvas)
+        self.vertex_marker = self.snapper_manager.vertex_marker
+
         if geom_type == 'node':
-            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
-        elif geom_type == 'arc':
-            self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        self.vertex_marker.setColor(color)
-        self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setPenWidth(3)
+            self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
 
 
     def manage_action_copy_paste_mouse_move(self, point):
@@ -3298,11 +3289,7 @@ class GwInfo(QObject):
         # Block the signals of de dialog so that the key ESC does not close it
         dialog.blockSignals(True)
 
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setColor(QColor(255, 100, 255))
-        self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        self.vertex_marker.setPenWidth(3)
+        self.vertex_marker = self.snapper_manager.vertex_marker
 
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()

@@ -16,8 +16,8 @@ import matplotlib.pyplot as plt
 from qgis.PyQt.QtCore import Qt, QDate
 from qgis.PyQt.QtWidgets import QListWidgetItem, QLineEdit, QAction
 from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsExpression
-from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
-from qgis.PyQt.QtGui import QDoubleValidator, QColor
+from qgis.gui import QgsMapToolEmitPoint
+from qgis.PyQt.QtGui import QDoubleValidator
 
 from ..dialog_button import GwDialogButton
 from ...ui.ui_manager import GwProfileUi, GwProfilesListUi
@@ -64,7 +64,7 @@ class GwProfileButton(GwDialogButton):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
         self.snapper_manager = GwSnapManager(self.iface)
-        self.vertex_marker = QgsVertexMarker(global_vars.canvas)
+        self.vertex_marker = self.snapper_manager.vertex_marker
         self.list_of_selected_nodes = []
         self.nodes = []
         self.links = []
@@ -290,10 +290,7 @@ class GwProfileButton(GwDialogButton):
         self.first_node = True
 
         # Set vertex marker propierties
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
-        self.vertex_marker.setColor(QColor(255, 100, 255))
-        self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setPenWidth(3)
+        self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
 
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)

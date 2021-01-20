@@ -352,17 +352,25 @@ class GwSnapManager(object):
             active_layer = tools_qgis.get_layer_by_tablename('version')
             global_vars.iface.setActiveLayer(active_layer)
 
-        # Vertex marker
-        vertex_marker.setColor(QColor(255, 100, 255))
-        vertex_marker.setIconSize(15)
-        vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
-        vertex_marker.setPenWidth(3)
-
         # Snapper
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
         global_vars.canvas.setMapTool(emit_point)
         global_vars.canvas.xyCoordinates.connect(partial(self.get_mouse_move, vertex_marker))
         emit_point.canvasClicked.connect(partial(self.get_xy, vertex_marker, emit_point))
+
+
+    def set_vertex_marker(self, vertex_marker, icon_type=1, color_type=0, icon_size=15, pen_width=3):
+
+        # Vertex marker
+        icons = {0: QgsVertexMarker.ICON_NONE, 1: QgsVertexMarker.ICON_CROSS, 2: QgsVertexMarker.ICON_X,
+                 3: QgsVertexMarker.ICON_BOX, 4: QgsVertexMarker.ICON_CIRCLE}
+        colors = {0: QColor(255, 100, 255), 1: QColor(0, 255, 0), 2: QColor(0, 255, 0),
+                 3: QColor(255, 0, 0), 4: QColor(0, 0, 255)}
+        
+        vertex_marker.setIconType(icons[icon_type])
+        vertex_marker.setColor(colors[color_type])
+        vertex_marker.setIconSize(icon_size)
+        vertex_marker.setPenWidth(pen_width)
 
 
     def get_mouse_move(self, vertex_marker, point):

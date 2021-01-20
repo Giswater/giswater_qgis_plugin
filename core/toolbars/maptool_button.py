@@ -64,20 +64,16 @@ class GwMaptoolButton(QgsMapTool):
         self.std_cursor = self.parent().cursor()
 
         # Set default vertex marker
-        color = QColor(255, 100, 255)
-        self.vertex_marker = QgsVertexMarker(self.canvas)
-        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
-        self.vertex_marker.setColor(color)
-        self.vertex_marker.setIconSize(15)
-        self.vertex_marker.setPenWidth(3)
+        self.vertex_marker = self.snapper_manager.vertex_marker
+        self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
 
         # Set default rubber band
-        color_selection = QColor(254, 178, 76, 63)
-        self.rubber_band = QgsRubberBand(self.canvas, 2)
-        self.rubber_band.setColor(color)
-        self.rubber_band.setFillColor(color_selection)
-        self.rubber_band.setWidth(1)
-        self.reset()
+        # color_selection = QColor(254, 178, 76, 63)
+        # self.rubber_band = QgsRubberBand(self.canvas, 2)
+        # self.rubber_band.setColor(color)
+        # self.rubber_band.setFillColor(color_selection)
+        # self.rubber_band.setWidth(1)
+        # self.reset()
 
         self.force_active_layer = True
 

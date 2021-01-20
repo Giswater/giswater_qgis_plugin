@@ -7,7 +7,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 
-from qgis.gui import QgsVertexMarker
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtGui import QRegExpValidator
 from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView
@@ -27,8 +26,8 @@ class GwElement:
         self.iface = global_vars.iface
         self.schema_name = global_vars.schema_name
 
-        self.vertex_marker = QgsVertexMarker(global_vars.canvas)
         self.snapper_manager = GwSnapManager(self.iface)
+        self.vertex_marker = self.snapper_manager.vertex_marker
 
 
     def get_element(self, new_element_id=True, feature=None, geom_type=None, selected_object_id=None):
