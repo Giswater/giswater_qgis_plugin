@@ -16,14 +16,15 @@ import matplotlib.pyplot as plt
 from qgis.PyQt.QtCore import Qt, QDate
 from qgis.PyQt.QtWidgets import QListWidgetItem, QLineEdit, QAction
 from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsExpression
-from qgis.gui import QgsMapToolEmitPoint
-from qgis.PyQt.QtGui import QDoubleValidator
+from qgis.gui import QgsMapToolEmitPoint, QgsVertexMarker
+from qgis.PyQt.QtGui import QDoubleValidator, QColor
 
-from ..maptool_button import GwMaptoolButton
+from ..dialog_button import GwDialogButton
 from ...ui.ui_manager import GwProfileUi, GwProfilesListUi
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_log, tools_qgis, tools_os
 from .... import global_vars
+from ...utils.snap_manager import GwSnapManager
 
 
 class GwNodeData:
@@ -53,15 +54,17 @@ class GwNodeData:
         self.surface_type = None
 
 
-class GwProfileButton(GwMaptoolButton):
+class GwProfileButton(GwDialogButton):
     """ Button 43: Draw_profiles """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         """ Class constructor """
 
-        # Call ParentMapTool constructor
+        # Call ParentDialog constructor
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
+        self.snapper_manager = GwSnapManager(self.iface)
+        self.vertex_marker = QgsVertexMarker(global_vars.canvas)
         self.list_of_selected_nodes = []
         self.nodes = []
         self.links = []
@@ -69,7 +72,7 @@ class GwProfileButton(GwMaptoolButton):
         self.lastnode_datatype = 'REAL'
 
 
-    def activate(self):
+    def clicked_event(self):
 
         self.action.setChecked(True)
 
@@ -122,17 +125,6 @@ class GwProfileButton(GwMaptoolButton):
             tools_gw.docker_dialog(self.dlg_draw_profile)
         else:
             tools_gw.open_dialog(self.dlg_draw_profile)
-
-
-    def deactivate(self):
-
-        try:
-            self.canvas.xyCoordinates.disconnect()
-            self.emit_point.canvasClicked.disconnect()
-        except Exception:
-            pass
-        finally:
-            super().deactivate()
 
 
     def get_profile(self):
@@ -237,7 +229,6 @@ class GwProfileButton(GwMaptoolButton):
             self.dlg_load.tbl_profiles.addItem(item_arc)
 
         tools_gw.open_dialog(self.dlg_load)
-        self.deactivate()
 
 
     def load_profile(self, parameters):
@@ -297,6 +288,12 @@ class GwProfileButton(GwMaptoolButton):
         self.initNode = None
         self.endNode = None
         self.first_node = True
+
+        # Set vertex marker propierties
+        self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
+        self.vertex_marker.setColor(QColor(255, 100, 255))
+        self.vertex_marker.setIconSize(15)
+        self.vertex_marker.setPenWidth(3)
 
         # Create the appropriate map tool and connect the gotPoint() signal.
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
@@ -384,6 +381,9 @@ class GwProfileButton(GwMaptoolButton):
 
                     # Center shortest path in canvas - ZOOM SELECTION
                     self.canvas.zoomToSelected(self.layer_arc)
+
+                    # Set action pan
+                    self.iface.actionPan().trigger()
 
 
     def disconnect_snapping(self, action_pan=True):
@@ -1340,7 +1340,6 @@ class GwProfileButton(GwMaptoolButton):
 
         # Clear selection
         self.remove_selection()
-        self.deactivate()
 
 
     def delete_profile(self):
