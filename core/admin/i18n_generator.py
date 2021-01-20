@@ -59,15 +59,15 @@ class GwI18NGenerator:
 
 
     def populate_cmb_language(self):
-        """ Populate combo with languages values """
+        """ Populate combo with languages values """ 
         self.dlg_qm.btn_translate.setEnabled(True)
         host = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f'Connected to {host}')
         sql = "SELECT id, idval FROM i18n.cat_language"
         rows = self.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows, 1)
-        cur_user = tools_db.get_current_user()
-        language = tools_qgis.get_plugin_settings_value('qm_lang_language' + cur_user)
+        language = tools_gw.get_config_parser('i18n_generator', 'qm_lang_language', "user", "init", False)
+
         tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 1)
 
 
@@ -411,13 +411,13 @@ class GwI18NGenerator:
         language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
         db_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_msg)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_host', f"{host}")
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_port', f"{port}")
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db', f"{db}")
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_user', f"{user}")
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_language', f"{language}")
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_py_msg', f"{py_msg}")
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db_msg', f"{db_msg}")
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_host', f"{host}", "user", "init", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_port', f"{port}", "user", "init", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db', f"{db}", "user", "init", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_user', f"{user}", "user", "init", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_language', f"{language}", "user", "init", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_py_msg', f"{py_msg}", "user", "init", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db_msg', f"{db_msg}", "user", "init", prefix=False)
 
 
     def load_user_values(self):
