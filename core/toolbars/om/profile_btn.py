@@ -756,7 +756,7 @@ class GwProfileButton(GwMaptoolButton):
                  horizontalalignment='center', verticalalignment='center')
 
         # print title
-        title = utils_giswater.getWidgetText(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
+        title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
         if title in (None, 'null'):
             title = ''
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(5.75) * self.height_row - self.height_row / 2,
@@ -764,7 +764,7 @@ class GwProfileButton(GwMaptoolButton):
                  color=title_color, fontweight=title_weight,
                  verticalalignment='center')
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(6) * self.height_row - self.height_row / 2,
-                 "" + str(utils_giswater.getCalendarDate(self.dlg_draw_profile, self.dlg_draw_profile.date)) + "",
+                 "" + str(tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.date)) + "",
                  fontsize=title_size*0.7,
                  color=title_color, fontweight=title_weight,
                  verticalalignment='center')
@@ -1374,8 +1374,12 @@ class GwProfileButton(GwMaptoolButton):
 
 
     def get_stylesheet(self, data_type='REAL'):
+        # TODO: Enhance this function, manage all case for data_type, harmonie REAL/TOP-REAL...
         # getting stylesheet
-        if data_type=='REAL':
+        line_style = ''
+        line_color = ''
+        line_width = ''
+        if data_type=='REAL' or data_type=='TOP-REAL':
             line_style = self.profile_json['body']['data']['stylesheet']['infra']['real']['style']
             line_color = self.profile_json['body']['data']['stylesheet']['infra']['real']['color']
             line_width = self.profile_json['body']['data']['stylesheet']['infra']['real']['width']
