@@ -6,18 +6,14 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import datetime
-import json
-import os
-import subprocess
-from collections import OrderedDict
 from functools import partial
 
 from qgis.PyQt.QtCore import QStringListModel
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QTableView, QPushButton, QLineEdit, QCompleter, QAbstractItemView
+from qgis.PyQt.QtWidgets import QTableView, QLineEdit, QCompleter, QAbstractItemView
 
 from ..shared.selector import GwSelector
-from ..ui.ui_manager import GwSelectorUi
+from ..ui.ui_manager import GwSelectorUi, GwMincutUi
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_db
@@ -84,17 +80,6 @@ class GwMincutTools:
             self.delete_mincut_management, self.tbl_mincut_edit, "om_mincut", "id"))
         self.dlg_mincut_man.btn_selector_mincut.clicked.connect(partial(
             self.mincut_selector, self.tbl_mincut_edit, 'id'))
-        self.btn_notify = self.dlg_mincut_man.findChild(QPushButton, "btn_notify")
-        self.btn_notify.clicked.connect(partial(self.get_clients_codes, self.dlg_mincut_man.tbl_mincut_edit))
-        tools_gw.add_icon(self.btn_notify, "307")
-
-        try:
-            row = tools_gw.get_config_value('om_mincut_enable_alerts', 'value', 'config_param_system')
-            if row:
-                self.custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
-                self.btn_notify.setVisible(self.custom_action_sms['show_mincut_sms'])
-        except KeyError:
-            self.btn_notify.setVisible(False)
 
         self.populate_combos()
         self.dlg_mincut_man.state_edit.activated.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
@@ -107,98 +92,6 @@ class GwMincutTools:
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_mincut_man, dlg_name='mincut_manager')
-
-
-    def get_clients_codes(self, qtable):
-
-        selected_list = qtable.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
-            return
-
-        field_code = self.custom_action_sms['field_code']
-        inf_text = "Are you sure you want to send smd to this clients?"
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_ = qtable.model().record(row).value(str('id'))
-            inf_text += f"\n\nMincut: {id_}"
-            sql = (f"SELECT t3.{field_code}, t2.forecast_start, t2.forecast_end, anl_cause "
-                   f"FROM om_mincut_hydrometer AS t1 "
-                   f"JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
-                   f"JOIN om_mincut AS t2 ON t1.result_id = t2.id "
-                   f"WHERE result_id = {id_}")
-            rows = tools_db.get_rows(sql)
-            if not rows:
-                inf_text += "\nClients: None(No messages will be sent)"
-                continue
-
-            inf_text += "\nClients: \n"
-            for row in rows:
-                inf_text += str(row[0]) + ", "
-
-        inf_text = inf_text[:-2]
-        inf_text += "\n"
-        answer = tools_qt.show_question(str(inf_text))
-        if answer:
-            self.call_sms_script(qtable)
-
-
-    def call_sms_script(self, qtable):
-
-        path = self.custom_action_sms['path_sms_script']
-        if path is None or not os.path.exists(path):
-            tools_qgis.show_warning("File not found", parameter=path)
-            return
-
-        selected_list = qtable.selectionModel().selectedRows()
-        field_code = self.custom_action_sms['field_code']
-
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_ = qtable.model().record(row).value(str('id'))
-            sql = (f"SELECT t3.{field_code}, t2.forecast_start, t2.forecast_end, anl_cause, notified  "
-                   f"FROM om_mincut_hydrometer AS t1 "
-                   f"JOIN ext_rtc_hydrometer AS t3 ON t1.hydrometer_id::bigint = t3.id::bigint "
-                   f"JOIN om_mincut AS t2 ON t1.result_id = t2.id "
-                   f"WHERE result_id = {id_}")
-            rows = tools_db.get_rows(sql)
-            if not rows:
-                continue
-
-            from_date = ""
-            if rows[0][1] is not None:
-                from_date = str(rows[0][1].strftime('%d/%m/%Y %H:%M'))
-
-            to_date = ""
-            if rows[0][2] is not None:
-                to_date = str(rows[0][2].strftime('%d/%m/%Y %H:%M'))
-
-            _cause = ""
-            if rows[0][3] is not None:
-                _cause = rows[0][3]
-
-            list_clients = ""
-            for row in rows:
-                list_clients += str(row[0]) + ", "
-            if len(list_clients) != 0:
-                list_clients = list_clients[:-2]
-
-            # Call script
-            result = subprocess.call([path, _cause, from_date, to_date, list_clients])
-
-            _date_sended = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
-            sql = ("UPDATE " + self.schema_name + ".om_mincut ")
-            if row[4] is None:
-                sql += f"SET notified = ('[{{\"code\":\"{result[0]}\",\"date\":\"{_date_sended}\",\"avisats\":\"{result[1]}\",\"afectats\":\"{result[2]}\"}}]') "
-            else:
-                sql += f"SET notified= concat(replace(notified::text,']',','),'{{\"code\":\"{result[0]}\",\"date\":\"{_date_sended}\",\"avisats\":\"{result[1]}\",\"afectats\":\"{result[2]}\"}}]')::json "
-            sql += f"WHERE id = '{id_}'"
-            tools_db.execute_sql(sql)
-
-            # Set a model with selected filter. Attach that model to selected table
-            self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
-            tools_gw.set_tablemodel_config(self.dlg_mincut_man, self.tbl_mincut_edit, "v_ui_mincut", sort_order=1)
 
 
     def set_state_cancel_mincut(self):
@@ -290,6 +183,7 @@ class GwMincutTools:
         # Close this dialog and open selected mincut
         tools_gw.close_dialog(self.dlg_mincut_man)
         self.mincut.is_new = False
+        self.mincut.set_dialog(GwMincutUi)
         self.mincut.init_mincut_form()
         self.mincut.load_mincut(result_mincut_id)
         self.mincut.manage_docker()

@@ -183,20 +183,8 @@ class GwMincut:
         tools_gw.add_icon(action, "181")
         self.action_mincut_composer = action
 
-        action = self.dlg_mincut.findChild(QAction, "actionShowNotified")
-        action.triggered.connect(self.show_notified_list)
-        self.show_notified = action
-
         # Set shortcut keys
         self.dlg_mincut.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_mincut))
-
-        try:
-            row = tools_gw.get_config_value('om_mincut_enable_alerts', 'value', 'config_param_system')
-            if row:
-                custom_action_sms = json.loads(row[0], object_pairs_hook=OrderedDict)
-                self.show_notified.setVisible(custom_action_sms['show_sms_info'])
-        except KeyError:
-            self.show_notified.setVisible(False)
 
         # Show future id of mincut
         if self.is_new:
@@ -269,22 +257,6 @@ class GwMincut:
         if d_from > d_to:
             date_to.setDate(date_from.date())
             time_to.setTime(time_from.time())
-
-
-    def show_notified_list(self):
-
-        mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
-        sql = (f"SELECT notified FROM om_mincut "
-               f"WHERE id = '{mincut_id}'")
-        row = tools_db.get_row(sql)
-        if not row or row[0] is None:
-            text = "Nothing to show"
-            tools_qt.show_info_box(str(text), "Sms info")
-            return
-        text = ""
-        for item in row[0]:
-            text += f"SMS sended on date: {item['date']}, with code result: {item['code']} .\n"
-        tools_qt.show_info_box(str(text), "Sms info")
 
 
     def set_id_val(self):

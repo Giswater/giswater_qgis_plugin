@@ -899,7 +899,6 @@
    <addaction name="actionAddConnec"/>
    <addaction name="actionAddHydrometer"/>
    <addaction name="actionComposer"/>
-   <addaction name="actionShowNotified"/>
   </widget>
   <action name="actionConfig">
    <property name="enabled">
@@ -983,17 +982,6 @@
    </property>
    <property name="text">
     <string>Composer</string>
-   </property>
-  </action>
-  <action name="actionShowNotified">
-   <property name="text">
-    <string>Show notified</string>
-   </property>
-   <property name="toolTip">
-    <string>Show notified</string>
-   </property>
-   <property name="visible">
-    <bool>true</bool>
    </property>
   </action>
  </widget>

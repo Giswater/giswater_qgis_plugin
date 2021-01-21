@@ -60,7 +60,7 @@ class GwGalleryUi(GwBasicDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('visit_gallery_zoom.ui')
 class GwGalleryZoomUi(GwBasicDialog, FORM_CLASS):
     pass
-	
+
 FORM_CLASS = get_ui_class('mincut.ui', 'om')
 class GwMincutUi(GwMainWindowDialog, FORM_CLASS):
 
@@ -219,7 +219,7 @@ class GwCsvUi(GwBasicDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('print.ui', 'utilities')
 class GwPrintUi(GwBasicDialog, FORM_CLASS):
     pass
-	
+
 
 # region TOC
 # endregion
