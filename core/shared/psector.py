@@ -175,9 +175,9 @@ class GwPsector:
         selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # if a row is selected from mg_psector_mangement(button 46 or button 81)
-        # Si psector_id contiene "1" o "0" python lo toma como boolean, si es True, quiere decir que no contiene valor
-        # y por lo tanto es uno nuevo. Convertimos ese valor en 0 ya que ningun id va a ser 0 de esta manera si psector_id
-        # tiene un valor distinto de 0, es que el sector ya existe y queremos hacer un update.
+        # if psector_id contains "1" or "0" python takes it as boolean, if it is True, it means that it does not
+        # contain a value and therefore it is a new one. We convert that value to 0 since no id will be 0 in this way
+        # if psector_id has a value other than 0, it is that the sector already exists and we want to do an update.
         if isinstance(psector_id, bool):
             psector_id = 0
         self.delete_psector_selector('selector_plan_psector')
