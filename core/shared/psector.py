@@ -93,6 +93,10 @@ class GwPsector:
 
         self.geom_type = "arc"
 
+        self.all_layers_checked = self._chek_for_layers()
+        if self.all_layers_checked:
+            tools_qt.set_checked(self.dlg_plan_psector, self.dlg_plan_psector.chk_enable_all, True)
+
         # Remove all previous selections
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
@@ -187,13 +191,6 @@ class GwPsector:
             self.set_tabs_enabled(True)
             self.enable_buttons(True)
             self.dlg_plan_psector.name.setEnabled(True)
-            self.dlg_plan_psector.chk_enable_all.setDisabled(False)
-            sql = (f"SELECT enable_all "
-                   f"FROM plan_psector "
-                   f"WHERE psector_id = '{psector_id}'")
-            row = tools_db.get_row(sql)
-            if row:
-                self.dlg_plan_psector.chk_enable_all.setChecked(row[0])
             self.fill_table(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc",
                             set_edit_triggers=QTableView.DoubleClicked)
             tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc")
@@ -358,7 +355,7 @@ class GwPsector:
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
         self.dlg_plan_psector.rejected.connect(partial(self.close_psector, cur_active_layer))
-        self.dlg_plan_psector.chk_enable_all.stateChanged.connect(partial(self.enable_all))
+        self.dlg_plan_psector.chk_enable_all.stateChanged.connect(partial(self._enable_layers))
 
         self.lbl_descript = self.dlg_plan_psector.findChild(QLabel, "lbl_descript")
         self.dlg_plan_psector.all_rows.clicked.connect(partial(self.show_description))
@@ -463,25 +460,6 @@ class GwPsector:
                 widget.setText("")
         else:
             widget.setText("")
-
-
-    def enable_all(self):
-
-        value = tools_qt.is_checked(self.dlg_plan_psector, "chk_enable_all")
-        psector_id = tools_qt.get_text(self.dlg_plan_psector, "psector_id")
-        sql = f"SELECT gw_fct_plan_psector_enableall({value}, '{psector_id}')"
-        tools_db.execute_sql(sql)
-        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'arc')
-        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'node')
-        tools_gw.load_tableview_psector(self.dlg_plan_psector, 'connec')
-        if self.project_type.upper() == 'UD':
-            tools_gw.load_tableview_psector(self.dlg_plan_psector, 'gully')
-
-        sql = (f"UPDATE plan_psector "
-               f"SET enable_all = '{value}' "
-               f"WHERE psector_id = '{psector_id}'")
-        tools_db.execute_sql(sql)
-        tools_qgis.refresh_map_canvas()
 
 
     def update_total(self, dialog, qtable):
@@ -866,8 +844,6 @@ class GwPsector:
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.other, row[0])
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, row[1])
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.vat, row[2])
-
-        self.dlg_plan_psector.chk_enable_all.setEnabled(True)
 
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
@@ -1705,3 +1681,46 @@ class GwPsector:
 
             global_vars.iface.mapCanvas().zoomScale(float(scale))
 
+    # region private functions
+    def _enable_layers(self, is_cheked):
+        """ Manage checkbox state and act accordingly with the layers """
+
+        layers = ['v_plan_psector_arc', 'v_plan_psector_connec', 'v_plan_psector_gully', 'v_plan_psector_link',
+                  'v_plan_psector_node']
+        if is_cheked == 0:  # user unckeck it
+            for layer_name in layers:
+                layer = tools_qgis.get_layer_by_tablename(layer_name)
+                if layer:
+                    tools_qgis.set_layer_visible(layer, False, False)
+
+        elif is_cheked == 2:  # user check it
+            self._check_layers_visible('v_plan_psector_arc', 'the_geom', 'arc_id')
+            self._check_layers_visible('v_plan_psector_connec', 'the_geom', 'connec_id')
+            self._check_layers_visible('v_plan_psector_link', 'the_geom', 'link_id')
+            self._check_layers_visible('v_plan_psector_node', 'the_geom', 'node_id')
+            if self.project_type == 'ud':
+                self._check_layers_visible('v_plan_psector_gully', 'the_geom', 'gully_id')
+
+
+    def _check_layers_visible(self, layer_name, the_geom, field_id):
+        """ Check layers visibility and add it if it is not in the toc """
+
+        layer = tools_qgis.get_layer_by_tablename(layer_name)
+        if layer is None: tools_gw.add_layer_database(layer_name, the_geom, field_id)
+        if layer and QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
+            tools_qgis.set_layer_visible(layer, True, True)
+
+
+    def _chek_for_layers(self):
+        """ Return if ALL this layers in the list are checked or not """
+
+        all_checked = True
+        layers = ['v_plan_psector_arc', 'v_plan_psector_connec', 'v_plan_psector_gully', 'v_plan_psector_link',
+                  'v_plan_psector_node']
+        for layer_name in layers:
+            if self.project_type == 'ws' and layer_name == 'v_plan_psector_gully': continue
+            layer = tools_qgis.get_layer_by_tablename(layer_name)
+            if layer is None or QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
+                all_checked = False
+        return all_checked
+    # endregion
