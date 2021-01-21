@@ -66,6 +66,10 @@ class ManageNewPsector(ParentManage):
 
         self.update = False  # if false: insert; if true: update
 
+        self.all_layers_checked = self._chek_for_layers()
+        if self.all_layers_checked:
+            utils_giswater.setChecked(self.dlg_plan_psector, self.dlg_plan_psector.chk_enable_all, True)
+
         # Remove all previous selections
         self.remove_selection(True)
 
@@ -127,11 +131,10 @@ class ManageNewPsector(ParentManage):
         if self.plan_om == 'om':
             self.populate_result_id(self.dlg_plan_psector.result_id, 'om_result_cat')
             utils_giswater.remove_tab_by_tabName(self.dlg_plan_psector.tabWidget, 'tab_document')
-            self.dlg_plan_psector.chk_enable_all.setVisible(False)
         elif self.plan_om == 'plan':
             self.dlg_plan_psector.lbl_result_id.setVisible(False)
             self.cmb_result_id.setVisible(False)
-            self.dlg_plan_psector.chk_enable_all.setEnabled(False)
+
 
         # tab Bugdet
         gexpenses = self.dlg_plan_psector.findChild(QLineEdit, "gexpenses")
@@ -161,9 +164,10 @@ class ManageNewPsector(ParentManage):
         selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # if a row is selected from mg_psector_mangement(button 46 or button 81)
-        # Si psector_id contiene "1" o "0" python lo toma como boolean, si es True, quiere decir que no contiene valor
-        # y por lo tanto es uno nuevo. Convertimos ese valor en 0 ya que ningun id va a ser 0 de esta manera si psector_id
-        # tiene un valor distinto de 0, es que el sector ya existe y queremos hacer un update.
+        # if psector_id contains "1" or "0" python takes it as boolean, if it is True, it means that it does not
+        # contain a value and therefore it is a new one. We convert that value to 0 since no id will be 0 in this way
+        # if psector_id has a value other than 0, it is that the sector already exists and we want to do an update.
+
         if isinstance(psector_id, bool):
             psector_id = 0
         self.delete_psector_selector('selector_plan_psector')
@@ -177,21 +181,15 @@ class ManageNewPsector(ParentManage):
             self.enable_tabs(True)
             self.enable_buttons(True)
             self.dlg_plan_psector.name.setEnabled(True)
-            self.dlg_plan_psector.chk_enable_all.setDisabled(False)
-            sql = (f"SELECT enable_all "
-                   f"FROM plan_psector "
-                   f"WHERE psector_id = '{psector_id}'")
-            row = self.controller.get_row(sql)
-            if row:
-                self.dlg_plan_psector.chk_enable_all.setChecked(row[0])
+
             self.fill_table(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc",
-                set_edit_triggers=QTableView.DoubleClicked)
+                            set_edit_triggers=QTableView.DoubleClicked)
             self.set_table_columns(self.dlg_plan_psector, self.qtbl_arc, "plan_psector_x_arc")
             self.fill_table(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node",
-                set_edit_triggers=QTableView.DoubleClicked)
+                            set_edit_triggers=QTableView.DoubleClicked)
             self.set_table_columns(self.dlg_plan_psector, self.qtbl_node, "plan_psector_x_node")
             self.fill_table(self.dlg_plan_psector, self.qtbl_connec, "plan_psector_x_connec",
-                set_edit_triggers=QTableView.DoubleClicked)
+                            set_edit_triggers=QTableView.DoubleClicked)
             self.set_table_columns(self.dlg_plan_psector, self.qtbl_connec, "plan_psector_x_connec")
             if self.project_type.upper() == 'UD':
                 self.fill_table(self.dlg_plan_psector, self.qtbl_gully, "plan_psector_x_gully",
@@ -346,43 +344,40 @@ class ManageNewPsector(ParentManage):
         self.insert_psector_selector('selector_state', 'state_id', '1')
 
         # Set signals
-        self.dlg_plan_psector.btn_accept.clicked.connect(partial(self.insert_or_update_new_psector,
-                                                                 'v_edit_plan_psector', True))
+        self.dlg_plan_psector.btn_accept.clicked.connect(
+            partial(self.insert_or_update_new_psector, 'v_edit_plan_psector', True))
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
-        self.dlg_plan_psector.psector_type.currentIndexChanged.connect(partial(self.populate_result_id,
-            self.dlg_plan_psector.result_id, 'plan_result_cat'))
+        self.dlg_plan_psector.psector_type.currentIndexChanged.connect(
+            partial(self.populate_result_id, self.dlg_plan_psector.result_id, 'plan_result_cat'))
         self.dlg_plan_psector.rejected.connect(partial(self.close_psector, cur_active_layer))
-        self.dlg_plan_psector.chk_enable_all.stateChanged.connect(partial(self.enable_all))
-
+        self.dlg_plan_psector.chk_enable_all.stateChanged.connect(partial(self._enable_layers))
         self.lbl_descript = self.dlg_plan_psector.findChild(QLabel, "lbl_descript")
         self.dlg_plan_psector.all_rows.clicked.connect(partial(self.show_description))
-        self.dlg_plan_psector.btn_select.clicked.connect(partial(self.update_total,
-            self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
-        self.dlg_plan_psector.btn_unselect.clicked.connect(partial(self.update_total,
-            self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
-        self.dlg_plan_psector.btn_insert.clicked.connect(partial(self.insert_feature,
-            self.dlg_plan_psector, table_object, True))
-        self.dlg_plan_psector.btn_delete.clicked.connect(partial(self.delete_records,
-            self.dlg_plan_psector, table_object, True))
+        self.dlg_plan_psector.btn_select.clicked.connect(
+            partial(self.update_total, self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
+        self.dlg_plan_psector.btn_unselect.clicked.connect(
+            partial(self.update_total, self.dlg_plan_psector, self.dlg_plan_psector.selected_rows))
+        self.dlg_plan_psector.btn_insert.clicked.connect(
+            partial(self.insert_feature, self.dlg_plan_psector, table_object, True))
+        self.dlg_plan_psector.btn_delete.clicked.connect(
+            partial(self.delete_records, self.dlg_plan_psector, table_object, True))
         self.dlg_plan_psector.btn_delete.setShortcut(QKeySequence(Qt.Key_Delete))
-        self.dlg_plan_psector.btn_snapping.clicked.connect(partial(self.selection_init,
-            self.dlg_plan_psector, table_object, True))
+        self.dlg_plan_psector.btn_snapping.clicked.connect(
+            partial(self.selection_init, self.dlg_plan_psector, table_object, True))
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
-        self.dlg_plan_psector.tab_feature.currentChanged.connect(partial(self.tab_feature_changed,
-            self.dlg_plan_psector, table_object, excluded_layers=["v_edit_element"]))
+        self.dlg_plan_psector.tab_feature.currentChanged.connect(
+            partial(self.tab_feature_changed, self.dlg_plan_psector, table_object, excluded_layers=["v_edit_element"]))
         self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
         viewname = 'v_edit_plan_psector_x_other'
         self.dlg_plan_psector.txt_name.textChanged.connect(partial(self.query_like_widget_text, self.dlg_plan_psector,
             self.dlg_plan_psector.txt_name, self.dlg_plan_psector.all_rows, 'v_price_compost', viewname, "id"))
 
-        self.dlg_plan_psector.gexpenses.returnPressed.connect(partial(self.calulate_percents,
-            'plan_psector', 'gexpenses'))
-        self.dlg_plan_psector.vat.returnPressed.connect(partial(self.calulate_percents,
-            'plan_psector', 'vat'))
-        self.dlg_plan_psector.other.returnPressed.connect(partial(self.calulate_percents,
-            'plan_psector', 'other'))
+        self.dlg_plan_psector.gexpenses.returnPressed.connect(
+            partial(self.calulate_percents, 'plan_psector', 'gexpenses'))
+        self.dlg_plan_psector.vat.returnPressed.connect(partial(self.calulate_percents, 'plan_psector', 'vat'))
+        self.dlg_plan_psector.other.returnPressed.connect(partial(self.calulate_percents, 'plan_psector', 'other'))
 
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
         self.dlg_plan_psector.btn_doc_delete.clicked.connect(
@@ -439,25 +434,6 @@ class ManageNewPsector(ParentManage):
 
         # Open dialog
         self.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector', maximize_button=False)
-
-
-    def enable_all(self):
-
-        value = utils_giswater.isChecked(self.dlg_plan_psector, "chk_enable_all")
-        psector_id = utils_giswater.getWidgetText(self.dlg_plan_psector, "psector_id")
-        sql = f"SELECT gw_fct_plan_psector_enableall({value}, '{psector_id}')"
-        self.controller.execute_sql(sql)
-        self.reload_qtable(self.dlg_plan_psector, 'arc')
-        self.reload_qtable(self.dlg_plan_psector, 'node')
-        self.reload_qtable(self.dlg_plan_psector, 'connec')
-        if self.project_type.upper() == 'UD':
-            self.reload_qtable(self.dlg_plan_psector, 'gully')
-
-        sql = (f"UPDATE plan_psector "
-               f"SET enable_all = '{value}' "
-               f"WHERE psector_id = '{psector_id}'")
-        self.controller.execute_sql(sql, log_sql=True)
-        self.refresh_map_canvas()
 
 
     def update_total(self, dialog, qtable):
@@ -872,8 +848,6 @@ class ManageNewPsector(ParentManage):
             utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.other, row[0])
             utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.gexpenses, row[1])
             utils_giswater.setWidgetText(self.dlg_plan_psector, self.dlg_plan_psector.vat, row[2])
-
-        self.dlg_plan_psector.chk_enable_all.setEnabled(True)
 
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
@@ -1374,4 +1348,48 @@ class ManageNewPsector(ParentManage):
                       "will turn obsolete. To mantain traceability, a copy of planified features will be inserted " \
                       "on the psector."
                 self.controller.show_details(msg, 'Message warning')
+
+    # region private functions
+    def _enable_layers(self, is_cheked):
+        """ Manage checkbox state and act accordingly with the layers """
+
+        layers = ['v_plan_psector_arc', 'v_plan_psector_connec', 'v_plan_psector_gully', 'v_plan_psector_link',
+                  'v_plan_psector_node']
+        if is_cheked == 0:  # user unckeck it
+            for layer_name in layers:
+                layer = self.controller.get_layer_by_tablename(layer_name)
+                if layer:
+                    self.controller.set_layer_visible(layer, False, False)
+
+        elif is_cheked == 2:  # user check it
+            self._check_layers_visible('v_plan_psector_arc', 'the_geom', 'arc_id')
+            self._check_layers_visible('v_plan_psector_connec', 'the_geom', 'connec_id')
+            self._check_layers_visible('v_plan_psector_link', 'the_geom', 'link_id')
+            self._check_layers_visible('v_plan_psector_node', 'the_geom', 'node_id')
+            if self.project_type == 'ud':
+                self._check_layers_visible('v_plan_psector_gully', 'the_geom', 'gully_id')
+
+
+    def _check_layers_visible(self, layer_name, the_geom, field_id):
+        """ Check layers visibility and add it if it is not in the toc """
+
+        layer = self.controller.get_layer_by_tablename(layer_name)
+        if layer is None: self.add_layer.from_postgres_to_toc(layer_name, the_geom, field_id)
+        if layer and QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
+            self.controller.set_layer_visible(layer, True, True)
+
+
+    def _chek_for_layers(self):
+        """ Return if ALL this layers in the list are checked or not """
+
+        all_checked = True
+        layers = ['v_plan_psector_arc', 'v_plan_psector_connec', 'v_plan_psector_gully', 'v_plan_psector_link',
+                  'v_plan_psector_node']
+        for layer_name in layers:
+            if self.project_type == 'ws' and layer_name == 'v_plan_psector_gully': continue
+            layer = self.controller.get_layer_by_tablename(layer_name)
+            if layer is None or QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
+                all_checked = False
+        return all_checked
+    # endregion
 
