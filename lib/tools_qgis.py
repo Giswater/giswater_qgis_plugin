@@ -103,11 +103,11 @@ def get_visible_layers(as_str_list=False, as_list=False):
     return visible_layer
 
 
-def get_plugin_metadata(parameter, default_value):
+def get_plugin_metadata(parameter, default_value, plugin_dir=global_vars.plugin_dir):
     """ Get @parameter from metadata.txt file """
 
     # Check if metadata file exists
-    metadata_file = os.path.join(global_vars.plugin_dir, 'metadata.txt')
+    metadata_file = os.path.join(plugin_dir, 'metadata.txt')
     if not os.path.exists(metadata_file):
         message = f"Metadata file not found: {metadata_file}"
         global_vars.iface.messageBar().pushMessage("", message, 1, 20)
@@ -146,17 +146,17 @@ def get_plugin_version():
     return plugin_version, message
 
 
-def get_higher_version(default_version='3.5'):
+def get_higher_version(default_version='3.5', plugin_dir=global_vars.plugin_dir):
     """ Get plugin higher version from metadata.txt file """
 
-    higher_version = get_plugin_metadata('version', default_version)[0:3]
+    higher_version = get_plugin_metadata('version', default_version, plugin_dir)[0:3]
     return higher_version
 
 
-def get_build_version(default_version='35001'):
+def get_build_version(default_version='35001', plugin_dir=global_vars.plugin_dir):
     """ Get plugin build version from metadata.txt file """
 
-    build_version = get_plugin_metadata('version', default_version).replace(".", "")
+    build_version = get_plugin_metadata('version', default_version, plugin_dir).replace(".", "")
     return build_version
 
 
