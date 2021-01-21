@@ -5,21 +5,19 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import configparser
 import os
 from functools import partial
-import configparser
-
 
 from qgis.PyQt.QtCore import QObject
-from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget, QMenu, QComboBox, QTableView, QAbstractItemView, \
-    QTableWidgetItem, QPushButton
 from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QActionGroup, QMenu, QComboBox, QTableView, QTableWidgetItem, QPushButton
 
-from .ui.ui_manager import GwLoadMenuUi
 from .toolbars import buttons
+from .ui.ui_manager import GwLoadMenuUi
+from .utils import tools_gw
 from .. import global_vars
 from ..lib import tools_os, tools_qt
-from .utils import tools_gw
 
 
 class GwMenuLoad(QObject):
@@ -36,17 +34,17 @@ class GwMenuLoad(QObject):
         self.roaming_path_folder = os.path.join(tools_os.get_datadir(), global_vars.roaming_user_dir)
         self.list_values = []
 
-    def read_menu(self, show_warning=True):
+
+    def read_menu(self):
         """  """
         main_menu = QMenu("&Giswater", self.iface.mainWindow().menuBar())
 
         actions = self.iface.mainWindow().menuBar().actions()
-        lastAction = actions[-1]
+        last_action = actions[-1]
 
         # region Toolbars
         toolbars_menu = QMenu(f"Toolbars", self.iface.mainWindow().menuBar())
-        icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep \
-            + '20x20' + os.sep + '36.png'
+        icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}36.png"
         toolbars_icon = QIcon(icon_path)
         toolbars_menu.setIcon(toolbars_icon)
         main_menu.addMenu(toolbars_menu)
@@ -55,8 +53,7 @@ class GwMenuLoad(QObject):
             toolbars_menu.addMenu(toolbar_submenu)
             buttons_toolbar = global_vars.settings.value(f"toolbars/{toolbar}")
             for index_action in buttons_toolbar:
-                icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + 'icons' + os.sep + 'toolbars'\
-                            + os.sep + str(toolbar) + os.sep + str(index_action) + '.png'
+                icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
                 icon = QIcon(icon_path)
                 button_def = global_vars.settings.value(f"buttons_def/{index_action}")
                 text = ""
@@ -76,8 +73,7 @@ class GwMenuLoad(QObject):
         # region Roaming
         roaming_menu = QMenu(f"Roaming", self.iface.mainWindow().menuBar())
         main_menu.addMenu(roaming_menu)
-        icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + 'icons' + os.sep + 'toolbars' + os.sep \
-            + 'utilities' + os.sep + '99.png'
+        icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
         roaming_icon = QIcon(icon_path)
         roaming_menu.setIcon(roaming_icon)
         action_open_path = roaming_menu.addAction(f"Open folder")
@@ -87,22 +83,24 @@ class GwMenuLoad(QObject):
         action_manage_file.triggered.connect(self._open_manage_file)
         # endregion
 
-        self.iface.mainWindow().menuBar().insertMenu(lastAction, main_menu)
+        self.iface.mainWindow().menuBar().insertMenu(last_action, main_menu)
+
 
     def clicked_event(self, action_function):
         """  """
         action_function.clicked_event()
+
 
     def translate(self, message):
         """ Calls on tools_qt to translate parameter message. """
         return tools_qt.tr(message, aux_context='ui_message')
 
     # region private functions
-
     def _open_roaming_path(self):
         """ Opens the OS-specific Roaming directory. """
         path = os.path.realpath(self.roaming_path_folder)
         os.startfile(path)
+
 
     def _open_manage_file(self):
         """ Manage files dialog:: """
@@ -133,7 +131,8 @@ class GwMenuLoad(QObject):
 
         # Open dialog
         self.dlg_manage_menu.open()
-        
+
+
     def _get_config_file_values(self):
         """ Populates a variable with a list of values parsed from a configuration file. """
         # Get values
@@ -155,21 +154,23 @@ class GwMenuLoad(QObject):
                 self.list_values.append(values)
                 values = {}
 
+
     def _fill_tbl_config_files(self, table):
         """ Fills a UI table with the local list of values variable. """
 
-        row_count = (len(self.list_values))
-        column_count = (len(self.list_values[0]))
+        row_count = len(self.list_values)
+        column_count = len(self.list_values[0])
 
         table.setColumnCount(column_count)
         table.setRowCount(row_count)
 
-        table.setHorizontalHeaderLabels((list(self.list_values[0].keys())))
+        table.setHorizontalHeaderLabels(list(self.list_values[0].keys()))
 
         for row in range(row_count):  # add items from array to QTableWidget
             for column in range(column_count):
-                item = (list(self.list_values[row].values())[column])
+                item = list(self.list_values[row].values())[column]
                 table.setItem(row, column, QTableWidgetItem(item))
+
 
     def _save_config_files(self):
         """ Writes the list of values into a persistant configuration file. """
@@ -180,8 +181,6 @@ class GwMenuLoad(QObject):
             section = self.tbl_config_files.item(row, 0).text()
             parameter = self.tbl_config_files.item(row, 1).text()
             value = self.tbl_config_files.item(row, 2).text()
-
-            tools_gw.set_config_parser(f"{section}", f"{parameter}", f"{value}",
-                                       file_name=filename, prefix=False)
+            tools_gw.set_config_parser(f"{section}", f"{parameter}", f"{value}", file_name=filename, prefix=False)
 
     # endregion
