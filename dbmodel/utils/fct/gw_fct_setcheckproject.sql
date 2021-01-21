@@ -327,7 +327,6 @@ BEGIN
 		END IF;
 
 		IF v_psector_vdef IS NOT NULL THEN
-			INSERT INTO selector_psector (psector_id, cur_user) VALUES (v_psector_vdef, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;
 			v_errortext=concat('Current psector: ',v_psector_vdef);
 			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 		END IF;
