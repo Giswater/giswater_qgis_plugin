@@ -39,6 +39,7 @@ class GwI18NGenerator:
         self.dlg_qm.rejected.connect(self._close_db)
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_translation')
 
+
     # region private functions
 
     def _check_connection(self):
@@ -68,7 +69,7 @@ class GwI18NGenerator:
         host = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f'Connected to {host}')
         sql = "SELECT id, idval FROM i18n.cat_language"
-        rows = self.get_rows(sql)
+        rows = self._get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows, 1)
         language = tools_gw.get_config_parser('i18n_generator', 'qm_lang_language', "user", "init")
 
@@ -108,6 +109,7 @@ class GwI18NGenerator:
 
     def _create_py_files(self):
         """ Read the values of the database and generate the ts and qm files """
+
         # On the database, the dialog_name column must match the name of the ui file (no extension).
         # Also, open_dialog function must be called, passed as parameter dlg_name = 'ui_file_name_without_extension'
 
@@ -117,17 +119,17 @@ class GwI18NGenerator:
 
         # Get python messages values
         sql = f"SELECT source, ms_en_en, {key_message} FROM i18n.pymessage;"
-        py_messages = self.get_rows(sql)
+        py_messages = self._get_rows(sql)
 
         # Get python toolbars and buttons values
         sql = f"SELECT source, lb_en_en, {key_label} FROM i18n.pytoolbar;"
-        py_toolbars = self.get_rows(sql)
+        py_toolbars = self._get_rows(sql)
 
         # Get python dialog values
         sql = (f"SELECT dialog_name, source, lb_en_en, {key_label}, tt_en_en, {key_tooltip} "
                f" FROM i18n.pydialog "
                f" ORDER BY dialog_name;")
-        py_dialogs = self.get_rows(sql)
+        py_dialogs = self._get_rows(sql)
 
         ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{self.language}.ts'
 
@@ -273,7 +275,6 @@ class GwI18NGenerator:
         rows = self._get_dbmessages_values()
         status = self._write_dbmessages_values(rows, cfg_path + file_name)
 
-
         return status
 
 
@@ -284,7 +285,7 @@ class GwI18NGenerator:
                f"tt_{self.lower_lang}"
                f" FROM i18n.dbdialog "
                f" ORDER BY context, formname;")
-        rows = self.get_rows(sql)
+        rows = self._get_rows(sql)
         if not rows:
             return False
         return rows
@@ -296,7 +297,7 @@ class GwI18NGenerator:
         sql = (f"SELECT source, project_type, context, ms_en_en, ms_{self.lower_lang}, ht_en_en, ht_{self.lower_lang}"
                f" FROM i18n.dbmessage "
                f" ORDER BY context;")
-        rows = self.get_rows(sql)
+        rows = self._get_rows(sql)
         if not rows:
             return False
         return rows
@@ -412,6 +413,7 @@ class GwI18NGenerator:
             file.write(line)
         file.close()
         del file
+
         return True
 
 
@@ -465,6 +467,7 @@ class GwI18NGenerator:
         except psycopg2.DatabaseError as e:
             self.last_error = e
             status = False
+
         return status
 
 
@@ -496,7 +499,7 @@ class GwI18NGenerator:
         self.conn.rollback()
 
 
-    def get_rows(self, sql, commit=True):
+    def _get_rows(self, sql, commit=True):
         """ Get multiple rows from selected query """
 
         self.last_error = None
@@ -512,4 +515,5 @@ class GwI18NGenerator:
                 self._rollback()
         finally:
             return rows
+
     # endregion
