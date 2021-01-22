@@ -805,7 +805,7 @@ def get_locale():
         except AttributeError as e:
             locale = "en_EN"
             tools_log.log_info(f"{type(e).__name__} --> {e}")
-    else
+    else:
         try:
             locale = QSettings().value('locale/userLocale')
         except AttributeError as e:
