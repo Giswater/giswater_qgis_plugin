@@ -1423,7 +1423,7 @@ def check_config_settings(section, parameter, value, config_type="user", file_na
 
 
 def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False,
-                      log_result=False, json_loads=False, is_notify=False, rubber_band=None):
+                      log_result=False, json_loads=False, is_thread=False, rubber_band=None):
     """ Manage execution database function
     :param function_name: Name of function to call (text)
     :param parameters: Parameters for function (json) or (query parameters)
@@ -1471,7 +1471,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
 
     # If failed, manage exception
     if 'status' in json_result and json_result['status'] == 'Failed':
-        manage_json_exception(json_result, sql, is_notify=is_notify)
+        manage_json_exception(json_result, sql, is_thread=is_thread)
         return json_result
 
     try:
@@ -1485,7 +1485,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     return json_result
 
 
-def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_increase=0, is_notify=False):
+def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_increase=0, is_thread=False):
     """ Manage exception in JSON database queries and show information to the user """
 
     try:
@@ -1501,9 +1501,9 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
             else:
                 parameter = 'text'
                 msg = "Key on returned json from ddbb is missed"
-            if is_notify is True:
+            if is_thread is True:
                 tools_log.log_info(msg, parameter=parameter, level=level)
-            elif not is_notify and global_vars.session_vars['show_db_exception']:
+            elif not is_thread and global_vars.session_vars['show_db_exception']:
                 # Show exception message only if we are not in a task process
                 tools_qgis.show_message(msg, level, parameter=parameter)
 
