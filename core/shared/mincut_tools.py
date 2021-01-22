@@ -166,7 +166,7 @@ class GwMincutTools:
         tools_qt.fill_combo_values(self.dlg_mincut_man.cmb_expl, rows, 1)
 
 
-    def open_mincut(self):
+    def open_mincut(self, dialog=GwMincutUi()):
         """ Open mincut form with selected record of the table """
 
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
@@ -183,7 +183,7 @@ class GwMincutTools:
         # Close this dialog and open selected mincut
         tools_gw.close_dialog(self.dlg_mincut_man)
         self.mincut.is_new = False
-        self.mincut.set_dialog(GwMincutUi())
+        self.mincut.set_dialog(dialog)
         self.mincut.init_mincut_form()
         self.mincut.load_mincut(result_mincut_id)
         self.mincut.manage_docker()
