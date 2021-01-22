@@ -135,7 +135,7 @@ class GwSnapManager(object):
 
 
     def config_snap_to_connec(self):
-        """ Set snapping to 'connec' and 'gully' """
+        """ Set snapping to 'connec' """
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
@@ -151,6 +151,7 @@ class GwSnapManager(object):
 
 
     def config_snap_to_gully(self):
+        """ Set snapping to 'gully' """
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()

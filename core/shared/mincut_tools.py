@@ -183,7 +183,7 @@ class GwMincutTools:
         # Close this dialog and open selected mincut
         tools_gw.close_dialog(self.dlg_mincut_man)
         self.mincut.is_new = False
-        self.mincut.set_dialog(GwMincutUi)
+        self.mincut.set_dialog(GwMincutUi())
         self.mincut.init_mincut_form()
         self.mincut.load_mincut(result_mincut_id)
         self.mincut.manage_docker()

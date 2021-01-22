@@ -99,6 +99,10 @@ class GwMincut:
         self.current_layer = self.layer_arc
 
 
+    def set_dialog(self, dialog=GwMincutUi()):
+        self.dlg_mincut = dialog
+
+
     def init_mincut_form(self):
         """ Custom form initial configuration """
         # Setting lists
@@ -110,7 +114,6 @@ class GwMincut:
         tools_qgis.remove_layer_from_toc('Other mincuts which overlaps', 'GW Temporal Layers')
         tools_qgis.remove_layer_from_toc('Overlap affected connecs', 'GW Temporal Layers')
 
-        self.dlg_mincut = GwMincutUi()
         tools_gw.load_settings(self.dlg_mincut)
         self.dlg_mincut.setWindowFlags(Qt.WindowStaysOnTopHint)
 
