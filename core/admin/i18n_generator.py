@@ -85,7 +85,7 @@ class GwI18NGenerator:
         self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         self.lower_lang = self.language.lower()
         if py_msg:
-            status_py_msg = self.__create_py_files()
+            status_py_msg = self._create_py_files()
             if status_py_msg is True:
                 msg += "Python translation successful\n"
             elif status_py_msg is False:
