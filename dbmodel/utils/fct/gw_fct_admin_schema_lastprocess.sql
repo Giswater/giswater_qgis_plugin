@@ -209,13 +209,13 @@ BEGIN
 		END IF;
 		
 		-- generate child views 
-        UPDATE config_param_system SET value='FALSE' WHERE parameter='admin_config_control_trigger';
+		UPDATE config_param_system SET value='FALSE' WHERE parameter='admin_config_control_trigger';
 		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 		"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
 		
 		PERFORM  gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 		"data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;
-        UPDATE config_param_system SET value='TRUE' WHERE parameter='admin_config_control_trigger';
+		UPDATE config_param_system SET value='TRUE' WHERE parameter='admin_config_control_trigger';
 		
 		--change widgettype for matcat_id when new empty data project (UD)
 		IF v_projecttype = 'UD' THEN 
@@ -228,6 +228,9 @@ BEGIN
 			UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
 			WHERE columnname='matcat_id' AND formname LIKE 've_arc%';
 		END IF;
+
+		-- forcing state selector for user
+		UPDATE sys_param_user SET vdefault = '1', ismandatory =  true WHERE id ='edit_state_vdefault';
 		
 	ELSIF v_isnew IS FALSE THEN
 		
