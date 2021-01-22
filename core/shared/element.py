@@ -209,7 +209,6 @@ class GwElement:
         if self.new_element_id is True:
             tools_qt.set_widget_text(self.dlg_add_element, 'num_elements', '1')
 
-
         self.update_location_cmb()
         if not self.new_element_id:
             tools_qt.set_widget_text(self.dlg_add_element, 'element_id', selected_object_id)
@@ -221,6 +220,7 @@ class GwElement:
 
 
     def get_point_xy(self):
+
         self.snapper_manager.add_point(self.vertex_marker)
         self.point_xy = self.snapper_manager.point_xy
 

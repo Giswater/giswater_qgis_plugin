@@ -1501,7 +1501,7 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
             else:
                 parameter = 'text'
                 msg = "Key on returned json from ddbb is missed"
-            if is_thread is True:
+            if is_thread:
                 tools_log.log_info(msg, parameter=parameter, level=level)
             elif not is_thread and global_vars.session_vars['show_db_exception']:
                 # Show exception message only if we are not in a task process

@@ -78,9 +78,10 @@ def get_visible_layers(as_str_list=False, as_list=False):
         True, False --> return str like ["name1", "name2", "..."]
         xxxx, True --> return list like ['name1', 'name2', '...']
     """
+
     layers_name = []
     visible_layer = '{'
-    if as_str_list is True:
+    if as_str_list:
         visible_layer = '['
     layers = get_project_layers()
     for layer in layers:
@@ -94,12 +95,14 @@ def get_visible_layers(as_str_list=False, as_list=False):
             visible_layer += f'"{table_name}", '
     visible_layer = visible_layer[:-2]
 
-    if as_list == True: return layers_name
+    if as_list:
+        return layers_name
 
-    if as_str_list is True:
+    if as_str_list:
         visible_layer += ']'
     else:
         visible_layer += '}'
+
     return visible_layer
 
 
@@ -400,7 +403,7 @@ def disconnect_snapping(action_pan=True, emit_point=None, vertex_marker=None):
         except AttributeError as e:
             tools_log.log_info(f"{type(e).__name__} --> {e}")
 
-    if action_pan is True:
+    if action_pan:
         global_vars.iface.actionPan().trigger()
 
 
@@ -796,13 +799,13 @@ def get_locale():
     override = QSettings().value('locale/overrideFlag')
 
     locale = None
-    if tools_os.set_boolean(override) is True:
+    if tools_os.set_boolean(override):
         try:
             locale = QSettings().value('locale/globalLocale')
         except AttributeError as e:
             locale = "en_EN"
             tools_log.log_info(f"{type(e).__name__} --> {e}")
-    elif tools_os.set_boolean(override) is False:
+    else
         try:
             locale = QSettings().value('locale/userLocale')
         except AttributeError as e:
@@ -816,7 +819,6 @@ def get_locale():
 
 
 # region private functions
-
 
 def _get_vertex_from_point(feature):
     """ Manage feature geometry when is Point

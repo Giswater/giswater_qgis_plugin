@@ -163,7 +163,7 @@ class GwInfo(QObject):
 
         # Comes from QPushButtons node1 or node2 from custom form or RightButton
         elif feature_id:
-            if is_add_schema is True:
+            if is_add_schema:
                 project_vars = global_vars.project_vars
                 add_schema = project_vars['add_schema']
                 extras = f'"addSchema":"{add_schema}"'
@@ -1145,15 +1145,17 @@ class GwInfo(QObject):
 
 
     def manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg):
+
         self.get_last_value()
         status = self.accept(dialog, self.complet_result, my_json, close_dlg=close_dlg, new_feature=new_feature)
-        if status is True:  # Commit succesfull and dialog keep opened
+        if status:  # Commit succesfull and dialog keep opened
             tools_qt.set_action_checked(action_edit, False)
             tools_gw.enable_widgets(dialog, self.complet_result['body']['data'], False)
             self.enable_actions(dialog, False)
 
 
     def stop_editing(self, dialog, action_edit, layer, fid, my_json, new_feature=None):
+
         if my_json == '' or str(my_json) == '{}':
             self.disconnect_signals()
             # Use commitChanges just for closse edition
@@ -1172,6 +1174,7 @@ class GwInfo(QObject):
 
 
     def start_editing(self, dialog, action_edit, result, layer):
+
         self.disconnect_signals()
         self.iface.setActiveLayer(layer)
         tools_qt.set_action_checked(action_edit, True)

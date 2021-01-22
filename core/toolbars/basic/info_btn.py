@@ -14,6 +14,7 @@ from qgis.PyQt.QtGui import QColor, QCursor, QIcon
 from qgis.PyQt.QtWidgets import QAction, QMenu
 from qgis.core import QgsGeometry, QgsMapToPixel, QgsPointXY
 from qgis.gui import QgsRubberBand
+
 from ...shared import info
 from ...shared.info import GwInfo
 from ...toolbars.maptool_button import GwMaptoolButton
@@ -112,7 +113,6 @@ class GwInfoButton(GwMaptoolButton):
         main_menu.exec_(click_point)
 
 
-
     def identify_all(self, complet_list, rb_list):
 
         self.rubber_band.reset()
@@ -147,7 +147,7 @@ class GwInfoButton(GwMaptoolButton):
 
         list_coord = re.search('\((.*)\)', str(feature['geometry']))
         max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
-        if reset_rb is True:
+        if reset_rb:
             self.rubber_band.reset()
         if str(max_x) == str(min_x) and str(max_y) == str(min_y):
             point = QgsPointXY(float(max_x), float(max_y))
@@ -159,6 +159,7 @@ class GwInfoButton(GwMaptoolButton):
 
     def get_info_from_selected_id(self, action, tab_type):
         """ Set active selected layer """
+
         self.rubber_band.reset()
         parent_menu = action.associatedWidgets()[0]
         layer = tools_qgis.get_layer_by_layername(parent_menu.title())
@@ -253,9 +254,4 @@ class GwInfoButton(GwMaptoolButton):
         super().deactivate()
 
     # endregion
-
-
-
-
-
 

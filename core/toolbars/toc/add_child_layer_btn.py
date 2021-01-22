@@ -107,11 +107,11 @@ class GwAddChildLayerButton(GwDialogButton):
         :param is_checked: This parameter is sent by the action itself with the trigger (Bool)
         """
 
-        if is_checked is True:
+        if is_checked:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is None:
                 tools_gw.add_layer_database(tablename, the_geom, field_id, child_layers, group, style_id)
-        elif is_checked is False:
+        else:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
                 tools_qgis.remove_layer_from_toc(tablename, group)
