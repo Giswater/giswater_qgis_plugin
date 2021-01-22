@@ -21,7 +21,6 @@ class GwLogger(object):
 
     def __init__(self, log_name, log_level, log_suffix, folder_has_tstamp=False, file_has_tstamp=True,
                  remove_previous=False):
-        """ Class constructor """
 
         # Create logger
         self.logger_file = logging.getLogger(log_name)

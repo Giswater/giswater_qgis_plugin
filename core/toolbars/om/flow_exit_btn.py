@@ -16,7 +16,6 @@ class GwFlowExitButton(GwMaptoolButton):
     """ Button 57: Flow exit """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
-        """ Class constructor """
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.layers_added = []

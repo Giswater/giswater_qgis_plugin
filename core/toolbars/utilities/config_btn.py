@@ -23,14 +23,17 @@ from ....lib import tools_qt, tools_db, tools_qgis
 class GwConfigButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
+
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
 
     def clicked_event(self):
+
         self.open_config()
 
 
     def open_config(self):
+
         # Get user and role
         super_users = tools_gw.get_config_parser('system', 'super_users', "project", "init")
         cur_user = tools_db.get_current_user()
@@ -230,6 +233,7 @@ class GwConfigButton(GwDialogButton):
         result = layers_name[:-2] + '}", ' + tables_name[:-2] + '}"'
 
         return result
+
 
     def get_event_combo_parent(self, row):
 

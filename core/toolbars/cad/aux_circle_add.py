@@ -22,7 +22,6 @@ class GwAuxCircleAddButton(GwMaptoolButton):
     """ Button 71: Add circle """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
-        """ Class constructor """
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
@@ -123,10 +122,12 @@ class GwAuxCircleAddButton(GwMaptoolButton):
 
 
     def canvasReleaseEvent(self, event):
+
         self.add_aux_circle(event)
 
 
     def add_aux_circle(self, event):
+
         if event.button() == Qt.LeftButton:
 
             # Get coordinates

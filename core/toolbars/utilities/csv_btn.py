@@ -23,14 +23,17 @@ from ....lib import tools_qt, tools_log, tools_db, tools_qgis
 class GwCSVButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
+
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
 
     def clicked_event(self):
+
         self.open_csv()
 
 
     def open_csv(self):
+
         self.func_name = None
         self.dlg_csv = GwCsvUi()
         tools_gw.load_settings(self.dlg_csv)
@@ -101,6 +104,7 @@ class GwCSVButton(GwDialogButton):
 
     def write_csv(self, dialog, temp_tablename):
         """ Write csv in postgres and call gw_fct_utils_csv2pg function """
+
         self.save_settings_values()
         insert_status = True
         if not self.validate_params(dialog):
@@ -215,6 +219,7 @@ class GwCSVButton(GwDialogButton):
 
     def save_settings_values(self):
         """ Save QGIS settings related with csv options """
+
         tools_gw.set_config_parser('btn_csv2pg', 'cmb_import_type', f"{tools_qt.get_combo_value(self.dlg_csv, 'cmb_import_type', 0)}")
         tools_gw.set_config_parser('btn_csv2pg', 'txt_import', tools_qt.get_text(self.dlg_csv, 'txt_import'))
         tools_gw.set_config_parser('btn_csv2pg', 'txt_file_csv', tools_qt.get_text(self.dlg_csv, 'txt_file_csv'))
@@ -338,3 +343,4 @@ class GwCSVButton(GwDialogButton):
             roles += ")"
 
         return roles
+

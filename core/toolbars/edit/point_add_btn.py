@@ -19,6 +19,7 @@ from ....lib import tools_os
 class GwPointAddButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
+
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
         # First add the menu before adding it to the toolbar
@@ -26,9 +27,7 @@ class GwPointAddButton(GwDialogButton):
             toolbar.removeAction(self.action)
 
         self.feature_cat = tools_gw.manage_feature_cat()
-
         project_type = tools_gw.get_project_type()
-
         self.info_feature = GwInfo('data')
 
         # Get list of different node and arc types

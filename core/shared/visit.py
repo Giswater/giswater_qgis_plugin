@@ -59,6 +59,7 @@ class GwVisit(QObject):
     def get_visit_dialog(self):
         return self.dlg_add_visit
 
+
     def get_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
                      open_dlg=True, is_new_from_cf=False):
 
@@ -1722,6 +1723,7 @@ class GwVisit(QObject):
 
 
     def feature_snapping_clicked(self, dialog, table_object):
+
         self.previous_map_tool = global_vars.canvas.mapTool()
         tools_gw.selection_init(self, dialog, table_object, False)
 

@@ -18,8 +18,8 @@ from ...lib import tools_qgis, tools_qt
 
 
 class GwSelector:
+
     def __init__(self):
-        """ Class constructor """
         pass
 
 
@@ -27,6 +27,7 @@ class GwSelector:
         """
         :param selector_type:This parameter must be a string between double quotes. Example: '"selector_basic"'
         """
+
         dlg_selector = GwSelectorUi()
         tools_gw.load_settings(dlg_selector)
 

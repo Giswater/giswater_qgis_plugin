@@ -23,7 +23,6 @@ from ...lib import tools_qgis, tools_qt
 class GwDimensioning:
 
     def __init__(self):
-        """ Class constructor """
 
         self.iface = global_vars.iface
         self.settings = global_vars.settings
@@ -36,6 +35,7 @@ class GwDimensioning:
 
 
     def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None, rubber_band=None):
+
         self.dlg_dim = GwDimensioningUi()
         tools_gw.load_settings(self.dlg_dim)
 
@@ -77,7 +77,6 @@ class GwDimensioning:
         action_orientation = self.dlg_dim.findChild(QAction, "actionOrientation")
         action_orientation.triggered.connect(partial(self.orientation, action_orientation))
         tools_gw.add_icon(action_orientation, "133")
-
 
         # LAYER SIGNALS
         self.layer_dimensions.editingStarted.connect(lambda: action_snapping.setEnabled(True))
@@ -199,6 +198,7 @@ class GwDimensioning:
 
 
     def deactivate_signals(self, action, emit_point=None):
+
         self.vertex_marker.hide()
         try:
             self.canvas.xyCoordinates.disconnect()
@@ -361,15 +361,14 @@ class GwDimensioning:
             return
 
         self.x_symbol = self.dlg_dim.findChild(QLineEdit, "x_symbol")
-
         self.x_symbol.setText(str(int(point.x())))
-
         self.y_symbol = self.dlg_dim.findChild(QLineEdit, "y_symbol")
         self.y_symbol.setText(str(int(point.y())))
 
         self.snapper_manager.restore_snap_options(self.previous_snapping)
         self.deactivate_signals(action, emit_point)
         action.setChecked(False)
+
 
     def create_map_tips(self):
         """ Create MapTips on the map """

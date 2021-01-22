@@ -28,6 +28,7 @@ from ..dialog_button import GwDialogButton
 class GwGo2EpaButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
+
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.iterations = 0
         self.project_type = tools_gw.get_project_type()
@@ -36,10 +37,12 @@ class GwGo2EpaButton(GwDialogButton):
 
 
     def clicked_event(self):
+
         self.open_go2epa()
 
 
     def open_go2epa(self):
+
         self.go2epa()
 
 
@@ -509,6 +512,7 @@ class GwGo2EpaButton(GwDialogButton):
 
 
     def update_sql(self):
+
         usql = GwAdminButton()
         usql.init_sql()
 
@@ -599,6 +603,7 @@ class GwGo2EpaButton(GwDialogButton):
 
 
     def hide_colums(self, widget, comuns_to_hide):
+
         for i in range(0, len(comuns_to_hide)):
             widget.hideColumn(comuns_to_hide[i])
 
@@ -726,6 +731,7 @@ class GwGo2EpaButton(GwDialogButton):
 
 
     def set_project_type(self, project_type):
+
         self.project_type = project_type
 
 

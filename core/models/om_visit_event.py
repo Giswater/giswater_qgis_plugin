@@ -41,6 +41,6 @@ class GwOmVisitEvent(GwTable):
     is_last = GwGenericDescriptor(None)
 
     def __init__(self):
-        """ Class constructor """
+
         GwTable.__init__(self, 'om_visit_event', 'id')
 

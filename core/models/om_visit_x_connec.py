@@ -26,6 +26,6 @@ class GwOmVisitXConnec(GwTable):
     is_last = GwGenericDescriptor(None)
 
     def __init__(self):
-        """ Class constructor """
+
         GwTable.__init__(self, 'om_visit_x_connec', 'id')
 

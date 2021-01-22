@@ -31,6 +31,6 @@ class GwConfigVisitParameter(GwTable):
     vdefault = GwGenericDescriptor(None)
 
     def __init__(self):
-        """ Class constructor """
+
         GwTable.__init__(self, 'config_visit_parameter', 'id')
 

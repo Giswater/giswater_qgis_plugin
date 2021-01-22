@@ -36,10 +36,12 @@ class GwToolBoxButton(GwDialogButton):
 
 
     def clicked_event(self):
+
         self.open_toolbox()
 
 
     def open_toolbox(self):
+
         self.no_clickable_items = ['Giswater']
         function_name = "gw_fct_gettoolbox"
         row = tools_db.check_function(function_name)
@@ -229,6 +231,7 @@ class GwToolBoxButton(GwDialogButton):
         else:
             tools_qt.set_checked(dialog, 'rbt_layer', True)
 
+
     def save_settings_values(self, dialog, function):
         """ Save QGIS settings related with toolbox options """
 
@@ -262,7 +265,6 @@ class GwToolBoxButton(GwDialogButton):
 
         if function_name is None:
             return
-
 
         if function[0]['input_params']['featureType']:
             layer = None

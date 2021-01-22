@@ -26,7 +26,6 @@ class GwNodeTypeChangeButton(GwMaptoolButton):
     """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
-        """ Class constructor """
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
@@ -161,16 +160,19 @@ class GwNodeTypeChangeButton(GwMaptoolButton):
     """ QgsMapTools inherited event functions """
 
     def keyPressEvent(self, event):
+
         if event.key() == Qt.Key_Escape:
             self.cancel_map_tool()
             return
 
 
     def canvasReleaseEvent(self, event):
+
         self.nodetype_change(event)
 
 
     def nodetype_change(self, event):
+
         self.node_id = None
 
         # With left click the digitizing is finished
@@ -217,7 +219,9 @@ class GwNodeTypeChangeButton(GwMaptoolButton):
 
 
     def deactivate(self):
+
         # Call parent method
         super().deactivate()
 
     # endregion
+

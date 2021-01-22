@@ -19,7 +19,7 @@ class GwArcFusionButton(GwMaptoolButton):
     """ Button 17: User select one node. Execute SQL function: 'gw_fct_delete_node' """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
-        """ Class constructor """
+
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
 
@@ -60,10 +60,12 @@ class GwArcFusionButton(GwMaptoolButton):
 
 
     def canvasReleaseEvent(self, event):
+
         self.get_arc_fusion(event)
 
 
     def get_arc_fusion(self, event):
+
         if event.button() == Qt.RightButton:
             self.cancel_map_tool()
             return
@@ -128,5 +130,4 @@ class GwArcFusionButton(GwMaptoolButton):
         super().deactivate()
 
     # endregion
-
 

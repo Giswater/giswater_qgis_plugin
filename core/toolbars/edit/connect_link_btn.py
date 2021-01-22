@@ -22,7 +22,6 @@ class GwConnectLinkButton(GwMaptoolButton):
     Execute SQL function: 'gw_fct_setlinktonetwork ' """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
-        """ Class constructor """
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
@@ -120,6 +119,7 @@ class GwConnectLinkButton(GwMaptoolButton):
         layer = tools_qgis.get_layer_by_tablename('v_edit_gully')
         if layer:
             layer.selectByRect(select_geometry, behaviour)
+
 
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
@@ -265,5 +265,4 @@ class GwConnectLinkButton(GwMaptoolButton):
         super().deactivate()
 
     # endregion
-
 

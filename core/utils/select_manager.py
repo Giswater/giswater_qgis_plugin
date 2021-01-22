@@ -20,8 +20,7 @@ class GwSelectManager(QgsMapTool):
 
     def __init__(self, class_object, table_object=None, dialog=None, query=None):
         """
-        Class constructor
-         :param table_object: Class where we will look for @layers, @geom_type, @list_ids, etc
+        :param table_object: Class where we will look for @layers, @geom_type, @list_ids, etc
         :param table_object: (String)
         :param dialog: (QDialog)
         :param query: Used only for psectors

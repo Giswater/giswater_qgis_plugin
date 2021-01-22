@@ -247,6 +247,7 @@ class GwDocument:
 
 
     def insert_doc_sql(self, doc_type, observ, date, path):
+
         sql = (f"INSERT INTO doc (doc_type, path, observ, date)"
                f" VALUES ('{doc_type}', '{path}', '{observ}', '{date}') RETURNING id;")
         new_doc_id = tools_db.execute_returning(sql)
@@ -263,6 +264,7 @@ class GwDocument:
 
 
     def update_doc_tables(self, sql, doc_id, table_object, tablename, item_id, qtable):
+
         # Manage records in tables @table_object_x_@geom_type
         sql += (f"\nDELETE FROM doc_x_node"
                 f" WHERE doc_id = '{doc_id}';")

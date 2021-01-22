@@ -23,10 +23,12 @@ from ....lib import tools_qgis, tools_qt, tools_log, tools_db
 class GwFeatureEndButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
+
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
 
     def clicked_event(self):
+
         # Get layers of every geom_type
 
         # Setting lists
@@ -119,7 +121,6 @@ class GwFeatureEndButton(GwDialogButton):
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end', maximize_button=False)
-
 
 
     def set_edit_arc_downgrade_force(self, value):

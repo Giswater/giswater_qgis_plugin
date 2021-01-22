@@ -48,7 +48,6 @@ class GwInfo(QObject):
     signal_activate = pyqtSignal()
 
     def __init__(self, tab_type):
-        """ Class constructor """
 
         super().__init__()
 
@@ -3334,8 +3333,8 @@ class GwInfo(QObject):
 
 
     def get_id(self, dialog, action, option, emit_point, point, event):
-
         """ Get selected attribute from snapped feature """
+
         # @options{'key':['att to get from snapped feature', 'widget name destination']}
         options = {'arc': ['arc_id', 'data_arc_id'], 'node': ['node_id', 'data_parent_id'],
                    'set_to_arc': ['arc_id', 'set_to_arc']}
@@ -3369,8 +3368,8 @@ class GwInfo(QObject):
         """  Function called in def get_id(self, dialog, action, option, point, event):
                 getattr(self, options[option][1])(feat_id)
         :param feat_id: Id of the snapped feature
-        :return:
         """
+
         w_dma_id = self.dlg_cf.findChild(QComboBox, 'data_dma_id')
         dma_id = tools_qt.get_combo_value(self.dlg_cf, w_dma_id)
         w_presszone_id = self.dlg_cf.findChild(QComboBox, 'data_presszone_id')
@@ -3428,6 +3427,7 @@ class GwInfo(QObject):
 
     def add_feature(self, feature_cat):
         """ Button 01, 02: Add 'node' or 'arc' """
+
         global is_inserting
         if is_inserting:
             msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
@@ -3467,6 +3467,7 @@ class GwInfo(QObject):
 
     def action_is_checked(self):
         """ Recover snapping options when action add feature is un-checked """
+
         if not self.iface.actionAddFeature().isChecked():
             self.snapper_manager.recover_snapping_options()
             self.iface.actionAddFeature().toggled.disconnect(self.action_is_checked)

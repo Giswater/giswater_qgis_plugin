@@ -129,6 +129,7 @@ class GwMaptoolButton(QgsMapTool):
 
 
     def recover_previus_maptool(self):
+
         if self.prev_maptool:
             self.iface.mapCanvas().setMapTool(self.prev_maptool)
             self.prev_maptool = None
@@ -136,6 +137,7 @@ class GwMaptoolButton(QgsMapTool):
 
     def remove_vertex(self):
         """ Remove vertex_marker from canvas"""
+
         vertex_items = [i for i in self.iface.mapCanvas().scene().items() if issubclass(type(i), QgsVertexMarker)]
 
         for ver in vertex_items:

@@ -7,7 +7,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from ..dialog_button import GwDialogButton
 from ...shared.selector import GwSelector
-
 from ....core.utils import tools_gw
 
 

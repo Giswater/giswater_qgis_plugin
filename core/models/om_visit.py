@@ -33,6 +33,6 @@ class GwOmVisit(GwTable):
     status = GwGenericDescriptor(None)
 
     def __init__(self):
-        """ Class constructor """
+
         GwTable.__init__(self, 'om_visit', 'id')
 

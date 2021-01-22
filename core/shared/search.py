@@ -32,7 +32,6 @@ from ...lib import tools_db, tools_qgis, tools_qt
 class GwSearch:
 
     def __init__(self):
-        """ Class constructor """
 
         self.manage_new_psector = GwPsector()
         self.manage_visit = GwVisit()
@@ -59,6 +58,7 @@ class GwSearch:
 
 
     def open_search(self, dlg_mincut=None, load_project=False):
+
         # If search is open, dont let user open another one
         open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "sessions")
         if open_search in ("True", "true", True) and dlg_mincut is None and load_project is False:
@@ -575,6 +575,7 @@ class GwSearch:
 
     def restore_selectors(self, current_selectors):
         """ Restore selector_expl and selector_state to how the user had it """
+
         qgis_project_add_schema = tools_qgis.get_plugin_settings_value('gwAddSchema')
         for form_tab in current_selectors['body']['form']['formTabs']:
             if form_tab['tableName'] not in ('selector_expl', 'selector_state'):

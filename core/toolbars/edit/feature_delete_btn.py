@@ -19,6 +19,7 @@ from ....lib import tools_qgis, tools_qt, tools_db
 class GwFeatureDeleteButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
+
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.dlg_feature_delete = None
 
@@ -194,6 +195,7 @@ class GwFeatureDeleteButton(GwDialogButton):
 
 
     def set_active_layer(self):
+
         self.dlg_feature_delete.feature_id.setStyleSheet(None)
 
         # Get current layer and remove selection

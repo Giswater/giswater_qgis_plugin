@@ -22,8 +22,8 @@ from .mincut_tools import GwMincutTools
 from .search import GwSearch
 from ..threads.task import GwTask
 from ..utils import tools_gw
-from ..ui.ui_manager import GwDialogTextUi, GwMincutUi, GwMincutComposerUi, GwMincutConnecUi, GwMincutEndUi, GwMincutHydrometerUi, \
-    GwMincutManagerUi
+from ..ui.ui_manager import GwDialogTextUi, GwMincutUi, GwMincutComposerUi, GwMincutConnecUi, GwMincutEndUi, \
+    GwMincutHydrometerUi, GwMincutManagerUi
 from ... import global_vars
 from ...lib import tools_qt, tools_qgis, tools_log, tools_db
 from ..utils.select_manager import GwSelectManager
@@ -33,7 +33,6 @@ from ..utils.snap_manager import GwSnapManager
 class GwMincut:
 
     def __init__(self):
-        """ Class constructor """
 
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
@@ -105,8 +104,8 @@ class GwMincut:
 
     def init_mincut_form(self):
         """ Custom form initial configuration """
-        # Setting lists
 
+        # Setting lists
         self.mincut_class = 1
         self.user_current_layer = self.iface.activeLayer()
         self.init_mincut_canvas()
@@ -1364,6 +1363,7 @@ class GwMincut:
 
     def auto_mincut(self):
         """ B1-126: Automatic mincut analysis """
+
         self.mincut_class = 1
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)

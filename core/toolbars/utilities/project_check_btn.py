@@ -14,14 +14,17 @@ from ....lib import tools_qgis
 class GwProjectCheckButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
+
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
 
     def clicked_event(self):
+
         self.open_check_project()
 
 
     def open_check_project(self):
+
         # Return layers in the same order as listed in TOC
         layers = tools_qgis.get_project_layers()
 

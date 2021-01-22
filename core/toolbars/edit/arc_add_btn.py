@@ -19,6 +19,7 @@ from ....lib import tools_os
 class GwArcAddButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
+
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
         # First add the menu before adding it to the toolbar

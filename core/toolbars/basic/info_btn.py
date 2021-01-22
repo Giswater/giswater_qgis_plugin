@@ -26,6 +26,7 @@ from ....lib import tools_qgis
 class GwInfoButton(GwMaptoolButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
+
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
         self.rubber_band = QgsRubberBand(global_vars.canvas)
@@ -51,6 +52,7 @@ class GwInfoButton(GwMaptoolButton):
 
     def reactivate_map_tool(self):
         """ Reactivate tool """
+
         self.block_signal = True
         info_action = self.iface.mainWindow().findChild(QAction, self.action_name)
         info_action.trigger()
@@ -194,10 +196,12 @@ class GwInfoButton(GwMaptoolButton):
 
 
     def canvasReleaseEvent(self, event):
+
         self.get_info(event)
 
 
     def get_info(self, event):
+
         for rb in self.rubberband_list:
             rb.reset()
 
@@ -228,6 +232,7 @@ class GwInfoButton(GwMaptoolButton):
 
 
     def activate(self):
+
         if info.is_inserting:
             msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
             tools_qgis.show_message(msg)
@@ -245,6 +250,7 @@ class GwInfoButton(GwMaptoolButton):
 
 
     def deactivate(self):
+
         if hasattr(self, 'rubberband_list'):
             for rb in self.rubberband_list:
                 rb.reset()

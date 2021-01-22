@@ -552,6 +552,7 @@ class GwPsector:
 
 
     def generate_rapports(self):
+
         tools_gw.set_config_parser('psector_rapport', 'psector_rapport_path',
                                    f"{tools_qt.get_text(self.dlg_psector_rapport, 'txt_path')}")
         tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_composer',
@@ -605,6 +606,7 @@ class GwPsector:
 
 
     def generate_composer(self, path):
+
         # Get layout manager object
         layout_manager = QgsProject.instance().layoutManager()
 
@@ -1241,6 +1243,7 @@ class GwPsector:
             1: OnRowChange
             2: OnManualSubmit
         """
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
@@ -1593,6 +1596,7 @@ class GwPsector:
 
 
     def update_price_vdefault(self):
+
         selected_list = self.dlg_merm.tbl_om_result_cat.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -1681,7 +1685,9 @@ class GwPsector:
 
             global_vars.iface.mapCanvas().zoomScale(float(scale))
 
+
     # region private functions
+
     def _enable_layers(self, is_cheked):
         """ Manage checkbox state and act accordingly with the layers """
 
@@ -1723,4 +1729,5 @@ class GwPsector:
             if layer is None or QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
                 all_checked = False
         return all_checked
+
     # endregion

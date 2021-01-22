@@ -22,7 +22,6 @@ from ...lib import tools_qgis, tools_qt, tools_db
 class GwMincutTools:
 
     def __init__(self, mincut):
-        """ Class constructor """
 
         self.mincut = mincut
         self.canvas = global_vars.canvas

@@ -23,7 +23,6 @@ class GwAuxPointAddButton(GwMaptoolButton):
     """ Button 72: Add point """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
-        """ Class constructor """
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CROSS)
@@ -59,6 +58,7 @@ class GwAuxPointAddButton(GwMaptoolButton):
 
 
     def get_values(self, point_1, point_2):
+
         tools_gw.set_config_parser('cadtools', f"{self.dlg_create_point.rb_left.objectName()}",
                                    f"{self.dlg_create_point.rb_left.isChecked()}")
 
@@ -142,7 +142,9 @@ class GwAuxPointAddButton(GwMaptoolButton):
 
 
     def canvasReleaseEvent(self, event):
+
         self.add_aux_point(event)
+
 
     def add_aux_point(self, event):
         if event.button() == Qt.LeftButton:

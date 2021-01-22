@@ -20,7 +20,6 @@ from ...lib import tools_qgis
 class GwSnapManager(object):
 
     def __init__(self, iface):
-        """ Class constructor """
 
         self.iface = iface
         self.canvas = self.iface.mapCanvas()

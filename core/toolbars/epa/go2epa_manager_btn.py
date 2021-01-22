@@ -20,14 +20,17 @@ from ....lib import tools_qt, tools_db, tools_qgis
 class GwGo2EpaManagerButton(GwDialogButton):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
+
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
 
     def clicked_event(self):
+
         self.manage_go2epa()
 
 
     def manage_go2epa(self):
+
         # Create the dialog
         self.dlg_manager = GwEpaManagerUi()
         tools_gw.load_settings(self.dlg_manager)

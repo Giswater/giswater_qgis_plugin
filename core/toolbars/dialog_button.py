@@ -46,4 +46,6 @@ class GwDialogButton:
 
 
     def clicked_event(self):
+
         tools_qgis.show_message("Action has no function!!", "INFO")
+

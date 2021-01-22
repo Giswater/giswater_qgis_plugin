@@ -16,7 +16,6 @@ class GwFlowTraceButton(GwMaptoolButton):
     """ Button 56: Flow trace """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
-        """ Class constructor """
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.layers_added = []
@@ -44,6 +43,7 @@ class GwFlowTraceButton(GwMaptoolButton):
 
 
     def set_flow_trace(self, event):
+
         if event.button() == Qt.LeftButton and self.current_layer:
 
             # Execute SQL function

@@ -109,7 +109,9 @@ class GwCatalog:
                     widget.currentIndexChanged.connect(partial(tools_gw.fill_child, self.dlg_catalog, widget, 'catalog', geom_type))
                     widget.currentIndexChanged.connect(partial(self._populate_catalog_id, geom_type))
 
+
     # region private functions
+
     def _get_catalog(self, matcat_id, pnom, dnom, id, feature_type, geom_type):
         """ Execute gw_fct_getcatalog """
 
@@ -163,6 +165,7 @@ class GwCatalog:
 
     def _populate_catalog_id(self, geom_type):
         """ Execute gw_api_get_catalog_id and fill combo id """
+
         # Get widgets
         widget_metcat_id = self.dlg_catalog.findChild(QComboBox, 'matcat_id')
         widget_pn = self.dlg_catalog.findChild(QComboBox, 'pnom')
@@ -183,6 +186,7 @@ class GwCatalog:
     
     def _add_combobox(self, field):
         """ Add QComboBox to dialog """
+
         widget = QComboBox()
         widget.setObjectName(field['columnname'])
         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
@@ -199,6 +203,7 @@ class GwCatalog:
         :param field: json where find values (Json)
         :return:
         """
+
         # Generate list of items to add into combo
         widget.blockSignals(True)
         widget.clear()
@@ -222,7 +227,6 @@ class GwCatalog:
 
         widget_id = self.dlg_catalog.findChild(QComboBox, 'id')
         catalog_id = tools_qt.get_text(self.dlg_catalog, widget_id)
-
         widget = previous_dialog.findChild(QWidget, widget_name)
 
         if type(widget) is QLineEdit:

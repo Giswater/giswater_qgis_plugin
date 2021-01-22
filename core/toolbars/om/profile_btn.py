@@ -58,7 +58,6 @@ class GwProfileButton(GwDialogButton):
     """ Button 43: Draw_profiles """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
-        """ Class constructor """
 
         # Call ParentDialog constructor
         super().__init__(icon_path, action_name, text, toolbar, action_group)
@@ -396,7 +395,7 @@ class GwProfileButton(GwDialogButton):
         except TypeError as e:
             self.controller.log_info(f"{type(e).__name__} --> {e}")
 
-        if action_pan is True:
+        if action_pan:
             self.iface.actionPan().trigger()
         try:
             self.vertex_marker.hide()
@@ -1371,6 +1370,7 @@ class GwProfileButton(GwDialogButton):
 
 
     def get_stylesheet(self, data_type='REAL'):
+
         # TODO: Enhance this function, manage all case for data_type, harmonie REAL/TOP-REAL...
         # getting stylesheet
         line_style = ''
@@ -1384,4 +1384,5 @@ class GwProfileButton(GwDialogButton):
             line_style = self.profile_json['body']['data']['stylesheet']['infra']['interpolated']['style']
             line_color = self.profile_json['body']['data']['stylesheet']['infra']['interpolated']['color']
             line_width = self.profile_json['body']['data']['stylesheet']['infra']['interpolated']['width']
+
         return line_style, line_color, line_width
