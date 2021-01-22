@@ -232,6 +232,9 @@ BEGIN
 		-- forcing state selector for user
 		UPDATE sys_param_user SET vdefault = '1', ismandatory =  true WHERE id ='edit_state_vdefault';
 		
+		-- force all cat feature not active in order to increase step-by-step 
+		UPDATE cat_feature SET active = false;
+		
 	ELSIF v_isnew IS FALSE THEN
 		
 		v_oldversion = (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1);
