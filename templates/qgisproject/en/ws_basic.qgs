@@ -7802,7 +7802,7 @@ def my_form_open(dialog, layer, feature):
 	geom = feature.geometry()
 	control = dialog.findChild(QWidget, "MyLineEdit")
 ]]></editforminitcode>
-      <featformsuppress>2</featformsuppress>
+      <featformsuppress>1</featformsuppress>
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field name="dma_id" editable="1"/>
