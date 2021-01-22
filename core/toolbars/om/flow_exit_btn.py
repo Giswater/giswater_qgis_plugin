@@ -106,5 +106,5 @@ class GwFlowExitButton(GwMaptoolButton):
         # Call parent method
         super().deactivate()
 
-    # enregion
+    # endregion
 
