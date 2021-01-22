@@ -24,42 +24,46 @@ class GwI18NGenerator:
 
 
     def init_dialog(self):
-
+        """ Constructor """
+        
         self.dlg_qm = GwAdminTranslationUi()
         tools_gw.load_settings(self.dlg_qm)
-        self.load_user_values()
+        self._load_user_values()
 
         self.dlg_qm.btn_translate.setEnabled(False)
         # Mysteriously without the partial the function check_connection is not called
-        self.dlg_qm.btn_connection.clicked.connect(partial(self.check_connection))
-        self.dlg_qm.btn_translate.clicked.connect(self.check_translate_options)
+        self.dlg_qm.btn_connection.clicked.connect(partial(self._check_connection))
+        self.dlg_qm.btn_translate.clicked.connect(self._check_translate_options)
         self.dlg_qm.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_qm))
-        self.dlg_qm.rejected.connect(self.save_user_values)
-        self.dlg_qm.rejected.connect(self.close_db)
+        self.dlg_qm.rejected.connect(self._save_user_values)
+        self.dlg_qm.rejected.connect(self._close_db)
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_translation')
 
+    # region private functions
 
-    def check_connection(self):
+    def _check_connection(self):
         """ Check connection to database """
+        
         self.dlg_qm.cmb_language.clear()
         self.dlg_qm.lbl_info.clear()
-        self.close_db()
+        self._close_db()
         host = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host)
         port = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_port)
         db = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_db)
         user = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_user)
         password = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_pass)
-        status = self.init_db(host, port, db, user, password)
+        status = self._init_db(host, port, db, user, password)
 
         if not status:
             self.dlg_qm.btn_translate.setEnabled(False)
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', self.last_error)
             return
-        self.populate_cmb_language()
+        self._populate_cmb_language()
 
 
-    def populate_cmb_language(self):
-        """ Populate combo with languages values """ 
+    def _populate_cmb_language(self):
+        """ Populate combo with languages values """
+
         self.dlg_qm.btn_translate.setEnabled(True)
         host = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f'Connected to {host}')
@@ -71,7 +75,9 @@ class GwI18NGenerator:
         tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0)
 
 
-    def check_translate_options(self):
+    def _check_translate_options(self):
+        """ Checkthe translation options selected by the user """
+
         py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
         db_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_msg)
         self.dlg_qm.lbl_info.clear()
@@ -79,7 +85,7 @@ class GwI18NGenerator:
         self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         self.lower_lang = self.language.lower()
         if py_msg:
-            status_py_msg = self.create_py_files()
+            status_py_msg = self.__create_py_files()
             if status_py_msg is True:
                 msg += "Python translation successful\n"
             elif status_py_msg is False:
@@ -88,7 +94,7 @@ class GwI18NGenerator:
                 msg += "Python translation canceled\n"
 
         if db_msg:
-            status_cfg_msg = self.create_db_files()
+            status_cfg_msg = self._create_db_files()
             if status_cfg_msg is True:
                 msg += "Data base translation successful\n"
             elif status_cfg_msg is False:
@@ -100,7 +106,7 @@ class GwI18NGenerator:
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
 
 
-    def create_py_files(self):
+    def _create_py_files(self):
         """ Read the values of the database and generate the ts and qm files """
         # On the database, the dialog_name column must match the name of the ui file (no extension).
         # Also, open_dialog function must be called, passed as parameter dlg_name = 'ui_file_name_without_extension'
@@ -187,7 +193,7 @@ class GwI18NGenerator:
                 name = py_dlg['dialog_name']
                 line = '\t<context>\n'
                 line += f'\t\t<name>{name}</name>\n'
-                title = self.get_title(py_dialogs, name, key_label)
+                title = self._get_title(py_dialogs, name, key_label)
                 if title:
                     line += f'\t\t<message>\n'
                     line += f'\t\t\t<source>title</source>\n'
@@ -227,7 +233,9 @@ class GwI18NGenerator:
             return False
 
 
-    def get_title(self, py_dialogs, name, key_label):
+    def _get_title(self, py_dialogs, name, key_label):
+        """ Return title according languaje """
+
         title = None
         for py in py_dialogs:
             if py['source'] == f'dlg_{name}':
@@ -238,7 +246,7 @@ class GwI18NGenerator:
         return title
 
 
-    def create_db_files(self):
+    def _create_db_files(self):
         """ Read the values of the database and update the i18n files """
 
         higher_version = tools_qgis.get_higher_version().replace(".", "")
@@ -257,20 +265,21 @@ class GwI18NGenerator:
         else:
             os.makedirs(cfg_path, exist_ok=True)
 
-        self.write_header(cfg_path + file_name)
+        self._write_header(cfg_path + file_name)
 
-        rows = self.get_dbdialog_values()
-        status = self.write_dbdialog_values(rows, cfg_path + file_name)
+        rows = self._get_dbdialog_values()
+        status = self._write_dbdialog_values(rows, cfg_path + file_name)
 
-        rows = self.get_dbmessages_values()
-        status = self.write_dbmessages_values(rows, cfg_path + file_name)
+        rows = self._get_dbmessages_values()
+        status = self._write_dbmessages_values(rows, cfg_path + file_name)
 
 
         return status
 
 
-    def get_dbdialog_values(self):
-        # Get db messages values
+    def _get_dbdialog_values(self):
+        """ Get db dialog values """
+
         sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_en, lb_{self.lower_lang}, tt_en_en, "
                f"tt_{self.lower_lang}"
                f" FROM i18n.dbdialog "
@@ -281,8 +290,9 @@ class GwI18NGenerator:
         return rows
 
 
-    def get_dbmessages_values(self):
-        # Get db messages values
+    def _get_dbmessages_values(self):
+        """ Get db messages values """
+
         sql = (f"SELECT source, project_type, context, ms_en_en, ms_{self.lower_lang}, ht_en_en, ht_{self.lower_lang}"
                f" FROM i18n.dbmessage "
                f" ORDER BY context;")
@@ -292,7 +302,11 @@ class GwI18NGenerator:
         return rows
 
 
-    def write_header(self, path):
+    def _write_header(self, path):
+        """ Write the file header
+        :param path: Full destination path (String)
+        """
+
         file = open(path, "w")
         header = (f'/*\n'
                   f'This file is part of Giswater 3\n'
@@ -307,7 +321,7 @@ class GwI18NGenerator:
         del file
 
 
-    def write_dbdialog_values(self, rows, path):
+    def _write_dbdialog_values(self, rows, path):
         """ Generate a string and write into file
         :param rows: List of values ([List][list])
         :param path: Full destination path (String)
@@ -367,8 +381,8 @@ class GwI18NGenerator:
         del file
         return True
 
-    def write_dbmessages_values(self, rows, path):
 
+    def _write_dbmessages_values(self, rows, path):
         """ Generate a string and write into file
         :param rows: List of values ([List][list])
         :param path: Full destination path (String)
@@ -401,7 +415,7 @@ class GwI18NGenerator:
         return True
 
 
-    def save_user_values(self):
+    def _save_user_values(self):
         """ Save selected user values """
 
         host = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host, return_string_null=False)
@@ -420,7 +434,7 @@ class GwI18NGenerator:
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_db_msg', f"{db_msg}", "user", "init")
 
 
-    def load_user_values(self):
+    def _load_user_values(self):
         """ Load last selected user values
         :return: Dictionary with values
         """
@@ -439,7 +453,7 @@ class GwI18NGenerator:
         tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_db_msg, db_msg)
         
 
-    def init_db(self, host, port, db, user, password):
+    def _init_db(self, host, port, db, user, password):
         """ Initializes database connection """
 
         self.conn = None
@@ -454,7 +468,7 @@ class GwI18NGenerator:
         return status
 
 
-    def close_db(self):
+    def _close_db(self):
         """ Close database connection """
 
         try:
@@ -472,12 +486,12 @@ class GwI18NGenerator:
         return status
 
 
-    def commit(self):
+    def _commit(self):
         """ Commit current database transaction """
         self.conn.commit()
 
 
-    def rollback(self):
+    def _rollback(self):
         """ Rollback current database transaction """
         self.conn.rollback()
 
@@ -491,10 +505,11 @@ class GwI18NGenerator:
             self.cursor.execute(sql)
             rows = self.cursor.fetchall()
             if commit:
-                self.commit()
+                self._commit()
         except Exception as e:
             self.last_error = e
             if commit:
-                self.rollback()
+                self._rollback()
         finally:
             return rows
+    # endregion
