@@ -20,3 +20,5 @@ TRUE, 6, 'utils', FALSE, FALSE, 'boolean', 'check', FALSE, TRUE, 'lyt_system');
             
 UPDATE config_param_system SET layoutorder=8 where parameter='admin_currency';
 
+UPDATE config_form_fields SET dv_parent_id = null, dv_querytext_filterc = null where formtype =  'form_catalog' and columnname = 'matcat_id';
+
