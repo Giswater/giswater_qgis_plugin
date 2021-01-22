@@ -450,15 +450,12 @@ class GwProfileButton(GwDialogButton):
         self.plot = plt
 
         # If file profile.png exist overwrite
-        main_folder = os.path.join(tools_os.get_datadir(), global_vars.roaming_user_dir)
-
-        temp_folder = main_folder + os.sep + "temp"
-        img_path = temp_folder + os.sep + "profile.png"
+        temp_folder = f"{global_vars.roaming_user_dir}{os.sep}temp"
+        img_path = f"{temp_folder}{os.sep}profile.png"
         if not os.path.exists(img_path):
             os.makedirs(temp_folder)
         else:
             tools_log.log_info(f"User settings file: {img_path}")
-
 
         fig_size = plt.rcParams["figure.figsize"]
 
