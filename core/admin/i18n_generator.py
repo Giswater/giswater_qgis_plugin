@@ -43,7 +43,7 @@ class GwI18NGenerator:
 
     def _check_connection(self):
         """ Check connection to database """
-        
+
         self.dlg_qm.cmb_language.clear()
         self.dlg_qm.lbl_info.clear()
         self._close_db()
