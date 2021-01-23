@@ -11,3 +11,10 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- parent:
 ALTER TABLE config_mincut_valve RENAME TO config_valve;
 ALTER TABLE config_mincut_checkvalve  RENAME TO config_checkvalve;
+
+-- 2021/01/21
+DROP FUNCTION IF EXISTS gw_fct_mincut(character varying, character varying, integer, text);
+DROP FUNCTION IF EXISTS gw_fct_mincut(character varying, character varying, integer, bigint, bigint);
+
+-- 2021/01/23
+UPDATE cat_feature_node SET graf_delimiter  ='CHECKVALVE' WHERE id = 'CHECK-VALVE';

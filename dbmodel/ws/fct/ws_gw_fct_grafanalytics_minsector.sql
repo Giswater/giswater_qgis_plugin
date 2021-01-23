@@ -22,6 +22,9 @@ select distinct(sector_id) from SCHEMA_NAME.arc where expl_id=1
 
 select * from exploitation order by 1
 
+
+ SELECT gw_fct_grafanalytics_minsector($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"exploitation":"[1]", "usePsectors":"false", "updateFeature":"false", "updateMinsectorGeom":"2", "geomParamUpdate":"10"}}}$$);
+
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_minsector('{"data":{"parameters":{"arc":"2002", "checkQualityData": true, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2, "geomParamUpdate":10}}}')
 
 delete from SCHEMA_NAME.audit_log_data;
@@ -34,6 +37,7 @@ SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fid=134 AND cur_user=current_user
 SELECT distinct(minsector_id) FROM SCHEMA_NAME.v_edit_arc
 
 --fid: 125,134
+
 
 MAIN
 ----
@@ -80,6 +84,7 @@ v_concavehull float = 0.85;
 v_error_context text;
 v_checkdata boolean;
 v_maxmsector integer = 0;
+v_returnerror boolean = false;
 
 BEGIN
 
@@ -138,19 +143,7 @@ BEGIN
 	-- Starting process
 	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('MINSECTOR DYNAMIC SECTORITZATION'));
 	INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, concat('---------------------------------------------------'));
-	IF v_usepsectors THEN
-		SELECT count(*) INTO v_count FROM selector_psector WHERE cur_user = current_user;
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid,
-		concat('INFO: Plan psector strategy is enabled. The number of psectors used on this analysis is ', v_count));
-	ELSE 
-		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid,
-		concat('INFO: All psectors have been disabled to execute this analysis'));
-	END IF;
-		
-	-- reset selectors
-	DELETE FROM selector_state WHERE cur_user=current_user;
-	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
-
+	
 	-- use masterplan
 	IF v_usepsectors IS NOT TRUE THEN
 		DELETE FROM selector_psector WHERE cur_user=current_user;
@@ -158,9 +151,33 @@ BEGIN
 
 	-- reset exploitation
 	IF v_expl IS NOT NULL THEN
-		DELETE FROM selector_expl WHERE cur_user=current_user;
-		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl_id)a USING (expl_id) ;
+		
+		IF substring(v_expl::text,0,2)='[' THEN
+			DELETE FROM selector_expl WHERE cur_user=current_user;
+			INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl_id)a USING (expl_id) ;
+		ELSE
+			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid,
+			concat('ERROR: Please entry exploitation id''s as tooltip shows using []'));
+			DELETE FROM selector_expl WHERE cur_user=current_user;  
+			v_returnerror = true;
+			 --dissabling all:
+			v_updatemapzgeom = 0;
+	
+		END IF;
 	END IF;
+
+	IF v_usepsectors THEN
+		SELECT count(*) INTO v_count FROM selector_psector WHERE cur_user = current_user;
+		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid,
+		concat('INFO: Plan psector strategy is enabled. The number of psectors used on this analysis is ', v_count));
+	ELSIF v_usepsectors IS FALSE AND v_returnerror IS FALSE THEN
+		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid,
+		concat('INFO: All psectors have been disabled to execute this analysis'));
+	END IF;
+		
+	-- reset selectors
+	DELETE FROM selector_state WHERE cur_user=current_user;
+	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 
 	-- create graf
 	IF v_maxmsector > 0 THEN
@@ -278,7 +295,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, error_message)
 		VALUES (v_fid, concat('WARNING: Minsector attribute (minsector_id) on arc/node/connec features have been updated by this process'));
 		
-	ELSE
+	ELSIF v_updatefeature IS FALSE and v_returnerror IS FALSE THEN
 		-- message
 		INSERT INTO audit_check_data (fid, error_message)
 		VALUES (v_fid, concat('INFO: Minsector attribute (minsector_id) on arc/node/connec features keeps same value previous function. Nothing have been updated by this process'));

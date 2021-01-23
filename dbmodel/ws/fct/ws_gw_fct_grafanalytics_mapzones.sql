@@ -409,10 +409,15 @@ BEGIN
 			-- close customized stoppers acording on grafconfig column on mapzone table
 			EXECUTE 'UPDATE temp_anlgraf SET flag = 1 WHERE node_1 IN (SELECT (json_array_elements_text((grafconfig->>''stopper'')::json)) as node_id FROM '||quote_ident(v_table)||')';
 			EXECUTE 'UPDATE temp_anlgraf SET flag = 1 WHERE node_2 IN (SELECT (json_array_elements_text((grafconfig->>''stopper'')::json)) as node_id FROM '||quote_ident(v_table)||')';
+	
+			-- close checkvalves on the opposite sense where they are working
+			UPDATE temp_anlgraf SET flag=1 WHERE id IN (
+					SELECT id FROM temp_anlgraf JOIN (
+					SELECT node_id, to_arc from config_mincut_checkvalve order by 1,2
+					) a 
+					ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_2::integer);
 
-				
-			-- open boundary conditions set flag=0 for graf delimiters that have been setted to 1 on query before BUT ONLY ENABLING the right sense (to_arc)
-			
+			-- open boundary conditions set flag=0 for graf delimiters that have been setted to 1 on query before BUT ONLY ENABLING the right sense (to_arc)			
 			-- in function of graf class
 			IF v_class = 'SECTOR' THEN
 				-- sector (sector.grafconfig)
