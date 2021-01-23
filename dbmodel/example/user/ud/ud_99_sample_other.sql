@@ -273,10 +273,7 @@ SELECT gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES"},
 
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
 
---deprecated fields
-UPDATE arc SET _sys_length=NULL;
 UPDATE node SET elev = null WHERE top_elev IS NOT NULL AND ymax IS NOT NULL;
-
 UPDATE connec SET customer_code = concat('cc',connec_id);
 
 UPDATE cat_grate SET cost_ut = 'N_BGRT1' WHERE id='N/I';

@@ -230,14 +230,17 @@ BEGIN
 			WHERE columnname='matcat_id' AND formname LIKE 've_arc%';
 		END IF;
 
-		-- forcing state selector for user
+		-- forcing user variables in order to enhance usability for new projects
 		UPDATE sys_param_user SET vdefault = '1', ismandatory =  true WHERE id ='edit_state_vdefault';
+		UPDATE sys_param_user SET vdefault = 'true', ismandatory = true WHERE id ='qgis_info_docker';
+		UPDATE sys_param_user SET vdefault = 'true', ismandatory = true WHERE id ='qgis_form_docker';
+
 		
 		-- force all cat feature not active in order to increase step-by-step 
 		UPDATE cat_feature SET active = false;
 		
-		-- force nodeinsert automatic endpoint
-		UPDATE sys_param_user SET vdefault = 'true', ismandatory = true WHERE id ='edit_arc_insert_automatic_endpoint';
+		-- hidden lastupdate and lastupdate_user columns
+		update config_form_fields SET hidden = true WHERE columnname IN ('lastupdate', 'lastupdate_user', 'publish', 'uncertain');
 		
 	ELSIF v_isnew IS FALSE THEN
 		
