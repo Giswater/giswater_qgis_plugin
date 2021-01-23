@@ -6,6 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+UPDATE cat_feature SET active = true;
 
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('feat_pipecat_vdefault', 'FC110-PN10', current_user);
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector_measurement_vdefault', '1', current_user);
