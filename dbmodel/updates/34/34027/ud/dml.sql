@@ -11,7 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- 2021/01/22
 INSERT INTO macroexploitation VALUES ('0', 'Undefined', 'Undefined');
 INSERT INTO exploitation VALUES (0, 'Undefined', 0, NULL, NULL, NULL, null, TRUE);
-INSERT INTO macrodma VALUES (1, 'Undefined', 0, NULL, NULL);
-INSERT INTO dma VALUES (1, 'Undefined', 0, NULL, NULL, NULL);
+INSERT INTO macrodma VALUES (0, 'Undefined', 0, NULL, NULL);
+INSERT INTO dma VALUES (0, 'Undefined', 0, NULL, NULL, NULL);
 INSERT INTO macrosector VALUES (0, 'Undefined','Undefined', NULL);
 INSERT INTO sector VALUES (0, 'Undefined', 0, 'Undefined', NULL);
