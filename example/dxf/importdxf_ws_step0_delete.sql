@@ -1,7 +1,6 @@
 
 SET search_path=SCHEMA_NAME;
---add import dxf to toolbox
-UPDATE audit_cat_function  set istoolbox=true where id=2784;
+
 --delete arc
 SELECT gw_fct_feature_delete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"type":"ARC"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_id":"113857"}}$$)::text;
 SELECT gw_fct_feature_delete($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"type":"ARC"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_id":"113935"}}$$)::text;
