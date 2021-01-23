@@ -221,6 +221,15 @@ BEGIN
 		DELETE FROM temp_arc WHERE arc_id IN (SELECT arc_id FROM anl_arc WHERE fid = 103 AND cur_user=current_user);
 	END IF;
 
+	-- update values from inp_*_importinp tables
+	UPDATE temp_arc t SET status = b.status, diameter = b.diameter, epa_type ='VALVE',
+	addparam = concat('{"valv_type":"',valv_type,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "flow":"',flow,'", "pressure":"',pressure,'", "status":"',b.status,'", "minorloss":"',b.minorloss,'"}')
+	FROM inp_valve_importinp b WHERE t.arc_id = b.arc_id;
+
+	UPDATE temp_arc t SET status = b.status, epa_type ='PUMP',
+	addparam = concat('{"power":"',power,'", "speed":"',speed,'", "curve_id":"',curve_id,'", "pattern":"',pattern,'", "energyparam":"',energyparam,'", "status":"',b.status,'", "energyvalue":"',b.energyvalue,'"}')
+	FROM inp_pump_importinp b WHERE t.arc_id = b.arc_id;
+
 	-- when is forced to remove demand on disconnected nodes (variable of inp_options_debug)
 	IF v_removedemand THEN
 		RAISE NOTICE '21 Set demand = 0 for dry nodes';

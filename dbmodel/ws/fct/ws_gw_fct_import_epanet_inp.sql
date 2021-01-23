@@ -575,7 +575,11 @@ BEGIN
 		UPDATE config_param_system SET value=0.1 where parameter = 'edit_arc_searchnodes';
 
 
-	RAISE NOTICE 'step-7/7';
+	RAISE NOTICE 'step-7/7 - last';
+	INSERT INTO selector_sector VALUES (1,current_user);
+	UPDATE arc SET code = arc_id;
+	UPDATE node SET code = node_id;
+	UPDATE config_param_user SET value = '13' WHERE parameter  = 'inp_options_patternmethod';
 	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Enabling constraints -> Done');
 	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Process finished');
 		
