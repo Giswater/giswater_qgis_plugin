@@ -346,10 +346,8 @@ BEGIN
 	INSERT INTO inp_pipe SELECT csv1, csv7::numeric(12,6), csv8 FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 	INSERT INTO man_pipe SELECT csv1 FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
-
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-
-	FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename NOT IN ('vi_pipes', 'vi_junctions') order by orderby
+	FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid2=v_fid AND tablename NOT IN ('vi_pipes', 'vi_junctions', 'vi_status') order by orderby
 	LOOP
 		--identifing the number of fields of the editable view
 		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
@@ -375,6 +373,11 @@ BEGIN
 		EXECUTE v_sql;
 		
 	END LOOP;
+
+	-- update status
+	UPDATE inp_valve_importinp SET status = csv2 FROM temp_csv where source='[STATUS]'  and arc_id = csv1;
+	UPDATE inp_pump_importinp SET status = csv2 FROM temp_csv where source='[STATUS]' and arc_id = csv1;
+
 
 	-- disable temporary the constraint in order to use ON CONFLICT on insert
 	ALTER TABLE config_param_user DROP CONSTRAINT config_param_user_parameter_cur_user_unique;
@@ -574,17 +577,16 @@ BEGIN
 		-- restore default default values
 		UPDATE config_param_system SET value=0.1 where parameter = 'edit_arc_searchnodes';
 
+	END IF;
 
 	RAISE NOTICE 'step-7/7 - last';
-	INSERT INTO selector_sector VALUES (1,current_user);
+	INSERT INTO selector_sector VALUES (1,current_user) ON CONFLICT (sector_id, cur_user) DO NOTHING;
 	UPDATE arc SET code = arc_id;
 	UPDATE node SET code = node_id;
-	UPDATE config_param_user SET value = '13' WHERE parameter  = 'inp_options_patternmethod';
+	INSERT INTO config_param_user ('inp_options_patternmethod', '13', current_user);
 	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Enabling constraints -> Done');
 	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Process finished');
-		
-	END IF;
-	
+			
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 

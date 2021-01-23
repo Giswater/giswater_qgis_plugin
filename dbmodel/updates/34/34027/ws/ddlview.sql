@@ -79,5 +79,3 @@ CREATE TRIGGER gw_trg_vi_status
   ON vi_status
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_vi('vi_status');
-
-'

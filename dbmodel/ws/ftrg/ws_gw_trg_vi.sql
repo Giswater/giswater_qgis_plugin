@@ -88,21 +88,13 @@ BEGIN
 	      ELSIF NEW.valv_type='GPV' THEN
 		UPDATE inp_valve_importinp SET curve_id=NEW.setting WHERE arc_id=NEW.arc_id;
 	      END IF;         
-	    INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id); 
 	    
 	  ELSIF v_view='vi_tags' THEN 
 	    INSERT INTO inp_tags(object, node_id, tag) VALUES (NEW.object, NEW.node_id, NEW.tag);
 	    
 	  ELSIF v_view='vi_demands' THEN 
 	    INSERT INTO inp_demand (feature_id, demand, pattern_id, demand_type) VALUES (NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.demand_type);
-	      
-	  ELSIF v_view='vi_status' THEN
-	    IF NEW.arc_id IN (SELECT arc_id FROM inp_pump_importinp) THEN
-	      UPDATE inp_pump_importinp SET status=upper(NEW.idval);
-	    ELSIF NEW.arc_id IN (SELECT arc_id FROM inp_valve_importinp) THEN
-      	      UPDATE inp_valve_importinp SET status=upper(NEW.idval);
-	    END IF;
-	    
+      	    
 	  ELSIF v_view='vi_patterns' THEN 
 	    INSERT INTO inp_pattern_value (pattern_id, factor_1,factor_2,factor_3,factor_4,factor_5,factor_6,factor_7,factor_8, factor_9,factor_10,
 					   factor_11,factor_12,factor_13,factor_14, factor_15, factor_16,factor_17, factor_18) VALUES 
