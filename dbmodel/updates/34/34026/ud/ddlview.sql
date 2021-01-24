@@ -181,7 +181,7 @@ CREATE OR REPLACE VIEW vi_curves AS
 	END AS curve_type,
     inp_curve_value.x_value,
     inp_curve_value.y_value
-   FROM moliba.inp_curve_value
+   FROM inp_curve_value
      JOIN inp_curve ON inp_curve.id::text = inp_curve_value.curve_id::text
      LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_curve.curve_type::text
   WHERE inp_typevalue.typevalue::text = 'inp_value_curve'::text
