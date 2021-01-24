@@ -12,8 +12,9 @@ $BODY$
 
 /*example
 current petition from client:
-SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"data":{"initNode":"116", "endNode":"111", "linksDistance":1, "scale":{ "eh":1000, "ev":1000}}}$$);
-SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "initNode":"60", "endNode":"61", "linksDistance":5, "scale":{ "eh":1000, "ev":1000}}}$$);
+
+SELECT * FROM arc join node using(node_1) where node.code = 2194
+SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"data":{"initNode":"6970", "endNode":"147", "linksDistance":5, "scale":{ "eh":1000, "ev":1000}}}$$);
 
 further petitions from client:
 SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
@@ -27,18 +28,25 @@ SELECT SCHEMA_NAME.gw_fct_getprofilevalues($${"client":{},
 		"ComposerTemplates":[{"ComposerTemplate":"mincutA4", "ComposerMap":[{"width":"179.0","height":"140.826","index":0, "name":"map0"},{"width":"77.729","height":"55.9066","index":1, "name":"map7"}]},
 				     {"ComposerTemplate":"mincutA3","ComposerMap":[{"width":"53.44","height":"55.9066","index":0, "name":"map7"},{"width":"337.865","height":"275.914","index":1, "name":"map6"}]}]
 				     }}$$); 
-				     
+
+ SELECT gw_fct_getprofilevalues($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "initNode":"64", "endNode":"38", "linksDistance":, "scale":{ "eh":1000, "ev":1000}}}$$);
+
+						     
 -- fid: 222
 
 Mains:
-- Profile works with 4 types of nodes
-	- TOP-REAL: Normal case, dimensions provided and node has representation on surface
-	- TOP-ESTIM: Node has representation on surface but dimensions are not provided (ymax). Interpolation is done
+- 3 types of nodes
+	- TOP: Normal case, dimensions provided and node has representation on surface
 	- BOTTOM: Node has not representation on surface (node_type WHERE isprofilesurface IS FALSE) 
-	- LINK: vnodes
+	- VNODES: vnodes, to represent only terrain
+- 2 types of data
+	- REAL: Data is fullfilled on nodes (sys_top_elev, sys_elev, sys_ymax)
+	- INTERPOLATED: When data is missed in some intermediate node, values are interpolated. Vnodes are automatic disabled
+	
 - profile works with user-friendly variables
-	- legendFactor: Factor on make bigger o smaller llegend and text 
-	- linksDistance: Value to prevent on guitar when text is overlaped with another text 
+	- Vnode min distance: Value to prevent on guitar when text is overlaped with another text 
+
+Is mandatory start-end nodes must have data, and must be profile_surface = true
 
 */
 
@@ -95,6 +103,7 @@ v_initv float;
 v_inith float;
 v_initpoint json;
 
+
 -- field variables to work with UD/WS
 v_fcatgeom text;
 v_ftopelev text;
@@ -104,8 +113,6 @@ v_fsystopelev text;
 v_fsyselev text;
 v_fsysymax text;
 v_querytext text;
-v_qnode1 text;
-v_qnode2 text;
 v_elev1 text;
 v_elev2 text;
 v_z1 text;
@@ -118,7 +125,6 @@ v_nodevalid boolean;
 v_nodemessage text;
 v_querytext1 text;
 v_querytext2 text;
-
 
 BEGIN
 
@@ -151,45 +157,8 @@ BEGIN
   	SELECT (value::json->>'node')::json->>'cat_geom1' INTO v_node_geom1 FROM config_param_system WHERE parameter = 'om_profile_vdefault';
 
   	-- set value to v_linksdistance if null
-    IF v_linksdistance IS NULL THEN
-        v_linksdistance = 0.5;
-    END IF;
-
-	-- define variables in function of the project type
-	IF v_project_type = 'UD' THEN
-		v_fcatgeom = 'cat_geom1'; 
-		v_ftopelev = 'top_elev'; 
-		v_fymax = 'ymax'; 
-		v_fslope = 'slope'; 
-		v_fsystopelev = 'sys_top_elev';	v_fsyselev = 'sys_elev'; v_fsysymax = 'sys_ymax';
-
-		v_querytext = ' UNION SELECT c.arc_id, vnode_id,link_id,''LINK'',gully_id, vnode_topelev, vnode_ymax, vnode_elev, vnode_distfromnode1, total_length
-				FROM v_arc_x_vnode 
-				JOIN anl_arc USING (arc_id)
-				JOIN v_edit_gully c ON c.gully_id = v_arc_x_vnode.feature_id
-				WHERE fid=222 AND cur_user = current_user
-				AND anl_arc.node_1 = v_arc_x_vnode.';
-		v_qnode1 = 'node_1 ';
-		v_qnode2 = 'node_2 ';
-		v_elev1 = 'sys_elev1';
-		v_elev2 = 'sys_elev2';
-		v_z1 = 'b.z1';
-		v_z2 = 'b.z2';
-		v_y1 = 'sys_y1';
-		v_y2 = 'sys_y2';
-
-	ELSIF v_project_type = 'WS' THEN
-		v_fcatgeom = 'cat_dnom::float*0.01'; v_ftopelev = 'elevation'; v_fymax = 'depth'; v_fslope = '100*(elevation1 - depth1 - elevation2 + depth2)/gis_length';
-		v_fsyselev = 'elevation - depth'; v_fsystopelev = v_ftopelev; v_fsysymax = v_fymax; 
-		v_querytext = '';
-		v_qnode1 = '';
-		v_qnode2 = '';
-		v_elev1 = 'elevation1';
-		v_elev2 = 'elevation2';
-		v_z1 = '0::integer';
-		v_z2 = '0::integer';
-		v_y1 = 'depth1';
-		v_y2 = 'depth2';
+	IF v_linksdistance IS NULL THEN
+		v_linksdistance = 0;
 	END IF;
 
 	-- Check start-end nodes
@@ -229,7 +198,9 @@ BEGIN
 				FROM v_arc_x_vnode 
 				JOIN anl_arc USING (arc_id)
 				JOIN v_edit_gully c ON c.gully_id = v_arc_x_vnode.feature_id
-				WHERE fid=222 AND cur_user = current_user';
+				WHERE fid=222 AND cur_user = current_user
+				AND anl_arc.node_1 = v_arc_x_vnode.node_2';
+
 				
 			v_elev1 = 'case when node_1=node_id then sys_elev1 else sys_elev2 end';
 			v_elev2 = 'case when node_1=node_id then sys_elev2 else sys_elev1 end';
@@ -339,8 +310,11 @@ BEGIN
 
 		-- update node table when node has not values and need to be interpolated
 		v_dist = (SELECT array_agg(total_distance) FROM (SELECT total_distance FROM anl_node WHERE fid=222 AND cur_user = current_user order by total_distance, arc_id)a);
+		EXECUTE '(SELECT array_agg(top_elev) FROM (SELECT '||v_ftopelev||' as top_elev FROM anl_node WHERE fid=222 AND cur_user = current_user order by total_distance, arc_id)a)' INTO v_telev;
+		v_elev = (SELECT array_agg(elev) FROM (SELECT elev FROM anl_node WHERE fid=222 AND cur_user = current_user order by total_distance, arc_id)a);
 		v_nid = (SELECT array_agg(node_id) FROM (SELECT node_id FROM anl_node WHERE fid=222 AND cur_user = current_user order by total_distance, arc_id)a);
-		v_systype = (SELECT array_agg(sys_type) FROM (SELECT sys_type FROM anl_node WHERE fid=222 AND cur_user = current_user order by total_distance, arc_id)a);
+
+		i = 0;
 		LOOP	
 			i = i+1;
 			EXIT WHEN v_nid[i] IS NULL;
@@ -403,27 +377,69 @@ BEGIN
 			UPDATE 	anl_node SET nodecat_id = 'VNODE' WHERE fid=222 AND cur_user = current_user AND node_id = v_nid[i] AND nodecat_id IS NULL;
 		END LOOP;
 
-	-- get profile dimensions
-	EXECUTE 'SELECT max('||v_ftopelev||')-min(elev) FROM anl_node WHERE fid=222 AND cur_user = current_user'
-	INTO v_elevation;
-	v_distance = (SELECT max(total_distance) FROM anl_node WHERE fid=222 AND cur_user = current_user);
-	
-	-- get leaflet dimensions
-	v_profheigtht = 1000*v_elevation/v_vs + v_legendfactor*50 + 10;
-	v_profwidth = 1000*v_distance/v_hs + v_legendfactor*20 + 10; -- profile + guitar + margin
+		-- update node table those ymax nulls
+		EXECUTE 'UPDATE anl_node SET descript = gw_fct_json_object_set_key(descript::json, ''ymax'', ''None''::text),  '||v_fymax||' = '||v_ftopelev||' - elev 
+			WHERE fid=222 AND cur_user = current_user AND '||v_fymax||' IS NULL';
+
+		-- update node catalog
+		UPDATE anl_node SET nodecat_id = 'BOTTOM' FROM cat_feature_node n WHERE n.id = sys_type AND isprofilesurface IS FALSE AND fid=222 AND cur_user = current_user AND nodecat_id !='VNODE';
+		UPDATE anl_node SET nodecat_id = 'TOP' WHERE nodecat_id NOT IN ('BOTTOM', 'VNODE') AND fid=222 AND cur_user = current_user;
+
+		-- update node type
+		UPDATE anl_node SET sys_type = 'REAL' WHERE sys_type NOT IN ('LINK') AND fid=222 AND cur_user = current_user;
+		UPDATE anl_node SET sys_type = 'INTERPOLATED' WHERE result_id = 'interpolated' AND fid=222 AND cur_user = current_user;
+		
+		UPDATE anl_node SET result_id = null where result_id is not null AND fid=222 AND cur_user = current_user;
+
+		-- get profile dimensions
+		EXECUTE 'SELECT max('||v_ftopelev||')-min(elev) FROM anl_node WHERE fid=222 AND cur_user = current_user'
+		INTO v_elevation;
+		v_distance = (SELECT max(total_distance) FROM anl_node WHERE fid=222 AND cur_user = current_user);
+		
+		-- get leaflet dimensions
+		v_profheigtht = 1000*v_elevation/v_vs + v_legendfactor*50 + 10;
+		v_profwidth = 1000*v_distance/v_hs + v_legendfactor*20 + 10; -- profile + guitar + margin
 
 
-	-- get portrait extension
-	IF v_composer !='' THEN
-		SELECT * INTO v_json FROM json_array_elements(v_templates) AS a WHERE a->>'ComposerTemplate' = v_composer;
+		-- get portrait extension
+		IF v_composer !='' THEN
+			SELECT * INTO v_json FROM json_array_elements(v_templates) AS a WHERE a->>'ComposerTemplate' = v_composer;
 
-		-- select map with maximum width
-		SELECT array_agg(a->>'width') INTO v_array_width FROM json_array_elements( v_json ->'ComposerMap') AS a;
-		SELECT max (a) INTO v_compwidth FROM unnest(v_array_width) AS a;
-		SELECT a->>'name' INTO v_mapcomposer_name FROM json_array_elements( v_json ->'ComposerMap') AS a WHERE (a->>'width')::float = v_compwidth::float;
-		SELECT a->>'height' INTO v_compheight FROM json_array_elements( v_json ->'ComposerMap') AS a WHERE a->>'name' = v_mapcomposer_name;  
-		SELECT a->>'index' INTO v_index FROM json_array_elements( v_json ->'ComposerMap') AS a WHERE a->>'name' = v_mapcomposer_name; 
+			-- select map with maximum width
+			SELECT array_agg(a->>'width') INTO v_array_width FROM json_array_elements( v_json ->'ComposerMap') AS a;
+			SELECT max (a) INTO v_compwidth FROM unnest(v_array_width) AS a;
+			SELECT a->>'name' INTO v_mapcomposer_name FROM json_array_elements( v_json ->'ComposerMap') AS a WHERE (a->>'width')::float = v_compwidth::float;
+			SELECT a->>'height' INTO v_compheight FROM json_array_elements( v_json ->'ComposerMap') AS a WHERE a->>'name' = v_mapcomposer_name;  
+			SELECT a->>'index' INTO v_index FROM json_array_elements( v_json ->'ComposerMap') AS a WHERE a->>'name' = v_mapcomposer_name; 
 
+			IF v_scaletofit IS FALSE THEN
+				IF v_compheight < v_profheigtht THEN
+					v_level = 2;
+					v_message = 'Profile too large. You need to modify the vertical scale or change the composer';
+					RETURN (concat('{"status":"accepted", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
+				END IF;
+				IF v_compwidth < v_profwidth THEN
+					v_level = 2;
+					v_message = 'Profile too long. You need to modify the horitzontal scale or change the composer';
+					RETURN (concat('{"status":"accepted", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
+				END IF;
+			END IF;
+		ELSE
+			-- set values for v_compheight & v_compwidth
+			v_compheight = v_profheigtht;
+			v_compwidth = v_profwidth;
+		END IF;
+		
+		-- get portrait extension
+		IF v_papersize = 0 THEN
+			v_compwidth = (((p_data ->> 'data')::json->> 'papersize')::json->>'customDim')::json->>'xdim';
+			v_compheight = (((p_data ->> 'data')::json->> 'papersize')::json->>'customDim')::json->>'ydim';
+		ELSE
+			v_compwidth = (SELECT addparam->>'xdim' FROM om_typevalue WHERE typevalue = 'profile_papersize' AND id = v_papersize::text);
+			v_compheight = (SELECT addparam->>'ydim' FROM om_typevalue WHERE typevalue = 'profile_papersize' AND id = v_papersize::text);
+		END IF;
+
+		-- check dimensions againts scale
 		IF v_scaletofit IS FALSE THEN
 			IF v_compheight < v_profheigtht THEN
 				v_level = 2;
@@ -435,88 +451,73 @@ BEGIN
 				v_message = 'Profile too long. You need to modify the horitzontal scale or change the composer';
 				RETURN (concat('{"status":"accepted", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
 			END IF;
+			-- calculate the init point to start to draw profile
+			v_initv = (v_compheight - v_profheigtht)/2;
+			v_inith = (v_compwidth - v_profwidth)/2;
+		ELSE
+			-- calculate scale 
+			v_vs = (v_compheight - v_legendfactor*50 - 10)/(1000*v_elevation);
+			v_hs = (v_compwidth - v_legendfactor*20 - 10)/(1000*v_distance);
+
+			-- calculate the init point to start to draw profile
+			v_initv = v_legendfactor*50;
+			v_inith = v_legendfactor*20;
 		END IF;
-	ELSE
-		-- set values for v_compheight & v_compwidth
-		v_compheight = v_profheigtht;
-		v_compwidth = v_profwidth;
-	END IF;
 
-	
-	-- get portrait extension
-	IF v_papersize = 0 THEN
-		v_compwidth = (((p_data ->> 'data')::json->> 'papersize')::json->>'customDim')::json->>'xdim';
-		v_compheight = (((p_data ->> 'data')::json->> 'papersize')::json->>'customDim')::json->>'ydim';
-	ELSE
-		v_compwidth = (SELECT addparam->>'xdim' FROM om_typevalue WHERE typevalue = 'profile_papersize' AND id = v_papersize::text);
-		v_compheight = (SELECT addparam->>'ydim' FROM om_typevalue WHERE typevalue = 'profile_papersize' AND id = v_papersize::text);
-	END IF;
+		IF v_compwidth IS NOT NULL  and v_compheight IS NOT NULL AND v_inith IS NOT NULL  and v_initv IS NOT NULL 
+			AND v_hs IS NOT NULL  AND v_hstext IS NOT NULL  AND v_vs IS NOT NULL AND v_vstext IS NOT NULL THEN
 
-	-- check dimensions againts scale
-	IF v_scaletofit IS FALSE THEN
-		IF v_compheight < v_profheigtht THEN
-			v_level = 2;
-			v_message = 'Profile too large. You need to modify the vertical scale or change the composer';
-			RETURN (concat('{"status":"accepted", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
+			-- extension as composer (redundant to fit the image as is)
+			v_extension = (concat('{"width":', v_compwidth,', "height":', v_compheight,'}'))::json;	
+
+			-- initpoint to start to draw profile
+			v_initpoint = (concat('{"initx":', v_inith,', "inity":', v_initv,'}'))::json;	
+
+			-- scale text
+			v_scale = concat('1:',v_hs, '(',v_hstext,') - 1:',v_vs,'(',v_vstext,')');
+			
+			-- update values using scale factor
+			v_hs = 2000/v_hs;
+			v_vs = 500/v_vs;
+		ELSE
+			v_vs = 1;
+			v_hs= 1;
 		END IF;
-		IF v_compwidth < v_profwidth THEN
-			v_level = 2;
-			v_message = 'Profile too long. You need to modify the horitzontal scale or change the composer';
-			RETURN (concat('{"status":"accepted", "message":{"level":',v_level,', "text":"',v_message,'"}}')::json);
-		END IF;
-		-- calculate the init point to start to draw profile
-		v_initv = (v_compheight - v_profheigtht)/2;
-		v_inith = (v_compwidth - v_profwidth)/2;
-	ELSE
-		-- calculate scale 
-		v_vs = (v_compheight - v_legendfactor*50 - 10)/(1000*v_elevation);
-		v_hs = (v_compwidth - v_legendfactor*20 - 10)/(1000*v_distance);
-
-		-- calculate the init point to start to draw profile
-		v_initv = v_legendfactor*50;
-		v_inith = v_legendfactor*20;
-	END IF;
-
-	IF v_compwidth IS NOT NULL  and v_compheight IS NOT NULL AND v_inith IS NOT NULL  and v_initv IS NOT NULL 
-		AND v_hs IS NOT NULL  AND v_hstext IS NOT NULL  AND v_vs IS NOT NULL AND v_vstext IS NOT NULL THEN
-
-		-- extension as composer (redundant to fit the image as is)
-		v_extension = (concat('{"width":', v_compwidth,', "height":', v_compheight,'}'))::json;	
-
-		-- initpoint to start to draw profile
-		v_initpoint = (concat('{"initx":', v_inith,', "inity":', v_initv,'}'))::json;	
-
-		-- scale text
-		v_scale = concat('1:',v_hs, '(',v_hstext,') - 1:',v_vs,'(',v_vstext,')');
 		
-		-- update values using scale factor
-		v_hs = 2000/v_hs;
-		v_vs = 500/v_vs;
-	ELSE
-		v_vs = 1;
-		v_hs= 1;
+		UPDATE anl_arc SET cat_geom1 = cat_geom1*v_vs, length = length*v_hs WHERE fid=222 AND cur_user = current_user;
+		EXECUTE 'UPDATE anl_node SET cat_geom1 = cat_geom1*'||v_vs||', '||v_ftopelev||' = '||v_ftopelev||'*'||v_vs||', elev = elev*'||v_vs||', '||
+		v_fymax||' = '||v_fymax||'*'||v_vs||' WHERE fid=222 AND cur_user = current_user';
+
+		-- recover values form temp table into response (filtering by spacing certain distance of length in order to not collapse profile)
+		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_arc
+		FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2 FROM anl_arc WHERE fid=222 AND cur_user = current_user ORDER BY total_length) row;
+
+
+		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT node_id, nodecat_id as surface_type, descript, sys_type as data_type, cat_geom1, '||
+				v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax FROM anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != ''VNODE'' ORDER BY total_distance) row'
+				INTO v_node;
+				/*      
+				SELECT node_id, descript, sys_type, cat_geom1, top_elev, elev, ymax FROM anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != 'VNODE' ORDER BY total_distance
+				select * from anl_arc WHERE fid=222 AND cur_user = current_user order by total_length
+				select * from anl_node WHERE fid=222 AND cur_user = current_user ORDER BY total_distance 
+				*/
+				
+		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (
+				WITH querytext AS (SELECT row_number() over (order by total_distance) as rid, * FROM anl_node where fid = 222 AND cur_user = current_user ORDER by total_distance)
+				select row_number() over (order by a.total_distance) as rid, a.'||v_ftopelev||' as top_n1, b.'||v_ftopelev||' as top_n2, (b.'||v_ftopelev||'-a.'||v_ftopelev||')::numeric(12,3) as delta_y, 
+				b.total_distance - a.total_distance as delta_x, a.total_distance as total_x, a.descript as label_n1, a.nodecat_id as surface_type from querytext a
+				left join querytext b ON a.rid = b.rid-1 
+				left join (select * from anl_arc where fid = 222 AND cur_user = current_user) c ON a.arc_id = c.arc_id) row'
+				INTO v_terrain;
+				/*
+				WITH querytext AS (SELECT row_number() over (order by total_distance) as rid, * FROM anl_node where fid = 222 AND cur_user = current_user ORDER by total_distance)
+				select row_number() over (order by a.total_distance) as rid, a.top_elev as top_n1, b.top_elev as top_n2, (b.top_elev-a.top_elev)::numeric(12,3) as delta_y, 
+				b.total_distance - a.total_distance as delta_x, a.total_distance as total_x, a.descript as label_n1, a.nodecat_id as surface_type from querytext a
+				left join querytext b ON a.rid = b.rid-1 
+				left join (select * from anl_arc where fid = 222 AND cur_user = current_user) c ON a.arc_id = c.arc_id
+				*/
+
 	END IF;
-	
-	UPDATE anl_arc SET cat_geom1 = cat_geom1*v_vs, length = length*v_hs WHERE fid=222 AND cur_user = current_user;
-	EXECUTE 'UPDATE anl_node SET cat_geom1 = cat_geom1*'||v_vs||', '||v_ftopelev||' = '||v_ftopelev||'*'||v_vs||', elev = elev*'||v_vs||', '||
-	v_fymax||' = '||v_fymax||'*'||v_vs||' WHERE fid=222 AND cur_user = current_user';
-
-	-- recover values form temp table into response (filtering by spacing certain distance of length in order to not collapse profile)
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_arc
-	FROM (SELECT arc_id, descript, cat_geom1, length, z1, z2, y1, y2, elev1, elev2, node_1, node_2 FROM anl_arc WHERE fid=222 AND cur_user = current_user ORDER BY total_length) row;
-
-	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT node_id, descript, sys_type, cat_geom1, '||
-			v_ftopelev||' AS top_elev, elev, '||v_fymax||' AS ymax FROM anl_node WHERE fid=222 AND cur_user = current_user AND nodecat_id != ''VNODE'' ORDER BY total_distance) row'
-			INTO v_node;
-
-
-	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(row))) FROM (
-			WITH querytext AS (SELECT row_number() over (order by total_distance) as rid, * FROM anl_node where fid = 222 AND cur_user = current_user ORDER by total_distance)
-			select row_number() over (order by a.total_distance) as rid, a.'||v_ftopelev||' as top_n1, b.'||v_ftopelev||' as top_n2, (b.'||v_ftopelev||'-a.'||v_ftopelev||')::numeric(12,3) as delta_y, 
-			b.total_distance - a.total_distance as delta_x, a.total_distance as total_x, a.descript as label_n1 from querytext a
-			join querytext b ON a.rid = b.rid-1 
-			join (select * from anl_arc where fid = 222 AND cur_user = current_user) c ON a.arc_id = c.arc_id) row'
-			INTO v_terrain;
 
 	-- control null values
 	IF v_guitarlegend IS NULL THEN v_guitarlegend='{}'; END IF;
@@ -529,11 +530,6 @@ BEGIN
 	v_node := COALESCE(v_node, '{}'); 
 	v_terrain := COALESCE(v_terrain, '{}'); 
 
-
-	-- default values
-	v_status = 'Accepted';	
-        v_level = 3;
-        v_message = 'Profile done successfully';
 
 	--  Return
 	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
