@@ -9,6 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2021/01/23
-ALTER TABLE ws_sample.cat_feature_node DROP CONSTRAINT node_type_graf_delimiter_check;
-ALTER TABLE ws_sample.cat_feature_node ADD CONSTRAINT node_type_graf_delimiter_check CHECK (graf_delimiter::text = ANY 
+ALTER TABLE cat_feature_node DROP CONSTRAINT node_type_graf_delimiter_check;
+ALTER TABLE cat_feature_node ADD CONSTRAINT node_type_graf_delimiter_check CHECK (graf_delimiter::text = ANY 
 (ARRAY['NONE'::text, 'MINSECTOR'::text, 'PRESSZONE'::text, 'DQA'::text, 'DMA'::text, 'SECTOR'::text,'CHECKVALVE'::text ]));
