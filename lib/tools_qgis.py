@@ -784,7 +784,7 @@ def get_geometry_from_json(feature):
     """
 
     try:
-        coordinates = getattr(sys.modules[__name__], f"get_vertex_from_{feature['geometry']['type'].lower()}")(feature)
+        coordinates = getattr(sys.modules[__name__], f"_get_vertex_from_{feature['geometry']['type'].lower()}")(feature)
         type_ = feature['geometry']['type']
         geometry = f"{type_}{coordinates}"
         return QgsGeometry.fromWkt(geometry)
