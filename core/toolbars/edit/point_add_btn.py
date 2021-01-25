@@ -13,7 +13,7 @@ from qgis.PyQt.QtWidgets import QAction, QMenu
 from ..dialog_button import GwDialogButton
 from ...shared.info import GwInfo
 from ...utils import tools_gw
-from ....lib import tools_os
+from ....lib import tools_os, tools_qgis
 
 
 class GwPointAddButton(GwDialogButton):
@@ -31,7 +31,7 @@ class GwPointAddButton(GwDialogButton):
         self.info_feature = GwInfo('data')
 
         # Get list of different node and arc types
-        menu = QMenu()
+        self.menu = QMenu()
         # List of nodes from node_type_cat_type - nodes which we are using
         list_feature_cat = tools_os.get_values_from_dictionary(self.feature_cat)
         for feature_cat in list_feature_cat:
@@ -42,9 +42,11 @@ class GwPointAddButton(GwDialogButton):
                     obj_action.setShortcutVisibleInContextMenu(True)
                 except:
                     pass
-                menu.addAction(obj_action)
+                self.menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
-        menu.addSeparator()
+                obj_action.triggered.connect(partial(self.save_last_selection, self.menu, feature_cat))
+
+        self.menu.addSeparator()
 
         list_feature_cat = tools_os.get_values_from_dictionary(self.feature_cat)
         for feature_cat in list_feature_cat:
@@ -55,9 +57,10 @@ class GwPointAddButton(GwDialogButton):
                     obj_action.setShortcutVisibleInContextMenu(True)
                 except:
                     pass
-                menu.addAction(obj_action)
+                self.menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
-        menu.addSeparator()
+                obj_action.triggered.connect(partial(self.save_last_selection, self.menu, feature_cat))
+        self.menu.addSeparator()
 
         list_feature_cat = tools_os.get_values_from_dictionary(self.feature_cat)
         for feature_cat in list_feature_cat:
@@ -68,15 +71,23 @@ class GwPointAddButton(GwDialogButton):
                     obj_action.setShortcutVisibleInContextMenu(True)
                 except:
                     pass
-                menu.addAction(obj_action)
+                self.menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
-        menu.addSeparator()
+                obj_action.triggered.connect(partial(self.save_last_selection, self.menu, feature_cat))
+        self.menu.addSeparator()
+
 
         if toolbar is not None:
-            self.action.setMenu(menu)
+            self.action.setMenu(self.menu)
             toolbar.addAction(self.action)
 
 
+    def save_last_selection(self, menu, feature_cat):
+        menu.setProperty("last_selection", feature_cat)
+
+
     def clicked_event(self):
-        pass
+        if self.menu.property('last_selection') is not None:
+            self.info_feature.add_feature(self.menu.property('last_selection'))
+
 
