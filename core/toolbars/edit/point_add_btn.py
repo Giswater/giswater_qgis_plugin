@@ -13,7 +13,8 @@ from qgis.PyQt.QtWidgets import QAction, QMenu
 from ..dialog_button import GwDialogButton
 from ...shared.info import GwInfo
 from ...utils import tools_gw
-from ....lib import tools_os, tools_qgis
+from ....lib import tools_os
+from .... import global_vars
 
 
 class GwPointAddButton(GwDialogButton):
@@ -37,7 +38,8 @@ class GwPointAddButton(GwDialogButton):
         for feature_cat in list_feature_cat:
             if feature_cat.feature_type.upper() == 'NODE':
                 obj_action = QAction(str(feature_cat.id), action_group)
-                obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
+                if f"{feature_cat.shortcut_key}" not in global_vars.session_vars['shortcut_keys']:
+                    obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 try:
                     obj_action.setShortcutVisibleInContextMenu(True)
                 except:
@@ -52,7 +54,8 @@ class GwPointAddButton(GwDialogButton):
         for feature_cat in list_feature_cat:
             if feature_cat.feature_type.upper() == 'CONNEC':
                 obj_action = QAction(str(feature_cat.id), action_group)
-                obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
+                if f"{feature_cat.shortcut_key}" not in global_vars.session_vars['shortcut_keys']:
+                    obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 try:
                     obj_action.setShortcutVisibleInContextMenu(True)
                 except:
@@ -66,7 +69,8 @@ class GwPointAddButton(GwDialogButton):
         for feature_cat in list_feature_cat:
             if feature_cat.feature_type.upper() == 'GULLY' and project_type == 'ud':
                 obj_action = QAction(str(feature_cat.id), action_group)
-                obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
+                if f"{feature_cat.shortcut_key}" not in global_vars.session_vars['shortcut_keys']:
+                    obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 try:
                     obj_action.setShortcutVisibleInContextMenu(True)
                 except:

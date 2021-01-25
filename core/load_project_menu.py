@@ -10,8 +10,8 @@ import os
 from functools import partial
 
 from qgis.PyQt.QtCore import QObject
-from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QActionGroup, QMenu, QComboBox, QTableView, QTableWidgetItem, QPushButton
+from qgis.PyQt.QtGui import QIcon, QKeySequence
+from qgis.PyQt.QtWidgets import QActionGroup, QMenu, QComboBox, QTableView, QTableWidgetItem, QPushButton, QTreeWidget, QTreeWidgetItem
 
 from .toolbars import buttons
 from .ui.ui_manager import GwLoadMenuUi
@@ -31,23 +31,25 @@ class GwMenuLoad(QObject):
         self.settings = global_vars.settings
         self.plugin_dir = global_vars.plugin_dir
 
-        self.roaming_path_folder = os.path.join(tools_os.get_datadir(), global_vars.roaming_user_dir)
+        self.config_path_folder = os.path.join(tools_os.get_datadir(), global_vars.config_user_dir)
         self.list_values = []
 
 
     def read_menu(self):
         """  """
-        main_menu = QMenu("&Giswater", self.iface.mainWindow().menuBar())
 
         actions = self.iface.mainWindow().menuBar().actions()
         last_action = actions[-1]
 
-        # region Toolbars
-        toolbars_menu = QMenu(f"Toolbars", self.iface.mainWindow().menuBar())
+        self.main_menu = QMenu("&Giswater", self.iface.mainWindow().menuBar())
+        tools_gw.set_config_parser("menu", "load", "true", "project", "init")
+
+        # region Toolbar
+        toolbars_menu = QMenu(f"Toolbar", self.iface.mainWindow().menuBar())
         icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}36.png"
         toolbars_icon = QIcon(icon_path)
         toolbars_menu.setIcon(toolbars_icon)
-        main_menu.addMenu(toolbars_menu)
+        self.main_menu.addMenu(toolbars_menu)
         for toolbar in global_vars.settings.value(f"toolbars/list_toolbars"):
             toolbar_submenu = QMenu(f"{toolbar}", self.iface.mainWindow().menuBar())
             toolbars_menu.addMenu(toolbar_submenu)
@@ -67,23 +69,36 @@ class GwMenuLoad(QObject):
 
                 action_function = getattr(buttons, button_def)(icon_path, button_def, text, None, ag)
                 action = toolbar_submenu.addAction(icon, f"{text}")
+                shortcut_key = tools_gw.get_config_parser("action_shortcuts", f"{index_action}", "user", "init", prefix=False)
+                if shortcut_key:
+                    action.setShortcuts(QKeySequence(f"{shortcut_key}"))
+                    global_vars.session_vars['shortcut_keys'].append(shortcut_key)
+
                 action.triggered.connect(partial(self.clicked_event, action_function))
 
         # endregion
-        # region Roaming
-        roaming_menu = QMenu(f"Roaming", self.iface.mainWindow().menuBar())
-        main_menu.addMenu(roaming_menu)
+        # region Config
+        config_menu = QMenu(f"Config", self.iface.mainWindow().menuBar())
+        self.main_menu.addMenu(config_menu)
         icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
-        roaming_icon = QIcon(icon_path)
-        roaming_menu.setIcon(roaming_icon)
-        action_open_path = roaming_menu.addAction(f"Open folder")
-        action_open_path.triggered.connect(self._open_roaming_path)
+        config_icon = QIcon(icon_path)
+        config_menu.setIcon(config_icon)
 
-        action_manage_file = roaming_menu.addAction(f"Manage Files")
+        action_manage_file = config_menu.addAction(f"Manage Files")
         action_manage_file.triggered.connect(self._open_manage_file)
         # endregion
 
-        self.iface.mainWindow().menuBar().insertMenu(last_action, main_menu)
+        # region User folder
+        config_menu = QMenu(f"User folder", self.iface.mainWindow().menuBar())
+        self.main_menu.addMenu(config_menu)
+        icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
+        config_icon = QIcon(icon_path)
+        config_menu.setIcon(config_icon)
+        action_open_path = config_menu.addAction(f"Open folder")
+        action_open_path.triggered.connect(self._open_config_path)
+        # endregion
+
+        self.iface.mainWindow().menuBar().insertMenu(last_action, self.main_menu)
 
 
     def clicked_event(self, action_function):
@@ -96,9 +111,9 @@ class GwMenuLoad(QObject):
         return tools_qt.tr(message, aux_context='ui_message')
 
     # region private functions
-    def _open_roaming_path(self):
-        """ Opens the OS-specific Roaming directory. """
-        path = os.path.realpath(self.roaming_path_folder)
+    def _open_config_path(self):
+        """ Opens the OS-specific Config directory. """
+        path = os.path.realpath(self.config_path_folder)
         os.startfile(path)
 
 
@@ -107,25 +122,14 @@ class GwMenuLoad(QObject):
         self.dlg_manage_menu = GwLoadMenuUi()
 
         # Manage widgets
-        self.cmb_config_files = self.dlg_manage_menu.findChild(QComboBox, 'cmb_config_files')
-        self.tbl_config_files = self.dlg_manage_menu.findChild(QTableView, 'tbl_config_files')
+        self.tree_config_files = self.dlg_manage_menu.findChild(QTreeWidget, 'tree_config_files')
         self.btn_save = self.dlg_manage_menu.findChild(QPushButton, 'btn_save')
         self.btn_close = self.dlg_manage_menu.findChild(QPushButton, 'btn_close')
 
-        # Populate cmb_config_files
-        files = [f for f in os.listdir(f"{self.roaming_path_folder}{os.sep}config")]
-        for file in files:
-            self.cmb_config_files.addItem(f"{file}")
-
-        # Get values
-        self._get_config_file_values()
-
         # Fill table_config_files
-        self._fill_tbl_config_files(self.tbl_config_files)
+        self._fill_tbl_config_files(self.tree_config_files)
 
         # Listeners
-        self.cmb_config_files.currentIndexChanged.connect(self._get_config_file_values)
-        self.cmb_config_files.currentIndexChanged.connect(partial(self._fill_tbl_config_files, self.tbl_config_files))
         self.btn_save.clicked.connect(partial(self._save_config_files))
         self.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manage_menu))
 
@@ -133,13 +137,12 @@ class GwMenuLoad(QObject):
         self.dlg_manage_menu.open()
 
 
-    def _get_config_file_values(self):
+    def _get_config_file_values(self, file_name):
         """ Populates a variable with a list of values parsed from a configuration file. """
         # Get values
         self.list_values = []
         values = {}
-        path = f"{self.roaming_path_folder}{os.sep}config{os.sep}" \
-               f"{tools_qt.get_text(self.dlg_manage_menu, self.cmb_config_files)}"
+        path = f"{self.config_path_folder}{os.sep}config{os.sep}{file_name}"
 
         if not os.path.exists(path):
             return None
@@ -155,26 +158,30 @@ class GwMenuLoad(QObject):
                 values = {}
 
 
-    def _fill_tbl_config_files(self, table):
+    def _fill_tbl_config_files(self, tree):
         """ Fills a UI table with the local list of values variable. """
 
-        row_count = len(self.list_values)
-        column_count = len(self.list_values[0])
+        files = [f for f in os.listdir(f"{self.config_path_folder}{os.sep}config")]
 
-        table.setColumnCount(column_count)
-        table.setRowCount(row_count)
+        for file in files:
+            self._get_config_file_values(file)
+            item = QTreeWidgetItem([f"{file}"])
 
-        table.setHorizontalHeaderLabels(list(self.list_values[0].keys()))
+            row_count = len(self.list_values)
+            for row in range(row_count):
+                item_child = QTreeWidgetItem([f"{self.list_values[row]['Section']}", f"{self.list_values[row]['Parameter']}", f"{self.list_values[row]['Value']}"])
+                # item_child.doubleClicked.connect(partial(self._onDoubleClick))
+                item.addChild(item_child)
 
-        for row in range(row_count):  # add items from array to QTableWidget
-            for column in range(column_count):
-                item = list(self.list_values[row].values())[column]
-                table.setItem(row, column, QTableWidgetItem(item))
+            tree.resize(500, 200)
+            tree.setColumnCount(3)
+            tree.setHeaderLabels(["Section", "Parameter", "Value"])
+            tree.addTopLevelItem(item)
 
 
     def _save_config_files(self):
         """ Writes the list of values into a persistant configuration file. """
-
+        return
         row_count = self.tbl_config_files.rowCount()
         filename = tools_qt.get_text(self.dlg_manage_menu, self.cmb_config_files).replace(".config", "")
         for row in range(row_count):
@@ -183,4 +190,11 @@ class GwMenuLoad(QObject):
             value = self.tbl_config_files.item(row, 2).text()
             tools_gw.set_config_parser(f"{section}", f"{parameter}", f"{value}", file_name=filename, prefix=False)
 
+
+    def _onDoubleClick(self, index):
+
+        item = self.currentItem()
+        item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+        if index.column() != 0:
+            item.setFlags(item.flags() & ~QtCore.Qt.ItemIsEditable)
     # endregion

@@ -13,7 +13,8 @@ from qgis.PyQt.QtWidgets import QAction, QMenu
 from ..dialog_button import GwDialogButton
 from ...shared.info import GwInfo
 from ...utils import tools_gw
-from ....lib import tools_os, tools_qgis
+from ....lib import tools_os
+from .... import global_vars
 
 
 class GwArcAddButton(GwDialogButton):
@@ -27,7 +28,6 @@ class GwArcAddButton(GwDialogButton):
             toolbar.removeAction(self.action)
 
         self.feature_cat = tools_gw.manage_feature_cat()
-
         self.info_feature = GwInfo('data')
 
         # Get list of different node and arc types
@@ -37,7 +37,8 @@ class GwArcAddButton(GwDialogButton):
         for feature_cat in list_feature_cat:
             if feature_cat.feature_type.upper() == 'ARC':
                 obj_action = QAction(str(feature_cat.id), action_group)
-                obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
+                if f"{feature_cat.shortcut_key}" not in global_vars.session_vars['shortcut_keys']:
+                    obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 try:
                     obj_action.setShortcutVisibleInContextMenu(True)
                 except:

@@ -15,7 +15,7 @@ iface = None
 canvas = None
 plugin_dir = None
 plugin_name = None
-roaming_user_dir = None
+config_user_dir = None
 schema_name = None
 project_type = None
 srid = None
@@ -26,17 +26,17 @@ project_vars = {}
 session_vars = {'user_settings': None, 'user_settings_path': None, 'min_log_level': 20, 'min_message_level': 0,
                 'last_error': None, 'show_db_exception': True, 'dlg_info': None, 'current_user': None,
                 'dlg_docker': None, 'show_docker': None, 'docker_type': None, 'logged': None,
-                'db': None, 'postgresql_version': None, 'dao': None, 'credentials': None}
+                'db': None, 'postgresql_version': None, 'dao': None, 'credentials': None, 'shortcut_keys':[]}
 
 
-def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name, p_roaming_user_dir):
+def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name, p_config_user_dir):
 
-    global iface, canvas, plugin_dir, plugin_name, roaming_user_dir
+    global iface, canvas, plugin_dir, plugin_name, config_user_dir
     iface = p_iface
     canvas = p_canvas
     plugin_dir = p_plugin_dir
     plugin_name = p_plugin_name
-    roaming_user_dir = p_roaming_user_dir
+    config_user_dir = p_config_user_dir
 
 
 def init_settings(setting_file):

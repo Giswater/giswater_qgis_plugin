@@ -65,8 +65,8 @@ class Giswater(QObject):
         global_vars.iface = self.iface
         self.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', self.plugin_dir)
         higher_version = tools_qgis.get_higher_version(plugin_dir=self.plugin_dir)
-        roaming_user_dir = f'{tools_os.get_datadir()}{os.sep}{self.plugin_name.capitalize()}{os.sep}{higher_version}'
-        global_vars.init_global(self.iface, self.iface.mapCanvas(), self.plugin_dir, self.plugin_name, roaming_user_dir)
+        config_user_dir = f'{tools_os.get_datadir()}{os.sep}{self.plugin_name.capitalize()}{os.sep}{higher_version}'
+        global_vars.init_global(self.iface, self.iface.mapCanvas(), self.plugin_dir, self.plugin_name, config_user_dir)
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
 
         # Check if config file exists
@@ -231,8 +231,9 @@ class Giswater(QObject):
                 self.notify.stop_listening(list_channels)
 
             if self.load_project:
-                if self.load_project.actions:
-                    for action in list(self.load_project.actions.values()):
+                if self.load_project.buttons != {}:
+
+                    for action in list(self.load_project.buttons.values()):
                         self.iface.removePluginMenu(self.plugin_name, action)
                         self.iface.removeToolBarIcon(action)
 
@@ -243,7 +244,7 @@ class Giswater(QObject):
                             plugin_toolbar.toolbar.setVisible(False)
                             del plugin_toolbar.toolbar
 
-        except Exception:
+        except Exception as e:
             pass
         finally:
 

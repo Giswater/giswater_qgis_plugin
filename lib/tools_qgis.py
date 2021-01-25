@@ -719,7 +719,7 @@ def set_margin(layer, margin):
 
 def create_qml(layer, style):
     """ Generates a qml file through a json of styles (@style) and puts it in the received @layer """
-    config_folder = f'{global_vars.roaming_user_dir}{os.sep}temp'
+    config_folder = f'{global_vars.config_user_dir}{os.sep}temp'
     if not os.path.exists(config_folder):
         os.makedirs(config_folder)
     path_temp_file = f"{config_folder}{os.sep}temporal_layer.qml"

@@ -109,6 +109,10 @@ class GwLoadProject(QObject):
         if self.project_type is None:
             return
 
+        # Create menu
+        load_project_menu = GwMenuLoad()
+        load_project_menu.read_menu()
+
         # Initialize toolbars
         self._get_buttons_to_hide()
 
@@ -136,10 +140,6 @@ class GwLoadProject(QObject):
 
         # call dynamic mapzones repaint
         tools_gw.set_style_mapzones()
-
-        # Create menu
-        load_project_menu = GwMenuLoad()
-        load_project_menu.read_menu()
 
         # Log it
         message = "Project read successfully"
