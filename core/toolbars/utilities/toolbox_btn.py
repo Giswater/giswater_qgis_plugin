@@ -14,10 +14,11 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox, \
     QGridLayout, QRadioButton, QAbstractItemView
-from qgis.core import QgsProject
+from qgis.core import QgsApplication, QgsProject
 from qgis.gui import QgsDateTimeEdit
 
 from ..dialog_button import GwDialogButton
+from ...threads.toolbox_execute import GwToolBoxTask
 from ...ui.ui_manager import GwToolboxUi, GwToolboxManagerUi
 from ...utils import tools_gw, tools_backend_calls
 from ....lib import tools_qt, tools_qgis, tools_db
@@ -94,6 +95,7 @@ class GwToolBoxButton(GwDialogButton):
         self.dlg_functions = GwToolboxManagerUi()
         tools_gw.load_settings(self.dlg_functions)
         self.dlg_functions.progressBar.setVisible(False)
+        self.dlg_functions.btn_cancel.setEnabled(False)
 
         self.dlg_functions.cmb_layers.currentIndexChanged.connect(partial(self.set_selected_layer, self.dlg_functions,
                                                                           self.dlg_functions.cmb_layers))
@@ -172,7 +174,7 @@ class GwToolBoxButton(GwDialogButton):
 
 
     def load_parametric_values(self, dialog, function):
-        """ Load QGIS settings related with parametric toolbox options """
+        """ Load QGIS settings related with toolbox options """
 
         function_name = function[0]['functionname']
         layout = dialog.findChild(QWidget, 'grb_parameters')
@@ -182,33 +184,33 @@ class GwToolBoxButton(GwDialogButton):
             if type(widget) not in (QCheckBox, QComboBox, QLineEdit, QRadioButton):
                 continue
             if type(widget) in (QCheckBox, QRadioButton):
-                value = tools_gw.get_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}", "user", "sessions")
+                value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user", "sessions")
                 tools_qt.set_checked(dialog, widget, value)
             elif type(widget) is QComboBox and widget.property('selectedId') is None:
-                value = tools_gw.get_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}", "user", "sessions")
+                value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user", "sessions")
                 if value in (None, '', 'NULL') and widget.property('selectedId') not in (None, '', 'NULL'):
                     value = widget.property('selectedId')
                 tools_qt.set_combo_value(widget, value, 0)
             elif type(widget) in (QLineEdit, QSpinBox):
-                value = tools_gw.get_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}", "user", "sessions")
+                value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user", "sessions")
                 tools_qt.set_widget_text(dialog, widget, value)
 
 
     def save_parametric_values(self, dialog, function):
-        """ Save QGIS settings related with parametric toolbox options """
+        """ Save QGIS settings related with toolbox options """
 
         function_name = function[0]['functionname']
         layout = dialog.findChild(QWidget, 'grb_parameters')
         widgets = layout.findChildren(QWidget)
         for widget in widgets:
             if type(widget) is QCheckBox:
-                tools_gw.set_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{widget.isChecked()}")
+                tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{widget.isChecked()}")
             elif type(widget) is QComboBox:
                 value = tools_qt.get_combo_value(dialog, widget, 0)
-                tools_gw.set_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{value}")
+                tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
             elif type(widget) in (QLineEdit, QSpinBox):
                 value = tools_qt.get_text(dialog, widget, False, False)
-                tools_gw.set_config_parser('btn_toolbox', f"parametric_{function_name}_{widget.objectName()}", f"{value}")
+                tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
 
 
     def load_settings_values(self, dialog, function):
@@ -244,170 +246,22 @@ class GwToolBoxButton(GwDialogButton):
 
 
     def execute_function(self, dialog, combo, result):
-
-        dialog.btn_cancel.setEnabled(False)
-        dialog.progressBar.setMaximum(0)
-        dialog.progressBar.setMinimum(0)
+        dialog.btn_cancel.setEnabled(True)
+        dialog.progressBar.setRange(0, 0)
         dialog.progressBar.setVisible(True)
-        extras = ''
-        feature_field = ''
-        # TODO Check if time functions is short or long, activate and set undetermined  if not short
+        dialog.progressBar.setStyleSheet("QProgressBar {border: 0px solid #000000; border-radius: 5px; "
+                                         "background-color: #E0E0E0;}"
+                                         "QProgressBar::chunk {background-color:#0bd82c; width: 10 px; margin: 0.5px;}")
+        # dialog.progressBar.setStyleSheet("QProgressBar {border: 2px solid grey; border-radius: 0px; text-align: center; }"
+        #                                  " QProgressBar::chunk {background-color: #3add36; width: 1px;filter: blur(10px);}")
 
-        # Get function name
-        function = None
-        function_name = None
-        for group, function in list(result['fields'].items()):
-            if len(function) != 0:
-                self.save_settings_values(dialog, function)
-                self.save_parametric_values(dialog, function)
-                function_name = function[0]['functionname']
-                break
+        # Set background task 'GwToolBoxTask'
+        description = f"ToolBox function"
+        self.toolbox_task = GwToolBoxTask(self, description, dialog, combo, result)
+        QgsApplication.taskManager().addTask(self.toolbox_task)
+        QgsApplication.taskManager().triggerTask(self.toolbox_task)
 
-        if function_name is None:
-            return
-
-        if function[0]['input_params']['featureType']:
-            layer = None
-            layer_name = tools_qt.get_combo_value(dialog, combo, 1)
-            if layer_name != -1:
-                layer = self.set_selected_layer(dialog, combo)
-                if not layer:
-                    dialog.progressBar.setVisible(False)
-                    dialog.progressBar.setMinimum(0)
-                    dialog.progressBar.setMaximum(1)
-                    dialog.progressBar.setValue(1)
-                    return
-
-            selection_mode = self.rbt_checked['widget']
-            extras += f'"selectionMode":"{selection_mode}",'
-            # Check selection mode and get (or not get) all feature id
-            feature_id_list = '"id":['
-            if (selection_mode == 'wholeSelection') or (selection_mode == 'previousSelection' and layer is None):
-                feature_id_list += ']'
-            elif selection_mode == 'previousSelection' and layer is not None:
-                features = layer.selectedFeatures()
-                feature_type = tools_qt.get_combo_value(dialog, dialog.cmb_geom_type, 0)
-                for feature in features:
-                    feature_id = feature.attribute(feature_type + "_id")
-                    feature_id_list += f'"{feature_id}", '
-                if len(features) > 0:
-                    feature_id_list = feature_id_list[:-2] + ']'
-                else:
-                    feature_id_list += ']'
-
-            if layer_name != -1:
-                feature_field = f'"tableName":"{layer_name}", '
-                feature_type = tools_qt.get_combo_value(dialog, dialog.cmb_geom_type, 0)
-                feature_field += f'"featureType":"{feature_type}", '
-            feature_field += feature_id_list
-
-        widget_list = dialog.grb_parameters.findChildren(QWidget)
-        widget_is_void = False
-        extras += '"parameters":{'
-        for group, function in list(result['fields'].items()):
-            if len(function) != 0:
-                if function[0]['return_type'] not in (None, ''):
-                    for field in function[0]['return_type']:
-                        widget = dialog.findChild(QWidget, field['widgetname'])
-                        param_name = widget.objectName()
-                        if type(widget) in ('', QLineEdit):
-                            widget.setStyleSheet(None)
-                            value = tools_qt.get_text(dialog, widget, False, False)
-                            extras += f'"{param_name}":"{value}", '.replace('""', 'null')
-                            if value is '' and widget.property('ismandatory'):
-                                widget_is_void = True
-                                widget.setStyleSheet("border: 1px solid red")
-                        elif type(widget) in ('', QSpinBox, QDoubleSpinBox):
-                            value = tools_qt.get_text(dialog, widget, False, False)
-                            if value == '':
-                                value = 0
-                            extras += f'"{param_name}":"{value}", '
-                        elif type(widget) in ('', QComboBox):
-                            value = tools_qt.get_combo_value(dialog, widget, 0)
-                            extras += f'"{param_name}":"{value}", '
-                        elif type(widget) in ('', QCheckBox):
-                            value = tools_qt.is_checked(dialog, widget)
-                            extras += f'"{param_name}":"{str(value).lower()}", '
-                        elif type(widget) in ('', QgsDateTimeEdit):
-                            value = tools_qt.get_calendar_date(dialog, widget)
-                            if value == "" or value is None:
-                                extras += f'"{param_name}":null, '
-                            else:
-                                extras += f'"{param_name}":"{value}", '
-
-        if widget_is_void:
-            message = "This param is mandatory. Please, set a value"
-            tools_qgis.show_warning(message, parameter='')
-            dialog.progressBar.setVisible(False)
-            dialog.progressBar.setMinimum(0)
-            dialog.progressBar.setMaximum(1)
-            dialog.progressBar.setValue(1)
-            return
-
-        dialog.progressBar.setFormat(f"Running function: {function_name}")
-        dialog.progressBar.setAlignment(Qt.AlignCenter)
-
-        if len(widget_list) > 0:
-            extras = extras[:-2] + '}'
-        else:
-            extras += '}'
-
-        body = tools_gw.create_body(feature=feature_field, extras=extras)
-        json_result = tools_gw.execute_procedure(function_name, body)
-        if json_result['status'] == 'Failed': return
-        tools_gw.fill_tab_log(dialog, json_result['body']['data'], True, True, 1, True)
-
-        dialog.progressBar.setAlignment(Qt.AlignCenter)
-        dialog.progressBar.setMinimum(0)
-        dialog.progressBar.setMaximum(1)
-        dialog.progressBar.setValue(1)
-        if json_result is None:
-            dialog.progressBar.setFormat(f"Function: {function_name} executed with no result")
-            return True
-
-        if not json_result:
-            dialog.progressBar.setFormat(f"Function: {function_name} failed. See log file for more details")
-            return False
-
-        try:
-            dialog.progressBar.setFormat(f"Function {function_name} has finished")
-
-            # getting simbology capabilities
-            if 'setStyle' in json_result['body']['data']:
-                set_sytle = json_result['body']['data']['setStyle']
-                if set_sytle == "Mapzones":
-                    # call function to simbolize mapzones
-                    tools_gw.set_style_mapzones()
-
-        except KeyError as e:
-            msg = f"<b>Key: </b>{e}<br>"
-            msg += f"<b>key container: </b>'body/data/ <br>"
-            msg += f"<b>Python file: </b>{__name__} <br>"
-            msg += f"<b>Python function:</b> {self.execute_function.__name__} <br>"
-            tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
-
-        self.remove_layers()
-
-
-    def execute_no_parametric(self, dialog, function_name):
-
-        dialog.progressBar.setMinimum(0)
-        dialog.progressBar.setFormat(f"Running function: {function_name}")
-        dialog.progressBar.setAlignment(Qt.AlignCenter)
-        dialog.progressBar.setFormat("")
-
-        sql = f"SELECT {function_name}()::text"
-        row = tools_db.get_row(sql)
-        if not row or row[0] in (None, ''):
-            tools_qgis.show_message(f"Function: {function_name} executed with no result ", 3)
-            return True
-
-        complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
-        tools_gw.add_layer_temp(dialog, complet_result['body']['data'], self.function_selected)
-        dialog.progressBar.setFormat(f"Function {function_name} has finished.")
-        dialog.progressBar.setAlignment(Qt.AlignCenter)
-
-        return True
+        dialog.btn_cancel.clicked.connect(self._cancel_task)
 
 
     def populate_functions_dlg(self, dialog, result):
@@ -552,3 +406,8 @@ class GwToolBoxButton(GwDialogButton):
             return json_['alias'].upper()
         except KeyError:
             return 0
+
+
+    def _cancel_task(self):
+        if hasattr(self, 'toolbox_task'):
+            self.toolbox_task.cancel()
