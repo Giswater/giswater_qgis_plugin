@@ -150,10 +150,10 @@ UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM config_visit
 UPDATE sys_param_user SET formname = 'hidden' WHERE formname = 'hidden_value';
 
 -- 2020/07/24
-UPDATE config_param_system set isenabled = true, layoutorder = 6, widgettype='check', ismandatory = false, iseditable = true, layoutname='lyt_system',
+UPDATE config_param_system set isenabled = true, layoutorder = 7, widgettype='check', ismandatory = false, iseditable = true, layoutname='lyt_system',
 dv_isparent=false, isautoupdate=false where parameter='edit_topocontrol_disable_error';
 
-UPDATE config_param_system set  layoutorder = 7 where parameter='admin_currency';
+UPDATE config_param_system set  layoutorder = 8 where parameter='admin_currency';
 
 
 UPDATE sys_table SET notify_action = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"muni_id, name","featureType":["arc", "node", "connec", "v_ext_plot","v_ext_streetaxis", "v_ext_address"]}]' 
