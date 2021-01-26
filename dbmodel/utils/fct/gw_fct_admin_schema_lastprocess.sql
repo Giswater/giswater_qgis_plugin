@@ -232,7 +232,7 @@ BEGIN
 
 		-- forcing user variables in order to enhance usability for new projects
 		UPDATE sys_param_user SET vdefault = '1', ismandatory =  true WHERE id ='edit_state_vdefault';
-		UPDATE sys_param_user SET vdefault = 'true', ismandatory = true WHERE id ='qgis_info_docker';
+		UPDATE sys_param_user SET vdefault = 'false', ismandatory = true WHERE id ='qgis_info_docker';
 		UPDATE sys_param_user SET vdefault = 'true', ismandatory = true WHERE id ='qgis_form_docker';
 
 		
