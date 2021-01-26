@@ -33,7 +33,7 @@ from .visit_gallery import GwVisitGallery
 from .visit import GwVisit
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
-from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindowDialog, GwVisitDocumentUi, GwInfoCrossectUi, \
+from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, GwInfoCrossectUi, \
     GwDialogTextUi
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_db
@@ -543,7 +543,7 @@ class GwInfo(QObject):
 
         if global_vars.session_vars['dlg_docker'] and is_docker and global_vars.session_vars['show_docker']:
             # Delete last form from memory
-            last_info = global_vars.session_vars['dlg_docker'].findChild(GwMainWindowDialog, 'dlg_info_feature')
+            last_info = global_vars.session_vars['dlg_docker'].findChild(GwMainWindow, 'dlg_info_feature')
             if last_info:
                 last_info.setParent(None)
                 del last_info

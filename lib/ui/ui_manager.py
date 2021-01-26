@@ -8,7 +8,7 @@ or (at your option) any later version.
 import os
 
 from qgis.PyQt import uic, QtCore
-from ...core.ui.basic_dialog import GwBasicDialog
+from ...core.ui.basic_dialog import GwDialog
 
 
 def get_ui_class(ui_file_name):
@@ -20,6 +20,6 @@ def get_ui_class(ui_file_name):
 
 # region SHARED
 FORM_CLASS = get_ui_class('dialog_text.ui')
-class DialogTextUi(GwBasicDialog, FORM_CLASS):
+class DialogTextUi(GwDialog, FORM_CLASS):
     pass
 # endregion

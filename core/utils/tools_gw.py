@@ -28,9 +28,9 @@ from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeatu
 from qgis.gui import QgsDateTimeEdit
 
 from ..models.cat_feature import GwCatFeature
-from ..ui.basic_dialog import GwBasicDialog
-from ..ui.main_window_dialog import GwMainWindowDialog
-from ..ui.docker_dialog import GwDockerDialog
+from ..ui.basic_dialog import GwDialog
+from ..ui.main_window_dialog import GwMainWindow
+from ..ui.docker_dialog import GwDocker
 
 from . import tools_backend_calls
 from ..utils.select_manager import GwSelectManager
@@ -198,9 +198,9 @@ def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top
     dlg.setWindowFlags(flags)
 
     # Open dialog
-    if issubclass(type(dlg), GwBasicDialog):
+    if issubclass(type(dlg), GwDialog):
         dlg.open()
-    elif issubclass(type(dlg), GwMainWindowDialog):
+    elif issubclass(type(dlg), GwMainWindow):
         dlg.show()
     else:
         dlg.show()
@@ -2084,7 +2084,7 @@ def init_docker(docker_param='qgis_info_docker'):
     if value == 'true':
         close_docker()
         global_vars.session_vars['docker_type'] = docker_param
-        global_vars.session_vars['dlg_docker'] = GwDockerDialog()
+        global_vars.session_vars['dlg_docker'] = GwDocker()
         global_vars.session_vars['dlg_docker'].dlg_closed.connect(close_docker)
         manage_docker_options()
     else:

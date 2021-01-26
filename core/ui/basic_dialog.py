@@ -14,7 +14,7 @@ from qgis.PyQt import QtCore
 from qgis.PyQt.QtWidgets import QDialog, QWhatsThis
 
 
-class GwBasicDialog(QDialog):
+class GwDialog(QDialog):
 
     def __init__(self, subtag=None):
         super().__init__()

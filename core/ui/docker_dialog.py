@@ -10,13 +10,13 @@ from qgis.PyQt import QtCore
 from qgis.PyQt.QtWidgets import QDockWidget
 
 
-class GwDockerDialog(QDockWidget):
+class GwDocker(QDockWidget):
     dlg_closed = QtCore.pyqtSignal()
 
 
     def __init__(self, subtag=None):
         super().__init__()
-        #TODO: Check try/catch. Strange error: "GwDockerDialog object has no attribute 'setupUi"
+        #TODO: Check try/catch. Strange error: "GwDocker object has no attribute 'setupUi"
         try:
             self.setupUi(self)
         except Exception:

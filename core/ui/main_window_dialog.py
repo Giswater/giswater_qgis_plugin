@@ -14,7 +14,7 @@ from qgis.PyQt import QtCore
 from qgis.PyQt.QtWidgets import QMainWindow, QWhatsThis
 
 
-class GwMainWindowDialog(QMainWindow):
+class GwMainWindow(QMainWindow):
 
     dlg_closed = QtCore.pyqtSignal()
     key_escape = QtCore.pyqtSignal()
