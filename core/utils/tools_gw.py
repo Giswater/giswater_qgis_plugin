@@ -88,7 +88,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
             parameter = f"{global_vars.project_type}_{parameter}"
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         if config_type in "user":
-            path_folder = os.path.join(tools_os.get_datadir(), global_vars.config_user_dir)
+            path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
 
         elif config_type in "project":
             path_folder = global_vars.plugin_dir
@@ -123,7 +123,7 @@ def set_config_parser(section: str, parameter: str, value: str, config_type="use
             parameter = f"{global_vars.project_type}_{parameter}"
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         if config_type in "user":
-            path_folder = os.path.join(tools_os.get_datadir(), global_vars.config_user_dir)
+            path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
         elif config_type in "project":
             path_folder = global_vars.plugin_dir
         else:

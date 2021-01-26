@@ -449,7 +449,7 @@ class GwProfileButton(GwDialogButton):
         self.plot = plt
 
         # If file profile.png exist overwrite
-        temp_folder = f"{global_vars.config_user_dir}{os.sep}temp"
+        temp_folder = f"{global_vars.user_folder_dir}{os.sep}temp"
         img_path = f"{temp_folder}{os.sep}profile.png"
         if not os.path.exists(img_path):
             os.makedirs(temp_folder)

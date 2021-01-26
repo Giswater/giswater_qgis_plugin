@@ -27,7 +27,7 @@ class GwLogger(object):
         self.logger_file.setLevel(int(log_level))
 
         # Define log folder in users folder
-        main_folder = os.path.join(tools_os.get_datadir(), global_vars.config_user_dir)
+        main_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
         log_folder = main_folder + os.sep + "log" + os.sep
         if folder_has_tstamp:
             tstamp = str(time.strftime(log_suffix))

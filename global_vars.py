@@ -15,7 +15,7 @@ iface = None
 canvas = None
 plugin_dir = None
 plugin_name = None
-config_user_dir = None
+user_folder_dir = None
 schema_name = None
 project_type = None
 srid = None
@@ -29,14 +29,14 @@ session_vars = {'user_settings': None, 'user_settings_path': None, 'min_log_leve
                 'db': None, 'postgresql_version': None, 'dao': None, 'credentials': None, 'shortcut_keys':[]}
 
 
-def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name, p_config_user_dir):
+def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name, p_user_folder_dir):
 
-    global iface, canvas, plugin_dir, plugin_name, config_user_dir
+    global iface, canvas, plugin_dir, plugin_name, user_folder_dir
     iface = p_iface
     canvas = p_canvas
     plugin_dir = p_plugin_dir
     plugin_name = p_plugin_name
-    config_user_dir = p_config_user_dir
+    user_folder_dir = p_user_folder_dir
 
 
 def init_settings(setting_file):

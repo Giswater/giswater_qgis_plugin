@@ -31,7 +31,7 @@ class GwMenuLoad(QObject):
         self.settings = global_vars.settings
         self.plugin_dir = global_vars.plugin_dir
 
-        self.config_path_folder = os.path.join(tools_os.get_datadir(), global_vars.config_user_dir)
+        self.config_path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
         self.list_values = []
 
 
