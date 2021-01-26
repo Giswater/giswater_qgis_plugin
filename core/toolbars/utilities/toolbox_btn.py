@@ -252,8 +252,6 @@ class GwToolBoxButton(GwDialogButton):
         dialog.progressBar.setStyleSheet("QProgressBar {border: 0px solid #000000; border-radius: 5px; "
                                          "background-color: #E0E0E0;}"
                                          "QProgressBar::chunk {background-color:#0bd82c; width: 10 px; margin: 0.5px;}")
-        # dialog.progressBar.setStyleSheet("QProgressBar {border: 2px solid grey; border-radius: 0px; text-align: center; }"
-        #                                  " QProgressBar::chunk {background-color: #3add36; width: 1px;filter: blur(10px);}")
 
         # Set background task 'GwToolBoxTask'
         description = f"ToolBox function"

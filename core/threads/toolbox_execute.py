@@ -143,9 +143,8 @@ class GwToolBoxTask(GwTask):
 
 
     def finished(self, result, e=None):
+        self.dialog.btn_cancel.setEnabled(False)
         self.dialog.progressBar.setVisible(False)
-        # self.dialog.btn_cancel.setEnabled(False)
-        self.toolbox.remove_layers()
         if result is False:
             msg = f"<b>Key: </b>{e}<br>"
             msg += f"<b>key container: </b>'body/data/ <br>"

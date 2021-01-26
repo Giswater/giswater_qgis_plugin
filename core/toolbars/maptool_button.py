@@ -40,21 +40,6 @@ class GwMaptoolButton(QgsMapTool):
 
         super().__init__(self.canvas)
 
-        icon = None
-        if os.path.exists(icon_path):
-            icon = QIcon(icon_path)
-
-        self.action = None
-
-        if icon is None:
-            self.action = QAction(text, action_group)
-        else:
-            self.action = QAction(icon, text, action_group)
-
-        self.action.setObjectName(action_name)
-        self.action.setCheckable(True)
-        self.action.triggered.connect(self.clicked_event)
-
         # Change map tool cursor
         self.cursor = QCursor()
         self.cursor.setShape(Qt.CrossCursor)
@@ -81,6 +66,20 @@ class GwMaptoolButton(QgsMapTool):
         if toolbar is None:
             return
 
+        self.action = None
+
+        icon = None
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+
+        if icon is None:
+            self.action = QAction(text, action_group)
+        else:
+            self.action = QAction(icon, text, action_group)
+
+        self.action.setObjectName(action_name)
+        self.action.setCheckable(True)
+        self.action.triggered.connect(self.clicked_event)
         toolbar.addAction(self.action)
         self.setAction(self.action)
 
