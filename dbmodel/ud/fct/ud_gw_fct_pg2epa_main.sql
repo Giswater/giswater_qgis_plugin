@@ -34,6 +34,7 @@ v_checknetwork boolean;
 v_advancedsettings boolean;
 v_input json;
 v_vdefault boolean;
+v_error_context text;
 
 
 BEGIN
@@ -170,6 +171,13 @@ BEGIN
 	"message":{"level":1, "text":"Inp export done succesfully"}')::json;
 	
 	RETURN v_return;
+
+	--  Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed", "body":{"data":{"info":{"values":[{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
+	to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+
 	
 END;
 $BODY$

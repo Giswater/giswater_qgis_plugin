@@ -1,0 +1,6 @@
+3.4.028
+************
+- Bug fix on trg edit element
+- Bug fix on temp tables (SRID harcoded-25831)
+- Add on exception when others on go2epa_main function for ud
+- Clean code on trg_edit_subcatchement

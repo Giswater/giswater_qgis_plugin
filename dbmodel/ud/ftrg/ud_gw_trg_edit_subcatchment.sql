@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_subcatchment()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-	expl_id_int integer;
+expl_id_int integer;
 
 
 BEGIN
@@ -21,23 +21,23 @@ BEGIN
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
     
-       -- Sector ID
-        IF (NEW.sector_id IS NULL) THEN
-            NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_sector_vdefault' AND "cur_user"="current_user"());
+		-- Sector ID
+		IF (NEW.sector_id IS NULL) THEN
+			NEW.sector_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_sector_vdefault' AND "cur_user"="current_user"());
 			IF (NEW.sector_id IS NULL) THEN
 				NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_DWithin(NEW.the_geom, sector.the_geom,0.001) LIMIT 1);
 			END IF;
-        END IF;
+		END IF;
 
-        -- hydrology_id
-		NEW.hydrology_id=(SELECT "hydrology_id" FROM selector_inp_hydrology WHERE "cur_user"="current_user"() LIMIT 1);
+		-- hydrology_id
 		IF (NEW.hydrology_id IS NULL) THEN
+			NEW.hydrology_id=(SELECT "hydrology_id" FROM selector_inp_hydrology WHERE "cur_user"="current_user"() LIMIT 1);
 		END IF;
 	
 		-- Subc ID
-        IF (NEW.subc_id IS NULL) THEN
-            NEW.subc_id := concat((SELECT value FROM config_param_system WHERE parameter='epa_subcatchment_concat_prefix_id'),(SELECT nextval('SCHEMA_NAME.inp_subcatchment_subc_id_seq'::regclass)));
-        END IF;
+		IF (NEW.subc_id IS NULL) THEN
+			NEW.subc_id := concat((SELECT value FROM config_param_system WHERE parameter='epa_subcatchment_concat_prefix_id'),(SELECT nextval('SCHEMA_NAME.inp_subcatchment_subc_id_seq'::regclass)));
+		END IF;
 
        		
 		-- FEATURE INSERT
@@ -62,9 +62,9 @@ BEGIN
 		RETURN NEW;
    
     ELSIF TG_OP = 'DELETE' THEN
-        DELETE FROM inp_subcatchment WHERE subc_id = OLD.subc_id;
+		DELETE FROM inp_subcatchment WHERE subc_id = OLD.subc_id;
 
-        RETURN NULL;
+		RETURN NULL;
    
     END IF;
 
