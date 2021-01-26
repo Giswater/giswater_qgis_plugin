@@ -12,7 +12,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QDate, Qt
 
-from ..maptool_button import GwMaptoolButton
+from ..maptool import GwMaptool
 from ...ui.ui_manager import GwFeatureReplaceUi, GwInfoWorkcatUi
 from ...shared.catalog import GwCatalog
 from ...utils import tools_gw
@@ -20,7 +20,7 @@ from ....lib import tools_qt, tools_log, tools_qgis, tools_db
 from .... import global_vars
 
 
-class GwFeatureReplaceButton(GwMaptoolButton):
+class GwFeatureReplaceButton(GwMaptool):
     """ Button 44: User select one feature. Execute SQL function: 'gw_fct_setfeaturereplace' """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):

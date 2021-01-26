@@ -11,14 +11,14 @@ from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtWidgets import QAction, QApplication, QMenu
 from qgis.PyQt.QtGui import QCursor
 
-from ..dialog_button import GwDialogButton
+from ..dialog import GwAction
 from ...load_project_check import GwLoadProjectCheck
 from ...threads.project_layers_config import GwProjectLayersConfig
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_log, tools_db
 
 
-class GwAddChildLayerButton(GwDialogButton):
+class GwAddChildLayerButton(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

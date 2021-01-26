@@ -18,7 +18,7 @@ from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
 
 
-class GwMaptoolButton(QgsMapTool):
+class GwMaptool(QgsMapTool):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

@@ -13,14 +13,14 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 from qgis.core import QgsExpression, QgsFeatureRequest
 
-from ...toolbars.dialog_button import GwDialogButton
+from ...toolbars.dialog import GwAction
 from ...ui.ui_manager import GwFeatureEndUi, GwInfoWorkcatUi, GwFeatureEndConnecUi
 from ...utils import tools_gw
 from .... import global_vars
 from ....lib import tools_qgis, tools_qt, tools_log, tools_db
 
 
-class GwFeatureEndButton(GwDialogButton):
+class GwFeatureEndButton(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

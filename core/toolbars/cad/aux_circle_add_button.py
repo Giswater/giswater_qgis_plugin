@@ -12,13 +12,13 @@ from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.core import QgsFeature, QgsGeometry, QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 
-from ..maptool_button import GwMaptoolButton
+from ..maptool import GwMaptool
 from ...ui.ui_manager import GwAuxCircleUi
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_qt
 
 
-class GwAuxCircleAddButton(GwMaptoolButton):
+class GwAuxCircleAddButton(GwMaptool):
     """ Button 71: Add circle """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):

@@ -17,7 +17,7 @@ from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QL
 from qgis.core import QgsApplication, QgsProject
 from qgis.gui import QgsDateTimeEdit
 
-from ..dialog_button import GwDialogButton
+from ..dialog import GwAction
 from ...threads.toolbox_execute import GwToolBoxTask
 from ...ui.ui_manager import GwToolboxUi, GwToolboxManagerUi
 from ...utils import tools_gw, tools_backend_calls
@@ -25,7 +25,7 @@ from ....lib import tools_qt, tools_qgis, tools_db
 from .... import global_vars
 
 
-class GwToolBoxButton(GwDialogButton):
+class GwToolBoxButton(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

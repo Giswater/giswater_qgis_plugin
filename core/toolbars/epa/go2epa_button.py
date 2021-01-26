@@ -22,10 +22,10 @@ from ...utils import tools_gw
 from ...ui.ui_manager import GwGo2EpaUI, GwHydrologySelectorUi, GwMultirowSelectorUi, GwGo2EpaOptionsUi
 from .... import global_vars
 from ....lib import tools_qgis, tools_qt, tools_db
-from ..dialog_button import GwDialogButton
+from ..dialog import GwAction
 
 
-class GwGo2EpaButton(GwDialogButton):
+class GwGo2EpaButton(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

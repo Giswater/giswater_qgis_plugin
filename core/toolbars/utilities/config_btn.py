@@ -14,13 +14,13 @@ from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox,
     QSizePolicy, QGridLayout, QWidget, QLabel, QTextEdit, QLineEdit
 from qgis.gui import QgsDateTimeEdit
 
-from ..dialog_button import GwDialogButton
+from ..dialog import GwAction
 from ...ui.ui_manager import GwConfigUi
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_db, tools_qgis
 
 
-class GwConfigButton(GwDialogButton):
+class GwConfigButton(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

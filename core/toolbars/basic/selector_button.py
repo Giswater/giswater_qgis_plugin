@@ -5,12 +5,12 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from ..dialog_button import GwDialogButton
+from ..dialog import GwAction
 from ...shared.selector import GwSelector
 from ....core.utils import tools_gw
 
 
-class GwSelectorButton(GwDialogButton):
+class GwSelectorButton(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

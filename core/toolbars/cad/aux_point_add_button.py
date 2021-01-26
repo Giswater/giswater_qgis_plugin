@@ -12,14 +12,14 @@ from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 
-from ..maptool_button import GwMaptoolButton
+from ..maptool import GwMaptool
 from ...ui.ui_manager import GwAuxPointUi
 from ...utils import tools_gw
 from .... import global_vars
 from ....lib import tools_qgis, tools_qt, tools_db
 
 
-class GwAuxPointAddButton(GwMaptoolButton):
+class GwAuxPointAddButton(GwMaptool):
     """ Button 72: Add point """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):

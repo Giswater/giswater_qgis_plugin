@@ -10,14 +10,14 @@ from functools import partial
 from qgis.PyQt.QtGui import QKeySequence
 from qgis.PyQt.QtWidgets import QAction, QMenu
 
-from ..dialog_button import GwDialogButton
+from ..dialog import GwAction
 from ...shared.info import GwInfo
 from ...utils import tools_gw
 from ....lib import tools_os
 from .... import global_vars
 
 
-class GwArcAddButton(GwDialogButton):
+class GwArcAddButton(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

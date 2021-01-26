@@ -17,13 +17,13 @@ from qgis.gui import QgsRubberBand
 
 from ...shared import info
 from ...shared.info import GwInfo
-from ...toolbars.maptool_button import GwMaptoolButton
+from ...toolbars.maptool import GwMaptool
 from ...utils import tools_gw
 from .... import global_vars
 from ....lib import tools_qgis
 
 
-class GwInfoButton(GwMaptoolButton):
+class GwInfoButton(GwMaptool):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

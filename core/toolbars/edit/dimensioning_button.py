@@ -7,12 +7,12 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import QSettings, Qt
 
-from ..maptool_button import GwMaptoolButton
+from ..maptool import GwMaptool
 from ...shared.dimensioning import GwDimensioning
 from ....lib import tools_qt, tools_log, tools_qgis
 
 
-class GwDimensioningButton(GwMaptoolButton):
+class GwDimensioningButton(GwMaptool):
     """ Button 39: Dimensioning """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
