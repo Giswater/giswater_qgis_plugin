@@ -40,7 +40,7 @@ class GwTest(QObject):
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
 
         # Check if config file exists
-        setting_file = os.path.join(self.plugin_dir, 'config', 'sessions.config')
+        setting_file = os.path.join(self.plugin_dir, 'config', 'session.config')
         if not os.path.exists(setting_file):
             message = f"Config file not found at: {setting_file}"
             print(message)

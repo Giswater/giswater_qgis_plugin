@@ -114,9 +114,9 @@ class GwProfileButton(GwDialogButton):
 
         # Set last parameters
         tools_qt.set_widget_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance,
-                                 tools_gw.get_config_parser('btn_profile', 'min_distance_profile', "user", "sessions"))
+                                 tools_gw.get_config_parser('btn_profile', 'min_distance_profile', "user", "session"))
         tools_qt.set_widget_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title,
-                                 tools_gw.get_config_parser('btn_profile', 'title_profile', "user", "sessions"))
+                                 tools_gw.get_config_parser('btn_profile', 'title_profile', "user", "session"))
 
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')

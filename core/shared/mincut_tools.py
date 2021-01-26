@@ -139,7 +139,7 @@ class GwMincutTools:
 
         self.dlg_selector = GwSelectorUi()
         tools_gw.load_settings(self.dlg_selector)
-        current_tab = tools_gw.get_config_parser('dialogs_tab', f"{self.dlg_selector.objectName()}_mincut", "user", "sessions")
+        current_tab = tools_gw.get_config_parser('dialogs_tab', f"{self.dlg_selector.objectName()}_mincut", "user", "session")
         self.dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_selector))
         self.dlg_selector.rejected.connect(partial(tools_gw.save_settings, self.dlg_selector))
         self.dlg_selector.rejected.connect(partial(tools_gw.save_current_tab, self.dlg_selector, self.dlg_selector.main_tab, 'mincut'))

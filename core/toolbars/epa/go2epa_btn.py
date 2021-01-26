@@ -194,22 +194,22 @@ class GwGo2EpaButton(GwDialogButton):
         """ Load QGIS settings related with file_manager """
 
         self.dlg_go2epa.txt_result_name.setMaxLength(16)
-        self.result_name = tools_gw.get_config_parser('btn_go2epa', 'go2epa_RESULT_NAME', "user", "sessions")
+        self.result_name = tools_gw.get_config_parser('btn_go2epa', 'go2epa_RESULT_NAME', "user", "session")
         self.dlg_go2epa.txt_result_name.setText(self.result_name)
-        self.file_inp = tools_gw.get_config_parser('btn_go2epa', 'go2epa_FILE_INP', "user", "sessions")
+        self.file_inp = tools_gw.get_config_parser('btn_go2epa', 'go2epa_FILE_INP', "user", "session")
         self.dlg_go2epa.txt_file_inp.setText(self.file_inp)
-        self.file_rpt = tools_gw.get_config_parser('btn_go2epa', 'go2epa_FILE_RPT', "user", "sessions")
+        self.file_rpt = tools_gw.get_config_parser('btn_go2epa', 'go2epa_FILE_RPT', "user", "session")
         self.dlg_go2epa.txt_file_rpt.setText(self.file_rpt)
 
-        value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_NETWORK_GEOM', "user", "sessions")
+        value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_NETWORK_GEOM', "user", "session")
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_only_check, value)
-        value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_INP', "user", "sessions")
+        value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_INP', "user", "session")
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export, value)
-        value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_UD', "user", "sessions")
+        value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_UD', "user", "session")
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, value)
-        value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_EPA', "user", "sessions")
+        value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_EPA', "user", "session")
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_exec, value)
-        value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_RPT', "user", "sessions")
+        value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_RPT', "user", "session")
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, value)
 
 

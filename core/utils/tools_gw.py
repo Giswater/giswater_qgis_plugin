@@ -45,10 +45,10 @@ def load_settings(dialog):
 
     # Get user UI config file
     try:
-        x = get_config_parser('dialogs_position', f"{dialog.objectName()}_x", "user", "sessions")
-        y = get_config_parser('dialogs_position', f"{dialog.objectName()}_y", "user", "sessions")
-        width = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", "user", "sessions")
-        height = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", "user", "sessions")
+        x = get_config_parser('dialogs_position', f"{dialog.objectName()}_x", "user", "session")
+        y = get_config_parser('dialogs_position', f"{dialog.objectName()}_y", "user", "session")
+        width = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_width", "user", "session")
+        height = get_config_parser('dialogs_dimension', f"{dialog.objectName()}_height", "user", "session")
 
         v_screens = ctypes.windll.user32
         screen_x = v_screens.GetSystemMetrics(78)  # Width of virtual screen
@@ -114,7 +114,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
     return value
 
 
-def set_config_parser(section: str, parameter: str, value: str, config_type="user", file_name="sessions", comment=None,
+def set_config_parser(section: str, parameter: str, value: str, config_type="user", file_name="session", comment=None,
                       prefix=True):
     """ Save simple parser value """
 
@@ -2123,7 +2123,7 @@ def manage_docker_options():
     # Load last docker position
     try:
         # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
-        pos = int(get_config_parser('docker', 'position', "user", "sessions"))
+        pos = int(get_config_parser('docker', 'position', "user", "session"))
         global_vars.session_vars['dlg_docker'].position = 2
         if pos in (1, 2, 4, 8):
             global_vars.session_vars['dlg_docker'].position = pos
