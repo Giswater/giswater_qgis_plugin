@@ -8,7 +8,7 @@ or (at your option) any later version.
 import os
 
 from qgis.PyQt import uic, QtCore
-from ...core.ui.basic_dialog import GwDialog
+from ...core.ui.dialog import GwDialog
 
 
 def get_ui_class(ui_file_name):

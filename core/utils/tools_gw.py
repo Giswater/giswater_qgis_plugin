@@ -28,9 +28,9 @@ from qgis.core import QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeatu
 from qgis.gui import QgsDateTimeEdit
 
 from ..models.cat_feature import GwCatFeature
-from ..ui.basic_dialog import GwDialog
-from ..ui.main_window_dialog import GwMainWindow
-from ..ui.docker_dialog import GwDocker
+from ..ui.dialog import GwDialog
+from ..ui.main_window import GwMainWindow
+from ..ui.docker import GwDocker
 
 from . import tools_backend_calls
 from ..utils.select_manager import GwSelectManager

@@ -11,9 +11,9 @@ from qgis.PyQt import uic, QtCore
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QLineEdit
 
-from .basic_dialog import GwDialog
-from .docker_dialog import GwDocker
-from .main_window_dialog import GwMainWindow
+from .dialog import GwDialog
+from .docker import GwDocker
+from .main_window import GwMainWindow
 
 
 def get_ui_class(ui_file_name, subfolder='shared'):

@@ -529,7 +529,7 @@ class GwGo2EpaButton(GwAction):
         :param name: field name (used in add_lot.py)
         :param hide_left: Columns to hide from the left table
         :param hide_right: Columns to hide from the right table
-        :param aql: (add query left) Query added to the left side (used in basic.py def basic_exploitation_selector())
+        :param aql: (add query left) Query added to the left side (used in dialog.py def basic_exploitation_selector())
         :return:
         """
 
