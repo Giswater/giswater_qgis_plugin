@@ -17,7 +17,7 @@ from .toolbars import buttons
 from .ui.ui_manager import GwLoadMenuUi
 from .utils import tools_gw
 from .. import global_vars
-from ..lib import tools_os, tools_qt
+from ..lib import tools_log, tools_qt
 
 
 class GwMenuLoad(QObject):
@@ -31,7 +31,8 @@ class GwMenuLoad(QObject):
         self.settings = global_vars.settings
         self.plugin_dir = global_vars.plugin_dir
 
-        self.config_path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
+        self.user_folder_dir = global_vars.user_folder_dir
+
         self.list_values = []
 
 
@@ -113,7 +114,7 @@ class GwMenuLoad(QObject):
     # region private functions
     def _open_config_path(self):
         """ Opens the OS-specific Config directory. """
-        path = os.path.realpath(self.config_path_folder)
+        path = os.path.realpath(self.user_folder_dir)
         os.startfile(path)
 
 
@@ -125,6 +126,7 @@ class GwMenuLoad(QObject):
         self.tree_config_files = self.dlg_manage_menu.findChild(QTreeWidget, 'tree_config_files')
         self.btn_save = self.dlg_manage_menu.findChild(QPushButton, 'btn_save')
         self.btn_close = self.dlg_manage_menu.findChild(QPushButton, 'btn_close')
+        self.btn_reset_dialog = self.dlg_manage_menu.findChild(QPushButton, 'btn_reset_dialog')
 
         # Fill table_config_files
         self._fill_tbl_config_files(self.tree_config_files)
@@ -132,9 +134,36 @@ class GwMenuLoad(QObject):
         # Listeners
         self.btn_save.clicked.connect(partial(self._save_config_files))
         self.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manage_menu))
+        self.btn_reset_dialog.clicked.connect(partial(self._reset_position_dialog))
 
         # Open dialog
         self.dlg_manage_menu.open()
+
+
+    def _reset_position_dialog(self):
+        """ Reset position dialog x/y """
+
+        try:
+            parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
+            config_folder = f"{self.user_folder_dir}{os.sep}config{os.sep}"
+            if not os.path.exists(config_folder):
+                os.makedirs(config_folder)
+            path = config_folder + f"session.config"
+            parser.read(path)
+
+            # Check if section exists in file
+            if "dialogs_position" in parser:
+                parser.remove_section("dialogs_position")
+
+            msg = "Reset position form done successfully."
+            tools_qt.show_info_box(msg, "Info")
+
+            with open(path, 'w') as configfile:
+                parser.write(configfile)
+                configfile.close()
+        except Exception as e:
+            tools_log.log_warning(f"set_config_parser exception [{type(e).__name__}]: {e}")
+            return
 
 
     def _get_config_file_values(self, file_name):
@@ -142,7 +171,7 @@ class GwMenuLoad(QObject):
         # Get values
         self.list_values = []
         values = {}
-        path = f"{self.config_path_folder}{os.sep}config{os.sep}{file_name}"
+        path = f"{self.user_folder_dir}{os.sep}config{os.sep}{file_name}"
 
         if not os.path.exists(path):
             return None
@@ -161,7 +190,7 @@ class GwMenuLoad(QObject):
     def _fill_tbl_config_files(self, tree):
         """ Fills a UI table with the local list of values variable. """
 
-        files = [f for f in os.listdir(f"{self.config_path_folder}{os.sep}config")]
+        files = [f for f in os.listdir(f"{self.user_folder_dir}{os.sep}config")]
 
         for file in files:
             self._get_config_file_values(file)
