@@ -443,7 +443,7 @@ class GwElement:
                 sql += f", verified = '{verified}'"
             else:
                 sql += ", verified = null"
-            if str(self.point_xy['x']) != "":
+            if str(self.point_xy['x']) not in ("", None, "None"):
                 sql += f", the_geom = ST_SetSRID(ST_MakePoint({self.point_xy['x']},{self.point_xy['y']}), {srid})"
 
             sql += f" WHERE element_id = '{element_id}';"
