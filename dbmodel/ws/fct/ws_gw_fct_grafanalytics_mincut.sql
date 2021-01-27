@@ -73,7 +73,7 @@ BEGIN
 		
 		-- setup graf closing check-valves
 		UPDATE temp_anlgraf SET flag = 1 
-		FROM config_mincut_checkvalve c 
+		FROM config_checkvalve c 
 		WHERE (temp_anlgraf.node_1 = c.node_id OR temp_anlgraf.node_2 = c.node_id);
 		
 		-- setup graf closing closed valves
