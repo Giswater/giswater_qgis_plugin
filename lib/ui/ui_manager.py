@@ -7,19 +7,21 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 
-from qgis.PyQt import uic, QtCore
-from ...core.ui.dialog import GwDialog
+from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QDialog
+
+from .dialog import GwDialog
 
 
 def get_ui_class(ui_file_name):
     """ Get UI Python class from @ui_file_name """
+
     # Folder that contains UI files
     ui_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ui_file_name))
     return uic.loadUiType(ui_file_path)[0]
 
 
-# region SHARED
 FORM_CLASS = get_ui_class('dialog_text.ui')
 class DialogTextUi(GwDialog, FORM_CLASS):
     pass
-# endregion
+
