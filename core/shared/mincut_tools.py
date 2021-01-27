@@ -13,7 +13,7 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QTableView, QLineEdit, QCompleter, QAbstractItemView
 
 from ..shared.selector import GwSelector
-from ..ui.ui_manager import GwSelectorUi, GwMincutUi
+from ..ui.ui_manager import GwSelectorUi, GwMincutManagerUi
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_db
@@ -30,8 +30,8 @@ class GwMincutTools:
         self.settings = global_vars.settings
 
 
-    def set_dialog(self, dialog):
-        self.dlg_mincut_man = dialog
+    def set_dialog(self):
+        self.dlg_mincut_man = GwMincutManagerUi()
 
 
     def get_mincut_manager(self):
@@ -165,7 +165,7 @@ class GwMincutTools:
         tools_qt.fill_combo_values(self.dlg_mincut_man.cmb_expl, rows, 1)
 
 
-    def open_mincut(self, dialog=GwMincutUi()):
+    def open_mincut(self):
         """ Open mincut form with selected record of the table """
 
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
@@ -182,7 +182,7 @@ class GwMincutTools:
         # Close this dialog and open selected mincut
         tools_gw.close_dialog(self.dlg_mincut_man)
         self.mincut.is_new = False
-        self.mincut.set_dialog(dialog)
+        self.mincut.set_dialog()
         self.mincut.init_mincut_form()
         self.mincut.load_mincut(result_mincut_id)
         self.mincut.manage_docker()
