@@ -46,7 +46,7 @@ class GwToolBoxButton(GwAction):
             tools_qgis.show_warning("Function not found in database", parameter=function_name)
             return
 
-        self.dlg_toolbox = GwToolboxUi()
+        self.dlg_toolbox = GwToolboxUi('toolbox')
         self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.dlg_toolbox.trv.setHeaderHidden(True)
         extras = '"isToolbox":true'

@@ -13,6 +13,8 @@ import webbrowser
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtWidgets import QMainWindow, QWhatsThis
 
+from ... import global_vars
+
 
 class GwMainWindow(QMainWindow):
 
@@ -43,7 +45,7 @@ class GwMainWindow(QMainWindow):
         if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
             QWhatsThis.leaveWhatsThisMode()
             parser = configparser.ConfigParser()
-            path = os.path.dirname(__file__) + os.sep + 'config' + os.sep + 'init.config'
+            path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}init.config"
             if not os.path.exists(path):
                 print(f"File not found: {path}")
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual')

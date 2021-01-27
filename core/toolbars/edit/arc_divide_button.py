@@ -42,11 +42,11 @@ class GwArcDivideButton(GwMaptool):
             if not result or result['status'] == 'Failed':
                 return
             if 'hideForm' not in result['body']['actions'] or not result['body']['actions']['hideForm']:
-                self.dlg_dtext = GwDialogTextUi()
+                self.dlg_dtext = GwDialogTextUi('arc_divide')
                 self.dlg_dtext.btn_accept.hide()
                 self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
                 tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, True, 1)
-                self.dlg_dtext.exec()
+                tools_gw.open_dialog(self.dlg_dtext)
 
         else:
             message = "Move node: Error updating geometry"
