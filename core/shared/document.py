@@ -77,7 +77,7 @@ class GwDocument:
             self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
         if feature is not None:
-            layer = self.iface.activeLayer()
+            layer = self.layers[geom_type][0]
             layer.selectByIds([feature.id()])
 
         # Set icons
