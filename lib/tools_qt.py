@@ -1203,7 +1203,7 @@ def _translate_form(dialog, context_name, aux_context='ui_message'):
     for widget_type in type_widget_list:
         widget_list = dialog.findChildren(widget_type)
         for widget in widget_list:
-            _translate_widget(context_name, widget)
+            _translate_widget(context_name, widget, aux_context)
 
     # Translate title of the form
     text = tr('title', context_name, aux_context)
@@ -1231,7 +1231,7 @@ def _translate_widget(context_name, widget, aux_context='ui_message'):
                     text = tr(widget_text, context_name, aux_context)
                     if text != widget_text:
                         widget.setTabText(i, text)
-                _translate_tooltip(context_name, widget, i)
+                _translate_tooltip(context_name, widget, i, aux_context=aux_context)
         elif type(widget) is QToolBox:
             num_tabs = widget.count()
             for i in range(0, num_tabs):
@@ -1244,7 +1244,7 @@ def _translate_widget(context_name, widget, aux_context='ui_message'):
                     text = tr(widget_text, context_name, aux_context)
                     if text != widget_text:
                         widget.setItemText(i, text)
-                _translate_tooltip(context_name, widget.widget(i))
+                _translate_tooltip(context_name, widget.widget(i), aux_context=aux_context)
         elif type(widget) is QGroupBox:
             widget_name = widget.objectName()
             text = tr(widget_name, context_name, aux_context)
@@ -1255,7 +1255,7 @@ def _translate_widget(context_name, widget, aux_context='ui_message'):
                 text = tr(widget_title, context_name, aux_context)
                 if text != widget_title:
                     widget.setTitle(text)
-            _translate_tooltip(context_name, widget)
+            _translate_tooltip(context_name, widget, aux_context=aux_context)
         else:
             widget_name = widget.objectName()
             text = tr(widget_name, context_name, aux_context)
@@ -1266,7 +1266,7 @@ def _translate_widget(context_name, widget, aux_context='ui_message'):
                 text = tr(widget_text, context_name, aux_context)
                 if text != widget_text:
                     widget.setText(text)
-            _translate_tooltip(context_name, widget)
+            _translate_tooltip(context_name, widget, aux_context=aux_context)
 
     except Exception as e:
         tools_log.log_info(f"{widget_name} --> {type(e).__name__} --> {e}")
