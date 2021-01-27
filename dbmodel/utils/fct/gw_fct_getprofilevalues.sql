@@ -163,9 +163,22 @@ BEGIN
 
 	-- Check start-end nodes
 	v_nodemessage = 'Start/End nodes is/are not valid(s). CHECK elev data AND cat_feature.isprofilesurface. Only NOT start/end nodes may have missed elev data OR may have cat_feature.isprofilesurface = false';
-	SELECT isprofilesurface INTO v_nodevalid FROM v_edit_node JOIN cat_feature_node ON node_type = id WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_init;
+	IF v_project_type = 'UD' THEN
+		SELECT isprofilesurface INTO v_nodevalid FROM v_edit_node JOIN cat_feature_node ON node_type = id 
+		WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_init;
+	ELSIF v_project_type = 'WS' THEN
+		SELECT isprofilesurface INTO v_nodevalid FROM v_edit_node JOIN cat_feature_node ON node_type = id 
+		WHERE elevation IS NOT NULL AND depth IS NOT NULL AND node_id = v_init;
+	END IF;
+
 	IF v_nodevalid THEN
-		SELECT isprofilesurface INTO v_nodevalid FROM v_edit_node JOIN cat_feature_node ON node_type = id WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_end;
+		IF v_project_type = 'UD' THEN
+			SELECT isprofilesurface INTO v_nodevalid FROM v_edit_node JOIN cat_feature_node ON node_type = id 
+			WHERE sys_elev IS NOT NULL AND sys_top_elev IS NOT NULL AND sys_ymax IS NOT NULL AND node_id = v_end;
+		ELSIF v_project_type = 'WS' THEN
+			SELECT isprofilesurface INTO v_nodevalid FROM v_edit_node JOIN cat_feature_node ON node_type = id 
+			WHERE elevation IS NOT NULL AND depth IS NOT NULL AND node_id = v_end;
+		END IF;
 
 		IF v_nodevalid IS NOT TRUE THEN	
 			v_level = 2;
@@ -241,8 +254,11 @@ BEGIN
 			USING (node_id)';
 
 		-- looking for null values (in case of exists links graf will be disabled as below)
-		SELECT count(*) INTO v_count FROM anl_node WHERE (elev IS NULL or ymax is null OR top_elev is null) AND fid = 222 and cur_user = current_user;
-
+		IF v_project_type = 'UD' THEN
+			SELECT count(*) INTO v_count FROM anl_node WHERE (elev IS NULL or ymax is null OR top_elev is null) AND fid = 222 and cur_user = current_user;
+		ELSIF v_project_type = 'WS' THEN
+			SELECT count(*) INTO v_count FROM anl_node WHERE (elevation IS NULL or depth is null) AND fid = 222 and cur_user = current_user;
+		END IF;
 		IF v_linksdistance > 0 AND v_count = 0 THEN
 
 			-- get vnode values
