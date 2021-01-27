@@ -88,7 +88,7 @@ class GwElement:
         # Remove all previous selections
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
         if feature:
-            layer = self.iface.activeLayer()
+            layer = self.layers[geom_type][0]
             layer.selectByIds([feature.id()])
 
         self.check_date(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
