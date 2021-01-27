@@ -141,7 +141,7 @@ def qgis_log_message(text=None, message_level=0, context_name=None, parameter=No
 
     msg = None
     if text:
-        msg = tools_qt.tr(text, context_name, aux_context='ui_message')
+        msg = tools_qt.tr(text, context_name)
         if parameter:
             msg += f": {parameter}"
 

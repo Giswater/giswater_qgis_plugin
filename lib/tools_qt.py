@@ -678,7 +678,7 @@ def get_folder_path(dialog, widget):
     file_dialog.setFileMode(QFileDialog.Directory)
     message = "Select folder"
     folder_path = file_dialog.getExistingDirectory(
-        parent=None, caption=tr(message, aux_context='ui_message'), directory=folder_path)
+        parent=None, caption=tr(message), directory=folder_path)
     if folder_path:
         set_widget_text(dialog, widget, str(folder_path))
 
@@ -881,10 +881,10 @@ def show_details(detail_text, title=None, inf_text=None):
     msg_box = QMessageBox()
     msg_box.setText(detail_text)
     if title:
-        title = tr(title, aux_context='ui_message')
+        title = tr(title)
         msg_box.setWindowTitle(title)
     if inf_text:
-        inf_text = tr(inf_text, aux_context='ui_message')
+        inf_text = tr(inf_text)
         msg_box.setInformativeText(inf_text)
     msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
     msg_box.setStandardButtons(QMessageBox.Ok)
@@ -895,10 +895,9 @@ def show_details(detail_text, title=None, inf_text=None):
 def show_warning_open_file(text, inf_text, file_path, context_name=None):
     """ Show warning message with a button to open @file_path """
 
-    widget = global_vars.iface.messageBar().createMessage(tr(text, context_name, aux_context='ui_message'),
-                                                          tr(inf_text, aux_context='ui_message'))
+    widget = global_vars.iface.messageBar().createMessage(tr(text, context_name), tr(inf_text))
     button = QPushButton(widget)
-    button.setText(tr("Open file", aux_context='ui_message'))
+    button.setText(tr("Open file"))
     button.clicked.connect(partial(tools_os.open_file, file_path))
     widget.layout().addWidget(button)
     global_vars.iface.messageBar().pushWidget(widget, 1)
@@ -908,15 +907,15 @@ def show_question(text, title=None, inf_text=None, context_name=None, parameter=
     """ Ask question to the user """
 
     msg_box = QMessageBox()
-    msg = tr(text, context_name, aux_context='ui_message')
+    msg = tr(text, context_name)
     if parameter:
         msg += ": " + str(parameter)
     msg_box.setText(msg)
     if title:
-        title = tr(title, context_name, aux_context='ui_message')
+        title = tr(title, context_name)
         msg_box.setWindowTitle(title)
     if inf_text:
-        inf_text = tr(inf_text, context_name, aux_context='ui_message')
+        inf_text = tr(inf_text, context_name)
         msg_box.setInformativeText(inf_text)
     msg_box.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
     msg_box.setDefaultButton(QMessageBox.Ok)
@@ -933,7 +932,7 @@ def show_info_box(text, title=None, inf_text=None, context_name=None, parameter=
 
     msg = ""
     if text:
-        msg = tr(text, context_name, aux_context='ui_message')
+        msg = tr(text, context_name)
         if parameter:
             msg += ": " + str(parameter)
 
@@ -941,10 +940,10 @@ def show_info_box(text, title=None, inf_text=None, context_name=None, parameter=
     msg_box.setText(msg)
     msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
     if title:
-        title = tr(title, context_name, aux_context='ui_message')
+        title = tr(title, context_name)
         msg_box.setWindowTitle(title)
     if inf_text:
-        inf_text = tr(inf_text, context_name, aux_context='ui_message')
+        inf_text = tr(inf_text, context_name)
         msg_box.setInformativeText(inf_text)
     msg_box.setDefaultButton(QMessageBox.No)
     msg_box.exec_()
@@ -979,7 +978,7 @@ def set_stylesheet(widget, style="border: 2px solid red"):
     widget.setStyleSheet(style)
 
 
-def tr(message, context_name=None, aux_context=None):
+def tr(message, context_name=None, aux_context='ui_message'):
     """ Translate @message looking it in @context_name """
 
     if context_name is None:
@@ -991,7 +990,7 @@ def tr(message, context_name=None, aux_context=None):
     except TypeError:
         value = QCoreApplication.translate(context_name, str(message))
     finally:
-        # If not translation has been found, check into 'ui_message' context
+        # If not translation has been found, check into context @aux_context
         if value == message:
             value = QCoreApplication.translate(aux_context, message)
 
@@ -1027,6 +1026,7 @@ def manage_translation(context_name, dialog=None, log_info=False):
 def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_increase=0, filepath=None,
                         schema_name=None):
     """ Manage exception in database queries and show information to the user """
+
     show_exception_msg = True
     description = ""
     if exception:
@@ -1206,7 +1206,7 @@ def _translate_form(dialog, context_name, aux_context='ui_message'):
             _translate_widget(context_name, widget)
 
     # Translate title of the form
-    text = tr('title', context_name, aux_context=aux_context)
+    text = tr('title', context_name, aux_context)
     if text != 'title':
         dialog.setWindowTitle(text)
 
@@ -1223,12 +1223,12 @@ def _translate_widget(context_name, widget, aux_context='ui_message'):
             num_tabs = widget.count()
             for i in range(0, num_tabs):
                 widget_name = widget.widget(i).objectName()
-                text = tr(widget_name, context_name, aux_context=aux_context)
+                text = tr(widget_name, context_name, aux_context)
                 if text not in (widget_name, None, 'None'):
                     widget.setTabText(i, text)
                 else:
                     widget_text = widget.tabText(i)
-                    text = tr(widget_text, context_name, aux_context=aux_context)
+                    text = tr(widget_text, context_name, aux_context)
                     if text != widget_text:
                         widget.setTabText(i, text)
                 _translate_tooltip(context_name, widget, i)
@@ -1236,34 +1236,34 @@ def _translate_widget(context_name, widget, aux_context='ui_message'):
             num_tabs = widget.count()
             for i in range(0, num_tabs):
                 widget_name = widget.widget(i).objectName()
-                text = tr(widget_name, context_name, aux_context=aux_context)
+                text = tr(widget_name, context_name, aux_context)
                 if text not in (widget_name, None, 'None'):
                     widget.setItemText(i, text)
                 else:
                     widget_text = widget.itemText(i)
-                    text = tr(widget_text, context_name, aux_context=aux_context)
+                    text = tr(widget_text, context_name, aux_context)
                     if text != widget_text:
                         widget.setItemText(i, text)
                 _translate_tooltip(context_name, widget.widget(i))
         elif type(widget) is QGroupBox:
             widget_name = widget.objectName()
-            text = tr(widget_name, context_name, aux_context=aux_context)
+            text = tr(widget_name, context_name, aux_context)
             if text not in (widget_name, None, 'None'):
                 widget.setTitle(text)
             else:
                 widget_title = widget.title()
-                text = tr(widget_title, context_name, aux_context=aux_context)
+                text = tr(widget_title, context_name, aux_context)
                 if text != widget_title:
                     widget.setTitle(text)
             _translate_tooltip(context_name, widget)
         else:
             widget_name = widget.objectName()
-            text = tr(widget_name, context_name, aux_context=aux_context)
+            text = tr(widget_name, context_name, aux_context)
             if text not in (widget_name, None, 'None'):
                 widget.setText(text)
             else:
                 widget_text = widget.text()
-                text = tr(widget_text, context_name, aux_context=aux_context)
+                text = tr(widget_text, context_name, aux_context)
                 if text != widget_text:
                     widget.setText(text)
             _translate_tooltip(context_name, widget)
@@ -1280,14 +1280,14 @@ def _translate_tooltip(context_name, widget, idx=None, aux_context='ui_message')
 
     if type(widget) is QTabWidget:
         widget_name = widget.widget(idx).objectName()
-        tooltip = tr(f'tooltip_{widget_name}', context_name, aux_context=aux_context)
+        tooltip = tr(f'tooltip_{widget_name}', context_name, aux_context)
         if tooltip not in (f'tooltip_{widget_name}', None, 'None'):
             widget.setTabToolTip(idx, tooltip)
         elif widget.toolTip() in ("", None):
             widget.setTabToolTip(idx, widget.tabText(idx))
     else:
         widget_name = widget.objectName()
-        tooltip = tr(f'tooltip_{widget_name}', context_name, aux_context=aux_context)
+        tooltip = tr(f'tooltip_{widget_name}', context_name, aux_context)
         if tooltip not in (f'tooltip_{widget_name}', None, 'None'):
             widget.setToolTip(tooltip)
         elif widget.toolTip() in ("", None):

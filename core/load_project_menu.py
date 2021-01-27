@@ -11,7 +11,8 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtGui import QIcon, QKeySequence
-from qgis.PyQt.QtWidgets import QActionGroup, QMenu, QComboBox, QTableView, QTableWidgetItem, QPushButton, QTreeWidget, QTreeWidgetItem
+from qgis.PyQt.QtWidgets import QActionGroup, QMenu, QComboBox, QTableView, QTableWidgetItem, QPushButton, \
+    QTreeWidget, QTreeWidgetItem
 
 from .toolbars import buttons
 from .ui.ui_manager import GwLoadMenuUi
@@ -26,13 +27,10 @@ class GwMenuLoad(QObject):
         """ Class to manage layers. Refactor code from main.py """
 
         super().__init__()
-
         self.iface = global_vars.iface
         self.settings = global_vars.settings
         self.plugin_dir = global_vars.plugin_dir
-
         self.user_folder_dir = global_vars.user_folder_dir
-
         self.list_values = []
 
 
@@ -109,7 +107,8 @@ class GwMenuLoad(QObject):
 
     def _translate(self, message):
         """ Calls on tools_qt to translate parameter message. """
-        return tools_qt.tr(message, aux_context='ui_message')
+        return tools_qt.tr(message)
+
 
     # region private functions
     def _open_config_path(self):
@@ -120,6 +119,7 @@ class GwMenuLoad(QObject):
 
     def _open_manage_file(self):
         """ Manage files dialog:: """
+
         self.dlg_manage_menu = GwLoadMenuUi()
 
         # Manage widgets
@@ -168,6 +168,7 @@ class GwMenuLoad(QObject):
 
     def _get_config_file_values(self, file_name):
         """ Populates a variable with a list of values parsed from a configuration file. """
+
         # Get values
         self.list_values = []
         values = {}
@@ -200,7 +201,9 @@ class GwMenuLoad(QObject):
 
             row_count = len(self.list_values)
             for row in range(row_count):
-                item_child = QTreeWidgetItem([f"{self.list_values[row]['Section']}", f"{self.list_values[row]['Parameter']}", f"{self.list_values[row]['Value']}"])
+                item_child = QTreeWidgetItem([f"{self.list_values[row]['Section']}",
+                                              f"{self.list_values[row]['Parameter']}",
+                                              f"{self.list_values[row]['Value']}"])
                 # item_child.doubleClicked.connect(partial(self._onDoubleClick))
                 item.addChild(item_child)
 
@@ -212,6 +215,7 @@ class GwMenuLoad(QObject):
 
     def _save_config_files(self):
         """ Writes the list of values into a persistant configuration file. """
+
         return
         row_count = self.tbl_config_files.rowCount()
         filename = tools_qt.get_text(self.dlg_manage_menu, self.cmb_config_files).replace(".config", "")

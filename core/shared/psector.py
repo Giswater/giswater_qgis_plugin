@@ -1527,7 +1527,7 @@ class GwPsector:
             if cur_psector is not None and (str(id_) == str(cur_psector[0])):
                 message = ("You are trying to delete your current psector. "
                            "Please, change your current psector before delete.")
-                tools_qt.show_exception_message('Current psector', tools_qt.tr(message, aux_context='ui_message'))
+                tools_qt.show_exception_message('Current psector', tools_qt.tr(message))
                 return
             inf_text += f'"{id_}", '
             list_id += f'"{id_}", '

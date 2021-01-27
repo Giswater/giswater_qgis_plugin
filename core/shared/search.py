@@ -658,7 +658,7 @@ class GwSearch:
         file_dialog.setFileMode(QFileDialog.Directory)
 
         msg = "Save as"
-        folder_path, filter_ = file_dialog.getSaveFileName(None, tools_qt.tr(msg, aux_context='ui_message'), folder_path, '*.csv')
+        folder_path, filter_ = file_dialog.getSaveFileName(None, tools_qt.tr(msg), folder_path, '*.csv')
         if folder_path:
             tools_qt.set_widget_text(dialog, widget, str(folder_path))
 

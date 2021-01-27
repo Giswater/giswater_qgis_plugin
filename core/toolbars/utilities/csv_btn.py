@@ -83,7 +83,7 @@ class GwCSVButton(GwAction):
         rows = tools_db.get_rows(sql)
         if not rows:
             message = "You do not have permission to execute this application"
-            self.dlg_csv.lbl_info.setText(tools_qt.tr(message, aux_context='ui_message'))
+            self.dlg_csv.lbl_info.setText(tools_qt.tr(message))
             self.dlg_csv.lbl_info.setStyleSheet("QLabel{color: red;}")
 
             self.dlg_csv.cmb_import_type.setEnabled(False)
@@ -166,7 +166,7 @@ class GwCSVButton(GwAction):
         if not os.path.exists(folder_path):
             folder_path = os.path.dirname(__file__)
         os.chdir(folder_path)
-        message = tools_qt.tr("Select CSV file", aux_context='ui_message')
+        message = tools_qt.tr("Select CSV file")
         file_csv, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.csv')
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.txt_file_csv, file_csv)
 

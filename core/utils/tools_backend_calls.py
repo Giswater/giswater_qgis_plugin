@@ -119,6 +119,7 @@ def refresh_attribute_table(**kwargs):
 
 def refresh_canvas(**kwargs):
     """ Function called in def wait_notifications(...) -->  getattr(self, function_name)(**params) """
+
     # Note: canvas.refreshAllLayers() mysteriously that leaves the layers broken
     # self.canvas.refreshAllLayers()
     # Get list of layer names
@@ -290,22 +291,13 @@ def show_messagebox(**kwargs):
     msg = kwargs['message'] if 'message' in kwargs else 'No message found'
     title = kwargs['title'] if 'title' in kwargs else 'New message'
     inf_text = kwargs['inf_text'] if 'inf_text' in kwargs else 'Info text'
-    # color = "black"
-    # bold = ''
-    # if 'styleSheet' in kwargs:
-    #     color = kwargs['styleSheet']['color'] if 'color' in kwargs['styleSheet'] else "black"
-    #     if 'bold' in kwargs['styleSheet']:
-    #         bold = 'b' if kwargs['styleSheet']['bold'] else ''
-    #     else:
-    #         bold = ''
-    # msg = f'<font color="{color}"><{bold}>{msg}</font>'
     msg_box = QMessageBox()
     msg_box.setText(msg)
     if title:
-        title = tools_qt.tr(title, aux_context='ui_message')
+        title = tools_qt.tr(title)
         msg_box.setWindowTitle(title)
     if inf_text:
-        inf_text = tools_qt.tr(inf_text, aux_context='ui_message')
+        inf_text = tools_qt.tr(inf_text)
         msg_box.setInformativeText(inf_text)
     msg_box.setWindowFlags(Qt.WindowStaysOnTopHint)
     msg_box.setStandardButtons(QMessageBox.Ok)

@@ -148,8 +148,10 @@ class GwLoadProject(QObject):
         message = "Project read successfully"
         tools_log.log_info(message)
 
+
     def translate(self, message):
-        return tools_qt.tr(message, aux_context='ui_message')
+        return tools_qt.tr(message)
+
 
     # region private functions
     
@@ -168,7 +170,8 @@ class GwLoadProject(QObject):
                 return False
 
         return True
-    
+
+
     def _check_database_connection(self, show_warning, force_commit=False):
         """ Set new database connection. If force_commit=True then force commit before opening project """
 
@@ -189,6 +192,7 @@ class GwLoadProject(QObject):
                 return False
 
             return True
+
 
     def _check_layers_from_distinct_schema(self):
         """
@@ -226,7 +230,8 @@ class GwLoadProject(QObject):
             global_vars.schema_name = self.project_vars['main_schema']
 
         return True
-    
+
+
     def _get_buttons_to_hide(self):
         """
             Populates the buttons_to_hide list.
@@ -248,7 +253,8 @@ class GwLoadProject(QObject):
         finally:
             # TODO remove this line if you want enabled info for epa
             self.buttons_to_hide.append('199')
-    
+
+
     def _manage_toolbars(self):
         """
             Manage actions of the custom plugin toolbars.
@@ -305,6 +311,7 @@ class GwLoadProject(QObject):
         self._enable_toolbar("utilities")
         self._enable_toolbar("toc")
 
+
     def _create_toolbar(self, toolbar_id):
         list_actions = tools_gw.check_config_settings('toolbars', str(toolbar_id), 'None', "project", "init")
 
@@ -330,6 +337,7 @@ class GwLoadProject(QObject):
         plugin_toolbar.list_actions = list_actions
         self.plugin_toolbars[toolbar_id] = plugin_toolbar
 
+
     def _manage_snapping_layers(self):
         """ Manage snapping of layers """
 
@@ -337,6 +345,7 @@ class GwLoadProject(QObject):
         tools_qgis.manage_snapping_layer('v_edit_connec', snapping_type=0)
         tools_qgis.manage_snapping_layer('v_edit_node', snapping_type=0)
         tools_qgis.manage_snapping_layer('v_edit_gully', snapping_type=0)
+
 
     def _check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
@@ -372,6 +381,7 @@ class GwLoadProject(QObject):
             self._enable_toolbar("epa")
             self._enable_toolbar("plan")
 
+
     def _enable_toolbars(self, visible=True):
         """ Enable/disable all plugin toolbars from QGIS GUI """
 
@@ -384,11 +394,13 @@ class GwLoadProject(QObject):
         except Exception as e:
             tools_log.log_warning(str(e))
 
+
     def _enable_all_buttons(self, enable=True):
         """ Utility to enable/disable all buttons """
 
         for index in self.buttons.keys():
             self._enable_button(index, enable)
+
 
     def _enable_button(self, button_id, enable=True):
         """ Enable/disable selected button """
@@ -397,12 +409,14 @@ class GwLoadProject(QObject):
         if key in self.buttons:
             self.buttons[key].action.setEnabled(enable)
 
+
     def _hide_button(self, button_id, hide=True):
         """ Enable/disable selected action """
 
         key = str(button_id).zfill(2)
         if key in self.buttons:
             self.buttons[key].action.setVisible(not hide)
+
 
     def _check_schema(self, schemaname=None):
         """ Check if selected schema exists """
@@ -415,7 +429,8 @@ class GwLoadProject(QObject):
         params = [schemaname]
         row = tools_db.get_row(sql, params=params)
         return row
-    
+
+
     def _enable_toolbar(self, toolbar_id, enable=True):
         """ Enable/Disable toolbar. Normally because user has no permission """
 
