@@ -136,7 +136,7 @@ class GwProfileButton(GwAction):
 
         # Get parameters
         links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance, False, False)
-
+        if links_distance in ("", "None", None): links_distance = 1
         # Create variable with all the content of the form
         extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", ' \
             f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, "ev":1000}}'
@@ -189,6 +189,7 @@ class GwProfileButton(GwAction):
 
         # Get values from profile form
         links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance)
+        if links_distance in ("", "None", None): links_distance = 1
         title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
         date = tools_qt.get_calendar_date(self.dlg_draw_profile, self.dlg_draw_profile.date, date_format='dd/MM/yyyy')
 
