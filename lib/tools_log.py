@@ -14,7 +14,6 @@ from qgis.core import QgsMessageLog
 
 from .. import global_vars
 from . import tools_qt, tools_os
-from ..core.utils import tools_gw
 
 
 class GwLogger(object):
@@ -128,9 +127,6 @@ def set_logger(logger_name=None):
     if global_vars.logger is None:
         if logger_name is None:
             logger_name = 'plugin'
-
-        global_vars.session_vars['min_log_level'] = \
-            tools_gw.check_config_settings('system', 'log_level', '20', 'user', 'init')
 
         log_suffix = '%Y%m%d'
         global_vars.logger = GwLogger(logger_name, global_vars.session_vars['min_log_level'], str(log_suffix))

@@ -62,7 +62,10 @@ class GwLoadProject(QObject):
         # TEMP
         global_vars.schema_name = self.schema_name
         global_vars.project_type = tools_gw.get_project_type()
+
         # Set logger (no database connection yet)
+        global_vars.session_vars['min_log_level'] = \
+            tools_gw.check_config_settings('system', 'log_level', '20', 'user', 'init')
         tools_log.set_logger('plugin')
         global_vars.plugin_name = self.plugin_name
 
