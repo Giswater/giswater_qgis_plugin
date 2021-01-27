@@ -18,7 +18,7 @@ from .toolbars import buttons
 from .ui.ui_manager import GwLoadMenuUi
 from .utils import tools_gw
 from .. import global_vars
-from ..lib import tools_log, tools_qt
+from ..lib import tools_log, tools_qt, tools_qgis
 
 
 class GwMenuLoad(QObject):
@@ -75,6 +75,7 @@ class GwMenuLoad(QObject):
 
                 action.triggered.connect(partial(self._clicked_event, action_function))
 
+
         # endregion
         # region Config
         config_menu = QMenu(f"Config", self.iface.mainWindow().menuBar())
@@ -85,6 +86,14 @@ class GwMenuLoad(QObject):
 
         action_manage_file = config_menu.addAction(f"Manage Files")
         action_manage_file.triggered.connect(self._open_manage_file)
+        action_set_log_sql = config_menu.addAction(f"Enable log sql")
+        log_sql_shortcut = tools_gw.get_config_parser("system", f"log_sql_shortcut", "user", "init", prefix=False)
+        if not log_sql_shortcut:
+            log_sql_shortcut = "Alt+1"
+            tools_gw.set_config_parser("system", f"log_sql_shortcut", f"{log_sql_shortcut}", "user", "init", prefix=False)
+        action_set_log_sql.setShortcuts(QKeySequence(f"{log_sql_shortcut}"))
+
+        action_set_log_sql.triggered.connect(self._set_log_sql)
         # endregion
 
         # region User folder
@@ -232,4 +241,19 @@ class GwMenuLoad(QObject):
         item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
         if index.column() != 0:
             item.setFlags(item.flags() & ~QtCore.Qt.ItemIsEditable)
+
+
+    def _set_log_sql(self):
+
+        log_sql = tools_gw.get_config_parser("system", f"log_sql", "user", "init")
+
+        if log_sql in ("False", "None"):
+            message = "Variable log_sql from user config file has been enabled."
+            tools_gw.set_config_parser("system", "log_sql", "True", file_name="init")
+        else:
+            message = "Variable log_sql from user config file has been disabled."
+            tools_gw.set_config_parser("system", "log_sql", "None", file_name="init")
+
+        tools_qgis.show_info(message)
+
     # endregion
