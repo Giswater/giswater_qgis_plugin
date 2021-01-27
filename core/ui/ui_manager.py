@@ -167,7 +167,6 @@ FORM_CLASS = get_ui_class('go2epa_selector.ui', 'epa')
 class GwGo2EpaSelectorUi(GwDialog, FORM_CLASS):
     pass
 
-
 FORM_CLASS = get_ui_class('go2epa_manager.ui', 'epa')
 class GwEpaManagerUi(GwDialog, FORM_CLASS):
     pass
@@ -180,7 +179,6 @@ FORM_CLASS = get_ui_class('hydrology_selector.ui', 'epa')
 class GwHydrologySelectorUi(GwDialog, FORM_CLASS):
     pass
 # endregion
-
 
 
 # region PLAN
@@ -200,7 +198,6 @@ FORM_CLASS = get_ui_class('psector_manager.ui', 'plan')
 class GwPsectorManagerUi(GwDialog, FORM_CLASS):
     pass
 
-
 FORM_CLASS = get_ui_class('psector_rapport.ui', 'plan')
 class GwPsectorRapportUi(GwDialog, FORM_CLASS):
     pass
@@ -219,7 +216,7 @@ class GwCsvUi(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('print.ui', 'utilities')
 class GwPrintUi(GwDialog, FORM_CLASS):
     pass
-
+# endregion
 
 # region TOC
 # endregion
@@ -314,17 +311,18 @@ class GwProjectCheckUi(GwDialog, FORM_CLASS):
     pass
 # endregion
 
+
 # region Menu
 FORM_CLASS = get_ui_class('load_menu.ui', 'menu')
 class GwLoadMenuUi(GwDialog, FORM_CLASS):
     pass
 # endregion
 
+
 # region SHARED
 FORM_CLASS = get_ui_class('dialog_text.ui')
 class GwDialogTextUi(GwDialog, FORM_CLASS):
     pass
-
 
 FORM_CLASS = get_ui_class('info_catalog.ui')
 class GwInfoCatalogUi(GwMainWindow, FORM_CLASS):
