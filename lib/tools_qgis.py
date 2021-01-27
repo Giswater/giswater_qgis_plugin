@@ -149,11 +149,11 @@ def get_plugin_version():
     return plugin_version, message
 
 
-def get_higher_version(default_version='3.5', plugin_dir=global_vars.plugin_dir):
+def get_major_version(default_version='3.5', plugin_dir=global_vars.plugin_dir):
     """ Get plugin higher version from metadata.txt file """
 
-    higher_version = get_plugin_metadata('version', default_version, plugin_dir)[0:3]
-    return higher_version
+    major_version = get_plugin_metadata('version', default_version, plugin_dir)[0:3]
+    return major_version
 
 
 def get_build_version(default_version='35001', plugin_dir=global_vars.plugin_dir):
@@ -485,6 +485,7 @@ def get_max_rectangle_from_coords(list_coord):
 
 def zoom_to_rectangle(x1, y1, x2, y2, margin=5):
     """ Generate an extension on the canvas according to the received coordinates """
+
     rect = QgsRectangle(float(x1) + margin, float(y1) + margin, float(x2) - margin, float(y2) - margin)
     global_vars.canvas.setExtent(rect)
     global_vars.canvas.refresh()
@@ -618,6 +619,7 @@ def remove_layer_from_toc(layer_name, group_name):
 
 def get_plugin_settings_value(key, default_value=""):
     """ Get @value of QSettings located in @key """
+
     key = global_vars.plugin_name + "/" + key
     value = global_vars.qgis_settings.value(key, default_value)
     return value
@@ -625,6 +627,7 @@ def get_plugin_settings_value(key, default_value=""):
 
 def set_plugin_settings_value(key, value):
     """ Set @value to QSettings of selected @value located in @key """
+
     global_vars.qgis_settings.setValue(global_vars.plugin_name + "/" + key, value)
 
 
@@ -658,7 +661,6 @@ def set_layer_visible(layer, recursive=True, visible=True):
     :param visible: (Boolean)
     :return:
     """
-
 
     if layer:
         if recursive:
@@ -702,6 +704,7 @@ def load_qml(layer, qml_path):
 
 def set_margin(layer, margin):
     """ Generates a margin around the layer so that it is fully visible on the canvas """
+
     if layer.extent().isNull():
         return
 
@@ -719,6 +722,7 @@ def set_margin(layer, margin):
 
 def create_qml(layer, style):
     """ Generates a qml file through a json of styles (@style) and puts it in the received @layer """
+
     config_folder = f'{global_vars.user_folder_dir}{os.sep}temp'
     if not os.path.exists(config_folder):
         os.makedirs(config_folder)

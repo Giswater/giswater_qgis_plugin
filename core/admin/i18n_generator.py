@@ -251,10 +251,10 @@ class GwI18NGenerator:
     def _create_db_files(self):
         """ Read the values of the database and update the i18n files """
 
-        higher_version = tools_qgis.get_higher_version().replace(".", "")
+        major_version = tools_qgis.get_major_version().replace(".", "")
         ver_build = tools_qgis.get_build_version()
 
-        cfg_path = f"{self.plugin_dir}{os.sep}dbmodel{os.sep}updates{os.sep}{higher_version}{os.sep}{ver_build}" \
+        cfg_path = f"{self.plugin_dir}{os.sep}dbmodel{os.sep}updates{os.sep}{major_version}{os.sep}{ver_build}" \
                    f"{os.sep}i18n{os.sep}{self.language}{os.sep}"
         file_name = f'dml.sql'
 

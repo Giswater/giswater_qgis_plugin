@@ -484,6 +484,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                     v_layer.renderer().symbol().setOpacity(0.7)
                 temp_layers_added.append(v_layer)
                 global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
+
     return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
 
 
@@ -1344,7 +1345,6 @@ def manage_combo_child(dialog, combo_parent, combo_child):
         else:
             child.setProperty('keepDisbled', True)
             child.setEnabled(False)
-
 
 
 def fill_child(dialog, widget, action, geom_type=''):
