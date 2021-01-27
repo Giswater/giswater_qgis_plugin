@@ -61,7 +61,7 @@ class GwMenuLoad(QObject):
                 button_def = global_vars.settings.value(f"buttons_def/{index_action}")
                 text = ""
                 if button_def:
-                    text = self.translate(f'{index_action}_text')
+                    text = self._translate(f'{index_action}_text')
                 parent = self.iface.mainWindow()
                 ag = QActionGroup(parent)
                 ag.setProperty('gw_name', 'gw_QActionGroup')
@@ -75,7 +75,7 @@ class GwMenuLoad(QObject):
                     action.setShortcuts(QKeySequence(f"{shortcut_key}"))
                     global_vars.session_vars['shortcut_keys'].append(shortcut_key)
 
-                action.triggered.connect(partial(self.clicked_event, action_function))
+                action.triggered.connect(partial(self._clicked_event, action_function))
 
         # endregion
         # region Config
@@ -102,12 +102,12 @@ class GwMenuLoad(QObject):
         self.iface.mainWindow().menuBar().insertMenu(last_action, self.main_menu)
 
 
-    def clicked_event(self, action_function):
+    def _clicked_event(self, action_function):
         """  """
         action_function.clicked_event()
 
 
-    def translate(self, message):
+    def _translate(self, message):
         """ Calls on tools_qt to translate parameter message. """
         return tools_qt.tr(message, aux_context='ui_message')
 
@@ -172,7 +172,7 @@ class GwMenuLoad(QObject):
         self.list_values = []
         values = {}
         path = f"{self.user_folder_dir}{os.sep}config{os.sep}{file_name}"
-
+        project_types = tools_gw.get_config_parser('system', 'project_types_dev', "project", "init")
         if not os.path.exists(path):
             return None
 
@@ -180,6 +180,8 @@ class GwMenuLoad(QObject):
         parser.read(path)
         for section in parser.sections():
             for parameter in parser[section]:
+                if parameter[0:2] in project_types and tools_gw.get_project_type() != parameter[0:2]:
+                    continue
                 values["Section"] = section
                 values["Parameter"] = parameter
                 values["Value"] = parser[section][parameter]
