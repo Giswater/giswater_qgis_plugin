@@ -11,7 +11,6 @@ from qgis.PyQt.QtCore import pyqtSignal, QObject
 
 from ..ui.ui_manager import GwPsectorDuplicateUi
 from ..utils import tools_gw
-from ... import global_vars
 from ...lib import tools_qt, tools_db, tools_qgis
 
 

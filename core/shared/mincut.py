@@ -7,7 +7,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import json
 import os
-from collections import OrderedDict
 from datetime import datetime
 from functools import partial
 

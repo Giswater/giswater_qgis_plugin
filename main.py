@@ -6,7 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os.path
-import sys
 
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtGui import QIcon
@@ -16,7 +15,7 @@ from . import global_vars
 from .core.admin.admin_btn import GwAdminButton
 from .core.load_project import GwLoadProject
 from .core.utils import tools_gw
-from .lib import tools_log, tools_qgis, tools_os
+from .lib import tools_qgis, tools_os
 
 
 class Giswater(QObject):

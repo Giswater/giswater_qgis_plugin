@@ -9,8 +9,6 @@ import os
 import shutil
 import sqlite3
 
-from qgis.PyQt.QtCore import QSettings
-
 from ...lib import tools_log, tools_qt, tools_db, tools_qgis
 
 

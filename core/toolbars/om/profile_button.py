@@ -22,7 +22,7 @@ from qgis.PyQt.QtGui import QDoubleValidator
 from ..dialog import GwAction
 from ...ui.ui_manager import GwProfileUi, GwProfilesListUi
 from ...utils import tools_gw
-from ....lib import tools_qt, tools_log, tools_qgis, tools_os
+from ....lib import tools_qt, tools_log, tools_qgis
 from .... import global_vars
 from ...utils.snap_manager import GwSnapManager
 

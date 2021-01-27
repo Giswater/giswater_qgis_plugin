@@ -5,17 +5,13 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import json
 import os
-from collections import OrderedDict
 from functools import partial
 
-from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox, \
     QGridLayout, QRadioButton, QAbstractItemView
 from qgis.core import QgsApplication, QgsProject
-from qgis.gui import QgsDateTimeEdit
 
 from ..dialog import GwAction
 from ...threads.toolbox_execute import GwToolBoxTask

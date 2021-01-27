@@ -14,7 +14,6 @@ from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGrou
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwInfoCatalogUi
-from ... import global_vars
 from ...lib import tools_qt, tools_log, tools_db, tools_qgis
 
 
