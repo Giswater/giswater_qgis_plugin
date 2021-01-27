@@ -9,7 +9,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtGui import QRegExpValidator
-from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView
+from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QComboBox
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwElementUi, GwElementManagerUi
@@ -631,7 +631,7 @@ class GwElement:
         sql = (f"SELECT * "
                f" FROM {table_object}"
                f" WHERE {table_object}_id = '{object_id}'")
-        row = tools_db.get_row(sql, log_info=False)
+        row = tools_db.get_row(sql, log_info=False, log_sql=True)
 
         # If object_id not found: Clear data
         if not row:
@@ -666,12 +666,15 @@ class GwElement:
             tools_qt.set_widget_text(dialog, "element_type", f"{row_type[0]}")
 
         # Fill input widgets with data of the @row
-        widgets = ["elementcat_id", "state", "expl_id", "ownercat_id", "location_type", "buildercat_id", "workcat_id",
-                   "workcat_id_end", "comment", "observ", "link", "rotation", "verified", "num_elements"]
+        cmb_widgets = ["elementcat_id", "state", "state_type", "expl_id", "ownercat_id", "location_type", "buildercat_id", "workcat_id",
+                   "workcat_id_end", "verified"]
+        widgets = ["comment", "observ", "link", "rotation", "num_elements"]
+        for widget_name in cmb_widgets:
+            widget = dialog.findChild(QComboBox, widget_name)
+            tools_qt.set_combo_value(widget, f"{row[widget_name]}", 0)
         for widget_name in widgets:
             tools_qt.set_widget_text(dialog, widget_name, f"{row[widget_name]}")
 
-        tools_qt.set_combo_value(dialog.state_type, f"{row['state_type']}", 0)
         tools_qt.set_widget_text(dialog, "builtdate", row['builtdate'])
         if str(row['undelete']) == 'True':
             dialog.undelete.setChecked(True)
