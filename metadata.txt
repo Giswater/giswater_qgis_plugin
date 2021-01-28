@@ -13,7 +13,7 @@ version=3.4.028
 
 author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Elies Bertran, Abel García Juanes, Xavier Torret
 # End of mandatory metadata
-changelog=Version 3.4.028 (28/01/2020), same 3.4.027
+changelog=Version 3.4.028 (28/01/2021), same 3.4.027
    - Bug fix from previous version
 
 # Tags are comma separated with spaces allowed
