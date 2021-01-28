@@ -90,9 +90,9 @@ class GwVisit(QObject):
             layer = tools_qgis.get_layer_by_tablename(layer_name)
             if layer:
                 layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
-        self.dlg_add_visit.rejected.connect(partial(self.restore_layers_visibility, layers_visibility))
+        self.dlg_add_visit.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_add_visit.rejected.connect(tools_gw.remove_selection)
-        self.dlg_add_visit.accepted.connect(partial(self.restore_layers_visibility, layers_visibility))
+        self.dlg_add_visit.accepted.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
 
         # Get expl_id from previus dialog
         self.expl_id = expl_id
@@ -256,12 +256,6 @@ class GwVisit(QObject):
             if is_new_from_cf is False:
                 self.feature_type.currentIndexChanged.emit(0)
             tools_gw.open_dialog(self.dlg_add_visit, dlg_name="visit")
-
-
-    def restore_layers_visibility(self, layers):
-
-        for layer, visibility in layers.items():
-            tools_qgis.set_layer_visible(layer, False, visibility)
 
 
     def zoom_box(self, box):

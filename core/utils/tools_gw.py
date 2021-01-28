@@ -2318,7 +2318,7 @@ def set_dates_from_to(widget_from, widget_to, table_name, field_from, field_to):
             widget_to.setDate(current_date)
 
 
-def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[], single_tool_mode=None, layers=None):
+def manage_close(dialog, table_object, cur_active_layer=None, single_tool_mode=None, layers=None):
     """ Close dialog and disconnect snapping """
 
     tools_qgis.disconnect_snapping()
@@ -2338,7 +2338,6 @@ def manage_close(dialog, table_object, cur_active_layer=None, excluded_layers=[]
         tools_qt.reset_model(dialog, table_object, geom_type)
 
     close_dialog(dialog)
-    hide_parent_layers(excluded_layers=excluded_layers)
 
     return layers
 
@@ -2439,9 +2438,31 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
     connect_signal_selection_changed(class_object, dialog, table_object, query)
 
 
+def get_parent_layers_visibility():
+    """ Get layer visibility to restore when dialog is closed
+    :return: example: {<QgsMapLayer: 'Arc' (postgres)>: True, <QgsMapLayer: 'Node' (postgres)>: False,
+                       <QgsMapLayer: 'Connec' (postgres)>: True, <QgsMapLayer: 'Element' (postgres)>: False}
+    """
+    layers_visibility = {}
+    for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully"]:
+        layer = tools_qgis.get_layer_by_tablename(layer_name)
+        if layer:
+            layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
+
+    return layers_visibility
+
+
+def restore_parent_layers_visibility(layers):
+    """ Receive a dictionary with the layer and if it has to be active or not
+    :param layers: example: {<QgsMapLayer: 'Arc' (postgres)>: True, <QgsMapLayer: 'Node' (postgres)>: False,
+                             <QgsMapLayer: 'Connec' (postgres)>: True, <QgsMapLayer: 'Element' (postgres)>: False}
+    """
+    print(layers)
+    for layer, visibility in layers.items():
+        tools_qgis.set_layer_visible(layer, False, visibility)
+
+
 # region private functions
-
-
 def _insert_feature_psector(dialog, geom_type, ids=None):
     """ Insert features_id to table plan_@geom_type_x_psector """
 
