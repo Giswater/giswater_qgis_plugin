@@ -152,7 +152,7 @@ UPDATE sys_table SET sys_sequence=NULL, sys_sequence_field=NULL WHERE id IN ('co
 UPDATE config_typevalue set id='open_url', idval='open_url' where typevalue='widgetfunction_typevalue' and id='set_open_url';
 
 --2020/12/10
-INSERT INTO sys_function VALUES (3014, 'gw_fct_copy_to_temp_csv','utils','function','json','json','Insert values into temp_csv','role_edit', NULL);
+INSERT INTO sys_function VALUES (3014, 'gw_fct_setcsv','utils','function','json','json','Insert values into temp_csv','role_edit', NULL);
 
 --2020/12/14
 UPDATE cat_brand SET active = TRUE WHERE active IS NULL;
