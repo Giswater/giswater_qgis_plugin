@@ -290,7 +290,7 @@ class GwCSVButton(GwAction):
 
         values = f'"values":{(json.dumps(fields, ensure_ascii=False).encode(_unicode)).decode()}'
         body = tools_gw.create_body(extras=values)
-        result = tools_gw.execute_procedure('gw_fct_copy_to_temp_csv', body)
+        result = tools_gw.execute_procedure('gw_fct_setcsv', body)
 
         if 'status' in result and result['status'] == 'Accepted':
             return True
