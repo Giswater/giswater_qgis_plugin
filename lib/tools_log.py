@@ -72,7 +72,38 @@ class GwLogger(object):
             pass
 
 
-    def log(self, msg=None, log_level=logging.INFO, stack_level=2):
+    def debug(self, msg=None, stack_level=2, stack_level_increase=0):
+        """ Logger message into logger file with level DEBUG (10) """
+        self._log(msg, logging.DEBUG, stack_level + stack_level_increase + 1)
+
+
+    def info(self, msg=None, stack_level=2, stack_level_increase=0):
+        """ Logger message into logger file with level INFO (20) """
+        self._log(msg, logging.INFO, stack_level + stack_level_increase + 1)
+
+
+    def warning(self, msg=None, stack_level=2, stack_level_increase=0, sum_error=True):
+        """ Logger message into logger file with level WARNING (30) """
+        self._log(msg, logging.WARNING, stack_level + stack_level_increase + 1)
+        if sum_error:
+            self.num_errors += 1
+
+
+    def error(self, msg=None, stack_level=2, stack_level_increase=0, sum_error=True):
+        """ Logger message into logger file with level ERROR (40) """
+        self._log(msg, logging.ERROR, stack_level + stack_level_increase + 1)
+        if sum_error:
+            self.num_errors += 1
+
+
+    def critical(self, msg=None, stack_level=2, stack_level_increase=0, sum_error=True):
+        """ Logger message into logger file with level CRITICAL (50) """
+        self._log(msg, logging.CRITICAL, stack_level + stack_level_increase + 1)
+        if sum_error:
+            self.num_errors += 1
+
+
+    def _log(self, msg=None, log_level=logging.INFO, stack_level=2):
         """ Logger message into logger file with selected level """
 
         try:
@@ -96,37 +127,6 @@ class GwLogger(object):
             log_warning(f"Error logging: {e}", logger_file=False)
 
 
-    def debug(self, msg=None, stack_level=2, stack_level_increase=0):
-        """ Logger message into logger file with level DEBUG (10) """
-        self.log(msg, logging.DEBUG, stack_level + stack_level_increase + 1)
-
-
-    def info(self, msg=None, stack_level=2, stack_level_increase=0):
-        """ Logger message into logger file with level INFO (20) """
-        self.log(msg, logging.INFO, stack_level + stack_level_increase + 1)
-
-
-    def warning(self, msg=None, stack_level=2, stack_level_increase=0, sum_error=True):
-        """ Logger message into logger file with level WARNING (30) """
-        self.log(msg, logging.WARNING, stack_level + stack_level_increase + 1)
-        if sum_error:
-            self.num_errors += 1
-
-
-    def error(self, msg=None, stack_level=2, stack_level_increase=0, sum_error=True):
-        """ Logger message into logger file with level ERROR (40) """
-        self.log(msg, logging.ERROR, stack_level + stack_level_increase + 1)
-        if sum_error:
-            self.num_errors += 1
-
-
-    def critical(self, msg=None, stack_level=2, stack_level_increase=0, sum_error=True):
-        """ Logger message into logger file with level CRITICAL (50) """
-        self.log(msg, logging.CRITICAL, stack_level + stack_level_increase + 1)
-        if sum_error:
-            self.num_errors += 1
-
-
 def set_logger(logger_name=None):
     """ Set logger class. This class will generate new logger file """
 
@@ -140,27 +140,6 @@ def set_logger(logger_name=None):
         global_vars.session_vars['min_message_level'] = values.get(global_vars.session_vars['min_log_level'], 0)
         min_message_level = values.get(int(global_vars.session_vars['min_log_level']), 0)
         global_vars.session_vars['min_message_level'] = min_message_level
-
-
-def _qgis_log_message(text=None, message_level=0, context_name=None, parameter=None, tab_name=None):
-    """ Write message into QGIS Log Messages Panel with selected message level
-        @message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3, NONE = 4}
-    """
-
-    msg = None
-    if text:
-        msg = tools_qt.tr(text, context_name)
-        if parameter:
-            msg += f": {parameter}"
-
-    if tab_name is None:
-        tab_name = global_vars.plugin_name
-
-    # Check session parameter 'min_message_level' to know if we need to log message in QGIS Log Messages Panel
-    if message_level >= global_vars.session_vars['min_message_level']:
-        QgsMessageLog.logMessage(msg, tab_name, message_level)
-
-    return msg
 
 
 def log_debug(text=None, context_name=None, parameter=None, logger_file=True, stack_level_increase=0, tab_name=None):
@@ -193,4 +172,25 @@ def log_error(text=None, context_name=None, parameter=None, logger_file=True, st
     msg = _qgis_log_message(text, 2, context_name, parameter, tab_name)
     if global_vars.logger and logger_file:
         global_vars.logger.error(msg, stack_level_increase=stack_level_increase)
+
+
+def _qgis_log_message(text=None, message_level=0, context_name=None, parameter=None, tab_name=None):
+    """ Write message into QGIS Log Messages Panel with selected message level
+        @message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3, NONE = 4}
+    """
+
+    msg = None
+    if text:
+        msg = tools_qt.tr(text, context_name)
+        if parameter:
+            msg += f": {parameter}"
+
+    if tab_name is None:
+        tab_name = global_vars.plugin_name
+
+    # Check session parameter 'min_message_level' to know if we need to log message in QGIS Log Messages Panel
+    if message_level >= global_vars.session_vars['min_message_level']:
+        QgsMessageLog.logMessage(msg, tab_name, message_level)
+
+    return msg
 
