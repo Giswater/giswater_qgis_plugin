@@ -147,26 +147,12 @@ def qgis_log_message(text=None, message_level=0, context_name=None, parameter=No
 
     if tab_name is None:
         tab_name = global_vars.plugin_name
+
+    # Check session parameter 'min_message_level' to know if we need to log message in QGIS Log Messages Panel
     if message_level >= global_vars.session_vars['min_message_level']:
         QgsMessageLog.logMessage(msg, tab_name, message_level)
 
     return msg
-
-
-def log_message(text=None, message_level=0, context_name=None, parameter=None, logger_file=True,
-                stack_level_increase=0, tab_name=None):
-    """ Write message into QGIS Log Messages Panel """
-
-    msg = qgis_log_message(text, message_level, context_name, parameter, tab_name)
-    if global_vars.logger and logger_file:
-        if message_level == 0:
-            global_vars.logger.info(msg, stack_level_increase=stack_level_increase)
-        elif message_level == 1:
-            global_vars.logger.warning(msg, stack_level_increase=stack_level_increase)
-        elif message_level == 2:
-            global_vars.logger.error(msg, stack_level_increase=stack_level_increase)
-        elif message_level == 4:
-            global_vars.logger.debug(msg, stack_level_increase=stack_level_increase)
 
 
 def log_debug(text=None, context_name=None, parameter=None, logger_file=True,
