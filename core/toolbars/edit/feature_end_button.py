@@ -90,11 +90,13 @@ class GwFeatureEndButton(GwAction):
         tools_gw.set_completer_object(self.dlg_work_end, self.table_object)
 
         # Set signals
+        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
+                           "v_edit_element"]
+        layers_visibility = tools_gw.get_parent_layers_visibility()
+        self.dlg_work_end.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_work_end.btn_accept.clicked.connect(partial(self.end_feature))
-        self.dlg_work_end.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_work_end, self.table_object,
-                                                             self.cur_active_layer, force_downgrade=True))
-        self.dlg_work_end.rejected.connect(partial(self.manage_close, self.dlg_work_end, self.table_object,
-                                                   self.cur_active_layer, force_downgrade=True, show_warning=True))
+        self.dlg_work_end.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_work_end, True, False))
+        self.dlg_work_end.rejected.connect(partial(self.manage_close, self.dlg_work_end, True, True))
         self.dlg_work_end.workcat_id_end.editTextChanged.connect(partial(self.fill_workids))
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self.new_workcat))
 
@@ -107,7 +109,7 @@ class GwFeatureEndButton(GwAction):
 
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(
-            partial(tools_gw.get_signal_change_tab, self.dlg_work_end, excluded_layers=["v_edit_element"]))
+            partial(tools_gw.get_signal_change_tab, self.dlg_work_end, excluded_layers))
 
         # Set values
         self.fill_fields()
@@ -117,7 +119,7 @@ class GwFeatureEndButton(GwAction):
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
-        tools_gw.get_signal_change_tab(self.dlg_work_end, excluded_layers=["v_edit_element"])
+        tools_gw.get_signal_change_tab(self.dlg_work_end, excluded_layers)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end', maximize_button=False)
@@ -202,7 +204,7 @@ class GwFeatureEndButton(GwAction):
         selected_list = qtable.model()
         self.selected_list = []
         if selected_list is None:
-            self.manage_close(self.dlg_work_end, self.table_object, self.cur_active_layer, force_downgrade=False)
+            self.manage_close(self.dlg_work_end)
             return
 
         for x in range(0, selected_list.rowCount()):
@@ -283,7 +285,7 @@ class GwFeatureEndButton(GwAction):
             self.update_geom_type("node")
 
 
-            self.manage_close(self.dlg_work_end, self.table_object, self.cur_active_layer, force_downgrade=True)
+            self.manage_close(self.dlg_work_end, True)
 
             # Remove selection for all layers in TOC
             for layer in self.iface.mapCanvas().layers():
@@ -439,11 +441,10 @@ class GwFeatureEndButton(GwAction):
         tools_gw.open_dialog(self.dlg_work_end)
 
 
-    def manage_close(self, dialog, table_object, cur_active_layer=None, force_downgrade=False, show_warning=False):
+    def manage_close(self, dialog, force_downgrade=False, show_warning=False):
         """ Close dialog and disconnect snapping """
 
         tools_gw.close_dialog(dialog)
-        tools_gw.hide_parent_layers(excluded_layers=["v_edit_element"])
         tools_qgis.disconnect_snapping()
         tools_qgis.disconnect_signal_selection_changed()
         if force_downgrade:
