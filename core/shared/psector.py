@@ -1376,7 +1376,7 @@ class GwPsector:
 
     def master_new_psector(self, psector_id=None):
         """ Button 45: New psector """
-        self.get_psector(psector_id, 'plan')
+        self.get_psector(psector_id)
 
 
     def manage_psectors(self):
