@@ -16,6 +16,7 @@ from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal, QDateTime,
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
     QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit
+from qgis.gui import QgsRubberBand
 
 from .document import GwDocument
 from ..models.om_visit import GwOmVisit
@@ -68,6 +69,8 @@ class GwVisit(QObject):
         if geom_type => lock geom_type in relations tab
         if feature_id => load related feature basing on geom_type in relation
         if single_tool notify that the tool is used called from another dialog."""
+
+        self.rubber_band = QgsRubberBand(self.canvas)
 
         # parameter to set if the dialog is working as single tool or integrated in another tool
         global_vars.single_tool_mode = single_tool
@@ -305,6 +308,7 @@ class GwVisit(QObject):
 
         self.dlg_add_visit.rejected.connect(self.manage_rejected)
         self.dlg_add_visit.rejected.connect(partial(tools_gw.close_dialog, self.dlg_add_visit))
+        self.dlg_add_visit.rejected.connect(lambda: self.rubber_band.reset())
         self.dlg_add_visit.accepted.connect(partial(self.update_relations, self.dlg_add_visit))
         self.dlg_add_visit.accepted.connect(self.manage_accepted)
         self.dlg_add_visit.btn_event_insert.clicked.connect(self.event_insert)
@@ -325,6 +329,14 @@ class GwVisit(QObject):
             partial(self.event_feature_type_selected, self.dlg_add_visit, None))
         self.feature_type.currentIndexChanged.connect(partial(self.manage_tabs_enabled, True))
         self.parameter_id.currentIndexChanged.connect(self.get_feature_type_of_parameter)
+        self.dlg_add_visit.tbl_visit_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
+            self.dlg_add_visit.tbl_visit_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+        self.dlg_add_visit.tbl_visit_x_node.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
+            self.dlg_add_visit.tbl_visit_x_node, "v_edit_node", "node_id", self.rubber_band, 1))
+        self.dlg_add_visit.tbl_visit_x_connec.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
+            self.dlg_add_visit.tbl_visit_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
+        self.dlg_add_visit.tbl_visit_x_gully.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
+            self.dlg_add_visit.tbl_visit_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
 
 
     def add_feature_clicked(self):

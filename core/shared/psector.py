@@ -260,26 +260,26 @@ class GwPsector:
             self.qtbl_arc.model().setFilter(expr)
             self.qtbl_arc.model().select()
             self.qtbl_arc.clicked.connect(
-                partial(self.hilight_feature_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+                partial(tools_qgis.hilight_feature_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
 
             expr = " psector_id = " + str(psector_id)
             self.qtbl_node.model().setFilter(expr)
             self.qtbl_node.model().select()
-            self.qtbl_node.clicked.connect(
-                partial(self.hilight_feature_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band, 1))
+            self.qtbl_node.clicked.connect(partial(
+                tools_qgis.hilight_feature_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band, 1))
 
             expr = " psector_id = " + str(psector_id)
             self.qtbl_connec.model().setFilter(expr)
             self.qtbl_connec.model().select()
             self.qtbl_connec.clicked.connect(partial(
-                self.hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
+                tools_qgis.hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
 
             if self.project_type.upper() == 'UD':
                 expr = " psector_id = " + str(psector_id)
                 self.qtbl_gully.model().setFilter(expr)
                 self.qtbl_gully.model().select()
                 self.qtbl_gully.clicked.connect(partial(
-                    self.hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
+                    tools_qgis.hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
 
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True
@@ -1352,29 +1352,6 @@ class GwPsector:
                       "will turn obsolete. To mantain traceability, a copy of planified features will be inserted " \
                       "on the psector."
                 tools_qt.show_details(msg, 'Message warning')
-
-
-
-    def hilight_feature_by_id(self, qtable, layer_name, field_id, rubber_band, width, index):
-        """ Based on the received index and field_id, the id of the received field_id is searched within the table
-         and is painted in red on the canvas """
-
-        rubber_band.reset()
-        layer = tools_qgis.get_layer_by_tablename(layer_name)
-        if not layer: return
-
-        row = index.row()
-        column_index = tools_qt.get_col_index_by_col_name(qtable, field_id)
-        _id = index.sibling(row, column_index).data()
-        feature = tools_qt.get_feature_by_id(layer, _id, field_id)
-        try:
-            geometry = feature.geometry()
-            rubber_band.setToGeometry(geometry, None)
-            rubber_band.setColor(QColor(255, 0, 0, 100))
-            rubber_band.setWidth(width)
-            rubber_band.show()
-        except AttributeError:
-            pass
 
 
     def master_new_psector(self, psector_id=None):

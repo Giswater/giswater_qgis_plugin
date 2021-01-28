@@ -10,6 +10,7 @@ from functools import partial
 from qgis.PyQt.QtCore import QRegExp
 from qgis.PyQt.QtGui import QRegExpValidator
 from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QComboBox
+from qgis.gui import QgsRubberBand
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwElementUi, GwElementManagerUi
@@ -25,14 +26,14 @@ class GwElement:
 
         self.iface = global_vars.iface
         self.schema_name = global_vars.schema_name
-
+        self.canvas = global_vars.canvas
         self.snapper_manager = GwSnapManager(self.iface)
         self.vertex_marker = self.snapper_manager.vertex_marker
 
 
     def get_element(self, new_element_id=True, feature=None, geom_type=None, selected_object_id=None):
         """ Button 33: Add element """
-
+        self.rubber_band = QgsRubberBand(self.canvas)
         self.new_element_id = new_element_id
 
         # Create the dialog and signals
@@ -125,6 +126,8 @@ class GwElement:
             partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_element, excluded_layers))
+        self.dlg_add_element.rejected.connect(lambda: self.rubber_band.reset())
+
 
         self.dlg_add_element.element_id.textChanged.connect(
             partial(self.fill_dialog_element, self.dlg_add_element, table_object, None))
@@ -137,6 +140,17 @@ class GwElement:
 
         self.dlg_add_element.btn_add_geom.clicked.connect(self.get_point_xy)
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
+
+        self.dlg_add_element.tbl_element_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
+            self.dlg_add_element.tbl_element_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+        self.dlg_add_element.tbl_element_x_node.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
+            self.dlg_add_element.tbl_element_x_node, "v_edit_node", "node_id", self.rubber_band, 1))
+        self.dlg_add_element.tbl_element_x_connec.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
+            self.dlg_add_element.tbl_element_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
+        self.dlg_add_element.tbl_element_x_gully.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
+            self.dlg_add_element.tbl_element_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
+
+
 
         # Fill combo boxes of the form and related events
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))

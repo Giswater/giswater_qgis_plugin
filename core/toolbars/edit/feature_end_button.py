@@ -12,6 +12,7 @@ from qgis.PyQt.QtCore import QDate, QStringListModel
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 from qgis.core import QgsExpression, QgsFeatureRequest
+from qgis.gui import QgsRubberBand
 
 from ...toolbars.dialog import GwAction
 from ...ui.ui_manager import GwFeatureEndUi, GwInfoWorkcatUi, GwFeatureEndConnecUi
@@ -55,6 +56,8 @@ class GwFeatureEndButton(GwAction):
 
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
+        self.rubber_band = QgsRubberBand(self.canvas)
+
         # Create the dialog and signals
         self.dlg_work_end = GwFeatureEndUi()
         tools_gw.load_settings(self.dlg_work_end)
@@ -94,6 +97,7 @@ class GwFeatureEndButton(GwAction):
                            "v_edit_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_work_end.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
+        self.dlg_work_end.rejected.connect(lambda: self.rubber_band.reset())
         self.dlg_work_end.btn_accept.clicked.connect(partial(self.end_feature))
         self.dlg_work_end.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_work_end, True, False))
         self.dlg_work_end.rejected.connect(partial(self.manage_close, self.dlg_work_end, True, True))
@@ -110,6 +114,17 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_work_end, excluded_layers))
+
+        self.dlg_work_end.tbl_cat_work_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
+            self.dlg_work_end.tbl_cat_work_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+        self.dlg_work_end.tbl_cat_work_x_node.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
+            self.dlg_work_end.tbl_cat_work_x_node, "v_edit_node", "node_id", self.rubber_band, 1))
+        self.dlg_work_end.tbl_cat_work_x_connec.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
+            self.dlg_work_end.tbl_cat_work_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
+        self.dlg_work_end.tbl_cat_work_x_gully.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
+            self.dlg_work_end.tbl_cat_work_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
+        self.dlg_work_end.tbl_cat_work_x_element.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
+            self.dlg_work_end.tbl_cat_work_x_element, "v_edit_element", "element_id", self.rubber_band, 1))
 
         # Set values
         self.fill_fields()

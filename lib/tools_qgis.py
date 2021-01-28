@@ -822,6 +822,27 @@ def get_locale():
     return locale
 
 
+def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, index):
+    """ Based on the received index and field_id, the id of the received field_id is searched within the table
+     and is painted in red on the canvas """
+
+    rubber_band.reset()
+    layer = get_layer_by_tablename(layer_name)
+    if not layer: return
+
+    row = index.row()
+    column_index = tools_qt.get_col_index_by_col_name(qtable, field_id)
+    _id = index.sibling(row, column_index).data()
+    feature = tools_qt.get_feature_by_id(layer, _id, field_id)
+    try:
+        geometry = feature.geometry()
+        rubber_band.setToGeometry(geometry, None)
+        rubber_band.setColor(QColor(255, 0, 0, 100))
+        rubber_band.setWidth(width)
+        rubber_band.show()
+    except AttributeError:
+        pass
+
 # region private functions
 
 def _get_vertex_from_point(feature):
