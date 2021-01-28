@@ -108,19 +108,23 @@ class GwElement:
         tools_gw.set_completer_object(self.dlg_add_element, table_object)
 
         # Set signals
+        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
+                           "v_edit_element"]
+        layers_visibility = tools_gw.get_parent_layers_visibility()
+        self.dlg_add_element.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
         self.dlg_add_element.btn_accept.clicked.connect(
             partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
-        self.dlg_add_element.btn_cancel.clicked.connect(lambda: setattr(self, 'layers',
-            tools_gw.manage_close(self.dlg_add_element, table_object, cur_active_layer, excluded_layers=[], layers=self.layers)))
+        self.dlg_add_element.btn_cancel.clicked.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(
+            self.dlg_add_element, table_object, cur_active_layer,  layers=self.layers)))
         self.dlg_add_element.btn_cancel.clicked.connect(
             partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
-        self.dlg_add_element.rejected.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_element,
-            table_object, cur_active_layer, excluded_layers=[], layers=self.layers)))
+        self.dlg_add_element.rejected.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(
+            self.dlg_add_element, table_object, cur_active_layer, layers=self.layers)))
         self.dlg_add_element.rejected.connect(
             partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.tab_feature.currentChanged.connect(
-            partial(tools_gw.get_signal_change_tab, self.dlg_add_element, []))
+            partial(tools_gw.get_signal_change_tab, self.dlg_add_element, excluded_layers))
 
         self.dlg_add_element.element_id.textChanged.connect(
             partial(self.fill_dialog_element, self.dlg_add_element, table_object, None))
@@ -199,7 +203,9 @@ class GwElement:
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        tools_gw.get_signal_change_tab(self.dlg_add_element)
+        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
+                           "v_edit_element"]
+        tools_gw.get_signal_change_tab(self.dlg_add_element, excluded_layers)
 
         # Force layer v_edit_element set active True
         if layer_element:

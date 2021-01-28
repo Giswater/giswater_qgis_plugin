@@ -2457,7 +2457,7 @@ def restore_parent_layers_visibility(layers):
     :param layers: example: {<QgsMapLayer: 'Arc' (postgres)>: True, <QgsMapLayer: 'Node' (postgres)>: False,
                              <QgsMapLayer: 'Connec' (postgres)>: True, <QgsMapLayer: 'Element' (postgres)>: False}
     """
-    print(layers)
+
     for layer, visibility in layers.items():
         tools_qgis.set_layer_visible(layer, False, visibility)
 
