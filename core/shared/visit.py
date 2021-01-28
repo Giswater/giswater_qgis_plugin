@@ -83,8 +83,13 @@ class GwVisit(QObject):
         # Create the dialog and signals and related ORM Visit class
         self.current_visit = GwOmVisit()
         self.dlg_add_visit = GwVisitUi(tag)
-        tools_gw.load_settings(self.dlg_add_visit)
-        layers_visibility = tools_gw.hide_parent_layers(['v_edit_element'])
+
+        # Get layer visibility to restore when dialog is closed
+        layers_visibility = {}
+        for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully"]:
+            layer = tools_qgis.get_layer_by_tablename(layer_name)
+            if layer:
+                layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
         self.dlg_add_visit.rejected.connect(partial(self.restore_layers_visibility, layers_visibility))
         self.dlg_add_visit.rejected.connect(tools_gw.remove_selection)
         self.dlg_add_visit.accepted.connect(partial(self.restore_layers_visibility, layers_visibility))
@@ -216,7 +221,9 @@ class GwVisit(QObject):
         self.event_feature_type_selected(self.dlg_add_visit, "arc")
 
         # Force visit_tab_feature_changed
-        self.visit_tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"], layers=self.layers)
+        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
+                           "v_edit_element"]
+        self.visit_tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=excluded_layers)
 
         # Manage relation locking
         if self.locked_geom_type:
@@ -698,12 +705,12 @@ class GwVisit(QObject):
             self.manage_tabs_enabled(True)
 
 
-    def connect_signal_tab_feature_signal(self, connect=True):
+    def connect_signal_tab_feature_signal(self, connect=True, excluded_layers=[]):
 
         try:
             if connect:
                 self.dlg_add_visit.tab_feature.currentChanged.connect(partial(
-                    self.visit_tab_feature_changed, self.dlg_add_visit, 'visit', excluded_layers=["v_edit_element"]))
+                    self.visit_tab_feature_changed, self.dlg_add_visit, 'visit', excluded_layers))
             else:
                 self.dlg_add_visit.tab_feature.currentChanged.disconnect()
         except Exception as e:
@@ -712,17 +719,18 @@ class GwVisit(QObject):
 
     def manage_tabs_enabled(self, enable_tabs=False):
         """ Enable/Disable tabs depending geom_type """
-
+        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
+                          "v_edit_element"]
         if self.geom_type is None:
             return
 
-        self.connect_signal_tab_feature_signal(False)
+        self.connect_signal_tab_feature_signal(False, excluded_layers)
 
         # If geom_type = 'all': enable all tabs
         if self.geom_type == 'all':
             for i in range(self.dlg_add_visit.tab_feature.count()):
                 self.dlg_add_visit.tab_feature.setTabEnabled(i, True)
-            self.connect_signal_tab_feature_signal(True)
+            self.connect_signal_tab_feature_signal(True, excluded_layers)
             return
 
         # Disable all tabs
@@ -1674,7 +1682,7 @@ class GwVisit(QObject):
         tools_qt.fill_combo_values(self.dlg_event.position_id, node_list, 1, True, False)
 
 
-    def visit_tab_feature_changed(self, dialog, table_object='visit', excluded_layers=[], layers=None):
+    def visit_tab_feature_changed(self, dialog, table_object='visit', excluded_layers=[]):
         """ Set geom_type and layer depending selected tab """
 
         # Get selected tab to set geometry type
