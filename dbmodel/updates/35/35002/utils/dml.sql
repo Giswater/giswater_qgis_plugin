@@ -233,7 +233,7 @@ UPDATE config_toolbox SET inputparams = '[{"widgetname":"state_type", "label":"S
 WHERE id = 2784;
 
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
-VALUES ('3016', 'gw_getfeaturesfrompolygon', 'utils', 'function','json', 'json', 
+VALUES ('3016', 'gw_getidsfrompolygon', 'utils', 'function','json', 'json', 
 'Function that returns features involved on input polygon', 'role_basic, NULL) ON CONFLICT (id) DO NOTHING;
 
 
