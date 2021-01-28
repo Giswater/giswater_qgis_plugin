@@ -3,4 +3,5 @@
 - Bug fix on trg edit element
 - Bug fix on temp tables (SRID harcoded-25831)
 - Add on exception when others on go2epa_main function for ud
+- Bug fix on get options dialog
 - Clean code on trg_edit_subcatchement
