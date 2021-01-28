@@ -202,28 +202,36 @@ class Giswater(QObject):
         # # Get all QToolBar
         widget_list = self.iface.mainWindow().findChildren(QToolBar)
         own_toolbars = []
+
         # Get a list with own QToolBars
         for w in widget_list:
             if w.property('gw_name'):
                 own_toolbars.append(w)
+
         # Order list of toolbar in function of X position
         own_toolbars = sorted(own_toolbars, key=lambda k: k.x())
         if len(own_toolbars) == 0:
             return
+
         sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
         sorted_toolbar_ids = ",".join(sorted_toolbar_ids)
         tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids),  "user", "init")
 
 
-    def unload(self, remove_modules=True):
+    def unload(self, is_plugin_reloaded=True):
         """ Removes plugin menu items and icons from QGIS GUI
             :param @remove_modules is True when plugin is disabled or reloaded
         """
 
-        # Remove Giswater dockers
-        self.remove_dockers()
-
         try:
+
+            # Remove Giswater dockers
+            self.remove_dockers()
+
+            # Remove 'Main Info button' only when plugin is reloaded through 'Plugin Reloader'
+            if is_plugin_reloaded:
+                self.unset_info_button()
+
             # Unlisten notify channel and stop thread
             if hasattr(self, 'notify'):
                 list_channels = ['desktop', global_vars.session_vars['current_user']]
