@@ -34,9 +34,6 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, input_p
 VALUES ('2998', 'gw_fct_user_check_data', 'utils', 'function','json', 'json', 
 'Function to analyze data quality using queries defined by user', 'role_om', NULL) ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
-VALUES ('3000', 'gw_fct_audit_log_project', 'utils', 'function','json', 'json', 
-'Function that executes all check functions and copy data into statistic table (audit_fid_log)', 'role_om', NULL) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_toolbox(id, alias, isparametric, functionparams, inputparams, observ, active)
 VALUES (2998,'User check data', TRUE, '{"featureType":[]}', 
@@ -231,9 +228,3 @@ UPDATE config_toolbox SET inputparams =NULL WHERE id = 2202;
 --2021/01/12
 UPDATE config_toolbox SET inputparams = '[{"widgetname":"state_type", "label":"State:", "widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layoutorder":3, "dvQueryText":"select value_state_type.id as id, concat(''state: '',value_state.name,'' state type: '', value_state_type.name) as idval from value_state_type join value_state on value_state.id = state where value_state_type.id is not null order by state, id", "selectedId":"2","isparent":"true"},{"widgetname":"workcat_id", "label":"Workcat:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"select id as id, id as idval from cat_work where id is not null order by id", "selectedId":"1"},{"widgetname":"builtdate", "label":"Builtdate:", "widgettype":"datetime","datatype":"date","layoutname":"grl_option_parameters","layoutorder":5, "value":null },{"widgetname":"arc_type", "label":"Arc type:", "widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layoutorder":6, "dvQueryText":"select distinct id as id, id as idval from cat_feature_arc where id is not null order by id", "selectedId":"1"},{"widgetname":"node_type", "label":"Node type:", "widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layoutorder":7, "dvQueryText":"select distinct id as id, id as idval from cat_feature_node where id is not null order by id", "selectedId":"1"},{"widgetname":"topocontrol", "label":"Active topocontrol:", "widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":8, "value":"true"}, {"widgetname": "btn_path", "label": "Select DXF file:", "widgettype": "button",  "datatype": "text", "layoutname": "grl_option_parameters", "layoutorder": 9, "value": "...","widgetfunction":"import_dxf" }]'
 WHERE id = 2784;
-
-INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query)
-VALUES ('3016', 'gw_getidsfrompolygon', 'utils', 'function','json', 'json', 
-'Function that returns features involved on input polygon', 'role_basic, NULL) ON CONFLICT (id) DO NOTHING;
-
-
