@@ -231,10 +231,9 @@ class Giswater(QObject):
 
             if self.load_project:
                 if self.load_project.buttons != {}:
-
-                    for action in list(self.load_project.buttons.values()):
-                        self.iface.removePluginMenu(self.plugin_name, action)
-                        self.iface.removeToolBarIcon(action)
+                    for button in list(self.load_project.buttons.values()):
+                        self.iface.removePluginMenu(self.plugin_name, button.action)
+                        self.iface.removeToolBarIcon(button.action)
 
             if self.load_project:
                 if self.load_project.plugin_toolbars:
@@ -244,9 +243,8 @@ class Giswater(QObject):
                             del plugin_toolbar.toolbar
 
         except Exception as e:
-            pass
+            print(f"Exception in unload: {e}")
         finally:
-
             self.load_project = None
 
 
