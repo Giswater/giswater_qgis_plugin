@@ -64,8 +64,8 @@ class GwLoadProject(QObject):
         global_vars.project_type = tools_gw.get_project_type()
 
         # Set logger (no database connection yet)
-        global_vars.session_vars['min_log_level'] = \
-            tools_gw.check_config_settings('system', 'log_level', '20', 'user', 'init')
+        min_log_level = int(tools_gw.check_config_settings('system', 'log_level', '20', 'user', 'init'))
+        global_vars.session_vars['min_log_level'] = min_log_level
         tools_log.set_logger(self.plugin_name)
         global_vars.plugin_name = self.plugin_name
 

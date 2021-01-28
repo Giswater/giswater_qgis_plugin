@@ -76,6 +76,12 @@ class GwLogger(object):
         """ Logger message into logger file with selected level """
 
         try:
+
+            # Check session parameter 'min_log_level' to know if we need to log message in logger file
+            valor = global_vars.session_vars['min_log_level']
+            if int(log_level) < int(valor):
+                return
+
             module_path = inspect.stack()[stack_level][1]
             file_name = os.path.basename(module_path)
             function_line = inspect.stack()[stack_level][2]
@@ -132,6 +138,8 @@ def set_logger(logger_name=None):
         global_vars.logger = GwLogger(logger_name, global_vars.session_vars['min_log_level'], str(log_suffix))
         values = {10: 0, 20: 0, 30: 1, 40: 2}
         global_vars.session_vars['min_message_level'] = values.get(global_vars.session_vars['min_log_level'], 0)
+        min_message_level = values.get(int(global_vars.session_vars['min_log_level']), 0)
+        global_vars.session_vars['min_message_level'] = min_message_level
 
 
 def _qgis_log_message(text=None, message_level=0, context_name=None, parameter=None, tab_name=None):
