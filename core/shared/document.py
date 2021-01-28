@@ -107,19 +107,21 @@ class GwDocument:
         tools_gw.set_completer_widget(viewname, self.dlg_add_doc.feature_id, str(geom_type) + "_id")
 
         # Set signals
+        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
+                           "v_edit_element"]
+        layers_visibility = tools_gw.get_parent_layers_visibility()
+        self.dlg_add_doc.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_add_doc.doc_type.currentIndexChanged.connect(self.activate_relations)
         self.dlg_add_doc.btn_path_url.clicked.connect(partial(self.open_web_browser, self.dlg_add_doc, "path"))
         self.dlg_add_doc.btn_path_doc.clicked.connect(lambda: setattr(self, 'files_path', self.get_file_dialog(self.dlg_add_doc, "path")))
         self.dlg_add_doc.btn_accept.clicked.connect(
             partial(self.manage_document_accept, table_object, tablename, qtable, item_id))
-        self.dlg_add_doc.btn_cancel.clicked.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_doc,
-                    table_object, cur_active_layer, excluded_layers=["v_edit_element"],
-                    single_tool_mode=self.single_tool_mode, layers=self.layers)))
-        self.dlg_add_doc.rejected.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(self.dlg_add_doc, table_object,
-                    cur_active_layer, excluded_layers=["v_edit_element"], single_tool_mode=self.single_tool_mode,
-                    layers=self.layers)))
+        self.dlg_add_doc.btn_cancel.clicked.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(
+            self.dlg_add_doc, table_object, cur_active_layer, single_tool_mode=self.single_tool_mode, layers=self.layers)))
+        self.dlg_add_doc.rejected.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(
+            self.dlg_add_doc, table_object, cur_active_layer, single_tool_mode=self.single_tool_mode, layers=self.layers)))
         self.dlg_add_doc.tab_feature.currentChanged.connect(
-            partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, excluded_layers=["v_edit_element"]))
+            partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, excluded_layers))
 
         self.dlg_add_doc.doc_id.textChanged.connect(
             partial(self.fill_dialog_document, self.dlg_add_doc, table_object, None))
@@ -137,7 +139,9 @@ class GwDocument:
         # Set default tab 'arc'
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        tools_gw.get_signal_change_tab(self.dlg_add_doc, excluded_layers=["v_edit_element"])
+        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
+                           "v_edit_element"]
+        tools_gw.get_signal_change_tab(self.dlg_add_doc, excluded_layers)
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_add_doc, dlg_name='doc', maximize_button=False)
