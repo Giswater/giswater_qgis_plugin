@@ -14,17 +14,10 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="1" column="3">
-    <widget class="QPushButton" name="btn_close">
+   <item row="1" column="0">
+    <widget class="QPushButton" name="btn_reset_dialog">
      <property name="text">
-      <string>Close</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="QPushButton" name="btn_save">
-     <property name="text">
-      <string>Save</string>
+      <string>Reset dialog</string>
      </property>
     </widget>
    </item>
@@ -41,20 +34,20 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="0">
-    <widget class="QPushButton" name="btn_reset_dialog">
-     <property name="text">
-      <string>Reset dialog</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" colspan="4">
+   <item row="0" column="0" colspan="3">
     <widget class="QTreeWidget" name="tree_config_files">
      <column>
       <property name="text">
        <string notr="true">1</string>
       </property>
      </column>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QPushButton" name="btn_close">
+     <property name="text">
+      <string>Close</string>
+     </property>
     </widget>
    </item>
   </layout>

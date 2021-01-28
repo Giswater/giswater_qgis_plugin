@@ -9,7 +9,7 @@ import configparser
 import os
 from functools import partial
 
-from qgis.PyQt.QtCore import QObject
+from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtGui import QIcon, QKeySequence
 from qgis.PyQt.QtWidgets import QActionGroup, QMenu, QComboBox, QTableView, QTableWidgetItem, QPushButton, \
     QTreeWidget, QTreeWidgetItem
@@ -133,15 +133,13 @@ class GwMenuLoad(QObject):
 
         # Manage widgets
         self.tree_config_files = self.dlg_manage_menu.findChild(QTreeWidget, 'tree_config_files')
-        self.btn_save = self.dlg_manage_menu.findChild(QPushButton, 'btn_save')
         self.btn_close = self.dlg_manage_menu.findChild(QPushButton, 'btn_close')
         self.btn_reset_dialog = self.dlg_manage_menu.findChild(QPushButton, 'btn_reset_dialog')
 
         # Fill table_config_files
-        self._fill_tbl_config_files(self.tree_config_files)
+        self._fill_tbl_config_files()
 
         # Listeners
-        self.btn_save.clicked.connect(partial(self._save_config_files))
         self.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manage_menu))
         self.btn_reset_dialog.clicked.connect(partial(self._reset_position_dialog))
 
@@ -199,7 +197,7 @@ class GwMenuLoad(QObject):
                 values = {}
 
 
-    def _fill_tbl_config_files(self, tree):
+    def _fill_tbl_config_files(self):
         """ Fills a UI table with the local list of values variable. """
 
         files = [f for f in os.listdir(f"{self.user_folder_dir}{os.sep}config")]
@@ -213,34 +211,35 @@ class GwMenuLoad(QObject):
                 item_child = QTreeWidgetItem([f"{self.list_values[row]['Section']}",
                                               f"{self.list_values[row]['Parameter']}",
                                               f"{self.list_values[row]['Value']}"])
-                # item_child.doubleClicked.connect(partial(self._onDoubleClick))
+                # item_child.itemDoubleClicked.connect(partial(self._onDoubleClick))
                 item.addChild(item_child)
 
-            tree.resize(500, 200)
-            tree.setColumnCount(3)
-            tree.setHeaderLabels(["Section", "Parameter", "Value"])
-            tree.addTopLevelItem(item)
+            self.tree_config_files.resize(500, 200)
+            self.tree_config_files.setColumnCount(3)
+            self.tree_config_files.setHeaderLabels(["Section", "Parameter", "Value"])
+            self.tree_config_files.addTopLevelItem(item)
+
+            self.tree_config_files.itemDoubleClicked.connect(partial(self._onDoubleClick))
+            self.tree_config_files.itemChanged.connect(partial(self._set_config_value))
 
 
-    def _save_config_files(self):
-        """ Writes the list of values into a persistant configuration file. """
+    def _set_config_value(self, item, column):
 
-        return
-        row_count = self.tbl_config_files.rowCount()
-        filename = tools_qt.get_text(self.dlg_manage_menu, self.cmb_config_files).replace(".config", "")
-        for row in range(row_count):
-            section = self.tbl_config_files.item(row, 0).text()
-            parameter = self.tbl_config_files.item(row, 1).text()
-            value = self.tbl_config_files.item(row, 2).text()
-            tools_gw.set_config_parser(f"{section}", f"{parameter}", f"{value}", file_name=filename, prefix=False)
+        if column == 2:
+            file_name = item.parent().text(0).replace(".config", "")
+            section = item.text(0)
+            parameter = item.text(1)
+            value = item.text(2)
+            tools_gw.set_config_parser(section, parameter, value, file_name=file_name, prefix=False)
 
 
-    def _onDoubleClick(self, index):
+    def _onDoubleClick(self, item, column):
 
-        item = self.currentItem()
-        item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
-        if index.column() != 0:
-            item.setFlags(item.flags() & ~QtCore.Qt.ItemIsEditable)
+        tmp = item.flags()
+
+        if column == 2:
+            item.setFlags(tmp | Qt.ItemIsEditable)
+
 
 
     def _set_log_sql(self):
