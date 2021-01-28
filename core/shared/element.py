@@ -203,8 +203,6 @@ class GwElement:
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
         self.geom_type = "arc"
-        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
-                           "v_edit_element"]
         tools_gw.get_signal_change_tab(self.dlg_add_element, excluded_layers)
 
         # Force layer v_edit_element set active True

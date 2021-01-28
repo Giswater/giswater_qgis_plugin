@@ -350,8 +350,12 @@ class GwPsector:
         self.insert_psector_selector('selector_state', 'state_id', '1')
 
         # Set signals
-        self.dlg_plan_psector.btn_accept.clicked.connect(partial(self.insert_or_update_new_psector,
-                                                                 'v_edit_plan_psector', True))
+        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
+                           "v_edit_element"]
+        layers_visibility = tools_gw.get_parent_layers_visibility()
+        self.dlg_plan_psector.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
+        self.dlg_plan_psector.btn_accept.clicked.connect(
+            partial(self.insert_or_update_new_psector, 'v_edit_plan_psector', True))
         self.dlg_plan_psector.tabWidget.currentChanged.connect(partial(self.check_tab_position))
         self.dlg_plan_psector.btn_cancel.clicked.connect(partial(self.close_psector, cur_active_layer))
         self.dlg_plan_psector.rejected.connect(partial(self.close_psector, cur_active_layer))
@@ -375,7 +379,7 @@ class GwPsector:
 
         self.dlg_plan_psector.btn_rapports.clicked.connect(partial(self.open_dlg_rapports))
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
-            partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, excluded_layers=["v_edit_element"]))
+            partial(tools_gw.get_signal_change_tab, self.dlg_plan_psector, excluded_layers))
         self.dlg_plan_psector.name.textChanged.connect(partial(self.enable_relation_tab, 'plan_psector'))
         viewname = 'v_edit_plan_psector_x_other'
         self.dlg_plan_psector.txt_name.textChanged.connect(
@@ -432,7 +436,7 @@ class GwPsector:
 
         # Set default tab 'arc'
         self.dlg_plan_psector.tab_feature.setCurrentIndex(0)
-        tools_gw.get_signal_change_tab(self.dlg_plan_psector, excluded_layers=["v_edit_element"])
+        tools_gw.get_signal_change_tab(self.dlg_plan_psector, excluded_layers)
 
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_rapports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
@@ -924,7 +928,6 @@ class GwPsector:
             self.reset_model_psector("gully")
         self.reset_model_psector("other")
         tools_gw.close_dialog(self.dlg_plan_psector)
-        tools_gw.hide_parent_layers(excluded_layers=["v_edit_element"])
         tools_qgis.disconnect_snapping()
         tools_qgis.disconnect_signal_selection_changed()
 
