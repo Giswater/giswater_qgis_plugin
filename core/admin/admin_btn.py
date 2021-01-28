@@ -531,7 +531,7 @@ class GwAdminButton:
             self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "init")
 
         else:
-            self.project_types = tools_gw.get_config_parser('system', 'project_types_dev', "project", "init")
+            self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "init")
 
         self.project_types = self.project_types.split(',')
 

@@ -180,7 +180,7 @@ class GwMenuLoad(QObject):
         self.list_values = []
         values = {}
         path = f"{self.user_folder_dir}{os.sep}config{os.sep}{file_name}"
-        project_types = tools_gw.get_config_parser('system', 'project_types_dev', "project", "init")
+        project_types = tools_gw.get_config_parser('system', 'project_types', "project", "init")
         if not os.path.exists(path):
             return None
 
