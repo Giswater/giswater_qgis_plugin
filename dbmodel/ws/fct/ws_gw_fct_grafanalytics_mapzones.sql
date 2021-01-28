@@ -142,6 +142,7 @@ v_count1 integer;
 v_count2 integer;
 v_count3 integer;
 v_geomparamupdate float;
+v_geomparamupdate_divide float;
 v_visible_layer text;
 v_concavehull float = 0.9;
 v_error_context text;
@@ -794,6 +795,7 @@ BEGIN
 
 				ELSIF  v_updatemapzgeom = 4 THEN
 			
+					v_geomparamupdate_divide = v_geomparamupdate/2;
 					-- use link and pipe buffer
 					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 							(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
@@ -802,7 +804,7 @@ BEGIN
 							(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 							group by '||quote_ident(v_field)||'
 							UNION
-							SELECT c.'||quote_ident(v_field)||', (st_buffer(st_collect(link.the_geom),'||v_geomparamupdate||'/2)) 
+							SELECT c.'||quote_ident(v_field)||', (st_buffer(st_collect(link.the_geom),'||v_geomparamupdate_divide||')) 
 							as geom FROM connec c, v_edit_link link
 							WHERE c.'||quote_ident(v_field)||'::text != ''0'' 
 							AND c.state > 0
