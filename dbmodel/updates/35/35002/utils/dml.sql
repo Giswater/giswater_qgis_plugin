@@ -228,3 +228,19 @@ UPDATE config_toolbox SET inputparams =NULL WHERE id = 2202;
 --2021/01/12
 UPDATE config_toolbox SET inputparams = '[{"widgetname":"state_type", "label":"State:", "widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layoutorder":3, "dvQueryText":"select value_state_type.id as id, concat(''state: '',value_state.name,'' state type: '', value_state_type.name) as idval from value_state_type join value_state on value_state.id = state where value_state_type.id is not null order by state, id", "selectedId":"2","isparent":"true"},{"widgetname":"workcat_id", "label":"Workcat:", "widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":4, "dvQueryText":"select id as id, id as idval from cat_work where id is not null order by id", "selectedId":"1"},{"widgetname":"builtdate", "label":"Builtdate:", "widgettype":"datetime","datatype":"date","layoutname":"grl_option_parameters","layoutorder":5, "value":null },{"widgetname":"arc_type", "label":"Arc type:", "widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layoutorder":6, "dvQueryText":"select distinct id as id, id as idval from cat_feature_arc where id is not null order by id", "selectedId":"1"},{"widgetname":"node_type", "label":"Node type:", "widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layoutorder":7, "dvQueryText":"select distinct id as id, id as idval from cat_feature_node where id is not null order by id", "selectedId":"1"},{"widgetname":"topocontrol", "label":"Active topocontrol:", "widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":8, "value":"true"}, {"widgetname": "btn_path", "label": "Select DXF file:", "widgettype": "button",  "datatype": "text", "layoutname": "grl_option_parameters", "layoutorder": 9, "value": "...","widgetfunction":"import_dxf" }]'
 WHERE id = 2784;
+
+--2021/01/29
+INSERT INTO config_form_tableview(location_type, project_type, tablename, columnname, columnindex,status, width, alias)
+VALUES ('connec_form', 'utils','v_ui_hydrometer','hydrometer_id',1,TRUE,NULL,'sys_hydrometer_id');
+INSERT INTO config_form_tableview(location_type, project_type, tablename, columnname, columnindex,status, width, alias)
+VALUES ('connec_form', 'utils','v_ui_hydrometer','connec_id',2,TRUE,NULL,'sys_connec_id');
+INSERT INTO config_form_tableview(location_type, project_type, tablename, columnname, columnindex,status, width, alias)
+VALUES ('connec_form', 'utils','v_ui_hydrometer','hydrometer_customer_code',3,TRUE,NULL,'Hydro ccode:');
+INSERT INTO config_form_tableview(location_type, project_type, tablename, columnname, columnindex,status, width, alias)
+VALUES ('connec_form', 'utils','v_ui_hydrometer','connec_customer_code',4,TRUE,NULL,'Connec ccode:');
+INSERT INTO config_form_tableview(location_type, project_type, tablename, columnname, columnindex,status, width, alias)
+VALUES ('connec_form', 'utils','v_ui_hydrometer','state',5,TRUE,NULL,'State:');
+INSERT INTO config_form_tableview(location_type, project_type, tablename, columnname, columnindex,status, width, alias)
+VALUES ('connec_form', 'utils','v_ui_hydrometer','expl_id',6,TRUE,NULL,'Exploitation:');
+INSERT INTO config_form_tableview(location_type, project_type, tablename, columnname, columnindex,status, width, alias)
+VALUES ('connec_form', 'utils','v_ui_hydrometer','hydrometer_link',7,TRUE,NULL,'Link:');

@@ -481,3 +481,15 @@ CREATE OR REPLACE VIEW ve_visit_node_singlevent AS
      JOIN om_visit_x_node ON om_visit.id = om_visit_x_node.visit_id
      JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
   WHERE config_visit_class.ismultievent = false;
+
+
+DROP VIEW v_ui_hydrometer;
+CREATE OR REPLACE VIEW v_ui_hydrometer AS 
+ SELECT v_rtc_hydrometer.hydrometer_id,
+    v_rtc_hydrometer.connec_id,
+    v_rtc_hydrometer.hydrometer_customer_code,
+    v_rtc_hydrometer.connec_customer_code,
+    v_rtc_hydrometer.state,
+    v_rtc_hydrometer.expl_name,
+    v_rtc_hydrometer.hydrometer_link
+   FROM v_rtc_hydrometer;
