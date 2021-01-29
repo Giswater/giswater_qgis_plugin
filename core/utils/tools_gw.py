@@ -603,7 +603,7 @@ def enable_all(dialog, result):
             if widget.property('keepDisbled'):
                 continue
             for field in result['fields']:
-                if widget.objectName() == field['widgetname']:
+                if widget.property('columnname') == field['columnname']:
                     if type(widget) in (QSpinBox, QDoubleSpinBox, QLineEdit, QTextEdit):
                         widget.setReadOnly(not field['iseditable'])
                         if not field['iseditable']:
