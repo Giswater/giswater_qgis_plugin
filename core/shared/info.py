@@ -2252,7 +2252,6 @@ class GwInfo(QObject):
         table_hydro = "v_ui_hydrometer"
         txt_hydrometer_id = self.dlg_cf.findChild(QLineEdit, "txt_hydrometer_id")
         self.fill_tbl_hydrometer(self.tbl_hydrometer, table_hydro)
-        tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_hydrometer, table_hydro)
         txt_hydrometer_id.textChanged.connect(partial(self.fill_tbl_hydrometer, self.tbl_hydrometer, table_hydro))
         self.tbl_hydrometer.doubleClicked.connect(partial(self.open_selected_hydro, self.tbl_hydrometer))
         self.dlg_cf.findChild(QPushButton, "btn_link").clicked.connect(self.check_url)
@@ -2315,6 +2314,8 @@ class GwInfo(QObject):
         message = tools_qt.fill_table(qtable, f"{self.schema_name}.{table_name}", filter)
         if message:
             tools_qgis.show_warning(message)
+        tools_gw.set_tablemodel_config(self.dlg_cf, qtable, table_name)
+
 
 
     """ FUNCTIONS RELATED WITH TAB HYDROMETER VALUES"""
