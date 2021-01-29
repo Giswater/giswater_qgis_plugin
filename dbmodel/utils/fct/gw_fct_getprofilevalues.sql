@@ -226,6 +226,8 @@ BEGIN
 			v_fcatgeom = 'cat_dnom::float*0.01'; v_ftopelev = 'elevation'; v_fymax = 'depth'; v_fslope = '100*(elevation1 - depth1 - elevation2 + depth2)/gis_length';
 			v_fsyselev = 'elevation - depth'; v_fsystopelev = v_ftopelev; v_fsysymax = v_fymax; 
 			v_querytext = '';
+			v_querytext1 = '';
+			v_querytext2 = '';
 			v_elev1 = 'case when node_1=node_id then elevation1 else elevation2 end';
 			v_elev2 = 'case when node_1=node_id then elevation2 else elevation1 end';
 			v_z1 = '0::integer';
