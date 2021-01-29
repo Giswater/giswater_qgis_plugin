@@ -444,7 +444,7 @@ BEGIN
 		
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity,table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, '230', 'INFO: Crítical minimun length checked. No values less than 0.2 meters missed.',v_count);
+		VALUES (v_fid, v_result_id, 1, '230', 'INFO: Critical minimun length checked. No values less than 0.2 meters missed.',v_count);
 	END IF;
 	
 	
