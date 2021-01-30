@@ -8,5 +8,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
--- 2021/01/27
-UPDATE sys_function SET project_type = 'ws' WHERE id=2790;
+-- 2021/01/30
+ALTER TABLE config_visit_parameter ALTER COLUMN active SET NOT NULL;

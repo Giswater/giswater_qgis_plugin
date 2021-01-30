@@ -1,0 +1,4 @@
+3.4.029
+************
+- Add pipebreak option for go2epa export on ws projects
+- Force mandatory active on config_visit_parameter.active
