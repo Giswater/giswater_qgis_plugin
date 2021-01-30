@@ -10,3 +10,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2021/01/30
 ALTER TABLE config_visit_parameter ALTER COLUMN active SET NOT NULL;
+ALTER TABLE link DROP CONSTRAINT link_unique;

@@ -40,25 +40,26 @@ BEGIN
 	-- control of project type
 	SELECT project_type INTO v_projectype FROM sys_version LIMIT 1;
 	
-    -- Control insertions ID
-    IF TG_OP = 'INSERT' THEN
+	-- Control insertions ID
+	IF TG_OP = 'INSERT' THEN
      
         -- link ID
-	IF (NEW.link_id IS NULL) THEN
-		NEW.link_id:= (SELECT nextval('link_link_id_seq'));
-	END IF;			
+		IF (NEW.link_id IS NULL) THEN
+			NEW.link_id:= (SELECT nextval('link_link_id_seq'));
+		END IF;	
+
+		-- State control of element
+		IF (NEW.state IS NULL) THEN
+			NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"());
+			IF (NEW.state IS NULL) THEN
+				NEW.state := 1;
+			END IF;
+		END IF;
 	
-		-- State
-        IF (NEW.state IS NULL) THEN
-            NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"());
-            IF (NEW.state IS NULL) THEN
-                NEW.state := 1;
-            END IF;
-        END IF;
 	END IF;	
         
-    -- topology control
-    IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+	-- topology control
+	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 	
 		-- control of relationship with connec / gully
 		SELECT * INTO v_connect FROM v_edit_connec WHERE ST_DWithin(ST_StartPoint(NEW.the_geom), v_edit_connec.the_geom, v_link_searchbuffer) AND state>0
@@ -311,8 +312,9 @@ BEGIN
 	-- upsert process
 		
 	IF TG_OP ='INSERT' THEN
+	
 		-- exception control. It's no possible to create another link when already exists for the connect
-		IF (SELECT feature_id FROM link WHERE feature_id=NEW.feature_id) IS NOT NULL THEN
+		IF (SELECT feature_id FROM link WHERE feature_id=NEW.feature_id AND state > 0) IS NOT NULL THEN
 			IF NEW.feature_type = 'CONNEC' THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        			"data":{"message":"3076", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
@@ -322,7 +324,7 @@ BEGIN
 			END IF;		
 		END IF;
 
-		-- state control
+		-- state control related to start and end point
 		IF v_connect.state=1 AND v_end_state=2 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        		"data":{"message":"3080", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
@@ -345,6 +347,8 @@ BEGIN
 				the_geom=NEW.the_geom, vnode_topelev = NEW.vnode_topelev WHERE link_id=NEW.link_id;
 				UPDATE vnode SET the_geom=St_endpoint(NEW.the_geom) WHERE vnode_id=NEW.exit_id::integer;
 			END IF;
+
+			UPDATE link SET state = NEW.state WHERE link_id=NEW.link_id;
 						
 		ELSE -- if geometry comes from psector_plan tables then 
 			
@@ -426,7 +430,7 @@ BEGIN
 		ELSIF OLD.feature_type='GULLY' THEN
 			UPDATE gully SET arc_id=NULL WHERE gully_id = OLD.feature_id;
 		END IF;
-						
+
 		RETURN NULL;
 	   
 	END IF;
