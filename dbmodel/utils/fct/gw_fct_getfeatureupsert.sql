@@ -123,16 +123,6 @@ v_node1 text;
 v_node2 text;
 v_formtype text;
 v_querytext text;
-v_isdmaheader boolean = false; -- For those nodes that headers of mapzone
-v_isdqaheader boolean = false; -- For those nodes that headers of mapzone
-v_issectorheader boolean = false; -- For those nodes that headers of mapzone
-v_ispresszoneheader boolean = false; -- For those nodes that headers of mapzone
-v_grafdelimiter text;
-v_mapzonetype text; -- Type of mapzone for that nodes that ar headers
-v_ispresszoneborder boolean = false; -- For those arcs that are on the border of mapzones againts two presszones (one each node)
-v_isdqaborder boolean = false; -- For those arcs that are on the border of mapzones againts two dqa (one each node)
-v_isdmaborder boolean = false; -- For those arcs that are on the border of mapzones againts two dma (one each node)
-v_issectorborder boolean = false; -- For those arcs that are on the border of mapzones againts two sectors (one each node)
 v_dqa_id integer;
 v_arc_insert_automatic_endpoint boolean;
 v_current_id text;
@@ -249,7 +239,6 @@ BEGIN
 							v_presszone_id = v_noderecord1.presszone_id;
 						ELSIF v_noderecord1.presszone_id::text != v_noderecord2.presszone_id::text THEN
 							v_presszone_id = v_noderecord1.presszone_id;
-							v_ispresszoneborder = true;						
 						END IF;
 					END IF;
 
@@ -261,7 +250,6 @@ BEGIN
 					ELSIF v_noderecord2.sector_id = 0 THEN
 						v_sector_id = v_noderecord1.sector_id;
 					ELSIF v_noderecord1.presszone_id::text != v_noderecord2.presszone_id::text THEN
-						v_issectorborder = v_noderecord1.presszone_id;
 						v_sector_id = true;	
 					END IF;
 
@@ -274,7 +262,6 @@ BEGIN
 						v_dma_id = v_noderecord1.dma_id;
 					ELSIF v_noderecord1.dma_id::text != v_noderecord2.dma_id::text THEN
 						v_dma_id = v_noderecord1.dma_id;
-						v_isdmaborder = true;	
 					END IF;
 
 					IF v_project_type = 'WS' THEN
@@ -287,7 +274,6 @@ BEGIN
 							v_dqa_id = v_noderecord1.dqa_id;
 						ELSIF v_noderecord1.dqa_id::text != v_noderecord2.dqa_id::text THEN
 							v_dqa_id = v_noderecord1.dqa_id;
-							v_isdqaborder = true;	
 						END IF;
 					END IF;
 
@@ -466,23 +452,6 @@ BEGIN
 				USING v_tablename, schemas_array[1]; 
 	END IF;
 
-	-- Getting node header
-	IF v_project_type = 'WS' THEN
-		v_grafdelimiter = (SELECT graf_delimiter FROM cat_feature JOIN cat_feature_node USING (id) WHERE child_layer = p_table_id);
-		IF v_grafdelimiter = 'PRESSZONE' THEN
-			v_ispresszoneheader = true;
-			v_mapzonetype = lower(v_grafdelimiter);
-		ELSIF v_grafdelimiter = 'DMA' THEN
-			v_isdmaheader = true;
-			v_mapzonetype = lower(v_grafdelimiter);
-		ELSIF v_grafdelimiter = 'DQA' THEN
-			v_isdqaheader = true;
-			v_mapzonetype = lower(v_grafdelimiter);
-		ELSIF v_grafdelimiter = 'SECTOR' THEN
-			v_issectorheader = true;
-			v_mapzonetype = lower(v_grafdelimiter);
-		END IF;
-	END IF;
 	
 	-- Filling the form widgets with values
 	---------------------------------------
@@ -695,13 +664,6 @@ BEGIN
 					END CASE;
 				END IF;
 
-				-- force enabled for arc mapzone borders
-				IF 	(v_ispresszoneborder AND (aux_json->>'columnname') = 'presszone_name') OR
-					(v_isdmaborder AND (aux_json->>'columnname') = 'dma_name') OR
-					(v_isdqaborder AND (aux_json->>'columnname') = 'dqa_name') OR 
-					(v_issectorborder AND (aux_json->>'columnname') = 'sector_name') THEN
-						v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'iseditable', 'true'::boolean);	
-				END IF;
 				
 			ELSIF  p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN 
 				field_value := (v_values_array->>(aux_json->>'columnname'));
@@ -752,14 +714,6 @@ BEGIN
 					v_widgetcontrols = gw_fct_json_object_set_key ((aux_json->>'widgetcontrols')::json, 'maxMinValues' ,(v_widgetvalues->>(aux_json->>'columnname'))::json);
 					v_fields_array[array_index] := gw_fct_json_object_set_key (v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
 				END IF;
-			END IF;
-			
-			-- force enabled widget of mapzones for nodes headers (insert or update)
-			IF 	(v_isdmaheader AND (aux_json->>'columnname'='dma_name')) OR 
-				(v_isdqaheader AND (aux_json->>'columnname'='dqa_name')) OR 
-				(v_issectorheader AND (aux_json->>'columnname'='sector_name')) OR 
-				(v_ispresszoneheader AND (aux_json->>'columnname'='presszone_name')) THEN
-					v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'iseditable', 'true'::boolean);
 			END IF;
 		END LOOP;  
 	END IF;
