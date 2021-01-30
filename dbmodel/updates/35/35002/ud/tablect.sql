@@ -13,3 +13,5 @@ SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAM
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"cat_feature_gully", "oldName":"gully_type_type_fkey", "newName":"cat_feature_gully_type_fkey"}}$$);
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"cat_feature_gully", "oldName":"gully_type_man_table_check", "newName":"cat_feature_gully_man_table_check"}}$$);
 
+--2021/01/30
+ALTER TABLE inp_flwreg_orifice ALTER COLUMN "offset" drop NOT NULL;

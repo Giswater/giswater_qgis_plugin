@@ -38,3 +38,29 @@ AND feature_type = 'GULLY';
 --2021/01/05
 UPDATE config_toolbox SET inputparams =NULL WHERE id = 2202;
 
+--2021/01/30
+UPDATE sys_param_user SET vdefault =
+'{"status":true, "parameters":{
+"junction":{"y0":0, "ysur":0}, 
+"outfall":{"outfallType":"NORMAL"}, 
+"conduit":{"barrels":1, "q0":0, "qmax":0},
+"orifice":{"oriType":"SIDE", "shape":"CIRCULAR", "cd":0.75, "geom1":1, "flap":"NO"}, 
+"weir":{"weirType":"SIDEFLOW", "cd":0.75, "ec":null, "cd2":null, "flap":"NO", "geom1":1, "geom2":1}, 
+"outlet":{"outletType":"TABULAR/DEPTH", "cd1":null, "cd2":null, "flap":"NO"}, 
+"pump":{}, 
+"raingage":{"scf":1}}}'
+WHERE id = 'inp_options_vdefault';
+
+UPDATE config_param_user SET value =
+'{"status":true, "parameters":{
+"junction":{"y0":0, "ysur":0}, 
+"outfall":{"outfallType":"NORMAL"}, 
+"conduit":{"barrels":1, "q0":0, "qmax":0},
+"orifice":{"oriType":"SIDE", "shape":"CIRCULAR", "cd":0.75, "geom1":1, "flap":"NO"}, 
+"weir":{"weirType":"SIDEFLOW", "cd":0.75, "ec":null, "cd2":null, "flap":"NO", "geom1":1, "geom2":1}, 
+"outlet":{"outletType":"TABULAR/DEPTH", "cd1":null, "cd2":null, "flap":"NO"}, 
+"pump":{}, 
+"raingage":{"scf":1}}}'
+WHERE parameter = 'inp_options_vdefault';
+
+

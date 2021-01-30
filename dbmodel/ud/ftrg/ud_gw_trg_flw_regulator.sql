@@ -42,7 +42,66 @@ BEGIN
 		NEW.flwreg_id=NEW.flwreg_id+1;
 	END IF;
 
-RETURN NEW;
+	-- specific flow regulators
+	IF flw_type_aux  = 'orifice' THEN
+		IF NEW.ori_type IS NULL THEN
+			NEW.ori_type = (SELECT ((value::json->>'parameters')::json->>'orifice')::json->>'oriType' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+		IF NEW.shape IS NULL  THEN
+			NEW.shape = (SELECT ((value::json->>'parameters')::json->>'orifice')::json->>'shape' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+		IF NEW.cd IS NULL  THEN
+			NEW.cd = (SELECT ((value::json->>'parameters')::json->>'orifice')::json->>'cd' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+		IF NEW.flap IS NULL  THEN
+			NEW.flap = (SELECT ((value::json->>'parameters')::json->>'orifice')::json->>'flap' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+		IF NEW.geom1 IS NULL THEN
+			NEW.geom1 = (SELECT ((value::json->>'parameters')::json->>'orifice')::json->>'geom1' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+		
+	ELSIF flw_type_aux  = 'weir' THEN
+		IF NEW.weir_type IS NULL THEN
+			NEW.weir_type = (SELECT ((value::json->>'parameters')::json->>'weir')::json->>'weirType' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+		IF NEW.cd IS NULL THEN
+			NEW.cd = (SELECT ((value::json->>'parameters')::json->>'weir')::json->>'cd' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+		IF NEW.ec IS NULL  THEN
+			NEW.ec = (SELECT ((value::json->>'parameters')::json->>'weir')::json->>'ec' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+		IF NEW.cd2 IS NULL  THEN
+			NEW.cd2 = (SELECT ((value::json->>'parameters')::json->>'weir')::json->>'cd2' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+		IF NEW.flap IS NULL  THEN
+			NEW.flap = (SELECT ((value::json->>'parameters')::json->>'weir')::json->>'flap' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+		IF NEW.geom1 IS NULL THEN
+			NEW.geom1 = (SELECT ((value::json->>'parameters')::json->>'weir')::json->>'geom1' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+		IF NEW.geom2 IS NULL THEN
+			NEW.geom2 = (SELECT ((value::json->>'parameters')::json->>'weir')::json->>'geom2' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+	
+	ELSIF flw_type_aux  = 'outlet' THEN
+		IF NEW.outlet_type IS NULL THEN
+			NEW.outlet_type = (SELECT ((value::json->>'parameters')::json->>'outlet')::json->>'outletType' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+		IF NEW.cd1 IS NULL THEN
+			NEW.cd1 = (SELECT ((value::json->>'parameters')::json->>'outlet')::json->>'cd1' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+		IF NEW.cd2 IS NULL  THEN
+			NEW.cd2 = (SELECT ((value::json->>'parameters')::json->>'outlet')::json->>'cd2' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+		IF NEW.flap IS NULL  THEN
+			NEW.flap = (SELECT ((value::json->>'parameters')::json->>'outlet')::json->>'flap' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user);
+		END IF;
+
+	ELSIF flw_type_aux  = 'pump' THEN
+	
+	END IF;
+
+	RETURN NEW;
     
 END;
 $BODY$
