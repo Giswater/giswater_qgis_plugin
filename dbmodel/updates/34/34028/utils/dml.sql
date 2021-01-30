@@ -10,3 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2021/01/27
 UPDATE sys_function SET project_type = 'ws' WHERE id=2790;
+
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
+VALUES (3020,'gw_fct_pg2epa_breakpipes', 'ws', 'function', 'json', 'json', 'Function that creates additional vnodes to enhance epanet models', 'role_epa') 
+ON CONFLICT (function_name, project_type) DO NOTHING;

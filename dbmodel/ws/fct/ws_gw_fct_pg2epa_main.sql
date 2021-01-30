@@ -45,6 +45,7 @@ v_delnetwork boolean;
 v_removedemand boolean;
 v_fid integer = 227;
 v_error_context text;
+v_breakpipes boolean;
 	
 BEGIN
 
@@ -60,7 +61,7 @@ BEGIN
 	v_buildupmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_buildup_mode' AND cur_user=current_user);
 	v_advancedsettings = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_advancedsettings' AND cur_user=current_user)::boolean;
 	v_vdefault = (SELECT value::json->>'status' FROM config_param_user WHERE parameter='inp_options_vdefault' AND cur_user=current_user);
-
+	
 	-- get debug parameters (settings)
 	v_onlyexport = (SELECT value::json->>'onlyExport' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_setdemand = (SELECT value::json->>'setDemand' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
@@ -68,11 +69,12 @@ BEGIN
 	v_checknetwork = (SELECT value::json->>'checkNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_delnetwork = (SELECT value::json->>'delDisconnNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_removedemand = (SELECT value::json->>'removeDemandOnDryNodes' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
+	v_breakpipes = (SELECT (value::json->>'breakPipes')::json->>'status' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	-- delete audit table
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
 	DELETE FROM audit_log_data WHERE fid = v_fid AND cur_user=current_user;
-
+	
 	-- force only state 1 selector
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
@@ -139,8 +141,18 @@ BEGIN
 
 		RAISE NOTICE '8 - Try to trim arcs with vnode';
 		IF v_networkmode = 3 OR v_networkmode = 4 THEN
+		
+			-- profilactic control on temp_table
+			TRUNCATE temp_table;
+
+			-- create ficticius vnode to tream pipes using debug variable breakPipes
+			IF v_breakpipes THEN
+				PERFORM gw_fct_pg2epa_breakpipes(v_result);
+			END IF;
+
+			-- execute vnodetrim arcs
 			SELECT gw_fct_pg2epa_vnodetrimarcs(v_result) INTO v_response;
-				
+			
 			-- setting first message again on user's pannel
 			IF v_response = 0 THEN
 				v_message = concat ('INFO: vnodes over nodarcs have been checked without any inconsistency. In terms of vnode/nodarc topological relation network is ok');
@@ -240,24 +252,26 @@ BEGIN
 	SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
 
 	RAISE NOTICE '23 - Profilactic last control';
-	
-	-- arcs without nodes
-	INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) 
-	SELECT v_fid, arc_id, arc_type, '23 - Profilactic last delete' FROM temp_arc JOIN temp_node ON node_1=node_id WHERE temp_node.node_id is null;
-	INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) 
-	SELECT v_fid, arc_id, arc_type, '23 - Profilactic last delete' FROM temp_arc JOIN temp_node ON node_2=node_id WHERE temp_node.node_id is null;
-	
-	DELETE FROM temp_arc WHERE id IN (SELECT a.id FROM temp_arc a JOIN temp_node ON node_1=node_id WHERE temp_node.node_id is null);
-	DELETE FROM temp_arc WHERE id IN (SELECT a.id FROM temp_arc a JOIN temp_node ON node_2=node_id WHERE temp_node.node_id is null);
-	
-	-- nodes without arcs
-	INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) 
-	SELECT v_fid, node_id, node_type, '23 - Profilactic last delete' FROM temp_node 
-	WHERE id IN (SELECT id FROM temp_node LEFT JOIN (SELECT node_1 as node_id FROM temp_arc UNION SELECT node_2 FROM temp_arc) a USING (node_id) WHERE a.node_id is null);
-	
-	DELETE FROM temp_node 
-	WHERE id IN (SELECT id FROM temp_node LEFT JOIN (SELECT node_1 as node_id FROM temp_arc UNION SELECT node_2 FROM temp_arc) a USING (node_id) WHERE a.node_id is null);
 
+	-- arcs without nodes
+	UPDATE temp_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_arc a JOIN temp_node ON node_1=node_id WHERE temp_node.node_id is null) a WHERE t.id = a.id;
+	UPDATE temp_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_arc a JOIN temp_node ON node_2=node_id WHERE temp_node.node_id is null) a WHERE t.id = a.id;
+
+	INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) 
+	SELECT v_fid, arc_id, arc_type, '23 - Profilactic last delete' FROM temp_arc WHERE epa_type  ='TODELETE';
+	
+	DELETE FROM temp_arc WHERE epa_type = 'TODELETE';
+
+	-- nodes without arcs
+	UPDATE temp_node t SET epa_type = 'TODELETE' FROM 
+	(SELECT id FROM temp_node LEFT JOIN (SELECT node_1 as node_id FROM temp_arc UNION SELECT node_2 FROM temp_arc) a USING (node_id) WHERE a.node_id IS NULL) a 
+	WHERE t.id = a.id;
+
+	INSERT INTO audit_log_data (fid, feature_id, feature_type, log_message) 
+	SELECT v_fid, node_id, node_type, '23 - Profilactic last delete' FROM temp_node WHERE epa_type  ='TODELETE';
+		
+	DELETE FROM temp_node WHERE epa_type = 'TODELETE';
+	
 	-- update shortpipe/valve diameter USING neighbourg
 	UPDATE temp_arc SET diameter = dint FROM (SELECT node_1 as n, diameter dint FROM temp_arc UNION SELECT node_2, diameter FROM temp_arc)t WHERE t.dint IS NOT NULL AND t.n = node_1 AND epa_type IN ('SHORTPIPE', 'VALVE') AND diameter IS NULL;
 	UPDATE temp_arc SET diameter = dint FROM (SELECT node_1 as n, diameter dint FROM temp_arc UNION SELECT node_2, diameter FROM temp_arc)t WHERE t.dint IS NOT NULL AND t.n = node_2 AND epa_type IN ('SHORTPIPE', 'VALVE') AND diameter IS NULL;
@@ -266,6 +280,13 @@ BEGIN
 	UPDATE temp_arc SET minorloss = 0 WHERE minorloss IS NULL;
 	UPDATE temp_arc SET status = 'OPEN' WHERE status IS NULL OR status = '';
 
+	-- remove pattern when breakPipes is enabled	
+	IF v_breakpipes THEN
+		UPDATE temp_node n SET pattern_id  = ';VNODE PIPE BREAKER' , demand = 0 FROM temp_table t WHERE n.node_id = concat('VN',t.id);				
+	END IF;
+
+	select * from temp_node limit 1
+	
 	RAISE NOTICE '24 - Move from temp tables to rpt_inp tables';
 	UPDATE temp_arc SET result_id  = v_result;
 	UPDATE temp_node SET result_id  = v_result;
