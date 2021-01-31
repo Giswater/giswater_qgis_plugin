@@ -42,6 +42,7 @@ v_geomparamupdate integer;
 v_useplanpsector boolean;
 v_updatemapzone float;
 v_oppositenode text;
+v_value integer;
 
 BEGIN
 
@@ -49,7 +50,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	
 	-- get project type
-    SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version LIMIT 1;
+	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version LIMIT 1;
 	
 	-- Get input parameters:
 	v_featuretype := (p_data ->> 'feature')::json->> 'featureType';
@@ -84,7 +85,10 @@ BEGIN
 			SELECT 'dqa', value::json->>'DQA' FROM config_param_system WHERE parameter='utils_grafanalytics_status') a
 			WHERE status::boolean is true
 			LOOP
-			-- looking for mapzones
+				EXECUTE ' SELECT '||lower(v_mapzone)||'_id FROM node WHERE node_id = '||v_id||
+				INTO v_value;
+					
+				-- looking for mapzones
 				EXECUTE 'SELECT count(*) FROM (SELECT DISTINCT '||lower(v_mapzone)||'_id FROM node WHERE node_id IN 
 				(SELECT node_1 as node_id FROM arc WHERE node_2 = '||v_id||'::text UNION SELECT node_2 FROM arc WHERE node_1 = '||v_id||'::text)) a '
 				INTO v_count;
@@ -130,9 +134,10 @@ BEGIN
 					END IF;
 
 					IF v_closedstatus IS TRUE THEN
-					-- looking for dry side using catching opposite node
+					
+						-- looking for dry side using catching opposite node
 						EXECUTE 'SELECT node_2 FROM arc WHERE node_1 = '''||v_id||''' AND '||lower(v_mapzone)||'_id::integer = 0 UNION SELECT node_1 
-					    FROM arc WHERE node_2 ='''||v_id||''' AND '||lower(v_mapzone)||'_id::integer = 0 LIMIT 1'
+						FROM arc WHERE node_2 ='''||v_id||''' AND '||lower(v_mapzone)||'_id::integer = 0 LIMIT 1'
 						INTO v_oppositenode;
 
 						IF v_oppositenode IS NOT NULL THEN
@@ -146,14 +151,12 @@ BEGIN
 						ELSE
 								
 							v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully closed. Maybe this operation have been affected mapzones scenario. Take a look on map for check it"}';	
-						END IF;						
-					ELSIF v_closedstatus IS FALSE THEN
-						IF v_count= 1 THEN
-							v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. If there were disconnected elements, it have been reconnected to mapzone"}';
-						ELSIF v_count =  2 THEN
-							v_message = '{"level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened. Be carefull because there is a conflict againts two mapzones"}';
-						END IF;
+						END IF;	
+										
 					END IF;
+					
+				ELSIF v_closedstatus IS FALSE AND v_count = 1 AND v_value = 0 THEN
+					v_message = '{"level": 1, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened, but as both sides have undefined dma, nothing have been updated"}';
 				ELSE
 					-- return message 
 					v_message = '{"level": 0, "text": "DYNAMIC MAPZONES: Valve have been succesfully opened and no mapzones have been updated"}';
@@ -166,13 +169,11 @@ BEGIN
 		END IF;
 	END IF;
 
-
 	-- Control NULL's
 	v_version := COALESCE(v_version, '[]');
 
-		-- Return
+	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":'||v_message||', "version":"' || v_version ||'","body":{"data":{}}}')::json, 3006);
-
 
 
 	-- Exception handling
