@@ -25,5 +25,3 @@ ALTER TABLE macrodqa ALTER COLUMN active SET DEFAULT TRUE;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 ALTER TABLE presszone ALTER COLUMN active SET DEFAULT TRUE;
 
-ALTER TABLE config_mincut_inlet RENAME to config_graf_inlet;
-ALTER SEQUENCE SCHEMA_NAME.config_mincut_inlet_id_seq RENAME TO config_graf_inlet_id_seq;

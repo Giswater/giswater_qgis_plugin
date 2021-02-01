@@ -11,6 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 -- parent:
 ALTER TABLE config_mincut_valve RENAME TO config_graf_valve;
 ALTER TABLE config_mincut_checkvalve  RENAME TO config_graf_checkvalve;
+ALTER TABLE config_mincut_inlet RENAME to config_graf_inlet;
 
 -- 2021/01/21
 DROP FUNCTION IF EXISTS gw_fct_mincut(character varying, character varying, integer, text);
