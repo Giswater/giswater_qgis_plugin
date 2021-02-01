@@ -1502,7 +1502,7 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
                 parameter = 'text'
                 msg = "Key on returned json from ddbb is missed"
             if is_thread:
-                tools_log.log_info(msg, parameter=parameter, level=level)
+                tools_log.log_info(msg, parameter=parameter)
             elif not is_thread and global_vars.session_vars['show_db_exception']:
                 # Show exception message only if we are not in a task process
                 tools_qgis.show_message(msg, level, parameter=parameter)
