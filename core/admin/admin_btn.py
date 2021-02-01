@@ -221,8 +221,9 @@ class GwAdminButton:
             if not is_test:
                 self.task1.setProgress(100)
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_import_data')
-            msg = ("The sql files have been correctly executed."
-                   "\nNow, a form will be opened to manage the import inp.")
+            msg = ("The base schema have been correctly executed."
+                   "\nNow will start the import process. It is experimental and it may crash."
+                   "\nIf this happens, please notify it by send a e-mail to info@giswater.org.")
             tools_qt.show_info_box(msg, "Info")
             self._execute_import_data(schema_type=project_type)
             return
