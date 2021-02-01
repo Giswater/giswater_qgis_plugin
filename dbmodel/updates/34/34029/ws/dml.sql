@@ -17,7 +17,7 @@ UPDATE config_param_user
 SET value = '{"onlyExport":false,"setDemand":true,"checkData":true,"checkNetwork":true,"checkResult":true,"onlyIsOperative":true,"delDisconnNetwork":false,"removeDemandOnDryNodes":false, "breakPipes":{"status":false, "maxLength":10, "removeVnodeBuffer":1}}'
 WHERE parameter = 'inp_options_debug';
 
-UPDATE sys_function SET descript = 'Function TO import network data from EPANET inp file into database. 
-Create node2arc transforms EPANET valves and pumps to node2arc Giswater elements, enabling to use this doublegeometry capability (node on Giswater tables, arc on EPANET tables).
-Option only valid if EPANET files comes from Giswater project.' 
+UPDATE sys_function SET descript = 'Function TO import network data from EPANET inp file into database. This function is experimental. Import may crash due many reasons. Be patient amb notify us if something went wrong. 
+The parameter ''Create node2arc'' transforms EPANET valves and pumps to node2arc Giswater elements, enabling to use this doublegeometry capability (node on Giswater tables, arc on EPANET tables).
+This option only is valid if EPANET file comes from Giswater project.' 
 WHERE id=2522;
