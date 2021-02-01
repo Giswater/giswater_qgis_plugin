@@ -173,6 +173,7 @@ class GwAdminButton:
             return
 
         if not is_test:
+            self.task1 = GwTask('Manage schema')
             self.task1.setProgress(10)
         status = self._update_30to31(new_project=True, project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
