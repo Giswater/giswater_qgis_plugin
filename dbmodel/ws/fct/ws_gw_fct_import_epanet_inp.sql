@@ -583,7 +583,7 @@ BEGIN
 	INSERT INTO selector_sector VALUES (1,current_user) ON CONFLICT (sector_id, cur_user) DO NOTHING;
 	UPDATE arc SET code = arc_id;
 	UPDATE node SET code = node_id;
-	INSERT INTO config_param_user ('inp_options_patternmethod', '13', current_user);
+	INSERT INTO config_param_user VALUES ('inp_options_patternmethod', '13', current_user);
 	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Enabling constraints -> Done');
 	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Process finished');
 			
