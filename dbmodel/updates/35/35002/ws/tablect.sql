@@ -53,17 +53,17 @@ SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAM
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_valve_unaccess", "oldName":"anl_mincut_result_valve_unaccess_pkey", "newName":"om_mincut_valve_unaccess_pkey"}}$$);
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_valve_unaccess", "oldName":"anl_mincut_result_valve_unaccess_result_id_fkey", "newName":"om_mincut_valve_unaccess_result_id_fkey"}}$$);
 
-SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_mincut_inlet", "oldName":"anl_mincut_inlet_x_exploitation_expl_id_fkey", "newName":"config_mincut_inlet_expl_id_fkey"}}$$);
-SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_mincut_inlet", "oldName":"anl_mincut_inlet_x_exploitation_node_id_fkey", "newName":"config_mincut_inlet_node_id_fkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_graf_inlet", "oldName":"anl_mincut_inlet_x_exploitation_expl_id_fkey", "newName":"config_graf_inlet_expl_id_fkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_graf_inlet", "oldName":"anl_mincut_inlet_x_exploitation_node_id_fkey", "newName":"config_graf_inlet_node_id_fkey"}}$$);
 
-SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_checkvalve", "oldName":"anl_mincut_checkvalve_pkey", "newName":"config_checkvalve_pkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_graf_checkvalve", "oldName":"anl_mincut_checkvalve_pkey", "newName":"config_graf_checkvalve_pkey"}}$$);
 
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_connec", "oldName":"anl_mincut_result_connec_pkey", "newName":"om_mincut_connec_pkey"}}$$);
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_connec", "oldName":"anl_mincut_result_connec_result_id_fkey", "newName":"om_mincut_connec_result_id_fkey"}}$$);
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"om_mincut_connec", "oldName":"anl_mincut_result_connec_unique_result_connec", "newName":"om_mincut_connec_unique_result_connec"}}$$);
 
-SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_valve", "oldName":"anl_mincut_selector_valve_pkey", "newName":"config_valve_pkey"}}$$);
-SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_valve", "oldName":"anl_mincut_selector_valve_id_fkey", "newName":"config_valve_valve_id_fkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_graf_valve", "oldName":"anl_mincut_selector_valve_pkey", "newName":"config_graf_valve_pkey"}}$$);
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_graf_valve", "oldName":"anl_mincut_selector_valve_id_fkey", "newName":"config_graf_valve_valve_id_fkey"}}$$);
 
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"selector_mincut_result", "oldName":"anl_mincut_result_selector_id_fkey", "newName":"selector_mincut_result_selector_id_fkey"}}$$);
 

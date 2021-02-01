@@ -27,8 +27,8 @@ INSERT INTO cat_users VALUES ('user4','user4');
 INSERT INTO cat_manager (idval, expl_id, username, active) VALUES ('general manager', '{1,2}', concat('{',current_user,'}')::text[], true);
 
 
-INSERT INTO config_mincut_inlet VALUES (113766, 1);
-INSERT INTO config_mincut_inlet VALUES (113952, 2);
+INSERT INTO config_graf_inlet VALUES (113766, 1);
+INSERT INTO config_graf_inlet VALUES (113952, 2);
 
 
 UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
@@ -81,10 +81,10 @@ UPDATE cat_feature_node SET graf_delimiter='DQA' WHERE id IN('CLORINATHOR');
 UPDATE cat_feature_node SET graf_delimiter='DMA' WHERE id IN('FLOWMETER');
 UPDATE cat_feature_node SET graf_delimiter='SECTOR' WHERE id IN('SOURCE','TANK','WATERWELL','WTP');
 
-INSERT INTO config_valve VALUES('CHECK_VALVE');
-INSERT INTO config_valve VALUES('FL_CONTR_VALVE');
-INSERT INTO config_valve VALUES('GEN_PURP_VALVE');
-INSERT INTO config_valve VALUES('THROTTLE_VALVE');
+INSERT INTO config_graf_valve VALUES('CHECK_VALVE');
+INSERT INTO config_graf_valve VALUES('FL_CONTR_VALVE');
+INSERT INTO config_graf_valve VALUES('GEN_PURP_VALVE');
+INSERT INTO config_graf_valve VALUES('THROTTLE_VALVE');
 
 
 update ext_rtc_hydrometer SET state_id=1;
@@ -319,10 +319,10 @@ WHERE parameter = 'om_dynamicmapzones_status';
 
 UPDATE element SET code = concat ('E',element_id);
 
-UPDATE config_mincut_inlet SET parameters = '{"inletArc":["113907", "113905"]}'
+UPDATE config_graf_inlet SET parameters = '{"inletArc":["113907", "113905"]}'
 WHERE node_id = '113766';
 
-UPDATE config_mincut_inlet SET parameters = '{"inletArc":["114145"]}'
+UPDATE config_graf_inlet SET parameters = '{"inletArc":["114145"]}'
 WHERE node_id = '113952';
 
 UPDATE config_form_fields SET label = 'Presszone' WHERE columnname = 'presszone_id';
@@ -377,7 +377,7 @@ update config_form_fields SET widgettype = 'text' WHERE columnname  = 'macrosect
 
 UPDATE v_edit_node SET nodecat_id = 'CHK-VALVE100-PN16' WHERE node_id = '1092';
 
-INSERT INTO config_checkvalve (node_id, to_arc) VALUES ('1092', '2104');
+INSERT INTO config_graf_checkvalve (node_id, to_arc) VALUES ('1092', '2104');
 
 UPDATE inp_connec SET demand  = 0.01;
 

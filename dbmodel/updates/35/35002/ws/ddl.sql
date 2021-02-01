@@ -24,3 +24,4 @@ ALTER TABLE macrodqa ALTER COLUMN active SET DEFAULT TRUE;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 ALTER TABLE presszone ALTER COLUMN active SET DEFAULT TRUE;
+

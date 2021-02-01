@@ -244,3 +244,7 @@ INSERT INTO config_form_tableview(location_type, project_type, tablename, column
 VALUES ('connec_form', 'utils','v_ui_hydrometer','expl_id',6,TRUE,NULL,'Exploitation:');
 INSERT INTO config_form_tableview(location_type, project_type, tablename, columnname, columnindex,status, width, alias)
 VALUES ('connec_form', 'utils','v_ui_hydrometer','hydrometer_link',7,TRUE,NULL,'Link:');
+
+--2021/02/01
+UPDATE sys_table SET id ='config_graf_inlet' WHERE id ='config_mincut_inlet';
+UPDATE sys_table SET id ='config_graf_checkvalve' WHERE id ='config_checkvalve';

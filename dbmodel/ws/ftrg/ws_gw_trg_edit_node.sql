@@ -570,9 +570,9 @@ BEGIN
 			END IF;
 		END IF;
 
-		--insert tank into config_mincut_inlet
+		--insert tank into config_graf_inlet
 		IF v_man_table='man_tank' THEN
-			INSERT INTO config_mincut_inlet(node_id, expl_id, active)
+			INSERT INTO config_graf_inlet(node_id, expl_id, active)
 			VALUES (NEW.node_id, NEW.expl_id, TRUE);
 		END IF;
 
@@ -793,9 +793,9 @@ BEGIN
 			hmax=NEW.hmax
 			WHERE node_id=OLD.node_id;
 			
-			--update config_mincut_inlet if exploitation changes
+			--update config_graf_inlet if exploitation changes
 			IF NEW.expl_id != OLD.expl_id THEN
-				UPDATE config_mincut_inlet SET expl_id=NEW.expl_id WHERE node_id=NEW.node_id;
+				UPDATE config_graf_inlet SET expl_id=NEW.expl_id WHERE node_id=NEW.node_id;
 			END IF;
 	
 		ELSIF v_man_table ='man_pump' THEN
@@ -920,8 +920,8 @@ BEGIN
 		-- delete from node table
 		DELETE FROM node WHERE node_id = OLD.node_id;
 
-		--remove node from config_mincut_inlet
-		DELETE FROM config_mincut_inlet WHERE node_id=OLD.node_id;
+		--remove node from config_graf_inlet
+		DELETE FROM config_graf_inlet WHERE node_id=OLD.node_id;
 
 		--Delete addfields (after or before deletion of node, doesn't matter)
 		DELETE FROM man_addfields_value WHERE feature_id = OLD.node_id  and parameter_id in 

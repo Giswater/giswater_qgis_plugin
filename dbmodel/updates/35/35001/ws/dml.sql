@@ -13,7 +13,7 @@ VALUES(2124,'gw_fct_connect_to_network',NULL,'{"visible": ["v_edit_arc", "v_edit
 
 
 -- 2020/07/14
-UPDATE sys_table SET id = 'config_valve' WHERE id = 'config_mincut_valve';
+UPDATE sys_table SET id = 'config_graf_valve' WHERE id = 'config_mincut_valve';
 
 DELETE FROM sys_param_user WHERE id = 'inp_options_skipdemandpattern';
 
@@ -5889,6 +5889,6 @@ WHERE id =2118;
 
 UPDATE sys_function SET function_type = 'gw_trg_ui_mincut' WHERE id = 2962;
 
-UPDATE config_checkvalve SET active = TRUE;
-UPDATE config_mincut_inlet SET active = TRUE;
-UPDATE config_valve SET active = TRUE;
+UPDATE config_graf_checkvalve SET active = TRUE;
+UPDATE config_graf_inlet SET active = TRUE;
+UPDATE config_graf_valve SET active = TRUE;

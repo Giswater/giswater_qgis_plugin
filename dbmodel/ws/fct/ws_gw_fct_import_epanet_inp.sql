@@ -86,7 +86,7 @@ BEGIN
 	IF v_delete_prev THEN
 		
 		DELETE FROM rpt_cat_result;
-		DELETE FROM config_valve;
+		DELETE FROM config_graf_valve;
 
 		-- Disable constraints
 		PERFORM gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"DROP"}}$$);
