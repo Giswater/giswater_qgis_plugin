@@ -29,4 +29,4 @@ CREATE SEQUENCE raingage_rg_id_seq
   START 1
   CACHE 1;
 
-ALTER TABLE raingage ALTER COLUMN rg_id SET DEFAULT nextval('ud_sample.raingage_rg_id_seq'::regclass);
+ALTER TABLE raingage ALTER COLUMN rg_id SET DEFAULT nextval('raingage_rg_id_seq'::regclass);
