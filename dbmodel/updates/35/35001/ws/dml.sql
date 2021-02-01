@@ -5889,6 +5889,6 @@ WHERE id =2118;
 
 UPDATE sys_function SET function_type = 'gw_trg_ui_mincut' WHERE id = 2962;
 
-UPDATE config_checkvalve SET active = TRUE;
+UPDATE config_graf_checkvalve SET active = TRUE;
 UPDATE config_graf_inlet SET active = TRUE;
 UPDATE config_valve SET active = TRUE;

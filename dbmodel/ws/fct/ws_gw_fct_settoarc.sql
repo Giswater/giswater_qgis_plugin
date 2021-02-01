@@ -80,11 +80,11 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, 
 		concat('Set to_arc for check-valve, ', v_feature_id, ' with value ',v_arc_id, '. and EPANET status with value ''CV'', '));
 
-		INSERT INTO config_checkvalve (node_id, to_arc, active) 
+		INSERT INTO config_graf_checkvalve (node_id, to_arc, active) 
 		VALUES (v_feature_id, v_arc_id,TRUE) ON CONFLICT (node_id) DO UPDATE SET to_arc = v_arc_id;
 
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, 
-		concat('and set to_arc of config_checkvalve for node ', v_feature_id, ' with value ',v_arc_id, '.'));
+		concat('and set to_arc of config_graf_checkvalve for node ', v_feature_id, ' with value ',v_arc_id, '.'));
 
     
     ELSIF v_epatype IN ('PUMP', 'VALVE', 'SHORTPIPE') OR v_grafdelim != 'NONE' THEN

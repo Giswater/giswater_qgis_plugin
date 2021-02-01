@@ -414,7 +414,7 @@ BEGIN
 			-- close checkvalves on the opposite sense where they are working
 			UPDATE temp_anlgraf SET flag=1 WHERE id IN (
 					SELECT id FROM temp_anlgraf JOIN (
-					SELECT node_id, to_arc from config_checkvalve order by 1,2
+					SELECT node_id, to_arc from config_graf_checkvalve order by 1,2
 					) a 
 					ON to_arc::integer=arc_id::integer WHERE node_id::integer=node_2::integer);
 

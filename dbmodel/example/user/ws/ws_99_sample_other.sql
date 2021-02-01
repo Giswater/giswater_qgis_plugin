@@ -377,7 +377,7 @@ update config_form_fields SET widgettype = 'text' WHERE columnname  = 'macrosect
 
 UPDATE v_edit_node SET nodecat_id = 'CHK-VALVE100-PN16' WHERE node_id = '1092';
 
-INSERT INTO config_checkvalve (node_id, to_arc) VALUES ('1092', '2104');
+INSERT INTO config_graf_checkvalve (node_id, to_arc) VALUES ('1092', '2104');
 
 UPDATE inp_connec SET demand  = 0.01;
 
