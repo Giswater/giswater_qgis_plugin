@@ -977,8 +977,8 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
     :param module: Module where find 'function_name', if 'function_name' is not in this module
     :return: (QWidget)
 
-    functions called in -> widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
-        module = tools_backend_calls -> def import_dxf(**kwargs)
+    functions called in -> widget.clicked.connect(partial(getattr(module, function_name), **kwargs)) atm:
+        None
     """
 
     widget = QPushButton()
