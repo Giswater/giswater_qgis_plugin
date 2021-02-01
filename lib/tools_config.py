@@ -11,52 +11,54 @@ import os
 from . import tools_log, tools_os
 from .. import global_vars
 
+config_parser = None
+project_config_file = None
 
-def check_user_settings(section, parameter, value=None,):
+def check_config_parser(section, parameter, value=None,):
     """ Check if @section and @parameter exists in user settings file. If not add them with @value """
 
     # Check if @section exists
-    if not global_vars.session_vars['user_settings'].has_section(section):
-        global_vars.session_vars['user_settings'].add_section(section)
-        global_vars.session_vars['user_settings'].set(section, parameter, value)
-        save_user_settings()
+    if not config_parser.has_section(section):
+        config_parser.add_section(section)
+        config_parser.set(section, parameter, value)
+        save_config_parser()
 
     # Check if @parameter exists
-    if not global_vars.session_vars['user_settings'].has_option(section, parameter):
-        global_vars.session_vars['user_settings'].set(section, parameter, value)
-        save_user_settings()
+    if not config_parser.has_option(section, parameter):
+        config_parser.set(section, parameter, value)
+        save_config_parser()
 
 
 def get_user_setting_value(section, parameter, default_value=None):
     """ Get value from user settings file of selected @parameter located in @section """
 
     value = default_value
-    if global_vars.session_vars['user_settings'] is None:
+    if config_parser is None:
         return value
 
-    check_user_settings(section, parameter, value)
-    value = global_vars.session_vars['user_settings'].get(section, parameter).lower()
+    check_config_parser(section, parameter, value)
+    value = config_parser.get(section, parameter).lower()
 
     return value
 
 
-def set_user_settings_value(section, parameter, value):
+def set_config_parser_value(section, parameter, value):
     """ Set @value from user settings file of selected @parameter located in @section """
 
-    if global_vars.session_vars['user_settings'] is None:
+    if config_parser is None:
         return value
 
-    check_user_settings(section, parameter, value)
-    global_vars.session_vars['user_settings'].set(section, parameter, value)
-    save_user_settings()
+    check_config_parser(section, parameter, value)
+    config_parser.set(section, parameter, value)
+    save_config_parser()
 
 
-def save_user_settings():
+def save_config_parser():
     """ Save user settings file """
 
     try:
-        with open(global_vars.session_vars['user_settings_path'], 'w') as configfile:
-            global_vars.session_vars['user_settings'].write(configfile)
+        with open(global_vars.user_folder_dir, 'w') as configfile:
+            config_parser.write(configfile)
             configfile.close()
     except Exception as e:
         tools_log.log_warning(str(e))
@@ -65,18 +67,14 @@ def save_user_settings():
 def manage_user_config_file():
     """ Manage user configuration file """
 
-    if global_vars.session_vars['user_settings']:
-        return
+    config_parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
+    project_config_file = f"{global_vars.user_folder_dir}{os.sep}{global_vars.plugin_name}.config"
 
-    global_vars.session_vars['user_settings'] = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
-    main_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
-    config_folder = main_folder + os.sep + "config" + os.sep
-    global_vars.session_vars['user_settings_path'] = config_folder + 'init.config'
-    if not os.path.exists(global_vars.session_vars['user_settings_path']):
-        tools_log.log_info(f"File not found: {global_vars.session_vars['user_settings_path']}")
-        save_user_settings()
+    if not os.path.exists(project_config_file):
+        tools_log.log_info(f"File not found: {project_config_file}")
+        save_config_parser()
     else:
-        tools_log.log_info(f"User settings file: {global_vars.session_vars['user_settings_path']}")
+        tools_log.log_info(f"User settings file: {project_config_file}")
 
     # Open file
-    global_vars.session_vars['user_settings'].read(global_vars.session_vars['user_settings_path'])
+    config_parser.read(project_config_file)

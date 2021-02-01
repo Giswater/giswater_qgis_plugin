@@ -22,7 +22,7 @@ logger = None
 settings = None
 qgis_settings = None
 project_vars = {}
-session_vars = {'user_settings': None, 'user_settings_path': None, 'min_log_level': 20, 'min_message_level': 0,
+session_vars = {'min_log_level': 20, 'min_message_level': 0,
                 'last_error': None, 'show_db_exception': True, 'dlg_info': None, 'current_user': None,
                 'dlg_docker': None, 'show_docker': None, 'docker_type': None, 'logged': None,
                 'db': None, 'postgresql_version': None, 'dao': None, 'credentials': None, 'shortcut_keys':[]}
