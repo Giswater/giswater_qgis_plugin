@@ -242,7 +242,7 @@ class GwPsector:
             tools_qt.set_checked(self.dlg_plan_psector, "active", row['active'])
             self.fill_widget(self.dlg_plan_psector, "name", row)
             self.fill_widget(self.dlg_plan_psector, "descript", row)
-            tools_qt.set_combo_value(self.dlg_plan_psector.priority, str(row["priority"]), 1)
+            tools_qt.set_combo_value(self.dlg_plan_psector.priority, str(row["priority"]), 0)
             self.fill_widget(self.dlg_plan_psector, "text1", row)
             self.fill_widget(self.dlg_plan_psector, "text2", row)
             self.fill_widget(self.dlg_plan_psector, "text3", row)
