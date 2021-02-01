@@ -2,4 +2,5 @@
 ************
 - Add pipebreak option for go2epa export on ws projects
 - Force mandatory active on config_visit_parameter.active
-- Enable dowgrade (state=0) links in order to relate to same connect more than one link keeping the rule only one with state=1
+- Enable downgrade (state=0) links in order to relate to same connect more than one link keeping the rule only one with state=1
+- Enhance import_epanet_inp managing brazilian version
