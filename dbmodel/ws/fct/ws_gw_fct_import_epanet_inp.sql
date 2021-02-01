@@ -341,9 +341,9 @@ BEGIN
 
 	-- improve velocity for pipes using directy tables in spite of vi_pipes view
 	INSERT INTO arc (arc_id, node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
-	SELECT csv1, csv2, csv3, concat((csv6::numeric(12,3))::text,'-',csv5), 'PIPE', 1, 1, 1, 1, 2 
+	SELECT csv1, csv2, csv3, concat((csv6::numeric(12,3))::text,'-',(csv5::numeric(12,3))::text), 'PIPE', 1, 1, 1, 1, 2 
 	FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user order by 1;
-	INSERT INTO inp_pipe SELECT csv1, csv7::numeric(12,6), csv8 FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
+	INSERT INTO inp_pipe SELECT csv1, csv7::numeric(12,6), upper(csv8) FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 	INSERT INTO man_pipe SELECT csv1 FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
@@ -375,8 +375,8 @@ BEGIN
 	END LOOP;
 
 	-- update status
-	UPDATE inp_valve_importinp SET status = csv2 FROM temp_csv where source='[STATUS]'  and arc_id = csv1;
-	UPDATE inp_pump_importinp SET status = csv2 FROM temp_csv where source='[STATUS]' and arc_id = csv1;
+	UPDATE inp_valve_importinp SET status = upper(csv2) FROM temp_csv where source='[STATUS]'  and arc_id = csv1;
+	UPDATE inp_pump_importinp SET status = upper(csv2) FROM temp_csv where source='[STATUS]' and arc_id = csv1;
 
 
 	-- disable temporary the constraint in order to use ON CONFLICT on insert
