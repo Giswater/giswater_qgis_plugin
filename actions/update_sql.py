@@ -1607,7 +1607,8 @@ class UpdateSQL(ApiParent):
                 self.task1.setProgress(100)
             self.controller.plugin_settings_set_value('create_schema_type', 'rdb_import_data')
             msg = ("The base schema have been correctly executed."
-                   "\nNow, a form will be opened to manage the import inp file into it.")
+                   "\nNow will start the import process. It is experimental and it may crash."
+                   "\nIf this happens, please notify it by send a e-mail to info@giswater.org.")
             self.controller.show_info_box(msg, "Info")
             self.execute_import_data(schema_type=project_type)
             return
