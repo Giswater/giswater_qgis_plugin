@@ -27,8 +27,8 @@ INSERT INTO cat_users VALUES ('user4','user4');
 INSERT INTO cat_manager (idval, expl_id, username, active) VALUES ('general manager', '{1,2}', concat('{',current_user,'}')::text[], true);
 
 
-INSERT INTO config_mincut_inlet VALUES (113766, 1);
-INSERT INTO config_mincut_inlet VALUES (113952, 2);
+INSERT INTO config_graf_inlet VALUES (113766, 1);
+INSERT INTO config_graf_inlet VALUES (113952, 2);
 
 
 UPDATE plan_arc_x_pavement SET pavcat_id = 'Asphalt';
@@ -319,10 +319,10 @@ WHERE parameter = 'om_dynamicmapzones_status';
 
 UPDATE element SET code = concat ('E',element_id);
 
-UPDATE config_mincut_inlet SET parameters = '{"inletArc":["113907", "113905"]}'
+UPDATE config_graf_inlet SET parameters = '{"inletArc":["113907", "113905"]}'
 WHERE node_id = '113766';
 
-UPDATE config_mincut_inlet SET parameters = '{"inletArc":["114145"]}'
+UPDATE config_graf_inlet SET parameters = '{"inletArc":["114145"]}'
 WHERE node_id = '113952';
 
 UPDATE config_form_fields SET label = 'Presszone' WHERE columnname = 'presszone_id';

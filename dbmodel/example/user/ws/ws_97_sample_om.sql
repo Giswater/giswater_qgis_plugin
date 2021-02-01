@@ -215,8 +215,8 @@ INSERT INTO config_visit_class_x_feature VALUES ('v_edit_connec', 2);
  -- config_mincut_checkvalve
 UPDATE config_checkvalve SET active = TRUE;
 
- -- config_mincut_inlet
-UPDATE config_mincut_inlet SET active = TRUE;
+ -- config_graf_inlet  
+UPDATE config_graf_inlet   SET active = TRUE;
 
  -- config_valve
 UPDATE config_valve SET active = TRUE;

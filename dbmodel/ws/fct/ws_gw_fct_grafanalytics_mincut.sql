@@ -83,8 +83,8 @@ BEGIN
 		
 		-- setup graf closing tank's inlet
 		UPDATE temp_anlgraf SET flag = 1 
-		FROM config_mincut_inlet 
-		WHERE (temp_anlgraf.node_1 = config_mincut_inlet.node_id OR temp_anlgraf.node_2 = config_mincut_inlet.node_id);
+		FROM config_graf_inlet 
+		WHERE (temp_anlgraf.node_1 = config_graf_inlet.node_id OR temp_anlgraf.node_2 = config_graf_inlet.node_id);
 
 		-- setup graf reset water flag
 		UPDATE temp_anlgraf SET water=0;
