@@ -231,6 +231,7 @@ class Giswater(QObject):
             # Remove 'Main Info button' only when plugin is reloaded through 'Plugin Reloader'
             if is_plugin_reloaded:
                 self.unset_info_button()
+                global_vars.logger.close_logger()
 
             # Unlisten notify channel and stop thread
             if hasattr(self, 'notify'):

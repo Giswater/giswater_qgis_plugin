@@ -63,7 +63,7 @@ class GwTest(QObject):
         print("init_plugin")
 
         # Set (no database connection yet)
-        tools_log.set_logger('plugin')
+        tools_log.set_logger(self.plugin_dir)
         global_vars.plugin_name = self.plugin_dir
         if schema_name:
             global_vars.schema_name = schema_name
