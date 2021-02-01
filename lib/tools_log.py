@@ -15,6 +15,7 @@ from qgis.core import QgsMessageLog
 from .. import global_vars
 from . import tools_qt, tools_os
 
+min_log_level = 20
 
 class GwLogger(object):
 
@@ -58,6 +59,9 @@ class GwLogger(object):
 
         # Initialize number of errors in current process
         self.num_errors = 0
+
+        # Initialize min message level
+        self.min_message_level = 0
 
 
     def close_logger(self):
@@ -109,7 +113,7 @@ class GwLogger(object):
         try:
 
             # Check session parameter 'min_log_level' to know if we need to log message in logger file
-            valor = global_vars.session_vars['min_log_level']
+            valor = min_log_level
             if int(log_level) < int(valor):
                 return
 
@@ -135,11 +139,9 @@ def set_logger(logger_name=None):
             logger_name = 'plugin'
 
         log_suffix = '%Y%m%d'
-        global_vars.logger = GwLogger(logger_name, global_vars.session_vars['min_log_level'], str(log_suffix))
+        global_vars.logger = GwLogger(logger_name, min_log_level, str(log_suffix))
         values = {10: 0, 20: 0, 30: 1, 40: 2}
-        global_vars.session_vars['min_message_level'] = values.get(global_vars.session_vars['min_log_level'], 0)
-        min_message_level = values.get(int(global_vars.session_vars['min_log_level']), 0)
-        global_vars.session_vars['min_message_level'] = min_message_level
+        global_vars.logger.min_message_level = values.get(int(min_log_level), 0)
 
 
 def log_debug(text=None, context_name=None, parameter=None, logger_file=True, stack_level_increase=0, tab_name=None):
@@ -189,7 +191,7 @@ def _qgis_log_message(text=None, message_level=0, context_name=None, parameter=N
         tab_name = global_vars.plugin_name
 
     # Check session parameter 'min_message_level' to know if we need to log message in QGIS Log Messages Panel
-    if message_level >= global_vars.session_vars['min_message_level']:
+    if global_vars.logger and message_level >= global_vars.logger.min_message_level:
         QgsMessageLog.logMessage(msg, tab_name, message_level)
 
     return msg
