@@ -285,8 +285,6 @@ BEGIN
 		UPDATE temp_node n SET pattern_id  = ';VNODE PIPE BREAKER' , demand = 0 FROM temp_table t WHERE n.node_id = concat('VN',t.id);				
 	END IF;
 
-	select * from temp_node limit 1
-	
 	RAISE NOTICE '24 - Move from temp tables to rpt_inp tables';
 	UPDATE temp_arc SET result_id  = v_result;
 	UPDATE temp_node SET result_id  = v_result;
