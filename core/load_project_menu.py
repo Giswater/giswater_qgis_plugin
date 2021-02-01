@@ -44,7 +44,7 @@ class GwMenuLoad(QObject):
         tools_gw.set_config_parser("menu", "load", "true", "project", "init")
 
         # region Toolbar
-        toolbars_menu = QMenu(f"Toolbar", self.iface.mainWindow().menuBar())
+        toolbars_menu = QMenu(f"Toolbars", self.iface.mainWindow().menuBar())
         icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}36.png"
         toolbars_icon = QIcon(icon_path)
         toolbars_menu.setIcon(toolbars_icon)
@@ -77,33 +77,46 @@ class GwMenuLoad(QObject):
 
 
         # endregion
+
         # region Config
         config_menu = QMenu(f"Config", self.iface.mainWindow().menuBar())
         self.main_menu.addMenu(config_menu)
-        icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
-        config_icon = QIcon(icon_path)
+        config_icon = QIcon(
+            f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}99.png")
         config_menu.setIcon(config_icon)
 
+        temporal_icon = QIcon(
+            f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}100.png")
+
         action_manage_file = config_menu.addAction(f"Manage Files")
+        action_manage_file.setIcon(temporal_icon)
         action_manage_file.triggered.connect(self._open_manage_file)
-        action_set_log_sql = config_menu.addAction(f"Enable log sql")
+
+        actions_menu = QMenu(f"Actions", self.iface.mainWindow().menuBar())
+        actions_menu.setIcon(temporal_icon)
+        config_menu.addMenu(actions_menu)
+
+        action_set_log_sql = actions_menu.addAction(f"Enable log sql")
         log_sql_shortcut = tools_gw.get_config_parser("system", f"log_sql_shortcut", "user", "init", prefix=False)
         if not log_sql_shortcut:
             log_sql_shortcut = "Alt+1"
-            tools_gw.set_config_parser("system", f"log_sql_shortcut", f"{log_sql_shortcut}", "user", "init", prefix=False)
+            tools_gw.set_config_parser("system", f"log_sql_shortcut", f"{log_sql_shortcut}", "user", "init",
+                                       prefix=False)
         action_set_log_sql.setShortcuts(QKeySequence(f"{log_sql_shortcut}"))
-
+        action_set_log_sql.setIcon(temporal_icon)
         action_set_log_sql.triggered.connect(self._set_log_sql)
-        # endregion
 
-        # region User folder
-        config_menu = QMenu(f"User folder", self.iface.mainWindow().menuBar())
-        self.main_menu.addMenu(config_menu)
-        icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}99.png"
-        config_icon = QIcon(icon_path)
-        config_menu.setIcon(config_icon)
+        action_reset_dialogs = actions_menu.addAction(f"Reset dialogs")
+
+        action_reset_dialogs.setIcon(temporal_icon)
+        action_reset_dialogs.triggered.connect(self._reset_position_dialog)
+
+        folder_icon = QIcon(
+            f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}170.png")
         action_open_path = config_menu.addAction(f"Open folder")
+        action_open_path.setIcon(folder_icon)
         action_open_path.triggered.connect(self._open_config_path)
+
         # endregion
 
         self.iface.mainWindow().menuBar().insertMenu(last_action, self.main_menu)
@@ -134,14 +147,12 @@ class GwMenuLoad(QObject):
         # Manage widgets
         self.tree_config_files = self.dlg_manage_menu.findChild(QTreeWidget, 'tree_config_files')
         self.btn_close = self.dlg_manage_menu.findChild(QPushButton, 'btn_close')
-        self.btn_reset_dialog = self.dlg_manage_menu.findChild(QPushButton, 'btn_reset_dialog')
 
         # Fill table_config_files
         self._fill_tbl_config_files()
 
         # Listeners
         self.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manage_menu))
-        self.btn_reset_dialog.clicked.connect(partial(self._reset_position_dialog))
 
         # Open dialog
         self.dlg_manage_menu.open()

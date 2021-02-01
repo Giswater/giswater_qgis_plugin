@@ -14,13 +14,6 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="1" column="0">
-    <widget class="QPushButton" name="btn_reset_dialog">
-     <property name="text">
-      <string>Reset dialog</string>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1">
     <spacer name="horizontalSpacer_2">
      <property name="orientation">
