@@ -2595,7 +2595,7 @@ class GwAdminButton:
             if status:
                 msg = "Process finished successfully"
                 tools_qt.show_info_box(msg, "Info", parameter="Delete schema")
-                self._populate_data_schema_name(self.cmb_project_type)
+                self._populate_data_schema_name(self.dlg_readsql.cmb_project_type)
                 self._set_info_project()
 
 
