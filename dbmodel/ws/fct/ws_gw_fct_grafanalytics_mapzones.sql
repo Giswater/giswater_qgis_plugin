@@ -388,7 +388,7 @@ BEGIN
 					SELECT a.node_id::integer FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
 					LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer 
 					JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer 
-					JOIN config_valve v ON v.id = c.id
+					JOIN config_graf_valve v ON v.id = c.id
 					WHERE closed=TRUE
 					AND v.active IS TRUE)';
 			EXECUTE v_querytext;
@@ -399,7 +399,7 @@ BEGIN
 					SELECT (a.node_id::integer) FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
 					LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer 
 					JOIN temp_anlgraf e ON a.node_id::integer=e.node_1::integer 
-					JOIN config_valve v ON v.id = c.id
+					JOIN config_graf_valve v ON v.id = c.id
 					WHERE closed=TRUE
 					AND v.active IS TRUE)';
 

@@ -218,5 +218,5 @@ UPDATE config_graf_checkvalve SET active = TRUE;
  -- config_graf_inlet  
 UPDATE config_graf_inlet   SET active = TRUE;
 
- -- config_valve
-UPDATE config_valve SET active = TRUE;
+ -- config_graf_valve
+UPDATE config_graf_valve SET active = TRUE;

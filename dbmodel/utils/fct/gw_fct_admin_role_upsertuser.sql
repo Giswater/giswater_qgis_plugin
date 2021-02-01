@@ -266,7 +266,7 @@ BEGIN
 		FOREACH rec_schema IN ARRAY v_gw_schema_array LOOP
 			--remove values for user from all the selectors and delete user
 			FOR rec IN EXECUTE 'SELECT * FROM information_schema.tables 
-			WHERE table_name ilike ''%selector%'' AND table_name!=''config_valve'' 
+			WHERE table_name ilike ''%selector%'' AND table_name!=''config_graf_valve'' 
 			AND table_schema= '''||rec_schema||'''' LOOP
 
 				EXECUTE 'DELETE FROM '||rec_schema||'.'||rec.table_name||' WHERE cur_user = '''||v_user_id||''';';
