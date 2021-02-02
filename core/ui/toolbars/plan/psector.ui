@@ -407,8 +407,11 @@
          </item>
          <item>
           <widget class="QCheckBox" name="chk_enable_all">
+           <property name="toolTip">
+            <string extracomment="Activate layers to allow visualize obsolete state on features related to psector. This layers are: v_plan_psector_connec, v_plan_psector_arc, v_plan_psector_node, v_plan_psector_link">Activate layers to allow visualize obsolete state on features related to psector. When all layers are active, checkbox is marked, if not, checkbox is unmarked. These layers are: Plan psector arc, Plan psector connec, Plan psector node, Plan psector link</string>
+           </property>
            <property name="text">
-            <string>Enable all</string>
+            <string>Enable all (visualize obsolete state on features related to psector)</string>
            </property>
           </widget>
          </item>
