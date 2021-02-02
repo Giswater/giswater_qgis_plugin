@@ -99,8 +99,7 @@ class GwLoadProject(QObject):
         global_vars.srid = srid
 
         # Get variables from qgis project
-        self.project_vars = tools_qgis.get_project_variables()
-        global_vars.project_vars = self.project_vars
+        tools_qgis.get_project_variables()
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self._check_layers_from_distinct_schema()
@@ -211,7 +210,7 @@ class GwLoadProject(QObject):
                 repeated_layers[layer_source['schema'].replace('"', '')] = 'v_edit_node'
 
         if len(repeated_layers) > 1:
-            if self.project_vars['main_schema'] is None or self.project_vars['add_schema'] is None:
+            if global_vars.project_vars['main_schema'] is None or global_vars.project_vars['add_schema'] is None:
                 self.dlg_dtext = GwDialogTextUi()
                 self.dlg_dtext.btn_accept.hide()
                 self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
@@ -226,8 +225,8 @@ class GwLoadProject(QObject):
 
             # If there are layers with a different schema, the one that the user has in the project variable
             # 'gwMainSchema' is taken as the schema_name.
-            self.schema_name = self.project_vars['main_schema']
-            global_vars.schema_name = self.project_vars['main_schema']
+            self.schema_name = global_vars.project_vars['main_schema']
+            global_vars.schema_name = global_vars.project_vars['main_schema']
 
         return True
 
@@ -350,7 +349,7 @@ class GwLoadProject(QObject):
     def _check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
 
-        restriction = tools_gw.get_role_permissions(self.project_vars['role'])
+        restriction = tools_gw.get_role_permissions(global_vars.project_vars['role'])
 
         if restriction == 'role_basic':
             pass

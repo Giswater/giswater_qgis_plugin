@@ -16,6 +16,7 @@ from ...load_project_check import GwLoadProjectCheck
 from ...threads.project_layers_config import GwProjectLayersConfig
 from ...utils import tools_gw
 from ....lib import tools_qgis, tools_log, tools_db
+from .... import global_vars
 
 
 class GwAddChildLayerButton(GwAction):
@@ -23,9 +24,9 @@ class GwAddChildLayerButton(GwAction):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.project_vars = tools_qgis.get_project_variables()
-        self.qgis_project_infotype = self.project_vars['infotype']
-        self.qgis_project_add_schema = self.project_vars['add_schema']
+        tools_qgis.get_project_variables()
+        self.qgis_project_infotype = global_vars.project_vars['info_type']
+        self.qgis_project_add_schema = global_vars.project_vars['add_schema']
         self.available_layers = None
         self.config_layers()
 

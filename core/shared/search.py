@@ -75,8 +75,7 @@ class GwSearch:
 
         self.dlg_search.lbl_msg.setStyleSheet("QLabel{color:red;}")
         self.dlg_search.lbl_msg.setVisible(False)
-        project_vars = global_vars.project_vars
-        qgis_project_add_schema = project_vars['add_schema']
+        qgis_project_add_schema = global_vars.project_vars['add_schema']
 
         if qgis_project_add_schema is None:
             body = tools_gw.create_body(form=form)

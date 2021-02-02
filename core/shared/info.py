@@ -106,11 +106,10 @@ class GwInfo(QObject):
         self.tab_type = tab_type
 
         # Get project variables
-        project_vars = global_vars.project_vars
-        qgis_project_add_schema = project_vars['add_schema']
-        qgis_project_main_schema = project_vars['main_schema']
-        qgis_project_infotype = project_vars['infotype']
-        qgis_project_role = project_vars['role']
+        qgis_project_add_schema = global_vars.project_vars['add_schema']
+        qgis_project_main_schema = global_vars.project_vars['main_schema']
+        qgis_project_infotype = global_vars.project_vars['info_type']
+        qgis_project_role = global_vars.project_vars['role']
 
         self.new_feature = new_feature
 
@@ -163,8 +162,7 @@ class GwInfo(QObject):
         # Comes from QPushButtons node1 or node2 from custom form or RightButton
         elif feature_id:
             if is_add_schema:
-                project_vars = global_vars.project_vars
-                add_schema = project_vars['add_schema']
+                add_schema = global_vars.project_vars['add_schema']
                 extras = f'"addSchema":"{add_schema}"'
             else:
                 extras = '"addSchema":""'
