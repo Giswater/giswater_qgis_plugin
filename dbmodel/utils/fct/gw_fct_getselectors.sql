@@ -83,10 +83,14 @@ BEGIN
 
 	-- Start the construction of the tabs array
 	v_formTabs := '[';
-
-	FOR v_tab IN EXECUTE 'SELECT config_form_tabs.*, value FROM config_form_tabs, config_param_system WHERE formname='||quote_literal(v_selector_type)||
-	' AND concat(''basic_selector_'', tabname) = parameter '||(v_querytab)||' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member''))  ORDER BY orderby'
-
+​
+	v_query = 'SELECT config_form_tabs.*, value FROM config_form_tabs, config_param_system WHERE formname='||quote_literal(v_selector_type)||
+	' AND concat(''basic_selector_'', tabname) = parameter '||(v_querytab)||' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member''))  ORDER BY orderby';
+​
+	raise notice 'v_quefghrewhgewryghrehry %',v_query;
+​
+	FOR v_tab IN EXECUTE v_query
+​
 	LOOP		
 		-- get variables form input
 		v_selector_list := (p_data ->> 'data')::json->> 'ids';
@@ -103,15 +107,23 @@ BEGIN
 		v_typeahead = v_tab.value::json->>'typeaheadFilter';
 		v_selectionMode = v_tab.value::json->>'selectionMode';
 		v_orderby = v_tab.value::json->>'orderBy';
-
+		v_name = v_tab.value::json->>'name';
+		
+​
 		-- profilactic control of v_orderby
 		IF v_orderby IS NULL THEN v_orderby = '2'; end if;
-
+		IF v_name IS NULL THEN v_name = v_orderby; end if;
+​
 		-- profilactic control of selection mode
 		IF v_selectionMode = '' OR v_selectionMode is null then
 			v_selectionMode = 'keepPrevious';
 		END IF;
 
+		-- getting from v_expl_x_user variable to setup v_filterfrominput
+		IF v_selector = 'selector_expl' AND v_expl_x_user THEN
+			v_filterfrominput = concat (v_filterfrominput, ' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)');
+		END IF;
+​
 		-- Manage filters from ids (only mincut)
 		IF v_selector = 'selector_mincut_result' THEN
 			v_selector_list = replace(replace(v_selector_list, '[', '('), ']', ')');
@@ -132,12 +144,14 @@ BEGIN
 		v_fullfilter := COALESCE(v_fullfilter, '');
 
 		v_finalquery =  'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-			SELECT '||quote_ident(v_table_id)||', concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
+		SELECT '||quote_ident(v_table_id)||', concat(' || v_label || ') AS label, '||v_orderby||' as orderby , '||v_name||' as name, '|| v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 			FROM '|| v_table ||' WHERE ' || v_table_id || ' IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_fullfilter ||' UNION 
-			SELECT '||quote_ident(v_table_id)||', concat(' || v_label || ') AS label, ' || v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
+			SELECT '||quote_ident(v_table_id)||', concat(' || v_label || ') AS label, '||v_orderby||' as orderby , '||v_name||' as name, '|| v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 			FROM '|| v_table ||' WHERE ' || v_table_id || ' NOT IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '||
-			 v_fullfilter ||' ORDER BY '||v_orderby||' ) a';
-
+			 v_fullfilter ||' ORDER BY orderby ) a';
+​
+		raise notice 'v_finalquery %', v_finalquery;
+​
 		EXECUTE  v_finalquery INTO v_formTabsAux;
 
 		-- Add tab name to json
