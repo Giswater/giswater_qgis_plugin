@@ -38,7 +38,7 @@ class GwPointAddButton(GwAction):
         for feature_cat in list_feature_cat:
             if feature_cat.feature_type.upper() == 'NODE':
                 obj_action = QAction(str(feature_cat.id), action_group)
-                if f"{feature_cat.shortcut_key}" not in global_vars.session_vars['shortcut_keys']:
+                if f"{feature_cat.shortcut_key}" not in global_vars.shortcut_keys:
                     obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 try:
                     obj_action.setShortcutVisibleInContextMenu(True)
@@ -54,7 +54,7 @@ class GwPointAddButton(GwAction):
         for feature_cat in list_feature_cat:
             if feature_cat.feature_type.upper() == 'CONNEC':
                 obj_action = QAction(str(feature_cat.id), action_group)
-                if f"{feature_cat.shortcut_key}" not in global_vars.session_vars['shortcut_keys']:
+                if f"{feature_cat.shortcut_key}" not in global_vars.shortcut_keys:
                     obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 try:
                     obj_action.setShortcutVisibleInContextMenu(True)
@@ -69,7 +69,7 @@ class GwPointAddButton(GwAction):
         for feature_cat in list_feature_cat:
             if feature_cat.feature_type.upper() == 'GULLY' and project_type == 'ud':
                 obj_action = QAction(str(feature_cat.id), action_group)
-                if f"{feature_cat.shortcut_key}" not in global_vars.session_vars['shortcut_keys']:
+                if f"{feature_cat.shortcut_key}" not in global_vars.shortcut_keys:
                     obj_action.setShortcut(QKeySequence(str(feature_cat.shortcut_key)))
                 try:
                     obj_action.setShortcutVisibleInContextMenu(True)

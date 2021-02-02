@@ -71,7 +71,7 @@ class GwMenuLoad(QObject):
                 shortcut_key = tools_gw.get_config_parser("action_shortcuts", f"{index_action}", "user", "init", prefix=False)
                 if shortcut_key:
                     action.setShortcuts(QKeySequence(f"{shortcut_key}"))
-                    global_vars.session_vars['shortcut_keys'].append(shortcut_key)
+                    global_vars.shortcut_keys.append(shortcut_key)
 
                 action.triggered.connect(partial(self._clicked_event, action_function))
 
