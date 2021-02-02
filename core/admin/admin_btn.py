@@ -267,10 +267,10 @@ class GwAdminButton:
         status = (self.error_count == 0)
         self._manage_result_message(status, parameter="Update project")
         if status:
-            global_vars.session_vars['dao'].commit()
+            global_vars.dao.commit()
             self._close_dialog_admin(self.dlg_readsql_show_info)
         else:
-            global_vars.session_vars['dao'].rollback()
+            global_vars.dao.rollback()
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -308,9 +308,9 @@ class GwAdminButton:
             status = (self.error_count == 0)
             self._manage_result_message(status, parameter="Load updates")
             if status:
-                global_vars.session_vars['dao'].commit()
+                global_vars.dao.commit()
             else:
-                global_vars.session_vars['dao'].rollback()
+                global_vars.dao.rollback()
 
             # Reset count error variable to 0
             self.error_count = 0
@@ -1867,7 +1867,7 @@ class GwAdminButton:
         status = (self.error_count == 0)
         self._manage_result_message(status, parameter="Create project")
         if status:
-            global_vars.session_vars['dao'].commit()
+            global_vars.dao.commit()
             self._close_dialog_admin(self.dlg_readsql_create_project)
             if not is_test:
                 self._populate_data_schema_name(self.cmb_project_type)
@@ -1875,7 +1875,7 @@ class GwAdminButton:
                     tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
                     self._set_info_project()
         else:
-            global_vars.session_vars['dao'].rollback()
+            global_vars.dao.rollback()
             # Reset count error variable to 0
             self.error_count = 0
 
@@ -1925,13 +1925,13 @@ class GwAdminButton:
         status = (self.error_count == 0)
         self._manage_result_message(status, parameter="Rename project")
         if status:
-            global_vars.session_vars['dao'].commit()
+            global_vars.dao.commit()
             self._event_change_connection()
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
             if close_dlg_rename:
                 self._close_dialog_admin(self.dlg_readsql_rename)
         else:
-            global_vars.session_vars['dao'].rollback()
+            global_vars.dao.rollback()
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1949,9 +1949,9 @@ class GwAdminButton:
         status = (self.error_count == 0)
         self._manage_result_message(status, parameter="Load custom SQL files")
         if status:
-            global_vars.session_vars['dao'].commit()
+            global_vars.dao.commit()
         else:
-            global_vars.session_vars['dao'].rollback()
+            global_vars.dao.rollback()
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -2359,9 +2359,9 @@ class GwAdminButton:
         status = (self.error_count == 0)
         self._manage_result_message(status, parameter="Reload")
         if status:
-            global_vars.session_vars['dao'].commit()
+            global_vars.dao.commit()
         else:
-            global_vars.session_vars['dao'].rollback()
+            global_vars.dao.rollback()
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -2488,14 +2488,14 @@ class GwAdminButton:
                     tools_log.log_info(str("_read_execute_file error"), parameter=filepath)
                     tools_log.log_info(str('Message: ' + str(global_vars.session_vars['last_error'])))
                     if self.dev_commit == 'TRUE':
-                        global_vars.session_vars['dao'].rollback()
+                        global_vars.dao.rollback()
                     return False
         except Exception as e:
             self.error_count = self.error_count + 1
             tools_log.log_info(str("_read_execute_file exception"), parameter=file)
             tools_log.log_info(str(e))
             if self.dev_commit == 'TRUE':
-                global_vars.session_vars['dao'].rollback()
+                global_vars.dao.rollback()
             status = False
         finally:
             if f:
@@ -2570,12 +2570,12 @@ class GwAdminButton:
         status = (self.error_count == 0)
         self._manage_result_message(status, parameter="Copy project")
         if status:
-            global_vars.session_vars['dao'].commit()
+            global_vars.dao.commit()
             self._event_change_connection()
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(new_schema_name))
             self._close_dialog_admin(self.dlg_readsql_copy)
         else:
-            global_vars.session_vars['dao'].rollback()
+            global_vars.dao.rollback()
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -2648,7 +2648,7 @@ class GwAdminButton:
                 if complet_result['status'] == 'Failed':
                     msg = "The importation process have been failed"
                     tools_qt.show_info_box(msg, "Info")
-                    global_vars.session_vars['dao'].rollback()
+                    global_vars.dao.rollback()
                     self.error_count = 0
 
                     # Close dialog
@@ -2665,7 +2665,7 @@ class GwAdminButton:
         else:
             msg = "A rollback on schema will be done."
             tools_qt.show_info_box(msg, "Info")
-            global_vars.session_vars['dao'].rollback()
+            global_vars.dao.rollback()
             self.error_count = 0
 
         # Close dialog

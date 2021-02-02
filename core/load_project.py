@@ -176,9 +176,9 @@ class GwLoadProject(QObject):
         """ Set new database connection. If force_commit=True then force commit before opening project """
 
         try:
-            if global_vars.session_vars['dao'] and force_commit:
+            if global_vars.dao and force_commit:
                 tools_log.log_info("Force commit")
-                global_vars.session_vars['dao'].commit()
+                global_vars.dao.commit()
         except Exception as e:
             tools_log.log_info(str(e))
         finally:

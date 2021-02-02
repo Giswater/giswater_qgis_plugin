@@ -341,7 +341,7 @@ class GwMincut:
 
         # Rollback transaction
         else:
-            global_vars.session_vars['dao'].rollback()
+            global_vars.dao.rollback()
 
         # Close dialog, save dialog position, and disconnect snapping
         tools_gw.close_dialog(self.dlg_mincut)

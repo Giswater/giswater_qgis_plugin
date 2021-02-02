@@ -93,7 +93,7 @@ class GwNotify:
             thread.start()
 
             # Check if any notification to process
-            dao = global_vars.session_vars['dao']
+            dao = global_vars.dao
             dao.get_poll()
 
             last_paiload = None

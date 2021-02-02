@@ -477,7 +477,7 @@ class GwGo2EpaButton(GwAction):
         # Iterate over all columns and populate its corresponding widget
         columns = []
         for i in range(0, len(row)):
-            column_name = global_vars.session_vars['dao'].get_column_name(i)
+            column_name = global_vars.dao.get_column_name(i)
             widget = dialog.findChild(QWidget, column_name)
             widget_type = tools_qt.get_widget_type(dialog, widget)
             if row[column_name] is not None:

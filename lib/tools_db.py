@@ -153,7 +153,7 @@ def set_database_connection():
     """ Set database connection """
 
     # Initialize variables
-    global_vars.session_vars['dao'] = None
+    global_vars.dao = None
     global_vars.session_vars['last_error'] = None
     global_vars.session_vars['logged'] = False
     global_vars.current_user = None
@@ -230,13 +230,13 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
         return False
 
     # Connect to Database
-    global_vars.session_vars['dao'] = tools_pgdao.GwPgDao()
-    global_vars.session_vars['dao'].set_params(host, port, db, user, pwd, sslmode)
-    status = global_vars.session_vars['dao'].init_db()
+    global_vars.dao = tools_pgdao.GwPgDao()
+    global_vars.dao.set_params(host, port, db, user, pwd, sslmode)
+    status = global_vars.dao.init_db()
     if not status:
         message = "Database connection error. Please open plugin log file to get more details"
         global_vars.session_vars['last_error'] = tools_qt.tr(message)
-        tools_log.log_warning(str(global_vars.session_vars['dao'].last_error))
+        tools_log.log_warning(str(global_vars.dao.last_error))
         return False
 
     return status
@@ -264,13 +264,13 @@ def connect_to_database_service(service, sslmode=None):
         return False
 
     # Connect to Database
-    global_vars.session_vars['dao'] = tools_pgdao.GwPgDao()
-    global_vars.session_vars['dao'].set_conn_string(conn_string)
-    status = global_vars.session_vars['dao'].init_db()
+    global_vars.dao = tools_pgdao.GwPgDao()
+    global_vars.dao.set_conn_string(conn_string)
+    status = global_vars.dao.init_db()
     if not status:
         message = "Database connection error (PgDao). Please open plugin log file to get more details"
         global_vars.session_vars['last_error'] = tools_qt.tr(message)
-        tools_log.log_warning(str(global_vars.session_vars['dao'].last_error))
+        tools_log.log_warning(str(global_vars.dao.last_error))
         return False
 
     return status
@@ -281,7 +281,7 @@ def get_postgis_version():
 
     postgis_version = None
     sql = "SELECT postgis_lib_version()"
-    row = global_vars.session_vars['dao'].get_row(sql)
+    row = global_vars.dao.get_row(sql)
     if row:
         postgis_version = row[0]
 
@@ -292,8 +292,8 @@ def get_row(sql, log_info=True, log_sql=False, commit=True, params=None):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
     sql = _get_sql(sql, log_sql, params)
-    row = global_vars.session_vars['dao'].get_row(sql, commit)
-    global_vars.session_vars['last_error'] = global_vars.session_vars['dao'].last_error
+    row = global_vars.dao.get_row(sql, commit)
+    global_vars.session_vars['last_error'] = global_vars.dao.last_error
     if not row:
         # Check if any error has been raised
         if global_vars.session_vars['last_error']:
@@ -309,8 +309,8 @@ def get_rows(sql, log_info=True, log_sql=False, commit=True, params=None, add_em
 
     sql = _get_sql(sql, log_sql, params)
     rows = None
-    rows2 = global_vars.session_vars['dao'].get_rows(sql, commit)
-    global_vars.session_vars['last_error'] = global_vars.session_vars['dao'].last_error
+    rows2 = global_vars.dao.get_rows(sql, commit)
+    global_vars.session_vars['last_error'] = global_vars.dao.last_error
     if not rows2:
         # Check if any error has been raised
         if global_vars.session_vars['last_error']:
@@ -332,8 +332,8 @@ def execute_sql(sql, log_sql=False, log_error=False, commit=True, filepath=None)
 
     if log_sql:
         tools_log.log_info(sql, stack_level_increase=1)
-    result = global_vars.session_vars['dao'].execute_sql(sql, commit)
-    global_vars.session_vars['last_error'] = global_vars.session_vars['dao'].last_error
+    result = global_vars.dao.execute_sql(sql, commit)
+    global_vars.session_vars['last_error'] = global_vars.dao.last_error
     if not result:
         if log_error:
             tools_log.log_info(sql, stack_level_increase=1)
@@ -348,8 +348,8 @@ def execute_returning(sql, log_sql=False, log_error=False, commit=True):
 
     if log_sql:
         tools_log.log_info(sql, stack_level_increase=1)
-    value = global_vars.session_vars['dao'].execute_returning(sql, commit)
-    global_vars.session_vars['last_error'] = global_vars.session_vars['dao'].last_error
+    value = global_vars.dao.execute_returning(sql, commit)
+    global_vars.session_vars['last_error'] = global_vars.dao.last_error
     if not value:
         if log_error:
             tools_log.log_info(sql, stack_level_increase=1)
@@ -364,7 +364,7 @@ def set_search_path(schema_name):
 
     sql = f"SET search_path = {schema_name}, public;"
     execute_sql(sql)
-    global_vars.session_vars['dao'].set_search_path = sql
+    global_vars.dao.set_search_path = sql
 
 
 def check_function(function_name, schema_name=None, commit=True):
@@ -479,7 +479,7 @@ def _get_sql(sql, log_sql=False, params=None):
     """ Generate SQL with params. Useful for debugging """
 
     if params:
-        sql = global_vars.session_vars['dao'].mogrify(sql, params)
+        sql = global_vars.dao.mogrify(sql, params)
     if log_sql:
         tools_log.log_info(sql, stack_level_increase=2)
 
