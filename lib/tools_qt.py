@@ -31,7 +31,7 @@ from .ui.ui_manager import DialogTextUi
 
 
 translator = QTranslator()
-
+dlg_text = DialogTextUi()
 
 class GwExtendedQLabel(QLabel):
     clicked = pyqtSignal()
@@ -1069,21 +1069,20 @@ def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_inc
 def show_exception_message(title=None, msg="", window_title="Information about exception", pattern=None):
     """ Show exception message in dialog """
 
-    global_vars.session_vars['dlg_info'] = DialogTextUi()
-    global_vars.session_vars['dlg_info'].btn_accept.setVisible(False)
-    global_vars.session_vars['dlg_info'].btn_close.clicked.connect(lambda: global_vars.session_vars['dlg_info'].close())
-    global_vars.session_vars['dlg_info'].setWindowTitle(window_title)
+    dlg_text.btn_accept.setVisible(False)
+    dlg_text.btn_close.clicked.connect(lambda: dlg_text.close())
+    dlg_text.setWindowTitle(window_title)
     if title:
-        global_vars.session_vars['dlg_info'].lbl_text.setText(title)
-    set_widget_text(global_vars.session_vars['dlg_info'], global_vars.session_vars['dlg_info'].txt_infolog, msg)
-    global_vars.session_vars['dlg_info'].setWindowFlags(Qt.WindowStaysOnTopHint)
+        dlg_text.lbl_text.setText(title)
+    set_widget_text(dlg_text, dlg_text.txt_infolog, msg)
+    dlg_text.setWindowFlags(Qt.WindowStaysOnTopHint)
     if pattern is None:
         pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:|Description|Schema name"
-    set_text_bold(global_vars.session_vars['dlg_info'].txt_infolog, pattern)
+    set_text_bold(dlg_text.txt_infolog, pattern)
 
     # Show dialog only if we are not in a task process
     if global_vars.session_vars['show_db_exception']:
-        global_vars.session_vars['dlg_info'].show()
+        dlg_text.show()
 
 
 def manage_exception(title=None, description=None, sql=None, schema_name=None):

@@ -129,7 +129,7 @@ class GwEpaFileManager(GwTask):
 
         # If Database exception, show dialog after task has finished
         if global_vars.session_vars['last_error']:
-            global_vars.session_vars['dlg_info'].show()
+            tools_qt.dlg_text.show()
 
 
     def cancel(self):
