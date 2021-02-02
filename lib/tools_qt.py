@@ -597,7 +597,7 @@ def fill_table(qtable, table_name, expr_filter=None, edit_strategy=QSqlTableMode
         table_name = global_vars.schema_name + "." + table_name
 
     # Set model
-    model = QSqlTableModel(db=global_vars.session_vars['db'])
+    model = QSqlTableModel(db=global_vars.db)
     model.setTable(table_name)
     model.setEditStrategy(edit_strategy)
     model.setSort(0, sort_order)
@@ -1147,7 +1147,7 @@ def set_table_model(dialog, table_object, table_name, expr_filter):
         table_name = global_vars.schema_name + "." + table_name
 
     # Set a model with selected filter expression
-    model = QSqlTableModel(db=global_vars.session_vars['db'])
+    model = QSqlTableModel(db=global_vars.db)
     model.setTable(table_name)
     model.setEditStrategy(QSqlTableModel.OnManualSubmit)
     model.select()

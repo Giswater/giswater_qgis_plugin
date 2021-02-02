@@ -702,7 +702,7 @@ class GwGo2EpaButton(GwAction):
         """
 
         model = QSqlQueryModel()
-        model.setQuery(query, db=global_vars.session_vars['db'])
+        model.setQuery(query, db=global_vars.db)
         qtable.setModel(model)
         qtable.show()
 

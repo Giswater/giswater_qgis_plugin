@@ -435,7 +435,7 @@ class GwFeatureEndButton(GwAction):
         filter_ += " AND arc_state = '1' "
 
         # Set model
-        model = QSqlTableModel(db=global_vars.session_vars['db'])
+        model = QSqlTableModel(db=global_vars.db)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.setFilter(filter_)

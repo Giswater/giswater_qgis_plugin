@@ -22,10 +22,11 @@ logger = None
 settings = None
 qgis_settings = None
 current_user = None
+db = None
 project_vars = {}
 session_vars = {'last_error': None, 'show_db_exception': True,
                 'dlg_docker': None, 'show_docker': None, 'docker_type': None, 'logged': None,
-                'db': None, 'postgresql_version': None, 'dao': None, 'credentials': None, 'shortcut_keys':[]}
+                'postgresql_version': None, 'dao': None, 'credentials': None, 'shortcut_keys':[]}
 
 
 def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name, p_user_folder_dir):

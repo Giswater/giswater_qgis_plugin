@@ -177,11 +177,11 @@ def check_db_connection():
 
     opened = True
     try:
-        opened = global_vars.session_vars['db'].isOpen()
+        opened = global_vars.db.isOpen()
         if not opened:
-            opened = global_vars.session_vars['db'].open()
+            opened = global_vars.db.open()
             if not opened:
-                details = global_vars.session_vars['db'].lastError().databaseText()
+                details = global_vars.db.lastError().databaseText()
                 tools_log.log_warning(f"check_db_connection not opened: {details}")
     except Exception as e:
         tools_log.log_warning(f"check_db_connection Exception: {e}")
@@ -214,18 +214,18 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
     global_vars.current_user = user
 
     # We need to create this connections for Table Views
-    global_vars.session_vars['db'] = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
-    global_vars.session_vars['db'].setHostName(host)
+    global_vars.db = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
+    global_vars.db.setHostName(host)
     if port != '':
-        global_vars.session_vars['db'].setPort(int(port))
-    global_vars.session_vars['db'].setDatabaseName(db)
-    global_vars.session_vars['db'].setUserName(user)
-    global_vars.session_vars['db'].setPassword(pwd)
-    status = global_vars.session_vars['db'].open()
+        global_vars.db.setPort(int(port))
+    global_vars.db.setDatabaseName(db)
+    global_vars.db.setUserName(user)
+    global_vars.db.setPassword(pwd)
+    status = global_vars.db.open()
     if not status:
         message = "Database connection error. Please open plugin log file to get more details"
         global_vars.session_vars['last_error'] = tools_qt.tr(message)
-        details = global_vars.session_vars['db'].lastError().databaseText()
+        details = global_vars.db.lastError().databaseText()
         tools_log.log_warning(str(details))
         return False
 
@@ -253,13 +253,13 @@ def connect_to_database_service(service, sslmode=None):
     tools_log.log_info(f"connect_to_database_service: {conn_string}")
 
     # We need to create this connections for Table Views
-    global_vars.session_vars['db'] = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
-    global_vars.session_vars['db'].setConnectOptions(conn_string)
-    status = global_vars.session_vars['db'].open()
+    global_vars.db = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)
+    global_vars.db.setConnectOptions(conn_string)
+    status = global_vars.db.open()
     if not status:
         message = "Database connection error (QSqlDatabase). Please open plugin log file to get more details"
         global_vars.session_vars['last_error'] = tools_qt.tr(message)
-        details = global_vars.session_vars['db'].lastError().databaseText()
+        details = global_vars.db.lastError().databaseText()
         tools_log.log_warning(str(details))
         return False
 
