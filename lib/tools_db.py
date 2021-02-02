@@ -468,7 +468,7 @@ def get_layer_source_from_credentials(sslmode_value, layer_name='v_edit_node'):
             global_vars.session_vars['last_error'] = tools_qt.tr("Error getting default connection", None, 'ui_message')
             return None, not_version
 
-    global_vars.session_vars['credentials'] = credentials
+    global_vars.credentials = credentials
     return credentials, not_version
 
 

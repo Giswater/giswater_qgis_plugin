@@ -387,7 +387,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
     """
 
     uri = tools_pgdao.get_uri()
-    schema_name = global_vars.session_vars['credentials']['schema'].replace('"', '')
+    schema_name = global_vars.credentials['schema'].replace('"', '')
     if child_layers is not None:
         for layer in child_layers:
             if layer[0] != 'Load all':
