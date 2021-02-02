@@ -31,7 +31,7 @@ class GwDialog(QDialog):
         if event.type() == QtCore.QEvent.EnterWhatsThisMode and self.isActiveWindow():
             QWhatsThis.leaveWhatsThisMode()
             parser = configparser.ConfigParser()
-            path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}init.config"
+            path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}giswater.config"
             if not os.path.exists(path):
                 print(f"File not found: {path}")
                 webbrowser.open_new_tab('https://giswater.org/giswater-manual')

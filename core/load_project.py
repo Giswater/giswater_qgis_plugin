@@ -79,7 +79,7 @@ class GwLoadProject(QObject):
         value = tools_gw.check_config_settings('system', 'show_message_durations', 'None', comment=comment)
         tools_qgis.user_parameters['show_message_durations'] = value
 
-        # Log values of system user parameters located in 'init.config'
+        # Log values of system user parameters located in 'giswater.config'
         for parameter, value in tools_qgis.user_parameters.items():
             tools_log.log_info(f"parameter '{parameter}': {value}")
 
@@ -264,7 +264,7 @@ class GwLoadProject(QObject):
         # Dynamically get list of toolbars from config file
         toolbar_names = tools_gw.check_config_settings('toolbars', 'list_toolbars',
                                                        'basic, om, edit, cad, epa, plan, utilities, toc',
-                                                       "project", "init")
+                                                       "project", "giswater")
         if toolbar_names in (None, 'None'): return
 
         toolbars_order = tools_gw.check_config_settings('toolbars_position', 'toolbars_order', toolbar_names,
@@ -282,7 +282,7 @@ class GwLoadProject(QObject):
             ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
                 button_def = tools_gw.check_config_settings('buttons_def', str(index_action), 'None',
-                                                            "project",  "init")
+                                                            "project",  "giswater")
 
                 if button_def not in (None, 'None'):
                     text = self.translate(f'{index_action}_text')
@@ -292,7 +292,7 @@ class GwLoadProject(QObject):
 
         # Disable buttons which are project type exclusive
         project_exclusive = tools_gw.check_config_settings('project_exclusive', str(self.project_type), 'None',
-                                                           "project", "init")
+                                                           "project", "giswater")
 
         if project_exclusive not in (None, 'None'):
             project_exclusive = project_exclusive.replace(' ', '').split(',')
@@ -313,7 +313,7 @@ class GwLoadProject(QObject):
 
 
     def _create_toolbar(self, toolbar_id):
-        list_actions = tools_gw.check_config_settings('toolbars', str(toolbar_id), 'None', "project", "init")
+        list_actions = tools_gw.check_config_settings('toolbars', str(toolbar_id), 'None', "project", "giswater")
 
         if list_actions in (None, 'None'):
             return

@@ -1745,7 +1745,7 @@ def get_role_permissions(qgis_project_role):
                 role_om = tools_db.check_role_user("role_om")
                 if not role_om:
                     role_basic = tools_db.check_role_user("role_basic")
-    super_users = get_config_parser('system', 'super_users', "project", "init")
+    super_users = get_config_parser('system', 'super_users', "project", "giswater")
 
     # Manage user 'postgres', 'gisadmin'
     if global_vars.current_user in ('postgres', 'gisadmin'):

@@ -41,7 +41,7 @@ class GwMenuLoad(QObject):
         last_action = actions[-1]
 
         self.main_menu = QMenu("&Giswater", self.iface.mainWindow().menuBar())
-        tools_gw.set_config_parser("menu", "load", "true", "project", "init")
+        tools_gw.set_config_parser("menu", "load", "true", "project", "giswater")
 
         # region Toolbar
         toolbars_menu = QMenu(f"Toolbars", self.iface.mainWindow().menuBar())
@@ -191,7 +191,7 @@ class GwMenuLoad(QObject):
         self.list_values = []
         values = {}
         path = f"{self.user_folder_dir}{os.sep}config{os.sep}{file_name}"
-        project_types = tools_gw.get_config_parser('system', 'project_types', "project", "init")
+        project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
         if not os.path.exists(path):
             return None
 

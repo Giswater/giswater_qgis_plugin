@@ -385,7 +385,7 @@ class GwAdminButton:
 
         # Populate combo with all locales
         list_locale = []
-        locales = tools_gw.get_config_parser('system', 'locale', "project", "init")
+        locales = tools_gw.get_config_parser('system', 'locale', "project", "giswater")
         locales = locales.replace(" ", "").split(',')
 
         for locale in locales:
@@ -482,7 +482,7 @@ class GwAdminButton:
 
         # Manage super users
         self.super_users = []
-        super_users = tools_gw.get_config_parser('system', 'super_users', "project", "init")
+        super_users = tools_gw.get_config_parser('system', 'super_users', "project", "giswater")
         if super_users:
             super_users = super_users.split(',')
             for super_user in super_users:
@@ -530,10 +530,10 @@ class GwAdminButton:
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "schema_manager")
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "api_manager")
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "custom")
-            self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "init")
+            self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
 
         else:
-            self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "init")
+            self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
 
         self.project_types = self.project_types.split(',')
 

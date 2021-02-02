@@ -69,7 +69,7 @@ class Giswater(QObject):
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '20x20' + os.sep
 
         # Check if config file exists
-        setting_file = os.path.join(self.plugin_dir, 'config', 'init.config')
+        setting_file = os.path.join(self.plugin_dir, 'config', 'giswater.config')
         if not os.path.exists(setting_file):
             message = f"Config file not found at: {setting_file}"
             self.iface.messageBar().pushMessage("", message, 1, 20)
@@ -80,7 +80,7 @@ class Giswater(QObject):
         global_vars.init_qgis_settings(self.plugin_name)
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
-        python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', "project", "init")
+        python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', "project", "giswater")
         if python_enable_console == 'TRUE':
             tools_qgis.enable_python_console()
 
