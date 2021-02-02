@@ -89,7 +89,7 @@ def check_role_user(role_name, username=None):
         return False
 
     if username is None:
-        username = global_vars.session_vars['current_user']
+        username = global_vars.current_user
 
     if not check_role(username):
         return False
@@ -105,15 +105,15 @@ def check_role_user(role_name, username=None):
 def get_current_user():
     """ Get current user connected to database """
 
-    if global_vars.session_vars['current_user']:
-        return global_vars.session_vars['current_user']
+    if global_vars.current_user:
+        return global_vars.current_user
 
     sql = "SELECT current_user"
     row = get_row(sql)
     cur_user = ""
     if row:
         cur_user = str(row[0])
-    global_vars.session_vars['current_user'] = cur_user
+    global_vars.current_user = cur_user
     return cur_user
 
 
@@ -156,7 +156,7 @@ def set_database_connection():
     global_vars.session_vars['dao'] = None
     global_vars.session_vars['last_error'] = None
     global_vars.session_vars['logged'] = False
-    global_vars.session_vars['current_user'] = None
+    global_vars.current_user = None
 
     layer_source, not_version = get_layer_source_from_credentials('disable')
     if layer_source:
@@ -211,7 +211,7 @@ def connect_to_database(host, port, db, user, pwd, sslmode):
         return False
 
     # Update current user
-    global_vars.session_vars['current_user'] = user
+    global_vars.current_user = user
 
     # We need to create this connections for Table Views
     global_vars.session_vars['db'] = QSqlDatabase.addDatabase("QPSQL", global_vars.plugin_name)

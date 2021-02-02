@@ -282,7 +282,7 @@ class GwFeatureReplaceButton(GwMaptool):
             tools_qgis.show_info(message)
 
             # Force user to manage with state = 1 features
-            current_user = global_vars.session_vars['current_user']
+            current_user = global_vars.current_user
             sql = (f"DELETE FROM selector_state "
                    f"WHERE state_id = 1 AND cur_user = '{current_user}';"
                    f"\nINSERT INTO selector_state (state_id, cur_user) "

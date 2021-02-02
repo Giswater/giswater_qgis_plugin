@@ -133,7 +133,7 @@ class GwLoadProject(QObject):
 
         # Create a thread to listen selected database channels
         self.notify = GwNotify()
-        list_channels = ['desktop', global_vars.session_vars['current_user']]
+        list_channels = ['desktop', global_vars.current_user]
         self.notify.start_listening(list_channels)
 
         # Open automatically 'search docker' depending its value in user settings

@@ -235,7 +235,7 @@ class Giswater(QObject):
 
             # Unlisten notify channel and stop thread
             if hasattr(self, 'notify'):
-                list_channels = ['desktop', global_vars.session_vars['current_user']]
+                list_channels = ['desktop', global_vars.current_user]
                 self.notify.stop_listening(list_channels)
 
             if self.load_project:

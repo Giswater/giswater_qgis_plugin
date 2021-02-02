@@ -1748,12 +1748,12 @@ def get_role_permissions(qgis_project_role):
     super_users = get_config_parser('system', 'super_users', "project", "init")
 
     # Manage user 'postgres', 'gisadmin'
-    if global_vars.session_vars['current_user'] in ('postgres', 'gisadmin'):
+    if global_vars.current_user in ('postgres', 'gisadmin'):
         role_master = True
 
     # Manage super_user
     if super_users is not None:
-        if global_vars.session_vars['current_user'] in super_users:
+        if global_vars.current_user in super_users:
             role_master = True
 
     if role_basic or qgis_project_role == 'role_basic':

@@ -21,8 +21,9 @@ srid = None
 logger = None
 settings = None
 qgis_settings = None
+current_user = None
 project_vars = {}
-session_vars = {'last_error': None, 'show_db_exception': True, 'current_user': None,
+session_vars = {'last_error': None, 'show_db_exception': True,
                 'dlg_docker': None, 'show_docker': None, 'docker_type': None, 'logged': None,
                 'db': None, 'postgresql_version': None, 'dao': None, 'credentials': None, 'shortcut_keys':[]}
 

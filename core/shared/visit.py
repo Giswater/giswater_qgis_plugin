@@ -197,8 +197,8 @@ class GwVisit(QObject):
         self.dlg_add_visit.enddate.setDate(_date)
 
         # set User name get from login
-        if global_vars.session_vars['current_user'] and self.user_name:
-            self.user_name.setText(str(global_vars.session_vars['current_user']))
+        if global_vars.current_user and self.user_name:
+            self.user_name.setText(str(global_vars.current_user))
 
         # set the start tab to be shown (e.g. tab_visit)
         self.current_tab_index = self.tab_index('tab_visit')
