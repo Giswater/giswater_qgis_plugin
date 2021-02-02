@@ -52,7 +52,7 @@ class GwInfo(QObject):
         super().__init__()
 
         self.iface = global_vars.iface
-        self.settings = global_vars.settings
+        self.settings = global_vars.giswater_settings
         self.plugin_dir = global_vars.plugin_dir
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
@@ -541,16 +541,16 @@ class GwInfo(QObject):
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
         title = f"{complet_result['body']['feature']['childType']} - {self.feature_id}"
 
-        if global_vars.session_vars['dlg_docker'] and is_docker and global_vars.session_vars['show_docker']:
+        if global_vars.session_vars['dialog_docker'] and is_docker and global_vars.session_vars['info_docker']:
             # Delete last form from memory
-            last_info = global_vars.session_vars['dlg_docker'].findChild(GwMainWindow, 'dlg_info_feature')
+            last_info = global_vars.session_vars['dialog_docker'].findChild(GwMainWindow, 'dlg_info_feature')
             if last_info:
                 last_info.setParent(None)
                 del last_info
 
             tools_gw.docker_dialog(dlg_cf)
-            global_vars.session_vars['dlg_docker'].dlg_closed.connect(self.manage_docker_close)
-            global_vars.session_vars['dlg_docker'].setWindowTitle(title)
+            global_vars.session_vars['dialog_docker'].dlg_closed.connect(self.manage_docker_close)
+            global_vars.session_vars['dialog_docker'].setWindowTitle(title)
             btn_cancel.clicked.connect(self.manage_docker_close)
 
         else:
@@ -1124,7 +1124,7 @@ class GwInfo(QObject):
                 self.manage_accept(dialog, action_edit, new_feature, self.my_json, False)
                 self.my_json = {}
             elif self.new_feature_id is not None:
-                if global_vars.session_vars['dlg_docker'] and global_vars.session_vars['show_docker']:
+                if global_vars.session_vars['dialog_docker'] and global_vars.session_vars['info_docker']:
                     self.manage_docker_close()
                 else:
                     tools_gw.close_dialog(dialog)
@@ -1513,8 +1513,8 @@ class GwInfo(QObject):
         after_insert = False
 
         if _json == '' or str(_json) == '{}':
-            if global_vars.session_vars['dlg_docker']:
-                global_vars.session_vars['dlg_docker'].setMinimumWidth(dialog.width())
+            if global_vars.session_vars['dialog_docker']:
+                global_vars.session_vars['dialog_docker'].setMinimumWidth(dialog.width())
                 tools_gw.close_docker()
             tools_gw.close_dialog(dialog)
             return None
@@ -1573,7 +1573,7 @@ class GwInfo(QObject):
             my_json = json.dumps(_json)
             if my_json == '' or str(my_json) == '{}':
                 if close_dlg:
-                    if global_vars.session_vars['dlg_docker']:
+                    if global_vars.session_vars['dialog_docker']:
                         tools_gw.close_docker()
                     tools_gw.close_dialog(dialog)
                 return True
@@ -1610,7 +1610,7 @@ class GwInfo(QObject):
             return False
 
         if close_dlg:
-            if global_vars.session_vars['dlg_docker']:
+            if global_vars.session_vars['dialog_docker']:
                 self.manage_docker_close()
             tools_gw.close_dialog(dialog)
             return None

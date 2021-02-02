@@ -19,21 +19,21 @@ schema_name = None
 project_type = None
 srid = None
 logger = None
-settings = None
+giswater_settings = None
 qgis_settings = None
 current_user = None
-db = None
+qgis_db_credentials = None
 dao = None
-credentials = None
+dao_db_credentials = None
 shortcut_keys = []
 project_vars = {}
 session_vars = {}
 session_vars['last_error'] = None
 session_vars['show_db_exception'] = None
-session_vars['dlg_docker'] = None
-session_vars['show_docker'] = None
+session_vars['dialog_docker'] = None
+session_vars['info_docker'] = None
 session_vars['docker_type'] = None
-session_vars['logged'] = None
+session_vars['logged_status'] = None
 session_vars['postgresql_version'] = None
 
 
@@ -47,7 +47,7 @@ def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name, p_user_folder_di
     user_folder_dir = p_user_folder_dir
 
 
-def init_settings(setting_file):
+def init_giswater_settings(setting_file):
 
     global settings
     settings = QSettings(setting_file, QSettings.IniFormat)

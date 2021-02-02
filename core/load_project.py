@@ -31,7 +31,7 @@ class GwLoadProject(QObject):
         super().__init__()
 
         self.iface = global_vars.iface
-        self.settings = global_vars.settings
+        self.settings = global_vars.giswater_settings
         self.plugin_dir = global_vars.plugin_dir
         self.plugin_toolbars = {}
         self.buttons_to_hide = []

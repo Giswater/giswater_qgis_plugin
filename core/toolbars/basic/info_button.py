@@ -173,7 +173,7 @@ class GwInfoButton(GwMaptool):
             info_feature.signal_activate.connect(self.reactivate_map_tool)
             info_feature.get_info_from_id(table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type)
             # Remove previous rubberband when open new docker
-            if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dlg_docker'] is not None:
+            if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dialog_docker'] is not None:
                 self.previous_info_feature.rubber_band.reset()
             self.previous_info_feature = info_feature
 
@@ -219,7 +219,7 @@ class GwInfoButton(GwMaptool):
             info_feature.signal_activate.connect(self.reactivate_map_tool)
             info_feature.get_info_from_coordinates(point, tab_type=self.tab_type)
             # Remove previous rubberband when open new docker
-            if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dlg_docker'] is not None:
+            if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dialog_docker'] is not None:
                 self.previous_info_feature.rubber_band.reset()
             self.previous_info_feature = info_feature
 

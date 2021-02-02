@@ -76,7 +76,7 @@ class Giswater(QObject):
             return
 
         # Set plugin and QGIS settings: stored in the registry (on Windows) or .ini file (on Unix)
-        global_vars.init_settings(setting_file)
+        global_vars.init_giswater_settings(setting_file)
         global_vars.init_qgis_settings(self.plugin_name)
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
@@ -142,11 +142,11 @@ class Giswater(QObject):
 
         # Dynamically get parameters defined in section 'actions_list'
         section = 'actions_not_checkable'
-        global_vars.settings.beginGroup(section)
-        list_keys = global_vars.settings.allKeys()
-        global_vars.settings.endGroup()
+        global_vars.giswater_settings.beginGroup(section)
+        list_keys = global_vars.giswater_settings.allKeys()
+        global_vars.giswater_settings.endGroup()
         for key in list_keys:
-            list_values = global_vars.settings.value(f"{section}/{key}")
+            list_values = global_vars.giswater_settings.value(f"{section}/{key}")
             if list_values:
                 self.dict_actions[key] = list_values
             else:
@@ -166,11 +166,11 @@ class Giswater(QObject):
 
         # Dynamically get parameters defined in section 'toolbars'
         section = 'toolbars'
-        global_vars.settings.beginGroup(section)
-        list_keys = global_vars.settings.allKeys()
-        global_vars.settings.endGroup()
+        global_vars.giswater_settings.beginGroup(section)
+        list_keys = global_vars.giswater_settings.allKeys()
+        global_vars.giswater_settings.endGroup()
         for key in list_keys:
-            list_values = global_vars.settings.value(f"{section}/{key}")
+            list_values = global_vars.giswater_settings.value(f"{section}/{key}")
             if list_values:
                 # Check if list_values has only one value
                 if type(list_values) is str:

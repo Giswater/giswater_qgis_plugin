@@ -25,7 +25,7 @@ class GwMaptool(QgsMapTool):
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
-        self.settings = global_vars.settings
+        self.settings = global_vars.giswater_settings
         self.plugin_dir = global_vars.plugin_dir
         self.project_type = global_vars.project_type
 

@@ -81,7 +81,7 @@ class GwGo2EpaButton(GwAction):
 
         self.set_completer_result(self.dlg_go2epa.txt_result_name, 'v_ui_rpt_cat_result', 'result_id')
         self.check_result_id()
-        if global_vars.session_vars['dlg_docker']:
+        if global_vars.session_vars['dialog_docker']:
             tools_qt.manage_translation('go2epa', self.dlg_go2epa)
             tools_gw.docker_dialog(self.dlg_go2epa)
             self.dlg_go2epa.btn_cancel.clicked.disconnect()
@@ -702,7 +702,7 @@ class GwGo2EpaButton(GwAction):
         """
 
         model = QSqlQueryModel()
-        model.setQuery(query, db=global_vars.db)
+        model.setQuery(query, db=global_vars.qgis_db_credentials)
         qtable.setModel(model)
         qtable.show()
 

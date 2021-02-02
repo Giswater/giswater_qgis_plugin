@@ -36,7 +36,7 @@ class GwMincut:
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
         self.plugin_dir = global_vars.plugin_dir
-        self.settings = global_vars.settings
+        self.settings = global_vars.giswater_settings
         self.schema_name = global_vars.schema_name
 
         # Create separate class to manage 'actionConfig'
@@ -205,7 +205,7 @@ class GwMincut:
 
     def set_signals(self):
 
-        if global_vars.session_vars['dlg_docker']:
+        if global_vars.session_vars['dialog_docker']:
             self.dlg_mincut.dlg_closed.connect(tools_gw.close_docker)
 
         self.dlg_mincut.btn_accept.clicked.connect(self.accept_save_data)
@@ -305,7 +305,7 @@ class GwMincut:
     def manage_docker(self):
 
         tools_gw.init_docker('qgis_form_docker')
-        if global_vars.session_vars['dlg_docker']:
+        if global_vars.session_vars['dialog_docker']:
             tools_gw.docker_dialog(self.dlg_mincut)
         else:
             tools_gw.open_dialog(self.dlg_mincut, dlg_name='mincut')

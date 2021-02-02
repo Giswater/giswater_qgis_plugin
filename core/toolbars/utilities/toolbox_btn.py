@@ -57,7 +57,7 @@ class GwToolBoxButton(GwAction):
 
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
-        if global_vars.session_vars['dlg_docker']:
+        if global_vars.session_vars['dialog_docker']:
             tools_gw.docker_dialog(self.dlg_toolbox)
         else:
             tools_gw.open_dialog(self.dlg_toolbox)

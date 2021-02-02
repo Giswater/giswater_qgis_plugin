@@ -774,7 +774,7 @@ class GwSearch:
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel(db=global_vars.db)
+        model = QSqlTableModel(db=global_vars.qgis_db_credentials)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)

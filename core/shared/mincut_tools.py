@@ -27,7 +27,7 @@ class GwMincutTools:
         self.canvas = global_vars.canvas
         self.plugin_dir = global_vars.plugin_dir
         self.schema_name = global_vars.schema_name
-        self.settings = global_vars.settings
+        self.settings = global_vars.giswater_settings
 
 
     def set_dialog(self):
@@ -271,7 +271,7 @@ class GwMincutTools:
             table_name = self.schema_name + "." + table_name
 
         # Set model
-        model = QSqlTableModel(db=global_vars.db)
+        model = QSqlTableModel(db=global_vars.qgis_db_credentials)
         model.setTable(table_name)
         model.setEditStrategy(QSqlTableModel.OnManualSubmit)
         model.sort(0, 1)

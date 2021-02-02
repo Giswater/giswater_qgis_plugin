@@ -28,7 +28,7 @@ class GwMenuLoad(QObject):
 
         super().__init__()
         self.iface = global_vars.iface
-        self.settings = global_vars.settings
+        self.settings = global_vars.giswater_settings
         self.plugin_dir = global_vars.plugin_dir
         self.user_folder_dir = global_vars.user_folder_dir
         self.list_values = []
@@ -49,14 +49,14 @@ class GwMenuLoad(QObject):
         toolbars_icon = QIcon(icon_path)
         toolbars_menu.setIcon(toolbars_icon)
         self.main_menu.addMenu(toolbars_menu)
-        for toolbar in global_vars.settings.value(f"toolbars/list_toolbars"):
+        for toolbar in global_vars.giswater_settings.value(f"toolbars/list_toolbars"):
             toolbar_submenu = QMenu(f"{toolbar}", self.iface.mainWindow().menuBar())
             toolbars_menu.addMenu(toolbar_submenu)
-            buttons_toolbar = global_vars.settings.value(f"toolbars/{toolbar}")
+            buttons_toolbar = global_vars.giswater_settings.value(f"toolbars/{toolbar}")
             for index_action in buttons_toolbar:
                 icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}{toolbar}{os.sep}{index_action}.png"
                 icon = QIcon(icon_path)
-                button_def = global_vars.settings.value(f"buttons_def/{index_action}")
+                button_def = global_vars.giswater_settings.value(f"buttons_def/{index_action}")
                 text = ""
                 if button_def:
                     text = self._translate(f'{index_action}_text')

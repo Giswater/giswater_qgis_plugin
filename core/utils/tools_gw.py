@@ -387,7 +387,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
     """
 
     uri = tools_pgdao.get_uri()
-    schema_name = global_vars.credentials['schema'].replace('"', '')
+    schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
     if child_layers is not None:
         for layer in child_layers:
             if layer[0] != 'Load all':
@@ -2052,11 +2052,11 @@ def docker_dialog(dialog):
     positions = {8: Qt.BottomDockWidgetArea, 4: Qt.TopDockWidgetArea,
                  2: Qt.RightDockWidgetArea, 1: Qt.LeftDockWidgetArea}
     try:
-        global_vars.session_vars['dlg_docker'].setWindowTitle(dialog.windowTitle())
-        global_vars.session_vars['dlg_docker'].setWidget(dialog)
-        global_vars.session_vars['dlg_docker'].setWindowFlags(Qt.WindowContextHelpButtonHint)
-        global_vars.iface.addDockWidget(positions[global_vars.session_vars['dlg_docker'].position],
-                                        global_vars.session_vars['dlg_docker'])
+        global_vars.session_vars['dialog_docker'].setWindowTitle(dialog.windowTitle())
+        global_vars.session_vars['dialog_docker'].setWidget(dialog)
+        global_vars.session_vars['dialog_docker'].setWindowFlags(Qt.WindowContextHelpButtonHint)
+        global_vars.iface.addDockWidget(positions[global_vars.session_vars['dialog_docker'].position],
+                                        global_vars.session_vars['dialog_docker'])
     except RuntimeError as e:
         tools_log.log_warning(f"{type(e).__name__} --> {e}")
 
@@ -2064,34 +2064,34 @@ def docker_dialog(dialog):
 def init_docker(docker_param='qgis_info_docker'):
     """ Get user config parameter @docker_param """
 
-    global_vars.session_vars['show_docker'] = True
+    global_vars.session_vars['info_docker'] = True
     # Show info or form in docker?
     row = get_config_value(docker_param)
     if not row:
-        global_vars.session_vars['dlg_docker'] = None
+        global_vars.session_vars['dialog_docker'] = None
         global_vars.session_vars['docker_type'] = None
         return None
     value = row[0].lower()
 
     # Check if docker has dialog of type 'form' or 'main'
     if docker_param == 'qgis_info_docker':
-        if global_vars.session_vars['dlg_docker']:
+        if global_vars.session_vars['dialog_docker']:
             if global_vars.session_vars['docker_type']:
                 if global_vars.session_vars['docker_type'] != 'qgis_info_docker':
-                    global_vars.session_vars['show_docker'] = False
+                    global_vars.session_vars['info_docker'] = False
                     return None
 
     if value == 'true':
         close_docker()
         global_vars.session_vars['docker_type'] = docker_param
-        global_vars.session_vars['dlg_docker'] = GwDocker()
-        global_vars.session_vars['dlg_docker'].dlg_closed.connect(close_docker)
+        global_vars.session_vars['dialog_docker'] = GwDocker()
+        global_vars.session_vars['dialog_docker'].dlg_closed.connect(close_docker)
         manage_docker_options()
     else:
-        global_vars.session_vars['dlg_docker'] = None
+        global_vars.session_vars['dialog_docker'] = None
         global_vars.session_vars['docker_type'] = None
 
-    return global_vars.session_vars['dlg_docker']
+    return global_vars.session_vars['dialog_docker']
 
 
 def close_docker():
@@ -2100,21 +2100,21 @@ def close_docker():
     """
 
     try:
-        if global_vars.session_vars['dlg_docker']:
-            if not global_vars.session_vars['dlg_docker'].isFloating():
-                docker_pos = global_vars.iface.mainWindow().dockWidgetArea(global_vars.session_vars['dlg_docker'])
-                widget = global_vars.session_vars['dlg_docker'].widget()
+        if global_vars.session_vars['dialog_docker']:
+            if not global_vars.session_vars['dialog_docker'].isFloating():
+                docker_pos = global_vars.iface.mainWindow().dockWidgetArea(global_vars.session_vars['dialog_docker'])
+                widget = global_vars.session_vars['dialog_docker'].widget()
                 if widget:
                     widget.close()
                     del widget
-                    global_vars.session_vars['dlg_docker'].setWidget(None)
+                    global_vars.session_vars['dialog_docker'].setWidget(None)
                     global_vars.session_vars['docker_type'] = None
                     set_config_parser('docker', 'position', f'{docker_pos}')
-                global_vars.iface.removeDockWidget(global_vars.session_vars['dlg_docker'])
-                global_vars.session_vars['dlg_docker'] = None
+                global_vars.iface.removeDockWidget(global_vars.session_vars['dialog_docker'])
+                global_vars.session_vars['dialog_docker'] = None
     except AttributeError:
         global_vars.session_vars['docker_type'] = None
-        global_vars.session_vars['dlg_docker'] = None
+        global_vars.session_vars['dialog_docker'] = None
 
 
 def manage_docker_options():
@@ -2124,11 +2124,11 @@ def manage_docker_options():
     try:
         # Docker positions: 1=Left, 2=Right, 4=Top, 8=Bottom
         pos = int(get_config_parser('docker', 'position', "user", "session"))
-        global_vars.session_vars['dlg_docker'].position = 2
+        global_vars.session_vars['dialog_docker'].position = 2
         if pos in (1, 2, 4, 8):
-            global_vars.session_vars['dlg_docker'].position = pos
+            global_vars.session_vars['dialog_docker'].position = pos
     except:
-        global_vars.session_vars['dlg_docker'].position = 2
+        global_vars.session_vars['dialog_docker'].position = 2
 
 
 def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardItemModel=False, schema_name=None):

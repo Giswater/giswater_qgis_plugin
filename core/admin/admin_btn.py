@@ -43,7 +43,7 @@ class GwAdminButton:
 
         # Initialize instance attributes
         self.iface = global_vars.iface
-        self.settings = global_vars.settings
+        self.settings = global_vars.giswater_settings
         self.plugin_dir = global_vars.plugin_dir
         self.schema_name = global_vars.schema_name
         self.plugin_version, self.message = tools_qgis.get_plugin_version()
@@ -67,7 +67,7 @@ class GwAdminButton:
         if set_database_connection:
             connection_status, not_version, layer_source = tools_db.set_database_connection()
         else:
-            connection_status = global_vars.session_vars['logged']
+            connection_status = global_vars.session_vars['logged_status']
 
         if not connection_status:
             self._create_credentials_form(set_connection=default_connection)
@@ -91,7 +91,7 @@ class GwAdminButton:
 
         try:
             tools_gw.init_docker('qgis_form_docker')
-            if global_vars.session_vars['dlg_docker']:
+            if global_vars.session_vars['dialog_docker']:
                 tools_gw.docker_dialog(self.dlg_readsql)
                 self.dlg_readsql.dlg_closed.connect(tools_gw.close_docker)
             else:
@@ -2275,7 +2275,7 @@ class GwAdminButton:
 
         # Populate Table
         self.model_srid = QSqlQueryModel()
-        self.model_srid.setQuery(sql, db=global_vars.db)
+        self.model_srid.setQuery(sql, db=global_vars.qgis_db_credentials)
         self.tbl_srid.setModel(self.model_srid)
         self.tbl_srid.show()
 
@@ -3133,7 +3133,7 @@ class GwAdminButton:
 
         # Populate table update
         qtable = self.dlg_manage_sys_fields.findChild(QTableView, "tbl_update")
-        self.model_update_table = QSqlTableModel(db=global_vars.db)
+        self.model_update_table = QSqlTableModel(db=global_vars.qgis_db_credentials)
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
         expr_filter = "cat_feature_id = '" + form_name + "'"
         self.fill_table(qtable, 've_config_sysfields', self.model_update_table, expr_filter)
@@ -3154,7 +3154,7 @@ class GwAdminButton:
 
         # Populate table update
         qtable = dialog.findChild(QTableView, "tbl_update")
-        self.model_update_table = QSqlTableModel(db=global_vars.db)
+        self.model_update_table = QSqlTableModel(db=global_vars.qgis_db_credentials)
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         if self.chk_multi_insert:
