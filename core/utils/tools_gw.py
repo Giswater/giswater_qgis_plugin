@@ -1276,7 +1276,7 @@ def add_tableview(complet_result, field, module=sys.modules[__name__]):
     real_name = widget.objectName()[5:len(widget.objectName())]
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
-            function_name = field['widgetfunction']
+            function_name = f"_{field['widgetfunction']}"
             exist = tools_os.check_python_function(sys.modules[__name__], function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
