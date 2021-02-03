@@ -248,3 +248,6 @@ VALUES ('connec_form', 'utils','v_ui_hydrometer','hydrometer_link',7,TRUE,NULL,'
 --2021/02/01
 UPDATE sys_table SET id ='config_graf_inlet' WHERE id ='config_mincut_inlet';
 UPDATE sys_table SET id ='config_graf_checkvalve' WHERE id ='config_checkvalve';
+
+UPDATE config_form_fields SET dv_querytext = replace(dv_querytext,'sys_role_id','sys_role')
+WHERE dv_querytext ilike '%sys_role_id%';
