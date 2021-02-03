@@ -25,27 +25,29 @@ class GwDateSelectorButton(GwAction):
 
 
     def clicked_event(self):
-        self.open_date_selector()
+        self._open_date_selector()
 
 
-    def open_date_selector(self):
+    # region private functions
+
+    def _open_date_selector(self):
         self.dlg_selector_date = GwSelectorDateUi()
         tools_gw.load_settings(self.dlg_selector_date)
         self.widget_date_from = self.dlg_selector_date.findChild(QDateEdit, "date_from")
         self.widget_date_to = self.dlg_selector_date.findChild(QDateEdit, "date_to")
-        self.dlg_selector_date.findChild(QPushButton, "btn_accept").clicked.connect(self.update_dates_into_db)
+        self.dlg_selector_date.findChild(QPushButton, "btn_accept").clicked.connect(self._update_dates_into_db)
         self.dlg_selector_date.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_selector_date))
         self.dlg_selector_date.rejected.connect(partial(tools_gw.close_dialog, self.dlg_selector_date))
-        self.widget_date_from.dateChanged.connect(partial(self.update_date_to))
-        self.widget_date_to.dateChanged.connect(partial(self.update_date_from))
+        self.widget_date_from.dateChanged.connect(partial(self._update_date_to))
+        self.widget_date_to.dateChanged.connect(partial(self._update_date_from))
 
-        self.get_default_dates()
+        self._get_default_dates()
         tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_from, self.from_date)
         tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_to, self.to_date)
         tools_gw.open_dialog(self.dlg_selector_date, dlg_name="selector_date")
 
 
-    def update_dates_into_db(self):
+    def _update_dates_into_db(self):
         """ Insert or update dates into data base """
 
         # Set project user
@@ -71,7 +73,7 @@ class GwDateSelectorButton(GwAction):
         tools_qgis.refresh_map_canvas()
 
 
-    def update_date_to(self):
+    def _update_date_to(self):
         """ If 'date from' is upper than 'date to' set 'date to' 1 day more than 'date from' """
 
         from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
@@ -81,7 +83,7 @@ class GwDateSelectorButton(GwAction):
             tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_to, datetime.strptime(to_date, '%Y-%m-%d'))
 
 
-    def update_date_from(self):
+    def _update_date_from(self):
         """ If 'date to' is lower than 'date from' set 'date from' 1 day less than 'date to' """
 
         from_date = self.widget_date_from.date().toString('yyyy-MM-dd')
@@ -91,7 +93,7 @@ class GwDateSelectorButton(GwAction):
             tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_from, datetime.strptime(from_date, '%Y-%m-%d'))
 
 
-    def get_default_dates(self):
+    def _get_default_dates(self):
         """ Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date) """
 
         # Set project user
@@ -110,3 +112,5 @@ class GwDateSelectorButton(GwAction):
         except:
             self.from_date = QDate.currentDate()
             self.to_date = QDate.currentDate().addDays(1)
+
+    # endregion
