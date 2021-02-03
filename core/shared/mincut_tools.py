@@ -64,27 +64,27 @@ class GwMincutTools:
 
         model.setStringList(values)
         self.completer.setModel(model)
-        self.txt_mincut_id.textChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
-        self.dlg_mincut_man.date_from.dateChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
-        self.dlg_mincut_man.date_to.dateChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
-        self.dlg_mincut_man.cmb_expl.currentIndexChanged.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
+        self.txt_mincut_id.textChanged.connect(partial(self._filter_by_id, self.tbl_mincut_edit))
+        self.dlg_mincut_man.date_from.dateChanged.connect(partial(self._filter_by_id, self.tbl_mincut_edit))
+        self.dlg_mincut_man.date_to.dateChanged.connect(partial(self._filter_by_id, self.tbl_mincut_edit))
+        self.dlg_mincut_man.cmb_expl.currentIndexChanged.connect(partial(self._filter_by_id, self.tbl_mincut_edit))
         self.dlg_mincut_man.spn_next_days.setRange(-9999, 9999)
-        self.dlg_mincut_man.btn_next_days.clicked.connect(self.filter_by_days)
-        self.dlg_mincut_man.spn_next_days.valueChanged.connect(self.filter_by_days)
-        self.dlg_mincut_man.btn_cancel_mincut.clicked.connect(self.set_state_cancel_mincut)
-        self.dlg_mincut_man.tbl_mincut_edit.doubleClicked.connect(self.open_mincut)
+        self.dlg_mincut_man.btn_next_days.clicked.connect(self._filter_by_days)
+        self.dlg_mincut_man.spn_next_days.valueChanged.connect(self._filter_by_days)
+        self.dlg_mincut_man.btn_cancel_mincut.clicked.connect(self._set_state_cancel_mincut)
+        self.dlg_mincut_man.tbl_mincut_edit.doubleClicked.connect(self._open_mincut)
         self.dlg_mincut_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_mincut_man))
         self.dlg_mincut_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_mincut_man))
         self.dlg_mincut_man.btn_delete.clicked.connect(partial(
-            self.delete_mincut_management, self.tbl_mincut_edit, "om_mincut", "id"))
+            self._delete_mincut_management, self.tbl_mincut_edit, "om_mincut", "id"))
         self.dlg_mincut_man.btn_selector_mincut.clicked.connect(partial(
-            self.mincut_selector, self.tbl_mincut_edit, 'id'))
+            self._mincut_selector, self.tbl_mincut_edit, 'id'))
 
-        self.populate_combos()
-        self.dlg_mincut_man.state_edit.activated.connect(partial(self.filter_by_id, self.tbl_mincut_edit))
+        self._populate_combos()
+        self.dlg_mincut_man.state_edit.activated.connect(partial(self._filter_by_id, self.tbl_mincut_edit))
 
         # Set a model with selected filter. Attach that model to selected table
-        self.fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
+        self._fill_table_mincut_management(self.tbl_mincut_edit, self.schema_name + ".v_ui_mincut")
         tools_gw.set_tablemodel_config(self.dlg_mincut_man, self.tbl_mincut_edit, "v_ui_mincut", sort_order=1)
 
         # self.mincut.tools_gw.set_tablemodel_config(self.tbl_mincut_edit, "v_ui_mincut")
@@ -93,7 +93,9 @@ class GwMincutTools:
         tools_gw.open_dialog(self.dlg_mincut_man, dlg_name='mincut_manager')
 
 
-    def set_state_cancel_mincut(self):
+    # region private functions
+
+    def _set_state_cancel_mincut(self):
 
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -119,7 +121,7 @@ class GwMincutTools:
             self.tbl_mincut_edit.model().select()
 
 
-    def mincut_selector(self, qtable, field_id):
+    def _mincut_selector(self, qtable, field_id):
         """ Manage mincut selector """
 
         model = qtable.model()
@@ -150,7 +152,7 @@ class GwMincutTools:
         tools_gw.open_dialog(self.dlg_selector, dlg_name='selector', maximize_button=False)
 
 
-    def populate_combos(self):
+    def _populate_combos(self):
 
         # Fill ComboBox state
         sql = ("SELECT id, idval "
@@ -165,7 +167,7 @@ class GwMincutTools:
         tools_qt.fill_combo_values(self.dlg_mincut_man.cmb_expl, rows, 1)
 
 
-    def open_mincut(self):
+    def _open_mincut(self):
         """ Open mincut form with selected record of the table """
 
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
@@ -189,7 +191,7 @@ class GwMincutTools:
         self.mincut.set_visible_mincut_layers(True)
 
 
-    def filter_by_days(self):
+    def _filter_by_days(self):
 
         date_from = datetime.datetime.now()
         days_added = self.dlg_mincut_man.spn_next_days.text()
@@ -211,7 +213,7 @@ class GwMincutTools:
         self.tbl_mincut_edit.model().select()
 
 
-    def filter_by_id(self, qtable):
+    def _filter_by_id(self, qtable):
 
         expr = ""
         id_ = tools_qt.get_text(self.dlg_mincut_man, self.dlg_mincut_man.txt_mincut_id, False, False)
@@ -264,7 +266,7 @@ class GwMincutTools:
         qtable.model().select()
 
 
-    def fill_table_mincut_management(self, widget, table_name):
+    def _fill_table_mincut_management(self, widget, table_name):
         """ Set a model with selected filter. Attach that model to selected table """
 
         if self.schema_name not in table_name:
@@ -285,7 +287,7 @@ class GwMincutTools:
         widget.setModel(model)
 
 
-    def delete_mincut_management(self, widget, table_name, column_id):
+    def _delete_mincut_management(self, widget, table_name, column_id):
         """ Delete selected elements of the table (by id) """
 
         # Get selected rows
@@ -330,3 +332,5 @@ class GwMincutTools:
             layer = tools_qgis.get_layer_by_tablename('v_om_mincut_hydrometer')
             if layer is not None:
                 layer.triggerRepaint()
+
+    # endregion
