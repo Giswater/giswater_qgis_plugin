@@ -23,30 +23,6 @@ class GwArcFusionButton(GwMaptool):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
 
-    def fusion_arc(self):
-
-        workcat_id_end = self.dlg_fusion.workcat_id_end.currentText()
-        enddate = self.dlg_fusion.enddate.date()
-        enddate_str = enddate.toString('yyyy-MM-dd')
-        feature_id = f'"id":["{self.node_id}"]'
-        extras = f'"workcat_id_end":"{workcat_id_end}", "enddate":"{enddate_str}"'
-        body = tools_gw.create_body(feature=feature_id, extras=extras)
-        # Execute SQL function and show result to the user
-        result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)
-        if not result or result['status'] == 'Failed':
-            return
-
-        text_result, change_tab = tools_gw.fill_tab_log(self.dlg_fusion, result['body']['data'], True, True, 1)
-
-        if not text_result:
-            self.dlg_fusion.close()
-        # Refresh map canvas
-        self.refresh_map_canvas()
-
-        # Deactivate map tool
-        self.deactivate()
-
-        self.set_action_pan()
 
 
     # region QgsMapTools inherited
@@ -61,43 +37,9 @@ class GwArcFusionButton(GwMaptool):
 
     def canvasReleaseEvent(self, event):
 
-        self.get_arc_fusion(event)
+        self._get_arc_fusion(event)
 
 
-    def get_arc_fusion(self, event):
-
-        if event.button() == Qt.RightButton:
-            self.cancel_map_tool()
-            return
-
-        # Get coordinates
-        event_point = self.snapper_manager.get_event_point(event)
-
-        # Snapping
-        snapped_feat = None
-        result = self.snapper_manager.snap_to_current_layer(event_point)
-        if result.isValid():
-            snapped_feat = self.snapper_manager.get_snapped_feature(result)
-
-        if snapped_feat:
-            self.node_id = snapped_feat.attribute('node_id')
-            self.dlg_fusion = GwArcFusionUi()
-            tools_gw.load_settings(self.dlg_fusion)
-
-            # Fill ComboBox workcat_id_end
-            sql = "SELECT id FROM cat_work ORDER BY id"
-            rows = tools_db.get_rows(sql)
-            tools_qt.fill_combo_box(self.dlg_fusion, "workcat_id_end", rows, False)
-
-            # Set QDateEdit to current date
-            current_date = QDate.currentDate()
-            tools_qt.set_calendar(self.dlg_fusion, "enddate", current_date)
-
-            # Set signals
-            self.dlg_fusion.btn_accept.clicked.connect(self.fusion_arc)
-            self.dlg_fusion.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
-
-            tools_gw.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
 
 
     def activate(self):
@@ -131,3 +73,67 @@ class GwArcFusionButton(GwMaptool):
 
     # endregion
 
+    # region private functions
+
+    def _fusion_arc(self):
+
+        workcat_id_end = self.dlg_fusion.workcat_id_end.currentText()
+        enddate = self.dlg_fusion.enddate.date()
+        enddate_str = enddate.toString('yyyy-MM-dd')
+        feature_id = f'"id":["{self.node_id}"]'
+        extras = f'"workcat_id_end":"{workcat_id_end}", "enddate":"{enddate_str}"'
+        body = tools_gw.create_body(feature=feature_id, extras=extras)
+        # Execute SQL function and show result to the user
+        result = tools_gw.execute_procedure('gw_fct_setarcfusion', body)
+        if not result or result['status'] == 'Failed':
+            return
+
+        text_result, change_tab = tools_gw.fill_tab_log(self.dlg_fusion, result['body']['data'], True, True, 1)
+
+        if not text_result:
+            self.dlg_fusion.close()
+        # Refresh map canvas
+        self.refresh_map_canvas()
+
+        # Deactivate map tool
+        self.deactivate()
+
+        self.set_action_pan()
+
+
+    def _get_arc_fusion(self, event):
+
+        if event.button() == Qt.RightButton:
+            self.cancel_map_tool()
+            return
+
+        # Get coordinates
+        event_point = self.snapper_manager.get_event_point(event)
+
+        # Snapping
+        snapped_feat = None
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if result.isValid():
+            snapped_feat = self.snapper_manager.get_snapped_feature(result)
+
+        if snapped_feat:
+            self.node_id = snapped_feat.attribute('node_id')
+            self.dlg_fusion = GwArcFusionUi()
+            tools_gw.load_settings(self.dlg_fusion)
+
+            # Fill ComboBox workcat_id_end
+            sql = "SELECT id FROM cat_work ORDER BY id"
+            rows = tools_db.get_rows(sql)
+            tools_qt.fill_combo_box(self.dlg_fusion, "workcat_id_end", rows, False)
+
+            # Set QDateEdit to current date
+            current_date = QDate.currentDate()
+            tools_qt.set_calendar(self.dlg_fusion, "enddate", current_date)
+
+            # Set signals
+            self.dlg_fusion.btn_accept.clicked.connect(self._fusion_arc)
+            self.dlg_fusion.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
+
+            tools_gw.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
+
+    # endregion
