@@ -49,13 +49,15 @@ class Giswater(QObject):
         """ Create the menu entries and toolbar icons inside the QGIS GUI """
 
         # Initialize plugin
-        self.init_plugin()
+        self._init_plugin()
 
         # Force project read (to work with PluginReloader)
-        self.project_read(False)
+        self._project_read(False)
 
 
-    def init_plugin(self):
+    # region private functions
+
+    def _init_plugin(self):
         """ Plugin main initialization function """
 
         # Initialize plugin global variables
@@ -90,30 +92,30 @@ class Giswater(QObject):
         tools_log.set_logger(self.plugin_name)
 
         # Define signals
-        self.set_signals()
+        self._set_signals()
 
         # Set main information button (always visible)
-        self.set_info_button()
+        self._set_info_button()
 
         # Manage section 'actions_list' of config file
-        self.manage_section_actions_list()
+        self._manage_section_actions_list()
 
         # Manage section 'toolbars' of config file
-        self.manage_section_toolbars()
+        self._manage_section_toolbars()
 
 
-    def set_signals(self):
+    def _set_signals(self):
         """ Define widget and event signals """
 
         try:
-            self.iface.projectRead.connect(self.project_read)
-            self.iface.newProjectCreated.connect(self.project_new)
-            self.iface.actionSaveProject().triggered.connect(self.save_toolbars_position)
+            self.iface.projectRead.connect(self._project_read)
+            self.iface.newProjectCreated.connect(self._project_new)
+            self.iface.actionSaveProject().triggered.connect(self._save_toolbars_position)
         except AttributeError:
             pass
 
 
-    def set_info_button(self):
+    def _set_info_button(self):
         """ Set main information button (always visible) """
 
         self.toolButton = QToolButton()
@@ -131,7 +133,7 @@ class Giswater(QObject):
         self.action.triggered.connect(self.update_sql.init_sql)
 
 
-    def unset_info_button(self):
+    def _unset_info_button(self):
         """ Unset main information button (when plugin is disabled or reloaded) """
 
         if self.action:
@@ -142,7 +144,7 @@ class Giswater(QObject):
         self.action_info = None
 
 
-    def manage_section_actions_list(self):
+    def _manage_section_actions_list(self):
         """ Manage section 'actions_list' of config file """
 
         # Dynamically get parameters defined in section 'actions_list'
@@ -166,7 +168,7 @@ class Giswater(QObject):
         self.actions_not_checkable = sorted(aux)
 
 
-    def manage_section_toolbars(self):
+    def _manage_section_toolbars(self):
         """ Manage section 'toolbars' of config file """
 
         # Dynamically get parameters defined in section 'toolbars'
@@ -185,24 +187,24 @@ class Giswater(QObject):
                 tools_qgis.show_warning(f"Parameter not set in section '{section}' of config file: '{key}'")
 
 
-    def project_new(self):
+    def _project_new(self):
         """ Function executed when a user creates a new QGIS project """
 
-        self.unload(False)
+        self._unload(False)
 
 
-    def project_read(self, show_warning=True):
+    def _project_read(self, show_warning=True):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
         # Unload plugin before reading opened project
-        self.unload(False)
+        self._unload(False)
 
         # Create class to manage code that performs project configuration
         self.load_project = GwLoadProject()
         self.load_project.project_read(show_warning)
 
 
-    def save_toolbars_position(self):
+    def _save_toolbars_position(self):
 
         # # Get all QToolBar
         widget_list = self.iface.mainWindow().findChildren(QToolBar)
@@ -223,7 +225,7 @@ class Giswater(QObject):
         tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids),  "user", "init")
 
 
-    def unload(self, is_plugin_reloaded=True):
+    def _unload(self, is_plugin_reloaded=True):
         """ Removes plugin menu items and icons from QGIS GUI
             :param @remove_modules is True when plugin is disabled or reloaded
         """
@@ -231,11 +233,11 @@ class Giswater(QObject):
         try:
 
             # Remove Giswater dockers
-            self.remove_dockers()
+            self._remove_dockers()
 
             # Remove 'Main Info button' only when plugin is reloaded through 'Plugin Reloader'
             if is_plugin_reloaded:
-                self.unset_info_button()
+                self._unset_info_button()
                 global_vars.logger.close_logger()
 
             # Unlisten notify channel and stop thread
@@ -262,7 +264,7 @@ class Giswater(QObject):
             self.load_project = None
 
 
-    def remove_dockers(self):
+    def _remove_dockers(self):
         """ Remove Giswater dockers """
 
         docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
@@ -280,3 +282,4 @@ class Giswater(QObject):
             toolbar.removeAction(toolbar.actions()[len(toolbar.actions()) - 1])
             self.btn_add_layers = None
 
+    # endregion
