@@ -29,20 +29,32 @@ class GwCSVButton(GwAction):
 
     def clicked_event(self):
 
-        self.open_csv()
+        self._open_csv()
 
 
-    def open_csv(self):
+    def save_settings_values(self):
+        """ Save QGIS settings related with csv options """
+
+        tools_gw.set_config_parser('btn_csv2pg', 'cmb_import_type', f"{tools_qt.get_combo_value(self.dlg_csv, 'cmb_import_type', 0)}")
+        tools_gw.set_config_parser('btn_csv2pg', 'txt_import', tools_qt.get_text(self.dlg_csv, 'txt_import'))
+        tools_gw.set_config_parser('btn_csv2pg', 'txt_file_csv', tools_qt.get_text(self.dlg_csv, 'txt_file_csv'))
+        tools_gw.set_config_parser('btn_csv2pg', 'cmb_unicode_list', tools_qt.get_text(self.dlg_csv, 'cmb_unicode_list'))
+        tools_gw.set_config_parser('btn_csv2pg', 'rb_semicolon', f"{self.dlg_csv.rb_semicolon.isChecked()}")
+
+
+    # region private functions
+
+    def _open_csv(self):
 
         self.func_name = None
         self.dlg_csv = GwCsvUi()
         tools_gw.load_settings(self.dlg_csv)
 
         # Get roles from BD
-        roles = self.get_rolenames()
+        roles = self._get_rolenames()
         temp_tablename = 'temp_csv'
         tools_qt.fill_combo_unicodes(self.dlg_csv.cmb_unicode_list)
-        self.populate_combos(self.dlg_csv.cmb_import_type, 'fid',
+        self._populate_combos(self.dlg_csv.cmb_import_type, 'fid',
                              'alias, config_csv.descript, functionname, readheader, orderby', 'config_csv', roles)
 
         self.dlg_csv.lbl_info.setWordWrap(True)
@@ -53,25 +65,25 @@ class GwCSVButton(GwAction):
         # Signals
         self.dlg_csv.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_csv))
         self.dlg_csv.rejected.connect(partial(tools_gw.close_dialog, self.dlg_csv))
-        self.dlg_csv.btn_accept.clicked.connect(partial(self.write_csv, self.dlg_csv, temp_tablename))
-        self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.update_info, self.dlg_csv))
-        self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self.get_function_name))
-        self.dlg_csv.btn_file_csv.clicked.connect(partial(self.select_file_csv))
-        self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self.preview_csv, self.dlg_csv))
-        self.dlg_csv.rb_comma.clicked.connect(partial(self.preview_csv, self.dlg_csv))
-        self.dlg_csv.rb_semicolon.clicked.connect(partial(self.preview_csv, self.dlg_csv))
+        self.dlg_csv.btn_accept.clicked.connect(partial(self._write_csv, self.dlg_csv, temp_tablename))
+        self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self._update_info, self.dlg_csv))
+        self.dlg_csv.cmb_import_type.currentIndexChanged.connect(partial(self._get_function_name))
+        self.dlg_csv.btn_file_csv.clicked.connect(partial(self._select_file_csv))
+        self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self._preview_csv, self.dlg_csv))
+        self.dlg_csv.rb_comma.clicked.connect(partial(self._preview_csv, self.dlg_csv))
+        self.dlg_csv.rb_semicolon.clicked.connect(partial(self._preview_csv, self.dlg_csv))
         self.get_function_name()
-        self.load_settings_values()
+        self._load_settings_values()
 
         if str(tools_qt.get_text(self.dlg_csv, self.dlg_csv.txt_file_csv)) != 'null':
-            self.preview_csv(self.dlg_csv)
+            self._preview_csv(self.dlg_csv)
         self.dlg_csv.progressBar.setVisible(False)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_csv, dlg_name='csv')
 
 
-    def populate_combos(self, combo, field_id, fields, table_name, roles):
+    def _populate_combos(self, combo, field_id, fields, table_name, roles):
 
         if roles is None:
             return
@@ -99,27 +111,27 @@ class GwCSVButton(GwAction):
 
 
         tools_qt.fill_combo_values(combo, rows, 1, True, True, 1)
-        self.update_info(self.dlg_csv)
+        self._update_info(self.dlg_csv)
 
 
-    def write_csv(self, dialog, temp_tablename):
+    def _write_csv(self, dialog, temp_tablename):
         """ Write csv in postgres and call gw_fct_utils_csv2pg function """
 
         self.save_settings_values()
         insert_status = True
-        if not self.validate_params(dialog):
+        if not self._validate_params(dialog):
             return
 
         fid_aux = tools_qt.get_combo_value(dialog, dialog.cmb_import_type, 0)
-        self.delete_table_csv(temp_tablename, fid_aux)
+        self._delete_table_csv(temp_tablename, fid_aux)
         path = tools_qt.get_text(dialog, dialog.txt_file_csv)
         label_aux = tools_qt.get_text(dialog, dialog.txt_import, return_string_null=False)
-        delimiter = self.get_delimiter(dialog)
+        delimiter = self._get_delimiter(dialog)
         _unicode = tools_qt.get_text(dialog, dialog.cmb_unicode_list)
 
         try:
             with open(path, 'r', encoding=_unicode) as csvfile:
-                insert_status = self.insert_into_db(dialog, csvfile, delimiter, _unicode)
+                insert_status = self._insert_into_db(dialog, csvfile, delimiter, _unicode)
                 csvfile.close()
                 del csvfile
         except Exception as e:
@@ -142,19 +154,19 @@ class GwCSVButton(GwAction):
             tools_qt.show_info_box(msg)
 
 
-    def update_info(self, dialog):
+    def _update_info(self, dialog):
         """ Update the tag according to item selected from cmb_import_type """
 
         dialog.lbl_info.setText(tools_qt.get_combo_value(self.dlg_csv, self.dlg_csv.cmb_import_type, 2))
 
 
-    def get_function_name(self):
+    def _get_function_name(self):
 
         self.func_name = tools_qt.get_combo_value(self.dlg_csv, self.dlg_csv.cmb_import_type, 3)
         tools_log.log_info(str(self.func_name))
 
 
-    def select_file_csv(self):
+    def _select_file_csv(self):
         """ Select CSV file """
 
         file_csv = tools_qt.get_text(self.dlg_csv, 'txt_file_csv')
@@ -171,17 +183,17 @@ class GwCSVButton(GwAction):
         tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.txt_file_csv, file_csv)
 
         self.save_settings_values()
-        self.preview_csv(self.dlg_csv)
+        self._preview_csv(self.dlg_csv)
 
 
-    def preview_csv(self, dialog):
+    def _preview_csv(self, dialog):
         """ Show current file in QTableView acorrding to selected delimiter and unicode """
 
-        path = self.get_path(dialog)
+        path = self._get_path(dialog)
         if path is None:
             return
 
-        delimiter = self.get_delimiter(dialog)
+        delimiter = self._get_delimiter(dialog)
         model = QStandardItemModel()
         _unicode = tools_qt.get_text(dialog, dialog.cmb_unicode_list)
         dialog.tbl_csv.setModel(model)
@@ -189,12 +201,12 @@ class GwCSVButton(GwAction):
 
         try:
             with open(path, "r", encoding=_unicode) as file_input:
-                self.read_csv_file(model, file_input, delimiter, _unicode)
+                self._read_csv_file(model, file_input, delimiter, _unicode)
         except Exception as e:
             tools_qgis.show_warning(str(e))
 
 
-    def load_settings_values(self):
+    def _load_settings_values(self):
         """ Load QGIS settings related with csv options """
 
         value = tools_gw.get_config_parser('btn_csv2pg', 'cmb_import_type', "user", "session")
@@ -217,27 +229,17 @@ class GwCSVButton(GwAction):
             self.dlg_csv.rb_comma.setChecked(True)
 
 
-    def save_settings_values(self):
-        """ Save QGIS settings related with csv options """
-
-        tools_gw.set_config_parser('btn_csv2pg', 'cmb_import_type', f"{tools_qt.get_combo_value(self.dlg_csv, 'cmb_import_type', 0)}")
-        tools_gw.set_config_parser('btn_csv2pg', 'txt_import', tools_qt.get_text(self.dlg_csv, 'txt_import'))
-        tools_gw.set_config_parser('btn_csv2pg', 'txt_file_csv', tools_qt.get_text(self.dlg_csv, 'txt_file_csv'))
-        tools_gw.set_config_parser('btn_csv2pg', 'cmb_unicode_list', tools_qt.get_text(self.dlg_csv, 'cmb_unicode_list'))
-        tools_gw.set_config_parser('btn_csv2pg', 'rb_semicolon', f"{self.dlg_csv.rb_semicolon.isChecked()}")
-
-
-    def validate_params(self, dialog):
+    def _validate_params(self, dialog):
         """ Validate if params are valids """
 
-        path = self.get_path(dialog)
-        self.preview_csv(dialog)
+        path = self._get_path(dialog)
+        self._preview_csv(dialog)
         if path is None or path == 'null':
             return False
         return True
 
 
-    def delete_table_csv(self, temp_tablename, fid_aux):
+    def _delete_table_csv(self, temp_tablename, fid_aux):
         """ Delete records from temp_csv for current user and selected cat """
 
         sql = (f"DELETE FROM {temp_tablename} "
@@ -245,7 +247,7 @@ class GwCSVButton(GwAction):
         tools_db.execute_sql(sql)
 
 
-    def get_delimiter(self, dialog):
+    def _get_delimiter(self, dialog):
 
         delimiter = ';'
         if dialog.rb_semicolon.isChecked():
@@ -255,7 +257,7 @@ class GwCSVButton(GwAction):
         return delimiter
 
 
-    def insert_into_db(self, dialog, csvfile, delimiter, _unicode):
+    def _insert_into_db(self, dialog, csvfile, delimiter, _unicode):
 
         progress = 0
         dialog.progressBar.setVisible(True)
@@ -298,7 +300,7 @@ class GwCSVButton(GwAction):
         return False
 
 
-    def get_path(self, dialog):
+    def _get_path(self, dialog):
         """ Take the file path if exist. AND if not exit ask it """
 
         path = tools_qt.get_text(dialog, dialog.txt_file_csv)
@@ -314,7 +316,7 @@ class GwCSVButton(GwAction):
         return path
 
 
-    def read_csv_file(self, model, file_input, delimiter, _unicode):
+    def _read_csv_file(self, model, file_input, delimiter, _unicode):
 
         rows = csv.reader(file_input, delimiter=delimiter)
         for row in rows:
@@ -323,7 +325,7 @@ class GwCSVButton(GwAction):
             model.appendRow(items)
 
 
-    def get_rolenames(self):
+    def _get_rolenames(self):
         """ Get list of rolenames of current user """
 
         super_users = tools_gw.get_config_parser('system', 'super_users', "project", "giswater")
@@ -344,3 +346,4 @@ class GwCSVButton(GwAction):
 
         return roles
 
+    # endregion
