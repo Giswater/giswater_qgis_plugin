@@ -15,8 +15,9 @@ from .dialog import GwDialog
 from .docker import GwDocker
 from .main_window import GwMainWindow
 
+# region private functions
 
-def get_ui_class(ui_file_name, subfolder='shared'):
+def _get_ui_class(ui_file_name, subfolder='shared'):
     """ Get UI Python class from @ui_file_name """
 
     # Folder that contains UI files
@@ -29,39 +30,41 @@ def get_ui_class(ui_file_name, subfolder='shared'):
     return uic.loadUiType(ui_file_path)[0]
 
 
+# endregion
+
 # region BASIC
-FORM_CLASS = get_ui_class('info_crossect.ui', 'basic')
+FORM_CLASS = _get_ui_class('info_crossect.ui', 'basic')
 class GwInfoCrossectUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('info_feature.ui', 'basic')
+FORM_CLASS = _get_ui_class('info_feature.ui', 'basic')
 class GwInfoFeatureUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('search.ui', 'basic')
+FORM_CLASS = _get_ui_class('search.ui', 'basic')
 class GwSearchUi(GwDocker, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('search_workcat.ui', 'basic')
+FORM_CLASS = _get_ui_class('search_workcat.ui', 'basic')
 class GwSearchWorkcatUi(GwDialog, FORM_CLASS):
     pass
 # endregion
 
 
 # region OM
-FORM_CLASS = get_ui_class('visit_event_full.ui')
+FORM_CLASS = _get_ui_class('visit_event_full.ui')
 class GwVisitEventFullUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('visit_gallery.ui')
+FORM_CLASS = _get_ui_class('visit_gallery.ui')
 class GwGalleryUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('visit_gallery_zoom.ui')
+FORM_CLASS = _get_ui_class('visit_gallery_zoom.ui')
 class GwGalleryZoomUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('mincut.ui', 'om')
+FORM_CLASS = _get_ui_class('mincut.ui', 'om')
 class GwMincutUi(GwMainWindow, FORM_CLASS):
 
     def __init__(self):
@@ -69,151 +72,151 @@ class GwMincutUi(GwMainWindow, FORM_CLASS):
         self.mincutCanceled = True
         super().__init__()
 
-FORM_CLASS = get_ui_class('mincut_connec.ui', 'om')
+FORM_CLASS = _get_ui_class('mincut_connec.ui', 'om')
 class GwMincutConnecUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('mincut_hydrometer.ui', 'om')
+FORM_CLASS = _get_ui_class('mincut_hydrometer.ui', 'om')
 class GwMincutHydrometerUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('mincut_composer.ui', 'om')
+FORM_CLASS = _get_ui_class('mincut_composer.ui', 'om')
 class GwMincutComposerUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('mincut_manager.ui', 'om')
+FORM_CLASS = _get_ui_class('mincut_manager.ui', 'om')
 class GwMincutManagerUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('mincut_end.ui', 'om')
+FORM_CLASS = _get_ui_class('mincut_end.ui', 'om')
 class GwMincutEndUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('profile.ui', 'om')
+FORM_CLASS = _get_ui_class('profile.ui', 'om')
 class GwProfileUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('profile_list.ui', 'om')
+FORM_CLASS = _get_ui_class('profile_list.ui', 'om')
 class GwProfilesListUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('selector_date.ui', 'om')
+FORM_CLASS = _get_ui_class('selector_date.ui', 'om')
 class GwSelectorDateUi(GwDialog, FORM_CLASS):
     pass
 # endregion
 
 
 # region EDIT
-FORM_CLASS = get_ui_class('arc_fusion.ui', 'edit')
+FORM_CLASS = _get_ui_class('arc_fusion.ui', 'edit')
 class GwArcFusionUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('auxcircle.ui', 'edit')
+FORM_CLASS = _get_ui_class('auxcircle.ui', 'edit')
 class GwAuxCircleUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('auxpoint.ui', 'edit')
+FORM_CLASS = _get_ui_class('auxpoint.ui', 'edit')
 class GwAuxPointUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('dimensioning.ui', 'edit')
+FORM_CLASS = _get_ui_class('dimensioning.ui', 'edit')
 class GwDimensioningUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('doc.ui', 'edit')
+FORM_CLASS = _get_ui_class('doc.ui', 'edit')
 class GwDocUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('doc_manager.ui', 'edit')
+FORM_CLASS = _get_ui_class('doc_manager.ui', 'edit')
 class GwDocManagerUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('element.ui', 'edit')
+FORM_CLASS = _get_ui_class('element.ui', 'edit')
 class GwElementUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('element_manager.ui', 'edit')
+FORM_CLASS = _get_ui_class('element_manager.ui', 'edit')
 class GwElementManagerUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('feature_delete.ui', 'edit')
+FORM_CLASS = _get_ui_class('feature_delete.ui', 'edit')
 class GwFeatureDeleteUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('feature_end.ui', 'edit')
+FORM_CLASS = _get_ui_class('feature_end.ui', 'edit')
 class GwFeatureEndUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('feature_end_connec.ui', 'edit')
+FORM_CLASS = _get_ui_class('feature_end_connec.ui', 'edit')
 class GwFeatureEndConnecUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('feature_replace.ui', 'edit')
+FORM_CLASS = _get_ui_class('feature_replace.ui', 'edit')
 class GwFeatureReplaceUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('nodetype_change.ui', 'edit')
+FORM_CLASS = _get_ui_class('nodetype_change.ui', 'edit')
 class GwNodeTypeChangeUi(GwDialog, FORM_CLASS):
     pass
 # endregion
 
 
 # region EPA
-FORM_CLASS = get_ui_class('go2epa.ui', 'epa')
+FORM_CLASS = _get_ui_class('go2epa.ui', 'epa')
 class GwGo2EpaUI(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('go2epa_selector.ui', 'epa')
+FORM_CLASS = _get_ui_class('go2epa_selector.ui', 'epa')
 class GwGo2EpaSelectorUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('go2epa_manager.ui', 'epa')
+FORM_CLASS = _get_ui_class('go2epa_manager.ui', 'epa')
 class GwEpaManagerUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('go2epa_options.ui', 'epa')
+FORM_CLASS = _get_ui_class('go2epa_options.ui', 'epa')
 class GwGo2EpaOptionsUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('hydrology_selector.ui', 'epa')
+FORM_CLASS = _get_ui_class('hydrology_selector.ui', 'epa')
 class GwHydrologySelectorUi(GwDialog, FORM_CLASS):
     pass
 # endregion
 
 
 # region PLAN
-FORM_CLASS = get_ui_class('psector.ui', 'plan')
+FORM_CLASS = _get_ui_class('psector.ui', 'plan')
 class GwPsectorUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('price_manager.ui', 'plan')
+FORM_CLASS = _get_ui_class('price_manager.ui', 'plan')
 class GwPriceManagerUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('psector_duplicate.ui', 'plan')
+FORM_CLASS = _get_ui_class('psector_duplicate.ui', 'plan')
 class GwPsectorDuplicateUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('psector_manager.ui', 'plan')
+FORM_CLASS = _get_ui_class('psector_manager.ui', 'plan')
 class GwPsectorManagerUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('psector_rapport.ui', 'plan')
+FORM_CLASS = _get_ui_class('psector_rapport.ui', 'plan')
 class GwPsectorRapportUi(GwDialog, FORM_CLASS):
     pass
 # endregion
 
 
 # region UTILITIES
-FORM_CLASS = get_ui_class('config.ui', 'utilities')
+FORM_CLASS = _get_ui_class('config.ui', 'utilities')
 class GwConfigUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('csv.ui', 'utilities')
+FORM_CLASS = _get_ui_class('csv.ui', 'utilities')
 class GwCsvUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('print.ui', 'utilities')
+FORM_CLASS = _get_ui_class('print.ui', 'utilities')
 class GwPrintUi(GwDialog, FORM_CLASS):
     pass
 # endregion
@@ -223,11 +226,11 @@ class GwPrintUi(GwDialog, FORM_CLASS):
 
 
 # region ADMIN
-FORM_CLASS = get_ui_class('admin_addfields.ui', 'admin')
+FORM_CLASS = _get_ui_class('admin_addfields.ui', 'admin')
 class GwAdminFieldsUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('admin_credentials.ui', 'admin')
+FORM_CLASS = _get_ui_class('admin_credentials.ui', 'admin')
 class GwCredentialsUi(GwDialog, FORM_CLASS):
 
     def __init__(self):
@@ -262,81 +265,81 @@ class GwCredentialsUi(GwDialog, FORM_CLASS):
             self.action.setIcon(icon)
             self.action.setText(text)
 
-FORM_CLASS = get_ui_class('admin_dbproject.ui', 'admin')
+FORM_CLASS = _get_ui_class('admin_dbproject.ui', 'admin')
 class GwAdminDbProjectUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('admin_gisproject.ui', 'admin')
+FORM_CLASS = _get_ui_class('admin_gisproject.ui', 'admin')
 class GwAdminGisProjectUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('admin_importinp.ui', 'admin')
+FORM_CLASS = _get_ui_class('admin_importinp.ui', 'admin')
 class GwAdminImportUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('admin_projectinfo.ui', 'admin')
+FORM_CLASS = _get_ui_class('admin_projectinfo.ui', 'admin')
 class GwAdminProjectInfoUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('admin_renameproj.ui', 'admin')
+FORM_CLASS = _get_ui_class('admin_renameproj.ui', 'admin')
 class GwAdminRenameProjUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('admin_sysfields.ui', 'admin')
+FORM_CLASS = _get_ui_class('admin_sysfields.ui', 'admin')
 class GwAdminSysFieldsUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('admin_ui.ui', 'admin')
+FORM_CLASS = _get_ui_class('admin_ui.ui', 'admin')
 class GwAdminUi(GwMainWindow, FORM_CLASS):
     dlg_closed = QtCore.pyqtSignal()
 
-FORM_CLASS = get_ui_class('admin_visitclass.ui', 'admin')
+FORM_CLASS = _get_ui_class('admin_visitclass.ui', 'admin')
 class GwAdminVisitClassUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('admin_visitparam.ui', 'admin')
+FORM_CLASS = _get_ui_class('admin_visitparam.ui', 'admin')
 class GwAdminVisitParamUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('toolbox.ui', 'utilities')
+FORM_CLASS = _get_ui_class('toolbox.ui', 'utilities')
 class GwToolboxUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('toolbox_tool.ui', 'utilities')
+FORM_CLASS = _get_ui_class('toolbox_tool.ui', 'utilities')
 class GwToolboxManagerUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('project_check.ui', 'utilities')
+FORM_CLASS = _get_ui_class('project_check.ui', 'utilities')
 class GwProjectCheckUi(GwDialog, FORM_CLASS):
     pass
 # endregion
 
 
 # region Menu
-FORM_CLASS = get_ui_class('load_menu.ui', 'menu')
+FORM_CLASS = _get_ui_class('load_menu.ui', 'menu')
 class GwLoadMenuUi(GwDialog, FORM_CLASS):
     pass
 # endregion
 
 
 # region SHARED
-FORM_CLASS = get_ui_class('dialog_text.ui')
+FORM_CLASS = _get_ui_class('dialog_text.ui')
 class GwDialogTextUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('info_catalog.ui')
+FORM_CLASS = _get_ui_class('info_catalog.ui')
 class GwInfoCatalogUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('info_generic.ui')
+FORM_CLASS = _get_ui_class('info_generic.ui')
 class GwInfoGenericUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('info_workcat.ui')
+FORM_CLASS = _get_ui_class('info_workcat.ui')
 class GwInfoWorkcatUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('admin_translation.ui', 'admin')
+FORM_CLASS = _get_ui_class('admin_translation.ui', 'admin')
 class GwAdminTranslationUi(GwDialog, FORM_CLASS):
 
     def __init__(self):
@@ -369,31 +372,31 @@ class GwAdminTranslationUi(GwDialog, FORM_CLASS):
             self.action.setIcon(icon)
             self.action.setText(text)
 
-FORM_CLASS = get_ui_class('selector_multirow.ui')
+FORM_CLASS = _get_ui_class('selector_multirow.ui')
 class GwMultirowSelectorUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('selector.ui')
+FORM_CLASS = _get_ui_class('selector.ui')
 class GwSelectorUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('visit.ui')
+FORM_CLASS = _get_ui_class('visit.ui')
 class GwVisitUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('visit_document.ui')
+FORM_CLASS = _get_ui_class('visit_document.ui')
 class GwVisitDocumentUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('visit_event_rehab.ui')
+FORM_CLASS = _get_ui_class('visit_event_rehab.ui')
 class GwVisitEventRehabUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('visit_event.ui')
+FORM_CLASS = _get_ui_class('visit_event.ui')
 class GwVisitEventUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('visit_manager.ui')
+FORM_CLASS = _get_ui_class('visit_manager.ui')
 class GwVisitManagerUi(GwDialog, FORM_CLASS):
     pass
 # endregion
