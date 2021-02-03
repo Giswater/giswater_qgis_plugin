@@ -20,13 +20,17 @@ class GwProjectCheckButton(GwAction):
 
     def clicked_event(self):
 
-        self.open_check_project()
+        self._open_check_project()
 
 
-    def open_check_project(self):
+    # region private functions
+
+    def _open_check_project(self):
 
         # Return layers in the same order as listed in TOC
         layers = tools_qgis.get_project_layers()
 
         check_project_result = GwLoadProjectCheck()
         check_project_result.fill_check_project_table(layers, "false")
+
+    # endregion
