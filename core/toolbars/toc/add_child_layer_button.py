@@ -28,15 +28,17 @@ class GwAddChildLayerButton(GwAction):
         self.qgis_project_infotype = global_vars.project_vars['info_type']
         self.qgis_project_add_schema = global_vars.project_vars['add_schema']
         self.available_layers = None
-        self.config_layers()
+        self._config_layers()
 
 
     def clicked_event(self):
 
-        self.add_child_layer()
+        self._add_child_layer()
 
 
-    def add_child_layer(self):
+    # region private functions
+
+    def _add_child_layer(self):
 
         # Create main menu and get cursor click position
         main_menu = QMenu()
@@ -85,7 +87,7 @@ class GwAddChildLayerButton(GwAction):
 
                 sub_menu.addAction(action)
                 if child_layer[0] == 'Load all':
-                    action.triggered.connect(partial(self.check_action_ischecked, None, "the_geom", "id", child_layers,
+                    action.triggered.connect(partial(self._check_action_ischecked, None, "the_geom", "id", child_layers,
                                                      "GW Layers", "-1"))
                 else:
                     layer_name = child_layer[0]
@@ -93,13 +95,13 @@ class GwAddChildLayerButton(GwAction):
                     geom_field = child_layer[1] + "_id"
                     style_id = child_layer[3]
                     group = child_layer[4] if child_layer[4] is not None else 'GW Layers'
-                    action.triggered.connect(partial(self.check_action_ischecked, layer_name, the_geom, geom_field,
+                    action.triggered.connect(partial(self._check_action_ischecked, layer_name, the_geom, geom_field,
                                                      None, group, style_id))
 
         main_menu.exec_(click_point)
 
 
-    def check_action_ischecked(self, tablename, the_geom, field_id, child_layers, group, style_id, is_checked):
+    def _check_action_ischecked(self, tablename, the_geom, field_id, child_layers, group, style_id, is_checked):
         """ Control if user check or uncheck action menu, then add or remove layer from toc
         :param tablename: Postgres table name (String)
         :param the_geom: Geometry field of the table (String)
@@ -120,9 +122,9 @@ class GwAddChildLayerButton(GwAction):
                 tools_qgis.remove_layer_from_toc(tablename, group)
 
 
-    def config_layers(self):
+    def _config_layers(self):
 
-        status = self.manage_layers()
+        status = self._manage_layers()
         if not status:
             return False
 
@@ -142,7 +144,8 @@ class GwAddChildLayerButton(GwAction):
 
         return True
 
-    def manage_layers(self):
+
+    def _manage_layers(self):
         """ Get references to project main layers """
 
         # Check if we have any layer loaded
@@ -162,7 +165,7 @@ class GwAddChildLayerButton(GwAction):
                         guided_map = result['body']['actions']['useGuideMap']
                         if guided_map:
                             tools_log.log_info("manage_guided_map")
-                            self.manage_guided_map()
+                            self._manage_guided_map()
             except Exception as e:
                 tools_log.log_info(str(e))
             finally:
@@ -172,7 +175,7 @@ class GwAddChildLayerButton(GwAction):
         return True
 
 
-    def manage_guided_map(self):
+    def _manage_guided_map(self):
         """ Guide map works using ext_municipality """
 
         self.layer_muni = tools_qgis.get_layer_by_tablename('ext_municipality')
@@ -185,13 +188,13 @@ class GwAddChildLayerButton(GwAction):
         self.iface.actionZoomToSelected().trigger()
         self.layer_muni.removeSelection()
         self.iface.actionSelect().trigger()
-        self.iface.mapCanvas().selectionChanged.connect(self.selection_changed)
+        self.iface.mapCanvas().selectionChanged.connect(self._selection_changed)
         cursor = tools_gw.get_cursor_multiple_selection()
         if cursor:
             self.iface.mapCanvas().setCursor(cursor)
 
 
-    def selection_changed(self):
+    def _selection_changed(self):
         """ Get selected muni_id and execute function setselectors """
 
         muni_id = None
@@ -219,3 +222,5 @@ class GwAddChildLayerButton(GwAction):
             self.iface.actionPan().trigger()
             self.iface.actionZoomIn().trigger()
             tools_gw.set_style_mapzones()
+
+    # endregion
