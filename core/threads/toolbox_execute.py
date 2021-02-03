@@ -29,6 +29,7 @@ class GwToolBoxTask(GwTask):
         self.combo = combo
         self.result = result
         self.json_result = None
+        self.exception = None
 
 
     def run(self):
@@ -137,16 +138,17 @@ class GwToolBoxTask(GwTask):
                     tools_gw.set_style_mapzones()
 
         except KeyError as e:
-            return False, e
+            self.exception = e
+            return False
 
         return True
 
 
-    def finished(self, result, e=None):
+    def finished(self, result):
         self.dialog.btn_cancel.setEnabled(False)
         self.dialog.progressBar.setVisible(False)
-        if result is False:
-            msg = f"<b>Key: </b>{e}<br>"
+        if result is False and self.exception is not None:
+            msg = f"<b>Key: </b>{self.exception}<br>"
             msg += f"<b>key container: </b>'body/data/ <br>"
             msg += f"<b>Python file: </b>{__name__} <br>"
             msg += f"<b>Python function:</b> {self.__class__.__name__} <br>"
