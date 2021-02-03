@@ -25,42 +25,6 @@ class GwArcDivideButton(GwMaptool):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
 
-    def move_node(self, node_id, point):
-        """ Move selected node to the current point """
-
-        srid = global_vars.srid
-
-        # Update node geometry
-        the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {srid})"
-        sql = (f"UPDATE node SET the_geom = {the_geom} "
-               f"WHERE node_id = '{node_id}'")
-        status = tools_db.execute_sql(sql)
-        if status:
-            feature_id = f'"id":["{node_id}"]'
-            body = tools_gw.create_body(feature=feature_id)
-            result = tools_gw.execute_procedure('gw_fct_setarcdivide', body)
-            if not result or result['status'] == 'Failed':
-                return
-            if 'hideForm' not in result['body']['actions'] or not result['body']['actions']['hideForm']:
-                self.dlg_dtext = GwDialogTextUi('arc_divide')
-                tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, True, 1)
-                tools_gw.open_dialog(self.dlg_dtext)
-
-        else:
-            message = "Move node: Error updating geometry"
-            tools_qgis.show_warning(message)
-
-        # Rubberband reset
-        self.reset()
-
-        # Refresh map canvas
-        self.refresh_map_canvas()
-
-        # Deactivate map tool
-        self.deactivate()
-        self.set_action_pan()
-
-
     # region QgsMapTools inherited
     """ QgsMapTool inherited event functions """
 
@@ -178,10 +142,50 @@ class GwArcDivideButton(GwMaptool):
 
     def canvasReleaseEvent(self, event):
 
-        self.get_arc_divide(event)
+        self._get_arc_divide(event)
 
 
-    def get_arc_divide(self, event):
+
+    # endregion
+
+    # region private functions
+
+    def _move_node(self, node_id, point):
+        """ Move selected node to the current point """
+
+        srid = global_vars.srid
+
+        # Update node geometry
+        the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {srid})"
+        sql = (f"UPDATE node SET the_geom = {the_geom} "
+               f"WHERE node_id = '{node_id}'")
+        status = tools_db.execute_sql(sql)
+        if status:
+            feature_id = f'"id":["{node_id}"]'
+            body = tools_gw.create_body(feature=feature_id)
+            result = tools_gw.execute_procedure('gw_fct_setarcdivide', body)
+            if not result or result['status'] == 'Failed':
+                return
+            if 'hideForm' not in result['body']['actions'] or not result['body']['actions']['hideForm']:
+                self.dlg_dtext = GwDialogTextUi('arc_divide')
+                tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, True, 1)
+                tools_gw.open_dialog(self.dlg_dtext)
+
+        else:
+            message = "Move node: Error updating geometry"
+            tools_qgis.show_warning(message)
+
+        # Rubberband reset
+        self.reset()
+
+        # Refresh map canvas
+        self.refresh_map_canvas()
+
+        # Deactivate map tool
+        self.deactivate()
+        self.set_action_pan()
+
+    def _get_arc_divide(self, event):
 
         if event.button() == Qt.LeftButton:
 
@@ -228,7 +232,7 @@ class GwArcDivideButton(GwMaptool):
                 title = "Info"
                 answer = tools_qt.show_question(message, title)
                 if answer:
-                    self.move_node(node_id, point)
+                    self._move_node(node_id, point)
                     tools_qgis.set_layer_index('v_edit_arc')
                     tools_qgis.set_layer_index('v_edit_connec')
                     tools_qgis.set_layer_index('v_edit_gully')
