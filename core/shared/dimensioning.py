@@ -71,11 +71,11 @@ class GwDimensioning:
 
         # ACTION SIGNALS
         action_snapping = self.dlg_dim.findChild(QAction, "actionSnapping")
-        action_snapping.triggered.connect(partial(self.snapping, action_snapping))
+        action_snapping.triggered.connect(partial(self._snapping, action_snapping))
         tools_gw.add_icon(action_snapping, "103")
 
         action_orientation = self.dlg_dim.findChild(QAction, "actionOrientation")
-        action_orientation.triggered.connect(partial(self.orientation, action_orientation))
+        action_orientation.triggered.connect(partial(self._orientation, action_orientation))
         tools_gw.add_icon(action_orientation, "133")
 
         # LAYER SIGNALS
@@ -87,21 +87,21 @@ class GwDimensioning:
         self.layer_dimensions.editingStopped.connect(partial(tools_gw.enable_widgets, self.dlg_dim, db_return['body']['data'], False))
 
         # WIDGETS SIGNALS
-        self.dlg_dim.btn_accept.clicked.connect(partial(self.save_dimensioning, qgis_feature, layer))
-        self.dlg_dim.btn_cancel.clicked.connect(partial(self.cancel_dimensioning))
+        self.dlg_dim.btn_accept.clicked.connect(partial(self._save_dimensioning, qgis_feature, layer))
+        self.dlg_dim.btn_cancel.clicked.connect(partial(self._cancel_dimensioning))
         self.dlg_dim.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_dim))
-        self.dlg_dim.dlg_closed.connect(partial(self.cancel_dimensioning))
+        self.dlg_dim.dlg_closed.connect(partial(self._cancel_dimensioning))
         self.dlg_dim.dlg_closed.connect(partial(tools_gw.save_settings, self.dlg_dim))
         self.dlg_dim.dlg_closed.connect(rubber_band.reset)
 
-        self.create_map_tips()
+        self._create_map_tips()
 
         layout_list = []
         for field in db_return['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
 
-            label, widget = self.set_widgets(self.dlg_dim, db_return, field)
+            label, widget = self._set_widgets(self.dlg_dim, db_return, field)
 
             if widget.objectName() == 'id':
                 tools_qt.set_widget_text(self.dlg_dim, widget, self.fid)
@@ -143,15 +143,16 @@ class GwDimensioning:
         tools_gw.open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
         return False, False
 
+    # region private functions
 
-    def cancel_dimensioning(self):
+    def _cancel_dimensioning(self):
 
         self.iface.actionRollbackEdits().trigger()
         tools_gw.close_dialog(self.dlg_dim)
         tools_qgis.restore_user_layer('v_edit_node', self.user_current_layer)
 
 
-    def save_dimensioning(self, qgis_feature, layer):
+    def _save_dimensioning(self, qgis_feature, layer):
 
         # Upsert feature into db
         layer.updateFeature(qgis_feature)
@@ -197,7 +198,7 @@ class GwDimensioning:
         tools_gw.close_dialog(self.dlg_dim)
 
 
-    def deactivate_signals(self, action, emit_point=None):
+    def _deactivate_signals(self, action, emit_point=None):
 
         self.vertex_marker.hide()
         try:
@@ -217,12 +218,12 @@ class GwDimensioning:
         return False
 
 
-    def snapping(self, action):
+    def _snapping(self, action):
 
         # Set active layer and set signals
         emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(emit_point)
-        if self.deactivate_signals(action, emit_point):
+        if self._deactivate_signals(action, emit_point):
             return
 
         self.snapper_manager.remove_marker(self.vertex_marker)
@@ -236,11 +237,11 @@ class GwDimensioning:
 
         self.dlg_dim.actionOrientation.setChecked(False)
         self.iface.setActiveLayer(self.layer_node)
-        self.canvas.xyCoordinates.connect(self.mouse_move)
-        emit_point.canvasClicked.connect(partial(self.click_button_snapping, action, emit_point))
+        self.canvas.xyCoordinates.connect(self._mouse_move)
+        emit_point.canvasClicked.connect(partial(self._click_button_snapping, action, emit_point))
 
 
-    def mouse_move(self, point):
+    def _mouse_move(self, point):
 
         # Hide marker and get coordinates
         self.vertex_marker.hide()
@@ -255,7 +256,7 @@ class GwDimensioning:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
-    def click_button_snapping(self, action, emit_point, point, btn):
+    def _click_button_snapping(self, action, emit_point, point, btn):
 
         if not self.layer_dimensions:
             return
@@ -263,7 +264,7 @@ class GwDimensioning:
         if btn == Qt.RightButton:
             if btn == Qt.RightButton:
                 action.setChecked(False)
-                self.deactivate_signals(action, emit_point)
+                self._deactivate_signals(action, emit_point)
                 return
 
         layer = self.layer_dimensions
@@ -315,15 +316,15 @@ class GwDimensioning:
             tools_qt.set_widget_text(self.dlg_dim, "feature_type", feat_type.upper())
 
             self.snapper_manager.restore_snap_options(self.previous_snapping)
-            self.deactivate_signals(action, emit_point)
+            self._deactivate_signals(action, emit_point)
             action.setChecked(False)
 
 
-    def orientation(self, action):
+    def _orientation(self, action):
 
         emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(emit_point)
-        if self.deactivate_signals(action, emit_point):
+        if self._deactivate_signals(action, emit_point):
             return
 
         self.snapper_manager.remove_marker(self.vertex_marker)
@@ -336,11 +337,11 @@ class GwDimensioning:
         self.snapper_manager.set_snap_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)
-        self.canvas.xyCoordinates.connect(self.canvas_move_event)
-        emit_point.canvasClicked.connect(partial(self.click_button_orientation, action, emit_point))
+        self.canvas.xyCoordinates.connect(self._canvas_move_event)
+        emit_point.canvasClicked.connect(partial(self._click_button_orientation, action, emit_point))
 
 
-    def canvas_move_event(self, point):
+    def _canvas_move_event(self, point):
 
         # Get clicked point
         self.vertex_marker.hide()
@@ -350,14 +351,14 @@ class GwDimensioning:
             self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
-    def click_button_orientation(self, action, emit_point, point, btn):
+    def _click_button_orientation(self, action, emit_point, point, btn):
 
         if not self.layer_dimensions:
             return
 
         if btn == Qt.RightButton:
             action.setChecked(False)
-            self.deactivate_signals(action, emit_point)
+            self._deactivate_signals(action, emit_point)
             return
 
         self.x_symbol = self.dlg_dim.findChild(QLineEdit, "x_symbol")
@@ -366,11 +367,11 @@ class GwDimensioning:
         self.y_symbol.setText(str(int(point.y())))
 
         self.snapper_manager.restore_snap_options(self.previous_snapping)
-        self.deactivate_signals(action, emit_point)
+        self._deactivate_signals(action, emit_point)
         action.setChecked(False)
 
 
-    def create_map_tips(self):
+    def _create_map_tips(self):
         """ Create MapTips on the map """
 
         row = tools_gw.get_config_value('qgis_dim_tooltip')
@@ -381,13 +382,13 @@ class GwDimensioning:
         self.map_tip_node = QgsMapTip()
         self.map_tip_connec = QgsMapTip()
 
-        self.canvas.xyCoordinates.connect(self.map_tip_changed)
-        self.timer_map_tips.timeout.connect(self.show_map_tip)
+        self.canvas.xyCoordinates.connect(self._map_tip_changed)
+        self.timer_map_tips.timeout.connect(self._show_map_tip)
         self.timer_map_tips_clear = QTimer(self.canvas)
-        self.timer_map_tips_clear.timeout.connect(self.clear_map_tip)
+        self.timer_map_tips_clear.timeout.connect(self._clear_map_tip)
 
 
-    def map_tip_changed(self, point):
+    def _map_tip_changed(self, point):
         """ SLOT. Initialize the Timer to show MapTips on the map """
 
         if self.canvas.underMouse():
@@ -397,7 +398,7 @@ class GwDimensioning:
             self.timer_map_tips.start(100)
 
 
-    def show_map_tip(self):
+    def _show_map_tip(self):
         """ Show MapTips on the map """
 
         self.timer_map_tips.stop()
@@ -411,7 +412,7 @@ class GwDimensioning:
             self.timer_map_tips_clear.start(1000)
 
 
-    def clear_map_tip(self):
+    def _clear_map_tip(self):
         """ Clear MapTips """
 
         self.timer_map_tips_clear.stop()
@@ -419,7 +420,7 @@ class GwDimensioning:
         self.map_tip_connec.clear(self.canvas)
 
 
-    def set_widgets(self, dialog, db_return, field):
+    def _set_widgets(self, dialog, db_return, field):
 
         widget = None
         label = None
@@ -471,3 +472,4 @@ class GwDimensioning:
 
         return label, widget
 
+    # endregion
