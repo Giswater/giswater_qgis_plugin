@@ -134,17 +134,6 @@ class GwMaptool(QgsMapTool):
             self.prev_maptool = None
 
 
-    def remove_vertex(self):
-        """ Remove vertex_marker from canvas"""
-
-        vertex_items = [i for i in self.iface.mapCanvas().scene().items() if issubclass(type(i), QgsVertexMarker)]
-
-        for ver in vertex_items:
-            if ver in self.iface.mapCanvas().scene().items():
-                if self.vertex_marker == ver:
-                    self.iface.mapCanvas().scene().removeItem(ver)
-
-
     def set_action_pan(self):
         """ Set action 'Pan' """
         try:
@@ -180,15 +169,6 @@ class GwMaptool(QgsMapTool):
         # Deactivate map tool
         self.deactivate()
         self.set_action_pan()
-
-
-    def remove_markers(self):
-        """ Remove previous markers """
-
-        vertex_items = [i for i in list(self.canvas.scene().items()) if issubclass(type(i), QgsVertexMarker)]
-        for ver in vertex_items:
-            if ver in list(self.canvas.scene().items()):
-                self.canvas.scene().removeItem(ver)
 
 
     def refresh_map_canvas(self):
