@@ -34,91 +34,7 @@ class GwToolBoxButton(GwAction):
 
     def clicked_event(self):
 
-        self.open_toolbox()
-
-
-    def open_toolbox(self):
-
-        self.no_clickable_items = ['Giswater']
-        function_name = "gw_fct_gettoolbox"
-        row = tools_db.check_function(function_name)
-        if not row:
-            tools_qgis.show_warning("Function not found in database", parameter=function_name)
-            return
-
-        self.dlg_toolbox = GwToolboxUi('toolbox')
-        self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.dlg_toolbox.trv.setHeaderHidden(True)
-        extras = '"isToolbox":true'
-        body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
-        if not json_result or json_result['status'] == 'Failed':
-            return False
-
-        # Show form in docker
-        tools_gw.init_docker('qgis_form_docker')
-        if global_vars.session_vars['dialog_docker']:
-            tools_gw.docker_dialog(self.dlg_toolbox)
-        else:
-            tools_gw.open_dialog(self.dlg_toolbox)
-
-        self.populate_trv(self.dlg_toolbox.trv, json_result['body']['data'])
-        self.dlg_toolbox.txt_filter.textChanged.connect(partial(self.filter_functions))
-        self.dlg_toolbox.trv.doubleClicked.connect(partial(self.open_function))
-        tools_qt.manage_translation('toolbox_docker', self.dlg_toolbox)
-
-
-    def filter_functions(self, text):
-
-        extras = f'"filterText":"{text}"'
-        body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
-        if not json_result or json_result['status'] == 'Failed':
-            return False
-
-        self.populate_trv(self.dlg_toolbox.trv, json_result['body']['data'], expand=True)
-
-
-    def open_function(self, index):
-
-        # this '0' refers to the index of the item in the selected row (alias in this case)
-        self.function_selected = index.sibling(index.row(), 0).data()
-
-        # Control no clickable items
-        if self.function_selected in self.no_clickable_items:
-            return
-
-        self.dlg_functions = GwToolboxManagerUi()
-        tools_gw.load_settings(self.dlg_functions)
-        self.dlg_functions.progressBar.setVisible(False)
-        self.dlg_functions.btn_cancel.setEnabled(False)
-
-        self.dlg_functions.cmb_layers.currentIndexChanged.connect(partial(self.set_selected_layer, self.dlg_functions,
-                                                                          self.dlg_functions.cmb_layers))
-        self.dlg_functions.rbt_previous.toggled.connect(partial(self.rbt_state, self.dlg_functions.rbt_previous))
-        self.dlg_functions.rbt_layer.toggled.connect(partial(self.rbt_state, self.dlg_functions.rbt_layer))
-        self.dlg_functions.rbt_layer.setChecked(True)
-
-        extras = f'"filterText":"{self.function_selected}"'
-        extras += ', "isToolbox":true'
-        body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
-        if not json_result or json_result['status'] == 'Failed':
-            return False
-
-        status = self.populate_functions_dlg(self.dlg_functions, json_result['body']['data'])
-        if not status:
-            self.function_selected = index.sibling(index.row(), 1).data()
-            message = "Function not found"
-            tools_qgis.show_message(message, parameter=self.function_selected)
-            return
-
-        self.dlg_functions.btn_run.clicked.connect(partial(self.execute_function, self.dlg_functions,
-                                                           self.dlg_functions.cmb_layers, json_result['body']['data']))
-        self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
-        self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
-        self.dlg_functions.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
-        tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
+        self._open_toolbox()
 
 
     def remove_layers(self):
@@ -155,7 +71,120 @@ class GwToolBoxButton(GwAction):
         return layer
 
 
-    def rbt_state(self, rbt, state):
+    def save_parametric_values(self, dialog, function):
+        """ Save QGIS settings related with toolbox options """
+
+        function_name = function[0]['functionname']
+        layout = dialog.findChild(QWidget, 'grb_parameters')
+        widgets = layout.findChildren(QWidget)
+        for widget in widgets:
+            if type(widget) is QCheckBox:
+                tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{widget.isChecked()}")
+            elif type(widget) is QComboBox:
+                value = tools_qt.get_combo_value(dialog, widget, 0)
+                tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
+            elif type(widget) in (QLineEdit, QSpinBox):
+                value = tools_qt.get_text(dialog, widget, False, False)
+                tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
+
+
+    def save_settings_values(self, dialog, function):
+        """ Save QGIS settings related with toolbox options """
+
+        function_name = function[0]['functionname']
+        geom_type = tools_qt.get_combo_value(dialog, dialog.cmb_geom_type, 0)
+        tools_gw.set_config_parser('btn_toolbox', f"{function_name}_cmb_geom_type", f"{geom_type}")
+        layer = tools_qt.get_combo_value(dialog, dialog.cmb_layers, 0)
+        tools_gw.set_config_parser('btn_toolbox', f"{function_name}_cmb_layers", f"{layer}")
+        tools_gw.set_config_parser('btn_toolbox', f"{function_name}_rbt_previous", f"{dialog.rbt_previous.isChecked()}")
+
+    # region private functions
+
+    def _open_toolbox(self):
+
+        self.no_clickable_items = ['Giswater']
+        function_name = "gw_fct_gettoolbox"
+        row = tools_db.check_function(function_name)
+        if not row:
+            tools_qgis.show_warning("Function not found in database", parameter=function_name)
+            return
+
+        self.dlg_toolbox = GwToolboxUi('toolbox')
+        self.dlg_toolbox.trv.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.dlg_toolbox.trv.setHeaderHidden(True)
+        extras = '"isToolbox":true'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
+        if not json_result or json_result['status'] == 'Failed':
+            return False
+
+        # Show form in docker
+        tools_gw.init_docker('qgis_form_docker')
+        if global_vars.session_vars['dialog_docker']:
+            tools_gw.docker_dialog(self.dlg_toolbox)
+        else:
+            tools_gw.open_dialog(self.dlg_toolbox)
+
+        self._populate_trv(self.dlg_toolbox.trv, json_result['body']['data'])
+        self.dlg_toolbox.txt_filter.textChanged.connect(partial(self._filter_functions))
+        self.dlg_toolbox.trv.doubleClicked.connect(partial(self._open_function))
+        tools_qt.manage_translation('toolbox_docker', self.dlg_toolbox)
+
+
+    def _filter_functions(self, text):
+
+        extras = f'"filterText":"{text}"'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
+        if not json_result or json_result['status'] == 'Failed':
+            return False
+
+        self._populate_trv(self.dlg_toolbox.trv, json_result['body']['data'], expand=True)
+
+
+    def _open_function(self, index):
+
+        # this '0' refers to the index of the item in the selected row (alias in this case)
+        self.function_selected = index.sibling(index.row(), 0).data()
+
+        # Control no clickable items
+        if self.function_selected in self.no_clickable_items:
+            return
+
+        self.dlg_functions = GwToolboxManagerUi()
+        tools_gw.load_settings(self.dlg_functions)
+        self.dlg_functions.progressBar.setVisible(False)
+        self.dlg_functions.btn_cancel.setEnabled(False)
+
+        self.dlg_functions.cmb_layers.currentIndexChanged.connect(partial(self.set_selected_layer, self.dlg_functions,
+                                                                          self.dlg_functions.cmb_layers))
+        self.dlg_functions.rbt_previous.toggled.connect(partial(self._rbt_state, self.dlg_functions.rbt_previous))
+        self.dlg_functions.rbt_layer.toggled.connect(partial(self._rbt_state, self.dlg_functions.rbt_layer))
+        self.dlg_functions.rbt_layer.setChecked(True)
+
+        extras = f'"filterText":"{self.function_selected}"'
+        extras += ', "isToolbox":true'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body)
+        if not json_result or json_result['status'] == 'Failed':
+            return False
+
+        status = self._populate_functions_dlg(self.dlg_functions, json_result['body']['data'])
+        if not status:
+            self.function_selected = index.sibling(index.row(), 1).data()
+            message = "Function not found"
+            tools_qgis.show_message(message, parameter=self.function_selected)
+            return
+
+        self.dlg_functions.btn_run.clicked.connect(partial(self._execute_function, self.dlg_functions,
+                                                           self.dlg_functions.cmb_layers, json_result['body']['data']))
+        self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
+        self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
+        self.dlg_functions.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
+        tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
+
+
+    def _rbt_state(self, rbt, state):
 
         if rbt.objectName() == 'rbt_previous' and state is True:
             self.rbt_checked['widget'] = 'previousSelection'
@@ -165,7 +194,7 @@ class GwToolBoxButton(GwAction):
         self.rbt_checked['value'] = state
 
 
-    def load_parametric_values(self, dialog, function):
+    def _load_parametric_values(self, dialog, function):
         """ Load QGIS settings related with toolbox options """
 
         function_name = function[0]['functionname']
@@ -188,24 +217,7 @@ class GwToolBoxButton(GwAction):
                 tools_qt.set_widget_text(dialog, widget, value)
 
 
-    def save_parametric_values(self, dialog, function):
-        """ Save QGIS settings related with toolbox options """
-
-        function_name = function[0]['functionname']
-        layout = dialog.findChild(QWidget, 'grb_parameters')
-        widgets = layout.findChildren(QWidget)
-        for widget in widgets:
-            if type(widget) is QCheckBox:
-                tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{widget.isChecked()}")
-            elif type(widget) is QComboBox:
-                value = tools_qt.get_combo_value(dialog, widget, 0)
-                tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
-            elif type(widget) in (QLineEdit, QSpinBox):
-                value = tools_qt.get_text(dialog, widget, False, False)
-                tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
-
-
-    def load_settings_values(self, dialog, function):
+    def _load_settings_values(self, dialog, function):
         """ Load QGIS settings related with toolbox options """
 
         function_name = function[0]['functionname']
@@ -226,18 +238,7 @@ class GwToolBoxButton(GwAction):
             tools_qt.set_checked(dialog, 'rbt_layer', True)
 
 
-    def save_settings_values(self, dialog, function):
-        """ Save QGIS settings related with toolbox options """
-
-        function_name = function[0]['functionname']
-        geom_type = tools_qt.get_combo_value(dialog, dialog.cmb_geom_type, 0)
-        tools_gw.set_config_parser('btn_toolbox', f"{function_name}_cmb_geom_type", f"{geom_type}")
-        layer = tools_qt.get_combo_value(dialog, dialog.cmb_layers, 0)
-        tools_gw.set_config_parser('btn_toolbox', f"{function_name}_cmb_layers", f"{layer}")
-        tools_gw.set_config_parser('btn_toolbox', f"{function_name}_rbt_previous", f"{dialog.rbt_previous.isChecked()}")
-
-
-    def execute_function(self, dialog, combo, result):
+    def _execute_function(self, dialog, combo, result):
         dialog.btn_cancel.setEnabled(True)
         dialog.progressBar.setRange(0, 0)
         dialog.progressBar.setVisible(True)
@@ -254,7 +255,7 @@ class GwToolBoxButton(GwAction):
         dialog.btn_cancel.clicked.connect(self._cancel_task)
 
 
-    def populate_functions_dlg(self, dialog, result, module=tools_backend_calls):
+    def _populate_functions_dlg(self, dialog, result, module=tools_backend_calls):
         status = False
         for group, function in result['fields'].items():
             if len(function) != 0:
@@ -266,19 +267,19 @@ class GwToolBoxButton(GwAction):
                     dialog.grb_selection_type.setVisible(False)
                 else:
                     feature_types = function[0]['input_params']['featureType']
-                    self.populate_cmb_type(feature_types)
-                    self.dlg_functions.cmb_geom_type.currentIndexChanged.connect(partial(self.populate_layer_combo))
-                    self.populate_layer_combo()
+                    self._populate_cmb_type(feature_types)
+                    self.dlg_functions.cmb_geom_type.currentIndexChanged.connect(partial(self._populate_layer_combo))
+                    self._populate_layer_combo()
                 tools_gw.build_dialog_options(dialog, function, 0, self.function_list, self.temp_layers_added, module)
-                self.load_settings_values(dialog, function)
-                self.load_parametric_values(dialog, function)
+                self._load_settings_values(dialog, function)
+                self._load_parametric_values(dialog, function)
                 status = True
                 break
 
         return status
 
 
-    def populate_cmb_type(self, feature_types):
+    def _populate_cmb_type(self, feature_types):
 
         feat_types = []
         for item in feature_types:
@@ -289,7 +290,7 @@ class GwToolBoxButton(GwAction):
         tools_qt.fill_combo_values(self.dlg_functions.cmb_geom_type, feat_types, 1)
 
 
-    def get_all_group_layers(self, geom_type):
+    def _get_all_group_layers(self, geom_type):
 
         list_items = []
         sql = (f"SELECT tablename, type FROM "
@@ -309,11 +310,11 @@ class GwToolBoxButton(GwAction):
         return list_items
 
 
-    def populate_layer_combo(self):
+    def _populate_layer_combo(self):
 
         geom_type = tools_qt.get_combo_value(self.dlg_functions, self.dlg_functions.cmb_geom_type, 0)
         self.layers = []
-        self.layers = self.get_all_group_layers(geom_type)
+        self.layers = self._get_all_group_layers(geom_type)
 
         layers = []
         legend_layers = tools_qgis.get_project_layers()
@@ -332,7 +333,7 @@ class GwToolBoxButton(GwAction):
         tools_qt.fill_combo_values(self.dlg_functions.cmb_layers, layers, sort_combo=False)
 
 
-    def populate_trv(self, trv_widget, result, expand=False):
+    def _populate_trv(self, trv_widget, result, expand=False):
 
         model = QStandardItemModel()
         trv_widget.setModel(model)
@@ -352,7 +353,7 @@ class GwToolBoxButton(GwAction):
         for group, functions in result['fields'].items():
             parent1 = QStandardItem(f'{group}   [{len(functions)} Giswater algorithm]')
             self.no_clickable_items.append(f'{group}   [{len(functions)} Giswater algorithm]')
-            functions.sort(key=self.sort_list, reverse=False)
+            functions.sort(key=self._sort_list, reverse=False)
             for function in functions:
                 func_name = QStandardItem(str(function['functionname']))
                 label = QStandardItem(str(function['alias']))
@@ -384,7 +385,7 @@ class GwToolBoxButton(GwAction):
             trv_widget.expandAll()
 
 
-    def sort_list(self, json_):
+    def _sort_list(self, json_):
 
         try:
             return json_['alias'].upper()
@@ -395,3 +396,5 @@ class GwToolBoxButton(GwAction):
     def _cancel_task(self):
         if hasattr(self, 'toolbox_task'):
             self.toolbox_task.cancel()
+
+    # endregion
