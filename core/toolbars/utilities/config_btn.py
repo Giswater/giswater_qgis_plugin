@@ -29,10 +29,12 @@ class GwConfigButton(GwAction):
 
     def clicked_event(self):
 
-        self.open_config()
+        self._open_config()
 
 
-    def open_config(self):
+    # region private functions
+
+    def _open_config(self):
 
         # Get user and role
         super_users = tools_gw.get_config_parser('system', 'super_users', "project", "giswater")
@@ -41,7 +43,7 @@ class GwConfigButton(GwAction):
         self.list_update = []
 
         # Get visible layers name from TOC
-        result = self.get_layers_name()
+        result = self._get_layers_name()
 
         body = tools_gw.create_body(form='"formName":"config"', extras=result)
         json_result = tools_gw.execute_procedure('gw_fct_getconfig', body)
@@ -51,7 +53,7 @@ class GwConfigButton(GwAction):
         self.dlg_config = GwConfigUi()
         tools_gw.load_settings(self.dlg_config)
         self.dlg_config.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_config))
-        self.dlg_config.btn_accept.clicked.connect(partial(self.update_values))
+        self.dlg_config.btn_accept.clicked.connect(partial(self._update_values))
 
         page1_layout1 = self.dlg_config.tab_main.findChild(QGridLayout, 'page1_layout1')
         page1_layout2 = self.dlg_config.tab_main.findChild(QGridLayout, 'page1_layout2')
@@ -124,8 +126,8 @@ class GwConfigButton(GwAction):
         self.addfields_form = QGridLayout()
 
         # Construct form for config and admin
-        self.build_dialog_options(json_result['body']['form']['formTabs'], 0)
-        self.construct_form_param_system(json_result['body']['form']['formTabs'], 1)
+        self._build_dialog_options(json_result['body']['form']['formTabs'], 0)
+        self._construct_form_param_system(json_result['body']['form']['formTabs'], 1)
 
         group_box_1.setLayout(self.basic_form)
         group_box_2.setLayout(self.om_form)
@@ -196,14 +198,14 @@ class GwConfigButton(GwAction):
         addfields_layout1.addItem(verticalSpacer1)
 
         # Event on change from combo parent
-        self.get_event_combo_parent(json_result['body']['form']['formTabs'])
+        self._get_event_combo_parent(json_result['body']['form']['formTabs'])
 
         # Set signals Combo parent/child
         chk_expl = self.dlg_config.tab_main.findChild(QWidget, 'chk_exploitation_vdefault')
         chk_dma = self.dlg_config.tab_main.findChild(QWidget, 'chk_dma_vdefault')
         if chk_dma and chk_expl:
-            chk_dma.stateChanged.connect(partial(self.check_child_to_parent, chk_dma, chk_expl))
-            chk_expl.stateChanged.connect(partial(self.check_parent_to_child, chk_expl, chk_dma))
+            chk_dma.stateChanged.connect(partial(self._check_child_to_parent, chk_dma, chk_expl))
+            chk_expl.stateChanged.connect(partial(self._check_parent_to_child, chk_expl, chk_dma))
         tools_qt.hide_void_groupbox(self.dlg_config)
 
         # Set shortcut keys
@@ -218,8 +220,7 @@ class GwConfigButton(GwAction):
         tools_gw.open_dialog(self.dlg_config, dlg_name='config')
 
 
-
-    def get_layers_name(self):
+    def _get_layers_name(self):
         """ Returns the name of all the layers visible in the TOC, then populate the cad_combo_layers """
 
         layers = self.iface.mapCanvas().layers()
@@ -235,7 +236,7 @@ class GwConfigButton(GwAction):
         return result
 
 
-    def get_event_combo_parent(self, row):
+    def _get_event_combo_parent(self, row):
 
         for field in row[0]["fields"]:
             if field['isparent']:
@@ -244,7 +245,7 @@ class GwConfigButton(GwAction):
                     widget.currentIndexChanged.connect(partial(tools_gw.fill_child, self.dlg_config, widget, 'config'))
 
 
-    def update_values(self):
+    def _update_values(self):
 
         my_json = json.dumps(self.list_update)
         extras = f'"fields":{my_json}'
@@ -260,7 +261,7 @@ class GwConfigButton(GwAction):
 
 
     # noinspection PyUnresolvedReferences
-    def build_dialog_options(self, row, pos):
+    def _build_dialog_options(self, row, pos):
 
         widget = None
         for field in row[pos]['fields']:
@@ -283,21 +284,21 @@ class GwConfigButton(GwAction):
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                     widget = QLineEdit()
                     widget.setText(field['value'])
-                    widget.editingFinished.connect(partial(self.get_dialog_changed_values, chk, widget, field))
+                    widget.editingFinished.connect(partial(self._get_dialog_changed_values, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'textarea':
                     widget = QTextEdit()
                     widget.setText(field['value'])
-                    widget.editingFinished.connect(partial(self.get_dialog_changed_values, chk, widget, field))
+                    widget.editingFinished.connect(partial(self._get_dialog_changed_values, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = QComboBox()
-                    self.fill_combo(widget, field)
-                    widget.currentIndexChanged.connect(partial(self.get_dialog_changed_values, chk, widget, field))
+                    self._fill_combo(widget, field)
+                    widget.currentIndexChanged.connect(partial(self._get_dialog_changed_values, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'check':
                     widget = chk
-                    widget.stateChanged.connect(partial(self.get_dialog_changed_values, chk, chk, field))
+                    widget.stateChanged.connect(partial(self._get_dialog_changed_values, chk, chk, field))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datetime':
                     widget = QgsDateTimeEdit()
@@ -312,14 +313,14 @@ class GwConfigButton(GwAction):
                         widget.setDate(date)
                     else:
                         widget.clear()
-                    widget.dateChanged.connect(partial(self.get_dialog_changed_values, chk, widget, field))
+                    widget.dateChanged.connect(partial(self._get_dialog_changed_values, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'spinbox':
                     widget = QDoubleSpinBox()
                     if 'value' in field and field['value'] is not None:
                         value = float(str(field['value']))
                         widget.setValue(value)
-                    widget.valueChanged.connect(partial(self.get_dialog_changed_values, chk, widget, field))
+                    widget.valueChanged.connect(partial(self._get_dialog_changed_values, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 else:
                     pass
@@ -327,48 +328,48 @@ class GwConfigButton(GwAction):
                 widget.setObjectName(field['widgetname'])
 
                 # Set signals
-                chk.stateChanged.connect(partial(self.get_values_checked_param_user, chk, widget, field))
+                chk.stateChanged.connect(partial(self._get_values_checked_param_user, chk, widget, field))
 
                 if field['layoutname'] == 'lyt_basic':
-                    self.order_widgets(field, self.basic_form, lbl, chk, widget)
+                    self._order_widgets(field, self.basic_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_om':
-                    self.order_widgets(field, self.om_form, lbl, chk, widget)
+                    self._order_widgets(field, self.om_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_inventory':
-                    self.order_widgets(field, self.inventory_form, lbl, chk, widget)
+                    self._order_widgets(field, self.inventory_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_mapzones':
-                    self.order_widgets(field, self.mapzones_form, lbl, chk, widget)
+                    self._order_widgets(field, self.mapzones_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_edit':
-                    self.order_widgets(field, self.cad_form, lbl, chk, widget)
+                    self._order_widgets(field, self.cad_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_epa':
-                    self.order_widgets(field, self.epa_form, lbl, chk, widget)
+                    self._order_widgets(field, self.epa_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_masterplan':
-                    self.order_widgets(field, self.masterplan_form, lbl, chk, widget)
+                    self._order_widgets(field, self.masterplan_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_other':
-                    self.order_widgets(field, self.other_form, lbl, chk, widget)
+                    self._order_widgets(field, self.other_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_node_vdef':
-                    self.order_widgets(field, self.node_type_form, lbl, chk, widget)
+                    self._order_widgets(field, self.node_type_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_arc_vdef':
-                    self.order_widgets(field, self.cat_form, lbl, chk, widget)
+                    self._order_widgets(field, self.cat_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_utils_vdef':
-                    self.order_widgets(field, self.utils_form, lbl, chk, widget)
+                    self._order_widgets(field, self.utils_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_connec_vdef':
-                    self.order_widgets(field, self.connec_form, lbl, chk, widget)
+                    self._order_widgets(field, self.connec_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_gully_vdef':
-                    self.order_widgets(field, self.gully_form, lbl, chk, widget)
+                    self._order_widgets(field, self.gully_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_fluid_type':
-                    self.order_widgets(field, self.fluid_type_form, lbl, chk, widget)
+                    self._order_widgets(field, self.fluid_type_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_location_type':
-                    self.order_widgets(field, self.location_type_form, lbl, chk, widget)
+                    self._order_widgets(field, self.location_type_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_category_type':
-                    self.order_widgets(field, self.category_type_form, lbl, chk, widget)
+                    self._order_widgets(field, self.category_type_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_function_type':
-                    self.order_widgets(field, self.function_type_form, lbl, chk, widget)
+                    self._order_widgets(field, self.function_type_form, lbl, chk, widget)
                 elif field['layoutname'] == 'lyt_addfields':
-                    self.order_widgets(field, self.addfields_form, lbl, chk, widget)
+                    self._order_widgets(field, self.addfields_form, lbl, chk, widget)
 
 
     # noinspection PyUnresolvedReferences
-    def construct_form_param_system(self, row, pos):
+    def _construct_form_param_system(self, row, pos):
 
         widget = None
         for field in row[pos]['fields']:
@@ -383,17 +384,17 @@ class GwConfigButton(GwAction):
                 if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                     widget = QLineEdit()
                     widget.setText(field['value'])
-                    widget.editingFinished.connect(partial(self.get_values_changed_param_system, widget))
+                    widget.editingFinished.connect(partial(self._get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'textarea':
                     widget = QTextEdit()
                     widget.setText(field['value'])
-                    widget.editingFinished.connect(partial(self.get_values_changed_param_system, widget))
+                    widget.editingFinished.connect(partial(self._get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'combo':
                     widget = QComboBox()
-                    self.fill_combo(widget, field)
-                    widget.currentIndexChanged.connect(partial(self.get_values_changed_param_system, widget))
+                    self._fill_combo(widget, field)
+                    widget.currentIndexChanged.connect(partial(self._get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'checkbox' or field['widgettype'] == 'check':
                     widget = QCheckBox()
@@ -401,7 +402,7 @@ class GwConfigButton(GwAction):
                         widget.setChecked(True)
                     elif field['value'] in ('false', 'False', 'FALSE', False):
                         widget.setChecked(False)
-                    widget.stateChanged.connect(partial(self.get_values_changed_param_system, widget))
+                    widget.stateChanged.connect(partial(self._get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datetime':
                     widget = QDateEdit()
@@ -410,14 +411,14 @@ class GwConfigButton(GwAction):
                         field['value'] = field['value'].replace('/', '-')
                     date = QDate.fromString(field['value'], 'yyyy-MM-dd')
                     widget.setDate(date)
-                    widget.dateChanged.connect(partial(self.get_values_changed_param_system, widget))
+                    widget.dateChanged.connect(partial(self._get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'spinbox':
                     widget = QSpinBox()
                     if 'value' in field and field['value'] is not None:
                         value = float(str(field['value']))
                         widget.setValue(value)
-                    widget.valueChanged.connect(partial(self.get_values_changed_param_system, widget))
+                    widget.valueChanged.connect(partial(self._get_values_changed_param_system, widget))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 else:
                     pass
@@ -430,30 +431,30 @@ class GwConfigButton(GwAction):
                 # Order Widgets
                 if 'layoutname' in field:
                     if field['layoutname'] == 'lyt_topology':
-                        self.order_widgets_system(field, self.topology_form, lbl, widget)
+                        self._order_widgets_system(field, self.topology_form, lbl, widget)
                     elif field['layoutname'] == 'lyt_builder':
-                        self.order_widgets_system(field, self.builder_form, lbl, widget)
+                        self._order_widgets_system(field, self.builder_form, lbl, widget)
                     elif field['layoutname'] == 'lyt_review':
-                        self.order_widgets_system(field, self.review_form, lbl, widget)
+                        self._order_widgets_system(field, self.review_form, lbl, widget)
                     elif field['layoutname'] == 'lyt_analysis':
-                        self.order_widgets_system(field, self.analysis_form, lbl, widget)
+                        self._order_widgets_system(field, self.analysis_form, lbl, widget)
                     elif field['layoutname'] == 'lyt_system':
-                        self.order_widgets_system(field, self.system_form, lbl, widget)
+                        self._order_widgets_system(field, self.system_form, lbl, widget)
 
 
-    def check_child_to_parent(self, widget_child, widget_parent):
+    def _check_child_to_parent(self, widget_child, widget_parent):
 
         if widget_child.isChecked():
             widget_parent.setChecked(True)
 
 
-    def check_parent_to_child(self, widget_parent, widget_child):
+    def _check_parent_to_child(self, widget_parent, widget_child):
 
         if not widget_parent.isChecked():
             widget_child.setChecked(False)
 
 
-    def fill_combo(self, widget, field):
+    def _fill_combo(self, widget, field):
 
         # Generate list of items to add into combo
         widget.blockSignals(True)
@@ -475,7 +476,7 @@ class GwConfigButton(GwAction):
                 tools_qt.set_combo_value(widget, field['value'], 0)
 
 
-    def get_dialog_changed_values(self, chk, widget, field, value=None):
+    def _get_dialog_changed_values(self, chk, widget, field, value=None):
 
         elem = {}
         if type(widget) is QLineEdit:
@@ -497,7 +498,7 @@ class GwConfigButton(GwAction):
             self.list_update.append(elem)
 
 
-    def get_values_checked_param_user(self, chk, widget, field, value=None):
+    def _get_values_checked_param_user(self, chk, widget, field, value=None):
 
         elem = {}
 
@@ -526,7 +527,7 @@ class GwConfigButton(GwAction):
         self.list_update.append(elem)
 
 
-    def get_values_changed_param_system(self, widget, value=None):
+    def _get_values_changed_param_system(self, widget, value=None):
 
         elem = {}
 
@@ -548,7 +549,7 @@ class GwConfigButton(GwAction):
         self.list_update.append(elem)
 
 
-    def order_widgets(self, field, form, lbl, chk, widget):
+    def _order_widgets(self, field, form, lbl, chk, widget):
 
         form.addWidget(lbl, field['layoutorder'], 0)
         if field['widgettype'] != 'check':
@@ -558,7 +559,7 @@ class GwConfigButton(GwAction):
             form.addWidget(chk, field['layoutorder'], 1)
 
 
-    def order_widgets_system(self, field, form, lbl, widget):
+    def _order_widgets_system(self, field, form, lbl, widget):
 
         form.addWidget(lbl, field['layoutorder'], 0)
         if field['widgettype'] == 'checkbox' or field['widgettype'] == 'check':
@@ -567,3 +568,5 @@ class GwConfigButton(GwAction):
             form.addWidget(widget, field['layoutorder'], 3)
         else:
             form.addWidget(widget, field['layoutorder'], 1)
+
+    # endregion
