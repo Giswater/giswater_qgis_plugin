@@ -8,6 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
--- 2021/01/26
+-- 2021/01/30
 ALTER TABLE temp_arc ALTER COLUMN the_geom TYPE geometry(LineString, SRID_VALUE);
 ALTER TABLE temp_node ALTER COLUMN the_geom TYPE geometry(Point, SRID_VALUE);
