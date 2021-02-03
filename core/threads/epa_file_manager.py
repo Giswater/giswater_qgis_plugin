@@ -45,7 +45,7 @@ class GwEpaFileManager(GwTask):
         self.result_name = self.go2epa.result_name
         self.file_inp = self.go2epa.file_inp
         self.file_rpt = self.go2epa.file_rpt
-        self.go2epa_export_inp = self.go2epa.export_inp
+        self.go2epa_export_inp = self.go2epa._export_inp
         self.exec_epa = self.go2epa.exec_epa
         self.import_result = self.go2epa.import_result
         self.project_type = self.go2epa.project_type
@@ -67,17 +67,17 @@ class GwEpaFileManager(GwTask):
         global_vars.session_vars['show_db_exception'] = False
         status = True
 
-        if not self.exec_function_pg2epa():
+        if not self._exec_function_pg2epa():
             return False
 
         if self.go2epa_export_inp:
-            status = self.export_inp()
+            status = self.vexport_inp()
 
         if status and self.exec_epa:
-            status = self.execute_epa()
+            status = self._execute_epa()
 
         if status and self.import_result:
-            status = self.import_rpt()
+            status = self._import_rpt()
 
         return status
 
@@ -86,7 +86,7 @@ class GwEpaFileManager(GwTask):
 
         global_vars.session_vars['show_db_exception'] = True
 
-        self.close_file()
+        self._close_file()
 
         if result:
 
@@ -138,13 +138,8 @@ class GwEpaFileManager(GwTask):
 
         global_vars.session_vars['show_db_exception'] = True
         tools_qgis.show_info(f"Task canceled - {self.description()}")
-        self.close_file()
+        self._close_file()
         super().cancel()
-
-
-    def progress_changed(self, progress):
-
-        tools_log.log_info(f"progressChanged: {progress}")
 
 
     def close_file(self, file=None):
@@ -160,13 +155,16 @@ class GwEpaFileManager(GwTask):
             pass
 
 
-    def exec_function_pg2epa(self):
+    # region private functions
+
+
+    def _exec_function_pg2epa(self):
 
         self.setProgress(0)
         extras = f'"resultId":"{self.result_name}"'
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
-        body = self.create_body(extras=extras)
+        body = self._create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', body)
         self.complet_result = json_result
         if json_result is None or not json_result:
@@ -181,7 +179,7 @@ class GwEpaFileManager(GwTask):
         return True
 
 
-    def export_inp(self):
+    def _export_inp(self):
 
         if self.isCanceled():
             return False
@@ -192,14 +190,14 @@ class GwEpaFileManager(GwTask):
         if 'file' not in self.complet_result['body']:
             return False
 
-        self.fill_inp_file(self.file_inp, self.complet_result['body']['file'])
+        self._fill_inp_file(self.file_inp, self.complet_result['body']['file'])
         self.message = self.complet_result['message']['text']
         self.common_msg += "Export INP finished. "
 
         return True
 
 
-    def fill_inp_file(self, folder_path=None, all_rows=None):
+    def _fill_inp_file(self, folder_path=None, all_rows=None):
 
         tools_log.log_info(f"Write inp file........: {folder_path}")
 
@@ -209,10 +207,10 @@ class GwEpaFileManager(GwTask):
                 line = row['text'].rstrip() + "\n"
                 file1.write(line)
 
-        self.close_file(file1)
+        self._close_file(file1)
 
 
-    def execute_epa(self):
+    def _execute_epa(self):
 
         if self.isCanceled():
             return False
@@ -253,7 +251,7 @@ class GwEpaFileManager(GwTask):
         return True
 
 
-    def import_rpt(self):
+    def _import_rpt(self):
         """import result file"""
 
         tools_log.log_info(f"Import rpt file........: {self.file_rpt}")
@@ -263,17 +261,17 @@ class GwEpaFileManager(GwTask):
         status = False
         try:
             # Call import function
-            status = self.read_rpt_file(self.file_rpt)
+            status = self._read_rpt_file(self.file_rpt)
             if not status:
                 return False
-            status = self.exec_import_function()
+            status = self._exec_import_function()
         except Exception as e:
             self.error_msg = str(e)
         finally:
             return status
 
 
-    def read_rpt_file(self, file_path=None):
+    def _read_rpt_file(self, file_path=None):
 
         self.file_rpt = open(file_path, "r+")
         full_file = self.file_rpt.readlines()
@@ -385,12 +383,12 @@ class GwEpaFileManager(GwTask):
         json_rpt = '[' + str(json_rpt[:-2]) + ']'
         self.json_rpt = json_rpt
 
-        self.close_file()
+        self._close_file()
 
         return True
 
 
-    def create_body(self, form='', feature='', filter_fields='', extras=None):
+    def _create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
 
         client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
@@ -407,13 +405,13 @@ class GwEpaFileManager(GwTask):
         return body
 
 
-    def exec_import_function(self):
+    def _exec_import_function(self):
         """ Call function gw_fct_rpt2pg_main """
 
         extras = f'"resultId":"{self.result_name}"'
         if self.json_rpt:
             extras += f', "file": {self.json_rpt}'
-        body = self.create_body(extras=extras)
+        body = self._create_body(extras=extras)
         function_name = 'gw_fct_rpt2pg_main'
         json_result = tools_gw.execute_procedure(function_name, body)
         self.rpt_result = json_result
@@ -431,3 +429,4 @@ class GwEpaFileManager(GwTask):
 
         return True
 
+    # endregion
