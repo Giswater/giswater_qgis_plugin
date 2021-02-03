@@ -109,7 +109,7 @@ class GwInfo(QObject):
         qgis_project_add_schema = global_vars.project_vars['add_schema']
         qgis_project_main_schema = global_vars.project_vars['main_schema']
         qgis_project_infotype = global_vars.project_vars['info_type']
-        qgis_project_role = global_vars.project_vars['role']
+        qgis_project_role = global_vars.project_vars['project_role']
 
         self.new_feature = new_feature
 

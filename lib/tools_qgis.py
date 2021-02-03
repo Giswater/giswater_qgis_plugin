@@ -170,7 +170,7 @@ def get_project_variables():
     global_vars.project_vars['info_type'] = get_project_variable('gwInfoType')
     global_vars.project_vars['add_schema'] = get_project_variable('gwAddSchema')
     global_vars.project_vars['main_schema'] = get_project_variable('gwMainSchema')
-    global_vars.project_vars['role'] = get_project_variable('gwProjectRole')
+    global_vars.project_vars['project_role'] = get_project_variable('gwProjectRole')
     global_vars.project_vars['project_type'] = get_project_variable('gwProjectType')
 
 

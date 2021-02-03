@@ -865,7 +865,7 @@ class GwPsector:
         :return:
         """
 
-        role = global_vars.project_vars['role']
+        role = global_vars.project_vars['project_role']
         role = tools_gw.get_role_permissions(role)
         if role in restriction:
             widget_list = dialog.findChildren(QWidget)

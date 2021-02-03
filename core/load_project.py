@@ -344,7 +344,7 @@ class GwLoadProject(QObject):
     def _check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
 
-        restriction = tools_gw.get_role_permissions(global_vars.project_vars['role'])
+        restriction = tools_gw.get_role_permissions(global_vars.project_vars['project_role'])
 
         if restriction == 'role_basic':
             pass
