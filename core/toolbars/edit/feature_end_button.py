@@ -61,7 +61,7 @@ class GwFeatureEndButton(GwAction):
         # Create the dialog and signals
         self.dlg_work_end = GwFeatureEndUi()
         tools_gw.load_settings(self.dlg_work_end)
-        self.set_edit_arc_downgrade_force('True')
+        self._set_edit_arc_downgrade_force('True')
 
         # Set default geom_type and viewname
         geom_type = "arc"
@@ -98,11 +98,11 @@ class GwFeatureEndButton(GwAction):
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_work_end.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_work_end.rejected.connect(lambda: self.rubber_band.reset())
-        self.dlg_work_end.btn_accept.clicked.connect(partial(self.end_feature))
-        self.dlg_work_end.btn_cancel.clicked.connect(partial(self.manage_close, self.dlg_work_end, True, False))
-        self.dlg_work_end.rejected.connect(partial(self.manage_close, self.dlg_work_end, True, True))
-        self.dlg_work_end.workcat_id_end.editTextChanged.connect(partial(self.fill_workids))
-        self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self.new_workcat))
+        self.dlg_work_end.btn_accept.clicked.connect(partial(self._end_feature))
+        self.dlg_work_end.btn_cancel.clicked.connect(partial(self._manage_close, self.dlg_work_end, True, False))
+        self.dlg_work_end.rejected.connect(partial(self._manage_close, self.dlg_work_end, True, True))
+        self.dlg_work_end.workcat_id_end.editTextChanged.connect(partial(self._fill_workids))
+        self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self._new_workcat))
 
         self.dlg_work_end.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_work_end, self.table_object, False, False, None, None))
@@ -111,7 +111,7 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work_end.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_work_end, self.table_object, False))
 
-        self.dlg_work_end.workcat_id_end.activated.connect(partial(self.fill_workids))
+        self.dlg_work_end.workcat_id_end.activated.connect(partial(self._fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_work_end, excluded_layers))
 
@@ -127,7 +127,7 @@ class GwFeatureEndButton(GwAction):
             self.dlg_work_end.tbl_cat_work_x_element, "v_edit_element", "element_id", self.rubber_band, 1))
 
         # Set values
-        self.fill_fields()
+        self._fill_fields()
 
         # Adding auto-completion to a QLineEdit for default feature
         tools_gw.set_completer_widget(viewname, self.dlg_work_end.feature_id, str(geom_type) + "_id")
@@ -140,7 +140,9 @@ class GwFeatureEndButton(GwAction):
         tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end', maximize_button=False)
 
 
-    def set_edit_arc_downgrade_force(self, value):
+    # region private functions
+
+    def _set_edit_arc_downgrade_force(self, value):
 
         # Update (or insert) on config_param_user the value of edit_arc_downgrade_force to true
         row = tools_gw.get_config_value('edit_arc_downgrade_force')
@@ -155,7 +157,7 @@ class GwFeatureEndButton(GwAction):
             tools_db.execute_sql(sql)
 
 
-    def fill_fields(self):
+    def _fill_fields(self):
         """ Fill dates and combos cat_work/state type end """
 
         sql = 'SELECT id as id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0'
@@ -167,7 +169,7 @@ class GwFeatureEndButton(GwAction):
         row = tools_gw.get_config_value('edit_enddate_vdefault')
 
         if row:
-            enddate = self.manage_dates(row[0]).date()
+            enddate = self._manage_dates(row[0]).date()
             self.dlg_work_end.enddate.setDate(enddate)
         else:
             enddate = QDate.currentDate()
@@ -182,7 +184,7 @@ class GwFeatureEndButton(GwAction):
             tools_qt.set_widget_text(self.dlg_work_end, self.dlg_work_end.workcat_id_end, row[0])
 
 
-    def manage_dates(self, date_value):
+    def _manage_dates(self, date_value):
         """ Manage dates """
 
         date_result = None
@@ -196,7 +198,7 @@ class GwFeatureEndButton(GwAction):
             return date_result
 
 
-    def fill_workids(self):
+    def _fill_workids(self):
         """ Auto fill descriptions and workid's """
 
         workcat_id = tools_qt.get_text(self.dlg_work_end, self.dlg_work_end.workcat_id_end)
@@ -214,12 +216,12 @@ class GwFeatureEndButton(GwAction):
             tools_qt.set_calendar(self.dlg_work_end, self.dlg_work_end.builtdate, None, False)
 
 
-    def set_list_selected_id(self, qtable):
+    def _set_list_selected_id(self, qtable):
 
         selected_list = qtable.model()
         self.selected_list = []
         if selected_list is None:
-            self.manage_close(self.dlg_work_end)
+            self._manage_close(self.dlg_work_end)
             return
 
         for x in range(0, selected_list.rowCount()):
@@ -228,8 +230,7 @@ class GwFeatureEndButton(GwAction):
             self.selected_list.append(id_)
 
 
-
-    def end_feature(self):
+    def _end_feature(self):
         """ Get elements from all the tables and update his data """
 
         # Setting values
@@ -244,7 +245,7 @@ class GwFeatureEndButton(GwAction):
             tools_qgis.show_warning(message)
             return
 
-        self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
+        self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
 
         row = None
         if len(self.selected_list) > 0:
@@ -262,13 +263,13 @@ class GwFeatureEndButton(GwAction):
             self.dlg_work = GwFeatureEndConnecUi()
             tools_gw.load_settings(self.dlg_work)
 
-            self.dlg_work.btn_cancel.clicked.connect(partial(self.close_dialog_workcat_list, self.dlg_work))
-            self.dlg_work.btn_accept.clicked.connect(self.exec_downgrade)
-            self.set_completer()
+            self.dlg_work.btn_cancel.clicked.connect(partial(self._close_dialog_workcat_list, self.dlg_work))
+            self.dlg_work.btn_accept.clicked.connect(self._exec_downgrade)
+            self._set_completer()
 
             table_relations = "v_ui_arc_x_relations"
             self.dlg_work.arc_id.textChanged.connect(
-                partial(self.filter_by_id, self.dlg_work.tbl_arc_x_relations, self.dlg_work.arc_id, table_relations))
+                partial(self._filter_by_id, self.dlg_work.tbl_arc_x_relations, self.dlg_work.arc_id, table_relations))
 
             self.tbl_arc_x_relations = self.dlg_work.findChild(QTableView, "tbl_arc_x_relations")
             self.tbl_arc_x_relations.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -281,26 +282,26 @@ class GwFeatureEndButton(GwAction):
 
             tools_qt.fill_table(self.tbl_arc_x_relations, table_relations, filter_)
             self.tbl_arc_x_relations.doubleClicked.connect(
-                partial(self.open_selected_object, self.tbl_arc_x_relations))
+                partial(self._open_selected_object, self.tbl_arc_x_relations))
 
             tools_gw.open_dialog(self.dlg_work, dlg_name='feature_end_connec')
 
         else:
             # Update tablename of every geom_type
-            self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_element)
-            self.update_geom_type("element")
-            self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_connec)
-            self.update_geom_type("connec")
+            self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_element)
+            self._update_geom_type("element")
+            self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_connec)
+            self._update_geom_type("connec")
             if str(self.project_type) == 'ud':
-                self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_gully)
-                self.update_geom_type("gully")
-            self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
-            self.update_geom_type("arc")
-            self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_node)
-            self.update_geom_type("node")
+                self.s_et_list_selected_id(self.dlg_work_end.tbl_cat_work_x_gully)
+                self._update_geom_type("gully")
+            self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
+            self._update_geom_type("arc")
+            self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_node)
+            self._update_geom_type("node")
 
 
-            self.manage_close(self.dlg_work_end, True)
+            self._manage_close(self.dlg_work_end, True)
 
             # Remove selection for all layers in TOC
             for layer in self.iface.mapCanvas().layers():
@@ -309,7 +310,7 @@ class GwFeatureEndButton(GwAction):
             self.iface.mapCanvas().refresh()
 
 
-    def update_geom_type(self, geom_type):
+    def _update_geom_type(self, geom_type):
         """ Get elements from @geom_type and update his corresponding table """
 
         if len(self.selected_list) == 0:
@@ -327,7 +328,7 @@ class GwFeatureEndButton(GwAction):
         tools_gw.execute_procedure('gw_fct_setendfeature', body)
 
 
-    def open_selected_object(self, widget):
+    def _open_selected_object(self, widget):
         """ Open object form with selected record of the table """
 
         selected_list = widget.selectionModel().selectedRows()
@@ -339,10 +340,10 @@ class GwFeatureEndButton(GwAction):
         row = selected_list[0].row()
         feature_id = widget.model().record(row).value("arc_id")
 
-        self.open_arc_form(feature_id)
+        self._open_arc_form(feature_id)
 
 
-    def open_arc_form(self, arc_id):
+    def _open_arc_form(self, arc_id):
         """ Open form corresponding to start or end node of the current arc """
 
         # Get sys_feature_cat.id from cat_feature.id
@@ -381,7 +382,7 @@ class GwFeatureEndButton(GwAction):
             canvas.zoomIn()
 
 
-    def exec_downgrade(self):
+    def _exec_downgrade(self):
 
         message = "Are you sure you want to disconnect this elements?"
         title = "Disconnect elements"
@@ -390,15 +391,15 @@ class GwFeatureEndButton(GwAction):
             return
 
         # Update tablename of every geom_type
-        self.set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
-        self.update_geom_type("arc")
+        self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
+        self._update_geom_type("arc")
 
         self.canvas.refresh()
         self.dlg_work.close()
-        self.end_feature()
+        self._end_feature()
 
 
-    def set_completer(self):
+    def _set_completer(self):
         """ Set autocompleters of the form """
 
         # Adding auto-completion to a QLineEdit - visit_id
@@ -410,7 +411,7 @@ class GwFeatureEndButton(GwAction):
         completer.setModel(model)
 
 
-    def filter_by_id(self, table, widget_txt, tablename):
+    def _filter_by_id(self, table, widget_txt, tablename):
 
         id_ = tools_qt.get_text(self.dlg_work, widget_txt)
         if id_ != 'null':
@@ -419,10 +420,10 @@ class GwFeatureEndButton(GwAction):
             table.model().setFilter(expr)
             table.model().select()
         else:
-            self.fill_table_relations(table, self.schema_name + "." + tablename)
+            self._fill_table_relations(table, self.schema_name + "." + tablename)
 
 
-    def fill_table_relations(self, widget, table_name):
+    def _fill_table_relations(self, widget, table_name):
         """ Set a model with selected filter. Attach that model to selected table """
 
         if self.schema_name not in table_name:
@@ -450,13 +451,13 @@ class GwFeatureEndButton(GwAction):
         widget.show()
 
 
-    def close_dialog_workcat_list(self, dlg=None):
+    def _close_dialog_workcat_list(self, dlg=None):
         """ Close dialog """
         tools_gw.close_dialog(dlg)
         tools_gw.open_dialog(self.dlg_work_end)
 
 
-    def manage_close(self, dialog, force_downgrade=False, show_warning=False):
+    def _manage_close(self, dialog, force_downgrade=False, show_warning=False):
         """ Close dialog and disconnect snapping """
 
         tools_gw.close_dialog(dialog)
@@ -484,11 +485,11 @@ class GwFeatureEndButton(GwAction):
                 sql = ("DELETE FROM audit_log_data "
                        "WHERE fid = 128 AND cur_user = current_user")
                 tools_db.execute_sql(sql)
-        self.set_edit_arc_downgrade_force('False')
+        self._set_edit_arc_downgrade_force('False')
         self.canvas.refresh()
 
 
-    def new_workcat(self):
+    def _new_workcat(self):
 
         self.dlg_new_workcat = GwInfoWorkcatUi()
         tools_gw.load_settings(self.dlg_new_workcat)
@@ -498,14 +499,14 @@ class GwFeatureEndButton(GwAction):
         tools_gw.set_completer_widget(table_object, self.dlg_new_workcat.cat_work_id, 'id')
 
         # Set signals
-        self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
+        self.dlg_new_workcat.btn_accept.clicked.connect(partial(self._manage_new_workcat_accept, table_object))
         self.dlg_new_workcat.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_new_workcat))
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
 
 
-    def manage_new_workcat_accept(self, table_object):
+    def _manage_new_workcat_accept(self, table_object):
         """ Insert table 'cat_work'. Add cat_work """
 
         # Get values from dialog
@@ -568,3 +569,4 @@ class GwFeatureEndButton(GwAction):
                 msg = "This Workcat already exist"
                 tools_qt.show_info_box(msg, "Warning")
 
+    # endregion
