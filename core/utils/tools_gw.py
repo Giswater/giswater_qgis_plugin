@@ -430,7 +430,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
 
 
 def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
-                   group='GW Temporal Layers', call_set_tabs_enabled=True):
+                   group='GW Temporal Layers', call_set_tabs_enabled=True, close=True):
     """ Add QgsVectorLayer into TOC
     :param dialog: Dialog where to find the tab to be displayed and the textedit to be filled (QDialog or QMainWindow)
     :param data: Json with information
@@ -441,6 +441,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     :param del_old_layers:Delete layers added in previous operations (Boolean)
     :param group: Name of the group to which we want to add the layer (String)
     :param call_set_tabs_enabled: set all tabs, except the last, enabled or disabled (boolean).
+    :param close: Manage buttons accept, cancel, close...  in function def fill_tab_log(...) (boolean).
     :return: Dictionary with text as result of previuos data (String), and list of layers added (QgsVectorLayer).
     """
 
@@ -449,7 +450,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     srid = global_vars.srid
     for k, v in list(data.items()):
         if str(k) == "info":
-            text_result, change_tab = fill_tab_log(dialog, data, force_tab, reset_text, tab_idx, call_set_tabs_enabled)
+            text_result, change_tab = fill_tab_log(dialog, data, force_tab, reset_text, tab_idx, call_set_tabs_enabled, close)
         elif k in ('point', 'line', 'polygon'):
             if 'features' not in data[k]: continue
             counter = len(data[k]['features'])
@@ -490,7 +491,7 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
     return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
 
 
-def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_set_tabs_enabled=True):
+def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_set_tabs_enabled=True, close=True):
     """ Populate txt_infolog QTextEdit widget
     :param dialog: QDialog
     :param data: Json
@@ -498,6 +499,8 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
     :param reset_text: Reset(or not) text for each iteration (boolean)
     :param tab_idx: index of tab to force (integer)
     :param call_set_tabs_enabled: set all tabs, except the last, enabled or disabled (boolean)
+    :param close: Manage buttons accept, cancel, close... (boolean)
+
     :return: Text received from data (String)
     """
 
@@ -522,7 +525,26 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
             qtabwidget.setCurrentIndex(tab_idx)
         if call_set_tabs_enabled:
             set_tabs_enabled(dialog)
+    if close:
+        try:
+            dialog.btn_accept.disconnect()
+            dialog.btn_accept.hide()
+        except AttributeError as e:
+            # Control if btn_accept exist
+            pass
 
+        try:
+            if hasattr(dialog, 'btn_cancel'):
+                dialog.btn_cancel.disconnect()
+                dialog.btn_cancel.setText("Close")
+                dialog.btn_cancel.clicked.connect(lambda: dialog.close())
+            if hasattr(dialog, 'btn_close'):
+                dialog.btn_close.disconnect()
+                dialog.btn_close.setText("Close")
+                dialog.btn_close.clicked.connect(lambda: dialog.close())
+        except AttributeError as e:
+            # Control if btn_cancel exist
+            pass
     return text, change_tab
 
 

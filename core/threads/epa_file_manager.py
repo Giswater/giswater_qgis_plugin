@@ -96,7 +96,8 @@ class GwEpaFileManager(GwTask):
                         if 'body' in self.complet_result:
                             if 'data' in self.complet_result['body']:
                                 tools_gw.add_layer_temp(self.dlg_go2epa, self.complet_result['body']['data'],
-                                                        'INP results', True, True, 1, False, call_set_tabs_enabled=False)
+                                                        'INP results', True, True, 1, False, close=False,
+                                                        call_set_tabs_enabled=False)
 
             if self.import_result and self.rpt_result:
                 if 'status' in self.rpt_result:
@@ -104,7 +105,8 @@ class GwEpaFileManager(GwTask):
                         if 'body' in self.rpt_result:
                             if 'data' in self.rpt_result['body']:
                                 tools_gw.add_layer_temp(self.dlg_go2epa, self.rpt_result['body']['data'],
-                                                        'RPT results', True, True, 1, False, call_set_tabs_enabled=False)
+                                                        'RPT results', True, True, 1, False, close=False,
+                                                        call_set_tabs_enabled=False)
                         self.message = self.rpt_result['message']['text']
 
             if self.common_msg != "":

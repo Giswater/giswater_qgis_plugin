@@ -43,8 +43,6 @@ class GwArcDivideButton(GwMaptool):
                 return
             if 'hideForm' not in result['body']['actions'] or not result['body']['actions']['hideForm']:
                 self.dlg_dtext = GwDialogTextUi('arc_divide')
-                self.dlg_dtext.btn_accept.hide()
-                self.dlg_dtext.btn_close.clicked.connect(lambda: self.dlg_dtext.close())
                 tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, True, 1)
                 tools_gw.open_dialog(self.dlg_dtext)
 

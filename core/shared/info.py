@@ -731,7 +731,7 @@ class GwInfo(QObject):
             self.interpolate_result = tools_gw.execute_procedure('gw_fct_node_interpolate', body)
             if not self.interpolate_result or self.interpolate_result['status'] == 'Failed':
                 return False
-            tools_gw.fill_tab_log(dlg_dtext, self.interpolate_result['body']['data'])
+            tools_gw.fill_tab_log(dlg_dtext, self.interpolate_result['body']['data'], close=False)
 
 
     def chek_for_existing_values(self, dlg_dtext):

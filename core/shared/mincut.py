@@ -610,7 +610,7 @@ class GwMincut:
                 self.dlg_dtext.btn_accept.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
                 self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
 
-                tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False)
+                tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, close=False)
                 tools_gw.open_dialog(self.dlg_dtext)
 
         self.iface.actionPan().trigger()
