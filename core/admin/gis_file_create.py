@@ -75,7 +75,7 @@ class GwGisFileCreate:
 
         if get_database_parameters:
             # Get database parameters from layer source
-            status = self.get_database_parameters(schema)
+            status = self._get_database_parameters(schema)
             if not status:
                 return False, None
 
@@ -84,11 +84,11 @@ class GwGisFileCreate:
             content = f.read()
 
         # Connect to sqlite database
-        sqlite_conn = self.connect_sqlite()
+        sqlite_conn = self._connect_sqlite()
 
         # Replace spatialrefsys and extent parameters
-        content = self.replace_spatial_parameters(self.srid, content, sqlite_conn)
-        content = self.replace_extent_parameters(schema, content)
+        content = self._replace_spatial_parameters(self.srid, content, sqlite_conn)
+        content = self._replace_extent_parameters(schema, content)
 
         # Replace SCHEMA_NAME for schemaName parameter. SRID_VALUE for srid parameter
         content = content.replace("SCHEMA_NAME", schema)
@@ -119,7 +119,19 @@ class GwGisFileCreate:
             tools_qgis.show_warning(message, parameter=qgs_path)
 
 
-    def get_database_parameters(self, schema):
+    def set_database_parameters(self, host, port, db, user, password, srid):
+
+        self.host = host
+        self.port = port
+        self.db = db
+        self.user = user
+        self.password = password
+        self.srid = srid
+
+
+    # region private functions
+
+    def _get_database_parameters(self, schema):
         """ Get database parameters from layer source """
 
         layer_source, not_version = tools_db.get_layer_source_from_credentials('disable')
@@ -134,17 +146,7 @@ class GwGisFileCreate:
         return True
 
 
-    def set_database_parameters(self, host, port, db, user, password, srid):
-
-        self.host = host
-        self.port = port
-        self.db = db
-        self.user = user
-        self.password = password
-        self.srid = srid
-
-
-    def connect_sqlite(self):
+    def _connect_sqlite(self):
 
         status = False
         try:
@@ -162,7 +164,7 @@ class GwGisFileCreate:
         return status
 
 
-    def replace_spatial_parameters(self, srid, content, sqlite_conn):
+    def _replace_spatial_parameters(self, srid, content, sqlite_conn):
 
         aux = content
         if sqlite_conn:
@@ -197,7 +199,7 @@ class GwGisFileCreate:
         return aux
 
 
-    def replace_extent_parameters(self, schema_name, content):
+    def _replace_extent_parameters(self, schema_name, content):
 
         aux = content
         table_name = "node"
@@ -230,3 +232,4 @@ class GwGisFileCreate:
 
         return aux
 
+    # endregion
