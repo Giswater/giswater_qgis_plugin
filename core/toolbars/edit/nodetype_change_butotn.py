@@ -30,7 +30,57 @@ class GwNodeTypeChangeButton(GwMaptool):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
 
-    def open_catalog(self):
+    # region QgsMapTools inherited
+    """ QgsMapTools inherited event functions """
+
+    def keyPressEvent(self, event):
+
+        if event.key() == Qt.Key_Escape:
+            self.cancel_map_tool()
+            return
+
+
+    def canvasReleaseEvent(self, event):
+
+        self._nodetype_change(event)
+
+
+
+
+    def activate(self):
+
+        # Check button
+        self.action.setChecked(True)
+
+        # Store user snapping configuration
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
+
+        # Clear snapping
+        self.snapper_manager.set_snapping_status()
+        self.current_layer = self.iface.activeLayer()
+        # Set active layer to 'v_edit_node'
+        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
+        self.iface.setActiveLayer(self.layer_node)
+
+        # Change cursor
+        self.canvas.setCursor(self.cursor)
+
+        # Show help message when action is activated
+        if self.show_help:
+            message = "Select the node inside a pipe by clicking on it and it will be changed"
+            tools_qgis.show_info(message)
+
+
+    def deactivate(self):
+
+        # Call parent method
+        super().deactivate()
+
+    # endregion
+
+    # region private functions
+
+    def _open_catalog(self):
 
         # Get feature_type
         feature_type = tools_qt.get_text(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
@@ -42,7 +92,7 @@ class GwNodeTypeChangeButton(GwMaptool):
         self.catalog.open_catalog(self.dlg_chg_node_type, 'node_nodecat_id', 'node', feature_type)
 
 
-    def edit_change_elem_type_accept(self):
+    def _edit_change_elem_type_accept(self):
         """ Update current type of node and save changes in database """
 
         project_type = tools_gw.get_project_type()
@@ -52,7 +102,8 @@ class GwNodeTypeChangeButton(GwMaptool):
         layer = False
         if node_node_type_new != "null":
 
-            if (node_nodecat_id != "null" and node_nodecat_id is not None and project_type == 'ws') or (project_type == 'ud'):
+            if (node_nodecat_id != "null" and node_nodecat_id is not None and project_type == 'ws') or (
+                    project_type == 'ud'):
                 # Update field 'nodecat_id'
                 sql = (f"UPDATE v_edit_node SET nodecat_id = '{node_nodecat_id}' "
                        f"WHERE node_id = '{self.node_id}'")
@@ -91,10 +142,10 @@ class GwNodeTypeChangeButton(GwMaptool):
         if not is_valid:
             return
         if layer:
-            self.open_custom_form(layer, expr)
+            self._open_custom_form(layer, expr)
 
 
-    def open_custom_form(self, layer, expr):
+    def _open_custom_form(self, layer, expr):
         """ Open custom from selected layer """
 
         it = layer.getFeatures(QgsFeatureRequest(expr))
@@ -103,14 +154,14 @@ class GwNodeTypeChangeButton(GwMaptool):
             self.customForm = GwInfo(tab_type='data')
             self.customForm.user_current_layer = self.current_layer
             complet_result, dialog = self.customForm.get_info_from_id(table_name='v_edit_node', tab_type='data',
-                                                                 feature_id=features[0]["node_id"])
+                                                                      feature_id=features[0]["node_id"])
             if not complet_result:
                 return
 
             dialog.dlg_closed.connect(partial(tools_qgis.restore_user_layer, 'v_edit_node'))
 
 
-    def change_elem_type(self, feature):
+    def _change_elem_type(self, feature):
 
         # Create the dialog, fill node_type and define its signals
         self.dlg_chg_node_type = GwNodeTypeChangeUi()
@@ -121,7 +172,7 @@ class GwNodeTypeChangeButton(GwMaptool):
         project_type = tools_gw.get_project_type()
         if project_type == 'ws':
             node_type = feature.attribute('nodetype_id')
-            self.dlg_chg_node_type.node_node_type_new.currentIndexChanged.connect(partial(self.filter_catalog))
+            self.dlg_chg_node_type.node_node_type_new.currentIndexChanged.connect(partial(self._filter_catalog))
         elif project_type == 'ud':
             node_type = feature.attribute('node_type')
             sql = "SELECT DISTINCT(id), id FROM cat_node  ORDER BY id"
@@ -129,8 +180,8 @@ class GwNodeTypeChangeButton(GwMaptool):
             tools_qt.fill_combo_values(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
         self.dlg_chg_node_type.node_node_type.setText(node_type)
-        self.dlg_chg_node_type.btn_catalog.clicked.connect(partial(self.open_catalog))
-        self.dlg_chg_node_type.btn_accept.clicked.connect(self.edit_change_elem_type_accept)
+        self.dlg_chg_node_type.btn_catalog.clicked.connect(partial(self._open_catalog))
+        self.dlg_chg_node_type.btn_accept.clicked.connect(self._edit_change_elem_type_accept)
         self.dlg_chg_node_type.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_chg_node_type))
 
         # Fill 1st combo boxes-new system node type
@@ -143,7 +194,7 @@ class GwNodeTypeChangeButton(GwMaptool):
         tools_gw.open_dialog(self.dlg_chg_node_type, dlg_name='nodetype_change', maximize_button=False)
 
 
-    def filter_catalog(self):
+    def _filter_catalog(self):
 
         node_node_type_new = tools_qt.get_text(self.dlg_chg_node_type, self.dlg_chg_node_type.node_node_type_new)
 
@@ -156,22 +207,7 @@ class GwNodeTypeChangeButton(GwMaptool):
         tools_qt.fill_combo_values(self.dlg_chg_node_type.node_nodecat_id, rows, 1)
 
 
-    # region QgsMapTools inherited
-    """ QgsMapTools inherited event functions """
-
-    def keyPressEvent(self, event):
-
-        if event.key() == Qt.Key_Escape:
-            self.cancel_map_tool()
-            return
-
-
-    def canvasReleaseEvent(self, event):
-
-        self.nodetype_change(event)
-
-
-    def nodetype_change(self, event):
+    def _nodetype_change(self, event):
 
         self.node_id = None
 
@@ -191,37 +227,6 @@ class GwNodeTypeChangeButton(GwMaptool):
             if snapped_feat:
                 self.node_id = snapped_feat.attribute('node_id')
                 # Change node type
-                self.change_elem_type(snapped_feat)
-
-
-    def activate(self):
-
-        # Check button
-        self.action.setChecked(True)
-
-        # Store user snapping configuration
-        self.previous_snapping = self.snapper_manager.get_snapping_options()
-
-        # Clear snapping
-        self.snapper_manager.set_snapping_status()
-        self.current_layer = self.iface.activeLayer()
-        # Set active layer to 'v_edit_node'
-        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
-        self.iface.setActiveLayer(self.layer_node)
-
-        # Change cursor
-        self.canvas.setCursor(self.cursor)
-
-        # Show help message when action is activated
-        if self.show_help:
-            message = "Select the node inside a pipe by clicking on it and it will be changed"
-            tools_qgis.show_info(message)
-
-
-    def deactivate(self):
-
-        # Call parent method
-        super().deactivate()
+                self._change_elem_type(snapped_feat)
 
     # endregion
-
