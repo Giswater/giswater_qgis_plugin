@@ -19,7 +19,7 @@ from qgis.gui import QgsMapToolEmitPoint
 
 from .mincut_tools import GwMincutTools
 from .search import GwSearch
-from ..threads.task import GwTask
+from ..threads.mincut_execute import GwMincutTask
 from ..utils import tools_gw
 from ..ui.ui_manager import GwDialogTextUi, GwMincutUi, GwMincutComposerUi, GwMincutConnecUi, GwMincutEndUi, \
     GwMincutHydrometerUi, GwMincutManagerUi
@@ -612,7 +612,7 @@ class GwMincut:
                 self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
 
                 tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False)
-                tools_gw.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
+                tools_gw.open_dialog(self.dlg_dtext)
 
         self.iface.actionPan().trigger()
         self.remove_selection()
@@ -654,7 +654,6 @@ class GwMincut:
                     message = "Error on create auto mincut, you need to review data"
                     tools_qgis.show_warning(message)
                     tools_qgis.restore_cursor()
-                    self.task1.setProgress(100)
                     return
                 x1, y1 = polygon[0].split(' ')
                 x2, y2 = polygon[2].split(' ')
@@ -1447,10 +1446,13 @@ class GwMincut:
             snapped_point = self.snapper_manager.get_snapped_point(result)
             element_id = snapped_feat.attribute(elem_type + '_id')
             layer.select([feature_id])
-            self.auto_mincut_execute(element_id, elem_type, snapped_point.x(), snapped_point.y())
-            self.set_visible_mincut_layers()
-            self.snapper_manager.restore_snap_options(self.previous_snapping)
-            self.remove_selection()
+            description = "Mincut execute"
+            self.mincut_task = GwMincutTask(description, self, element_id)
+
+            QgsApplication.taskManager().addTask(self.mincut_task)
+            QgsApplication.taskManager().triggerTask(self.mincut_task)
+            self.mincut_task.task_finished.connect(
+                partial(self.mincut_task_finished, snapped_point, elem_type, element_id))
 
 
     def set_visible_mincut_layers(self, zoom=False):
@@ -1523,39 +1525,12 @@ class GwMincut:
             self.snapper_manager.get_snapped_feature(result, True)
 
 
-    def auto_mincut_execute(self, elem_id, elem_type, snapping_x, snapping_y):
-        """ Automatic mincut: Execute function 'gw_fct_mincut' """
-
-        self.task1 = GwTask('Calculating mincut')
-        QgsApplication.taskManager().addTask(self.task1)
-        self.task1.setProgress(0)
-
-        srid = global_vars.srid
-        real_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
-        if self.is_new:
-            self.set_id_val()
-            self.is_new = False
-
-            sql = ("INSERT INTO om_mincut (mincut_state)"
-                   " VALUES (0) RETURNING id;")
-            new_mincut_id = tools_db.execute_returning(sql)
-            if new_mincut_id[0] < 1:
-                real_mincut_id = 1
-                sql = (f"UPDATE om_mincut SET(id) = (1) "
-                       f"WHERE id = {new_mincut_id[0]};")
-                tools_db.execute_sql(sql)
-            else:
-                real_mincut_id = new_mincut_id[0]
-
-        tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id, real_mincut_id)
-        self.task1.setProgress(25)
-
-        extras = f'"action":"mincutNetwork", '
-        extras += f'"mincutId":"{real_mincut_id}", "arcId":"{elem_id}"'
-        body = tools_gw.create_body(extras=extras)
-        complet_result = tools_gw.execute_procedure('gw_fct_setmincut', body)
-        if complet_result in (False, None) or ('status' in complet_result and complet_result['status'] == 'Failed'): return False
-        if 'mincutOverlap' in complet_result or complet_result['status'] == 'Accepted':
+    def mincut_task_finished(self, snapped_point, elem_type, element_id, signal):
+        if not signal[0]:
+            return False
+        elif signal[1]:
+            complet_result = signal[1]
+            real_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
             if 'mincutOverlap' in complet_result and complet_result['mincutOverlap'] != "":
                 message = "Mincut done, but has conflict and overlaps with"
                 tools_qt.show_info_box(message, parameter=complet_result['mincutOverlap'])
@@ -1571,25 +1546,22 @@ class GwMincut:
                 message = "Error on create auto mincut, you need to review data"
                 tools_qgis.show_warning(message)
                 tools_qgis.restore_cursor()
-                self.task1.setProgress(100)
                 return
             x1, y1 = polygon[0].split(' ')
             x2, y2 = polygon[2].split(' ')
             tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
             sql = (f"UPDATE om_mincut"
                    f" SET mincut_class = 1, "
-                   f" anl_the_geom = ST_SetSRID(ST_Point({snapping_x}, "
-                   f"{snapping_y}), {srid}),"
+                   f" anl_the_geom = ST_SetSRID(ST_Point({snapped_point.x()}, "
+                   f"{snapped_point.y()}), {global_vars.srid}),"
                    f" anl_user = current_user, anl_feature_type = '{elem_type.upper()}',"
-                   f" anl_feature_id = '{elem_id}'"
+                   f" anl_feature_id = '{element_id}'"
                    f" WHERE id = '{real_mincut_id}'")
             status = tools_db.execute_sql(sql)
-            self.task1.setProgress(50)
             if not status:
                 message = "Error updating element in table, you need to review data"
                 tools_qgis.show_warning(message)
                 tools_qgis.restore_cursor()
-                self.task1.setProgress(100)
                 return
 
             # Enable button CustomMincut and button Start
@@ -1604,13 +1576,17 @@ class GwMincut:
                    f"INSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
                    f" (current_user, {real_mincut_id});")
             tools_db.execute_sql(sql, log_error=True)
-            self.task1.setProgress(75)
             # Refresh map canvas
             tools_qgis.refresh_map_canvas()
 
-        # Disconnect snapping and related signals
+            # Disconnect snapping and related signals
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-        self.task1.setProgress(100)
+        self.set_visible_mincut_layers()
+        self.snapper_manager.restore_snap_options(self.previous_snapping)
+        self.remove_selection()
+
+
+
 
 
     def custom_mincut(self, action, is_checked):
