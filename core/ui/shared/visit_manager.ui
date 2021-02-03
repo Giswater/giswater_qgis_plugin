@@ -90,15 +90,15 @@
           </item>
           <item>
            <widget class="QDateEdit" name="date_event_from">
+            <property name="calendarPopup">
+             <bool>true</bool>
+            </property>
             <property name="date">
              <date>
               <year>2016</year>
               <month>1</month>
               <day>1</day>
              </date>
-            </property>
-            <property name="calendarPopup">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -135,15 +135,15 @@
           </item>
           <item>
            <widget class="QDateEdit" name="date_event_to">
+            <property name="calendarPopup">
+             <bool>true</bool>
+            </property>
             <property name="date">
              <date>
               <year>2017</year>
               <month>1</month>
               <day>1</day>
              </date>
-            </property>
-            <property name="calendarPopup">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -192,21 +192,16 @@
          </spacer>
         </item>
         <item>
-         <widget class="QDialogButtonBox" name="btn_box">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+         <widget class="QPushButton" name="btn_accept">
+          <property name="text">
+           <string>Accept</string>
           </property>
-          <property name="maximumSize">
-           <size>
-            <width>200</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="standardButtons">
-           <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_close">
+          <property name="text">
+           <string>Close</string>
           </property>
          </widget>
         </item>
@@ -226,38 +221,5 @@
   <tabstop>tbl_visit</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>btn_box</sender>
-   <signal>accepted()</signal>
-   <receiver>dlg_visit_manager</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>btn_box</sender>
-   <signal>rejected()</signal>
-   <receiver>dlg_visit_manager</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
