@@ -46,7 +46,7 @@ class GwPointAddButton(GwAction):
                     pass
                 self.menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
-                obj_action.triggered.connect(partial(self.save_last_selection, self.menu, feature_cat))
+                obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
 
         self.menu.addSeparator()
 
@@ -62,7 +62,7 @@ class GwPointAddButton(GwAction):
                     pass
                 self.menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
-                obj_action.triggered.connect(partial(self.save_last_selection, self.menu, feature_cat))
+                obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
         self.menu.addSeparator()
 
         list_feature_cat = tools_os.get_values_from_dictionary(self.feature_cat)
@@ -77,7 +77,7 @@ class GwPointAddButton(GwAction):
                     pass
                 self.menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
-                obj_action.triggered.connect(partial(self.save_last_selection, self.menu, feature_cat))
+                obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
         self.menu.addSeparator()
 
 
@@ -86,12 +86,14 @@ class GwPointAddButton(GwAction):
             toolbar.addAction(self.action)
 
 
-    def save_last_selection(self, menu, feature_cat):
-        menu.setProperty("last_selection", feature_cat)
-
-
     def clicked_event(self):
         if self.menu.property('last_selection') is not None:
             self.info_feature.add_feature(self.menu.property('last_selection'))
 
 
+    # region private functions
+
+    def _save_last_selection(self, menu, feature_cat):
+        menu.setProperty("last_selection", feature_cat)
+
+    # endregion
