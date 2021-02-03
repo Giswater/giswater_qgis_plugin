@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import json
 import os
 from datetime import datetime
 from functools import partial
@@ -19,14 +18,14 @@ from qgis.gui import QgsMapToolEmitPoint
 
 from .mincut_tools import GwMincutTools
 from .search import GwSearch
-from ..threads.mincut_execute import GwMincutTask
+from ..threads.auto_mincut_execute import GwAutoMincutTask
 from ..utils import tools_gw
-from ..ui.ui_manager import GwDialogTextUi, GwMincutUi, GwMincutComposerUi, GwMincutConnecUi, GwMincutEndUi, \
-    GwMincutHydrometerUi, GwMincutManagerUi
-from ... import global_vars
-from ...lib import tools_qt, tools_qgis, tools_log, tools_db
 from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
+from ..ui.ui_manager import GwDialogTextUi, GwMincutUi, GwMincutComposerUi, GwMincutConnecUi, GwMincutEndUi, \
+    GwMincutHydrometerUi
+from ... import global_vars
+from ...lib import tools_qt, tools_qgis, tools_log, tools_db
 
 
 class GwMincut:
@@ -1447,7 +1446,7 @@ class GwMincut:
             element_id = snapped_feat.attribute(elem_type + '_id')
             layer.select([feature_id])
             description = "Mincut execute"
-            self.mincut_task = GwMincutTask(description, self, element_id)
+            self.mincut_task = GwAutoMincutTask(description, self, element_id)
 
             QgsApplication.taskManager().addTask(self.mincut_task)
             QgsApplication.taskManager().triggerTask(self.mincut_task)
@@ -1584,9 +1583,6 @@ class GwMincut:
         self.set_visible_mincut_layers()
         self.snapper_manager.restore_snap_options(self.previous_snapping)
         self.remove_selection()
-
-
-
 
 
     def custom_mincut(self, action, is_checked):

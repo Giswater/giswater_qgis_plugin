@@ -6,18 +6,15 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDoubleSpinBox, QSpinBox, QWidget, QLineEdit
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsTask
-from qgis.gui import QgsDateTimeEdit
 
 from .task import GwTask
 from ..utils import tools_gw
-from ...lib import tools_db, tools_log, tools_qgis, tools_qt
-from ... import global_vars
+from ...lib import tools_db, tools_qt
 
 
-class GwMincutTask(GwTask):
+class GwAutoMincutTask(GwTask):
     """ This shows how to subclass QgsTask """
 
     task_finished = pyqtSignal(list)
@@ -72,6 +69,7 @@ class GwMincutTask(GwTask):
             self.task_finished.emit([False, self.complet_result])
         elif 'mincutOverlap' in self.complet_result or self.complet_result['status'] == 'Accepted':
             self.task_finished.emit([True, self.complet_result])
+
 
     def cancel(self):
         super().cancel()
