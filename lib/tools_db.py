@@ -420,9 +420,10 @@ def get_layer_source_from_credentials(sslmode_value, layer_name='v_edit_node'):
         global_vars.session_vars['last_error'] = f"Layer not found: '{layer_name}'"
         return None, not_version
 
-    # Get sslmode from user config file
-    tools_config.manage_user_config_file()
+    # Get sslmode from user init config file
+    tools_config.manage_init_config_file()
     sslmode = tools_config.get_user_setting_value('system', 'sslmode', sslmode_value)
+
     credentials = None
     not_version = True
     if layer:
