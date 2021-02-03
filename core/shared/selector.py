@@ -123,7 +123,7 @@ class GwSelector:
                     widget.textChanged.connect(partial(self.get_selector, dialog, selector_type, filter=True,
                                                        widget=widget, current_tab=current_tab,
                                                        selector_vars=selector_vars))
-                    widget.textChanged.connect(partial(self.manage_filter, dialog, widget, 'save', selector_vars))
+                    widget.textChanged.connect(partial(self._manage_filter, dialog, widget, 'save', selector_vars))
                     widget.setLayoutDirection(Qt.RightToLeft)
 
                 else:
@@ -147,7 +147,7 @@ class GwSelector:
                     if tools_qt.get_widget(dialog, f"chk_all_{form_tab['tabName']}") is None:
                         widget = QCheckBox()
                         widget.setObjectName('chk_all_' + str(form_tab['tabName']))
-                        widget.stateChanged.connect(partial(self.manage_all, dialog, widget, selector_vars))
+                        widget.stateChanged.connect(partial(self._manage_all, dialog, widget, selector_vars))
                         widget.setLayoutDirection(Qt.RightToLeft)
 
                     else:
@@ -163,7 +163,7 @@ class GwSelector:
                 label.setText(field['label'])
 
                 widget = tools_gw.add_checkbox(field)
-                widget.stateChanged.connect(partial(self.set_selection_mode, dialog, widget, selection_mode, selector_vars))
+                widget.stateChanged.connect(partial(self._set_selection_mode, dialog, widget, selection_mode, selector_vars))
                 widget.setLayoutDirection(Qt.RightToLeft)
 
                 field['layoutname'] = gridlayout.objectName()
@@ -190,7 +190,10 @@ class GwSelector:
                 tools_qt.set_widget_text(dialog, widget, f'{value}')
                 widget.blockSignals(False)
 
-    def set_selection_mode(self, dialog, widget, selection_mode, selector_vars):
+
+    # region private functions
+
+    def _set_selection_mode(self, dialog, widget, selection_mode, selector_vars):
         """ Manage selection mode
         :param dialog: QDialog where search all checkbox
         :param widget: QCheckBox that has changed status (QCheckBox)
@@ -213,12 +216,12 @@ class GwSelector:
                 widget_all.blockSignals(True)
                 tools_qt.set_checked(dialog, widget_all, False)
                 widget_all.blockSignals(False)
-            self.remove_previuos(dialog, widget, widget_all, widget_list)
+            self._remove_previuos(dialog, widget, widget_all, widget_list)
 
-        self.set_selector(dialog, widget, is_alone, selector_vars)
+        self._set_selector(dialog, widget, is_alone, selector_vars)
 
 
-    def set_selector(self, dialog, widget, is_alone, selector_vars):
+    def _set_selector(self, dialog, widget, is_alone, selector_vars):
         """  Send values to DB and reload selectors
         :param dialog: QDialog
         :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
@@ -271,7 +274,7 @@ class GwSelector:
             widget_filter.textChanged.emit(widget_filter.text())
 
 
-    def remove_previuos(self, dialog, widget, widget_all, widget_list):
+    def _remove_previuos(self, dialog, widget, widget_all, widget_list):
         """ Remove checks of not selected QCheckBox
         :param dialog: QDialog
         :param widget: QCheckBox that has changed status (QCheckBox)
@@ -295,7 +298,7 @@ class GwSelector:
                 checkbox.blockSignals(False)
 
 
-    def manage_filter(self, dialog, widget, action, selector_vars):
+    def _manage_filter(self, dialog, widget, action, selector_vars):
         index = dialog.main_tab.currentIndex()
         tab_name = dialog.main_tab.widget(index).objectName()
         if action == 'save':
@@ -304,7 +307,7 @@ class GwSelector:
             selector_vars[f"var_txt_filter_{tab_name}"] = ''
 
 
-    def manage_all(self, dialog, widget_all, selector_vars):
+    def _manage_all(self, dialog, widget_all, selector_vars):
 
         key_modifier = QApplication.keyboardModifiers()
         status = tools_qt.is_checked(dialog, widget_all)
@@ -321,4 +324,6 @@ class GwSelector:
             tools_qt.set_checked(dialog, widget, status)
             widget.blockSignals(False)
 
-        self.set_selector(dialog, widget_all, False, selector_vars)
+        self._set_selector(dialog, widget_all, False, selector_vars)
+
+    # endregion
