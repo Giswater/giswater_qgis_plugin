@@ -199,6 +199,9 @@ BEGIN
 		ALTER TABLE sys_addfields DROP COLUMN if exists _dv_table_;
 		ALTER TABLE sys_addfields DROP COLUMN if exists _dv_key_column_;
 		ALTER TABLE sys_addfields DROP COLUMN if exists _sql_text_;
+		ALTER TABLE sys_addfields DROP COLUMN if exists _field_length_;
+		ALTER TABLE sys_addfields DROP COLUMN if exists _num_decimals_;
+		ALTER TABLE sys_addfields DROP COLUMN if exists _dv_value_column_;
 		
 		-- inserting on config_param_system table
 		INSERT INTO config_param_system (parameter, value, datatype, descript, project_type, label)

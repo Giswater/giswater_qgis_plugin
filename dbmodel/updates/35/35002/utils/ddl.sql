@@ -107,3 +107,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_featur
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_table", "column":"sys_roleselect_id", "newName":"sys_roleselect"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_table", "column":"qgis_role_id", "newName":"qgis_role"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_visit_class", "column":"sys_role_id", "newName":"sys_role"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_addfields", "column":"field_length", "newName":"_field_length_"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_addfields", "column":"num_decimals", "newName":"_num_decimals_"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_addfields", "column":"dv_value_column", "newName":"_dv_value_column_"}}$$);
