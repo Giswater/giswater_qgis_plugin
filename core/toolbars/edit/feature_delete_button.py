@@ -47,15 +47,15 @@ class GwFeatureDeleteButton(GwAction):
         # Configure feature_id as typeahead
         completer = QCompleter()
         model = QStringListModel()
-        self.filter_typeahead(self.dlg_feature_delete.feature_id, completer, model)
+        self._filter_typeahead(self.dlg_feature_delete.feature_id, completer, model)
 
         # Set listeners
         self.dlg_feature_delete.feature_id.textChanged.connect(
-            partial(self.filter_typeahead, self.dlg_feature_delete.feature_id, completer, model))
+            partial(self._filter_typeahead, self.dlg_feature_delete.feature_id, completer, model))
 
         # Set button snapping
-        self.dlg_feature_delete.btn_snapping.clicked.connect(partial(self.set_active_layer))
-        self.dlg_feature_delete.btn_snapping.clicked.connect(partial(self.selection_init))
+        self.dlg_feature_delete.btn_snapping.clicked.connect(partial(self._set_active_layer))
+        self.dlg_feature_delete.btn_snapping.clicked.connect(partial(self._selection_init))
         tools_gw.add_icon(self.dlg_feature_delete.btn_snapping, "137")
 
         # Set listeners
@@ -63,9 +63,9 @@ class GwFeatureDeleteButton(GwAction):
         self.dlg_feature_delete.rejected.connect(tools_qgis.disconnect_signal_selection_changed)
         self.dlg_feature_delete.rejected.connect(partial(tools_gw.save_settings, self.dlg_feature_delete))
 
-        self.dlg_feature_delete.btn_relations.clicked.connect(partial(self.show_feature_relation))
-        self.dlg_feature_delete.btn_delete.clicked.connect(partial(self.delete_feature_relation))
-        self.dlg_feature_delete.feature_type.currentIndexChanged.connect(partial(self.set_active_layer))
+        self.dlg_feature_delete.btn_relations.clicked.connect(partial(self._show_feature_relation))
+        self.dlg_feature_delete.btn_delete.clicked.connect(partial(self._delete_feature_relation))
+        self.dlg_feature_delete.feature_type.currentIndexChanged.connect(partial(self._set_active_layer))
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_feature_delete, dlg_name='feature_delete')
@@ -91,7 +91,18 @@ class GwFeatureDeleteButton(GwAction):
         self.dlg_feature_delete.feature_id.setStyleSheet(None)
 
 
-    def show_feature_relation(self):
+    def connect_signal_selection_changed(self):
+        """ Connect signal selectionChanged """
+
+        try:
+            self.canvas.selectionChanged.connect(partial(self._manage_selection))
+        except:
+            pass
+
+
+    # region private functions
+
+    def _show_feature_relation(self):
 
         # Get feature_type and feature_id
         feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
@@ -119,7 +130,7 @@ class GwFeatureDeleteButton(GwAction):
             self.dlg_feature_delete.btn_delete.setEnabled(True)
 
 
-    def delete_feature_relation(self):
+    def _delete_feature_relation(self):
 
         # Get feature_type and feature_id
         feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
@@ -155,7 +166,7 @@ class GwFeatureDeleteButton(GwAction):
             tools_gw.close_dialog(self.dlg_feature_delete)
 
 
-    def selection_init(self):
+    def _selection_init(self):
         """ Set canvas map tool to an instance of class 'GwSelectManager' """
 
         tools_qgis.disconnect_signal_selection_changed()
@@ -163,16 +174,7 @@ class GwFeatureDeleteButton(GwAction):
         self.connect_signal_selection_changed()
 
 
-    def connect_signal_selection_changed(self):
-        """ Connect signal selectionChanged """
-
-        try:
-            self.canvas.selectionChanged.connect(partial(self.manage_selection))
-        except:
-            pass
-
-
-    def manage_selection(self):
+    def _manage_selection(self):
         """ Slot function for signal 'canvas.selectionChanged' """
 
         # Get feature_type and feature_id
@@ -194,7 +196,7 @@ class GwFeatureDeleteButton(GwAction):
                 tools_qt.set_widget_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, str(selected_id))
 
 
-    def set_active_layer(self):
+    def _set_active_layer(self):
 
         self.dlg_feature_delete.feature_id.setStyleSheet(None)
 
@@ -212,3 +214,5 @@ class GwFeatureDeleteButton(GwAction):
         # Clear feature id field
         tools_qt.set_widget_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, '')
         self.dlg_feature_delete.feature_id.setStyleSheet(None)
+
+    # endregion
