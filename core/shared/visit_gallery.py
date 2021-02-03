@@ -102,7 +102,7 @@ class GwVisitGallery:
                 pixmap = pixmap.scaled(171, 151, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
                 widget_extended = GwExtendedQLabel(widget)
                 widget_extended.setPixmap(pixmap)
-                widget_extended.clicked.connect(partial(self.zoom_img, i, visit_id, event_id))
+                widget_extended.clicked.connect(partial(self._zoom_img, i, visit_id, event_id))
                 self.list_widget.append(widget_extended)
                 self.list_labels.append(widget)
 
@@ -113,9 +113,9 @@ class GwVisitGallery:
 
         self.start_indx = 0
         self.btn_next = self.dlg_gallery.findChild(QPushButton, "btn_next")
-        self.btn_next.clicked.connect(self.next_gallery)
+        self.btn_next.clicked.connect(self._next_gallery)
         self.btn_previous = self.dlg_gallery.findChild(QPushButton, "btn_previous")
-        self.btn_previous.clicked.connect(self.previous_gallery)
+        self.btn_previous.clicked.connect(self._previous_gallery)
         tools_gw.add_icon(self.btn_previous, "109")
         tools_gw.add_icon(self.btn_next, "108")
         self.btn_close = self.dlg_gallery.findChild(QPushButton, "btn_close")
@@ -129,7 +129,10 @@ class GwVisitGallery:
         tools_gw.open_dialog(self.dlg_gallery, dlg_name='visit_gallery', maximize_button=False)
 
 
-    def next_gallery(self):
+    # region private functions
+
+
+    def _next_gallery(self):
 
         self.start_indx = self.start_indx + 1
 
@@ -166,7 +169,7 @@ class GwVisitGallery:
             self.btn_next.setEnabled(False)
 
 
-    def previous_gallery(self):
+    def _previous_gallery(self):
 
         self.start_indx = self.start_indx - 1
 
@@ -201,7 +204,7 @@ class GwVisitGallery:
             self.btn_next.setEnabled(True)
 
 
-    def zoom_img(self, i, visit_id, event_id):
+    def _zoom_img(self, i, visit_id, event_id):
 
         handeler_index = i
 
@@ -238,8 +241,8 @@ class GwVisitGallery:
         self.dlg_gallery_zoom.rejected.connect(partial(tools_gw.close_dialog, self.dlg_gallery_zoom))
 
         self.i = i
-        self.btn_slidePrevious.clicked.connect(self.slide_previous)
-        self.btn_slideNext.clicked.connect(self.slide_next)
+        self.btn_slidePrevious.clicked.connect(self._slide_previous)
+        self.btn_slideNext.clicked.connect(self._slide_next)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_gallery_zoom, dlg_name='visit_gallery_zoom', maximize_button=False)
@@ -249,7 +252,7 @@ class GwVisitGallery:
             self.start_indx = self.start_indx + 1
 
 
-    def slide_previous(self):
+    def _slide_previous(self):
 
         indx = (self.start_indx * 9) + self.i - 1
 
@@ -276,7 +279,7 @@ class GwVisitGallery:
             self.btn_slideNext.setEnabled(True)
 
 
-    def slide_next(self):
+    def _slide_next(self):
 
         indx = (self.start_indx * 9) + self.i + 1
 
@@ -303,3 +306,4 @@ class GwVisitGallery:
         if indx == (self.num_events - 1):
             self.btn_slideNext.setEnabled(False)
 
+    # endregion
