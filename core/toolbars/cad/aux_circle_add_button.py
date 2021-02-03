@@ -30,59 +30,6 @@ class GwAuxCircleAddButton(GwMaptool):
         self.snap_to_selected_layer = False
 
 
-    def init_create_circle_form(self, point):
-
-        # Create the dialog and signals
-        self.dlg_create_circle = GwAuxCircleUi()
-        tools_gw.load_settings(self.dlg_create_circle)
-        self.cancel_circle = False
-        validator = QDoubleValidator(0.00, 999.00, 3)
-        validator.setNotation(QDoubleValidator().StandardNotation)
-        self.dlg_create_circle.radius.setValidator(validator)
-
-        self.dlg_create_circle.btn_accept.clicked.connect(partial(self.get_radius, point))
-        self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
-        self.dlg_create_circle.radius.setFocus()
-
-        tools_gw.open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
-
-
-    def get_radius(self, point):
-
-        self.radius = self.dlg_create_circle.radius.text()
-        if not self.radius:
-            self.radius = 0.1
-        self.delete_prev = tools_qt.is_checked(self.dlg_create_circle, self.dlg_create_circle.chk_delete_prev)
-
-        if self.layer_circle:
-            self.layer_circle.startEditing()
-            tools_gw.close_dialog(self.dlg_create_circle)
-            if self.delete_prev:
-                selection = self.layer_circle.getFeatures()
-                self.layer_circle.selectByIds([f.id() for f in selection])
-                if self.layer_circle.selectedFeatureCount() > 0:
-                    features = self.layer_circle.selectedFeatures()
-                    for feature in features:
-                        self.layer_circle.deleteFeature(feature.id())
-
-            if not self.cancel_circle:
-                feature = QgsFeature()
-                feature.setGeometry(QgsGeometry.fromPointXY(point).buffer(float(self.radius), 100))
-                provider = self.layer_circle.dataProvider()
-                # Next line generate: WARNING    Attribute index 0 out of bounds [0;0]
-                # but all work ok
-                provider.addFeatures([feature])
-
-            self.layer_circle.commitChanges()
-            self.layer_circle.dataProvider().forceReload()
-            self.layer_circle.triggerRepaint()
-
-        else:
-            self.iface.actionPan().trigger()
-            self.cancel_circle = False
-            return
-
-
     def cancel(self):
 
         tools_gw.close_dialog(self.dlg_create_circle)
@@ -92,7 +39,6 @@ class GwAuxCircleAddButton(GwMaptool):
                 self.layer_circle.commitChanges()
         self.cancel_circle = True
         self.iface.setActiveLayer(self.current_layer)
-
 
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
@@ -123,37 +69,7 @@ class GwAuxCircleAddButton(GwMaptool):
 
     def canvasReleaseEvent(self, event):
 
-        self.add_aux_circle(event)
-
-
-    def add_aux_circle(self, event):
-
-        if event.button() == Qt.LeftButton:
-
-            # Get coordinates
-            x = event.pos().x()
-            y = event.pos().y()
-            event_point = self.snapper_manager.get_event_point(event)
-
-            # Create point with snap reference
-            result = self.snapper_manager.snap_to_project_config_layers(event_point)
-            point = self.snapper_manager.get_snapped_point(result)
-
-            # Create point with mouse cursor reference
-            if point is None:
-                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
-
-            self.init_create_circle_form(point)
-
-        elif event.button() == Qt.RightButton:
-            self.iface.actionPan().trigger()
-            self.cancel_circle = True
-            self.cancel_map_tool()
-            self.iface.setActiveLayer(self.current_layer)
-            return
-
-        if self.layer_circle:
-            self.layer_circle.commitChanges()
+        self._add_aux_circle(event)
 
 
     def activate(self):
@@ -204,5 +120,91 @@ class GwAuxCircleAddButton(GwMaptool):
         # Call parent method
         super().deactivate()
         self.iface.setActiveLayer(self.current_layer)
+
+    # endregion
+
+    # region private functions
+
+    def _init_create_circle_form(self, point):
+
+        # Create the dialog and signals
+        self.dlg_create_circle = GwAuxCircleUi()
+        tools_gw.load_settings(self.dlg_create_circle)
+        self.cancel_circle = False
+        validator = QDoubleValidator(0.00, 999.00, 3)
+        validator.setNotation(QDoubleValidator().StandardNotation)
+        self.dlg_create_circle.radius.setValidator(validator)
+
+        self.dlg_create_circle.btn_accept.clicked.connect(partial(self._get_radius, point))
+        self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
+        self.dlg_create_circle.radius.setFocus()
+
+        tools_gw.open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
+
+
+    def _get_radius(self, point):
+
+        self.radius = self.dlg_create_circle.radius.text()
+        if not self.radius:
+            self.radius = 0.1
+        self.delete_prev = tools_qt.is_checked(self.dlg_create_circle, self.dlg_create_circle.chk_delete_prev)
+
+        if self.layer_circle:
+            self.layer_circle.startEditing()
+            tools_gw.close_dialog(self.dlg_create_circle)
+            if self.delete_prev:
+                selection = self.layer_circle.getFeatures()
+                self.layer_circle.selectByIds([f.id() for f in selection])
+                if self.layer_circle.selectedFeatureCount() > 0:
+                    features = self.layer_circle.selectedFeatures()
+                    for feature in features:
+                        self.layer_circle.deleteFeature(feature.id())
+
+            if not self.cancel_circle:
+                feature = QgsFeature()
+                feature.setGeometry(QgsGeometry.fromPointXY(point).buffer(float(self.radius), 100))
+                provider = self.layer_circle.dataProvider()
+                # Next line generate: WARNING    Attribute index 0 out of bounds [0;0]
+                # but all work ok
+                provider.addFeatures([feature])
+
+            self.layer_circle.commitChanges()
+            self.layer_circle.dataProvider().forceReload()
+            self.layer_circle.triggerRepaint()
+
+        else:
+            self.iface.actionPan().trigger()
+            self.cancel_circle = False
+            return
+
+
+    def _add_aux_circle(self, event):
+
+        if event.button() == Qt.LeftButton:
+
+            # Get coordinates
+            x = event.pos().x()
+            y = event.pos().y()
+            event_point = self.snapper_manager.get_event_point(event)
+
+            # Create point with snap reference
+            result = self.snapper_manager.snap_to_project_config_layers(event_point)
+            point = self.snapper_manager.get_snapped_point(result)
+
+            # Create point with mouse cursor reference
+            if point is None:
+                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+
+            self._init_create_circle_form(point)
+
+        elif event.button() == Qt.RightButton:
+            self.iface.actionPan().trigger()
+            self.cancel_circle = True
+            self.cancel_map_tool()
+            self.iface.setActiveLayer(self.current_layer)
+            return
+
+        if self.layer_circle:
+            self.layer_circle.commitChanges()
 
     # endregion
