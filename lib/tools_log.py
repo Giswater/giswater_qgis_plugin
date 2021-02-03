@@ -17,6 +17,7 @@ from . import tools_qt, tools_os
 
 min_log_level = 20
 
+
 class GwLogger(object):
 
     def __init__(self, log_name, log_level, log_suffix, folder_has_tstamp=False, file_has_tstamp=True,
@@ -131,13 +132,10 @@ class GwLogger(object):
             log_warning(f"Error logging: {e}", logger_file=False)
 
 
-def set_logger(logger_name=None):
+def set_logger(logger_name):
     """ Set logger class. This class will generate new logger file """
 
     if global_vars.logger is None:
-        if logger_name is None:
-            logger_name = 'plugin'
-
         log_suffix = '%Y%m%d'
         global_vars.logger = GwLogger(logger_name, min_log_level, str(log_suffix))
         values = {10: 0, 20: 0, 30: 1, 40: 2}
