@@ -502,7 +502,7 @@ BEGIN
 		END IF;
 
 		-- start process
-		FOR v_rectable IN SELECT * FROM sys_table WHERE qgis_role_id IN 
+		FOR v_rectable IN SELECT * FROM sys_table WHERE qgis_role IN 
 		(SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member') )
 		LOOP
 		
