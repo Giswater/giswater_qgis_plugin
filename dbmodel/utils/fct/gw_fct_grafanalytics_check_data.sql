@@ -50,6 +50,7 @@ v_dqa boolean;
 v_minsector boolean;
 v_grafclass text;
 v_error_context text;
+rec text;
 
 BEGIN
 
@@ -373,6 +374,39 @@ BEGIN
 		END IF;
 
 	END IF;
+
+	--Check if defined nodes and arcs exist in a database
+
+	FOR rec IN SELECT DISTINCT lower(graf_delimiter) FROM SCHEMA_NAME.cat_feature_node where graf_delimiter NOT IN ('MINSECTOR','NONE') AND graf_delimiter IS NOT NULL LOOP
+	
+		v_querytext = 'SELECT b.arc_id FROM (
+		SELECT json_array_elements_text(((json_array_elements_text((grafconfig->>''use'')::json))::json->>''toArc'')::json) as arc_id FROM '||rec||')b 
+		WHERE arc_id not in (select arc_id FROM arc)';
+
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+		IF v_count > 0 THEN
+			EXECUTE 'INSERT INTO audit_check_data (fid, criticity, error_message)
+			SELECT 211, 2, concat(''WARNING: There is/are '','||v_count||',
+			'' arc(s) that are configured as toArc for '','''||rec||''','' but does not exist on arc table. Arc_id - '',string_agg(a.arc_id,'', ''),''.'') FROM('|| v_querytext||')a;';
+		ELSE
+			INSERT INTO audit_check_data (fid, criticity, error_message)
+			VALUES (211, 1, concat('INFO: All arcs defined as toArc on ',rec,' exists on DB.'));
+		END IF;
+
+		v_querytext = 'SELECT b.node_id FROM (
+		SELECT ((json_array_elements_text((grafconfig->>''use'')::json))::json->>''nodeParent'')::json as node_id FROM '||rec||')b 
+		WHERE node_id::text not in (select node_id FROM node)';
+
+		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+		IF v_count > 0 THEN
+			EXECUTE 'INSERT INTO audit_check_data (fid, criticity, error_message)
+			SELECT 211, 2, concat(''WARNING: There is/are '','||v_count||',
+			'' node(s) that are configured as nodeParent for '','''||rec||''','' but does not exist on node table. Node_id - '',string_agg(a.node_id::text,'', ''),''.'') FROM('|| v_querytext||')a;';
+		ELSE
+			INSERT INTO audit_check_data (fid, criticity, error_message)
+			VALUES (211, 1, concat('INFO: All arcs defined as nodeParent on ',rec,' exists on DB.'));
+		END IF;
+	END LOOP;
 
 	
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (211, v_result_id, 4, '');
