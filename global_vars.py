@@ -53,10 +53,9 @@ def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name, p_user_folder_di
 
 
 def init_giswater_settings(setting_file):
-
-    global settings
-    settings = QSettings(setting_file, QSettings.IniFormat)
-    settings.setIniCodec(sys.getfilesystemencoding())
+    global giswater_settings
+    giswater_settings = QSettings(setting_file, QSettings.IniFormat)
+    giswater_settings.setIniCodec(sys.getfilesystemencoding())
 
 
 def init_qgis_settings(p_plugin_name):

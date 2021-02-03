@@ -305,9 +305,9 @@ def get_layer_by_tablename(tablename, show_warning_=False, log_info=False, schem
 
     # Iterate over all layers
     layer = None
-    project_vars = get_project_variables()
+    get_project_variables()
     if schema_name is None:
-        schema_name = project_vars['main_schema']
+        schema_name = global_vars.project_vars['main_schema']
     for cur_layer in layers:
         uri_table = get_layer_source_table_name(cur_layer)
         table_schema = get_layer_schema(cur_layer)
