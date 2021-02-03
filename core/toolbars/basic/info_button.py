@@ -37,7 +37,61 @@ class GwInfoButton(GwMaptool):
         self.action_name = action_name
 
 
-    def create_point(self, event):
+    # region QgsMapTools inherited
+    """ QgsMapTools inherited event functions """
+
+    def keyPressEvent(self, event):
+
+        if event.key() == Qt.Key_Escape:
+            for rb in self.rubberband_list:
+                rb.reset()
+            self.rubber_band.reset()
+            self.action.trigger()
+            return
+
+
+    def canvasMoveEvent(self, event):
+        pass
+
+
+    def canvasReleaseEvent(self, event):
+
+        self._get_info(event)
+
+
+    def activate(self):
+
+        if info.is_inserting:
+            msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
+            tools_qgis.show_message(msg)
+            super().deactivate()
+            return
+
+        # Check button
+        self.action.setChecked(True)
+        # Change map tool cursor
+        self.cursor = QCursor()
+        self.cursor.setShape(Qt.WhatsThisCursor)
+        self.canvas.setCursor(self.cursor)
+        self.rubberband_list = []
+        self.tab_type = 'data'
+
+
+    def deactivate(self):
+
+        if hasattr(self, 'rubberband_list'):
+            for rb in self.rubberband_list:
+                rb.reset()
+        if hasattr(self, 'dlg_info_feature'):
+            self.rubber_band.reset()
+
+        super().deactivate()
+
+    # endregion
+    
+    # region private functions
+
+    def _create_point(self, event):
 
         x = event.pos().x()
         y = event.pos().y()
@@ -50,7 +104,7 @@ class GwInfoButton(GwMaptool):
         return point
 
 
-    def reactivate_map_tool(self):
+    def _reactivate_map_tool(self):
         """ Reactivate tool """
 
         self.block_signal = True
@@ -58,7 +112,7 @@ class GwInfoButton(GwMaptool):
         info_action.trigger()
 
 
-    def get_layers_from_coordinates(self, point, rb_list, tab_type=None):
+    def _get_layers_from_coordinates(self, point, rb_list, tab_type=None):
 
         cursor = QCursor()
         x = cursor.pos().x()
@@ -100,8 +154,8 @@ class GwInfoButton(GwMaptool):
             for feature in layer['ids']:
                 action = QAction(str(feature['id']), None)
                 sub_menu.addAction(action)
-                action.triggered.connect(partial(self.get_info_from_selected_id, action, tab_type))
-                action.hovered.connect(partial(self.draw_by_action, feature, rb_list))
+                action.triggered.connect(partial(self._get_info_from_selected_id, action, tab_type))
+                action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
 
         main_menu.addSeparator()
         # Identify all
@@ -109,13 +163,13 @@ class GwInfoButton(GwMaptool):
         for layer in json_result['body']['data']['layersNames']:
             cont += len(layer['ids'])
         action = QAction(f'Identify all ({cont})', None)
-        action.hovered.connect(partial(self.identify_all, json_result, rb_list))
+        action.hovered.connect(partial(self._identify_all, json_result, rb_list))
         main_menu.addAction(action)
         main_menu.addSeparator()
         main_menu.exec_(click_point)
 
 
-    def identify_all(self, complet_list, rb_list):
+    def _identify_all(self, complet_list, rb_list):
 
         self.rubber_band.reset()
         for rb in rb_list:
@@ -139,7 +193,7 @@ class GwInfoButton(GwMaptool):
                 rb_list.append(rb)
 
 
-    def draw_by_action(self, feature, rb_list, reset_rb=True):
+    def _draw_by_action(self, feature, rb_list, reset_rb=True):
         """ Draw lines based on geometry """
 
         for rb in rb_list:
@@ -159,7 +213,7 @@ class GwInfoButton(GwMaptool):
             tools_qgis.draw_polyline(points, self.rubber_band)
 
 
-    def get_info_from_selected_id(self, action, tab_type):
+    def _get_info_from_selected_id(self, action, tab_type):
         """ Set active selected layer """
 
         self.rubber_band.reset()
@@ -170,7 +224,7 @@ class GwInfoButton(GwMaptool):
             self.iface.setActiveLayer(layer)
             tools_gw.init_docker()
             info_feature = GwInfo(self.tab_type)
-            info_feature.signal_activate.connect(self.reactivate_map_tool)
+            info_feature.signal_activate.connect(self._reactivate_map_tool)
             info_feature.get_info_from_id(table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type)
             # Remove previous rubberband when open new docker
             if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dialog_docker'] is not None:
@@ -178,29 +232,7 @@ class GwInfoButton(GwMaptool):
             self.previous_info_feature = info_feature
 
 
-    # region QgsMapTools inherited
-    """ QgsMapTools inherited event functions """
-
-    def keyPressEvent(self, event):
-
-        if event.key() == Qt.Key_Escape:
-            for rb in self.rubberband_list:
-                rb.reset()
-            self.rubber_band.reset()
-            self.action.trigger()
-            return
-
-
-    def canvasMoveEvent(self, event):
-        pass
-
-
-    def canvasReleaseEvent(self, event):
-
-        self.get_info(event)
-
-
-    def get_info(self, event):
+    def _get_info(self, event):
 
         for rb in self.rubberband_list:
             rb.reset()
@@ -211,12 +243,12 @@ class GwInfoButton(GwMaptool):
 
         if event.button() == Qt.LeftButton:
 
-            point = self.create_point(event)
+            point = self._create_point(event)
             if point is False:
                 return
             tools_gw.init_docker()
             info_feature = GwInfo(self.tab_type)
-            info_feature.signal_activate.connect(self.reactivate_map_tool)
+            info_feature.signal_activate.connect(self._reactivate_map_tool)
             info_feature.get_info_from_coordinates(point, tab_type=self.tab_type)
             # Remove previous rubberband when open new docker
             if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dialog_docker'] is not None:
@@ -224,40 +256,11 @@ class GwInfoButton(GwMaptool):
             self.previous_info_feature = info_feature
 
         elif event.button() == Qt.RightButton:
-            point = self.create_point(event)
+            point = self._create_point(event)
             if point is False:
                 return
 
-            self.get_layers_from_coordinates(point, self.rubberband_list, self.tab_type)
-
-
-    def activate(self):
-
-        if info.is_inserting:
-            msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
-            tools_qgis.show_message(msg)
-            super().deactivate()
-            return
-
-        # Check button
-        self.action.setChecked(True)
-        # Change map tool cursor
-        self.cursor = QCursor()
-        self.cursor.setShape(Qt.WhatsThisCursor)
-        self.canvas.setCursor(self.cursor)
-        self.rubberband_list = []
-        self.tab_type = 'data'
-
-
-    def deactivate(self):
-
-        if hasattr(self, 'rubberband_list'):
-            for rb in self.rubberband_list:
-                rb.reset()
-        if hasattr(self, 'dlg_info_feature'):
-            self.rubber_band.reset()
-
-        super().deactivate()
+            self._get_layers_from_coordinates(point, self.rubberband_list, self.tab_type)
 
     # endregion
 
