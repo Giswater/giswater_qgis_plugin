@@ -33,72 +33,6 @@ class GwAuxPointAddButton(GwMaptool):
         self.snap_to_selected_layer = False
 
 
-    def init_create_point_form(self, point_1=None, point_2=None):
-
-        # Create the dialog and signals
-        self.dlg_create_point = GwAuxPointUi()
-        tools_gw.load_settings(self.dlg_create_point)
-
-        validator = QDoubleValidator(-99999.99, 99999.999, 3)
-        validator.setNotation(QDoubleValidator().StandardNotation)
-        self.dlg_create_point.dist_x.setValidator(validator)
-        validator = QDoubleValidator(-99999.99, 99999.999, 3)
-        validator.setNotation(QDoubleValidator().StandardNotation)
-        self.dlg_create_point.dist_y.setValidator(validator)
-        self.dlg_create_point.dist_x.setFocus()
-        self.dlg_create_point.btn_accept.clicked.connect(partial(self.get_values, point_1, point_2))
-        self.dlg_create_point.btn_cancel.clicked.connect(self.cancel)
-
-        if tools_gw.get_config_parser('cadtools', f"{self.dlg_create_point.rb_left.objectName()}", "user", "init") == 'True':
-            self.dlg_create_point.rb_left.setChecked(True)
-        else:
-            self.dlg_create_point.rb_right.setChecked(True)
-
-        tools_gw.open_dialog(self.dlg_create_point, dlg_name='auxpoint', maximize_button=False)
-
-
-    def get_values(self, point_1, point_2):
-
-        tools_gw.set_config_parser('cadtools', f"{self.dlg_create_point.rb_left.objectName()}",
-                                   f"{self.dlg_create_point.rb_left.isChecked()}")
-
-        self.dist_x = self.dlg_create_point.dist_x.text()
-        if not self.dist_x:
-            self.dist_x = 0
-        self.dist_y = self.dlg_create_point.dist_y.text()
-        if not self.dist_y:
-            self.dist_y = 0
-
-        self.delete_prev = tools_qt.is_checked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
-        if self.layer_points:
-            self.layer_points.startEditing()
-            tools_gw.close_dialog(self.dlg_create_point)
-            if self.dlg_create_point.rb_left.isChecked():
-                self.direction = 1
-            else:
-                self.direction = 2
-
-            sql = f"SELECT ST_GeomFromText('POINT({point_1[0]} {point_1[1]})', {self.srid})"
-            row = tools_db.get_row(sql)
-            point_1 = row[0]
-            sql = f"SELECT ST_GeomFromText('POINT({point_2[0]} {point_2[1]})', {self.srid})"
-            row = tools_db.get_row(sql)
-            point_2 = row[0]
-
-            sql = (f"SELECT gw_fct_cad_add_relative_point "
-                   f"('{point_1}', '{point_2}', {self.dist_x}, "
-                   f"{self.dist_y}, {self.direction}, {self.delete_prev})")
-            tools_db.execute_sql(sql)
-            self.layer_points.commitChanges()
-            self.layer_points.dataProvider().forceReload()
-            self.layer_points.triggerRepaint()
-
-        else:
-            self.iface.actionPan().trigger()
-            self.cancel_point = False
-            return
-
-
     def cancel(self):
 
         tools_gw.set_config_parser('cadtools', f"{self.dlg_create_point.rb_left.objectName()}",
@@ -143,41 +77,7 @@ class GwAuxPointAddButton(GwMaptool):
 
     def canvasReleaseEvent(self, event):
 
-        self.add_aux_point(event)
-
-
-    def add_aux_point(self, event):
-        if event.button() == Qt.LeftButton:
-
-            # Get coordinates
-            x = event.pos().x()
-            y = event.pos().y()
-            event_point = self.snapper_manager.get_event_point(event)
-
-            # Create point with snap reference
-            result = self.snapper_manager.snap_to_project_config_layers(event_point)
-            point = None
-            if result.isValid():
-                point = self.snapper_manager.get_snapped_point(result)
-
-            # Create point with mouse cursor reference
-            if point is None:
-                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
-
-            if self.point_1 is None:
-                self.point_1 = point
-            else:
-                self.point_2 = point
-
-            if self.point_1 is not None and self.point_2 is not None:
-                self.init_create_point_form(self.point_1, self.point_2)
-
-        elif event.button() == Qt.RightButton:
-            self.cancel_map_tool()
-            self.iface.setActiveLayer(self.current_layer)
-
-        if self.layer_points:
-            self.layer_points.commitChanges()
+        self._add_aux_point(event)
 
 
     def activate(self):
@@ -231,5 +131,108 @@ class GwAuxPointAddButton(GwMaptool):
         # Call parent method
         super().deactivate()
         self.iface.setActiveLayer(self.current_layer)
+
+    # endregion
+
+    # region private functions
+
+    def _init_create_point_form(self, point_1=None, point_2=None):
+
+        # Create the dialog and signals
+        self.dlg_create_point = GwAuxPointUi()
+        tools_gw.load_settings(self.dlg_create_point)
+
+        validator = QDoubleValidator(-99999.99, 99999.999, 3)
+        validator.setNotation(QDoubleValidator().StandardNotation)
+        self.dlg_create_point.dist_x.setValidator(validator)
+        validator = QDoubleValidator(-99999.99, 99999.999, 3)
+        validator.setNotation(QDoubleValidator().StandardNotation)
+        self.dlg_create_point.dist_y.setValidator(validator)
+        self.dlg_create_point.dist_x.setFocus()
+        self.dlg_create_point.btn_accept.clicked.connect(partial(self._get_values, point_1, point_2))
+        self.dlg_create_point.btn_cancel.clicked.connect(self.cancel)
+
+        if tools_gw.get_config_parser('cadtools', f"{self.dlg_create_point.rb_left.objectName()}", "user", "init") == 'True':
+            self.dlg_create_point.rb_left.setChecked(True)
+        else:
+            self.dlg_create_point.rb_right.setChecked(True)
+
+        tools_gw.open_dialog(self.dlg_create_point, dlg_name='auxpoint', maximize_button=False)
+
+
+    def _get_values(self, point_1, point_2):
+
+        tools_gw.set_config_parser('cadtools', f"{self.dlg_create_point.rb_left.objectName()}",
+                                   f"{self.dlg_create_point.rb_left.isChecked()}")
+
+        self.dist_x = self.dlg_create_point.dist_x.text()
+        if not self.dist_x:
+            self.dist_x = 0
+        self.dist_y = self.dlg_create_point.dist_y.text()
+        if not self.dist_y:
+            self.dist_y = 0
+
+        self.delete_prev = tools_qt.is_checked(self.dlg_create_point, self.dlg_create_point.chk_delete_prev)
+        if self.layer_points:
+            self.layer_points.startEditing()
+            tools_gw.close_dialog(self.dlg_create_point)
+            if self.dlg_create_point.rb_left.isChecked():
+                self.direction = 1
+            else:
+                self.direction = 2
+
+            sql = f"SELECT ST_GeomFromText('POINT({point_1[0]} {point_1[1]})', {self.srid})"
+            row = tools_db.get_row(sql)
+            point_1 = row[0]
+            sql = f"SELECT ST_GeomFromText('POINT({point_2[0]} {point_2[1]})', {self.srid})"
+            row = tools_db.get_row(sql)
+            point_2 = row[0]
+
+            sql = (f"SELECT gw_fct_cad_add_relative_point "
+                   f"('{point_1}', '{point_2}', {self.dist_x}, "
+                   f"{self.dist_y}, {self.direction}, {self.delete_prev})")
+            tools_db.execute_sql(sql)
+            self.layer_points.commitChanges()
+            self.layer_points.dataProvider().forceReload()
+            self.layer_points.triggerRepaint()
+
+        else:
+            self.iface.actionPan().trigger()
+            self.cancel_point = False
+            return
+
+
+    def _add_aux_point(self, event):
+        if event.button() == Qt.LeftButton:
+
+            # Get coordinates
+            x = event.pos().x()
+            y = event.pos().y()
+            event_point = self.snapper_manager.get_event_point(event)
+
+            # Create point with snap reference
+            result = self.snapper_manager.snap_to_project_config_layers(event_point)
+            point = None
+            if result.isValid():
+                point = self.snapper_manager.get_snapped_point(result)
+
+            # Create point with mouse cursor reference
+            if point is None:
+                point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
+
+            if self.point_1 is None:
+                self.point_1 = point
+            else:
+                self.point_2 = point
+
+            if self.point_1 is not None and self.point_2 is not None:
+                self._init_create_point_form(self.point_1, self.point_2)
+
+        elif event.button() == Qt.RightButton:
+            self.cancel_map_tool()
+            self.iface.setActiveLayer(self.current_layer)
+
+        if self.layer_points:
+            self.layer_points.commitChanges()
 
     # endregion
