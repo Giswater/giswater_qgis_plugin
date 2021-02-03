@@ -87,7 +87,6 @@ BEGIN
 	v_query = 'SELECT config_form_tabs.*, value FROM config_form_tabs, config_param_system WHERE formname='||quote_literal(v_selector_type)||
 	' AND concat(''basic_selector_'', tabname) = parameter '||(v_querytab)||' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member''))  ORDER BY orderby';
 ​
-	raise notice 'v_quefghrewhgewryghrehry %',v_query;
 ​
 	FOR v_tab IN EXECUTE v_query
 ​
