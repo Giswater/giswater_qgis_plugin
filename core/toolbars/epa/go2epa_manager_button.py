@@ -26,10 +26,12 @@ class GwGo2EpaManagerButton(GwAction):
 
     def clicked_event(self):
 
-        self.manage_go2epa()
+        self._manage_go2epa()
 
 
-    def manage_go2epa(self):
+    # region private functions
+
+    def _manage_go2epa(self):
 
         # Create the dialog
         self.dlg_manager = GwEpaManagerUi()
@@ -40,7 +42,7 @@ class GwGo2EpaManagerButton(GwAction):
         self.dlg_manager.txt_result_id.setValidator(QRegExpValidator(reg_exp))
 
         # Fill combo box and table view
-        self.fill_combo_result_id()
+        self._fill_combo_result_id()
         self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectRows)
         message = tools_qt.fill_table(self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
         if message:
@@ -48,24 +50,24 @@ class GwGo2EpaManagerButton(GwAction):
         tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
 
         # Set signals
-        self.dlg_manager.btn_delete.clicked.connect(partial(self.multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
+        self.dlg_manager.btn_delete.clicked.connect(partial(self._multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result,
                                                             'rpt_cat_result', 'result_id'))
         self.dlg_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manager))
         self.dlg_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_manager))
-        self.dlg_manager.txt_result_id.editTextChanged.connect(self.filter_by_result_id)
+        self.dlg_manager.txt_result_id.editTextChanged.connect(self._filter_by_result_id)
 
         # Open form
         tools_gw.open_dialog(self.dlg_manager, dlg_name='go2epa_manager')
 
 
-    def fill_combo_result_id(self):
+    def _fill_combo_result_id(self):
 
         sql = "SELECT result_id FROM v_ui_rpt_cat_result ORDER BY result_id"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_box(self.dlg_manager, self.dlg_manager.txt_result_id, rows)
 
 
-    def filter_by_result_id(self):
+    def _filter_by_result_id(self):
 
         table = self.dlg_manager.tbl_rpt_cat_result
         widget_txt = self.dlg_manager.txt_result_id
@@ -82,7 +84,7 @@ class GwGo2EpaManagerButton(GwAction):
                 tools_qgis.show_warning(message)
 
 
-    def multi_rows_delete(self, widget, table_name, column_id):
+    def _multi_rows_delete(self, widget, table_name, column_id):
         """ Delete selected elements of the table
         :param QTableView widget: origin
         :param table_name: table origin
@@ -113,3 +115,5 @@ class GwGo2EpaManagerButton(GwAction):
             sql += f" WHERE {column_id} IN ({list_id})"
             tools_db.execute_sql(sql)
             widget.model().select()
+
+    # endregion
