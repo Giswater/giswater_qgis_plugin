@@ -35,7 +35,110 @@ class GwFeatureReplaceButton(GwMaptool):
         self.feature_type_ud = None
 
 
-    def manage_dates(self, date_value):
+    # region QgsMapTools inherited
+    """ QgsMapTools inherited event functions """
+
+    def keyPressEvent(self, event):
+
+        if event.key() == Qt.Key_Escape:
+            self.cancel_map_tool()
+            return
+
+
+    def canvasMoveEvent(self, event):
+
+        # Hide marker and get coordinates
+        self.vertex_marker.hide()
+        event_point = self.snapper_manager.get_event_point(event)
+
+        # Snapping layers 'v_edit_'
+        result = self.snapper_manager.snap_to_project_config_layers(event_point)
+        if result.isValid():
+            layer = self.snapper_manager.get_snapped_layer(result)
+            tablename = tools_qgis.get_layer_source_table_name(layer)
+            if tablename and 'v_edit' in tablename:
+                self.snapper_manager.add_marker(result, self.vertex_marker)
+
+
+    def canvasReleaseEvent(self, event):
+
+        if event.button() == Qt.RightButton:
+            self.cancel_map_tool()
+            return
+
+        event_point = self.snapper_manager.get_event_point(event)
+
+        # Snapping
+        result = self.snapper_manager.snap_to_project_config_layers(event_point)
+        if not result.isValid():
+            return
+
+        # Get snapped feature
+        snapped_feat = self.snapper_manager.get_snapped_feature(result)
+        if snapped_feat:
+            layer = self.snapper_manager.get_snapped_layer(result)
+            tablename = tools_qgis.get_layer_source_table_name(layer)
+
+            if tablename and 'v_edit' in tablename:
+                if tablename == 'v_edit_node':
+                    self.geom_type = 'node'
+                elif tablename == 'v_edit_connec':
+                    self.geom_type = 'connec'
+                elif tablename == 'v_edit_gully':
+                    self.geom_type = 'gully'
+
+                self.geom_view = tablename
+                self.cat_table = 'cat_' + self.geom_type
+                self.feature_type_ws = self.geom_type + 'type_id'
+                self.feature_type_ud = self.geom_type + '_type'
+                self.feature_id = snapped_feat.attribute(self.geom_type + '_id')
+                self._init_replace_feature_form(snapped_feat)
+
+
+    def activate(self):
+
+        # Set active and current layer
+        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
+        self.iface.setActiveLayer(self.layer_node)
+        self.current_layer = self.layer_node
+
+        # Check button
+        self.action.setChecked(True)
+
+        # Store user snapping configuration
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
+
+        # Disable snapping
+        self.snapper_manager.set_snapping_status()
+
+        # Set snapping to 'node', 'connec' and 'gully'
+        self.snapper_manager.set_snapping_layers()
+
+        self.snapper_manager.config_snap_to_node()
+        self.snapper_manager.config_snap_to_connec()
+        self.snapper_manager.config_snap_to_gully()
+
+        self.snapper_manager.set_snap_mode()
+
+        # Change cursor
+        self.canvas.setCursor(self.cursor)
+
+        self.project_type = tools_gw.get_project_type()
+
+        # Show help message when action is activated
+        if self.show_help:
+            message = "Select the feature by clicking on it and it will be replaced"
+            tools_qgis.show_info(message)
+
+
+    def deactivate(self):
+        super().deactivate()
+
+    # endregion
+
+    # region private functions
+
+    def _manage_dates(self, date_value):
         """ Manage dates """
 
         date_result = None
@@ -49,7 +152,7 @@ class GwFeatureReplaceButton(GwMaptool):
             return date_result
 
 
-    def init_replace_feature_form(self, feature):
+    def _init_replace_feature_form(self, feature):
 
         # Create the dialog and signals
         self.dlg_replace = GwFeatureReplaceUi()
@@ -69,15 +172,15 @@ class GwFeatureReplaceButton(GwMaptool):
 
         row = tools_gw.get_config_value('edit_enddate_vdefault')
         if row:
-            self.enddate_aux = self.manage_dates(row[0]).date()
+            self.enddate_aux = self._manage_dates(row[0]).date()
         else:
             work_id = tools_qt.get_text(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
                    f"WHERE id = '{work_id}'")
             row = tools_db.get_row(sql)
-            current_date = self.manage_dates(self.current_date)
+            current_date = self._manage_dates(self.current_date)
             if row and row[0]:
-                builtdate = self.manage_dates(row[0])
+                builtdate = self._manage_dates(row[0])
                 if builtdate != 'null' and builtdate:
                     self.enddate_aux = builtdate.date()
                 else:
@@ -103,9 +206,9 @@ class GwFeatureReplaceButton(GwMaptool):
                 tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
 
         self.dlg_replace.feature_type.setText(feature_type)
-        self.dlg_replace.feature_type_new.currentIndexChanged.connect(self.edit_change_elem_type_get_value)
-        self.dlg_replace.btn_catalog.clicked.connect(partial(self.open_catalog))
-        self.dlg_replace.workcat_id_end.currentIndexChanged.connect(self.update_date)
+        self.dlg_replace.feature_type_new.currentIndexChanged.connect(self._edit_change_elem_type_get_value)
+        self.dlg_replace.btn_catalog.clicked.connect(partial(self._open_catalog))
+        self.dlg_replace.workcat_id_end.currentIndexChanged.connect(self._update_date)
 
         # Fill 1st combo boxes-new system node type
         sql = (f"SELECT DISTINCT(id) FROM cat_feature WHERE lower(feature_type) = '{self.geom_type}' "
@@ -114,15 +217,15 @@ class GwFeatureReplaceButton(GwMaptool):
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_box(self.dlg_replace, "feature_type_new", rows)
 
-        self.dlg_replace.btn_new_workcat.clicked.connect(partial(self.new_workcat))
-        self.dlg_replace.btn_accept.clicked.connect(partial(self.replace_feature, self.dlg_replace))
+        self.dlg_replace.btn_new_workcat.clicked.connect(partial(self._new_workcat))
+        self.dlg_replace.btn_accept.clicked.connect(partial(self._replace_feature, self.dlg_replace))
         self.dlg_replace.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_replace))
         self.dlg_replace.rejected.connect(self.cancel_map_tool)
         # Open dialog
         tools_gw.open_dialog(self.dlg_replace, maximize_button=False)
 
 
-    def open_catalog(self):
+    def _open_catalog(self):
 
         # Get feature_type
         feature_type = tools_qt.get_text(self.dlg_replace, self.dlg_replace.feature_type_new)
@@ -138,19 +241,19 @@ class GwFeatureReplaceButton(GwMaptool):
         self.catalog.open_catalog(self.dlg_replace, 'featurecat_id', row[0], feature_type)
 
 
-    def update_date(self):
+    def _update_date(self):
 
         row = tools_gw.get_config_value('edit_enddate_vdefault')
         if row:
-            self.enddate_aux = self.manage_dates(row[0]).date()
+            self.enddate_aux = self._manage_dates(row[0]).date()
         else:
             work_id = tools_qt.get_text(self.dlg_replace, self.dlg_replace.workcat_id_end)
             sql = (f"SELECT builtdate FROM cat_work "
                    f"WHERE id = '{work_id}'")
             row = tools_db.get_row(sql)
-            current_date = self.manage_dates(self.current_date)
+            current_date = self._manage_dates(self.current_date)
             if row and row[0]:
-                builtdate = self.manage_dates(row[0])
+                builtdate = self._manage_dates(row[0])
                 if builtdate != 'null' and builtdate:
                     self.enddate_aux = builtdate.date()
                 else:
@@ -161,7 +264,7 @@ class GwFeatureReplaceButton(GwMaptool):
         self.dlg_replace.enddate.setDate(self.enddate_aux)
 
 
-    def new_workcat(self):
+    def _new_workcat(self):
 
         self.dlg_new_workcat = GwInfoWorkcatUi()
 
@@ -171,14 +274,14 @@ class GwFeatureReplaceButton(GwMaptool):
         tools_gw.set_completer_object(self.dlg_new_workcat, "cat_work")
 
         # Set signals
-        self.dlg_new_workcat.btn_accept.clicked.connect(partial(self.manage_new_workcat_accept, table_object))
+        self.dlg_new_workcat.btn_accept.clicked.connect(partial(self._manage_new_workcat_accept, table_object))
         self.dlg_new_workcat.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_new_workcat))
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
 
 
-    def manage_new_workcat_accept(self, table_object):
+    def _manage_new_workcat_accept(self, table_object):
         """ Insert table 'cat_work'. Add cat_work """
 
         # Get values from dialog
@@ -238,7 +341,7 @@ class GwFeatureReplaceButton(GwMaptool):
                     tools_qt.show_info_box(msg, "Warning")
 
 
-    def replace_feature(self, dialog):
+    def _replace_feature(self, dialog):
 
         self.workcat_id_end_aux = tools_qt.get_text(dialog, dialog.workcat_id_end)
         self.enddate_aux = dialog.enddate.date().toString('yyyy-MM-dd')
@@ -334,7 +437,7 @@ class GwFeatureReplaceButton(GwMaptool):
             self.dlg_replace.btn_accept.setEnabled(False)
 
 
-    def edit_change_elem_type_get_value(self, index):
+    def _edit_change_elem_type_get_value(self, index):
         """ Just select item to 'real' combo 'featurecat_id' (that is hidden) """
 
         if index == -1:
@@ -356,105 +459,4 @@ class GwFeatureReplaceButton(GwMaptool):
             rows = tools_db.get_rows(sql)
             tools_qt.fill_combo_box(self.dlg_replace, self.dlg_replace.featurecat_id, rows)
 
-
-    # region QgsMapTools inherited
-    """ QgsMapTools inherited event functions """
-
-    def keyPressEvent(self, event):
-
-        if event.key() == Qt.Key_Escape:
-            self.cancel_map_tool()
-            return
-
-
-    def canvasMoveEvent(self, event):
-
-        # Hide marker and get coordinates
-        self.vertex_marker.hide()
-        event_point = self.snapper_manager.get_event_point(event)
-
-        # Snapping layers 'v_edit_'
-        result = self.snapper_manager.snap_to_project_config_layers(event_point)
-        if result.isValid():
-            layer = self.snapper_manager.get_snapped_layer(result)
-            tablename = tools_qgis.get_layer_source_table_name(layer)
-            if tablename and 'v_edit' in tablename:
-                self.snapper_manager.add_marker(result, self.vertex_marker)
-
-
-    def canvasReleaseEvent(self, event):
-
-        if event.button() == Qt.RightButton:
-            self.cancel_map_tool()
-            return
-
-        event_point = self.snapper_manager.get_event_point(event)
-
-        # Snapping
-        result = self.snapper_manager.snap_to_project_config_layers(event_point)
-        if not result.isValid():
-            return
-
-        # Get snapped feature
-        snapped_feat = self.snapper_manager.get_snapped_feature(result)
-        if snapped_feat:
-            layer = self.snapper_manager.get_snapped_layer(result)
-            tablename = tools_qgis.get_layer_source_table_name(layer)
-
-            if tablename and 'v_edit' in tablename:
-                if tablename == 'v_edit_node':
-                    self.geom_type = 'node'
-                elif tablename == 'v_edit_connec':
-                    self.geom_type = 'connec'
-                elif tablename == 'v_edit_gully':
-                    self.geom_type = 'gully'
-
-                self.geom_view = tablename
-                self.cat_table = 'cat_' + self.geom_type
-                self.feature_type_ws = self.geom_type + 'type_id'
-                self.feature_type_ud = self.geom_type + '_type'
-                self.feature_id = snapped_feat.attribute(self.geom_type + '_id')
-                self.init_replace_feature_form(snapped_feat)
-
-
-    def activate(self):
-
-        # Set active and current layer
-        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
-        self.iface.setActiveLayer(self.layer_node)
-        self.current_layer = self.layer_node
-
-        # Check button
-        self.action.setChecked(True)
-
-        # Store user snapping configuration
-        self.previous_snapping = self.snapper_manager.get_snapping_options()
-
-        # Disable snapping
-        self.snapper_manager.set_snapping_status()
-
-        # Set snapping to 'node', 'connec' and 'gully'
-        self.snapper_manager.set_snapping_layers()
-
-        self.snapper_manager.config_snap_to_node()
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
-
-        self.snapper_manager.set_snap_mode()
-
-        # Change cursor
-        self.canvas.setCursor(self.cursor)
-
-        self.project_type = tools_gw.get_project_type()
-
-        # Show help message when action is activated
-        if self.show_help:
-            message = "Select the feature by clicking on it and it will be replaced"
-            tools_qgis.show_info(message)
-
-
-    def deactivate(self):
-        super().deactivate()
-
     # endregion
-
