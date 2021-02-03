@@ -21,26 +21,6 @@ class GwDimensioningButton(GwMaptool):
         self.suppres_form = None
 
 
-    def open_new_dimensioning(self, feature_id):
-
-        self.layer.featureAdded.disconnect(self.open_new_dimensioning)
-        feature = tools_qt.get_feature_by_id(self.layer, feature_id)
-        list_points = tools_qgis.get_points_from_geometry(self.layer, feature)
-
-        # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
-        QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
-        config = self.layer.editFormConfig()
-        config.setSuppress(self.conf_supp)
-        self.layer.setEditFormConfig(config)
-
-        self.recover_previus_maptool()
-
-        self.dimensioning = GwDimensioning()
-        self.dimensioning.points = list_points
-        self.dimensioning.open_dimensioning_form(qgis_feature=feature, layer=self.layer)
-        super().deactivate()
-
-
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
     def canvasMoveEvent(self, event):
@@ -88,12 +68,35 @@ class GwDimensioningButton(GwMaptool):
             self.snapper_manager.set_snap_mode()
 
             # Manage new tool
-            self.layer.featureAdded.connect(self.open_new_dimensioning)
+            self.layer.featureAdded.connect(self._open_new_dimensioning)
 
 
     def deactivate(self):
 
         # Call parent method
+        super().deactivate()
+
+    # endregion
+
+    # region private functions
+
+    def _open_new_dimensioning(self, feature_id):
+
+        self.layer.featureAdded.disconnect(self._open_new_dimensioning)
+        feature = tools_qt.get_feature_by_id(self.layer, feature_id)
+        list_points = tools_qgis.get_points_from_geometry(self.layer, feature)
+
+        # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
+        QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
+        config = self.layer.editFormConfig()
+        config.setSuppress(self.conf_supp)
+        self.layer.setEditFormConfig(config)
+
+        self.recover_previus_maptool()
+
+        self.dimensioning = GwDimensioning()
+        self.dimensioning.points = list_points
+        self.dimensioning.open_dimensioning_form(qgis_feature=feature, layer=self.layer)
         super().deactivate()
 
     # endregion
