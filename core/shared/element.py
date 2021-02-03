@@ -92,7 +92,7 @@ class GwElement:
             layer = self.layers[geom_type][0]
             layer.selectByIds([feature.id()])
 
-        self.check_date(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
+        self._check_date(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
 
         # Get layer element and save if is visible or not for restore when finish process
         layer_element = tools_qgis.get_layer_by_tablename("v_edit_element")
@@ -113,7 +113,7 @@ class GwElement:
                            "v_edit_element"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_add_element.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
-        self.dlg_add_element.btn_accept.clicked.connect(partial(self.manage_element_accept, table_object))
+        self.dlg_add_element.btn_accept.clicked.connect(partial(self._manage_element_accept, table_object))
         self.dlg_add_element.btn_accept.clicked.connect(
             partial(tools_qgis.set_layer_visible, layer_element, recursive, layer_is_visible))
         self.dlg_add_element.btn_cancel.clicked.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(
@@ -130,7 +130,7 @@ class GwElement:
 
 
         self.dlg_add_element.element_id.textChanged.connect(
-            partial(self.fill_dialog_element, self.dlg_add_element, table_object, None))
+            partial(self._fill_dialog_element, self.dlg_add_element, table_object, None))
         self.dlg_add_element.btn_insert.clicked.connect(
             partial(tools_gw.insert_feature, self, self.dlg_add_element, table_object, False, False, None, None))
         self.dlg_add_element.btn_delete.clicked.connect(
@@ -138,8 +138,8 @@ class GwElement:
         self.dlg_add_element.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_add_element, table_object, False))
 
-        self.dlg_add_element.btn_add_geom.clicked.connect(self.get_point_xy)
-        self.dlg_add_element.state.currentIndexChanged.connect(partial(self.filter_state_type))
+        self.dlg_add_element.btn_add_geom.clicked.connect(self._get_point_xy)
+        self.dlg_add_element.state.currentIndexChanged.connect(partial(self._filter_state_type))
 
         self.dlg_add_element.tbl_element_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
             self.dlg_add_element.tbl_element_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
@@ -153,8 +153,8 @@ class GwElement:
 
 
         # Fill combo boxes of the form and related events
-        self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.filter_elementcat_id))
-        self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self.update_location_cmb))
+        self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self._filter_elementcat_id))
+        self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self._update_location_cmb))
         # TODO maybe all this values can be in one Json query
         # Fill combo boxes
         sql = "SELECT DISTINCT(elementtype_id), elementtype_id FROM cat_element ORDER BY elementtype_id"
@@ -169,7 +169,7 @@ class GwElement:
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.state, rows, 1)
 
-        self.filter_state_type()
+        self._filter_state_type()
 
         sql = ("SELECT location_type, location_type FROM man_type_location"
                " WHERE feature_type = 'ELEMENT' "
@@ -201,18 +201,18 @@ class GwElement:
         sql = "SELECT id, idval FROM edit_typevalue WHERE typevalue = 'value_verified'"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.verified, rows, 1, add_empty=True)
-        self.filter_elementcat_id()
+        self._filter_elementcat_id()
 
         if self.new_element_id:
             # Set default values
-            self.set_default_values()
+            self._set_default_values()
 
         # Adding auto-completion to a QLineEdit for default feature
         tools_gw.set_completer_widget("v_edit_arc", self.dlg_add_element.feature_id, "arc_id", )
 
         if feature:
             self.dlg_add_element.tabWidget.currentChanged.connect(partial(
-                self.fill_tbl_new_element, self.dlg_add_element, geom_type, feature[geom_type + "_id"]))
+                self._fill_tbl_new_element, self.dlg_add_element, geom_type, feature[geom_type + "_id"]))
 
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
@@ -227,50 +227,14 @@ class GwElement:
         if self.new_element_id is True:
             tools_qt.set_widget_text(self.dlg_add_element, 'num_elements', '1')
 
-        self.update_location_cmb()
+        self._update_location_cmb()
         if not self.new_element_id:
             tools_qt.set_widget_text(self.dlg_add_element, 'element_id', selected_object_id)
-            self.fill_dialog_element(self.dlg_add_element, 'element', None)
+            self._fill_dialog_element(self.dlg_add_element, 'element', None)
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_add_element, dlg_name='element', maximize_button=False)
         return self.dlg_add_element
-
-
-    def get_point_xy(self):
-
-        self.snapper_manager.add_point(self.vertex_marker)
-        self.point_xy = self.snapper_manager.point_xy
-
-
-    def set_default_values(self):
-        """ Set default values """
-
-        self.manage_combo(self.dlg_add_element.element_type, 'edit_elementcat_vdefault')
-        self.manage_combo(self.dlg_add_element.elementcat_id, 'edit_elementcat_vdefault')
-        self.manage_combo(self.dlg_add_element.state, 'edit_state_vdefault')
-        self.manage_combo(self.dlg_add_element.state_type, 'edit_statetype_1_vdefault')
-        self.manage_combo(self.dlg_add_element.ownercat_id, 'edit_ownercat_vdefault')
-        self.manage_combo(self.dlg_add_element.builtdate, 'edit_builtdate_vdefault')
-        self.manage_combo(self.dlg_add_element.workcat_id, 'edit_workcat_vdefault')
-        self.manage_combo(self.dlg_add_element.workcat_id_end, 'edit_workcat_id_end_vdefault')
-        self.manage_combo(self.dlg_add_element.verified, 'edit_verified_vdefault')
-
-
-    def manage_combo(self, combo, parameter):
-
-        row = tools_gw.get_config_value(parameter)
-        if row:
-            tools_qt.set_combo_value(combo, row[0], 0)
-
-
-    def filter_state_type(self):
-
-        state = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.state, 0)
-        sql = (f"SELECT DISTINCT(id), name FROM value_state_type "
-               f"WHERE state = {state}")
-        rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.state_type, rows, 1)
 
 
     def update_location_cmb(self):
@@ -286,7 +250,77 @@ class GwElement:
             tools_qt.set_combo_value(self.dlg_add_element.location_type, rows[0][0], 0)
 
 
-    def fill_tbl_new_element(self, dialog, geom_type, feature_id):
+    def manage_elements(self):
+        """ Button 67: Edit element """
+
+        # Create the dialog
+        self.dlg_man = GwElementManagerUi()
+        tools_gw.load_settings(self.dlg_man)
+        self.dlg_man.tbl_element.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        # Adding auto-completion to a QLineEdit
+        table_object = "element"
+        tools_gw.set_completer_object(self.dlg_man, table_object)
+
+        # Set a model with selected filter. Attach that model to selected table
+        message = tools_qt.fill_table(self.dlg_man.tbl_element, f"{self.schema_name}.{table_object}")
+        if message:
+            tools_qgis.show_warning(message)
+        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_element, table_object)
+
+        # Set signals
+        self.dlg_man.element_id.textChanged.connect(partial(
+            tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))
+        self.dlg_man.tbl_element.doubleClicked.connect(partial(
+            self._open_selected_object_element, self.dlg_man, self.dlg_man.tbl_element, table_object))
+        self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))
+        self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))
+        self.dlg_man.btn_delete.clicked.connect(partial(
+            tools_gw.delete_selected_rows, self.dlg_man.tbl_element, table_object))
+
+        # Open form
+        tools_gw.open_dialog(self.dlg_man, dlg_name='element_manager')
+        
+
+    # region private functions
+
+    def _get_point_xy(self):
+
+        self.snapper_manager.add_point(self.vertex_marker)
+        self.point_xy = self.snapper_manager.point_xy
+
+
+    def _set_default_values(self):
+        """ Set default values """
+
+        self._manage_combo(self.dlg_add_element.element_type, 'edit_elementcat_vdefault')
+        self._manage_combo(self.dlg_add_element.elementcat_id, 'edit_elementcat_vdefault')
+        self._manage_combo(self.dlg_add_element.state, 'edit_state_vdefault')
+        self._manage_combo(self.dlg_add_element.state_type, 'edit_statetype_1_vdefault')
+        self._manage_combo(self.dlg_add_element.ownercat_id, 'edit_ownercat_vdefault')
+        self._manage_combo(self.dlg_add_element.builtdate, 'edit_builtdate_vdefault')
+        self._manage_combo(self.dlg_add_element.workcat_id, 'edit_workcat_vdefault')
+        self._manage_combo(self.dlg_add_element.workcat_id_end, 'edit_workcat_id_end_vdefault')
+        self._manage_combo(self.dlg_add_element.verified, 'edit_verified_vdefault')
+
+
+    def _manage_combo(self, combo, parameter):
+
+        row = tools_gw.get_config_value(parameter)
+        if row:
+            tools_qt.set_combo_value(combo, row[0], 0)
+
+
+    def _filter_state_type(self):
+
+        state = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.state, 0)
+        sql = (f"SELECT DISTINCT(id), name FROM value_state_type "
+               f"WHERE state = {state}")
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.dlg_add_element.state_type, rows, 1)
+
+
+    def _fill_tbl_new_element(self, dialog, geom_type, feature_id):
 
         widget = "tbl_element_x_" + geom_type
         widget = dialog.findChild(QTableView, widget)
@@ -304,7 +338,7 @@ class GwElement:
         tools_gw.set_completer_object(dialog, self.table_object)
 
 
-    def manage_element_accept(self, table_object):
+    def _manage_element_accept(self, table_object):
         """ Insert or update table 'element'. Add element to selected feature """
 
         # Get values from dialog
@@ -493,7 +527,7 @@ class GwElement:
             self.layers = tools_gw.manage_close(self.dlg_add_element, table_object, excluded_layers=[], layers=self.layers)
 
 
-    def filter_elementcat_id(self):
+    def _filter_elementcat_id(self):
         """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
 
         element_type = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.element_type, 1)
@@ -504,39 +538,7 @@ class GwElement:
         tools_qt.fill_combo_values(self.dlg_add_element.elementcat_id, rows, 1)
 
 
-    def manage_elements(self):
-        """ Button 67: Edit element """
-
-        # Create the dialog
-        self.dlg_man = GwElementManagerUi()
-        tools_gw.load_settings(self.dlg_man)
-        self.dlg_man.tbl_element.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-        # Adding auto-completion to a QLineEdit
-        table_object = "element"
-        tools_gw.set_completer_object(self.dlg_man, table_object)
-
-        # Set a model with selected filter. Attach that model to selected table
-        message = tools_qt.fill_table(self.dlg_man.tbl_element, f"{self.schema_name}.{table_object}")
-        if message:
-            tools_qgis.show_warning(message)
-        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_element, table_object)
-
-        # Set signals
-        self.dlg_man.element_id.textChanged.connect(partial(
-            tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object))
-        self.dlg_man.tbl_element.doubleClicked.connect(partial(
-            self.open_selected_object_element, self.dlg_man, self.dlg_man.tbl_element, table_object))
-        self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))
-        self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))
-        self.dlg_man.btn_delete.clicked.connect(partial(
-            tools_gw.delete_selected_rows, self.dlg_man.tbl_element, table_object))
-
-        # Open form
-        tools_gw.open_dialog(self.dlg_man, dlg_name='element_manager')
-
-
-    def open_selected_object_element(self, dialog, widget, table_object):
+    def _open_selected_object_element(self, dialog, widget, table_object):
 
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -556,7 +558,7 @@ class GwElement:
         self.get_element(new_element_id=False, selected_object_id=selected_object_id)
 
 
-    def check_date(self, widget, button=None, regex_type=1):
+    def _check_date(self, widget, button=None, regex_type=1):
         """ Set QRegExpression in order to validate QLineEdit(widget) field type date.
         Also allow to enable or disable a QPushButton(button), like typical accept button
         @Type=1 (yyy-mm-dd), @Type=2 (dd-mm-yyyy)
@@ -610,10 +612,10 @@ class GwElement:
                               "((29)([/])(02)([/])([0-9][0-9][13579][26])))")
 
         widget.setValidator(QRegExpValidator(reg_exp))
-        widget.textChanged.connect(partial(self.check_regex, widget, reg_exp, button, placeholder))
+        widget.textChanged.connect(partial(self._check_regex, widget, reg_exp, button, placeholder))
 
 
-    def check_regex(self, widget, reg_exp, button, placeholder, text):
+    def _check_regex(self, widget, reg_exp, button, placeholder, text):
 
         is_valid = False
         if reg_exp.exactMatch(text) is True:
@@ -634,7 +636,7 @@ class GwElement:
                 button.setEnabled(True)
 
 
-    def fill_dialog_element(self, dialog, table_object, single_tool_mode=None):
+    def _fill_dialog_element(self, dialog, table_object, single_tool_mode=None):
 
         # Reset list of selected records
         self.ids, self.list_ids = tools_gw.reset_feature_list()
@@ -660,11 +662,11 @@ class GwElement:
             for widget_name in widgets:
                 tools_qt.set_widget_text(dialog, widget_name, "")
 
-            self.set_combo_from_param_user(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
-            self.set_combo_from_param_user(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
+            self._set_combo_from_param_user(dialog, 'state', 'value_state', 'edit_state_vdefault', field_name='name')
+            self._set_combo_from_param_user(dialog, 'expl_id', 'exploitation', 'edit_exploitation_vdefault',
                                            field_id='expl_id', field_name='name')
             tools_gw.set_calendar_from_user_param(dialog, 'builtdate', 'config_param_user', 'value', 'edit_builtdate_vdefault')
-            self.set_combo_from_param_user(dialog, 'workcat_id', 'cat_work', 'edit_workcat_vdefault',
+            self._set_combo_from_param_user(dialog, 'workcat_id', 'cat_work', 'edit_workcat_vdefault',
                                            field_id='id', field_name='id')
             if single_tool_mode is not None:
                 self.layers = tools_gw.remove_selection(single_tool_mode, self.layers)
@@ -702,7 +704,7 @@ class GwElement:
             tools_gw.get_rows_by_feature_type(self, dialog, table_object, geom_type)
 
 
-    def set_combo_from_param_user(self, dialog, widget, table_name, parameter, field_id='id', field_name='id'):
+    def _set_combo_from_param_user(self, dialog, widget, table_name, parameter, field_id='id', field_name='id'):
         """ Executes query and set combo box """
 
         sql = (f"SELECT t1.{field_name} FROM {table_name} as t1"
@@ -712,3 +714,5 @@ class GwElement:
         if row:
             tools_qt.set_widget_text(dialog, widget, row[0])
 
+
+    # endregion
