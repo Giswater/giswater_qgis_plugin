@@ -40,7 +40,7 @@ class GwNotify:
         for channel_name in list_channels:
             tools_db.execute_sql(f'LISTEN "{channel_name}";')
 
-        thread = threading.Thread(target=self.wait_notifications)
+        thread = threading.Thread(target=self._wait_notifications)
         thread.start()
 
 
@@ -79,7 +79,9 @@ class GwNotify:
             tools_db.execute_sql(f'UNLISTEN "{channel_name}";')
 
 
-    def wait_notifications(self):
+    # region private functions
+
+    def _wait_notifications(self):
 
         try:
             if self.conn_failed:
@@ -89,7 +91,7 @@ class GwNotify:
                 self.conn_failed = False
 
             # Initialize thread
-            thread = threading.Timer(interval=1, function=self.wait_notifications)
+            thread = threading.Timer(interval=1, function=self._wait_notifications)
             thread.start()
 
             # Check if any notification to process
@@ -106,7 +108,7 @@ class GwNotify:
                     last_paiload = notify.payload
                     try:
                         complet_result = json.loads(notify.payload, object_pairs_hook=OrderedDict)
-                        self.execute_functions(complet_result)
+                        self._execute_functions(complet_result)
                     except Exception:
                         pass
 
@@ -114,7 +116,7 @@ class GwNotify:
             self.conn_failed = True
 
 
-    def execute_functions(self, complet_result):
+    def _execute_functions(self, complet_result):
         """
         functions called in -> getattr(tools_backend_calls, function_name)(**params)
             def set_layer_index(self, **kwargs)
@@ -132,3 +134,5 @@ class GwNotify:
             except AttributeError as e:
                 # If function_name not exist as python function
                 tools_log.log_warning(f"Exception error: {e}")
+
+    #endregion
