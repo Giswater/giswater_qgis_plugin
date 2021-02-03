@@ -231,7 +231,7 @@ class GwMenuLoad(QObject):
             self.tree_config_files.setHeaderLabels(["Section", "Parameter", "Value"])
             self.tree_config_files.addTopLevelItem(item)
 
-            self.tree_config_files.itemDoubleClicked.connect(partial(self._onDoubleClick))
+            self.tree_config_files.itemDoubleClicked.connect(partial(self._double_click_event))
             self.tree_config_files.itemChanged.connect(partial(self._set_config_value))
 
 
@@ -245,7 +245,7 @@ class GwMenuLoad(QObject):
             tools_gw.set_config_parser(section, parameter, value, file_name=file_name, prefix=False)
 
 
-    def _onDoubleClick(self, item, column):
+    def _double_click_event(self, item, column):
 
         tmp = item.flags()
 

@@ -33,10 +33,6 @@ class GwDocument:
         self.files_path = []
 
 
-    def edit_add_file(self):
-        self.get_document()
-
-
     def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, geom_type=None, row=None):
         """ Button 34: Add document """
 

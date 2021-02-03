@@ -99,16 +99,6 @@ class GwCatalog:
         tools_gw.open_dialog(self.dlg_catalog, dlg_name='info_catalog')
 
 
-    def get_event_combo_parent(self, fields, row, geom_type):
-
-        if fields == 'fields':
-            for field in row["fields"]:
-                if field['isparent'] is True:
-                    widget = self.dlg_catalog.findChild(QComboBox, field['columnname'])
-                    widget.currentIndexChanged.connect(partial(tools_gw.fill_child, self.dlg_catalog, widget, 'catalog', geom_type))
-                    widget.currentIndexChanged.connect(partial(self._populate_catalog_id, geom_type))
-
-
     # region private functions
 
     def _get_catalog(self, matcat_id, pnom, dnom, id, feature_type, geom_type):
