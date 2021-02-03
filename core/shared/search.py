@@ -48,15 +48,6 @@ class GwSearch:
         self.rubber_band = QgsRubberBand(self.canvas)
 
 
-    def init_dialog(self):
-        """ Initialize dialog. Make it dockable in left dock widget area """
-
-        self.dlg_search = GwSearchUi()
-        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
-        self.dlg_search.dlg_closed.connect(self.reset_rubber_band)
-        self.dlg_search.dlg_closed.connect(self.close_search)
-
-
     def open_search(self, dlg_mincut=None, load_project=False):
 
         # If search is open, dont let user open another one
@@ -65,7 +56,7 @@ class GwSearch:
             return
         form = ""
         if self.dlg_search is None and dlg_mincut is None:
-            self.init_dialog()
+            self._init_dialog()
             tools_gw.set_config_parser('btn_search', 'open_search', 'true')
 
         if dlg_mincut:
@@ -114,10 +105,10 @@ class GwSearch:
                 if field['widgettype'] == 'typeahead':
                     completer = QCompleter()
                     widget = tools_gw.add_lineedit(field)
-                    widget = self.set_typeahead_completer(widget, completer)
+                    widget = self._set_typeahead_completer(widget, completer)
                     self.lineedit_list.append(widget)
                 elif field['widgettype'] == 'combo':
-                    widget = self.add_combobox(field)
+                    widget = self._add_combobox(field)
                 gridlayout.addWidget(label, x, 0)
                 gridlayout.addWidget(widget, x, 1)
                 x += 1
@@ -129,30 +120,96 @@ class GwSearch:
             tools_qt.manage_translation('search', self.dlg_search)
 
 
-    def reset_rubber_band(self):
+    def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
+
+        folder_path = tools_qt.get_text(dialog, path)
+        if folder_path is None or folder_path == 'null':
+            path.setStyleSheet("border: 1px solid red")
+            return
+
+        path.setStyleSheet(None)
+        if folder_path.find('.csv') == -1:
+            folder_path += '.csv'
+        if qtable_1:
+            model_1 = qtable_1.model()
+        else:
+            return
+
+        model_2 = None
+        if qtable_2:
+            model_2 = qtable_2.model()
+
+        # Convert qtable values into list
+        all_rows = []
+        headers = []
+        for i in range(0, model_1.columnCount()):
+            headers.append(str(model_1.headerData(i, Qt.Horizontal)))
+        all_rows.append(headers)
+        for rows in range(0, model_1.rowCount()):
+            row = []
+            for col in range(0, model_1.columnCount()):
+                row.append(str(model_1.data(model_1.index(rows, col))))
+            all_rows.append(row)
+        if qtable_2 is not None:
+            headers = []
+            for i in range(0, model_2.columnCount()):
+                headers.append(str(model_2.headerData(i, Qt.Horizontal)))
+            all_rows.append(headers)
+            for rows in range(0, model_2.rowCount()):
+                row = []
+                for col in range(0, model_2.columnCount()):
+                    row.append(str(model_2.data(model_2.index(rows, col))))
+                all_rows.append(row)
+
+        # Write list into csv file
+        try:
+            if os.path.exists(folder_path):
+                msg = "Are you sure you want to overwrite this file?"
+                answer = tools_qt.show_question(msg, "Overwrite")
+                if answer:
+                    self._write_to_csv(dialog, folder_path, all_rows)
+            else:
+                self._write_to_csv(dialog, folder_path, all_rows)
+        except:
+            msg = "File path doesn't exist or you dont have permission or file is opened"
+            tools_qgis.show_warning(msg)
+
+
+    # region private functions
+
+    def _init_dialog(self):
+        """ Initialize dialog. Make it dockable in left dock widget area """
+
+        self.dlg_search = GwSearchUi()
+        self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
+        self.dlg_search.dlg_closed.connect(self._reset_rubber_band)
+        self.dlg_search.dlg_closed.connect(self._close_search)
+
+
+    def _reset_rubber_band(self):
 
         self.rubber_band.reset()
 
 
-    def close_search(self):
+    def _close_search(self):
 
         self.dlg_search = None
         tools_gw.set_config_parser('btn_search', 'open_search', 'false')
 
 
-    def set_typeahead_completer(self, widget, completer=None):
+    def _set_typeahead_completer(self, widget, completer=None):
         """ Set completer and add listeners """
 
         if completer:
             model = QStringListModel()
-            completer.highlighted.connect(partial(self.check_tab, completer))
-            self.make_list(completer, model, widget)
-            widget.textChanged.connect(partial(self.make_list, completer, model, widget))
+            completer.highlighted.connect(partial(self._check_tab, completer))
+            self._make_list(completer, model, widget)
+            widget.textChanged.connect(partial(self._make_list, completer, model, widget))
 
         return widget
 
 
-    def check_tab(self, completer, is_add_schema=False):
+    def _check_tab(self, completer, is_add_schema=False):
 
         # We look for the index of current tab so we can search by name
         index = self.dlg_search.main_tab.currentIndex()
@@ -236,7 +293,7 @@ class GwSearch:
             point = QgsPointXY(float(x1), float(y1))
             tools_qgis.draw_point(point, self.rubber_band)
             tools_qgis.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
-            self.open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
+            self._open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'])
 
         # Tab 'workcat'
         elif tab_selected == 'workcat':
@@ -246,10 +303,10 @@ class GwSearch:
                 tools_qgis.show_warning(msg)
                 return
             points = tools_qgis.get_geometry_vertex(list_coord)
-            self.draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
+            self._draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y)
-            self.workcat_open_table_items(item)
+            self._workcat_open_table_items(item)
             return
 
         # Tab 'psector'
@@ -263,7 +320,7 @@ class GwSearch:
                 return
             points = tools_qgis.get_geometry_vertex(list_coord)
             self.rubber_band.reset()
-            self.draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
+            self._draw_polygon(points, self.rubber_band, fill_color=QColor(255, 0, 255, 50))
             max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
 
@@ -287,7 +344,7 @@ class GwSearch:
         self.dlg_search.lbl_msg.setVisible(self.lbl_visible)
 
 
-    def make_list(self, completer, model, widget):
+    def _make_list(self, completer, model, widget):
         """ Create a list of ids and populate widget (QLineEdit) """
 
         # Create 2 json, one for first QLineEdit and other for second QLineEdit
@@ -317,7 +374,7 @@ class GwSearch:
             line_edit = line_list[0]
             # If current tab have more than one QLineEdit, clear second QLineEdit
             if len(line_list) == 2:
-                line_edit.textChanged.connect(partial(self.clear_line_edit_add, line_list))
+                line_edit.textChanged.connect(partial(self._clear_line_edit_add, line_list))
 
             value = tools_qt.get_text(self.dlg_search, line_edit, return_string_null=False)
             if str(value) == '':
@@ -373,7 +430,7 @@ class GwSearch:
                 tools_qt.set_completer_object(completer, model, line_edit_add, display_list)
 
 
-    def clear_line_edit_add(self, line_list):
+    def _clear_line_edit_add(self, line_list):
         """ Clear second line edit if exist """
 
         line_edit_add = line_list[1]
@@ -382,29 +439,29 @@ class GwSearch:
         line_edit_add.blockSignals(False)
 
 
-    def add_combobox(self, field):
+    def _add_combobox(self, field):
 
         widget = QComboBox()
         widget.setObjectName(field['widgetname'])
         widget.setProperty('columnname', field['columnname'])
-        list_items = self.get_list_items(widget, field)
+        list_items = self._get_list_items(widget, field)
         tools_qt.fill_combo_values(widget, list_items, 1)
         if 'selectedId' in field:
             tools_qt.set_combo_value(widget, field['selectedId'], 0)
         # noinspection PyUnresolvedReferences
-        widget.currentIndexChanged.connect(partial(self.clear_lineedits))
+        widget.currentIndexChanged.connect(partial(self._clear_lineedits))
 
         return widget
 
 
-    def clear_lineedits(self):
+    def _clear_lineedits(self):
 
         # Clear all lineedit widgets from search tabs
         for widget in self.lineedit_list:
             tools_qt.set_widget_text(self.dlg_search, widget, '')
 
 
-    def get_list_items(self, widget, field):
+    def _get_list_items(self, widget, field):
 
         # Generate list of items to add into combo
         widget.blockSignals(True)
@@ -421,7 +478,7 @@ class GwSearch:
         return list_items
 
 
-    def open_hydrometer_dialog(self, table_name=None, feature_id=None):
+    def _open_hydrometer_dialog(self, table_name=None, feature_id=None):
 
         # get sys variale
         qgis_project_infotype = tools_qgis.get_plugin_settings_value('infoType')
@@ -447,7 +504,7 @@ class GwSearch:
         tools_gw.open_dialog(self.hydro_info_dlg, dlg_name='info_generic')
 
 
-    def workcat_open_table_items(self, item):
+    def _workcat_open_table_items(self, item):
         """ Create the view and open the dialog with his content """
 
         workcat_id = item['sys_id']
@@ -457,9 +514,9 @@ class GwSearch:
         if workcat_id is None:
             return False
 
-        self.update_selector_workcat(workcat_id)
-        current_selectors = self.get_current_selectors()
-        self.force_expl(workcat_id)
+        self._update_selector_workcat(workcat_id)
+        current_selectors = self._get_current_selectors()
+        self._force_expl(workcat_id)
         # TODO ZOOM TO SELECTED WORKCAT
         # self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
@@ -487,8 +544,8 @@ class GwSearch:
         self.items_dialog.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_document.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-        self.set_enable_qatable_by_state(self.items_dialog.tbl_psm, 1, self.items_dialog.btn_state1)
-        self.set_enable_qatable_by_state(self.items_dialog.tbl_psm_end, 0, self.items_dialog.btn_state0)
+        self._set_enable_qatable_by_state(self.items_dialog.tbl_psm, 1, self.items_dialog.btn_state1)
+        self._set_enable_qatable_by_state(self.items_dialog.tbl_psm_end, 0, self.items_dialog.btn_state0)
 
         # Create list for completer QLineEdit
         sql = "SELECT DISTINCT(id) FROM v_ui_document ORDER BY id"
@@ -499,46 +556,46 @@ class GwSearch:
         table_name_end = "v_ui_workcat_x_feature_end"
         table_doc = "v_ui_doc_x_workcat"
         self.items_dialog.btn_doc_insert.clicked.connect(
-            partial(self.document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id', item['sys_id']))
+            partial(self._document_insert, self.items_dialog, 'doc_x_workcat', 'workcat_id', item['sys_id']))
         self.items_dialog.btn_doc_delete.clicked.connect(partial(tools_qt.delete_rows_tableview, self.items_dialog.tbl_document))
         self.items_dialog.btn_doc_new.clicked.connect(
-            partial(self.manage_document, self.items_dialog.tbl_document, item['sys_id']))
+            partial(self._manage_document, self.items_dialog.tbl_document, item['sys_id']))
         self.items_dialog.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.items_dialog.tbl_document, 'path'))
         self.items_dialog.tbl_document.doubleClicked.connect(
             partial(tools_qt.document_open, self.items_dialog.tbl_document, 'path'))
 
         self.items_dialog.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.items_dialog))
         self.items_dialog.btn_path.clicked.connect(
-            partial(self.get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
-        self.items_dialog.rejected.connect(partial(self.restore_selectors, current_selectors))
+            partial(self._get_folder_dialog, self.items_dialog, self.items_dialog.txt_path))
+        self.items_dialog.rejected.connect(partial(self._restore_selectors, current_selectors))
         self.items_dialog.rejected.connect(partial(tools_gw.close_dialog, self.items_dialog))
         self.items_dialog.rejected.connect(self.rubber_band.reset)
         self.items_dialog.btn_state1.clicked.connect(
-            partial(self.force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
+            partial(self._force_state, self.items_dialog.btn_state1, 1, self.items_dialog.tbl_psm))
         self.items_dialog.btn_state0.clicked.connect(
-            partial(self.force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
+            partial(self._force_state, self.items_dialog.btn_state0, 0, self.items_dialog.tbl_psm_end))
         self.items_dialog.btn_export_to_csv.clicked.connect(
             partial(self.export_to_csv, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.tbl_psm_end,
                     self.items_dialog.txt_path))
 
         self.items_dialog.txt_name.textChanged.connect(partial(
-            self.workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.txt_name,
+            self._workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm, self.items_dialog.txt_name,
             table_name, workcat_id, field_id))
         self.items_dialog.txt_name_end.textChanged.connect(partial(
-            self.workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm_end,
+            self._workcat_filter_by_text, self.items_dialog, self.items_dialog.tbl_psm_end,
             self.items_dialog.txt_name_end, table_name_end, workcat_id, field_id))
-        self.items_dialog.tbl_psm.doubleClicked.connect(partial(self.open_feature_form, self.items_dialog.tbl_psm))
+        self.items_dialog.tbl_psm.doubleClicked.connect(partial(self._open_feature_form, self.items_dialog.tbl_psm))
         self.items_dialog.tbl_psm_end.doubleClicked.connect(
-            partial(self.open_feature_form, self.items_dialog.tbl_psm_end))
+            partial(self._open_feature_form, self.items_dialog.tbl_psm_end))
 
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
-        self.workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
+        self._workcat_fill_table(self.items_dialog.tbl_psm, table_name, expr=expr)
         tools_gw.set_tablemodel_config(self.items_dialog, self.items_dialog.tbl_psm, table_name)
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
-        self.workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
+        self._workcat_fill_table(self.items_dialog.tbl_psm_end, table_name_end, expr=expr)
         tools_gw.set_tablemodel_config(self.items_dialog, self.items_dialog.tbl_psm_end, table_name_end)
         expr = "workcat_id ILIKE '%" + str(workcat_id) + "%'"
-        self.workcat_fill_table(self.items_dialog.tbl_document, table_doc, expr=expr)
+        self._workcat_fill_table(self.items_dialog.tbl_document, table_doc, expr=expr)
         tools_gw.set_tablemodel_config(self.items_dialog, self.items_dialog.tbl_document, table_doc)
 
         #
@@ -546,13 +603,13 @@ class GwSearch:
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
         extension = '_end'
-        self.fill_label_data(workcat_id, table_name)
-        self.fill_label_data(workcat_id, table_name_end, extension)
+        self._fill_label_data(workcat_id, table_name)
+        self._fill_label_data(workcat_id, table_name_end, extension)
 
         tools_gw.open_dialog(self.items_dialog, dlg_name='search_workcat')
 
 
-    def manage_document(self, qtable, item_id):
+    def _manage_document(self, qtable, item_id):
         """ Access GUI to manage documents e.g Execute action of button 34 """
 
         manage_document = GwDocument(single_tool=False)
@@ -561,7 +618,7 @@ class GwSearch:
         tools_qt.remove_tab(dlg_docman.tabWidget, 'tab_rel')
 
 
-    def get_current_selectors(self):
+    def _get_current_selectors(self):
         """ Take the current selector_expl and selector_state to restore them at the end of the operation """
 
         current_tab = tools_gw.get_config_parser('dialogs_tab', 'selector_basic', "user", "session")
@@ -572,7 +629,7 @@ class GwSearch:
         return json_result
 
 
-    def restore_selectors(self, current_selectors):
+    def _restore_selectors(self, current_selectors):
         """ Restore selector_expl and selector_state to how the user had it """
 
         qgis_project_add_schema = tools_qgis.get_plugin_settings_value('gwAddSchema')
@@ -596,7 +653,7 @@ class GwSearch:
         tools_qgis.refresh_map_canvas()
 
 
-    def force_expl(self, workcat_id):
+    def _force_expl(self, workcat_id):
         """ Active exploitations are compared with workcat farms.
             If there is consistency nothing happens, if there is no consistency force this exploitations to selector."""
 
@@ -622,7 +679,7 @@ class GwSearch:
             tools_qgis.show_info(msg)
 
 
-    def update_selector_workcat(self, workcat_id):
+    def _update_selector_workcat(self, workcat_id):
         """ Update table selector_workcat """
 
         sql = ("DELETE FROM selector_workcat "
@@ -632,7 +689,7 @@ class GwSearch:
         tools_db.execute_sql(sql)
 
 
-    def set_enable_qatable_by_state(self, qtable, _id, qbutton):
+    def _set_enable_qatable_by_state(self, qtable, _id, qbutton):
 
         sql = (f"SELECT state_id FROM selector_state "
                f" WHERE cur_user = current_user AND state_id ='{_id}'")
@@ -642,7 +699,7 @@ class GwSearch:
             qbutton.setEnabled(True)
 
 
-    def get_folder_dialog(self, dialog, widget):
+    def _get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
 
         widget.setStyleSheet(None)
@@ -662,7 +719,7 @@ class GwSearch:
             tools_qt.set_widget_text(dialog, widget, str(folder_path))
 
 
-    def force_state(self, qbutton, state, qtable):
+    def _force_state(self, qbutton, state, qtable):
         """ Force selected state and set qtable enabled = True """
 
         sql = (f"SELECT state_id "
@@ -681,62 +738,7 @@ class GwSearch:
         qtable.model().select()
 
 
-    def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
-
-        folder_path = tools_qt.get_text(dialog, path)
-        if folder_path is None or folder_path == 'null':
-            path.setStyleSheet("border: 1px solid red")
-            return
-
-        path.setStyleSheet(None)
-        if folder_path.find('.csv') == -1:
-            folder_path += '.csv'
-        if qtable_1:
-            model_1 = qtable_1.model()
-        else:
-            return
-
-        model_2 = None
-        if qtable_2:
-            model_2 = qtable_2.model()
-
-        # Convert qtable values into list
-        all_rows = []
-        headers = []
-        for i in range(0, model_1.columnCount()):
-            headers.append(str(model_1.headerData(i, Qt.Horizontal)))
-        all_rows.append(headers)
-        for rows in range(0, model_1.rowCount()):
-            row = []
-            for col in range(0, model_1.columnCount()):
-                row.append(str(model_1.data(model_1.index(rows, col))))
-            all_rows.append(row)
-        if qtable_2 is not None:
-            headers = []
-            for i in range(0, model_2.columnCount()):
-                headers.append(str(model_2.headerData(i, Qt.Horizontal)))
-            all_rows.append(headers)
-            for rows in range(0, model_2.rowCount()):
-                row = []
-                for col in range(0, model_2.columnCount()):
-                    row.append(str(model_2.data(model_2.index(rows, col))))
-                all_rows.append(row)
-
-        # Write list into csv file
-        try:
-            if os.path.exists(folder_path):
-                msg = "Are you sure you want to overwrite this file?"
-                answer = tools_qt.show_question(msg, "Overwrite")
-                if answer:
-                    self.write_to_csv(dialog, folder_path, all_rows)
-            else:
-                self.write_to_csv(dialog, folder_path, all_rows)
-        except:
-            msg = "File path doesn't exist or you dont have permission or file is opened"
-            tools_qgis.show_warning(msg)
-
-
-    def write_to_csv(self, dialog, folder_path=None, all_rows=None):
+    def _write_to_csv(self, dialog, folder_path=None, all_rows=None):
 
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
@@ -746,7 +748,7 @@ class GwSearch:
         tools_qgis.show_info(message)
 
 
-    def workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
+    def _workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
         """ Filter list of workcats by workcat_id and field_id """
 
         result_select = tools_qt.get_text(dialog, widget_txt)
@@ -755,11 +757,11 @@ class GwSearch:
                     f" and {field_id} ILIKE '%{result_select}%'")
         else:
             expr = f"workcat_id ILIKE '%{workcat_id}%'"
-        self.workcat_fill_table(qtable, table_name, expr=expr)
+        self._workcat_fill_table(qtable, table_name, expr=expr)
         tools_gw.set_tablemodel_config(dialog, qtable, table_name)
 
 
-    def workcat_fill_table(self, widget, table_name, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+    def _workcat_fill_table(self, widget, table_name, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Fill table @widget filtering query by @workcat_id
         Set a model with selected filter.
         Attach that model to selected table
@@ -791,7 +793,7 @@ class GwSearch:
             widget.setModel(model)
 
 
-    def open_feature_form(self, qtable):
+    def _open_feature_form(self, qtable):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
 
         # Get selected code from combo
@@ -817,7 +819,7 @@ class GwSearch:
         tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, 1)
 
 
-    def fill_label_data(self, workcat_id, table_name, extension=None):
+    def _fill_label_data(self, workcat_id, table_name, extension=None):
 
         if workcat_id == "null":
             return
@@ -870,7 +872,7 @@ class GwSearch:
                 widget.setText(f"Total arcs length: {length}")
 
 
-    def draw_polygon(self, points, rubber_band, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
+    def _draw_polygon(self, points, rubber_band, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
         """ Draw 'polygon' over canvas following list of points
         :param duration_time: integer milliseconds ex: 3000 for 3 seconds
         """
@@ -889,7 +891,7 @@ class GwSearch:
             QTimer.singleShot(duration_time, rubber_band.reset)
 
 
-    def document_insert(self, dialog, tablename, field, field_value):
+    def _document_insert(self, dialog, tablename, field, field_value):
         """ Insert a document related to the current visit
         :param dialog: (QDialog )
         :param tablename: Name of the table to make the queries (string)
@@ -922,3 +924,5 @@ class GwSearch:
             tools_qgis.show_info(message)
 
         dialog.tbl_document.model().select()
+
+    # endregions
