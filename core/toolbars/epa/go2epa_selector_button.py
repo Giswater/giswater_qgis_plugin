@@ -25,10 +25,12 @@ class GwGo2EpaSelectorButton(GwAction):
     def clicked_event(self):
         """ Button 29: Epa result selector """
 
-        self.open_go2epa_selector()
+        self._open_go2epa_selector()
 
 
-    def open_go2epa_selector(self):
+    # region private functions
+
+    def _open_go2epa_selector(self):
 
         # Create the dialog and signals
         self.dlg_go2epa_result = GwGo2EpaSelectorUi('go2epa')
@@ -37,7 +39,7 @@ class GwGo2EpaSelectorButton(GwAction):
             tools_qt.remove_tab(self.dlg_go2epa_result.tabWidget, "tab_time")
         if self.project_type == 'ws':
             tools_qt.remove_tab(self.dlg_go2epa_result.tabWidget, "tab_datetime")
-        self.dlg_go2epa_result.btn_accept.clicked.connect(self.result_selector_accept)
+        self.dlg_go2epa_result.btn_accept.clicked.connect(self._result_selector_accept)
         self.dlg_go2epa_result.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_result))
         self.dlg_go2epa_result.rejected.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_result))
 
@@ -58,9 +60,9 @@ class GwGo2EpaSelectorButton(GwAction):
             tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_time_to_compare, rows)
 
             self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(partial(
-                self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_time_to_show))
+                self._populate_time, self.dlg_go2epa_result.rpt_selector_result_id, self.dlg_go2epa_result.cmb_time_to_show))
             self.dlg_go2epa_result.rpt_selector_compare_id.currentIndexChanged.connect(partial(
-                self.populate_time, self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_time_to_compare))
+                self._populate_time, self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_time_to_compare))
 
         elif self.project_type == 'ud':
 
@@ -81,10 +83,10 @@ class GwGo2EpaSelectorButton(GwAction):
                 tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_sel_time, rows)
 
             self.dlg_go2epa_result.rpt_selector_result_id.currentIndexChanged.connect(
-                partial(self.populate_date_time, self.dlg_go2epa_result.cmb_sel_date))
+                partial(self._populate_date_time, self.dlg_go2epa_result.cmb_sel_date))
 
             self.dlg_go2epa_result.cmb_sel_date.currentIndexChanged.connect(
-                partial(self.populate_time, self.dlg_go2epa_result.rpt_selector_result_id,
+                partial(self._populate_time, self.dlg_go2epa_result.rpt_selector_result_id,
                         self.dlg_go2epa_result.cmb_sel_time))
 
             # Populate GroupBox Selector compare
@@ -105,9 +107,9 @@ class GwGo2EpaSelectorButton(GwAction):
                 tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_com_time, rows)
 
             self.dlg_go2epa_result.rpt_selector_compare_id.currentIndexChanged.connect(partial(
-                self.populate_date_time, self.dlg_go2epa_result.cmb_com_date))
+                self._populate_date_time, self.dlg_go2epa_result.cmb_com_date))
             self.dlg_go2epa_result.cmb_com_date.currentIndexChanged.connect(partial(
-                self.populate_time, self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_com_time))
+                self._populate_time, self.dlg_go2epa_result.rpt_selector_compare_id, self.dlg_go2epa_result.cmb_com_time))
 
         # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
         sql = "SELECT result_id FROM selector_rpt_main"
@@ -123,7 +125,7 @@ class GwGo2EpaSelectorButton(GwAction):
         tools_gw.open_dialog(self.dlg_go2epa_result, dlg_name='go2epa_selector')
 
 
-    def result_selector_accept(self):
+    def _result_selector_accept(self):
         """ Update current values to the table """
 
         # Set project user
@@ -183,7 +185,7 @@ class GwGo2EpaSelectorButton(GwAction):
         tools_gw.close_dialog(self.dlg_go2epa_result)
 
 
-    def populate_time(self, combo_result, combo_time):
+    def _populate_time(self, combo_result, combo_time):
         """ Populate combo times """
 
         result_id = tools_qt.get_combo_value(self.dlg_go2epa_result, combo_result)
@@ -201,7 +203,7 @@ class GwGo2EpaSelectorButton(GwAction):
         tools_qt.fill_combo_values(combo_time, rows)
 
 
-    def populate_date_time(self, combo_date):
+    def _populate_date_time(self, combo_date):
 
         result_id = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
         sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
@@ -209,3 +211,5 @@ class GwGo2EpaSelectorButton(GwAction):
                f"ORDER BY resultdate")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(combo_date, rows)
+
+    # endregion
