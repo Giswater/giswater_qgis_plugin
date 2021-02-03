@@ -79,7 +79,7 @@ def save_settings(dialog):
         pass
 
 
-def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True) -> str:
+def get_config_parser(section: str, parameter: str, config_type, file_name, prefix=True, log_warning=True) -> str:
     """ Load a simple parser value """
 
     value = None
@@ -89,7 +89,6 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
         parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
         if config_type in "user":
             path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)
-
         elif config_type in "project":
             path_folder = global_vars.plugin_dir
         else:
@@ -98,20 +97,23 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
 
         path = path_folder + os.sep + "config" + os.sep + f'{file_name}.config'
         if not os.path.exists(path):
+            tools_log.log_warning(f"get_config_parser - File not found: {path}")
             return None
 
         parser.read(path)
         if not parser.has_section(section):
-            tools_log.log_warning(f"Section '{section}' not found")
+            if log_warning:
+                tools_log.log_warning(f"Section '{section}' not found")
             return None
         if not parser.has_option(section, parameter):
-            tools_log.log_warning(f"Parameter '{parameter}' not found in section '{section}'")
+            if log_warning:
+                tools_log.log_warning(f"Parameter '{parameter}' not found in section '{section}'")
             return None
         value = parser[section][parameter]
     except Exception as e:
         tools_log.log_warning(str(e))
+    finally:
         return value
-    return value
 
 
 def set_config_parser(section: str, parameter: str, value: str, config_type="user", file_name="session", comment=None,
