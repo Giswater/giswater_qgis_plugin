@@ -43,10 +43,6 @@ class GwSnapManager(object):
         self.vertex_marker.setPenWidth(3)
 
 
-    def init_snapping_config(self):
-        pass
-
-
     def set_snapping_layers(self):
         """ Set main snapping layers """
 
@@ -324,20 +320,11 @@ class GwSnapManager(object):
             feature_request = QgsFeatureRequest().setFilterFid(feature_id)
             snapped_feat = next(layer.getFeatures(feature_request))
             if select_feature and snapped_feat:
-                self.select_snapped_feature(result, feature_id)
+                self._select_snapped_feature(result, feature_id)
         except:
             pass
         finally:
             return snapped_feat
-
-
-    def select_snapped_feature(self, result, feature_id):
-
-        if not result.isValid():
-            return
-
-        layer = result.layer()
-        layer.select([feature_id])
 
 
     def result_is_valid(self):
@@ -355,8 +342,8 @@ class GwSnapManager(object):
         # Snapper
         emit_point = QgsMapToolEmitPoint(global_vars.canvas)
         global_vars.canvas.setMapTool(emit_point)
-        global_vars.canvas.xyCoordinates.connect(partial(self.get_mouse_move, vertex_marker))
-        emit_point.canvasClicked.connect(partial(self.get_xy, vertex_marker, emit_point))
+        global_vars.canvas.xyCoordinates.connect(partial(self._get_mouse_move, vertex_marker))
+        emit_point.canvasClicked.connect(partial(self._get_xy, vertex_marker, emit_point))
 
 
     def set_vertex_marker(self, vertex_marker, icon_type=1, color_type=0, icon_size=15, pen_width=3):
@@ -373,7 +360,10 @@ class GwSnapManager(object):
         vertex_marker.setPenWidth(pen_width)
 
 
-    def get_mouse_move(self, vertex_marker, point):
+    # region private functions
+
+
+    def _get_mouse_move(self, vertex_marker, point):
 
         # Hide marker and get coordinates
         vertex_marker.hide()
@@ -387,7 +377,7 @@ class GwSnapManager(object):
             vertex_marker.hide()
 
 
-    def get_xy(self, vertex_marker, emit_point, point):
+    def _get_xy(self, vertex_marker, emit_point, point):
         """ Get coordinates of selected point """
 
         # Setting x, y coordinates from point
@@ -400,3 +390,14 @@ class GwSnapManager(object):
         global_vars.canvas.xyCoordinates.disconnect()
         global_vars.iface.mapCanvas().refreshAllLayers()
         vertex_marker.hide()
+
+
+    def _select_snapped_feature(self, result, feature_id):
+
+        if not result.isValid():
+            return
+
+        layer = result.layer()
+        layer.select([feature_id])
+
+    # endregion
