@@ -39,28 +39,7 @@ class GwFlowTraceButton(GwMaptool):
 
     def canvasReleaseEvent(self, event):
         """ With left click the digitizing is finished """
-        self.set_flow_trace(event)
-
-
-    def set_flow_trace(self, event):
-
-        if event.button() == Qt.LeftButton and self.current_layer:
-
-            # Execute SQL function
-            function_name = "gw_fct_grafanalytics_upstream"
-
-            elem_id = self.snapped_feat.attribute('node_id')
-            feature_id = f'"id":["{elem_id}"]'
-            body = tools_gw.create_body(feature=feature_id)
-            result = tools_gw.execute_procedure(function_name, body)
-            if not result or result['status'] == 'Failed':
-                return
-
-            # Refresh map canvas
-            self.refresh_map_canvas()
-
-            # Set action pan
-            self.set_action_pan()
+        self._set_flow_trace(event)
 
 
     def activate(self):
@@ -105,3 +84,27 @@ class GwFlowTraceButton(GwMaptool):
         # Call parent method
         super().deactivate()
 
+
+    # region private functions
+
+    def _set_flow_trace(self, event):
+
+        if event.button() == Qt.LeftButton and self.current_layer:
+
+            # Execute SQL function
+            function_name = "gw_fct_grafanalytics_upstream"
+
+            elem_id = self.snapped_feat.attribute('node_id')
+            feature_id = f'"id":["{elem_id}"]'
+            body = tools_gw.create_body(feature=feature_id)
+            result = tools_gw.execute_procedure(function_name, body)
+            if not result or result['status'] == 'Failed':
+                return
+
+            # Refresh map canvas
+            self.refresh_map_canvas()
+
+            # Set action pan
+            self.set_action_pan()
+
+    # endregion
