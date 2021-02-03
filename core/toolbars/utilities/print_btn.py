@@ -35,13 +35,15 @@ class GwPrintButton(GwAction):
 
     def clicked_event(self):
 
-        self.open_print()
+        self._open_print()
 
 
-    def open_print(self):
+    # region private functions
+
+    def _open_print(self):
 
         self.my_json = {}
-        composers_list = self.get_composer()
+        composers_list = self._get_composer()
         if composers_list == '"{}"':
             msg = "No composers found."
             tools_qt.show_info_box(msg, "Info")
@@ -64,7 +66,7 @@ class GwPrintButton(GwAction):
             # This dialog is created from config_form_fieds
             # where formname == 'print' and formtype == 'utils'
             # At the moment, u can set column widgetfunction with 'gw_fct_setprint' or open_composer
-            self.create_dialog(self.dlg_composer, fields)
+            self._create_dialog(self.dlg_composer, fields)
         tools_qt.hide_void_groupbox(self.dlg_composer)
 
         # Set current values from canvas
@@ -73,12 +75,12 @@ class GwPrintButton(GwAction):
 
         w_rotation = self.dlg_composer.findChild(QLineEdit, "data_rotation")
         if w_rotation:
-            w_rotation.editingFinished.connect(partial(self.set_rotation, w_rotation))
+            w_rotation.editingFinished.connect(partial(self._set_rotation, w_rotation))
             tools_qt.set_widget_text(self.dlg_composer, w_rotation, rotation)
 
         w_scale = self.dlg_composer.findChild(QLineEdit, "data_scale")
         if w_scale:
-            w_scale.editingFinished.connect(partial(self.set_scale, w_scale))
+            w_scale.editingFinished.connect(partial(self._set_scale, w_scale))
             reg_exp = QRegExp("\d{0,8}[\r]?")
             w_scale.setValidator(QRegExpValidator(reg_exp))
             tools_qt.set_widget_text(self.dlg_composer, w_scale, scale)
@@ -87,28 +89,28 @@ class GwPrintButton(GwAction):
 
         # Signals
         self.dlg_composer.btn_print.clicked.connect(partial(self.__print, self.dlg_composer))
-        self.dlg_composer.btn_preview.clicked.connect(partial(self.preview, self.dlg_composer, True))
+        self.dlg_composer.btn_preview.clicked.connect(partial(self._preview, self.dlg_composer, True))
         self.dlg_composer.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_composer))
         self.dlg_composer.btn_close.clicked.connect(partial(tools_gw.save_settings, self.dlg_composer))
-        self.dlg_composer.btn_close.clicked.connect(self.destructor)
+        self.dlg_composer.btn_close.clicked.connect(self._destructor)
         self.dlg_composer.rejected.connect(partial(tools_gw.save_settings, self.dlg_composer))
-        self.dlg_composer.rejected.connect(self.destructor)
+        self.dlg_composer.rejected.connect(self._destructor)
 
-        self.check_whidget_exist(self.dlg_composer)
-        self.load_composer_values(self.dlg_composer)
+        self._check_whidget_exist(self.dlg_composer)
+        self._load_composer_values(self.dlg_composer)
 
         tools_gw.open_dialog(self.dlg_composer, dlg_name='fastprint')
 
         # Control if no have composers
         if composers_list != '"{}"':
-            self.accept(self.dlg_composer, self.my_json)
-            self.iface.mapCanvas().extentsChanged.connect(partial(self.accept, self.dlg_composer, self.my_json))
+            self._accept(self.dlg_composer, self.my_json)
+            self.iface.mapCanvas().extentsChanged.connect(partial(self._accept, self.dlg_composer, self.my_json))
         else:
             self.dlg_composer.btn_print.setEnabled(False)
             self.dlg_composer.btn_preview.setEnabled(False)
 
 
-    def get_composer(self, removed=None):
+    def _get_composer(self, removed=None):
         """ Get all composers from current QGis project """
 
         composers = '"{'
@@ -126,20 +128,20 @@ class GwPrintButton(GwAction):
         return composers
 
 
-    def create_dialog(self, dialog, fields):
+    def _create_dialog(self, dialog, fields):
 
         for field in fields['fields']:
-            label, widget = self.set_widgets_into_composer(dialog, field, self.my_json)
+            label, widget = self._set_widgets_into_composer(dialog, field, self.my_json)
             tools_gw.add_widget(dialog, field, label, widget)
             tools_gw.get_values(dialog, widget, self.my_json)
 
 
-    def set_rotation(self, widget):
+    def _set_rotation(self, widget):
         """ Set rotation to mapCanvas """
         self.iface.mapCanvas().setRotation(float(widget.text()))
 
 
-    def set_scale(self, widget):
+    def _set_scale(self, widget):
         """ Set zoomScale to mapCanvas """
         self.iface.mapCanvas().zoomScale(float(widget.text()))
 
@@ -148,8 +150,8 @@ class GwPrintButton(GwAction):
 
         if not self.printer:
             self.printer = QPrinter()
-        self.preview(dialog, False)
-        selected_com = self.get_current_composer()
+        self._preview(dialog, False)
+        selected_com = self._get_current_composer()
         if selected_com is None:
             return
 
@@ -166,12 +168,12 @@ class GwPrintButton(GwAction):
         print_(self.printer, QgsLayoutExporter.PrintExportSettings())
 
 
-    def preview(self, dialog, show):
+    def _preview(self, dialog, show):
         """ Export values from widgets(only QLineEdit) into dialog, to selected composer
                 if composer.widget.id == dialog.widget.property('columnname')
         """
 
-        selected_com = self.get_current_composer()
+        selected_com = self._get_current_composer()
         widget_list = dialog.findChildren(QLineEdit)
 
         for widget in widget_list:
@@ -180,10 +182,10 @@ class GwPrintButton(GwAction):
                 item.setText(str(widget.text()))
                 item.refresh()
         if show:
-            self.open_composer(dialog)
+            self._open_composer(dialog)
 
 
-    def destructor(self):
+    def _destructor(self):
         self.iface.mapCanvas().setRotation(self.initial_rotation)
         self.destroyed = True
         if self.rubber_band:
@@ -191,10 +193,10 @@ class GwPrintButton(GwAction):
             self.rubber_band = None
 
 
-    def check_whidget_exist(self, dialog):
+    def _check_whidget_exist(self, dialog):
         """ Check if widget exist in composer """
 
-        selected_com = self.get_current_composer()
+        selected_com = self._get_current_composer()
         widget_list = dialog.grb_option_values.findChildren(QLineEdit)
         for widget in widget_list:
             item = selected_com.itemById(widget.property('columnname'))
@@ -206,10 +208,10 @@ class GwPrintButton(GwAction):
                 widget.setStyleSheet(None)
 
 
-    def load_composer_values(self, dialog):
+    def _load_composer_values(self, dialog):
         """ Load values from composer into form dialog """
 
-        selected_com = self.get_current_composer()
+        selected_com = self._get_current_composer()
         widget_list = dialog.grb_option_values.findChildren(QLineEdit)
 
         if selected_com is not None:
@@ -219,7 +221,7 @@ class GwPrintButton(GwAction):
                     widget.setText(str(item.text()))
 
 
-    def accept(self, dialog, my_json):
+    def _accept(self, dialog, my_json):
 
         if self.destroyed:
             return
@@ -268,7 +270,7 @@ class GwPrintButton(GwAction):
             return False
 
         result = json_result['data']
-        self.draw_rectangle(result, self.rubber_band)
+        self._draw_rectangle(result, self.rubber_band)
         map_index = json_result['data']['mapIndex']
 
         maps = []
@@ -294,7 +296,7 @@ class GwPrintButton(GwAction):
         return True
 
 
-    def set_widgets_into_composer(self, dialog, field, my_json=None):
+    def _set_widgets_into_composer(self, dialog, field, my_json=None):
         """
         functions called in -> widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json))
             def set_print(self, dialog, my_json)
@@ -330,7 +332,7 @@ class GwPrintButton(GwAction):
         return label, widget
 
 
-    def get_current_composer(self):
+    def _get_current_composer(self):
         """ Get composer selected in QComboBox """
 
         selected_com = None
@@ -343,32 +345,17 @@ class GwPrintButton(GwAction):
         return selected_com
 
 
-    def open_composer(self, dialog):
+    def _open_composer(self, dialog):
         """ Open selected composer and load values from composer into form dialog """
 
-        selected_com = self.get_current_composer()
+        selected_com = self._get_current_composer()
         if selected_com is not None:
             self.iface.openLayoutDesigner(layout=selected_com)
 
-        self.load_composer_values(dialog)
+        self._load_composer_values(dialog)
 
 
-    def set_print(self, dialog, my_json):
-
-        if my_json['composer'] != '-1':
-            self.check_whidget_exist(self.dlg_composer)
-            self.load_composer_values(dialog)
-            self.accept(dialog, my_json)
-
-
-    def set_composer(self, dialog, my_json):
-
-        if my_json['composer'] != '-1':
-            self.preview(dialog, False)
-            self.accept(dialog, my_json)
-
-
-    def draw_rectangle(self, result, rubber_band):
+    def _draw_rectangle(self, result, rubber_band):
         """ Draw lines based on geometry """
 
         if result['geometry'] is None:
@@ -377,3 +364,5 @@ class GwPrintButton(GwAction):
         list_coord = re.search('\((.*)\)', str(result['geometry']['st_astext']))
         points = tools_qgis.get_geometry_vertex(list_coord)
         tools_qgis.draw_polyline(points, rubber_band)
+
+    # endregion
