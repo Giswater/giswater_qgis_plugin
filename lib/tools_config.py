@@ -14,19 +14,6 @@ from .. import global_vars
 config_parser = None
 project_config_file = None
 
-def check_config_parser(section, parameter, value=None):
-    """ Check if @section and @parameter exists in user settings file. If not add them with @value """
-
-    # Check if @section exists
-    if not config_parser.has_section(section):
-        config_parser.add_section(section)
-        config_parser.set(section, parameter, value)
-        save_config_parser()
-    # Check if @parameter exists
-    if not config_parser.has_option(section, parameter):
-        config_parser.set(section, parameter, value)
-        save_config_parser()
-
 
 def get_user_setting_value(section, parameter, default_value=None):
     """ Get value from user settings file 'init.config' of selected @parameter located in @section """
@@ -35,7 +22,7 @@ def get_user_setting_value(section, parameter, default_value=None):
     if config_parser is None:
         return value
 
-    check_config_parser(section, parameter, value)
+    _check_config_parser(section, parameter, value)
     value = config_parser.get(section, parameter).lower()
 
     return value
@@ -47,12 +34,28 @@ def set_config_parser_value(section, parameter, value):
     if config_parser is None:
         return value
 
-    check_config_parser(section, parameter, value)
+    _check_config_parser(section, parameter, value)
     config_parser.set(section, parameter, value)
-    save_config_parser()
+    _save_config_parser()
 
 
-def save_config_parser():
+def manage_init_config_file():
+    """ Manage user configuration file 'init.config' """
+    global config_parser
+    config_parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
+    project_config_file = f"{global_vars.user_folder_dir}{os.sep}config{os.sep}init.config"
+    if not os.path.exists(project_config_file):
+        tools_log.log_info(f"File not found: {project_config_file}")
+        _save_config_parser()
+    else:
+        tools_log.log_info(f"User settings file: {project_config_file}")
+
+    # Open file
+    config_parser.read(project_config_file)
+
+# region private functions
+
+def _save_config_parser():
     """ Save user settings file """
 
     try:
@@ -63,16 +66,17 @@ def save_config_parser():
         tools_log.log_warning(str(e))
 
 
-def manage_init_config_file():
-    """ Manage user configuration file 'init.config' """
-    global config_parser
-    config_parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
-    project_config_file = f"{global_vars.user_folder_dir}{os.sep}config{os.sep}init.config"
-    if not os.path.exists(project_config_file):
-        tools_log.log_info(f"File not found: {project_config_file}")
-        save_config_parser()
-    else:
-        tools_log.log_info(f"User settings file: {project_config_file}")
+def _check_config_parser(section, parameter, value=None):
+    """ Check if @section and @parameter exists in user settings file. If not add them with @value """
 
-    # Open file
-    config_parser.read(project_config_file)
+    # Check if @section exists
+    if not config_parser.has_section(section):
+        config_parser.add_section(section)
+        config_parser.set(section, parameter, value)
+        _save_config_parser()
+    # Check if @parameter exists
+    if not config_parser.has_option(section, parameter):
+        config_parser.set(section, parameter, value)
+        _save_config_parser()
+
+# endregion
