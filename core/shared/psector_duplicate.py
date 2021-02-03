@@ -40,13 +40,15 @@ class GwPsectorDuplicate(QObject):
 
         # Set listeners
         self.dlg_duplicate_psector.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_duplicate_psector))
-        self.dlg_duplicate_psector.btn_accept.clicked.connect(partial(self.duplicate_psector))
+        self.dlg_duplicate_psector.btn_accept.clicked.connect(partial(self._duplicate_psector))
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_duplicate_psector, dlg_name='psector_duplicate')
 
 
-    def duplicate_psector(self):
+    # region private functions
+
+    def _duplicate_psector(self):
 
         id_psector = tools_qt.get_combo_value(self.dlg_duplicate_psector, self.dlg_duplicate_psector.duplicate_psector, 0)
         new_psector_name = tools_qt.get_text(self.dlg_duplicate_psector, self.dlg_duplicate_psector.new_psector_name)
@@ -78,3 +80,4 @@ class GwPsectorDuplicate(QObject):
 
         self.is_duplicated.emit()
 
+    # endregion
