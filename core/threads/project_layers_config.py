@@ -37,8 +37,8 @@ class GwProjectLayersConfig(GwTask):
         self.setProgress(0)
         if self.get_layers:
             # tools_log.log_info("get_layers_to_config")
-            self.get_layers_to_config()
-        self.set_layer_config(self.available_layers)
+            self._get_layers_to_config()
+        self._set_layer_config(self.available_layers)
         self.setProgress(100)
 
         return True
@@ -70,7 +70,10 @@ class GwProjectLayersConfig(GwTask):
         self.get_layers = get_layers
 
 
-    def get_layers_to_config(self):
+    # region private functions
+
+
+    def _get_layers_to_config(self):
         """ Get available layers to be configured """
 
         schema_name = self.schema_name.replace('"', '')
@@ -83,7 +86,7 @@ class GwProjectLayersConfig(GwTask):
         rows = tools_db.get_rows(sql)
         self.available_layers = [layer[0] for layer in rows]
 
-        self.set_form_suppress(self.available_layers)
+        self._set_form_suppress(self.available_layers)
         all_layers_toc = tools_qgis.get_project_layers()
         for layer in all_layers_toc:
             layer_source = tools_qgis.get_layer_source(layer)
@@ -95,7 +98,7 @@ class GwProjectLayersConfig(GwTask):
                     self.available_layers.append(table_name)
 
 
-    def set_form_suppress(self, layers_list):
+    def _set_form_suppress(self, layers_list):
         """ Set form suppress on "Hide form on add feature (global settings) """
 
         for layer_name in layers_list:
@@ -106,7 +109,7 @@ class GwProjectLayersConfig(GwTask):
             layer.setEditFormConfig(config)
 
 
-    def set_layer_config(self, layers):
+    def _set_layer_config(self, layers):
         """ Set layer fields configured according to client configuration.
             At the moment manage:
                 Column names as alias, combos as ValueMap, typeahead as textedit"""
@@ -131,7 +134,7 @@ class GwProjectLayersConfig(GwTask):
 
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
-            body = self.create_body(feature=feature, extras=extras)
+            body = self._create_body(feature=feature, extras=extras)
             complet_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
             if not complet_result or complet_result['status'] == 'Failed':
                 continue
@@ -153,7 +156,7 @@ class GwProjectLayersConfig(GwTask):
 
                 # Hide selected fields according table config_form_fields.hidden
                 if 'hidden' in field:
-                    self.set_column_visibility(layer, field['columnname'], field['hidden'])
+                    self._set_column_visibility(layer, field['columnname'], field['hidden'])
 
                 # Set alias column
                 if field['label']:
@@ -161,7 +164,7 @@ class GwProjectLayersConfig(GwTask):
 
                 # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
                 if field['widgettype'] == 'text':
-                    self.set_column_multiline(layer, field, field_index)
+                    self._set_column_multiline(layer, field, field_index)
 
                 # widgetcontrols
                 if 'widgetcontrols' in field:
@@ -179,7 +182,7 @@ class GwProjectLayersConfig(GwTask):
                                              QgsFieldConstraints.ConstraintStrengthSoft)
 
                 # Manage editability
-                self.set_read_only(layer, field, field_index)
+                self._set_read_only(layer, field, field_index)
 
                 # delete old values on ValueMap
                 editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
@@ -219,7 +222,7 @@ class GwProjectLayersConfig(GwTask):
         tools_log.log_info("Finish set_layer_config")
 
 
-    def set_read_only(self, layer, field, field_index):
+    def _set_read_only(self, layer, field, field_index):
         """ Set field readOnly according to client configuration into config_form_fields (field 'iseditable') """
 
         # Get layer config
@@ -234,7 +237,7 @@ class GwProjectLayersConfig(GwTask):
             layer.setEditFormConfig(config)
 
 
-    def set_column_visibility(self, layer, col_name, hidden):
+    def _set_column_visibility(self, layer, col_name, hidden):
         """ Hide selected fields according table config_form_fields.hidden """
 
         config = layer.attributeTableConfig()
@@ -247,7 +250,7 @@ class GwProjectLayersConfig(GwTask):
         layer.setAttributeTableConfig(config)
 
 
-    def set_column_multiline(self, layer, field, field_index):
+    def _set_column_multiline(self, layer, field, field_index):
         """ Set multiline selected fields according table config_form_fields.widgetcontrols['setQgisMultiline'] """
 
         if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
@@ -257,7 +260,7 @@ class GwProjectLayersConfig(GwTask):
         layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
 
-    def create_body(self, form='', feature='', filter_fields='', extras=None):
+    def _create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
 
         client = f'$${{"client":{{"device":4, "infoType":1, "lang":"ES"}}, '
@@ -273,3 +276,4 @@ class GwProjectLayersConfig(GwTask):
 
         return body
 
+    # endregion
