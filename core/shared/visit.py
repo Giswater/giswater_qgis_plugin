@@ -1640,7 +1640,7 @@ class GwVisit(QObject):
 
         # Set width and alias of visible columns
         columns_to_delete = []
-        sql = (f"SELECT columnindex, width, alias, status"
+        sql = (f"SELECT columnindex, width, alias, visible"
                f" FROM config_form_tableview"
                f" WHERE tablename = '{table_name}'"
                f" ORDER BY columnindex")
@@ -1649,15 +1649,15 @@ class GwVisit(QObject):
             return
 
         for row in rows:
-            if not row['status']:
-                columns_to_delete.append(row['columnindex'] - 1)
+            if not row['visible']:
+                columns_to_delete.append(row['columnindex'])
             else:
                 width = row['width']
                 if width is None:
                     width = 100
-                widget.setColumnWidth(row['columnindex'] - 1, width)
+                widget.setColumnWidth(row['columnindex'], width)
                 widget.model().setHeaderData(
-                    row['columnindex'] - 1, Qt.Horizontal, row['alias'])
+                    row['columnindex'], Qt.Horizontal, row['alias'])
 
         # Set order
         widget.model().setSort(0, Qt.AscendingOrder)

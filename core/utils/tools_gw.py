@@ -2169,7 +2169,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
 
     # Set width and alias of visible columns
     columns_to_delete = []
-    sql = (f"SELECT columnindex, width, alias, status"
+    sql = (f"SELECT columnindex, width, alias, visible"
            f" FROM {config_table}"
            f" WHERE tablename = '{table_name}'"
            f" ORDER BY columnindex")
@@ -2178,15 +2178,15 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
         return
 
     for row in rows:
-        if not row['status']:
-            columns_to_delete.append(row['columnindex'] - 1)
+        if not row['visible']:
+            columns_to_delete.append(row['columnindex'])
         else:
             width = row['width']
             if width is None:
                 width = 100
-            widget.setColumnWidth(row['columnindex'] - 1, width)
+            widget.setColumnWidth(row['columnindex'], width)
             if row['alias'] is not None:
-                widget.model().setHeaderData(row['columnindex'] - 1, Qt.Horizontal, row['alias'])
+                widget.model().setHeaderData(row['columnindex'], Qt.Horizontal, row['alias'])
 
     # Set order
     if isQStandardItemModel:
