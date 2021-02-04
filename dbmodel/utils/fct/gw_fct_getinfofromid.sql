@@ -165,7 +165,7 @@ BEGIN
 	END IF;
 
 	-- looking for additional schema 
-	IF v_addschema IS NOT NULL AND v_addschema != v_schemaname AND v_flag IS FALSE THEN
+	IF v_addschema NOT IN (NULL, 'NULL') AND v_addschema != v_schemaname AND v_flag IS FALSE THEN
 	
 		EXECUTE 'SET search_path = '||v_addschema||', public';
 		SELECT gw_fct_getinfofromid(p_data) INTO v_return;
