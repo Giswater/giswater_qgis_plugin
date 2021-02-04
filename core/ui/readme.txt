@@ -21,27 +21,50 @@ utils	- lyt_bot_2
 
 GO2EPA_OPTIONS.UI
 -----------------
-utils	- grl_general_1
-utils	- grl_general_2
-ws		- grl_hyd_3
-ws		- grl_hyd_4
-ws		- grl_quality_5
-ws		- grl_quality_6
-ws		- grl_status_7
-ws		- grl_status_8
-ws		- grl_crm_9
-ws		- grl_crm_10
-ud		- grl_dyn_11
-ud		- grl_dyn_12
-utils	- grl_date_13
-utils	- grl_date_14
-utils	- grl_inpother_15
-utils	- grl_inpother_16
-utils	- grl_reports_17
-utils	- grl_reports_18
-utils	- grl_rptother_19
-utils	- grl_rptother_20
+utils	- lyt_general_1
+utils	- lyt_general_2
+utils	- lyt_date_1
+utils	- lyt_date_2
+utils	- lyt_reports_1
+utils	- lyt_reports_2
+utils	- lyt_other_1
+utils	- lyt_other_2
+ws		- lyt_hydraulics_1
+ws		- lyt_hydraulics_2
 
 
 CONFIG.UI
 ---------
+utils	- lyt_basic
+utils	- lyt_edit
+utils	- lyt_om
+utils	- lyt_masterplan
+utils	- lyt_inventory
+utils	- lyt_other
+utils	- lyt_node
+utils	- lyt_arc
+utils	- lyt_connec
+utils	- lyt_utils
+utils	- lyt_fluid_type
+utils	- lyt_category_type
+utils	- lyt_location_type
+utils	- lyt_function_type
+utils	- lyt_addfields
+utils	- lyt_topology
+utils	- lyt_builder
+utils	- lyt_review
+utils	- lyt_system
+
+
+PROJECT_CHECK.UI
+---------
+uitls   - lyt_critical
+uitls   - lyt_others
+
+
+DIMENSIONING.UI
+---------
+uitls   - lyt_top_1
+uitls   - lyt_measurements
+uitls   - lyt_other
+uitls   - lyt_symbology

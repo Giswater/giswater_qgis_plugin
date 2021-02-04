@@ -704,10 +704,10 @@ class GwGo2EpaButton(GwAction):
             if len(widget_list) == 0:
                 grbox.setVisible(False)
             else:
-                gridlist = grbox.findChildren(QGridLayout)
-                for grl in gridlist:
+                layout_list = grbox.findChildren(QGridLayout)
+                for lyt in layout_list:
                     spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-                    grl.addItem(spacer)
+                    lyt.addItem(spacer)
 
         # Event on change from combo parent
         self._get_event_combo_parent(json_result)

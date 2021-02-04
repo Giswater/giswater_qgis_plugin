@@ -144,8 +144,8 @@ class GwLoadProjectCheck:
 
     def _get_missing_layers(self, dialog, m_layers, critical_level):
 
-        grl_critical = dialog.findChild(QGridLayout, "grl_critical")
-        grl_others = dialog.findChild(QGridLayout, "grl_others")
+        lyt_critical = dialog.findChild(QGridLayout, "lyt_critical")
+        lyt_others = dialog.findChild(QGridLayout, "lyt_others")
         for pos, item in enumerate(m_layers):
             try:
                 if not item:
@@ -166,11 +166,11 @@ class GwLoadProjectCheck:
                 widget.setObjectName(f"{item['layer']}")
 
                 if int(item['criticity']) == 3:
-                    grl_critical.addWidget(label, pos, 0)
-                    grl_critical.addWidget(widget, pos, 1)
+                    lyt_critical.addWidget(label, pos, 0)
+                    lyt_critical.addWidget(widget, pos, 1)
                 else:
-                    grl_others.addWidget(label, pos, 0)
-                    grl_others.addWidget(widget, pos, 1)
+                    lyt_others.addWidget(label, pos, 0)
+                    lyt_others.addWidget(widget, pos, 1)
             except KeyError:
                 description = "Key on returned json from ddbb is missed"
                 tools_qt.manage_exception(None, description, schema_name=global_vars.schema_name)

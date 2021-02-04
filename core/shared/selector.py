@@ -106,7 +106,7 @@ class GwSelector:
 
             # Create a new QGridLayout and put it into tab
             gridlayout = QGridLayout()
-            gridlayout.setObjectName("grl_" + form_tab['tabName'])
+            gridlayout.setObjectName("lyt" + form_tab['tabName'])
             tab_widget.setLayout(gridlayout)
             field = {}
             i = 0

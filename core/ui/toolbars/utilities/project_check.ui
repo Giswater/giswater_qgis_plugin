@@ -63,7 +63,7 @@
              </property>
              <layout class="QVBoxLayout" name="verticalLayout">
               <item>
-               <layout class="QGridLayout" name="grl_critical"/>
+               <layout class="QGridLayout" name="lyt_critical"/>
               </item>
              </layout>
             </widget>
@@ -75,7 +75,7 @@
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_2">
               <item>
-               <layout class="QGridLayout" name="grl_others"/>
+               <layout class="QGridLayout" name="lyt_others"/>
               </item>
              </layout>
             </widget>
