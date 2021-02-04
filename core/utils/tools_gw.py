@@ -1896,13 +1896,13 @@ def manage_layer_manager(json_result, sql):
 def selection_init(class_object, dialog, table_object, query=False):
     """ Set canvas map tool to an instance of class 'GwSelectManager' """
     try:
-        class_object.geom_type = get_signal_change_tab(dialog)
+        class_object.feature_type = get_signal_change_tab(dialog)
     except AttributeError:
         # In case the dialog has no tab
         pass
 
-    if class_object.geom_type in ('all', None):
-        class_object.geom_type = 'arc'
+    if class_object.feature_type in ('all', None):
+        class_object.feature_type = 'arc'
 
     select_manager = GwSelectManager(class_object, table_object, dialog, query)
     global_vars.canvas.setMapTool(select_manager)
@@ -1914,13 +1914,13 @@ def selection_changed(class_object, dialog, table_object, query=False, lazy_widg
     """ Slot function for signal 'canvas.selectionChanged' """
 
     tools_qgis.disconnect_signal_selection_changed()
-    field_id = f"{class_object.geom_type}_id"
+    field_id = f"{class_object.feature_type}_id"
 
     ids = []
     if class_object.layers is None: return
 
     # Iterate over all layers of the group
-    for layer in class_object.layers[class_object.geom_type]:
+    for layer in class_object.layers[class_object.feature_type]:
         if layer.selectedFeatureCount() > 0:
             # Get selected features of the layer
             features = layer.selectedFeatures()
@@ -1930,7 +1930,7 @@ def selection_changed(class_object, dialog, table_object, query=False, lazy_widg
                 if selected_id not in ids:
                     ids.append(selected_id)
 
-    class_object.list_ids[class_object.geom_type] = ids
+    class_object.list_ids[class_object.feature_type] = ids
 
     expr_filter = None
     if len(ids) > 0:
@@ -1945,15 +1945,15 @@ def selection_changed(class_object, dialog, table_object, query=False, lazy_widg
         if not is_valid:
             return
 
-        tools_qgis.select_features_by_ids(class_object.geom_type, expr, class_object.layers)
+        tools_qgis.select_features_by_ids(class_object.feature_type, expr, class_object.layers)
 
-    # Reload contents of table 'tbl_@table_object_x_@geom_type'
+    # Reload contents of table 'tbl_@table_object_x_@feature_type'
     if query:
-        _insert_feature_psector(dialog, class_object.geom_type, ids=ids)
+        _insert_feature_psector(dialog, class_object.feature_type, ids=ids)
         remove_selection()
-        load_tableview_psector(dialog, class_object.geom_type)
+        load_tableview_psector(dialog, class_object.feature_type)
     else:
-        load_tablename(dialog, table_object, class_object.geom_type, expr_filter)
+        load_tablename(dialog, table_object, class_object.feature_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     enable_feature_type(dialog, table_object, ids=ids)
