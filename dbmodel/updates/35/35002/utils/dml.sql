@@ -251,3 +251,7 @@ UPDATE sys_table SET id ='config_graf_checkvalve' WHERE id ='config_checkvalve';
 
 UPDATE config_form_fields SET dv_querytext = replace(dv_querytext,'sys_role_id','sys_role')
 WHERE dv_querytext ilike '%sys_role_id%';
+
+-- 2021/04/02
+UPDATE config_form_tableview SET columnindex = columnindex - 1;
+ALTER TABLE config_form_tableview RENAME COLUMN status TO visible;
