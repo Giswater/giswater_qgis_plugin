@@ -9,7 +9,8 @@ import sys
 
 from qgis.PyQt.QtCore import QSettings
 
-
+# static variables
+# values are initialized on load project without changes during session
 iface = None
 canvas = None
 plugin_dir = None
@@ -26,12 +27,18 @@ qgis_db_credentials = None
 dao = None
 dao_db_credentials = None
 shortcut_keys = []
+
+#qgis project variables
 project_vars = {}
 project_vars['info_type'] = None
 project_vars['add_schema'] = None
 project_vars['main_schema'] = None
 project_vars['project_role'] = None
 project_vars['project_type'] = None
+
+
+# session dynamic variables
+# may change value during user's session
 session_vars = {}
 session_vars['last_error'] = None
 session_vars['show_db_exception'] = None
