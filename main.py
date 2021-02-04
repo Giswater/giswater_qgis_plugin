@@ -55,6 +55,45 @@ class Giswater(QObject):
         self._project_read(False)
 
 
+    def unload(self, is_plugin_reloaded=True):
+        """ Removes plugin menu items and icons from QGIS GUI
+            :param @remove_modules is True when plugin is disabled or reloaded
+        """
+
+        try:
+
+            # Remove Giswater dockers
+            self._remove_dockers()
+
+            # Remove 'Main Info button' only when plugin is reloaded through 'Plugin Reloader'
+            if is_plugin_reloaded:
+                self._unset_info_button()
+                global_vars.logger.close_logger()
+
+            # Unlisten notify channel and stop thread
+            if hasattr(self, 'notify'):
+                list_channels = ['desktop', global_vars.current_user]
+                self.notify.stop_listening(list_channels)
+
+            if self.load_project:
+                if self.load_project.buttons != {}:
+                    for button in list(self.load_project.buttons.values()):
+                        self.iface.removePluginMenu(self.plugin_name, button.action)
+                        self.iface.removeToolBarIcon(button.action)
+
+            if self.load_project:
+                if self.load_project.plugin_toolbars:
+                    for plugin_toolbar in list(self.load_project.plugin_toolbars.values()):
+                        if plugin_toolbar.enabled:
+                            plugin_toolbar.toolbar.setVisible(False)
+                            del plugin_toolbar.toolbar
+
+        except Exception as e:
+            print(f"Exception in unload: {e}")
+        finally:
+            self.load_project = None
+
+
     # region private functions
 
     def _init_plugin(self):
@@ -223,45 +262,6 @@ class Giswater(QObject):
         sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
         sorted_toolbar_ids = ",".join(sorted_toolbar_ids)
         tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids),  "user", "init")
-
-
-    def unload(self, is_plugin_reloaded=True):
-        """ Removes plugin menu items and icons from QGIS GUI
-            :param @remove_modules is True when plugin is disabled or reloaded
-        """
-
-        try:
-
-            # Remove Giswater dockers
-            self._remove_dockers()
-
-            # Remove 'Main Info button' only when plugin is reloaded through 'Plugin Reloader'
-            if is_plugin_reloaded:
-                self._unset_info_button()
-                global_vars.logger.close_logger()
-
-            # Unlisten notify channel and stop thread
-            if hasattr(self, 'notify'):
-                list_channels = ['desktop', global_vars.current_user]
-                self.notify.stop_listening(list_channels)
-
-            if self.load_project:
-                if self.load_project.buttons != {}:
-                    for button in list(self.load_project.buttons.values()):
-                        self.iface.removePluginMenu(self.plugin_name, button.action)
-                        self.iface.removeToolBarIcon(button.action)
-
-            if self.load_project:
-                if self.load_project.plugin_toolbars:
-                    for plugin_toolbar in list(self.load_project.plugin_toolbars.values()):
-                        if plugin_toolbar.enabled:
-                            plugin_toolbar.toolbar.setVisible(False)
-                            del plugin_toolbar.toolbar
-
-        except Exception as e:
-            print(f"Exception in unload: {e}")
-        finally:
-            self.load_project = None
 
 
     def _remove_dockers(self):
