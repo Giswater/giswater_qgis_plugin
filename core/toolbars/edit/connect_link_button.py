@@ -179,8 +179,8 @@ class GwConnectLinkButton(GwMaptool):
 
     # region private functions
 
-    def _link_selected_features(self, geom_type, layer):
-        """ Link selected @geom_type to the pipe """
+    def _link_selected_features(self, feature_type, layer):
+        """ Link selected @feature_type to the pipe """
 
         # Check features selected
         number_features = layer.selectedFeatureCount()
@@ -189,9 +189,9 @@ class GwConnectLinkButton(GwMaptool):
             tools_qgis.show_warning(message)
             return
 
-        # Get selected features from layers of selected @geom_type
+        # Get selected features from layers of selected @feature_type
         aux = "["
-        field_id = geom_type + "_id"
+        field_id = feature_type + "_id"
 
         if layer.selectedFeatureCount() > 0:
             # Get selected features of the layer
@@ -201,7 +201,7 @@ class GwConnectLinkButton(GwMaptool):
                 aux += str(feature_id) + ", "
             list_feature_id = aux[:-2] + "]"
             feature_id = f'"id":"{list_feature_id}"'
-            extras = f'"feature_type":"{geom_type.upper()}"'
+            extras = f'"feature_type":"{feature_type.upper()}"'
             body = tools_gw.create_body(feature=feature_id, extras=extras)
             # Execute SQL function and show result to the user
             result = tools_gw.execute_procedure('gw_fct_setlinktonetwork', body)

@@ -851,10 +851,10 @@ def delete_rows_tableview(qtable):
             qtable.model().select()
 
 
-def reset_model(dialog, table_object, geom_type):
+def reset_model(dialog, table_object, feature_type):
     """ Reset model of the widget """
 
-    table_relation = f"{table_object}_x_{geom_type}"
+    table_relation = f"{table_object}_x_{feature_type}"
     widget_name = f"tbl_{table_relation}"
     widget = get_widget(dialog, widget_name)
     if widget:

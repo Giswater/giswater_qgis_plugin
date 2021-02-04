@@ -534,9 +534,9 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.dlg_cf.btn_doc_new, "131b", "24x24")
         tools_gw.add_icon(self.dlg_cf.btn_open_doc, "170b", "24x24")
 
-        # Get feature type as geom_type (node, arc, connec, gully)
-        self.geom_type = str(complet_result['body']['feature']['featureType'])
-        if str(self.geom_type) in ('', '[]'):
+        # Get feature type as feature_type (node, arc, connec, gully)
+        self.feature_type = str(complet_result['body']['feature']['featureType'])
+        if str(self.feature_type) in ('', '[]'):
             if 'feature_cat' in globals():
                 parent_layer = self.feature_cat.parent_layer
             else:
@@ -544,7 +544,7 @@ class GwInfo(QObject):
             sql = f"SELECT lower(feature_type) FROM cat_feature WHERE parent_layer = '{parent_layer}' LIMIT 1"
             result = tools_db.get_row(sql)
             if result:
-                self.geom_type = result[0]
+                self.feature_type = result[0]
 
         result = complet_result['body']['data']
         layout_list = []
@@ -616,11 +616,11 @@ class GwInfo(QObject):
         action_zoom_in.triggered.connect(partial(self._manage_action_zoom_in, self.canvas, self.layer))
         action_centered.triggered.connect(partial(self._manage_action_centered, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self._manage_action_zoom_out, self.canvas, self.layer))
-        action_copy_paste.triggered.connect(partial(self._manage_action_copy_paste, self.dlg_cf, self.geom_type, tab_type))
+        action_copy_paste.triggered.connect(partial(self._manage_action_copy_paste, self.dlg_cf, self.feature_type, tab_type))
         action_rotation.triggered.connect(partial(self._change_hemisphere, self.dlg_cf, action_rotation))
         action_link.triggered.connect(lambda: webbrowser.open('http://www.giswater.org'))
         action_section.triggered.connect(partial(self._open_section_form))
-        action_help.triggered.connect(partial(self._open_help, self.geom_type))
+        action_help.triggered.connect(partial(self._open_help, self.feature_type))
         self.ep = QgsMapToolEmitPoint(self.canvas)
         action_interpolate.triggered.connect(partial(self._activate_snapping, complet_result, self.ep))
 
@@ -664,8 +664,8 @@ class GwInfo(QObject):
         return self.complet_result, self.dlg_cf
 
 
-    def _open_help(self, geom_type):
-        """ Open PDF file with selected @project_type and @geom_type """
+    def _open_help(self, feature_type):
+        """ Open PDF file with selected @project_type and @feature_type """
 
         # Get locale of QGIS application
         locale = tools_qgis.get_locale()
@@ -673,14 +673,14 @@ class GwInfo(QObject):
         project_type = tools_gw.get_project_type()
         # Get PDF file
         pdf_folder = os.path.join(global_vars.plugin_dir, f'resources{os.sep}png')
-        pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
+        pdf_path = os.path.join(pdf_folder, f"{project_type}_{feature_type}_{locale}.png")
 
         # Open PDF if exists. If not open Spanish version
         if os.path.exists(pdf_path):
             os.system(pdf_path)
         else:
             locale = "es_ES"
-            pdf_path = os.path.join(pdf_folder, f"{project_type}_{geom_type}_{locale}.png")
+            pdf_path = os.path.join(pdf_folder, f"{project_type}_{feature_type}_{locale}.png")
             if os.path.exists(pdf_path):
                 os.system(pdf_path)
             else:
@@ -952,7 +952,7 @@ class GwInfo(QObject):
             tools_log.log_info(f"{type(e).__name__} --> {e}")
 
 
-    def _manage_action_copy_paste(self, dialog, geom_type, tab_type=None):
+    def _manage_action_copy_paste(self, dialog, feature_type, tab_type=None):
         """ Copy some fields from snapped feature to current feature """
 
         # Set map tool emit point and signals
@@ -960,7 +960,7 @@ class GwInfo(QObject):
         global_vars.canvas.setMapTool(emit_point)
         global_vars.canvas.xyCoordinates.connect(self._manage_action_copy_paste_mouse_move)
         emit_point.canvasClicked.connect(partial(self._manage_action_copy_paste_canvas_clicked, dialog, tab_type, emit_point))
-        self.geom_type = geom_type
+        self.feature_type = feature_type
 
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options
@@ -975,7 +975,7 @@ class GwInfo(QObject):
         # Set marker
         self.vertex_marker = self.snapper_manager.vertex_marker
 
-        if geom_type == 'node':
+        if feature_type == 'node':
             self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
 
 
@@ -1020,7 +1020,7 @@ class GwInfo(QObject):
         snapped_feature = self.snapper_manager.get_snapped_feature(result, True)
         snapped_feature_attr = snapped_feature.attributes()
 
-        aux = f'"{self.geom_type}_id" = '
+        aux = f'"{self.feature_type}_id" = '
         aux += f"'{self.feature_id}'"
         expr = QgsExpression(aux)
         if expr.hasParserError():
@@ -1039,7 +1039,7 @@ class GwInfo(QObject):
 
         # Select only first element of the feature list
         feature = feature_list[0]
-        feature_id = feature.attribute(str(self.geom_type) + '_id')
+        feature_id = feature.attribute(str(self.feature_type) + '_id')
         msg = (f"Selected snapped feature_id to copy values from: {snapped_feature_attr[0]}\n"
                f"Do you want to copy its values to the current node?\n\n")
         # Replace id because we don't have to copy it!
@@ -1052,11 +1052,11 @@ class GwInfo(QObject):
             if fields[i].name() == 'sector_id' or fields[i].name() == 'dma_id' or fields[i].name() == 'expl_id' \
                     or fields[i].name() == 'state' or fields[i].name() == 'state_type' \
                     or fields[i].name() == layername + '_workcat_id' or fields[i].name() == layername + '_builtdate' \
-                    or fields[i].name() == 'verified' or fields[i].name() == str(self.geom_type) + 'cat_id':
+                    or fields[i].name() == 'verified' or fields[i].name() == str(self.feature_type) + 'cat_id':
                 snapped_feature_attr_aux.append(snapped_feature_attr[i])
                 fields_aux.append(fields[i].name())
             if global_vars.project_type == 'ud':
-                if fields[i].name() == str(self.geom_type) + '_type':
+                if fields[i].name() == str(self.feature_type) + '_type':
                     snapped_feature_attr_aux.append(snapped_feature_attr[i])
                     fields_aux.append(fields[i].name())
 
@@ -1955,12 +1955,12 @@ class GwInfo(QObject):
 
         self.catalog = GwCatalog()
 
-        # Check geom_type
-        if self.geom_type == 'connec':
-            widget = f'{tab_type}_{self.geom_type}at_id'
+        # Check feature_type
+        if self.feature_type == 'connec':
+            widget = f'{tab_type}_{self.feature_type}at_id'
         else:
-            widget = f'{tab_type}_{self.geom_type}cat_id'
-        self.catalog.open_catalog(self.dlg_cf, widget, self.geom_type, feature_type)
+            widget = f'{tab_type}_{self.feature_type}cat_id'
+        self.catalog.open_catalog(self.dlg_cf, widget, feature_type)
 
 
     def _show_actions(self, dialog, tab_name):
@@ -2019,7 +2019,7 @@ class GwInfo(QObject):
             self.tab_hydrometer_val_loaded = True
         # Tab 'O&M'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_om' and not self.tab_om_loaded:
-            self._fill_tab_om(self.geom_type)
+            self._fill_tab_om(self.feature_type)
             self.tab_om_loaded = True
         # Tab 'Documents'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_documents' and not self.tab_document_loaded:
@@ -2037,7 +2037,7 @@ class GwInfo(QObject):
     def _fill_tab_element(self):
         """ Fill tab 'Element' """
 
-        table_element = "v_ui_element_x_" + self.geom_type
+        table_element = "v_ui_element_x_" + self.feature_type
         self._fill_tbl_element_man(self.dlg_cf, self.tbl_element, table_element, self.filter)
         tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_element, table_element)
 
@@ -2113,7 +2113,7 @@ class GwInfo(QObject):
 
         # Check if this object is already associated to current feature
         field_object_id = table_object + "_id"
-        tablename = table_object + "_x_" + self.geom_type
+        tablename = table_object + "_x_" + self.feature_type
         sql = ("SELECT *"
                " FROM " + str(tablename) + ""
                " WHERE " + str(self.field_id) + " = '" + str(self.feature_id) + "'"
@@ -2182,7 +2182,7 @@ class GwInfo(QObject):
         """ Execute action of button 33 """
 
         elem = GwElement()
-        elem.get_element(True, feature, self.geom_type)
+        elem.get_element(True, feature, self.feature_type)
         elem.dlg_add_element.accepted.connect(partial(self._manage_element_new, dialog, elem))
         elem.dlg_add_element.rejected.connect(partial(self._manage_element_new, dialog, elem))
 
@@ -2212,7 +2212,7 @@ class GwInfo(QObject):
     def _fill_tab_relations(self):
         """ Fill tab 'Relations' """
 
-        table_relations = f"v_ui_{self.geom_type}_x_relations"
+        table_relations = f"v_ui_{self.feature_type}_x_relations"
         message = tools_qt.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
         if message:
             tools_qgis.show_warning(message)
@@ -2444,10 +2444,10 @@ class GwInfo(QObject):
     """ FUNCTIONS RELATED WITH TAB OM"""
 
 
-    def _fill_tab_om(self, geom_type):
+    def _fill_tab_om(self, feature_type):
         """ Fill tab 'O&M' (event) """
 
-        table_event_geom = "v_ui_event_x_" + geom_type
+        table_event_geom = "v_ui_event_x_" + feature_type
         self._fill_tbl_event(self.tbl_event_cf, table_event_geom, self.filter)
         self.tbl_event_cf.doubleClicked.connect(self._open_visit_event)
         tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_event_cf, table_event_geom)
@@ -2747,12 +2747,12 @@ class GwInfo(QObject):
 
         manage_visit = GwVisit()
         manage_visit.visit_added.connect(self._update_visit_table)
-        manage_visit.manage_visits(self.geom_type, self.feature_id)
+        manage_visit.manage_visits(self.feature_type, self.feature_id)
 
 
     def _update_visit_table(self):
         """ Convenience fuction set as slot to update table after a Visit GUI close. """
-        table_name = "v_ui_event_x_" + self.geom_type
+        table_name = "v_ui_event_x_" + self.feature_type
         tools_gw.set_dates_from_to(self.date_event_from, self.date_event_to, table_name, 'visit_start', 'visit_end')
         self.tbl_event_cf.model().select()
 
@@ -2774,7 +2774,7 @@ class GwInfo(QObject):
         # so the workaroud is to do a unuseful query to have the dao active
         sql = "SELECT id FROM om_visit LIMIT 1"
         tools_db.get_rows(sql)
-        manage_visit.get_visit(geom_type=self.geom_type, feature_id=self.feature_id, expl_id=expl_id, is_new_from_cf=True)
+        manage_visit.get_visit(feature_type=self.feature_type, feature_id=self.feature_id, expl_id=expl_id, is_new_from_cf=True)
 
 
     def _open_gallery(self):
@@ -2890,7 +2890,7 @@ class GwInfo(QObject):
     def _fill_tab_document(self):
         """ Fill tab 'Document' """
 
-        table_document = "v_ui_doc_x_" + self.geom_type
+        table_document = "v_ui_doc_x_" + self.feature_type
         self._fill_tbl_document_man(self.dlg_cf, self.tbl_document, table_document, self.filter)
         tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_document, table_document)
 
@@ -3007,7 +3007,7 @@ class GwInfo(QObject):
         """ Execute action of button 34 """
 
         doc = GwDocument()
-        doc.get_document(feature=feature, geom_type=self.geom_type)
+        doc.get_document(feature=feature, feature_type=self.feature_type)
         doc.dlg_add_doc.accepted.connect(partial(self._manage_document_new, dialog, doc))
         doc.dlg_add_doc.rejected.connect(partial(self._manage_document_new, dialog, doc))
 
@@ -3199,7 +3199,7 @@ class GwInfo(QObject):
 
         plan_layout = self.dlg_cf.findChild(QGridLayout, 'plan_layout')
 
-        if self.geom_type == 'arc' or self.geom_type == 'node':
+        if self.feature_type == 'arc' or self.feature_type == 'node':
             index_tab = self.tab_main.currentIndex()
             tab_name = self.tab_main.widget(index_tab).objectName()
             form = f'"tabName":"{tab_name}"'

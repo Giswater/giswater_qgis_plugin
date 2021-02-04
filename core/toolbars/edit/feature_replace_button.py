@@ -29,7 +29,7 @@ class GwFeatureReplaceButton(GwMaptool):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.current_date = QDate.currentDate().toString('yyyy-MM-dd')
         self.project_type = None
-        self.geom_type = None
+        self.feature_type = None
         self.geom_view = None
         self.cat_table = None
         self.feature_type_ws = None
@@ -82,17 +82,17 @@ class GwFeatureReplaceButton(GwMaptool):
 
             if tablename and 'v_edit' in tablename:
                 if tablename == 'v_edit_node':
-                    self.geom_type = 'node'
+                    self.feature_type = 'node'
                 elif tablename == 'v_edit_connec':
-                    self.geom_type = 'connec'
+                    self.feature_type = 'connec'
                 elif tablename == 'v_edit_gully':
-                    self.geom_type = 'gully'
+                    self.feature_type = 'gully'
 
                 self.geom_view = tablename
-                self.cat_table = 'cat_' + self.geom_type
-                self.feature_type_ws = self.geom_type + 'type_id'
-                self.feature_type_ud = self.geom_type + '_type'
-                self.feature_id = snapped_feat.attribute(self.geom_type + '_id')
+                self.cat_table = 'cat_' + self.feature_type
+                self.feature_type_ws = self.feature_type + 'type_id'
+                self.feature_type_ud = self.feature_type + '_type'
+                self.feature_id = snapped_feat.attribute(self.feature_type + '_id')
                 self._init_replace_feature_form(snapped_feat)
 
 
@@ -197,11 +197,11 @@ class GwFeatureReplaceButton(GwMaptool):
             feature_type = feature.attribute(self.feature_type_ws)
         elif self.project_type == 'ud':
             feature_type = feature.attribute(self.feature_type_ud)
-            if self.geom_type in ('node', 'connec'):
+            if self.feature_type in ('node', 'connec'):
                 sql = f"SELECT DISTINCT(id) FROM {self.cat_table} ORDER BY id"
                 rows = tools_db.get_rows(sql)
                 tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
-            elif self.geom_type in 'gully':
+            elif self.feature_type in 'gully':
                 sql = f"SELECT DISTINCT(id) FROM cat_grate ORDER BY id"
                 rows = tools_db.get_rows(sql)
                 tools_qt.fill_combo_box(self.dlg_replace, "featurecat_id", rows, allow_nulls=False)
@@ -212,7 +212,7 @@ class GwFeatureReplaceButton(GwMaptool):
         self.dlg_replace.workcat_id_end.currentIndexChanged.connect(self._update_date)
 
         # Fill 1st combo boxes-new system node type
-        sql = (f"SELECT DISTINCT(id) FROM cat_feature WHERE lower(feature_type) = '{self.geom_type}' "
+        sql = (f"SELECT DISTINCT(id) FROM cat_feature WHERE lower(feature_type) = '{self.feature_type}' "
                f"AND active is True "
                f"ORDER BY id")
         rows = tools_db.get_rows(sql)
@@ -239,7 +239,7 @@ class GwFeatureReplaceButton(GwMaptool):
         row = tools_db.get_row(sql)
 
         self.catalog = GwCatalog()
-        self.catalog.open_catalog(self.dlg_replace, 'featurecat_id', row[0], feature_type)
+        self.catalog.open_catalog(self.dlg_replace, 'featurecat_id', feature_type)
 
 
     def _update_date(self):
@@ -362,7 +362,7 @@ class GwFeatureReplaceButton(GwMaptool):
         if answer:
 
             # Get function input parameters
-            feature = f'"type":"{self.geom_type}"'
+            feature = f'"type":"{self.feature_type}"'
             extras = f'"old_feature_id":"{self.feature_id}"'
             extras += f', "workcat_id_end":"{self.workcat_id_end_aux}"'
             extras += f', "enddate":"{self.enddate_aux}"'
@@ -395,24 +395,24 @@ class GwFeatureReplaceButton(GwMaptool):
 
             if feature_type_new != "null" and featurecat_id != "null":
                 # Get id of new generated feature
-                sql = (f"SELECT {self.geom_type}_id "
+                sql = (f"SELECT {self.feature_type}_id "
                        f"FROM {self.geom_view} "
-                       f"ORDER BY {self.geom_type}_id::int4 DESC LIMIT 1")
+                       f"ORDER BY {self.feature_type}_id::int4 DESC LIMIT 1")
                 row = tools_db.get_row(sql)
                 if row:
-                    if self.geom_type == 'connec':
+                    if self.feature_type == 'connec':
                         field_cat_id = "connecat_id"
                     else:
-                        field_cat_id = self.geom_type + "cat_id"
-                    if self.geom_type != 'gully':
+                        field_cat_id = self.feature_type + "cat_id"
+                    if self.feature_type != 'gully':
                         sql = (f"UPDATE {self.geom_view} "
                                f"SET {field_cat_id} = '{featurecat_id}' "
-                               f"WHERE {self.geom_type}_id = '{row[0]}'")
+                               f"WHERE {self.feature_type}_id = '{row[0]}'")
                     tools_db.execute_sql(sql)
                     if self.project_type == 'ud':
                         sql = (f"UPDATE {self.geom_view} "
-                               f"SET {self.geom_type}_type = '{feature_type_new}' "
-                               f"WHERE {self.geom_type}_id = '{row[0]}'")
+                               f"SET {self.feature_type}_type = '{feature_type_new}' "
+                               f"WHERE {self.feature_type}_id = '{row[0]}'")
                         tools_db.execute_sql(sql)
 
                 message = "Values has been updated"

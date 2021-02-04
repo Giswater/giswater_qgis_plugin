@@ -45,7 +45,7 @@ class GwVisit(QObject):
         self.schema_name = global_vars.schema_name
         self.iface = global_vars.iface
 
-        self.geom_type = None
+        self.feature_type = None
         self.layers = None
         self.event_parameter_id = None
         self.event_feature_type = None
@@ -58,13 +58,13 @@ class GwVisit(QObject):
 
 
 
-    def get_visit(self, visit_id=None, geom_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
+    def get_visit(self, visit_id=None, feature_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
                      open_dlg=True, is_new_from_cf=False):
 
         """ Button 64. Add visit.
         if visit_id => load record related to the visit_id
-        if geom_type => lock geom_type in relations tab
-        if feature_id => load related feature basing on geom_type in relation
+        if feature_type => lock feature_type in relations tab
+        if feature_id => load related feature basing on feature_type in relation
         if single_tool notify that the tool is used called from another dialog."""
 
         self.rubber_band = QgsRubberBand(self.canvas)
@@ -77,7 +77,7 @@ class GwVisit(QObject):
         self.visit_id_value = visit_id
 
         # set vars to manage if GUI have to lock the relation
-        self.locked_geom_type = geom_type
+        self.locked_feature_type = feature_type
         self.locked_feature_id = feature_id
 
         # Create the dialog and signals and related ORM Visit class
@@ -97,7 +97,7 @@ class GwVisit(QObject):
         # Get expl_id from previus dialog
         self.expl_id = expl_id
 
-        # Get layers of every geom_type
+        # Get layers of every feature_type
 
         # Setting lists
         self.ids = []
@@ -225,7 +225,7 @@ class GwVisit(QObject):
         self._visit_tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=excluded_layers)
 
         # Manage relation locking
-        if self.locked_geom_type:
+        if self.locked_feature_type:
             self._set_locked_relation()
 
         # Disable widgets when the visit is not new
@@ -245,7 +245,7 @@ class GwVisit(QObject):
                 if not box.isNull():
                     self._zoom_box(box)
                 else:
-                    for layer in self.layers[self.geom_type]:
+                    for layer in self.layers[self.feature_type]:
                         box = layer.boundingBoxOfSelected()
                         self._zoom_box(box)
 
@@ -257,7 +257,7 @@ class GwVisit(QObject):
             tools_gw.open_dialog(self.dlg_add_visit, dlg_name="visit")
 
 
-    def manage_visits(self, geom_type=None, feature_id=None, dialog=GwVisitManagerUi()):
+    def manage_visits(self, feature_type=None, feature_id=None, dialog=GwVisitManagerUi()):
         """ Button 65: manage visits """
 
         # Create the dialog
@@ -265,7 +265,7 @@ class GwVisit(QObject):
         tools_gw.load_settings(self.dlg_visit_manager)
         self.dlg_visit_manager.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        if geom_type is None:
+        if feature_type is None:
             # Set a model with selected filter. Attach that model to selected table
             tools_qt.set_widget_text(self.dlg_visit_manager, self.dlg_visit_manager.lbl_filter, 'Filter by ext_code')
             filed_to_filter = "ext_code"
@@ -279,8 +279,8 @@ class GwVisit(QObject):
             # Set a model with selected filter. Attach that model to selected table
             tools_qt.set_widget_text(self.dlg_visit_manager, self.dlg_visit_manager.lbl_filter, 'Filter by code')
             filed_to_filter = "code"
-            table_object = "v_ui_om_visitman_x_" + str(geom_type)
-            expr_filter = f"{geom_type}_id = '{feature_id}'"
+            table_object = "v_ui_om_visitman_x_" + str(feature_type)
+            expr_filter = f"{feature_type}_id = '{feature_id}'"
             # Refresh model with selected filter
             message = tools_qt.fill_table(self.dlg_visit_manager.tbl_visit, f"{self.schema_name}.{table_object}", expr_filter)
             if message:
@@ -449,14 +449,14 @@ class GwVisit(QObject):
 
 
     def _set_locked_relation(self):
-        """ Set geom_type and listed feature_id in @table_name to lock it """
+        """ Set feature_type and listed feature_id in @table_name to lock it """
 
         # Enable tab
         index = self._tab_index('tab_relations')
         self.tabs.setTabEnabled(index, True)
 
         # set geometry_type
-        feature_type_index = self.feature_type.findText(self.locked_geom_type.upper())
+        feature_type_index = self.feature_type.findText(self.locked_feature_type.upper())
         if feature_type_index < 0:
             return
 
@@ -469,17 +469,17 @@ class GwVisit(QObject):
         # Load feature if in @table_name. Select list of related features
         # Set 'expr_filter' with features that are in the list
         if self.locked_feature_id:
-            expr_filter = f'"{self.geom_type}_id" IN (\'{self.locked_feature_id}\')'
+            expr_filter = f'"{self.feature_type}_id" IN (\'{self.locked_feature_id}\')'
             (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
             if not is_valid:
                 return
 
             # do selection allowing @table_name to be linked to canvas selectionChanged
-            widget_name = f'tbl_visit_x_{self.geom_type}'
+            widget_name = f'tbl_visit_x_{self.feature_type}'
             widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
             tools_qgis.disconnect_signal_selection_changed()
             tools_gw.connect_signal_selection_changed(self, self.dlg_add_visit, widget_table)
-            tools_qgis.select_features_by_ids(self.geom_type, expr, self.layers)
+            tools_qgis.select_features_by_ids(self.feature_type, expr, self.layers)
             tools_qgis.disconnect_signal_selection_changed()
 
 
@@ -617,15 +617,15 @@ class GwVisit(QObject):
         for index in range(self.feature_type.count()):
             # feture_type combobox is filled before the visit_id is changed
             # it will contain all the geometry type allows basing on project type
-            geom_type = self.feature_type.itemText(index).lower()
-            if geom_type != '' and geom_type != 'all':
-                table_name = f'om_visit_x_{geom_type}'
+            feature_type = self.feature_type.itemText(index).lower()
+            if feature_type != '' and feature_type != 'all':
+                table_name = f'om_visit_x_{feature_type}'
                 sql = f"SELECT id FROM {table_name} WHERE visit_id = '{self.current_visit.id}'"
                 rows = tools_db.get_rows(sql, log_info=False)
                 if not rows or not rows[0]:
                     continue
 
-                feature_type = geom_type
+                feature_type = feature_type
                 feature_type_index = index
                 break
 
@@ -662,43 +662,43 @@ class GwVisit(QObject):
 
 
     def _update_relations(self, dialog, delete_old_relations=True):
-        """ Save current selected features in every table of geom_type """
+        """ Save current selected features in every table of feature_type """
 
         if delete_old_relations:
             for index in range(self.feature_type.count()):
-                # Remove all old relations related with current visit_id and @geom_type
-                geom_type = self.feature_type.itemText(index).lower()
-                self._delete_relations_geom_type(geom_type)
+                # Remove all old relations related with current visit_id and @feature_type
+                feature_type = self.feature_type.itemText(index).lower()
+                self._delete_relations_feature_type(feature_type)
 
         feature_type = tools_qt.get_text(self.dlg_add_visit, self.feature_type).lower()
-        # Save new relations listed in every table of geom_type
+        # Save new relations listed in every table of feature_type
         if feature_type == 'all':
-            self._update_relations_geom_type("arc")
-            self._update_relations_geom_type("node")
-            self._update_relations_geom_type("connec")
+            self._update_relations_feature_type("arc")
+            self._update_relations_feature_type("node")
+            self._update_relations_feature_type("connec")
             if tools_gw.get_project_type() == 'ud':
-                self._update_relations_geom_type("gully")
+                self._update_relations_feature_type("gully")
         else:
-            self._update_relations_geom_type(self.geom_type)
+            self._update_relations_feature_type(self.feature_type)
 
-        widget_name = f"tbl_visit_x_{self.geom_type}"
+        widget_name = f"tbl_visit_x_{self.feature_type}"
         tools_gw.enable_feature_type(dialog, widget_name, ids=self.ids)
 
 
-    def _delete_relations_geom_type(self, geom_type):
-        """ Remove all old relations related with current visit_id and @geom_type """
+    def _delete_relations_feature_type(self, feature_type):
+        """ Remove all old relations related with current visit_id and @feature_type """
 
-        if geom_type == '' or geom_type.lower() == 'all':
+        if feature_type == '' or feature_type.lower() == 'all':
             return
 
         db_record = None
-        if geom_type == 'arc':
+        if feature_type == 'arc':
             db_record = GwOmVisitXArc()
-        elif geom_type == 'node':
+        elif feature_type == 'node':
             db_record = GwOmVisitXNode()
-        elif geom_type == 'connec':
+        elif feature_type == 'connec':
             db_record = GwOmVisitXConnec()
-        elif geom_type == 'gully':
+        elif feature_type == 'gully':
             db_record = GwOmVisitXGully()
 
         # remove all actual saved records related with visit_id
@@ -708,33 +708,33 @@ class GwVisit(QObject):
             db_record.delete(where_clause=where_clause)
 
 
-    def _update_relations_geom_type(self, geom_type):
-        """ Update relations of specific @geom_type """
+    def _update_relations_feature_type(self, feature_type):
+        """ Update relations of specific @feature_type """
 
-        if geom_type == '' or geom_type.lower() == 'all':
+        if feature_type == '' or feature_type.lower() == 'all':
             return
 
-        # for each showed element of a specific geom_type create an db entry
-        column_name = f"{geom_type}_id"
-        widget = tools_qt.get_widget(self.dlg_add_visit, f"tbl_visit_x_{geom_type}")
+        # for each showed element of a specific feature_type create an db entry
+        column_name = f"{feature_type}_id"
+        widget = tools_qt.get_widget(self.dlg_add_visit, f"tbl_visit_x_{feature_type}")
         if not widget:
             message = "Widget not found"
-            tools_log.log_info(message, parameter=f"tbl_visit_x_{geom_type}")
+            tools_log.log_info(message, parameter=f"tbl_visit_x_{feature_type}")
             return None
 
         # do nothing if model is None or no element is present
         if not widget.model():  # or not widget.rowCount():
-            tools_log.log_info(f"Widget model is none: tbl_visit_x_{geom_type}")
+            tools_log.log_info(f"Widget model is none: tbl_visit_x_{feature_type}")
             return
 
         db_record = None
-        if geom_type == 'arc':
+        if feature_type == 'arc':
             db_record = GwOmVisitXArc()
-        elif geom_type == 'node':
+        elif feature_type == 'node':
             db_record = GwOmVisitXNode()
-        elif geom_type == 'connec':
+        elif feature_type == 'connec':
             db_record = GwOmVisitXConnec()
-        elif geom_type == 'gully':
+        elif feature_type == 'gully':
             db_record = GwOmVisitXGully()
 
         if db_record:
@@ -746,7 +746,7 @@ class GwVisit(QObject):
                 db_record.id = db_record.max_pk() + 1
                 db_record.visit_id = int(self.visit_id.text())
 
-                # set value for column <geom_type>_id
+                # set value for column <feature_type>_id
                 # db_record.column_name = index.data()
                 setattr(db_record, column_name, index.data())
 
@@ -763,7 +763,7 @@ class GwVisit(QObject):
             self._manage_leave_visit_tab()
             # need to create the relation record that is done only
             # changing tab
-            if self.locked_geom_type:
+            if self.locked_feature_type:
                 self._update_relations(dialog)
 
         # manage arriving tab
@@ -804,7 +804,7 @@ class GwVisit(QObject):
         row = tools_db.get_row(sql)
         if row:
             self.feature_type_parameter = row[0]
-            self.geom_type = self.feature_type_parameter.lower()
+            self.feature_type = self.feature_type_parameter.lower()
             self._manage_tabs_enabled(True)
 
 
@@ -821,16 +821,16 @@ class GwVisit(QObject):
 
 
     def _manage_tabs_enabled(self, enable_tabs=False):
-        """ Enable/Disable tabs depending geom_type """
+        """ Enable/Disable tabs depending feature_type """
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                           "v_edit_element"]
-        if self.geom_type is None:
+        if self.feature_type is None:
             return
 
         self._connect_signal_tab_feature_signal(False, excluded_layers)
 
-        # If geom_type = 'all': enable all tabs
-        if self.geom_type == 'all':
+        # If feature_type = 'all': enable all tabs
+        if self.feature_type == 'all':
             for i in range(self.dlg_add_visit.tab_feature.count()):
                 self.dlg_add_visit.tab_feature.setTabEnabled(i, True)
             self._connect_signal_tab_feature_signal(True, excluded_layers)
@@ -841,19 +841,19 @@ class GwVisit(QObject):
             for i in range(self.dlg_add_visit.tab_feature.count()):
                 self.dlg_add_visit.tab_feature.setTabEnabled(i, False)
 
-        self._manage_geom_type_selected()
+        self._manage_feature_type_selected()
 
 
-    def _manage_geom_type_selected(self):
+    def _manage_feature_type_selected(self):
 
         tab_index = 0
-        if self.geom_type == 'arc':
+        if self.feature_type == 'arc':
             tab_index = 0
-        elif self.geom_type == 'node':
+        elif self.feature_type == 'node':
             tab_index = 1
-        elif self.geom_type == 'connec':
+        elif self.feature_type == 'connec':
             tab_index = 2
-        elif self.geom_type == 'gully':
+        elif self.feature_type == 'gully':
             tab_index = 3
 
         # Enable only tab of this geometry type
@@ -863,8 +863,8 @@ class GwVisit(QObject):
         self._connect_signal_tab_feature_signal(True)
 
         # tools_gw.hide_parent_layers(excluded_layers=excluded_layers)
-        widget_name = f"tbl_visit_x_{self.geom_type}"
-        viewname = f"v_edit_{self.geom_type}"
+        widget_name = f"tbl_visit_x_{self.feature_type}"
+        viewname = f"v_edit_{self.feature_type}"
         widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
 
         try:
@@ -872,7 +872,7 @@ class GwVisit(QObject):
             self.dlg_add_visit.btn_feature_delete.clicked.disconnect()
             self.dlg_add_visit.btn_feature_snapping.clicked.disconnect()
         except Exception as e:
-            tools_log.log_info(f"manage_geom_type_selected exception: {e}")
+            tools_log.log_info(f"manage_feature_type_selected exception: {e}")
         finally:
 
             self.dlg_add_visit.btn_feature_insert.clicked.connect(partial(tools_gw.insert_feature, self,
@@ -884,7 +884,7 @@ class GwVisit(QObject):
                 partial(self._feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
-        tools_gw.set_completer_widget(viewname, self.dlg_add_visit.feature_id, str(self.geom_type) + "_id")
+        tools_gw.set_completer_widget(viewname, self.dlg_add_visit.feature_id, str(self.feature_type) + "_id")
 
 
     def _config_relation_table(self, dialog):
@@ -892,46 +892,46 @@ class GwVisit(QObject):
         It's necessary a centralised call because base class can create a None model
         where all callbacks are lost ance can't be registered."""
 
-        if self.geom_type == '':
+        if self.feature_type == '':
             return
 
         # configure model visibility
-        table_name = f"v_edit_{self.geom_type}"
+        table_name = f"v_edit_{self.feature_type}"
         self._set_configuration(dialog, "tbl_visit_x_arc", table_name)
         self._set_configuration(dialog, "tbl_visit_x_node", table_name)
         self._set_configuration(dialog, "tbl_visit_x_connec", table_name)
         self._set_configuration(dialog, "tbl_visit_x_gully", table_name)
 
 
-    def _event_feature_type_selected(self, dialog, geom_type=None):
+    def _event_feature_type_selected(self, dialog, feature_type=None):
         """ Manage selection change in feature_type combo box.
         THis means that have to set completer for feature_id QTextLine and
         setup model for features to select table """
         # 1) set the model linked to selecte features
         # 2) check if there are features related to the current visit
         # 3) if so, select them => would appear in the table associated to the model
-        if geom_type is None:
-            geom_type = self.feature_type.currentText().lower()
+        if feature_type is None:
+            feature_type = self.feature_type.currentText().lower()
 
-        self.geom_type = geom_type
-        if geom_type == '':
+        self.feature_type = feature_type
+        if feature_type == '':
             return
 
-        # Fill combo parameter_id depending geom_type
+        # Fill combo parameter_id depending feature_type
         self._fill_combo_parameter_id()
 
         if self.event_parameter_id:
             tools_qt.set_combo_value(self.dlg_add_visit.parameter_id, self.event_parameter_id, 0)
 
-        if geom_type.lower() == 'all':
+        if feature_type.lower() == 'all':
             return
 
-        viewname = f"v_edit_{geom_type}"
-        tools_gw.set_completer_widget(viewname, dialog.feature_id, str(geom_type) + "_id")
+        viewname = f"v_edit_{feature_type}"
+        tools_gw.set_completer_widget(viewname, dialog.feature_id, str(feature_type) + "_id")
 
         # set table model and completer
-        widget_name = f'tbl_visit_x_{geom_type}'
-        self._get_features_visit_geom_type(self.current_visit.id, geom_type)
+        widget_name = f'tbl_visit_x_{feature_type}'
+        self._get_features_visit_feature_type(self.current_visit.id, feature_type)
 
         # set the callback to setup all events later
         # its not possible to setup listener in this moment beacouse set_table_model without
@@ -943,7 +943,7 @@ class GwVisit(QObject):
         if not self.visit_id.text():
             return
 
-        self._get_features_visit_geom_type(self.visit_id.text(), geom_type, widget_table)
+        self._get_features_visit_feature_type(self.visit_id.text(), feature_type, widget_table)
 
 
     def _lazy_configuration(self, widget, init_function):
@@ -957,12 +957,12 @@ class GwVisit(QObject):
         return lazy_widget, lazy_init_function
 
 
-    def _get_features_visit_geom_type(self, visit_id, geom_type, widget_table=None):
-        """ Get features from table om_visit_x@geom_type of selected @visit_id
+    def _get_features_visit_feature_type(self, visit_id, feature_type, widget_table=None):
+        """ Get features from table om_visit_x@feature_type of selected @visit_id
         Select them in canvas and automatically load them into @widget_table """
 
-        table_name = f'om_visit_x_{geom_type}'
-        sql = f"SELECT {geom_type}_id FROM {table_name} WHERE visit_id = '{visit_id}'"
+        table_name = f'om_visit_x_{feature_type}'
+        sql = f"SELECT {feature_type}_id FROM {table_name} WHERE visit_id = '{visit_id}'"
         rows = tools_db.get_rows(sql, log_info=False)
         if not rows or not rows[0]:
             return
@@ -971,19 +971,19 @@ class GwVisit(QObject):
 
         # Select list of related features
         # Set 'expr_filter' with features that are in the list
-        expr_filter = f"{geom_type}_id IN ({','.join(ids)})"
+        expr_filter = f"{feature_type}_id IN ({','.join(ids)})"
         (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
 
         if widget_table is None:
-            widget_name = f'tbl_visit_x_{geom_type}'
+            widget_name = f'tbl_visit_x_{feature_type}'
             widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
 
         # Do selection allowing @widget_table to be linked to canvas selectionChanged
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.connect_signal_selection_changed(self, self.dlg_add_visit, widget_table)
-        tools_qgis.select_features_by_ids(geom_type, expr, self.layers)
+        tools_qgis.select_features_by_ids(feature_type, expr, self.layers)
         tools_qgis.disconnect_signal_selection_changed()
 
 
@@ -1095,7 +1095,7 @@ class GwVisit(QObject):
 
 
     def _fill_combo_parameter_id(self):
-        """ Fill combo parameter_id depending geom_type """
+        """ Fill combo parameter_id depending feature_type """
 
         sql = (f"SELECT id, descript "
                f"FROM config_visit_parameter ")
@@ -1103,11 +1103,11 @@ class GwVisit(QObject):
         parameter_type_id = tools_qt.get_text(self.dlg_add_visit, "parameter_type_id")
         if parameter_type_id:
             where = f"WHERE parameter_type = '{parameter_type_id}' "
-        if self.geom_type:
+        if self.feature_type:
             if where is None:
-                where = f"WHERE UPPER(feature_type) = '{self.geom_type.upper()}' "
+                where = f"WHERE UPPER(feature_type) = '{self.feature_type.upper()}' "
             else:
-                where += f"AND UPPER(feature_type) = '{self.geom_type.upper()}' "
+                where += f"AND UPPER(feature_type) = '{self.feature_type.upper()}' "
 
         sql += where
         sql += f"ORDER BY id"
@@ -1670,11 +1670,11 @@ class GwVisit(QObject):
 
     def _populate_position_id(self):
 
-        self.dlg_event.position_id.setEnabled(self.geom_type == 'arc')
-        self.dlg_event.position_value.setEnabled(self.geom_type == 'arc')
+        self.dlg_event.position_id.setEnabled(self.feature_type == 'arc')
+        self.dlg_event.position_value.setEnabled(self.feature_type == 'arc')
         node_list = []
-        if self.geom_type != 'all':
-            widget_name = f"tbl_visit_x_{self.geom_type}"
+        if self.feature_type != 'all':
+            widget_name = f"tbl_visit_x_{self.feature_type}"
             widget_table = tools_qt.get_widget(self.dlg_add_visit, widget_name)
             node_1 = widget_table.model().record(0).value('node_1')
             node_2 = widget_table.model().record(0).value('node_2')
@@ -1688,24 +1688,24 @@ class GwVisit(QObject):
 
 
     def _visit_tab_feature_changed(self, dialog, table_object='visit', excluded_layers=[]):
-        """ Set geom_type and layer depending selected tab """
+        """ Set feature_type and layer depending selected tab """
 
         # Get selected tab to set geometry type
         tab_idx = dialog.tab_feature.currentIndex()
         if dialog.tab_feature.widget(tab_idx).objectName() == 'tab_arc':
-            self.geom_type = "arc"
+            self.feature_type = "arc"
         elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_node':
-            self.geom_type = "node"
+            self.feature_type = "node"
         elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_connec':
-            self.geom_type = "connec"
+            self.feature_type = "connec"
         elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_gully':
-            self.geom_type = "gully"
-        if self.geom_type == '':
+            self.feature_type = "gully"
+        if self.feature_type == '':
             return
 
         tools_gw.hide_parent_layers(excluded_layers=excluded_layers)
-        widget_name = f"tbl_{table_object}_x_{self.geom_type}"
-        viewname = f"v_edit_{self.geom_type}"
+        widget_name = f"tbl_{table_object}_x_{self.feature_type}"
+        viewname = f"v_edit_{self.feature_type}"
         widget_table = tools_qt.get_widget(dialog, widget_name)
 
         try:
@@ -1726,7 +1726,7 @@ class GwVisit(QObject):
                 partial(self._feature_snapping_clicked, self.dlg_add_visit, widget_table))
 
         # Adding auto-completion to a QLineEdit
-        tools_gw.set_completer_widget(viewname, dialog.feature_id, str(self.geom_type) + "_id")
+        tools_gw.set_completer_widget(viewname, dialog.feature_id, str(self.feature_type) + "_id")
         tools_gw.selection_changed(self, dialog, widget_table, False, self.lazy_widget, self.lazy_init_function)
 
         try:

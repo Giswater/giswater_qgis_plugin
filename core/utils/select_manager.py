@@ -20,7 +20,7 @@ class GwSelectManager(QgsMapTool):
 
     def __init__(self, class_object, table_object=None, dialog=None, query=None):
         """
-        :param table_object: Class where we will look for @layers, @geom_type, @list_ids, etc
+        :param table_object: Class where we will look for @layers, @feature_type, @list_ids, etc
         :param table_object: (String)
         :param dialog: (QDialog)
         :param query: Used only for psectors
@@ -70,8 +70,8 @@ class GwSelectManager(QgsMapTool):
         # We will reconnect it when processing last layer of the group
         tools_qgis.disconnect_signal_selection_changed()
 
-        for i, layer in enumerate(self.class_object.layers[self.class_object.geom_type]):
-            if i == len(self.class_object.layers[self.class_object.geom_type]) - 1:
+        for i, layer in enumerate(self.class_object.layers[self.class_object.feature_type]):
+            if i == len(self.class_object.layers[self.class_object.feature_type]) - 1:
                 tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, query=self.query)
 
                 # Selection by rectangle

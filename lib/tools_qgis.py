@@ -340,15 +340,15 @@ def manage_snapping_layer(layername, snapping_type=0, tolerance=15.0):
     QgsSnappingUtils.LayerConfig(layer, snapping_type, tolerance, QgsTolerance.Pixels)
 
 
-def select_features_by_ids(geom_type, expr, layers=None):
-    """ Select features of layers of group @geom_type applying @expr """
+def select_features_by_ids(feature_type, expr, layers=None):
+    """ Select features of layers of group @feature_type applying @expr """
 
     if layers is None: return
 
-    if geom_type not in layers: return
+    if feature_type not in layers: return
 
     # Build a list of feature id's and select them
-    for layer in layers[geom_type]:
+    for layer in layers[feature_type]:
         if expr is None:
             layer.removeSelection()
         else:

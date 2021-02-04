@@ -33,7 +33,7 @@ class GwDocument:
         self.files_path = []
 
 
-    def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, geom_type=None, row=None):
+    def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None):
         """ Button 34: Add document """
 
         self.rubber_band = QgsRubberBand(self.canvas)
@@ -50,7 +50,7 @@ class GwDocument:
         for widget in widget_list:
             tools_qt.set_tableview_config(widget)
 
-        # Get layers of every geom_type
+        # Get layers of every feature_type
 
         # Setting lists
         self.ids = []
@@ -76,7 +76,7 @@ class GwDocument:
             self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
         if feature is not None:
-            layer = self.layers[geom_type][0]
+            layer = self.layers[feature_type][0]
             layer.selectByIds([feature.id()])
 
         # Set icons
@@ -100,10 +100,10 @@ class GwDocument:
         tools_gw.set_completer_object(self.dlg_add_doc, table_object)
 
         # Adding auto-completion to a QLineEdit for default feature
-        if geom_type is None:
-            geom_type = "arc"
-        viewname = f"v_edit_{geom_type}"
-        tools_gw.set_completer_widget(viewname, self.dlg_add_doc.feature_id, str(geom_type) + "_id")
+        if feature_type is None:
+            feature_type = "arc"
+        viewname = f"v_edit_{feature_type}"
+        tools_gw.set_completer_widget(viewname, self.dlg_add_doc.feature_id, str(feature_type) + "_id")
 
         # Set signals
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
@@ -143,11 +143,11 @@ class GwDocument:
 
         if feature:
             self.dlg_add_doc.tabWidget.currentChanged.connect(
-                partial(self._fill_table_doc, self.dlg_add_doc, geom_type, feature[geom_type + "_id"]))
+                partial(self._fill_table_doc, self.dlg_add_doc, feature_type, feature[feature_type + "_id"]))
 
         # Set default tab 'arc'
         self.dlg_add_doc.tab_feature.setCurrentIndex(0)
-        self.geom_type = "arc"
+        self.feature_type = "arc"
         tools_gw.get_signal_change_tab(self.dlg_add_doc, excluded_layers)
 
         # Open the dialog
@@ -213,15 +213,15 @@ class GwDocument:
             self.dlg_add_doc.tabWidget.setTabEnabled(1, True)
 
 
-    def _fill_table_doc(self, dialog, geom_type, feature_id):
+    def _fill_table_doc(self, dialog, feature_type, feature_id):
 
-        widget = "tbl_doc_x_" + geom_type
+        widget = "tbl_doc_x_" + feature_type
         widget = dialog.findChild(QTableView, widget)
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        expr_filter = f"{geom_type}_id = '{feature_id}'"
+        expr_filter = f"{feature_type}_id = '{feature_id}'"
 
         # Set model of selected widget
-        table_name = f"{self.schema_name}.v_edit_{geom_type}"
+        table_name = f"{self.schema_name}.v_edit_{feature_type}"
         message = tools_qt.fill_table(widget, table_name, expr_filter)
         if message:
             tools_qgis.show_warning(message)
@@ -310,7 +310,7 @@ class GwDocument:
 
     def _update_doc_tables(self, sql, doc_id, table_object, tablename, item_id, qtable):
 
-        # Manage records in tables @table_object_x_@geom_type
+        # Manage records in tables @table_object_x_@feature_type
         sql += (f"\nDELETE FROM doc_x_node"
                 f" WHERE doc_id = '{doc_id}';")
         sql += (f"\nDELETE FROM doc_x_arc"
@@ -420,9 +420,9 @@ class GwDocument:
         # Reset list of selected records
         self.ids, self.list_ids = tools_gw.reset_feature_list()
 
-        list_geom_type = ['arc', 'node', 'connec', 'element']
+        list_feature_type = ['arc', 'node', 'connec', 'element']
         if global_vars.project_type == 'ud':
-            list_geom_type.append('gully')
+            list_feature_type.append('gully')
 
         object_id = tools_qt.get_text(dialog, table_object + "_id")
 
@@ -445,8 +445,8 @@ class GwDocument:
             else:
                 self.layers = tools_gw.remove_selection(True, self.layers)
 
-            for geom_type in list_geom_type:
-                tools_qt.reset_model(dialog, table_object, geom_type)
+            for feature_type in list_feature_type:
+                tools_qt.reset_model(dialog, table_object, feature_type)
 
             return
 
@@ -455,8 +455,8 @@ class GwDocument:
         tools_qt.set_widget_text(dialog, "observ", row["observ"])
         tools_qt.set_widget_text(dialog, "path", row["path"])
 
-        # Check related @geom_type
-        for geom_type in list_geom_type:
-            tools_gw.get_rows_by_feature_type(self, dialog, table_object, geom_type)
+        # Check related @feature_type
+        for feature_type in list_feature_type:
+            tools_gw.get_rows_by_feature_type(self, dialog, table_object, feature_type)
 
     # endregion

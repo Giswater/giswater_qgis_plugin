@@ -794,7 +794,7 @@ class GwSearch:
 
 
     def _open_feature_form(self, qtable):
-        """ Zoom feature with the code set in 'network_code' of the layer set in 'network_geom_type' """
+        """ Zoom feature with the code set in 'network_code' of the layer set in 'network_feature_type' """
 
         # Get selected code from combo
         element = qtable.selectionModel().selectedRows()
@@ -805,8 +805,8 @@ class GwSearch:
 
         row = element[0].row()
 
-        geom_type = qtable.model().record(row).value('feature_type').lower()
-        table_name = "v_edit_" + geom_type
+        feature_type = qtable.model().record(row).value('feature_type').lower()
+        table_name = "v_edit_" + feature_type
 
         feature_id = qtable.model().record(row).value('feature_id')
 

@@ -31,7 +31,7 @@ class GwFeatureEndButton(GwAction):
 
     def clicked_event(self):
 
-        # Get layers of every geom_type
+        # Get layers of every feature_type
 
         # Setting lists
         self.ids = []
@@ -63,10 +63,6 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work_end = GwFeatureEndUi()
         tools_gw.load_settings(self.dlg_work_end)
         self._set_edit_arc_downgrade_force('True')
-
-        # Set default geom_type and viewname
-        geom_type = "arc"
-        viewname = "v_edit_" + geom_type
 
         # Capture the current layer to return it at the end of the operation
         self.cur_active_layer = self.iface.activeLayer()
@@ -131,7 +127,7 @@ class GwFeatureEndButton(GwAction):
         self._fill_fields()
 
         # Adding auto-completion to a QLineEdit for default feature
-        tools_gw.set_completer_widget(viewname, self.dlg_work_end.feature_id, str(geom_type) + "_id")
+        tools_gw.set_completer_widget("v_edit_arc", self.dlg_work_end.feature_id, "arc_id")
 
         # Set default tab 'arc'
         self.dlg_work_end.tab_feature.setCurrentIndex(0)
@@ -288,18 +284,18 @@ class GwFeatureEndButton(GwAction):
             tools_gw.open_dialog(self.dlg_work, dlg_name='feature_end_connec')
 
         else:
-            # Update tablename of every geom_type
+            # Update tablename of every feature_type
             self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_element)
-            self._update_geom_type("element")
+            self._update_feature_type("element")
             self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_connec)
-            self._update_geom_type("connec")
+            self._update_feature_type("connec")
             if str(self.project_type) == 'ud':
-                self.s_et_list_selected_id(self.dlg_work_end.tbl_cat_work_x_gully)
-                self._update_geom_type("gully")
+                self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_gully)
+                self._update_feature_type("gully")
             self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
-            self._update_geom_type("arc")
+            self._update_feature_type("arc")
             self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_node)
-            self._update_geom_type("node")
+            self._update_feature_type("node")
 
 
             self._manage_close(self.dlg_work_end, True)
@@ -311,8 +307,8 @@ class GwFeatureEndButton(GwAction):
             self.iface.mapCanvas().refresh()
 
 
-    def _update_geom_type(self, geom_type):
-        """ Get elements from @geom_type and update his corresponding table """
+    def _update_feature_type(self, feature_type):
+        """ Get elements from @feature_type and update his corresponding table """
 
         if len(self.selected_list) == 0:
             return
@@ -322,7 +318,7 @@ class GwFeatureEndButton(GwAction):
             id_list += f'"{id_}", '
         id_list = "[" + id_list[:-2] + "]"
 
-        feature = f'"featureType":"{geom_type}", "featureId":{id_list}'
+        feature = f'"featureType":"{feature_type}", "featureId":{id_list}'
         extras = f'"state_type":"{self.statetype_id_end}", "workcat_id_end":"{self.workcat_id_end}", '
         extras += f'"enddate":"{self.enddate}", "workcat_date":"{self.workcatdate}", "description":"{self.description}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
@@ -391,9 +387,9 @@ class GwFeatureEndButton(GwAction):
         if not answer:
             return
 
-        # Update tablename of every geom_type
+        # Update tablename of every feature_type
         self._set_list_selected_id(self.dlg_work_end.tbl_cat_work_x_arc)
-        self._update_geom_type("arc")
+        self._update_feature_type("arc")
 
         self.canvas.refresh()
         self.dlg_work.close()

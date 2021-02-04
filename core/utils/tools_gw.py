@@ -338,28 +338,28 @@ def reset_feature_list():
 
 
 def get_signal_change_tab(dialog, excluded_layers=[]):
-    """ Set geom_type and layer depending selected tab """
+    """ Set feature_type and layer depending selected tab """
 
     tab_idx = dialog.tab_feature.currentIndex()
     tab_name = {'tab_arc': 'arc', 'tab_node': 'node', 'tab_connec': 'connec', 'tab_gully': 'gully',
                 'tab_elem': 'element'}
 
-    geom_type = tab_name.get(dialog.tab_feature.widget(tab_idx).objectName(), 'arc')
+    feature_type = tab_name.get(dialog.tab_feature.widget(tab_idx).objectName(), 'arc')
     hide_parent_layers(excluded_layers=excluded_layers)
-    viewname = f"v_edit_{geom_type}"
+    viewname = f"v_edit_{feature_type}"
 
     # Adding auto-completion to a QLineEdit
-    set_completer_feature_id(dialog.feature_id, geom_type, viewname)
+    set_completer_feature_id(dialog.feature_id, feature_type, viewname)
     global_vars.iface.actionPan().trigger()
-    return geom_type
+    return feature_type
 
 
-def set_completer_feature_id(widget, geom_type, viewname):
+def set_completer_feature_id(widget, feature_type, viewname):
     """ Set autocomplete of widget 'feature_id'
         getting id's from selected @viewname
     """
 
-    if geom_type == '':
+    if feature_type == '':
         return
 
     # Adding auto-completion to a QLineEdit
@@ -367,7 +367,7 @@ def set_completer_feature_id(widget, geom_type, viewname):
     completer.setCaseSensitivity(Qt.CaseInsensitive)
     widget.setCompleter(completer)
     model = QStringListModel()
-    sql = (f"SELECT {geom_type}_id"
+    sql = (f"SELECT {feature_type}_id"
            f" FROM {viewname}")
     row = tools_db.get_rows(sql)
     if row:
@@ -1371,24 +1371,24 @@ def manage_combo_child(dialog, combo_parent, combo_child):
             child.setEnabled(False)
 
 
-def fill_child(dialog, widget, action, geom_type=''):
+def fill_child(dialog, widget, action, feature_type=''):
 
     combo_parent = widget.objectName()
     combo_id = tools_qt.get_combo_value(dialog, widget)
     # TODO cambiar por gw_fct_getchilds then unified with get_child if posible
-    json_result = execute_procedure('gw_fct_getcombochilds', f"'{action}' ,'' ,'' ,'{combo_parent}', '{combo_id}','{geom_type}'")
+    json_result = execute_procedure('gw_fct_getcombochilds', f"'{action}' ,'' ,'' ,'{combo_parent}', '{combo_id}','{feature_type}'")
     for combo_child in json_result['fields']:
         if combo_child is not None:
             fill_combo_child(dialog, combo_child)
 
 
-def get_expression_filter(geom_type, list_ids=None, layers=None):
+def get_expression_filter(feature_type, list_ids=None, layers=None):
     """ Set an expression filter with the contents of the list.
         Set a model with selected filter. Attach that model to selected table
     """
 
-    list_ids = list_ids[geom_type]
-    field_id = geom_type + "_id"
+    list_ids = list_ids[feature_type]
+    field_id = feature_type + "_id"
     if len(list_ids) == 0:
         return None
 
@@ -1404,7 +1404,7 @@ def get_expression_filter(geom_type, list_ids=None, layers=None):
         return None
 
     # Select features of layers applying @expr
-    tools_qgis.select_features_by_ids(geom_type, expr, layers=layers)
+    tools_qgis.select_features_by_ids(feature_type, expr, layers=layers)
 
     return expr_filter
 
@@ -1674,11 +1674,11 @@ def manage_json_return(json_result, sql, rubber_band=None):
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
 
-def get_rows_by_feature_type(class_object, dialog, table_object, geom_type):
-    """ Get records of @geom_type associated to selected @table_object """
+def get_rows_by_feature_type(class_object, dialog, table_object, feature_type):
+    """ Get records of @feature_type associated to selected @table_object """
 
     object_id = tools_qt.get_text(dialog, table_object + "_id")
-    table_relation = table_object + "_x_" + geom_type
+    table_relation = table_object + "_x_" + feature_type
     widget_name = "tbl_" + table_relation
 
     exists = tools_db.check_table(table_relation)
@@ -1686,17 +1686,17 @@ def get_rows_by_feature_type(class_object, dialog, table_object, geom_type):
         tools_log.log_info(f"Not found: {table_relation}")
         return
 
-    sql = (f"SELECT {geom_type}_id "
+    sql = (f"SELECT {feature_type}_id "
            f"FROM {table_relation} "
            f"WHERE {table_object}_id = '{object_id}'")
     rows = tools_db.get_rows(sql, log_info=False)
     if rows:
         for row in rows:
-            class_object.list_ids[geom_type].append(str(row[0]))
+            class_object.list_ids[feature_type].append(str(row[0]))
             class_object.ids.append(str(row[0]))
 
-        expr_filter = get_expression_filter(geom_type, class_object.list_ids, class_object.layers)
-        table_name = f"v_edit_{geom_type}"
+        expr_filter = get_expression_filter(feature_type, class_object.list_ids, class_object.layers)
+        table_name = f"v_edit_{feature_type}"
         tools_qt.set_table_model(dialog, widget_name, table_name, expr_filter)
 
 
@@ -1733,16 +1733,16 @@ def get_project_type(schemaname=None):
     return project_type
 
 
-def get_layers_from_feature_type(geom_type):
-    """ Get layers of the group @geom_type """
+def get_layers_from_feature_type(feature_type):
+    """ Get layers of the group @feature_type """
 
     list_items = []
     sql = (f"SELECT child_layer "
            f"FROM cat_feature "
-           f"WHERE upper(feature_type) = '{geom_type.upper()}' "
+           f"WHERE upper(feature_type) = '{feature_type.upper()}' "
            f"UNION SELECT DISTINCT parent_layer "
            f"FROM cat_feature "
-           f"WHERE upper(feature_type) = '{geom_type.upper()}';")
+           f"WHERE upper(feature_type) = '{feature_type.upper()}';")
     rows = tools_db.get_rows(sql)
     if rows:
         for row in rows:
@@ -1967,12 +1967,12 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
     """
 
     tools_qgis.disconnect_signal_selection_changed()
-    geom_type = get_signal_change_tab(dialog)
+    feature_type = get_signal_change_tab(dialog)
     # Clear list of ids
     if remove_ids:
         class_object.ids = []
 
-    field_id = f"{geom_type}_id"
+    field_id = f"{feature_type}_id"
     feature_id = tools_qt.get_text(dialog, "feature_id")
     expr_filter = f"{field_id} = '{feature_id}'"
 
@@ -1982,7 +1982,7 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
         return None
 
     # Select features of layers applying @expr
-    tools_qgis.select_features_by_ids(geom_type, expr, layers=class_object.layers)
+    tools_qgis.select_features_by_ids(feature_type, expr, layers=class_object.layers)
 
     if feature_id == 'null':
         message = "You need to enter a feature id"
@@ -1990,7 +1990,7 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
         return
 
     # Iterate over all layers of the group
-    for layer in class_object.layers[geom_type]:
+    for layer in class_object.layers[feature_type]:
         if layer.selectedFeatureCount() > 0:
             # Get selected features of the layer
             features = layer.selectedFeatures()
@@ -2016,27 +2016,27 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
 
     # Select features with previous filter
     # Build a list of feature id's and select them
-    for layer in class_object.layers[geom_type]:
+    for layer in class_object.layers[feature_type]:
         it = layer.getFeatures(QgsFeatureRequest(expr))
         id_list = [i.id() for i in it]
         if len(id_list) > 0:
             layer.selectByIds(id_list)
 
-    # Reload contents of table 'tbl_???_x_@geom_type'
+    # Reload contents of table 'tbl_xxx_xxx_@feature_type'
     if query:
-        _insert_feature_psector(dialog, geom_type, ids=class_object.ids)
+        _insert_feature_psector(dialog, feature_type, ids=class_object.ids)
         layers = remove_selection(True, class_object.layers)
         class_object.layers = layers
     else:
-        load_tablename(dialog, table_object, geom_type, expr_filter)
+        load_tablename(dialog, table_object, feature_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Update list
-    class_object.list_ids[geom_type] = class_object.ids
+    class_object.list_ids[feature_type] = class_object.ids
     enable_feature_type(dialog, table_object, ids=class_object.ids)
-    connect_signal_selection_changed(class_object, dialog, table_object, geom_type)
+    connect_signal_selection_changed(class_object, dialog, table_object, feature_type)
 
-    tools_log.log_info(class_object.list_ids[geom_type])
+    tools_log.log_info(class_object.list_ids[feature_type])
 
 
 def remove_selection(remove_groups=True, layers=None):
@@ -2260,11 +2260,11 @@ def set_calendar_from_user_param(dialog, widget, table_name, value, parameter):
     tools_qt.set_calendar(dialog, widget, date)
 
 
-def load_tablename(dialog, table_object, geom_type, expr_filter):
+def load_tablename(dialog, table_object, feature_type, expr_filter):
     """ Reload @widget with contents of @tablename applying selected @expr_filter """
 
     if type(table_object) is str:
-        widget_name = f"tbl_{table_object}_x_{geom_type}"
+        widget_name = f"tbl_{table_object}_x_{feature_type}"
         widget = tools_qt.get_widget(dialog, widget_name)
         if not widget:
             message = "Widget not found"
@@ -2276,21 +2276,21 @@ def load_tablename(dialog, table_object, geom_type, expr_filter):
         msg = "Table_object is not a table name or QTableView"
         tools_log.log_info(msg)
         return None
-    table_name = f"v_edit_{geom_type}"
+    table_name = f"v_edit_{feature_type}"
     expr = tools_qt.set_table_model(dialog, widget, table_name, expr_filter)
     return expr
 
 
-def load_tableview_psector(dialog, geom_type):
+def load_tableview_psector(dialog, feature_type):
     """ Reload QtableView """
 
     value = tools_qt.get_text(dialog, dialog.psector_id)
     expr = f"psector_id = '{value}'"
-    qtable = tools_qt.get_widget(dialog, f'tbl_psector_x_{geom_type}')
-    message = tools_qt.fill_table(qtable, f"plan_psector_x_{geom_type}", expr)
+    qtable = tools_qt.get_widget(dialog, f'tbl_psector_x_{feature_type}')
+    message = tools_qt.fill_table(qtable, f"plan_psector_x_{feature_type}", expr)
     if message:
         tools_qgis.show_warning(message)
-    set_tablemodel_config(dialog, qtable, f"plan_psector_x_{geom_type}")
+    set_tablemodel_config(dialog, qtable, f"plan_psector_x_{feature_type}")
     tools_qgis.refresh_map_canvas()
 
 
@@ -2355,11 +2355,11 @@ def manage_close(dialog, table_object, cur_active_layer=None, single_tool_mode=N
     else:
         layers = remove_selection(True, layers=layers)
 
-    list_geom_type = ['arc', 'node', 'connec', 'element']
+    list_feature_type = ['arc', 'node', 'connec', 'element']
     if global_vars.project_type == 'ud':
-        list_geom_type.append('gully')
-    for geom_type in list_geom_type:
-        tools_qt.reset_model(dialog, table_object, geom_type)
+        list_feature_type.append('gully')
+    for feature_type in list_feature_type:
+        tools_qt.reset_model(dialog, table_object, feature_type)
 
     close_dialog(dialog)
 
@@ -2370,9 +2370,9 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
     """ Delete selected elements of the table """
 
     tools_qgis.disconnect_signal_selection_changed()
-    geom_type = get_signal_change_tab(dialog)
+    feature_type = get_signal_change_tab(dialog)
     if type(table_object) is str:
-        widget_name = f"tbl_{table_object}_x_{geom_type}"
+        widget_name = f"tbl_{table_object}_x_{feature_type}"
         widget = tools_qt.get_widget(dialog, widget_name)
         if not widget:
             message = "Widget not found"
@@ -2400,11 +2400,11 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
     if query:
         full_list = widget.model()
         for x in range(0, full_list.rowCount()):
-            class_object.ids.append(widget.model().record(x).value(f"{geom_type}_id"))
+            class_object.ids.append(widget.model().record(x).value(f"{feature_type}_id"))
     else:
-        class_object.ids = class_object.list_ids[geom_type]
+        class_object.ids = class_object.list_ids[feature_type]
 
-    field_id = geom_type + "_id"
+    field_id = feature_type + "_id"
 
     del_id = []
     inf_text = ""
@@ -2443,21 +2443,21 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
 
     # Update model of the widget with selected expr_filter
     if query:
-        _delete_feature_psector(dialog, geom_type, list_id)
-        load_tableview_psector(dialog, geom_type)
+        _delete_feature_psector(dialog, feature_type, list_id)
+        load_tableview_psector(dialog, feature_type)
     else:
-        load_tablename(dialog, table_object, geom_type, expr_filter)
+        load_tablename(dialog, table_object, feature_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Select features with previous filter
     # Build a list of feature id's and select them
-    tools_qgis.select_features_by_ids(geom_type, expr, layers=class_object.layers)
+    tools_qgis.select_features_by_ids(feature_type, expr, layers=class_object.layers)
 
     if query:
         class_object.layers = remove_selection(layers=class_object.layers)
 
     # Update list
-    class_object.list_ids[geom_type] = class_object.ids
+    class_object.list_ids[feature_type] = class_object.ids
     enable_feature_type(dialog, table_object, ids=class_object.ids)
     connect_signal_selection_changed(class_object, dialog, table_object, query)
 
@@ -2487,23 +2487,23 @@ def restore_parent_layers_visibility(layers):
 
 
 # region private functions
-def _insert_feature_psector(dialog, geom_type, ids=None):
-    """ Insert features_id to table plan_@geom_type_x_psector """
+def _insert_feature_psector(dialog, feature_type, ids=None):
+    """ Insert features_id to table plan_@feature_type_x_psector """
 
     value = tools_qt.get_text(dialog, dialog.psector_id)
     for i in range(len(ids)):
-        sql = f"INSERT INTO plan_psector_x_{geom_type} ({geom_type}_id, psector_id) "
+        sql = f"INSERT INTO plan_psector_x_{feature_type} ({feature_type}_id, psector_id) "
         sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"
         tools_db.execute_sql(sql)
-        load_tableview_psector(dialog, geom_type)
+        load_tableview_psector(dialog, feature_type)
 
 
-def _delete_feature_psector(dialog, geom_type, list_id):
-    """ Delete features_id to table plan_@geom_type_x_psector"""
+def _delete_feature_psector(dialog, feature_type, list_id):
+    """ Delete features_id to table plan_@feature_type_x_psector"""
 
     value = tools_qt.get_text(dialog, dialog.psector_id)
-    sql = (f"DELETE FROM plan_psector_x_{geom_type} "
-           f"WHERE {geom_type}_id IN ({list_id}) AND psector_id = '{value}'")
+    sql = (f"DELETE FROM plan_psector_x_{feature_type} "
+           f"WHERE {feature_type}_id IN ({list_id}) AND psector_id = '{value}'")
     tools_db.execute_sql(sql)
 
 

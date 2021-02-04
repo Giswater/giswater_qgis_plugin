@@ -90,7 +90,7 @@ class GwNodeTypeChangeButton(GwMaptool):
             tools_qt.show_info_box(msg, "Info")
             return
         self.catalog = GwCatalog()
-        self.catalog.open_catalog(self.dlg_chg_node_type, 'node_nodecat_id', 'node', feature_type)
+        self.catalog.open_catalog(self.dlg_chg_node_type, 'node_nodecat_id', feature_type)
 
 
     def _edit_change_elem_type_accept(self):

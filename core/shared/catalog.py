@@ -24,14 +24,14 @@ class GwCatalog:
         pass
 
 
-    def open_catalog(self, previous_dialog, widget_name, geom_type, feature_type):
+    def open_catalog(self, previous_dialog, widget_name, feature_type):
         """ Main function of catalog """
-        
-        # Manage if geom_type is gully and set grate
-        if geom_type == 'gully':
-            geom_type = 'grate'
 
-        form_name = 'upsert_catalog_' + geom_type + ''
+        # Manage if feature_type is gully and set grate
+        if feature_type == 'gully':
+            feature_type = 'grate'
+
+        form_name = 'upsert_catalog_' + feature_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
         body = tools_gw.create_body(form, feature)
@@ -82,15 +82,15 @@ class GwCatalog:
         id = self.dlg_catalog.findChild(QComboBox, 'id')
 
         # Call _get_catalog first time
-        self._get_catalog(matcat_id, pnom, dnom, id, feature_type, geom_type)
+        self._get_catalog(matcat_id, pnom, dnom, id, feature_type)
 
         # Set Listeners
         matcat_id.currentIndexChanged.connect(
-            partial(self._populate_pn_dn, matcat_id, pnom, dnom, feature_type, geom_type))
+            partial(self._populate_pn_dn, matcat_id, pnom, dnom, feature_type))
         pnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id,
-                                         pnom, dnom, id, feature_type, geom_type))
+                                         pnom, dnom, id, feature_type))
         dnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id,
-                                         pnom, dnom, id, feature_type, geom_type))
+                                         pnom, dnom, id, feature_type))
 
         # Set shortcut keys
         self.dlg_catalog.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_catalog))
@@ -101,14 +101,14 @@ class GwCatalog:
 
     # region private functions
 
-    def _get_catalog(self, matcat_id, pnom, dnom, id, feature_type, geom_type):
+    def _get_catalog(self, matcat_id, pnom, dnom, id, feature_type):
         """ Execute gw_fct_getcatalog """
 
         matcat_id_value = tools_qt.get_combo_value(self.dlg_catalog, matcat_id)
         pn_value = tools_qt.get_combo_value(self.dlg_catalog, pnom)
         dn_value = tools_qt.get_combo_value(self.dlg_catalog, dnom)
 
-        form_name = 'upsert_catalog_' + geom_type + ''
+        form_name = 'upsert_catalog_' + feature_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
         extras = None
@@ -131,12 +131,12 @@ class GwCatalog:
                     self._fill_combo(id, field)
 
 
-    def _populate_pn_dn(self, matcat_id, pnom, dnom, feature_type, geom_type):
+    def _populate_pn_dn(self, matcat_id, pnom, dnom, feature_type):
         """ Execute gw_fct_getcatalog and fill combos """
 
         matcat_id_value = tools_qt.get_combo_value(self.dlg_catalog, matcat_id)
 
-        form_name = f'upsert_catalog_' + geom_type + ''
+        form_name = f'upsert_catalog_' + feature_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{feature_type}"'
         extras = f'"fields":{{"matcat_id":"{matcat_id_value}"}}'
@@ -152,7 +152,7 @@ class GwCatalog:
                 self._fill_combo(dnom, field)
 
 
-    def _populate_catalog_id(self, geom_type):
+    def _populate_catalog_id(self, feature_type):
         """ Execute gw_api_get_catalog_id and fill combo id """
 
         # Get widgets
@@ -168,7 +168,7 @@ class GwCatalog:
 
         exists = tools_db.check_function('gw_api_get_catalog_id')
         if exists:
-            sql = f"SELECT gw_api_get_catalog_id('{metcat_value}', '{pn_value}', '{dn_value}', '{geom_type}', 9)"
+            sql = f"SELECT gw_api_get_catalog_id('{metcat_value}', '{pn_value}', '{dn_value}', '{feature_type}', 9)"
             row = tools_db.get_row(sql)
             self._fill_combo(widget_id, row[0]['catalog_id'][0])
             

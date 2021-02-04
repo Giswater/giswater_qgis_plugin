@@ -93,8 +93,8 @@ class GwToolBoxButton(GwAction):
         """ Save QGIS settings related with toolbox options """
 
         function_name = function[0]['functionname']
-        geom_type = tools_qt.get_combo_value(dialog, dialog.cmb_geom_type, 0)
-        tools_gw.set_config_parser('btn_toolbox', f"{function_name}_cmb_geom_type", f"{geom_type}")
+        feature_type = tools_qt.get_combo_value(dialog, dialog.cmb_geom_type, 0)
+        tools_gw.set_config_parser('btn_toolbox', f"{function_name}_cmb_geom_type", f"{feature_type}")
         layer = tools_qt.get_combo_value(dialog, dialog.cmb_layers, 0)
         tools_gw.set_config_parser('btn_toolbox', f"{function_name}_cmb_layers", f"{layer}")
         tools_gw.set_config_parser('btn_toolbox', f"{function_name}_rbt_previous", f"{dialog.rbt_previous.isChecked()}")
@@ -223,10 +223,10 @@ class GwToolBoxButton(GwAction):
 
         function_name = function[0]['functionname']
         if dialog.cmb_geom_type.property('selectedId') in (None, '', 'NULL'):
-            geom_type = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_cmb_geom_type", "user", "session")
+            feature_type = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_cmb_geom_type", "user", "session")
         else:
-            geom_type = dialog.cmb_geom_type.property('selectedId')
-        tools_qt.set_combo_value(dialog.cmb_geom_type, geom_type, 0)
+            feature_type = dialog.cmb_geom_type.property('selectedId')
+        tools_qt.set_combo_value(dialog.cmb_geom_type, feature_type, 0)
         if dialog.cmb_layers.property('selectedId') in (None, '', 'NULL'):
             layer = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_cmb_layers", "user", "session")
         else:
@@ -291,14 +291,14 @@ class GwToolBoxButton(GwAction):
         tools_qt.fill_combo_values(self.dlg_functions.cmb_geom_type, feat_types, 1)
 
 
-    def _get_all_group_layers(self, geom_type):
+    def _get_all_group_layers(self, feature_type):
 
         list_items = []
         sql = (f"SELECT tablename, type FROM "
                f"(SELECT DISTINCT(parent_layer) AS tablename, feature_type as type, 0 as c "
-               f"FROM cat_feature WHERE feature_type = '{geom_type.upper()}' "
+               f"FROM cat_feature WHERE feature_type = '{feature_type.upper()}' "
                f"UNION SELECT child_layer, feature_type, 2 as c "
-               f"FROM cat_feature WHERE feature_type = '{geom_type.upper()}') as t "
+               f"FROM cat_feature WHERE feature_type = '{feature_type.upper()}') as t "
                f"ORDER BY c, tablename")
         rows = tools_db.get_rows(sql)
         if rows:
@@ -313,22 +313,22 @@ class GwToolBoxButton(GwAction):
 
     def _populate_layer_combo(self):
 
-        geom_type = tools_qt.get_combo_value(self.dlg_functions, self.dlg_functions.cmb_geom_type, 0)
+        feature_type = tools_qt.get_combo_value(self.dlg_functions, self.dlg_functions.cmb_geom_type, 0)
         self.layers = []
-        self.layers = self._get_all_group_layers(geom_type)
+        self.layers = self._get_all_group_layers(feature_type)
 
         layers = []
         legend_layers = tools_qgis.get_project_layers()
-        for geom_type, layer in self.layers:
+        for feature_type, layer in self.layers:
             if layer in legend_layers:
                 elem = []
                 layer_name = tools_qgis.get_layer_source_table_name(layer)
                 elem.append(layer.name())
                 elem.append(layer_name)
-                elem.append(geom_type)
+                elem.append(feature_type)
                 layers.append(elem)
         if not layers:
-            elem = [f"There is no layer related to {geom_type}.", None, None]
+            elem = [f"There is no layer related to {feature_type}.", None, None]
             layers.append(elem)
 
         tools_qt.fill_combo_values(self.dlg_functions.cmb_layers, layers, sort_combo=False)

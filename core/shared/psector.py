@@ -58,10 +58,10 @@ class GwPsector:
             tools_qt.set_tableview_config(widget)
         self.project_type = tools_gw.get_project_type()
 
-        # Get layers of every geom_type
+        # Get layers of every feature_type
         self.list_elemets = {}
 
-        # Get layers of every geom_type
+        # Get layers of every feature_type
 
         # Setting lists
         self.ids = []
@@ -91,7 +91,7 @@ class GwPsector:
 
         self.update = False  # if false: insert; if true: update
 
-        self.geom_type = "arc"
+        self.feature_type = "arc"
 
         self.all_layers_checked = self._chek_for_layers()
         if self.all_layers_checked:
@@ -431,8 +431,8 @@ class GwPsector:
             tools_qt.set_widget_text(self.dlg_plan_psector, 'cur_pca', self.sys_currency['symbol'])
 
         # Adding auto-completion to a QLineEdit for default feature
-        viewname = "v_edit_" + self.geom_type
-        tools_gw.set_completer_widget(viewname, self.dlg_plan_psector.feature_id, str(self.geom_type) + "_id")
+        viewname = "v_edit_" + self.feature_type
+        tools_gw.set_completer_widget(viewname, self.dlg_plan_psector.feature_id, str(self.feature_type) + "_id")
 
         # Set default tab 'arc'
         self.dlg_plan_psector.tab_feature.setCurrentIndex(0)
@@ -931,10 +931,10 @@ class GwPsector:
         tools_qgis.disconnect_signal_selection_changed()
 
 
-    def reset_model_psector(self, geom_type):
+    def reset_model_psector(self, feature_type):
         """ Reset model of the widget """
 
-        table_relation = "" + geom_type + "_plan"
+        table_relation = "" + feature_type + "_plan"
         widget_name = "tbl_" + table_relation
         widget = tools_qt.get_widget(self.dlg_plan_psector, widget_name)
         if widget:
@@ -1636,8 +1636,8 @@ class GwPsector:
         tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', row[0])
 
 
-    def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
-        """ Zoom to selected features of the @layer with @geom_type """
+    def zoom_to_selected_features(self, layer, feature_type=None, zoom=None):
+        """ Zoom to selected features of the @layer with @feature_type """
 
         if not layer:
             return
@@ -1645,14 +1645,14 @@ class GwPsector:
         global_vars.iface.setActiveLayer(layer)
         global_vars.iface.actionZoomToSelected().trigger()
 
-        if geom_type and zoom:
+        if feature_type and zoom:
 
             # Set scale = scale_zoom
-            if geom_type in ('node', 'connec', 'gully'):
+            if feature_type in ('node', 'connec', 'gully'):
                 scale = zoom
 
             # Set scale = max(current_scale, scale_zoom)
-            elif geom_type == 'arc':
+            elif feature_type == 'arc':
                 scale = global_vars.iface.mapCanvas().scale()
                 if int(scale) < int(zoom):
                     scale = zoom

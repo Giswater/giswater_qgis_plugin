@@ -31,7 +31,7 @@ class GwElement:
         self.vertex_marker = self.snapper_manager.vertex_marker
 
 
-    def get_element(self, new_element_id=True, feature=None, geom_type=None, selected_object_id=None):
+    def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None):
         """ Button 33: Add element """
         self.rubber_band = QgsRubberBand(self.canvas)
         self.new_element_id = new_element_id
@@ -48,7 +48,7 @@ class GwElement:
         for widget in widget_list:
             tools_qt.set_tableview_config(widget)
 
-        # Get layers of every geom_type
+        # Get layers of every feature_type
 
         # Setting lists
         self.ids = []
@@ -89,7 +89,7 @@ class GwElement:
         # Remove all previous selections
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
         if feature:
-            layer = self.layers[geom_type][0]
+            layer = self.layers[feature_type][0]
             layer.selectByIds([feature.id()])
 
         self._check_date(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
@@ -212,11 +212,11 @@ class GwElement:
 
         if feature:
             self.dlg_add_element.tabWidget.currentChanged.connect(partial(
-                self._fill_tbl_new_element, self.dlg_add_element, geom_type, feature[geom_type + "_id"]))
+                self._fill_tbl_new_element, self.dlg_add_element, feature_type, feature[feature_type + "_id"]))
 
         # Set default tab 'arc'
         self.dlg_add_element.tab_feature.setCurrentIndex(0)
-        self.geom_type = "arc"
+        self.feature_type = "arc"
         tools_gw.get_signal_change_tab(self.dlg_add_element, excluded_layers)
 
         # Force layer v_edit_element set active True
@@ -320,15 +320,15 @@ class GwElement:
         tools_qt.fill_combo_values(self.dlg_add_element.state_type, rows, 1)
 
 
-    def _fill_tbl_new_element(self, dialog, geom_type, feature_id):
+    def _fill_tbl_new_element(self, dialog, feature_type, feature_id):
 
-        widget = "tbl_element_x_" + geom_type
+        widget = "tbl_element_x_" + feature_type
         widget = dialog.findChild(QTableView, widget)
         widget.setSelectionBehavior(QAbstractItemView.SelectRows)
-        expr_filter = f"{geom_type}_id = '{feature_id}'"
+        expr_filter = f"{feature_type}_id = '{feature_id}'"
 
         # Set model of selected widget
-        table_name = f"{self.schema_name}.v_edit_{geom_type}"
+        table_name = f"{self.schema_name}.v_edit_{feature_type}"
         message = tools_qt.fill_table(widget, table_name, expr_filter)
         if message:
             tools_qgis.show_warning(message)
@@ -500,7 +500,7 @@ class GwElement:
 
             sql += f" WHERE element_id = '{element_id}';"
 
-        # Manage records in tables @table_object_x_@geom_type
+        # Manage records in tables @table_object_x_@feature_type
         sql += (f"\nDELETE FROM element_x_node"
                 f" WHERE element_id = '{element_id}';")
         sql += (f"\nDELETE FROM element_x_arc"
@@ -641,9 +641,9 @@ class GwElement:
         # Reset list of selected records
         self.ids, self.list_ids = tools_gw.reset_feature_list()
 
-        list_geom_type = ['arc', 'node', 'connec', 'element']
+        list_feature_type = ['arc', 'node', 'connec', 'element']
         if global_vars.project_type == 'ud':
-            list_geom_type.append('gully')
+            list_feature_type.append('gully')
 
         object_id = tools_qt.get_text(dialog, table_object + "_id")
 
@@ -673,8 +673,8 @@ class GwElement:
             else:
                 self.layers = tools_gw.remove_selection(True, self.layers)
 
-            for geom_type in list_geom_type:
-                tools_qt.reset_model(dialog, table_object, geom_type)
+            for feature_type in list_feature_type:
+                tools_qt.reset_model(dialog, table_object, feature_type)
 
             return
 
@@ -699,9 +699,9 @@ class GwElement:
         if str(row['undelete']) == 'True':
             dialog.undelete.setChecked(True)
 
-        # Check related @geom_type
-        for geom_type in list_geom_type:
-            tools_gw.get_rows_by_feature_type(self, dialog, table_object, geom_type)
+        # Check related @feature_type
+        for feature_type in list_feature_type:
+            tools_gw.get_rows_by_feature_type(self, dialog, table_object, feature_type)
 
 
     def _set_combo_from_param_user(self, dialog, widget, table_name, parameter, field_id='id', field_name='id'):
