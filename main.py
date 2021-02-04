@@ -190,14 +190,14 @@ class Giswater(QObject):
     def _project_new(self):
         """ Function executed when a user creates a new QGIS project """
 
-        self._unload(False)
+        self.unload(False)
 
 
     def _project_read(self, show_warning=True):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
         # Unload plugin before reading opened project
-        self._unload(False)
+        self.unload(False)
 
         # Create class to manage code that performs project configuration
         self.load_project = GwLoadProject()
@@ -225,7 +225,7 @@ class Giswater(QObject):
         tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids),  "user", "init")
 
 
-    def _unload(self, is_plugin_reloaded=True):
+    def unload(self, is_plugin_reloaded=True):
         """ Removes plugin menu items and icons from QGIS GUI
             :param @remove_modules is True when plugin is disabled or reloaded
         """
