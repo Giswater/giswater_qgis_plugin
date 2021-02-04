@@ -26,6 +26,7 @@ current_user = None
 qgis_db_credentials = None
 dao = None
 dao_db_credentials = None
+pg_version = None
 shortcut_keys = []
 
 #qgis project variables
@@ -46,7 +47,6 @@ session_vars['dialog_docker'] = None
 session_vars['info_docker'] = None
 session_vars['docker_type'] = None
 session_vars['logged_status'] = None
-session_vars['pg_version'] = None
 
 
 def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name, p_user_folder_dir):
