@@ -153,7 +153,7 @@ class GwToolBoxTask(GwTask):
             msg += f"<b>Python file: </b>{__name__} <br>"
             msg += f"<b>Python function:</b> {self.__class__.__name__} <br>"
             tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
-        else:
+        elif result:
             tools_gw.fill_tab_log(self.dialog, self.json_result['body']['data'], True, True, 1, True, False)
 
 
