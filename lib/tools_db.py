@@ -189,16 +189,16 @@ def check_db_connection():
         return opened
 
 
-def get_postgresql_version():
+def get_pg_version():
     """ Get PostgreSQL version (integer value) """
 
-    global_vars.session_vars['postgresql_version'] = None
+    global_vars.session_vars['pg_version'] = None
     sql = "SELECT current_setting('server_version_num');"
     row = get_row(sql)
     if row:
-        global_vars.session_vars['postgresql_version'] = row[0]
+        global_vars.session_vars['pg_version'] = row[0]
 
-    return global_vars.session_vars['postgresql_version']
+    return global_vars.session_vars['pg_version']
 
 
 def connect_to_database(host, port, db, user, pwd, sslmode):

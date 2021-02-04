@@ -46,7 +46,7 @@ session_vars['dialog_docker'] = None
 session_vars['info_docker'] = None
 session_vars['docker_type'] = None
 session_vars['logged_status'] = None
-session_vars['postgresql_version'] = None
+session_vars['pg_version'] = None
 
 
 def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name, p_user_folder_dir):

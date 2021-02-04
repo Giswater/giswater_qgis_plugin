@@ -198,8 +198,8 @@ class GwTable(object):
         """ Execute UPSERT sentence """
 
         # Check PostgreSQL version
-        if not global_vars.session_vars['postgresql_version']:
-            tools_db.get_postgresql_version()
+        if not global_vars.session_vars['pg_version']:
+            tools_db.get_pg_version()
 
         # Set SQL for INSERT
         sql = "INSERT INTO " + tablename + "(" + unique_field + ", "

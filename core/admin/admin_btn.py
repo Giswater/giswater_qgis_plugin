@@ -2288,7 +2288,7 @@ class GwAdminButton:
         self.project_version = self._get_project_version(schemaname=schema_name)
         self.project_language = self._get_project_language(schemaname=schema_name)
 
-        self.postgresql_version = tools_db.get_postgresql_version()
+        self.postgresql_version = tools_db.get_pg_version()
         self.postgis_version = tools_db.get_postgis_version()
 
         if schema_name is None:
