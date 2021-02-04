@@ -101,7 +101,7 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="0">
-           <widget class="QComboBox" name="cmb_geom_type"/>
+           <widget class="QComboBox" name="cmb_feature_type"/>
           </item>
           <item row="1" column="0">
            <widget class="QComboBox" name="cmb_layers">

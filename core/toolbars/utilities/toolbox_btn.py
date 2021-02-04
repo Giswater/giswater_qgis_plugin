@@ -93,8 +93,8 @@ class GwToolBoxButton(GwAction):
         """ Save QGIS settings related with toolbox options """
 
         function_name = function[0]['functionname']
-        feature_type = tools_qt.get_combo_value(dialog, dialog.cmb_geom_type, 0)
-        tools_gw.set_config_parser('btn_toolbox', f"{function_name}_cmb_geom_type", f"{feature_type}")
+        feature_type = tools_qt.get_combo_value(dialog, dialog.cmb_feature_type, 0)
+        tools_gw.set_config_parser('btn_toolbox', f"{function_name}_cmb_feature_type", f"{feature_type}")
         layer = tools_qt.get_combo_value(dialog, dialog.cmb_layers, 0)
         tools_gw.set_config_parser('btn_toolbox', f"{function_name}_cmb_layers", f"{layer}")
         tools_gw.set_config_parser('btn_toolbox', f"{function_name}_rbt_previous", f"{dialog.rbt_previous.isChecked()}")
@@ -222,11 +222,11 @@ class GwToolBoxButton(GwAction):
         """ Load QGIS settings related with toolbox options """
 
         function_name = function[0]['functionname']
-        if dialog.cmb_geom_type.property('selectedId') in (None, '', 'NULL'):
-            feature_type = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_cmb_geom_type", "user", "session")
+        if dialog.cmb_feature_type.property('selectedId') in (None, '', 'NULL'):
+            feature_type = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_cmb_feature_type", "user", "session")
         else:
-            feature_type = dialog.cmb_geom_type.property('selectedId')
-        tools_qt.set_combo_value(dialog.cmb_geom_type, feature_type, 0)
+            feature_type = dialog.cmb_feature_type.property('selectedId')
+        tools_qt.set_combo_value(dialog.cmb_feature_type, feature_type, 0)
         if dialog.cmb_layers.property('selectedId') in (None, '', 'NULL'):
             layer = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_cmb_layers", "user", "session")
         else:
@@ -269,7 +269,7 @@ class GwToolBoxButton(GwAction):
                 else:
                     feature_types = function[0]['input_params']['featureType']
                     self._populate_cmb_type(feature_types)
-                    self.dlg_functions.cmb_geom_type.currentIndexChanged.connect(partial(self._populate_layer_combo))
+                    self.dlg_functions.cmb_feature_type.currentIndexChanged.connect(partial(self._populate_layer_combo))
                     self._populate_layer_combo()
                 tools_gw.build_dialog_options(dialog, function, 0, self.function_list, self.temp_layers_added, module)
                 self._load_settings_values(dialog, function)
@@ -287,8 +287,8 @@ class GwToolBoxButton(GwAction):
             elem = [item.upper(), item.upper()]
             feat_types.append(elem)
         if feat_types and len(feat_types) <= 1:
-            self.dlg_functions.cmb_geom_type.setVisible(False)
-        tools_qt.fill_combo_values(self.dlg_functions.cmb_geom_type, feat_types, 1)
+            self.dlg_functions.cmb_feature_type.setVisible(False)
+        tools_qt.fill_combo_values(self.dlg_functions.cmb_feature_type, feat_types, 1)
 
 
     def _get_all_group_layers(self, feature_type):
@@ -313,7 +313,7 @@ class GwToolBoxButton(GwAction):
 
     def _populate_layer_combo(self):
 
-        feature_type = tools_qt.get_combo_value(self.dlg_functions, self.dlg_functions.cmb_geom_type, 0)
+        feature_type = tools_qt.get_combo_value(self.dlg_functions, self.dlg_functions.cmb_feature_type, 0)
         self.layers = []
         self.layers = self._get_all_group_layers(feature_type)
 

@@ -67,7 +67,7 @@ class GwToolBoxTask(GwTask):
                 feature_id_list += ']'
             elif selection_mode == 'previousSelection' and layer is not None:
                 features = layer.selectedFeatures()
-                feature_type = tools_qt.get_combo_value(self.dialog, self.dialog.cmb_geom_type, 0)
+                feature_type = tools_qt.get_combo_value(self.dialog, self.dialog.cmb_feature_type, 0)
                 for feature in features:
                     feature_id = feature.attribute(feature_type + "_id")
                     feature_id_list += f'"{feature_id}", '
@@ -78,7 +78,7 @@ class GwToolBoxTask(GwTask):
 
             if layer_name != -1:
                 feature_field = f'"tableName":"{layer_name}", '
-                feature_type = tools_qt.get_combo_value(self.dialog, self.dialog.cmb_geom_type, 0)
+                feature_type = tools_qt.get_combo_value(self.dialog, self.dialog.cmb_feature_type, 0)
                 feature_field += f'"featureType":"{feature_type}", '
             feature_field += feature_id_list
 
