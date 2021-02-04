@@ -595,9 +595,6 @@ class GwAdminButton:
         self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self._create_qgis_template))
         self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))
         self.dlg_readsql.btn_gis_create.clicked.connect(partial(self._open_form_create_gis_project))
-        self.dlg_readsql.btn_path.clicked.connect(partial(self._select_file_ui))
-        self.dlg_readsql.btn_import_ui.clicked.connect(partial(self._execute_import_ui))
-        self.dlg_readsql.btn_export_ui.clicked.connect(partial(self._execute_export_ui))
         self.dlg_readsql.dlg_closed.connect(partial(self._save_selection))
 
         self.dlg_readsql.btn_create_field.clicked.connect(partial(self._open_manage_field, 'create'))
@@ -2745,115 +2742,6 @@ class GwAdminButton:
             msg = "The QGIS Projects templates was correctly created."
             tools_qt.show_info_box(msg, "Info")
 
-    """ Import / Export UI and manage fields """
-
-
-    def _execute_import_ui(self):
-        """"""
-        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
-        tpath = tools_qt.get_text(self.dlg_readsql, 'tpath')
-        form_name_ui = tools_qt.get_text(self.dlg_readsql, 'cmb_formname_ui')
-        status_update_childs = self.dlg_readsql.chk_multi_update.isChecked()
-
-        # Control if ui path is invalid or null
-        if tpath in (None, 'null'):
-            msg = "Please, select a valid UI Path."
-            tools_qt.show_info_box(msg, "Info")
-            return
-
-        with open(str(tpath)) as f:
-            content = f.read()
-        sql = ("INSERT INTO " + schema_name + ".temp_csv(source, csv1, fid) VALUES($$" +
-               str(form_name_ui) + "$$, $$" + str(content) + "$$, 247);")
-        status = tools_db.execute_sql(sql)
-
-        # Import xml to database
-        sql = ("SELECT " + schema_name + ".gw_fct_import_ui_xml('" + str(form_name_ui) + "', " +
-               str(status_update_childs) + ")::text")
-        status = tools_db.execute_sql(sql)
-        self._manage_result_message(status, parameter="Import data into 'config_form_fields'")
-
-        # Clear temp_csv
-        self._clear_temp_table()
-
-
-    def _execute_export_ui(self):
-        """"""
-        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
-        tpath = tools_qt.get_text(self.dlg_readsql, 'tpath')
-        form_name_ui = tools_qt.get_text(self.dlg_readsql, 'cmb_formname_ui')
-        status_update_childs = self.dlg_readsql.chk_multi_update.isChecked()
-
-        # Control if ui path is invalid or null
-        if tpath is None or tpath == '' or tpath == 'null':
-            msg = "Please, select a valid UI Path."
-            tools_qt.show_info_box(msg, "Info")
-            return
-
-        # Export xml from database
-        sql = ("SELECT " + schema_name + ".gw_fct_export_ui_xml('"
-               + str(form_name_ui) + "', " + str(status_update_childs) + ")::text")
-        status = tools_db.execute_sql(sql)
-        if status is False:
-            msg = "Process finished with some errors"
-            tools_qt.show_info_box(msg, "Warning", parameter="Function import/export")
-            return
-
-        # Populate UI file
-        sql = ("SELECT csv1 FROM " + schema_name + ".temp_csv "
-               "WHERE cur_user = current_user AND source = '" + str(form_name_ui) + "' "
-               "ORDER BY id DESC")
-        row = tools_db.get_row(sql)
-        if not row:
-            return
-
-        data = et.Element(str(row[0]))
-        data = et.tostring(data)
-        data = data.decode('utf-8')
-
-        file_ui = open(tpath, "w")
-
-        # TODO:: dont use replace for remove invalid characters
-        data = data.replace(' />', '').replace('<<', '<')
-
-        file_ui.write(data)
-        file_ui.close()
-        del file_ui
-        msg = ("Exported data into '" + str(tpath) + "' successfully."
-               "\nDo you want to open the UI form?")
-        result = tools_qt.show_question(msg, "Info")
-        if result:
-            opener = "C:\OSGeo4W64/bin/designer.exe"
-            subprocess.Popen([opener, tpath])
-
-        # Clear temp_csv
-        self._clear_temp_table()
-
-
-    def _clear_temp_table(self):
-        """"""
-        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
-        # Clear temp_csv
-        sql = f"DELETE FROM {schema_name}.temp_csv WHERE cur_user = current_user"
-        status = tools_db.execute_sql(sql)
-
-
-    def _select_file_ui(self):
-        """ Select UI file """
-
-        file_ui = tools_qt.get_text(self.dlg_readsql, 'tpath')
-        # Set default value if necessary
-        if file_ui is None or file_ui == '':
-            file_ui = self.plugin_dir
-
-        # Get directory of that file
-        folder_path = os.path.dirname(file_ui)
-        if not os.path.exists(folder_path):
-            folder_path = os.path.dirname(__file__)
-        os.chdir(folder_path)
-        message = tools_qt.tr("Select UI file")
-        file_ui, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.ui')
-        tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.tpath, str(file_ui))
 
     def _update_manage_ui(self):
         """"""
@@ -2868,20 +2756,16 @@ class GwAdminButton:
         if str(self.project_version).replace('.', '') < str(self.plugin_version).replace('.', ''):
 
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(False)
-            tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(False)
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(False)
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(False)
 
             self.dlg_readsql.cmb_feature_name_view.clear()
             self.dlg_readsql.cmb_formname_fields.clear()
-            self.dlg_readsql.cmb_formname_ui.clear()
             self.dlg_readsql.cmb_feature_sys_fields.clear()
             return
 
         else:
-
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(True)
-            tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_ui).setEnabled(True)
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(True)
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(True)
 
@@ -2893,7 +2777,6 @@ class GwAdminButton:
                    f"FROM {schema_name}.cat_feature "
                    f" ORDER BY id")
             rows = tools_db.get_rows(sql)
-            tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_ui, rows, 1)
 
             sql = (f"SELECT cat_feature.id, cat_feature.id "
                    f"FROM {schema_name}.cat_feature "
