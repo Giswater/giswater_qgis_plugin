@@ -16,7 +16,8 @@ from ....lib import tools_qt, tools_db, tools_qgis
 
 
 class GwArcFusionButton(GwMaptool):
-    """ Button 17: User select one node. Execute SQL function: 'gw_fct_delete_node' """
+    """ Button 17: Fusion arc
+    User select one node. Execute SQL function: 'gw_fct_delete_node' """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

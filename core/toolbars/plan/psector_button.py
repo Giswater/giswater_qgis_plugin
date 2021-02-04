@@ -10,6 +10,7 @@ from ...shared.psector import GwPsector
 
 
 class GwPsectorButton(GwAction):
+    """ Button 45: Psector """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

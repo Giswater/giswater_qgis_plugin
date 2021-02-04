@@ -20,6 +20,7 @@ from .... import global_vars
 
 
 class GwAddChildLayerButton(GwAction):
+    """ Button 306: Add child layer """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

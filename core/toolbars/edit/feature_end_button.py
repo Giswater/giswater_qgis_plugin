@@ -22,6 +22,7 @@ from ....lib import tools_qgis, tools_qt, tools_log, tools_db
 
 
 class GwFeatureEndButton(GwAction):
+    """ Button 68: End feature """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

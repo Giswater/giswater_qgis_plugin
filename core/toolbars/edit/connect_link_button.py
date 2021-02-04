@@ -18,7 +18,8 @@ from ....lib import tools_qgis, tools_qt
 
 
 class GwConnectLinkButton(GwMaptool):
-    """ Button 20: User select connections from layer 'connec'
+    """ Button 20: Connect Link
+    User select connections from layer 'connec'
     Execute SQL function: 'gw_fct_setlinktonetwork ' """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):

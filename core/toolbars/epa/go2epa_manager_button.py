@@ -18,6 +18,7 @@ from ....lib import tools_qt, tools_db, tools_qgis
 
 
 class GwGo2EpaManagerButton(GwAction):
+    """ Button 25: Go2epa maanger """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

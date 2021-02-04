@@ -17,6 +17,7 @@ from ....lib import tools_qgis, tools_qt, tools_db
 
 
 class GwFeatureDeleteButton(GwAction):
+    """ Button 69: Delete feature """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

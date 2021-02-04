@@ -21,7 +21,8 @@ from .... import global_vars
 
 
 class GwFeatureReplaceButton(GwMaptool):
-    """ Button 44: User select one feature. Execute SQL function: 'gw_fct_setfeaturereplace' """
+    """ Button 44: Replace feature
+    User select one feature. Execute SQL function: 'gw_fct_setfeaturereplace' """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

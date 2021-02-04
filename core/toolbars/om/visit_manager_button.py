@@ -10,6 +10,7 @@ from ...shared.visit import GwVisit
 
 
 class GwVisitManagerButton(GwAction):
+    """ Button 65: Visit manager """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

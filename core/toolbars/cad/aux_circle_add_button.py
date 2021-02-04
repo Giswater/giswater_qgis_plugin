@@ -19,7 +19,7 @@ from ....lib import tools_qgis, tools_qt
 
 
 class GwAuxCircleAddButton(GwMaptool):
-    """ Button 71: Add circle """
+    """ Button 71: Add circle aux """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

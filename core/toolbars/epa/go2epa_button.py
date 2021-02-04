@@ -26,6 +26,7 @@ from ..dialog import GwAction
 
 
 class GwGo2EpaButton(GwAction):
+    """ Button 23: Go2epa """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

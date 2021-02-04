@@ -19,6 +19,7 @@ from .... import global_vars
 
 
 class GwDateSelectorButton(GwAction):
+    """ Button 84: Date selector """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

@@ -19,7 +19,8 @@ from ....lib import tools_qgis, tools_qt, tools_db
 
 
 class GwNodeTypeChangeButton(GwMaptool):
-    """ Button 28: User select one node. A form is opened showing current node_type.type
+    """ Button 28: Change node type
+    User select one node. A form is opened showing current node_type.type
             Combo to select new node_type.type
             Combo to select new node_type.id
             Combo to select new cat_node.id

@@ -17,7 +17,7 @@ from .... import global_vars
 
 
 class GwArcDivideButton(GwMaptool):
-    """ Button 16. Move node
+    """ Button 16: Divide arc
     Execute SQL function: 'gw_fct_node2arc' """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
