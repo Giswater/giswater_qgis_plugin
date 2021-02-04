@@ -274,6 +274,20 @@ class GwToolBoxButton(GwAction):
                 tools_gw.build_dialog_options(dialog, function, 0, self.function_list, self.temp_layers_added, module)
                 self._load_settings_values(dialog, function)
                 self._load_parametric_values(dialog, function)
+
+                # We configure functionparams in the table config_toolbox, if we do not find the key "selectionType" or
+                # the length of the key is different from 1, we will do nothing, but if we find it and its length is 1,
+                # it means that the user has configured it to show only one of the two radiobuttons, therefore, we will
+                # hide the other and mark the one that the user tells us.
+                # Options: "selectionType":"selected" //  "selectionType":"all"
+                if 'selectionType' in function[0]['input_params']:
+                    if 'selected' in function[0]['input_params']['selectionType']:
+                        dialog.rbt_previous.setChecked(True)
+                        dialog.rbt_layer.setVisible(False)
+                    elif 'all' in function[0]['input_params']['selectionType']:
+                        dialog.rbt_layer.setChecked(True)
+                        dialog.rbt_previous.setVisible(False)
+
                 status = True
                 break
 
