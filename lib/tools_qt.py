@@ -21,7 +21,8 @@ from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, \
     QDateEdit,  QAbstractItemView, QCompleter, QDateTimeEdit, QTableView, QSpinBox, QTimeEdit, QPushButton, \
-    QPlainTextEdit, QRadioButton, QSizePolicy, QSpacerItem, QFileDialog, QGroupBox, QMessageBox, QTabWidget, QToolBox
+    QPlainTextEdit, QRadioButton, QSizePolicy, QSpacerItem, QFileDialog, QGroupBox, QMessageBox, QTabWidget, QToolBox, \
+    QToolButton
 from qgis.core import QgsExpression, QgsProject
 from qgis.gui import QgsDateTimeEdit
 
@@ -1178,6 +1179,18 @@ def set_table_model(dialog, table_object, table_name, expr_filter):
 
     return expr
 
+
+def create_datetime(object_name, allow_null=True, set_cal_popup=True, display_format='dd/MM/yyyy'):
+    """ Create a QgsDateTimeEdit widget """
+
+    widget = QgsDateTimeEdit()
+    widget.setObjectName(object_name)
+    widget.setAllowNull(allow_null)
+    widget.setCalendarPopup(set_cal_popup)
+    widget.setDisplayFormat(display_format)
+    btn_calendar = widget.findChild(QToolButton)
+    btn_calendar.clicked.connect(partial(set_calendar_empty, widget))
+    return widget
 
 # region private functions
 
