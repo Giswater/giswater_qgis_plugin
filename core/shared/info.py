@@ -1880,9 +1880,13 @@ class GwInfo(QObject):
             if widget:
                 cur_value = tools_qt.get_text(dialog, widget)
                 value = field["value"]
-                if str(cur_value) != str(value) and str(value) != '':
+                if str(cur_value) != str(value):
                     widget.setText(value)
                     widget.setStyleSheet("border: 2px solid #3ED396")
+                    if widget.isReadOnly():
+                        widget.setStyleSheet("QLineEdit {background: rgb(244, 244, 244); color: rgb(100, 100, 100); "
+                                             "border: 2px solid #3ED396}")
+
             elif "message" in field:
                 level = field['message']['level'] if 'level' in field['message'] else 0
                 tools_qgis.show_message(field['message']['text'], level)
