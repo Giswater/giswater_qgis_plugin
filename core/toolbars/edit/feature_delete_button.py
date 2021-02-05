@@ -72,7 +72,7 @@ class GwFeatureDeleteButton(GwAction):
         tools_gw.open_dialog(self.dlg_feature_delete, dlg_name='feature_delete')
 
 
-    def filter_typeahead(self, widget, completer, model):
+    def _filter_typeahead(self, widget, completer, model):
 
         # Get feature_type and feature_id
         feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
