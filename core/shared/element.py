@@ -237,7 +237,7 @@ class GwElement:
         return self.dlg_add_element
 
 
-    def update_location_cmb(self):
+    def _update_location_cmb(self):
 
         element_type = tools_qt.get_text(self.dlg_add_element, self.dlg_add_element.element_type)
         sql = (f"SELECT location_type, location_type FROM man_type_location"

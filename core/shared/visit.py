@@ -158,7 +158,7 @@ class GwVisit(QObject):
         self.tbl_event = self.dlg_add_visit.findChild(QTableView, "tbl_event")
         self.parameter_type_id = self.dlg_add_visit.findChild(QComboBox, "parameter_type_id")
         self.parameter_id = self.dlg_add_visit.findChild(QComboBox, "parameter_id")
-        self.feature_type = self.dlg_add_visit.findChild(QComboBox, "feature_type")
+        self.cmb_feature_type = self.dlg_add_visit.findChild(QComboBox, "feature_type")
 
         # tab 'Document'
         self.doc_id = self.dlg_add_visit.findChild(QLineEdit, "doc_id")
@@ -253,7 +253,7 @@ class GwVisit(QObject):
         if open_dlg:
             # If the new visit dont come from info emit signal
             if is_new_from_cf is False:
-                self.feature_type.currentIndexChanged.emit(0)
+                self.cmb_feature_type.currentIndexChanged.emit(0)
             tools_gw.open_dialog(self.dlg_add_visit, dlg_name="visit")
 
 
@@ -428,9 +428,9 @@ class GwVisit(QObject):
 
         # Fill combo boxes of the form and related events
         self.parameter_type_id.currentIndexChanged.connect(partial(self._set_parameter_id_combo, self.dlg_add_visit))
-        self.feature_type.currentIndexChanged.connect(
+        self.cmb_feature_type.currentIndexChanged.connect(
             partial(self._event_feature_type_selected, self.dlg_add_visit, None))
-        self.feature_type.currentIndexChanged.connect(partial(self._manage_tabs_enabled, True))
+        self.cmb_feature_type.currentIndexChanged.connect(partial(self._manage_tabs_enabled, True))
         self.parameter_id.currentIndexChanged.connect(self._get_feature_type_of_parameter)
         self.dlg_add_visit.tbl_visit_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
             self.dlg_add_visit.tbl_visit_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
@@ -456,15 +456,15 @@ class GwVisit(QObject):
         self.tabs.setTabEnabled(index, True)
 
         # set geometry_type
-        feature_type_index = self.feature_type.findText(self.locked_feature_type.upper())
+        feature_type_index = self.cmb_feature_type.findText(self.locked_feature_type.upper())
         if feature_type_index < 0:
             return
 
         # set default combo box value = trigger model and selection of related features
-        if self.feature_type.currentIndex() != feature_type_index:
-            self.feature_type.setCurrentIndex(feature_type_index)
+        if self.cmb_feature_type.currentIndex() != feature_type_index:
+            self.cmb_feature_type.setCurrentIndex(feature_type_index)
         else:
-            self.feature_type.currentIndexChanged.emit(feature_type_index)
+            self.cmb_feature_type.currentIndexChanged.emit(feature_type_index)
 
         # Load feature if in @table_name. Select list of related features
         # Set 'expr_filter' with features that are in the list
@@ -612,12 +612,12 @@ class GwVisit(QObject):
         1) check geometry type looking what table contain records related with visit_id
         2) set gemetry type."""
 
-        feature_type = None
+        selected_feature_type = None
         feature_type_index = None
-        for index in range(self.feature_type.count()):
+        for index in range(self.cmb_feature_type.count()):
             # feture_type combobox is filled before the visit_id is changed
             # it will contain all the geometry type allows basing on project type
-            feature_type = self.feature_type.itemText(index).lower()
+            feature_type = self.cmb_feature_type.itemText(index).lower()
             if feature_type != '' and feature_type != 'all':
                 table_name = f'om_visit_x_{feature_type}'
                 sql = f"SELECT id FROM {table_name} WHERE visit_id = '{self.current_visit.id}'"
@@ -625,20 +625,20 @@ class GwVisit(QObject):
                 if not rows or not rows[0]:
                     continue
 
-                feature_type = feature_type
+                selected_feature_type = feature_type
                 feature_type_index = index
                 break
 
         # if no related records found do nothing
-        if not feature_type:
+        if not selected_feature_type:
             return
 
         # set default combo box value = trigger model and selection
         # of related features
-        if self.feature_type.currentIndex() != feature_type_index:
-            self.feature_type.setCurrentIndex(feature_type_index)
+        if self.cmb_feature_type.currentIndex() != feature_type_index:
+            self.cmb_feature_type.setCurrentIndex(feature_type_index)
         else:
-            self.feature_type.currentIndexChanged.emit(feature_type_index)
+            self.cmb_feature_type.currentIndexChanged.emit(feature_type_index)
 
 
     def _manage_leave_visit_tab(self):
@@ -665,12 +665,12 @@ class GwVisit(QObject):
         """ Save current selected features in every table of feature_type """
 
         if delete_old_relations:
-            for index in range(self.feature_type.count()):
+            for index in range(self.cmb_feature_type.count()):
                 # Remove all old relations related with current visit_id and @feature_type
-                feature_type = self.feature_type.itemText(index).lower()
+                feature_type = self.cmb_feature_type.itemText(index).lower()
                 self._delete_relations_feature_type(feature_type)
 
-        feature_type = tools_qt.get_text(self.dlg_add_visit, self.feature_type).lower()
+        feature_type = tools_qt.get_text(self.dlg_add_visit, self.cmb_feature_type).lower()
         # Save new relations listed in every table of feature_type
         if feature_type == 'all':
             self._update_relations_feature_type("arc")
@@ -782,8 +782,8 @@ class GwVisit(QObject):
         sql = (f"SELECT id, descript "
                f"FROM config_visit_parameter "
                f"WHERE UPPER(parameter_type) = '{self.parameter_type_id.currentText().upper()}' ")
-        if self.feature_type.currentText() != '':
-            sql += f"AND UPPER(feature_type) = '{self.feature_type.currentText().upper()}' "
+        if self.cmb_feature_type.currentText() != '':
+            sql += f"AND UPPER(feature_type) = '{self.cmb_feature_type.currentText().upper()}' "
         sql += f"ORDER BY id"
         rows = tools_db.get_rows(sql)
         if rows:
@@ -911,7 +911,7 @@ class GwVisit(QObject):
         # 2) check if there are features related to the current visit
         # 3) if so, select them => would appear in the table associated to the model
         if feature_type is None:
-            feature_type = self.feature_type.currentText().lower()
+            feature_type = self.cmb_feature_type.currentText().lower()
 
         self.feature_type = feature_type
         if feature_type == '':
