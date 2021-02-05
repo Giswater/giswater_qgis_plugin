@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file is part of Giswater 3
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2796
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getselectors(p_data json);
+-- DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getselectors(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getselectors(p_data json)
   RETURNS json AS
 $BODY$
@@ -53,6 +53,8 @@ v_finalquery text;
 v_querytab text;
 v_orderby text;
 v_geometry text;
+v_query text;
+v_name text;
 
 BEGIN
 
@@ -83,11 +85,10 @@ BEGIN
 
 	-- Start the construction of the tabs array
 	v_formTabs := '[';
-​
+
 	v_query = 'SELECT config_form_tabs.*, value FROM config_form_tabs, config_param_system WHERE formname='||quote_literal(v_selector_type)||
 	' AND concat(''basic_selector_'', tabname) = parameter '||(v_querytab)||' AND sys_role IN (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, ''member''))  ORDER BY orderby';
-​
-​
+
 	FOR v_tab IN EXECUTE v_query
 ​
 	LOOP		
@@ -107,12 +108,11 @@ BEGIN
 		v_selectionMode = v_tab.value::json->>'selectionMode';
 		v_orderby = v_tab.value::json->>'orderBy';
 		v_name = v_tab.value::json->>'name';
-		
-​
+
 		-- profilactic control of v_orderby
 		IF v_orderby IS NULL THEN v_orderby = '2'; end if;
 		IF v_name IS NULL THEN v_name = v_orderby; end if;
-​
+
 		-- profilactic control of selection mode
 		IF v_selectionMode = '' OR v_selectionMode is null then
 			v_selectionMode = 'keepPrevious';
@@ -122,7 +122,7 @@ BEGIN
 		IF v_selector = 'selector_expl' AND v_expl_x_user THEN
 			v_filterfrominput = concat (v_filterfrominput, ' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)');
 		END IF;
-​
+
 		-- Manage filters from ids (only mincut)
 		IF v_selector = 'selector_mincut_result' THEN
 			v_selector_list = replace(replace(v_selector_list, '[', '('), ']', ')');
@@ -148,9 +148,9 @@ BEGIN
 			SELECT '||quote_ident(v_table_id)||', concat(' || v_label || ') AS label, '||v_orderby||' as orderby , '||v_name||' as name, '|| v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 			FROM '|| v_table ||' WHERE ' || v_table_id || ' NOT IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '||
 			 v_fullfilter ||' ORDER BY orderby ) a';
-​
+
+
 		raise notice 'v_finalquery %', v_finalquery;
-​
 		EXECUTE  v_finalquery INTO v_formTabsAux;
 
 		-- Add tab name to json
