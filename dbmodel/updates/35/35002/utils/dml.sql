@@ -257,5 +257,9 @@ WHERE dv_querytext ilike '%sys_role_id%';
 UPDATE config_form_tableview SET columnindex = columnindex - 1;
 ALTER TABLE config_form_tableview RENAME COLUMN status TO visible;
 
- --UPDATE config_toolbox SET functionparams = '{"featureType":["arc"], "selectionType":"selected"}' WHERE id = 2496;
- UPDATE config_toolbox SET functionparams = '{"featureType":["arc"], "selectionType":"all"}' WHERE id = 2496;
+--UPDATE config_toolbox SET functionparams = '{"featureType":["arc"], "selectionType":"selected"}' WHERE id = 2496;
+UPDATE config_toolbox SET functionparams = '{"featureType":["arc"], "selectionType":"all"}' WHERE id = 2496;
+
+-- update querytext for value_verified to enable translation
+UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_verified'''
+WHERE columnname  = 'verified'
