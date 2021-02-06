@@ -6,13 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2304
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut( element_id_arg character varying, type_element_arg character varying, result_id_arg integer)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_mincut(character varying, character varying, integer,  boolean)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_mincut( element_id_arg character varying, type_element_arg character varying, result_id_arg integer, p_usepsectors boolean)
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 INSERT INTO SCHEMA_NAME.om_mincut VALUES (-1);
-SELECT SCHEMA_NAME.gw_fct_mincut('134706', 'arc', -1)
+SELECT SCHEMA_NAME.gw_fct_mincut('134706', 'arc', -1, false)
 
 --fid: 199
 
@@ -117,11 +118,11 @@ BEGIN
 	SELECT 199, (array_agg(state_id)) FROM selector_state WHERE cur_user=current_user;
 
 	-- save & reset psector selector
-	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
-		DELETE FROM selector_psector WHERE cur_user = current_user;
+	IF p_usepsectors IS FALSE AND 'role_master' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
 		DELETE FROM temp_table WHERE fid=287 AND cur_user=current_user;
 		INSERT INTO temp_table (fid, text_column)  
 		SELECT 287, (array_agg(psector_id)) FROM selector_psector WHERE cur_user=current_user;
+		DELETE FROM selector_psector WHERE cur_user = current_user;
 	END IF;
 	
 	-- set state selector

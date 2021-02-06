@@ -19,6 +19,7 @@ v_flag boolean = false;
 v_node_id character varying;
 v_result_id integer;
 v_error_context text;
+v_usepsectors boolean;
 
 BEGIN 
 	-- set search_path
@@ -26,7 +27,8 @@ BEGIN
 
 	-- get input parameters
 	v_node_id := (p_data ->>'data')::json->>'nodeId';
-	v_result_id := ((p_data ->>'data')::json->>'mincutId')::integer;	
+	v_result_id := ((p_data ->>'data')::json->>'mincutId')::integer;
+	v_usepsectors := ((p_data ->>'data')::json->>'usePsectors')::integer;
 
 	SELECT anl_feature_id INTO feature_id_aux FROM om_mincut WHERE id=v_result_id;
 	SELECT anl_feature_type INTO feature_type_aux FROM om_mincut WHERE id=v_result_id;
@@ -49,7 +51,7 @@ BEGIN
 	RAISE NOTICE 'TEST 10';
 	
 	-- Recalculate the mincut
-	PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, v_result_id);
+	PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, v_result_id, v_usepsectors);
 	
 	-- In case of variable om_mincut_valvestatus_unaccess on TRUE and valve closed status on TRUE)
 	IF v_flag IS TRUE THEN

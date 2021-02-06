@@ -13,13 +13,13 @@ $BODY$
 
 /*
 -- Button networkMincut on mincut dialog
-SELECT gw_fct_setmincut('{"data":{"action":"mincutNetwork", "arcId":"2001", "mincutId":"3"}}');
+SELECT gw_fct_setmincut('{"data":{"action":"mincutNetwork", "arcId":"2001", "mincutId":"3", "usePsectors":false}}');
 
 -- Button valveUnaccess on mincut dialog
-SELECT gw_fct_setmincut('{"data":{"action":"mincutValveUnaccess", "nodeId":1001, "mincutId":"3"}}');
+SELECT gw_fct_setmincut('{"data":{"action":"mincutValveUnaccess", "nodeId":1001, "mincutId":"3", "usePsectors":false}}');
 
 -- Button Accept on mincut dialog
-SELECT gw_fct_setmincut('{"data":{"action":"mincutAccept", "mincutClass":1, "mincutId":"3", "status":"check"}}');
+SELECT gw_fct_setmincut('{"data":{"action":"mincutAccept", "mincutClass":1, "mincutId":"3", "status":"check", "usePsectors":false}}');
 
 -- Button Accept on mincut conflict dialog
 SELECT gw_fct_setmincut('{"data":{"action":"mincutAccept", "mincutClass":1, "mincutId":"3", "status":"continue"}}');
@@ -46,6 +46,7 @@ v_action text;
 v_mincut_class integer;
 v_version text;
 v_error_context text;
+v_usepsectors boolean;
 
 BEGIN
 
@@ -62,10 +63,11 @@ BEGIN
 	v_mincut_class := ((p_data ->>'data')::json->>'mincutClass')::integer;
 	v_node := ((p_data ->>'data')::json->>'nodeId')::integer;
 	v_arc := ((p_data ->>'data')::json->>'arcId')::integer;
+	v_usepsectors := ((p_data ->>'data')::json->>'usePsectors')::integer;
 	
 	IF v_action = 'mincutNetwork' THEN
 
-		RETURN gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut);
+		RETURN gw_fct_mincut(v_arc::text, 'arc'::text, v_mincut, v_usepsectors);
 		
 	ELSIF v_action = 'mincutValveUnaccess' THEN
 
