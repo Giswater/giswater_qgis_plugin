@@ -1014,7 +1014,9 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
         widget.setText(field['value'])
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     function_name = 'no_function_associated'
-    real_name = widget.objectName()[5:len(widget.objectName())]
+    real_name = widget.objectName()
+    if 'data_' in widget.objectName():
+        real_name = widget.objectName()[5:len(widget.objectName())]
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             function_name = field['widgetfunction']
@@ -1144,7 +1146,9 @@ def add_hyperlink(field):
     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     func_name = 'no_function_associated'
-    real_name = widget.objectName()[5:len(widget.objectName())]
+    real_name = widget.objectName()
+    if 'data_' in widget.objectName():
+        real_name = widget.objectName()[5:len(widget.objectName())]
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             func_name = field['widgetfunction']
@@ -1273,7 +1277,9 @@ def add_tableview(complet_result, field, module=sys.modules[__name__]):
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
     function_name = 'no_function_asociated'
-    real_name = widget.objectName()[5:len(widget.objectName())]
+    real_name = widget.objectName()
+    if 'data_' in widget.objectName():
+        real_name = widget.objectName()[5:len(widget.objectName())]
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             function_name = f"_{field['widgetfunction']}"
