@@ -263,3 +263,7 @@ UPDATE config_toolbox SET functionparams = '{"featureType":["arc"], "selectionTy
 -- update querytext for value_verified to enable translation
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_verified'''
 WHERE columnname  = 'verified'
+
+
+-- 2021/08/02
+DELETE FROM config_toolbox WHERE id = 2784;
