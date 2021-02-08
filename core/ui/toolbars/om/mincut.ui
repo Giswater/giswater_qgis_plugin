@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>376</width>
-    <height>647</height>
+    <height>768</height>
    </rect>
   </property>
   <property name="font">
@@ -32,7 +32,7 @@
          <x>0</x>
          <y>0</y>
          <width>356</width>
-         <height>546</height>
+         <height>658</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_5">
@@ -545,6 +545,13 @@
                 </spacer>
                </item>
               </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="chk_use_planified">
+              <property name="text">
+               <string>Use planified network</string>
+              </property>
              </widget>
             </item>
            </layout>
