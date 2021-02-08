@@ -47,6 +47,13 @@
      </item>
      <item>
       <widget class="QPushButton" name="btn_cancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_close">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -54,7 +61,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Cancel</string>
+        <string>Close</string>
        </property>
       </widget>
      </item>
@@ -411,8 +418,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>571</width>
-            <height>489</height>
+            <width>98</width>
+            <height>89</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_6">

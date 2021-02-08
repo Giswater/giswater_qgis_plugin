@@ -137,6 +137,7 @@ class GwGo2EpaButton(GwAction):
 
         # Set signals
         self._set_signals()
+        self.dlg_go2epa.btn_cancel.setEnabled(False)
 
         if self.project_type == 'ws':
             tableleft = "cat_dscenario"
@@ -160,19 +161,19 @@ class GwGo2EpaButton(GwAction):
         if global_vars.session_vars['dialog_docker']:
             tools_qt.manage_translation('go2epa', self.dlg_go2epa)
             tools_gw.docker_dialog(self.dlg_go2epa)
-            self.dlg_go2epa.btn_cancel.clicked.disconnect()
-            self.dlg_go2epa.btn_cancel.clicked.connect(tools_gw.close_docker)
+            self.dlg_go2epa.btn_close.clicked.disconnect()
+            self.dlg_go2epa.btn_close.clicked.connect(tools_gw.close_docker)
         else:
             tools_gw.open_dialog(self.dlg_go2epa, dlg_name='go2epa')
 
 
     def _set_signals(self):
-
+        self.dlg_go2epa.btn_cancel.clicked.connect(self._cancel_task)
         self.dlg_go2epa.txt_result_name.textChanged.connect(partial(self.check_result_id))
         self.dlg_go2epa.btn_file_inp.clicked.connect(self._go2epa_select_file_inp)
         self.dlg_go2epa.btn_file_rpt.clicked.connect(self._go2epa_select_file_rpt)
         self.dlg_go2epa.btn_accept.clicked.connect(self._go2epa_accept)
-        self.dlg_go2epa.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa))
+        self.dlg_go2epa.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.rejected.connect(partial(tools_gw.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.btn_options.clicked.connect(self._epa_options)
 
@@ -492,11 +493,19 @@ class GwGo2EpaButton(GwAction):
                 tools_qt.show_info_box(msg)
                 return
 
+
+        self.dlg_go2epa.btn_cancel.setEnabled(True)
+
         # Set background task 'Go2Epa'
         description = f"Go2Epa"
         self.go2epa_task = GwEpaFileManager(description, self)
         QgsApplication.taskManager().addTask(self.go2epa_task)
         QgsApplication.taskManager().triggerTask(self.go2epa_task)
+
+
+    def _cancel_task(self):
+        if hasattr(self, 'go2epa_task'):
+            self.go2epa_task.cancel()
 
 
     def _set_completer_result(self, widget, viewname, field_name):
@@ -712,7 +721,7 @@ class GwGo2EpaButton(GwAction):
         # Event on change from combo parent
         self._get_event_combo_parent(json_result)
         self.dlg_go2epa_options.btn_accept.clicked.connect(partial(self._update_values, self.epa_options_list))
-        self.dlg_go2epa_options.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_options))
+        self.dlg_go2epa_options.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_options))
 
         tools_gw.open_dialog(self.dlg_go2epa_options, dlg_name='go2epa_options')
 
