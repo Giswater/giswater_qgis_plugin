@@ -907,28 +907,13 @@
    <addaction name="actionAddHydrometer"/>
    <addaction name="actionComposer"/>
   </widget>
-  <action name="actionConfig">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/99.png</normaloff>../icons/99.png</iconset>
-   </property>
-   <property name="text">
-    <string>Config</string>
-   </property>
-   <property name="iconText">
-    <string>Config</string>
-   </property>
-  </action>
   <action name="actionMincut">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../icons/126.png</normaloff>../icons/126.png</iconset>
+     <normaloff>../../../../icons/dialogs/20x20/126.png</normaloff>../../../../icons/dialogs/20x20/126.png</iconset>
    </property>
    <property name="text">
     <string>Automatic Mincut</string>
@@ -946,7 +931,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../icons/123.png</normaloff>../icons/123.png</iconset>
+     <normaloff>../../../../icons/dialogs/20x20/123.png</normaloff>../../../../icons/dialogs/20x20/123.png</iconset>
    </property>
    <property name="text">
     <string>Custom Mincut</string>
@@ -961,7 +946,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../icons/121.png</normaloff>../icons/121.png</iconset>
+     <normaloff>../../../../icons/dialogs/20x20/121.png</normaloff>../../../../icons/dialogs/20x20/121.png</iconset>
    </property>
    <property name="text">
     <string>Connec</string>
@@ -973,7 +958,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../icons/122.png</normaloff>../icons/122.png</iconset>
+     <normaloff>../../../../icons/dialogs/20x20/122.png</normaloff>../../../../icons/dialogs/20x20/122.png</iconset>
    </property>
    <property name="text">
     <string>Hydrometer</string>
@@ -985,7 +970,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../icons/181.png</normaloff>../icons/181.png</iconset>
+     <normaloff>../../../../icons/dialogs/20x20/181.png</normaloff>../../../../icons/dialogs/20x20/181.png</iconset>
    </property>
    <property name="text">
     <string>Composer</string>

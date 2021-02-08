@@ -20,7 +20,6 @@ from .mincut_tools import GwMincutTools
 from .search import GwSearch
 from ..threads.auto_mincut_execute import GwAutoMincutTask
 from ..utils import tools_gw
-from ..utils.select_manager import GwSelectManager
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwDialogTextUi, GwMincutUi, GwMincutComposerUi, GwMincutConnecUi, GwMincutEndUi, \
     GwMincutHydrometerUi
@@ -338,27 +337,22 @@ class GwMincut:
         # Toolbar actions
         action = self.dlg_mincut.findChild(QAction, "actionMincut")
         action.triggered.connect(self._auto_mincut)
-        tools_gw.add_icon(action, "126")
         self.action_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionCustomMincut")
         action.triggered.connect(partial(self._custom_mincut, action))
-        tools_gw.add_icon(action, "123")
         self.action_custom_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionAddConnec")
         action.triggered.connect(self._add_connec)
-        tools_gw.add_icon(action, "121")
         self.action_add_connec = action
 
         action = self.dlg_mincut.findChild(QAction, "actionAddHydrometer")
         action.triggered.connect(self._add_hydrometer)
-        tools_gw.add_icon(action, "122")
         self.action_add_hydrometer = action
 
         action = self.dlg_mincut.findChild(QAction, "actionComposer")
         action.triggered.connect(self._mincut_composer)
-        tools_gw.add_icon(action, "181")
         self.action_mincut_composer = action
 
         # Set shortcut keys
@@ -1728,6 +1722,7 @@ class GwMincut:
 
 
     def _mincut_task_finished(self, snapped_point, elem_type, element_id, signal):
+
         if not signal[0]:
             return False
         elif signal[1]:
@@ -1790,6 +1785,7 @@ class GwMincut:
 
     def _custom_mincut(self, action, is_checked):
         """ B2-123: Custom mincut analysis. Working just with valve layer """
+
         if is_checked is False:
             # Disconnect snapping and related signals
             tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
