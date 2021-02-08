@@ -145,8 +145,11 @@ class GwToolBoxTask(GwTask):
 
 
     def finished(self, result):
+
+
         self.dialog.btn_cancel.setEnabled(False)
         self.dialog.progressBar.setVisible(False)
+        if self.isCanceled(): return
         if result is False and self.exception is not None:
             msg = f"<b>Key: </b>{self.exception}<br>"
             msg += f"<b>key container: </b>'body/data/ <br>"

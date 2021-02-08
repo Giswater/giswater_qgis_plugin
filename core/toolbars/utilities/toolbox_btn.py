@@ -157,6 +157,7 @@ class GwToolBoxButton(GwAction):
         self.dlg_functions.progressBar.setVisible(False)
         self.dlg_functions.btn_cancel.setEnabled(False)
 
+        self.dlg_functions.btn_cancel.clicked.connect(self._cancel_task)
         self.dlg_functions.cmb_layers.currentIndexChanged.connect(partial(self.set_selected_layer, self.dlg_functions,
                                                                           self.dlg_functions.cmb_layers))
         self.dlg_functions.rbt_previous.toggled.connect(partial(self._rbt_state, self.dlg_functions.rbt_previous))
@@ -181,7 +182,7 @@ class GwToolBoxButton(GwAction):
                                                            self.dlg_functions.cmb_layers, json_result['body']['data']))
         self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
-        self.dlg_functions.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
+
         tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
 
 
@@ -252,8 +253,6 @@ class GwToolBoxButton(GwAction):
         self.toolbox_task = GwToolBoxTask(self, description, dialog, combo, result)
         QgsApplication.taskManager().addTask(self.toolbox_task)
         QgsApplication.taskManager().triggerTask(self.toolbox_task)
-
-        dialog.btn_cancel.clicked.connect(self._cancel_task)
 
 
     def _populate_functions_dlg(self, dialog, result, module=tools_backend_calls):
