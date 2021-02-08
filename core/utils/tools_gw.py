@@ -870,6 +870,9 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
         return
 
     for field in row[pos][field_id]:
+
+        check_parameters(field)
+
         if field['label']:
             lbl = QLabel()
             lbl.setObjectName('lbl' + field['widgetname'])
@@ -879,7 +882,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
             if 'tooltip' in field:
                 lbl.setToolTip(field['tooltip'])
 
-            widget = None
+
             if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                 widget = QLineEdit()
                 if 'isMandatory' in field:
@@ -914,8 +917,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 if 'value' in field and field['value'] not in ('', None, 'null'):
                     date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
                 widget.setDate(date)
-                widget.dateChanged.connect(partial(get_dialog_changed_values,
-                                           dialog, None, widget, field, _json))
+                widget.dateChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'spinbox':
                 widget = QDoubleSpinBox()
@@ -924,8 +926,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 if 'value' in field and field['value'] not in (None, ""):
                     value = float(str(field['value']))
                     widget.setValue(value)
-                widget.valueChanged.connect(partial(get_dialog_changed_values,
-                                            dialog, None, widget, field, _json))
+                widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'button':
                 widget = add_button(dialog, field, temp_layers_added, module)
@@ -949,6 +950,28 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 widget.setEnabled(bool(field['iseditable']))
 
             add_widget(dialog, field, lbl, widget)
+
+
+def check_parameters(field):
+    """ Check that all the parameters necessary to mount the form are correct """
+
+    msg = ""
+    if 'widgettype' not in field:
+        msg += "widgettype not found. "
+
+    if 'widgetname' not in field:
+        msg += "widgetname not found. "
+
+    if 'widgettype' in field and field['widgettype'] not in ('text', 'linetext', 'combo', 'check', 'datetime',
+                                                             'spinbox', 'button'):
+        msg += "widgettype is wrongly configured. Needs to be in " \
+               "('text', 'linetext', 'combo', 'check', 'datetime', 'spinbox', 'button')"
+
+    if 'layoutorder' not in field:
+        msg += "layoutorder not found. "
+
+    if msg != "":
+        tools_qgis.show_warning(msg)
 
 
 def add_widget(dialog, field, lbl, widget):
