@@ -63,7 +63,7 @@ BEGIN
 	v_mincut_class := ((p_data ->>'data')::json->>'mincutClass')::integer;
 	v_node := ((p_data ->>'data')::json->>'nodeId')::integer;
 	v_arc := ((p_data ->>'data')::json->>'arcId')::integer;
-	v_usepsectors := ((p_data ->>'data')::json->>'usePsectors')::integer;
+	v_usepsectors := ((p_data ->>'data')::json->>'usePsectors')::boolean;
 	
 	IF v_action = 'mincutNetwork' THEN
 
