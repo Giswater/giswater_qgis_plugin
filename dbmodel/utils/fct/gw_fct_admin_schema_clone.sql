@@ -190,7 +190,9 @@ BEGIN
 		EXECUTE 'select * from pg_get_functiondef('''||v_source_schema||'.'|| rec_fct.routine_name||'''::regproc)'
 		INTO v_fct_definition;
 		v_fct_definition = REPLACE (v_fct_definition,concat(v_source_schema,'.'), concat(v_dest_schema,'.'));
-		
+		v_fct_definition = REPLACE (v_fct_definition,concat('"',v_source_schema,'"'), concat('"',v_dest_schema,'"'));
+		v_fct_definition = REPLACE (v_fct_definition,concat('''',v_source_schema,''''), concat('''',v_dest_schema,''''));
+
 		IF v_fct_definition ~* v_software THEN
 		v_fct_definition = REPLACE (v_fct_definition,v_software, 'project_type');
 		END IF; 
