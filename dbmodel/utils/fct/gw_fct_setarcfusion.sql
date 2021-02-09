@@ -216,27 +216,39 @@ BEGIN
 		    IF v_state_node = 1 THEN
 
 			-- update elements
-			SELECT count(id) INTO v_count FROM element_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			SELECT count(distinct element_id) INTO v_count FROM element_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 			IF v_count > 0 THEN
-				UPDATE element_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+				INSERT INTO element_x_arc (element_id, arc_id) 
+				SELECT DISTINCT ON (element_id) element_id, v_new_record.arc_id 
+				FROM element_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+
+				DELETE FROM element_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
 				VALUES (214, 1, concat('Copy ',v_count,' elements from old arcs to new one.'));
 			END IF;
 
 			-- update documents
-			SELECT count(id) INTO v_count FROM doc_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			SELECT count(distinct doc_id) INTO v_count FROM doc_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 			IF v_count > 0 THEN
-				UPDATE doc_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+				INSERT INTO doc_x_arc (doc_id, arc_id) 
+				SELECT DISTINCT ON (doc_id) doc_id, v_new_record.arc_id 
+				FROM doc_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+
+				DELETE FROM doc_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
 				VALUES (214, 1, concat('Copy ',v_count,' documents from old arcs to new one.'));
 			END IF;
 
 			-- update visits
-			SELECT count(id) INTO v_count FROM om_visit_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			SELECT count(distinct visit_id) INTO v_count FROM om_visit_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 			IF v_count > 0 THEN
-				UPDATE om_visit_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+				INSERT INTO om_visit_x_arc (visit_id, arc_id) 
+				SELECT DISTINCT ON (visit_id) visit_id, v_new_record.arc_id 
+				FROM om_visit_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+
+				DELETE FROM om_visit_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
 				VALUES (214, 1, concat('Copy ',v_count,' visits from old arcs to new one.'));
