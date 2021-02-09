@@ -66,7 +66,7 @@ class GwLoadProject(QObject):
 
         # Check for developers options
         comment = f'# {global_vars.project_type}_log_sql --> If True then show all get_json log, if False then does ' \
-                  f'not show any, if None then show python log_sql option'
+                  f'not show any, anything else will use the show python log_sql option'
         value = tools_gw.check_config_settings('system', 'log_sql', 'None', comment=comment)
         tools_qgis.user_parameters['log_sql'] = value
         comment = f'# {global_vars.project_type}_show_message_durations --> Integer or None, if none then show python' \
