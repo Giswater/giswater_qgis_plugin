@@ -55,6 +55,8 @@ v_orderby text;
 v_geometry text;
 v_query text;
 v_name text;
+v_pkeyfield text;
+
 
 BEGIN
 
@@ -110,7 +112,8 @@ BEGIN
 		v_name = v_tab.value::json->>'name';
 
 		-- profilactic control of v_orderby
-		IF v_orderby IS NULL THEN v_orderby = '2'; end if;
+		EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_table||''');' INTO v_pkeyfield;
+		IF v_orderby IS NULL THEN v_orderby = v_pkeyfield; end if;
 		IF v_name IS NULL THEN v_name = v_orderby; end if;
 
 		-- profilactic control of selection mode
