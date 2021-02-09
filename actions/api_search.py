@@ -469,7 +469,6 @@ class ApiSearch(ApiParent):
         #self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
         self.items_dialog = SearchWorkcat()
-        self.items_dialog.setWindowTitle(f'Workcat: {display_name}')
 
         self.set_icon(self.items_dialog.btn_doc_insert, "111")
         self.set_icon(self.items_dialog.btn_doc_delete, "112")
@@ -545,7 +544,6 @@ class ApiSearch(ApiParent):
         self.workcat_fill_table(self.items_dialog.tbl_document, table_doc, expr=expr)
         self.set_table_columns(self.items_dialog, self.items_dialog.tbl_document, table_doc)
 
-        #
         # Add data to workcat search form
         table_name = "v_ui_workcat_x_feature"
         table_name_end = "v_ui_workcat_x_feature_end"
@@ -554,6 +552,8 @@ class ApiSearch(ApiParent):
         self.fill_label_data(workcat_id, table_name_end, extension)
 
         self.open_dialog(self.items_dialog, dlg_name='search_workcat')
+        title = self.items_dialog.windowTitle()
+        self.items_dialog.setWindowTitle(f"{title} - {display_name}")
 
 
     def manage_document(self, qtable, item_id):
