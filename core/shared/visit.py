@@ -317,7 +317,15 @@ class GwVisit(QObject):
         tools_gw.open_dialog(self.dlg_visit_manager, dlg_name="lot_visitmanager")
 
 
-    def delete_files(self, qtable, visit_id, event_id):
+
+    def get_visit_dialog(self):
+        return self.dlg_add_visit
+
+
+    # region private functions
+
+
+    def _delete_files(self, qtable, visit_id, event_id):
         """ Delete rows from table om_visit_event_photo, NOT DELETE FILES FROM DISC """
 
         # Get selected rows
@@ -354,13 +362,6 @@ class GwVisit(QObject):
             self._populate_tbl_docs_x_event(event_id)
         else:
             return
-
-
-    def get_visit_dialog(self):
-        return self.dlg_add_visit
-
-
-    # region private functions
 
 
     def _zoom_box(self, box):
