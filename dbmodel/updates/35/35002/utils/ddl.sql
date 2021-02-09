@@ -104,10 +104,13 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hyd
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_feature_arc", "column":"addparam"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_feature_connec", "column":"addparam"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_table", "column":"sys_roleselect_id", "newName":"sys_roleselect"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_table", "column":"qgis_role_id", "newName":"qgis_role"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"config_visit_class", "column":"sys_role_id", "newName":"sys_role"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_addfields", "column":"field_length", "newName":"_field_length_"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_addfields", "column":"num_decimals", "newName":"_num_decimals_"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_addfields", "column":"dv_value_column", "newName":"_dv_value_column_"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_table", "column":"sys_roleselect_id"}}$$);
+
+ALTER TABLE IF EXISTS om_visit_parameter_index RENAME TO _om_visit_parameter_index_;
