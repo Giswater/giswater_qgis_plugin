@@ -76,11 +76,6 @@ BEGIN
 
 			-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
 			UPDATE connec SET label_rotation=label_rotation_aux, label_x=label_side WHERE connec_id=rec_connec.connec_id;
-
-			-- update vnode rotation
-			link_exit_id_aux=(SELECT exit_id FROM link JOIN vnode ON link.exit_id::integer=vnode.vnode_id WHERE exit_type='VNODE' AND feature_id=rec_connec.connec_id);
-
-			UPDATE vnode SET rotation=label_rotation_aux WHERE vnode_id=link_exit_id_aux;
 				
 			
 		END LOOP;
@@ -125,12 +120,7 @@ BEGIN
 			END IF;
 
 			-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
-			UPDATE gully set label_rotation=label_rotation_aux, label_x=label_side where gully_id=rec_gully.gully_id;
-
-			-- update vnode rotation
-			link_exit_id_aux=(SELECT exit_id FROM link JOIN vnode ON link.exit_id::integer=vnode.vnode_id WHERE exit_type='VNODE' AND feature_id=rec_gully.gully_id);
-
-			UPDATE vnode SET rotation=label_rotation_aux WHERE vnode_id=link_exit_id_aux;		
+			UPDATE gully set label_rotation=label_rotation_aux, label_x=label_side where gully_id=rec_gully.gully_id;	
 		
 			
 		END LOOP;
@@ -183,12 +173,7 @@ BEGIN
 			END IF;
 			
 			-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
-			UPDATE connec set label_rotation=label_rotation_aux,label_x=label_side  where connec_id=rec_connec.connec_id;
-
-			-- update vnode rotation
-			link_exit_id_aux=(SELECT exit_id FROM link JOIN vnode ON link.exit_id::integer=vnode.vnode_id WHERE exit_type='VNODE' AND feature_id=rec_connec.connec_id);
-
-			UPDATE vnode SET rotation=label_rotation_aux WHERE vnode_id=link_exit_id_aux;		
+			UPDATE connec set label_rotation=label_rotation_aux,label_x=label_side  where connec_id=rec_connec.connec_id;	
 
 		
 		END LOOP;
@@ -234,12 +219,7 @@ BEGIN
 			END IF;
 
 			-- 'label_x' is forced to 'label_rotation_aux' because it's a column which only will be used for labels. Users who use this trigger to automatic label connecs never will use label_x for other reasons
-			UPDATE GULLY set label_rotation=label_rotation_aux,label_x=label_side  where gully_id=rec_gully.gully_id;
-
-			-- update vnode rotation
-			link_exit_id_aux=(SELECT exit_id FROM link JOIN vnode ON link.exit_id::integer=vnode.vnode_id WHERE exit_type='VNODE' AND feature_id=rec_gully.gully_id);
-
-			UPDATE vnode SET rotation=label_rotation_aux WHERE vnode_id=link_exit_id_aux;				
+			UPDATE GULLY set label_rotation=label_rotation_aux,label_x=label_side  where gully_id=rec_gully.gully_id;			
 
 		
 		END LOOP;
