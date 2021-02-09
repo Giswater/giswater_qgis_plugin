@@ -374,7 +374,7 @@ class GwInfo(QObject):
 
     def _open_generic_form(self, complet_result):
 
-        tools_gw.draw_by_json(complet_result, self.rubber_band, zoom=False)
+        tools_gw.draw_by_json(complet_result, self.rubber_band)
         self.hydro_info_dlg = GwInfoGenericUi()
         tools_gw.load_settings(self.hydro_info_dlg)
         self.hydro_info_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.hydro_info_dlg))
