@@ -56,8 +56,9 @@ class GwGo2EpaButton(GwAction):
             self.dlg_go2epa.chk_only_check.setEnabled(True)
 
 
-    def multi_rows_selector(self, qtable_left, qtable_right, id_ori,
-                            tablename_des, id_des, query_left, query_right, field_id):
+    # region private functions
+    def _multi_rows_selector(self, qtable_left, qtable_right, id_ori, tablename_des, id_des, query_left, query_right,
+                             field_id):
         """
             :param qtable_left: QTableView origin
             :param qtable_right: QTableView destini
@@ -114,8 +115,6 @@ class GwGo2EpaButton(GwAction):
         self._fill_table_by_query(qtable_left, query_left)
         tools_qgis.refresh_map_canvas()
 
-
-    # region private functions
 
     def _open_go2epa(self):
 
