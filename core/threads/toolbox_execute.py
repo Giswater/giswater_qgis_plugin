@@ -11,9 +11,10 @@ from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsTask
 from qgis.gui import QgsDateTimeEdit
 
-from ..utils import tools_gw
-from ...lib import tools_log, tools_qt
 from .task import GwTask
+from ..utils import tools_gw
+from ... import global_vars
+from ...lib import tools_log, tools_qt
 
 
 class GwToolBoxTask(GwTask):
@@ -35,6 +36,7 @@ class GwToolBoxTask(GwTask):
     def run(self):
         extras = ''
         feature_field = ''
+        global_vars.session_vars['threads'].append(self)
 
         # Get function name
         function = None
@@ -125,7 +127,7 @@ class GwToolBoxTask(GwTask):
         else:
             extras += '}'
         body = tools_gw.create_body(feature=feature_field, extras=extras)
-        self.json_result = tools_gw.execute_procedure(function_name, body, log_sql=True, is_thread=True)
+        self.json_result = tools_gw.execute_procedure(function_name, body, log_sql=True)
         if self.json_result['status'] == 'Failed': return False
         if not self.json_result or self.json_result is None: return False
 
@@ -146,7 +148,7 @@ class GwToolBoxTask(GwTask):
 
     def finished(self, result):
 
-
+        global_vars.session_vars['threads'].remove(self)
         self.dialog.btn_cancel.setEnabled(False)
         self.dialog.progressBar.setVisible(False)
         if self.isCanceled(): return

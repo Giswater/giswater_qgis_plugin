@@ -10,6 +10,7 @@ from qgis.core import QgsTask
 
 from .task import GwTask
 from ..utils import tools_gw
+from ... import global_vars
 from ...lib import tools_db, tools_qt
 
 
@@ -27,7 +28,7 @@ class GwAutoMincutTask(GwTask):
 
     def run(self):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
-
+        global_vars.session_vars['threads'].append(self)
         try:
 
             real_mincut_id = tools_qt.get_text(self.mincut_class.dlg_mincut, 'result_mincut_id')
@@ -60,6 +61,7 @@ class GwAutoMincutTask(GwTask):
 
     def finished(self, result):
 
+        global_vars.session_vars['threads'].remove(self)
         if self.exception is not None:
             msg = f"<b>Key: </b>{self.exception}<br>"
             msg += f"<b>key container: </b>'body/data/ <br>"

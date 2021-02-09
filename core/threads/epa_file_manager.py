@@ -62,6 +62,7 @@ class GwEpaFileManager(GwTask):
         self.common_msg = ""
         self.function_failed = False
         self.complet_result = None
+        global_vars.session_vars['threads'].append(self)
 
         status = True
 
@@ -81,6 +82,7 @@ class GwEpaFileManager(GwTask):
 
 
     def finished(self, result):
+        global_vars.session_vars['threads'].remove(self)
         self.dlg_go2epa.btn_cancel.setEnabled(False)
         if self.isCanceled(): return
 
@@ -162,7 +164,7 @@ class GwEpaFileManager(GwTask):
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         body = self._create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', body, is_thread=True)
+        json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', body)
         self.complet_result = json_result
         if json_result is None or not json_result:
             self.function_failed = True
@@ -410,7 +412,7 @@ class GwEpaFileManager(GwTask):
             extras += f', "file": {self.json_rpt}'
         body = self._create_body(extras=extras)
         function_name = 'gw_fct_rpt2pg_main'
-        json_result = tools_gw.execute_procedure(function_name, body, is_thread=True)
+        json_result = tools_gw.execute_procedure(function_name, body)
         self.rpt_result = json_result
         if json_result is None or not json_result:
             self.function_failed = True

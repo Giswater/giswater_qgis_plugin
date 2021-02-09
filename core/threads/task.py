@@ -10,6 +10,7 @@ from time import sleep
 from qgis.PyQt.QtCore import pyqtSignal, QObject
 from qgis.core import QgsTask
 
+from ... import global_vars
 from ...lib import tools_log
 
 
@@ -27,6 +28,7 @@ class GwTask(QgsTask, QObject):
 
 
     def run(self):
+        global_vars.session_vars['threads'].append(self)
 
         tools_log.log_info(f"Started task {self.description()}")
 
@@ -49,6 +51,7 @@ class GwTask(QgsTask, QObject):
 
 
     def finished(self, result):
+        global_vars.session_vars['threads'].remove(self)
 
         if result:
             tools_log.log_info(f"Task {self.description()} completed")

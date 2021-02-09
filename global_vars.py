@@ -42,7 +42,7 @@ project_vars['project_type'] = None
 # may change value during user's session
 session_vars = {}
 session_vars['last_error'] = None
-session_vars['show_db_exception'] = None
+session_vars['threads'] = []
 session_vars['dialog_docker'] = None
 session_vars['info_docker'] = None
 session_vars['docker_type'] = None

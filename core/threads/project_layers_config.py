@@ -7,10 +7,11 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsTask
-
-from ..utils import tools_gw
-from ...lib import tools_log, tools_db, tools_qgis, tools_qt
 from .task import GwTask
+from ..utils import tools_gw
+from ... import global_vars
+from ...lib import tools_log, tools_db, tools_qgis, tools_qt
+
 
 
 class GwProjectLayersConfig(GwTask):
@@ -31,7 +32,7 @@ class GwProjectLayersConfig(GwTask):
 
 
     def run(self):
-
+        global_vars.session_vars['threads'].append(self)
         tools_log.log_info(f"Task started: {self.description()}")
 
         self.setProgress(0)
@@ -45,7 +46,7 @@ class GwProjectLayersConfig(GwTask):
 
 
     def finished(self, result):
-
+        global_vars.session_vars['threads'].remove(self)
         if result:
             tools_log.log_info(f"Task finished: {self.description()}")
             return

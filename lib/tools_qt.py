@@ -1070,6 +1070,10 @@ def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_inc
 def show_exception_message(title=None, msg="", window_title="Information about exception", pattern=None):
     """ Show exception message in dialog """
 
+    # Show dialog only if we are not in a task process
+    if len(global_vars.session_vars['threads']) > 0:
+        return
+
     dlg_text.btn_accept.setVisible(False)
     dlg_text.btn_close.clicked.connect(lambda: dlg_text.close())
     dlg_text.setWindowTitle(window_title)
@@ -1081,9 +1085,8 @@ def show_exception_message(title=None, msg="", window_title="Information about e
         pattern = "File\sname:|Function\sname:|Line\snumber:|SQL:|SQL\sfile:|Detail:|Context:|Description|Schema name"
     set_text_bold(dlg_text.txt_infolog, pattern)
 
-    # Show dialog only if we are not in a task process
-    if global_vars.session_vars['show_db_exception']:
-        dlg_text.show()
+
+    dlg_text.show()
 
 
 def manage_exception(title=None, description=None, sql=None, schema_name=None):
@@ -1115,7 +1118,7 @@ def manage_exception(title=None, description=None, sql=None, schema_name=None):
     tools_log.log_warning(msg)
 
     # Show exception message only if we are not in a task process
-    if global_vars.session_vars['show_db_exception']:
+    if len(global_vars.session_vars['threads']) == 0:
         show_exception_message(title, msg)
 
 

@@ -1475,8 +1475,8 @@ def check_config_settings(section, parameter, value, config_type="user", file_na
     return value
 
 
-def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False,
-                      log_result=False, json_loads=False, is_thread=False, rubber_band=None):
+def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False, log_result=False,
+                      json_loads=False, rubber_band=None):
     """ Manage execution database function
     :param function_name: Name of function to call (text)
     :param parameters: Parameters for function (json) or (query parameters)
@@ -1524,7 +1524,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
 
     # If failed, manage exception
     if 'status' in json_result and json_result['status'] == 'Failed':
-        manage_json_exception(json_result, sql, is_thread=is_thread)
+        manage_json_exception(json_result, sql)
         return json_result
 
     try:
@@ -1538,7 +1538,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     return json_result
 
 
-def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_increase=0, is_thread=False):
+def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_increase=0):
     """ Manage exception in JSON database queries and show information to the user """
 
     try:
@@ -1554,11 +1554,12 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
             else:
                 parameter = 'text'
                 msg = "Key on returned json from ddbb is missed"
-            if is_thread:
-                tools_log.log_info(msg, parameter=parameter)
-            elif not is_thread and global_vars.session_vars['show_db_exception']:
-                # Show exception message only if we are not in a task process
+
+            # Show exception message only if we are not in a task process
+            if len(global_vars.session_vars['threads']) == 0:
                 tools_qgis.show_message(msg, level, parameter=parameter)
+            else:
+                tools_log.log_info(msg, parameter=parameter)
 
         else:
 
@@ -1585,7 +1586,7 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
 
             tools_log.log_warning(msg, stack_level_increase=2)
             # Show exception message only if we are not in a task process
-            if global_vars.session_vars['show_db_exception']:
+            if len(global_vars.session_vars['threads']) == 0:
                 tools_qt.show_exception_message(title, msg)
 
     except Exception:

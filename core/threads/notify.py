@@ -125,6 +125,7 @@ class GwNotify:
             def show_message(self, **kwargs)
 
         """
+        global_vars.session_vars['threads'].append(self)
 
         for function in complet_result['functionAction']['functions']:
             function_name = function['name']
@@ -134,5 +135,6 @@ class GwNotify:
             except AttributeError as e:
                 # If function_name not exist as python function
                 tools_log.log_warning(f"Exception error: {e}")
+        global_vars.session_vars['threads'].remove(self)
 
     #endregion

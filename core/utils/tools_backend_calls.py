@@ -56,7 +56,7 @@ def refresh_attribute_table(**kwargs):
         feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
         extras = f'"infoType":"{qgis_project_infotype}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_getinfofromid', body, is_thread=True)
+        result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
         if not result:
             continue
         for field in result['body']['data']['fields']:
