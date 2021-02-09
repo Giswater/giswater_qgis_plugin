@@ -267,3 +267,4 @@ WHERE columnname  = 'verified';
 
 -- 2021/08/02
 DELETE FROM config_toolbox WHERE id = 2784;
+DELETE FROM sys_table WHERE id ='om_visit_parameter_index';
