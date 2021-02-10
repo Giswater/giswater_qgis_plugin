@@ -2221,79 +2221,11 @@ class GwInfo(QObject):
         if message:
             tools_qgis.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_relations, table_relations)
-        self.tbl_relations.doubleClicked.connect(partial(self._open_relation, str(self.field_id)))
+        self.tbl_relations.doubleClicked.connect(partial(self._open_selected_feature, self.tbl_relations))
 
 
-    def _open_relation(self, field_id):
-        """ Open feature form of selected element """
-
-        selected_list = self.tbl_relations.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
-            return
-
-        row = selected_list[0].row()
-
-        # Get object_id from selected row
-        field_object_id = "parent_id"
-        if field_id == "arc_id":
-            field_object_id = "feature_id"
-        selected_object_id = self.tbl_relations.model().record(row).value(field_object_id)
-        sys_type = self.tbl_relations.model().record(row).value("sys_type")
-        sql = (f"SELECT feature_type FROM cat_feature "
-               f"WHERE system_id = '{sys_type}'")
-        sys_type = tools_db.get_row(sql)
-        table_name = self.tbl_relations.model().record(row).value("sys_table_id")
-        feature_id = self.tbl_relations.model().record(row).value("sys_id")
-
-        if table_name is None:
-            table_name = 'v_edit_' + sys_type[0].lower()
-
-        if feature_id is None:
-            feature_id = selected_object_id
-
-        layer = tools_qgis.get_layer_by_tablename(table_name, log_info=True)
-
-        if not layer:
-            message = "Layer not found"
-            tools_qgis.show_message(message, parameter=table_name)
-            return
-
-        info_feature = GwInfo(self.tab_type)
-        complet_result, dialog = info_feature.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
-        if not complet_result:
-            tools_log.log_info("FAIL open_relation")
-            return
-
-        margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        tools_gw.draw_by_json(complet_result, self.rubber_band, margin)
-
-
-    """ FUNCTIONS RELATED WITH TAB CONNECTIONS """
-
-    def _fill_tab_connections(self):
-        """ Fill tab 'Connections' """
-
-        filter_ = f"node_id='{self.feature_id}'"
-        table_name = f"{self.schema_name}.v_ui_node_x_connection_upstream"
-        message = tools_qt.fill_table(self.dlg_cf.tbl_upstream, table_name, filter_)
-        if message:
-            tools_qgis.show_warning(message)
-        tools_gw.set_tablemodel_config(self.dlg_cf, self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
-
-        table_name = f"{self.schema_name}.v_ui_node_x_connection_downstream"
-        message = tools_qt.fill_table(self.dlg_cf.tbl_downstream, table_name, filter_)
-        if message:
-            tools_qgis.show_warning(message)
-        tools_gw.set_tablemodel_config(self.dlg_cf, self.dlg_cf.tbl_downstream, "v_ui_node_x_connection_downstream")
-
-        self.dlg_cf.tbl_upstream.doubleClicked.connect(partial(self._open_up_down_stream, self.tbl_upstream))
-        self.dlg_cf.tbl_downstream.doubleClicked.connect(partial(self._open_up_down_stream, self.tbl_downstream))
-
-
-    def _open_up_down_stream(self, qtable):
-        """ Open selected node from @qtable """
+    def _open_selected_feature(self, qtable):
+        """ Open selected feature from @qtable """
 
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -2312,6 +2244,29 @@ class GwInfo(QObject):
 
         margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
         tools_gw.draw_by_json(complet_result, self.rubber_band, margin)
+
+
+    """ FUNCTIONS RELATED WITH TAB CONNECTIONS """
+
+
+    def _fill_tab_connections(self):
+        """ Fill tab 'Connections' """
+
+        filter_ = f"node_id='{self.feature_id}'"
+        table_name = f"{self.schema_name}.v_ui_node_x_connection_upstream"
+        message = tools_qt.fill_table(self.dlg_cf.tbl_upstream, table_name, filter_)
+        if message:
+            tools_qgis.show_warning(message)
+        tools_gw.set_tablemodel_config(self.dlg_cf, self.dlg_cf.tbl_upstream, "v_ui_node_x_connection_upstream")
+
+        table_name = f"{self.schema_name}.v_ui_node_x_connection_downstream"
+        message = tools_qt.fill_table(self.dlg_cf.tbl_downstream, table_name, filter_)
+        if message:
+            tools_qgis.show_warning(message)
+        tools_gw.set_tablemodel_config(self.dlg_cf, self.dlg_cf.tbl_downstream, "v_ui_node_x_connection_downstream")
+
+        self.dlg_cf.tbl_upstream.doubleClicked.connect(partial(self._open_selected_feature, self.tbl_upstream))
+        self.dlg_cf.tbl_downstream.doubleClicked.connect(partial(self._open_selected_feature, self.tbl_downstream))
 
 
     """ FUNCTIONS RELATED WITH TAB HYDROMETER"""
