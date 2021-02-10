@@ -149,7 +149,8 @@ class GwToolBoxTask(GwTask):
     def finished(self, result):
 
         global_vars.session_vars['threads'].remove(self)
-        self.dialog.btn_cancel.setEnabled(False)
+        self.dialog.btn_cancel.hide()
+        self.dialog.btn_close.show()
         self.dialog.progressBar.setVisible(False)
         if self.isCanceled(): return
         if result is False and self.exception is not None:

@@ -155,7 +155,8 @@ class GwToolBoxButton(GwAction):
         self.dlg_functions = GwToolboxManagerUi()
         tools_gw.load_settings(self.dlg_functions)
         self.dlg_functions.progressBar.setVisible(False)
-        self.dlg_functions.btn_cancel.setEnabled(False)
+        self.dlg_functions.btn_cancel.hide()
+        self.dlg_functions.btn_close.show()
 
         self.dlg_functions.btn_cancel.clicked.connect(self._cancel_task)
         self.dlg_functions.cmb_layers.currentIndexChanged.connect(partial(self.set_selected_layer, self.dlg_functions,
@@ -241,7 +242,8 @@ class GwToolBoxButton(GwAction):
 
 
     def _execute_function(self, dialog, combo, result):
-        dialog.btn_cancel.setEnabled(True)
+        self.dlg_functions.btn_cancel.show()
+        self.dlg_functions.btn_close.hide()
         dialog.progressBar.setRange(0, 0)
         dialog.progressBar.setVisible(True)
         dialog.progressBar.setStyleSheet("QProgressBar {border: 0px solid #000000; border-radius: 5px; "
