@@ -161,6 +161,7 @@ class GwAdminButton:
                 if result:
                     self.project_epsg = '25831'
                     self.locale = 'en_EN'
+                    project_locale = 'en_EN'
                     tools_qt.set_widget_text(self.dlg_readsql_create_project, 'srid_id', self.project_epsg)
                     tools_qt.set_widget_text(self.dlg_readsql_create_project, 'cmb_locale', self.locale)
                 else:
