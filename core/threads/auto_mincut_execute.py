@@ -29,6 +29,9 @@ class GwAutoMincutTask(GwTask):
     def run(self):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
         global_vars.session_vars['threads'].append(self)
+        self.mincut_class.dlg_mincut.btn_cancel_task.show()
+        self.mincut_class.dlg_mincut.btn_cancel.hide()
+
         try:
 
             real_mincut_id = tools_qt.get_text(self.mincut_class.dlg_mincut, 'result_mincut_id')
@@ -51,7 +54,9 @@ class GwAutoMincutTask(GwTask):
             extras = (f'"action":"mincutNetwork", "mincutId":"{real_mincut_id}", "arcId":"{self.element_id}", '
                       f'"usePsectors":"{use_planified}"')
             body = tools_gw.create_body(extras=extras)
+
             self.complet_result = tools_gw.execute_procedure('gw_fct_setmincut', body)
+            if self.isCanceled(): return False
             return True
 
         except KeyError as e:
@@ -60,8 +65,11 @@ class GwAutoMincutTask(GwTask):
 
 
     def finished(self, result):
-
+        self.mincut_class.dlg_mincut.btn_cancel_task.hide()
+        self.mincut_class.dlg_mincut.btn_cancel.show()
         global_vars.session_vars['threads'].remove(self)
+        
+        # Handle exception
         if self.exception is not None:
             msg = f"<b>Key: </b>{self.exception}<br>"
             msg += f"<b>key container: </b>'body/data/ <br>"
@@ -69,8 +77,12 @@ class GwAutoMincutTask(GwTask):
             msg += f"<b>Python function:</b> {self.__class__.__name__} <br>"
             tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
             self.task_finished.emit([False, self.complet_result])
+
+        # Task finished but postgres function failed
         elif self.complet_result in (False, None) or ('status' in self.complet_result and self.complet_result['status'] == 'Failed'):
             self.task_finished.emit([False, self.complet_result])
+
+        # Task finished with Accepted result
         elif 'mincutOverlap' in self.complet_result or self.complet_result['status'] == 'Accepted':
             self.task_finished.emit([True, self.complet_result])
 

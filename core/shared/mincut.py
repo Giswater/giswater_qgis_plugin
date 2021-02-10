@@ -290,6 +290,8 @@ class GwMincut:
         self.dlg_mincut = GwMincutUi()
         tools_gw.load_settings(self.dlg_mincut)
         self.dlg_mincut.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.dlg_mincut.btn_cancel_task.hide()
+        self.dlg_mincut.btn_cancel.show()
 
         self.search = GwSearch()
         self.search.open_search(self.dlg_mincut)
@@ -509,6 +511,7 @@ class GwMincut:
 
         if global_vars.session_vars['dialog_docker']:
             self.dlg_mincut.dlg_closed.connect(tools_gw.close_docker)
+        self.dlg_mincut.btn_cancel_task.clicked.connect(self._cancel_task)
 
         self.dlg_mincut.btn_accept.clicked.connect(self._accept_save_data)
         self.dlg_mincut.btn_cancel.clicked.connect(self._mincut_close)
@@ -1693,6 +1696,13 @@ class GwMincut:
             QgsApplication.taskManager().triggerTask(self.mincut_task)
             self.mincut_task.task_finished.connect(
                 partial(self._mincut_task_finished, snapped_point, elem_type, element_id))
+
+
+    def _cancel_task(self):
+        """ Cancel GwAutoMincutTask """
+        self.action_mincut.setChecked(False)
+        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+        self.mincut_task.cancel()
 
 
     # noinspection PyUnusedLocal
