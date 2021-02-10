@@ -9,9 +9,7 @@ import json
 import os
 import random
 import re
-import subprocess
 import sys
-import xml.etree.cElementTree as et
 from collections import OrderedDict
 from functools import partial
 from time import sleep
@@ -919,53 +917,6 @@ class GwAdminButton:
                         return False
             else:
                 status = self._execute_files(self.folderLocale, True)
-                if status is False and self.dev_commit == 'FALSE':
-                    return False
-
-        elif str(project_type) in ('pl', 'tm'):
-
-            folder = self.folderSoftware + self.file_pattern_ddl
-            status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
-                return False
-
-            folder = self.folderSoftware + self.file_pattern_ddlrule
-            status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
-                return False
-
-            folder = self.folderSoftware + self.file_pattern_dml
-            status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
-                return False
-
-            folder = self.folderSoftware + self.file_pattern_fct
-            status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
-                return False
-
-            folder = self.folderSoftware + self.file_pattern_ftrg
-            status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
-                return False
-
-            folder = self.folderSoftware + self.file_pattern_tablect
-            status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
-                return False
-
-            cmb_locale = tools_qt.get_combo_value(self.dlg_readsql_create_project, self.cmb_locale, 0)
-
-            folder_i18n = self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'i18n'
-            if self._process_folder(folder_i18n + os.sep + self.locale + os.sep, '') is False:
-                if self._process_folder(folder_i18n + os.sep, 'en_EN') is False:
-                    return False
-                else:
-                    status = self._execute_files(folder_i18n + os.sep + 'en_EN', True)
-                    if status is False and self.dev_commit == 'FALSE':
-                        return False
-            else:
-                status = self._execute_files(folder_i18n + os.sep + cmb_locale + os.sep, True)
                 if status is False and self.dev_commit == 'FALSE':
                     return False
 
