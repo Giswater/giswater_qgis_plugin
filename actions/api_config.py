@@ -6,9 +6,9 @@ or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
 from qgis.gui import QgsDateTimeEdit
-from qgis.PyQt.QtCore import QDate
+from qgis.PyQt.QtCore import QDate, QStringListModel
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QSpinBox, QGroupBox, QSpacerItem, \
-    QSizePolicy, QGridLayout, QWidget, QLabel, QTextEdit, QLineEdit
+    QSizePolicy, QGridLayout, QWidget, QLabel, QTextEdit, QLineEdit, QCompleter
 
 import json
 import operator
@@ -237,11 +237,19 @@ class ApiConfig(ApiParent):
                     chk.setChecked(False)
                 chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-                if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
+                if field['widgettype'] == 'text' or field['widgettype'] == 'linetext' or field['widgettype'] == 'typeahead':
                     widget = QLineEdit()
                     widget.setText(field['value'])
                     widget.editingFinished.connect(partial(self.get_values_changed_param_user, chk, widget, field))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    if field['widgettype'] == 'typeahead':
+                        completer = QCompleter()
+                        if 'dv_querytext' in field or 'dv_querytext_filterc' in field:
+                            widget.setProperty('typeahead', True)
+                            model = QStringListModel()
+                            widget.textChanged.connect(
+                                partial(self.populate_typeahead, completer, model, field, self.dlg_config, widget))
+
                 elif field['widgettype'] == 'textarea':
                     widget = QTextEdit()
                     widget.setText(field['value'])
@@ -323,6 +331,25 @@ class ApiConfig(ApiParent):
                 elif field['layoutname'] == 'lyt_addfields':
                     self.order_widgets(field, self.addfields_form, lbl, chk, widget)
 
+
+    def populate_typeahead(self, completer, model, field, dialog, widget):
+
+        if not widget:
+            return
+
+        extras = f'"queryText":"{field["dv_querytext"]}"'
+        extras += f', "queryTextFilter":"{field["dv_querytext_filterc"]}"'
+        extras += f', "textToSearch":"{utils_giswater.getWidgetText(dialog, widget)}"'
+        body = self.create_body(extras=extras)
+        complet_list = self.controller.get_json('gw_fct_gettypeahead', body)
+
+        if not complet_list:
+            return False
+
+        list_items = []
+        for field in complet_list['body']['data']:
+            list_items.append(field['idval'])
+        self.set_completer_object_api(completer, model, widget, list_items)
 
     def construct_form_param_system(self, row, pos):
 
