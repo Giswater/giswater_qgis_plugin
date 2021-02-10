@@ -15,3 +15,6 @@ SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAM
 
 --2021/01/30
 ALTER TABLE inp_flwreg_orifice ALTER COLUMN "offset" drop NOT NULL;
+
+--2021/02/10
+ALTER TABLE plan_psector_x_gully ADD CONSTRAINT plan_psector_x_gully_unique UNIQUE(gully_id, psector_id);
