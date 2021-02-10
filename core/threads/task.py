@@ -66,6 +66,6 @@ class GwTask(QgsTask, QObject):
     def cancel(self):
         pid = global_vars.dao.conn.get_backend_pid()
         if isinstance(pid, int):
-            tools_db.execute_sql(f"SELECT pg_cancel_backend({pid})")
+            tools_db.cancel_pid(pid)
         tools_log.log_info(f"Task {self.description()} was cancelled")
         super().cancel()
