@@ -102,7 +102,7 @@ BEGIN
 	IF v_psector_vdefault IS NULL THEN
 		INSERT INTO config_param_user (parameter,value, cur_user) VALUES ('plan_psector_vdefault', v_new_psector_id, current_user);
 	ELSE 
-		UPDATE config_param_user SET value=v_new_psector_id, cur_user=current_user WHERE parameter='plan_psector_vdefault';
+		UPDATE config_param_user SET value=v_new_psector_id WHERE parameter='plan_psector_vdefault' and cur_user=current_user;
 	END IF;
 	
 	INSERT INTO audit_check_data (fid, result_id, error_message)
