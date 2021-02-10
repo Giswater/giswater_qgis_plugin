@@ -345,7 +345,7 @@ def execute_sql(sql, log_sql=False, log_error=False, commit=True, filepath=None)
 
 def cancel_pid(pid):
     """ Cancel one process by pid """
-    global_vars.dao.cancel_pid(pid)
+    return global_vars.dao.cancel_pid(pid)
 
 
 def execute_returning(sql, log_sql=False, log_error=False, commit=True):

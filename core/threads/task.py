@@ -66,6 +66,9 @@ class GwTask(QgsTask, QObject):
     def cancel(self):
         pid = global_vars.dao.conn.get_backend_pid()
         if isinstance(pid, int):
-            tools_db.cancel_pid(pid)
+            result = tools_db.cancel_pid(pid)
+            if result['last_error'] is not None:
+                tools_log.log_warning(result['last_error'])
+
         tools_log.log_info(f"Task {self.description()} was cancelled")
         super().cancel()
