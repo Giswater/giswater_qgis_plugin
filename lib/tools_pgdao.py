@@ -20,6 +20,7 @@ class GwPgDao(object):
         self.last_error = None
         self.set_search_path = None
         self.conn = None
+        self.conn_aux = None
 
 
     def init_db(self):
@@ -29,6 +30,11 @@ class GwPgDao(object):
             self.conn = psycopg2.connect(self.conn_string)
             self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
             status = True
+            
+            # Create an auxiliary connection with the intention of being able to cancel processes of the main connection
+            self.conn_aux = psycopg2.connect(self.conn_string)
+            self.cursor_aux = self.conn_aux.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
         except psycopg2.DatabaseError as e:
             self.last_error = e
             status = False
@@ -256,6 +262,11 @@ class GwPgDao(object):
             return None
         except Exception as e:
             return e
+
+
+    def cancel_pid(self, pid):
+        """ Cancel one process by pid """
+        self.cursor_aux.execute(f"SELECT pg_cancel_backend({pid})")
 
 
 def get_uri():

@@ -343,6 +343,11 @@ def execute_sql(sql, log_sql=False, log_error=False, commit=True, filepath=None)
     return True
 
 
+def cancel_pid(pid):
+    """ Cancel one process by pid """
+    global_vars.dao.cancel_pid(pid)
+
+
 def execute_returning(sql, log_sql=False, log_error=False, commit=True):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
