@@ -337,22 +337,32 @@ class GwMincut:
         # Toolbar actions
         action = self.dlg_mincut.findChild(QAction, "actionMincut")
         action.triggered.connect(self._auto_mincut)
+        tools_gw.add_icon(action, "126")
         self.action_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionCustomMincut")
         action.triggered.connect(partial(self._custom_mincut, action))
+        tools_gw.add_icon(action, "123")
         self.action_custom_mincut = action
+
+        action = self.dlg_mincut.findChild(QAction, "actionChangeValveStatus")
+        action.triggered.connect(partial(self._change_valve_status, action))
+        tools_gw.add_icon(action, "124")
+        self.action_change_valve_status = action
 
         action = self.dlg_mincut.findChild(QAction, "actionAddConnec")
         action.triggered.connect(self._add_connec)
+        tools_gw.add_icon(action, "121")
         self.action_add_connec = action
 
         action = self.dlg_mincut.findChild(QAction, "actionAddHydrometer")
         action.triggered.connect(self._add_hydrometer)
+        tools_gw.add_icon(action, "122")
         self.action_add_hydrometer = action
 
         action = self.dlg_mincut.findChild(QAction, "actionComposer")
         action.triggered.connect(self._mincut_composer)
+        tools_gw.add_icon(action, "181")
         self.action_mincut_composer = action
 
         # Set shortcut keys
@@ -1595,6 +1605,7 @@ class GwMincut:
         self.mincut_class = 1
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
+
         # Snapper
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper = self.snapper_manager.get_snapper()
@@ -1761,9 +1772,10 @@ class GwMincut:
                 tools_qgis.restore_cursor()
                 return
 
-            # Enable button CustomMincut and button Start
+            # Enable button CustomMincut, ChangeValveStatus and button Start
             self.dlg_mincut.btn_start.setDisabled(False)
             self.action_custom_mincut.setDisabled(False)
+            self.action_change_valve_status.setDisabled(False)
             self.action_mincut.setDisabled(False)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
@@ -1846,7 +1858,10 @@ class GwMincut:
                 # Get the point. Leave selection
                 snapped_feat = self.snapper_manager.get_snapped_feature(result, True)
                 element_id = snapped_feat.attribute('node_id')
-                self._custom_mincut_execute(element_id)
+                if action.objectName() == "actionCustomMincut":
+                    self._custom_mincut_execute(element_id)
+                elif action.objectName() == "actionChangeValveStatus":
+                    self._change_valve_status_execute(element_id)
                 self.snapper_manager.recover_snapping_options()
                 tools_qgis.refresh_map_canvas(True)
                 self.set_visible_mincut_layers()
@@ -2145,5 +2160,51 @@ class GwMincut:
             self.action_custom_mincut.setDisabled(True)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
+
+
+    def _change_valve_status(self, action, is_checked):
+        """ Change status of selected valve. Execute function gw_fct_setchangevalvestatus """
+
+        if is_checked is False:
+            # Disconnect snapping and related signals
+            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+            # Recover snapping options, refresh canvas & set visible layers
+            self.snapper_manager.recover_snapping_options()
+            return
+
+        # Disconnect other snapping and signals in case wrong user clicks
+        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+
+        # Store user snapping configuration
+        self.snapper_manager.store_snapping_options()
+
+        # Set vertex marker propierties
+        self.vertex_marker = self.snapper_manager.vertex_marker
+
+        # Set active and current layer
+        self.layer = tools_qgis.get_layer_by_tablename("v_om_mincut_valve")
+        self.iface.setActiveLayer(self.layer)
+        self.current_layer = self.layer
+
+        # Waiting for signals
+        self.canvas.xyCoordinates.connect(self._mouse_move_valve)
+        self.emit_point.canvasClicked.connect(partial(self._custom_mincut_snapping, action))
+
+
+    def _change_valve_status_execute(self, elem_id):
+        """ Execute function 'gw_fct_setchangevalvestatus' """
+
+        result_mincut_id = tools_qt.get_text(self.dlg_mincut, "result_mincut_id")
+        if result_mincut_id != 'null':
+            extras = f'"nodeId":{elem_id}, "mincutId":{result_mincut_id}'
+            body = tools_gw.create_body(extras=extras)
+            result = tools_gw.execute_procedure('gw_fct_setchangevalvestatus', body, log_sql=True)
+            if result['status'] == 'Accepted' and result['message']:
+                level = int(result['message']['level']) if 'level' in result['message'] else 1
+                tools_qgis.show_message(result['message']['text'], level)
+
+        # Disconnect snapping and related signals
+        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+
 
     # endregion
