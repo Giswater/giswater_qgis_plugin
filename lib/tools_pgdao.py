@@ -275,9 +275,6 @@ class GwPgDao(object):
             conn.close()
             del cursor
             del conn
-        except psycopg2.DatabaseError as e:
-            last_error = e
-            status = False
         except Exception as e:
             last_error = e
             status = False
