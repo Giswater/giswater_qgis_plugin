@@ -1869,16 +1869,10 @@ class GwAdminButton:
             if not is_test:
                 self._populate_data_schema_name(self.cmb_project_type)
                 if schema_name is not None:
-                    tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
-                    self._set_info_project()
                     proyect_type = tools_qt.get_text(self.dlg_readsql_create_project, 'cmb_create_project_type')
                     tools_qt.set_widget_text(self.dlg_readsql, 'cmb_project_type', proyect_type)
-                    self.cmb_create_project_type.currentIndexChanged.emit(self.cmb_create_project_type.currentIndex())
-                    project_name = tools_qt.get_text(self.dlg_readsql_create_project, 'project_name')
-                    tools_qt.set_widget_text(self.dlg_readsql, 'project_schema_name', project_name)
-                    self.dlg_readsql.project_schema_name.currentIndexChanged.emit(self.dlg_readsql.project_schema_name.currentIndex())
-
-
+                    tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
+                    self._set_info_project()
         else:
             global_vars.dao.rollback()
             # Reset count error variable to 0
