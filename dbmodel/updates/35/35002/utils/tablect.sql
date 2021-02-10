@@ -76,9 +76,3 @@ SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAM
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_visit_class", "oldName":"config_visit_class_sys_role_id_fkey", "newName":"config_visit_class_sys_role_fkey"}}$$);
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"sys_table", "oldName":"sys_table_qgis_role_id_fkey", "newName":"sys_table_qgis_role_fkey"}}$$);
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"sys_table", "oldName":"sys_table_sys_role_id_fkey", "newName":"sys_table_sys_role_fkey"}}$$);
-
---2021/02/10
-ALTER TABLE plan_psector_x_node ADD CONSTRAINT plan_psector_x_node_unique UNIQUE(node_id, psector_id);
-ALTER TABLE plan_psector_x_arc ADD CONSTRAINT plan_psector_x_arc_unique UNIQUE(arc_id, psector_id);
-ALTER TABLE plan_psector_x_connec ADD CONSTRAINT plan_psector_x_connec_unique UNIQUE(connec_id, psector_id);
-	
