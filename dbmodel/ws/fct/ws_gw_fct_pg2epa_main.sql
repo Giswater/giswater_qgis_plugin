@@ -187,6 +187,8 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE '13 - Try to set demands & patterns';
+
+	TRUNCATE temp_demand;
 	IF v_setdemand THEN
 		PERFORM gw_fct_pg2epa_demand(v_result);		
 	END IF;

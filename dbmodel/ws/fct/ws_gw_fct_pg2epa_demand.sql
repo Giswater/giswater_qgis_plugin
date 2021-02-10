@@ -94,20 +94,31 @@ BEGIN
 			-- pattern
 			UPDATE temp_node SET pattern_id=dma.pattern_id 
 			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE temp_node.node_id=concat('VN',pjoint_id);
-		
+
 		ELSIF v_patternmethod = 23 THEN -- CONNEC ESTIMATED (PJOINT)
+			-- demand & pattern
+			UPDATE temp_node SET demand=sum::numeric(12,8), pattern_id = c.pattern_id
+			FROM
+			(SELECT concat('VN',pjoint_id)as pjoint_id, sum(demand), pattern_id FROM inp_connec join connec using (connec_id) where pjoint_type  ='VNODE' GROUP BY pjoint_id, pattern_id)c
+			WHERE pjoint_id = node_id;
+
+		ELSIF v_patternmethod = 24 THEN -- PJOINT ESTIMATED (PJOINT)
 			-- demand & pattern			
 			DELETE FROM rpt_inp_pattern_value WHERE result_id=result_id_var;
 			INSERT INTO rpt_inp_pattern_value (
 				   result_id, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
-			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
+				   
+			SELECT result_id_var, dma_id, concat('VN',pattern_id), idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-				   FROM vi_pjointpattern JOIN vnode ON pattern_id=concat('VN',vnode_id::text) JOIN v_edit_link ON exit_id::integer = vnode_id
+				   FROM vi_pjointpattern JOIN vnode ON pattern_id=vnode_id::text JOIN v_edit_link ON exit_id::integer = vnode_id WHERE exit_type  ='VNODE'
 			UNION
-			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
+			SELECT result_id_var, node.dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-				   FROM vi_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;		
+				   FROM vi_pjointpattern JOIN node ON pattern_id=node_id
+				   JOIN v_edit_link ON exit_id = node_id 
+				   WHERE exit_type  ='NODE'
+			ORDER by 3,4;					   	
 
 			UPDATE temp_node SET demand = 1, pattern_id=node_id FROM vi_pjoint WHERE node_id = concat('VN',pjoint_id) AND pjoint_type = 'VNODE';
 			UPDATE temp_node SET demand = 1, pattern_id=node_id FROM vi_pjoint WHERE node_id = pjoint_id AND pjoint_type = 'NODE';

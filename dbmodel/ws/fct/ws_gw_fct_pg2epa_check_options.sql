@@ -80,19 +80,29 @@ BEGIN
 			v_return = '{"status":"Failed", "message":{"level":1, "text":"Pattern method is incompatible to work with demand scenarios. The process is aborted...."},"body":{"data":{}}}'; 
 		END IF;
 
-		-- check inconsistency on demand scenario: More than one connec with same link and different pattern on inp_demand table
-		IF v_patternmethod IN (21,22,23) THEN
-			v_count = (SELECT sum(count) FROM 
-			(SELECT count(*),exit_id FROM (SELECT exit_id, count(*) as times , pattern_id FROM vi_demands JOIN v_edit_link USING (feature_id) GROUP BY exit_id, pattern_id HAVING count(*) > 1 order by 1 desc) a GROUP by exit_id)b
-			WHERE count > 1);
-		
-			IF v_count > 0 THEN
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING: There are ',v_count,' vnodes with more than one connec with same link and different pattern on inp_demand table'));
-				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, 'Unselect all your demand scenarios to work with this pattern method.');
+		IF v_patternmethod IN (21,22,23,24) THEN
+
+			-- info about how many pjoints has more than one connec
+			v_count = (SELECT count(*) FROM (SELECT pjoint_id, count(pattern_id) FROM inp_connec join connec USING (connec_id) group by pjoint_id having count(pattern_id) > 1 order by 1)a);
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (v_fid, v_result_id, 1, concat('INFO: There are ',v_count,' vnodes with more than one connec'));
+
+			-- check inconsistency on inp_connec: More than one connec with same vnode and different pattern on inp_connec table
+			IF v_patternmethod = 23 THEN
+
+				v_count  = (SELECT pjoint_id, pattern_id FROM ws_sample.inp_connec join ws_sample.connec USING (connec_id) group by pjoint_id, pattern_id having count(pjoint_id) > 1 
+					    AND count(pattern_id) < count(pjoint_id) order by 1);
+
+				IF v_count > 0 THEN
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+					VALUES (v_fid, v_result_id, 3, concat('ERROR: There are ',v_count,' connec with same vnode and different pattern on inp_connec table'));
+					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+					VALUES (v_fid, v_result_id, 3, 'HINT: Look for inp_connec table and modify some pattern on connecs with same vnode in order to force same pattern_id for all connecs with same vnode.');
+				END IF;
 			END IF;
+
 		END IF;
+
 	END IF;
 
 	--  Return
