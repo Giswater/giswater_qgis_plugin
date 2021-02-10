@@ -33,16 +33,16 @@ class CreateGisProject:
         try:
             locale = QSettings().value('locale/userLocale').lower()
         except AttributeError:
-            locale = "en"
+            locale = "us"
 
         if locale == 'es_es' or locale == 'es':
             locale = 'es'
         elif locale == 'es_ca':
             locale = 'ca'
         elif locale == 'en_us':
-            locale = 'en'
+            locale = 'us'
         else:
-            locale = "en"
+            locale = "us"
 
         # Get folder with QGS templates
         gis_extension = "qgs"
@@ -52,7 +52,7 @@ class CreateGisProject:
         # If QGIS template locale folder not found, use English one
         if not os.path.exists(gis_locale_path):
             self.controller.log_info("Locale gis folder not found", parameter=gis_locale_path)
-            gis_locale_path = gis_folder + os.sep + "en"
+            gis_locale_path = gis_folder + os.sep + "us"
 
         # Check if template_path and folder_path exists
         # Set default project for type sample

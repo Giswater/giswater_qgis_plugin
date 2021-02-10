@@ -212,7 +212,7 @@ class ApiParent(ParentAction):
         elif locale == 'es_ca':
             locale = 'ca'
         elif locale == 'en_us':
-            locale = 'en'
+            locale = 'us'
         project_type = self.controller.get_project_type()
         # Get PDF file
         pdf_folder = os.path.join(self.plugin_dir, 'png')
@@ -536,6 +536,7 @@ class ApiParent(ParentAction):
         extras += f', "textToSearch":"{utils_giswater.getWidgetText(dialog, widget)}"'
         body = self.create_body(extras=extras)
         complet_list = self.controller.get_json('gw_fct_gettypeahead', body)
+
         if not complet_list:
             return False
 

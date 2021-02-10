@@ -114,11 +114,11 @@ class I18NGenerator(ParentAction):
         py_messages = self.get_rows(sql)
 
         # Get python toolbars and buttons values
-        sql = f"SELECT source, lb_en_en, {key_label} FROM i18n.pytoolbar;"
+        sql = f"SELECT source, lb_en_us, {key_label} FROM i18n.pytoolbar;"
         py_toolbars = self.get_rows(sql)
 
         # Get python dialog values
-        sql = (f"SELECT dialog_name, source, lb_en_en, {key_label}, tt_en_en, {key_tooltip} "
+        sql = (f"SELECT dialog_name, source, lb_en_us, {key_label}, tt_en_us, {key_tooltip} "
                f" FROM i18n.pydialog "
                f" ORDER BY dialog_name;")
         py_dialogs = self.get_rows(sql)
@@ -148,8 +148,8 @@ class I18NGenerator(ParentAction):
             line = f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_tlb['source']}</source>\n"
             if py_tlb[key_label] is None:
-                py_tlb[key_label] = py_tlb['lb_en_en']
-                if py_tlb['lb_en_en'] is None:
+                py_tlb[key_label] = py_tlb['lb_en_us']
+                if py_tlb['lb_en_us'] is None:
                     py_tlb[key_label] = py_tlb['source']
 
             line += f"\t\t\t<translation>{py_tlb[key_label]}</translation>\n"
@@ -198,7 +198,7 @@ class I18NGenerator(ParentAction):
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_dlg['source']}</source>\n"
             if py_dlg[key_label] is None:
-                py_dlg[key_label] = py_dlg['lb_en_en']
+                py_dlg[key_label] = py_dlg['lb_en_us']
 
             line += f"\t\t\t<translation>{py_dlg[key_label]}</translation>\n"
             line += f"\t\t</message>\n"
@@ -207,7 +207,7 @@ class I18NGenerator(ParentAction):
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>tooltip_{py_dlg['source']}</source>\n"
             if py_dlg[key_label] is None:
-                py_dlg[key_tooltip] = py_dlg['lb_en_en']
+                py_dlg[key_tooltip] = py_dlg['lb_en_us']
             line += f"\t\t\t<translation>{py_dlg[key_tooltip]}</translation>\n"
             line += f"\t\t</message>\n"
 
@@ -234,7 +234,7 @@ class I18NGenerator(ParentAction):
             if py['source'] == f'dlg_{name}':
                 title = py[key_label]
                 if not title:
-                    title = py['lb_en_en']
+                    title = py['lb_en_us']
                 return title
         return title
 
@@ -272,7 +272,7 @@ class I18NGenerator(ParentAction):
 
     def get_dbdialog_values(self):
         # Get db messages values
-        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_en, lb_{self.lower_lang}, tt_en_en, "
+        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_us, lb_{self.lower_lang}, tt_en_us, "
                f"tt_{self.lower_lang}"
                f" FROM i18n.dbdialog "
                f" ORDER BY context, formname;")
@@ -284,7 +284,7 @@ class I18NGenerator(ParentAction):
 
     def get_dbmessages_values(self):
         # Get db messages values
-        sql = (f"SELECT source, project_type, context, ms_en_en, ms_{self.lower_lang}, ht_en_en, ht_{self.lower_lang}"
+        sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}"
                f" FROM i18n.dbmessage "
                f" ORDER BY context;")
         rows = self.get_rows(sql)
@@ -322,14 +322,14 @@ class I18NGenerator(ParentAction):
             form_name = row['formname']if row['formname'] is not None else ""
             form_type = row['formtype']if row['formtype'] is not None else ""
             source = row['source']if row['source'] is not None else ""
-            lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None else row['lb_en_en']
+            lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None else row['lb_en_us']
             lbl_value = lbl_value if lbl_value is not None else ""
             if row[f'tt_{self.lower_lang}'] is not None:
                 tt_value = row[f'tt_{self.lower_lang}']
-            elif row[f'tt_en_en'] is not None:
-                tt_value = row[f'tt_en_en']
+            elif row[f'tt_en_us'] is not None:
+                tt_value = row[f'tt_en_us']
             else:
-                tt_value = row['lb_en_en']
+                tt_value = row['lb_en_us']
             tt_value = tt_value if tt_value is not None else ""
             line = f'SELECT gw_fct_admin_schema_i18n($$'
             if row['context'] in ('config_param_system', 'sys_param_user'):
@@ -382,7 +382,7 @@ class I18NGenerator(ParentAction):
         for row in rows:
             table = row['context'] if row['context'] is not None else ""
             source = row['source'] if row['source'] is not None else ""
-            ms_value = row[f'ms_{self.lower_lang}'] if row[f'ms_{self.lower_lang}'] is not None else row['ms_en_en']
+            ms_value = row[f'ms_{self.lower_lang}'] if row[f'ms_{self.lower_lang}'] is not None else row['ms_en_us']
             ht_value = ms_value if ms_value is not None else ""
 
             line = f'SELECT gw_fct_admin_schema_i18n($$'

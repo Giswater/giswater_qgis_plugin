@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="pt_BR">
+<TS version="2.0" language="es_ES">
 	<!-- TOOLBARS AND ACTIONS -->
 	<context>
 		<name>giswater</name>
@@ -10,67 +10,67 @@
 		</message>
 		<message>
 			<source>26_text</source>
-			<translation>New mincut</translation>
+			<translation>Nuevo polígono de corte</translation>
 		</message>
 		<message>
 			<source>43_text</source>
-			<translation>Profile tool</translation>
+			<translation>Herramienta de perfil</translation>
 		</message>
 		<message>
 			<source>56_text</source>
-			<translation>Flow trace</translation>
+			<translation>Rastreo de flujo</translation>
 		</message>
 		<message>
 			<source>57_text</source>
-			<translation>Flow exit</translation>
+			<translation>Salida de flujo</translation>
 		</message>
 		<message>
 			<source>27_text</source>
-			<translation>Mincut manager</translation>
+			<translation>Gestor de polígonos de corte</translation>
 		</message>
 		<message>
 			<source>65_text</source>
-			<translation>Visit manager</translation>
+			<translation>Gestor de visitas</translation>
 		</message>
 		<message>
 			<source>74_text</source>
-			<translation>Add new lot</translation>
+			<translation>Añadir nuevo lote</translation>
 		</message>
 		<message>
 			<source>75_text</source>
-			<translation>Lot manager</translation>
+			<translation>Gestor de lotes</translation>
 		</message>
 		<message>
 			<source>76_text</source>
-			<translation>Lot filter</translation>
+			<translation>Filtro de lotes</translation>
 		</message>
 		<message>
 			<source>01_text</source>
-			<translation>Insert point</translation>
+			<translation>Insertar punto</translation>
 		</message>
 		<message>
 			<source>02_text</source>
-			<translation>Insert arc</translation>
+			<translation>Insertar arco</translation>
 		</message>
 		<message>
 			<source>16_text</source>
-			<translation>Arc divide</translation>
+			<translation>Dividir arco</translation>
 		</message>
 		<message>
 			<source>17_text</source>
-			<translation>Arc fusion</translation>
+			<translation>Fusionar arco</translation>
 		</message>
 		<message>
 			<source>18_text</source>
-			<translation>Commercial connection</translation>
+			<translation>Conexión con comercial</translation>
 		</message>
 		<message>
 			<source>19_text</source>
-			<translation>Topo tools</translation>
+			<translation>Caja de herramientas</translation>
 		</message>
 		<message>
 			<source>20_text</source>
-			<translation>Connect to network</translation>
+			<translation>Conectar a la red</translation>
 		</message>
 		<message>
 			<source>toolbar_custom_name</source>
@@ -78,15 +78,15 @@
 		</message>
 		<message>
 			<source>64_text</source>
-			<translation>Add visit</translation>
+			<translation>Añadir visita</translation>
 		</message>
 		<message>
 			<source>306_text</source>
-			<translation>Load Giswater layer</translation>
+			<translation>Cargar capa Giswater</translation>
 		</message>
 		<message>
 			<source>143_text</source>
-			<translation>Search plus</translation>
+			<translation>Buscador</translation>
 		</message>
 		<message>
 			<source>menu_name</source>
@@ -102,63 +102,63 @@
 		</message>
 		<message>
 			<source>142_text</source>
-			<translation>Selectors</translation>
+			<translation>Selectores</translation>
 		</message>
 		<message>
 			<source>28_text</source>
-			<translation>Change node type</translation>
+			<translation>Cambiar el tipo de nodo</translation>
 		</message>
 		<message>
 			<source>33_text</source>
-			<translation>Add element</translation>
+			<translation>Añadir elemento</translation>
 		</message>
 		<message>
 			<source>66_text</source>
-			<translation>Document manager</translation>
+			<translation>Gestor de documentos</translation>
 		</message>
 		<message>
 			<source>67_text</source>
-			<translation>Element manager</translation>
+			<translation>Gestor de elementos</translation>
 		</message>
 		<message>
 			<source>68_text</source>
-			<translation>End feature</translation>
+			<translation>Dar de baja</translation>
 		</message>
 		<message>
 			<source>69_text</source>
-			<translation>Delete feature</translation>
+			<translation>Eliminar elemento de red</translation>
 		</message>
 		<message>
 			<source>82_text</source>
-			<translation>Psector manager</translation>
+			<translation>Gestor de sectores de planificación OM</translation>
 		</message>
 		<message>
 			<source>84_text</source>
-			<translation>Date selector</translation>
+			<translation>Selector de fecha</translation>
 		</message>
 		<message>
 			<source>34_text</source>
-			<translation>Add document</translation>
+			<translation>Añadir documento</translation>
 		</message>
 		<message>
 			<source>39_text</source>
-			<translation>Dimensioning</translation>
+			<translation>Acotaciones</translation>
 		</message>
 		<message>
 			<source>44_text</source>
-			<translation>Replace feature</translation>
+			<translation>Reemplazar objeto</translation>
 		</message>
 		<message>
 			<source>98_text</source>
-			<translation>Config editor</translation>
+			<translation>Editor de configuración</translation>
 		</message>
 		<message>
 			<source>71_text</source>
-			<translation>Create circle</translation>
+			<translation>Crear circulo</translation>
 		</message>
 		<message>
 			<source>72_text</source>
-			<translation>Create point</translation>
+			<translation>Crear punto</translation>
 		</message>
 		<message>
 			<source>23_text</source>
@@ -170,11 +170,11 @@
 		</message>
 		<message>
 			<source>25_text</source>
-			<translation>Epa result manager</translation>
+			<translation>Gestor de resultados Epa</translation>
 		</message>
 		<message>
 			<source>29_text</source>
-			<translation>Epa result selector</translation>
+			<translation>Selector de resultados Epa</translation>
 		</message>
 		<message>
 			<source>36_text</source>
@@ -182,31 +182,31 @@
 		</message>
 		<message>
 			<source>38_text</source>
-			<translation>New network cost</translation>
+			<translation>Nuevo coste de la red</translation>
 		</message>
 		<message>
 			<source>45_text</source>
-			<translation>New psector</translation>
+			<translation>Nuevo sector de planificaciones</translation>
 		</message>
 		<message>
 			<source>46_text</source>
-			<translation>Psector manager</translation>
+			<translation>Gestor de sectores de planificación</translation>
 		</message>
 		<message>
 			<source>47_text</source>
-			<translation>Psector selector</translation>
+			<translation>Selector de sectores de planificación</translation>
 		</message>
 		<message>
 			<source>50_text</source>
-			<translation>Network cost manager</translation>
+			<translation>Gestionar coste de la red</translation>
 		</message>
 		<message>
 			<source>99_text</source>
-			<translation>Config</translation>
+			<translation>Configuración</translation>
 		</message>
 		<message>
 			<source>83_text</source>
-			<translation>Import CSV</translation>
+			<translation>Importar CSV</translation>
 		</message>
 		<message>
 			<source>58_text</source>
@@ -214,39 +214,39 @@
 		</message>
 		<message>
 			<source>206_text</source>
-			<translation>Toolbox</translation>
+			<translation>Caja de herramientas</translation>
 		</message>
 		<message>
 			<source>37_text</source>
-			<translation>Identify feature</translation>
+			<translation>Identificar objeto</translation>
 		</message>
 		<message>
 			<source>81_text</source>
-			<translation>New psector</translation>
+			<translation>Nuevo sector de planificación OM</translation>
 		</message>
 		<message>
 			<source>59_text</source>
-			<translation>Check project</translation>
+			<translation>Verificar proyecto</translation>
 		</message>
 		<message>
 			<source>301_text</source>
-			<translation>Annual planner</translation>
+			<translation>Planificador anual</translation>
 		</message>
 		<message>
 			<source>302_text</source>
-			<translation>Monthly planner</translation>
+			<translation>Planificador mensual</translation>
 		</message>
 		<message>
 			<source>303_text</source>
-			<translation>Prices generator</translation>
+			<translation>Generador de precios</translation>
 		</message>
 		<message>
 			<source>304_text</source>
-			<translation>Add visit</translation>
+			<translation>Añadir visita</translation>
 		</message>
 		<message>
 			<source>309_text</source>
-			<translation>Incident manager</translation>
+			<translation>Planificador de incidencias</translation>
 		</message>
 		<message>
 			<source>toolbar_plan_name</source>
@@ -262,11 +262,11 @@
 		</message>
 		<message>
 			<source>toolbar_utilities_name</source>
-			<translation>Giswater - Utilities</translation>
+			<translation>Giswater - Utilidades</translation>
 		</message>
 		<message>
 			<source>305_text</source>
-			<translation>Unit Planner</translation>
+			<translation>Planficador unitario</translation>
 		</message>
 	</context>
 
@@ -274,751 +274,751 @@
 	<context>
 		<message>
 			<source>Any record selected</source>
-			<translation>Any record selected</translation>
+			<translation>Ningún registro seleccionado</translation>
 		</message>
 		<message>
 			<source>Warning</source>
-			<translation>Warning</translation>
+			<translation>Advertencia</translation>
 		</message>
 		<message>
 			<source>Giswater executable file not found</source>
-			<translation>Giswater executable file not found</translation>
+			<translation>No se encontró el archivo ejecutable de Giswater</translation>
 		</message>
 		<message>
 			<source>Java Runtime executable file not found</source>
-			<translation>Java Runtime executable file not found</translation>
+			<translation>No se encontró el archivo ejecutable de Java Runtime</translation>
 		</message>
 		<message>
 			<source>GSW file not found</source>
-			<translation>GSW file not found</translation>
+			<translation>Archivo GSW no encontrado</translation>
 		</message>
 		<message>
 			<source>Executing</source>
-			<translation>Executing</translation>
+			<translation>Ejecutando</translation>
 		</message>
 		<message>
 			<source>Node type has been update!</source>
-			<translation>Node type has been update!</translation>
+			<translation>¡El tipo de nodo ha sido actualizado!</translation>
 		</message>
 		<message>
 			<source>File not found</source>
-			<translation>File not found</translation>
+			<translation>Archivo no encontrado</translation>
 		</message>
 		<message>
 			<source>Valve analytics executed successfully</source>
-			<translation>Valve analytics executed successfully</translation>
+			<translation>Análisis de válvulas ejecutado con éxito</translation>
 		</message>
 		<message>
 			<source>Current layer not valid</source>
-			<translation>Current layer not valid</translation>
+			<translation>La capa actual no es válida</translation>
 		</message>
 		<message>
 			<source>Error inserting node</source>
-			<translation>Error inserting node</translation>
+			<translation>Error al insertar el nodo</translation>
 		</message>
 		<message>
 			<source>Node deleted successfully</source>
-			<translation>Node deleted successfully</translation>
+			<translation>Nodo eliminado correctamente</translation>
 		</message>
 		<message>
 			<source>Select a node or pipe and click on it, the valves minimum cut polygon is computed</source>
-			<translation>Select a node or pipe and click on it, the valves minimum cut polygon is computed</translation>
+			<translation>Seleccione un nodo o tubería y haga clic en él, se calcula el polígono de corte mínimo de las válvulas</translation>
 		</message>
 		<message>
 			<source>Select the node inside a pipe by clicking on it and it will be removed</source>
-			<translation>Select the node inside a pipe by clicking on it and it will be removed</translation>
+			<translation>Seleccione el nodo dentro de una tubería haciendo clic en él y se eliminará</translation>
 		</message>
 		<message>
 			<source>Info</source>
-			<translation>Info</translation>
+			<translation>Información</translation>
 		</message>
 		<message>
 			<source>Any table has been selected</source>
-			<translation>Any table has been selected</translation>
+			<translation>Se ha seleccionado cualquier tabla</translation>
 		</message>
 		<message>
 			<source>Cannot get giswater folder from windows registry</source>
-			<translation>Cannot get giswater folder from windows registry</translation>
+			<translation>No se puede obtener la carpeta giswater del registro de Windows</translation>
 		</message>
 		<message>
 			<source>Giswater folder not found</source>
-			<translation>Giswater folder not found</translation>
+			<translation>Carpeta Giswater no encontrada</translation>
 		</message>
 		<message>
 			<source>File path doesn't exist</source>
-			<translation>File path doesn't exist</translation>
+			<translation>La ruta del archivo no existe</translation>
 		</message>
 		<message>
 			<source>You need to insert doc_id</source>
-			<translation>You need to insert doc_id</translation>
+			<translation>Necesitas insertar doc_id</translation>
 		</message>
 		<message>
 			<source>This id already exists</source>
-			<translation>This id already exists</translation>
+			<translation>Esta identificación ya existe</translation>
 		</message>
 		<message>
 			<source>Error inserting profile table, you need to review data</source>
-			<translation>Error inserting profile table, you need to review data</translation>
+			<translation>Error al insertar la tabla de perfil, necesita revisar los datos</translation>
 		</message>
 		<message>
 			<source>Some parameters are missing for node</source>
-			<translation>Some parameters are missing for node</translation>
+			<translation>Faltan algunos parámetros para el nodo</translation>
 		</message>
 		<message>
 			<source>Field catalog_id required!</source>
-			<translation>Field catalog_id required!</translation>
+			<translation>¡El campo catalog_id es obligatorio!</translation>
 		</message>
 		<message>
 			<source>Node replaced successfully</source>
-			<translation>Node replaced successfully</translation>
+			<translation>Nodo reemplazado con éxito</translation>
 		</message>
 		<message>
 			<source>Cannot get giswater build version from windows registry</source>
-			<translation>Cannot get giswater build version from windows registry</translation>
+			<translation>No se puede obtener la versión de compilación de giswater desde el registro de Windows</translation>
 		</message>
 		<message>
 			<source>Select a Custom node Type</source>
-			<translation>Select a Custom node Type</translation>
+			<translation>Seleccione un tipo de nodo personalizado</translation>
 		</message>
 		<message>
 			<source>Cannot get current Java version from windows registry</source>
-			<translation>Cannot get current Java version from windows registry</translation>
+			<translation>No se puede obtener la versión actual de Java desde el registro de Windows</translation>
 		</message>
 		<message>
 			<source>Java folder not found</source>
-			<translation>Java folder not found</translation>
+			<translation>Carpeta Java no encontrada</translation>
 		</message>
 		<message>
 			<source>Java executable file not found</source>
-			<translation>Java executable file not found</translation>
+			<translation>No se encontró el archivo ejecutable de Java</translation>
 		</message>
 		<message>
 			<source>Undefined error</source>
-			<translation>Undefined error</translation>
+			<translation>Error indefinido</translation>
 		</message>
 		<message>
 			<source>Expression Error</source>
-			<translation>Expression Error</translation>
+			<translation>Error de expresión</translation>
 		</message>
 		<message>
 			<source>Metadata file not found</source>
-			<translation>Metadata file not found</translation>
+			<translation>Archivo de metadatos no encontrado</translation>
 		</message>
 		<message>
 			<source>You need to upgrade your version of pgRouting</source>
-			<translation>You need to upgrade your version of pgRouting</translation>
+			<translation>Necesita actualizar su versión de pgRouting</translation>
 		</message>
 		<message>
 			<source>Some data is missing</source>
-			<translation>Some data is missing</translation>
+			<translation>Faltan algunos datos</translation>
 		</message>
 		<message>
 			<source>You need to select a template</source>
-			<translation>You need to select a template</translation>
+			<translation>Necesita seleccionar una plantilla</translation>
 		</message>
 		<message>
 			<source>Error creating composer</source>
-			<translation>Error creating composer</translation>
+			<translation>Error al crear el compositor</translation>
 		</message>
 		<message>
 			<source>Composer template not found. Name should be</source>
-			<translation>Composer template not found. Name should be</translation>
+			<translation>No se encontró la plantilla del compositor. El nombre debe ser</translation>
 		</message>
 		<message>
 			<source>Date interval not valid!</source>
-			<translation>Date interval not valid!</translation>
+			<translation>¡Intervalo de fecha no válido!</translation>
 		</message>
 		<message>
 			<source>Delete profile</source>
-			<translation>Delete profile</translation>
+			<translation>Borrar perfil</translation>
 		</message>
 		<message>
 			<source>Error deleting profile</source>
-			<translation>Error deleting profile</translation>
+			<translation>Error al eliminar el perfil</translation>
 		</message>
 		<message>
 			<source>Profile deleted</source>
-			<translation>Profile deleted</translation>
+			<translation>Perfil eliminado</translation>
 		</message>
 		<message>
 			<source>Project read successfully</source>
-			<translation>Project read successfully</translation>
+			<translation>Proyecto leído correctamente</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete these profile?</source>
-			<translation>Are you sure you want to delete these profile?</translation>
+			<translation>¿Está seguro de que desea eliminar este perfil?</translation>
 		</message>
 		<message>
 			<source>To see the conflicts load the views</source>
-			<translation>To see the conflicts load the views</translation>
+			<translation>Para ver los conflictos cargue las vistas</translation>
 		</message>
 		<message>
 			<source>The name is current in use</source>
-			<translation>The name is current in use</translation>
+			<translation>El nombre está actualmente en uso</translation>
 		</message>
 		<message>
 			<source>Column not found</source>
-			<translation>Column not found</translation>
+			<translation>Columna no encontrada</translation>
 		</message>
 		<message>
 			<source>Layers of your role not found</source>
-			<translation>Layers of your role not found</translation>
+			<translation>Capas de su rol no encontradas</translation>
 		</message>
 		<message>
 			<source>File created successfully</source>
-			<translation>File created successfully</translation>
+			<translation>Archivo creado con éxito</translation>
 		</message>
 		<message>
 			<source>No primary key value set</source>
-			<translation>No primary key value set</translation>
+			<translation>No se ha establecido ningún valor de clave principal</translation>
 		</message>
 		<message>
 			<source>Execute epa model</source>
-			<translation>Execute epa model</translation>
+			<translation>Ejecutar modelo epa</translation>
 		</message>
 		<message>
 			<source>Table not found</source>
-			<translation>Table not found</translation>
+			<translation>Tabla no encontrada</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete these records?</source>
-			<translation>Are you sure you want to delete these records?</translation>
+			<translation>¿Está seguro de que desea eliminar estos registros?</translation>
 		</message>
 		<message>
 			<source>Delete records</source>
-			<translation>Delete records</translation>
+			<translation>Eliminar registros</translation>
 		</message>
 		<message>
 			<source>Error deleting records</source>
-			<translation>Error deleting records</translation>
+			<translation>Error al eliminar registros</translation>
 		</message>
 		<message>
 			<source>Records deleted</source>
-			<translation>Records deleted</translation>
+			<translation>Registros eliminados</translation>
 		</message>
 		<message>
 			<source>You need to insert visit_id</source>
-			<translation>You need to insert visit_id</translation>
+			<translation>Debe insertar visit_id</translation>
 		</message>
 		<message>
 			<source>Unrecognised form type</source>
-			<translation>Unrecognised form type</translation>
+			<translation>Tipo de formulario no reconocido</translation>
 		</message>
 		<message>
 			<source>The state selector is empty</source>
-			<translation>The state selector is empty</translation>
+			<translation>El selector de estado está vacío</translation>
 		</message>
 		<message>
 			<source>Select a workcat id end</source>
-			<translation>Select a workcat id end</translation>
+			<translation>Seleccione una identificación de workcat final  </translation>
 		</message>
 		<message>
 			<source>CSV not generated. Check fields from table or view</source>
-			<translation>CSV not generated. Check fields from table or view</translation>
+			<translation>CSV no generado. Verifique los campos de la tabla o vista</translation>
 		</message>
 		<message>
 			<source>Selected node</source>
-			<translation>Selected node</translation>
+			<translation>Nodo seleccionado</translation>
 		</message>
 		<message>
 			<source>Parameter not found</source>
-			<translation>Parameter not found</translation>
+			<translation>Parámetro no encontrado</translation>
 		</message>
 		<message>
 			<source>Zoom unavailable. Doesn't exist the geometry for the street</source>
-			<translation>Zoom unavailable. Doesn't exist the geometry for the street</translation>
+			<translation>Zoom no disponible. No existe la geometría de la calle</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to cancel these mincuts?</source>
-			<translation>Are you sure you want to cancel these mincuts?</translation>
+			<translation>¿Está seguro de que desea cancelar estos polígonos de corte?</translation>
 		</message>
 		<message>
 			<source>Function not found</source>
-			<translation>Function not found</translation>
+			<translation>Función no encontrada</translation>
 		</message>
 		<message>
 			<source>Select a valid path.</source>
-			<translation>Select a valid path.</translation>
+			<translation>Seleccione una ruta válida.</translation>
 		</message>
 		<message>
 			<source>Select CSV file</source>
-			<translation>Select CSV file</translation>
+			<translation>Seleccione archivo CSV</translation>
 		</message>
 		<message>
 			<source>You need to insert data</source>
-			<translation>You need to insert data</translation>
+			<translation>Necesita insertar datos</translation>
 		</message>
 		<message>
 			<source>Object already associated with this feature</source>
-			<translation>Object already associated with this feature</translation>
+			<translation>Objeto ya asociado con ese elemento de red</translation>
 		</message>
 		<message>
 			<source>Layer not found</source>
-			<translation>Layer not found</translation>
+			<translation>Capa no encontrada</translation>
 		</message>
 		<message>
 			<source>Select just one document</source>
-			<translation>Select just one document</translation>
+			<translation>Seleccione solo un documento</translation>
 		</message>
 		<message>
 			<source>Do you want to overwrite file?</source>
-			<translation>Do you want to overwrite file?</translation>
+			<translation>¿Quiere sobrescribir el archivo?</translation>
 		</message>
 		<message>
 			<source>Do you want to open GIS project?</source>
-			<translation>Do you want to open GIS project?</translation>
+			<translation>¿Quiere abrir el proyecto SIG?</translation>
 		</message>
 		<message>
 			<source>Process finished with some errors</source>
-			<translation>Process finished with some errors</translation>
+			<translation>Proceso terminado con algunos errores</translation>
 		</message>
 		<message>
 			<source>This param is mandatory. Please, set a value</source>
-			<translation>This param is mandatory. Please, set a value</translation>
+			<translation>Este parámetro es obligatorio. Por favor, establezca un valor</translation>
 		</message>
 		<message>
 			<source>You need to insert doc_type</source>
-			<translation>You need to insert doc_type</translation>
+			<translation>Necesita insertar doc_type</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to update the data?</source>
-			<translation>Are you sure you want to update the data?</translation>
+			<translation>¿Está seguro de que quiere actualizar los datos?</translation>
 		</message>
 		<message>
 			<source>Document PDF created in</source>
-			<translation>Document PDF created in</translation>
+			<translation>Documento PDF creado en</translation>
 		</message>
 		<message>
 			<source>Cannot create file, check if its open</source>
-			<translation>Cannot create file, check if its open</translation>
+			<translation>No se puede crear el archivo, verifique si está abierto</translation>
 		</message>
 		<message>
 			<source>Check fields from table or view</source>
-			<translation>Check fields from table or view</translation>
+			<translation>Verifique los campos de la tabla o vista</translation>
 		</message>
 		<message>
 			<source>You need to insert psector_id</source>
-			<translation>You need to insert psector_id</translation>
+			<translation>Necesita insertar psector_id</translation>
 		</message>
 		<message>
 			<source>Id already selected</source>
-			<translation>Id already selected</translation>
+			<translation>Id ya seleccionado</translation>
 		</message>
 		<message>
 			<source>Error deleting data</source>
-			<translation>Error deleting data</translation>
+			<translation>Error al eliminar datos</translation>
 		</message>
 		<message>
 			<source>Event deleted</source>
-			<translation>Event deleted</translation>
+			<translation>Evento eliminado</translation>
 		</message>
 		<message>
 			<source>Please select a workcat id end</source>
-			<translation>Please select a workcat id end</translation>
+			<translation>Seleccione una identificación de workcat final </translation>
 		</message>
 		<message>
 			<source>Are you sure you want to disconnect this elements?</source>
-			<translation>Are you sure you want to disconnect this elements?</translation>
+			<translation>¿Seguro que quiere desconectar estos elementos?</translation>
 		</message>
 		<message>
 			<source>Please, introduce a result name</source>
-			<translation>Please, introduce a result name</translation>
+			<translation>Por favor, introduzca un nombre de resultado</translation>
 		</message>
 		<message>
 			<source>No function associated to</source>
-			<translation>No function associated to</translation>
+			<translation>Sin función asociada a</translation>
 		</message>
 		<message>
 			<source>Error updating table</source>
-			<translation>Error updating table</translation>
+			<translation>Error al actualizar la tabla</translation>
 		</message>
 		<message>
 			<source>Widget not found</source>
-			<translation>Widget not found</translation>
+			<translation>Widget no encontrado</translation>
 		</message>
 		<message>
 			<source>You are trying to delete your current psector. Please, change your current psector before delete.</source>
-			<translation>You are trying to delete your current psector. Please, change your current psector before delete.</translation>
+			<translation>Está intentando eliminar su psector actual. Por favor, cambie su psector actual antes de eliminarlo.</translation>
 		</message>
 		<message>
 			<source>Some parameters are missing (Values Defaults used for)</source>
-			<translation>Some parameters are missing (Values Defaults used for)</translation>
+			<translation>Faltan algunos parámetros (valores predeterminados utilizados para)</translation>
 		</message>
 		<message>
 			<source>More than one feature selected. Only the first one will be processed!</source>
-			<translation>More than one feature selected. Only the first one will be processed!</translation>
+			<translation>Más de un elemento de red seleccionado. ¡Solo se procesará el primero!</translation>
 		</message>
 		<message>
 			<source>Values has been updated</source>
-			<translation>Values has been updated</translation>
+			<translation>Valores actualizados</translation>
 		</message>
 		<message>
 			<source>Selected date interval is not valid</source>
-			<translation>Selected date interval is not valid</translation>
+			<translation>Intérvalo de fecha seleccionado no es válido</translation>
 		</message>
 		<message>
 			<source>Error inserting element in table, you need to review data</source>
-			<translation>Error inserting element in table, you need to review data</translation>
+			<translation>Error al insertar elemento en tabla. Debe revisar sus datos</translation>
 		</message>
 		<message>
 			<source>Selected hydrometer_id not found</source>
-			<translation>Selected hydrometer_id not found</translation>
+			<translation>Hydrometer_id seleccionado no encontrado</translation>
 		</message>
 		<message>
 			<source>You need to enter a customer code</source>
-			<translation>You need to enter a customer code</translation>
+			<translation>Necesita ingresar un código de cliente</translation>
 		</message>
 		<message>
 			<source>Element does not exist</source>
-			<translation>Element does not exist</translation>
+			<translation>El elemento no existe</translation>
 		</message>
 		<message>
 			<source>Select file</source>
-			<translation>Select file</translation>
+			<translation>Seleccione Archivo</translation>
 		</message>
 		<message>
 			<source>Select folder</source>
-			<translation>Select folder</translation>
+			<translation>Seleccione la carpeta</translation>
 		</message>
 		<message>
 			<source>Document deleted</source>
-			<translation>Document deleted</translation>
+			<translation>Documento eliminado</translation>
 		</message>
 		<message>
 			<source>Geometry has been added!</source>
-			<translation>Geometry has been added!</translation>
+			<translation>¡Se ha añadido geometría!</translation>
 		</message>
 		<message>
 			<source>You need to enter a feature id</source>
-			<translation>You need to enter a feature id</translation>
+			<translation>Debe ingresar una identificación del elemento de red</translation>
 		</message>
 		<message>
 			<source>Please choose a csv file</source>
-			<translation>Please choose a csv file</translation>
+			<translation>Elija un archivo csv</translation>
 		</message>
 		<message>
 			<source>Import failed</source>
-			<translation>Import failed</translation>
+			<translation>Importación fallida</translation>
 		</message>
 		<message>
 			<source>Database connection error (PgDao). Please open plugin log file to get more details</source>
-			<translation>Database connection error (PgDao). Please open plugin log file to get more details</translation>
+			<translation>Error de conexión a la base de datos (PgDao). Por favor abra el archivo de registro del complemento para obtener más detalles</translation>
 		</message>
 		<message>
 			<source>Select INP file</source>
-			<translation>Select INP file</translation>
+			<translation>Seleccione archivo INP</translation>
 		</message>
 		<message>
 			<source>Select UI file</source>
-			<translation>Select UI file</translation>
+			<translation>Seleccione archivo UI</translation>
 		</message>
 		<message>
 			<source>Select an element and click it to set radius</source>
-			<translation>Select an element and click it to set radius</translation>
+			<translation>Seleccione un elemento y haga clic en él para establecer el radio</translation>
 		</message>
 		<message>
 			<source>Click two points over canvas and draw a line</source>
-			<translation>Click two points over canvas and draw a line</translation>
+			<translation>Haga clic en dos puntos sobre el lienzo y dibuje una línea</translation>
 		</message>
 		<message>
 			<source>Number of features selected in the group of</source>
-			<translation>Number of features selected in the group of</translation>
+			<translation>Número de elementos de red seleccionados en el grupo de</translation>
 		</message>
 		<message>
 			<source>Select visit to open</source>
-			<translation>Select visit to open</translation>
+			<translation>Seleccionar visita para abrir</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to replace selected feature with a new one?</source>
-			<translation>Are you sure you want to replace selected feature with a new one?</translation>
+			<translation>¿Está seguro de que desea reemplazar el elemento de red seleccionado por un nuevo?</translation>
 		</message>
 		<message>
 			<source>Error replacing feature</source>
-			<translation>Error replacing feature</translation>
+			<translation>Error al reemplazar el elemento de red</translation>
 		</message>
 		<message>
 			<source>Select one</source>
-			<translation>Select one</translation>
+			<translation>Seleccione un</translation>
 		</message>
 		<message>
 			<source>Feature replaced successfully</source>
-			<translation>Feature replaced successfully</translation>
+			<translation>Elemento de red reemplazado con éxito</translation>
 		</message>
 		<message>
 			<source>Adress configuration. Field not found</source>
-			<translation>Adress configuration. Field not found</translation>
+			<translation>Configuración de la dirección. Campo no encontrado</translation>
 		</message>
 		<message>
 			<source>Selected functions have been executed</source>
-			<translation>Selected functions have been executed</translation>
+			<translation>Se han ejecutado las funciones seleccionadas</translation>
 		</message>
 		<message>
 			<source>Move node: Error updating geometry</source>
-			<translation>Move node: Error updating geometry</translation>
+			<translation>Mover nodo: error al actualizar la geometría</translation>
 		</message>
 		<message>
 			<source>Any record found in table 'cat_node' related with selected 'node_type.type'</source>
-			<translation>Any record found in table 'cat_node' related with selected 'node_type.type'</translation>
+			<translation>Cualquier registro encontrado en la tabla 'cat_node' relacionado con el 'node_type.type' seleccionado</translation>
 		</message>
 		<message>
 			<source>Right click to use current selection, select connec points by clicking or dragging (selection box)</source>
-			<translation>Right click to use current selection, select connec points by clicking or dragging (selection box)</translation>
+			<translation>Haga clic derecho para usar la selección actual, seleccione puntos de acometida haciendo clic o arrastrando (cuadro de selección)</translation>
 		</message>
 		<message>
 			<source>You are trying to enter different types</source>
-			<translation>You are trying to enter different types</translation>
+			<translation>Está intentando ingresar diferentes tipos</translation>
 		</message>
 		<message>
 			<source>You need to upgrade your version of pg_routing!</source>
-			<translation>You need to upgrade your version of pg_routing!</translation>
+			<translation>¡Necesita actualizar su versión de pg_routing!</translation>
 		</message>
 		<message>
 			<source>You need to enter hydrometer_id</source>
-			<translation>You need to enter hydrometer_id</translation>
+			<translation>Debe ingresar hydrometer_id</translation>
 		</message>
 		<message>
 			<source>Cannot get giswater minor version from windows registry</source>
-			<translation>Cannot get giswater minor version from windows registry</translation>
+			<translation>No se puede obtener la versión menor de giswater desde el registro de Windows</translation>
 		</message>
 		<message>
 			<source>Cannot get Java folder from windows registry</source>
-			<translation>Cannot get Java folder from windows registry</translation>
+			<translation>No se puede obtener la carpeta Java desde el registro de Windows</translation>
 		</message>
 		<message>
 			<source>Plugin version not found</source>
-			<translation>Plugin version not found</translation>
+			<translation>No se encontró la versión del complemento</translation>
 		</message>
 		<message>
 			<source>Composer 'ud_profile' created</source>
-			<translation>Composer 'ud_profile' created</translation>
+			<translation>Compositor 'ud_profile' creado</translation>
 		</message>
 		<message>
 			<source>File cannot be created. Check if it is already opened</source>
-			<translation>File cannot be created. Check if it is already opened</translation>
+			<translation>No se puede crear el archivo. Compruebe si ya está abierto</translation>
 		</message>
 		<message>
 			<source>No records found with selected 'result_id'</source>
-			<translation>No records found with selected 'result_id'</translation>
+			<translation>No se encontraron registros con el "result_id" seleccionado</translation>
 		</message>
 		<message>
 			<source>This is not a valid Giswater project. Do you want to view problem details?</source>
-			<translation>This is not a valid Giswater project. Do you want to view problem details?</translation>
+			<translation>Este no es un proyecto Giswater válido. ¿Quiere ver los detalles del problema?</translation>
 		</message>
 		<message>
 			<source>Data is ok. You can try to generate the INP file</source>
-			<translation>Data is ok. You can try to generate the INP file</translation>
+			<translation>Los datos están bien. Puede intentar generar el archivo INP</translation>
 		</message>
 		<message>
 			<source>Document inserted successfully</source>
-			<translation>Document inserted successfully</translation>
+			<translation>Documento insertado correctamente</translation>
 		</message>
 		<message>
 			<source>Mincut done, but has conflict and overlaps with</source>
-			<translation>Mincut done, but has conflict and overlaps with</translation>
+			<translation>Polígono de corte hecho, pero tiene conflicto y se superpone con</translation>
 		</message>
 		<message>
 			<source>Parameter widgetfunction is null for widget</source>
-			<translation>Parameter widgetfunction is null for widget</translation>
+			<translation>El parámetro widgetfunction es nulo para el widget</translation>
 		</message>
 		<message>
 			<source>The csv file has been successfully exported</source>
-			<translation>The csv file has been successfully exported</translation>
+			<translation>El archivo csv se ha exportado correctamente</translation>
 		</message>
 		<message>
 			<source>Hemisphere of the node has been updated. Value is</source>
-			<translation>Hemisphere of the node has been updated. Value is</translation>
+			<translation>Se ha actualizado el hemisferio del nodo. El valor es</translation>
 		</message>
 		<message>
 			<source>Some data is missing. Check gis_length for arc</source>
-			<translation>Some data is missing. Check gis_length for arc</translation>
+			<translation>Faltan algunos datos. Compruebe gis_length para el arco</translation>
 		</message>
 		<message>
 			<source>Function gw_fct_duplicate_psector executed with no result</source>
-			<translation>Function gw_fct_duplicate_psector executed with no result</translation>
+			<translation>Función gw_fct_duplicate_psector ejecutada sin resultado</translation>
 		</message>
 		<message>
 			<source>Price list csv file name is required</source>
-			<translation>Price list csv file name is required</translation>
+			<translation>Se requiere el nombre del archivo csv de la lista de precios</translation>
 		</message>
 		<message>
 			<source>Any record found for current user in table</source>
-			<translation>Any record found for current user in table</translation>
+			<translation>Cualquier registro encontrado para el usuario actual en la tabla</translation>
 		</message>
 		<message>
 			<source>Are you sure you want to delete these records?\nSome events have documents</source>
-			<translation>Are you sure you want to delete these records?\nSome events have documents</translation>
+			<translation>¿Está seguro de que desea eliminar estos registros? \ Algunos eventos tienen documentos</translation>
 		</message>
 		<message>
 			<source>Error on create auto mincut, you need to review data</source>
-			<translation>Error on create auto mincut, you need to review data</translation>
+			<translation>Error al crear polígono de corte automático, es necesario revisar los datos</translation>
 		</message>
 		<message>
 			<source>Selected element already in the list</source>
-			<translation>Selected element already in the list</translation>
+			<translation>El elemento seleccionado ya está en la lista</translation>
 		</message>
 		<message>
 			<source>Any connec_id found with this customer_code</source>
-			<translation>Any connec_id found with this customer_code</translation>
+			<translation>Cualquier connec_id encontrado con este customer_code</translation>
 		</message>
 		<message>
 			<source>Feature already in the list</source>
-			<translation>Feature already in the list</translation>
+			<translation>Elemento de red ya en la lista</translation>
 		</message>
 		<message>
 			<source>Please choose a valid path</source>
-			<translation>Please choose a valid path</translation>
+			<translation>Elija una ruta válida</translation>
 		</message>
 		<message>
 			<source>You do not have permission to execute this application</source>
-			<translation>You do not have permission to execute this application</translation>
+			<translation>No tiene permiso para ejecutar esta aplicación</translation>
 		</message>
 		<message>
 			<source>Database connection error. Please check your connection parameters.</source>
-			<translation>Database connection error. Please check your connection parameters.</translation>
+			<translation>Error de conexión a la base de datos. Por favor compruebe sus parámetros de conexión.</translation>
 		</message>
 		<message>
 			<source>Select the node inside a pipe by clicking on it and it will be changed</source>
-			<translation>Select the node inside a pipe by clicking on it and it will be changed</translation>
+			<translation>Seleccione el nodo dentro de una tubería haciendo clic en él y se cambiará</translation>
 		</message>
 		<message>
 			<source>Database connection error (QSqlDatabase). Please open plugin log file to get more details</source>
-			<translation>Database connection error (QSqlDatabase). Please open plugin log file to get more details</translation>
+			<translation>Error de conexión a la base de datos (QSqlDatabase). Por favor abra el archivo de registro del complemento para obtener más detalles</translation>
 		</message>
 		<message>
 			<source>Selected CSV has been imported successfully</source>
-			<translation>Selected CSV has been imported successfully</translation>
+			<translation>CSV seleccionado se ha importado con éxito</translation>
 		</message>
 		<message>
 			<source>Any record found in table 'node_type' related with selected 'node_type.type'</source>
-			<translation>Any record found in table 'node_type' related with selected 'node_type.type'</translation>
+			<translation>Cualquier registro encontrado en la tabla 'node_type' relacionado con el 'node_type.type' seleccionado</translation>
 		</message>
 		<message>
 			<source>Error getting table name from selected layer</source>
-			<translation>Error getting table name from selected layer</translation>
+			<translation>Error al obtener el nombre de la tabla de la capa seleccionada</translation>
 		</message>
 		<message>
 			<source>Selected schema not found</source>
-			<translation>Selected schema not found</translation>
+			<translation>No se encontró el esquema seleccionado</translation>
 		</message>
 		<message>
 			<source>Cannot get giswater major version from windows registry</source>
-			<translation>Cannot get giswater major version from windows registry</translation>
+			<translation>No se puede obtener la versión principal de giswater desde el registro de Windows</translation>
 		</message>
 		<message>
 			<source>Error getting pgRouting version</source>
-			<translation>Error getting pgRouting version</translation>
+			<translation>Error al obtener la versión de pgRouting</translation>
 		</message>
 		<message>
 			<source>Selected 'profile_id' already exist in database</source>
-			<translation>Selected 'profile_id' already exist in database</translation>
+			<translation>El 'profile_id' seleccionado ya existe en la base de datos</translation>
 		</message>
 		<message>
 			<source>File name is required</source>
-			<translation>File name is required</translation>
+			<translation>El nombre del archivo es obligatorio</translation>
 		</message>
 		<message>
 			<source>Mandatory field is missing. Please, set a value</source>
-			<translation>Mandatory field is missing. Please, set a value</translation>
+			<translation>Falta el campo obligatorio. Por favor, establezca un valor</translation>
 		</message>
 		<message>
 			<source>The node has not been updated because no catalog has been selected</source>
-			<translation>The node has not been updated because no catalog has been selected</translation>
+			<translation>El nodo no se ha actualizado porque no se ha seleccionado ningún catálogo</translation>
 		</message>
 		<message>
 			<source>Some layers of your role not found. Do you want to view them?</source>
-			<translation>Some layers of your role not found. Do you want to view them?</translation>
+			<translation>No se han encontrado algunas capas de su función. ¿Quiere verlas?</translation>
 		</message>
 		<message>
 			<source>This is not a valid Giswater project</source>
-			<translation>This is not a valid Giswater project</translation>
+			<translation>Este no es un proyecto Giswater válido</translation>
 		</message>
 		<message>
 			<source>You have to select at least one feature!</source>
-			<translation>You have to select at least one feature!</translation>
+			<translation>¡Debe seleccionar al menos un elemento de red!</translation>
 		</message>
 		<message>
 			<source>You need to select a valid parameter id</source>
-			<translation>You need to select a valid parameter id</translation>
+			<translation>Debe seleccionar una identificación de parámetro válida</translation>
 		</message>
 		<message>
 			<source>The field widgettype is not configured for</source>
-			<translation>The field widgettype is not configured for</translation>
+			<translation>El campo widgettype no está configurado para</translation>
 		</message>
 		<message>
 			<source>Parameter button_function is null for button</source>
-			<translation>Parameter button_function is null for button</translation>
+			<translation>El parámetro button_function es nulo para el botón</translation>
 		</message>
 		<message>
 			<source>Any of the snapped features belong to selected layer</source>
-			<translation>Any of the snapped features belong to selected layer</translation>
+			<translation>Cualquier de los elementos de red ajustados pertenece a la capa seleccionada</translation>
 		</message>
 		<message>
 			<source>You need to insert value for field</source>
-			<translation>You need to insert value for field</translation>
+			<translation>Necesita insertar valor para el campo</translation>
 		</message>
 		<message>
 			<source>More then one document selected. Select just one document.</source>
-			<translation>More then one document selected. Select just one document.</translation>
+			<translation>Más de un documento seleccionado. Seleccione solo un documento.</translation>
 		</message>
 		<message>
 			<source>Error updating element in table, you need to review data</source>
-			<translation>Error updating element in table, you need to review data</translation>
+			<translation>Error al actualizar el elemento en la tabla, necesita revisar los datos</translation>
 		</message>
 		<message>
 			<source>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</source>
-			<translation>Select the disconnected node by clicking on it, move the pointer to desired location inside a pipe and click again</translation>
+			<translation>Seleccione el nodo desconectado haciendo clic en él, mueva el puntero a la ubicación deseada dentro de una tubería y haga clic nuevamente</translation>
 		</message>
 		<message>
 			<source>Custom mincut executed successfully</source>
-			<translation>Custom mincut executed successfully</translation>
+			<translation>Polígono de corte personalizado ejecutado con éxito</translation>
 		</message>
 		<message>
 			<source>Parameters related with 'searchplus' not set in table 'config_param_system'</source>
-			<translation>Parameters related with 'searchplus' not set in table 'config_param_system'</translation>
+			<translation>Parámetros relacionados con 'searchplus' no establecidos en la tabla 'config_param_system'</translation>
 		</message>
 		<message>
 			<source>Database connection error. Please open plugin log file to get more details</source>
-			<translation>Database connection error. Please open plugin log file to get more details</translation>
+			<translation>Error de conexión a la base de datos. Por favor abra el archivo de registro del complemento para obtener más detalles</translation>
 		</message>
 		<message>
 			<source>Folder not found</source>
-			<translation>Folder not found</translation>
+			<translation>Carpeta no encontrada</translation>
 		</message>
 		<message>
 			<source>More then one event selected. Select just one</source>
-			<translation>More then one event selected. Select just one</translation>
+			<translation>Más de un evento seleccionado. Seleccione solo uno</translation>
 		</message>
 		<message>
 			<source>Select a node and click on it, the downstream nodes are computed</source>
-			<translation>Select a node and click on it, the downstream nodes are computed</translation>
+			<translation>Seleccione un nodo y haga clic en él, se calculan los nodos aguas abajo</translation>
 		</message>
 		<message>
 			<source>Mincut done, but has conflict. Take a look on the anl_arc and anl_node to see the details of the conflict</source>
-			<translation>Mincut done, but has conflict. Take a look on the anl_arc and anl_node to see the details of the conflict</translation>
+			<translation>Polígono de cortet hecho, pero tiene conflicto. Eche un vistazo a anl_arc y anl_node para ver los detalles del conflicto</translation>
 		</message>
 		<message>
 			<source>Cannot create file, check if selected composer is the correct composer</source>
-			<translation>Cannot create file, check if selected composer is the correct composer</translation>
+			<translation>No se puede crear el archivo, verifique si el compositor seleccionado es el compositor correcto</translation>
 		</message>
 		<message>
 			<source>Your composer's path is bad configured. Please, modify it and try again.</source>
-			<translation>Your composer's path is bad configured. Please, modify it and try again.</translation>
+			<translation>La ruta de su compositor está mal configurada. Modifíquelo y vuelva a intentarlo.</translation>
 		</message>
 		<message>
 			<source>Select a node and click on it, the upstream nodes are computed</source>
-			<translation>Select a node and click on it, the upstream nodes are computed</translation>
+			<translation>Seleccione un nodo y haga clic en él, se calculan los nodos aguas arriba</translation>
 		</message>
 		<message>
 			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
  Please ensure that features has no undelete value on true.\n
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
- On the other hand you must know that traceability table will storage precedent information.</translation>
+			<translation>El procedimiento eliminará elementos de red en la base de datos a menos que sea un nodo que no divide el arco.\ N
+Asegúrese de que los elementos de red no tengan un valor de recuperación en verdadero. \ N
+Por otro lado debe saber que la tabla de trazabilidad almacenará información precedente.</translation>
 		</message>
 		<message>
 			<source>There are no visible mincuts in the table. Try a different filter</source>
-			<translation>There are no visible mincuts in the table. Try a different filter</translation>
+			<translation>No hay polígonos de corte visibles en la tabla. Pruebe un filtro diferente</translation>
 		</message>
 	</context>
 
@@ -1027,7 +1027,7 @@
 		<name>admin_addfields</name>
 		<message>
 			<source>lbl_field_length</source>
-			<translation>Field length:</translation>
+			<translation>Longitud campo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_field_length</source>
@@ -1035,7 +1035,7 @@
 		</message>
 		<message>
 			<source>lbl_num_dec</source>
-			<translation>Num decimals:</translation>
+			<translation>Número decimales:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_num_dec</source>
@@ -1043,7 +1043,7 @@
 		</message>
 		<message>
 			<source>lbl_action_function</source>
-			<translation>Action function:</translation>
+			<translation>Función de acción:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_action_function</source>
@@ -1051,7 +1051,7 @@
 		</message>
 		<message>
 			<source>lbl_stylesheet</source>
-			<translation>Stylesheet:</translation>
+			<translation>Hoja de estilo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_stylesheet</source>
@@ -1059,7 +1059,7 @@
 		</message>
 		<message>
 			<source>lbl_typeahead</source>
-			<translation>Typeahead:</translation>
+			<translation>Mecanografiar:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_typeahead</source>
@@ -1067,7 +1067,7 @@
 		</message>
 		<message>
 			<source>lbl_list_filter</source>
-			<translation>List filter param:</translation>
+			<translation>Parámetro de filtro de lista:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_list_filter</source>
@@ -1075,7 +1075,7 @@
 		</message>
 		<message>
 			<source>lbl_parent</source>
-			<translation>Parent:</translation>
+			<translation>Es padre:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parent</source>
@@ -1083,7 +1083,7 @@
 		</message>
 		<message>
 			<source>lbl_parent_id</source>
-			<translation>Parent id:</translation>
+			<translation>Id del padre:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parent_id</source>
@@ -1099,7 +1099,7 @@
 		</message>
 		<message>
 			<source>lbl_form_type</source>
-			<translation>Form type:</translation>
+			<translation>Tipo formulario:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_form_type</source>
@@ -1107,7 +1107,7 @@
 		</message>
 		<message>
 			<source>lbl_data_type</source>
-			<translation>Data type:</translation>
+			<translation>Tipo dato:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_data_type</source>
@@ -1115,7 +1115,7 @@
 		</message>
 		<message>
 			<source>lbl_field_name</source>
-			<translation>Field name:</translation>
+			<translation>Nombre del campo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_field_name</source>
@@ -1123,7 +1123,7 @@
 		</message>
 		<message>
 			<source>tab_create</source>
-			<translation>Create</translation>
+			<translation>Crear</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_create</source>
@@ -1131,7 +1131,7 @@
 		</message>
 		<message>
 			<source>grb_additional</source>
-			<translation>Additional configuration</translation>
+			<translation>Configuracíon adicional</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_additional</source>
@@ -1139,7 +1139,7 @@
 		</message>
 		<message>
 			<source>lbl_editability</source>
-			<translation>Editability:</translation>
+			<translation>Editabilidad:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_editability</source>
@@ -1147,7 +1147,7 @@
 		</message>
 		<message>
 			<source>grb_mandatory</source>
-			<translation>Mandatory addfields configuration</translation>
+			<translation>Configuración obligatoria de campos añadidos</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_mandatory</source>
@@ -1155,7 +1155,7 @@
 		</message>
 		<message>
 			<source>lbl_not_update</source>
-			<translation>Not update:</translation>
+			<translation>No actualizado:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_not_update</source>
@@ -1163,7 +1163,7 @@
 		</message>
 		<message>
 			<source>lbl_reload_field</source>
-			<translation>Reload field:</translation>
+			<translation>Recargar campo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_reload_field</source>
@@ -1171,7 +1171,7 @@
 		</message>
 		<message>
 			<source>lbl_null_value</source>
-			<translation>Null value:</translation>
+			<translation>Valor nulo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_null_value</source>
@@ -1179,7 +1179,7 @@
 		</message>
 		<message>
 			<source>lbl_auto_update</source>
-			<translation>Auto update:</translation>
+			<translation>Auto actualizable:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_auto_update</source>
@@ -1187,7 +1187,7 @@
 		</message>
 		<message>
 			<source>lbl_active</source>
-			<translation>Active:</translation>
+			<translation>Activo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_active</source>
@@ -1195,7 +1195,7 @@
 		</message>
 		<message>
 			<source>lbl_mandatory</source>
-			<translation>Mandatory:</translation>
+			<translation>Obligatorio:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_mandatory</source>
@@ -1203,7 +1203,7 @@
 		</message>
 		<message>
 			<source>lbl_column_id</source>
-			<translation>Column name:</translation>
+			<translation>Nombre columna:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_column_id</source>
@@ -1219,7 +1219,7 @@
 		</message>
 		<message>
 			<source>lbl_enabled</source>
-			<translation>Enabled:</translation>
+			<translation>Habilitado:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_enabled</source>
@@ -1227,7 +1227,7 @@
 		</message>
 		<message>
 			<source>lbl_widget_dim</source>
-			<translation>Widget dim:</translation>
+			<translation>Dim widget:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_widget_dim</source>
@@ -1235,7 +1235,7 @@
 		</message>
 		<message>
 			<source>btn_open</source>
-			<translation>Open</translation>
+			<translation>Abrir</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_open</source>
@@ -1243,15 +1243,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tab_delete</source>
-			<translation>Delete</translation>
+			<translation>Borrar</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_delete</source>
@@ -1259,7 +1259,7 @@
 		</message>
 		<message>
 			<source>tab_update</source>
-			<translation>Update</translation>
+			<translation>Actualizar</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_update</source>
@@ -1267,7 +1267,7 @@
 		</message>
 		<message>
 			<source>lbl_label</source>
-			<translation>Label:</translation>
+			<translation>Etiqueta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_label</source>
@@ -1275,7 +1275,7 @@
 		</message>
 		<message>
 			<source>lbl_widget_function</source>
-			<translation>Widget function:</translation>
+			<translation>Función widget:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_widget_function</source>
@@ -1283,7 +1283,7 @@
 		</message>
 		<message>
 			<source>lbl_widget_type</source>
-			<translation>Widget type:</translation>
+			<translation>Tipo widget:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_widget_type</source>
@@ -1291,15 +1291,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>dlg_main_addfields</source>
-			<translation>Dialog</translation>
+			<translation>Diálogo</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_addfields</source>
@@ -1307,7 +1307,7 @@
 		</message>
 		<message>
 			<source>lbl_placeholder</source>
-			<translation>Placeholder:</translation>
+			<translation>Marcador de posición</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_placeholder</source>
@@ -1315,7 +1315,7 @@
 		</message>
 		<message>
 			<source>lbl_query_text</source>
-			<translation>Query text:</translation>
+			<translation>Texto de consulta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_query_text</source>
@@ -1323,7 +1323,7 @@
 		</message>
 		<message>
 			<source>lbl_query_filter</source>
-			<translation>Query text filter:</translation>
+			<translation>Filtro texto consulta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_query_filter</source>
@@ -1334,7 +1334,7 @@
 		<name>admin_credentials</name>
 		<message>
 			<source>dlg_main_credentials</source>
-			<translation>Dialog</translation>
+			<translation>Diálogo</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_credentials</source>
@@ -1342,7 +1342,7 @@
 		</message>
 		<message>
 			<source>lbl_connection_message</source>
-			<translation>Could not retrieve connection parameters for:</translation>
+			<translation>No se pudieron recuperar los parámetros de conexión para:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_connection_message</source>
@@ -1350,7 +1350,7 @@
 		</message>
 		<message>
 			<source>lbl_connec</source>
-			<translation>Connection:</translation>
+			<translation>Conexión:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_connec</source>
@@ -1358,7 +1358,7 @@
 		</message>
 		<message>
 			<source>lbl_user_name</source>
-			<translation>User name:</translation>
+			<translation>Nombre usuario:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_user_name</source>
@@ -1366,15 +1366,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>lbl_password</source>
-			<translation>Password:</translation>
+			<translation>Contraseña:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_password</source>
@@ -1385,7 +1385,7 @@
 		<name>admin_dbproject</name>
 		<message>
 			<source>dlg_main_dbproject</source>
-			<translation>Create project</translation>
+			<translation>Crear proyecto</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_dbproject</source>
@@ -1393,7 +1393,7 @@
 		</message>
 		<message>
 			<source>lbl_project_name</source>
-			<translation>Project name:</translation>
+			<translation>Nombre proyecto:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_project_name</source>
@@ -1401,7 +1401,7 @@
 		</message>
 		<message>
 			<source>lbl_locale</source>
-			<translation>Locale:</translation>
+			<translation>Idioma:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_locale</source>
@@ -1409,7 +1409,7 @@
 		</message>
 		<message>
 			<source>grb_projectschema</source>
-			<translation>Project schema Settings</translation>
+			<translation>Configuracion del esquema de proyecto</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_projectschema</source>
@@ -1417,11 +1417,11 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>btn_push_file</source>
@@ -1433,15 +1433,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>lbl_filter</source>
-			<translation>Filter SRID</translation>
+			<translation>Filtrar SRID:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_filter</source>
@@ -1452,7 +1452,7 @@
 		<name>admin_gisproject</name>
 		<message>
 			<source>lbl_is_sample</source>
-			<translation>Sample:</translation>
+			<translation>Muestra:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_is_sample</source>
@@ -1468,15 +1468,15 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>lbl_gis_file</source>
-			<translation>QGIS file name:</translation>
+			<translation>Nombre archivo QGIS:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_gis_file</source>
@@ -1484,7 +1484,7 @@
 		</message>
 		<message>
 			<source>dlg_main_gisproject</source>
-			<translation>Create QGIS project</translation>
+			<translation>Crear proyecto QGIS</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_gisproject</source>
@@ -1492,7 +1492,7 @@
 		</message>
 		<message>
 			<source>lbl_gis_folder</source>
-			<translation>Folder:</translation>
+			<translation>Carpeta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_gis_folder</source>
@@ -1500,7 +1500,7 @@
 		</message>
 		<message>
 			<source>lbl_role</source>
-			<translation>Role type:</translation>
+			<translation>Tipo rol:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_role</source>
@@ -1508,7 +1508,7 @@
 		</message>
 		<message>
 			<source>lbl_export_user_pass</source>
-			<translation>Export user password:</translation>
+			<translation>Exportar contraseña usuario:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_export_user_pass</source>
@@ -1516,11 +1516,11 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 	</context>
 	<context>
@@ -1535,15 +1535,15 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tab_config</source>
-			<translation>Config</translation>
+			<translation>Configuración</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_config</source>
@@ -1551,7 +1551,7 @@
 		</message>
 		<message>
 			<source>btn_run</source>
-			<translation>Run</translation>
+			<translation>Ejecutar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_run</source>
@@ -1559,7 +1559,7 @@
 		</message>
 		<message>
 			<source>dlg_main_importinp</source>
-			<translation>Config parameters</translation>
+			<translation>Parámetros de configuración</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_importinp</source>
@@ -1570,7 +1570,7 @@
 		<name>admin_projectinfo</name>
 		<message>
 			<source>dlg_main_projectinfo</source>
-			<translation>Update SQL</translation>
+			<translation>Actualizar SQL</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_projectinfo</source>
@@ -1578,7 +1578,7 @@
 		</message>
 		<message>
 			<source>lbl_info</source>
-			<translation>Information about new updates</translation>
+			<translation>Info sobre nuevas actualizaciones</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_info</source>
@@ -1586,7 +1586,7 @@
 		</message>
 		<message>
 			<source>btn_update</source>
-			<translation>Update</translation>
+			<translation>Actualizar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update</source>
@@ -1594,18 +1594,18 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 	</context>
 	<context>
 		<name>admin_qtdialog</name>
 		<message>
 			<source>lbl_formname</source>
-			<translation>Form name:</translation>
+			<translation>Nombre formulario:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_formname</source>
@@ -1621,23 +1621,23 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>dlg_main_qtdialog</source>
-			<translation>Dialog</translation>
+			<translation>Diálogo</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_qtdialog</source>
@@ -1645,7 +1645,7 @@
 		</message>
 		<message>
 			<source>lbl_path</source>
-			<translation>UI path:</translation>
+			<translation>Ruta UI</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_path</source>
@@ -1656,23 +1656,23 @@
 		<name>admin_renameproj</name>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>dlg_readsq_rename</source>
-			<translation>Rename project</translation>
+			<translation>Renombrar proyecto</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_readsq_rename</source>
@@ -1680,7 +1680,7 @@
 		</message>
 		<message>
 			<source>lbl_rename_copy</source>
-			<translation>Please, set a new project name:</translation>
+			<translation>Por favor, configure un nuevo nombre de proyecto:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_rename_copy</source>
@@ -1691,7 +1691,7 @@
 		<name>admin_sysfields</name>
 		<message>
 			<source>btn_open</source>
-			<translation>Open</translation>
+			<translation>Abrir</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_open</source>
@@ -1699,7 +1699,7 @@
 		</message>
 		<message>
 			<source>lbl_editability</source>
-			<translation>Editability:</translation>
+			<translation>Editabilidad:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_editability</source>
@@ -1707,7 +1707,7 @@
 		</message>
 		<message>
 			<source>lbl_stylesheet</source>
-			<translation>Stylesheet:</translation>
+			<translation>Hoja de estilo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_stylesheet</source>
@@ -1715,7 +1715,7 @@
 		</message>
 		<message>
 			<source>lbl_placeholder</source>
-			<translation>Placeholder:</translation>
+			<translation>Marcador de posición:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_placeholder</source>
@@ -1723,7 +1723,7 @@
 		</message>
 		<message>
 			<source>lbl_hidden</source>
-			<translation>Hidden:</translation>
+			<translation>Oculto:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_hidden</source>
@@ -1739,7 +1739,7 @@
 		</message>
 		<message>
 			<source>lbl_enabled</source>
-			<translation>Enabled:</translation>
+			<translation>Habilitado:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_enabled</source>
@@ -1747,7 +1747,7 @@
 		</message>
 		<message>
 			<source>lbl_mandatory</source>
-			<translation>Mandatory:</translation>
+			<translation>Obligatorio:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_mandatory</source>
@@ -1755,7 +1755,7 @@
 		</message>
 		<message>
 			<source>lbl_layout_order</source>
-			<translation>Layout order:</translation>
+			<translation>Orden de diseño:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_layout_order</source>
@@ -1763,7 +1763,7 @@
 		</message>
 		<message>
 			<source>lbl_layout_name</source>
-			<translation>Layout name:</translation>
+			<translation>Nombre de diseño:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_layout_name</source>
@@ -1771,7 +1771,7 @@
 		</message>
 		<message>
 			<source>lbl_label</source>
-			<translation>Label:</translation>
+			<translation>Etiqueta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_label</source>
@@ -1779,7 +1779,7 @@
 		</message>
 		<message>
 			<source>lbl_column_id</source>
-			<translation>Column id:</translation>
+			<translation>Id columna:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_column_id</source>
@@ -1787,7 +1787,7 @@
 		</message>
 		<message>
 			<source>lbl_form_name</source>
-			<translation>Form name:</translation>
+			<translation>Nombre formulario:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_form_name</source>
@@ -1795,7 +1795,7 @@
 		</message>
 		<message>
 			<source>dlg_main_sysfields</source>
-			<translation>Dialog</translation>
+			<translation>Diálogo</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_sysfields</source>
@@ -1803,7 +1803,7 @@
 		</message>
 		<message>
 			<source>grb_basic_conf</source>
-			<translation>Basic configuration</translation>
+			<translation>Configuracíon básica</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_basic_conf</source>
@@ -1811,7 +1811,7 @@
 		</message>
 		<message>
 			<source>tab_update</source>
-			<translation>Update</translation>
+			<translation>Actualizar</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_update</source>
@@ -1819,7 +1819,7 @@
 		</message>
 		<message>
 			<source>grb_additional_conf</source>
-			<translation>Additional configuration</translation>
+			<translation>Configuracíon adicional</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_additional_conf</source>
@@ -1827,15 +1827,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tab_create</source>
-			<translation>Create</translation>
+			<translation>Crear</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_create</source>
@@ -1843,15 +1843,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>lbl_widgetcontrols</source>
-			<translation>Widget controls:</translation>
+			<translation>Controles del widget:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_widgetcontrols</source>
@@ -1859,7 +1859,7 @@
 		</message>
 		<message>
 			<source>lbl_widgetdim</source>
-			<translation>Widget dim:</translation>
+			<translation>Dim widget:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_widgetdim</source>
@@ -1878,15 +1878,15 @@
 		<name>admin_ui</name>
 		<message>
 			<source>btn_delete</source>
-			<translation>Delete</translation>
+			<translation>Borrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>btn_copy</source>
-			<translation>Copy</translation>
+			<translation>Copiar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_copy</source>
@@ -1910,7 +1910,7 @@
 		</message>
 		<message>
 			<source>btn_create_field</source>
-			<translation>Create</translation>
+			<translation>Crear</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_create_field</source>
@@ -1918,7 +1918,7 @@
 		</message>
 		<message>
 			<source>btn_create_qgis_template</source>
-			<translation>QGIS templates</translation>
+			<translation>Plantillas QGIS</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_create_qgis_template</source>
@@ -1926,7 +1926,7 @@
 		</message>
 		<message>
 			<source>btn_create_view</source>
-			<translation>Create</translation>
+			<translation>Crear</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_create_view</source>
@@ -1934,7 +1934,7 @@
 		</message>
 		<message>
 			<source>btn_delete_field</source>
-			<translation>Delete</translation>
+			<translation>Borrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete_field</source>
@@ -1942,7 +1942,7 @@
 		</message>
 		<message>
 			<source>btn_export_ui</source>
-			<translation>Export</translation>
+			<translation>Exportar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_export_ui</source>
@@ -1950,7 +1950,7 @@
 		</message>
 		<message>
 			<source>btn_gis_create</source>
-			<translation>Create QGIS project file</translation>
+			<translation>Crear archivo proyecto QGIS</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_gis_create</source>
@@ -1958,7 +1958,7 @@
 		</message>
 		<message>
 			<source>lbl_system_feature</source>
-			<translation>Feature name:</translation>
+			<translation>Nombre del elemento:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_system_feature</source>
@@ -1966,7 +1966,7 @@
 		</message>
 		<message>
 			<source>lbl_add_fields_feature</source>
-			<translation>Feature name:</translation>
+			<translation>Nombre del elemento:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_add_fields_feature</source>
@@ -1974,7 +1974,7 @@
 		</message>
 		<message>
 			<source>lbl_child_feature</source>
-			<translation>Feature name:</translation>
+			<translation>Nombre del elemento:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_child_feature</source>
@@ -1982,7 +1982,7 @@
 		</message>
 		<message>
 			<source>lbl_ui_path</source>
-			<translation>UI path:</translation>
+			<translation>Ruta UI:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_ui_path</source>
@@ -1990,7 +1990,7 @@
 		</message>
 		<message>
 			<source>lbl_update_all_sch</source>
-			<translation>Update all:</translation>
+			<translation>Actualizar todo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_update_all_sch</source>
@@ -1998,7 +1998,7 @@
 		</message>
 		<message>
 			<source>grb_load_cf</source>
-			<translation>Load custom file</translation>
+			<translation>Cargar archivo personalizado</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_load_cf</source>
@@ -2006,7 +2006,7 @@
 		</message>
 		<message>
 			<source>grb_schema_manager</source>
-			<translation>Schema management</translation>
+			<translation>Gestión de esquema</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_schema_manager</source>
@@ -2014,7 +2014,7 @@
 		</message>
 		<message>
 			<source>grb_project_scin</source>
-			<translation>Project schema information</translation>
+			<translation>Información del esquema del proyecto</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_project_scin</source>
@@ -2022,7 +2022,7 @@
 		</message>
 		<message>
 			<source>grb_conection</source>
-			<translation>Connection</translation>
+			<translation>Conexión</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_conection</source>
@@ -2030,7 +2030,7 @@
 		</message>
 		<message>
 			<source>lbl_use_constrains</source>
-			<translation>Use constrains:</translation>
+			<translation>Usar restricciones:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_use_constrains</source>
@@ -2038,7 +2038,7 @@
 		</message>
 		<message>
 			<source>grb_schema_reload</source>
-			<translation>Reload</translation>
+			<translation>Recargar</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_schema_reload</source>
@@ -2046,7 +2046,7 @@
 		</message>
 		<message>
 			<source>grb_schema_update</source>
-			<translation>Update</translation>
+			<translation>Actualizar</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_schema_update</source>
@@ -2054,7 +2054,7 @@
 		</message>
 		<message>
 			<source>grb_manage_ui</source>
-			<translation>Manage UI</translation>
+			<translation>Administrar UI</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_manage_ui</source>
@@ -2062,7 +2062,7 @@
 		</message>
 		<message>
 			<source>grb_manage_addfields</source>
-			<translation>Manage add fields</translation>
+			<translation>Administrar campos añadidos</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_manage_addfields</source>
@@ -2070,7 +2070,7 @@
 		</message>
 		<message>
 			<source>grb_manage_sys_fields</source>
-			<translation>Manage system fields</translation>
+			<translation>Administrar campos de sistema</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_manage_sys_fields</source>
@@ -2078,7 +2078,7 @@
 		</message>
 		<message>
 			<source>grb_manage_childviews</source>
-			<translation>Manage child views</translation>
+			<translation>Administrar vistas secundarias</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_manage_childviews</source>
@@ -2086,7 +2086,7 @@
 		</message>
 		<message>
 			<source>tab_advanced</source>
-			<translation>Advanced</translation>
+			<translation>Avanzado</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_advanced</source>
@@ -2094,7 +2094,7 @@
 		</message>
 		<message>
 			<source>btn_import_ui</source>
-			<translation>Import</translation>
+			<translation>Importar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_import_ui</source>
@@ -2102,7 +2102,7 @@
 		</message>
 		<message>
 			<source>grb_visit</source>
-			<translation>Visit</translation>
+			<translation>Visita</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_visit</source>
@@ -2110,7 +2110,7 @@
 		</message>
 		<message>
 			<source>tab_api_manager</source>
-			<translation>Api manager</translation>
+			<translation>Administrador de Api</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_api_manager</source>
@@ -2118,7 +2118,7 @@
 		</message>
 		<message>
 			<source>tab_fields_manager</source>
-			<translation>Fields manager</translation>
+			<translation>Administrador de campos</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_fields_manager</source>
@@ -2126,7 +2126,7 @@
 		</message>
 		<message>
 			<source>tab_schema_manager</source>
-			<translation>Schema manager</translation>
+			<translation>Administrador de esquema</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_schema_manager</source>
@@ -2134,7 +2134,7 @@
 		</message>
 		<message>
 			<source>grb_files_generator</source>
-			<translation>Plugin files generator</translation>
+			<translation>Generador de ficheros del pluggin</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_files_generator</source>
@@ -2142,7 +2142,7 @@
 		</message>
 		<message>
 			<source>btn_custom_load_file</source>
-			<translation>Load file</translation>
+			<translation>Cargar archivo</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_custom_load_file</source>
@@ -2166,7 +2166,7 @@
 		</message>
 		<message>
 			<source>btn_update_field</source>
-			<translation>Update</translation>
+			<translation>Actualizar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update_field</source>
@@ -2174,7 +2174,7 @@
 		</message>
 		<message>
 			<source>btn_update_sys_field</source>
-			<translation>Update</translation>
+			<translation>Actualizar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update_sys_field</source>
@@ -2182,7 +2182,7 @@
 		</message>
 		<message>
 			<source>lbl_reload_func_sch</source>
-			<translation>Reload functions:</translation>
+			<translation>Recargar funciones:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_reload_func_sch</source>
@@ -2190,7 +2190,7 @@
 		</message>
 		<message>
 			<source>btn_schema_file_to_db</source>
-			<translation>File to DB</translation>
+			<translation>Archivo a BBDD</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_schema_file_to_db</source>
@@ -2198,7 +2198,7 @@
 		</message>
 		<message>
 			<source>btn_update_schema</source>
-			<translation>Execute</translation>
+			<translation>Ejecutar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update_schema</source>
@@ -2206,7 +2206,7 @@
 		</message>
 		<message>
 			<source>btn_schema_create</source>
-			<translation>Create DB project schema</translation>
+			<translation>Crear esquema proyecto BBDD</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_schema_create</source>
@@ -2214,7 +2214,7 @@
 		</message>
 		<message>
 			<source>btn_visit_delete</source>
-			<translation>Delete</translation>
+			<translation>Borrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_visit_delete</source>
@@ -2222,7 +2222,7 @@
 		</message>
 		<message>
 			<source>btn_visit_update</source>
-			<translation>Update</translation>
+			<translation>Actualizar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_visit_update</source>
@@ -2230,7 +2230,7 @@
 		</message>
 		<message>
 			<source>btn_visit_create</source>
-			<translation>Create</translation>
+			<translation>Crear</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_visit_create</source>
@@ -2238,15 +2238,15 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>btn_translation</source>
-			<translation>Translation files</translation>
+			<translation>Archivos de traduccion</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_translation</source>
@@ -2262,7 +2262,7 @@
 		</message>
 		<message>
 			<source>btn_schema_rename</source>
-			<translation>Rename</translation>
+			<translation>Renombrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_schema_rename</source>
@@ -2270,7 +2270,7 @@
 		</message>
 		<message>
 			<source>lbl_name</source>
-			<translation>Name:</translation>
+			<translation>Nombre:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_name</source>
@@ -2278,7 +2278,7 @@
 		</message>
 		<message>
 			<source>lbl_connection</source>
-			<translation>Connection name:</translation>
+			<translation>Nombre conexión:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_connection</source>
@@ -2294,7 +2294,7 @@
 		</message>
 		<message>
 			<source>lbl_ui_form_name</source>
-			<translation>Form name:</translation>
+			<translation>Nombre formulario:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_ui_form_name</source>
@@ -2302,7 +2302,7 @@
 		</message>
 		<message>
 			<source>lbl_project_type</source>
-			<translation>Project type:</translation>
+			<translation>Tipo proyecto:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_project_type</source>
@@ -2313,7 +2313,7 @@
 		<name>admin_visitclass</name>
 		<message>
 			<source>btn_class_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_class_cancel</source>
@@ -2321,7 +2321,7 @@
 		</message>
 		<message>
 			<source>lbl_multi_event</source>
-			<translation>Multi event:</translation>
+			<translation>Evento múltiple:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_multi_event</source>
@@ -2329,7 +2329,7 @@
 		</message>
 		<message>
 			<source>dlg_main_visitclass</source>
-			<translation>Manage visit class</translation>
+			<translation>Gestionar clase de visita</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_visitclass</source>
@@ -2337,7 +2337,7 @@
 		</message>
 		<message>
 			<source>btn_class_ok</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_class_ok</source>
@@ -2345,7 +2345,7 @@
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Descript:</translation>
+			<translation>Descripción:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -2353,7 +2353,7 @@
 		</message>
 		<message>
 			<source>lbl_visit_type</source>
-			<translation>Visit type:</translation>
+			<translation>Tipo visita:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_type</source>
@@ -2361,7 +2361,7 @@
 		</message>
 		<message>
 			<source>lbl_class_id</source>
-			<translation>Class id:</translation>
+			<translation>Id clase:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_class_id</source>
@@ -2369,7 +2369,7 @@
 		</message>
 		<message>
 			<source>lbl_class_name</source>
-			<translation>Class name:</translation>
+			<translation>Nombre clase:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_class_name</source>
@@ -2377,7 +2377,7 @@
 		</message>
 		<message>
 			<source>btn_ok</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_ok</source>
@@ -2385,7 +2385,7 @@
 		</message>
 		<message>
 			<source>lbl_active</source>
-			<translation>Active:</translation>
+			<translation>Activo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_active</source>
@@ -2393,7 +2393,7 @@
 		</message>
 		<message>
 			<source>btn_param_delete</source>
-			<translation>Delete</translation>
+			<translation>Borrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_param_delete</source>
@@ -2401,7 +2401,7 @@
 		</message>
 		<message>
 			<source>btn_param_create</source>
-			<translation>Create</translation>
+			<translation>Crear</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_param_create</source>
@@ -2409,15 +2409,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>lbl_viewname</source>
-			<translation>View name:</translation>
+			<translation>Ver nombre:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_viewname</source>
@@ -2425,7 +2425,7 @@
 		</message>
 		<message>
 			<source>btn_param_update</source>
-			<translation>Update</translation>
+			<translation>Actualizar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_param_update</source>
@@ -2433,7 +2433,7 @@
 		</message>
 		<message>
 			<source>lbl_feat_type</source>
-			<translation>Feature type:</translation>
+			<translation>Tipo de elemento:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feat_type</source>
@@ -2441,7 +2441,7 @@
 		</message>
 		<message>
 			<source>lbl_param_opt</source>
-			<translation>Param options:</translation>
+			<translation>Opciones parám:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_param_opt</source>
@@ -2449,7 +2449,7 @@
 		</message>
 		<message>
 			<source>lbl_multi_feat</source>
-			<translation>Multi feature:</translation>
+			<translation>Característica múltiple:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_multi_feat</source>
@@ -2460,7 +2460,7 @@
 		<name>admin_visitparam</name>
 		<message>
 			<source>grb_params</source>
-			<translation>Parameters</translation>
+			<translation>Parametros</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_params</source>
@@ -2468,7 +2468,7 @@
 		</message>
 		<message>
 			<source>lbl_widgettype</source>
-			<translation>Widget type:</translation>
+			<translation>Tipo widget:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_widgettype</source>
@@ -2476,7 +2476,7 @@
 		</message>
 		<message>
 			<source>lbl_parameter_name</source>
-			<translation>Parameter name:</translation>
+			<translation>Nombre parámetro:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_name</source>
@@ -2484,7 +2484,7 @@
 		</message>
 		<message>
 			<source>lbl_code</source>
-			<translation>Code:</translation>
+			<translation>Código:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_code</source>
@@ -2492,7 +2492,7 @@
 		</message>
 		<message>
 			<source>lbl_default_value</source>
-			<translation>Default value:</translation>
+			<translation>Valor por defecto:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_default_value</source>
@@ -2500,7 +2500,7 @@
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Descript:</translation>
+			<translation>Descripción:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -2508,7 +2508,7 @@
 		</message>
 		<message>
 			<source>lbl_short_descript</source>
-			<translation>Short descript:</translation>
+			<translation>Descripción corta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_short_descript</source>
@@ -2516,7 +2516,7 @@
 		</message>
 		<message>
 			<source>lbl_enabled</source>
-			<translation>Enabled:</translation>
+			<translation>Habilitado:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_enabled</source>
@@ -2532,7 +2532,7 @@
 		</message>
 		<message>
 			<source>lbl_mandatory</source>
-			<translation>Mandatory:</translation>
+			<translation>Obligatorio:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_mandatory</source>
@@ -2540,7 +2540,7 @@
 		</message>
 		<message>
 			<source>lbl_query_text</source>
-			<translation>Query text:</translation>
+			<translation>Texto de consulta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_query_text</source>
@@ -2548,7 +2548,7 @@
 		</message>
 		<message>
 			<source>btn_ok</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_ok</source>
@@ -2556,7 +2556,7 @@
 		</message>
 		<message>
 			<source>lbl_parameter_type</source>
-			<translation>Parameter type:</translation>
+			<translation>Tipo parámetro:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_type</source>
@@ -2564,7 +2564,7 @@
 		</message>
 		<message>
 			<source>lbl_data_type</source>
-			<translation>Data type:</translation>
+			<translation>Tipo dato:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_data_type</source>
@@ -2572,7 +2572,7 @@
 		</message>
 		<message>
 			<source>lbl_form_type</source>
-			<translation>Form type:</translation>
+			<translation>Tipo formulario:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_form_type</source>
@@ -2580,7 +2580,7 @@
 		</message>
 		<message>
 			<source>dlg_main_visitparam</source>
-			<translation>Manage visit parameter</translation>
+			<translation>Gestionar parámetro de visita</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_main_visitparam</source>
@@ -2588,22 +2588,22 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 	</context>
 	<context>
 		<name>arc_fusion</name>
 		<message>
 			<source>title</source>
-			<translation>Arc fusion</translation>
+			<translation>Fusionar arco</translation>
 		</message>
 		<message>
 			<source>lbl_enddate</source>
-			<translation>End date:</translation>
+			<translation>Fecha fin:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_enddate</source>
@@ -2611,11 +2611,11 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tab_config</source>
@@ -2627,15 +2627,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>lbl_workcat_id_end</source>
-			<translation>Workcat id end:</translation>
+			<translation>Expdte baja:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workcat_id_end</source>
@@ -2643,7 +2643,7 @@
 		</message>
 		<message>
 			<source>dlg_arc_fusion</source>
-			<translation>Arc fusion</translation>
+			<translation>Fusionar arco</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_arc_fusion</source>
@@ -2662,11 +2662,11 @@
 		<name>auxcircle</name>
 		<message>
 			<source>title</source>
-			<translation>CAD draw circle</translation>
+			<translation>Dibujar circulo CAD</translation>
 		</message>
 		<message>
 			<source>lbl_ins_radius</source>
-			<translation>Insert radius:</translation>
+			<translation>Insertar radio:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_ins_radius</source>
@@ -2674,15 +2674,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>chk_deleete_prev</source>
-			<translation>Delete previous circles</translation>
+			<translation>Eliminar círculos anteriores</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_deleete_prev</source>
@@ -2690,7 +2690,7 @@
 		</message>
 		<message>
 			<source>dlg_auxcircle</source>
-			<translation>CAD draw circle</translation>
+			<translation>Dibujar circulo CAD</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_auxcircle</source>
@@ -2698,22 +2698,22 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 	</context>
 	<context>
 		<name>auxpoint</name>
 		<message>
 			<source>title</source>
-			<translation>CAD Add point</translation>
+			<translation>Añadir punto CAD</translation>
 		</message>
 		<message>
 			<source>rb_left</source>
-			<translation>Init point</translation>
+			<translation>Punto inicial</translation>
 		</message>
 		<message>
 			<source>tooltip_rb_left</source>
@@ -2729,7 +2729,7 @@
 		</message>
 		<message>
 			<source>chk_delete_prev</source>
-			<translation>Delete previous points</translation>
+			<translation>Eliminar puntos anteriores</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_delete_prev</source>
@@ -2737,15 +2737,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>dlg_auxpoint</source>
-			<translation>CAD Add point</translation>
+			<translation>Añadir punto CAD</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_auxpoint</source>
@@ -2761,15 +2761,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>rb_right</source>
-			<translation>End point</translation>
+			<translation>Punto final</translation>
 		</message>
 		<message>
 			<source>tooltip_rb_right</source>
@@ -2780,19 +2780,19 @@
 		<name>config</name>
 		<message>
 			<source>title</source>
-			<translation>Config</translation>
+			<translation>Configuración</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tab_basic</source>
-			<translation>Basic</translation>
+			<translation>Básico</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_basic</source>
@@ -2816,15 +2816,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>dlg_config</source>
-			<translation>Config</translation>
+			<translation>Configuración</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_config</source>
@@ -2832,7 +2832,7 @@
 		</message>
 		<message>
 			<source>tab_addfields</source>
-			<translation>Add fields</translation>
+			<translation>Campos adicionales</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_addfields</source>
@@ -2851,7 +2851,7 @@
 		<name>crm_trace</name>
 		<message>
 			<source>lbl_inst</source>
-			<translation>Instructions:</translation>
+			<translation>Instrucciones:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_inst</source>
@@ -2862,7 +2862,7 @@
 		<name>csv</name>
 		<message>
 			<source>lbl_import_label</source>
-			<translation>Import label:</translation>
+			<translation>Importar etiqueta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_import_label</source>
@@ -2878,7 +2878,7 @@
 		</message>
 		<message>
 			<source>dlg_csv2pg</source>
-			<translation>Import CSV</translation>
+			<translation>Importar CSV</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_csv2pg</source>
@@ -2886,7 +2886,7 @@
 		</message>
 		<message>
 			<source>lbl_import_type</source>
-			<translation>Import type:</translation>
+			<translation>Importar tipo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_import_type</source>
@@ -2894,7 +2894,7 @@
 		</message>
 		<message>
 			<source>tab_preview</source>
-			<translation>Preview</translation>
+			<translation>Previsualizar</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_preview</source>
@@ -2902,7 +2902,7 @@
 		</message>
 		<message>
 			<source>lbl_file</source>
-			<translation>File:</translation>
+			<translation>Archivo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_file</source>
@@ -2910,11 +2910,11 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tab_info</source>
@@ -2926,7 +2926,7 @@
 		</message>
 		<message>
 			<source>lbl_set_of_charac</source>
-			<translation>Set of characters:</translation>
+			<translation>Conjunto de caracteres</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_set_of_charac</source>
@@ -2934,7 +2934,7 @@
 		</message>
 		<message>
 			<source>lbl_delimiter</source>
-			<translation>Delimiter:</translation>
+			<translation>Delimitador:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_delimiter</source>
@@ -2950,38 +2950,38 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 	</context>
 	<context>
 		<name>dialog_table</name>
 		<message>
 			<source>title</source>
-			<translation>Dialog</translation>
+			<translation>Diálogo</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>btn_add_row</source>
-			<translation>Add row</translation>
+			<translation>Añadir fila</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_row</source>
@@ -2989,7 +2989,7 @@
 		</message>
 		<message>
 			<source>dlg_dialog_table</source>
-			<translation>Dialog</translation>
+			<translation>Diálogo</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_dialog_table</source>
@@ -3000,19 +3000,19 @@
 		<name>dialog_text</name>
 		<message>
 			<source>title</source>
-			<translation>Dialog</translation>
+			<translation>Diálogo</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>dlg_dialog_text</source>
-			<translation>Dialog</translation>
+			<translation>Diálogo</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_dialog_text</source>
@@ -3020,22 +3020,22 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 	</context>
 	<context>
 		<name>dimensioning</name>
 		<message>
 			<source>title</source>
-			<translation>Dimensioning</translation>
+			<translation>Dimensionamiento</translation>
 		</message>
 		<message>
 			<source>dlg_dimensioning</source>
-			<translation>Dimensioning</translation>
+			<translation>Dimensionamiento</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_dimensioning</source>
@@ -3043,7 +3043,7 @@
 		</message>
 		<message>
 			<source>grb_other</source>
-			<translation>Other</translation>
+			<translation>Otros</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_other</source>
@@ -3051,7 +3051,7 @@
 		</message>
 		<message>
 			<source>grb_symbology</source>
-			<translation>Circle symbology</translation>
+			<translation>Simbología del círculo</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_symbology</source>
@@ -3059,7 +3059,7 @@
 		</message>
 		<message>
 			<source>grb_depth</source>
-			<translation>Measurements</translation>
+			<translation>Mediciones</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_depth</source>
@@ -3067,30 +3067,30 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 	</context>
 	<context>
 		<name>doc</name>
 		<message>
 			<source>title</source>
-			<translation>Document</translation>
+			<translation>Documento</translation>
 		</message>
 		<message>
 			<source>tab_doc</source>
-			<translation>Document</translation>
+			<translation>Documento</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_doc</source>
@@ -3098,15 +3098,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>_dlg_doc</source>
-			<translation>Document</translation>
+			<translation>Documento</translation>
 		</message>
 		<message>
 			<source>tooltip__dlg_doc</source>
@@ -3114,7 +3114,7 @@
 		</message>
 		<message>
 			<source>dlg_doc</source>
-			<translation>Document</translation>
+			<translation>Documento</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_doc</source>
@@ -3122,39 +3122,39 @@
 		</message>
 		<message>
 			<source>lbl_link</source>
-			<translation>Link:</translation>
+			<translation>Enlace:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_link</source>
-			<translation>None</translation>
+			<translation>Enlace</translation>
 		</message>
 		<message>
 			<source>tab_node</source>
-			<translation>Node</translation>
+			<translation>Nodo</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_node</source>
-			<translation>None</translation>
+			<translation>Nodo</translation>
 		</message>
 		<message>
 			<source>btn_insert</source>
-			<translation>None</translation>
+			<translation>Insertar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_insert</source>
-			<translation>None</translation>
+			<translation>Insertar</translation>
 		</message>
 		<message>
 			<source>tab_gully</source>
-			<translation>Gully</translation>
+			<translation>Sumidero</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
+			<translation>Sumidero</translation>
 		</message>
 		<message>
 			<source>lbl_observ</source>
-			<translation>Observations:</translation>
+			<translation>Observaciones:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_observ</source>
@@ -3162,11 +3162,11 @@
 		</message>
 		<message>
 			<source>lbl_doc_id</source>
-			<translation>Doc id:</translation>
+			<translation>Id doc:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_doc_id</source>
-			<translation>None</translation>
+			<translation>Id documento</translation>
 		</message>
 		<message>
 			<source>btn_path_url</source>
@@ -3178,19 +3178,19 @@
 		</message>
 		<message>
 			<source>lbl_doc_type</source>
-			<translation>Doc type:</translation>
+			<translation>Tipo doc:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_doc_type</source>
-			<translation>None</translation>
+			<translation>Tipo documento</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>btn_path_doc</source>
@@ -3198,43 +3198,43 @@
 		</message>
 		<message>
 			<source>tooltip_btn_path_doc</source>
-			<translation>None</translation>
+			<translation>Ruta</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>tab_arc</source>
-			<translation>Arc</translation>
+			<translation>Arco</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_arc</source>
-			<translation>None</translation>
+			<translation>Arco</translation>
 		</message>
 		<message>
 			<source>btn_snapping</source>
-			<translation>None</translation>
+			<translation>Snapping</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
-			<translation>None</translation>
+			<translation>Snapping</translation>
 		</message>
 		<message>
 			<source>tab_connec</source>
-			<translation>Connec</translation>
+			<translation>Acometida</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_connec</source>
-			<translation>None</translation>
+			<translation>Acometida</translation>
 		</message>
 		<message>
 			<source>tab_rel</source>
-			<translation>Relations</translation>
+			<translation>Relaciones</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_rel</source>
@@ -3245,19 +3245,19 @@
 		<name>doc_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Document management</translation>
+			<translation>Gestor de documentos</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Delete</translation>
+			<translation>Borrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>dlg_doc_manager</source>
-			<translation>Document management</translation>
+			<translation>Gestor de documentos</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_doc_manager</source>
@@ -3265,7 +3265,7 @@
 		</message>
 		<message>
 			<source>lbl_doc_id</source>
-			<translation>Filter by: Doc id</translation>
+			<translation>Filtrar por: Id doc</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_doc_id</source>
@@ -3273,22 +3273,22 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 	</context>
 	<context>
 		<name>element</name>
 		<message>
 			<source>title</source>
-			<translation>Element</translation>
+			<translation>Elemento</translation>
 		</message>
 		<message>
 			<source>dlg_element</source>
-			<translation>Element</translation>
+			<translation>Elemento</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_element</source>
@@ -3296,7 +3296,7 @@
 		</message>
 		<message>
 			<source>lbl_element_id</source>
-			<translation>Element id:</translation>
+			<translation>Id elemento:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_element_id</source>
@@ -3304,7 +3304,7 @@
 		</message>
 		<message>
 			<source>lbl_num_element</source>
-			<translation>Num element:</translation>
+			<translation>Núm elem:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_num_element</source>
@@ -3312,7 +3312,7 @@
 		</message>
 		<message>
 			<source>lbl_expl_id</source>
-			<translation>Exploitation:</translation>
+			<translation>Explotación:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_expl_id</source>
@@ -3320,7 +3320,7 @@
 		</message>
 		<message>
 			<source>lbl_owner</source>
-			<translation>Owner:</translation>
+			<translation>Propietario:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_owner</source>
@@ -3328,7 +3328,7 @@
 		</message>
 		<message>
 			<source>lbl_comment</source>
-			<translation>Comment:</translation>
+			<translation>Comentario:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_comment</source>
@@ -3336,7 +3336,7 @@
 		</message>
 		<message>
 			<source>tab_element</source>
-			<translation>Element</translation>
+			<translation>Elemento</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_element</source>
@@ -3344,23 +3344,23 @@
 		</message>
 		<message>
 			<source>tab_node</source>
-			<translation>Node</translation>
+			<translation>Nodo</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_node</source>
-			<translation>None</translation>
+			<translation>Nodo</translation>
 		</message>
 		<message>
 			<source>tab_gully</source>
-			<translation>Gully</translation>
+			<translation>Sumidero</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_gully</source>
-			<translation>None</translation>
+			<translation>Sumidero</translation>
 		</message>
 		<message>
 			<source>lbl_state_type</source>
-			<translation>State type:</translation>
+			<translation>Tipo estado:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_state_type</source>
@@ -3368,47 +3368,47 @@
 		</message>
 		<message>
 			<source>tab_connec</source>
-			<translation>Connec</translation>
+			<translation>Acometida</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_connec</source>
-			<translation>None</translation>
+			<translation>Acometida</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tab_arc</source>
-			<translation>Arc</translation>
+			<translation>Arco</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_arc</source>
-			<translation>None</translation>
+			<translation>Arco</translation>
 		</message>
 		<message>
 			<source>lbl_code</source>
-			<translation>Code:</translation>
+			<translation>Cód:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_code</source>
-			<translation>None</translation>
+			<translation>Código</translation>
 		</message>
 		<message>
 			<source>lbl_elementcad_id</source>
-			<translation>Elementcat id:</translation>
+			<translation>Id elem cat:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_elementcad_id</source>
-			<translation>None</translation>
+			<translation>Catálogo</translation>
 		</message>
 		<message>
 			<source>lbl_state</source>
-			<translation>State:</translation>
+			<translation>Estado:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_state</source>
@@ -3416,23 +3416,23 @@
 		</message>
 		<message>
 			<source>lbl_workcat_id</source>
-			<translation>Workcat id:</translation>
+			<translation>Expdte alta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workcat_id</source>
-			<translation>None</translation>
+			<translation>Expediente alta</translation>
 		</message>
 		<message>
 			<source>lbl_builtdate</source>
-			<translation>Builtdate:</translation>
+			<translation>Fecha constr:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_builtdate</source>
-			<translation>None</translation>
+			<translation>Fecha alta</translation>
 		</message>
 		<message>
 			<source>lbl_observ</source>
-			<translation>Observations:</translation>
+			<translation>Observaciones:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_observ</source>
@@ -3440,15 +3440,15 @@
 		</message>
 		<message>
 			<source>lbl_workcat_id_end</source>
-			<translation>Workcat id end:</translation>
+			<translation>Expdte baja:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workcat_id_end</source>
-			<translation>None</translation>
+			<translation>Expediente baja</translation>
 		</message>
 		<message>
 			<source>lbl_rotation</source>
-			<translation>Rotation:</translation>
+			<translation>Rotación:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_rotation</source>
@@ -3456,47 +3456,47 @@
 		</message>
 		<message>
 			<source>lbl_buildercat_id</source>
-			<translation>Buildercat id:</translation>
+			<translation>Constructor:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_buildercat_id</source>
-			<translation>None</translation>
+			<translation>Constructor</translation>
 		</message>
 		<message>
 			<source>lbl_element_type</source>
-			<translation>Element type:</translation>
+			<translation>Tipo elem:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_element_type</source>
-			<translation>None</translation>
+			<translation>Tipo elemento</translation>
 		</message>
 		<message>
 			<source>lbl_location_type</source>
-			<translation>Location type:</translation>
+			<translation>Tipo ubicación:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_location_type</source>
-			<translation>None</translation>
+			<translation>Ubicación</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>lbl_verified</source>
-			<translation>Verified:</translation>
+			<translation>Verificado:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_verified</source>
@@ -3504,70 +3504,70 @@
 		</message>
 		<message>
 			<source>btn_insert</source>
-			<translation>None</translation>
+			<translation>Insertar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_insert</source>
-			<translation>None</translation>
+			<translation>Insertar</translation>
 		</message>
 		<message>
 			<source>btn_snapping</source>
-			<translation>None</translation>
+			<translation>Snapping</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
-			<translation>None</translation>
+			<translation>Snapping</translation>
 		</message>
 		<message>
 			<source>btn_add_geom</source>
-			<translation>Add geom</translation>
+			<translation>Añadir geom</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_geom</source>
-			<translation>None</translation>
+			<translation>Añadir geometría</translation>
 		</message>
 		<message>
 			<source>lbl_link</source>
-			<translation>Link:</translation>
+			<translation>Enlace:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_link</source>
-			<translation>None</translation>
+			<translation>Enlace</translation>
 		</message>
 		<message>
 			<source>tab_relations</source>
-			<translation>Relations</translation>
+			<translation>Relaciones</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_relations</source>
-			<translation>None</translation>
+			<translation>Relaciones</translation>
 		</message>
 	</context>
 	<context>
 		<name>element_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Element management</translation>
+			<translation>Gestor de elementos</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Delete</translation>
+			<translation>Borrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>lbl_element_id</source>
-			<translation>Filter by: Element id</translation>
+			<translation>Filtrar por: Id elem</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_element_id</source>
@@ -3575,7 +3575,7 @@
 		</message>
 		<message>
 			<source>dlg_element_manager</source>
-			<translation>Element management</translation>
+			<translation>Gestor de elementos</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_element_manager</source>
@@ -3586,7 +3586,7 @@
 		<name>epa_compare</name>
 		<message>
 			<source>lbl_compare_date</source>
-			<translation>Compare date:</translation>
+			<translation>Comparar fecha:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_compare_date</source>
@@ -3594,15 +3594,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>lbl_selector_date</source>
-			<translation>Selector date:</translation>
+			<translation>Selector fecha:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_selector_date</source>
@@ -3610,7 +3610,7 @@
 		</message>
 		<message>
 			<source>lbl_time_to_show</source>
-			<translation>Time (to show):</translation>
+			<translation>Hora (para mostrar):</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_time_to_show</source>
@@ -3626,7 +3626,7 @@
 		</message>
 		<message>
 			<source>tab_result</source>
-			<translation>Result</translation>
+			<translation>Resultado</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_result</source>
@@ -3634,7 +3634,7 @@
 		</message>
 		<message>
 			<source>tab_time</source>
-			<translation>Time</translation>
+			<translation>Hora:</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_time</source>
@@ -3642,7 +3642,7 @@
 		</message>
 		<message>
 			<source>dlg_selector</source>
-			<translation>Result compare selector</translation>
+			<translation>Selector de comparación de resultados</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_selector</source>
@@ -3650,7 +3650,7 @@
 		</message>
 		<message>
 			<source>lbl_result_name_to_show</source>
-			<translation>Result name (to show):</translation>
+			<translation>Nombre del resultado (para mostrar):</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_name_to_show</source>
@@ -3658,7 +3658,7 @@
 		</message>
 		<message>
 			<source>lbl_result_name_to_compare</source>
-			<translation>Result name (to compare):</translation>
+			<translation>Nombre del resultado (para comparar):</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_name_to_compare</source>
@@ -3666,15 +3666,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>lbl_selector_time</source>
-			<translation>Selector time:</translation>
+			<translation>Selector hora:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_selector_time</source>
@@ -3682,7 +3682,7 @@
 		</message>
 		<message>
 			<source>lbl_time_to_compare</source>
-			<translation>Time (to compare):</translation>
+			<translation>Hora (para comparar):</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_time_to_compare</source>
@@ -3690,7 +3690,7 @@
 		</message>
 		<message>
 			<source>lbl_compare_time</source>
-			<translation>Compare time:</translation>
+			<translation>Comparar hora:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_compare_time</source>
@@ -3701,19 +3701,19 @@
 		<name>fastprint</name>
 		<message>
 			<source>title</source>
-			<translation>Dialog</translation>
+			<translation>Diálogo</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>btn_print</source>
-			<translation>Print</translation>
+			<translation>Imprimir</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_print</source>
@@ -3721,7 +3721,7 @@
 		</message>
 		<message>
 			<source>btn_preview</source>
-			<translation>Preview</translation>
+			<translation>Vista previa</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_preview</source>
@@ -3729,7 +3729,7 @@
 		</message>
 		<message>
 			<source>grb_map_options</source>
-			<translation>Map options:</translation>
+			<translation>Opciones de mapa:</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_map_options</source>
@@ -3737,7 +3737,7 @@
 		</message>
 		<message>
 			<source>dlg_fastprint</source>
-			<translation>Dialog</translation>
+			<translation>Diálogo</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_fastprint</source>
@@ -3745,7 +3745,7 @@
 		</message>
 		<message>
 			<source>grb_option_values</source>
-			<translation>Optional values:</translation>
+			<translation>Valores opcionales:</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_option_values</source>
@@ -3756,19 +3756,19 @@
 		<name>feature_delete</name>
 		<message>
 			<source>title</source>
-			<translation>Delete feature</translation>
+			<translation>Borrar elemento</translation>
 		</message>
 		<message>
 			<source>btn_snapping</source>
-			<translation>None</translation>
+			<translation>Snapping</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
-			<translation>None</translation>
+			<translation>Snapping</translation>
 		</message>
 		<message>
 			<source>lbl_feature_id</source>
-			<translation>Feature id:</translation>
+			<translation>Id elemento</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feature_id</source>
@@ -3776,7 +3776,7 @@
 		</message>
 		<message>
 			<source>btn_relations</source>
-			<translation>Show feature relations</translation>
+			<translation>Mostrar relaciones del elemento</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_relations</source>
@@ -3784,7 +3784,7 @@
 		</message>
 		<message>
 			<source>lbl_feature_type</source>
-			<translation>Feature type:</translation>
+			<translation>Tipo de elemento:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feature_type</source>
@@ -3800,7 +3800,7 @@
 		</message>
 		<message>
 			<source>tab_del_feature</source>
-			<translation>Delete feature</translation>
+			<translation>Borrar elemento</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_del_feature</source>
@@ -3808,23 +3808,23 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Delete selected feature</translation>
+			<translation>Borrar elemento seleccionado</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>dlg_feature_delete</source>
-			<translation>Delete feature</translation>
+			<translation>Borrar elemento</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_feature_delete</source>
@@ -3835,11 +3835,11 @@
 		<name>feature_end</name>
 		<message>
 			<source>title</source>
-			<translation>End feature</translation>
+			<translation>Característica final</translation>
 		</message>
 		<message>
 			<source>dlg_feature_end</source>
-			<translation>End feature</translation>
+			<translation>Característica final</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_feature_end</source>
@@ -3847,7 +3847,7 @@
 		</message>
 		<message>
 			<source>lbl_state_type</source>
-			<translation>State type end:</translation>
+			<translation>Tipo estado final:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_state_type</source>
@@ -3855,7 +3855,7 @@
 		</message>
 		<message>
 			<source>lbl_workcat_date</source>
-			<translation>Workcat date:</translation>
+			<translation>Fecha expdte:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workcat_date</source>
@@ -3863,23 +3863,23 @@
 		</message>
 		<message>
 			<source>btn_snapping</source>
-			<translation>None</translation>
+			<translation>Snapping</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
-			<translation>None</translation>
+			<translation>Snapping</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>lbl_enddate</source>
-			<translation>End date:</translation>
+			<translation>Fecha final:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_enddate</source>
@@ -3895,23 +3895,23 @@
 		</message>
 		<message>
 			<source>tab_relations</source>
-			<translation>Relations</translation>
+			<translation>Relaciones</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_relations</source>
-			<translation>None</translation>
+			<translation>Relaciones</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>lbl_description</source>
-			<translation>Description:</translation>
+			<translation>Descripción:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_description</source>
@@ -3919,7 +3919,7 @@
 		</message>
 		<message>
 			<source>tab_arc</source>
-			<translation>Arc</translation>
+			<translation>Arco</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_arc</source>
@@ -3927,7 +3927,7 @@
 		</message>
 		<message>
 			<source>lbl_workcat_id_end</source>
-			<translation>Workcat id end:</translation>
+			<translation>Expdte baja:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workcat_id_end</source>
@@ -3935,15 +3935,15 @@
 		</message>
 		<message>
 			<source>btn_insert</source>
-			<translation>None</translation>
+			<translation>Insertar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_insert</source>
-			<translation>None</translation>
+			<translation>Insertar</translation>
 		</message>
 		<message>
 			<source>tab_workcat</source>
-			<translation>Workcat</translation>
+			<translation>Expediente</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_workcat</source>
@@ -3951,7 +3951,7 @@
 		</message>
 		<message>
 			<source>tab_connec</source>
-			<translation>Connec</translation>
+			<translation>Acometida</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_connec</source>
@@ -3959,11 +3959,11 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tab_elem</source>
@@ -3975,7 +3975,7 @@
 		</message>
 		<message>
 			<source>tab_gully</source>
-			<translation>Gully</translation>
+			<translation>Sumidero</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_gully</source>
@@ -3983,7 +3983,7 @@
 		</message>
 		<message>
 			<source>tab_node</source>
-			<translation>Node</translation>
+			<translation>Nodo</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_node</source>
@@ -3994,11 +3994,11 @@
 		<name>feature_end_connec</name>
 		<message>
 			<source>title</source>
-			<translation>Workcat end list</translation>
+			<translation>Elementos desconectados de tramo</translation>
 		</message>
 		<message>
 			<source>dlg_feature_end_connec</source>
-			<translation>Workcat end list</translation>
+			<translation>Elementos desconectados de tramo</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_feature_end_connec</source>
@@ -4006,7 +4006,7 @@
 		</message>
 		<message>
 			<source>lbl_info</source>
-			<translation>These connecs will be desconnected after dowgrading selected arcs:</translation>
+			<translation>Lista de elementos que quedarán desconectados cuando los tramos seleccionados sean dados de baja:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_info</source>
@@ -4014,15 +4014,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>lbl_filter_by</source>
-			<translation>Filter by arc id:</translation>
+			<translation>Filtrar por id arco:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_filter_by</source>
@@ -4030,22 +4030,22 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 	</context>
 	<context>
 		<name>go2epa</name>
 		<message>
 			<source>title</source>
-			<translation>Go2Epa</translation>
+			<translation>Ir a Epa</translation>
 		</message>
 		<message>
 			<source>chk_exec</source>
-			<translation>Execute EPA software</translation>
+			<translation>Ejecutar software EPA</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_exec</source>
@@ -4085,15 +4085,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>dlg_go2epa</source>
-			<translation>Go2Epa</translation>
+			<translation>Ir a Epa</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_go2epa</source>
@@ -4101,7 +4101,7 @@
 		</message>
 		<message>
 			<source>btn_hs_ds</source>
-			<translation>Scenario selector</translation>
+			<translation>Selector escenario</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_hs_ds</source>
@@ -4109,7 +4109,7 @@
 		</message>
 		<message>
 			<source>btn_options</source>
-			<translation>Options</translation>
+			<translation>Opciones</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_options</source>
@@ -4117,7 +4117,7 @@
 		</message>
 		<message>
 			<source>lbl_result_name</source>
-			<translation>Result name:</translation>
+			<translation>Nombre resultado:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_name</source>
@@ -4125,7 +4125,7 @@
 		</message>
 		<message>
 			<source>lbl_inp_file</source>
-			<translation>INP file:</translation>
+			<translation>Archivo INP:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_inp_file</source>
@@ -4133,15 +4133,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>chk_import_result</source>
-			<translation>Import result</translation>
+			<translation>Importar resultado</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_import_result</source>
@@ -4149,7 +4149,7 @@
 		</message>
 		<message>
 			<source>chk_export</source>
-			<translation>Export INP</translation>
+			<translation>Exportar INP</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_export</source>
@@ -4157,7 +4157,7 @@
 		</message>
 		<message>
 			<source>chk_recurrent</source>
-			<translation>Use iterative calls</translation>
+			<translation>Usar llamadas iterativas</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_recurrent</source>
@@ -4165,7 +4165,7 @@
 		</message>
 		<message>
 			<source>tab_file_manager</source>
-			<translation>File manager</translation>
+			<translation>Administrador de archivo</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_file_manager</source>
@@ -4173,7 +4173,7 @@
 		</message>
 		<message>
 			<source>chk_only_check</source>
-			<translation>Use result network geometry</translation>
+			<translation>Usar la geometría de red resultante</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_only_check</source>
@@ -4181,7 +4181,7 @@
 		</message>
 		<message>
 			<source>lbl_rpt_file</source>
-			<translation>RPT file:</translation>
+			<translation>Archivo RPT:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_rpt_file</source>
@@ -4192,19 +4192,19 @@
 		<name>go2epa_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Epa result management</translation>
+			<translation>Gestor de resultados Epa</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Delete</translation>
+			<translation>Borrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>lbl_result_id</source>
-			<translation>Filter by: Result id</translation>
+			<translation>Filtrar por: Id resultado</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_id</source>
@@ -4212,7 +4212,7 @@
 		</message>
 		<message>
 			<source>dlg_go2epa_manager</source>
-			<translation>Epa result management</translation>
+			<translation>Gestor de resultados Epa</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_go2epa_manager</source>
@@ -4220,22 +4220,22 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 	</context>
 	<context>
 		<name>go2epa_options</name>
 		<message>
 			<source>title</source>
-			<translation>Go2Epa - options</translation>
+			<translation>Go2Epa - opciones</translation>
 		</message>
 		<message>
 			<source>dlg_go2epa_options</source>
-			<translation>Go2Epa - options</translation>
+			<translation>Go2Epa - opciones</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_go2epa_options</source>
@@ -4251,11 +4251,11 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tab_inp</source>
@@ -4267,22 +4267,22 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 	</context>
 	<context>
 		<name>info_catalog</name>
 		<message>
 			<source>title</source>
-			<translation>Catalog</translation>
+			<translation>Catálogo</translation>
 		</message>
 		<message>
 			<source>dlg_info_catalog</source>
-			<translation>Catalog</translation>
+			<translation>Catálogo</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_catalog</source>
@@ -4290,38 +4290,38 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 	</context>
 	<context>
 		<name>info_crmvalue</name>
 		<message>
 			<source>title</source>
-			<translation>Hydrometer</translation>
+			<translation>Hidrómetro</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>dlg_info_crmvalue</source>
-			<translation>Hydrometer</translation>
+			<translation>Hidrómetro</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_crmvalue</source>
@@ -4329,7 +4329,7 @@
 		</message>
 		<message>
 			<source>lbl_hydrometer_id</source>
-			<translation>Hydrometer id:</translation>
+			<translation>Id hidrómetro:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_hydrometer_id</source>
@@ -4337,18 +4337,18 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 	</context>
 	<context>
 		<name>info_crossect</name>
 		<message>
 			<source>title</source>
-			<translation>Section</translation>
+			<translation>Sección</translation>
 		</message>
 		<message>
 			<source>lbl_cost_exc</source>
@@ -4384,7 +4384,7 @@
 		</message>
 		<message>
 			<source>dlg_info_crossect</source>
-			<translation>Section</translation>
+			<translation>Sección</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_crossect</source>
@@ -4432,11 +4432,11 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>lbl_cost_trench</source>
@@ -4459,7 +4459,7 @@
 		<name>info_feature</name>
 		<message>
 			<source>tab_elements</source>
-			<translation>Elements</translation>
+			<translation>Elementos</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_elements</source>
@@ -4467,7 +4467,7 @@
 		</message>
 		<message>
 			<source>tab_connections</source>
-			<translation>Connections</translation>
+			<translation>Conexiones</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_connections</source>
@@ -4475,15 +4475,15 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>tab_hydrometer</source>
-			<translation>Hydrometer</translation>
+			<translation>Hidrómetro</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_hydrometer</source>
@@ -4491,7 +4491,7 @@
 		</message>
 		<message>
 			<source>tab_hydrometer_val</source>
-			<translation>Hydrometer values</translation>
+			<translation>Valores hidrómetro</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_hydrometer_val</source>
@@ -4507,7 +4507,7 @@
 		</message>
 		<message>
 			<source>lbl_downstream_features</source>
-			<translation>Downstream features:</translation>
+			<translation>Características aguas abajo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_downstream_features</source>
@@ -4515,7 +4515,7 @@
 		</message>
 		<message>
 			<source>lbl_to_om</source>
-			<translation>To:</translation>
+			<translation>Hasta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_to_om</source>
@@ -4547,7 +4547,7 @@
 		</message>
 		<message>
 			<source>lbl_param_type_om</source>
-			<translation>Parameter type:</translation>
+			<translation>Tipo parámetro:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_param_type_om</source>
@@ -4579,7 +4579,7 @@
 		</message>
 		<message>
 			<source>lbl_doc_id</source>
-			<translation>Doc id:</translation>
+			<translation>Id doc:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_doc_id</source>
@@ -4595,15 +4595,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>lbl_parameter_om</source>
-			<translation>Parameter:</translation>
+			<translation>Parámetro:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_om</source>
@@ -4611,7 +4611,7 @@
 		</message>
 		<message>
 			<source>lbl_upstream_features</source>
-			<translation>Upstream features:</translation>
+			<translation>Características aguas arriba:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_upstream_features</source>
@@ -4627,19 +4627,19 @@
 		</message>
 		<message>
 			<source>btn_insert</source>
-			<translation>None</translation>
+			<translation>Insertar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_insert</source>
-			<translation>None</translation>
+			<translation>Insertar</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tab_plan</source>
@@ -4659,7 +4659,7 @@
 		</message>
 		<message>
 			<source>lbl_from_om</source>
-			<translation>From:</translation>
+			<translation>Desde:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_from_om</source>
@@ -4683,7 +4683,7 @@
 		</message>
 		<message>
 			<source>lbl_type_doc</source>
-			<translation>Type:</translation>
+			<translation>Tipo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_type_doc</source>
@@ -4691,7 +4691,7 @@
 		</message>
 		<message>
 			<source>lbl_to_doc</source>
-			<translation>To:</translation>
+			<translation>Hasta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_to_doc</source>
@@ -4699,7 +4699,7 @@
 		</message>
 		<message>
 			<source>lbl_from_doc</source>
-			<translation>From:</translation>
+			<translation>Desde:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_from_doc</source>
@@ -4723,7 +4723,7 @@
 		</message>
 		<message>
 			<source>tab_data</source>
-			<translation>Data</translation>
+			<translation>Datos</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_data</source>
@@ -4731,7 +4731,7 @@
 		</message>
 		<message>
 			<source>tab_documents</source>
-			<translation>Documents</translation>
+			<translation>Documentos</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_documents</source>
@@ -4739,11 +4739,11 @@
 		</message>
 		<message>
 			<source>tab_relations</source>
-			<translation>Relations</translation>
+			<translation>Relaciones</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_relations</source>
-			<translation>None</translation>
+			<translation>Relaciones</translation>
 		</message>
 		<message>
 			<source>btn_open_visit_doc</source>
@@ -4766,19 +4766,19 @@
 		<name>info_generic</name>
 		<message>
 			<source>title</source>
-			<translation>Basic info</translation>
+			<translation>Info básica</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>dlg_info_generic</source>
-			<translation>Basic info</translation>
+			<translation>Info básica</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_generic</source>
@@ -4786,30 +4786,30 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 	</context>
 	<context>
 		<name>info_workcat</name>
 		<message>
 			<source>title</source>
-			<translation>New workcat</translation>
+			<translation>Nuevo expdte</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>lbl_workid_key_2</source>
-			<translation>Work id key 2:</translation>
+			<translation>Clave 2 id trabajo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workid_key_2</source>
@@ -4817,7 +4817,7 @@
 		</message>
 		<message>
 			<source>lbl_workid_key_1</source>
-			<translation>Work id key 1:</translation>
+			<translation>Clave 1 id trabajo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_workid_key_1</source>
@@ -4825,7 +4825,7 @@
 		</message>
 		<message>
 			<source>dlg_info_workcat</source>
-			<translation>New workcat</translation>
+			<translation>Nuevo expdte</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_workcat</source>
@@ -4833,7 +4833,7 @@
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Description:</translation>
+			<translation>Descripción:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -4841,7 +4841,7 @@
 		</message>
 		<message>
 			<source>lbl_builtdate</source>
-			<translation>Built date:</translation>
+			<translation>Fecha construcción:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_builtdate</source>
@@ -4849,30 +4849,30 @@
 		</message>
 		<message>
 			<source>lbl_link</source>
-			<translation>Link:</translation>
+			<translation>Enlace:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_link</source>
-			<translation>None</translation>
+			<translation>Enlace</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 	</context>
 	<context>
 		<name>main_dbproject</name>
 		<message>
 			<source>title</source>
-			<translation>Create project</translation>
+			<translation>Crear proyecto</translation>
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Description:</translation>
+			<translation>Descripción:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -4891,11 +4891,11 @@
 		<name>mincut</name>
 		<message>
 			<source>title</source>
-			<translation>Mincut</translation>
+			<translation>Polígono de corte</translation>
 		</message>
 		<message>
 			<source>lbl_dist_from_plot</source>
-			<translation>Distance from plot:</translation>
+			<translation>Distancia fachada:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_dist_from_plot</source>
@@ -4903,15 +4903,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>btn_start</source>
-			<translation>Start</translation>
+			<translation>Inicio</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_start</source>
@@ -4919,7 +4919,7 @@
 		</message>
 		<message>
 			<source>lbl_cause</source>
-			<translation>Cause:</translation>
+			<translation>Causa:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_cause</source>
@@ -4927,7 +4927,7 @@
 		</message>
 		<message>
 			<source>lbl_state</source>
-			<translation>State:</translation>
+			<translation>Estado:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_state</source>
@@ -4935,7 +4935,7 @@
 		</message>
 		<message>
 			<source>lbl_exec_appropriate</source>
-			<translation>Appropriate:</translation>
+			<translation>Apropiado:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_exec_appropriate</source>
@@ -4943,7 +4943,7 @@
 		</message>
 		<message>
 			<source>lbl_work_order</source>
-			<translation>Work order:</translation>
+			<translation>Orden de trabajo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_work_order</source>
@@ -4959,7 +4959,7 @@
 		</message>
 		<message>
 			<source>lbl_assigned_to</source>
-			<translation>Assigned to:</translation>
+			<translation>Asignado a:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_assigned_to</source>
@@ -4967,7 +4967,7 @@
 		</message>
 		<message>
 			<source>lbl_exec_startdate</source>
-			<translation>Start date:</translation>
+			<translation>Fecha inicial:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_exec_startdate</source>
@@ -4975,7 +4975,7 @@
 		</message>
 		<message>
 			<source>grb_location</source>
-			<translation>Location</translation>
+			<translation>Localización</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_location</source>
@@ -4983,7 +4983,7 @@
 		</message>
 		<message>
 			<source>lbl_msg</source>
-			<translation>No results found</translation>
+			<translation>Sin resultados</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_msg</source>
@@ -4991,7 +4991,7 @@
 		</message>
 		<message>
 			<source>lbl_descript_rd</source>
-			<translation>Description:</translation>
+			<translation>Descripción:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript_rd</source>
@@ -4999,15 +4999,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>lbl_received_date</source>
-			<translation>Received date:</translation>
+			<translation>Fecha de recibo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_received_date</source>
@@ -5015,7 +5015,7 @@
 		</message>
 		<message>
 			<source>btn_end</source>
-			<translation>End</translation>
+			<translation>Fin</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_end</source>
@@ -5023,7 +5023,7 @@
 		</message>
 		<message>
 			<source>lbl_end</source>
-			<translation>To:</translation>
+			<translation>Hasta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end</source>
@@ -5031,7 +5031,7 @@
 		</message>
 		<message>
 			<source>lbl_type</source>
-			<translation>Type:</translation>
+			<translation>Tipo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_type</source>
@@ -5039,7 +5039,7 @@
 		</message>
 		<message>
 			<source>lbl_depth</source>
-			<translation>Depth:</translation>
+			<translation>Profundidad:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_depth</source>
@@ -5047,7 +5047,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut</source>
-			<translation>Mincut</translation>
+			<translation>Polígono de corte</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut</source>
@@ -5055,7 +5055,7 @@
 		</message>
 		<message>
 			<source>lbl_exec_user</source>
-			<translation>Exec user:</translation>
+			<translation>Usuario ejecutivo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_exec_user</source>
@@ -5063,7 +5063,7 @@
 		</message>
 		<message>
 			<source>grb_exec_realdates</source>
-			<translation>Real dates</translation>
+			<translation>Fechas reales</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_exec_realdates</source>
@@ -5071,7 +5071,7 @@
 		</message>
 		<message>
 			<source>lbl_start</source>
-			<translation>From:</translation>
+			<translation>Desde:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_start</source>
@@ -5079,7 +5079,7 @@
 		</message>
 		<message>
 			<source>grb_plan_forecasted_dates</source>
-			<translation>Forecasted dates</translation>
+			<translation>Fechas previstas</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_plan_forecasted_dates</source>
@@ -5087,7 +5087,7 @@
 		</message>
 		<message>
 			<source>grb_plan_details</source>
-			<translation>Details</translation>
+			<translation>Detalles</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_plan_details</source>
@@ -5095,7 +5095,7 @@
 		</message>
 		<message>
 			<source>lbl_exec_enddate</source>
-			<translation>End date:</translation>
+			<translation>Fecha final:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_exec_enddate</source>
@@ -5103,7 +5103,7 @@
 		</message>
 		<message>
 			<source>lbl_descript_pd</source>
-			<translation>Description:</translation>
+			<translation>Descripción:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript_pd</source>
@@ -5114,11 +5114,11 @@
 		<name>mincut_composer</name>
 		<message>
 			<source>title</source>
-			<translation>Mincut composer</translation>
+			<translation>Compositor polígono de corte</translation>
 		</message>
 		<message>
 			<source>lbl_title</source>
-			<translation>Title:</translation>
+			<translation>Título:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_title</source>
@@ -5126,7 +5126,7 @@
 		</message>
 		<message>
 			<source>lbl_template</source>
-			<translation>Template:</translation>
+			<translation>Modelo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_template</source>
@@ -5134,7 +5134,7 @@
 		</message>
 		<message>
 			<source>btn_ok</source>
-			<translation>Open</translation>
+			<translation>Abrir</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_ok</source>
@@ -5142,7 +5142,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut_composer</source>
-			<translation>Mincut composer</translation>
+			<translation>Compositor polígono de corte</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_composer</source>
@@ -5150,7 +5150,7 @@
 		</message>
 		<message>
 			<source>lbl_rotation</source>
-			<translation>Rotation:</translation>
+			<translation>Rotación:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_rotation</source>
@@ -5158,46 +5158,46 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 	</context>
 	<context>
 		<name>mincut_connec</name>
 		<message>
 			<source>title</source>
-			<translation>Mincut connec</translation>
+			<translation>Conexión polígono de corte</translation>
 		</message>
 		<message>
 			<source>btn_insert</source>
-			<translation>None</translation>
+			<translation>Insertar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_insert</source>
-			<translation>None</translation>
+			<translation>Insertar</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>btn_snapping</source>
-			<translation>None</translation>
+			<translation>Snapping</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
-			<translation>None</translation>
+			<translation>Snapping</translation>
 		</message>
 		<message>
 			<source>lbl_search</source>
-			<translation>Search by customer code:</translation>
+			<translation>Buscar por código cliente:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_search</source>
@@ -5205,15 +5205,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>dlg_mincut_connec</source>
-			<translation>Mincut connec</translation>
+			<translation>Conexión polígono de corte</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_connec</source>
@@ -5224,11 +5224,11 @@
 		<name>mincut_end</name>
 		<message>
 			<source>title</source>
-			<translation>Mincut end</translation>
+			<translation>Finalizar polígono de corte</translation>
 		</message>
 		<message>
 			<source>lbl_executed</source>
-			<translation>Executed by:</translation>
+			<translation>Ejecutado por:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_executed</source>
@@ -5236,7 +5236,7 @@
 		</message>
 		<message>
 			<source>lbl_work_order</source>
-			<translation>Work order:</translation>
+			<translation>Orden de trabajo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_work_order</source>
@@ -5244,15 +5244,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>lbl_end_date</source>
-			<translation>To:</translation>
+			<translation>Hasta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_date</source>
@@ -5260,7 +5260,7 @@
 		</message>
 		<message>
 			<source>lbl_mincut</source>
-			<translation>Mincut:</translation>
+			<translation>Id:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_mincut</source>
@@ -5268,7 +5268,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut_end</source>
-			<translation>Mincut end</translation>
+			<translation>Finalizar polígono de corte</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_end</source>
@@ -5276,7 +5276,7 @@
 		</message>
 		<message>
 			<source>lbl_start_date</source>
-			<translation>From:</translation>
+			<translation>Desde:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_start_date</source>
@@ -5284,15 +5284,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>btn_set_real_location</source>
-			<translation>Set real location</translation>
+			<translation>Establecer ubicación real</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_set_real_location</source>
@@ -5300,7 +5300,7 @@
 		</message>
 		<message>
 			<source>lbl_end_hour</source>
-			<translation>End hour:</translation>
+			<translation>Hora fin:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_hour</source>
@@ -5308,7 +5308,7 @@
 		</message>
 		<message>
 			<source>lbl_start_hour</source>
-			<translation>Start hour:</translation>
+			<translation>Hora inicio:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_start_hour</source>
@@ -5316,7 +5316,7 @@
 		</message>
 		<message>
 			<source>lbl_number</source>
-			<translation>Number:</translation>
+			<translation>Número:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_number</source>
@@ -5324,7 +5324,7 @@
 		</message>
 		<message>
 			<source>grb_close_mincut</source>
-			<translation>Close mincut</translation>
+			<translation>Cerrar mincut</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_close_mincut</source>
@@ -5332,7 +5332,7 @@
 		</message>
 		<message>
 			<source>lbl_street</source>
-			<translation>Street:</translation>
+			<translation>Calle:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_street</source>
@@ -5340,7 +5340,7 @@
 		</message>
 		<message>
 			<source>lbl_municipality</source>
-			<translation>Municipality:</translation>
+			<translation>Municipio:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_municipality</source>
@@ -5351,11 +5351,11 @@
 		<name>mincut_hydrometer</name>
 		<message>
 			<source>title</source>
-			<translation>Mincut hydrometer</translation>
+			<translation>Hidrómetro polígono de corte</translation>
 		</message>
 		<message>
 			<source>lbl_ccc</source>
-			<translation>Connec customer code:</translation>
+			<translation>Conectar código cliente:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_ccc</source>
@@ -5363,15 +5363,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>dlg_mincut_hydrometer</source>
-			<translation>Mincut hydrometer</translation>
+			<translation>Hidrómetro polígono de corte</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_hydrometer</source>
@@ -5379,15 +5379,15 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>lbl_hcc</source>
-			<translation>Hydrometer customer code:</translation>
+			<translation>Código cliente hidrómetro:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_hcc</source>
@@ -5395,22 +5395,22 @@
 		</message>
 		<message>
 			<source>btn_insert</source>
-			<translation>None</translation>
+			<translation>Insertar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_insert</source>
-			<translation>None</translation>
+			<translation>Insertar</translation>
 		</message>
 	</context>
 	<context>
 		<name>mincut_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Mincut management</translation>
+			<translation>Gestión polígono de corte</translation>
 		</message>
 		<message>
 			<source>lbl_date_to</source>
-			<translation>To:</translation>
+			<translation>Hasta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_date_to</source>
@@ -5418,7 +5418,7 @@
 		</message>
 		<message>
 			<source>lbl_state</source>
-			<translation>State:</translation>
+			<translation>Estado:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_state</source>
@@ -5426,7 +5426,7 @@
 		</message>
 		<message>
 			<source>lbl_exploitation</source>
-			<translation>Exploitation:</translation>
+			<translation>Explotación:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_exploitation</source>
@@ -5442,7 +5442,7 @@
 		</message>
 		<message>
 			<source>btn_cancel_mincut</source>
-			<translation>Cancel mincut</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel_mincut</source>
@@ -5450,7 +5450,7 @@
 		</message>
 		<message>
 			<source>lbl_date_from</source>
-			<translation>From:</translation>
+			<translation>Desde:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_date_from</source>
@@ -5458,7 +5458,7 @@
 		</message>
 		<message>
 			<source>btn_notify</source>
-			<translation>Send sms</translation>
+			<translation>Enviar sms</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_notify</source>
@@ -5466,7 +5466,7 @@
 		</message>
 		<message>
 			<source>dlg_mincut_manager</source>
-			<translation>Mincut management</translation>
+			<translation>Gestión polígono de corte</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_manager</source>
@@ -5474,7 +5474,7 @@
 		</message>
 		<message>
 			<source>lbl_filter</source>
-			<translation>Filter by:</translation>
+			<translation>Filtrar por:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_filter</source>
@@ -5482,15 +5482,15 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Delete</translation>
+			<translation>Borrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>btn_next_days</source>
-			<translation>Next days</translation>
+			<translation>Próximos días</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_next_days</source>
@@ -5498,22 +5498,22 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 	</context>
 	<context>
 		<name>nodetype_change</name>
 		<message>
 			<source>title</source>
-			<translation>Change node type</translation>
+			<translation>Cambiar tipo nodo</translation>
 		</message>
 		<message>
 			<source>lbl_catalog_id</source>
-			<translation>Catalog id:</translation>
+			<translation>Id catálogo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_catalog_id</source>
@@ -5521,7 +5521,7 @@
 		</message>
 		<message>
 			<source>lbl_node_type</source>
-			<translation>Current node type:</translation>
+			<translation>Tipo nodo actual:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_node_type</source>
@@ -5529,7 +5529,7 @@
 		</message>
 		<message>
 			<source>lbl_custom_node_type</source>
-			<translation>New node type:</translation>
+			<translation>Nuevo tipo nodo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_custom_node_type</source>
@@ -5537,7 +5537,7 @@
 		</message>
 		<message>
 			<source>dlg_nodetype_change</source>
-			<translation>Change node type</translation>
+			<translation>Cambiar tipo nodo</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_nodetype_change</source>
@@ -5545,19 +5545,19 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>btn_catalog</source>
@@ -5572,27 +5572,27 @@
 		<name>price_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Price result management</translation>
+			<translation>Gestión resultados precios</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Delete</translation>
+			<translation>Borrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>lbl_result_id</source>
-			<translation>Filter by:</translation>
+			<translation>Filtrar por:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_id</source>
@@ -5600,7 +5600,7 @@
 		</message>
 		<message>
 			<source>btn_update_result</source>
-			<translation>Current result</translation>
+			<translation>Resultado actual</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update_result</source>
@@ -5608,7 +5608,7 @@
 		</message>
 		<message>
 			<source>dlg_price_manager</source>
-			<translation>Price result management</translation>
+			<translation>Gestión resultados precios</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_price_manager</source>
@@ -5619,15 +5619,15 @@
 		<name>profile</name>
 		<message>
 			<source>title</source>
-			<translation>Draw profile</translation>
+			<translation>Dibujar perfil</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>btn_update_path</source>
@@ -5639,7 +5639,7 @@
 		</message>
 		<message>
 			<source>lbl_additional_point</source>
-			<translation>Additional point:</translation>
+			<translation>Pto adicional:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_additional_point</source>
@@ -5647,7 +5647,7 @@
 		</message>
 		<message>
 			<source>btn_save_profile</source>
-			<translation>Save profile</translation>
+			<translation>Guardar perfil</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_save_profile</source>
@@ -5663,7 +5663,7 @@
 		</message>
 		<message>
 			<source>lbl_rotation</source>
-			<translation>Rotation:</translation>
+			<translation>Rotación:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_rotation</source>
@@ -5671,7 +5671,7 @@
 		</message>
 		<message>
 			<source>lbl_sh</source>
-			<translation>Horizontal scale:</translation>
+			<translation>Escala horizontal:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_sh</source>
@@ -5687,7 +5687,7 @@
 		</message>
 		<message>
 			<source>lbl_template</source>
-			<translation>Template:</translation>
+			<translation>Modelo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_template</source>
@@ -5695,7 +5695,7 @@
 		</message>
 		<message>
 			<source>btn_draw</source>
-			<translation>Draw profile</translation>
+			<translation>Dibujar perfil</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_draw</source>
@@ -5703,7 +5703,7 @@
 		</message>
 		<message>
 			<source>lbl_sv</source>
-			<translation>Vertical scale:</translation>
+			<translation>Escala vertical:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_sv</source>
@@ -5711,7 +5711,7 @@
 		</message>
 		<message>
 			<source>btn_load_profile</source>
-			<translation>Load profile</translation>
+			<translation>Cargar perfil</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_load_profile</source>
@@ -5719,7 +5719,7 @@
 		</message>
 		<message>
 			<source>lbl_path</source>
-			<translation>Path:</translation>
+			<translation>Ruta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_path</source>
@@ -5727,7 +5727,7 @@
 		</message>
 		<message>
 			<source>lbl_end_point</source>
-			<translation>End point:</translation>
+			<translation>Pto final:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_point</source>
@@ -5735,7 +5735,7 @@
 		</message>
 		<message>
 			<source>lbl_title</source>
-			<translation>Title:</translation>
+			<translation>Título:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_title</source>
@@ -5743,7 +5743,7 @@
 		</message>
 		<message>
 			<source>lbl_start_point</source>
-			<translation>Start point:</translation>
+			<translation>Pto inicial:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_start_point</source>
@@ -5751,7 +5751,7 @@
 		</message>
 		<message>
 			<source>btn_clear_profile</source>
-			<translation>Clear profile</translation>
+			<translation>Limpiar perfil</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_clear_profile</source>
@@ -5775,7 +5775,7 @@
 		</message>
 		<message>
 			<source>btn_export_pdf</source>
-			<translation>Open composer</translation>
+			<translation>Abrir compositor</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_export_pdf</source>
@@ -5783,7 +5783,7 @@
 		</message>
 		<message>
 			<source>dlg_profile</source>
-			<translation>Draw profile</translation>
+			<translation>Dibujar perfil</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_profile</source>
@@ -5791,7 +5791,7 @@
 		</message>
 		<message>
 			<source>lbl_profile_id</source>
-			<translation>Profile id:</translation>
+			<translation>Id perfil:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_profile_id</source>
@@ -5802,11 +5802,11 @@
 		<name>profile_list</name>
 		<message>
 			<source>title</source>
-			<translation>Load profiles</translation>
+			<translation>Cargar perfiles</translation>
 		</message>
 		<message>
 			<source>btn_open</source>
-			<translation>Open</translation>
+			<translation>Abrir</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_open</source>
@@ -5814,7 +5814,7 @@
 		</message>
 		<message>
 			<source>btn_delete_profile</source>
-			<translation>Delete</translation>
+			<translation>Borrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete_profile</source>
@@ -5822,7 +5822,7 @@
 		</message>
 		<message>
 			<source>dlg_profile_list</source>
-			<translation>Load profiles</translation>
+			<translation>Cargar perfiles</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_profile_list</source>
@@ -5833,11 +5833,11 @@
 		<name>project_check</name>
 		<message>
 			<source>title</source>
-			<translation>Check project</translation>
+			<translation>Chequear proyecto</translation>
 		</message>
 		<message>
 			<source>tab_databaselog</source>
-			<translation>Database log</translation>
+			<translation>Base de datos log</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_databaselog</source>
@@ -5845,7 +5845,7 @@
 		</message>
 		<message>
 			<source>tab_qgis_projlog</source>
-			<translation>Qgis project log</translation>
+			<translation>Qgis proyecto log</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_qgis_projlog</source>
@@ -5853,15 +5853,15 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>dlg_project_check</source>
-			<translation>Check project</translation>
+			<translation>Chequear proyecto</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_project_check</source>
@@ -5872,19 +5872,19 @@
 		<name>psector_duplicate</name>
 		<message>
 			<source>title</source>
-			<translation>Duplicate psector</translation>
+			<translation>Duplicar sector</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>dlg_psector_duplicate</source>
-			<translation>Duplicate psector</translation>
+			<translation>Duplicar sector</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_psector_duplicate</source>
@@ -5892,11 +5892,11 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tab_info_log</source>
@@ -5908,7 +5908,7 @@
 		</message>
 		<message>
 			<source>lbl_new_psector</source>
-			<translation>New psector name:</translation>
+			<translation>Nombre sector nuevo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_new_psector</source>
@@ -5916,7 +5916,7 @@
 		</message>
 		<message>
 			<source>lbl_duplicate_psector</source>
-			<translation>Duplicate psector:</translation>
+			<translation>Duplicar sector:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_duplicate_psector</source>
@@ -5924,7 +5924,7 @@
 		</message>
 		<message>
 			<source>tab_duplicate_psector</source>
-			<translation>Duplicate psector</translation>
+			<translation>Duplicar sector</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_duplicate_psector</source>
@@ -5935,11 +5935,11 @@
 		<name>psector_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Psector management</translation>
+			<translation>Gestor de sector</translation>
 		</message>
 		<message>
 			<source>btn_duplicate</source>
-			<translation>Duplicate</translation>
+			<translation>Duplicar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_duplicate</source>
@@ -5947,15 +5947,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>dlg_psector_manager</source>
-			<translation>Psector management</translation>
+			<translation>Gestor de sector</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_psector_manager</source>
@@ -5963,7 +5963,7 @@
 		</message>
 		<message>
 			<source>lbl_psector_name</source>
-			<translation>Filter by:</translation>
+			<translation>Filtrar por:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_psector_name</source>
@@ -5971,7 +5971,7 @@
 		</message>
 		<message>
 			<source>btn_update_psector</source>
-			<translation>Current psector</translation>
+			<translation>Sector actual</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_update_psector</source>
@@ -5979,22 +5979,22 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Delete</translation>
+			<translation>Borrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
+			<translation>Eliminar</translation>
 		</message>
 	</context>
 	<context>
 		<name>psector_rapport</name>
 		<message>
 			<source>title</source>
-			<translation>Psector rapport</translation>
+			<translation>Generador de informes</translation>
 		</message>
 		<message>
 			<source>dlg_psector_rapport</source>
-			<translation>Psector rapport</translation>
+			<translation>Generador de informes</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_psector_rapport</source>
@@ -6010,7 +6010,7 @@
 		</message>
 		<message>
 			<source>lbl_template</source>
-			<translation>Template:</translation>
+			<translation>Modelo:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_template</source>
@@ -6026,7 +6026,7 @@
 		</message>
 		<message>
 			<source>lbl_detail_csv</source>
-			<translation>Detail csv file:</translation>
+			<translation>Archivo csv detalle:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_detail_csv</source>
@@ -6034,7 +6034,7 @@
 		</message>
 		<message>
 			<source>lbl_prices_list</source>
-			<translation>Prices list csv file:</translation>
+			<translation>Archivo csv lista precios:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_prices_list</source>
@@ -6042,7 +6042,7 @@
 		</message>
 		<message>
 			<source>btn_ok</source>
-			<translation>Create</translation>
+			<translation>Crear</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_ok</source>
@@ -6050,7 +6050,7 @@
 		</message>
 		<message>
 			<source>chk_composer</source>
-			<translation>Composer pdf file</translation>
+			<translation>Archivo pdf compositor</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_composer</source>
@@ -6058,15 +6058,15 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>grb_rapport</source>
-			<translation>Rapport</translation>
+			<translation>Reporte</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_rapport</source>
@@ -6077,11 +6077,11 @@
 		<name>search</name>
 		<message>
 			<source>title</source>
-			<translation>SearchPlus</translation>
+			<translation>Búsqueda</translation>
 		</message>
 		<message>
 			<source>dlg_search</source>
-			<translation>SearchPlus</translation>
+			<translation>Búsqueda</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_search</source>
@@ -6089,7 +6089,7 @@
 		</message>
 		<message>
 			<source>lbl_msg</source>
-			<translation>No results found</translation>
+			<translation>Sin resultados</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_msg</source>
@@ -6100,11 +6100,11 @@
 		<name>search_workcat</name>
 		<message>
 			<source>title</source>
-			<translation>Workcat search</translation>
+			<translation>Buscar expdte</translation>
 		</message>
 		<message>
 			<source>lbl_feat_end</source>
-			<translation>Features ended with the selected workcat:</translation>
+			<translation>Elementos dados de baja:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feat_end</source>
@@ -6112,7 +6112,7 @@
 		</message>
 		<message>
 			<source>dlg_search_workcat</source>
-			<translation>Workcat search</translation>
+			<translation>Buscar expdte</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_search_workcat</source>
@@ -6120,7 +6120,7 @@
 		</message>
 		<message>
 			<source>lbl_feat_ini</source>
-			<translation>Features initiated with the selected workcat:</translation>
+			<translation>Elementos en servicio:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feat_ini</source>
@@ -6128,7 +6128,7 @@
 		</message>
 		<message>
 			<source>tab_init</source>
-			<translation>Initiated</translation>
+			<translation>Iniciado</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_init</source>
@@ -6136,7 +6136,7 @@
 		</message>
 		<message>
 			<source>tab_ended</source>
-			<translation>Ended</translation>
+			<translation>Finalizado</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_ended</source>
@@ -6144,7 +6144,7 @@
 		</message>
 		<message>
 			<source>lbl_init</source>
-			<translation>Init - Feature id</translation>
+			<translation>Id elemento inicio</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_init</source>
@@ -6152,7 +6152,7 @@
 		</message>
 		<message>
 			<source>lbl_end</source>
-			<translation>End - Feature id</translation>
+			<translation>Id elemento final</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end</source>
@@ -6160,7 +6160,7 @@
 		</message>
 		<message>
 			<source>btn_export_to_csv</source>
-			<translation>Export to CSV</translation>
+			<translation>Exportar a CSV</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_export_to_csv</source>
@@ -6168,7 +6168,7 @@
 		</message>
 		<message>
 			<source>tab_doc</source>
-			<translation>Documents</translation>
+			<translation>Documentos</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_doc</source>
@@ -6176,7 +6176,7 @@
 		</message>
 		<message>
 			<source>lbl_destination_path</source>
-			<translation>Destination path:</translation>
+			<translation>Ruta de destino:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_destination_path</source>
@@ -6192,7 +6192,7 @@
 		</message>
 		<message>
 			<source>btn_state1</source>
-			<translation>Active</translation>
+			<translation>Activo</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_state1</source>
@@ -6200,15 +6200,15 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>btn_state0</source>
-			<translation>Active</translation>
+			<translation>Activo</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_state0</source>
@@ -6216,7 +6216,7 @@
 		</message>
 		<message>
 			<source>lbl_total1</source>
-			<translation>Total numbers:</translation>
+			<translation>Números totales:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_total1</source>
@@ -6224,7 +6224,7 @@
 		</message>
 		<message>
 			<source>lbl_total2</source>
-			<translation>Total numbers:</translation>
+			<translation>Números totales:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_total2</source>
@@ -6235,15 +6235,15 @@
 		<name>selector</name>
 		<message>
 			<source>title</source>
-			<translation>Result compare selector</translation>
+			<translation>Selector de comparación de resultados</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>dlg_selector</source>
@@ -6255,38 +6255,38 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 	</context>
 	<context>
 		<name>toolbox</name>
 		<message>
 			<source>title</source>
-			<translation>Config parameters</translation>
+			<translation>Parámetros de configuración</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>btn_run</source>
-			<translation>Run</translation>
+			<translation>Ejecutar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_run</source>
@@ -6294,7 +6294,7 @@
 		</message>
 		<message>
 			<source>tab_config</source>
-			<translation>Config</translation>
+			<translation>Configuración</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_config</source>
@@ -6310,7 +6310,7 @@
 		</message>
 		<message>
 			<source>dlg_toolbox</source>
-			<translation>Config parameters</translation>
+			<translation>Parámetros de configuración</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_toolbox</source>
@@ -6321,11 +6321,11 @@
 		<name>toolbox_docker</name>
 		<message>
 			<source>title</source>
-			<translation>Giswater toolbox</translation>
+			<translation>Caja de herramientas de Giswater</translation>
 		</message>
 		<message>
 			<source>dlg_toolbox_docker</source>
-			<translation>Giswater toolbox</translation>
+			<translation>Caja de herramientas de Giswater</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_toolbox_docker</source>
@@ -6336,7 +6336,7 @@
 		<name>visit</name>
 		<message>
 			<source>title</source>
-			<translation>Visit</translation>
+			<translation>Visita</translation>
 		</message>
 		<message>
 			<source>lbl_visitcat_id</source>
@@ -6348,7 +6348,7 @@
 		</message>
 		<message>
 			<source>lbl_user_name</source>
-			<translation>User name:</translation>
+			<translation>Nombre usuario:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_user_name</source>
@@ -6356,7 +6356,7 @@
 		</message>
 		<message>
 			<source>tab_document</source>
-			<translation>Document</translation>
+			<translation>Documento</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_document</source>
@@ -6364,7 +6364,7 @@
 		</message>
 		<message>
 			<source>lbl_feature_type</source>
-			<translation>Feature type:</translation>
+			<translation>Tipo elem:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_feature_type</source>
@@ -6372,7 +6372,7 @@
 		</message>
 		<message>
 			<source>tab_event</source>
-			<translation>Event</translation>
+			<translation>Evento</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_event</source>
@@ -6380,7 +6380,7 @@
 		</message>
 		<message>
 			<source>lbl_start_date</source>
-			<translation>From:</translation>
+			<translation>Desde:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_start_date</source>
@@ -6412,7 +6412,7 @@
 		</message>
 		<message>
 			<source>lbl_status</source>
-			<translation>Status:</translation>
+			<translation>Estado:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_status</source>
@@ -6420,7 +6420,7 @@
 		</message>
 		<message>
 			<source>lbl_end_date</source>
-			<translation>To:</translation>
+			<translation>Hasta:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_date</source>
@@ -6436,11 +6436,11 @@
 		</message>
 		<message>
 			<source>tab_relations</source>
-			<translation>Relations</translation>
+			<translation>Relaciones</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_relations</source>
-			<translation>None</translation>
+			<translation>Relaciones</translation>
 		</message>
 		<message>
 			<source>btn_doc_delete</source>
@@ -6452,7 +6452,7 @@
 		</message>
 		<message>
 			<source>lbl_code</source>
-			<translation>Code:</translation>
+			<translation>Código:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_code</source>
@@ -6468,7 +6468,7 @@
 		</message>
 		<message>
 			<source>tab_visit</source>
-			<translation>Visit</translation>
+			<translation>Visita</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_visit</source>
@@ -6484,7 +6484,7 @@
 		</message>
 		<message>
 			<source>btn_event_delete</source>
-			<translation>Delete event</translation>
+			<translation>Borrar evento</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_event_delete</source>
@@ -6492,7 +6492,7 @@
 		</message>
 		<message>
 			<source>btn_event_insert</source>
-			<translation>Insert event</translation>
+			<translation>Insertar evento</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_event_insert</source>
@@ -6500,7 +6500,7 @@
 		</message>
 		<message>
 			<source>btn_event_update</source>
-			<translation>Update event</translation>
+			<translation>Actualizar evento</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_event_update</source>
@@ -6508,7 +6508,7 @@
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Description:</translation>
+			<translation>Descripción:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -6516,7 +6516,7 @@
 		</message>
 		<message>
 			<source>btn_add_geom</source>
-			<translation>Add geom</translation>
+			<translation>Añadir geom</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_geom</source>
@@ -6540,7 +6540,7 @@
 		</message>
 		<message>
 			<source>dlg_visit</source>
-			<translation>Visit</translation>
+			<translation>Visita</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit</source>
@@ -6548,30 +6548,30 @@
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 	</context>
 	<context>
 		<name>visit_document</name>
 		<message>
 			<source>title</source>
-			<translation>Load documents</translation>
+			<translation>Cargar documentos</translation>
 		</message>
 		<message>
 			<source>dlg_visit_document</source>
-			<translation>Load documents</translation>
+			<translation>Cargar documentos</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_document</source>
@@ -6579,15 +6579,15 @@
 		</message>
 		<message>
 			<source>lbl_visit_id</source>
-			<translation>Visit id:</translation>
+			<translation>Id visita:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_id</source>
-			<translation>None</translation>
+			<translation>Visita ID</translation>
 		</message>
 		<message>
 			<source>btn_open</source>
-			<translation>Open</translation>
+			<translation>Abrir</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_open</source>
@@ -6598,11 +6598,11 @@
 		<name>visit_event</name>
 		<message>
 			<source>title</source>
-			<translation>Standard arc event</translation>
+			<translation>Evento estándar de arco</translation>
 		</message>
 		<message>
 			<source>lbl_position_id</source>
-			<translation>Position id:</translation>
+			<translation>Id posición:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_id</source>
@@ -6610,7 +6610,7 @@
 		</message>
 		<message>
 			<source>lbl_parameter_id</source>
-			<translation>Parameter id:</translation>
+			<translation>Id parámetro:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_id</source>
@@ -6618,7 +6618,7 @@
 		</message>
 		<message>
 			<source>lbl_position_value</source>
-			<translation>Position value:</translation>
+			<translation>Valor posición:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -6626,7 +6626,7 @@
 		</message>
 		<message>
 			<source>lbl_text</source>
-			<translation>Text:</translation>
+			<translation>Texto:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_text</source>
@@ -6634,7 +6634,7 @@
 		</message>
 		<message>
 			<source>btn_delete_file</source>
-			<translation>Delete file</translation>
+			<translation>Borrar archivo</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete_file</source>
@@ -6642,7 +6642,7 @@
 		</message>
 		<message>
 			<source>lbl_files</source>
-			<translation>Files:</translation>
+			<translation>Archivos:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_files</source>
@@ -6650,7 +6650,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_event</source>
-			<translation>Standard arc event</translation>
+			<translation>Evento estándar de arco</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_event</source>
@@ -6658,7 +6658,7 @@
 		</message>
 		<message>
 			<source>lbl_value</source>
-			<translation>Value:</translation>
+			<translation>Valor:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value</source>
@@ -6666,7 +6666,7 @@
 		</message>
 		<message>
 			<source>btn_add_file</source>
-			<translation>Add file</translation>
+			<translation>Añadir archivo</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_file</source>
@@ -6677,11 +6677,11 @@
 		<name>visit_event_full</name>
 		<message>
 			<source>title</source>
-			<translation>Event</translation>
+			<translation>Evento</translation>
 		</message>
 		<message>
 			<source>lbl_compass</source>
-			<translation>Compass:</translation>
+			<translation>Orientación:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_compass</source>
@@ -6689,7 +6689,7 @@
 		</message>
 		<message>
 			<source>lbl_value1</source>
-			<translation>Value 1:</translation>
+			<translation>Valor 1:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value1</source>
@@ -6697,7 +6697,7 @@
 		</message>
 		<message>
 			<source>lbl_value2</source>
-			<translation>Value 2:</translation>
+			<translation>Valor 2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value2</source>
@@ -6705,11 +6705,11 @@
 		</message>
 		<message>
 			<source>lbl_visit_id</source>
-			<translation>Visit id:</translation>
+			<translation>Id visita:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_id</source>
-			<translation>None</translation>
+			<translation>Visita ID</translation>
 		</message>
 		<message>
 			<source>tab_info</source>
@@ -6729,7 +6729,7 @@
 		</message>
 		<message>
 			<source>lbl_is_last</source>
-			<translation>Is last:</translation>
+			<translation>Último valor:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_is_last</source>
@@ -6737,7 +6737,7 @@
 		</message>
 		<message>
 			<source>tab_files</source>
-			<translation>Files</translation>
+			<translation>Archivos</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_files</source>
@@ -6745,7 +6745,7 @@
 		</message>
 		<message>
 			<source>lbl_value</source>
-			<translation>Value:</translation>
+			<translation>Valor:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value</source>
@@ -6753,15 +6753,15 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>lbl_index_val</source>
-			<translation>Index val:</translation>
+			<translation>Factor de peso:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_index_val</source>
@@ -6777,7 +6777,7 @@
 		</message>
 		<message>
 			<source>lbl_xcoord</source>
-			<translation>X coord:</translation>
+			<translation>Coord X:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_xcoord</source>
@@ -6785,7 +6785,7 @@
 		</message>
 		<message>
 			<source>lbl_ycoord</source>
-			<translation>Y coord:</translation>
+			<translation>Coord Y:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_ycoord</source>
@@ -6801,7 +6801,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_event_full</source>
-			<translation>Event</translation>
+			<translation>Evento</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_event_full</source>
@@ -6817,7 +6817,7 @@
 		</message>
 		<message>
 			<source>lbl_event_code</source>
-			<translation>Event code:</translation>
+			<translation>Código evento:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_event_code</source>
@@ -6825,7 +6825,7 @@
 		</message>
 		<message>
 			<source>lbl_position_id</source>
-			<translation>Position id:</translation>
+			<translation>Id posición:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_id</source>
@@ -6833,7 +6833,7 @@
 		</message>
 		<message>
 			<source>lbl_position_value</source>
-			<translation>Position value:</translation>
+			<translation>Valor posición:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -6841,7 +6841,7 @@
 		</message>
 		<message>
 			<source>lbl_parameter_id</source>
-			<translation>Parameter id:</translation>
+			<translation>Id parametro:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_id</source>
@@ -6857,7 +6857,7 @@
 		</message>
 		<message>
 			<source>lbl_files</source>
-			<translation>Files:</translation>
+			<translation>Archivos:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_files</source>
@@ -6865,7 +6865,7 @@
 		</message>
 		<message>
 			<source>lbl_text</source>
-			<translation>Text:</translation>
+			<translation>Texto:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_text</source>
@@ -6876,7 +6876,7 @@
 		<name>visit_event_rehab</name>
 		<message>
 			<source>title</source>
-			<translation>Rehabilitation arc event</translation>
+			<translation>Evento rehabilitación de arco</translation>
 		</message>
 		<message>
 			<source>lbl_geom2</source>
@@ -6888,7 +6888,7 @@
 		</message>
 		<message>
 			<source>lbl_text</source>
-			<translation>Text:</translation>
+			<translation>Texto:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_text</source>
@@ -6896,7 +6896,7 @@
 		</message>
 		<message>
 			<source>btn_delete_file</source>
-			<translation>Delete file</translation>
+			<translation>Borrar archivo</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete_file</source>
@@ -6904,7 +6904,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_event_rehab</source>
-			<translation>Rehabilitation arc event</translation>
+			<translation>Evento rehabilitación de arco</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_event_rehab</source>
@@ -6912,7 +6912,7 @@
 		</message>
 		<message>
 			<source>lbl_value1</source>
-			<translation>Value 1:</translation>
+			<translation>Valor 1:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value1</source>
@@ -6920,7 +6920,7 @@
 		</message>
 		<message>
 			<source>lbl_files</source>
-			<translation>Files:</translation>
+			<translation>Archivos:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_files</source>
@@ -6928,7 +6928,7 @@
 		</message>
 		<message>
 			<source>lbl_value2</source>
-			<translation>Value 2:</translation>
+			<translation>Valor 2:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_value2</source>
@@ -6936,7 +6936,7 @@
 		</message>
 		<message>
 			<source>lbl_position_value</source>
-			<translation>Position value:</translation>
+			<translation>Valor posición:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
@@ -6944,7 +6944,7 @@
 		</message>
 		<message>
 			<source>btn_add_file</source>
-			<translation>Add file</translation>
+			<translation>Añadir archivo</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_add_file</source>
@@ -6960,7 +6960,7 @@
 		</message>
 		<message>
 			<source>lbl_position_id</source>
-			<translation>Position id:</translation>
+			<translation>Id posición:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_id</source>
@@ -6976,7 +6976,7 @@
 		</message>
 		<message>
 			<source>lbl_parameter_id</source>
-			<translation>Parameter id:</translation>
+			<translation>Id parámetro:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_parameter_id</source>
@@ -6987,19 +6987,19 @@
 		<name>visit_gallery</name>
 		<message>
 			<source>title</source>
-			<translation>Gallery</translation>
+			<translation>Galería</translation>
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Close</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
-			<translation>None</translation>
+			<translation>Cerrar</translation>
 		</message>
 		<message>
 			<source>dlg_visit_gallery</source>
-			<translation>Gallery</translation>
+			<translation>Galería</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_gallery</source>
@@ -7023,15 +7023,15 @@
 		</message>
 		<message>
 			<source>lbl_visit_id</source>
-			<translation>Visit id:</translation>
+			<translation>Id visita:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_id</source>
-			<translation>None</translation>
+			<translation>Visita ID</translation>
 		</message>
 		<message>
 			<source>lbl_event_id</source>
-			<translation>Event id:</translation>
+			<translation>Id evento:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_event_id</source>
@@ -7042,11 +7042,11 @@
 		<name>visit_gallery_zoom</name>
 		<message>
 			<source>title</source>
-			<translation>Gallery zoom</translation>
+			<translation>Zum de la galería</translation>
 		</message>
 		<message>
 			<source>dlg_visit_gallery_zoom</source>
-			<translation>Gallery zoom</translation>
+			<translation>Zum de la galería</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_gallery_zoom</source>
@@ -7070,15 +7070,15 @@
 		</message>
 		<message>
 			<source>lbl_visit_id</source>
-			<translation>Visit id:</translation>
+			<translation>Id visita:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_visit_id</source>
-			<translation>None</translation>
+			<translation>Visita ID</translation>
 		</message>
 		<message>
 			<source>lbl_event_id</source>
-			<translation>Event id:</translation>
+			<translation>Id evento:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_event_id</source>
@@ -7097,7 +7097,7 @@
 		<name>visit_picture</name>
 		<message>
 			<source>title</source>
-			<translation>Add picture</translation>
+			<translation>Añadir foto</translation>
 		</message>
 		<message>
 			<source>path_doc</source>
@@ -7109,7 +7109,7 @@
 		</message>
 		<message>
 			<source>dlg_visit_picture</source>
-			<translation>Add picture</translation>
+			<translation>Añadir foto</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_picture</source>
@@ -7117,27 +7117,27 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
+			<translation>Aceptar</translation>
 		</message>
 		<message>
 			<source>lbl_link</source>
-			<translation>Link:</translation>
+			<translation>Enlace:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_link</source>
-			<translation>None</translation>
+			<translation>Enlace</translation>
 		</message>
 	</context>
 </TS>

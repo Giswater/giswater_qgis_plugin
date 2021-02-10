@@ -1241,7 +1241,7 @@ class DaoController(object):
         if not os.path.exists(locale_path):
             if log_info:
                 self.log_info("Locale not found", parameter=locale_path)
-            locale_default = 'en'
+            locale_default = 'us'
             locale_path = os.path.join(self.plugin_dir, 'i18n', f'giswater_{locale_default}.qm')
             # If English locale file not found, exit function
             # It means that probably that form has not been translated yet
@@ -2076,16 +2076,16 @@ class DaoController(object):
             try:
                 locale = QSettings().value('locale/globalLocale')
             except AttributeError as e:
-                locale = "en_EN"
+                locale = "en_US"
                 self.log_info(f"{type(e).__name__} --> {e}")
         elif utils_giswater.set_boolean(override) is False:
             try:
                 locale = QSettings().value('locale/userLocale')
             except AttributeError as e:
-                locale = "en_EN"
+                locale = "en_US"
                 self.log_info(f"{type(e).__name__} --> {e}")
 
         if locale is None:
-            locale = "en_EN"
+            locale = "en_US"
 
         return locale
