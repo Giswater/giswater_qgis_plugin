@@ -67,6 +67,8 @@ BEGIN
 	-- harmonize state of vnodes according link
 	UPDATE vnode set state=0 FROM link WHERE link.exit_type ='VNODE' and exit_id = vnode_id::text AND link.state=0;
 	UPDATE vnode set state=1 FROM link WHERE link.exit_type ='VNODE' and exit_id = vnode_id::text AND link.state=1;
+	
+	PERFORM setval('SCHEMA_NAME.vnode_vnode_id_seq', (SELECT max(vnode_id) FROM vnode), true);
 
 	-- create vnode when is missed at the end of link and exit type is vnode
 	FOR v_link IN SELECT l.*, vnode.* FROM v_edit_link l LEFT JOIN vnode ON vnode_id = exit_id::integer WHERE l.exit_type ='VNODE' AND (exit_id IS NULL or vnode_id IS NULL)
