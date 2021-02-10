@@ -1871,6 +1871,14 @@ class GwAdminButton:
                 if schema_name is not None:
                     tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
                     self._set_info_project()
+                    proyect_type = tools_qt.get_text(self.dlg_readsql_create_project, 'cmb_create_project_type')
+                    tools_qt.set_widget_text(self.dlg_readsql, 'cmb_project_type', proyect_type)
+                    self.cmb_create_project_type.currentIndexChanged.emit(self.cmb_create_project_type.currentIndex())
+                    project_name = tools_qt.get_text(self.dlg_readsql_create_project, 'project_name')
+                    tools_qt.set_widget_text(self.dlg_readsql, 'project_schema_name', project_name)
+                    self.dlg_readsql.project_schema_name.currentIndexChanged.emit(self.dlg_readsql.project_schema_name.currentIndex())
+
+
         else:
             global_vars.dao.rollback()
             # Reset count error variable to 0
@@ -2322,12 +2330,12 @@ class GwAdminButton:
         elif str(self.plugin_version) > str(self.project_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                   '(Schema version is lower than plugin version, please update schema)')
+                                     '(Schema version is lower than plugin version, please update schema)')
             self.dlg_readsql.btn_info.setEnabled(True)
         elif str(self.plugin_version) < str(self.project_version):
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
-                                   '(Schema version is higher than plugin version, please update plugin)')
+                                     '(Schema version is higher than plugin version, please update plugin)')
             self.dlg_readsql.btn_info.setEnabled(False)
         else:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
@@ -2387,8 +2395,7 @@ class GwAdminButton:
 
         # Get project_type from previous dialog
         self.cmb_project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-        tools_qt.set_widget_text(self.dlg_readsql_create_project, self.cmb_create_project_type,
-                               self.cmb_project_type)
+        tools_qt.set_widget_text(self.dlg_readsql_create_project, self.cmb_create_project_type, self.cmb_project_type)
         self._change_project_type(self.cmb_create_project_type)
 
         # Open dialog
