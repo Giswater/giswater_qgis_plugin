@@ -685,7 +685,7 @@ BEGIN
 
 					--select values for missing id
 					EXECUTE 'SELECT id, idval FROM ('||v_querytext||')a
-					WHERE id = '||field_value||''
+					WHERE id::text = '||quote_literal(field_value)||''
 					INTO v_selected_id,v_selected_idval;
 					
 					v_current_id =json_extract_path_text(v_fields_array[array_index],'comboIds');
