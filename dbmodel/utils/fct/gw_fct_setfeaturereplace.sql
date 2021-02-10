@@ -228,8 +228,6 @@ BEGIN
 			v_query_string_insert='INSERT INTO '||v_man_table||' VALUES ('||v_id||');';
 			execute v_query_string_insert;
 
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (143, v_result_id, concat('Insert new feature id into ',v_man_table,'.'));
 
 		END IF;
 		
@@ -239,8 +237,6 @@ BEGIN
 			v_query_string_insert='INSERT INTO '||v_epa_table||' VALUES ('||v_id||');';
 			execute v_query_string_insert;
 
-			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (143, v_result_id, concat('Insert new feature id into ',v_epa_table,'.'));
 
 		END IF;
 		
@@ -263,8 +259,6 @@ BEGIN
 			IF v_query_string_update IS NOT NULL THEN
 				EXECUTE v_query_string_update; 
 	
-				INSERT INTO audit_check_data (fid, result_id, error_message)
-				VALUES (143, v_result_id, concat('Copy value of ',v_column,': ',v_value,'.'));
 			END IF;
 		END LOOP;
 
@@ -285,8 +279,6 @@ BEGIN
 				IF v_query_string_update IS NOT NULL THEN
 					EXECUTE v_query_string_update; 
 
-					INSERT INTO audit_check_data (fid, result_id, error_message)
-					VALUES (143, v_result_id, concat('Copy value of ',v_column,': ',v_value,'.'));
 				END IF;
 				
 			END LOOP;
@@ -308,8 +300,6 @@ BEGIN
 				IF v_query_string_update IS NOT NULL THEN
 					EXECUTE v_query_string_update; 
 
-					INSERT INTO audit_check_data (fid, result_id, error_message)
-					VALUES (143, v_result_id, concat('Copy value of ', v_column,': ',v_value,'.'));
 				END IF;
 			END LOOP;
 		END IF;
@@ -393,6 +383,10 @@ BEGIN
 			EXECUTE 'UPDATE '||v_feature_type||' SET state=1, workcat_id='''||v_workcat_id_end||''', builtdate='''||v_enddate||''', enddate=NULL WHERE '||v_id_column||'='''||v_id||''';';
 			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (143, v_result_id, concat('Update new feature, set state: 1, workcat_id: ',v_workcat_id_end,', builtdate: ',v_enddate,'.'));
+			
+			INSERT INTO audit_check_data (fid, result_id, error_message)
+			VALUES (143, v_result_id, concat('Common values from old feature have been updated on new feature.'));
+			
 		END IF;
 		
 		--reconect existing link to the new feature
