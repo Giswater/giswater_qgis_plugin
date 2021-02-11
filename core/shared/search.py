@@ -526,7 +526,6 @@ class GwSearch:
         # self.zoom_to_polygon(workcat_id, layer_name, field_id)
 
         self.items_dialog = GwSearchWorkcatUi()
-        self.items_dialog.setWindowTitle(f'Workcat: {display_name}')
 
         tools_gw.add_icon(self.items_dialog.btn_doc_insert, "111")
         tools_gw.add_icon(self.items_dialog.btn_doc_delete, "112")
@@ -612,7 +611,8 @@ class GwSearch:
         self._fill_label_data(workcat_id, table_name_end, extension)
 
         tools_gw.open_dialog(self.items_dialog, dlg_name='search_workcat')
-
+        title = self.items_dialog.windowTitle()
+        self.items_dialog.setWindowTitle(f"{title} - {display_name}")
 
     def _manage_document(self, qtable, item_id):
         """ Access GUI to manage documents e.g Execute action of button 34 """
