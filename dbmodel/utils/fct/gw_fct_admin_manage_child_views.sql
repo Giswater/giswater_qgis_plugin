@@ -20,6 +20,10 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "inf
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
+
+ SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE" }}$$); --only replace views, not config
+ 
 */
 
 DECLARE 
@@ -87,6 +91,16 @@ BEGIN
 		v_return_msg = 'Process finished successfully';
 
 	ELSE 
+
+		IF v_action = 'MULTI-UPDATE' THEN
+			v_multi_create = TRUE;
+			FOR v_childview IN SELECT child_layer FROM cat_feature WHERE child_layer IS NOT NULL
+			LOOP
+				EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
+				PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
+			END LOOP;
+		END IF;
+		
 		--if the view should be created for all the features loop over the cat_features
 		IF v_multi_create IS TRUE AND v_project_type IS NOT NULL THEN -- only for that existing projects (projecttype not null)
 				
@@ -223,7 +237,7 @@ BEGIN
 					CONTINUE;
 				END IF;
 
-				IF 	v_viewname NOT IN (SELECT formname FROM config_form_fields) THEN
+				IF v_viewname NOT IN (SELECT formname FROM config_form_fields) THEN
 					EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 					"feature":{"catFeature":"'||v_cat_feature||'"}, 
 					"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
@@ -354,7 +368,7 @@ BEGIN
 				v_return_msg = 'Process finished successfully';
 				END IF;
 
-			IF 	v_viewname NOT IN (SELECT formname FROM config_form_fields) THEN
+			IF v_viewname NOT IN (SELECT formname FROM config_form_fields) THEN
 				EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 				"feature":{"catFeature":"'||v_cat_feature||'"}, 
 				"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';

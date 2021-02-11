@@ -2,3 +2,4 @@
 ************
 - Bug fix on vi_valves
 - Minor improvements on go2epa
+- Add field workcat_id_plan to node, arc, connec and gully tables
