@@ -1241,7 +1241,7 @@ class DaoController(object):
         if not os.path.exists(locale_path):
             if log_info:
                 self.log_info("Locale not found", parameter=locale_path)
-            locale_default = 'us'
+            locale_default = 'en'
             locale_path = os.path.join(self.plugin_dir, 'i18n', f'giswater_{locale_default}.qm')
             # If English locale file not found, exit function
             # It means that probably that form has not been translated yet

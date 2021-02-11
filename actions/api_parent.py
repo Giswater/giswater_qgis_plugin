@@ -209,10 +209,10 @@ class ApiParent(ParentAction):
         locale = QSettings().value('locale/userLocale').lower()
         if locale == 'es_es':
             locale = 'es'
-        elif locale == 'es_ca':
+        elif locale == 'ca_es':
             locale = 'ca'
         elif locale == 'en_us':
-            locale = 'us'
+            locale = 'en'
         project_type = self.controller.get_project_type()
         # Get PDF file
         pdf_folder = os.path.join(self.plugin_dir, 'png')
