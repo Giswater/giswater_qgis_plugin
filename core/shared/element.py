@@ -524,7 +524,7 @@ class GwElement:
         status = tools_db.execute_sql(sql)
         if status:
             self.element_id = element_id
-            self.layers = tools_gw.manage_close(self.dlg_add_element, table_object, excluded_layers=[], layers=self.layers)
+            self.layers = tools_gw.manage_close(self.dlg_add_element, table_object, layers=self.layers)
 
 
     def _filter_elementcat_id(self):

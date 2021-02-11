@@ -113,13 +113,14 @@ class GwDocument:
         self.dlg_add_doc.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
         self.dlg_add_doc.doc_type.currentIndexChanged.connect(self._activate_relations)
         self.dlg_add_doc.btn_path_url.clicked.connect(partial(self._open_web_browser, self.dlg_add_doc, "path"))
-        self.dlg_add_doc.btn_path_doc.clicked.connect(lambda: setattr(self, 'files_path', self._get_file_dialog(self.dlg_add_doc, "path")))
+        self.dlg_add_doc.btn_path_doc.clicked.connect(
+            lambda: setattr(self, 'files_path', self._get_file_dialog(self.dlg_add_doc, "path")))
         self.dlg_add_doc.btn_accept.clicked.connect(
             partial(self._manage_document_accept, table_object, tablename, qtable, item_id))
         self.dlg_add_doc.btn_cancel.clicked.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(
-            self.dlg_add_doc, table_object, cur_active_layer, single_tool_mode=self.single_tool_mode, layers=self.layers)))
+            self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.layers)))
         self.dlg_add_doc.rejected.connect(lambda: setattr(self, 'layers', tools_gw.manage_close(
-            self.dlg_add_doc, table_object, cur_active_layer, single_tool_mode=self.single_tool_mode, layers=self.layers)))
+            self.dlg_add_doc, table_object, cur_active_layer, self.single_tool_mode, self.layers)))
         self.dlg_add_doc.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, excluded_layers))
 
@@ -133,7 +134,7 @@ class GwDocument:
             partial(tools_gw.selection_init, self, self.dlg_add_doc, table_object, False))
 
         self.dlg_add_doc.tbl_doc_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_add_doc.tbl_doc_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+             self.dlg_add_doc.tbl_doc_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
         self.dlg_add_doc.tbl_doc_x_node.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
             self.dlg_add_doc.tbl_doc_x_node, "v_edit_node", "node_id", self.rubber_band, 1))
         self.dlg_add_doc.tbl_doc_x_connec.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
@@ -189,6 +190,7 @@ class GwDocument:
 
 
     # region private functions
+
 
     def _fill_combo_by_query(self, dialog, widget, table_name, field_name="id"):
         """ Executes query and fill combo box """
@@ -341,8 +343,7 @@ class GwDocument:
         status = tools_db.execute_sql(sql)
         if status:
             self.doc_id = doc_id
-            tools_gw.manage_close(self.dlg_add_doc, table_object, excluded_layers=["v_edit_element"],
-                                  single_tool_mode=self.single_tool_mode, layers=self.layers)
+            tools_gw.manage_close(self.dlg_add_doc, table_object, None, self.single_tool_mode, self.layers)
 
         if tablename is None:
             return
