@@ -607,7 +607,7 @@ class GwInfo(QObject):
         action_edit.setChecked(layer.isEditable())
         # Actions signals
         action_edit.triggered.connect(partial(self._manage_edition, dlg_cf, action_edit, fid, new_feature))
-        action_catalog.triggered.connect(partial(self._open_catalog, tab_type, self.feature_type))
+        action_catalog.triggered.connect(partial(self._open_catalog, tab_type, self.feature_type, complet_result['body']['feature']['childType']))
         action_workcat.triggered.connect(partial(self._get_catalog, 'new_workcat', self.tablename, self.feature_type, self.feature_id, self.field_id, list_points))
         action_mapzone.triggered.connect(partial(self._get_catalog, 'new_mapzone', self.tablename, self.feature_type, self.feature_id, self.field_id, list_points))
         action_set_to_arc.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_set_to_arc, 'v_edit_arc', 'set_to_arc', None))
@@ -1955,7 +1955,7 @@ class GwInfo(QObject):
         return widget
 
 
-    def _open_catalog(self, tab_type, feature_type):
+    def _open_catalog(self, tab_type, feature_type, child_type):
 
         self.catalog = GwCatalog()
 
@@ -1964,7 +1964,7 @@ class GwInfo(QObject):
             widget = f'{tab_type}_{self.feature_type}at_id'
         else:
             widget = f'{tab_type}_{self.feature_type}cat_id'
-        self.catalog.open_catalog(self.dlg_cf, widget, feature_type)
+        self.catalog.open_catalog(self.dlg_cf, widget, feature_type, child_type)
 
 
     def _show_actions(self, dialog, tab_name):

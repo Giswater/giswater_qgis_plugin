@@ -24,7 +24,7 @@ class GwCatalog:
         pass
 
 
-    def open_catalog(self, previous_dialog, widget_name, feature_type):
+    def open_catalog(self, previous_dialog, widget_name, feature_type, child_type):
         """ Main function of catalog """
 
         # Manage if feature_type is gully and set grate
@@ -33,15 +33,10 @@ class GwCatalog:
 
         form_name = 'upsert_catalog_' + feature_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
-        feature = f'"feature_type":"{feature_type}"'
+        feature = f'"feature_type":"{child_type}"'
         body = tools_gw.create_body(form, feature)
-        sql = f"SELECT gw_fct_getcatalog({body})::text"
-        row = tools_db.get_row(sql)
-        if not row:
-            tools_qgis.show_message("NOT ROW FOR: " + sql, 2)
-            return
+        json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body, log_sql=True)
 
-        complet_list = json.loads(row[0], object_pairs_hook=OrderedDict)
         group_box_1 = QGroupBox("Filter")
         self.filter_form = QGridLayout()
 
@@ -51,7 +46,7 @@ class GwCatalog:
         self.dlg_catalog.btn_accept.clicked.connect(partial(self._fill_geomcat_id, previous_dialog, widget_name))
 
         main_layout = self.dlg_catalog.widget.findChild(QGridLayout, 'main_layout')
-        result = complet_list['body']['data']
+        result = json_result['body']['data']
         for field in result['fields']:
             label = QLabel()
             label.setObjectName('lbl_' + field['label'])
@@ -82,15 +77,12 @@ class GwCatalog:
         id = self.dlg_catalog.findChild(QComboBox, 'id')
 
         # Call _get_catalog first time
-        self._get_catalog(matcat_id, pnom, dnom, id, feature_type)
+        self._get_catalog(matcat_id, pnom, dnom, id, feature_type, child_type)
 
         # Set Listeners
-        matcat_id.currentIndexChanged.connect(
-            partial(self._populate_pn_dn, matcat_id, pnom, dnom, feature_type))
-        pnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id,
-                                         pnom, dnom, id, feature_type))
-        dnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id,
-                                         pnom, dnom, id, feature_type))
+        matcat_id.currentIndexChanged.connect(partial(self._populate_pn_dn, matcat_id, pnom, dnom, feature_type, child_type))
+        pnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id,pnom, dnom, id, feature_type, child_type))
+        dnom.currentIndexChanged.connect(partial(self._get_catalog, matcat_id, pnom, dnom, id, feature_type, child_type))
 
         # Set shortcut keys
         self.dlg_catalog.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_catalog))
@@ -101,7 +93,7 @@ class GwCatalog:
 
     # region private functions
 
-    def _get_catalog(self, matcat_id, pnom, dnom, id, feature_type):
+    def _get_catalog(self, matcat_id, pnom, dnom, id, feature_type, child_type):
         """ Execute gw_fct_getcatalog """
 
         matcat_id_value = tools_qt.get_combo_value(self.dlg_catalog, matcat_id)
@@ -110,7 +102,7 @@ class GwCatalog:
 
         form_name = 'upsert_catalog_' + feature_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
-        feature = f'"feature_type":"{feature_type}"'
+        feature = f'"feature_type":"{child_type}"'
         extras = None
         if tools_gw.get_project_type() == 'ws':
             extras = f'"fields":{{"matcat_id":"{matcat_id_value}", "pnom":"{pn_value}", "dnom":"{dn_value}"}}'
@@ -118,34 +110,29 @@ class GwCatalog:
             extras = f'"fields":{{"matcat_id":"{matcat_id_value}", "shape":"{pn_value}", "geom1":"{dn_value}"}}'
 
         body = tools_gw.create_body(form=form, feature=feature, extras=extras)
-        sql = f"SELECT gw_fct_getcatalog({body})::text"
-        row = tools_db.get_row(sql)
-        complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
-        if complet_result['status'] == "Failed":
-            tools_log.log_warning(complet_result)
+        json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body, log_sql=True)
+        if json_result['status'] == "Failed":
+            tools_log.log_warning(json_result)
             return False
-        if complet_result['status'] == "Accepted":
-            result = complet_result['body']['data']
+        if json_result['status'] == "Accepted":
+            result = json_result['body']['data']
             for field in result['fields']:
                 if field['columnname'] == 'id':
                     self._fill_combo(id, field)
 
 
-    def _populate_pn_dn(self, matcat_id, pnom, dnom, feature_type):
+    def _populate_pn_dn(self, matcat_id, pnom, dnom, feature_type, child_type):
         """ Execute gw_fct_getcatalog and fill combos """
 
         matcat_id_value = tools_qt.get_combo_value(self.dlg_catalog, matcat_id)
 
         form_name = f'upsert_catalog_' + feature_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
-        feature = f'"feature_type":"{feature_type}"'
+        feature = f'"feature_type":"{child_type}"'
         extras = f'"fields":{{"matcat_id":"{matcat_id_value}"}}'
         body = tools_gw.create_body(form=form, feature=feature, extras=extras)
-        sql = f"SELECT gw_fct_getcatalog({body})::text"
-        row = tools_db.get_row(sql)
-        complet_list = json.loads(row[0], object_pairs_hook=OrderedDict)
-        result = complet_list['body']['data']
-        for field in result['fields']:
+        json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body, log_sql=True)
+        for field in json_result['body']['data']['fields']:
             if field['columnname'] in ('pnom', 'shape'):
                 self._fill_combo(pnom, field)
             elif field['columnname'] in ('dnom', 'geom1'):
