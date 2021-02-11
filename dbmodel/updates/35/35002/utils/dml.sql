@@ -268,3 +268,9 @@ WHERE columnname  = 'verified';
 -- 2021/08/02
 DELETE FROM config_toolbox WHERE id = 2784;
 DELETE FROM sys_table WHERE id ='om_visit_parameter_index';
+
+-- 2021/11/02
+UPDATE sys_param_user SET layoutname = 'lyt_connec' WHERE layoutname = 'lyt_connec_vdef' AND formname = 'config';
+UPDATE sys_param_user SET layoutname = 'lyt_arc' WHERE layoutname = 'lyt_arc_vdef' AND formname = 'config';
+UPDATE sys_param_user SET layoutname = 'lyt_node' WHERE layoutname = 'lyt_node_vdef' AND formname = 'config';
+UPDATE sys_param_user SET layoutname = 'lyt_utils' WHERE layoutname = 'lyt_utils_vdef' AND formname = 'config';
