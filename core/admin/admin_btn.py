@@ -2698,6 +2698,7 @@ class GwAdminButton:
 
     def _update_manage_ui(self):
         """"""
+
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
         if schema_name is None:
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
@@ -2707,7 +2708,6 @@ class GwAdminButton:
 
         # Control if schema_version is updated to 3.2
         if str(self.project_version).replace('.', '') < str(self.plugin_version).replace('.', ''):
-
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_addfields).setEnabled(False)
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(False)
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(False)
@@ -2722,19 +2722,17 @@ class GwAdminButton:
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(True)
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(True)
 
-            if not tools_db.check_table('cat_feature'):
+            print(f"tools_db.check_table('cat_feature') -> {tools_db.check_table('cat_feature')}")
+
+            if not tools_db.check_table('cat_feature', schema_name):
                 tools_log.log_warning(f"Table not found: 'cat_feature'")
                 return
-
-            sql = (f"SELECT cat_feature.child_layer, cat_feature.child_layer "
-                   f"FROM {schema_name}.cat_feature "
-                   f" ORDER BY id")
-            rows = tools_db.get_rows(sql)
 
             sql = (f"SELECT cat_feature.id, cat_feature.id "
                    f"FROM {schema_name}.cat_feature "
                    f" ORDER BY id")
             rows = tools_db.get_rows(sql)
+
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_fields, rows, 1)
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_name_view, rows, 1)
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_feature_sys_fields, rows, 1)
