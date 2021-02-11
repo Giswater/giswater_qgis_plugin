@@ -800,11 +800,11 @@ class GwProfileButton(GwAction):
         yninf = [i2y, i3y, i4y, i5y]
 
         if node.surface_type == 'TOP':
-          xnsup = [s2x, s3x, s4x, s5x]
-          ynsup = [s2y, s3y, s4y, s5y]
+            xnsup = [s2x, s3x, s4x, s5x]
+            ynsup = [s2y, s3y, s4y, s5y]
         else:
-          xnsup = [s2x, s5x]
-          ynsup = [s2y, s5y]
+            xnsup = [s2x, s5x]
+            ynsup = [s2y, s5y]
 
         # draw node bottom line
         plt.plot(xninf, yninf,
