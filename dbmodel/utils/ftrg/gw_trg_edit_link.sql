@@ -28,6 +28,7 @@ DECLARE
 	v_arc_id text;
 	v_userdefined_geom boolean;
 	v_end_state integer;
+	v_autoupdate_dma boolean;
 
 
 BEGIN
@@ -39,6 +40,9 @@ BEGIN
 
 	-- control of project type
 	SELECT project_type INTO v_projectype FROM sys_version LIMIT 1;
+
+	-- control autoupdate_dma
+	SELECT value::boolean INTO v_autoupdate_dma FROM config_param_system WHERE parameter='edit_connect_autoupdate_dma';
 	
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
@@ -166,9 +170,16 @@ BEGIN
 			
 			--update connec or plan_psector_x_connec.arc_id
 			IF NEW.ispsectorgeom IS NOT TRUE THEN
-				UPDATE connec SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id, 
-				expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
-				WHERE connec_id=v_connec1.connec_id;
+				IF v_autoupdate_dma IS FALSE THEN
+					UPDATE connec SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id, 
+					expl_id=v_arc.expl_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
+					WHERE connec_id=v_connec1.connec_id;
+				ELSE
+					UPDATE connec SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id, 
+					expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
+					WHERE connec_id=v_connec1.connec_id;
+				END IF;
+					
 			ELSIF NEW.ispsectorgeom IS TRUE THEN
 				UPDATE plan_psector_x_connec SET arc_id=v_arc.arc_id WHERE plan_psector_x_connec.id=NEW.psector_rowid;
 			END IF;
@@ -178,9 +189,16 @@ BEGIN
 			
 				--update gully or plan_psector_x_gully.arc_id
 				IF NEW.ispsectorgeom IS NOT TRUE THEN
-					UPDATE gully SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id,
-					expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
-					WHERE gully_id=v_gully1.gully_id;
+					IF v_autoupdate_dma IS FALSE THEN
+						UPDATE gully SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id,
+						expl_id=v_arc.expl_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
+						WHERE gully_id=v_gully1.gully_id;
+					ELSE
+						UPDATE gully SET arc_id=v_arc.arc_id, featurecat_id=v_arc.arc_type, feature_id=v_arc.arc_id,
+						expl_id=v_arc.expl_id, dma_id=v_arc.dma_id, sector_id=v_arc.sector_id, pjoint_type='VNODE', pjoint_id=v_node_id
+						WHERE gully_id=v_gully1.gully_id;
+					END IF;
+
 				ELSIF NEW.ispsectorgeom IS TRUE THEN
 					UPDATE plan_psector_x_gully SET arc_id=v_arc.arc_id WHERE plan_psector_x_gully.id=NEW.psector_rowid;
 				END IF;
@@ -205,9 +223,16 @@ BEGIN
 
 			--update connec or plan_psector_x_connec.arc_id
 			IF NEW.ispsectorgeom IS NOT TRUE THEN
-				UPDATE connec SET arc_id=v_arc.arc_id, featurecat_id=v_node.node_type, feature_id=v_node.node_id,
-				expl_id=v_node.expl_id, dma_id=v_node.dma_id, sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
-				WHERE connec_id=v_connec1.connec_id;
+				IF v_autoupdate_dma IS FALSE THEN
+					UPDATE connec SET arc_id=v_arc.arc_id, featurecat_id=v_node.node_type, feature_id=v_node.node_id,
+					expl_id=v_node.expl_id, sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
+					WHERE connec_id=v_connec1.connec_id;
+				ELSE
+					UPDATE connec SET arc_id=v_arc.arc_id, featurecat_id=v_node.node_type, feature_id=v_node.node_id,
+					expl_id=v_node.expl_id, dma_id=v_node.dma_id, sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
+					WHERE connec_id=v_connec1.connec_id;
+				END IF;
+				
 			ELSIF NEW.ispsectorgeom IS TRUE THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
@@ -218,9 +243,17 @@ BEGIN
 			
 				--update gully or plan_psector_x_gully.arc_id
 				IF NEW.ispsectorgeom IS NOT TRUE THEN
-					UPDATE gully SET arc_id=v_arc.arc_id, featurecat_id=v_node.node_type, feature_id=v_node.node_id,
-					expl_id=v_node.expl_id, dma_id=v_node.dma_id, sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
-					WHERE gully_id=v_gully1.gully_id;
+					IF v_autoupdate_dma IS FALSE THEN
+						UPDATE gully SET arc_id=v_arc.arc_id, featurecat_id=v_node.node_type, feature_id=v_node.node_id,
+						expl_id=v_node.expl_id, sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
+						WHERE gully_id=v_gully1.gully_id;
+					ELSE
+						UPDATE gully SET arc_id=v_arc.arc_id, featurecat_id=v_node.node_type, feature_id=v_node.node_id,
+						expl_id=v_node.expl_id, dma_id=v_node.dma_id, sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
+						WHERE gully_id=v_gully1.gully_id;
+
+					END IF;
+					
 				ELSIF NEW.ispsectorgeom IS TRUE THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';				
@@ -241,9 +274,17 @@ BEGIN
 
 			--update connec or plan_psector_x_connec.arc_id
 			IF NEW.ispsectorgeom IS NOT TRUE THEN
-				UPDATE connec SET arc_id=v_connec2.arc_id, expl_id=v_connec2.expl_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, 
-				sector_id=v_connec2.sector_id, pjoint_type=v_connec2.pjoint_type, pjoint_id=v_connec2.pjoint_id
-				WHERE connec_id=v_connec1.connec_id;
+				IF v_autoupdate_dma IS FALSE THEN
+					UPDATE connec SET arc_id=v_connec2.arc_id, expl_id=v_connec2.expl_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type,
+					sector_id=v_connec2.sector_id, pjoint_type=v_connec2.pjoint_type, pjoint_id=v_connec2.pjoint_id
+					WHERE connec_id=v_connec1.connec_id;
+				ELSE
+					UPDATE connec SET arc_id=v_connec2.arc_id, expl_id=v_connec2.expl_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, 
+					sector_id=v_connec2.sector_id, pjoint_type=v_connec2.pjoint_type, pjoint_id=v_connec2.pjoint_id
+					WHERE connec_id=v_connec1.connec_id;
+
+				END IF;
+				
 			ELSIF NEW.ispsectorgeom IS TRUE THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
@@ -254,9 +295,17 @@ BEGIN
 			
 				--update gully or plan_psector_x_gully.arc_id
 				IF NEW.ispsectorgeom IS NOT TRUE THEN
-					UPDATE gully SET arc_id=v_connec2.arc_id, expl_id=v_connec2.expl_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, 
-					sector_id=v_connec2.sector_id, pjoint_type=v_connec2.pjoint_type, pjoint_id=v_connec2.pjoint_id
-					WHERE gully_id=v_gully1.gully_id;
+					IF v_autoupdate_dma IS FALSE THEN
+						UPDATE gully SET arc_id=v_connec2.arc_id, expl_id=v_connec2.expl_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type,
+						sector_id=v_connec2.sector_id, pjoint_type=v_connec2.pjoint_type, pjoint_id=v_connec2.pjoint_id
+						WHERE gully_id=v_gully1.gully_id;
+					ELSE
+						UPDATE gully SET arc_id=v_connec2.arc_id, expl_id=v_connec2.expl_id, feature_id=v_connec2.connec_id, featurecat_id=v_connec2.connec_type, dma_id=v_connec2.dma_id, 
+						sector_id=v_connec2.sector_id, pjoint_type=v_connec2.pjoint_type, pjoint_id=v_connec2.pjoint_id
+						WHERE gully_id=v_gully1.gully_id;
+
+					END IF;
+					
 				ELSIF NEW.ispsectorgeom IS TRUE THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';				
@@ -278,13 +327,24 @@ BEGIN
 
 				--update gully or plan_psector_x_gully.arc_id
 				IF NEW.ispsectorgeom IS NOT TRUE THEN
-					UPDATE gully SET arc_id=v_gully2.arc_id, expl_id=v_gully2.expl_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, 
-					sector_id=v_gully2.sector_id, pjoint_type=v_gully2.pjoint_type, pjoint_id=v_gully2.pjoint_id
-					WHERE gully_id=v_gully1.gully_id;
+					IF v_autoupdate_dma IS FALSE THEN
+						UPDATE gully SET arc_id=v_gully2.arc_id, expl_id=v_gully2.expl_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type,
+						sector_id=v_gully2.sector_id, pjoint_type=v_gully2.pjoint_type, pjoint_id=v_gully2.pjoint_id
+						WHERE gully_id=v_gully1.gully_id;
+						
+						UPDATE connec SET arc_id=v_gully2.arc_id, expl_id=v_gully2.expl_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type,
+						sector_id=v_gully2.sector_id, pjoint_type=v_gully2.pjoint_type, pjoint_id=v_gully2.pjoint_id
+						WHERE connec_id=v_connec1.connec_id;
+					ELSE
+						UPDATE gully SET arc_id=v_gully2.arc_id, expl_id=v_gully2.expl_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, 
+						sector_id=v_gully2.sector_id, pjoint_type=v_gully2.pjoint_type, pjoint_id=v_gully2.pjoint_id
+						WHERE gully_id=v_gully1.gully_id;
+						
+						UPDATE connec SET arc_id=v_gully2.arc_id, expl_id=v_gully2.expl_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, 
+						sector_id=v_gully2.sector_id, pjoint_type=v_gully2.pjoint_type, pjoint_id=v_gully2.pjoint_id
+						WHERE connec_id=v_connec1.connec_id;
+					END IF;
 					
-					UPDATE connec SET arc_id=v_gully2.arc_id, expl_id=v_gully2.expl_id, feature_id=v_gully2.gully_id, featurecat_id=v_gully2.gully_type, dma_id=v_gully2.dma_id, 
-					sector_id=v_gully2.sector_id, pjoint_type=v_gully2.pjoint_type, pjoint_id=v_gully2.pjoint_id
-					WHERE connec_id=v_connec1.connec_id;
 				ELSIF NEW.ispsectorgeom IS TRUE THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';

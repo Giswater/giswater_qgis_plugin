@@ -24,6 +24,7 @@ gullyRecord3 record;
 v_link record;
 xvar float;
 yvar float;
+v_autoupdate_dma boolean;
 
 BEGIN 
 
@@ -33,6 +34,9 @@ BEGIN
 	v_move_polgeom = (SELECT value FROM config_param_user WHERE parameter='edit_gully_autoupdate_polgeom' AND cur_user=current_user);
 
 	v_projectype = (SELECT project_type FROM sys_version LIMIT 1);
+
+	-- control autoupdate_dma
+	SELECT value::boolean INTO v_autoupdate_dma FROM config_param_system WHERE parameter='edit_connect_autoupdate_dma';
 	
 	
 	IF v_featuretype='connec' THEN
@@ -60,15 +64,21 @@ BEGIN
 		LOOP
 
 			IF v_link.feature_type='CONNEC' THEN
-
-				-- update connec, mandatory to use v_edit_connec because it's identified and managed when arc_id comes from plan psector tables
-				UPDATE v_edit_connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE connec_id=v_link.feature_id;
+				IF v_autoupdate_dma IS FALSE THEN
+					-- update connec, mandatory to use v_edit_connec because it's identified and managed when arc_id comes from plan psector tables
+					UPDATE v_edit_connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, sector_id=NEW.sector_id WHERE connec_id=v_link.feature_id;
+				ELSE
+					UPDATE v_edit_connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE connec_id=v_link.feature_id;
+				END IF;
 							
 			
 			ELSIF v_link.feature_type='GULLY' THEN
- 		
-				-- update gully, mandatory to use v_edit_gully because it's identified and managed when arc_id comes from plan psector tables
-				UPDATE v_edit_gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE gully_id=v_link.feature_id;
+				IF v_autoupdate_dma IS FALSE THEN
+					-- update gully, mandatory to use v_edit_gully because it's identified and managed when arc_id comes from plan psector tables
+					UPDATE v_edit_gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, sector_id=NEW.sector_id WHERE gully_id=v_link.feature_id;
+				ELSE
+					UPDATE v_edit_gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE gully_id=v_link.feature_id;
+				END IF;
 				
 			END IF;
 			
@@ -119,12 +129,19 @@ BEGIN
 		FOR v_link IN SELECT * FROM link WHERE (exit_type='GULLY' AND exit_id=OLD.gully_id)
 		LOOP
 			IF v_link.feature_type='CONNEC' THEN
-			
-				UPDATE v_edit_connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE connec_id=v_link.feature_id;
+				IF v_autoupdate_dma IS FALSE THEN			
+					UPDATE v_edit_connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, sector_id=NEW.sector_id WHERE connec_id=v_link.feature_id;
+				ELSE
+					UPDATE v_edit_connec SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE connec_id=v_link.feature_id;
+				END IF;
 			
 			ELSIF v_link.feature_type='GULLY' THEN
-		
-				UPDATE v_edit_gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE gully_id=v_link.feature_id;
+				IF v_autoupdate_dma IS FALSE THEN		
+					UPDATE v_edit_gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, sector_id=NEW.sector_id WHERE gully_id=v_link.feature_id;
+				ELSE
+					UPDATE v_edit_gully SET arc_id=NEW.arc_id, expl_id=NEW.expl_id, dma_id= NEW.dma_id, sector_id=NEW.sector_id WHERE gully_id=v_link.feature_id;
+				END IF;
+				
 			END IF;
 
 		END LOOP;
