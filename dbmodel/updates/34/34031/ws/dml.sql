@@ -21,3 +21,17 @@ ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 
 INSERT INTO sys_table VALUES ('temp_demand','Table with temporal demands when go2epa inp file is created',
 	'role_epa',0, 'role_epa',null,null,'temp_demand_id_seq', 'id');
+
+
+--2021/02/11
+INSERT INTO config_form_fields VALUES ('v_edit_arc', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE);
+INSERT INTO config_form_fields VALUES ('ve_arc', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE);
+
+INSERT INTO config_form_fields VALUES ('v_edit_node', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE);
+INSERT INTO config_form_fields VALUES ('ve_node', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE);
+
+INSERT INTO config_form_fields VALUES ('v_edit_connec', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE);
+INSERT INTO config_form_fields VALUES ('ve_connec', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE);
+
+INSERT INTO config_form_fields SELECT child_layer, 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', 
+NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE FROM cat_feature;

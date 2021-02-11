@@ -15,3 +15,9 @@ CREATE TABLE temp_demand(
   demand numeric(12,6),
   pattern_id character varying(16),
   demand_type character varying(18));
+  
+  
+-- 2020/02/11
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"True"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"True"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"True"}}$$);
