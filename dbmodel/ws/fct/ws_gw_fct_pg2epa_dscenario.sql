@@ -43,7 +43,6 @@ BEGIN
 			INSERT INTO temp_demand (feature_id, demand, pattern_id)
 			SELECT DISTINCT ON (feature_id) feature_id, n.demand, n.pattern_id 
 			FROM temp_node n, inp_demand d WHERE n.node_id = d.feature_id AND n.demand > 0 AND dscenario_id IN (SELECT dscenario_id FROM selector_inp_demand where cur_user=current_user);
-			select * from ws_sample.temp_demand
 		END IF;
 		
 		-- move patterns used demands scenario table
