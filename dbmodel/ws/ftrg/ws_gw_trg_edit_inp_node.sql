@@ -93,7 +93,7 @@ BEGIN
         IF v_node_table = 'inp_junction' THEN
             UPDATE inp_junction SET demand=NEW.demand, pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;
         ELSIF v_node_table = 'inp_reservoir' THEN
-            UPDATE inp_reservoir SET pattern_id=NEW.pattern_id WHERE node_id=OLD.node_id;  
+            UPDATE inp_reservoir SET pattern_id=NEW.pattern_id, head = NEW.head WHERE node_id=OLD.node_id;  
         ELSIF v_node_table = 'inp_tank' THEN
             UPDATE inp_tank SET initlevel=NEW.initlevel, minlevel=NEW.minlevel, maxlevel=NEW.maxlevel, diameter=NEW.diameter, minvol=NEW.minvol, curve_id=NEW.curve_id WHERE node_id=OLD.node_id;
         ELSIF v_node_table = 'inp_pump' THEN          

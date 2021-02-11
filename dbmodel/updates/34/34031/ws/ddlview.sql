@@ -1235,3 +1235,161 @@ SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "l
 
 
 
+-- 2021/02/09
+CREATE OR REPLACE VIEW vi_valves AS 
+SELECT DISTINCT ON (arc_id) * FROM (
+ SELECT rpt_inp_arc.arc_id::text AS arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.diameter,
+    ((rpt_inp_arc.addparam::json ->> 'valv_type'::text))::character varying(18) AS valv_type,
+    rpt_inp_arc.addparam::json ->> 'pressure'::text AS setting,
+    rpt_inp_arc.minorloss
+   FROM selector_inp_result,
+    rpt_inp_arc
+  WHERE ((rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'PRV'::text OR (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'PSV'::text OR (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'PBV'::text) AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.diameter,
+    rpt_inp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
+    rpt_inp_arc.addparam::json ->> 'flow'::text AS setting,
+    rpt_inp_arc.minorloss
+   FROM selector_inp_result,
+    rpt_inp_arc
+  WHERE (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'FCV'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.diameter,
+    rpt_inp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
+    rpt_inp_arc.addparam::json ->> 'coefloss'::text AS setting,
+    rpt_inp_arc.minorloss
+   FROM selector_inp_result,
+    rpt_inp_arc
+  WHERE (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'TCV'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.diameter,
+    rpt_inp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
+    rpt_inp_arc.addparam::json ->> 'curve_id'::text AS setting,
+    rpt_inp_arc.minorloss
+   FROM selector_inp_result,
+    rpt_inp_arc
+  WHERE (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'GPV'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.diameter,
+    'PRV'::character varying(18) AS valv_type,
+    0.000::text AS setting,
+    rpt_inp_arc.minorloss
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_pump ON rpt_inp_arc.arc_id::text = concat(inp_pump.node_id, '_n2a_4')
+  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.diameter,
+    'GPV'::character varying(18) AS valv_type,
+    rpt_inp_arc.addparam::json ->> 'curve_id'::text AS setting,
+    rpt_inp_arc.minorloss
+   FROM selector_inp_result,
+    rpt_inp_arc
+     JOIN inp_pump ON rpt_inp_arc.arc_id::text = concat(inp_pump.node_id, '_n2a_5')
+  WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.diameter,
+    rpt_inp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
+    rpt_inp_arc.addparam::json ->> 'pressure'::text AS setting,
+    rpt_inp_arc.minorloss
+   FROM selector_inp_result,
+    rpt_inp_arc
+  WHERE ((rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'PRV'::text OR (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'PSV'::text OR (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'PBV'::text) AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.diameter,
+    rpt_inp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
+    rpt_inp_arc.addparam::json ->> 'flow'::text AS setting,
+    rpt_inp_arc.minorloss
+   FROM selector_inp_result,
+    rpt_inp_arc
+  WHERE (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'FCV'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.diameter,
+    rpt_inp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
+    rpt_inp_arc.addparam::json ->> 'coef_loss'::text AS setting,
+    rpt_inp_arc.minorloss
+   FROM selector_inp_result,
+    rpt_inp_arc
+  WHERE (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'TCV'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
+UNION
+ SELECT rpt_inp_arc.arc_id,
+    rpt_inp_arc.node_1,
+    rpt_inp_arc.node_2,
+    rpt_inp_arc.diameter,
+    rpt_inp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
+    rpt_inp_arc.addparam::json ->> 'curve_id'::text AS setting,
+    rpt_inp_arc.minorloss
+   FROM selector_inp_result,
+    rpt_inp_arc
+  WHERE (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'GPV'::text 
+  AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text 
+  AND selector_inp_result.cur_user = "current_user"()::text) a;
+
+
+DROP VIEW IF EXISTS vi_demands;
+CREATE OR REPLACE VIEW vi_demands AS 
+ SELECT inp_demand.feature_id,
+    inp_demand.demand,
+    inp_demand.pattern_id,
+    inp_demand.demand_type
+      FROM selector_inp_demand,
+    inp_demand
+  WHERE selector_inp_demand.dscenario_id::text = inp_demand.dscenario_id::text 
+  AND selector_inp_demand.cur_user = "current_user"()::text
+  UNION
+SELECT feature_id,
+    demand,
+    pattern_id,
+    demand_type
+   FROM temp_demand
+  ORDER BY feature_id;
+
+
+
+DROP VIEW v_edit_inp_reservoir;
+CREATE OR REPLACE VIEW v_edit_inp_reservoir AS 
+ SELECT n.node_id,
+    n.elevation,
+    n.depth,
+    n.nodecat_id,
+    n.sector_id,
+    n.macrosector_id,
+    n.dma_id,
+    n.state,
+    n.state_type,
+    n.annotation,
+    n.expl_id,
+    inp_reservoir.pattern_id,
+    head,
+    n.the_geom
+   FROM selector_sector,
+    v_node n
+     JOIN inp_reservoir USING (node_id)
+  WHERE n.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;

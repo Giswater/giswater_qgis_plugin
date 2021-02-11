@@ -60,6 +60,9 @@ BEGIN
 	-- update child param for inp_reservoir
 	UPDATE temp_node SET pattern_id=inp_reservoir.pattern_id FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id;
 
+	-- update head for those reservoirs head is not null
+	UPDATE temp_node SET elevation = head FROM inp_reservoir WHERE temp_node.node_id=inp_reservoir.node_id AND head is not null;
+	
 	-- update child param for inp_junction
 	UPDATE temp_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id FROM inp_junction WHERE temp_node.node_id=inp_junction.node_id;
 
