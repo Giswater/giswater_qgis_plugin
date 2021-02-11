@@ -296,16 +296,20 @@ BEGIN
 		-- Fix exploitation vdefault
 		DELETE FROM config_param_user WHERE parameter='basic_search_exploitation_vdefault' AND cur_user=current_user;
 		INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('basic_search_exploitation_vdefault',v_idarg, current_user);
-		
+
 		-- Get hydrometer 
 		EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 			SELECT '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_id_field)||' AS sys_id, ST_X(connec.the_geom) AS sys_x, ST_Y(connec.the_geom) AS sys_y, 
-			concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||')
+			concat ('||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_1)||','' - '',
+			'||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_2)||','' - '',
+			'||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_3)||')
 			 AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname
 			FROM '||quote_ident(v_hydro_layer)||'
 			JOIN connec ON (connec.connec_id = '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_connec_field)||')
 			WHERE '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(v_name)||'
-					AND concat ('||quote_ident(v_hydro_search_field_1)||','' - '','||quote_ident(v_hydro_search_field_2)||','' - '','||quote_ident(v_hydro_search_field_3)||')
+					AND concat ('||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_1)||','' - '',
+					'||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_2)||','' - '',
+					'||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_3)||')
 					ILIKE '||quote_literal(v_textarg)||' order by length('||quote_ident(v_hydro_search_field_1)||') asc
 					LIMIT 10) a'
 			INTO v_response; 
