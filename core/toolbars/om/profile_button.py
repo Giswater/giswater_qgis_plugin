@@ -435,7 +435,7 @@ class GwProfileButton(GwAction):
         # If file profile.png exist overwrite
         temp_folder = f"{global_vars.user_folder_dir}{os.sep}temp"
         img_path = f"{temp_folder}{os.sep}profile.png"
-        if not os.path.exists(img_path):
+        if not os.path.exists(temp_folder):
             os.makedirs(temp_folder)
         else:
             tools_log.log_info(f"User settings file: {img_path}")
