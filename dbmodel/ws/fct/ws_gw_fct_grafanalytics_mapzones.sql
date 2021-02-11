@@ -676,7 +676,7 @@ BEGIN
 
 
 				-- check for intercomunicated mapzones (select if at least one node header has different mazpones from what is configured)
-				EXECUTE 'SELECT array_agg(n.'||v_field||') FROM v_edit_node n JOIN 
+				EXECUTE 'SELECT array_agg(distinct n.'||v_field||') FROM v_edit_node n JOIN 
 					(SELECT json_array_elements_text((grafconfig->>''use'')::json)::json->>''nodeParent'' as node_id, '||v_field||', name FROM '||v_table||') mpz
 					USING (node_id)
 					WHERE n.'||v_field||' != mpz.'||v_field
