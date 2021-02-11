@@ -274,3 +274,6 @@ UPDATE sys_param_user SET layoutname = 'lyt_connec' WHERE layoutname = 'lyt_conn
 UPDATE sys_param_user SET layoutname = 'lyt_arc' WHERE layoutname = 'lyt_arc_vdef' AND formname = 'config';
 UPDATE sys_param_user SET layoutname = 'lyt_node' WHERE layoutname = 'lyt_node_vdef' AND formname = 'config';
 UPDATE sys_param_user SET layoutname = 'lyt_utils' WHERE layoutname = 'lyt_utils_vdef' AND formname = 'config';
+
+UPDATE config_param_system SET value ='{"sys_table_id":"v_ui_hydrometer", "sys_id_field":"hydrometer_id", "sys_connec_id":"connec_id", "sys_search_field_1":"hydrometer_customer_code",  "sys_search_field_2":"connec_customer_code",  "sys_search_field_3":"state", "sys_parent_field":"expl_name"}'
+WHERE parameter = 'basic_search_hydrometer';
