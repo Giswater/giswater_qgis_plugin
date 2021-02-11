@@ -91,7 +91,7 @@ class GwTestQgis:
         if project_title is None:
             project_title = f"test_{project_type}"
         self.test_giswater.gw_admin.create_project_data_schema(project_name, project_title, project_type,
-            '25831', 'EN', is_test=True, exec_last_process=True, example_data=True)
+            '25831', 'US', is_test=True, exec_last_process=True, example_data=True)
 
         print("Finish create_project")
 

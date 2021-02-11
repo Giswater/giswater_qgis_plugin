@@ -1008,7 +1008,7 @@ def manage_translation(context_name, dialog=None, log_info=False):
     if not os.path.exists(locale_path):
         if log_info:
             tools_log.log_info("Locale not found", parameter=locale_path)
-        locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'{global_vars.plugin_name}_en_EN.qm')
+        locale_path = os.path.join(global_vars.plugin_dir, 'i18n', f'{global_vars.plugin_name}_en_US.qm')
         # If English locale file not found, exit function
         # It means that probably that form has not been translated yet
         if not os.path.exists(locale_path):

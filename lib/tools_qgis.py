@@ -805,17 +805,17 @@ def get_locale():
         try:
             locale = QSettings().value('locale/globalLocale')
         except AttributeError as e:
-            locale = "en_EN"
+            locale = "en_US"
             tools_log.log_info(f"{type(e).__name__} --> {e}")
     else:
         try:
             locale = QSettings().value('locale/userLocale')
         except AttributeError as e:
-            locale = "en_EN"
+            locale = "en_US"
             tools_log.log_info(f"{type(e).__name__} --> {e}")
 
     if locale is None:
-        locale = "en_EN"
+        locale = "en_US"
 
     return locale
 

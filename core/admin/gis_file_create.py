@@ -39,7 +39,7 @@ class GwGisFileCreate:
         # If QGIS template locale folder not found, use English one
         if not os.path.exists(gis_locale_path):
             tools_log.log_info("Locale gis folder not found", parameter=gis_locale_path)
-            gis_locale_path = gis_folder + os.sep + "en_EN"
+            gis_locale_path = gis_folder + os.sep + "en_US"
 
         # Check if template_path and folder_path exists
         # Set default project for type sample

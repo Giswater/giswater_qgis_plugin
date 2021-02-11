@@ -272,7 +272,7 @@
   </ComposerMapGrid>
   <AtlasMap margin="0.10000000000000001" atlasDriven="0" scalingMode="2"/>
  </LayoutItem>
- <LayoutItem position="366.101,196.629,mm" pictureWidth="8.60659" visibility="1" referencePoint="0" file="../.qgis2/python/plugins/giswater/templates/logo.png" resizeMode="0" blendMode="0" pictureRotation="0" uuid="{5eaa40ac-a602-451c-8e79-54c22ee352b0}" positionLock="false" mapUuid="" id="" templateUuid="{5eaa40ac-a602-451c-8e79-54c22ee352b0}" background="false" size="33.8129,8.65939,mm" excludeFromExports="0" anchorPoint="0" pictureHeight="8.65939" svgBorderWidth="0.2" type="65640" frame="false" groupUuid="" positionOnPage="366.101,196.629,mm" outlineWidthM="0.3,mm" svgFillColor="255,255,255,255" itemRotation="0" frameJoinStyle="miter" opacity="1" svgBorderColor="0,0,0,255" zValue="33" northMode="0" northOffset="0">
+ <LayoutItem position="366.101,196.629,mm" pictureWidth="8.60659" visibility="1" referencePoint="0" file="../.qgis2/python/plugins/giswater/resources/templates/logo.png" resizeMode="0" blendMode="0" pictureRotation="0" uuid="{5eaa40ac-a602-451c-8e79-54c22ee352b0}" positionLock="false" mapUuid="" id="" templateUuid="{5eaa40ac-a602-451c-8e79-54c22ee352b0}" background="false" size="33.8129,8.65939,mm" excludeFromExports="0" anchorPoint="0" pictureHeight="8.65939" svgBorderWidth="0.2" type="65640" frame="false" groupUuid="" positionOnPage="366.101,196.629,mm" outlineWidthM="0.3,mm" svgFillColor="255,255,255,255" itemRotation="0" frameJoinStyle="miter" opacity="1" svgBorderColor="0,0,0,255" zValue="33" northMode="0" northOffset="0">
   <FrameColor red="0" blue="0" alpha="255" green="0"/>
   <BackgroundColor red="255" blue="255" alpha="255" green="255"/>
   <LayoutObject>
@@ -750,7 +750,7 @@
    </layer>
   </symbol>
  </LayoutItem>
- <LayoutItem position="20,10,mm" pictureWidth="169.312" visibility="1" referencePoint="0" file="../../../AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/templates/profile.png" resizeMode="0" blendMode="0" pictureRotation="0" uuid="{89c747c9-5845-4255-a44c-6ddd2cee571c}" positionLock="false" mapUuid="" id="profile" templateUuid="{89c747c9-5845-4255-a44c-6ddd2cee571c}" background="false" size="335,126.984,mm" excludeFromExports="0" anchorPoint="4" pictureHeight="126.984" svgBorderWidth="0.2" type="65640" frame="true" groupUuid="" positionOnPage="20,10,mm" outlineWidthM="0.2,mm" svgFillColor="255,255,255,255" itemRotation="0" frameJoinStyle="miter" opacity="1" svgBorderColor="0,0,0,255" zValue="9" northMode="0" northOffset="0">
+ <LayoutItem position="20,10,mm" pictureWidth="169.312" visibility="1" referencePoint="0" file="../../../AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/resources/templates/profile.png" resizeMode="0" blendMode="0" pictureRotation="0" uuid="{89c747c9-5845-4255-a44c-6ddd2cee571c}" positionLock="false" mapUuid="" id="profile" templateUuid="{89c747c9-5845-4255-a44c-6ddd2cee571c}" background="false" size="335,126.984,mm" excludeFromExports="0" anchorPoint="4" pictureHeight="126.984" svgBorderWidth="0.2" type="65640" frame="true" groupUuid="" positionOnPage="20,10,mm" outlineWidthM="0.2,mm" svgFillColor="255,255,255,255" itemRotation="0" frameJoinStyle="miter" opacity="1" svgBorderColor="0,0,0,255" zValue="9" northMode="0" northOffset="0">
   <FrameColor red="0" blue="0" alpha="255" green="0"/>
   <BackgroundColor red="255" blue="255" alpha="255" green="255"/>
   <LayoutObject>

@@ -1959,7 +1959,7 @@
         <fieldstyles/>
       </conditionalstyles>
       <storedexpressions/>
-      <editform tolerant="1">AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/templates/qgisproject/en</editform>
+      <editform tolerant="1">AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/resources/templates/qgisproject/en_US</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
       <editforminitfilepath></editforminitfilepath>
@@ -12374,7 +12374,7 @@ def my_form_open(dialog, layer, feature):
         <fieldstyles/>
       </conditionalstyles>
       <storedexpressions/>
-      <editform tolerant="1">AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/templates/qgisproject/en</editform>
+      <editform tolerant="1">AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/resources/templates/qgisproject/en_US</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
       <editforminitfilepath></editforminitfilepath>
@@ -12761,7 +12761,7 @@ def my_form_open(dialog, layer, feature):
         <fieldstyles/>
       </conditionalstyles>
       <storedexpressions/>
-      <editform tolerant="1">AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/templates/qgisproject/en</editform>
+      <editform tolerant="1">AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/resources/templates/qgisproject/en_US</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
       <editforminitfilepath></editforminitfilepath>
@@ -27689,7 +27689,7 @@ def my_form_open(dialog, layer, feature):
         <fieldstyles/>
       </conditionalstyles>
       <storedexpressions/>
-      <editform tolerant="1">AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/templates/qgisproject/en</editform>
+      <editform tolerant="1">AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/resources/templates/qgisproject/en_US</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
       <editforminitfilepath></editforminitfilepath>
@@ -28092,7 +28092,7 @@ def my_form_open(dialog, layer, feature):
         <fieldstyles/>
       </conditionalstyles>
       <storedexpressions/>
-      <editform tolerant="1">AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/templates/qgisproject/en</editform>
+      <editform tolerant="1">AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/resources/templates/qgisproject/en_US</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
       <editforminitfilepath></editforminitfilepath>
@@ -28515,7 +28515,7 @@ def my_form_open(dialog, layer, feature):
         <fieldstyles/>
       </conditionalstyles>
       <storedexpressions/>
-      <editform tolerant="1">AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/templates/qgisproject</editform>
+      <editform tolerant="1">AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/resources/templates/qgisproject</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
       <editforminitfilepath></editforminitfilepath>
@@ -30293,7 +30293,7 @@ def my_form_open(dialog, layer, feature):
         <fieldstyles/>
       </conditionalstyles>
       <storedexpressions/>
-      <editform tolerant="1">AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/templates/qgisproject/en</editform>
+      <editform tolerant="1">AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/resources/templates/qgisproject/en_US</editform>
       <editforminit/>
       <editforminitcodesource>0</editforminitcodesource>
       <editforminitfilepath></editforminitfilepath>
