@@ -2722,8 +2722,6 @@ class GwAdminButton:
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_childviews).setEnabled(True)
             tools_qt.get_widget(self.dlg_readsql, self.dlg_readsql.grb_manage_sys_fields).setEnabled(True)
 
-            print(f"tools_db.check_table('cat_feature') -> {tools_db.check_table('cat_feature')}")
-
             if not tools_db.check_table('cat_feature', schema_name):
                 tools_log.log_warning(f"Table not found: 'cat_feature'")
                 return
