@@ -816,7 +816,7 @@ class GwSearch:
         feature_id = qtable.model().record(row).value('feature_id')
 
         self.customForm = GwInfo(tab_type='data')
-        complet_result, dialog = self.customForm.get_info_from_id(table_name=table_name, feature_id=feature_id, tab_type='data')
+        complet_result, dialog = self.customForm.get_info_from_id(table_name, feature_id, 'data')
 
         # Get list of all coords in field geometry
         list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))

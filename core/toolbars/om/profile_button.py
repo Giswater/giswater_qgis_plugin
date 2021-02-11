@@ -7,24 +7,24 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import json
 import math
+import matplotlib.pyplot as plt
 import os
 from collections import OrderedDict
 from decimal import Decimal
 from functools import partial
-import matplotlib.pyplot as plt
 
 from qgis.PyQt.QtCore import Qt, QDate
+from qgis.PyQt.QtGui import QDoubleValidator
 from qgis.PyQt.QtWidgets import QListWidgetItem, QLineEdit, QAction
 from qgis.core import QgsFeatureRequest, QgsVectorLayer, QgsExpression
 from qgis.gui import QgsMapToolEmitPoint
-from qgis.PyQt.QtGui import QDoubleValidator
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwProfileUi, GwProfilesListUi
 from ...utils import tools_gw
+from ...utils.snap_manager import GwSnapManager
 from ....lib import tools_qt, tools_log, tools_qgis
 from .... import global_vars
-from ...utils.snap_manager import GwSnapManager
 
 
 class GwNodeData:
@@ -128,6 +128,7 @@ class GwProfileButton(GwAction):
 
     # region private functions
 
+
     def _get_profile(self):
 
         # Clear main variables
@@ -139,9 +140,10 @@ class GwProfileButton(GwAction):
         # Get parameters
         links_distance = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_min_distance, False, False)
         if links_distance in ("", "None", None): links_distance = 1
+
         # Create variable with all the content of the form
         extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", ' \
-            f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, "ev":1000}}'
+                 f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, "ev":1000}}'
 
         body = tools_gw.create_body(extras=extras)
 
@@ -161,12 +163,12 @@ class GwProfileButton(GwAction):
 
         # Execute draw profile
         self._draw_profile(self.profile_json['body']['data']['arc'], self.profile_json['body']['data']['node'],
-                          self.profile_json['body']['data']['terrain'])
+                           self.profile_json['body']['data']['terrain'])
 
         # Save profile values
         tools_gw.set_config_parser('btn_profile', 'min_distance_profile', f'{links_distance}')
-        tools_gw.set_config_parser('btn_profile', 'title_profile',
-                                   f'{tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, False, False)}')
+        title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, False, False)
+        tools_gw.set_config_parser('btn_profile', 'title_profile', f'{title}')
 
         # Maximize window (after drawing)
         self.plot.show()
@@ -407,7 +409,7 @@ class GwProfileButton(GwAction):
         for i in range(1, self.t):
 
             # define variables
-            self.first_top_x = self.links[i - 1].start_point # start_point = total_x
+            self.first_top_x = self.links[i - 1].start_point  # start_point = total_x
             self.node_top_x = self.links[i].start_point  # start_point = total_x
             self.first_top_y = self.links[i - 1].node_id  # node_id = top_n1
             self.node_top_y = self.links[i - 1].geom  # geom = top_n2
@@ -609,7 +611,7 @@ class GwProfileButton(GwAction):
 
         # Draw header
         self._draw_guitar_vertical_lines(node.start_point)
-        self._fill_guitar_text_legend(node.start_point)
+        self._fill_guitar_text_legend()
         self._draw_guitar_auxiliar_lines(0)
 
 
@@ -645,7 +647,7 @@ class GwProfileButton(GwAction):
         auxline_style = self.profile_json['body']['data']['stylesheet']['guitar']['auxiliarlines']['style']
         auxline_width = self.profile_json['body']['data']['stylesheet']['guitar']['auxiliarlines']['width']
 
-        if first_vl: # separator for first slope / length (only for nodes)
+        if first_vl:  # separator for first slope / length (only for nodes)
             # Vertical line [0,0]
             x = [start_point, start_point]
             y = [self.min_top_elev - 1 * self.height_row,
@@ -678,7 +680,7 @@ class GwProfileButton(GwAction):
         plt.plot(x, y, linestyle=auxline_style, color=auxline_color, linewidth=auxline_width, zorder=100)
 
 
-    def _fill_guitar_text_legend(self, start_point):
+    def _fill_guitar_text_legend(self):
 
         # Get stylesheet values
         text_color = self.profile_json['body']['data']['stylesheet']['guitar']['text']['color']
@@ -866,7 +868,7 @@ class GwProfileButton(GwAction):
 
         # Fill top_elevation
         plt.annotate(' ' + '\n' + str(self.nodes[index].descript['top_elev']) + '\n' + ' ',
-                     xy=(Decimal(start_point), self.min_top_elev - \
+                     xy=(Decimal(start_point), self.min_top_elev -
                          Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
                      fontsize=6,
                      color=text_color, fontweight=text_weight,
@@ -1001,7 +1003,7 @@ class GwProfileButton(GwAction):
 
             # Fill top_elevation
             plt.annotate(' ' + '\n' + str(self.links[index].descript['top_elev']) + '\n' + ' ',
-                         xy=(Decimal(start_point), self.min_top_elev - \
+                         xy=(Decimal(start_point), self.min_top_elev -
                              Decimal(self.height_row * Decimal(1.8) + self.height_row / 2)),
                          fontsize=6,
                          color=text_color, fontweight=text_weight,
@@ -1014,7 +1016,7 @@ class GwProfileButton(GwAction):
                      color=text_color, fontweight=text_weight,
                      horizontalalignment='center', verticalalignment='center')
 
-             # Fill y_max
+            # Fill y_max
             plt.annotate(
                 str(self.links[index].descript['ymax']),
                 xy=(Decimal(0 + start_point),
@@ -1135,7 +1137,7 @@ class GwProfileButton(GwAction):
         # Search y coordinate min_top_elev ( top_elev- ymax)
         self.min_top_elev = Decimal(self.nodes[0].top_elev - self.nodes[0].ymax)
 
-        #self.min_top_elev_descript = Decimal(self.nodes[0].descript['top_elev'] - self.nodes[0].descript['ymax'])
+        # self.min_top_elev_descript = Decimal(self.nodes[0].descript['top_elev'] - self.nodes[0].descript['ymax'])
         for i in range(1, self.n):
             if (self.nodes[i].top_elev - self.nodes[i].ymax) < self.min_top_elev:
                 self.min_top_elev = Decimal(self.nodes[i].top_elev - self.nodes[i].ymax)
