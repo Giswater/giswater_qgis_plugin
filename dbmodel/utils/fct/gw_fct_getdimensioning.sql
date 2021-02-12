@@ -114,7 +114,8 @@ BEGIN
 	END LOOP; 
 
 	v_fields := array_to_json(v_fields_array);
-
+	
+	PERFORM setval('SCHEMA_NAME.dimensions_id_seq', (SELECT max(id) FROM dimensions), true);
 	v_id = (SELECT nextval('SCHEMA_NAME.dimensions_id_seq'::regclass));
 
 	v_featureinfo = '{"tableName":"v_edit_dimensions", "idName":"id", "id":'||v_id||'}';
