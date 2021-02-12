@@ -16,33 +16,33 @@ $BODY$
 /*EXAMPLE
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PUMP"},
-"data":{"action":"CREATE", "multi_create":"true", "parameters":{"columnname":"addfield_all", "datatype":"string", "widgettype":"text", "label":"addfield_all","ismandatory":"False",
-"fieldLength":"50", "numDecimals" :null,"active":"True", "iseditable":"True","v_isenabled":"True"}}}$$);
+"data":{"action":"CREATE", "multiCreate":"true", "parameters":{"columnname":"addfield_all", "datatype":"string", "widgettype":"text", "label":"addfield_all",
+"ismandatory":"False","active":"True", "iseditable":"True", "hidden":"False","layoutname":"lyt_data_1"}}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{}, 
 "feature":{"catFeature":"PUMP"}, 
-"data":{"filterFields":{}, "pageInfo":{}, "action":"CREATE", "multi_create":false, 
-"parameters":{"label": "pump1", "field_length": null, "addfield_active": true, "iseditable": true, "ismandatory": false, "formtype": "feature", 
-"datatype": "boolean", "num_decimals": null, "columnname": "pump1", "isenabled": true, "widgettype": "check", "dv_isnullvalue": false,
-"isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "reload_field": null, 
-"isparent": false,  "listfilterparam": null, "editability": null, "dv_querytext_filterc": null, "linkedaction": null, 
-"stylesheet": null, "widgetdim": null}}}$$)::text
+"data":{"filterFields":{}, "pageInfo":{}, "action":"CREATE", "multiCreate":false, 
+"parameters":{"label": "pump1", "active": true, "iseditable": true, "ismandatory": false, "formtype": "feature", 
+"datatype": "boolean",  "columnname": "pump1", "widgettype": "check", "dv_isnullvalue": false,
+"isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "reloadField": null, 
+"isparent": false,  "listfilterparam": null,  "dv_querytext_filterc": null, "linkedaction": null, 
+"stylesheet": null, "widgetdim": null,"hidden":"False","layoutname":"lyt_data_1"}}}$$)::text
 
 	SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${"client":{"device":4, "infoType":1, "lang":"ES"},
 	"form":{}, 
 	"feature":{"catFeature":"PUMP"}, 
-	"data":{"filterFields":{}, "pageInfo":{}, "action":"UPDATE", "multi_create":false, 
-	"parameters":{"label": "pump111", "field_length": null, "addfield_active": true, "iseditable": true, "ismandatory": false, "formtype": "feature", 
-	"datatype": "integer", "num_decimals": null, "columnname": "pump1", "isenabled": true, "widgettype": "text", "dv_isnullvalue": false,
-	"isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "reload_field": null, 
-	"isparent": false, "listfilterparam": null, "editability": null, "dv_querytext_filterc": null, "linkedaction": null, 
-	"stylesheet": null, "widgetdim": null}}}$$)::text
+	"data":{"filterFields":{}, "pageInfo":{}, "action":"UPDATE", "multiCreate":false, 
+	"parameters":{"label": "pump111", "active": true, "iseditable": true, "ismandatory": false, "formtype": "feature", 
+	"datatype": "integer", "columnname": "pump1", "widgettype": "text", "dv_isnullvalue": false,
+	"isautoupdate": false, "dv_parent_id": null, "tooltip": null, "dv_querytext": null, "widgetfunction": null, "placeholder": null, "reloadField": null, 
+	"isparent": false, "listfilterparam": null, "dv_querytext_filterc": null, "linkedaction": null, 
+	"stylesheet": null, "widgetdim": null, "hidden":"False","layoutname":"lyt_data_1"}}}$$)::text
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_addfields($${
 "client":{"lang":"ES"}, 
 "feature":{"catFeature":"PUMP"},
-"data":{"action":"DELETE", "multi_create":"true", "parameters":{"columnname":"pump_test"}}}$$)
+"data":{"action":"DELETE", "multiCreate":"true", "parameters":{"columnname":"pump_test"}}}$$)
 
 -- fid: 218
 
@@ -81,12 +81,12 @@ v_formtype text;
 v_placeholder text;
 v_tooltip text;
 v_isparent boolean;
-v_dv_parent_id text;
-v_dv_querytext text;
-v_dv_isnullvalue boolean;
+v_parentid text;
+v_querytext text;
+v_isnullvalue boolean;
 v_stylesheet json;
-v_multi_create boolean;
-v_dv_querytext_filterc text;
+v_multicreate boolean;
+v_querytextfilterc text;
 v_widgetfunction text;
 v_widgetdim integer;
 v_isautoupdate boolean;
@@ -101,6 +101,7 @@ v_active_feature text;
 v_created_addfields record;
 v_unaccent_id text;
 v_hidden boolean;
+v_layoutname text;
 
 v_result text;
 v_result_info text;
@@ -142,7 +143,7 @@ BEGIN
 	v_label = (((p_data ->>'data')::json->>'parameters')::json->>'label')::text;
 	v_config_widgettype = (((p_data ->>'data')::json->>'parameters')::json->>'widgettype')::text;
 	v_action = ((p_data ->>'data')::json->>'action')::text;
-	v_active = (((p_data ->>'data')::json->>'parameters')::json->>'addfield_active')::text;
+	v_active = (((p_data ->>'data')::json->>'parameters')::json->>'active')::text;
 	v_iseditable = (((p_data ->>'data')::json->>'parameters')::json ->>'iseditable')::text;
 
 	--set new addfield as active if it wasnt defined
@@ -155,19 +156,20 @@ BEGIN
 	v_placeholder = (((p_data ->>'data')::json->>'parameters')::json->>'placeholder')::text;
 	v_tooltip = (((p_data ->>'data')::json->>'parameters')::json ->>'tooltip')::text;
 	v_isparent = (((p_data ->>'data')::json->>'parameters')::json ->>'isparent')::text;
-	v_dv_parent_id = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_parent_id')::text;
-	v_dv_querytext = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_querytext')::text;
-	v_dv_isnullvalue = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_isnullvalue')::text;
+	v_parentid = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_parent_id')::text;
+	v_querytext = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_querytext')::text;
+	v_isnullvalue = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_isnullvalue')::text;
 	v_linkedaction = (((p_data ->>'data')::json->>'parameters')::json ->>'linkedaction')::text;
-	v_hidden = (((p_data ->>'data')::json->>'parameters')::json ->>'hidden')::json;
+	v_hidden = (((p_data ->>'data')::json->>'parameters')::json ->>'hidden')::boolean;
 	v_stylesheet = (((p_data ->>'data')::json->>'parameters')::json ->>'stylesheet')::json;
-	v_multi_create = ((p_data ->>'data')::json->>'multi_create')::text;
-	v_dv_querytext_filterc = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_querytext_filterc')::text;
+	v_multicreate = ((p_data ->>'data')::json->>'multiCreate')::text;
+	v_querytextfilterc = (((p_data ->>'data')::json->>'parameters')::json ->>'dv_querytext_filterc')::text;
 	v_widgetfunction = (((p_data ->>'data')::json->>'parameters')::json ->>'widgetfunction')::text;
 	v_widgetdim = (((p_data ->>'data')::json->>'parameters')::json ->>'widgetdim')::integer;
 	v_isautoupdate = (((p_data ->>'data')::json->>'parameters')::json ->>'isautoupdate')::text;
 	v_listfilterparam = (((p_data ->>'data')::json->>'parameters')::json ->>'listfilterparam')::json;
-	v_hidden = COALESCE(v_hidden, FALSE);
+	v_layoutname = (((p_data ->>'data')::json->>'parameters')::json ->>'layoutname')::text;
+	IF v_hidden IS NULL THEN v_hidden=false; END IF;
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=218 AND cur_user=current_user;
@@ -224,7 +226,7 @@ BEGIN
 
 	END IF;
 
-	IF v_multi_create IS TRUE THEN
+	IF v_multicreate IS TRUE THEN
 	
 		IF v_action='UPDATE' THEN
 			v_update_old_datatype = (SELECT datatype_id FROM sys_addfields WHERE param_name=v_param_name);
@@ -317,7 +319,7 @@ BEGIN
 					project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, dv_querytext, dv_querytext_filterc,feature_field_id, isenabled)
 					VALUES (concat('edit_addfield_p', v_idaddparam,'_vdefault'),'config', concat('Default value of addfield ',v_param_name), 'role_edit', v_param_name,
 					'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false,
-					v_dv_querytext, v_dv_querytext_filterc,v_param_name, true);
+					v_querytext, v_querytextfilterc,v_param_name, true);
 		
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (218, null, 4, concat('Create new vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault')));
@@ -332,8 +334,8 @@ BEGIN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (218, null, 4, 'Update parameter definition in sys_addfields.');
 
-				UPDATE sys_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
-				dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat('edit_addfield_p', v_idaddparam,'_vdefault');
+				UPDATE sys_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_querytext,
+				dv_querytext_filterc = v_querytextfilterc WHERE id = concat('edit_addfield_p', v_idaddparam,'_vdefault');
 
 			
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -355,7 +357,7 @@ BEGIN
 
 			IF v_action = 'CREATE' THEN
 
-				EXECUTE 'SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname='''||v_viewname||''' AND layoutname = ''lyt_data_1'';'
+				EXECUTE 'SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname='''||v_viewname||''' AND layoutname = '''||v_layoutname||''';'
 				INTO v_layoutorder;
 
 				IF v_layoutorder IS NULL THEN
@@ -367,21 +369,25 @@ BEGIN
 				placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
 				dv_parent_id, dv_querytext_filterc, dv_querytext, listfilterparam, linkedaction, hidden)	
 				VALUES (v_viewname, v_formtype, v_param_name, v_layoutorder, v_config_datatype, v_config_widgettype,
-				v_label, v_ismandatory,v_isparent, v_iseditable, v_isautoupdate, 'lyt_data_1',
-				v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
-				v_dv_parent_id, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_linkedaction, v_hidden);
+				v_label, v_ismandatory,v_isparent, v_iseditable, v_isautoupdate, v_layoutname,
+				v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_isnullvalue, v_widgetdim,
+				v_parentid, v_querytextfilterc, v_querytext, v_listfilterparam, v_linkedaction, v_hidden);
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (218, null, 4, 'Insert parameter into config_form_fields.');
 
 			ELSIF v_action = 'UPDATE' THEN
+
+				EXECUTE 'SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname='''||v_viewname||''' AND layoutname = '''||v_layoutname||''';'
+				INTO v_layoutorder;
+
 				UPDATE config_form_fields SET datatype=v_config_datatype,
-				widgettype=v_config_widgettype, label=v_label,
+				widgettype=v_config_widgettype, label=v_label, layoutname=v_layoutname,
 				ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate, 
 				placeholder=v_placeholder, stylesheet=v_stylesheet, tooltip=v_tooltip, 
-				widgetfunction=v_widgetfunction, dv_isnullvalue=v_dv_isnullvalue, widgetdim=v_widgetdim,
-				dv_parent_id=v_dv_parent_id, dv_querytext_filterc=v_dv_querytext_filterc, 
-				dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,linkedaction=v_linkedaction, hidden = v_hidden
+				widgetfunction=v_widgetfunction, dv_isnullvalue=v_isnullvalue, widgetdim=v_widgetdim,
+				dv_parent_id=v_parentid, dv_querytext_filterc=v_querytextfilterc, 
+				dv_querytext=v_querytext, listfilterparam=v_listfilterparam,linkedaction=v_linkedaction, hidden = v_hidden
 				WHERE columnname=v_param_name AND formname=v_viewname;
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -602,7 +608,7 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (218, null, 4, 'Insert parameter definition into sys_addfields.');
 
-			EXECUTE 'SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname='''||v_viewname||''' AND layoutname = ''lyt_data_1'';'
+			EXECUTE 'SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname='''||v_viewname||''' AND layoutname = '''||v_layoutname||''';'
 			INTO v_layoutorder;
 
 			IF v_layoutorder IS NULL THEN
@@ -614,9 +620,9 @@ BEGIN
 			layoutname, placeholder, stylesheet, tooltip, widgetfunction, dv_isnullvalue, widgetdim,
 			dv_parent_id, dv_querytext_filterc, dv_querytext, listfilterparam, linkedaction, hidden)
 			VALUES (v_viewname, v_formtype, v_param_name, v_layoutorder,v_config_datatype, v_config_widgettype,
-			v_label, v_ismandatory, v_isparent, v_iseditable, 'lyt_data_1',
-			v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_dv_isnullvalue, v_widgetdim,
-			v_dv_parent_id, v_dv_querytext_filterc, v_dv_querytext, v_listfilterparam, v_linkedaction, v_hidden);
+			v_label, v_ismandatory, v_isparent, v_iseditable, v_layoutname,
+			v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_isnullvalue, v_widgetdim,
+			v_parentid, v_querytextfilterc, v_querytext, v_listfilterparam, v_linkedaction, v_hidden);
 
 			
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -633,7 +639,7 @@ BEGIN
 			VALUES (concat('edit_addfield_p', v_idaddparam,'_vdefault'),'config', 
 			concat('Default value of addfield ',v_param_name, ' for ', v_cat_feature), 
 			'role_edit', v_param_name, 'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, 
-			v_audit_widgettype, false, v_dv_querytext, v_dv_querytext_filterc, v_param_name, true);
+			v_audit_widgettype, false, v_querytext, v_querytextfilterc, v_param_name, true);
 			
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (218, null, 4, concat('Create new vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault'),'.'));
@@ -652,9 +658,9 @@ BEGIN
 				widgettype=v_config_widgettype, label=v_label,
 				ismandatory=v_ismandatory, isparent=v_isparent, iseditable=v_iseditable, isautoupdate=v_isautoupdate, 
 				placeholder=v_placeholder, stylesheet=v_stylesheet, tooltip=v_tooltip, 
-				widgetfunction=v_widgetfunction, dv_isnullvalue=v_dv_isnullvalue, widgetdim=v_widgetdim,
-				dv_parent_id=v_dv_parent_id, dv_querytext_filterc=v_dv_querytext_filterc, 
-				dv_querytext=v_dv_querytext, listfilterparam=v_listfilterparam,linkedaction=v_linkedaction,
+				widgetfunction=v_widgetfunction, dv_isnullvalue=v_isnullvalue, widgetdim=v_widgetdim,
+				dv_parent_id=v_parentid, dv_querytext_filterc=v_querytextfilterc, 
+				dv_querytext=v_querytext, listfilterparam=v_listfilterparam,linkedaction=v_linkedaction,
 				hidden = v_hidden
 				WHERE columnname=v_param_name AND formname=v_viewname;
 		
@@ -663,8 +669,8 @@ BEGIN
 
 			END IF;
 
-			UPDATE sys_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_dv_querytext,
-			dv_querytext_filterc = v_dv_querytext_filterc WHERE id = concat('edit_addfield_p', v_idaddparam,'_vdefault');
+			UPDATE sys_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_querytext,
+			dv_querytext_filterc = v_querytextfilterc WHERE id = concat('edit_addfield_p', v_idaddparam,'_vdefault');
 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (218, null, 4, concat('Update definition of vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault'),'.'));
