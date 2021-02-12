@@ -252,14 +252,15 @@ class GwSearch:
         # Tab 'network or add_network'
         if tab_selected == 'network' or tab_selected == 'add_network':
             self.customForm = GwInfo(tab_type='data')
-            complet_result, dialog = self.customForm.get_info_from_id(table_name=item['sys_table_id'], tab_type='data',
-                                                                 feature_id=item['sys_id'], is_add_schema=is_add_schema)
+            complet_result, dialog = self.customForm.get_info_from_id(
+                item['sys_table_id'], tab_type='data', feature_id=item['sys_id'], is_add_schema=is_add_schema)
+
             if not complet_result:
                 return
 
-            # self.customForm.get_info_from_id (...) in turn ends up calling self.open_custom_form (...) which will draw the
-            # line on the feature but not zoom. Here, with draw we redraw simply to zoom and so that there are not two
-            # ruberbands (the one from self.open_custom_form (...) and this one) we delete these
+            # self.customForm.get_info_from_id (...) in turn ends up calling self.open_custom_form (...) which will draw
+            # the line on the feature but not zoom. Here, with draw we redraw simply to zoom and so that there are not
+            # two ruberbands (the one from self.open_custom_form (...) and this one) we delete these
 
             try:
                 margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
@@ -820,6 +821,8 @@ class GwSearch:
 
         # Get list of all coords in field geometry
         list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
+        if list_coord is None: return
+
         max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
         tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, 1)
 
