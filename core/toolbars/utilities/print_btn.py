@@ -356,6 +356,16 @@ class GwPrintButton(GwAction):
         self._load_composer_values(dialog)
 
 
+    def set_print(self, dialog, my_json):
+        """ Function called in def _set_widgets_into_composer(...) -->
+            widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json)) """
+
+        if my_json['composer'] != '-1':
+            self._check_whidget_exist(self.dlg_composer)
+            self._load_composer_values(dialog)
+            self._accept(dialog, my_json)
+
+
     def _draw_rectangle(self, result, rubber_band):
         """ Draw lines based on geometry """
 
