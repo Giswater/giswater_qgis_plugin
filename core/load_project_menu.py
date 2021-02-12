@@ -212,8 +212,13 @@ class GwMenuLoad(QObject):
     def _fill_tbl_config_files(self):
         """ Fills a UI table with the local list of values variable. """
 
-        files = [f for f in os.listdir(f"{self.user_folder_dir}{os.sep}config")]
+        self.tree_config_files.resize(500, 200)
+        self.tree_config_files.setColumnCount(3)
+        self.tree_config_files.setHeaderLabels(["Section", "Parameter", "Value"])
+        self.tree_config_files.itemDoubleClicked.connect(partial(self._double_click_event))
+        self.tree_config_files.itemChanged.connect(partial(self._set_config_value))
 
+        files = [f for f in os.listdir(f"{self.user_folder_dir}{os.sep}config")]
         for file in files:
             self._get_config_file_values(file)
             item = QTreeWidgetItem([f"{file}"])
@@ -226,13 +231,7 @@ class GwMenuLoad(QObject):
                 # item_child.itemDoubleClicked.connect(partial(self._onDoubleClick))
                 item.addChild(item_child)
 
-            self.tree_config_files.resize(500, 200)
-            self.tree_config_files.setColumnCount(3)
-            self.tree_config_files.setHeaderLabels(["Section", "Parameter", "Value"])
             self.tree_config_files.addTopLevelItem(item)
-
-            self.tree_config_files.itemDoubleClicked.connect(partial(self._double_click_event))
-            self.tree_config_files.itemChanged.connect(partial(self._set_config_value))
 
 
     def _set_config_value(self, item, column):
