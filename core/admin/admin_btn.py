@@ -2746,7 +2746,7 @@ class GwAdminButton:
 
         # Create body
         feature = '"catFeature":"' + form_name + '"'
-        extras = '"multi_create":' + str(
+        extras = '"multiCreate":' + str(
             tools_qt.is_checked(self.dlg_readsql, self.dlg_readsql.chk_multi_create)).lower() + ''
         body = tools_gw.create_body(feature=feature, extras=extras)
         body = body.replace('""', 'null')
@@ -2948,12 +2948,11 @@ class GwAdminButton:
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_manage_fields.datatype, rows, 1)
 
-        # Populate widgetfunction combo
-        sql = (f"SELECT null as id, null as idval UNION ALL "
-               f"SELECT id, idval FROM {schema_name}.config_typevalue "
-               f"WHERE typevalue = 'widgetfunction_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
+        # Populate layoutname combo
+        sql = (f"SELECT id, idval FROM {schema_name}.config_typevalue "
+               f"WHERE typevalue = 'layout_name_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_manage_fields.widgetfunction, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_manage_fields.layoutname, rows, 1)
 
         # Set default value for formtype widget
         tools_qt.set_widget_text(self.dlg_manage_fields, self.dlg_manage_fields.formtype, 'feature')
@@ -3126,7 +3125,7 @@ class GwAdminButton:
 
             # Create body
             feature = '"catFeature":"' + form_name + '"'
-            extras = '"action":"CREATE", "multi_create":' + \
+            extras = '"action":"CREATE", "multiCreate":' + \
                 str(self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
             body = tools_gw.create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
@@ -3169,7 +3168,7 @@ class GwAdminButton:
             # Create body
             feature = '"catFeature":"' + form_name + '"'
             extras = '"action":"UPDATE"'
-            extras += ', "multi_create":' + str(self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
+            extras += ', "multiCreate":' + str(self.chk_multi_insert).lower() + ', "parameters":' + result_json + ''
             body = tools_gw.create_body(feature=feature, extras=extras)
             body = body.replace('""', 'null')
 
@@ -3186,7 +3185,7 @@ class GwAdminButton:
 
             # Create body
             feature = '"catFeature":"' + form_name + '"'
-            extras = '"action":"DELETE", "multi_create":' + str(
+            extras = '"action":"DELETE", "multiCreate":' + str(
                 self.chk_multi_insert).lower() + ',"parameters":{"columnname":"' + field_value + '"}'
             body = tools_gw.create_body(feature=feature, extras=extras)
 
