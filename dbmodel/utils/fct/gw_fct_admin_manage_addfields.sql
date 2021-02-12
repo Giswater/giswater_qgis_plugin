@@ -344,6 +344,8 @@ BEGIN
 
 			ELSIF v_action = 'DELETE' THEN
 
+				SELECT id INTO v_idaddparam FROM sys_addfields WHERE cat_feature_id IS NULL AND param_name = v_param_name;
+				
 				DELETE FROM config_form_fields WHERE formname=v_viewname AND columnname=v_param_name;
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -677,6 +679,9 @@ BEGIN
 			VALUES (218, null, 4, concat('Update definition of vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault'),'.'));
 
 		ELSIF v_action = 'DELETE' THEN
+		
+			SELECT id INTO v_idaddparam FROM sys_addfields WHERE cat_feature_id = v_cat_feature AND param_name = v_param_name;
+
 			EXECUTE 'DELETE FROM sys_addfields WHERE param_name='''||v_param_name||''' AND cat_feature_id='''||v_cat_feature||''';';
 
 			DELETE FROM sys_param_user WHERE id = concat('edit_addfield_p', v_idaddparam,'_vdefault');
