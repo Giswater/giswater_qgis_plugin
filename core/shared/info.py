@@ -605,11 +605,13 @@ class GwInfo(QObject):
         self._enable_actions(dlg_cf, layer.isEditable())
 
         action_edit.setChecked(layer.isEditable())
+        child_type = complet_result['body']['feature']['childType']
+        
         # Actions signals
         action_edit.triggered.connect(partial(self._manage_edition, dlg_cf, action_edit, fid, new_feature))
-        action_catalog.triggered.connect(partial(self._open_catalog, tab_type, self.feature_type, complet_result['body']['feature']['childType']))
-        action_workcat.triggered.connect(partial(self._get_catalog, 'new_workcat', self.tablename, self.feature_type, self.feature_id, self.field_id, list_points))
-        action_mapzone.triggered.connect(partial(self._get_catalog, 'new_mapzone', self.tablename, self.feature_type, self.feature_id, self.field_id, list_points))
+        action_catalog.triggered.connect(partial(self._open_catalog, tab_type, self.feature_type, child_type))
+        action_workcat.triggered.connect(partial(self._get_catalog, 'new_workcat', self.tablename, child_type, self.feature_id, list_points))
+        action_mapzone.triggered.connect(partial(self._get_catalog, 'new_mapzone', self.tablename, child_type, self.feature_id, list_points))
         action_set_to_arc.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_set_to_arc, 'v_edit_arc', 'set_to_arc', None))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id,  'v_edit_arc', 'arc', 'data_arc_id'))
         action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_parent_id, 'v_edit_node', 'node', 'data_parent_id'))
@@ -3216,7 +3218,7 @@ class GwInfo(QObject):
         return widget
 
 
-    def _get_catalog(self, form_name, table_name, feature_type, feature_id, field_id, list_points):
+    def _get_catalog(self, form_name, table_name, feature_type, feature_id, list_points):
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"tableName":"{table_name}", "featureId":"{feature_id}", "feature_type":"{feature_type}"'
         extras = f'"coordinates":{{{list_points}}}'
