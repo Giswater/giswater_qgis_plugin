@@ -220,8 +220,6 @@ def close_dialog(dlg):
             global_vars.iface.actionPan().trigger()
     except Exception:
         pass
-    finally:
-        global_vars.schema = None
 
 
 def create_body(form='', feature='', filter_fields='', extras=None):
