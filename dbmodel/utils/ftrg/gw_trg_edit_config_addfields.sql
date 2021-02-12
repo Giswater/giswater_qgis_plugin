@@ -17,11 +17,7 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	-- sys_addfields table
-	UPDATE sys_addfields SET
-	num_decimals = NEW.num_decimals,
-	field_length = NEW.field_length,
-	orderby = NEW.addfield_order,
-	active = NEW.addfield_active
+	UPDATE sys_addfields SET orderby = NEW.addfield_order, active = NEW.active
 	WHERE param_id=OLD.param_id AND cat_feature_id=OLD.cat_feature_id;
 		
     RETURN NEW;
