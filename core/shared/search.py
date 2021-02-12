@@ -54,11 +54,16 @@ class GwSearch:
         open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
         if open_search in ("True", "true", True) and dlg_mincut is None and load_project is False:
             return
-        form = ""
+
+        # If self.dlg_search is None(search is not open yet) and dlg_mincut is None (we are not opening from mincut),
+        # we want to indicate that we are going to open search independently. If self.dlg_search was not None, it would
+        # mean that we already have it open.If dlg_mincut had a dialog, it means that we are going to embed search in
+        # the mincut form
         if self.dlg_search is None and dlg_mincut is None:
             self._init_dialog()
             tools_gw.set_config_parser('btn_search', 'open_search', 'true')
 
+        form = ""
         if dlg_mincut:
             self.dlg_search = dlg_mincut
             self.is_mincut = True
