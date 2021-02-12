@@ -4251,7 +4251,7 @@ VALUES('103', 'v_edit_link', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgi
     <fieldstyles/>
   </conditionalstyles>
   <storedexpressions/>
-  <editform tolerant="1">C:/Users/Nestor/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/templates/qgisproject/en</editform>
+  <editform tolerant="1">C:/Users/Nestor/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins/giswater/resources/templates/qgisproject/en_US</editform>
   <editforminit/>
   <editforminitcodesource>0</editforminitcodesource>
   <editforminitfilepath></editforminitfilepath>
