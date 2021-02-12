@@ -158,6 +158,8 @@ class GwFeatureReplaceButton(GwMaptool):
         # Create the dialog and signals
         self.dlg_replace = GwFeatureReplaceUi()
         tools_gw.load_settings(self.dlg_replace)
+        tools_gw.add_icon(self.dlg_replace.btn_new_workcat, "193")
+        tools_gw.add_icon(self.dlg_replace.btn_catalog, "195")
 
         sql = "SELECT id FROM cat_work ORDER BY id"
         rows = tools_db.get_rows(sql)
@@ -208,7 +210,7 @@ class GwFeatureReplaceButton(GwMaptool):
 
         self.dlg_replace.feature_type.setText(feature_type)
         self.dlg_replace.feature_type_new.currentIndexChanged.connect(self._edit_change_elem_type_get_value)
-        self.dlg_replace.btn_catalog.clicked.connect(partial(self._open_catalog))
+        self.dlg_replace.btn_catalog.clicked.connect(partial(self._open_catalog, self.feature_type))
         self.dlg_replace.workcat_id_end.currentIndexChanged.connect(self._update_date)
 
         # Fill 1st combo boxes-new system node type
@@ -226,20 +228,17 @@ class GwFeatureReplaceButton(GwMaptool):
         tools_gw.open_dialog(self.dlg_replace, maximize_button=False)
 
 
-    def _open_catalog(self):
+    def _open_catalog(self, feature_type):
 
         # Get feature_type
-        feature_type = tools_qt.get_text(self.dlg_replace, self.dlg_replace.feature_type_new)
-        if feature_type is 'null':
+        child_type = tools_qt.get_text(self.dlg_replace, self.dlg_replace.feature_type_new)
+        if child_type is 'null':
             msg = "New feature type is null. Please, select a valid value."
             tools_qt.show_info_box(msg, "Info")
             return
 
-        sql = f"SELECT lower(feature_type) FROM cat_feature WHERE id = '{feature_type}'"
-        row = tools_db.get_row(sql)
-
         self.catalog = GwCatalog()
-        self.catalog.open_catalog(self.dlg_replace, 'featurecat_id', feature_type)
+        self.catalog.open_catalog(self.dlg_replace, 'featurecat_id', feature_type, child_type)
 
 
     def _update_date(self):

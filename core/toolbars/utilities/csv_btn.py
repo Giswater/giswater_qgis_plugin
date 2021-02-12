@@ -73,7 +73,7 @@ class GwCSVButton(GwAction):
         self.dlg_csv.cmb_unicode_list.currentIndexChanged.connect(partial(self._preview_csv, self.dlg_csv))
         self.dlg_csv.rb_comma.clicked.connect(partial(self._preview_csv, self.dlg_csv))
         self.dlg_csv.rb_semicolon.clicked.connect(partial(self._preview_csv, self.dlg_csv))
-        self.get_function_name()
+        self._get_function_name()
         self._load_settings_values()
 
         if str(tools_qt.get_text(self.dlg_csv, self.dlg_csv.txt_file_csv)) != 'null':
