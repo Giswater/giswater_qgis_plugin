@@ -170,6 +170,7 @@ BEGIN
 	v_listfilterparam = (((p_data ->>'data')::json->>'parameters')::json ->>'listfilterparam')::json;
 	v_layoutname = (((p_data ->>'data')::json->>'parameters')::json ->>'layoutname')::text;
 	IF v_hidden IS NULL THEN v_hidden=false; END IF;
+	IF v_layoutname IS NULL THEN v_layoutname='lyt_data_1'; END IF;
 
 	-- delete old values on result table
 	DELETE FROM audit_check_data WHERE fid=218 AND cur_user=current_user;
