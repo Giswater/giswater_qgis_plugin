@@ -820,11 +820,12 @@ class GwSearch:
         complet_result, dialog = self.customForm.get_info_from_id(table_name, feature_id, 'data')
 
         # Get list of all coords in field geometry
-        list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
-        if list_coord is None: return
-
-        max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
-        tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, 1)
+        try:
+            list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
+            max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
+            tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, 1)
+        except Exception:
+            pass
 
 
     def _fill_label_data(self, workcat_id, table_name, extension=None):
