@@ -403,7 +403,8 @@ CREATE OR REPLACE VIEW v_edit_node AS
     v_node.dma_style,
     v_node.presszone_style,
     man_valve.closed AS closed_valve,
-    man_valve.broken AS broken_valve
+    man_valve.broken AS broken_valve,
+    v_node.workcat_id_plan
    FROM v_node
      LEFT JOIN man_valve USING (node_id);
 
