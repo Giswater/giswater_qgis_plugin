@@ -383,15 +383,9 @@ class GwAdminButton:
         self.cmb_locale = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_locale')
 
         # Populate combo with all locales
-        list_locale = []
-        locales = tools_gw.get_config_parser('system', 'locale', "project", "giswater")
-        locales = locales.replace(" ", "").split(',')
-
-        for locale in locales:
-            elem = [locale, locale]
-            list_locale.append(elem)
-
-        tools_qt.fill_combo_values(self.cmb_locale, list_locale)
+        status, sqlite_cur = tools_gw.create_sqlite_conn("config")
+        list_locale = self._select_active_locales(sqlite_cur)
+        tools_qt.fill_combo_values(self.cmb_locale, list_locale, 1)
 
         # Set shortcut keys
         self.dlg_readsql_create_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_create_project))
@@ -3438,5 +3432,11 @@ class GwAdminButton:
             project_language = 'ca_ES'
 
         return project_language
+
+
+    def _select_active_locales(self, sqlite_cursor):
+        sql = f"SELECT locale as id, name as idval FROM locales WHERE active=1"
+        sqlite_cursor.execute(sql)
+        return sqlite_cursor.fetchall()
 
     # endregion

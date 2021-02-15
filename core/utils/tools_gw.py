@@ -12,6 +12,7 @@ import os
 import random
 import re
 import sys
+import sqlite3
 if 'nt' in sys.builtin_module_names:
     import ctypes
 from collections import OrderedDict
@@ -2513,6 +2514,23 @@ def restore_parent_layers_visibility(layers):
     for layer, visibility in layers.items():
         tools_qgis.set_layer_visible(layer, False, visibility)
 
+
+def create_sqlite_conn(file_name):
+    status = False
+    cursor = None
+    try:
+        db_path = f"{global_vars.plugin_dir}{os.sep}resources{os.sep}gis{os.sep}{file_name}.sqlite"
+        tools_log.log_info(db_path)
+        if os.path.exists(db_path):
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            status = True
+        else:
+            tools_log.log_warning("Config database file not found", parameter=db_path)
+    except Exception as e:
+        tools_log.log_warning(str(e))
+
+    return status, cursor
 
 # region private functions
 def _insert_feature_psector(dialog, feature_type, ids=None):

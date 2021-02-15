@@ -10,6 +10,7 @@ import shutil
 import sqlite3
 
 from ...lib import tools_log, tools_qt, tools_db, tools_qgis
+from ..utils import tools_gw
 
 
 class GwGisFileCreate:
@@ -84,7 +85,7 @@ class GwGisFileCreate:
             content = f.read()
 
         # Connect to sqlite database
-        sqlite_conn = self._connect_sqlite()
+        sqlite_conn, self.cursor = tools_gw.create_sqlite_conn("srid")
 
         # Replace spatialrefsys and extent parameters
         content = self._replace_spatial_parameters(self.srid, content, sqlite_conn)
@@ -144,24 +145,6 @@ class GwGisFileCreate:
                                      tools_db.get_srid('v_edit_node', schema))
 
         return True
-
-
-    def _connect_sqlite(self):
-
-        status = False
-        try:
-            db_path = self.plugin_dir + os.sep + "resources" + os.sep + "gis" + os.sep + "srid.sqlite"
-            tools_log.log_info(db_path)
-            if os.path.exists(db_path):
-                self.conn = sqlite3.connect(db_path)
-                self.cursor = self.conn.cursor()
-                status = True
-            else:
-                tools_log.log_warning("Config database file not found", parameter=db_path)
-        except Exception as e:
-            tools_log.log_warning(str(e))
-
-        return status
 
 
     def _replace_spatial_parameters(self, srid, content, sqlite_conn):
