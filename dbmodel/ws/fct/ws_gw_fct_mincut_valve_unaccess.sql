@@ -56,7 +56,7 @@ BEGIN
 	-- In case of variable om_mincut_valvestatus_unaccess on TRUE and valve closed status on TRUE)
 	IF v_flag IS TRUE THEN
 		-- Modify result values
-		INSERT INTO om_mincut_valve (result_id, node_id) VALUES (v_result_id, v_node_id);
+		INSERT INTO om_mincut_valve (result_id, node_id) VALUES (v_result_id, v_node_id) ON CONFLICT (result_id, node_id) DO NOTHING;
         UPDATE om_mincut_valve SET closed=TRUE, proposed=TRUE, broken=FALSE, unaccess=FALSE, 
 		the_geom=(SELECT the_geom FROM node WHERE node_id=v_node_id) WHERE node_id=v_node_id;
 		
