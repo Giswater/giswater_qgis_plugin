@@ -47,10 +47,16 @@ BEGIN
 
 		RETURN NEW;
 	ELSIF TG_OP = 'DELETE' THEN
+
+		-- counting if is last psector where feature is atached
 		IF (SELECT count(psector_id) FROM plan_psector_x_gully JOIN gully USING (gully_id) WHERE gully.state = 2 AND gully_id = OLD.gully_id) = 1 THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-	         "data":{"message":"3160", "function":"2968","debug_msg":'||OLD.psector_id||'}}$$);';
-	    END IF;
+			IF (SELECT lower(value) FROM config_param_user WHERE parameter = 'plan_psector_force_delete' AND cur_user= current_user) !='true' THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3160", "function":"1130","debug_msg":'||OLD.psector_id||'}}$$);';
+			ELSE
+				DELETE FROM gully WHERE gully_id = OLD.gully_id;
+			END IF;
+		END IF;
 
 	    RETURN OLD;
 	END IF;
