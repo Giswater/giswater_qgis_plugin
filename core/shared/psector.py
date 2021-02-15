@@ -74,13 +74,8 @@ class GwPsector:
 
         # Setting layers
         self.layers = {}
-        self.layers['arc'] = []
-        self.layers['node'] = []
-        self.layers['connec'] = []
         self.layers['gully'] = []
         self.layers['element'] = []
-
-
         self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
@@ -93,7 +88,7 @@ class GwPsector:
 
         self.feature_type = "arc"
 
-        self.all_layers_checked = self._chek_for_layers()
+        self.all_layers_checked = self._check_for_layers()
         if self.all_layers_checked:
             tools_qt.set_checked(self.dlg_plan_psector, self.dlg_plan_psector.chk_enable_all, True)
 
@@ -1606,6 +1601,7 @@ class GwPsector:
 
     def filter_merm(self, dialog, tablename):
         """ Filter rows from 'manage_prices' dialog from selected tab """
+
         self.filter_by_text(dialog, dialog.tbl_om_result_cat, dialog.txt_name, tablename)
 
 
@@ -1617,6 +1613,7 @@ class GwPsector:
             message = "Any record selected"
             tools_qgis.show_warning(message)
             return
+
         row = selected_list[0].row()
         psector_id = self.qtbl_psm.model().record(row).value("psector_id")
         self.duplicate_psector = GwPsectorDuplicate()
@@ -1696,7 +1693,7 @@ class GwPsector:
             tools_qgis.set_layer_visible(layer, True, True)
 
 
-    def _chek_for_layers(self):
+    def _check_for_layers(self):
         """ Return if ALL this layers in the list are checked or not """
 
         all_checked = True
