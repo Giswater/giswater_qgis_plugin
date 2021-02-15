@@ -20,7 +20,9 @@ CREATE TABLE temp_demand(
 -- 2020/02/11
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"True"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"True"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"True"}}$$);SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"True"}}$$);ALTER TABLE inp_reservoir ADD COLUMN head double precision;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"True"}}$$);
+
+ALTER TABLE inp_reservoir ADD COLUMN head double precision;
 
 ALTER TABLE inp_pump ADD CONSTRAINT inp_pump_curve_id_fkey FOREIGN KEY (curve_id) 
 REFERENCES inp_curve (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
