@@ -376,6 +376,8 @@ class ManageNewPsector(ParentManage):
 
         self.dlg_plan_psector.gexpenses.returnPressed.connect(
             partial(self.calulate_percents, 'plan_psector', 'gexpenses'))
+        self.dlg_plan_psector.gexpenses.editingFinished.connect(
+            partial(self.calulate_percents, 'plan_psector', 'gexpenses'))
         self.dlg_plan_psector.vat.returnPressed.connect(partial(self.calulate_percents, 'plan_psector', 'vat'))
         self.dlg_plan_psector.other.returnPressed.connect(partial(self.calulate_percents, 'plan_psector', 'other'))
 
@@ -826,16 +828,17 @@ class ManageNewPsector(ParentManage):
         self.dlg_plan_psector.name.setEnabled(False)
         self.insert_or_update_new_psector(tablename=f'v_edit_plan_psector', close_dlg=False)
         self.update = True
-        if self.dlg_plan_psector.tabWidget.currentIndex() == 2:
+
+        if self.dlg_plan_psector.tabWidget.currentIndex() == 3:
             tableleft = "v_price_compost"
             tableright = f"v_edit_plan_psector_x_other"
             field_id_right = "price_id"
             self.price_selector(self.dlg_plan_psector, tableleft, tableright, field_id_right)
             self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
-        elif self.dlg_plan_psector.tabWidget.currentIndex() == 3:
+        elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
             self.populate_budget(self.dlg_plan_psector, utils_giswater.getWidgetText(
                 self.dlg_plan_psector, 'psector_id'))
-        elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
+        elif self.dlg_plan_psector.tabWidget.currentIndex() == 5:
             psector_id = utils_giswater.getWidgetText(self.dlg_plan_psector, 'psector_id')
             expr = f"psector_id = '{psector_id}'"
             self.fill_table_object(self.tbl_document, self.schema_name + ".v_ui_doc_x_psector", expr_filter=expr)
