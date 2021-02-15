@@ -40,22 +40,19 @@ class GwVisit(QObject):
 
     def __init__(self):
         """ Class to control 'Add visit' of toolbar 'edit' """
+
         QObject.__init__(self)
         self.canvas = global_vars.canvas
         self.schema_name = global_vars.schema_name
         self.iface = global_vars.iface
-
         self.feature_type = None
         self.layers = None
         self.event_parameter_id = None
         self.event_feature_type = None
-
         self.lazy_widget = None
         self.lazy_init_function = None
-
         self.snapper_manager = GwSnapManager(self.iface)
         self.vertex_marker = self.snapper_manager.vertex_marker
-
 
 
     def get_visit(self, visit_id=None, feature_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
@@ -110,12 +107,8 @@ class GwVisit(QObject):
 
         # Setting layers
         self.layers = {}
-        self.layers['arc'] = []
-        self.layers['node'] = []
-        self.layers['connec'] = []
         self.layers['gully'] = []
         self.layers['element'] = []
-
         self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
@@ -257,11 +250,11 @@ class GwVisit(QObject):
             tools_gw.open_dialog(self.dlg_add_visit, dlg_name="visit")
 
 
-    def manage_visits(self, feature_type=None, feature_id=None, dialog=GwVisitManagerUi()):
+    def manage_visits(self, feature_type=None, feature_id=None):
         """ Button 65: manage visits """
 
         # Create the dialog
-        self.dlg_visit_manager = dialog
+        self.dlg_visit_manager = GwVisitManagerUi()
         tools_gw.load_settings(self.dlg_visit_manager)
         self.dlg_visit_manager.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
 
@@ -315,7 +308,6 @@ class GwVisit(QObject):
 
         # Open form
         tools_gw.open_dialog(self.dlg_visit_manager, dlg_name="lot_visitmanager")
-
 
 
     def get_visit_dialog(self):
@@ -408,6 +400,7 @@ class GwVisit(QObject):
 
 
     def _set_signals(self):
+
         self.dlg_add_visit.btn_cancel.clicked.connect(lambda: self.dlg_add_visit.close())
         self.dlg_add_visit.rejected.connect(self._manage_rejected)
         self.dlg_add_visit.rejected.connect(partial(tools_gw.close_dialog, self.dlg_add_visit))
@@ -444,6 +437,7 @@ class GwVisit(QObject):
 
 
     def _add_feature_clicked(self):
+
         self.previous_map_tool = global_vars.canvas.mapTool()
         self.snapper_manager.add_point(self.vertex_marker)
         self.point_xy = self.snapper_manager.point_xy
@@ -823,6 +817,7 @@ class GwVisit(QObject):
 
     def _manage_tabs_enabled(self, enable_tabs=False):
         """ Enable/Disable tabs depending feature_type """
+
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
                           "v_edit_element"]
         if self.feature_type is None:
