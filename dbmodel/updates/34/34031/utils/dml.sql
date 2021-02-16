@@ -19,6 +19,6 @@ VALUES ('plan_psector_force_delete', 'hidden', 'Force delete when feature is del
 
 -- 2021/02/16
 INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
-VALUES (3022,'gw_trg_plan_psector_delete', 'utils', 'trigger function', null, null, 'Trigger to delete features state =2 when are orphan of psector','role_plan') 
+VALUES (3022,'gw_trg_plan_psector_delete', 'utils', 'trigger function', null, null, 'Trigger to delete features state =2 when are orphan of psector','role_master') 
 ON CONFLICT (function_name, project_type) DO NOTHING;
 
