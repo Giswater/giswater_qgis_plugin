@@ -126,10 +126,10 @@ class GwConfigButton(GwAction):
     # noinspection PyUnresolvedReferences
     def _build_dialog_options(self, row, tab):
 
+        self.tab = tab
         for field in row['fields']:
             widget = None
             self.chk = None
-            self.tab = tab
             if field['label']:
                 lbl = QLabel()
                 lbl.setObjectName('lbl' + field['widgetname'])
@@ -147,7 +147,7 @@ class GwConfigButton(GwAction):
                         self.chk.setChecked(False)
                     self.chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-                if field['widgettype'] == 'text' or field['widgettype'] == 'linetext' or field['widgettype'] == 'typeahead':
+                if field['widgettype'] in ('text', 'linetext', 'typeahead'):
                     widget = QLineEdit()
                     widget.setText(field['value'])
                     widget.editingFinished.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
@@ -155,12 +155,11 @@ class GwConfigButton(GwAction):
 
                     if field['widgettype'] == 'typeahead':
                         completer = QCompleter()
-
                         if 'dv_querytext' in field:
                             widget.setProperty('typeahead', True)
                             model = QStringListModel()
                             widget.textChanged.connect(
-                            partial(self.populate_typeahead, completer, model, field, self.dlg_config, widget))
+                                partial(self.populate_typeahead, completer, model, field, self.dlg_config, widget))
 
                 elif field['widgettype'] == 'textarea':
                     widget = QTextEdit()
@@ -175,7 +174,6 @@ class GwConfigButton(GwAction):
                 elif field['widgettype'] == 'check':
                     widget = QCheckBox()
                     widget.setObjectName('chk_' + field['widgetname'])
-
                     if self.tab == 'user' and field['checked'] in ('true', 'True', 'TRUE', True):
                         widget.setChecked(True)
                     elif self.tab == 'user' and field['checked'] in ('false', 'False', 'FALSE', False):
@@ -277,8 +275,8 @@ class GwConfigButton(GwAction):
                 tools_qt.set_combo_value(widget, field['value'], 0)
 
 
-    def _get_dialog_changed_values(self, widget, tab, chk, value=None):
-
+    def _get_dialog_changed_values(self, widget, tab, chk):
+        value = None
         elem = {}
         if type(widget) is QLineEdit:
             value = tools_qt.get_text(self.dlg_config, widget, return_string_null=False)
