@@ -693,63 +693,45 @@ class GwProfileButton(GwAction):
         c = (self.fix_x - self.fix_x * Decimal(0.2)) / 2
         plt.text(-(c + self.fix_x * Decimal(0.2)),
                  self.min_top_elev - 1 * self.height_row - Decimal(0.35) * self.height_row, legend['catalog'],
-                 fontsize=7.5,
-                 color=text_color, fontweight=text_weight,
-                 horizontalalignment='center')
+                 fontsize=7.5, color=text_color, fontweight=text_weight, horizontalalignment='center')
 
         plt.text(-(c + self.fix_x * Decimal(0.2)),
                  self.min_top_elev - 1 * self.height_row - Decimal(0.68) * self.height_row, legend['dimensions'],
-                 fontsize=7.5,
-                 color=text_color, fontweight=text_weight,
-                 horizontalalignment='center')
+                 fontsize=7.5, color=text_color, fontweight=text_weight, horizontalalignment='center')
 
         c = (self.fix_x * Decimal(0.25)) / 2
         plt.text(-(c + self.fix_x * Decimal(0.74)),
                  self.min_top_elev - Decimal(2) * self.height_row - self.height_row * 3 / 2, legend['ordinates'],
-                 fontsize=7.5,
-                 color=text_color, fontweight=text_weight,
-                 rotation='vertical', horizontalalignment='center', verticalalignment='center')
+                 fontsize=7.5, color=text_color, fontweight=text_weight, rotation='vertical',
+                 horizontalalignment='center', verticalalignment='center')
 
         plt.text(-self.fix_x * Decimal(0.70), self.min_top_elev - Decimal(1.85) * self.height_row - self.height_row / 2,
-                 legend['topelev'], fontsize=7.5,
-                 color=text_color, fontweight=text_weight,
-                 verticalalignment='center')
+                 legend['topelev'], fontsize=7.5, color=text_color, fontweight=text_weight, verticalalignment='center')
 
         plt.text(-self.fix_x * Decimal(0.70), self.min_top_elev - Decimal(2.65) * self.height_row - self.height_row / 2,
-                 legend['ymax'], fontsize=7.5,
-                 color=text_color, fontweight=text_weight,
-                 verticalalignment='center')
+                 legend['ymax'], fontsize=7.5, color=text_color, fontweight=text_weight, verticalalignment='center')
 
         plt.text(-self.fix_x * Decimal(0.70), self.min_top_elev - Decimal(3.45) * self.height_row - self.height_row / 2,
-                 legend['elev'], fontsize=7.5,
-                 color=text_color, fontweight=text_weight,
-                 verticalalignment='center')
+                 legend['elev'], fontsize=7.5, color=text_color, fontweight=text_weight, verticalalignment='center')
 
         plt.text(-self.fix_x * Decimal(0.70), self.min_top_elev - Decimal(4.25) * self.height_row - self.height_row / 2,
-                 legend['distance'], fontsize=7.5,
-                 color=text_color, fontweight=text_weight,
-                 verticalalignment='center')
+                 legend['distance'], fontsize=7.5, color=text_color, fontweight=text_weight, verticalalignment='center')
 
         c = (self.fix_x - self.fix_x * Decimal(0.2)) / 2
         plt.text(-(c + self.fix_x * Decimal(0.2)),
                  self.min_top_elev - Decimal(self.height_row * 5 + self.height_row / 2), legend['code'],
-                 fontsize=7.5,
-                 color=text_color, fontweight=text_weight,
-                 horizontalalignment='center', verticalalignment='center')
+                 fontsize=7.5, color=text_color, fontweight=text_weight, horizontalalignment='center',
+                 verticalalignment='center')
 
-        # print title
-        title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title)
-        if title in (None, 'null'):
-            title = ''
+        # Print title
+        title = tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.txt_title, True, False)
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(5.75) * self.height_row - self.height_row / 2,
-                 title.upper(), fontsize=title_size,
-                 color=title_color, fontweight=title_weight,
+                 title.upper(), fontsize=title_size, color=title_color, fontweight=title_weight,
                  verticalalignment='center')
+
+        date = tools_qt.get_calendar_date(self.dlg_draw_profile, self.dlg_draw_profile.date)
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(6) * self.height_row - self.height_row / 2,
-                 "" + str(tools_qt.get_text(self.dlg_draw_profile, self.dlg_draw_profile.date)) + "",
-                 fontsize=title_size*0.7,
-                 color=title_color, fontweight=title_weight,
-                 verticalalignment='center')
+                 date, fontsize=title_size*0.7, color=title_color, fontweight=title_weight, verticalalignment='center')
 
 
     def _draw_nodes(self, node, prev_node, index):
