@@ -24,6 +24,7 @@ BEGIN
 	ELSIF v_stateaux=2 THEN
 		NEW.state=1;
 		NEW.doable=true;
+	END IF;
 
 	RETURN NEW;
 
