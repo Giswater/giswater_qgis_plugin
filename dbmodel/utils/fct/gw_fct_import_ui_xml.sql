@@ -33,7 +33,7 @@ v_parent_layer text;
 
 BEGIN
 
-	SET search_path=SCHEMA_NAME, public;
+	SET search_path="SCHEMA_NAME", public;
 
 	--Loop in order to extract parts of xml related to layout_data_1,2,3
 	FOR rec IN 1..3 LOOP

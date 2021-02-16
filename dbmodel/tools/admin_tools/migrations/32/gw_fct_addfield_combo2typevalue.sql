@@ -11,7 +11,7 @@ DECLARE
 	rec_child record;
 BEGIN
 
-	SET search_path=SCHEMA_NAME, public;
+	SET search_path="SCHEMA_NAME", public;
 
 	--insert values from man_addfields_cat_combo into edit_typevalue
 	INSERT INTO edit_typevalue( typevalue, id, idval, descript)

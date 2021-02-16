@@ -27,7 +27,7 @@ v_id integer;
 
 BEGIN 
 
-	SET search_path=SCHEMA_NAME, public;
+	SET search_path="SCHEMA_NAME", public;
 
 	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
 
