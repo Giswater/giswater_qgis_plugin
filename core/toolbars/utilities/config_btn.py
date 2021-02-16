@@ -172,19 +172,18 @@ class GwConfigButton(GwAction):
                     widget.currentIndexChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
                     widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'check':
-                    widget = QCheckBox()
-                    widget.setObjectName('chk_' + field['widgetname'])
+                    self.chk = QCheckBox()
+                    self.chk.setObjectName(field['widgetname'])
                     if self.tab == 'user' and field['checked'] in ('true', 'True', 'TRUE', True):
-                        widget.setChecked(True)
+                        self.chk.setChecked(True)
                     elif self.tab == 'user' and field['checked'] in ('false', 'False', 'FALSE', False):
-                        widget.setChecked(False)
+                        self.chk.setChecked(False)
                     elif field['value'] in ('true', 'True', 'TRUE', True):
-                        widget.setChecked(True)
+                        self.chk.setChecked(True)
                     elif field['value'] in ('false', 'False', 'FALSE', False):
-                        widget.setChecked(False)
-
-                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                    widget.stateChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
+                        self.chk.setChecked(False)
+                    self.chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                    self.chk.stateChanged.connect(partial(self._get_dialog_changed_values, self.chk, self.tab, self.chk))
                 elif field['widgettype'] == 'datetime':
                     widget = QgsDateTimeEdit()
                     widget.setAllowNull(True)
@@ -214,8 +213,11 @@ class GwConfigButton(GwAction):
                     widget.setObjectName(field['widgetname'])
 
                 # Set signals
-                if self.tab == 'user':
+                if self.tab == 'user' and widget is not None:
                     self.chk.stateChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
+
+                if widget is None:
+                    widget = self.chk
 
                 self._order_widgets(field, lbl, widget)
 
