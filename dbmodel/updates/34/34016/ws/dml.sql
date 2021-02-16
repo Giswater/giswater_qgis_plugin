@@ -209,7 +209,7 @@ INSERT INTO config_form_fields (formname, formtype, columnname, layoutorder,  da
 
 -- re-creation of child
 SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-"data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
+"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
 
 
 UPDATE config_form_fields SET 

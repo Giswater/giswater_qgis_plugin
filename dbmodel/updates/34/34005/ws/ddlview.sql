@@ -576,10 +576,6 @@ v_connec.connectype_id AS custom_type
 FROM v_connec;
 
 
-SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-"data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
-
-
 -- creacio de les pol
 CREATE OR REPLACE VIEW ve_pol_fountain AS 
  SELECT man_fountain.pol_id,

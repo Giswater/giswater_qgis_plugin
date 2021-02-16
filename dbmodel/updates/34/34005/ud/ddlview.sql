@@ -2697,10 +2697,7 @@ CREATE OR REPLACE VIEW v_edit_man_netelement AS
    FROM v_node
 	 JOIN man_netelement ON man_netelement.node_id::text = v_node.node_id::text;
 
-SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-"data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
-
-	 CREATE OR REPLACE VIEW ve_pol_netgully AS 
+ CREATE OR REPLACE VIEW ve_pol_netgully AS 
  SELECT man_netgully.pol_id,
 	v_node.node_id,
 	polygon.the_geom

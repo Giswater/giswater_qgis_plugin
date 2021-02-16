@@ -11,13 +11,17 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_schema_lastprocess(p_data js
 $BODY$
 
 /*EXAMPLE
+
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${
 "client":{"lang":"ES"}, 
-"data":{"isNewProject":"TRUE", "gwVersion":"3.1.105", "projectType":"WS", "isSample":true, "epsg":"25831", "title":"test project", "author":"test", "date":"01/01/2000", "superUsers":["postgres", "giswater"]}}$$)
+"data":{"isNewProject":"TRUE", "gwVersion":"3.1.105", "projectType":"WS", "isSample":true,
+		"epsg":"25831", "title":"test project", "author":"test", "date":"01/01/2000", "superUsers":["postgres", "giswater"]}}$$)
+
 
 SELECT SCHEMA_NAME.gw_fct_admin_schema_lastprocess($${
 "client":{"lang":"ES"},
 "data":{"isNewProject":"FALSE", "gwVersion":"3.3.031", "projectType":"UD", "epsg":25831}}$$)
+
 
 -- fid: 133
 
@@ -50,6 +54,7 @@ BEGIN
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
+	
 
 	-- get input parameters
 	v_gwversion := (p_data ->> 'data')::json->> 'gwVersion';
@@ -211,14 +216,12 @@ BEGIN
 		IF (SELECT value FROM config_param_system WHERE parameter='admin_utils_schema') IS NOT NULL THEN
 			PERFORM gw_fct_admin_schema_utils_fk();  -- this is the position to use it because we need values on version table to work with
 		END IF;
-		
+
 		-- generate child views 
 		UPDATE config_param_system SET value='FALSE' WHERE parameter='admin_config_control_trigger';
 		PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-		"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
-		
-		PERFORM  gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-		"data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;
+		"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE"}}$$)::text;
+
 		UPDATE config_param_system SET value='TRUE' WHERE parameter='admin_config_control_trigger';
 		
 		--change widgettype for matcat_id when new empty data project (UD)
@@ -252,15 +255,10 @@ BEGIN
 
 		-- create child views for users from 3.2 to 3.3 updates
 		IF v_oldversion < '3.3.000' AND v_gwversion > '3.3.000' THEN
-			PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":true}}$$)::text;
+			PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+			"feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE"}}$$)::text;
 		END IF;
-	
-		-- check project consistency
-		IF v_projecttype = 'WS' THEN
-			
-		ELSIF v_projecttype = 'UD' THEN
 
-		END IF;
 		-- inserting version table
 		SELECT * INTO v_version FROM sys_version LIMIT 1;
 		INSERT INTO sys_version (giswater, project_type, postgres, postgis, language, epsg, sample)
@@ -282,11 +280,12 @@ BEGIN
 	
 	-- update permissions	
 	PERFORM gw_fct_admin_role_permissions();
-
+	
 
 	--    Control NULL's
 	v_message := COALESCE(v_message, '');
-	
+	v_priority := 1;
+
 	-- Return
 	RETURN ('{"message":{"level":"'||v_priority||'", "text":"'||v_message||'"}}');	
 END;

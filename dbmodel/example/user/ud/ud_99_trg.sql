@@ -44,3 +44,5 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
   ON SCHEMA_NAME.ve_visit_arc_rehabit
   FOR EACH ROW
   EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent('arc');
+  
+UPDATE config_param_system SET value='TRUE' WHERE parameter='admin_config_control_trigger';

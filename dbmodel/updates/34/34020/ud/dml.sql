@@ -20,7 +20,7 @@ TRUE, FALSE, 2) ON CONFLICT (id) DO NOTHING;
 
 -- re-creation of child
 SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-"data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
+"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
 
 
 

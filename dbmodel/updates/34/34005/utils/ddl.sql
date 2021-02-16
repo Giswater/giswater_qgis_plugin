@@ -8,7 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE config_api_form_fields RENAME TO config_form_fields;
-
 ALTER TABLE ext_rtc_scada_dma_period RENAME TO ext_rtc_dma_period;
 
 --2020/06/15

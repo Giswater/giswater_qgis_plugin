@@ -6,6 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+UPDATE config_param_system SET value='FALSE' WHERE parameter='admin_config_control_trigger';
+
 UPDATE cat_feature SET active = TRUE;
 
 INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('edit_gratecat_vdefault', 'N/I', current_user);

@@ -32,3 +32,5 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
   ON SCHEMA_NAME.ve_visit_noinfra
   FOR EACH ROW
   EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_om_visit_multievent();
+  
+UPDATE config_param_system SET value='TRUE' WHERE parameter='admin_config_control_trigger';

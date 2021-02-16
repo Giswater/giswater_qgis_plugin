@@ -252,7 +252,7 @@ BEGIN
 
 	--create child views 
 	PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
- 	"data":{"filterFields":{}, "pageInfo":{}, "multi_create":"True" }}$$);
+ 	"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
 
 	-- enable temporary the constraint in order to use ON CONFLICT on insert
 	ALTER TABLE config_param_user ADD CONSTRAINT config_param_user_parameter_cur_user_unique UNIQUE(parameter, cur_user);
