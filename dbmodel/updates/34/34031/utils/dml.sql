@@ -14,7 +14,7 @@ ON CONFLICT (parameter) DO NOTHING;
 INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutorder, project_type, isparent, 
 isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable, isdeprecated, vdefault)
 VALUES ('plan_psector_force_delete', 'hidden', 'Force delete when feature is deleted from one psector and no more it appears on other psector',
-'role_master', 'Force delete planned feature', FALSE, NULL, 'utils', FALSE, FALSE, 'boolean', 'check', false, NULL, NULL, FALSE, 
+'role_master', 'Force delete planned feature', FALSE, NULL, 'utils', FALSE, FALSE, 'boolean', 'check', true, NULL, NULL, FALSE, 
 'true') ON CONFLICT (id) DO NOTHING;
 
 -- 2021/02/16
