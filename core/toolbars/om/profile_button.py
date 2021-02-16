@@ -1312,6 +1312,7 @@ class GwProfileButton(GwAction):
 
         # Clear widgets
         self.dlg_draw_profile.tbl_list_arc.clear()
+        self.dlg_draw_profile.txt_profile_id.clear()
         self.action_profile.setDisabled(False)
         self.dlg_draw_profile.btn_draw_profile.setEnabled(False)
         self.dlg_draw_profile.btn_save_profile.setEnabled(False)
