@@ -8,6 +8,10 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/02/10
+ALTER TABLE plan_psector_x_node DROP CONSTRAINT IF EXISTS plan_psector_x_node_unique;
+ALTER TABLE plan_psector_x_arc DROP CONSTRAINT IF EXISTS plan_psector_x_arc_unique;
+ALTER TABLE plan_psector_x_connec DROP CONSTRAINT IF EXISTS plan_psector_x_connec_unique;
+
 ALTER TABLE plan_psector_x_node ADD CONSTRAINT plan_psector_x_node_unique UNIQUE(node_id, psector_id);
 ALTER TABLE plan_psector_x_arc ADD CONSTRAINT plan_psector_x_arc_unique UNIQUE(arc_id, psector_id);
 ALTER TABLE plan_psector_x_connec ADD CONSTRAINT plan_psector_x_connec_unique UNIQUE(connec_id, psector_id);

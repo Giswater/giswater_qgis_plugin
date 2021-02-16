@@ -8,5 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/02/10
+ALTER TABLE plan_psector_x_gully DROP CONSTRAINT IF EXISTS plan_psector_x_gully_unique;
 ALTER TABLE plan_psector_x_gully ADD CONSTRAINT plan_psector_x_gully_unique UNIQUE(gully_id, psector_id);
 

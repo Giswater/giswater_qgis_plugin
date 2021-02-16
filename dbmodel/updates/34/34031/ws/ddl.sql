@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2021/02/10
-CREATE TABLE temp_demand(
+CREATE TABLE IF NOT EXISTS temp_demand(
   id serial PRIMARY KEY,
   feature_id character varying(16) NOT NULL,
   demand numeric(12,6),
@@ -22,8 +22,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "col
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"True"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"True"}}$$);
 
-ALTER TABLE inp_reservoir ADD COLUMN head double precision;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_reservoir", "column":"head", "dataType":"double precision", "isUtils":"False"}}$$);
 
-ALTER TABLE inp_pump ADD CONSTRAINT inp_pump_curve_id_fkey FOREIGN KEY (curve_id) 
-REFERENCES inp_curve (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
 

@@ -8,7 +8,8 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/02/11
-INSERT INTO config_param_system VALUES ('edit_connect_autoupdate_dma', 'TRUE', 'If true, after connect to network, gully or connec will have the same dma as its pjoint. If false, this value won''t propagate', 'Connect autoupdate dma', NULL, NULL, FALSE, NULL, 'utils', NULL, NULL, 'boolean');
+INSERT INTO config_param_system VALUES ('edit_connect_autoupdate_dma', 'TRUE', 'If true, after connect to network, gully or connec will have the same dma as its pjoint. If false, this value won''t propagate', 'Connect autoupdate dma', NULL, NULL, FALSE, NULL, 'utils', NULL, NULL, 'boolean')
+ON CONFLICT (parameter) DO NOTHING;
 
 
 INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutorder, project_type, isparent, 

@@ -10,7 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2021/02/10
 UPDATE config_fprocess SET fid = 141 WHERE target  ='[DEMANDS]';
-INSERT INTO inp_typevalue values ('inp_value_patternmethod','24','PJOINT ESTIMATED (PJOINT)',NULL, '{"DemandType":2}');
+INSERT INTO inp_typevalue values ('inp_value_patternmethod','24','PJOINT ESTIMATED (PJOINT)',NULL, '{"DemandType":2}') ON CONFLICT (typevalue, id) DO NOTHING;
 
 ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 DELETE FROM inp_typevalue WHERE typevalue  ='inp_options_dscenario_priority' and id = '2';
@@ -20,18 +20,27 @@ UPDATE inp_typevalue SET typevalue = concat('_',typevalue) WHERE typevalue = 'in
 ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 
 INSERT INTO sys_table VALUES ('temp_demand','Table with temporal demands when go2epa inp file is created',
-	'role_epa',0, 'role_epa',null,null,'temp_demand_id_seq', 'id');
+'role_epa',0, 'role_epa',null,null,'temp_demand_id_seq', 'id') ON CONFLICT (id) DO NOTHING;
 
 
 --2021/02/11
-INSERT INTO config_form_fields VALUES ('v_edit_arc', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE);
-INSERT INTO config_form_fields VALUES ('ve_arc', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE);
+INSERT INTO config_form_fields VALUES ('v_edit_arc', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE)
+ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+INSERT INTO config_form_fields VALUES ('ve_arc', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE)
+ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
-INSERT INTO config_form_fields VALUES ('v_edit_node', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE);
-INSERT INTO config_form_fields VALUES ('ve_node', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE);
+INSERT INTO config_form_fields VALUES ('v_edit_node', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE)
+ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
-INSERT INTO config_form_fields VALUES ('v_edit_connec', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE);
-INSERT INTO config_form_fields VALUES ('ve_connec', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE);
+INSERT INTO config_form_fields VALUES ('ve_node', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE)
+ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+
+INSERT INTO config_form_fields VALUES ('v_edit_connec', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE)
+ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+
+INSERT INTO config_form_fields VALUES ('ve_connec', 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE)
+ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
 INSERT INTO config_form_fields SELECT child_layer, 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', 
-NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE FROM cat_feature;
+NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE FROM cat_feature
+ON CONFLICT (formname, formtype, columnname) DO NOTHING;

@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
--- 2021/01/22
-ALTER TABLE cat_feature_gully DROP CONSTRAINT IF EXISTS gully_type_id_fkey;
-ALTER TABLE cat_feature_gully ADD CONSTRAINT cat_feature_gully_fkey FOREIGN KEY (id)
-REFERENCES cat_feature (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+-- 2021/02/10
+ALTER TABLE inp_pump DROP CONSTRAINT IF EXISTS inp_pump_curve_id_fkey;
+ALTER TABLE inp_pump ADD CONSTRAINT inp_pump_curve_id_fkey FOREIGN KEY (curve_id) 
+REFERENCES inp_curve (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
