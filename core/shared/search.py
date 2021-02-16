@@ -61,7 +61,6 @@ class GwSearch:
         # the mincut form
         if self.dlg_search is None and dlg_mincut is None:
             self._init_dialog()
-            tools_gw.set_config_parser('btn_search', 'open_search', 'true')
 
         form = ""
         if dlg_mincut:
@@ -122,7 +121,9 @@ class GwSearch:
             gridlayout.addItem(vertical_spacer1)
 
         if self.is_mincut is False:
+            tools_gw.set_config_parser('btn_search', 'open_search', 'true')
             tools_qt.manage_translation('search', self.dlg_search)
+
 
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
