@@ -214,10 +214,11 @@ BEGIN
 		EXECUTE 'select replace('''||rec_trg.event||''', '','', '' OR '')'
 		INTO v_replace_query;
 		
+		rec_trg.definition = replace(replace(rec_trg.definition,'EXECUTE PROCEDURE',''),concat(v_source_schema,'.'), 
+				concat(v_dest_schema,'.'));
 		IF v_trg_fields IS NULL THEN 
 
-			rec_trg.definition = replace(replace(rec_trg.definition,'EXECUTE PROCEDURE',''),concat(v_source_schema,'.'), 
-				concat(v_dest_schema,'.'));
+			
 
 			EXECUTE 'CREATE TRIGGER '||rec_trg.trigger_name||' '||rec_trg.activation||' '||v_replace_query||'
 			ON '||v_dest_schema||'.'||rec_trg.table_name||' FOR EACH ROW EXECUTE PROCEDURE '|| rec_trg.definition||';';
@@ -229,7 +230,7 @@ BEGIN
 	   
 
 			EXECUTE 'CREATE TRIGGER '||rec_trg.trigger_name||' '||rec_trg.activation||' '||v_replace_query||' ON 
-			'||v_dest_schema||'.'||rec_trg.table_name||' FOR EACH ROW '|| rec_trg.definition||';';
+			'||v_dest_schema||'.'||rec_trg.table_name||' FOR EACH ROW EXECUTE PROCEDURE '|| rec_trg.definition||';';
 
 		END IF;
 

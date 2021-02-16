@@ -25,17 +25,17 @@ v_version text;
 v_project_type text;
 
 BEGIN
+	SET search_path = "SCHEMA_NAME", public;
 
 	v_target = ((p_data ->>'data')::json->>'target')::text; 
 
-	-- search path
+	-- set correct search path
 	EXECUTE 'SET search_path = '||v_target||', public';
 
 	SELECT giswater, upper(project_type) INTO v_version, v_project_type FROM sys_version order by id desc limit 1;
 	
 	v_action = ((p_data ->>'data')::json->>'action')::text; 
 	v_source = ((p_data ->>'data')::json->>'source')::text; 
-	v_target = ((p_data ->>'data')::json->>'target')::text; 
 
 	IF v_action = 'REPAIRVIEWS' THEN
 
