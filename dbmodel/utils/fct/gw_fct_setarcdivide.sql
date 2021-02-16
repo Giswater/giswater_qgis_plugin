@@ -619,7 +619,13 @@ BEGIN
 								VALUES (212, 1, 'Update psector_x_arc as doable for fictitious arcs.');
 							END IF;	
 
-							DELETE FROM plan_psector_x_arc WHERE arc_id=v_arc_id AND psector_id=v_psector;
+							SELECT count(*) INTO v_count FROM plan_psector_x_arc WHERE arc_id=v_arc_id;
+
+							IF v_count > 1 THEN
+								DELETE FROM plan_psector_x_arc WHERE arc_id=v_arc_id AND psector_id=v_psector;
+							ELSE
+								DELETE FROM arc WHERE arc_id=v_arc_id;
+							END IF;
 
 							UPDATE plan_psector_x_connec SET arc_id=NULL WHERE arc_id=v_arc_id AND psector_id=v_psector;				
 						END IF;
