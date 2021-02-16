@@ -183,7 +183,7 @@ BEGIN
 
 		IF v_count > 0 THEN
 			EXECUTE 'DELETE FROM v_edit_link WHERE feature_type=''CONNEC'' AND feature_id IN (SELECT connec_id FROM connec  WHERE connec.arc_id='''||v_feature_id||''');';
-			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Number of removed links: ',v_count ));
+			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Number of removed links related to connecs: ',v_count ));
 		END IF;
 		
 		--set arc_id to null if there are connecs related
@@ -206,6 +206,17 @@ BEGIN
 
 		--set arc_id to null if there are gullies related
 		IF v_project_type='UD' THEN
+
+			--remove links related to arc
+			EXECUTE 'SELECT count(*) FROM v_edit_link WHERE feature_type=''GULLY'' AND feature_id IN 
+			(SELECT gully_id FROM gully  WHERE gully.arc_id='''||v_feature_id||''');'
+			INTO v_count;
+
+			IF v_count > 0 THEN
+				EXECUTE 'DELETE FROM v_edit_link WHERE feature_type=''GULLY'' AND feature_id IN (SELECT gully_id FROM gully  WHERE gully.arc_id='''||v_feature_id||''');';
+				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Number of removed links related to gullies: ',v_count ));
+			END IF;
+
 			EXECUTE 'SELECT string_agg(gully_id,'','') FROM gully WHERE arc_id='''||v_feature_id||''''
 			INTO v_related_id;
 

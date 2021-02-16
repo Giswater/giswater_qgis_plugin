@@ -73,6 +73,10 @@ BEGIN
 			EXECUTE 'UPDATE connec SET arc_id = NULL WHERE arc_id = '|| rec_id||';';
 
 			IF v_projecttype = 'UD' THEN
+				--remove links related to arc
+				EXECUTE 'DELETE FROM link 
+				WHERE link_id IN (SELECT link_id FROM link l JOIN gully g ON g.gully_id = l.feature_id WHERE g.arc_id = '|| rec_id||');';
+				
 				EXECUTE 'UPDATE gully SET arc_id = NULL WHERE arc_id = '|| rec_id||';';
 			END IF;
 			
