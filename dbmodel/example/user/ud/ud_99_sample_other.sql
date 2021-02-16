@@ -113,7 +113,7 @@ SELECT 	gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "
 
 UPDATE config_param_system SET value='FALSE' WHERE parameter='admin_config_control_trigger';
 SELECT 	gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"CONDUIT"},
- "data":{"filterFields":{}, "pageInfo":{}, "multiCreate":"TRUE" }}$$);
+ "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"TRUE" }}$$);
 UPDATE config_param_system SET value='TRUE' WHERE parameter='admin_config_control_trigger';
 
 
