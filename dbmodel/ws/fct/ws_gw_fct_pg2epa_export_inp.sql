@@ -149,7 +149,8 @@ BEGIN
 			-- spacer-19 it's used because a rare bug reading epanet when spacer=20 on target [PATTERNS]????
 			select id, concat(rpad(csv1,19),' ',rpad(coalesce(csv2,''),19),' ', rpad(coalesce(csv3,''),19),' ',rpad(coalesce(csv4,''),19),' ',rpad(coalesce(csv5,''),19),
 			' ',rpad(coalesce(csv6,''),19),	' ',rpad(coalesce(csv7,''),19),' ',rpad(coalesce(csv8,''),19),' ',rpad(coalesce(csv9,''),19),' ',rpad(coalesce(csv10,''),19),
-			' ',rpad(coalesce(csv11,''),19),' ',rpad(coalesce(csv12,''),19),' ',rpad(csv13,19),' ',rpad(csv14,19)) as text
+			' ',rpad(coalesce(csv11,''),19),' ',rpad(coalesce(csv12,''),19),' ',rpad(csv13,19),' ',rpad(csv14,19),' ',rpad(csv15,19),' ',rpad(csv16,19),' ',rpad(csv17,19)
+			,' ',rpad(csv18,19),' ',rpad(csv19,19),' ',rpad(csv20,19)) as text
 			from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_patterns')
 		union
 			select id, concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),

@@ -57,14 +57,17 @@ BEGIN
 		INSERT INTO temp_csv (csv1,fid) VALUES (NULL,v_fid);
 		EXECUTE 'INSERT INTO temp_csv(fid,csv1) VALUES ('||v_fid||','''|| rec_table.target||''');';
 	
-		INSERT INTO temp_csv (fid,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12)
+		INSERT INTO temp_csv (fid,csv1,csv2,csv3,csv4,csv5,csv6,csv7,csv8,csv9,csv10,csv11,csv12,csv13,csv14,csv15,csv16,csv17,csv18,csv19,csv20,csv21,csv22,csv23,csv24,csv25,csv26, csv27, csv28, csv29, csv30)
 		SELECT v_fid,rpad(concat(';;',c1),20),rpad(c2,20),rpad(c3,20),rpad(c4,20),rpad(c5,20),rpad(c6,20),rpad(c7,20),rpad(c8,20),rpad(c9,20),rpad(c10,20),rpad(c11,20),rpad(c12,20)
-		FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''SCHEMA_NAME'' and table_name='''||rec_table.tablename||'''::text') 
-		AS rpt(table_name text, c1 text, c2 text, c3 text, c4 text, c5 text, c6 text, c7 text, c8 text, c9 text, c10 text, c11 text, c12 text);
+		,rpad(c13,20),rpad(c14,20),rpad(c15,20),rpad(c16,20),rpad(c17,20),rpad(c18,20),rpad(c19,20),rpad(c20,20),rpad(c21,20),rpad(c22,20),rpad(c23,20),rpad(c24,20),rpad(c25,20),rpad(c26,20)
+		,rpad(c27,20),rpad(c28,20),rpad(c29,20),rpad(c30,20)
+		FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE table_schema =''ud_sample'' and table_name='''||rec_table.tablename||'''::text') 
+		AS rpt(table_name text, c1 text, c2 text, c3 text, c4 text, c5 text, c6 text, c7 text, c8 text, c9 text, c10 text, c11 text, c12 text, c13 text, c14 text, c15 text, 
+		c16 text, c17 text, c18 text, c19 text, c20 text, c21 text, c22 text, c23 text, c24 text, c25 text, c26 text, c27 text, c28 text, c29 text, c30 text);
 	
 		INSERT INTO temp_csv (fid) VALUES (141) RETURNING id INTO id_last;
 	
-		SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='SCHEMA_NAME';
+		SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND table_schema='ud_sample';
 	
 		--add underlines    
 		FOR num_col_rec IN 1..num_column
@@ -101,9 +104,10 @@ BEGIN
 	select (array_to_json(array_agg(row_to_json(row))))::json
 	into v_return 
 		from ( select text from (
-		select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', rpad(csv3,20), ' ', rpad(csv4,20), ' ', rpad(csv5,20), ' ', rpad(csv6,20), ' ', rpad(csv7,20), ' ', rpad(csv8,20), ' '
-		, rpad(csv9,20), ' ', rpad(csv10,20), ' ', rpad(csv11,20), ' ', rpad(csv12,20)) 
-		as text from temp_csv where fid = 141 and cur_user = current_user and source is null
+		select id, concat(rpad(csv1,20), ' ', rpad(csv2,20), ' ', rpad(csv3,20), ' ', rpad(csv4,20), ' ', rpad(csv5,20), ' ', rpad(csv6,20), ' ', rpad(csv7,20), ' ', rpad(csv8,20), ' ', rpad(csv9,20), ' ', rpad(csv10,20), 
+		' ', rpad(csv11,20), ' ', rpad(csv12,20), ' ', rpad(csv13,20), ' ', rpad(csv14,20), ' ', rpad(csv15,20), ' ', rpad(csv16,20), ' ', rpad(csv17,20), ' ', rpad(csv18,20), ' ', rpad(csv19,20), ' ', rpad(csv20,20), 
+		' ', rpad(csv21,20), ' ', rpad(csv22,20), ' ', rpad(csv23,20), ' ', rpad(csv24,20), ' ', rpad(csv25,20), ' ', rpad(csv26,20), ' ', rpad(csv27,20), ' ', rpad(csv28,20), ' ', rpad(csv29,20), ' ', rpad(csv30,20)) as text 
+			from temp_csv where fid = 141 and cur_user = current_user and source is null
 		union
 			select id, csv1 as text from temp_csv where fid  = 141 and cur_user = current_user and source in ('vi_controls','vi_rules', 'vi_backdrop', 'vi_hydrographs','vi_polygons','vi_transects')
 		union
@@ -113,22 +117,21 @@ BEGIN
 		union
 			select id, 
 			case when  substring(csv2,0,5) = 'FILE' THEN concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),length(csv2)+2))
-					ELSE concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20), rpad(coalesce(csv4,''),20),' ', rpad(coalesce(csv5,''),20)) END 
-			from temp_csv 
-			where fid = 141 and cur_user = current_user and source in ('vi_timeseries')	
+			ELSE concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20), rpad(coalesce(csv4,''),20),' ', rpad(coalesce(csv5,''),20)) END 
+			from temp_csv where fid = 141 and cur_user = current_user and source in ('vi_timeseries')	
 		union
 			select id, 
 			case when csv5 = 'FILE' THEN concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),' ',rpad(coalesce(csv6,''),length(csv6)+2),
 					' ',rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20)) 
 					ELSE concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),' ',rpad(coalesce(csv6,''),20),
 					' ',rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20)) END 
-			from temp_csv 
-			where fid = 141 and cur_user = current_user and source in ('vi_raingages')	
+			from temp_csv where fid = 141 and cur_user = current_user and source in ('vi_raingages')	
 		union
 			select id, concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),20),' ', rpad(coalesce(csv3,''),20),' ',rpad(coalesce(csv4,''),20),' ',rpad(coalesce(csv5,''),20),' ',rpad(coalesce(csv6,''),20),
 			' ',rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20),' ',rpad(coalesce(csv9,''),20),' ',rpad(coalesce(csv10,''),20),' ',rpad(coalesce(csv11,''),20),' ',rpad(coalesce(csv12,''),20),
-			' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20),' ', rpad(csv15,20),' ',rpad(csv16,20),' ',rpad(csv17,20),' ', rpad(csv20,20), ' ', rpad(csv19,20),' ',rpad(csv20,20)) as text
-			from temp_csv where source not in
+			' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20),' ', rpad(csv16,20),' ',rpad(csv17,20),' ',rpad(csv18,20),' ', rpad(csv19,20), ' ', rpad(csv20,20),' ',rpad(csv21,20),
+			' ',rpad(csv22,20),' ',rpad(csv23,20),' ',rpad(csv24,20),' ', rpad(csv25,20),' ',rpad(csv26,20),' ',rpad(csv27,20),' ', rpad(csv28,20), ' ', rpad(csv29,20),' ',rpad(csv30,20)) as text
+			from temp_csv where fid  = 141 and cur_user = current_user and source not in
 			('header','vi_controls','vi_rules', 'vi_backdrop', 'vi_adjustments','vi_evaporation', 'vi_files','vi_hydrographs','vi_polygons','vi_temperature','vi_transects','vi_raingages','vi_timeseries')
 		order by id
 		)a )row;
