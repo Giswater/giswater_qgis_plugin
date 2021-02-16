@@ -167,6 +167,7 @@ class GwNodeTypeChangeButton(GwMaptool):
         # Create the dialog, fill node_type and define its signals
         self.dlg_chg_node_type = GwNodeTypeChangeUi()
         tools_gw.load_settings(self.dlg_chg_node_type)
+        tools_gw.add_icon(self.dlg_chg_node_type.btn_catalog, "195")
 
         # Get nodetype_id from current node
         node_type = ""

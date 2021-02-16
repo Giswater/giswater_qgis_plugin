@@ -85,6 +85,10 @@
 			<translation>Load Giswater layer</translation>
 		</message>
 		<message>
+			<source>143_text</source>
+			<translation>Search plus</translation>
+		</message>
+		<message>
 			<source>menu_name</source>
 			<translation>Giswater</translation>
 		</message>
@@ -99,10 +103,6 @@
 		<message>
 			<source>142_text</source>
 			<translation>Selectors</translation>
-		</message>
-		<message>
-			<source>143_text</source>
-			<translation>Search plus</translation>
 		</message>
 		<message>
 			<source>28_text</source>

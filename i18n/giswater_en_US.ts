@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="pt_BR">
+<TS version="2.0" language="en_US">
 	<!-- TOOLBARS AND ACTIONS -->
 	<context>
 		<name>giswater</name>
@@ -1018,7 +1018,7 @@
 		</message>
 		<message>
 			<source>There are no visible mincuts in the table. Try a different filter</source>
-			<translation>There are no visible mincuts in the table. Try a different filter</translation>
+			<translation>There are no visible mincuts in the table. Try a different filter or make one</translation>
 		</message>
 	</context>
 
