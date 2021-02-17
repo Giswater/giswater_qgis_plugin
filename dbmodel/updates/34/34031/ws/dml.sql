@@ -44,3 +44,7 @@ ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 INSERT INTO config_form_fields SELECT child_layer, 'form_feature', 'workcat_id_plan', 41, 'string', 'typeahead', 'workcat_id_plan', NULL, 'workcat_id_plan - Expediente de planificación del elemento', 
 NULL, FALSE, FALSE, TRUE, FALSE, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_data_2', NULL, FALSE FROM cat_feature
 ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+
+--2021/02/17
+UPDATE sys_table SET sys_sequence='cat_mat_roughness_id_seq' WHERE sys_sequence='inp_cat_mat_roughness_id_seq';
+
