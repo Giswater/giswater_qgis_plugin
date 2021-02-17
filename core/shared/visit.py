@@ -290,8 +290,6 @@ class GwVisit(QObject):
         # manage save and rollback when closing the dialog
         self.dlg_visit_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_visit_manager))
         self.dlg_visit_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_visit_manager))
-        self.dlg_visit_manager.btn_accept.clicked.connect(
-            partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, table_object))
 
         # Set signals
         self.dlg_visit_manager.tbl_visit.doubleClicked.connect(
