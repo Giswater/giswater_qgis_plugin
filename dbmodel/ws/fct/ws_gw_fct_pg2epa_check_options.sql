@@ -90,7 +90,7 @@ BEGIN
 			-- check inconsistency on inp_connec: More than one connec with same vnode and different pattern on inp_connec table
 			IF v_patternmethod = 23 THEN
 
-				v_count  = (SELECT pjoint_id, pattern_id FROM ws_sample.inp_connec join ws_sample.connec USING (connec_id) group by pjoint_id, pattern_id having count(pjoint_id) > 1 
+				v_count  = (SELECT count(pjoint_id) FROM ws_sample.inp_connec join ws_sample.connec USING (connec_id) group by pjoint_id, pattern_id having count(pjoint_id) > 1 
 					    AND count(pattern_id) < count(pjoint_id) order by 1);
 
 				IF v_count > 0 THEN

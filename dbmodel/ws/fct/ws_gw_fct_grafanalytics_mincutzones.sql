@@ -9,22 +9,38 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_mincutzones(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_grafanalytics_mincutzones(p_data json)
-RETURNS json AS
+  RETURNS json AS
 $BODY$
 
 /*
 CONFIG
 mincut -1 must exists
 
+INSERT INTO SCHEMA_NAME.om_mincut VALUES (-1)
+
 SELECT * from SCHEMA_NAME.arc where arc_id='2205'
 
 TO EXECUTE
--- for any exploitation you want
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincutzones('{"data":{"parameters":{"exploitation": "[1]", "checkData":true}}}');
+-- mandatory:
+DELETE FROM anl_arc where fid = 134
+INSERT INTO anl_arc (fid, arc_id, descript) SELECT 134, arc_id, minsector_id FROM arc WHERE state = 1;
+
+-- start
+BEGIN;
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincutzones('{"data":{"parameters":{"exploitation": "[1]", "checkData":false, "maxMsector":50}}}');
+COMMIT;
+
+BEGIN;
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincutzones('{"data":{"parameters":{"exploitation": "[1]", "checkData":false, "maxMsector":90}}}');
+COMMIT;
+
+BEGIN;
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincutzones('{"data":{"parameters":{"exploitation": "[1]", "checkData":false, "maxMsector":91}}}');
+COMMIT;
+
 
 TO SEE RESULTS ON LOG TABLE
-SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fid=149 AND cur_user=current_user
-SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fid=129 AND cur_user=current_user
+SELECT * FROM SCHEMA_NAME.audit_log_data WHERE fid=129 AND cur_user=current_user
 
 TO SEE RESULTS ON SYSTEM TABLES (IN CASE OF "upsertAttributes":"TRUE")
 
@@ -54,6 +70,7 @@ v_input	json;
 v_count2 integer;
 v_error_context text;
 v_checkdata boolean;
+v_maxmsector integer = 0;
 
 BEGIN
 	-- Search path
@@ -62,6 +79,7 @@ BEGIN
 	-- get variables
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_checkdata = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'checkData');
+	v_maxmsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'maxMsector');
 
 	-- select config values
 	SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;
@@ -110,10 +128,8 @@ BEGIN
 	IF v_expl IS NOT NULL THEN
 		DELETE FROM selector_expl WHERE cur_user=current_user;
 		INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation where macroexpl_id IN 
-		(SELECT distinct(macroexpl_id) FROM SCHEMA_NAME.exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
+		(SELECT distinct(macroexpl_id) FROM exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl)a  ON expl=expl_id);
 	END IF;
-
-	INSERT INTO anl_arc (fid, arc_id, descript)	SELECT 134, arc_id, minsector_id FROM arc WHERE state = 1;
 
 	SELECT count(*) into v_count1 FROM arc WHERE state = 1 AND minsector_id IS NOT NULL;
 	SELECT count(*) into v_count2 FROM arc WHERE state = 1 AND minsector_id IS NULL;
@@ -131,13 +147,16 @@ BEGIN
 		v_count1 = 0;
 	
 		-- starting recursive process for all minsectors
-		LOOP
+		LOOP		
 			v_count1 = v_count1 + 1;
+
+			RAISE NOTICE '----------------------- % maxmsector % ', v_count1, v_maxmsector;
 		
 			-- get arc_id represented minsector (fid: 134)			
 			v_arc = (SELECT descript FROM anl_arc WHERE result_id IS NULL AND fid=134 AND cur_user=current_user LIMIT 1);
 
 			EXIT WHEN v_arc is null;
+			EXIT WHEN v_count1  = v_maxmsector;
 		
 			-- set flag not don't take it in next loop
 			UPDATE anl_arc SET result_id='flag' WHERE descript=v_arc AND fid=134 AND cur_user=current_user;
@@ -146,23 +165,10 @@ BEGIN
 			PERFORM gw_fct_mincut(v_arc, 'arc', -1);
 		
 			-- insert results into audit table
-			INSERT INTO audit_log_data (fid, feature_id, log_message)
-			SELECT 149, v_arc, concat('"minsector_id":"',v_arc,'","node_id":"',node_id,'"') FROM om_mincut_node WHERE result_id=-1;
-
-			INSERT INTO audit_log_data (fid, feature_id, log_message)
-			SELECT 149, v_arc, concat('"minsector_id":"',v_arc,'","arc_id":"',arc_id,'"') FROM om_mincut_arc WHERE result_id=-1;
-		
-			INSERT INTO audit_log_data (fid, feature_id, log_message)
-			SELECT 149, v_arc, concat('"minsector_id":"',v_arc,'","connec_id":"',connec_id,'"') FROM om_mincut_connec WHERE result_id=-1;
-
-			INSERT INTO audit_log_data (fid, feature_id, log_message)
-			SELECT 149, v_arc, concat('"minsector_id":"',v_arc,'","valve_id":"',node_id,'"') FROM om_mincut_valve WHERE result_id=-1;
-		
-			INSERT INTO audit_log_data (fid, feature_id, log_message)
-			SELECT 149, v_arc, concat('"minsector_id":"',v_arc,'","hydrometer_id":"',hydrometer_id,'"') FROM om_mincut_hydrometer WHERE result_id=-1;
-			
 			INSERT INTO audit_log_data (fid, feature_id, log_message) 
 			SELECT 129, v_arc,  output::text FROM om_mincut WHERE id=-1;
+
+			--SELECT * FROM om_mincut WHERE id=-1;
 
 		END LOOP;
 
@@ -172,11 +178,11 @@ BEGIN
 		INSERT INTO audit_check_data (fid, error_message)
 		VALUES (v_fid, concat('RESUME (fid : 129)'));
 		INSERT INTO audit_check_data (fid, error_message)
-		VALUES (v_fid, concat('SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fid=129 AND cur_user=current_user'));
+		VALUES (v_fid, concat('SELECT log_message FROM audit_log_data WHERE fid=129 AND cur_user=current_user'));
 		INSERT INTO audit_check_data (fid, error_message)
 		VALUES (v_fid, concat('DETAIL (fid : 149)'));
 		INSERT INTO audit_check_data (fid, error_message)
-		VALUES (v_fid, concat('SELECT log_message FROM SCHEMA_NAME.audit_log_data WHERE fid=149 AND cur_user=current_user'));
+		VALUES (v_fid, concat('SELECT log_message FROM audit_log_data WHERE fid=149 AND cur_user=current_user'));
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, '');
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, 'RESUME');
 		INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid, '-------------------------------------------------');
