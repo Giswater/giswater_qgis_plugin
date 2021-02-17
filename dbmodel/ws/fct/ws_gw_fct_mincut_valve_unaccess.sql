@@ -65,7 +65,7 @@ BEGIN
 	END IF;
 
 
-	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Custom mincut executed successfully"}, "version":""'||
+	RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Custom mincut executed successfully"}, "version":""'||
 		',"body":{"form":{}'||
 		',"data":{}'||
 		'}}')::json;
