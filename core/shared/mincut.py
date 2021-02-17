@@ -77,7 +77,7 @@ class GwMincut:
         sql = (f"SELECT om_mincut.*, cat_users.name AS assigned_to_name, v_ext_streetaxis.descript AS street_name"
                f" FROM om_mincut"
                f" INNER JOIN cat_users ON cat_users.id = om_mincut.assigned_to"
-               f" INNER JOIN v_ext_streetaxis ON v_ext_streetaxis.id = om_mincut.streetaxis_id"
+               f" LEFT JOIN v_ext_streetaxis ON v_ext_streetaxis.id = om_mincut.streetaxis_id"
                f" WHERE om_mincut.id = '{result_mincut_id}'")
         row = tools_db.get_row(sql)
         if not row:
@@ -955,6 +955,8 @@ class GwMincut:
         tools_qt.set_combo_value(self.dlg_mincut.address_add_muni, municipality, 1)
         street = tools_qt.get_text(self.dlg_fin, self.dlg_fin.address_add_street, return_string_null=False)
         tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.address_add_street, street)
+        street_id = self.dlg_fin.address_add_street.property('id_')
+        self.dlg_mincut.address_add_street.setProperty('id_', street_id)
         number = tools_qt.get_text(self.dlg_fin, self.dlg_fin.address_add_postnumber, return_string_null=False)
         tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.address_add_postnumber, number)
         exec_user = tools_qt.get_text(self.dlg_fin, self.dlg_fin.exec_user)
