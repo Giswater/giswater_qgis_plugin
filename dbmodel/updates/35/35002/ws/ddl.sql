@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2020/09/30
-ALTER SEQUENCE inp_cat_mat_roughness_id_seq RENAME TO cat_mat_roughness_id_seq;
+ALTER SEQUENCE IF EXISTS inp_cat_mat_roughness_id_seq RENAME TO cat_mat_roughness_id_seq;
 ALTER TABLE cat_mat_roughness ALTER COLUMN id SET DEFAULT nextval('cat_mat_roughness_id_seq'); 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_mat_roughness", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);

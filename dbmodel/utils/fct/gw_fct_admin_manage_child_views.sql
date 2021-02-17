@@ -379,7 +379,6 @@ BEGIN
 			INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
 			FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||v_cat_feature||''');';
 
-		END IF;
 			
 		v_return_status = 'Accepted';
 		v_return_msg = 'Single-create view successfully';
