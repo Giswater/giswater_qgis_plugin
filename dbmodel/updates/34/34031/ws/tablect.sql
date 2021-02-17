@@ -59,3 +59,5 @@ SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAM
 
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_mincut_valve", "oldName":"anl_mincut_selector_valve_pkey", "newName":"config_mincut_valve_pkey"}}$$);
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_mincut_valve", "oldName":"anl_mincut_selector_valve_id_fkey", "newName":"config_mincut_valve_id_fkey"}}$$);
+
+SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_mincut_checkvalve", "oldName":"anl_mincut_checkvalve_pkey", "newName":"config_mincut_checkvalve_id_fkey"}}$$);

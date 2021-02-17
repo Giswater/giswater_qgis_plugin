@@ -24,5 +24,4 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "c
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_reservoir", "column":"head", "dataType":"double precision", "isUtils":"False"}}$$);
 
-
-
+ALTER SEQUENCE IF EXISTS inp_cat_mat_roughness_id_seq RENAME TO cat_mat_roughness_id_seq;
