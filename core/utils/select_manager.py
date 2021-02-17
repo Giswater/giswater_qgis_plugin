@@ -14,6 +14,7 @@ from qgis.gui import QgsMapTool, QgsRubberBand
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_qgis
+from ..utils.snap_manager import GwSnapManager
 
 
 class GwSelectManager(QgsMapTool):
@@ -35,6 +36,8 @@ class GwSelectManager(QgsMapTool):
 
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
+
+        self.snapper_manager = GwSnapManager(self.iface)
 
         self.rubber_band = QgsRubberBand(self.canvas, 2)
         self.rubber_band.setColor(QColor(255, 100, 255))
@@ -87,11 +90,11 @@ class GwSelectManager(QgsMapTool):
 
             # Selection one by one
             else:
-                event_point = self.get_event_point(event)
-                result = self.snap_to_project_config_layers(event_point)
+                event_point = self.snapper_manager.get_event_point(event)
+                result = self.snapper_manager.snap_to_project_config_layers(event_point)
                 if result.isValid():
                     # Get the point. Leave selection
-                    self.get_snapped_feature(result, True)
+                    self.snapper_manager.get_snapped_feature(result, True)
 
         self.rubber_band.hide()
 
