@@ -263,3 +263,8 @@ SELECT 239, tablename, target, fields,orderby, addparam FROM config_fprocess WHE
 
 --2020/12/14
 DELETE FROM sys_param_user WHERE isdeprecated IS TRUE;
+
+UPDATE sys_param_user SET layoutname = 'lyt_connec' WHERE layoutname = 'lyt_connec_vdef' AND formname = 'config';
+UPDATE sys_param_user SET layoutname = 'lyt_arc' WHERE layoutname = 'lyt_arc_vdef' AND formname = 'config';
+UPDATE sys_param_user SET layoutname = 'lyt_node' WHERE layoutname = 'lyt_node_vdef' AND formname = 'config';
+UPDATE sys_param_user SET layoutname = 'lyt_utils' WHERE layoutname = 'lyt_utils_vdef' AND formname = 'config';
