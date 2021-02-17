@@ -208,13 +208,9 @@ BEGIN
 	LOOP
 		-- reset water flag
 		UPDATE temp_anlgraf SET water=0;
-	
-		EXIT WHEN v_cont1 = -1;
-
+		
 		v_cont2 = v_cont2 +1;
-
 		EXIT WHEN v_cont2 = v_maxmsector + 1;
-
 
 		------------------
 		-- starting engine

@@ -160,6 +160,9 @@ BEGIN
 		
 			INSERT INTO audit_log_data (fid, feature_id, log_message)
 			SELECT 149, v_arc, concat('"minsector_id":"',v_arc,'","hydrometer_id":"',hydrometer_id,'"') FROM om_mincut_hydrometer WHERE result_id=-1;
+			
+			INSERT INTO audit_log_data (fid, feature_id, log_message) 
+			SELECT 129, v_arc,  output::text FROM om_mincut WHERE id=-1;
 
 		END LOOP;
 

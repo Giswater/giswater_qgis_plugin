@@ -49,7 +49,7 @@ BEGIN
 	SELECT * INTO mincut_rec FROM om_mincut WHERE id=result_id_arg;
 	SELECT macroexpl_id INTO v_macroexpl FROM exploitation WHERE expl_id=mincut_rec.expl_id;
 
-	TRUNCATE temp_mincut;
+	DELETE FROM temp_mincut;
 
 	-- Create the matrix to work with pgrouting
 	INSERT INTO temp_mincut 
