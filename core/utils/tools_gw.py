@@ -2237,7 +2237,7 @@ def add_icon(widget, icon, sub_folder="20x20", adjust_size=True):
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
     if os.path.exists(icon_path):
         widget.setIcon(QIcon(icon_path))
-        if adjust_size:
+        if type(widget) == QPushButton and adjust_size:
             widget.setIconSize(widget.size())
     else:
         tools_log.log_info("File not found", parameter=icon_path)
