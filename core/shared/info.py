@@ -303,7 +303,7 @@ class GwInfo(QObject):
     """ FUNCTIONS RELATED WITH TAB PLAN """
 
 
-    def get_snapped_feature_id(self, dialog, action, layer_name, option, widget_name):
+    def get_snapped_feature_id(self, dialog, action, layer_name, option, widget_name, child_type):
         """ Snap feature and set a value into dialog """
 
         layer = tools_qgis.get_layer_by_tablename(layer_name)
@@ -335,10 +335,11 @@ class GwInfo(QObject):
         self.canvas.xyCoordinates.connect(partial(self._mouse_moved, layer))
         emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(emit_point)
-        emit_point.canvasClicked.connect(partial(self._get_id, dialog, action, option, emit_point))
+        emit_point.canvasClicked.connect(partial(self._get_id, dialog, action, option, emit_point, child_type))
 
 
     # region private functions
+
 
     def _get_feature_insert(self, point, feature_cat, new_feature_id, layer_new_feature, tab_type, new_feature):
         return self.open_form(point=point, feature_cat=feature_cat, new_feature_id=new_feature_id,
@@ -612,9 +613,9 @@ class GwInfo(QObject):
         action_catalog.triggered.connect(partial(self._open_catalog, tab_type, self.feature_type, child_type))
         action_workcat.triggered.connect(partial(self._get_catalog, 'new_workcat', self.tablename, child_type, self.feature_id, list_points))
         action_mapzone.triggered.connect(partial(self._get_catalog, 'new_mapzone', self.tablename, child_type, self.feature_id, list_points))
-        action_set_to_arc.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_set_to_arc, 'v_edit_arc', 'set_to_arc', None))
-        action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id,  'v_edit_arc', 'arc', 'data_arc_id'))
-        action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_parent_id, 'v_edit_node', 'node', 'data_parent_id'))
+        action_set_to_arc.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_set_to_arc, 'v_edit_arc', 'set_to_arc', None, child_type))
+        action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id,  'v_edit_arc', 'arc', 'data_arc_id', child_type))
+        action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_parent_id, 'v_edit_node', 'node', 'data_parent_id', child_type))
         action_zoom_in.triggered.connect(partial(self._manage_action_zoom_in, self.canvas, self.layer))
         action_centered.triggered.connect(partial(self._manage_action_centered, self.canvas, self.layer))
         action_zoom_out.triggered.connect(partial(self._manage_action_zoom_out, self.canvas, self.layer))
@@ -3312,7 +3313,7 @@ class GwInfo(QObject):
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
-    def _get_id(self, dialog, action, option, emit_point, point, event):
+    def _get_id(self, dialog, action, option, emit_point, child_type, point, event):
         """ Get selected attribute from snapped feature """
 
         # @options{'key':['att to get from snapped feature', 'widget name destination']}
@@ -3338,15 +3339,16 @@ class GwInfo(QObject):
             widget.setFocus()
             tools_qt.set_widget_text(dialog, widget, str(feat_id))
         elif option == 'set_to_arc':
-            # functions called in -> getattr(self, options[option][0])(feat_id) --> def set_to_arc(self, feat_id)
-            getattr(self, options[option][1])(feat_id)
+            # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
+            #       def set_to_arc(self, feat_id, child_type)
+            getattr(self, options[option][1])(feat_id, child_type)
         self.snapper_manager.recover_snapping_options()
         self._cancel_snapping_tool(dialog, action)
 
 
-    def _set_to_arc(self, feat_id):
+    def _set_to_arc(self, feat_id, child_type):
         """  Function called in def get_id(self, dialog, action, option, point, event):
-                getattr(self, options[option][1])(feat_id)
+                getattr(self, options[option][1])(feat_id, child_type)
         :param feat_id: Id of the snapped feature
         """
 
@@ -3359,7 +3361,7 @@ class GwInfo(QObject):
         w_dqa_id = self.dlg_cf.findChild(QComboBox, 'data_dqa_id')
         dqa_id = tools_qt.get_combo_value(self.dlg_cf, w_dqa_id)
 
-        feature = f'"featureType":"{self.feature_type}", "id":"{self.feature_id}"'
+        feature = f'"featureType":"{child_type}", "id":"{self.feature_id}"'
         extras = (f'"arcId":"{feat_id}", "dmaId":"{dma_id}", "presszoneId":"{presszone_id}", "sectorId":"{sector_id}", '
                   f'"dqaId":"{dqa_id}"')
         body = tools_gw.create_body(feature=feature, extras=extras)
