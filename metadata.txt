@@ -15,6 +15,7 @@ author=David Erill, Luigi Pirelli, Natasa Cica, Nestor Ibañez, Barbara Rzepka, 
 # End of mandatory metadata
 changelog=Version 3.4.031 (03/02/2021)
    - Set correct title to workcat dialog
+   - Set correct street_id on mincut
 
 # Tags are comma separated with spaces allowed
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
