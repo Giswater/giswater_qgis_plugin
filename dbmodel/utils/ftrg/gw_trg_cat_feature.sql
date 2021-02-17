@@ -66,7 +66,7 @@ BEGIN
 	IF (TG_OP = 'INSERT' OR  TG_OP = 'UPDATE') THEN
 
 		-- set layoutname
-		v_layout = concat('lyt_', lower(NEW.feature_type),'_vdef');
+		v_layout = concat('lyt_', lower(NEW.feature_type));
 
 		-- set layoutorder
 		SELECT max(layoutorder)+1 INTO v_layoutorder FROM sys_param_user WHERE formname='config' and layoutname=v_layout;
