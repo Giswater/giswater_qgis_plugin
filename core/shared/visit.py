@@ -228,15 +228,15 @@ class GwVisit(QObject):
         if self.locked_feature_type:
             self._set_locked_relation()
 
-        # Disable widgets when the visit is not new
+
         if self.it_is_new_visit is False:
+            # Disable widgets when the visit is not new
             self.dlg_add_visit.btn_feature_insert.setEnabled(False)
             self.dlg_add_visit.btn_feature_delete.setEnabled(False)
             self.dlg_add_visit.btn_feature_snapping.setEnabled(False)
             self.dlg_add_visit.tab_feature.setEnabled(False)
 
-        # Zoom to selected geometry or relations
-        if self.it_is_new_visit is False:
+            # Zoom to selected geometry or relations
             visit_layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
             if visit_layer:
                 visit_layer.selectByExpression(f'"id"={visit_id}')
