@@ -138,8 +138,9 @@ class GwVisit(QObject):
 
         # tab events
         self.tabs = self.dlg_add_visit.findChild(QTabWidget, 'tab_widget')
+        self.button_box = self.dlg_add_visit.findChild(QDialogButtonBox, 'button_box')
         if visit_id is None:
-            self.dlg_add_visit.btn_accept.setEnabled(False)
+            self.button_box.button(QDialogButtonBox.Ok).setEnabled(False)
 
         # Tab 'Data'/'Visit'
         self.visit_id = self.dlg_add_visit.findChild(QLineEdit, "visit_id")
@@ -401,12 +402,11 @@ class GwVisit(QObject):
 
     def _set_signals(self):
 
-        self.dlg_add_visit.btn_cancel.clicked.connect(lambda: self.dlg_add_visit.close())
         self.dlg_add_visit.rejected.connect(self._manage_rejected)
         self.dlg_add_visit.rejected.connect(partial(tools_gw.close_dialog, self.dlg_add_visit))
         self.dlg_add_visit.rejected.connect(lambda: self.rubber_band.reset())
-        self.dlg_add_visit.btn_accept.clicked.connect(partial(self._update_relations, self.dlg_add_visit))
-        self.dlg_add_visit.btn_accept.clicked.connect(self._manage_accepted)
+        self.dlg_add_visit.accepted.connect(partial(self._update_relations, self.dlg_add_visit))
+        self.dlg_add_visit.accepted.connect(self._manage_accepted)
 
         self.dlg_add_visit.btn_event_insert.clicked.connect(self._event_insert)
         self.dlg_add_visit.btn_event_delete.clicked.connect(self._event_delete)
@@ -511,7 +511,6 @@ class GwVisit(QObject):
         if layer:
             layer.dataProvider().forceReload()
         tools_qgis.refresh_map_canvas()
-        tools_gw.close_dialog(self.dlg_add_visit)
 
 
     def _execute_pgfunction(self):
@@ -1385,7 +1384,7 @@ class GwVisit(QObject):
         A) if some record is available => enable OK button of VisitDialog"""
 
         state = (self.tbl_event.model().rowCount() > 0)
-        self.dlg_add_visit.btn_accept.setEnabled(state)
+        self.button_box.button(QDialogButtonBox.Ok).setEnabled(state)
 
 
     def _event_update(self):
