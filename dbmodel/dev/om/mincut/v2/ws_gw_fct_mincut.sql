@@ -22,7 +22,7 @@ DECLARE
 
 BEGIN
     -- Search path
-    SET search_path = SCHEMA_NAME, public;
+    SET search_path = "SCHEMA_NAME", public;
   	
 	PERFORM gw_fct_mincut (p_feature_id, p_feature_type, p_result_id);
 	
@@ -82,7 +82,7 @@ DECLARE
 
 BEGIN
     -- Search path
-    SET search_path = SCHEMA_NAME, public;
+    SET search_path = "SCHEMA_NAME", public;
 
     SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
 

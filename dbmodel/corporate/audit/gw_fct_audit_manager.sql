@@ -15,7 +15,7 @@ DECLARE
 BEGIN
 
 --	Set search path to local schema
-	SET search_path = SCHEMA_NAME, public;
+	SET search_path = "SCHEMA_NAME", public;
 	
 	FOR table_record IN SELECT * FROM sys_table WHERE isaudit  IS TRUE
 	LOOP 

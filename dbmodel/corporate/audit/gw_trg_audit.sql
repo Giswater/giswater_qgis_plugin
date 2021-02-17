@@ -18,7 +18,7 @@ DECLARE
 BEGIN
 
 --  Set search path to local schema
-    SET search_path = SCHEMA_NAME, public;
+    SET search_path = "SCHEMA_NAME", public;
 
     select TRUE INTO v_foreign_audit  from information_schema.tables where table_schema = 'foreign_audit' LIMIT 1;
 

@@ -29,7 +29,7 @@ v_definition text;
 BEGIN 
 
 	-- Search path
-    SET search_path = SCHEMA_NAME, public;
+    SET search_path = "SCHEMA_NAME", public;
 	
 	-- get input data
 	v_oldschemaname := ((p_data->>'data')::json)->>'oldSchemaName'::text;

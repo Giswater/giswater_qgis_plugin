@@ -43,7 +43,7 @@ v_audit_date date;
 BEGIN
 
 --  Set search path to local schema
-    SET search_path = SCHEMA_NAME, public;
+    SET search_path = "SCHEMA_NAME", public;
 
     -- select config values
     SELECT  wsoftware,epsg  INTO v_version, v_srid FROM version order by 1 desc limit 1;

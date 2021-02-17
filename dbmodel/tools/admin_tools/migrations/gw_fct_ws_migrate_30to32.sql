@@ -20,7 +20,7 @@ rec record;
 
 BEGIN
     -- Search path
-    SET search_path = SCHEMA_NAME, public;
+    SET search_path = "SCHEMA_NAME", public;
 
 	ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
 	ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;

@@ -62,7 +62,7 @@ v_priority json;
 BEGIN
 
 	-- Search path
-	SET search_path = SCHEMA_NAME, public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	SELECT value::boolean INTO v_debug FROM config_param_system WHERE parameter='om_mincut_debug';
 	SELECT value::int2 INTO v_mincutversion FROM config_param_system WHERE parameter='om_mincut_version';

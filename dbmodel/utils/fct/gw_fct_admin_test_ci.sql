@@ -43,7 +43,7 @@ v_psector_id integer;
 
 BEGIN
 
-	SET search_path = SCHEMA_NAME, public;
+	SET search_path = "SCHEMA_NAME", public;
 	
 	v_schemaname = 'SCHEMA_NAME';
 	

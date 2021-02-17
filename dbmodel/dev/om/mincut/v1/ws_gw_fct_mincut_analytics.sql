@@ -19,7 +19,7 @@ v_query_text text;
 
 BEGIN
 	-- Search path
-    SET search_path = SCHEMA_NAME, public;
+    SET search_path = "SCHEMA_NAME", public;
 
     DELETE FROM anl_arc WHERE fid = 30;
     DELETE FROM temp_anl_mincut_analytics;

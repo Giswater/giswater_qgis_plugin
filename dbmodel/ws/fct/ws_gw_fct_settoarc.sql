@@ -52,7 +52,7 @@ v_error_context text;
 BEGIN
 
 --  Set search path to local schema
-    SET search_path = SCHEMA_NAME, public;
+    SET search_path = "SCHEMA_NAME", public;
 
     -- select version
     SELECT giswater INTO v_version FROM sys_version order by 1 desc limit 1;

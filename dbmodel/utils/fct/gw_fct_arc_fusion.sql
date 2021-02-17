@@ -61,7 +61,7 @@ v_state_arc int2;
 BEGIN
 
     -- Search path
-    SET search_path = SCHEMA_NAME, public;
+    SET search_path = "SCHEMA_NAME", public;
 
     SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version LIMIT 1;
 
