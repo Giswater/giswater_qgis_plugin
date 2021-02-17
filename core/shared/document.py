@@ -84,8 +84,9 @@ class GwDocument:
         tools_gw.add_icon(self.dlg_add_doc.btn_delete, "112")
         tools_gw.add_icon(self.dlg_add_doc.btn_snapping, "137")
         self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
+
         # Fill combo boxes
-        self._fill_combo_by_query(self.dlg_add_doc, "doc_type", "doc_type")
+        self._fill_combo_doc_type(self.dlg_add_doc.doc_type)
 
         # Set current/selected date and link
         if row:
@@ -192,22 +193,26 @@ class GwDocument:
     # region private functions
 
 
-    def _fill_combo_by_query(self, dialog, widget, table_name, field_name="id"):
+    def _fill_combo_doc_type(self, widget):
         """ Executes query and fill combo box """
 
-        sql = (f"SELECT {field_name}"
-               f" FROM {table_name}"
-               f" ORDER BY {field_name}")
+        sql = (f"SELECT id, id"
+               f" FROM doc_type"
+               f" ORDER BY id;")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_box(dialog, widget, rows)
-        if rows:
-            tools_qt.set_current_index(dialog, widget, 0)
+        tools_qt.fill_combo_values(widget, rows, 1, add_empty=True)
+        doctype_vdefault = tools_gw.get_config_value('edit_doctype_vdefault')[0]
+
+        if doctype_vdefault:
+            tools_qt.set_combo_value(widget, doctype_vdefault, 0)
+            self._activate_relations()
+
 
 
     def _activate_relations(self):
         """ Force user to set doc_id and doc_type """
 
-        doc_type = tools_qt.get_text(self.dlg_add_doc, self.dlg_add_doc.doc_type, False, False)
+        doc_type = tools_qt.get_combo_value(self.dlg_add_doc, self.dlg_add_doc.doc_type)
 
         if doc_type in (None, '', 'null'):
             self.dlg_add_doc.tabWidget.setTabEnabled(1, False)
@@ -234,12 +239,12 @@ class GwDocument:
 
         # Get values from dialog
         doc_id = tools_qt.get_text(self.dlg_add_doc, "doc_id", False, False)
-        doc_type = tools_qt.get_text(self.dlg_add_doc, "doc_type", False, False)
+        doc_type = tools_qt.get_combo_value(self.dlg_add_doc, self.dlg_add_doc.doc_type)
         date = tools_qt.get_calendar_date(self.dlg_add_doc, "date", datetime_format="yyyy/MM/dd")
         path = tools_qt.get_text(self.dlg_add_doc, "path", return_string_null=False)
         observ = tools_qt.get_text(self.dlg_add_doc, "observ", False, False)
 
-        if doc_type in (None, ''):
+        if doc_type in (None, '', -1):
             message = "You need to insert doc_type"
             tools_qgis.show_warning(message)
             return
