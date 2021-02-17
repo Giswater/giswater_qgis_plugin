@@ -73,6 +73,12 @@ class GwVisit(QObject):
         self.it_is_new_visit = (not visit_id)
         self.visit_id_value = visit_id
 
+        # Remove previous selection
+        for layer in self.canvas.layers():
+            if layer.type() == layer.VectorLayer:
+                layer.removeSelection()
+
+        self.iface.mapCanvas().refresh()
         # set vars to manage if GUI have to lock the relation
         self.locked_feature_type = feature_type
         self.locked_feature_id = feature_id
