@@ -280,7 +280,7 @@ BEGIN
 	
 	-- update permissions	
 	PERFORM gw_fct_admin_role_permissions();
-	
+	PERFORM gw_fct_setowner($${"client":{"lang":"ES"},"data":{"owner":"role_admin"}}$$);
 
 	--    Control NULL's
 	v_message := COALESCE(v_message, '');

@@ -22,3 +22,6 @@ INSERT INTO sys_function(id, function_name, project_type, function_type, input_p
 VALUES (3022,'gw_trg_plan_psector_delete', 'utils', 'trigger function', null, null, 'Trigger to delete features state =2 when are orphan of psector','role_master') 
 ON CONFLICT (function_name, project_type) DO NOTHING;
 
+INSERT INTO sys_function(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role)
+VALUES (3024,'gw_fct_setowner', 'utils', 'function', 'json', 'json', 'Function that allows changing the owner of all the tables, functions, sequences in a schema',
+'role_admin') ON CONFLICT (function_name, project_type) DO NOTHING;
