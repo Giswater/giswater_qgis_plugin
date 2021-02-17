@@ -1652,9 +1652,10 @@ def manage_json_return(json_result, sql, rubber_band=None):
                     # Get values for set layer style
                     opacity = 100
                     style_type = json_result['body']['returnManager']['style']
-                    if 'style' in return_manager and 'transparency' in return_manager['style'][key]:
-                        opacity = return_manager['style'][key]['transparency'] * 255
 
+                    if 'style' in return_manager and 'values' in return_manager['style'][key]:
+                        if 'transparency' in return_manager['style'][key]['values']:
+                            opacity = return_manager['style'][key]['values']['transparency']
                     if style_type[key]['style'] == 'categorized':
                         color_values = {}
                         for item in json_result['body']['returnManager']['style'][key]['values']:
