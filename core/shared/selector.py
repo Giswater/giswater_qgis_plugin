@@ -33,7 +33,7 @@ class GwSelector:
 
         # Get the name of the last tab used by the user
         selector_vars = {}
-        current_tab = tools_gw.get_config_parser('dialogs_tab', f"{dlg_selector.objectName()}_basic", "user", "session")
+        current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
         self.get_selector(dlg_selector, selector_type, current_tab=current_tab, selector_vars=selector_vars)
 
         if global_vars.session_vars['dialog_docker']:

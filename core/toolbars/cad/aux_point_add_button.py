@@ -152,7 +152,7 @@ class GwAuxPointAddButton(GwMaptool):
         self.dlg_create_point.btn_accept.clicked.connect(partial(self._get_values, point_1, point_2))
         self.dlg_create_point.btn_cancel.clicked.connect(self.cancel)
 
-        if tools_gw.get_config_parser('cadtools', f"{self.dlg_create_point.rb_left.objectName()}", "user", "init") == 'True':
+        if tools_gw.get_config_parser('cadtools', "rb_left", "user", "init") == 'True':
             self.dlg_create_point.rb_left.setChecked(True)
         else:
             self.dlg_create_point.rb_right.setChecked(True)
@@ -162,8 +162,7 @@ class GwAuxPointAddButton(GwMaptool):
 
     def _get_values(self, point_1, point_2):
 
-        tools_gw.set_config_parser('cadtools', f"{self.dlg_create_point.rb_left.objectName()}",
-                                   f"{self.dlg_create_point.rb_left.isChecked()}")
+        tools_gw.set_config_parser('cadtools', "rb_left", f"{self.dlg_create_point.rb_left.isChecked()}")
 
         self.dist_x = self.dlg_create_point.dist_x.text()
         if not self.dist_x:
