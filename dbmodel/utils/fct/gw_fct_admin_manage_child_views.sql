@@ -12,14 +12,17 @@ $BODY$
 
 /*EXAMPLE
 
-SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"T"},
- "data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}$$);
+SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+"feature":{"catFeature":"T"},"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}$$);
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
- "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE" }}$$); --only replace views, not config
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newChildColumn":"workcat_id_plan" }}$$); --only replace views, not config
+
+SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+"feature":{"catFeature":"T"}, "data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-UPDATE", "newChildColumn":"workcat_id_plan" }}$$); --only replace views, not config
 
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
@@ -36,6 +39,7 @@ v_definition text;
 v_feature_type text;
 v_feature_system_id text;
 v_man_fields text;
+v_parent_layer text;
 
 rec record;
 rec_orderby record;
@@ -52,7 +56,7 @@ v_childview text;
 v_return_status text = 'Failed';
 v_return_msg text = 'Process finished with some errors';
 v_error_context text;
-
+v_newchildcolumn text;
 
 BEGIN
 
@@ -68,6 +72,8 @@ BEGIN
 
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_action = ((p_data ->>'data')::json->>'action')::text;
+	v_newchildcolumn = ((p_data ->>'data')::json->>'newChildColumn')::text;
+
 
 	IF v_cat_feature IS NULL THEN
 		v_cat_feature = (SELECT id FROM cat_feature LIMIT 1);
@@ -89,16 +95,48 @@ BEGIN
 		
 	ELSIF v_action = 'MULTI-UPDATE' THEN
 	
-		v_multi_create = TRUE;
-
-		FOR v_childview IN SELECT child_layer FROM cat_feature WHERE child_layer IS NOT NULL
+		FOR v_childview, v_cat_feature, v_parent_layer IN SELECT child_layer, id, parent_layer 
+		FROM cat_feature WHERE child_layer IS NOT NULL
 		LOOP
+			-- delete existing view
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
 			PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
+			
+			-- create new view with all columns from parent/man/addfields
+			PERFORM gw_fct_admin_manage_child_views(concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+			        "feature":{"catFeature":"',v_cat_feature,'"},"data":{"filterFields":{}, "pageInfo":{}, 
+					"action":"SINGLE-CREATE" }}'));
+					
+			-- insert into config_form_fields new column values coyping from parent
+			INSERT INTO config_form_fields 
+			SELECT * FROM config_form_fields WHERE formname = v_parent AND columnname = v_newchildcolumn
+			ON CONFLICT (formname, columnname, formtype) DO NOTHING;
+			
 		END LOOP;
 	
 		v_return_status = 'Accepted';
 		v_return_msg = 'Multi-update view successfully';
+
+	ELSIF v_action = 'SINGLE-UPDATE' THEN
+	
+		SELECT child_layer INTO v_childview FROM cat_feature WHERE id = v_cat_feature;
+	
+		-- delete existing view
+		EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
+		PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
+			
+		-- create new view with all columns from parent/man/addfields
+		PERFORM gw_fct_admin_manage_child_views(concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+		        "feature":{"catFeature":"',v_cat_feature,'"},"data":{"filterFields":{}, "pageInfo":{}, 
+				"action":"SINGLE-CREATE" }}'));
+					
+		-- insert into config_form_fields new column values coyping from parent
+		INSERT INTO config_form_fields 
+		SELECT * FROM config_form_fields WHERE formname = v_parent AND columnname = v_newchildcolumn
+		ON CONFLICT (formname, columnname, formtype) DO NOTHING;
+	
+		v_return_status = 'Accepted';
+		v_return_msg = 'Single-update view successfully';
 
 	
 	ELSIF v_action = 'MULTI-CREATE' THEN 
