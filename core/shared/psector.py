@@ -552,14 +552,14 @@ class GwPsector:
 
     def generate_rapports(self):
 
-        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_path',
-                                   f"{tools_qt.get_text(self.dlg_psector_rapport, 'txt_path')}")
-        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_composer',
-                                   f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_composer')}")
-        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_csv_detail',
-                                   f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv_detail')}")
-        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_csv',
-                                   f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv')}")
+        txt_path = f"{tools_qt.get_text(self.dlg_psector_rapport, 'txt_path')}"
+        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_path', txt_path)
+        chk_composer = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_composer')}"
+        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_composer', chk_composer)
+        chk_csv_detail = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv_detail')}"
+        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_csv_detail', chk_csv_detail)
+        chk_csv = f"{tools_qt.is_checked(self.dlg_psector_rapport, 'chk_csv')}"
+        tools_gw.set_config_parser('psector_rapport', 'psector_rapport_chk_csv', chk_csv)
 
         folder_path = tools_qt.get_text(self.dlg_psector_rapport, self.dlg_psector_rapport.txt_path)
         if folder_path is None or folder_path == 'null' or not os.path.exists(folder_path):
@@ -662,8 +662,8 @@ class GwPsector:
             column_name = rows[i]
             columns.append(str(column_name[0]))
 
-        sql = (f"SELECT * FROM {viewname}"
-               f" WHERE psector_id = '{tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)}'")
+        psector_id = f"{tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)}"
+        sql = f"SELECT * FROM {viewname} WHERE psector_id = '{psector_id}'"
         rows = tools_db.get_rows(sql)
         all_rows = []
         all_rows.append(columns)
@@ -752,10 +752,9 @@ class GwPsector:
 
     def calculate_percents(self, tablename, field):
 
+        field_value = f"{tools_qt.get_text(self.dlg_plan_psector, field)}"
         psector_id = tools_qt.get_text(self.dlg_plan_psector, "psector_id")
-        sql = (f"UPDATE {tablename} "
-               f"SET {field} = '{tools_qt.get_text(self.dlg_plan_psector, field)}' "
-               f"WHERE psector_id = '{psector_id}'")
+        sql = f"UPDATE {tablename} SET {field} = '{field_value}' WHERE psector_id = '{psector_id}'"
         tools_db.execute_sql(sql)
         self.populate_budget(self.dlg_plan_psector, psector_id)
 
@@ -791,8 +790,8 @@ class GwPsector:
 
     def enable_relation_tab(self, tablename):
 
-        sql = (f"SELECT name FROM {tablename} "
-               f" WHERE LOWER(name) = '{tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.name)}'")
+        psector_name = f"{tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.name)}"
+        sql = f"SELECT name FROM {tablename} WHERE LOWER(name) = '{psector_name}'"
         rows = tools_db.get_rows(sql)
         if not rows:
             if self.dlg_plan_psector.name.text() != '':
@@ -822,6 +821,7 @@ class GwPsector:
         self.dlg_plan_psector.name.setEnabled(False)
         self.insert_or_update_new_psector(tablename=f'v_edit_plan_psector', close_dlg=False)
         self.update = True
+        psector_id = tools_qt.get_text(self.dlg_plan_psector, 'psector_id')
         if self.dlg_plan_psector.tabWidget.currentIndex() == 2:
             tableleft = "v_price_compost"
             tableright = f"v_edit_plan_psector_x_other"
@@ -829,17 +829,14 @@ class GwPsector:
             self.price_selector(self.dlg_plan_psector, tableleft, tableright, field_id_right)
             self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 3:
-            self.populate_budget(self.dlg_plan_psector, tools_qt.get_text(self.dlg_plan_psector, 'psector_id'))
+            self.populate_budget(self.dlg_plan_psector, psector_id)
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
-            psector_id = tools_qt.get_text(self.dlg_plan_psector, 'psector_id')
             expr = f"psector_id = '{psector_id}'"
             message = tools_qt.fill_table(self.tbl_document, f"{self.schema_name}.v_ui_doc_x_psector", expr)
             if message:
                 tools_qgis.show_warning(message)
 
-        sql = (f"SELECT other, gexpenses, vat"
-               f" FROM plan_psector "
-               f" WHERE psector_id = '{tools_qt.get_text(self.dlg_plan_psector, 'psector_id')}'")
+        sql = f"SELECT other, gexpenses, vat  FROM plan_psector WHERE psector_id = '{psector_id}'"
         row = tools_db.get_row(sql)
         if row:
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.other, row[0])
@@ -1060,8 +1057,8 @@ class GwPsector:
 
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, True)
         self.delete_psector_selector('selector_plan_psector')
-        self.insert_psector_selector('selector_plan_psector', 'psector_id',
-                                     tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id))
+        psector_id = tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id)
+        self.insert_psector_selector('selector_plan_psector', 'psector_id', psector_id)
                 
         if close_dlg:
             json_result = self.set_plan()
@@ -1185,17 +1182,17 @@ class GwPsector:
             tools_qgis.show_warning(message)
             return
         expl_id = []
+        psector_id = tools_qt.get_text(dialog, 'psector_id')
         for i in range(0, len(selected_list)):
             row = selected_list[i].row()
             id_ = str(tbl_selected_rows.model().record(row).value(field_id_right))
             expl_id.append(id_)
         for i in range(0, len(expl_id)):
-            sql = (f"{query}'{expl_id[i]}'"
-                   f" AND psector_id = '{tools_qt.get_text(dialog, 'psector_id')}'")
+            sql = f"{query}'{expl_id[i]}' AND psector_id = '{psector_id}'"
             tools_db.execute_sql(sql)
 
         # Refresh
-        expr = f" psector_id = '{tools_qt.get_text(dialog, 'psector_id')}'"
+        expr = f" psector_id = '{psector_id}'"
         # Refresh model with selected filter
         self.fill_table(dialog, tbl_selected_rows, tableright, True, QTableView.DoubleClicked, expr)
         tools_gw.set_tablemodel_config(dialog, tbl_selected_rows, tableright)
@@ -1206,13 +1203,13 @@ class GwPsector:
         """ Populate the QTableView by filtering through the QLineEdit"""
 
         schema_name = self.schema_name.replace('"', '')
+        psector_id = tools_qt.get_text(dialog, 'psector_id')
         query = tools_qt.get_text(dialog, text_line).lower()
         if query == 'null':
             query = ""
         sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE LOWER ({field_id})"
-               f" LIKE '%{query}%' AND {field_id} NOT IN ("
-               f" SELECT price_id FROM {tableright}"
-               f" WHERE psector_id = '{tools_qt.get_text(dialog, 'psector_id')}')")
+               f" LIKE '%{query}%' AND {field_id} NOT IN (SELECT price_id FROM {tableright}"
+               f" WHERE psector_id = '{psector_id}')")
         self.fill_table_by_query(qtable, sql)
 
 

@@ -3251,7 +3251,8 @@ class GwInfo(QObject):
         for widget in widgets:
             widget.setStyleSheet(None)
             # Check mandatory fields
-            if widget.property('ismandatory') and tools_qt.get_text(dialog, widget, False, False) in (None, ''):
+            value = tools_qt.get_text(dialog, widget, False, False)
+            if widget.property('ismandatory') and value in (None, ''):
                 missing_mandatory = True
                 tools_qt.set_stylesheet(widget, "border: 2px solid red")
         if missing_mandatory:

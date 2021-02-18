@@ -206,8 +206,7 @@ class GwFeatureDeleteButton(GwAction):
         current_layer.removeSelection()
 
         # Set active layer
-        layer_name = 'v_edit_' + \
-                     tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+        layer_name = 'v_edit_' + tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         layer = tools_qgis.get_layer_by_tablename(layer_name)
         self.iface.setActiveLayer(layer)
         tools_qgis.set_layer_visible(layer)
