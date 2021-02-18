@@ -270,7 +270,31 @@ DELETE FROM config_toolbox WHERE id = 2784;
 DELETE FROM sys_table WHERE id ='om_visit_parameter_index';
 
 -- 2021/11/02
-
-
 UPDATE config_param_system SET value ='{"sys_table_id":"v_ui_hydrometer", "sys_id_field":"hydrometer_id", "sys_connec_id":"connec_id", "sys_search_field_1":"hydrometer_customer_code",  "sys_search_field_2":"connec_customer_code",  "sys_search_field_3":"state", "sys_parent_field":"expl_name"}'
 WHERE parameter = 'basic_search_hydrometer';
+
+-- 2021/02/18
+
+UPDATE config_form_fields set layoutorder=null,  hidden=false  where formname='v_edit_element';
+
+UPDATE config_form_fields set layoutorder=1 where formname='v_edit_element' and columnname = 'element_id';
+UPDATE config_form_fields set layoutorder=2 where formname='v_edit_element' and columnname = 'code';
+UPDATE config_form_fields set layoutorder=3 where formname='v_edit_element' and columnname = 'elementtype_id';
+UPDATE config_form_fields set layoutorder=4 where formname='v_edit_element' and columnname = 'elementcat_id';
+UPDATE config_form_fields set layoutorder=5 where formname='v_edit_element' and columnname = 'num_elements';
+UPDATE config_form_fields set layoutorder=6 where formname='v_edit_element' and columnname = 'state';
+UPDATE config_form_fields set layoutorder=7 where formname='v_edit_element' and columnname = 'state_type';
+UPDATE config_form_fields set layoutorder=8 where formname='v_edit_element' and columnname = 'expl_id';
+UPDATE config_form_fields set layoutorder=9 where formname='v_edit_element' and columnname = 'ownercat_id';
+UPDATE config_form_fields set layoutorder=10 where formname='v_edit_element' and columnname = 'location_type';
+UPDATE config_form_fields set layoutorder=11 where formname='v_edit_element' and columnname = 'buildercat_id';
+UPDATE config_form_fields set layoutorder=12 where formname='v_edit_element' and columnname = 'builtdate';
+UPDATE config_form_fields set layoutorder=13 where formname='v_edit_element' and columnname = 'workcat_id';
+UPDATE config_form_fields set layoutorder=14 where formname='v_edit_element' and columnname = 'workcat_id_end';
+UPDATE config_form_fields set layoutorder=15 where formname='v_edit_element' and columnname = 'comment';
+UPDATE config_form_fields set layoutorder=16 where formname='v_edit_element' and columnname = 'observ';
+UPDATE config_form_fields set layoutorder=17 where formname='v_edit_element' and columnname = 'link';
+UPDATE config_form_fields set layoutorder=18 where formname='v_edit_element' and columnname = 'verified';
+UPDATE config_form_fields set layoutorder=19 where formname='v_edit_element' and columnname = 'rotation';
+
+UPDATE config_form_fields set hidden=true where layoutorder is null and formname='v_edit_element';
