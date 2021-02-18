@@ -192,7 +192,7 @@ BEGIN
 	EXECUTE v_querytext INTO v_newid;
 
 	--find query that populates form combo
-	EXECUTE 'SELECT dv_querytext,columnname FROM config_form_fields WHERE dv_querytext ILIKE ''%FROM '||v_catname||'%'' AND formname = '||quote_literal(v_feature_table)||''
+	EXECUTE 'SELECT dv_querytext,columnname FROM config_form_fields WHERE dv_querytext ILIKE ''%FROM '||v_catname||'%'' AND formname = '||quote_literal(v_feature_table)||' AND columnname = ''workcat_id'''
 	INTO v_dvquery, v_columnname;
 
 	EXECUTE 'SELECT json_build_object (''widgetname'', '||quote_literal(concat('data_',v_columnname))||',''comboIds'',id,''comboNames'',idval, ''selectedId'','||quote_literal(v_newid)||') as fields
