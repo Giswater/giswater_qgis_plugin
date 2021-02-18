@@ -179,29 +179,29 @@ class CreateGisProject:
         aux = content
         if sqlite_conn:
             sql = (f"SELECT parameters, srs_id, srid, auth_name || ':' || auth_id as auth_id, description, "
-                   f"projection_acronym, ellipsoid_acronym, is_geo "
+                   f"projection_acronym, is_geo "
                    f"FROM srs "
-                   f"WHERE srid = '{srid}'")
+                   f"WHERE srid = '{srid}';")
             self.cursor.execute(sql)
             row = self.cursor.fetchone()
 
         else:
             sql = (f"SELECT proj4text as parameters, 2104 as srs_id, srid, auth_name || ':' || auth_srid as auth_id, "
-                   f"'ETRS89 / UTM zone 31N' as description, 'UTM' as projection_acronym, 'GRS80' as ellipsoid_acronym, 0 as is_geo "
+                   f"'ETRS89 / UTM zone 31N' as description, 'UTM' as projection_acronym, 0 as is_geo "
                    f"FROM spatial_ref_sys "
-                   f"WHERE srid = '{srid}'")
+                   f"WHERE srid = '{srid}';")
             row = self.controller.get_row(sql, log_sql=True)
 
         if row:
+
             aux = aux.replace("__PROJ4__", row[0])
             aux = aux.replace("__SRSID__", str(row[1]))
             aux = aux.replace("__SRID__", str(row[2]))
             aux = aux.replace("__AUTHID__", row[3])
             aux = aux.replace("__DESCRIPTION__", row[4])
             aux = aux.replace("__PROJECTIONACRONYM__", row[5])
-            aux = aux.replace("__ELLIPSOIDACRONYM__", row[6])
             geo = "false"
-            if row[7] != 0:
+            if row[6] != 0:
                 geo = "true"
             aux = aux.replace("__GEOGRAPHICFLAG__", geo)
 
