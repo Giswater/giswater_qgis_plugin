@@ -112,6 +112,7 @@ BEGIN
 	SELECT string_agg(arc_id,',') INTO v_feature_list FROM plan_psector_x_arc  WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
 
 	IF v_feature_list IS NOT NULL THEN
+		PERFORM setval('SCHEMA_NAME.plan_psector_x_arc_id_seq', (select max(id) from plan_psector_x_arc) , true);
 		INSERT INTO plan_psector_x_arc(arc_id, psector_id, state, doable, descript, addparam) 
 		SELECT arc_id, v_new_psector_id, state, doable, descript, addparam FROM plan_psector_x_arc 
 		WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
@@ -123,6 +124,7 @@ BEGIN
 	SELECT string_agg(node_id,',') INTO v_feature_list FROM plan_psector_x_node  WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
 
 	IF v_feature_list IS NOT NULL THEN
+		PERFORM setval('SCHEMA_NAME.plan_psector_x_node_id_seq', (select max(id) from plan_psector_x_node) , true);
 		INSERT INTO plan_psector_x_node(node_id, psector_id, state, doable, descript) 
 		SELECT node_id, v_new_psector_id, state, doable, descript FROM plan_psector_x_node 
 		WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
@@ -134,9 +136,10 @@ BEGIN
 	SELECT string_agg(connec_id,',') INTO v_feature_list FROM plan_psector_x_connec WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
 
 	IF v_feature_list IS NOT NULL THEN
+		PERFORM setval('SCHEMA_NAME.plan_psector_x_connec_id_seq', (select max(id) from plan_psector_x_connec) , true);
 		INSERT INTO plan_psector_x_connec(connec_id, psector_id, state, doable, descript,link_geom, vnode_geom) 
-		SELECT connec_id, v_new_psector_id, state, doable, descript,link_geom, vnode_geom FROM plan_psector_x_connec 
-		WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
+		SELECT DISTINCT connec_id, v_new_psector_id, state, doable, descript,link_geom, vnode_geom FROM plan_psector_x_connec 
+		WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false)) ON CONFLICT (psector_id, connec_id) DO NOTHING;
 
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied connecs with state 0: ', v_feature_list ));
 	END IF;
@@ -145,8 +148,9 @@ BEGIN
 	IF v_project_type='UD' THEN
 		SELECT string_agg(gully_id,',') INTO v_feature_list FROM plan_psector_x_gully WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
 		IF v_feature_list IS NOT NULL THEN
+			PERFORM setval('SCHEMA_NAME.plan_psector_x_gully_id_seq', (select max(id) from plan_psector_x_gully) , true);
 			INSERT INTO plan_psector_x_gully(gully_id, psector_id, state, doable, descript,link_geom, vnode_geom) 
-			SELECT gully_id, v_new_psector_id, state, doable, descript,link_geom, vnode_geom FROM plan_psector_x_gully 
+			SELECT DISTINCT gully_id, v_new_psector_id, state, doable, descript,link_geom, vnode_geom FROM plan_psector_x_gully 
 			WHERE psector_id=v_old_psector_id AND (state=0 OR (state=1 and doable = false));
 	
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied gullies with state 0: ', v_feature_list ));
