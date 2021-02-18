@@ -814,6 +814,8 @@ def build_dialog_info(dialog, result, my_json=None):
     grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
 
     for x, field in enumerate(fields["fields"]):
+        if 'hidden' in field and field['hidden']: continue
+        
         label = QLabel()
         label.setObjectName('lbl_' + field['label'])
         label.setText(field['label'].capitalize())
