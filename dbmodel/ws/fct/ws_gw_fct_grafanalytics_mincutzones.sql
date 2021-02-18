@@ -18,12 +18,11 @@ mincut -1 must exists
 
 INSERT INTO SCHEMA_NAME.om_mincut VALUES (-1)
 
-SELECT * from SCHEMA_NAME.arc where arc_id='2205'
 
 TO EXECUTE
 -- mandatory:
-DELETE FROM anl_arc where fid = 134
-INSERT INTO anl_arc (fid, arc_id, descript) SELECT 134, arc_id, minsector_id FROM arc WHERE state = 1;
+DELETE FROM ws.anl_arc where fid = 134
+INSERT INTO ws.anl_arc (fid, arc_id) SELECT 134, minsector_id FROM ws.arc WHERE state = 1 and minsector_id > 0;
 
 -- start
 BEGIN;
