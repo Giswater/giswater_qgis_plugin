@@ -12,18 +12,23 @@ $BODY$
 
 /*EXAMPLE
 
+-- create views and add config_form_fields columns only if is empty
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
 "feature":{"catFeature":"T"},"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}$$);
 
+-- create views and add config_form_fields columns only if is empty
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
 
+--only replace views, not delete nothing but add a new one column on config_form_fields (newColumn) copying values from parent
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
- "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newChildColumn":"workcat_id_plan" }}$$); --only replace views, not config
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"workcat_id_plan" }}$$);
 
+--only replace views, not delete nothing but add a new one column on config_form_fields (newColumn) copying values from parent
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-"feature":{"catFeature":"T"}, "data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-UPDATE", "newChildColumn":"workcat_id_plan" }}$$); --only replace views, not config
+"feature":{"catFeature":"T"}, "data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-UPDATE", "newColumn":"workcat_id_plan" }}$$); --only replace views, not config
 
+--delete views & config_form_fields information
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
 
@@ -56,7 +61,7 @@ v_childview text;
 v_return_status text = 'Failed';
 v_return_msg text = 'Process finished with some errors';
 v_error_context text;
-v_newchildcolumn text;
+v_newcolumn text;
 
 BEGIN
 
@@ -72,7 +77,7 @@ BEGIN
 
 	v_cat_feature = ((p_data ->>'feature')::json->>'catFeature')::text;
 	v_action = ((p_data ->>'data')::json->>'action')::text;
-	v_newchildcolumn = ((p_data ->>'data')::json->>'newChildColumn')::text;
+	v_newcolumn = ((p_data ->>'data')::json->>'newColumn')::text;
 
 
 	IF v_cat_feature IS NULL THEN
@@ -109,7 +114,7 @@ BEGIN
 					
 			-- insert into config_form_fields new column values coyping from parent
 			INSERT INTO config_form_fields 
-			SELECT * FROM config_form_fields WHERE formname = v_parent AND columnname = v_newchildcolumn
+			SELECT * FROM config_form_fields WHERE formname = v_parent AND columnname = v_newcolumn
 			ON CONFLICT (formname, columnname, formtype) DO NOTHING;
 			
 		END LOOP;
@@ -132,7 +137,7 @@ BEGIN
 					
 		-- insert into config_form_fields new column values coyping from parent
 		INSERT INTO config_form_fields 
-		SELECT * FROM config_form_fields WHERE formname = v_parent AND columnname = v_newchildcolumn
+		SELECT * FROM config_form_fields WHERE formname = v_parent AND columnname = v_newcolumn
 		ON CONFLICT (formname, columnname, formtype) DO NOTHING;
 	
 		v_return_status = 'Accepted';
