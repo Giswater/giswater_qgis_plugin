@@ -1644,6 +1644,8 @@ class UpdateSQL(ApiParent):
             if not is_test:
                 self.populate_data_schema_name(self.cmb_project_type)
                 if schema_name is not None:
+                    proyect_type = utils_giswater.getWidgetText(self.dlg_readsql_create_project, 'cmb_create_project_type')
+                    utils_giswater.setWidgetText(self.dlg_readsql, 'cmb_project_type', proyect_type)
                     utils_giswater.setWidgetText(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
                     self.set_info_project()
         else:
