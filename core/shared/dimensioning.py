@@ -60,8 +60,7 @@ class GwDimensioning:
             rubber_band = QgsRubberBand(self.canvas, 0)
             extras = f'"coordinates":{{{self.points}}}'
             body = tools_gw.create_body(extras=extras)
-            function_name = 'gw_fct_getdimensioning'
-            json_result = tools_gw.execute_procedure(function_name, body)
+            json_result = tools_gw.execute_procedure('gw_fct_getdimensioning', body)
             if json_result is None or json_result['status'] == 'Failed':
                 return False
             db_return = json_result

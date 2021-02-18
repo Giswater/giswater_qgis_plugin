@@ -2583,13 +2583,11 @@ class GwAdminButton:
             self.dlg_import_inp.progressBar.setFormat("")
 
             body = tools_gw.create_body(extras=extras)
-            sql = ("SELECT " + str(function_name) + "(" + body + ")::text")
-            row = tools_db.get_row(sql, commit=False)
+            complet_result = tools_gw.execute_procedure(f"{function_name}", body)
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
-            if row:
-                complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
+            if complet_result:
                 self._set_log_text(self.dlg_import_inp, complet_result['body']['data'])
                 if complet_result['status'] == 'Failed':
                     msg = "The importation process have been failed"

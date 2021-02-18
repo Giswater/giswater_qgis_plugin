@@ -369,10 +369,8 @@ class GwFeatureReplaceButton(GwMaptool):
             body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute SQL function and show result to the user
-            function_name = "gw_fct_setfeaturereplace"
-            sql = f"SELECT {function_name}({body})::text"
-            row = tools_db.get_row(sql)
-            if not row:
+            complet_result = tools_gw.execute_procedure('gw_fct_setfeaturereplace', body, log_sql=True)
+            if not complet_result:
                 message = "Error replacing feature"
                 tools_qgis.show_warning(message)
                 self.deactivate()
@@ -380,7 +378,6 @@ class GwFeatureReplaceButton(GwMaptool):
                 tools_gw.close_dialog(dialog)
                 return
 
-            complet_result = json.loads(row[0], object_pairs_hook=OrderedDict)
             message = "Feature replaced successfully"
             tools_qgis.show_info(message)
 

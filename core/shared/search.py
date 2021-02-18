@@ -77,8 +77,7 @@ class GwSearch:
         else:
             extras = f'"addSchema":"{qgis_project_add_schema}"'
             body = tools_gw.create_body(form=form, extras=extras)
-        function_name = "gw_fct_getsearch"
-        complet_list = tools_gw.execute_procedure(function_name, body)
+        complet_list = tools_gw.execute_procedure('gw_fct_getsearch', body)
         if not complet_list or complet_list['status'] == 'Failed':
             return False
 
@@ -498,8 +497,7 @@ class GwSearch:
         feature = f'"tableName":"{table_name}", "id":"{feature_id}"'
         extras = f'"infoType":"{qgis_project_infotype}"'
         body = tools_gw.create_body(feature=feature, extras=extras)
-        function_name = 'gw_fct_getinfofromid'
-        json_result = tools_gw.execute_procedure(function_name, body)
+        json_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
         if json_result is None or json_result['status'] == 'Failed':
             return
         result = json_result

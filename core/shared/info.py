@@ -3076,8 +3076,7 @@ class GwInfo(QObject):
         id_name = complet_result['body']['feature']['idName']
         feature = f'"tableName":"{self.tablename}", "idName":"{id_name}", "id":"{self.feature_id}"'
         body = tools_gw.create_body(form, feature, filter_fields)
-        function_name = 'gw_fct_getlist'
-        json_result = tools_gw.execute_procedure(function_name, body)
+        json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
         if json_result is None or json_result['status'] == 'Failed':
             return False
         complet_list = json_result

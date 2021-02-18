@@ -1518,7 +1518,7 @@ class GwPsector:
                     if answer:
                         feature += f', "tableName":"{table_name}", "idName":"{column_id}"'
                         body = tools_gw.create_body(feature=feature)
-                        result = tools_gw.execute_procedure('gw_fct_setdelete', body)
+                        tools_gw.execute_procedure('gw_fct_setdelete', body)
 
         elif action == 'price':
             message = "Are you sure you want to delete these records?"

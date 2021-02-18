@@ -522,9 +522,8 @@ class GwVisit(QObject):
 
         feature = f'"id":"{self.current_visit.id}"'
         body = tools_gw.create_body(feature=feature)
-        sql = f"SELECT gw_fct_om_visit_multiplier({body})::text"
-        row = tools_db.get_row(sql)
-        tools_log.log_info(f"execute_pgfunction: {row}")
+        complet_result = tools_gw.execute_procedure('gw_fct_om_visit_multiplier', body)
+        tools_log.log_info(f"execute_pgfunction: {complet_result}")
 
 
     def _update_geom(self):

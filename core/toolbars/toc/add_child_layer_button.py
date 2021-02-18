@@ -215,9 +215,8 @@ class GwAddChildLayerButton(GwAction):
         extras = f'"selectorType":"explfrommuni", "id":{muni_id}, "value":true, "isAlone":true, '
         extras += f'"addSchema":"{self.qgis_project_add_schema}"'
         body = tools_gw.create_body(extras=extras)
-        sql = f"SELECT gw_fct_setselectors({body})::text"
-        row = tools_db.get_row(sql, commit=True)
-        if row:
+        complet_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
+        if complet_result:
             self.iface.mapCanvas().refreshAllLayers()
             self.layer_muni.triggerRepaint()
             self.iface.actionPan().trigger()
