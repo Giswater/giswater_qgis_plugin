@@ -1542,22 +1542,19 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
     try:
 
         if 'message' in json_result:
-
-            parameter = None
             level = 1
             if 'level' in json_result['message']:
                 level = int(json_result['message']['level'])
             if 'text' in json_result['message']:
                 msg = json_result['message']['text']
             else:
-                parameter = 'text'
-                msg = "Key on returned json from ddbb is missed"
+                msg = json_result['message']
 
             # Show exception message only if we are not in a task process
             if len(global_vars.session_vars['threads']) == 0:
-                tools_qgis.show_message(msg, level, parameter=parameter)
+                tools_qgis.show_message(msg, level)
             else:
-                tools_log.log_info(msg, parameter=parameter)
+                tools_log.log_info(msg)
 
         else:
 
