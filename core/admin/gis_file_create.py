@@ -152,7 +152,7 @@ class GwGisFileCreate:
         aux = content
         if sqlite_conn:
             sql = (f"SELECT parameters, srs_id, srid, auth_name || ':' || auth_id as auth_id, description, "
-                   f"projection_acronym, ellipsoid_acronym, is_geo "
+                   f"projection_acronym, is_geo "
                    f"FROM srs "
                    f"WHERE srid = '{srid}'")
             self.cursor.execute(sql)
@@ -160,8 +160,7 @@ class GwGisFileCreate:
 
         else:
             sql = (f"SELECT proj4text as parameters, 2104 as srs_id, srid, auth_name || ':' || auth_srid as auth_id, "
-                   f"'ETRS89 / UTM zone 31N' as description, 'UTM' as projection_acronym, "
-                   f"'GRS80' as ellipsoid_acronym, 0 as is_geo "
+                   f"'ETRS89 / UTM zone 31N' as description, 'UTM' as projection_acronym, 0 as is_geo "
                    f"FROM spatial_ref_sys "
                    f"WHERE srid = '{srid}'")
             row = tools_db.get_row(sql)
@@ -173,9 +172,8 @@ class GwGisFileCreate:
             aux = aux.replace("__AUTHID__", row[3])
             aux = aux.replace("__DESCRIPTION__", row[4])
             aux = aux.replace("__PROJECTIONACRONYM__", row[5])
-            aux = aux.replace("__ELLIPSOIDACRONYM__", row[6])
             geo = "false"
-            if row[7] != 0:
+            if row[6] != 0:
                 geo = "true"
             aux = aux.replace("__GEOGRAPHICFLAG__", geo)
 
