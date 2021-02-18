@@ -48,7 +48,7 @@ class GwMainWindow(QMainWindow):
             path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}giswater.config"
             if not os.path.exists(path):
                 print(f"File not found: {path}")
-                webbrowser.open_new_tab('https://giswater.org/giswater-manual')
+                webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
                 return True
 
             parser.read(path)
@@ -58,9 +58,9 @@ class GwMainWindow(QMainWindow):
                 tag = str(self.objectName())
             try:
                 web_tag = parser.get('web_tag', tag)
-                webbrowser.open_new_tab(f'https://giswater.org/giswater-manual/#{web_tag}')
+                webbrowser.open_new_tab(f'https://giswater.gitbook.io/giswater-manual/{web_tag}')
             except Exception:
-                webbrowser.open_new_tab('https://giswater.org/giswater-manual')
+                webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
             return True
         return False
 
