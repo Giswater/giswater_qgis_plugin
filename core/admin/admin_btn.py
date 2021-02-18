@@ -2620,11 +2620,11 @@ class GwAdminButton:
     def _create_qgis_template(self):
         """"""
         msg = ("Warning: Are you sure to continue?. This button will update your plugin qgis templates file replacing "
-               "all strings defined on the config/system.config file. Be sure your config file is OK before continue")
+               "all strings defined on the config/dev.config file. Be sure your config file is OK before continue")
         result = tools_qt.show_question(msg, "Info")
         if result:
             # Get dev config file
-            setting_file = os.path.join(self.plugin_dir, 'config', 'system.config')
+            setting_file = os.path.join(self.plugin_dir, 'config', 'dev.config')
             if not os.path.exists(setting_file):
                 message = "File not found"
                 tools_qgis.show_warning(message, parameter=setting_file)
@@ -2639,8 +2639,11 @@ class GwAdminButton:
 
             self.text_replace_labels = tools_gw.get_config_parser('qgis_project_text_replace', 'labels',
                                                                   "project", "dev")
+            self.text_replace_labels = self.text_replace_labels.split(',')
             self.xml_set_labels = tools_gw.get_config_parser('qgis_project_xml_set', 'labels', "project", "dev")
-            if not os.path.exists(self.folder_path):
+            self.xml_set_labels = self.xml_set_labels.split(',')
+
+            if not os.path.exists(f"{self.folder_path}"):
                 message = "Folder not found"
                 tools_qgis.show_warning(message, parameter=self.folder_path)
                 return
@@ -2661,12 +2664,14 @@ class GwAdminButton:
 
                     # Replace into template text
                     for text_replace in self.text_replace_labels:
+                        text_replace = text_replace.replace(" ", "")
                         self.text_replace = tools_gw.get_config_parser('qgis_project_text_replace', text_replace,
                                                                        "project", "dev")
                         tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
                         f_to_read = re.sub(str(self.text_replace[0]), str(self.text_replace[1]), f_to_read)
 
                     for text_replace in self.xml_set_labels:
+                        text_replace = text_replace.replace(" ", "")
                         self.text_replace = tools_gw.get_config_parser('qgis_project_xml_set', text_replace,
                                                                        "project", "dev")
                         tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
