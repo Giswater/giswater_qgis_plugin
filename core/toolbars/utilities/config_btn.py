@@ -290,6 +290,8 @@ class GwConfigButton(GwAction):
             value = tools_qt.get_calendar_date(self.dlg_config, widget)
         elif type(widget) is QgsDateTimeEdit:
             value = tools_qt.get_calendar_date(self.dlg_config, widget)
+        elif type(widget) is QDoubleSpinBox:
+            value = tools_qt.get_text(self.dlg_config, widget, return_string_null=False)
 
         elem['widget'] = str(widget.objectName())
         elem['value'] = value
