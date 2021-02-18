@@ -822,15 +822,15 @@ class GwPsector:
         self.insert_or_update_new_psector(tablename=f'v_edit_plan_psector', close_dlg=False)
         self.update = True
         psector_id = tools_qt.get_text(self.dlg_plan_psector, 'psector_id')
-        if self.dlg_plan_psector.tabWidget.currentIndex() == 2:
+        if self.dlg_plan_psector.tabWidget.currentIndex() == 3:
             tableleft = "v_price_compost"
             tableright = f"v_edit_plan_psector_x_other"
             field_id_right = "price_id"
             self.price_selector(self.dlg_plan_psector, tableleft, tableright, field_id_right)
             self.update_total(self.dlg_plan_psector, self.dlg_plan_psector.selected_rows)
-        elif self.dlg_plan_psector.tabWidget.currentIndex() == 3:
-            self.populate_budget(self.dlg_plan_psector, psector_id)
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
+            self.populate_budget(self.dlg_plan_psector, psector_id)
+        elif self.dlg_plan_psector.tabWidget.currentIndex() == 5:
             expr = f"psector_id = '{psector_id}'"
             message = tools_qt.fill_table(self.tbl_document, f"{self.schema_name}.v_ui_doc_x_psector", expr)
             if message:
