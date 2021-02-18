@@ -813,7 +813,7 @@ def build_dialog_info(dialog, result, my_json=None):
         return
     grid_layout = dialog.findChild(QGridLayout, 'gridLayout')
 
-    for x, field in enumerate(fields["fields"]):
+    for order, field in enumerate(fields["fields"]):
         if 'hidden' in field and field['hidden']: continue
         
         label = QLabel()
@@ -848,8 +848,10 @@ def build_dialog_info(dialog, result, my_json=None):
         elif field['widgettype'] == 'button':
             widget = add_button(dialog, field)
         widget.setProperty('ismandatory', field['ismandatory'])
-        grid_layout.addWidget(label, x, 0)
-        grid_layout.addWidget(widget, x, 1)
+
+        if 'layoutorder' in field: order = field['layoutorder']
+        grid_layout.addWidget(label, order, 0)
+        grid_layout.addWidget(widget, order, 1)
 
     vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
     grid_layout.addItem(vertical_spacer1)
