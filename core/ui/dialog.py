@@ -45,7 +45,7 @@ class GwDialog(QDialog):
 
             try:
                 web_tag = parser.get('web_tag', tag)
-                webbrowser.open_new_tab(f'https://giswater.gitbook.io/giswater-manual/5.-giswater-plugin#{web_tag}')
+                webbrowser.open_new_tab(f'https://giswater.gitbook.io/giswater-manual/{web_tag}')
             except Exception:
                 webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
             finally:
