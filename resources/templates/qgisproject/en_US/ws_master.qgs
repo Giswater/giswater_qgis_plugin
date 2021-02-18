@@ -27848,7 +27848,7 @@ def my_form_open(dialog, layer, feature):
         <field editable="1" name="builtcost"/>
         <field editable="1" name="builtdate"/>
         <field editable="0" name="bulk"/>
-        <field editable="0" name="bSCHEMA_NAMEget"/>
+        <field editable="0" name="budgetget"/>
         <field editable="0" name="calculed_y"/>
         <field editable="0" name="cost"/>
         <field editable="0" name="cost_unit"/>
@@ -27878,7 +27878,7 @@ def my_form_open(dialog, layer, feature):
         <field editable="0" name="node_1"/>
         <field editable="0" name="node_2"/>
         <field editable="0" name="other_budget"/>
-        <field editable="0" name="other_bSCHEMA_NAMEget"/>
+        <field editable="0" name="other_budgetget"/>
         <field editable="0" name="pav_cost"/>
         <field editable="1" name="pending"/>
         <field editable="0" name="protec_cost"/>
@@ -27888,7 +27888,7 @@ def my_form_open(dialog, layer, feature):
         <field editable="0" name="state"/>
         <field editable="0" name="thickness"/>
         <field editable="0" name="total_budget"/>
-        <field editable="0" name="total_bSCHEMA_NAMEget"/>
+        <field editable="0" name="total_budgetget"/>
         <field editable="0" name="total_y"/>
         <field editable="0" name="trenchl_cost"/>
         <field editable="0" name="width"/>
@@ -27916,7 +27916,7 @@ def my_form_open(dialog, layer, feature):
         <field name="builtcost" labelOnTop="0"/>
         <field name="builtdate" labelOnTop="0"/>
         <field name="bulk" labelOnTop="0"/>
-        <field name="bSCHEMA_NAMEget" labelOnTop="0"/>
+        <field name="budgetget" labelOnTop="0"/>
         <field name="calculed_y" labelOnTop="0"/>
         <field name="cost" labelOnTop="0"/>
         <field name="cost_unit" labelOnTop="0"/>
@@ -27946,7 +27946,7 @@ def my_form_open(dialog, layer, feature):
         <field name="node_1" labelOnTop="0"/>
         <field name="node_2" labelOnTop="0"/>
         <field name="other_budget" labelOnTop="0"/>
-        <field name="other_bSCHEMA_NAMEget" labelOnTop="0"/>
+        <field name="other_budgetget" labelOnTop="0"/>
         <field name="pav_cost" labelOnTop="0"/>
         <field name="pending" labelOnTop="0"/>
         <field name="protec_cost" labelOnTop="0"/>
@@ -27956,7 +27956,7 @@ def my_form_open(dialog, layer, feature):
         <field name="state" labelOnTop="0"/>
         <field name="thickness" labelOnTop="0"/>
         <field name="total_budget" labelOnTop="0"/>
-        <field name="total_bSCHEMA_NAMEget" labelOnTop="0"/>
+        <field name="total_budgetget" labelOnTop="0"/>
         <field name="total_y" labelOnTop="0"/>
         <field name="trenchl_cost" labelOnTop="0"/>
         <field name="width" labelOnTop="0"/>
@@ -28512,7 +28512,7 @@ def my_form_open(dialog, layer, feature):
         <field editable="0" name="budget"/>
         <field editable="1" name="builtcost"/>
         <field editable="1" name="builtdate"/>
-        <field editable="0" name="bSCHEMA_NAMEget"/>
+        <field editable="0" name="budgetget"/>
         <field editable="0" name="cost"/>
         <field editable="0" name="cost_unit"/>
         <field editable="0" name="descript"/>
@@ -38017,7 +38017,7 @@ LEFT JOIN sample_epanet.connec ON (((connec.connec_id)::text = (link.connec_id):
         <LabelFont style="" description="Arial,10,-1,5,75,0,0,0,0,0"/>
         <FontColor alpha="255" green="0" red="0" blue="0"/>
       </LayoutItem>
-      <LayoutItem frameJoinStyle="miter" labelText="BSCHEMA_NAMEget summary of [% &quot;name&quot; %]:" outlineWidthM="0.3,mm" frame="false" blendMode="0" positionLock="false" htmlState="0" itemRotation="0" valign="32" size="97.7075,5.87319,mm" marginY="0" halign="1" positionOnPage="18.5098,144.841,mm" opacity="1" excludeFromExports="0" type="65641" position="18.5098,144.841,mm" visibility="1" background="false" templateUuid="{de426041-f9c2-42f8-85e1-2eec4605de4a}" groupUuid="" uuid="{de426041-f9c2-42f8-85e1-2eec4605de4a}" zValue="24" id="" referencePoint="0" marginX="0">
+      <LayoutItem frameJoinStyle="miter" labelText="Budget summary of [% &quot;name&quot; %]:" outlineWidthM="0.3,mm" frame="false" blendMode="0" positionLock="false" htmlState="0" itemRotation="0" valign="32" size="97.7075,5.87319,mm" marginY="0" halign="1" positionOnPage="18.5098,144.841,mm" opacity="1" excludeFromExports="0" type="65641" position="18.5098,144.841,mm" visibility="1" background="false" templateUuid="{de426041-f9c2-42f8-85e1-2eec4605de4a}" groupUuid="" uuid="{de426041-f9c2-42f8-85e1-2eec4605de4a}" zValue="24" id="" referencePoint="0" marginX="0">
         <FrameColor alpha="255" green="0" red="0" blue="0"/>
         <BackgroundColor alpha="255" green="255" red="255" blue="255"/>
         <LayoutObject>
@@ -40612,7 +40612,7 @@ def my_form_open(dialog, layer, feature):
         <LabelFont style="" description="MS Shell Dlg 2,9,-1,5,50,0,0,0,0,0"/>
         <FontColor alpha="255" green="0" red="0" blue="0"/>
       </LayoutItem>
-      <LayoutItem frameJoinStyle="miter" labelText="Total bSCHEMA_NAMEget per contract (PEC IVA inclSCHEMA_NAMEed):" outlineWidthM="0.3,mm" frame="false" blendMode="0" positionLock="false" htmlState="0" itemRotation="0" valign="32" size="77.862,4.52331,mm" marginY="0" halign="1" positionOnPage="18.472,191.26,mm" opacity="1" excludeFromExports="0" type="65641" position="18.472,191.26,mm" visibility="1" background="false" templateUuid="{2cfabc59-b775-4022-a3fe-5bd1db3f55ab}" groupUuid="" uuid="{2cfabc59-b775-4022-a3fe-5bd1db3f55ab}" zValue="13" id="" referencePoint="0" marginX="0">
+      <LayoutItem frameJoinStyle="miter" labelText="Total budgetget per contract (PEC IVA inclSCHEMA_NAMEed):" outlineWidthM="0.3,mm" frame="false" blendMode="0" positionLock="false" htmlState="0" itemRotation="0" valign="32" size="77.862,4.52331,mm" marginY="0" halign="1" positionOnPage="18.472,191.26,mm" opacity="1" excludeFromExports="0" type="65641" position="18.472,191.26,mm" visibility="1" background="false" templateUuid="{2cfabc59-b775-4022-a3fe-5bd1db3f55ab}" groupUuid="" uuid="{2cfabc59-b775-4022-a3fe-5bd1db3f55ab}" zValue="13" id="" referencePoint="0" marginX="0">
         <FrameColor alpha="255" green="0" red="0" blue="0"/>
         <BackgroundColor alpha="255" green="255" red="255" blue="255"/>
         <LayoutObject>
@@ -40644,7 +40644,7 @@ def my_form_open(dialog, layer, feature):
         <LabelFont style="" description="Arial,10,-1,5,50,1,0,0,0,0"/>
         <FontColor alpha="255" green="0" red="0" blue="0"/>
       </LayoutItem>
-      <LayoutItem frameJoinStyle="miter" labelText="BSCHEMA_NAMEget of Material Execution (PEM):" outlineWidthM="0.3,mm" frame="false" blendMode="0" positionLock="false" htmlState="0" itemRotation="0" valign="32" size="63.839,5.87319,mm" marginY="0" halign="1" positionOnPage="18.472,184.169,mm" opacity="1" excludeFromExports="0" type="65641" position="18.472,184.169,mm" visibility="1" background="false" templateUuid="{9a235067-fe1b-4381-b763-4606e1d7f8ee}" groupUuid="" uuid="{9a235067-fe1b-4381-b763-4606e1d7f8ee}" zValue="11" id="" referencePoint="0" marginX="0">
+      <LayoutItem frameJoinStyle="miter" labelText="Budget of Material Execution (PEM):" outlineWidthM="0.3,mm" frame="false" blendMode="0" positionLock="false" htmlState="0" itemRotation="0" valign="32" size="63.839,5.87319,mm" marginY="0" halign="1" positionOnPage="18.472,184.169,mm" opacity="1" excludeFromExports="0" type="65641" position="18.472,184.169,mm" visibility="1" background="false" templateUuid="{9a235067-fe1b-4381-b763-4606e1d7f8ee}" groupUuid="" uuid="{9a235067-fe1b-4381-b763-4606e1d7f8ee}" zValue="11" id="" referencePoint="0" marginX="0">
         <FrameColor alpha="255" green="0" red="0" blue="0"/>
         <BackgroundColor alpha="255" green="255" red="255" blue="255"/>
         <LayoutObject>

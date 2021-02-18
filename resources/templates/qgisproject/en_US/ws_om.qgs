@@ -17174,7 +17174,7 @@ LEFT JOIN sample_epanet.connec ON (((connec.connec_id)::text = (link.connec_id):
         <LabelFont description="Arial,10,-1,5,75,0,0,0,0,0" style=""/>
         <FontColor alpha="255" green="0" red="0" blue="0"/>
       </LayoutItem>
-      <LayoutItem blendMode="0" positionOnPage="18.5098,144.841,mm" marginX="0" halign="1" frameJoinStyle="miter" marginY="0" valign="32" referencePoint="0" labelText="BSCHEMA_NAMEget summary of [% &quot;name&quot; %]:" excludeFromExports="0" size="97.7075,5.87319,mm" id="" templateUuid="{de426041-f9c2-42f8-85e1-2eec4605de4a}" position="18.5098,144.841,mm" background="false" type="65641" positionLock="false" visibility="1" groupUuid="" htmlState="0" frame="false" zValue="24" itemRotation="0" outlineWidthM="0.3,mm" uuid="{de426041-f9c2-42f8-85e1-2eec4605de4a}" opacity="1">
+      <LayoutItem blendMode="0" positionOnPage="18.5098,144.841,mm" marginX="0" halign="1" frameJoinStyle="miter" marginY="0" valign="32" referencePoint="0" labelText="Budget summary of [% &quot;name&quot; %]:" excludeFromExports="0" size="97.7075,5.87319,mm" id="" templateUuid="{de426041-f9c2-42f8-85e1-2eec4605de4a}" position="18.5098,144.841,mm" background="false" type="65641" positionLock="false" visibility="1" groupUuid="" htmlState="0" frame="false" zValue="24" itemRotation="0" outlineWidthM="0.3,mm" uuid="{de426041-f9c2-42f8-85e1-2eec4605de4a}" opacity="1">
         <FrameColor alpha="255" green="0" red="0" blue="0"/>
         <BackgroundColor alpha="255" green="255" red="255" blue="255"/>
         <LayoutObject>
@@ -19769,7 +19769,7 @@ def my_form_open(dialog, layer, feature):
         <LabelFont description="MS Shell Dlg 2,9,-1,5,50,0,0,0,0,0" style=""/>
         <FontColor alpha="255" green="0" red="0" blue="0"/>
       </LayoutItem>
-      <LayoutItem blendMode="0" positionOnPage="18.472,191.26,mm" marginX="0" halign="1" frameJoinStyle="miter" marginY="0" valign="32" referencePoint="0" labelText="Total bSCHEMA_NAMEget per contract (PEC IVA inclSCHEMA_NAMEed):" excludeFromExports="0" size="77.862,4.52331,mm" id="" templateUuid="{2cfabc59-b775-4022-a3fe-5bd1db3f55ab}" position="18.472,191.26,mm" background="false" type="65641" positionLock="false" visibility="1" groupUuid="" htmlState="0" frame="false" zValue="13" itemRotation="0" outlineWidthM="0.3,mm" uuid="{2cfabc59-b775-4022-a3fe-5bd1db3f55ab}" opacity="1">
+      <LayoutItem blendMode="0" positionOnPage="18.472,191.26,mm" marginX="0" halign="1" frameJoinStyle="miter" marginY="0" valign="32" referencePoint="0" labelText="Total budget per contract (PEC IVA inclSCHEMA_NAMEed):" excludeFromExports="0" size="77.862,4.52331,mm" id="" templateUuid="{2cfabc59-b775-4022-a3fe-5bd1db3f55ab}" position="18.472,191.26,mm" background="false" type="65641" positionLock="false" visibility="1" groupUuid="" htmlState="0" frame="false" zValue="13" itemRotation="0" outlineWidthM="0.3,mm" uuid="{2cfabc59-b775-4022-a3fe-5bd1db3f55ab}" opacity="1">
         <FrameColor alpha="255" green="0" red="0" blue="0"/>
         <BackgroundColor alpha="255" green="255" red="255" blue="255"/>
         <LayoutObject>
@@ -19801,7 +19801,7 @@ def my_form_open(dialog, layer, feature):
         <LabelFont description="Arial,10,-1,5,50,1,0,0,0,0" style=""/>
         <FontColor alpha="255" green="0" red="0" blue="0"/>
       </LayoutItem>
-      <LayoutItem blendMode="0" positionOnPage="18.472,184.169,mm" marginX="0" halign="1" frameJoinStyle="miter" marginY="0" valign="32" referencePoint="0" labelText="BSCHEMA_NAMEget of Material Execution (PEM):" excludeFromExports="0" size="63.839,5.87319,mm" id="" templateUuid="{9a235067-fe1b-4381-b763-4606e1d7f8ee}" position="18.472,184.169,mm" background="false" type="65641" positionLock="false" visibility="1" groupUuid="" htmlState="0" frame="false" zValue="11" itemRotation="0" outlineWidthM="0.3,mm" uuid="{9a235067-fe1b-4381-b763-4606e1d7f8ee}" opacity="1">
+      <LayoutItem blendMode="0" positionOnPage="18.472,184.169,mm" marginX="0" halign="1" frameJoinStyle="miter" marginY="0" valign="32" referencePoint="0" labelText="Budget of Material Execution (PEM):" excludeFromExports="0" size="63.839,5.87319,mm" id="" templateUuid="{9a235067-fe1b-4381-b763-4606e1d7f8ee}" position="18.472,184.169,mm" background="false" type="65641" positionLock="false" visibility="1" groupUuid="" htmlState="0" frame="false" zValue="11" itemRotation="0" outlineWidthM="0.3,mm" uuid="{9a235067-fe1b-4381-b763-4606e1d7f8ee}" opacity="1">
         <FrameColor alpha="255" green="0" red="0" blue="0"/>
         <BackgroundColor alpha="255" green="255" red="255" blue="255"/>
         <LayoutObject>
