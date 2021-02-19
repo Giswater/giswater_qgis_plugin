@@ -1231,9 +1231,6 @@ CREATE OR REPLACE VIEW ve_connec AS
    FROM v_connec;
 
 
-SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
- "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE" }}$$);
-
 
 
 -- 2021/02/09
