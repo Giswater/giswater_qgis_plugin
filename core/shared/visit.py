@@ -14,6 +14,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal, QDateTime, QObject
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
+from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
     QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit
 from qgis.gui import QgsRubberBand
@@ -257,7 +258,7 @@ class GwVisit(QObject):
             tools_gw.open_dialog(self.dlg_add_visit, dlg_name="visit")
 
 
-    def manage_visits(self, feature_type=None, feature_id=None):
+    def manage_visits(self, feature_type=None, feature_id=None, parameters=None):
         """ Button 65: manage visits """
 
         # Create the dialog
@@ -301,6 +302,13 @@ class GwVisit(QObject):
         self.dlg_visit_manager.txt_filter.textChanged.connect(partial(self._filter_visit, self.dlg_visit_manager,
             self.dlg_visit_manager.tbl_visit, self.dlg_visit_manager.txt_filter, table_object, expr_filter, filed_to_filter))
 
+        if parameters:
+            table_name = tools_gw.get_config_parser('visit', 'om_visit_table_name', 'user', 'session')
+            self.dlg_visit_manager.btn_delete.clicked.connect(
+                partial(self._update_table_visit, parameters[0], table_name, parameters[2]))
+        self.dlg_visit_manager.txt_filter.textChanged.connect(partial(self._filter_visit, self.dlg_visit_manager,
+            self.dlg_visit_manager.tbl_visit, self.dlg_visit_manager.txt_filter, table_object, expr_filter, filed_to_filter))
+
         # set timeStart and timeEnd as the min/max dave values get from model
         tools_gw.set_dates_from_to(self.dlg_visit_manager.date_event_from, self.dlg_visit_manager.date_event_to,
                                    'om_visit', 'startdate', 'enddate')
@@ -320,6 +328,49 @@ class GwVisit(QObject):
 
 
     # region private functions
+
+    def _update_table_visit(self, widget, table_name, expr_filter=None, cmb_visitclass=None, id=None):
+
+        """ Set a model with selected filter.
+                Attach that model to selected table """
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
+        # Set model
+        model = QSqlTableModel()
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        if expr_filter is not None:
+            model.setFilter(expr_filter)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            self.controller.show_warning(model.lastError().text())
+
+            # Attach model to table view
+        if widget:
+            widget.setModel(model)
+        else:
+            self.controller.log_info("set_model_to_table: widget not found")
+        current_visit_class = tools_qt.get_combo_value(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)
+        feature_key = tools_qgis.get_primary_key()
+        if feature_key == 'node_id':
+            feature_type = 'node'
+        if feature_key == 'connec_id':
+            feature_type = 'connec'
+        if feature_key == 'arc_id':
+            feature_type = 'arc'
+        if feature_key == 'gully_id':
+            feature_type = 'gully'
+        # Fill ComboBox cmb_visit_class
+        sql = ("SELECT DISTINCT(class_id), om_visit_class.idval"
+               " FROM " + self.schema_name + ".v_ui_om_visit_x_" + feature_type + ""
+               " JOIN " + self.schema_name + ".om_visit_class ON om_visit_class.id = v_ui_om_visit_x_" + feature_type + ".class_id"
+               " WHERE " + str(feature_key) + " IS NOT NULL AND " + str(feature_key) + " = '" + str(id) + "'")
+        rows = self.controller.get_rows(sql)
+        tools_qt.set_combo_value(cmb_visitclass, rows, 1)
+        tools_qt.fill_combo_values(cmb_visitclass, str(current_visit_class), 0)
 
 
     def _delete_files(self, qtable, visit_id, event_id):

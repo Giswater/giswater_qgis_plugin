@@ -2458,7 +2458,7 @@ class GwInfo(QObject):
         parameters = [widget, table_name, filter_, self.cmb_visit_class, self.feature_id]
         btn_new_visit.clicked.connect(partial(self._new_visit, table_name, refresh_table=parameters, tab='visit'))
         btn_open_gallery.clicked.connect(partial(self._open_visit_files))
-        btn_open_visit.clicked.connect(partial(self._open_visit, refresh_table=parameters))
+        btn_open_visit.clicked.connect(partial(self._open_visit, parameters))
 
         # Fill ComboBox cmb_visit_class
         sql = ("SELECT DISTINCT(class_id), config_visit_class.idval"
@@ -2898,12 +2898,12 @@ class GwInfo(QObject):
         widget.model().select()
 
 
-    def _open_visit(self):
+    def _open_visit(self, parameters=None):
         """ Call button 65: om_visit_management """
 
         manage_visit = GwVisit()
         manage_visit.visit_added.connect(self._update_visit_table)
-        manage_visit.manage_visits(self.feature_type, self.feature_id)
+        manage_visit.manage_visits(self.feature_type, self.feature_id, parameters)
 
 
     def _update_visit_table(self):
