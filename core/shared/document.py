@@ -201,10 +201,9 @@ class GwDocument:
                f" ORDER BY id;")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(widget, rows, 1, add_empty=True)
-        doctype_vdefault = tools_gw.get_config_value('edit_doctype_vdefault')[0]
-
+        doctype_vdefault = tools_gw.get_config_value('edit_doctype_vdefault')
         if doctype_vdefault:
-            tools_qt.set_combo_value(widget, doctype_vdefault, 0)
+            tools_qt.set_combo_value(widget, doctype_vdefault[0], 0)
             self._activate_relations()
 
 
