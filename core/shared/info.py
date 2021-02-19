@@ -90,7 +90,8 @@ class GwInfo(QObject):
         self.tab_connections_loaded = False
         self.tab_hydrometer_loaded = False
         self.tab_hydrometer_val_loaded = False
-        self.tab_om_loaded = False
+        self.tab_visit_loaded = False
+        self.tab_event_loaded = False
         self.tab_document_loaded = False
         self.tab_rpt_loaded = False
         self.tab_plan_loaded = False
@@ -425,6 +426,7 @@ class GwInfo(QObject):
         tools_qt.set_tableview_config(self.tbl_hydrometer)
         self.tbl_hydrometer_value = self.dlg_cf.findChild(QTableView, "tbl_hydrometer_value")
         tools_qt.set_tableview_config(self.tbl_hydrometer_value, QAbstractItemView.SelectItems, QTableView.CurrentChanged)
+        self.tbl_visit_cf = self.dlg_cf.findChild(QTableView, "tbl_visit_cf")
         self.tbl_event_cf = self.dlg_cf.findChild(QTableView, "tbl_event_cf")
         tools_qt.set_tableview_config(self.tbl_event_cf)
         self.tbl_document = self.dlg_cf.findChild(QTableView, "tbl_document")
@@ -523,7 +525,11 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.dlg_cf.btn_open_element, "134b", "24x24")
         # tab hydrometer
         tools_gw.add_icon(self.dlg_cf.btn_link, "70", "24x24")
-        # tab om
+        # tab visit
+        tools_gw.add_icon(self.dlg_cf.btn_open_visit_2, "65", "24x24")
+        tools_gw.add_icon(self.dlg_cf.btn_new_visit_2, "64", "24x24")
+        tools_gw.add_icon(self.dlg_cf.btn_open_gallery_2, "136b", "24x24")
+        # tab event
         tools_gw.add_icon(self.dlg_cf.btn_open_visit, "65", "24x24")
         tools_gw.add_icon(self.dlg_cf.btn_new_visit, "64", "24x24")
         tools_gw.add_icon(self.dlg_cf.btn_open_gallery, "136b", "24x24")
@@ -2024,10 +2030,14 @@ class GwInfo(QObject):
         elif self.tab_main.widget(index_tab).objectName() == 'tab_hydrometer_val' and not self.tab_hydrometer_val_loaded:
             self._fill_tab_hydrometer_values()
             self.tab_hydrometer_val_loaded = True
-        # Tab 'O&M'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_om' and not self.tab_om_loaded:
-            self._fill_tab_om(self.feature_type)
-            self.tab_om_loaded = True
+        # Tab 'Visit'
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_visit' and not self.tab_visit_loaded:
+            self._fill_tab_visit(self.feature_type)
+            self.tab_visit_loaded = True
+        # Tab 'Event'
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_event' and not self.tab_event_loaded:
+            self._fill_tab_event(self.feature_type)
+            self.tab_event_loaded = True
         # Tab 'Documents'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_documents' and not self.tab_document_loaded:
             self._fill_tab_document()
@@ -2403,19 +2413,203 @@ class GwInfo(QObject):
         tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_hydrometer_value, table_name)
 
 
-    """ FUNCTIONS RELATED WITH TAB OM"""
+    """ FUNTIONS RELATED WITH TAB VISIT """
+
+    def _fill_tab_visit(self, geom_type):
+        """ Fill tab Visit """
+
+        sql = f"SELECT id, ui_tablename FROM config_visit_class WHERE feature_type = upper('{geom_type}')"
+        rows = tools_db.get_rows(sql)
+        table_visit_node_dict = {}
+        for row in rows:
+            table_visit_node_dict[row[0]] = str(row[1])
+        self._fill_tbl_visit(self.tbl_visit_cf, table_visit_node_dict, self.filter, geom_type)
+        # self.tbl_visit_cf.doubleClicked.connect(self.open_visit)
 
 
-    def _fill_tab_om(self, feature_type):
+    def _fill_tbl_visit(self, widget, table_name, filter_, geom_type):
+        """ Fill the table control to show documents """
+
+        # Get widgets
+        widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.cmb_visit_class = self.dlg_cf.findChild(QComboBox, "cmb_visit_class")
+        self.date_visit_to = self.dlg_cf.findChild(QDateEdit, "date_visit_to")
+        self.date_visit_from = self.dlg_cf.findChild(QDateEdit, "date_visit_from")
+        btn_new_visit = self.dlg_cf.findChild(QPushButton, "btn_new_visit_2")
+        date = QDate.currentDate()
+        self.date_visit_to.setDate(date)
+
+        btn_open_gallery = self.dlg_cf.findChild(QPushButton, "btn_open_gallery_2")
+        btn_open_visit = self.dlg_cf.findChild(QPushButton, "btn_open_visit_2")
+        btn_open_gallery.setEnabled(False)
+
+        feature_key = f"{geom_type}_id"
+        feature_type = geom_type.upper()
+
+        # Set signals
+        widget.clicked.connect(partial(self._tbl_visit_clicked, table_name))
+        self.cmb_visit_class.currentIndexChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
+            visitClass=True, column_filter=feature_key, value_filter=self.feature_id))
+        self.date_visit_to.dateChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
+            visitClass=False, column_filter=feature_key, value_filter=self.feature_id))
+        self.date_visit_from.dateChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
+            visitClass=False, column_filter=feature_key, value_filter=self.feature_id))
+
+        parameters = [widget, table_name, filter_, self.cmb_visit_class, self.feature_id]
+        btn_new_visit.clicked.connect(partial(self._new_visit, table_name, refresh_table=parameters, tab='visit'))
+        btn_open_gallery.clicked.connect(partial(self._open_visit_files))
+        btn_open_visit.clicked.connect(partial(self._open_visit, refresh_table=parameters))
+
+        # Fill ComboBox cmb_visit_class
+        sql = ("SELECT DISTINCT(class_id), config_visit_class.idval"
+               " FROM " + self.schema_name + ".v_ui_om_visit_x_" + feature_type.lower() + ""
+               " JOIN " + self.schema_name + ".config_visit_class ON config_visit_class.id = v_ui_om_visit_x_" + feature_type.lower() + ".class_id"
+               " WHERE " + feature_key + " IS NOT NULL AND " + str(feature_key) + " = '" + str(self.feature_id) + "'")
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.cmb_visit_class, rows, 1)
+
+        # Get selected dates
+        date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
+        date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
+        if date_from > date_to:
+            message = "Selected date interval is not valid"
+            tools_qgis.show_warning(message)
+            return
+
+        filter_ += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "' ORDER BY startdate desc"
+
+        # Set model of selected widget
+        if tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0) not in (None, ''):
+            table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
+            self.controller.plugin_settings_set_value("om_visit_table_name", str(table_name))
+            tools_qt.fill_table(widget, table_name, filter_)
+            self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
+                                   column_filter=feature_key, value_filter=self.feature_id, widget=widget)
+
+
+    def _set_filter_table_visit(self, widget, table_name, visitClass=False, column_filter=None, value_filter=None):
+        """ Get values selected by the user and sets a new filter for its table model """
+        # Get selected dates
+        date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
+        date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
+
+        if date_from > date_to:
+            message = "Selected date interval is not valid"
+            tools_qgis.show_warning(message)
+            return
+        if type(table_name) is dict:
+            table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
+
+        # Set model of selected widget
+        if visitClass:
+            tools_qt.fill_table(widget, table_name, self.filter)
+            self.set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
+                                  column_filter, value_filter)
+
+            date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
+            date_to = self.date_visit_to.date().toString('yyyyMMdd 23:59:59')
+
+        # Set filter to model
+        expr = self.field_id + " = '" + self.feature_id + "'"
+        expr += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "'"
+
+        # Get selected values in Comboboxes
+        visit_class_value = tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)
+        if str(visit_class_value) != 'null':
+            expr += " AND class_id::text = '" + str(visit_class_value) + "'"
+        expr += " ORDER BY startdate desc"
+
+        # Refresh model with selected filter
+        widget.model().setFilter(expr)
+        widget.model().select()
+
+
+    def _tbl_visit_clicked(self, table_name):
+
+        # Enable/Disable buttons
+        btn_open_gallery = self.dlg_cf.findChild(QPushButton, "btn_open_gallery_2")
+        btn_open_visit_doc = self.dlg_cf.findChild(QPushButton, "btn_open_visit_doc")
+        btn_open_gallery.setEnabled(False)
+        btn_open_visit_doc.setEnabled(False)
+
+        # Get selected row
+        selected_list = self.tbl_visit_cf.selectionModel().selectedRows()
+        selected_row = selected_list[0].row()
+        self.visit_id = self.tbl_visit_cf.model().record(selected_row).value("visit_id")
+        self.parameter_id = self.tbl_visit_cf.model().record(selected_row).value("parameter_id")
+
+        if type(table_name) is dict:
+            table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
+
+        sql = f"SELECT photo FROM {table_name} WHERE photo IS TRUE AND visit_id = '{self.visit_id}'"
+        row = tools_db.get_row(sql)
+
+        if not row:
+            return
+
+        # If gallery 'True' or 'False'
+        if str(row[0]) == 'True':
+            btn_open_gallery.setEnabled(True)
+
+    def _open_visit_files(self):
+
+        sql = (f"SELECT value FROM om_visit_event_photo"
+               f" WHERE visit_id = '{self.visit_id}'")
+        rows = tools_db.get_rows(sql, commit=True)
+        for path in rows:
+            # Parse a URL into components
+            url = parse.urlsplit(path[0])
+
+            # Open selected document
+            # Check if path is URL
+            if url.scheme == "http" or url.scheme == "https":
+                # If path is URL open URL in browser
+                webbrowser.open(path[0])
+
+
+    def _set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate, column_filter=None,
+                          value_filter=None, widget=None):
+        if self.schema_name not in table_name:
+            table_name = self.schema_name + "." + table_name
+
+        sql = ("SELECT MIN("+str(mindate)+"), MAX("+str(maxdate)+")"
+               " FROM {}".format(str(table_name)))
+        if column_filter is not None and value_filter is not None:
+            sql += " WHERE " + str(column_filter) + " = '" + str(value_filter) + "'"
+        row = tools_db.get_row(sql)
+        if row:
+            widget_fromdate.blockSignals(True)
+            widget_todate.blockSignals(True)
+            if row[0]:
+                widget_fromdate.setDate(row[0])
+            else:
+                current_date = QDate.currentDate()
+                widget_fromdate.setDate(current_date)
+            if row[1]:
+                widget_todate.setDate(row[1])
+            else:
+                current_date = QDate.currentDate()
+                widget_todate.setDate(current_date)
+
+            widget_fromdate.blockSignals(False)
+            widget_todate.blockSignals(False)
+            if widget is not None:
+                self._set_filter_table_visit(widget, table_name)
+
+
+    """ FUNCTIONS RELATED WITH TAB EVENT"""
+
+
+    def _fill_tab_event(self, feature_type):
         """ Fill tab 'O&M' (event) """
 
         table_event_geom = "v_ui_event_x_" + feature_type
-        self._fill_tbl_event(self.tbl_event_cf, table_event_geom, self.filter)
+        self._fill_tbl_event(self.tbl_event_cf, table_event_geom)
         self.tbl_event_cf.doubleClicked.connect(self._open_visit_event)
         tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_event_cf, table_event_geom)
 
 
-    def _fill_tbl_event(self, widget, table_name, filter_):
+    def _fill_tbl_event(self, widget, table_name):
         """ Fill the table control to show events """
 
         # Get widgets
