@@ -57,7 +57,7 @@ class GwVisit(QObject):
 
 
     def get_visit(self, visit_id=None, feature_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
-                     open_dlg=True, is_new_from_cf=False):
+                     open_dlg=True, is_new_from_cf=False, parameters=None):
 
         """ Button 64. Add visit.
         if visit_id => load record related to the visit_id
@@ -202,7 +202,7 @@ class GwVisit(QObject):
         self.tabs.setCurrentIndex(self.current_tab_index)
 
         # Set signals
-        self._set_signals()
+        self._set_signals(parameters)
 
         # Set autocompleters of the form
         self._set_completers()
@@ -455,13 +455,13 @@ class GwVisit(QObject):
         self.dlg_visit_manager.btn_open.clicked.disconnect()
 
 
-    def _set_signals(self):
+    def _set_signals(self, parameters=None):
 
         self.dlg_add_visit.rejected.connect(self._manage_rejected)
         self.dlg_add_visit.rejected.connect(partial(tools_gw.close_dialog, self.dlg_add_visit))
         self.dlg_add_visit.rejected.connect(lambda: self.rubber_band.reset())
         self.dlg_add_visit.accepted.connect(partial(self._update_relations, self.dlg_add_visit))
-        self.dlg_add_visit.accepted.connect(self._manage_accepted)
+        self.dlg_add_visit.accepted.connect(partial(self._manage_accepted, parameters))
 
         self.dlg_add_visit.btn_event_insert.clicked.connect(self._event_insert)
         self.dlg_add_visit.btn_event_delete.clicked.connect(self._event_delete)
@@ -533,7 +533,7 @@ class GwVisit(QObject):
             tools_qgis.disconnect_signal_selection_changed()
 
 
-    def _manage_accepted(self):
+    def _manage_accepted(self, parameters=None):
         """Do all action when closed the dialog with Ok.
         e.g. all necessary commits and cleanings.
         A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
@@ -567,6 +567,9 @@ class GwVisit(QObject):
             layer.dataProvider().forceReload()
         tools_qgis.refresh_map_canvas()
 
+        if parameters is not None:
+            table_name = tools_gw.get_config_parser('visit', 'om_visit_table_name', 'user', 'session')
+            self.update_table_visit(parameters[0], table_name, parameters[2], parameters[3], parameters[4])
 
     def _execute_pgfunction(self):
         """ Execute function 'gw_fct_om_visit_multiplier' """
