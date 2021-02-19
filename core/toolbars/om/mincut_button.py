@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from ..dialog import GwAction
 from ...shared.mincut import GwMincut
+from ...ui.ui_manager import GwMincutUi
 
 
 class GwMincutButton(GwAction):
@@ -18,6 +19,6 @@ class GwMincutButton(GwAction):
 
 
     def clicked_event(self):
-        self.mincut.set_dialog()
+        self.mincut.set_dialog(GwMincutUi())
         self.mincut.get_mincut()
 

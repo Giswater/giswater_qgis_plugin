@@ -13,7 +13,7 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QTableView, QLineEdit, QCompleter, QAbstractItemView
 
 from ..shared.selector import GwSelector
-from ..ui.ui_manager import GwSelectorUi, GwMincutManagerUi
+from ..ui.ui_manager import GwSelectorUi, GwMincutUi
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_db
@@ -30,8 +30,8 @@ class GwMincutTools:
         self.settings = global_vars.giswater_settings
 
 
-    def set_dialog(self):
-        self.dlg_mincut_man = GwMincutManagerUi()
+    def set_dialog(self, dialog):
+        self.dlg_mincut_man = dialog
 
 
     def get_mincut_manager(self):
@@ -72,7 +72,7 @@ class GwMincutTools:
         self.dlg_mincut_man.btn_next_days.clicked.connect(self._filter_by_days)
         self.dlg_mincut_man.spn_next_days.valueChanged.connect(self._filter_by_days)
         self.dlg_mincut_man.btn_cancel_mincut.clicked.connect(self._set_state_cancel_mincut)
-        self.dlg_mincut_man.tbl_mincut_edit.doubleClicked.connect(self._open_mincut)
+        self.dlg_mincut_man.tbl_mincut_edit.doubleClicked.connect(partial(self._open_mincut, GwMincutUi()))
         self.dlg_mincut_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_mincut_man))
         self.dlg_mincut_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_mincut_man))
         self.dlg_mincut_man.btn_delete.clicked.connect(partial(
@@ -166,7 +166,7 @@ class GwMincutTools:
         tools_qt.fill_combo_values(self.dlg_mincut_man.cmb_expl, rows, 1)
 
 
-    def _open_mincut(self):
+    def _open_mincut(self, mincut_dialog):
         """ Open mincut form with selected record of the table """
 
         selected_list = self.tbl_mincut_edit.selectionModel().selectedRows()
@@ -183,7 +183,7 @@ class GwMincutTools:
         # Close this dialog and open selected mincut
         tools_gw.close_dialog(self.dlg_mincut_man)
         self.mincut.is_new = False
-        self.mincut.set_dialog()
+        self.mincut.set_dialog(mincut_dialog)
         self.mincut.init_mincut_form()
         self.mincut.load_mincut(result_mincut_id)
         self.mincut.manage_docker()

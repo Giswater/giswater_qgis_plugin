@@ -21,8 +21,7 @@ from .search import GwSearch
 from ..threads.auto_mincut_execute import GwAutoMincutTask
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
-from ..ui.ui_manager import GwDialogTextUi, GwMincutUi, GwMincutComposerUi, GwMincutConnecUi, GwMincutEndUi, \
-    GwMincutHydrometerUi
+from ..ui.ui_manager import GwDialogTextUi, GwMincutComposerUi, GwMincutConnecUi, GwMincutEndUi, GwMincutHydrometerUi
 from ... import global_vars
 from ...lib import tools_qt, tools_qgis, tools_log, tools_db
 
@@ -60,11 +59,11 @@ class GwMincut:
         self.vertex_marker = None
 
 
-    def manage_mincuts(self):
+    def manage_mincuts(self, dialog):
         """ Button 27: Mincut management """
 
         self.action = "manage_mincuts"
-        self.mincut_tools.set_dialog()
+        self.mincut_tools.set_dialog(dialog)
         self.mincut_tools.get_mincut_manager()
 
 
@@ -271,8 +270,8 @@ class GwMincut:
             pass
 
 
-    def set_dialog(self):
-        self.dlg_mincut = GwMincutUi()
+    def set_dialog(self, dialog):
+        self.dlg_mincut = dialog
 
 
     def init_mincut_form(self):
@@ -286,7 +285,7 @@ class GwMincut:
         tools_qgis.remove_layer_from_toc('Other mincuts which overlaps', 'GW Temporal Layers')
         tools_qgis.remove_layer_from_toc('Overlap affected connecs', 'GW Temporal Layers')
 
-        self.dlg_mincut = GwMincutUi()
+
         tools_gw.load_settings(self.dlg_mincut)
         self.dlg_mincut.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_mincut.btn_cancel_task.hide()
@@ -700,7 +699,7 @@ class GwMincut:
 
     def _accept_save_data(self):
         """ Slot function button 'Accept' """
-
+        print("TEST 10")
         tools_gw.save_settings(self.dlg_mincut)
         mincut_result_state = self.current_state
 
@@ -758,7 +757,7 @@ class GwMincut:
                 return
 
         if self.is_new:
-            self.set_id_val()
+            self.set_ifd_val()
             self.is_new = False
 
         # Check if id exist in table 'om_mincut'
