@@ -51,7 +51,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>765</width>
+             <width>634</width>
              <height>382</height>
             </rect>
            </property>
@@ -72,8 +72,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>765</width>
-             <height>382</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">
@@ -125,7 +125,7 @@
             </property>
             <property name="maximumSize">
              <size>
-              <width>24</width>
+              <width>16777215</width>
               <height>24</height>
              </size>
             </property>
@@ -148,7 +148,7 @@
            <widget class="QPushButton" name="btn_delete">
             <property name="maximumSize">
              <size>
-              <width>24</width>
+              <width>16777215</width>
               <height>24</height>
              </size>
             </property>
@@ -177,7 +177,7 @@
             </property>
             <property name="maximumSize">
              <size>
-              <width>24</width>
+              <width>16777215</width>
               <height>24</height>
              </size>
             </property>
@@ -213,7 +213,7 @@
            <widget class="QPushButton" name="btn_open_element">
             <property name="maximumSize">
              <size>
-              <width>24</width>
+              <width>16777215</width>
               <height>24</height>
              </size>
             </property>
@@ -334,7 +334,7 @@
            <widget class="QPushButton" name="btn_link">
             <property name="maximumSize">
              <size>
-              <width>24</width>
+              <width>16777215</width>
               <height>24</height>
              </size>
             </property>
@@ -468,7 +468,7 @@
          <widget class="QPushButton" name="btn_new_visit_2">
           <property name="maximumSize">
            <size>
-            <width>24</width>
+            <width>16777215</width>
             <height>24</height>
            </size>
           </property>
@@ -497,7 +497,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>24</width>
+            <width>16777215</width>
             <height>24</height>
            </size>
           </property>
@@ -527,7 +527,7 @@
          <widget class="QPushButton" name="btn_open_gallery_2">
           <property name="maximumSize">
            <size>
-            <width>24</width>
+            <width>16777215</width>
             <height>24</height>
            </size>
           </property>
@@ -569,12 +569,121 @@
         <string>Event</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_14">
-        <item row="4" column="0">
-         <widget class="QTableView" name="tbl_event_cf">
-          <property name="sortingEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
+        <item row="3" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_10">
+          <item>
+           <widget class="QPushButton" name="btn_open_visit">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>../icons/65b.png</normaloff>../icons/65b.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_new_visit">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_open_gallery">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_open_visit_doc">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_open_visit_event">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>24</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>22</width>
+              <height>22</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item row="1" column="0">
          <widget class="Line" name="line_2">
@@ -647,121 +756,12 @@
           </item>
          </layout>
         </item>
-        <item row="3" column="0">
-         <layout class="QHBoxLayout" name="horizontalLayout_10">
-          <item>
-           <widget class="QPushButton" name="btn_open_visit">
-            <property name="maximumSize">
-             <size>
-              <width>24</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>../icons/65b.png</normaloff>../icons/65b.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>22</width>
-              <height>22</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_new_visit">
-            <property name="maximumSize">
-             <size>
-              <width>24</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>22</width>
-              <height>22</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_7">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_open_gallery">
-            <property name="maximumSize">
-             <size>
-              <width>24</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>22</width>
-              <height>22</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_open_visit_doc">
-            <property name="maximumSize">
-             <size>
-              <width>24</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>22</width>
-              <height>22</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="btn_open_visit_event">
-            <property name="maximumSize">
-             <size>
-              <width>24</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>22</width>
-              <height>22</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-         </layout>
+        <item row="4" column="0">
+         <widget class="QTableView" name="tbl_event_cf">
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -844,7 +844,7 @@
            <widget class="QPushButton" name="btn_doc_insert">
             <property name="maximumSize">
              <size>
-              <width>24</width>
+              <width>16777215</width>
               <height>24</height>
              </size>
             </property>
@@ -867,7 +867,7 @@
            <widget class="QPushButton" name="btn_doc_delete">
             <property name="maximumSize">
              <size>
-              <width>24</width>
+              <width>16777215</width>
               <height>24</height>
              </size>
             </property>
@@ -890,7 +890,7 @@
            <widget class="QPushButton" name="btn_doc_new">
             <property name="maximumSize">
              <size>
-              <width>24</width>
+              <width>16777215</width>
               <height>24</height>
              </size>
             </property>
@@ -926,7 +926,7 @@
            <widget class="QPushButton" name="btn_open_doc">
             <property name="maximumSize">
              <size>
-              <width>24</width>
+              <width>16777215</width>
               <height>24</height>
              </size>
             </property>
