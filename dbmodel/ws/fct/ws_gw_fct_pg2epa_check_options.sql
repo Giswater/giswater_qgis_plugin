@@ -71,15 +71,6 @@ BEGIN
 	-- check demand scenario compatibility
 	IF (SELECT count(*) FROM selector_inp_demand WHERE cur_user = current_user) > 0 THEN
 
-		-- check not allowed pattern method
-		IF v_patternmethod IN (32,34,42,44,52,54) THEN 
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: The pattern method used, it is incompatible with use demand scenario.'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, 'Unselect all your demand scenarios to work with this pattern method.');
-			v_return = '{"status":"Failed", "message":{"level":1, "text":"Pattern method is incompatible to work with demand scenarios. The process is aborted...."},"body":{"data":{}}}'; 
-		END IF;
-
 		IF v_patternmethod IN (21,22,23,24) THEN
 
 			-- info about how many pjoints has more than one connec

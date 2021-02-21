@@ -45,3 +45,6 @@ ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 --2021/02/17
 UPDATE sys_table SET sys_sequence='cat_mat_roughness_id_seq' WHERE sys_sequence='inp_cat_mat_roughness_id_seq';
 
+
+-- 2021/02/19
+DELETE FROM config_toolbox WHERE id  = 2766;

@@ -75,9 +75,9 @@ BEGIN
     SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
    
    -- Get parameters from input json
-   v_array_node_id = lower(((p_data ->>'feature')::json->>'id')::text);
+   v_array_node_id = ((p_data ->>'feature')::json->>'id')::text;
    v_node_id = (SELECT json_array_elements_text(v_array_node_id)); 
-   v_workcat_id_end = lower(((p_data ->>'data')::json->>'workcat_id_end')::text);
+   v_workcat_id_end = ((p_data ->>'data')::json->>'workcat_id_end')::text;
    v_enddate = ((p_data ->>'data')::json->>'enddate')::date;
 
     -- delete old values on result table

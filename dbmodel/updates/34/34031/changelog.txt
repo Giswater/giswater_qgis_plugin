@@ -5,3 +5,7 @@
 - Add field workcat_id_plan to node, arc, connec and gully tables
 - Add connect_autoupdate_dma system variable
 - New function gw_fct_setowner(3024) that changes owner of a schema
+- Remove mapzones basic function from toolbox
+- Enable fr_FR version
+- Bug on setsearch when same street o diferent muni
+- Remove lower getting parameters on arcfusion
