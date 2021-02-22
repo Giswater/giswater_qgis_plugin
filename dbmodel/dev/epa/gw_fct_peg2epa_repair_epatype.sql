@@ -41,6 +41,20 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid = v_fid;
 	
 	IF v_projecttype  = 'WS' THEN
+	
+		-- remove possible mistakes for epa_table on cat_feature
+		UPDATE cat_feature_node SET epa_table = 'inp_reservoir' WHERE epa_default  ='RESERVOIR';
+		UPDATE cat_feature_node SET epa_table = 'inp_tank' WHERE epa_default  ='TANK';
+		UPDATE cat_feature_node SET epa_table = 'inp_inlet' WHERE epa_default  ='INLET';
+		UPDATE cat_feature_node SET epa_table = 'inp_valve' WHERE epa_default  ='VALVE';
+		UPDATE cat_feature_node SET epa_table = 'inp_junction' WHERE epa_default  ='JUNCTION';
+		UPDATE cat_feature_node SET epa_table = 'inp_pump' WHERE epa_default  ='PUMP';
+		UPDATE cat_feature_node SET epa_table = 'inp_shortpipe' WHERE epa_default  ='SHORTPIPE';
+
+		UPDATE cat_feature_arc SET epa_table = 'inp_pipe' WHERE epa_default  ='PIPE';
+		UPDATE cat_feature_arc SET epa_table = 'inp_virtualvalve' WHERE epa_default  ='VIRTUALVALVE';
+		UPDATE cat_feature_arc SET epa_table = 'inp_pump_importinp' WHERE epa_default  ='PUMP-IMPORTINP';
+		UPDATE cat_feature_arc SET epa_table = 'inp_valve_importinp' WHERE epa_default  ='VALVE-IMPORTINP';
 
 		FOR rec_feature IN 
 		SELECT DISTINCT ON (cat_feature_node.id) cat_feature_node.*, cat_node.id as nodecat_id FROM cat_node JOIN cat_feature_node ON cat_node.nodetype_id = cat_feature_node.id 
