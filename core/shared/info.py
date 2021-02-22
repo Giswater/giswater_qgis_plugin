@@ -2456,7 +2456,7 @@ class GwInfo(QObject):
             visit_class=False, column_filter=feature_key, value_filter=self.feature_id))
 
         parameters = [widget, table_name, filter_, self.cmb_visit_class, self.feature_id]
-        btn_new_visit.clicked.connect(partial(self._new_visit, table_name, parameters, 'visit'))
+        btn_new_visit.clicked.connect(partial(self._new_visit, table_name, parameters))
         btn_open_gallery.clicked.connect(partial(self._open_visit_files))
         btn_open_visit.clicked.connect(partial(self._open_visit, parameters))
 
@@ -2650,7 +2650,7 @@ class GwInfo(QObject):
         sql = (f"SELECT DISTINCT(id), id "
                f"FROM {table_name_event_id} "
                f"WHERE feature_type = '{feature_type[self.field_id]}' OR feature_type = 'ALL' "
-               f"ORDER BY id")
+               f"ORDER BY id;")
         rows = tools_db.get_rows(sql)
         if rows:
             rows.append(['', ''])
@@ -2659,7 +2659,7 @@ class GwInfo(QObject):
         sql = (f"SELECT DISTINCT(parameter_type), parameter_type "
                f"FROM {table_name_event_id} "
                f"WHERE feature_type = '{feature_type[self.field_id]}' OR feature_type = 'ALL' "
-               f"ORDER BY parameter_type")
+               f"ORDER BY parameter_type;")
         rows = tools_db.get_rows(sql)
         if rows:
             rows.append(['', ''])
@@ -2680,7 +2680,7 @@ class GwInfo(QObject):
         self.dlg_event_full.rejected.connect(partial(tools_gw.close_dialog, self.dlg_event_full))
         # Get all data for one visit
         sql = (f"SELECT * FROM om_visit_event"
-               f" WHERE id = '{self.event_id}' AND visit_id = '{self.visit_id}'")
+               f" WHERE id = '{self.event_id}' AND visit_id = '{self.visit_id}';")
         row = tools_db.get_row(sql)
         if not row:
             return
@@ -2912,7 +2912,7 @@ class GwInfo(QObject):
         self.tbl_event_cf.model().select()
 
 
-    def _new_visit(self, table_name=None, parameters=None, tab=None):
+    def _new_visit(self, table_name=None, parameters=None):
         """ Call button 64: om_add_visit """
 
         # Get expl_id to save it on om_visit and show the geometry of visit
@@ -2922,13 +2922,6 @@ class GwInfo(QObject):
             tools_qgis.show_warning(msg)
             return
 
-        try:
-            if type(table_name) is dict:
-                table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
-        except KeyError:
-            msg = "Check values from config_visit_class and v_ui_om_visit_x_'feature' "
-            tools_qgis.show_warning(msg)
-            return
         manage_visit = GwVisit()
         manage_visit.visit_added.connect(self._update_visit_table)
         # TODO: the following query fix a (for me) misterious bug
@@ -2938,12 +2931,6 @@ class GwInfo(QObject):
         tools_db.get_rows(sql)
         manage_visit.get_visit(feature_type=self.feature_type, feature_id=self.feature_id, expl_id=expl_id,
                                is_new_from_cf=True, parameters=parameters)
-
-        if tab == 'event':
-            self._set_filter_dates('visit_start', 'visit_end', table_name, self.date_event_from, self.date_event_to)
-        elif tab == 'visit':
-            self._set_filter_dates('visit_start', 'visit_end', table_name, self.date_visit_from, self.date_visit_to)
-
 
 
     def _open_gallery(self):
