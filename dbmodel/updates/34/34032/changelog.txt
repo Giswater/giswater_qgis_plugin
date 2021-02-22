@@ -1,3 +1,4 @@
 3.4.032
 ************
 - Force F-FACTOR = no
+- Show result_id on epa result manager
