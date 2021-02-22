@@ -116,7 +116,7 @@ BEGIN
 			SELECT result_id_var, node.dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
 				   FROM vi_pjointpattern JOIN node ON pattern_id=node_id
-				   JOIN v_edit_link ON exit_id = node_id 
+				   JOIN v_edit_link ON exit_id = node_id
 				   WHERE exit_type  ='NODE'
 			ORDER by 3,4;					   	
 
@@ -144,7 +144,8 @@ BEGIN
 			UNION
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-				   FROM v_rtc_period_nodepattern JOIN node ON pattern_id=node_id ORDER by 3,4;
+				   FROM v_rtc_period_nodepattern JOIN node ON pattern_id=node_id 
+			ORDER by 3,4;
 
 			UPDATE temp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id
 			FROM v_rtc_period_nodepattern a WHERE node_id = a.pattern_id;
@@ -167,7 +168,8 @@ BEGIN
 			UNION
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-				   FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;
+				   FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id
+			ORDER by 3,4;
 
 			UPDATE temp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id 
 			FROM v_rtc_period_pjointpattern a WHERE node_id = a.pattern_id;
@@ -188,7 +190,8 @@ BEGIN
 				factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9,
 				factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
-				FROM v_rtc_period_nodepattern JOIN node ON pattern_id=node_id ORDER by 3,4;
+				FROM v_rtc_period_nodepattern JOIN node ON pattern_id=node_id
+			ORDER by 3,4;
 
 			UPDATE temp_node SET demand = ((1*v_epaunits))::numeric(12,8), pattern_id = node_id 
 			FROM v_rtc_period_nodepattern a WHERE node_id = a.pattern_id;
@@ -211,7 +214,8 @@ BEGIN
 			UNION
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-				   FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;
+				   FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id
+			ORDER by 3,4;
 
 			UPDATE temp_node SET demand = ((1*v_epaunits)), pattern_id=node_id 
 			FROM v_rtc_period_pjointpattern a WHERE node_id = a.pattern_id;
@@ -232,7 +236,8 @@ BEGIN
 				factor_15*pattern_volume, factor_16*pattern_volume, factor_17*pattern_volume, factor_18*pattern_volume 
 				FROM v_rtc_period_dma v JOIN ext_rtc_dma_period ext ON v.dma_id=ext.dma_id::integer
 				JOIN inp_pattern_value i ON i.pattern_id = v.pattern_id
-				WHERE ext.cat_period_id = period_id;
+				WHERE ext.cat_period_id = period_id
+			ORDER by 3,4;
 				
 			-- demand & pattern
 			UPDATE temp_node SET demand=(a.m3_total_period/c.m3_total_period)*v_epaunits::numeric(12,8), pattern_id=c.pattern_id 
@@ -250,7 +255,8 @@ BEGIN
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18) 
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-				   FROM v_rtc_period_nodepattern JOIN node ON pattern_id=node_id ORDER by 3,4;
+				   FROM v_rtc_period_nodepattern JOIN node ON pattern_id=node_id
+			ORDER by 3,4;
 
 			UPDATE temp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id;
 
@@ -266,7 +272,8 @@ BEGIN
 				factor_15*pattern_volume, factor_16*pattern_volume, factor_17*pattern_volume, factor_18*pattern_volume 
 				FROM v_rtc_period_dma v JOIN ext_rtc_dma_period ext ON v.dma_id=ext.dma_id::integer
 				JOIN inp_pattern_value i ON i.pattern_id = v.pattern_id
-				WHERE ext.cat_period_id = period_id;
+				WHERE ext.cat_period_id = period_id
+			ORDER by 3,4;
 				
 			-- demand & pattern
 			UPDATE temp_node SET demand=(a.m3_total_period*v_epaunits/c.m3_total_period)::numeric(12,8), pattern_id=c.pattern_id 
@@ -290,7 +297,8 @@ BEGIN
 			UNION
 			SELECT result_id_var, dma_id, pattern_id, idrow, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, 
 				   factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
-				   FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id ORDER by 3,4;
+				   FROM v_rtc_period_pjointpattern JOIN node ON pattern_id=node_id
+			ORDER by 3,4;
 
 			UPDATE temp_node SET demand=(1*v_epaunits)::numeric(12,8), pattern_id=node_id 
 			WHERE node_id IN (SELECT DISTINCT pattern_id FROM rpt_inp_pattern_value WHERE result_id=result_id_var);
