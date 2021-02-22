@@ -2449,11 +2449,11 @@ class GwInfo(QObject):
         # Set signals
         widget.clicked.connect(partial(self._tbl_visit_clicked, table_name))
         self.cmb_visit_class.currentIndexChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
-            visitClass=True, column_filter=feature_key, value_filter=self.feature_id))
+            visit_class=True, column_filter=feature_key, value_filter=self.feature_id))
         self.date_visit_to.dateChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
-            visitClass=False, column_filter=feature_key, value_filter=self.feature_id))
+            visit_class=False, column_filter=feature_key, value_filter=self.feature_id))
         self.date_visit_from.dateChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
-            visitClass=False, column_filter=feature_key, value_filter=self.feature_id))
+            visit_class=False, column_filter=feature_key, value_filter=self.feature_id))
 
         parameters = [widget, table_name, filter_, self.cmb_visit_class, self.feature_id]
         btn_new_visit.clicked.connect(partial(self._new_visit, table_name, parameters, 'visit'))
@@ -2462,15 +2462,11 @@ class GwInfo(QObject):
 
         # Fill ComboBox cmb_visit_class
         sql = ("SELECT DISTINCT(class_id), config_visit_class.idval"
-               " FROM " + self.schema_name + ".v_ui_om_visit_x_" + feature_type.lower() + ""
-               " JOIN " + self.schema_name + ".config_visit_class ON config_visit_class.id = v_ui_om_visit_x_" + feature_type.lower() + ".class_id"
+               " FROM v_ui_om_visit_x_" + feature_type.lower() + ""
+               " JOIN config_visit_class ON config_visit_class.id = v_ui_om_visit_x_" + feature_type.lower() + ".class_id"
                " WHERE " + feature_key + " IS NOT NULL AND " + str(feature_key) + " = '" + str(self.feature_id) + "'")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.cmb_visit_class, rows, 1)
-        if rows is None:
-            btn_new_visit.setEnabled(False)
-            
-
 
         # Get selected dates
         date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
@@ -2480,18 +2476,17 @@ class GwInfo(QObject):
             tools_qgis.show_warning(message)
             return
 
-        filter_ += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "' ORDER BY startdate desc"
-
         # Set model of selected widget
         if tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0) not in (None, ''):
+            filter_ += " AND startdate >= '" + date_from + "' AND startdate <= '" + date_to + "' ORDER BY startdate desc"
             table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
-            self.controller.plugin_settings_set_value("om_visit_table_name", str(table_name))
+            tools_gw.set_config_parser('visit', 'om_visit_table_name', table_name, 'user', 'session')
             tools_qt.fill_table(widget, table_name, filter_)
             self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
                                    column_filter=feature_key, value_filter=self.feature_id, widget=widget)
 
 
-    def _set_filter_table_visit(self, widget, table_name, visitClass=False, column_filter=None, value_filter=None):
+    def _set_filter_table_visit(self, widget, table_name, visit_class=False, column_filter=None, value_filter=None):
         """ Get values selected by the user and sets a new filter for its table model """
         # Get selected dates
         date_from = self.date_visit_from.date().toString('yyyyMMdd 00:00:00')
@@ -2505,7 +2500,7 @@ class GwInfo(QObject):
             table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
 
         # Set model of selected widget
-        if visitClass:
+        if visit_class:
             tools_qt.fill_table(widget, table_name, self.filter)
             self._set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to,
                                    column_filter, value_filter)
@@ -2926,19 +2921,20 @@ class GwInfo(QObject):
             msg = "Widget expl_id not found"
             tools_qgis.show_warning(msg)
             return
+
         try:
             if type(table_name) is dict:
                 table_name = str(table_name[tools_qt.get_combo_value(self.dlg_cf, self.cmb_visit_class, 0)])
         except KeyError:
-            msg = "Check values from "
-            tools_qgis.show_warning()
+            msg = "Check values from config_visit_class and v_ui_om_visit_x_'feature' "
+            tools_qgis.show_warning(msg)
             return
         manage_visit = GwVisit()
         manage_visit.visit_added.connect(self._update_visit_table)
         # TODO: the following query fix a (for me) misterious bug
         # the DB connection is not available during manage_visit.manage_visit first call
         # so the workaroud is to do a unuseful query to have the dao active
-        sql = "SELECT id FROM om_visit LIMIT 1"
+        sql = "SELECT id FROM om_visit LIMIT 1;"
         tools_db.get_rows(sql)
         manage_visit.get_visit(feature_type=self.feature_type, feature_id=self.feature_id, expl_id=expl_id,
                                is_new_from_cf=True, parameters=parameters)
