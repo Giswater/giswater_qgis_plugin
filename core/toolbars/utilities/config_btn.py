@@ -281,14 +281,19 @@ class GwConfigButton(GwAction):
         elem = {}
         if type(widget) is QLineEdit:
             value = tools_qt.get_text(self.dlg_config, widget, return_string_null=False)
+            elem['widget_type'] = 'text'
         elif type(widget) is QComboBox:
             value = tools_qt.get_combo_value(self.dlg_config, widget, 0)
+            elem['widget_type'] = 'combo'
         elif type(widget) is QCheckBox:
             value = tools_qt.is_checked(self.dlg_config, widget)
+            elem['widget_type'] = 'check'
         elif type(widget) is QDateEdit:
             value = tools_qt.get_calendar_date(self.dlg_config, widget)
+            elem['widget_type'] = 'datetime'
         elif type(widget) is QgsDateTimeEdit:
             value = tools_qt.get_calendar_date(self.dlg_config, widget)
+            elem['widget_type'] = 'datetime'
         elif type(widget) is QDoubleSpinBox:
             value = tools_qt.get_text(self.dlg_config, widget, return_string_null=False)
 
