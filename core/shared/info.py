@@ -526,8 +526,6 @@ class GwInfo(QObject):
         # tab hydrometer
         tools_gw.add_icon(self.dlg_cf.btn_link, "70", "24x24")
         # tab visit
-        tools_gw.add_icon(self.dlg_cf.btn_open_visit_2, "65", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_new_visit_2, "64", "24x24")
         tools_gw.add_icon(self.dlg_cf.btn_open_gallery_2, "136b", "24x24")
         # tab event
         tools_gw.add_icon(self.dlg_cf.btn_open_visit, "65", "24x24")
@@ -2435,12 +2433,10 @@ class GwInfo(QObject):
         self.cmb_visit_class = self.dlg_cf.findChild(QComboBox, "cmb_visit_class")
         self.date_visit_to = self.dlg_cf.findChild(QDateEdit, "date_visit_to")
         self.date_visit_from = self.dlg_cf.findChild(QDateEdit, "date_visit_from")
-        btn_new_visit = self.dlg_cf.findChild(QPushButton, "btn_new_visit_2")
         date = QDate.currentDate()
         self.date_visit_to.setDate(date)
 
         btn_open_gallery = self.dlg_cf.findChild(QPushButton, "btn_open_gallery_2")
-        btn_open_visit = self.dlg_cf.findChild(QPushButton, "btn_open_visit_2")
         btn_open_gallery.setEnabled(False)
 
         feature_key = f"{geom_type}_id"
@@ -2455,10 +2451,7 @@ class GwInfo(QObject):
         self.date_visit_from.dateChanged.connect(partial(self._set_filter_table_visit, widget, table_name,
             visit_class=False, column_filter=feature_key, value_filter=self.feature_id))
 
-        parameters = [widget, table_name, filter_, self.cmb_visit_class, self.feature_id]
-        btn_new_visit.clicked.connect(partial(self._new_visit, table_name, parameters))
         btn_open_gallery.clicked.connect(partial(self._open_visit_files))
-        btn_open_visit.clicked.connect(partial(self._open_visit, parameters))
 
         # Fill ComboBox cmb_visit_class
         sql = ("SELECT DISTINCT(class_id), config_visit_class.idval"
@@ -2897,12 +2890,12 @@ class GwInfo(QObject):
         widget.model().select()
 
 
-    def _open_visit(self, parameters=None):
+    def _open_visit(self):
         """ Call button 65: om_visit_management """
 
         manage_visit = GwVisit()
         manage_visit.visit_added.connect(self._update_visit_table)
-        manage_visit.manage_visits(self.feature_type, self.feature_id, parameters)
+        manage_visit.manage_visits(self.feature_type, self.feature_id)
 
 
     def _update_visit_table(self):
@@ -2912,7 +2905,7 @@ class GwInfo(QObject):
         self.tbl_event_cf.model().select()
 
 
-    def _new_visit(self, table_name=None, parameters=None):
+    def _new_visit(self):
         """ Call button 64: om_add_visit """
 
         # Get expl_id to save it on om_visit and show the geometry of visit
@@ -2930,7 +2923,7 @@ class GwInfo(QObject):
         sql = "SELECT id FROM om_visit LIMIT 1;"
         tools_db.get_rows(sql)
         manage_visit.get_visit(feature_type=self.feature_type, feature_id=self.feature_id, expl_id=expl_id,
-                               is_new_from_cf=True, parameters=parameters)
+                               is_new_from_cf=True)
 
 
     def _open_gallery(self):

@@ -57,7 +57,7 @@ class GwVisit(QObject):
 
 
     def get_visit(self, visit_id=None, feature_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
-                     open_dlg=True, is_new_from_cf=False, parameters=None):
+                  open_dlg=True, is_new_from_cf=False):
 
         """ Button 64. Add visit.
         if visit_id => load record related to the visit_id
@@ -202,7 +202,7 @@ class GwVisit(QObject):
         self.tabs.setCurrentIndex(self.current_tab_index)
 
         # Set signals
-        self._set_signals(parameters)
+        self._set_signals()
 
         # Set autocompleters of the form
         self._set_completers()
@@ -258,7 +258,7 @@ class GwVisit(QObject):
             tools_gw.open_dialog(self.dlg_add_visit, dlg_name="visit")
 
 
-    def manage_visits(self, feature_type=None, feature_id=None, parameters=None):
+    def manage_visits(self, feature_type=None, feature_id=None):
         """ Button 65: manage visits """
 
         # Create the dialog
@@ -302,10 +302,6 @@ class GwVisit(QObject):
         self.dlg_visit_manager.txt_filter.textChanged.connect(partial(self._filter_visit, self.dlg_visit_manager,
             self.dlg_visit_manager.tbl_visit, self.dlg_visit_manager.txt_filter, table_object, expr_filter, filed_to_filter))
 
-        if parameters:
-            table_name = tools_gw.get_config_parser('visit', 'om_visit_table_name', 'user', 'session')
-            self.dlg_visit_manager.btn_delete.clicked.connect(
-                partial(self._update_table_visit, parameters[0], table_name, parameters[2]))
         self.dlg_visit_manager.txt_filter.textChanged.connect(partial(self._filter_visit, self.dlg_visit_manager,
             self.dlg_visit_manager.tbl_visit, self.dlg_visit_manager.txt_filter, table_object, expr_filter, filed_to_filter))
 
@@ -455,13 +451,13 @@ class GwVisit(QObject):
         self.dlg_visit_manager.btn_open.clicked.disconnect()
 
 
-    def _set_signals(self, parameters=None):
+    def _set_signals(self):
 
         self.dlg_add_visit.rejected.connect(self._manage_rejected)
         self.dlg_add_visit.rejected.connect(partial(tools_gw.close_dialog, self.dlg_add_visit))
         self.dlg_add_visit.rejected.connect(lambda: self.rubber_band.reset())
         self.dlg_add_visit.accepted.connect(partial(self._update_relations, self.dlg_add_visit))
-        self.dlg_add_visit.accepted.connect(partial(self._manage_accepted, parameters))
+        self.dlg_add_visit.accepted.connect(partial(self._manage_accepted))
 
         self.dlg_add_visit.btn_event_insert.clicked.connect(self._event_insert)
         self.dlg_add_visit.btn_event_delete.clicked.connect(self._event_delete)
@@ -533,7 +529,7 @@ class GwVisit(QObject):
             tools_qgis.disconnect_signal_selection_changed()
 
 
-    def _manage_accepted(self, parameters=None):
+    def _manage_accepted(self):
         """Do all action when closed the dialog with Ok.
         e.g. all necessary commits and cleanings.
         A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
@@ -567,9 +563,6 @@ class GwVisit(QObject):
             layer.dataProvider().forceReload()
         tools_qgis.refresh_map_canvas()
 
-        if parameters is not None:
-            table_name = tools_gw.get_config_parser('visit', 'om_visit_table_name', 'user', 'session')
-            self.update_table_visit(parameters[0], table_name, parameters[2], parameters[3], parameters[4])
 
     def _execute_pgfunction(self):
         """ Execute function 'gw_fct_om_visit_multiplier' """
