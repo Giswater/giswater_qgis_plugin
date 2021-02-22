@@ -2406,7 +2406,7 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
         widget = tools_qt.get_widget(dialog, widget_name)
         if not widget:
             message = "Widget not found"
-            tools_qgis.tools_qgis.show_warning(message, parameter=widget_name)
+            tools_qgis.show_warning(message, parameter=widget_name)
             return
     elif type(table_object) is QTableView:
         widget = table_object

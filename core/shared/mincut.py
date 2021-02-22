@@ -757,7 +757,7 @@ class GwMincut:
                 return
 
         if self.is_new:
-            self.set_ifd_val()
+            self.set_id_val()
             self.is_new = False
 
         # Check if id exist in table 'om_mincut'
