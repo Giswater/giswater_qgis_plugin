@@ -581,3 +581,5 @@ INSERT INTO dma (dma_id, name, expl_id, grafconfig) VALUES (12,'Conflict mapzone
 INSERT INTO dqa (dqa_id, name, expl_id, grafconfig) VALUES (11,'Conflict mapzone',1, '{"status":"useWhenConflict"}');
 INSERT INTO dqa (dqa_id, name, expl_id, grafconfig) VALUES (12,'Conflict mapzone',2, '{"status":"useWhenConflict"}');
 INSERT INTO sector (sector_id, name, grafconfig) VALUES (11,'Conflict mapzone', '{"status":"useWhenConflict"}');
+
+UPDATE cat_feature SET active = false WHERE id IN ('CURVE','MANHOLE','WTP');

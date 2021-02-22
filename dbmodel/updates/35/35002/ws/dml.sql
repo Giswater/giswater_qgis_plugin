@@ -24,3 +24,17 @@ UPDATE config_form_fields SET dv_querytext = concat(dv_querytext, ' AND active I
 WHERE columnname IN ('dqa_id', 'presszone_id','macrodqa_id') AND
 (formname ilike 've_arc%' OR formname ilike 've_node%' OR formname ilike 've_connec%' OR formname ilike 've_gully%' 
 OR formname in ('v_edit_element','v_edit_node','v_edit_arc','v_edit_connec','v_edit_gully')) and dv_querytext is not null;
+
+UPDATE cat_feature_node SET epa_table = 'inp_reservoir' WHERE epa_default  ='RESERVOIR';
+UPDATE cat_feature_node SET epa_table = 'inp_tank' WHERE epa_default  ='TANK';
+UPDATE cat_feature_node SET epa_table = 'inp_inlet' WHERE epa_default  ='INLET';
+UPDATE cat_feature_node SET epa_table = 'inp_valve' WHERE epa_default  ='VALVE';
+UPDATE cat_feature_node SET epa_table = 'inp_junction' WHERE epa_default  ='JUNCTION';
+UPDATE cat_feature_node SET epa_table = 'inp_pump' WHERE epa_default  ='PUMP';
+UPDATE cat_feature_node SET epa_table = 'inp_shortpipe' WHERE epa_default  ='SHORTPIPE';
+
+UPDATE cat_feature_arc SET epa_table = 'inp_pipe' WHERE epa_default  ='PIPE';
+UPDATE cat_feature_arc SET epa_table = 'inp_virtualvalve' WHERE epa_default  ='VIRTUALVALVE';
+UPDATE cat_feature_arc SET epa_table = 'inp_pump_importinp' WHERE epa_default  ='PUMP-IMPORTINP';
+UPDATE cat_feature_arc SET epa_table = 'inp_valve_importinp' WHERE epa_default  ='VALVE-IMPORTINP';
+
