@@ -1220,6 +1220,8 @@ def _translate_form(dialog, context_name, aux_context='ui_message'):
     for widget_type in type_widget_list:
         widget_list = dialog.findChildren(widget_type)
         for widget in widget_list:
+            if type(widget) is QPushButton and widget.property('has_icon'):
+                continue
             _translate_widget(context_name, widget, aux_context)
 
     # Translate title of the form

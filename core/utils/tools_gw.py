@@ -2240,6 +2240,7 @@ def add_icon(widget, icon, sub_folder="20x20"):
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
     if os.path.exists(icon_path):
         widget.setIcon(QIcon(icon_path))
+        widget.setProperty('has_icon', True)
     else:
         tools_log.log_info("File not found", parameter=icon_path)
 

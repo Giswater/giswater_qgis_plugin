@@ -34,7 +34,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_data">
        <attribute name="title">
@@ -72,8 +72,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>28</height>
+             <width>634</width>
+             <height>382</height>
             </rect>
            </property>
            <attribute name="label">
@@ -125,7 +125,7 @@
             </property>
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
+              <width>24</width>
               <height>24</height>
              </size>
             </property>
@@ -148,7 +148,7 @@
            <widget class="QPushButton" name="btn_delete">
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
+              <width>24</width>
               <height>24</height>
              </size>
             </property>
@@ -177,7 +177,7 @@
             </property>
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
+              <width>24</width>
               <height>24</height>
              </size>
             </property>
@@ -213,7 +213,7 @@
            <widget class="QPushButton" name="btn_open_element">
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
+              <width>24</width>
               <height>24</height>
              </size>
             </property>
@@ -468,7 +468,7 @@
          <widget class="QPushButton" name="btn_new_visit_2">
           <property name="maximumSize">
            <size>
-            <width>16777215</width>
+            <width>24</width>
             <height>24</height>
            </size>
           </property>
@@ -497,7 +497,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>16777215</width>
+            <width>24</width>
             <height>24</height>
            </size>
           </property>
@@ -527,7 +527,7 @@
          <widget class="QPushButton" name="btn_open_gallery_2">
           <property name="maximumSize">
            <size>
-            <width>16777215</width>
+            <width>24</width>
             <height>24</height>
            </size>
           </property>
@@ -575,7 +575,7 @@
            <widget class="QPushButton" name="btn_open_visit">
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
+              <width>24</width>
               <height>24</height>
              </size>
             </property>
@@ -598,7 +598,7 @@
            <widget class="QPushButton" name="btn_new_visit">
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
+              <width>24</width>
               <height>24</height>
              </size>
             </property>
@@ -630,7 +630,7 @@
            <widget class="QPushButton" name="btn_open_gallery">
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
+              <width>24</width>
               <height>24</height>
              </size>
             </property>
@@ -649,7 +649,7 @@
            <widget class="QPushButton" name="btn_open_visit_doc">
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
+              <width>24</width>
               <height>24</height>
              </size>
             </property>
@@ -668,7 +668,7 @@
            <widget class="QPushButton" name="btn_open_visit_event">
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
+              <width>24</width>
               <height>24</height>
              </size>
             </property>
@@ -844,7 +844,7 @@
            <widget class="QPushButton" name="btn_doc_insert">
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
+              <width>24</width>
               <height>24</height>
              </size>
             </property>
@@ -867,7 +867,7 @@
            <widget class="QPushButton" name="btn_doc_delete">
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
+              <width>24</width>
               <height>24</height>
              </size>
             </property>
@@ -890,7 +890,7 @@
            <widget class="QPushButton" name="btn_doc_new">
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
+              <width>24</width>
               <height>24</height>
              </size>
             </property>
@@ -926,7 +926,7 @@
            <widget class="QPushButton" name="btn_open_doc">
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
+              <width>24</width>
               <height>24</height>
              </size>
             </property>
