@@ -527,7 +527,7 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
         try:
             dialog.btn_accept.disconnect()
             dialog.btn_accept.hide()
-        except AttributeError as e:
+        except AttributeError:
             # Control if btn_accept exist
             pass
 
@@ -540,9 +540,10 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
                 dialog.btn_close.disconnect()
                 dialog.btn_close.setText("Close")
                 dialog.btn_close.clicked.connect(lambda: dialog.close())
-        except AttributeError as e:
+        except AttributeError:
             # Control if btn_cancel exist
             pass
+
     return text, change_tab
 
 

@@ -5,8 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import json
-from collections import OrderedDict
 from datetime import datetime
 from functools import partial
 
@@ -114,11 +112,9 @@ class GwFeatureReplaceButton(GwMaptool):
 
         # Set snapping to 'node', 'connec' and 'gully'
         self.snapper_manager.set_snapping_layers()
-
         self.snapper_manager.config_snap_to_node()
         self.snapper_manager.config_snap_to_connec()
         self.snapper_manager.config_snap_to_gully()
-
         self.snapper_manager.set_snap_mode()
 
         # Change cursor
@@ -171,7 +167,6 @@ class GwFeatureReplaceButton(GwMaptool):
         if row:
             edit_workcat_vdefault = self.dlg_replace.workcat_id_end.findText(row[0])
             self.dlg_replace.workcat_id_end.setCurrentIndex(edit_workcat_vdefault)
-
 
         row = tools_gw.get_config_value('edit_enddate_vdefault')
         if row:

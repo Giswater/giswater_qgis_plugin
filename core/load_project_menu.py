@@ -11,8 +11,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtGui import QIcon, QKeySequence
-from qgis.PyQt.QtWidgets import QActionGroup, QMenu, QComboBox, QTableView, QTableWidgetItem, QPushButton, \
-    QTreeWidget, QTreeWidgetItem
+from qgis.PyQt.QtWidgets import QActionGroup, QMenu, QPushButton, QTreeWidget, QTreeWidgetItem
 
 from .toolbars import buttons
 from .ui.ui_manager import GwLoadMenuUi
@@ -124,18 +123,20 @@ class GwMenuLoad(QObject):
 
 
     def _clicked_event(self, action_function):
-        """  """
+
         action_function.clicked_event()
 
 
     def _translate(self, message):
-        """ Calls on tools_qt to translate parameter message. """
+        """ Calls on tools_qt to translate parameter message """
+
         return tools_qt.tr(message)
 
 
     # region private functions
     def _open_config_path(self):
-        """ Opens the OS-specific Config directory. """
+        """ Opens the OS-specific Config directory """
+
         path = os.path.realpath(self.user_folder_dir)
         os.startfile(path)
 
@@ -247,16 +248,13 @@ class GwMenuLoad(QObject):
     def _double_click_event(self, item, column):
 
         tmp = item.flags()
-
         if column == 2:
             item.setFlags(tmp | Qt.ItemIsEditable)
-
 
 
     def _set_log_sql(self):
 
         log_sql = tools_gw.get_config_parser("system", f"log_sql", "user", "init")
-
         if log_sql in ("False", "None"):
             message = "Variable log_sql from user config file has been enabled."
             tools_gw.set_config_parser("system", "log_sql", "True", file_name="init")

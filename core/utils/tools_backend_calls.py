@@ -8,13 +8,11 @@ or (at your option) any later version.
 import os
 
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QMessageBox, QWidget
-from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsProject, \
-    QgsVectorLayer, QgsVectorLayerExporter, QgsDataSourceUri
+from qgis.PyQt.QtWidgets import QMessageBox
+from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer
 
 from ..utils import tools_gw
-from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
+from ...lib import tools_qgis, tools_qt, tools_log, tools_os
 
 
 def set_layer_index(**kwargs):
@@ -239,8 +237,6 @@ def open_url(widget):
     """ Function called in def add_hyperlink(field): -->
             widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget))"""
     tools_os.open_url(widget)
-
-
 
 
 # region unused functions atm

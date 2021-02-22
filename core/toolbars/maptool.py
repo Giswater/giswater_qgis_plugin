@@ -8,7 +8,7 @@ or (at your option) any later version.
 import os
 
 from qgis.core import QgsWkbTypes
-from qgis.gui import QgsMapTool, QgsVertexMarker, QgsRubberBand
+from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QCursor, QColor, QIcon
 from qgis.PyQt.QtWidgets import QAction
@@ -60,7 +60,6 @@ class GwMaptool(QgsMapTool):
         self.rubber_band.setFillColor(color_selection)
         self.rubber_band.setWidth(1)
         self.reset()
-
         self.force_active_layer = True
 
         if toolbar is None:
@@ -71,7 +70,6 @@ class GwMaptool(QgsMapTool):
         icon = None
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
-
         if icon is None:
             self.action = QAction(text, action_group)
         else:
@@ -85,6 +83,7 @@ class GwMaptool(QgsMapTool):
 
 
     def clicked_event(self):
+
         self.prev_maptool = self.iface.mapCanvas().mapTool()
         if not (self == self.iface.mapCanvas().mapTool()):
             self.iface.mapCanvas().setMapTool(self)

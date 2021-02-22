@@ -5,9 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-import json
 import operator
-from collections import OrderedDict
 from functools import partial
 
 from qgis.PyQt.QtWidgets import QGridLayout, QLabel, QLineEdit, QComboBox, QGroupBox, QSpacerItem, QSizePolicy, QWidget

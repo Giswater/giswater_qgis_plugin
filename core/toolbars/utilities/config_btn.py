@@ -10,8 +10,8 @@ import operator
 from functools import partial
 
 from qgis.PyQt.QtCore import QDate
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QSpinBox, QGroupBox, QSpacerItem, \
-    QSizePolicy, QGridLayout, QWidget, QLabel, QTextEdit, QLineEdit
+from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QSizePolicy, QGridLayout, QLabel, \
+    QTextEdit, QLineEdit
 from qgis.gui import QgsDateTimeEdit
 
 from ..dialog import GwAction
@@ -46,10 +46,8 @@ class GwConfigButton(GwAction):
         # Get visible layers name from TOC
         result = self._get_layers_name()
 
-
         self.dlg_config = GwConfigUi()
         tools_gw.load_settings(self.dlg_config)
-
 
         # Call function gw_fct_getconfig and get json_result
         body = tools_gw.create_body(form='"formName":"config"', extras=result)
@@ -278,6 +276,7 @@ class GwConfigButton(GwAction):
 
 
     def _get_dialog_changed_values(self, widget, tab, chk):
+
         value = None
         elem = {}
         if type(widget) is QLineEdit:

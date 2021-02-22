@@ -8,7 +8,7 @@ or (at your option) any later version.
 import configparser
 import os
 
-from . import tools_log, tools_os
+from . import tools_log
 from .. import global_vars
 
 config_parser = None

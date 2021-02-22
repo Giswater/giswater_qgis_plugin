@@ -16,7 +16,7 @@ from functools import partial
 from encodings.aliases import aliases
 
 from qgis.PyQt.QtCore import QDate, QDateTime, QSortFilterProxyModel, QStringListModel, QTime, Qt, QRegExp, pyqtSignal,\
-    QPersistentModelIndex, QCoreApplication, QTranslator, QSettings
+    QPersistentModelIndex, QCoreApplication, QTranslator
 from qgis.PyQt.QtGui import QPixmap, QDoubleValidator, QTextCharFormat, QFont
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QLineEdit, QComboBox, QWidget, QDoubleSpinBox, QCheckBox, QLabel, QTextEdit, \
@@ -30,11 +30,12 @@ from . import tools_log, tools_os, tools_qgis
 from .. import global_vars
 from .ui.ui_manager import DialogTextUi
 
-
 translator = QTranslator()
 dlg_text = DialogTextUi()
 
+
 class GwExtendedQLabel(QLabel):
+
     clicked = pyqtSignal()
 
     def __init(self, parent):
@@ -45,6 +46,7 @@ class GwExtendedQLabel(QLabel):
 
 
 class GwHyperLinkLabel(QLabel):
+
     clicked = pyqtSignal()
 
     def __init__(self):

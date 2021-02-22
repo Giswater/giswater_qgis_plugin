@@ -10,13 +10,12 @@ import sys
 from functools import partial
 import json
 
-from qgis.PyQt.QtCore import QDate, QStringListModel, QTime, Qt
+from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtSql import QSqlQueryModel
-from qgis.PyQt.QtWidgets import QWidget, QCheckBox, QDateEdit, QTimeEdit, QComboBox, QCompleter, QFileDialog, \
-    QTableView, QAbstractItemView, QGroupBox, QSpacerItem, QSizePolicy, QGridLayout
+from qgis.PyQt.QtWidgets import QWidget, QComboBox, QCompleter, QFileDialog, QTableView, QAbstractItemView, \
+    QGroupBox, QSpacerItem, QSizePolicy, QGridLayout
 from qgis.core import QgsApplication
 
-from ...admin.admin_btn import GwAdminButton
 from ...threads.epa_file_manager import GwEpaFileManager
 from ...utils import tools_gw
 from ...ui.ui_manager import GwGo2EpaUI, GwHydrologySelectorUi, GwMultirowSelectorUi, GwGo2EpaOptionsUi

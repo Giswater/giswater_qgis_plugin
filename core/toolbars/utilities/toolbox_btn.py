@@ -9,8 +9,7 @@ import os
 from functools import partial
 
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
-from qgis.PyQt.QtWidgets import QSpinBox, QDoubleSpinBox, QTextEdit, QWidget, QLabel, QLineEdit, QComboBox, QCheckBox, \
-    QGridLayout, QRadioButton, QAbstractItemView
+from qgis.PyQt.QtWidgets import QSpinBox, QWidget, QLineEdit, QComboBox, QCheckBox, QRadioButton, QAbstractItemView
 from qgis.core import QgsApplication, QgsProject
 
 from ..dialog import GwAction

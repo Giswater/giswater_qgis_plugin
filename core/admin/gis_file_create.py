@@ -7,7 +7,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import shutil
-import sqlite3
 
 from ...lib import tools_log, tools_qt, tools_db, tools_qgis
 from ..utils import tools_gw

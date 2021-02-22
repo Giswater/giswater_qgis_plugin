@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt import QtCore
 from qgis.PyQt.QtWidgets import QDialog
 
 

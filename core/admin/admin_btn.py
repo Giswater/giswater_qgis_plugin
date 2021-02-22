@@ -10,7 +10,6 @@ import os
 import random
 import re
 import sys
-from collections import OrderedDict
 from functools import partial
 from time import sleep
 

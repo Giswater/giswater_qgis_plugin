@@ -8,7 +8,6 @@ or (at your option) any later version.
 import os
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QDialog
 
 from .dialog import GwDialog
 
