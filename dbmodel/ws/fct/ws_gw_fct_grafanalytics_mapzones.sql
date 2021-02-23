@@ -737,7 +737,7 @@ BEGIN
 					-- pipe buffer
 					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 
-							(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from arc 
+							(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(the_geom),'||v_geomparamupdate||')) as geom from v_edit_arc arc 
 							where arc.state > 0 AND '||quote_ident(v_field)||'::text != ''0'' AND arc.'||quote_ident(v_field)||' IN
 							(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 							group by '||quote_ident(v_field)||')a 
@@ -759,9 +759,9 @@ BEGIN
 					-- use plot and pipe buffer
 					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 								(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
-								(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from v_edit_arc 
-								where v_edit_arc.state > 0 AND '||quote_ident(v_field)||'::text != ''0'' AND v_edit_arc.'||quote_ident(v_field)||' IN
-								(SELECT DISTINCT '||quote_ident(v_field)||' FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
+								(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from v_edit_arc arc
+								where arc.state > 0 AND  '||quote_ident(v_field)||'::text != ''0'' AND arc.'||quote_ident(v_field)||' IN
+								(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 								group by '||quote_ident(v_field)||'
 								UNION
 								SELECT '||quote_ident(v_field)||', st_collect(ext_plot.the_geom) as geom FROM v_edit_connec, ext_plot
@@ -777,8 +777,8 @@ BEGIN
 							UPDATE arc set the_geom = geom FROM(
 								SELECT dma_id, st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
 								(SELECT dma_id, st_buffer(st_collect(the_geom), 10) as geom from v_edit_arc 
-								where dma_id::integer > 0 AND v_edit_arc.dma_id IN
-								(SELECT DISTINCT dma_id FROM v_edit_arc JOIN anl_arc USING (arc_id) WHERE fid = 145 and cur_user = current_user)
+								where dma_id::integer > 0 AND arc.dma_id IN
+								(SELECT DISTINCT dma_id FROM arc JOIN anl_arc USING (arc_id) WHERE fid = 145 and cur_user = current_user)
 								group by dma_id
 								UNION
 								SELECT dma_id, st_collect(ext_plot.the_geom) as geom FROM v_edit_connec, ext_plot
@@ -799,13 +799,13 @@ BEGIN
 					-- use link and pipe buffer
 					v_querytext = '	UPDATE '||quote_ident(v_table)||' set the_geom = geom FROM
 							(SELECT '||quote_ident(v_field)||', st_multi(st_buffer(st_collect(geom),0.01)) as geom FROM
-							(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from arc 
+							(SELECT '||quote_ident(v_field)||', st_buffer(st_collect(the_geom), '||v_geomparamupdate||') as geom from v_edit_arc arc 
 							where arc.state > 0 AND '||quote_ident(v_field)||'::text != ''0'' AND arc.'||quote_ident(v_field)||' IN
 							(SELECT DISTINCT '||quote_ident(v_field)||' FROM arc JOIN anl_arc USING (arc_id) WHERE fid = '||v_fid||' and cur_user = current_user)
 							group by '||quote_ident(v_field)||'
 							UNION
 							SELECT c.'||quote_ident(v_field)||', (st_buffer(st_collect(link.the_geom),'||v_geomparamupdate_divide||')) 
-							as geom FROM connec c, v_edit_link link
+							as geom FROM v_edit_connec connec c, v_edit_link link
 							WHERE c.'||quote_ident(v_field)||'::text != ''0'' 
 							AND c.state > 0
 							AND c.'||quote_ident(v_field)||' IN
