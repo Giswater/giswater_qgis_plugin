@@ -10,4 +10,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2021/02/22
 UPDATE config_param_user SET value = 'NO' WHERE parameter  ='inp_report_f_factor';
-UPDATE config_form_tableview SET status = TRUE WHERE tablename  ='v_ui_rpt_cat_result' AND columname = 'id';
+UPDATE config_form_tableview SET status = TRUE WHERE tablename  ='v_ui_rpt_cat_result' AND columnname = 'id';
