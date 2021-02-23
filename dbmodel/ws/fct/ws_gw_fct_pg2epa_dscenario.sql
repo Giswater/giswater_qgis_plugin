@@ -52,6 +52,7 @@ BEGIN
 			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18 
 			from inp_pattern_value p 
 			WHERE pattern_id IN (SELECT distinct (pattern_id) FROM inp_demand d, selector_inp_demand s WHERE cur_user = current_user AND d.dscenario_id = s.dscenario_id)
+			      AND pattern_id NOT IN (SELECT distinct (pattern_id) FROM temp_node)
 			order by pattern_id, id;	
 
 		-- set cero where null in order to prevent user's null values on demand table
