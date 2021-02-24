@@ -9,8 +9,8 @@ import sys
 
 from qgis.PyQt.QtCore import QSettings
 
-# static variables
-# values are initialized on load project without changes during session
+
+# region Static Variables (values are initialized on load project without changes during session)
 
 iface = None                            # An instance of interface that provides the hook by which you can manipulate the QGIS application at run time. Type "QgsInterface"
 canvas = None                           # An insance of QGIS canvas. Contains "canvas", "mapTool", "xyCoordinates", "Cursor", "Extent"
@@ -30,17 +30,17 @@ dao_db_credentials = None               # An instance of credentials used to est
 pg_version = None                       # An instance of PostgreSql version of current connection
 shortcut_keys = []                      # An instance of used shortcut_keys for Giswater menu. This keys are configurated on file "init.config" from user config path "/user/AppData/Roaming/Giswater/"
 
-# A instance of project variables from QgsProject relating to Giswater
-project_vars = {}
+project_vars = {}                       # A instance of project variables from QgsProject relating to Giswater
 project_vars['info_type'] = None        # gwInfoType
 project_vars['add_schema'] = None       # gwAddSchema
 project_vars['main_schema'] = None      # gwMainSchema
 project_vars['project_role'] = None     # gwProjectRole
 project_vars['project_type'] = None     # gwProjectType
 
+# endregion
 
-# dynamic variables (session)
-# variables (may change value during user's session)
+# region Dynamic Variables (variables may change value during user's session)
+
 session_vars = {}
 session_vars['last_error'] = None       # An instance of the last database runtime error
 session_vars['threads'] = []            # An instance of the different threads for the execution of the Giswater functionalities (type:list)
@@ -49,7 +49,9 @@ session_vars['info_docker'] = None      # An instance of current status of the i
 session_vars['docker_type'] = None      # An instance of current status of the docker form configured by user. Can be configured "qgis_info_docker" and "qgis_form_docker"
 session_vars['logged_status'] = None    # An instance of connection status. Can be True or False
 
+# endregion
 
+# region Init Variables Functions
 
 def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name, p_user_folder_dir):
     """ Function to initialize the global variables needed to load plugin """
@@ -78,3 +80,4 @@ def init_qgis_settings(p_plugin_name):
     qgis_settings = QSettings()
     qgis_settings.setIniCodec(sys.getfilesystemencoding())
 
+# endregion
