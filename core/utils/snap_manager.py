@@ -25,7 +25,7 @@ class GwSnapManager(object):
         self.canvas = self.iface.mapCanvas()
         self.previous_snapping = None
         self.is_valid = False
-        self.point_xy = {}
+        self.point_xy = {"x": None, "y": None}
 
         # Snapper
         self.snapping_config = self.get_snapping_options()
