@@ -75,12 +75,14 @@ class Giswater(QObject):
                 list_channels = ['desktop', global_vars.current_user]
                 self.notify.stop_listening(list_channels)
 
+            # Check if project is current loaded and remove giswater action from PluginMenu and Toolbars
             if self.load_project:
                 if self.load_project.buttons != {}:
                     for button in list(self.load_project.buttons.values()):
                         self.iface.removePluginMenu(self.plugin_name, button.action)
                         self.iface.removeToolBarIcon(button.action)
 
+            # Check if project is current loaded and remove giswater toolbars from qgis
             if self.load_project:
                 if self.load_project.plugin_toolbars:
                     for plugin_toolbar in list(self.load_project.plugin_toolbars.values()):
@@ -144,7 +146,7 @@ class Giswater(QObject):
 
 
     def _set_signals(self):
-        """ Define widget and event signals """
+        """ Define iface event signals on Project Read / New Project / Save Project """
 
         try:
             self.iface.projectRead.connect(self._project_read)
@@ -155,11 +157,16 @@ class Giswater(QObject):
 
 
     def _set_info_button(self):
-        """ Set main information button (always visible) """
+        """ Set Giswater information button (always visible)
+            If project is loaded show information form relating to Plugin Giswater
+            Else open admin form with which can manage database and qgis projects
+        """
 
+        # Create instance class and add button into QGIS toolbar
         self.toolButton = QToolButton()
         self.action_info = self.iface.addToolBarWidget(self.toolButton)
 
+        # Set icon button if exists
         icon_path = self.icon_folder + '36.png'
         if os.path.exists(icon_path):
             icon = QIcon(icon_path)
@@ -173,12 +180,17 @@ class Giswater(QObject):
 
 
     def _unset_info_button(self):
-        """ Unset main information button (when plugin is disabled or reloaded) """
+        """ Unset Giswater information button (when plugin is disabled or reloaded) """
 
+        # Disconnect signal from action if exists
         if self.action:
             self.action.triggered.disconnect()
+
+        # Remove button from toolbar if exists
         if self.action_info:
             self.iface.removeToolBarIcon(self.action_info)
+
+        # Set action and button as None
         self.action = None
         self.action_info = None
 
@@ -186,11 +198,13 @@ class Giswater(QObject):
     def _manage_section_actions_list(self):
         """ Manage section 'actions_list' of config file """
 
-        # Dynamically get parameters defined in section 'actions_list'
+        # Dynamically get parameters defined in section 'actions_list' from qgis variables into 'list_keys'
         section = 'actions_not_checkable'
         global_vars.giswater_settings.beginGroup(section)
         list_keys = global_vars.giswater_settings.allKeys()
         global_vars.giswater_settings.endGroup()
+
+        # Get value for every key and append into 'self.dict_actions' dictionary
         for key in list_keys:
             list_values = global_vars.giswater_settings.value(f"{section}/{key}")
             if list_values:
@@ -210,11 +224,13 @@ class Giswater(QObject):
     def _manage_section_toolbars(self):
         """ Manage section 'toolbars' of config file """
 
-        # Dynamically get parameters defined in section 'toolbars'
+        # Dynamically get parameters defined in section 'toolbars' from qgis variables into 'list_keys'
         section = 'toolbars'
         global_vars.giswater_settings.beginGroup(section)
         list_keys = global_vars.giswater_settings.allKeys()
         global_vars.giswater_settings.endGroup()
+
+        # Get value for every key and append into 'self.dict_toolbars' dictionary
         for key in list_keys:
             list_values = global_vars.giswater_settings.value(f"{section}/{key}")
             if list_values:
@@ -229,6 +245,7 @@ class Giswater(QObject):
     def _project_new(self):
         """ Function executed when a user creates a new QGIS project """
 
+        # Unload plugin when create new QGIS project
         self.unload(False)
 
 
@@ -245,11 +262,11 @@ class Giswater(QObject):
 
     def _save_toolbars_position(self):
 
-        # # Get all QToolBar
+        # Get all QToolBar from qgis iface
         widget_list = self.iface.mainWindow().findChildren(QToolBar)
         own_toolbars = []
 
-        # Get a list with own QToolBars
+        # Get list with own QToolBars
         for w in widget_list:
             if w.property('gw_name'):
                 own_toolbars.append(w)
@@ -259,6 +276,7 @@ class Giswater(QObject):
         if len(own_toolbars) == 0:
             return
 
+        # Set 'toolbars_order' parameter on 'toolbars_position' section on init.config user file (found in user path)
         sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
         sorted_toolbar_ids = ",".join(sorted_toolbar_ids)
         tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids),  "user", "init")
@@ -267,14 +285,17 @@ class Giswater(QObject):
     def _remove_dockers(self):
         """ Remove Giswater dockers """
 
+        # Get 'Search' docker form from qgis iface and remove it if exists
         docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
         if docker_search:
             self.iface.removeDockWidget(docker_search)
 
+        # Get 'Docker' docker form from qgis iface and remove it if exists
         docker_info = self.iface.mainWindow().findChild(QDockWidget, 'docker')
         if docker_info:
             self.iface.removeDockWidget(docker_info)
 
+        # Get 'Layers' docker form and his actions from qgis iface and remove it if exists
         if self.btn_add_layers:
             dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
             toolbar = dockwidget.findChildren(QToolBar)[0]
