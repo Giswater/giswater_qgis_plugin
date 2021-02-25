@@ -252,11 +252,16 @@ BEGIN
 		
 		v_oldversion = (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1);
         
-
-		-- create child views for users from 3.2 to 3.3 updates
+        -- create child views for users from 3.2 to 3.3 updates
 		IF v_oldversion < '3.3.000' AND v_gwversion > '3.3.000' THEN
 			PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
 			"feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE"}}$$)::text;
+		END IF;
+		
+		-- recreate child views adding workcat_id_plan on parent tables
+		IF v_oldversion < '3.4.032' AND v_gwversion > '3.4.030' THEN
+			PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+			"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-UPDATE", "newColumn":"workcat_id_plan" }}$$);
 		END IF;
 
 		-- inserting version table

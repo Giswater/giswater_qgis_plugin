@@ -10,3 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2021/02/22
 DELETE FROM sys_function WHERE id = 2896;
+
+UPDATE sys_param_user SET vdefault='{"action_index":[199,18]}' WHERE id='qgis_toolbar_hidebuttons';
+
+UPDATE sys_message SET hint_message = 'It is necessary to remove feature from ve_* or v_edit_* or using end feature tool.' WHERE id = 3160;

@@ -62,6 +62,8 @@ v_return_status text = 'Failed';
 v_return_msg text = 'Process finished with some errors';
 v_error_context text;
 v_newcolumn text;
+v_query json;
+
 
 BEGIN
 
@@ -103,22 +105,25 @@ BEGIN
 		FOR v_childview, v_cat_feature, v_parent_layer IN SELECT child_layer, id, parent_layer 
 		FROM cat_feature WHERE child_layer IS NOT NULL
 		LOOP
+
 			-- delete existing view
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
 			PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
 			
 			-- create new view with all columns from parent/man/addfields
-			PERFORM gw_fct_admin_manage_child_views(concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-			        "feature":{"catFeature":"',v_cat_feature,'"},"data":{"filterFields":{}, "pageInfo":{}, 
-					"action":"SINGLE-CREATE" }}'));
+			v_query = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"',v_cat_feature,
+			'"},"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE"}}');			
+
+			PERFORM gw_fct_admin_manage_child_views(v_query);
 					
 			-- insert into config_form_fields new column values coyping from parent
 			INSERT INTO config_form_fields 
-			SELECT * FROM config_form_fields WHERE formname = v_parent AND columnname = v_newcolumn
+			SELECT * FROM config_form_fields WHERE formname = v_parent_layer AND columnname = v_newcolumn
 			ON CONFLICT (formname, columnname, formtype) DO NOTHING;
 			
 		END LOOP;
-	
+
+
 		v_return_status = 'Accepted';
 		v_return_msg = 'Multi-update view successfully';
 
@@ -129,12 +134,13 @@ BEGIN
 		-- delete existing view
 		EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
 		PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
-			
+		
 		-- create new view with all columns from parent/man/addfields
-		PERFORM gw_fct_admin_manage_child_views(concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
-		        "feature":{"catFeature":"',v_cat_feature,'"},"data":{"filterFields":{}, "pageInfo":{}, 
-				"action":"SINGLE-CREATE" }}'));
-					
+		v_query = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"',v_cat_feature,
+		'"},"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE"}}');	
+		
+		PERFORM gw_fct_admin_manage_child_views(v_query);
+		
 		-- insert into config_form_fields new column values coyping from parent
 		INSERT INTO config_form_fields 
 		SELECT * FROM config_form_fields WHERE formname = v_parent AND columnname = v_newcolumn
