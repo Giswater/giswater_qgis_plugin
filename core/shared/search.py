@@ -541,7 +541,7 @@ class GwSearch:
         self.items_dialog.btn_state1.setEnabled(False)
         self.items_dialog.btn_state0.setEnabled(False)
 
-        search_csv_path = tools_gw.get_config_parser('search', 'search_csv_path', "user", "init")
+        search_csv_path = tools_gw.get_config_parser('search', 'search_csv_path', "user", "session")
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_init, f"Filter by: {field_id}")
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_end, f"Filter by: {field_id}")
