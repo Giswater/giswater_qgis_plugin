@@ -35,6 +35,7 @@ v_arc_id text;
 v_auto_pol_id text;
 v_streetaxis text;
 v_streetaxis2 text;
+v_force_delete boolean;
 
 
 BEGIN
@@ -730,11 +731,17 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_getcheckdelete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"'||OLD.connec_id||'","featureType":"CONNEC"}, "data":{}}$$)';
 
+		-- force plan_psector_force_delete
+		SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+		UPDATE config_param_user SET value = 'true' WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+ 
+		DELETE FROM connec WHERE connec_id = OLD.connec_id;
+
+ 		-- restore plan_psector_force_delete
+		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+
 		IF v_man_table ='man_fountain'  THEN
-			DELETE FROM connec WHERE connec_id=OLD.connec_id;
 			DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM man_fountain WHERE connec_id=OLD.connec_id );
-		ELSE
-			DELETE FROM connec WHERE connec_id = OLD.connec_id;
 		END IF;		
 
 		-- delete links & vnode's

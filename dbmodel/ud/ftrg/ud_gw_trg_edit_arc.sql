@@ -30,6 +30,7 @@ v_featurecat text;
 v_streetaxis text;
 v_streetaxis2 text;
 v_matfromcat boolean = false;
+v_force_delete boolean;
 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -680,8 +681,15 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_getcheckdelete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"'||OLD.arc_id||'","featureType":"ARC"}, "data":{}}$$)';
 
+		-- force plan_psector_force_delete
+		SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+		UPDATE config_param_user SET value = 'true' WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+
 		DELETE FROM arc WHERE arc_id = OLD.arc_id;
 
+		-- restore plan_psector_force_delete
+		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+		
 		--Delete addfields
   		DELETE FROM man_addfields_value WHERE feature_id = OLD.arc_id  and parameter_id in 
   		(SELECT id FROM sys_addfields WHERE cat_feature_id IS NULL OR cat_feature_id =OLD.arc_type);

@@ -27,6 +27,7 @@ v_old_value_param text;
 v_featurecat text;
 v_streetaxis text;
 v_streetaxis2 text;
+v_force_delete boolean;
 
 BEGIN
 
@@ -564,31 +565,36 @@ BEGIN
 				EXECUTE 'DELETE FROM man_addfields_value WHERE feature_id=$1 AND parameter_id=$2'
 					USING NEW.arc_id , v_addfields.id;
 			END IF;
-		
 		END LOOP;
-    END IF;       
+
+        END IF;       
 		--update values of related connecs;
 		IF NEW.fluid_type != OLD.fluid_type THEN
 			UPDATE connec SET fluid_type = NEW.fluid_type WHERE arc_id = NEW.arc_id;
 		END IF;
 
+		RETURN NEW;
 
-        RETURN NEW;
-
-     ELSIF TG_OP = 'DELETE' THEN 
+	ELSIF TG_OP = 'DELETE' THEN 
 		
 		EXECUTE 'SELECT gw_fct_getcheckdelete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"'||OLD.arc_id||'","featureType":"ARC"}, "data":{}}$$)';
+
+		-- force plan_psector_force_delete
+		SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+		UPDATE config_param_user SET value = 'true' WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
  
-        DELETE FROM arc WHERE arc_id = OLD.arc_id;
+		DELETE FROM arc WHERE arc_id = OLD.arc_id;
+
+		-- restore plan_psector_force_delete
+		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
         
 		--Delete addfields
   		DELETE FROM man_addfields_value WHERE feature_id = OLD.arc_id  and parameter_id in 
   		(SELECT id FROM sys_addfields WHERE cat_feature_id IS NULL OR cat_feature_id =OLD.arc_type);
 
-        RETURN NULL;
-     
-     END IF;
+		RETURN NULL;
+	END IF;
 
 END;
 $BODY$

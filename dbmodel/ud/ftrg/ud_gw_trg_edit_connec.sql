@@ -24,6 +24,8 @@ v_arc_id text;
 v_streetaxis text;
 v_streetaxis2 text;
 v_matfromcat boolean = false;
+v_force_delete boolean;
+
 
 BEGIN
 
@@ -602,29 +604,34 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_getcheckdelete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"'||OLD.connec_id||'","featureType":"CONNEC"}, "data":{}}$$)';
 
-        DELETE FROM connec WHERE connec_id = OLD.connec_id;
+		-- force plan_psector_force_delete
+		SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+		UPDATE config_param_user SET value = 'true' WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+ 
+		DELETE FROM connec WHERE connec_id = OLD.connec_id;
+ 
+		-- restore plan_psector_force_delete
+		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
 
 		--Delete addfields
   		DELETE FROM man_addfields_value WHERE feature_id = OLD.connec_id  and parameter_id in 
   		(SELECT id FROM sys_addfields WHERE cat_feature_id IS NULL OR cat_feature_id =OLD.connec_type);
 
-	-- delete links & vnode's
-	FOR v_record_link IN SELECT * FROM link WHERE feature_type='CONNEC' AND feature_id=OLD.connec_id
-	LOOP
-		-- delete link
-		DELETE FROM link WHERE link_id=v_record_link.link_id;
+		-- delete links & vnode's
+		FOR v_record_link IN SELECT * FROM link WHERE feature_type='CONNEC' AND feature_id=OLD.connec_id
+		LOOP
+			-- delete link
+			DELETE FROM link WHERE link_id=v_record_link.link_id;
 
-		-- delete vnode if no more links are related to vnode
-		SELECT count(exit_id) INTO v_count FROM link WHERE exit_id=v_record_link.exit_id;
-						
-		IF v_count =0 THEN 
-			DELETE FROM vnode WHERE vnode_id=v_record_link.exit_id::integer;
-		END IF;
-	END LOOP;
+			-- delete vnode if no more links are related to vnode
+			SELECT count(exit_id) INTO v_count FROM link WHERE exit_id=v_record_link.exit_id;
+							
+			IF v_count =0 THEN 
+				DELETE FROM vnode WHERE vnode_id=v_record_link.exit_id::integer;
+			END IF;
+		END LOOP;
 
-
-        RETURN NULL;
-   
+		RETURN NULL;  
     END IF;
 
 END;

@@ -50,6 +50,8 @@ v_arc_id text;
 v_streetaxis text;
 v_streetaxis2 text;
 v_autorotation_disabled boolean;
+v_force_delete boolean;
+
     
 BEGIN
 
@@ -742,30 +744,38 @@ BEGIN
 	
 		EXECUTE 'SELECT gw_fct_getcheckdelete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"'||OLD.gully_id||'","featureType":"GULLY"}, "data":{}}$$)';
-	-- delete from polygon table (before the deletion of gully)
-	DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM gully WHERE gully_id=OLD.gully_id);
-	
-        DELETE FROM gully WHERE gully_id = OLD.gully_id;
 
-        --Delete addfields
+		-- delete from polygon table (before the deletion of gully)
+		DELETE FROM polygon WHERE pol_id IN (SELECT pol_id FROM gully WHERE gully_id=OLD.gully_id);
+
+		-- force plan_psector_force_delete
+		SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+		UPDATE config_param_user SET value = 'true' WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+ 
+		DELETE FROM gully WHERE gully_id = OLD.gully_id;
+
+		-- restore plan_psector_force_delete
+		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+
+		--Delete addfields
   		DELETE FROM man_addfields_value WHERE feature_id = OLD.gully_id  and parameter_id in 
   		(SELECT id FROM sys_addfields WHERE cat_feature_id IS NULL OR cat_feature_id =OLD.gully_type);
 
-	-- delete links & vnode's
-	FOR v_record_link IN SELECT * FROM link WHERE feature_type='GULLY' AND feature_id=OLD.gully_id
-	LOOP
-		-- delete link
-		DELETE FROM link WHERE link_id=v_record_link.link_id;
+		-- delete links & vnode's
+		FOR v_record_link IN SELECT * FROM link WHERE feature_type='GULLY' AND feature_id=OLD.gully_id
+		LOOP
+			-- delete link
+			DELETE FROM link WHERE link_id=v_record_link.link_id;
 
-		-- delete vnode if no more links are related to vnode
-		SELECT count(exit_id) INTO v_count FROM link WHERE exit_id=v_record_link.exit_id;
-						
-		IF v_count =0 THEN 
-			DELETE FROM vnode WHERE vnode_id=v_record_link.exit_id::integer;
-		END IF;
-	END LOOP;
+			-- delete vnode if no more links are related to vnode
+			SELECT count(exit_id) INTO v_count FROM link WHERE exit_id=v_record_link.exit_id;
+							
+			IF v_count =0 THEN 
+				DELETE FROM vnode WHERE vnode_id=v_record_link.exit_id::integer;
+			END IF;
+		END LOOP;
 
-        RETURN NULL;
+		RETURN NULL;
    
     END IF;
 
