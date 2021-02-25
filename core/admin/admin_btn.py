@@ -766,7 +766,7 @@ class GwAdminButton:
         project.read(qgs_path)
 
         # Load Giswater plugin
-        reloadPlugin('giswater')
+        reloadPlugin(f"{global_vars.plugin_name}")
 
 
     def _open_form_create_gis_project(self):
