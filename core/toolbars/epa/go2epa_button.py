@@ -43,7 +43,7 @@ class GwGo2EpaButton(GwAction):
 
     def check_result_id(self):
         """ Check if selected @result_id already exists """
-
+        self.dlg_go2epa.txt_result_name.setStyleSheet(None)
         result_id = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name)
         sql = (f"SELECT result_id FROM v_ui_rpt_cat_result"
                f" WHERE result_id = '{result_id}'")
@@ -252,6 +252,8 @@ class GwGo2EpaButton(GwAction):
             msg = "This parameter is mandatory. Please, set a value"
             tools_qt.show_details(msg, title="Rpt fail", inf_text=None)
             return False
+
+        self.dlg_go2epa.txt_result_name.setStyleSheet(None)
 
         sql = (f"SELECT result_id FROM rpt_cat_result "
                f"WHERE result_id = '{result_name}' LIMIT 1")

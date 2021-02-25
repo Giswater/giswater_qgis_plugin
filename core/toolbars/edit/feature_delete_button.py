@@ -140,7 +140,7 @@ class GwFeatureDeleteButton(GwAction):
         if feature_id == 'null':
             self.dlg_feature_delete.feature_id.setStyleSheet("border: 1px solid red")
             return
-
+        self.dlg_feature_delete.feature_id.setStyleSheet(None)
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = tools_gw.create_body(feature=feature, extras=extras)
