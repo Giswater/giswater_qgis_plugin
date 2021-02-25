@@ -96,13 +96,13 @@ BEGIN
 	DELETE FROM temp_csv WHERE source='rpt_node' AND (csv1='Node' or csv1='Elevation' or csv1='MINIMUM' or csv1='MAXIMUM' or csv1='DIFFERENTIAL' or csv1='AVERAGE');
 	UPDATE temp_csv SET csv6=null WHERE source='rpt_node' AND (csv6='Reservoir' OR csv6='Tank'); -- delete Reservoir AND tank word when quality is not enabled
 	INSERT INTO rpt_node (node_id, result_id, "time", elevation, demand, head, press, quality) 
-	SELECT csv1, v_result_id, csv40, csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric
+	SELECT csv1, v_result_id, (case when csv40 is null then '00:00' else csv40 end), csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric
 	FROM temp_csv WHERE source='rpt_node' AND fid = 140 AND cur_user=current_user ORDER BY id;
 
 	-- rpt_arc
 	DELETE FROM temp_csv WHERE source='rpt_arc' AND (csv1='Link' or csv1='Length' or csv1='Analysis' or csv1='MINIMUM' or csv1='MAXIMUM' or csv1='DIFFERENTIAL' or csv1='AVERAGE');
 	INSERT INTO rpt_arc(arc_id,result_id,"time",length, diameter, flow, vel, headloss,setting,reaction, ffactor,other)
-	SELECT csv1,v_result_id, csv40, csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric, csv8::numeric, csv9::numeric, csv10
+	SELECT csv1,v_result_id, (case when csv40 is null then '00:00' else csv40 end), csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric, csv8::numeric, csv9::numeric, csv10
 	FROM temp_csv WHERE source='rpt_arc' AND fid = 140 AND cur_user=current_user ORDER BY id;
 
 	-- energy_usage
