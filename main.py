@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 
+from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton
@@ -52,10 +53,11 @@ class Giswater(QObject):
         self._init_plugin()
 
         # Force project read (to work with PluginReloader)
-        self._project_read(False)
+        self._project_read(False, False)
 
 
-    def unload(self, is_plugin_reloaded=True):
+
+    def unload(self, hide_gw_button=True):
         """ Removes plugin menu items and icons from QGIS GUI
             :param @remove_modules is True when plugin is disabled or reloaded
         """
@@ -65,10 +67,14 @@ class Giswater(QObject):
             # Remove Giswater dockers
             self._remove_dockers()
 
-            # Remove 'Main Info button' only when plugin is reloaded through 'Plugin Reloader'
-            if is_plugin_reloaded:
-                self._unset_info_button()
-                global_vars.logger.close_logger()
+            # Remove 'Main Info button'
+            self._unset_info_button()
+            global_vars.logger.close_logger()
+
+            # Set 'Main Info button' if project is unload or project don't have layers
+            layers = QgsProject.instance().mapLayers().values()
+            if hide_gw_button is False and len(layers) == 0:
+                self._set_info_button()
 
             # Unlisten notify channel and stop thread
             if hasattr(self, 'notify'):
@@ -249,11 +255,11 @@ class Giswater(QObject):
         self.unload(False)
 
 
-    def _project_read(self, show_warning=True):
+    def _project_read(self, show_warning=True, hide_gw_button=True):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
         # Unload plugin before reading opened project
-        self.unload(False)
+        self.unload(hide_gw_button)
 
         # Create class to manage code that performs project configuration
         self.load_project = GwLoadProject()

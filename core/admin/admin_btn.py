@@ -78,8 +78,6 @@ class GwAdminButton:
 
         # Create the dialog and signals
         self._init_show_database()
-
-        # Check if we have any layer loaded
         self._info_show_database(username=username, show_dialog=show_dialog)
 
 
