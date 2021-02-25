@@ -26,13 +26,14 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "inf
 
 --only replace views, not delete nothing but add a new one column on config_form_fields (newColumn) copying values from parent
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
-"feature":{"catFeature":"T"}, "data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-UPDATE", "newColumn":"workcat_id_plan" }}$$); --only replace views, not config
+"feature":{"catFeature":"PIPE"}, "data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-UPDATE", "newColumn":"workcat_id_plan" }}$$); --only replace views, not config
 
 --delete views & config_form_fields information
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
 
- 
+
+select *  from SCHEMA_NAME.config_form_fields where formname = 'v_edit_arc' and columnname = 'workcat_id_plan'
 */
 
 DECLARE 
@@ -118,7 +119,12 @@ BEGIN
 					
 			-- insert into config_form_fields new column values coyping from parent
 			INSERT INTO config_form_fields 
-			SELECT * FROM config_form_fields WHERE formname = v_parent_layer AND columnname = v_newcolumn
+			SELECT v_childview, formtype, columnname, layoutorder, datatype, widgettype, 
+				label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, 
+				isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+				dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam,
+				layoutname, widgetcontrols, hidden 
+			FROM config_form_fields WHERE formname = v_parent_layer AND columnname = v_newcolumn
 			ON CONFLICT (formname, columnname, formtype) DO NOTHING;
 			
 		END LOOP;
@@ -129,7 +135,10 @@ BEGIN
 
 	ELSIF v_action = 'SINGLE-UPDATE' THEN
 	
-		SELECT child_layer INTO v_childview FROM cat_feature WHERE id = v_cat_feature;
+		SELECT child_layer, parent_layer INTO v_childview, v_parent_layer FROM cat_feature WHERE id = v_cat_feature;
+
+		raise notice 'v_childview, % v_parent_layer %', v_childview, v_parent_layer ;
+
 	
 		-- delete existing view
 		EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
@@ -143,7 +152,12 @@ BEGIN
 		
 		-- insert into config_form_fields new column values coyping from parent
 		INSERT INTO config_form_fields 
-		SELECT * FROM config_form_fields WHERE formname = v_parent AND columnname = v_newcolumn
+		SELECT v_childview, formtype, columnname, layoutorder, datatype, widgettype, 
+			label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, 
+			isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
+			dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam,
+			layoutname, widgetcontrols, hidden 
+		FROM config_form_fields WHERE formname = v_parent_layer AND columnname = v_newcolumn
 		ON CONFLICT (formname, columnname, formtype) DO NOTHING;
 	
 		v_return_status = 'Accepted';
