@@ -562,6 +562,7 @@ class GwAdminButton:
     def _set_signals(self):
         """ Set signals. Function has to be executed only once (during form initialization) """
 
+        self.dlg_readsql.btn_close.connect(partial(self._save_selection))
         self.dlg_readsql.btn_close.clicked.connect(partial(self._close_dialog_admin, self.dlg_readsql))
         self.dlg_readsql.btn_schema_create.clicked.connect(partial(self._open_create_project))
         self.dlg_readsql.btn_custom_load_file.clicked.connect(
@@ -588,6 +589,7 @@ class GwAdminButton:
         self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))
         self.dlg_readsql.btn_gis_create.clicked.connect(partial(self._open_form_create_gis_project))
         self.dlg_readsql.dlg_closed.connect(partial(self._save_selection))
+        self.dlg_readsql.dlg_closed.connect(partial(self._close_dialog_admin, self.dlg_readsql))
 
         self.dlg_readsql.btn_create_field.clicked.connect(partial(self._open_manage_field, 'create'))
         self.dlg_readsql.btn_update_field.clicked.connect(partial(self._open_manage_field, 'update'))
