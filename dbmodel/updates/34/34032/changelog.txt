@@ -2,3 +2,6 @@
 ************
 - Force F-FACTOR = no
 - Show result_id on epa result manager
+- Various bug fix on epa workflow
+- Force variable plan_psector_force_delete on true when deleting from ve_* and v_edit_*
+- Force MULTI-UPDATE views when version < 3.4.032 and version > 3.4.030
