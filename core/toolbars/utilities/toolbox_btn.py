@@ -181,6 +181,7 @@ class GwToolBoxButton(GwAction):
         self.dlg_functions.btn_run.clicked.connect(partial(self._execute_function, self.dlg_functions,
                                                            self.dlg_functions.cmb_layers, json_result['body']['data']))
         self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
+        self.dlg_functions.rejected.connect(partial(tools_gw.close_dialog, self.dlg_functions))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
 
         tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
