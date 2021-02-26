@@ -2329,7 +2329,7 @@ class ApiCF(ApiParent, QObject):
         self.date_event_from.dateChanged.connect(partial(self.set_filter_table_event, widget))
 
         btn_open_visit.clicked.connect(self.open_visit)
-        btn_new_visit.clicked.connect(partial(self.new_visit, tab='event'))
+        btn_new_visit.clicked.connect(partial(self.new_visit, table_name, tab='event'))
         btn_open_gallery.clicked.connect(partial(self.open_gallery))
         btn_open_visit_doc.clicked.connect(self.open_visit_doc)
         btn_open_visit_event.clicked.connect(self.open_visit_event)
@@ -2625,9 +2625,9 @@ class ApiCF(ApiParent, QObject):
         self.controller.get_rows(sql)
         manage_visit.manage_visit(geom_type=self.geom_type, feature_id=self.feature_id, expl_id=expl_id,
                                   refresh_table=refresh_table)
-        if tab=='event':
+        if tab == 'event':
             self.set_filter_dates('visit_start', 'visit_end', table_name, self.date_event_from, self.date_event_to)
-        elif tab=='visit':
+        elif tab == 'visit':
             self.set_filter_dates('visit_start', 'visit_end', table_name, self.date_visit_from, self.date_visit_to)
 
 
