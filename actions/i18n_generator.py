@@ -253,7 +253,7 @@ class I18NGenerator(ParentAction):
         # Check if file exist
         if os.path.exists(cfg_path + file_name):
             msg = "Are you sure you want to overwrite this file?"
-            answer = self.controller.ask_question(msg, "Overwrite", parameter=f"\n\n{cfg_path }{os.sep}{file_name}")
+            answer = self.controller.ask_question(msg, "Overwrite", parameter=f"\n\n{cfg_path }{file_name}")
             if not answer:
                 return False
         else:
