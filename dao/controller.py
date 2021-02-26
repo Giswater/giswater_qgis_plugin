@@ -944,6 +944,8 @@ class DaoController(object):
         for widget_type in type_widget_list:
             widget_list = dialog.findChildren(widget_type)
             for widget in widget_list:
+                if type(widget) is QPushButton and widget.property('has_icon'):
+                    continue
                 self.translate_widget(context_name, widget)
 
         # Translate title of the form
