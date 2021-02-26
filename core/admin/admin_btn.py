@@ -2398,6 +2398,10 @@ class GwAdminButton:
                         tools_log.log_info(str(filedir + os.sep + str(self.project_type_selected) + '.sql'))
                     status = self._read_execute_file(filedir, os.sep + str(self.project_type_selected) + '.sql',
                         schema_name, self.project_epsg)
+                elif file in ("ddl.sql", "ddlview.sql", "dml.sql", "tablect.sql", "trg.sql"):
+                    if log_files:
+                        tools_log.log_info(str(filedir + os.sep + file))
+                    status = self._read_execute_file(filedir, file, schema_name, self.project_epsg)
                 if not status and self.dev_commit == 'FALSE':
                     return False
         else:
