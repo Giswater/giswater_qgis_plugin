@@ -698,7 +698,7 @@ class GwMincut:
 
     def _accept_save_data(self):
         """ Slot function button 'Accept' """
-        print("TEST 10")
+
         tools_gw.save_settings(self.dlg_mincut)
         mincut_result_state = self.current_state
 

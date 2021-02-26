@@ -3550,14 +3550,6 @@
 			<translation>Element management</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Close</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_delete</source>
 			<translation>Delete</translation>
 		</message>
@@ -3581,23 +3573,23 @@
 			<source>tooltip_dlg_element_manager</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Close</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>epa_compare</name>
 		<message>
-			<source>lbl_compare_date</source>
-			<translation>Compare date:</translation>
+			<source>btn_accept</source>
+			<translation>Accept</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_compare_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3609,67 +3601,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_time_to_show</source>
-			<translation>Time (to show):</translation>
+			<source>btn_cancel</source>
+			<translation>Cancel</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_time_to_show</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_datetime</source>
-			<translation>Date time</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_datetime</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_result</source>
-			<translation>Result</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_result</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_time</source>
-			<translation>Time</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_time</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_selector</source>
-			<translation>Result compare selector</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_selector</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_name_to_show</source>
-			<translation>Result name (to show):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_name_to_show</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_name_to_compare</source>
-			<translation>Result name (to compare):</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_name_to_compare</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Accept</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
+			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3689,11 +3625,75 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_compare_date</source>
+			<translation>Compare date:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_compare_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_time</source>
+			<translation>Time</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_time</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_result</source>
+			<translation>Result</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_name_to_compare</source>
+			<translation>Result name (to compare):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_name_to_compare</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_name_to_show</source>
+			<translation>Result name (to show):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_name_to_show</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_selector</source>
+			<translation>Result compare selector</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_selector</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_compare_time</source>
 			<translation>Compare time:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_compare_time</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_time_to_show</source>
+			<translation>Time (to show):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_time_to_show</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_datetime</source>
+			<translation>Date time</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_datetime</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -3704,11 +3704,11 @@
 			<translation>Dialog</translation>
 		</message>
 		<message>
-			<source>btn_close</source>
-			<translation>Close</translation>
+			<source>grb_map_options</source>
+			<translation>Map options:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_close</source>
+			<source>tooltip_grb_map_options</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3720,6 +3720,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>dlg_fastprint</source>
+			<translation>Dialog</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_fastprint</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_preview</source>
 			<translation>Preview</translation>
 		</message>
@@ -3728,19 +3736,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_map_options</source>
-			<translation>Map options:</translation>
+			<source>btn_close</source>
+			<translation>Close</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_map_options</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_fastprint</source>
-			<translation>Dialog</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_fastprint</source>
+			<source>tooltip_btn_close</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3759,11 +3759,51 @@
 			<translation>Delete feature</translation>
 		</message>
 		<message>
+			<source>tab_info_log</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info_log</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_del_feature</source>
+			<translation>Delete feature</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_del_feature</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_snapping</source>
 			<translation>None</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_feature_delete</source>
+			<translation>Delete feature</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_feature_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Delete selected feature</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3790,46 +3830,6 @@
 			<source>tooltip_lbl_feature_type</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>tab_info_log</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_info_log</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_del_feature</source>
-			<translation>Delete feature</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_del_feature</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>Delete selected feature</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_feature_delete</source>
-			<translation>Delete feature</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_feature_delete</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>feature_end</name>
@@ -3838,67 +3838,11 @@
 			<translation>End feature</translation>
 		</message>
 		<message>
-			<source>dlg_feature_end</source>
-			<translation>End feature</translation>
+			<source>tab_arc</source>
+			<translation>Arc</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_feature_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state_type</source>
-			<translation>State type end:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workcat_date</source>
-			<translation>Workcat date:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_enddate</source>
-			<translation>End date:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_enddate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_new_workcat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_new_workcat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_relations</source>
-			<translation>Relations</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_relations</source>
+			<source>tooltip_tab_arc</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3910,35 +3854,27 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_description</source>
-			<translation>Description:</translation>
+			<source>lbl_workcat_date</source>
+			<translation>Workcat date:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_description</source>
+			<source>tooltip_lbl_workcat_date</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_arc</source>
-			<translation>Arc</translation>
+			<source>tab_node</source>
+			<translation>Node</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_arc</source>
+			<source>tooltip_tab_node</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_workcat_id_end</source>
-			<translation>Workcat id end:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workcat_id_end</source>
+			<source>btn_delete</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_insert</source>
+			<source>tooltip_btn_delete</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3950,11 +3886,67 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_connec</source>
-			<translation>Connec</translation>
+			<source>tab_gully</source>
+			<translation>Gully</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_connec</source>
+			<source>tooltip_tab_gully</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_state_type</source>
+			<translation>State type end:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_state_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_new_workcat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_new_workcat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_enddate</source>
+			<translation>End date:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_enddate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_description</source>
+			<translation>Description:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_description</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_workcat_id_end</source>
+			<translation>Workcat id end:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workcat_id_end</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -3974,19 +3966,27 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_gully</source>
-			<translation>Gully</translation>
+			<source>tab_relations</source>
+			<translation>Relations</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_gully</source>
+			<source>tooltip_tab_relations</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_node</source>
-			<translation>Node</translation>
+			<source>tab_connec</source>
+			<translation>Connec</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_node</source>
+			<source>tooltip_tab_connec</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_feature_end</source>
+			<translation>End feature</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_feature_end</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -3995,6 +3995,22 @@
 		<message>
 			<source>title</source>
 			<translation>Workcat end list</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Accept</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>dlg_feature_end_connec</source>
@@ -4013,27 +4029,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Accept</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_filter_by</source>
 			<translation>Filter by arc id:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_filter_by</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -4044,27 +4044,11 @@
 			<translation>Go2Epa</translation>
 		</message>
 		<message>
-			<source>chk_exec</source>
-			<translation>Execute EPA software</translation>
+			<source>chk_import_result</source>
+			<translation>Import result</translation>
 		</message>
 		<message>
-			<source>tooltip_chk_exec</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_file_rpt</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_file_rpt</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_file_inp</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_file_inp</source>
+			<source>tooltip_chk_import_result</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4084,11 +4068,43 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_accept</source>
 			<translation>Accept</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_file_manager</source>
+			<translation>File manager</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_file_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_file_rpt</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_file_rpt</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_file_inp</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_file_inp</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4132,19 +4148,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<source>chk_exec</source>
+			<translation>Execute EPA software</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>chk_import_result</source>
-			<translation>Import result</translation>
-		</message>
-		<message>
-			<source>tooltip_chk_import_result</source>
+			<source>tooltip_chk_exec</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4161,14 +4169,6 @@
 		</message>
 		<message>
 			<source>tooltip_chk_recurrent</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_file_manager</source>
-			<translation>File manager</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_file_manager</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4195,11 +4195,11 @@
 			<translation>Epa result management</translation>
 		</message>
 		<message>
-			<source>btn_delete</source>
-			<translation>Delete</translation>
+			<source>btn_close</source>
+			<translation>Close</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_delete</source>
+			<source>tooltip_btn_close</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4211,19 +4211,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_delete</source>
+			<translation>Delete</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>dlg_go2epa_manager</source>
 			<translation>Epa result management</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_go2epa_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Close</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -4234,14 +4234,6 @@
 			<translation>Go2Epa - options</translation>
 		</message>
 		<message>
-			<source>dlg_go2epa_options</source>
-			<translation>Go2Epa - options</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_go2epa_options</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>tab_rpt</source>
 			<translation>Rpt</translation>
 		</message>
@@ -4250,11 +4242,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Accept</translation>
+			<source>btn_cancel</source>
+			<translation>Cancel</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_accept</source>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_go2epa_options</source>
+			<translation>Go2Epa - options</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_go2epa_options</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4266,11 +4266,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<source>btn_accept</source>
+			<translation>Accept</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_cancel</source>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -4312,14 +4312,6 @@
 			<translation>Hydrometer</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Accept</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>dlg_info_crmvalue</source>
 			<translation>Hydrometer</translation>
 		</message>
@@ -4328,11 +4320,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_hydrometer_id</source>
-			<translation>Hydrometer id:</translation>
+			<source>btn_accept</source>
+			<translation>Accept</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_hydrometer_id</source>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4343,6 +4335,14 @@
 			<source>tooltip_btn_close</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>lbl_hydrometer_id</source>
+			<translation>Hydrometer id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_hydrometer_id</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>info_crossect</name>
@@ -4351,75 +4351,11 @@
 			<translation>Section</translation>
 		</message>
 		<message>
-			<source>lbl_cost_exc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_exc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_fill</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_fill</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_bulk</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_bulk</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_excav</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_excav</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_info_crossect</source>
-			<translation>Section</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_info_crossect</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_section_image</source>
 			<translation>None</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_section_image</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_b_right</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_b_right</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_width</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_width</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cost_b_left</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cost_b_left</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4431,11 +4367,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_close</source>
-			<translation>Close</translation>
+			<source>dlg_info_crossect</source>
+			<translation>Section</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_close</source>
+			<source>tooltip_dlg_info_crossect</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_b_left</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_b_left</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4454,31 +4398,103 @@
 			<source>tooltip_lbl_cost_area</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>lbl_cost_excav</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_excav</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_bulk</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_bulk</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_exc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_exc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Close</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_fill</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_fill</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_width</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_width</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_cost_b_right</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cost_b_right</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>info_feature</name>
 		<message>
-			<source>tab_elements</source>
-			<translation>Elements</translation>
+			<source>btn_cancel</source>
+			<translation>Cancel</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_elements</source>
+			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_connections</source>
-			<translation>Connections</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_connections</source>
+			<source>btn_open_gallery</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_delete</source>
+			<source>tooltip_btn_open_gallery</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_delete</source>
+			<source>tab_relations</source>
+			<translation>Relations</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_relations</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_data</source>
+			<translation>Data</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_data</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_documents</source>
+			<translation>Documents</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_documents</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4498,35 +4514,43 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_open_gallery</source>
+			<source>tab_om</source>
+			<translation>OM</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_om</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_open_gallery</source>
+			<source>tab_elements</source>
+			<translation>Elements</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_elements</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_downstream_features</source>
-			<translation>Downstream features:</translation>
+			<source>tab_connections</source>
+			<translation>Connections</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_downstream_features</source>
+			<source>tooltip_tab_connections</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_to_om</source>
-			<translation>To:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_to_om</source>
+			<source>btn_link</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_new_element</source>
+			<source>tooltip_btn_link</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_new_element</source>
+			<source>lbl_upstream_features</source>
+			<translation>Upstream features:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_upstream_features</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4538,19 +4562,27 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_new_visit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_new_visit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_new_element</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_new_element</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_open_doc</source>
 			<translation>None</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_open_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_param_type_om</source>
-			<translation>Parameter type:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_param_type_om</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4594,43 +4626,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
+			<source>btn_open_visit_doc</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_parameter_om</source>
-			<translation>Parameter:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_parameter_om</source>
+			<source>tooltip_btn_open_visit_doc</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_upstream_features</source>
-			<translation>Upstream features:</translation>
+			<source>lbl_to_doc</source>
+			<translation>To:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_upstream_features</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_link</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_insert</source>
+			<source>tooltip_lbl_to_doc</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4658,46 +4666,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_from_om</source>
-			<translation>From:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_from_om</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_new_visit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_new_visit</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cat_per_filter</source>
-			<translation>Cat period filter:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cat_per_filter</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_type_doc</source>
-			<translation>Type:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_type_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_to_doc</source>
-			<translation>To:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_to_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_from_doc</source>
 			<translation>From:</translation>
 		</message>
@@ -4714,6 +4682,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>dlg_info_feature</source>
 			<translation>None</translation>
 		</message>
@@ -4722,43 +4698,67 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_data</source>
-			<translation>Data</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_data</source>
+			<source>btn_insert</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_documents</source>
-			<translation>Documents</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_documents</source>
+			<source>tooltip_btn_insert</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_relations</source>
-			<translation>Relations</translation>
+			<source>lbl_type_doc</source>
+			<translation>Type:</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_relations</source>
+			<source>tooltip_lbl_type_doc</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_open_visit_doc</source>
+			<source>lbl_cat_per_filter</source>
+			<translation>Cat period filter:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cat_per_filter</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_open_visit_doc</source>
+			<source>lbl_from_om</source>
+			<translation>From:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_from_om</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_om</source>
-			<translation>OM</translation>
+			<source>lbl_parameter_om</source>
+			<translation>Parameter:</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_om</source>
+			<source>tooltip_lbl_parameter_om</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_param_type_om</source>
+			<translation>Parameter type:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_param_type_om</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_to_om</source>
+			<translation>To:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_to_om</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_downstream_features</source>
+			<translation>Downstream features:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_downstream_features</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -4769,19 +4769,19 @@
 			<translation>Basic info</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Accept</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>dlg_info_generic</source>
 			<translation>Basic info</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_info_generic</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Accept</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4800,38 +4800,6 @@
 			<translation>New workcat</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Accept</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workid_key_2</source>
-			<translation>Work id key 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workid_key_2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_workid_key_1</source>
-			<translation>Work id key 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_workid_key_1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_info_workcat</source>
-			<translation>New workcat</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_info_workcat</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_descript</source>
 			<translation>Description:</translation>
 		</message>
@@ -4840,11 +4808,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_builtdate</source>
-			<translation>Built date:</translation>
+			<source>btn_cancel</source>
+			<translation>Cancel</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_builtdate</source>
+			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4856,11 +4824,43 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<source>lbl_workid_key_2</source>
+			<translation>Work id key 2:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_cancel</source>
+			<source>tooltip_lbl_workid_key_2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_info_workcat</source>
+			<translation>New workcat</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_info_workcat</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Accept</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_workid_key_1</source>
+			<translation>Work id key 1:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_workid_key_1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_builtdate</source>
+			<translation>Built date:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_builtdate</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -4894,51 +4894,11 @@
 			<translation>Mincut</translation>
 		</message>
 		<message>
-			<source>lbl_dist_from_plot</source>
-			<translation>Distance from plot:</translation>
+			<source>btn_cancel</source>
+			<translation>Cancel</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_dist_from_plot</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Accept</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_start</source>
-			<translation>Start</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_start</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cause</source>
-			<translation>Cause:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cause</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_state</source>
-			<translation>State:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_state</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_exec_appropriate</source>
-			<translation>Appropriate:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exec_appropriate</source>
+			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -4958,51 +4918,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_assigned_to</source>
-			<translation>Assigned to:</translation>
+			<source>lbl_state</source>
+			<translation>State:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_assigned_to</source>
+			<source>tooltip_lbl_state</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_exec_startdate</source>
-			<translation>Start date:</translation>
+			<source>lbl_cause</source>
+			<translation>Cause:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_exec_startdate</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_location</source>
-			<translation>Location</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_location</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_msg</source>
-			<translation>No results found</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_msg</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript_rd</source>
-			<translation>Description:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript_rd</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
+			<source>tooltip_lbl_cause</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5014,11 +4942,35 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_end</source>
-			<translation>End</translation>
+			<source>lbl_assigned_to</source>
+			<translation>Assigned to:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_end</source>
+			<source>tooltip_lbl_assigned_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript_pd</source>
+			<translation>Description:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript_pd</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut</source>
+			<translation>Mincut</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start</source>
+			<translation>From:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5038,6 +4990,22 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_start</source>
+			<translation>Start</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_start</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript_rd</source>
+			<translation>Description:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript_rd</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_depth</source>
 			<translation>Depth:</translation>
 		</message>
@@ -5046,51 +5014,43 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_mincut</source>
-			<translation>Mincut</translation>
+			<source>btn_end</source>
+			<translation>End</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_mincut</source>
+			<source>tooltip_btn_end</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_exec_user</source>
-			<translation>Exec user:</translation>
+			<source>btn_accept</source>
+			<translation>Accept</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_exec_user</source>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_exec_realdates</source>
-			<translation>Real dates</translation>
+			<source>lbl_dist_from_plot</source>
+			<translation>Distance from plot:</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_exec_realdates</source>
+			<source>tooltip_lbl_dist_from_plot</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_start</source>
-			<translation>From:</translation>
+			<source>lbl_exec_startdate</source>
+			<translation>Start date:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_start</source>
+			<source>tooltip_lbl_exec_startdate</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>grb_plan_forecasted_dates</source>
-			<translation>Forecasted dates</translation>
+			<source>lbl_exec_appropriate</source>
+			<translation>Appropriate:</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_plan_forecasted_dates</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_plan_details</source>
-			<translation>Details</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_plan_details</source>
+			<source>tooltip_lbl_exec_appropriate</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5102,11 +5062,51 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript_pd</source>
-			<translation>Description:</translation>
+			<source>grb_plan_details</source>
+			<translation>Details</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_descript_pd</source>
+			<source>tooltip_grb_plan_details</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_plan_forecasted_dates</source>
+			<translation>Forecasted dates</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_plan_forecasted_dates</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_exec_realdates</source>
+			<translation>Real dates</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_exec_realdates</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exec_user</source>
+			<translation>Exec user:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exec_user</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_msg</source>
+			<translation>No results found</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_msg</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_location</source>
+			<translation>Location</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_location</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -5117,27 +5117,19 @@
 			<translation>Mincut composer</translation>
 		</message>
 		<message>
+			<source>lbl_rotation</source>
+			<translation>Rotation:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rotation</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_title</source>
 			<translation>Title:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_title</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_template</source>
-			<translation>Template:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_template</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_ok</source>
-			<translation>Open</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_ok</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5149,19 +5141,27 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_rotation</source>
-			<translation>Rotation:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rotation</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_cancel</source>
 			<translation>Cancel</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_ok</source>
+			<translation>Open</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_ok</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_template</source>
+			<translation>Template:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_template</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -5172,11 +5172,27 @@
 			<translation>Mincut connec</translation>
 		</message>
 		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_insert</source>
 			<translation>None</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_insert</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_connec</source>
+			<translation>Mincut connec</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_connec</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5188,11 +5204,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_snapping</source>
-			<translation>None</translation>
+			<source>btn_accept</source>
+			<translation>Accept</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_snapping</source>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5203,22 +5219,6 @@
 			<source>tooltip_lbl_search</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Accept</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_connec</source>
-			<translation>Mincut connec</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_connec</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>mincut_end</name>
@@ -5227,99 +5227,11 @@
 			<translation>Mincut end</translation>
 		</message>
 		<message>
-			<source>lbl_executed</source>
-			<translation>Executed by:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_executed</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_work_order</source>
-			<translation>Work order:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_work_order</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end_date</source>
-			<translation>To:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_mincut</source>
-			<translation>Mincut:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>dlg_mincut_end</source>
 			<translation>Mincut end</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_mincut_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start_date</source>
-			<translation>From:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Accept</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_set_real_location</source>
-			<translation>Set real location</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_set_real_location</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end_hour</source>
-			<translation>End hour:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end_hour</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start_hour</source>
-			<translation>Start hour:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_hour</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_number</source>
-			<translation>Number:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_number</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5331,11 +5243,51 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_street</source>
-			<translation>Street:</translation>
+			<source>btn_accept</source>
+			<translation>Accept</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_street</source>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end_hour</source>
+			<translation>End hour:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end_hour</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_number</source>
+			<translation>Number:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_number</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_mincut</source>
+			<translation>Mincut:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_end_date</source>
+			<translation>To:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end_date</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5346,6 +5298,54 @@
 			<source>tooltip_lbl_municipality</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>lbl_start_hour</source>
+			<translation>Start hour:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_hour</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_street</source>
+			<translation>Street:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_street</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_set_real_location</source>
+			<translation>Set real location</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_set_real_location</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_executed</source>
+			<translation>Executed by:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_executed</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start_date</source>
+			<translation>From:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_work_order</source>
+			<translation>Work order:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_work_order</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>mincut_hydrometer</name>
@@ -5354,19 +5354,11 @@
 			<translation>Mincut hydrometer</translation>
 		</message>
 		<message>
-			<source>lbl_ccc</source>
-			<translation>Connec customer code:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_ccc</source>
+			<source>btn_insert</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Accept</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
+			<source>tooltip_btn_insert</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5378,11 +5370,27 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_accept</source>
+			<translation>Accept</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_delete</source>
 			<translation>None</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ccc</source>
+			<translation>Connec customer code:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ccc</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5393,14 +5401,6 @@
 			<source>tooltip_lbl_hcc</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>btn_insert</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_insert</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>mincut_manager</name>
@@ -5409,11 +5409,11 @@
 			<translation>Mincut management</translation>
 		</message>
 		<message>
-			<source>lbl_date_to</source>
-			<translation>To:</translation>
+			<source>btn_cancel</source>
+			<translation>Close</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_date_to</source>
+			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5425,51 +5425,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_exploitation</source>
-			<translation>Exploitation:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_exploitation</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_selector_mincut</source>
 			<translation>None</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_selector_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_cancel_mincut</source>
-			<translation>Cancel mincut</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel_mincut</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_date_from</source>
-			<translation>From:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_date_from</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_notify</source>
-			<translation>Send sms</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_notify</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_mincut_manager</source>
-			<translation>Mincut management</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_mincut_manager</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5481,14 +5441,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_delete</source>
-			<translation>Delete</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_next_days</source>
 			<translation>Next days</translation>
 		</message>
@@ -5497,11 +5449,59 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Close</translation>
+			<source>btn_cancel_mincut</source>
+			<translation>Cancel mincut</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_cancel</source>
+			<source>tooltip_btn_cancel_mincut</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_notify</source>
+			<translation>Send sms</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_notify</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_exploitation</source>
+			<translation>Exploitation:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_exploitation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Delete</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_date_to</source>
+			<translation>To:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_date_to</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_mincut_manager</source>
+			<translation>Mincut management</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_mincut_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_date_from</source>
+			<translation>From:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_date_from</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -5520,11 +5520,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_node_type</source>
-			<translation>Current node type:</translation>
+			<source>btn_cancel</source>
+			<translation>Cancel</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_node_type</source>
+			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5533,6 +5533,14 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_custom_node_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_node_type</source>
+			<translation>Current node type:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_node_type</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5551,22 +5559,6 @@
 			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_catalog</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_catalog</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>price_manager</name>
@@ -5575,11 +5567,19 @@
 			<translation>Price result management</translation>
 		</message>
 		<message>
-			<source>btn_delete</source>
-			<translation>Delete</translation>
+			<source>dlg_price_manager</source>
+			<translation>Price result management</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_delete</source>
+			<source>tooltip_dlg_price_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_update_result</source>
+			<translation>Current result</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_update_result</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5599,19 +5599,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_update_result</source>
-			<translation>Current result</translation>
+			<source>btn_delete</source>
+			<translation>Delete</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_update_result</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_price_manager</source>
-			<translation>Price result management</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_price_manager</source>
+			<source>tooltip_btn_delete</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -5622,51 +5614,11 @@
 			<translation>Draw profile</translation>
 		</message>
 		<message>
-			<source>btn_close</source>
-			<translation>Close</translation>
+			<source>lbl_title</source>
+			<translation>Title:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_update_path</source>
-			<translation>...</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_update_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_additional_point</source>
-			<translation>Additional point:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_additional_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_save_profile</source>
-			<translation>Save profile</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_save_profile</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_add_additional_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_additional_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_rotation</source>
-			<translation>Rotation:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_rotation</source>
+			<source>tooltip_lbl_title</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5678,11 +5630,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_add_end_point</source>
+			<source>btn_delete_additional_point</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_add_end_point</source>
+			<source>tooltip_btn_delete_additional_point</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5694,27 +5646,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_draw</source>
-			<translation>Draw profile</translation>
+			<source>btn_update_path</source>
+			<translation>...</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_draw</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_sv</source>
-			<translation>Vertical scale:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_sv</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_load_profile</source>
-			<translation>Load profile</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_load_profile</source>
+			<source>tooltip_btn_update_path</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5726,19 +5662,35 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_close</source>
+			<translation>Close</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_save_profile</source>
+			<translation>Save profile</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_save_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_additional_point</source>
+			<translation>Additional point:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_additional_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_end_point</source>
 			<translation>End point:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_end_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_title</source>
-			<translation>Title:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_title</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5750,35 +5702,27 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_clear_profile</source>
-			<translation>Clear profile</translation>
+			<source>lbl_profile_id</source>
+			<translation>Profile id:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_clear_profile</source>
+			<source>tooltip_lbl_profile_id</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_add_start_point</source>
+			<source>lbl_rotation</source>
+			<translation>Rotation:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_rotation</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_add_start_point</source>
-			<translation>None</translation>
+			<source>btn_load_profile</source>
+			<translation>Load profile</translation>
 		</message>
 		<message>
-			<source>btn_delete_additional_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_additional_point</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_export_pdf</source>
-			<translation>Open composer</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export_pdf</source>
+			<source>tooltip_btn_load_profile</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5790,11 +5734,59 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_profile_id</source>
-			<translation>Profile id:</translation>
+			<source>btn_add_end_point</source>
+			<translation>None</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_profile_id</source>
+			<source>tooltip_btn_add_end_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_additional_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_additional_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_start_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_start_point</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_clear_profile</source>
+			<translation>Clear profile</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_clear_profile</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_sv</source>
+			<translation>Vertical scale:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_sv</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_draw</source>
+			<translation>Draw profile</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_draw</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_export_pdf</source>
+			<translation>Open composer</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_export_pdf</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -5803,6 +5795,14 @@
 		<message>
 			<source>title</source>
 			<translation>Load profiles</translation>
+		</message>
+		<message>
+			<source>dlg_profile_list</source>
+			<translation>Load profiles</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_profile_list</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_open</source>
@@ -5820,36 +5820,12 @@
 			<source>tooltip_btn_delete_profile</source>
 			<translation>None</translation>
 		</message>
-		<message>
-			<source>dlg_profile_list</source>
-			<translation>Load profiles</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_profile_list</source>
-			<translation>None</translation>
-		</message>
 	</context>
 	<context>
 		<name>project_check</name>
 		<message>
 			<source>title</source>
 			<translation>Check project</translation>
-		</message>
-		<message>
-			<source>tab_databaselog</source>
-			<translation>Database log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_databaselog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_qgis_projlog</source>
-			<translation>Qgis project log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_qgis_projlog</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -5867,20 +5843,28 @@
 			<source>tooltip_dlg_project_check</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>tab_qgis_projlog</source>
+			<translation>Qgis project log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_qgis_projlog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_databaselog</source>
+			<translation>Database log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_databaselog</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>psector_duplicate</name>
 		<message>
 			<source>title</source>
 			<translation>Duplicate psector</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>Accept</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>dlg_psector_duplicate</source>
@@ -5899,11 +5883,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_info_log</source>
-			<translation>Info log</translation>
+			<source>btn_accept</source>
+			<translation>Accept</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_info_log</source>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5923,6 +5907,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>tab_info_log</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info_log</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>tab_duplicate_psector</source>
 			<translation>Duplicate psector</translation>
 		</message>
@@ -5938,11 +5930,19 @@
 			<translation>Psector management</translation>
 		</message>
 		<message>
-			<source>btn_duplicate</source>
-			<translation>Duplicate</translation>
+			<source>lbl_psector_name</source>
+			<translation>Filter by:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_duplicate</source>
+			<source>tooltip_lbl_psector_name</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_delete</source>
+			<translation>Delete</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_delete</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -5954,22 +5954,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_psector_manager</source>
-			<translation>Psector management</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_psector_manager</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_psector_name</source>
-			<translation>Filter by:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_psector_name</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_update_psector</source>
 			<translation>Current psector</translation>
 		</message>
@@ -5978,11 +5962,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_delete</source>
-			<translation>Delete</translation>
+			<source>dlg_psector_manager</source>
+			<translation>Psector management</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_delete</source>
+			<source>tooltip_dlg_psector_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_duplicate</source>
+			<translation>Duplicate</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_duplicate</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -5993,6 +5985,14 @@
 			<translation>Psector rapport</translation>
 		</message>
 		<message>
+			<source>lbl_detail_csv</source>
+			<translation>Detail csv file:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_detail_csv</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>dlg_psector_rapport</source>
 			<translation>Psector rapport</translation>
 		</message>
@@ -6001,19 +6001,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_path</source>
-			<translation>...</translation>
+			<source>grb_rapport</source>
+			<translation>Rapport</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_path</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_template</source>
-			<translation>Template:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_template</source>
+			<source>tooltip_grb_rapport</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6025,19 +6017,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_detail_csv</source>
-			<translation>Detail csv file:</translation>
+			<source>btn_cancel</source>
+			<translation>Cancel</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_detail_csv</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_prices_list</source>
-			<translation>Prices list csv file:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_prices_list</source>
+			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6049,6 +6033,22 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_prices_list</source>
+			<translation>Prices list csv file:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_prices_list</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_template</source>
+			<translation>Template:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_template</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>chk_composer</source>
 			<translation>Composer pdf file</translation>
 		</message>
@@ -6057,19 +6057,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<source>btn_path</source>
+			<translation>...</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_rapport</source>
-			<translation>Rapport</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_rapport</source>
+			<source>tooltip_btn_path</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -6080,19 +6072,19 @@
 			<translation>SearchPlus</translation>
 		</message>
 		<message>
-			<source>dlg_search</source>
-			<translation>SearchPlus</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_search</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_msg</source>
 			<translation>No results found</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_msg</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_search</source>
+			<translation>SearchPlus</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_search</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -6103,35 +6095,19 @@
 			<translation>Workcat search</translation>
 		</message>
 		<message>
-			<source>lbl_feat_end</source>
-			<translation>Features ended with the selected workcat:</translation>
+			<source>lbl_init</source>
+			<translation>Init - Feature id</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_feat_end</source>
+			<source>tooltip_lbl_init</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_search_workcat</source>
-			<translation>Workcat search</translation>
+			<source>btn_export_to_csv</source>
+			<translation>Export to CSV</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_search_workcat</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feat_ini</source>
-			<translation>Features initiated with the selected workcat:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feat_ini</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_init</source>
-			<translation>Initiated</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_init</source>
+			<source>tooltip_btn_export_to_csv</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6143,27 +6119,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_init</source>
-			<translation>Init - Feature id</translation>
+			<source>lbl_total2</source>
+			<translation>Total numbers:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_init</source>
+			<source>tooltip_lbl_total2</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_end</source>
-			<translation>End - Feature id</translation>
+			<source>lbl_total1</source>
+			<translation>Total numbers:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_end</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_export_to_csv</source>
-			<translation>Export to CSV</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_export_to_csv</source>
+			<source>tooltip_lbl_total1</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6183,11 +6151,35 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_state0</source>
+			<translation>Active</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_state0</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_path</source>
 			<translation>...</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_path</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_init</source>
+			<translation>Initiated</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_init</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feat_end</source>
+			<translation>Features ended with the selected workcat:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feat_end</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6199,6 +6191,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_end</source>
+			<translation>End - Feature id</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_end</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_close</source>
 			<translation>Close</translation>
 		</message>
@@ -6207,27 +6207,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_state0</source>
-			<translation>Active</translation>
+			<source>lbl_feat_ini</source>
+			<translation>Features initiated with the selected workcat:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_state0</source>
+			<source>tooltip_lbl_feat_ini</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_total1</source>
-			<translation>Total numbers:</translation>
+			<source>dlg_search_workcat</source>
+			<translation>Workcat search</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_total1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_total2</source>
-			<translation>Total numbers:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_total2</source>
+			<source>tooltip_dlg_search_workcat</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -6269,6 +6261,30 @@
 			<translation>Config parameters</translation>
 		</message>
 		<message>
+			<source>tab_loginfo</source>
+			<translation>Info log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_loginfo</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_toolbox</source>
+			<translation>Config parameters</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_toolbox</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_run</source>
+			<translation>Run</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_run</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_cancel</source>
 			<translation>Cancel</translation>
 		</message>
@@ -6285,35 +6301,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_run</source>
-			<translation>Run</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_run</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>tab_config</source>
 			<translation>Config</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_loginfo</source>
-			<translation>Info log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_loginfo</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_toolbox</source>
-			<translation>Config parameters</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_toolbox</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -6339,67 +6331,27 @@
 			<translation>Visit</translation>
 		</message>
 		<message>
-			<source>lbl_visitcat_id</source>
-			<translation>Visit cat id:</translation>
+			<source>btn_event_update</source>
+			<translation>Update event</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_visitcat_id</source>
+			<source>tooltip_btn_event_update</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_user_name</source>
-			<translation>User name:</translation>
+			<source>dlg_visit</source>
+			<translation>Visit</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_user_name</source>
+			<source>tooltip_dlg_visit</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_document</source>
-			<translation>Document</translation>
+			<source>btn_add_geom</source>
+			<translation>Add geom</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_document</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_feature_type</source>
-			<translation>Feature type:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_feature_type</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_event</source>
-			<translation>Event</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_event</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_start_date</source>
-			<translation>From:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_start_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_info</source>
-			<translation>Info:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_open_doc</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_open_doc</source>
+			<source>tooltip_btn_add_geom</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6411,27 +6363,35 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_code</source>
+			<translation>Code:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_code</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_cancel</source>
+			<translation>Cancel</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Description:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_status</source>
 			<translation>Status:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_status</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_end_date</source>
-			<translation>To:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_end_date</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_doc_new</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_doc_new</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6443,19 +6403,27 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>tab_visit</source>
+			<translation>Visit</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_visit</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_accept</source>
+			<translation>Accept</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_doc_delete</source>
 			<translation>None</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_doc_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_code</source>
-			<translation>Code:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_code</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6467,19 +6435,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>tab_visit</source>
-			<translation>Visit</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_visit</source>
+			<source>btn_doc_new</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_feature_delete</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_feature_delete</source>
+			<source>tooltip_btn_doc_new</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6499,35 +6459,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_event_update</source>
-			<translation>Update event</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_event_update</source>
+			<source>btn_feature_delete</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript</source>
-			<translation>Description:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
+			<source>tooltip_btn_feature_delete</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_add_geom</source>
-			<translation>Add geom</translation>
+			<source>lbl_user_name</source>
+			<translation>User name:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_add_geom</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_feature_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_feature_snapping</source>
+			<source>tooltip_lbl_user_name</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6539,27 +6483,75 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_visit</source>
-			<translation>Visit</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_visit</source>
+			<source>btn_feature_snapping</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_accept</source>
-			<translation>Accept</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
+			<source>tooltip_btn_feature_snapping</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<source>lbl_end_date</source>
+			<translation>To:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_cancel</source>
+			<source>tooltip_lbl_end_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_open_doc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open_doc</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_info</source>
+			<translation>Info:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_start_date</source>
+			<translation>From:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_start_date</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_feature_type</source>
+			<translation>Feature type:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_feature_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_document</source>
+			<translation>Document</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_document</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_event</source>
+			<translation>Event</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_event</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_visitcat_id</source>
+			<translation>Visit cat id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visitcat_id</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -6578,19 +6570,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_visit_id</source>
-			<translation>Visit id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_visit_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>btn_open</source>
 			<translation>Open</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_open</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_visit_id</source>
+			<translation>Visit id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visit_id</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -6601,11 +6593,27 @@
 			<translation>Standard arc event</translation>
 		</message>
 		<message>
-			<source>lbl_position_id</source>
-			<translation>Position id:</translation>
+			<source>lbl_text</source>
+			<translation>Text:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_position_id</source>
+			<source>tooltip_lbl_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value</source>
+			<translation>Value:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_add_file</source>
+			<translation>Add file</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_add_file</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6617,27 +6625,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_position_id</source>
+			<translation>Position id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_position_value</source>
 			<translation>Position value:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_position_value</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text</source>
-			<translation>Text:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_delete_file</source>
-			<translation>Delete file</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_delete_file</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6657,19 +6657,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_value</source>
-			<translation>Value:</translation>
+			<source>btn_delete_file</source>
+			<translation>Delete file</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_value</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_add_file</source>
-			<translation>Add file</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_file</source>
+			<source>tooltip_btn_delete_file</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -6680,99 +6672,11 @@
 			<translation>Event</translation>
 		</message>
 		<message>
-			<source>lbl_compass</source>
-			<translation>Compass:</translation>
+			<source>lbl_tstamp</source>
+			<translation>Tstamp:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_compass</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value1</source>
-			<translation>Value 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value2</source>
-			<translation>Value 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_visit_id</source>
-			<translation>Visit id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_visit_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_info</source>
-			<translation>Info</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_info</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom3</source>
-			<translation>Geom 3:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_is_last</source>
-			<translation>Is last:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_is_last</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_files</source>
-			<translation>Files</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_files</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value</source>
-			<translation>Value:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_close</source>
-			<translation>Close</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_index_val</source>
-			<translation>Index val:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_index_val</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom1</source>
-			<translation>Geom 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom1</source>
+			<source>tooltip_lbl_tstamp</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6784,11 +6688,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_ycoord</source>
-			<translation>Y coord:</translation>
+			<source>tab_files</source>
+			<translation>Files</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_ycoord</source>
+			<source>tooltip_tab_files</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6800,11 +6704,123 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_visit_event_full</source>
-			<translation>Event</translation>
+			<source>lbl_geom1</source>
+			<translation>Geom 1:</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_visit_event_full</source>
+			<source>tooltip_lbl_geom1</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_files</source>
+			<translation>Files:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_files</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_position_value</source>
+			<translation>Position value:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_value</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_compass</source>
+			<translation>Compass:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_compass</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_index_val</source>
+			<translation>Index val:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_index_val</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_is_last</source>
+			<translation>Is last:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_is_last</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_parameter_id</source>
+			<translation>Parameter id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_parameter_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Close</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_text</source>
+			<translation>Text:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_text</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_geom3</source>
+			<translation>Geom 3:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom3</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_info</source>
+			<translation>Info</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_info</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_visit_id</source>
+			<translation>Visit id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visit_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_ycoord</source>
+			<translation>Y coord:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_ycoord</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_position_id</source>
+			<translation>Position id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_position_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_event_code</source>
+			<translation>Event code:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_event_code</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6816,11 +6832,50 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_event_code</source>
-			<translation>Event code:</translation>
+			<source>lbl_value</source>
+			<translation>Value:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_event_code</source>
+			<source>tooltip_lbl_value</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value2</source>
+			<translation>Value 2:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value2</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_visit_event_full</source>
+			<translation>Event</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_visit_event_full</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_value1</source>
+			<translation>Value 1:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_value1</source>
+			<translation>None</translation>
+		</message>
+	</context>
+	<context>
+		<name>visit_event_rehab</name>
+		<message>
+			<source>title</source>
+			<translation>Rehabilitation arc event</translation>
+		</message>
+		<message>
+			<source>lbl_parameter_id</source>
+			<translation>Parameter id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_parameter_id</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6840,43 +6895,28 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_parameter_id</source>
-			<translation>Parameter id:</translation>
+			<source>btn_add_file</source>
+			<translation>Add file</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_parameter_id</source>
+			<source>tooltip_btn_add_file</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_tstamp</source>
-			<translation>Tstamp:</translation>
+			<source>lbl_value2</source>
+			<translation>Value 2:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_tstamp</source>
+			<source>tooltip_lbl_value2</source>
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_files</source>
-			<translation>Files:</translation>
+			<source>lbl_geom1</source>
+			<translation>Geom 1:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_files</source>
+			<source>tooltip_lbl_geom1</source>
 			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_text</source>
-			<translation>Text:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_text</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>visit_event_rehab</name>
-		<message>
-			<source>title</source>
-			<translation>Rehabilitation arc event</translation>
 		</message>
 		<message>
 			<source>lbl_geom2</source>
@@ -6887,6 +6927,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_geom3</source>
+			<translation>Geom 3:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_geom3</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_text</source>
 			<translation>Text:</translation>
 		</message>
@@ -6895,11 +6943,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_delete_file</source>
-			<translation>Delete file</translation>
+			<source>lbl_files</source>
+			<translation>Files:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_delete_file</source>
+			<source>tooltip_lbl_files</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -6919,67 +6967,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_files</source>
-			<translation>Files:</translation>
+			<source>btn_delete_file</source>
+			<translation>Delete file</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_files</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_value2</source>
-			<translation>Value 2:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_value2</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_position_value</source>
-			<translation>Position value:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_value</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_add_file</source>
-			<translation>Add file</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_add_file</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom1</source>
-			<translation>Geom 1:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom1</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_position_id</source>
-			<translation>Position id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_position_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_geom3</source>
-			<translation>Geom 3:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_geom3</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_parameter_id</source>
-			<translation>Parameter id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_parameter_id</source>
+			<source>tooltip_btn_delete_file</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -6990,27 +6982,11 @@
 			<translation>Gallery</translation>
 		</message>
 		<message>
-			<source>btn_close</source>
-			<translation>Close</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_close</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>dlg_visit_gallery</source>
 			<translation>Gallery</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_visit_gallery</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_next</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_next</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7022,19 +6998,35 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_visit_id</source>
-			<translation>Visit id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_visit_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_event_id</source>
 			<translation>Event id:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_event_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Close</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_next</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_next</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_visit_id</source>
+			<translation>Visit id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visit_id</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -7053,30 +7045,6 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_slideNext</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_slideNext</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_slidePrevious</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_slidePrevious</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_visit_id</source>
-			<translation>Visit id:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_visit_id</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_event_id</source>
 			<translation>Event id:</translation>
 		</message>
@@ -7092,6 +7060,30 @@
 			<source>tooltip_lbl_img_zoom</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>lbl_visit_id</source>
+			<translation>Visit id:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_visit_id</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_slidePrevious</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_slidePrevious</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_slideNext</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_slideNext</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>visit_picture</name>
@@ -7100,11 +7092,11 @@
 			<translation>Add picture</translation>
 		</message>
 		<message>
-			<source>path_doc</source>
-			<translation>...</translation>
+			<source>lbl_link</source>
+			<translation>Link:</translation>
 		</message>
 		<message>
-			<source>tooltip_path_doc</source>
+			<source>tooltip_lbl_link</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -7124,19 +7116,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>path_doc</source>
+			<translation>...</translation>
+		</message>
+		<message>
+			<source>tooltip_path_doc</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>btn_accept</source>
 			<translation>Accept</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_link</source>
-			<translation>Link:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_link</source>
 			<translation>None</translation>
 		</message>
 	</context>
