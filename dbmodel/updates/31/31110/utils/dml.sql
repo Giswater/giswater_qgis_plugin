@@ -10,3 +10,6 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 --2019/03/26
 UPDATE audit_cat_table SET qgis_role_id=NULL, sys_role_id='role_om' WHERE id='v_ui_anl_mincut_result_cat';
+
+--2021/02/26 (add Undefined municipality here to add it to new schemas but not in production schmas)
+INSERT INTO ext_municipality (muni_id, name) VALUES (0, 'Undefined');
