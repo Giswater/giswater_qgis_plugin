@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_grafanalytics_check_data($${
 "feature":{},"data":{"parameters":{"selectionMode":"userSelectors","grafClass":"SECTOR"}}}$$)
 
 -- fid: main:211,
-	other: 176,179,180,181,192,208,209
+	other: 176,179,180,181,192,208,209,367
 
 select * FROM audit_check_data WHERE fid=211 AND cur_user=current_user; 
 
@@ -381,9 +381,9 @@ BEGIN
 
 	END IF;
 
-	--Check if defined nodes and arcs exist in a database
+	--Check if defined nodes and arcs exist in a database (fid 367)
 
-	FOR rec IN SELECT DISTINCT lower(graf_delimiter) FROM SCHEMA_NAME.cat_feature_node where graf_delimiter NOT IN ('MINSECTOR','NONE') AND graf_delimiter IS NOT NULL LOOP
+	FOR rec IN SELECT DISTINCT lower(graf_delimiter) FROM cat_feature_node where graf_delimiter NOT IN ('MINSECTOR','NONE') AND graf_delimiter IS NOT NULL LOOP
 	
 		v_querytext = 'SELECT b.arc_id, b.'||rec||'_id as zone_id FROM (
 		SELECT '||rec||'_id, json_array_elements_text(((json_array_elements_text((grafconfig->>''use'')::json))::json->>''toArc'')::json) as arc_id FROM '||rec||')b 
@@ -391,12 +391,13 @@ BEGIN
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 		IF v_count > 0 THEN
-			EXECUTE 'INSERT INTO audit_check_data (fid, criticity, error_message)
-			SELECT 211, 2, concat(''WARNING: There is/are '','||v_count||',
-			'' arc(s) that are configured as toArc for '','''||rec||''','' but does not exist on arc table. Arc_id - '',string_agg(concat('''||rec||':'',zone_id,''-'',a.arc_id),'', ''),''.'') FROM('|| v_querytext||')a;';
+			EXECUTE 'INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+			SELECT 211, 2, 367, concat(''WARNING-367: There is/are '','||v_count||',
+			'' arc(s) that are configured as toArc for '','''||rec||''','' but does not exist on arc table. Arc_id - '',
+			string_agg(concat('''||rec||':'',zone_id,''-'',a.arc_id),'', ''),''.'') FROM('|| v_querytext||')a, '||v_count||';';
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message)
-			VALUES (211, 1, concat('INFO: All arcs defined as toArc on ',rec,' exists on DB.'));
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+			VALUES (211, 1, 367, concat('INFO: All arcs defined as toArc on ',rec,' exists on DB.'), 0);
 		END IF;
 
 		v_querytext = 'SELECT b.node_id, b.'||rec||'_id as zone_id FROM (
@@ -405,12 +406,13 @@ BEGIN
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 		IF v_count > 0 THEN
-			EXECUTE 'INSERT INTO audit_check_data (fid, criticity, error_message)
-			SELECT 211, 2, concat(''WARNING: There is/are '','||v_count||',
-			'' node(s) that are configured as nodeParent for '','''||rec||''','' but does not exist on node table. Node_id - '',string_agg(concat('''||rec||':'',zone_id,''-'',a.node_id::text),'', ''),''.'') FROM('|| v_querytext||')a;';
+			EXECUTE 'INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+			SELECT 211, 2, 367, concat(''WARNING-367: There is/are '','||v_count||',
+			'' node(s) that are configured as nodeParent for '','''||rec||''','' but does not exist on node table. Node_id - '',
+			string_agg(concat('''||rec||':'',zone_id,''-'',a.node_id::text),'', ''),''.'') FROM('|| v_querytext||')a, '||v_count||';';
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message)
-			VALUES (211, 1, concat('INFO: All arcs defined as nodeParent on ',rec,' exists on DB.'));
+			INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+			VALUES (211, 1, 367, concat('INFO: All arcs defined as nodeParent on ',rec,' exists on DB.'),0);
 		END IF;
 	END LOOP;
 
