@@ -12,6 +12,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 CREATE TRIGGER gw_trg_vi_demands
   INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON ws_inp.vi_demands
+  ON SCHEMA_NAME.vi_demands
   FOR EACH ROW
-  EXECUTE PROCEDURE ws_inp.gw_trg_vi('vi_demands');
+  EXECUTE PROCEDURE SCHEMA_NAME.gw_trg_vi('vi_demands');
