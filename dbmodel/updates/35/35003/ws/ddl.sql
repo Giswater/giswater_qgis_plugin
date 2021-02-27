@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
---2020/12/14
+--2021/02/27
 ALTER TABLE inp_arc_type ADD COLUMN epa_table character varying(30);
 ALTER TABLE inp_node_type ADD COLUMN epa_table character varying(30);
 
@@ -44,3 +44,5 @@ ALTER TABLE arc DROP CONSTRAINT arc_epa_type_fkey ;
 
 DROP TABLE IF EXISTS inp_node_type;
 DROP TABLE IF EXISTS inp_arc_type;
+
+ALTER TABLE inp_rules_controls_importinp RENAME TO _inp_rules_controls_importinp_ ;

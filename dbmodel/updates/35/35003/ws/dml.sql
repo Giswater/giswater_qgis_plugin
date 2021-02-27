@@ -8,12 +8,11 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
---2020/02/27
+--2021/02/27
 UPDATE sys_feature_epa_type SET active = true;
 UPDATE sys_feature_epa_type SET active = false WHERE id IN('PUMP-IMPORTINP','VALVE-IMPORTINP', 'INLET');
 
-UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM sys_feature_epa_type WHERE active 
-AND feature_type = ''NODE'''  WHERE columnname = 'epa_type' AND formname like '%_arc%';
-UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM sys_feature_epa_type WHERE active 
-AND feature_type = ''ARC'''  WHERE columnname = 'epa_type' AND formname like '%_node%';
+UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM sys_feature_epa_type WHERE active AND feature_type = ''ARC'''  WHERE columnname = 'epa_type' AND formname like '%_arc%';
+UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM sys_feature_epa_type WHERE active AND feature_type = ''NODE'''  WHERE columnname = 'epa_type' AND formname like '%_node%';
 
+DELETE FROM sys_table WHERE id = 'inp_rules_controls_importinp';
