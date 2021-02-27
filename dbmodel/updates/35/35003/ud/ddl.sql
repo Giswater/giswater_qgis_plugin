@@ -34,14 +34,18 @@ ALTER TABLE cat_feature_arc DROP COLUMN epa_table;
 INSERT INTO sys_feature_epa_type SELECT id, 'NODE', epa_table FROM inp_node_type;
 INSERT INTO sys_feature_epa_type SELECT id, 'ARC', epa_table FROM inp_arc_type;
 
-ALTER TABLE cat_feature_arc ADD CONSTRAINT cat_feature_arc_inp_check CHECK (epa_default = ANY(ARRAY['CONDUIT', 'WEIR', 'ORIFICE', 'VIRTUAL', 'PUMP', 'OUTLET', 'NOT DEFINED']));
-ALTER TABLE cat_feature_node ADD CONSTRAINT cat_feature_node_inp_check CHECK (epa_default = ANY(ARRAY['JUNCTION', 'STORAGE', 'DIVIDER', 'OUTFALL', 'NOT DEFINED']));
+ALTER TABLE cat_feature_arc ADD CONSTRAINT cat_feature_arc_inp_check 
+CHECK (epa_default = ANY(ARRAY['CONDUIT', 'WEIR', 'ORIFICE', 'VIRTUAL', 'PUMP', 'OUTLET', 'NOT DEFINED']));
+ALTER TABLE cat_feature_node ADD CONSTRAINT cat_feature_node_inp_check 
+CHECK (epa_default = ANY(ARRAY['JUNCTION', 'STORAGE', 'DIVIDER', 'OUTFALL', 'NOT DEFINED']));
 
 ALTER TABLE cat_feature_node DROP CONSTRAINT cat_feature_node_epa_default_fkey;
 ALTER TABLE cat_feature_arc DROP CONSTRAINT cat_feature_arc_epa_default_fkey;
 
-ALTER TABLE arc ADD CONSTRAINT cat_feature_arc_inp_check CHECK (epa_type = ANY(ARRAY['CONDUIT', 'WEIR', 'ORIFICE', 'VIRTUAL', 'PUMP', 'OUTLET', 'NOT DEFINED']));
-ALTER TABLE node ADD CONSTRAINT cat_feature_node_inp_check CHECK (epa_type = ANY(ARRAY['JUNCTION', 'STORAGE', 'DIVIDER', 'OUTFALL', 'NOT DEFINED']));
+ALTER TABLE arc ADD CONSTRAINT cat_arc_epa_type_check 
+CHECK (epa_type = ANY(ARRAY['CONDUIT', 'WEIR', 'ORIFICE', 'VIRTUAL', 'PUMP', 'OUTLET', 'NOT DEFINED']));
+ALTER TABLE node ADD CONSTRAINT cat_node_epa_type_check 
+CHECK (epa_type = ANY(ARRAY['JUNCTION', 'STORAGE', 'DIVIDER', 'OUTFALL', 'NOT DEFINED']));
 
 ALTER TABLE node DROP CONSTRAINT node_epa_type_fkey ;
 ALTER TABLE arc DROP CONSTRAINT arc_epa_type_fkey ;

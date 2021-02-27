@@ -115,13 +115,14 @@ BEGIN
 		VALUES (concat('feat_',v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layoutorder,
 		v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo', true, true)
 		ON CONFLICT (id) DO NOTHING;
+		
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN
 	
 		EXECUTE 'SELECT lower(id) as id, type, concat(''man_'',lower(id)) as man_table, epa_default, 
 		CASE WHEN epa_default IS NOT NULL THEN concat(''inp_'',lower(epa_default)) END AS epa_table 
-		FROM sys_feature_cat WHERE id='||quote_literal(NEW.system_id)||';'
+		FROM sys_feature_cat WHERE id='||quote_literal(NEW.system_id)
 		INTO v_feature;
 
 		EXECUTE 'UPDATE cat_feature SET feature_type = '||quote_literal(v_feature.type)||', parent_layer =  concat(''v_edit_'',lower('||quote_literal(v_feature.type)||'))
@@ -129,7 +130,7 @@ BEGIN
 
 		IF lower(v_feature.type)='arc' THEN
 			EXECUTE 'INSERT INTO cat_feature_arc (id, type, epa_default)
-			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.epa_default)||')||');';
+			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.epa_default)||');';
 		ELSIF lower(v_feature.type)='node' THEN
 			EXECUTE 'INSERT INTO cat_feature_node (id, type, epa_default, choose_hemisphere, isarcdivide, num_arcs)
 			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.epa_default)||', TRUE, TRUE, 2)';
@@ -280,7 +281,7 @@ BEGIN
 
 			IF lower(NEW.feature_type)='arc' THEN
 				EXECUTE 'INSERT INTO cat_feature_arc (id, type, epa_default)
-				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.epa_default)||')||');';
+				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.epa_default)||')';
 			ELSIF lower(NEW.feature_type)='node' THEN
 				EXECUTE 'INSERT INTO cat_feature_node (id, type, epa_default, choose_hemisphere, isarcdivide, num_arcs)
 				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||',	'||quote_literal(v_feature.epa_default)||', TRUE, TRUE, 2);';

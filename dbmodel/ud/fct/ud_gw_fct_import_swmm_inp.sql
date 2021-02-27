@@ -222,16 +222,16 @@ BEGIN
 	
 	--arc_type
 	--arc
-	INSERT INTO cat_feature_arc VALUES ('EPACOND', 'CONDUIT', 'CONDUIT', 'man_conduit', 'inp_conduit');
-	INSERT INTO cat_feature_arc VALUES ('EPAWEIR', 'VARC', 'WEIR', 'man_varc', 'inp_weir');
-	INSERT INTO cat_feature_arc VALUES ('EPAORIF', 'VARC', 'ORIFICE', 'man_varc', 'inp_orifice');
-	INSERT INTO cat_feature_arc VALUES ('EPAPUMP', 'VARC', 'PUMP', 'man_varc', 'inp_pump');
-	INSERT INTO cat_feature_arc VALUES ('EPAOUTL', 'VARC', 'OUTLET', 'man_varc', 'inp_outlet');
+	INSERT INTO cat_feature_arc VALUES ('EPACOND', 'CONDUIT', 'CONDUIT');
+	INSERT INTO cat_feature_arc VALUES ('EPAWEIR', 'VARC', 'WEIR');
+	INSERT INTO cat_feature_arc VALUES ('EPAORIF', 'VARC', 'ORIFICE');
+	INSERT INTO cat_feature_arc VALUES ('EPAPUMP', 'VARC', 'PUMP');
+	INSERT INTO cat_feature_arc VALUES ('EPAOUTL', 'VARC', 'OUTLET');
 
 	--node_type
-	INSERT INTO cat_feature_node VALUES ('EPAMANH', 'MANHOLE', 'JUNCTION', 'man_manhole', 'inp_junction', 2, TRUE,TRUE);
-	INSERT INTO cat_feature_node VALUES ('EPAOUTF', 'OUTFALL', 'OUTFALL', 'man_outfall', 'inp_outfall', 2, TRUE,TRUE);
-	INSERT INTO cat_feature_node VALUES ('EPASTOR', 'STORAGE', 'STORAGE', 'man_storage', 'inp_storage', 2, TRUE,TRUE);
+	INSERT INTO cat_feature_node VALUES ('EPAMANH', 'MANHOLE', 'JUNCTION', 2, TRUE,TRUE);
+	INSERT INTO cat_feature_node VALUES ('EPAOUTF', 'OUTFALL', 'OUTFALL', 2, TRUE,TRUE);
+	INSERT INTO cat_feature_node VALUES ('EPASTOR', 'STORAGE', 'STORAGE', 2, TRUE,TRUE);
 	
 	ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
 	--cat_mat_node 

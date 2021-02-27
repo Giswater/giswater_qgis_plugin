@@ -26,14 +26,18 @@ ALTER TABLE cat_feature_arc DROP COLUMN epa_table;
 INSERT INTO sys_feature_epa_type SELECT id, 'NODE', epa_table FROM inp_node_type;
 INSERT INTO sys_feature_epa_type SELECT id, 'ARC', epa_table FROM inp_arc_type;
 
-ALTER TABLE cat_feature_arc ADD CONSTRAINT cat_feature_arc_inp_check CHECK (epa_default = ANY(ARRAY['PIPE', 'NOT DEFINED', 'PUMP-IMPORTINP', 'VALVE-IMPORTINP', 'VIRTUALVALVE']));
-ALTER TABLE cat_feature_node ADD CONSTRAINT cat_feature_node_inp_check CHECK (epa_default = ANY(ARRAY['JUNCTION', 'RESERVOIR', 'TANK', 'INLET', 'NOT DEFINED']));
+ALTER TABLE cat_feature_arc ADD CONSTRAINT cat_feature_arc_inp_check 
+CHECK (epa_default = ANY(ARRAY['PIPE', 'NOT DEFINED', 'PUMP-IMPORTINP', 'VALVE-IMPORTINP', 'VIRTUALVALVE']));
+ALTER TABLE cat_feature_node ADD CONSTRAINT cat_feature_node_inp_check 
+CHECK (epa_default = ANY(ARRAY['JUNCTION', 'RESERVOIR', 'TANK', 'INLET', 'NOT DEFINED', 'SHORTPIPE', 'VALVE', 'PUMP']));
 
 ALTER TABLE cat_feature_node DROP CONSTRAINT cat_feature_node_epa_default_fkey;
 ALTER TABLE cat_feature_arc DROP CONSTRAINT cat_feature_arc_epa_default_fkey;
 
-ALTER TABLE arc ADD CONSTRAINT cat_feature_arc_inp_check CHECK (epa_type = ANY(ARRAY['PIPE', 'NOT DEFINED', 'PUMP-IMPORTINP', 'VALVE-IMPORTINP', 'VIRTUALVALVE']));
-ALTER TABLE node ADD CONSTRAINT cat_feature_node_inp_check CHECK (epa_type = ANY(ARRAY['JUNCTION', 'RESERVOIR', 'TANK', 'INLET', 'NOT DEFINED', 'SHORTPIPE', 'VALVE', 'PUMP']));
+ALTER TABLE arc ADD CONSTRAINT cat_arc_epa_type_check 
+CHECK (epa_type = ANY(ARRAY['PIPE', 'NOT DEFINED', 'PUMP-IMPORTINP', 'VALVE-IMPORTINP', 'VIRTUALVALVE']));
+ALTER TABLE node ADD CONSTRAINT cat_node_epat_type_check 
+CHECK (epa_type = ANY(ARRAY['JUNCTION', 'RESERVOIR', 'TANK', 'INLET', 'NOT DEFINED', 'SHORTPIPE', 'VALVE', 'PUMP']));
 
 ALTER TABLE node DROP CONSTRAINT node_epa_type_fkey ;
 ALTER TABLE arc DROP CONSTRAINT arc_epa_type_fkey ;

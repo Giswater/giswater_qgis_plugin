@@ -262,29 +262,29 @@ BEGIN
 
 	--arc_type
 	--arc
-	INSERT INTO cat_feature_arc VALUES ('EPAPIPE', 'PIPE', 'PIPE', 'man_pipe', 'inp_pipe') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPAPIPE', 'PIPE', 'PIPE') ON CONFLICT (id) DO NOTHING;
 	--nodarc
-	INSERT INTO cat_feature_arc VALUES ('EPACHV', 'VARC', 'PIPE', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_arc VALUES ('EPAFCV', 'VARC', 'VALVE-IMPORTINP', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_arc VALUES ('EPAGPV', 'VARC', 'VALVE-IMPORTINP', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_arc VALUES ('EPAPBV', 'VARC', 'VALVE-IMPORTINP', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_arc VALUES ('EPAPSV', 'VARC', 'VALVE-IMPORTINP', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_arc VALUES ('EPAPRV', 'VARC', 'VALVE-IMPORTINP', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_arc VALUES ('EPATCV', 'VARC', 'VALVE-IMPORTINP', 'man_varc', 'inp_valve_importinp') ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_arc VALUES ('EPAPUMP', 'VARC', 'PUMP-IMPORTINP', 'man_varc', 'inp_pump_importinp') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPACHV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPAFCV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPAGPV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPAPBV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPAPSV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPAPRV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPATCV', 'VARC', 'VALVE-IMPORTINP') ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_arc VALUES ('EPAPUMP', 'VARC', 'PUMP-IMPORTINP') ON CONFLICT (id) DO NOTHING;
 	--cat_feature_node
 	--node
-	INSERT INTO cat_feature_node VALUES ('EPAJUN', 'JUNCTION', 'JUNCTION', 'man_junction', 'inp_junction', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPATAN', 'TANK', 'TANK', 'man_tank', 'inp_tank', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPARES', 'SOURCE', 'RESERVOIR', 'man_source', 'inp_reservoir', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPACHVA2N', 'VALVE', 'SHORTPIPE', 'man_valve', 'inp_shortpipe', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPAFCVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPAGPVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPAPBVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPAPSVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPATCVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPAPRVA2N', 'VALVE', 'VALVE', 'man_valve', 'inp_valve', 2, FALSE) ON CONFLICT (id) DO NOTHING;
-	INSERT INTO cat_feature_node VALUES ('EPAPUMPA2N', 'PUMP', 'PUMP', 'man_pump', 'inp_pump', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPAJUN', 'JUNCTION', 'JUNCTION', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPATAN', 'TANK', 'TANK', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPARES', 'SOURCE', 'RESERVOIR', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPACHVA2N', 'VALVE', 'SHORTPIPE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPAFCVA2N', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPAGPVA2N', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPAPBVA2N', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPAPSVA2N', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPATCVA2N', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPAPRVA2N', 'VALVE', 'VALVE', 2, FALSE) ON CONFLICT (id) DO NOTHING;
+	INSERT INTO cat_feature_node VALUES ('EPAPUMPA2N', 'PUMP', 'PUMP', 2, FALSE) ON CONFLICT (id) DO NOTHING;
 
 	ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature;
 	--Materials
@@ -347,10 +347,10 @@ BEGIN
 	INSERT INTO man_pipe SELECT csv1 FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
 	-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-	FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid2=v_fid AND tablename NOT IN ('vi_pipes', 'vi_junctions', 'vi_status') order by orderby
+	FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename NOT IN ('vi_pipes', 'vi_junctions', 'vi_status') order by orderby
 	LOOP
 		--identifing the number of fields of the editable view
-		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
+		FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns where table_name=v_rec_table.tablename AND table_schema='ws_inp'
 		LOOP	
 
 			IF v_rec_view.rid=1 THEN

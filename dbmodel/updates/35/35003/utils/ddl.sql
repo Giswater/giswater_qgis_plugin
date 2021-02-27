@@ -24,7 +24,7 @@ CREATE TABLE sys_feature_epa_type
 (
   id character varying(30) NOT NULL,
   feature_type character varying(30),
-  epa_table character varying(16),
+  epa_table character varying(50),
   descript text,
   active boolean,
   CONSTRAINT sys_feature_inp_pkey PRIMARY KEY (id, feature_type)
