@@ -27,20 +27,24 @@ BEGIN
 	-- get input parameters
 	v_mincut_id := ((p_data ->>'data')::json->>'mincutId')::integer;
 	v_node := ((p_data ->>'data')::json->>'nodeId')::text;
+	v_usepsectors := ((p_data ->>'data')::json->>'usePsectors')::text;
 
 	UPDATE man_valve
 	SET closed = NOT closed
 	WHERE node_id = v_node;
 
+	-- Recalculate the mincut
+	PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, v_result_id, v_usepsectors);
+	
 	v_status = 'Accepted';
 	v_level = 3;
 	v_message = 'Change valve status done successfully';
 
 	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}}')::json;
 
-    EXCEPTION WHEN OTHERS THEN
-    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$
