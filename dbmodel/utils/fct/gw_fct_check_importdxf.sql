@@ -68,16 +68,16 @@ BEGIN
 		"feature":{"catFeature":"DXF_JUN"}, "data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}$$);
 
 		IF v_project_type = 'WS' THEN
-			INSERT INTO cat_feature_node(id, type, epa_default, man_table, epa_table, choose_hemisphere,
+			INSERT INTO cat_feature_node(id, type, epa_default, choose_hemisphere,
 		            isarcdivide, graf_delimiter)
-			VALUES ('DXF_JUN', 'JUNCTION','JUNCTION','man_junction', 'inp_junction',  false, true ,'NONE') 
+			VALUES ('DXF_JUN', 'JUNCTION','JUNCTION',false, true ,'NONE') 
 			ON CONFLICT DO NOTHING;
 
 			INSERT INTO cat_node(id, nodetype_id, active)
 			VALUES ('DXF_JUN_CAT', 'DXF_JUN', true) ON CONFLICT DO NOTHING;
 		ELSIF v_project_type = 'UD' THEN
-			INSERT INTO cat_feature_node(id, type, epa_default, man_table, epa_table, isarcdivide, choose_hemisphere)
-			VALUES ('DXF_JUN', 'JUNCTION','JUNCTION','man_junction', 'inp_junction', true, false) 
+			INSERT INTO cat_feature_node(id, type, epa_default, isarcdivide, choose_hemisphere)
+			VALUES ('DXF_JUN', 'JUNCTION','JUNCTION', true, false) 
 			ON CONFLICT DO NOTHING;
 
 			INSERT INTO cat_node(id, active)

@@ -147,9 +147,9 @@ BEGIN
 						UPDATE config_param_user SET value=FALSE WHERE parameter = 'edit_disable_statetopocontrol' AND cur_user=current_user;
 
 						-- getting table child information (man_table)
-						v_mantable = (SELECT man_table FROM cat_feature_arc JOIN v_edit_arc ON id=arc_type WHERE arc_id=v_arc.arc_id);
-						v_epatable = (SELECT epa_table FROM cat_feature_arc JOIN v_edit_arc ON id=arc_type WHERE arc_id=v_arc.arc_id);
-
+						v_mantable = (SELECT man_table FROM cat_feature_arc c JOIN sys_feature_cat s ON c.type = s.id JOIN v_edit_arc ON c.id=arc_type WHERE arc_id=v_arc_id);
+						v_epatable = (SELECT epa_table FROM cat_feature_arc c JOIN sys_feature_epa_type s ON epa_default = s.id JOIN v_edit_arc ON c.id=arc_type WHERE arc_id=v_arc_id);
+						
 						-- building querytext for man_table
 						v_querytext:= (SELECT replace (replace (array_agg(column_name::text)::text,'{',','),'}','') 
 						FROM information_schema.columns WHERE table_name=v_mantable AND table_schema=v_schemaname AND column_name !='arc_id');

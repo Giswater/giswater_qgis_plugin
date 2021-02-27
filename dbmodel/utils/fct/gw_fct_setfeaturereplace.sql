@@ -222,7 +222,7 @@ BEGIN
 
 		-- inserting new feature on table man_table
 		IF v_feature_type='node' or (v_feature_type='connec' AND v_project_type='WS') THEN
-			EXECUTE 'SELECT man_table FROM '||v_feature_type_table||' WHERE id='''||v_old_featuretype||''';'
+			EXECUTE 'SELECT man_table FROM '||v_feature_type_table||' c JOIN sys_feature_cat ON c.type = s.id WHERE id='''||v_old_featuretype||''';'
 			INTO v_man_table;
 
 			v_query_string_insert='INSERT INTO '||v_man_table||' VALUES ('||v_id||');';
@@ -233,7 +233,7 @@ BEGIN
 		
 		-- inserting new feature on table epa_table
 		IF v_feature_type='node' THEN
-			SELECT epa_table INTO v_epa_table FROM cat_feature_node WHERE id=v_old_featuretype;		
+			SELECT epa_table INTO v_epa_table FROM cat_feature_node c JOIN sys_feature_epa_type s ON epa_default=s.id WHERE c.id=v_old_featuretype;		
 			v_query_string_insert='INSERT INTO '||v_epa_table||' VALUES ('||v_id||');';
 			execute v_query_string_insert;
 

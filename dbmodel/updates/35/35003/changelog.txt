@@ -1,0 +1,3 @@
+3.5.003
+*************
+- Remove man_table & epa_table from cat_feature_* tables

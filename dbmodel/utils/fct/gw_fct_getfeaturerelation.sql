@@ -79,7 +79,7 @@ BEGIN
 	EXECUTE 'SELECT '||v_feature_type||'_type FROM v_edit_'||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''''
 	INTO v_featurecat;
 
-	EXECUTE 'SELECT man_table FROM cat_feature_'||v_feature_type||' WHERE id = '''||v_featurecat||''';'
+	EXECUTE 'SELECT man_table FROM cat_feature_'||v_feature_type||' c JOIN sys_feature_cat s ON c.type = s.id WHERE id = '''||v_featurecat||''';'
 	INTO v_man_table;
 
 	IF v_feature_type='arc' THEN

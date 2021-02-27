@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_repair_epatype(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_repair_epa_type(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -42,23 +42,9 @@ BEGIN
 	
 	IF v_projecttype  = 'WS' THEN
 	
-		-- remove possible mistakes for epa_table on cat_feature
-		UPDATE cat_feature_node SET epa_table = 'inp_reservoir' WHERE epa_default  ='RESERVOIR';
-		UPDATE cat_feature_node SET epa_table = 'inp_tank' WHERE epa_default  ='TANK';
-		UPDATE cat_feature_node SET epa_table = 'inp_inlet' WHERE epa_default  ='INLET';
-		UPDATE cat_feature_node SET epa_table = 'inp_valve' WHERE epa_default  ='VALVE';
-		UPDATE cat_feature_node SET epa_table = 'inp_junction' WHERE epa_default  ='JUNCTION';
-		UPDATE cat_feature_node SET epa_table = 'inp_pump' WHERE epa_default  ='PUMP';
-		UPDATE cat_feature_node SET epa_table = 'inp_shortpipe' WHERE epa_default  ='SHORTPIPE';
-
-		UPDATE cat_feature_arc SET epa_table = 'inp_pipe' WHERE epa_default  ='PIPE';
-		UPDATE cat_feature_arc SET epa_table = 'inp_virtualvalve' WHERE epa_default  ='VIRTUALVALVE';
-		UPDATE cat_feature_arc SET epa_table = 'inp_pump_importinp' WHERE epa_default  ='PUMP-IMPORTINP';
-		UPDATE cat_feature_arc SET epa_table = 'inp_valve_importinp' WHERE epa_default  ='VALVE-IMPORTINP';
-
 		FOR rec_feature IN 
-		SELECT DISTINCT ON (cat_feature_node.id) cat_feature_node.*, cat_node.id as nodecat_id FROM cat_node JOIN cat_feature_node ON cat_node.nodetype_id = cat_feature_node.id 
-		JOIN cat_feature ON cat_feature_node.id = cat_feature.id
+		SELECT DISTINCT ON (cat_feature_node.id) cat_feature_node.*, cat_node.id as nodecat_id, s.epa_table FROM cat_node JOIN cat_feature_node ON cat_node.nodetype_id = cat_feature_node.id 
+		JOIN cat_feature ON cat_feature_node.id = cat_feature.id JOIN sys_feature_epa_type s ON cat_feature_node.epa_default = s.id
 		WHERE epa_default != 'NOT DEFINED' AND cat_feature.active = true
 		LOOP
 
@@ -93,7 +79,7 @@ BEGIN
 
 		-- delete
 		FOR rec_feature IN 
-		SELECT DISTINCT ON (epa_default) * FROM cat_feature_node
+		SELECT DISTINCT ON (epa_default) c.*, epa_table FROM cat_feature_node c JOIN sys_feature_epa_type s ON c.epa_default = s.id
 		LOOP
 			-- delete wrong features on inp tables
 			EXECUTE 'DELETE FROM '||quote_ident(rec_feature.epa_table)||' WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = '||quote_literal(rec_feature.epa_default)||' AND state >0)';
@@ -110,8 +96,8 @@ BEGIN
 		END LOOP;
 
 		FOR rec_feature IN 
-		SELECT DISTINCT ON (cat_feature_arc.id) cat_feature_arc.*, cat_arc.id as arccat_id FROM cat_arc JOIN cat_feature_arc ON cat_arc.arctype_id = cat_feature_arc.id 
-		JOIN cat_feature ON cat_feature_arc.id = cat_feature.id
+		SELECT DISTINCT ON (cat_feature_arc.id) cat_feature_arc.*, cat_arc.id as arccat_id, epa_table FROM cat_arc JOIN cat_feature_arc ON cat_arc.arctype_id = cat_feature_arc.id 
+		JOIN cat_feature ON cat_feature_arc.id = cat_feature.id JOIN sys_feature_epa_type s ON cat_feature_arc.epa_default = s.id
 		WHERE epa_default != 'NOT DEFINED' AND cat_feature.active = true
 		LOOP
 
@@ -146,7 +132,7 @@ BEGIN
 
 		-- delete
 		FOR rec_feature IN 
-		SELECT DISTINCT ON (epa_default) * FROM cat_feature_arc
+		SELECT DISTINCT ON (epa_default) c.*, epa_table FROM cat_feature_arc c JOIN sys_feature_epa_type s ON c.epa_default = s.id
 		LOOP
 			-- delete wrong features on inp tables
 			EXECUTE 'DELETE FROM '||quote_ident(rec_feature.epa_table)||' WHERE arc_id NOT IN (SELECT arc_id FROM arc WHERE epa_type = '||quote_literal(rec_feature.epa_default)||' AND state >0)';
@@ -169,15 +155,7 @@ BEGIN
 
 	ELSE 
 
-
-
-
-
-
-
-
-
-	
+		-- UD TODO
 		
 	END IF;
 	     
@@ -186,9 +164,9 @@ BEGIN
 
 
 	-- Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

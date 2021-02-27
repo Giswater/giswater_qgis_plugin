@@ -128,19 +128,17 @@ BEGIN
 		WHERE id = '||quote_literal(NEW.id)||';';
 
 		IF lower(v_feature.type)='arc' THEN
-			EXECUTE 'INSERT INTO cat_feature_arc (id, type, man_table, epa_default, epa_table)
-			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.man_table)||', 
-			'||quote_literal(v_feature.epa_default)||', '||quote_literal(v_feature.epa_table)||');';
+			EXECUTE 'INSERT INTO cat_feature_arc (id, type, epa_default)
+			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.epa_default)||')||');';
 		ELSIF lower(v_feature.type)='node' THEN
-			EXECUTE 'INSERT INTO cat_feature_node (id, type, man_table,epa_default, epa_table, choose_hemisphere, isarcdivide, num_arcs)
-			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.man_table)||', 
-			'||quote_literal(v_feature.epa_default)||', '||quote_literal(v_feature.epa_table)||', TRUE, TRUE, 2)';
+			EXECUTE 'INSERT INTO cat_feature_node (id, type, epa_default, choose_hemisphere, isarcdivide, num_arcs)
+			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.epa_default)||', TRUE, TRUE, 2)';
 		ELSIF lower(v_feature.type)='connec' THEN
-			EXECUTE 'INSERT INTO cat_feature_connec (id, type, man_table)
-			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.man_table)||');';
+			EXECUTE 'INSERT INTO cat_feature_connec (id, type)
+			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||');';
 		ELSIF lower(v_feature.type)='gully' THEN
-			EXECUTE 'INSERT INTO cat_feature_gully (id, type, man_table)
-			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.man_table)||');';
+			EXECUTE 'INSERT INTO cat_feature_gully (id, type)
+			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||');';
 		END IF;
 		--create child view
 		v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"False" }}';
@@ -281,19 +279,17 @@ BEGIN
 			EXECUTE 'DELETE FROM cat_feature_'||lower(OLD.feature_type)||' WHERE id = '||quote_literal(NEW.id)||';';
 
 			IF lower(NEW.feature_type)='arc' THEN
-				EXECUTE 'INSERT INTO cat_feature_arc (id,type,man_table,epa_default,epa_table)
-				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.man_table)||', 
-				'||quote_literal(v_feature.epa_default)||', '||quote_literal(v_feature.epa_table)||');';
+				EXECUTE 'INSERT INTO cat_feature_arc (id, type, epa_default)
+				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.epa_default)||')||');';
 			ELSIF lower(NEW.feature_type)='node' THEN
-				EXECUTE 'INSERT INTO cat_feature_node (id, type, man_table,epa_default, epa_table, choose_hemisphere, isarcdivide, num_arcs)
-				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.man_table)||', 
-				'||quote_literal(v_feature.epa_default)||', '||quote_literal(v_feature.epa_table)||', TRUE, TRUE, 2);';
+				EXECUTE 'INSERT INTO cat_feature_node (id, type, epa_default, choose_hemisphere, isarcdivide, num_arcs)
+				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||',	'||quote_literal(v_feature.epa_default)||', TRUE, TRUE, 2);';
 			ELSIF lower(NEW.feature_type)='connec' THEN
-				EXECUTE 'INSERT INTO cat_feature_connec (id, type, man_table)
-				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.man_table)||');';
+				EXECUTE 'INSERT INTO cat_feature_connec (id, type)
+				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||');';
 			ELSIF lower(NEW.feature_type)='gully' THEN
-				EXECUTE 'INSERT INTO cat_feature_gully (id, type, man_table)
-				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.man_table)||');';
+				EXECUTE 'INSERT INTO cat_feature_gully (id, type)
+				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||');';
 			END IF;
 
 			--delete configuration from config_form_fields

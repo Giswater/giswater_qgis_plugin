@@ -39,7 +39,7 @@ BEGIN
 	--modify values for custom view inserts
 	IF v_man_table IN (SELECT id FROM cat_feature_arc) THEN
 		v_customfeature:=v_man_table;
-		v_man_table:=(SELECT man_table FROM cat_feature_arc WHERE id=v_man_table);
+		v_man_table:=(SELECT man_table FROM cat_feature_arc c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id=v_man_table);
 	END IF;
 
 	v_type_v_man_table:=v_man_table;
@@ -86,7 +86,7 @@ BEGIN
 			END IF;
 			
 		ELSIF (NEW.arc_type IS NULL) AND v_man_table !='parent' THEN
-			NEW.arc_type:= (SELECT id FROM cat_feature_arc WHERE man_table=v_type_v_man_table LIMIT 1);
+			NEW.arc_type:= (SELECT c.id FROM cat_feature_arc c JOIN sys_feature_cat s ON c.type = s.id WHERE man_table=v_type_v_man_table LIMIT 1);
 		END IF;
 
 		 -- Epa type
@@ -418,7 +418,7 @@ BEGIN
 			INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 		
 		ELSIF v_man_table='parent' THEN
-		v_man_table := (SELECT man_table FROM cat_feature_arc WHERE id=NEW.arc_type);
+		v_man_table := (SELECT man_table FROM cat_feature_arc  c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id=NEW.arc_type);
 		v_sql:= 'INSERT INTO '||v_man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';    
 		EXECUTE v_sql;				
 		
@@ -432,19 +432,19 @@ BEGIN
 		ELSIF (NEW.epa_type = 'PUMP') THEN 
 		    INSERT INTO inp_pump (arc_id) VALUES (NEW.arc_id); 
 				
-			ELSIF (NEW.epa_type = 'ORIFICE') THEN 
+		ELSIF (NEW.epa_type = 'ORIFICE') THEN 
 		    INSERT INTO inp_orifice (arc_id, ori_type) VALUES (NEW.arc_id,'BOTTOM');
 				
-			ELSIF (NEW.epa_type = 'WEIR') THEN 
+		ELSIF (NEW.epa_type = 'WEIR') THEN 
 		    INSERT INTO inp_weir (arc_id, weir_type) VALUES (NEW.arc_id,'SIDEFLOW');
 				
-			ELSIF (NEW.epa_type = 'OUTLET') THEN 
+		ELSIF (NEW.epa_type = 'OUTLET') THEN 
 		    INSERT INTO inp_outlet (arc_id, outlet_type) VALUES (NEW.arc_id,'TABULAR/HEAD');
 		    
-			ELSIF (NEW.epa_type = 'VIRTUAL') THEN 
+		ELSIF (NEW.epa_type = 'VIRTUAL') THEN 
 		    INSERT INTO inp_virtual (arc_id, add_length) VALUES (NEW.arc_id, false);
 					
-			END IF;
+		END IF;
 
 		-- man addfields insert
 		IF v_customfeature IS NOT NULL THEN
@@ -553,8 +553,8 @@ BEGIN
 
 		 -- UPDATE management values
 		IF (NEW.arc_type <> OLD.arc_type) THEN 
-			v_new_man_table:= (SELECT man_table FROM cat_feature_arc WHERE id = NEW.arc_type);
-			v_old_man_table:= (SELECT man_table FROM cat_feature_arc WHERE id = OLD.arc_type);
+			v_new_man_table:= (SELECT man_table FROM cat_feature_arc  c JOIN sys_feature_cat s ON c.type = s.id  WHERE c.id = NEW.arc_type);
+			v_old_man_table:= (SELECT man_table FROM cat_feature_arc  c JOIN sys_feature_cat s ON c.type = s.id  WHERE c.id = OLD.arc_type);
 			IF v_new_man_table IS NOT NULL THEN
 				v_sql:= 'DELETE FROM '||v_old_man_table||' WHERE arc_id= '||quote_literal(OLD.arc_id);
 				EXECUTE v_sql;

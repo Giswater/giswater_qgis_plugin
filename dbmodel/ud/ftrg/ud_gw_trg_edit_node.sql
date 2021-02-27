@@ -65,7 +65,7 @@ BEGIN
 	-- modify values for custom view inserts
 	IF v_man_table IN (SELECT id FROM cat_feature_node) THEN
 		v_customfeature:=v_man_table;
-		v_man_table:=(SELECT man_table FROM cat_feature_node WHERE id=v_man_table);
+		v_man_table:=(SELECT man_table FROM cat_feature_node c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id=v_man_table);
 	END IF;
 
 	v_type_v_man_table:=v_man_table;
@@ -186,7 +186,7 @@ BEGIN
 				NEW.node_type:= (SELECT id FROM cat_feature_node LIMIT 1);
 
 			ELSIF (NEW.node_type IS NULL) AND v_man_table !='parent' THEN
-				NEW.node_type:= (SELECT id FROM cat_feature_node WHERE man_table=v_type_v_man_table LIMIT 1);
+				NEW.node_type:= (SELECT id FROM cat_feature_node c JOIN sys_feature_cat s ON c.type = s.id WHERE man_table=v_type_v_man_table LIMIT 1);
 			END IF;
 		END IF;
 
@@ -560,7 +560,7 @@ BEGIN
 		
 		ELSIF v_man_table='parent' THEN
 
-			v_man_table:= (SELECT man_table FROM cat_feature_node WHERE id=NEW.node_type);
+			v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id=NEW.node_type);
 			v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
 			EXECUTE v_sql;
 
@@ -644,8 +644,8 @@ BEGIN
 
 		-- node type
 		IF (NEW.node_type <> OLD.node_type) THEN 
-			v_new_v_man_table:= (SELECT man_table FROM cat_feature_node WHERE id = NEW.node_type);
-			v_old_v_man_table:= (SELECT man_table FROM cat_feature_node WHERE id = OLD.node_type);
+			v_new_v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id = NEW.node_type);
+			v_old_v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id = OLD.node_type);
 			IF v_new_v_man_table IS NOT NULL THEN
 				v_sql:= 'DELETE FROM '||v_old_v_man_table||' WHERE node_id= '||quote_literal(OLD.node_id);
 				EXECUTE v_sql;
@@ -841,17 +841,10 @@ BEGIN
 				END IF;
 			END LOOP;
 		END IF;       
-<<<<<<< HEAD
-			
-		RETURN NEW;
-		
-    ELSIF TG_OP = 'DELETE' THEN
-=======
 	    		
 		RETURN NEW;
 			
 	ELSIF TG_OP = 'DELETE' THEN
->>>>>>> c9e3ca246... Force variable plan_psector_force_delete on true when deleting from ve_* and v_edit_*
 
 		EXECUTE 'SELECT gw_fct_getcheckdelete($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"'||OLD.node_id||'","featureType":"NODE"}, "data":{}}$$)';

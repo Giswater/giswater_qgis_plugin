@@ -10,13 +10,6 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_inp_demand() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE 
 
-    node_table varchar;
-    man_table varchar;
-    epa_type varchar;
-    v_sql varchar;
-    old_nodetype varchar;
-    new_nodetype varchar;    
-	
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';

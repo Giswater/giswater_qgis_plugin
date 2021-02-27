@@ -416,7 +416,8 @@ BEGIN
 			END IF;
 			
 			-- getting man_table to work with
-			SELECT man_table, epa_table INTO v_mantablename, v_epatablename FROM cat_feature JOIN cat_feature_node USING(id) WHERE epa_default = v_epatype;
+			SELECT man_table, epa_table INTO v_mantablename, v_epatablename FROM cat_feature_node c JOIN sys_feature_epa_type s ON c.epa_default = s.id 
+			WHERE epa_default = v_epatype;
 
 			-- defining new node parameters
 			v_node_id = replace(v_data.arc_id, '_n2a', '');

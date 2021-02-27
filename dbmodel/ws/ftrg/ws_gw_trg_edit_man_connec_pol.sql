@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_man_connec_pol() RETURNS tr
 $BODY$
 
 DECLARE 
-    man_table varchar;
+man_table varchar;
 
 BEGIN
 
