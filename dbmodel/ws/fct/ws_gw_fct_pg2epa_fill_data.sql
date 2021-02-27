@@ -108,7 +108,7 @@ BEGIN
 			WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
 			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
 			||v_statetype||' AND v_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
-			AND epa_type != ''NOT DEFINED''';
+			AND epa_type != ''UNDEFINED''';
 
 
         raise notice 'updating inp_pipe';

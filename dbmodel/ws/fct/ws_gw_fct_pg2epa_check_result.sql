@@ -409,26 +409,26 @@ BEGIN
 			END IF;
 		END IF;
 
-		RAISE NOTICE '9 - Check for NOT DEFINED elements on temp table (297)';
+		RAISE NOTICE '9 - Check for UNDEFINED elements on temp table (297)';
 		INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-		SELECT 297, node_id, nodecat_id, the_geom, 'epa_type NOT DEFINED' FROM temp_node WHERE  epa_type = 'NOT DEFINED';
+		SELECT 297, node_id, nodecat_id, the_geom, 'epa_type UNDEFINED' FROM temp_node WHERE  epa_type = 'UNDEFINED';
 		
 		SELECT count(*) INTO v_count FROM anl_node WHERE fid = 297 AND cur_user = current_user;
 		IF  v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' nodes with epa_type NOT DEFINED on this exportation. If are disconnected, may be have been deleted, but please check it before continue.'));
+			VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' nodes with epa_type UNDEFINED on this exportation. If are disconnected, may be have been deleted, but please check it before continue.'));
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: All nodes have epa_type defined.'));
 		END IF;
 
 		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, descript)
-		SELECT 297, arc_id, arccat_id, the_geom, 'epa_type NOT DEFINED' FROM temp_arc WHERE  epa_type = 'NOT DEFINED';
+		SELECT 297, arc_id, arccat_id, the_geom, 'epa_type UNDEFINED' FROM temp_arc WHERE  epa_type = 'UNDEFINED';
 		
-		SELECT count(*) INTO v_count FROM temp_arc WHERE epa_type = 'NOT DEFINED';
+		SELECT count(*) INTO v_count FROM temp_arc WHERE epa_type = 'UNDEFINED';
 		IF  v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' arcs with epa_type NOT DEFINED on this exportation. Please check it before continue.'));
+			VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' arcs with epa_type UNDEFINED on this exportation. Please check it before continue.'));
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: All arcs have epa_type defined.'));

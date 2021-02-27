@@ -83,7 +83,7 @@ BEGIN
 			(SELECT node_1 as node_id FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc))a JOIN v_edit_node USING (node_id)
 			JOIN selector_sector USING (sector_id) 
 			JOIN value_state_type v ON state_type = v.id
-			WHERE epa_type != ''NOT DEFINED'' and is_operative = true and cur_user = current_user ) b';	
+			WHERE epa_type != ''UNDEFINED'' and is_operative = true and cur_user = current_user ) b';	
 		
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
@@ -153,12 +153,12 @@ BEGIN
 		v_querytext = '(SELECT arc_id, ''arc'' as feature_tpe FROM arc JOIN
 				(select arc_id from inp_conduit UNION select arc_id from inp_virtual UNION select arc_id from inp_weir UNION select arc_id from inp_pump UNION select arc_id from inp_outlet UNION select arc_id from inp_orifice) a
 				USING (arc_id) 
-				WHERE state > 0 AND epa_type !=''NOT DEFINED'' AND a.arc_id IS NULL
+				WHERE state > 0 AND epa_type !=''UNDEFINED'' AND a.arc_id IS NULL
 				UNION
 				SELECT node_id, ''node'' FROM node JOIN
 				(select node_id from inp_junction UNION select node_id from inp_storage UNION select node_id from inp_outfall UNION select node_id from inp_divider) a
 				USING (node_id) 
-				WHERE state > 0 AND epa_type !=''NOT DEFINED'' AND a.node_id IS NULL) a';
+				WHERE state > 0 AND epa_type !=''UNDEFINED'' AND a.node_id IS NULL) a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 

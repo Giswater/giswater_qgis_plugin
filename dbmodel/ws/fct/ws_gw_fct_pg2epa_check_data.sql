@@ -83,7 +83,7 @@ BEGIN
 			(SELECT node_1 as node_id FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc))a JOIN v_edit_node USING (node_id)
 			JOIN selector_sector USING (sector_id) 
 			JOIN value_state_type v ON state_type = v.id
-			WHERE epa_type != ''NOT DEFINED'' and is_operative = true and cur_user = current_user ) b';		
+			WHERE epa_type != ''UNDEFINED'' and is_operative = true and cur_user = current_user ) b';		
 			
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
@@ -147,7 +147,7 @@ BEGIN
 	RAISE NOTICE '5 - Check for missed features on inp tables';
 	v_querytext = '(SELECT arc_id, ''arc'' FROM arc LEFT JOIN 
 			(SELECT arc_id from inp_pipe UNION SELECT arc_id FROM inp_virtualvalve) b using (arc_id)
-			WHERE b.arc_id IS NULL AND state > 0 AND epa_type !=''NOT DEFINED''
+			WHERE b.arc_id IS NULL AND state > 0 AND epa_type !=''UNDEFINED''
 			UNION 
 		SELECT node_id, ''node'' FROM node LEFT JOIN 
 			(select node_id from inp_shortpipe UNION select node_id from inp_valve 
@@ -155,7 +155,7 @@ BEGIN
 			UNION select node_id FROM inp_reservoir UNION select node_id FROM inp_pump 
 			UNION SELECT node_id from inp_inlet 
 			UNION SELECT node_id from inp_junction) b USING (node_id)
-			WHERE b.node_id IS NULL AND state >0 AND epa_type !=''NOT DEFINED'') a';
+			WHERE b.node_id IS NULL AND state >0 AND epa_type !=''UNDEFINED'') a';
 
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;

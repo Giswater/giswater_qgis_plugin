@@ -1081,7 +1081,7 @@ VALUES('101', 'v_edit_Arc', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis
           <Option type="Map">
             <Option type="Map" name="map">
               <Option type="QString" value="CONDUIT" name="CONDUIT"/>
-              <Option type="QString" value="NOT DEFINED" name="NOT DEFINED"/>
+              <Option type="QString" value="UNDEFINED" name="UNDEFINED"/>
               <Option type="QString" value="ORIFICE" name="ORIFICE"/>
               <Option type="QString" value="OUTLET" name="OUTLET"/>
               <Option type="QString" value="PUMP" name="PUMP"/>
@@ -4977,7 +4977,7 @@ VALUES('104', 'v_edit_node', 'qml', $$<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgi
             <Option type="Map" name="map">
               <Option type="QString" value="DIVIDER" name="DIVIDER"/>
               <Option type="QString" value="JUNCTION" name="JUNCTION"/>
-              <Option type="QString" value="NOT DEFINED" name="NOT DEFINED"/>
+              <Option type="QString" value="UNDEFINED" name="UNDEFINED"/>
               <Option type="QString" value="OUTFALL" name="OUTFALL"/>
               <Option type="QString" value="STORAGE" name="STORAGE"/>
             </Option>
