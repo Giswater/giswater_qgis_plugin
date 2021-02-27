@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
---2020/12/14
+--2021/02/27
 UPDATE sys_feature_cat SET man_table = f.man_table FROM cat_feature_gully f WHERE sys_feature_cat.id=f.type;
 
 ALTER TABLE cat_feature_gully DROP COLUMN man_table;

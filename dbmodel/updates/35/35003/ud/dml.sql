@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
---2020/02/27
+--2021/02/27
 UPDATE sys_feature_epa_type SET active = true;
 UPDATE sys_feature_epa_type SET active = false WHERE id IN ('DIVIDER');
 
