@@ -2197,7 +2197,7 @@ class GwMincut:
         self.vertex_marker = self.snapper_manager.vertex_marker
 
         # Set active and current layer
-        self.layer = tools_qgis.get_layer_by_tablename("v_om_mincut_valve")
+        self.layer = tools_qgis.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer)
         self.current_layer = self.layer
 
