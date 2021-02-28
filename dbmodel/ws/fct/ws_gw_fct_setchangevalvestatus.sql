@@ -28,14 +28,22 @@ BEGIN
 	v_mincut_id := ((p_data ->>'data')::json->>'mincutId')::integer;
 	v_node := ((p_data ->>'data')::json->>'nodeId')::text;
 	v_usepsectors := ((p_data ->>'data')::json->>'usePsectors')::text;
+	
+	IF (SELECT count(*) FROM man_valve WHERE node_id  = v_node) > 0 THEN
 
-	UPDATE man_valve
-	SET closed = NOT closed
-	WHERE node_id = v_node;
+		UPDATE man_valve SET closed = NOT closed WHERE node_id = v_node;
+		
+		v_message = 'Change valve status done successfully';
+		
+	ELSE
+	
+		v_message = 'No valve have been choosed';
+	
+	END IF;
 
 	v_status = 'Accepted';
 	v_level = 3;
-	v_message = 'Change valve status done successfully';
+	
 
 	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}}')::json;
 
