@@ -17,7 +17,7 @@ CREATE OR REPLACE VIEW v_edit_inp_junction AS
     n.custom_ymax,
     n.elev,
     n.custom_elev,
-    n.elev AS sys_elev,
+    n.sys_elev,
     n.nodecat_id,
     n.sector_id,
     macrosector_id,
