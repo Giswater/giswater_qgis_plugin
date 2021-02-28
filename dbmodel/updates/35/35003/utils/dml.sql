@@ -9,4 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2021/02/27
-INSERT INTO sys_fprocess VALUES(367, 'Check graf config', 'ws');
+INSERT INTO sys_fprocess VALUES (367, 'Check graf config', 'ws');
+
+INSERT INTO sys_function VALUES (3026, 'gw_fct_setchangevalvestatus', 'ws', 'function', 'json', 'json', 'Function that changes status valve', 'role_om');

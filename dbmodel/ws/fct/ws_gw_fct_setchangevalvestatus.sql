@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: xxx
+--FUNCTION CODE: 3026
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_setchangevalvestatus(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setchangevalvestatus(p_data json) RETURNS json AS $BODY$
@@ -33,9 +33,6 @@ BEGIN
 	SET closed = NOT closed
 	WHERE node_id = v_node;
 
-	-- Recalculate the mincut
-	PERFORM gw_fct_mincut(feature_id_aux, feature_type_aux, v_result_id, v_usepsectors);
-	
 	v_status = 'Accepted';
 	v_level = 3;
 	v_message = 'Change valve status done successfully';
