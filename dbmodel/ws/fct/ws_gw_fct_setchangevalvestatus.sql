@@ -32,12 +32,10 @@ BEGIN
 	IF (SELECT count(*) FROM man_valve WHERE node_id  = v_node) > 0 THEN
 
 		UPDATE man_valve SET closed = NOT closed WHERE node_id = v_node;
-		
-		v_message = 'Change valve status done successfully';
+		v_message = 'Change valve status done successfully. You can continue by click on more valves or finish the process by click on...';
 		
 	ELSE
-	
-		v_message = 'No valve have been choosed';
+		v_message = 'No valve have been choosed. You can continue by click on more valves or finish the process by click on...';
 	
 	END IF;
 
