@@ -227,26 +227,18 @@ class GwLoadProject(QObject):
 
 
     def _get_buttons_to_hide(self):
-        """
-            Populates the buttons_to_hide list.
-        """
+        """ Get all buttons to hide """
 
         try:
-            # db format of value for parameter qgis_toolbar_hidebuttons -> {"index_action":[199, 74,75]}
-            row = tools_gw.get_config_value('qgis_toolbar_hidebuttons')
-            if not row:
+            row = tools_gw.get_config_parser('qgis_toolbar_hidebuttons', 'buttons_to_hide', "user", "init")
+            if not row or row in (None, 'None'):
                 return
 
-            json_list = json.loads(row[0], object_pairs_hook=OrderedDict)
-            self.buttons_to_hide = [str(x) for x in json_list['action_index']]
-        except KeyError:
-            pass
-        except json.JSONDecodeError:
-            # TODO: Control if json have a correct format
-            pass
-        finally:
-            # TODO remove this line if you want enabled info for epa
-            self.buttons_to_hide.append('199')
+            self.buttons_to_hide = [int(x) for x in row.split(',')]
+
+        except Exception as e:
+            tools_log.show_warning(f"{type(e).__name__}: {e}")
+
 
 
     def _manage_toolbars(self):
