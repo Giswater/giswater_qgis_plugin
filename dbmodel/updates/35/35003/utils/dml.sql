@@ -12,3 +12,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 INSERT INTO sys_fprocess VALUES (367, 'Check graf config', 'ws');
 
 INSERT INTO sys_function VALUES (3026, 'gw_fct_setchangevalvestatus', 'ws', 'function', 'json', 'json', 'Function that changes status valve', 'role_om');
+
+
+--2021/03/01
+DELETE FROM config_param_user WHERE parameter = 'qgis_toolbar_hidebuttons';
