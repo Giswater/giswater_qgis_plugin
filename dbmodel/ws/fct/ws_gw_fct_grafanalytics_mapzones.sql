@@ -700,7 +700,7 @@ BEGIN
 						VALUES (v_fid, 1, 'INFO: For more information, please configure your system (utils_grafanalytics_status.manageConflictOnExpl = true and define one conflict mapzone for each exploitation)');
 
 					ELSE
-						v_querytext = (SELECT unnest(v_conflict));
+						v_querytext = (SELECT string_agg(a::text,', ') FROM (SELECT unnest(v_conflict))a);
 
 						-- update features
 						EXECUTE 'UPDATE arc a SET '||v_field||' = m.'||v_field||' FROM (SELECT '||v_field||', expl_id FROM '||v_table||' WHERE grafconfig->>''status'' = ''useWhenConflict'')m 
