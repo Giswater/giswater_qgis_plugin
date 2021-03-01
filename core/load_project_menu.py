@@ -42,6 +42,9 @@ class GwMenuLoad(QObject):
         self.main_menu = QMenu("&Giswater", self.iface.mainWindow().menuBar())
         tools_gw.set_config_parser("menu", "load", "true", "project", "giswater")
 
+        config_icon = QIcon(
+            f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}99.png")
+
         # region Toolbar
         toolbars_menu = QMenu(f"Toolbars", self.iface.mainWindow().menuBar())
         icon_path = f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}36.png"
@@ -74,49 +77,40 @@ class GwMenuLoad(QObject):
                     global_vars.shortcut_keys.append(shortcut_key)
 
                 action.triggered.connect(partial(self._clicked_event, action_function))
-
-
         # endregion
 
-        # region Config
-        config_menu = QMenu(f"Config", self.iface.mainWindow().menuBar())
-        self.main_menu.addMenu(config_menu)
-        config_icon = QIcon(
-            f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}toolbars{os.sep}utilities{os.sep}99.png")
-        config_menu.setIcon(config_icon)
-
-        temporal_icon = QIcon(
-            f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}100.png")
-
-        action_manage_file = config_menu.addAction(f"Manage Files")
-        action_manage_file.setIcon(temporal_icon)
-        action_manage_file.triggered.connect(self._open_manage_file)
-
+        # region Actions
         actions_menu = QMenu(f"Actions", self.iface.mainWindow().menuBar())
-        actions_menu.setIcon(temporal_icon)
-        config_menu.addMenu(actions_menu)
+        actions_menu.setIcon(config_icon)
+        self.main_menu.addMenu(actions_menu)
 
         action_set_log_sql = actions_menu.addAction(f"Enable log sql")
         log_sql_shortcut = tools_gw.get_config_parser("system", f"log_sql_shortcut", "user", "init", prefix=False)
         if not log_sql_shortcut:
-            log_sql_shortcut = "Alt+1"
             tools_gw.set_config_parser("system", f"log_sql_shortcut", f"{log_sql_shortcut}", "user", "init",
                                        prefix=False)
         action_set_log_sql.setShortcuts(QKeySequence(f"{log_sql_shortcut}"))
-        action_set_log_sql.setIcon(temporal_icon)
         action_set_log_sql.triggered.connect(self._set_log_sql)
 
         action_reset_dialogs = actions_menu.addAction(f"Reset dialogs")
 
-        action_reset_dialogs.setIcon(temporal_icon)
         action_reset_dialogs.triggered.connect(self._reset_position_dialog)
+        # endregion
 
+        # region Adavanced
+        action_manage_file = self.main_menu.addAction(f"Advanced")
+        action_manage_file.triggered.connect(self._open_manage_file)
         folder_icon = QIcon(
-            f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}170.png")
-        action_open_path = config_menu.addAction(f"Open folder")
+            f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}105.png")
+        action_manage_file.setIcon(folder_icon)
+        # endregion
+
+        # region Open user folder
+        folder_icon = QIcon(
+            f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}102.png")
+        action_open_path = self.main_menu.addAction(f"Open folder")
         action_open_path.setIcon(folder_icon)
         action_open_path.triggered.connect(self._open_config_path)
-
         # endregion
 
         self.iface.mainWindow().menuBar().insertMenu(last_action, self.main_menu)
