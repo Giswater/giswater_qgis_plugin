@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2021/02/27
-
+DROP TRIGGER IF EXISTS gw_trg_vi_demands ON vi_demands;
 CREATE TRIGGER gw_trg_vi_demands
   INSTEAD OF INSERT OR UPDATE OR DELETE
   ON SCHEMA_NAME.vi_demands
