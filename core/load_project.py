@@ -231,13 +231,14 @@ class GwLoadProject(QObject):
 
         try:
             row = tools_gw.get_config_parser('qgis_toolbar_hidebuttons', 'buttons_to_hide', "user", "init")
-            if not row or row is None:
+
+            if not row or row in (None, 'None'):
                 return
 
             self.buttons_to_hide = [int(x) for x in row.split(',')]
 
-        except Exception:
-            pass
+        except Exception as e:
+            tools_log.show_warning(f"{type(e).__name__}: {e}")
 
 
     def _manage_toolbars(self):
