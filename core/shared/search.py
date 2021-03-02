@@ -101,20 +101,25 @@ class GwSearch:
             x = 0
 
             for field in tab['fields']:
-                label = QLabel()
-                label.setObjectName('lbl_' + field['label'])
-                label.setText(field['label'].capitalize())
-                widget = None
-                if field['widgettype'] == 'typeahead':
-                    completer = QCompleter()
-                    widget = tools_gw.add_lineedit(field)
-                    widget = self._set_typeahead_completer(widget, completer)
-                    self.lineedit_list.append(widget)
-                elif field['widgettype'] == 'combo':
-                    widget = self._add_combobox(field)
-                gridlayout.addWidget(label, x, 0)
-                gridlayout.addWidget(widget, x, 1)
-                x += 1
+                try:
+                    label = QLabel()
+                    label.setObjectName('lbl_' + field['label'])
+                    label.setText(field['label'].capitalize())
+                    widget = None
+                    if field['widgettype'] == 'typeahead':
+                        completer = QCompleter()
+                        widget = tools_gw.add_lineedit(field)
+                        widget = self._set_typeahead_completer(widget, completer)
+                        self.lineedit_list.append(widget)
+                    elif field['widgettype'] == 'combo':
+                        widget = self._add_combobox(field)
+                    gridlayout.addWidget(label, x, 0)
+                    gridlayout.addWidget(widget, x, 1)
+                    x += 1
+                except Exception:
+                    msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
+                          f"widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
+                    tools_qgis.show_message(msg, 2)
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)

@@ -125,99 +125,106 @@ class GwConfigButton(GwAction):
     def _build_dialog_options(self, row, tab):
 
         self.tab = tab
+
         for field in row['fields']:
-            widget = None
-            self.chk = None
-            if field['label']:
-                lbl = QLabel()
-                lbl.setObjectName('lbl' + field['widgetname'])
-                lbl.setText(field['label'])
-                lbl.setMinimumSize(160, 0)
-                lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-                lbl.setToolTip(field['tooltip'])
+            try:
+                widget = None
+                self.chk = None
+                if field['label']:
+                    lbl = QLabel()
+                    lbl.setObjectName('lbl' + field['widgetname'])
+                    lbl.setText(field['label'])
+                    lbl.setMinimumSize(160, 0)
+                    lbl.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+                    lbl.setToolTip(field['tooltip'])
 
-                if self.tab == 'user':
-                    self.chk = QCheckBox()
-                    self.chk.setObjectName('chk_' + field['widgetname'])
-                    if field['checked'] in ('true', 'True', 'TRUE', True):
-                        self.chk.setChecked(True)
-                    elif field['checked'] in ('false', 'False', 'FALSE', False):
-                        self.chk.setChecked(False)
-                    self.chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                    if self.tab == 'user':
+                        self.chk = QCheckBox()
+                        self.chk.setObjectName('chk_' + field['widgetname'])
+                        if field['checked'] in ('true', 'True', 'TRUE', True):
+                            self.chk.setChecked(True)
+                        elif field['checked'] in ('false', 'False', 'FALSE', False):
+                            self.chk.setChecked(False)
+                        self.chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-                if field['widgettype'] in ('text', 'linetext', 'typeahead'):
-                    widget = QLineEdit()
-                    widget.setText(field['value'])
-                    widget.editingFinished.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    if field['widgettype'] in ('text', 'linetext', 'typeahead'):
+                        widget = QLineEdit()
+                        widget.setText(field['value'])
+                        widget.editingFinished.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
+                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
-                    if field['widgettype'] == 'typeahead':
-                        completer = QCompleter()
-                        if 'dv_querytext' in field:
-                            widget.setProperty('typeahead', True)
-                            model = QStringListModel()
-                            widget.textChanged.connect(
-                                partial(self.populate_typeahead, completer, model, field, self.dlg_config, widget))
+                        if field['widgettype'] == 'typeahead':
+                            completer = QCompleter()
+                            if 'dv_querytext' in field:
+                                widget.setProperty('typeahead', True)
+                                model = QStringListModel()
+                                widget.textChanged.connect(
+                                    partial(self.populate_typeahead, completer, model, field, self.dlg_config, widget))
 
-                elif field['widgettype'] == 'textarea':
-                    widget = QTextEdit()
-                    widget.setText(field['value'])
-                    widget.editingFinished.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'combo':
-                    widget = QComboBox()
-                    self._fill_combo(widget, field)
-                    widget.currentIndexChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'check':
-                    self.chk = QCheckBox()
-                    self.chk.setObjectName(field['widgetname'])
-                    if self.tab == 'user' and field['checked'] in ('true', 'True', 'TRUE', True):
-                        self.chk.setChecked(True)
-                    elif self.tab == 'user' and field['checked'] in ('false', 'False', 'FALSE', False):
-                        self.chk.setChecked(False)
-                    elif field['value'] in ('true', 'True', 'TRUE', True):
-                        self.chk.setChecked(True)
-                    elif field['value'] in ('false', 'False', 'FALSE', False):
-                        self.chk.setChecked(False)
-                    self.chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                    self.chk.stateChanged.connect(partial(self._get_dialog_changed_values, self.chk, self.tab, self.chk))
-                elif field['widgettype'] == 'datetime':
-                    widget = QgsDateTimeEdit()
-                    widget.setAllowNull(True)
-                    widget.setCalendarPopup(True)
-                    widget.setDisplayFormat('dd/MM/yyyy')
+                    elif field['widgettype'] == 'textarea':
+                        widget = QTextEdit()
+                        widget.setText(field['value'])
+                        widget.editingFinished.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
+                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    elif field['widgettype'] == 'combo':
+                        widget = QComboBox()
+                        self._fill_combo(widget, field)
+                        widget.currentIndexChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
+                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    elif field['widgettype'] == 'check':
+                        self.chk = QCheckBox()
+                        self.chk.setObjectName(field['widgetname'])
+                        if self.tab == 'user' and field['checked'] in ('true', 'True', 'TRUE', True):
+                            self.chk.setChecked(True)
+                        elif self.tab == 'user' and field['checked'] in ('false', 'False', 'FALSE', False):
+                            self.chk.setChecked(False)
+                        elif field['value'] in ('true', 'True', 'TRUE', True):
+                            self.chk.setChecked(True)
+                        elif field['value'] in ('false', 'False', 'FALSE', False):
+                            self.chk.setChecked(False)
+                        self.chk.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                        self.chk.stateChanged.connect(partial(self._get_dialog_changed_values, self.chk, self.tab, self.chk))
+                    elif field['widgettype'] == 'datetime':
+                        widget = QgsDateTimeEdit()
+                        widget.setAllowNull(True)
+                        widget.setCalendarPopup(True)
+                        widget.setDisplayFormat('dd/MM/yyyy')
 
-                    if field['value']:
-                        field['value'] = field['value'].replace('/', '-')
-                    date = QDate.fromString(field['value'], 'yyyy-MM-dd')
-                    if date:
-                        widget.setDate(date)
+                        if field['value']:
+                            field['value'] = field['value'].replace('/', '-')
+                        date = QDate.fromString(field['value'], 'yyyy-MM-dd')
+                        if date:
+                            widget.setDate(date)
+                        else:
+                            widget.clear()
+                        widget.dateChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
+                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    elif field['widgettype'] == 'spinbox':
+                        widget = QDoubleSpinBox()
+                        if 'value' in field and field['value'] is not None:
+                            value = float(str(field['value']))
+                            widget.setValue(value)
+                        widget.valueChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
+                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                     else:
-                        widget.clear()
-                    widget.dateChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                elif field['widgettype'] == 'spinbox':
-                    widget = QDoubleSpinBox()
-                    if 'value' in field and field['value'] is not None:
-                        value = float(str(field['value']))
-                        widget.setValue(value)
-                    widget.valueChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
-                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                else:
-                    pass
+                        pass
 
-                if widget:
-                    widget.setObjectName(field['widgetname'])
+                    if widget:
+                        widget.setObjectName(field['widgetname'])
 
-                # Set signals
-                if self.tab == 'user' and widget is not None:
-                    self.chk.stateChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
+                    # Set signals
+                    if self.tab == 'user' and widget is not None:
+                        self.chk.stateChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
 
-                if widget is None:
-                    widget = self.chk
+                    if widget is None:
+                        widget = self.chk
 
-                self._order_widgets(field, lbl, widget)
+                    self._order_widgets(field, lbl, widget)
+
+            except Exception:
+                msg = f"key 'comboIds' or/and comboNames not found WHERE " \
+                      f"widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
+                tools_qgis.show_message(msg, 2)
 
 
     def populate_typeahead(self, completer, model, field, dialog, widget):

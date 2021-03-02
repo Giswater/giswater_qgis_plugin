@@ -158,17 +158,22 @@ class GwSelector:
                     tools_gw.add_widget(dialog, field, label, widget)
 
             for order, field in enumerate(form_tab['fields']):
-                label = QLabel()
-                label.setObjectName('lbl_' + field['label'])
-                label.setText(field['label'])
+                try:
+                    label = QLabel()
+                    label.setObjectName('lbl_' + field['label'])
+                    label.setText(field['label'])
 
-                widget = tools_gw.add_checkbox(field)
-                widget.stateChanged.connect(partial(self._set_selection_mode, dialog, widget, selection_mode, selector_vars))
-                widget.setLayoutDirection(Qt.RightToLeft)
+                    widget = tools_gw.add_checkbox(field)
+                    widget.stateChanged.connect(partial(self._set_selection_mode, dialog, widget, selection_mode, selector_vars))
+                    widget.setLayoutDirection(Qt.RightToLeft)
 
-                field['layoutname'] = gridlayout.objectName()
-                field['layoutorder'] = order + i
-                tools_gw.add_widget(dialog, field, label, widget)
+                    field['layoutname'] = gridlayout.objectName()
+                    field['layoutorder'] = order + i
+                    tools_gw.add_widget(dialog, field, label, widget)
+                except Exception:
+                    msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
+                          f"widgetname='{field['widgetname']}'"
+                    tools_qgis.show_message(msg, 2)
 
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             gridlayout.addItem(vertical_spacer1)
