@@ -1383,7 +1383,7 @@ def fill_combo(widget, field):
     widget.clear()
     widget.blockSignals(False)
     combolist = []
-    if 'comboIds' in field:
+    if 'comboIds' in field and 'comboNames' in field:
         if 'isNullValue' in field and field['isNullValue']:
             combolist.append(['', ''])
         for i in range(0, len(field['comboIds'])):

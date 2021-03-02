@@ -394,8 +394,14 @@ def set_combo_value(combo, value, item1):
     # Add new value if @value not in combo
     if value not in ("", None, 'None', 'none', '-1', -1):
         new_elem = []
-        for x in range(len(combo.itemData(0))):
+        # Control if the QComboBox has been previously filled
+        if combo.count() > 0:
+            for x in range(len(combo.itemData(0))):
+                new_elem.append("")
+        else:
             new_elem.append("")
+            new_elem.append("")
+
         new_elem[0] = value
         new_elem[1] = f"({value})"
         combo.addItem(new_elem[1], new_elem)
