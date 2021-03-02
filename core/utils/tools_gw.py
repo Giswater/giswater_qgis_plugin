@@ -1389,7 +1389,10 @@ def fill_combo(widget, field):
         for i in range(0, len(field['comboIds'])):
             elem = [field['comboIds'][i], field['comboNames'][i]]
             combolist.append(elem)
-
+    else:
+        msg = f"key 'comboIds' or/and comboNames not found WHERE columname='{field['columnname']}' AND " \
+              f"widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
+        tools_qgis.show_message(msg, 2)
     # Populate combo
     for record in combolist:
         widget.addItem(record[1], record)

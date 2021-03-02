@@ -1348,7 +1348,7 @@ class GwInfo(QObject):
             kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature}
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         except Exception as e:
-            msg = f"{type(e).__name__}: {e}"
+            msg = f"{type(e).__name__}: {e} WHERE columname='{field['columnname']}' AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
             tools_qgis.show_message(msg, 2)
             return label, widget
 
