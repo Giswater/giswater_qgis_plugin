@@ -552,7 +552,7 @@ BEGIN
 
 		IF v_man_table='parent' THEN
 		    v_man_table:= (SELECT man_table FROM cat_feature_node n 
-			JOIN sys_feature_cat ON n.type = s.id
+			JOIN sys_feature_cat s ON n.type = s.id
 			JOIN cat_node ON cat_node.id=NEW.nodecat_id WHERE n.id = cat_node.nodetype_id LIMIT 1)::text;
 	         
 			IF v_man_table IS NOT NULL THEN
@@ -764,13 +764,14 @@ BEGIN
 				END IF;
 
 				-- epa tables
-				v_new_epatable = (SELECT epa_table FROM cat_feature_node JOIN sys_feature_epa_type s ON epa_default = s.id				
-								JOIN cat_node ON cat_feature_node.id=nodetype_id where cat_node.id=NEW.nodecat_id);
+				SELECT epa_table,epa_default into v_new_epatable, NEW.epa_type FROM cat_feature_node JOIN sys_feature_epa_type s ON epa_default = s.id				
+				JOIN cat_node ON cat_feature_node.id=nodetype_id where cat_node.id=NEW.nodecat_id;
 
+					raise notice 'epa,%,%',v_new_epatable,NEW.epa_type;
 				v_old_epatable = (SELECT epa_table FROM cat_feature_node JOIN sys_feature_epa_type s ON epa_default = s.id
 								WHERE epa_default = OLD.epa_type LIMIT 1);
 								
-				NEW.epa_type = (SELECT epa_default FROM cat_feature_node WHERE epa_table = v_new_epatable LIMIT 1);
+				--NEW.epa_type = (SELECT epa_default FROM cat_feature_node JOINWHERE epa_table = v_new_epatable LIMIT 1);
 				IF v_new_epatable != v_old_epatable THEN
 					v_sql='DELETE FROM '||v_old_epatable||' WHERE node_id='||quote_literal(OLD.node_id);
 					EXECUTE v_sql;
