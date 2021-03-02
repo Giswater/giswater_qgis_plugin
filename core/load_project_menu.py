@@ -71,7 +71,7 @@ class GwMenuLoad(QObject):
                 action_function = getattr(buttons, button_def)(icon_path, button_def, text, None, ag)
                 action = toolbar_submenu.addAction(icon, f"{text}")
                 shortcut_key = tools_gw.get_config_parser("action_shortcuts", f"{index_action}", "user", "init",
-                    prefix=False, log_warning=False)
+                                                          prefix=False, log_warning=False)
                 if shortcut_key:
                     action.setShortcuts(QKeySequence(f"{shortcut_key}"))
                     global_vars.shortcut_keys.append(shortcut_key)
@@ -158,7 +158,7 @@ class GwMenuLoad(QObject):
         """ Reset position dialog x/y """
 
         try:
-            parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
+            parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
             config_folder = f"{self.user_folder_dir}{os.sep}config{os.sep}"
             if not os.path.exists(config_folder):
                 os.makedirs(config_folder)

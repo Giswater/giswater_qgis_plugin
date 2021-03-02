@@ -42,7 +42,7 @@ def set_config_parser_value(section, parameter, value):
 def manage_init_config_file():
     """ Manage user configuration file 'init.config' """
     global config_parser
-    config_parser = configparser.ConfigParser(comment_prefixes='/', inline_comment_prefixes='/', allow_no_value=True)
+    config_parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
     project_config_file = f"{global_vars.user_folder_dir}{os.sep}config{os.sep}init.config"
     if not os.path.exists(project_config_file):
         tools_log.log_info(f"File not found: {project_config_file}")
