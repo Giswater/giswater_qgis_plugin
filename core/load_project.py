@@ -9,13 +9,13 @@ import os
 import json
 from collections import OrderedDict
 
-from qgis.PyQt.QtCore import QObject
+from qgis.PyQt.QtCore import QObject, Qt
 from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
 
 from .models.plugin_toolbar import GwPluginToolbar
 from .shared.search import GwSearch
 from .toolbars import buttons
-from .ui.ui_manager import GwDialogTextUi
+from .ui.ui_manager import GwDialogTextUi, GwSearchUi
 from .utils import tools_gw
 from .load_project_menu import GwMenuLoad
 from .threads.notify import GwNotify
@@ -133,7 +133,8 @@ class GwLoadProject(QObject):
         # Open automatically 'search docker' depending its value in user settings
         open_search = tools_gw.check_config_settings('btn_search', 'open_search', 'false', "user", "session")
         if tools_os.set_boolean(open_search):
-            GwSearch().open_search(load_project=True)
+            dlg_search = GwSearchUi()
+            GwSearch().open_search(dlg_search, load_project=True)
 
         # call dynamic mapzones repaint
         tools_gw.set_style_mapzones()

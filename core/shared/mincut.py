@@ -291,7 +291,7 @@ class GwMincut:
         self.dlg_mincut.btn_cancel.show()
 
         self.search = GwSearch()
-        self.search.open_search(self.dlg_mincut)
+        self.search.open_search(None, self.dlg_mincut)
 
         # These widgets are put from the database, mysteriously if we do something like:
         # self.dlg_mincut.address_add_muni.text() or self.dlg_mincut.address_add_muni.setDiabled(True) etc...
@@ -629,7 +629,7 @@ class GwMincut:
         tools_gw.load_settings(self.dlg_fin)
 
         search = GwSearch()
-        search.open_search(self.dlg_fin)
+        search.open_search(None, self.dlg_fin)
 
         # These widgets are put from the database, mysteriously if we do something like:
         # self.dlg_mincut.address_add_muni.text() or self.dlg_mincut.address_add_muni.setDiabled(True) etc...

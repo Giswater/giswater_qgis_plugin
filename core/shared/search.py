@@ -23,7 +23,7 @@ from .document import GwDocument
 from .info import GwInfo
 from .psector import GwPsector
 from .visit import GwVisit
-from ..ui.ui_manager import GwSearchUi, GwInfoGenericUi, GwSearchWorkcatUi
+from ..ui.ui_manager import GwInfoGenericUi, GwSearchWorkcatUi
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_db, tools_qgis, tools_qt
@@ -48,21 +48,20 @@ class GwSearch:
         self.rubber_band = QgsRubberBand(self.canvas)
 
 
-    def open_search(self, dlg_mincut=None, load_project=False):
+    def open_search(self, dlg_search, dlg_mincut=None, load_project=False):
 
         # If search is open, dont let user open another one
         open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
         if open_search in ("True", "true", True) and dlg_mincut is None and load_project is False:
             return
 
-        # If self.dlg_search is None(search is not open yet) and dlg_mincut is None (we are not opening from mincut),
-        # we want to indicate that we are going to open search independently. If self.dlg_search was not None, it would
-        # mean that we already have it open.If dlg_mincut had a dialog, it means that we are going to embed search in
-        # the mincut form
-        if self.dlg_search is None and dlg_mincut is None:
+        # If dlg_search is not None we are going to open search independently.
+        if dlg_search:
+            self.dlg_search = dlg_search
             self._init_dialog()
-
         form = ""
+
+        # If dlg_mincut is None we are not opening from mincut
         if dlg_mincut:
             self.dlg_search = dlg_mincut
             self.is_mincut = True
@@ -189,8 +188,6 @@ class GwSearch:
 
     def _init_dialog(self):
         """ Initialize dialog. Make it dockable in left dock widget area """
-
-        self.dlg_search = GwSearchUi()
         self.iface.addDockWidget(Qt.LeftDockWidgetArea, self.dlg_search)
         self.dlg_search.dlg_closed.connect(self._reset_rubber_band)
         self.dlg_search.dlg_closed.connect(self._close_search)

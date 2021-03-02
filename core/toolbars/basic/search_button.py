@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from ..dialog import GwAction
+from ...ui.ui_manager import GwSearchUi
 from ...shared.search import GwSearch
 
 
@@ -19,4 +20,5 @@ class GwSearchButton(GwAction):
 
 
     def clicked_event(self):
-        self.search.open_search()
+        dlg_search = GwSearchUi()
+        self.search.open_search(dlg_search)
