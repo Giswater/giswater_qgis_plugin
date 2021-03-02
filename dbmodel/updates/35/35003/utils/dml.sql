@@ -21,4 +21,4 @@ DELETE FROM sys_param_user WHERE id = 'qgis_toolbar_hidebuttons';
 DELETE FROM sys_function WHERE id = 2784 OR id = 2786;
 DELETE FROM sys_fprocess WHERE fid = 206;
 
-UPDATE sys_function set sample_query=NULL WHERE sample_query='false'
+UPDATE sys_function set sample_query=NULL WHERE sample_query='false';
