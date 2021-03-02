@@ -2555,7 +2555,7 @@ class GwAdminButton:
                 self._set_info_project()
 
 
-    def _execute_import_inp(self, accepted=False, schema_type='', is_test=False):
+    def _execute_import_inp(self, accepted=False, schema_type=''):
         """"""
         is_test = False
 
@@ -2592,11 +2592,13 @@ class GwAdminButton:
 
             body = tools_gw.create_body(extras=extras)
             complet_result = tools_gw.execute_procedure(f"{function_name}", body, self.schema)
+
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
+
             if complet_result:
-                self._set_log_text(self.dlg_import_inp, complet_result['body']['data'])
+
                 if complet_result['status'] == 'Failed':
                     msg = "The importation process have been failed"
                     tools_qt.show_info_box(msg, "Info")
@@ -2607,7 +2609,7 @@ class GwAdminButton:
                     tools_gw.close_dialog(self.dlg_import_inp)
                     tools_gw.close_dialog(self.dlg_readsql_create_project)
                     return
-
+                self._set_log_text(self.dlg_import_inp, complet_result['body']['data'])
             else:
                 self.error_count = self.error_count + 1
 
