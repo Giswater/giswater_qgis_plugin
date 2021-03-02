@@ -45,6 +45,7 @@ class GwEpaFileManager(GwTask):
         self.result_name = self.go2epa.result_name
         self.file_inp = self.go2epa.file_inp
         self.file_rpt = self.go2epa.file_rpt
+        self.go2epa_export_inp = self.go2epa.export_inp
         self.exec_epa = self.go2epa.exec_epa
         self.import_result = self.go2epa.import_result
         self.project_type = self.go2epa.project_type
@@ -69,8 +70,8 @@ class GwEpaFileManager(GwTask):
         if not self._exec_function_pg2epa():
             return False
 
-        if self._go2epa_export_inp:
-            status = self.vexport_inp()
+        if self.go2epa_export_inp:
+            status = self._export_inp()
 
         if status and self.exec_epa:
             status = self._execute_epa()
@@ -90,7 +91,7 @@ class GwEpaFileManager(GwTask):
 
         if result:
 
-            if self._go2epa_export_inp and self.complet_result:
+            if self.go2epa_export_inp and self.complet_result:
                 if 'status' in self.complet_result:
                     if self.complet_result['status'] == "Accepted":
                         if 'body' in self.complet_result:
@@ -178,7 +179,7 @@ class GwEpaFileManager(GwTask):
         return True
 
 
-    def _go2epa_export_inp(self):
+    def _export_inp(self):
 
         if self.isCanceled():
             return False
