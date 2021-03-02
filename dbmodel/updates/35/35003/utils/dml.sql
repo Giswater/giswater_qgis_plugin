@@ -16,3 +16,7 @@ INSERT INTO sys_function VALUES (3026, 'gw_fct_setchangevalvestatus', 'ws', 'fun
 
 --2021/03/01
 DELETE FROM config_param_user WHERE parameter = 'qgis_toolbar_hidebuttons';
+
+
+--2021/03/02
+DELETE FROM sys_param_user WHERE parameter = 'qgis_toolbar_hidebuttons';
