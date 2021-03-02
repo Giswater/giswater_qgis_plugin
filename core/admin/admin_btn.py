@@ -352,8 +352,9 @@ class GwAdminButton:
         self.project_name.setText(tools_gw.get_config_parser('btn_admin', 'project_name_schema', "user", "session"))
         self.project_descript.setText(tools_gw.get_config_parser('btn_admin', 'project_descript', "user", "session"))
         create_schema_type = tools_gw.get_config_parser('btn_admin', 'create_schema_type', "user", "session")
-        if create_schema_type == 'True':
-            tools_qt.set_checked(self.dlg_readsql_create_project, str(create_schema_type))
+        if create_schema_type:
+            chk_widget = self.dlg_readsql_create_project.findChild(QWidget, create_schema_type)
+            chk_widget.setChecked(True)
         if tools_gw.get_config_parser('btn_admin', 'inp_file_path', "user", "session") not in ('null', None):
             self.data_file.setText(tools_gw.get_config_parser('btn_admin', 'inp_file_path', "user", "session"))
 
