@@ -2643,7 +2643,8 @@ class GwAdminButton:
             # Get values
             self.folder_path = tools_gw.get_config_parser('system', 'folder_path', "project", "dev")
             self.folder_path = self.folder_path.replace('"', '')
-            self.text_replace_labels = tools_gw.get_config_parser('qgis_project_text_replace', 'labels', "project", "dev")
+            self.text_replace_labels = tools_gw.get_config_parser('qgis_project_text_replace', 'labels', "project",
+                                                                  "dev")
             self.text_replace_labels = self.text_replace_labels.split(',')
             self.xml_set_labels = tools_gw.get_config_parser('qgis_project_xml_set', 'labels', "project", "dev")
             self.xml_set_labels = self.xml_set_labels.split(',')
@@ -2677,8 +2678,8 @@ class GwAdminButton:
 
                     for text_replace in self.xml_set_labels:
                         text_replace = text_replace.replace(" ", "")
-                        self.text_replace = tools_gw.get_config_parser('qgis_project_xml_set', text_replace,
-                                                                       "project", "dev")
+                        self.text_replace = tools_gw.get_config_parser('qgis_project_xml_set', text_replace, "project",
+                                                                       "dev")
                         tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
                         f_to_read = re.sub(str(self.text_replace[0]), str(self.text_replace[1]), f_to_read)
 

@@ -139,7 +139,7 @@ class GwLoadProject(QObject):
         tools_gw.set_style_mapzones()
 
         # Check if user has all config params
-        tools_gw.inv_to_userconfig()
+        tools_gw.user_params_to_userconfig()
 
         # Log it
         message = "Project read successfully"

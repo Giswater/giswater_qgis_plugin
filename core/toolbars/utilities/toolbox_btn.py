@@ -79,7 +79,8 @@ class GwToolBoxButton(GwAction):
         widgets = layout.findChildren(QWidget)
         for widget in widgets:
             if type(widget) is QCheckBox:
-                tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{widget.isChecked()}")
+                tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}",
+                                           f"{widget.isChecked()}")
             elif type(widget) is QComboBox:
                 value = tools_qt.get_combo_value(dialog, widget, 0)
                 tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
@@ -208,15 +209,18 @@ class GwToolBoxButton(GwAction):
             if type(widget) not in (QCheckBox, QComboBox, QLineEdit, QRadioButton):
                 continue
             if type(widget) in (QCheckBox, QRadioButton):
-                value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user", "session")
+                value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
+                                                   "session")
                 tools_qt.set_checked(dialog, widget, value)
             elif type(widget) is QComboBox and widget.property('selectedId') is None:
-                value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user", "session")
+                value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
+                                                   "session")
                 if value in (None, '', 'NULL') and widget.property('selectedId') not in (None, '', 'NULL'):
                     value = widget.property('selectedId')
                 tools_qt.set_combo_value(widget, value, 0)
             elif type(widget) in (QLineEdit, QSpinBox):
-                value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user", "session")
+                value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
+                                                   "session")
                 tools_qt.set_widget_text(dialog, widget, value)
 
 
@@ -225,7 +229,8 @@ class GwToolBoxButton(GwAction):
 
         function_name = function[0]['functionname']
         if dialog.cmb_feature_type.property('selectedId') in (None, '', 'NULL'):
-            feature_type = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_cmb_feature_type", "user", "session")
+            feature_type = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_cmb_feature_type", "user",
+                                                      "session")
         else:
             feature_type = dialog.cmb_feature_type.property('selectedId')
         tools_qt.set_combo_value(dialog.cmb_feature_type, feature_type, 0)

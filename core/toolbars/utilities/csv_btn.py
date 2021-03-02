@@ -36,10 +36,12 @@ class GwCSVButton(GwAction):
     def save_settings_values(self):
         """ Save QGIS settings related with csv options """
 
-        tools_gw.set_config_parser('btn_csv2pg', 'cmb_import_type', f"{tools_qt.get_combo_value(self.dlg_csv, 'cmb_import_type', 0)}")
+        tools_gw.set_config_parser('btn_csv2pg', 'cmb_import_type',
+                                   f"{tools_qt.get_combo_value(self.dlg_csv, 'cmb_import_type', 0)}")
         tools_gw.set_config_parser('btn_csv2pg', 'txt_import', tools_qt.get_text(self.dlg_csv, 'txt_import'))
         tools_gw.set_config_parser('btn_csv2pg', 'txt_file_csv', tools_qt.get_text(self.dlg_csv, 'txt_file_csv'))
-        tools_gw.set_config_parser('btn_csv2pg', 'cmb_unicode_list', tools_qt.get_text(self.dlg_csv, 'cmb_unicode_list'))
+        tools_gw.set_config_parser('btn_csv2pg', 'cmb_unicode_list',
+                                   tools_qt.get_text(self.dlg_csv, 'cmb_unicode_list'))
         tools_gw.set_config_parser('btn_csv2pg', 'rb_semicolon', f"{self.dlg_csv.rb_semicolon.isChecked()}")
 
 

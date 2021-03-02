@@ -285,7 +285,7 @@ class Giswater(QObject):
         # Set 'toolbars_order' parameter on 'toolbars_position' section on init.config user file (found in user path)
         sorted_toolbar_ids = [tb.property('gw_name') for tb in own_toolbars]
         sorted_toolbar_ids = ",".join(sorted_toolbar_ids)
-        tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids),  "user", "init")
+        tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids), "user", "init")
 
 
     def _remove_dockers(self):
