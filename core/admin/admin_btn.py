@@ -123,6 +123,8 @@ class GwAdminButton:
         tools_gw.set_config_parser('btn_admin', 'project_descript', f'{project_descript}')
         inp_file_path = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file', False, False)
         tools_gw.set_config_parser('btn_admin', 'inp_file_path', f'{inp_file_path}')
+        locale = tools_qt.get_combo_value(self.dlg_readsql_create_project, self.cmb_locale, 0)
+        tools_gw.set_config_parser('btn_admin', 'locale', f'{locale}')
 
         # Check if project name is valid
         if not self._check_project_name(project_name_schema, project_descript):
@@ -383,6 +385,8 @@ class GwAdminButton:
         status, sqlite_cur = tools_gw.create_sqlite_conn("config")
         list_locale = self._select_active_locales(sqlite_cur)
         tools_qt.fill_combo_values(self.cmb_locale, list_locale, 1)
+        locale = tools_gw.get_config_parser('btn_admin', 'locale', 'user', 'session')
+        tools_qt.set_combo_value(self.cmb_locale, locale, 0)
 
         # Set shortcut keys
         self.dlg_readsql_create_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_create_project))
