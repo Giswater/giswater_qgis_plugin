@@ -2591,7 +2591,7 @@ class GwAdminButton:
             self.dlg_import_inp.progressBar.setFormat("")
 
             body = tools_gw.create_body(extras=extras)
-            complet_result = tools_gw.execute_procedure(f"{function_name}", body)
+            complet_result = tools_gw.execute_procedure(f"{function_name}", body, self.schema)
             self.task1 = GwTask('Manage schema')
             QgsApplication.taskManager().addTask(self.task1)
             self.task1.setProgress(50)
