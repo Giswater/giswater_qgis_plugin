@@ -37,7 +37,12 @@ BEGIN
 
 		IF v_triggerfromtable = 'om_visit' THEN -- we need workflow when function is triggered by om_visit (for this reason when parameter is null)
 
-			-- when visit is not finished
+			-- if uses lot_manage, equal visitcat and visitclass (in order to fill Visit tab)
+			IF (SELECT value::json->>'lotManage' FROM config_param_system WHERE parameter='plugin_lotmanage')='TRUE' AND NEW.class_id IS NULL THEN
+				UPDATE om_visit SET class_id=NEW.visitcat_id WHERE id=NEW.id;
+			END IF;
+            
+            -- when visit is not finished
 			IF NEW.status < 4 THEN 
 				NEW.enddate=null;
 				
