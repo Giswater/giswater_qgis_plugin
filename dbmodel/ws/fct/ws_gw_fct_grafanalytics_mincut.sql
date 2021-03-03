@@ -97,7 +97,7 @@ BEGIN
 		AND (temp_anlgraf.node_1 = om_mincut_valve.node_id OR temp_anlgraf.node_2 = om_mincut_valve.node_id);
 
 		-- setup graf closing only with proposed valves defined on step1
-		UPDATE temp_anlgraf SET flag=1 
+		UPDATE temp_anlgraf SET flag=2
 		FROM om_mincut_valve WHERE result_id=v_mincutid AND proposed = TRUE
 		AND (temp_anlgraf.node_1 = om_mincut_valve.node_id OR temp_anlgraf.node_2 = om_mincut_valve.node_id);
 		
