@@ -153,7 +153,12 @@ class GwInfoButton(GwMaptool):
                 sub_menu = main_menu.addMenu(layer_name.name())
             # Create one QAction for each id
             for feature in layer['ids']:
-                action = QAction(str(feature['id']), None)
+                if 'label' in feature:
+                    label = str(feature['label'])
+                else:
+                    label = str(feature['id'])
+                action = QAction(label, None)
+                action.setProperty('feature_id', str(feature['id']))
                 sub_menu.addAction(action)
                 action.triggered.connect(partial(self._get_info_from_selected_id, action, tab_type))
                 action.hovered.connect(partial(self._draw_by_action, feature, rb_list))
@@ -226,7 +231,7 @@ class GwInfoButton(GwMaptool):
             tools_gw.init_docker()
             info_feature = GwInfo(self.tab_type)
             info_feature.signal_activate.connect(self._reactivate_map_tool)
-            info_feature.get_info_from_id(table_name=layer_source['table'], feature_id=action.text(), tab_type=tab_type)
+            info_feature.get_info_from_id(table_name=layer_source['table'], feature_id=action.property('feature_id'), tab_type=tab_type)
             # Remove previous rubberband when open new docker
             if isinstance(self.previous_info_feature, GwInfo) and global_vars.session_vars['dialog_docker'] is not None:
                 self.previous_info_feature.rubber_band.reset()
