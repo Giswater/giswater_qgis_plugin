@@ -31,6 +31,7 @@ from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
 from ...lib import tools_qt, tools_qgis, tools_log, tools_db
+from ..ui.docker import GwDocker
 
 
 class GwAdminButton:
@@ -85,14 +86,16 @@ class GwAdminButton:
         """ Puts the dialog in a docker, depending on the user configuration """
 
         try:
-            tools_gw.init_docker('qgis_form_docker')
-            if global_vars.session_vars['dialog_docker']:
-                tools_gw.docker_dialog(self.dlg_readsql)
-                self.dlg_readsql.dlg_closed.connect(tools_gw.close_docker)
-            else:
-                tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
-        except RuntimeError as e:
+            tools_gw.close_docker()
+            global_vars.session_vars['docker_type'] = 'qgis_form_docker'
+            global_vars.session_vars['dialog_docker'] = GwDocker()
+            global_vars.session_vars['dialog_docker'].dlg_closed.connect(tools_gw.close_docker)
+            tools_gw.manage_docker_options()
+            tools_gw.docker_dialog(self.dlg_readsql)
+            self.dlg_readsql.dlg_closed.connect(tools_gw.close_docker)
+        except Exception as e:
             tools_log.log_info(str(e))
+            tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
 
 
     def create_project_data_schema(self, project_name_schema=None, project_descript=None, project_type=None,
