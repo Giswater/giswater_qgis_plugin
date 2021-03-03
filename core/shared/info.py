@@ -1357,8 +1357,8 @@ class GwInfo(QObject):
 
 
     def _manage_text(self, **kwargs):
-        """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
         dialog = kwargs['dialog']
         field = kwargs['field']
@@ -1412,8 +1412,8 @@ class GwInfo(QObject):
 
 
     def _manage_typeahead(self, **kwargs):
-        """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
         dialog = kwargs['dialog']
         field = kwargs['field']
@@ -1425,8 +1425,8 @@ class GwInfo(QObject):
 
 
     def _manage_combo(self, **kwargs):
-        """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
         dialog = kwargs['dialog']
         field = kwargs['field']
@@ -1439,8 +1439,8 @@ class GwInfo(QObject):
 
 
     def _manage_check(self, **kwargs):
-        """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
         dialog = kwargs['dialog']
         field = kwargs['field']
@@ -1453,8 +1453,8 @@ class GwInfo(QObject):
 
 
     def _manage_datetime(self, **kwargs):
-        """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
         dialog = kwargs['dialog']
         field = kwargs['field']
@@ -1466,8 +1466,8 @@ class GwInfo(QObject):
 
 
     def _manage_button(self, **kwargs):
-        """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
         dialog = kwargs['dialog']
         field = kwargs['field']
@@ -1478,8 +1478,8 @@ class GwInfo(QObject):
 
 
     def _manage_hyperlink(self, **kwargs):
-        """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
         field = kwargs['field']
 
@@ -1489,8 +1489,8 @@ class GwInfo(QObject):
 
 
     def _manage_hspacer(self, **kwargs):
-        """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
 
         widget = tools_qt.add_horizontal_spacer()
@@ -1498,16 +1498,16 @@ class GwInfo(QObject):
 
 
     def _manage_vspacer(self, **kwargs):
-        """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
         widget = tools_qt.add_verticalspacer()
         return widget
 
 
     def _manage_textarea(self, **kwargs):
-        """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
         dialog = kwargs['dialog']
         field = kwargs['field']
@@ -1519,8 +1519,8 @@ class GwInfo(QObject):
 
 
     def _manage_spinbox(self, **kwargs):
-        """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
         dialog = kwargs['dialog']
         field = kwargs['field']
@@ -1532,8 +1532,8 @@ class GwInfo(QObject):
 
 
     def _manage_doubleSpinbox(self, **kwargs):
-        """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
         dialog = kwargs['dialog']
         field = kwargs['field']
@@ -1546,8 +1546,8 @@ class GwInfo(QObject):
 
 
     def _manage_tableView(self, **kwargs):
-        """ This function is called in def set_widgets(self, dialog, complet_result, field)
-            widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
+        """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
         complet_result = kwargs['complet_result']
         field = kwargs['field']
