@@ -22,3 +22,11 @@ DELETE FROM sys_function WHERE id = 2784 OR id = 2786;
 DELETE FROM sys_fprocess WHERE fid = 206;
 
 UPDATE sys_function set sample_query=NULL WHERE sample_query='false';
+
+UPDATE value_state SET name = 'OPERATIVE' WHERE name ='ON_SERVICE';
+UPDATE value_state SET name = 'OPERATIVO' WHERE name ='EN_SERVICIO';
+UPDATE value_state SET name = 'OPERATIU' WHERE name ='EN_SERVEI';
+
+UPDATE value_state_type SET name = 'OPERATIVE' WHERE name ='ON_SERVICE';
+UPDATE value_state_type SET name = 'OPERATIVO' WHERE name ='EN_SERVICIO';
+UPDATE value_state_type SET name = 'OPERATIU' WHERE name ='EN_SERVEI';
