@@ -48,6 +48,7 @@ fields_array json[];
 fields json;
 v_geometry json;
 v_all_geom json;
+v_parenttype text;
 
 v_xcoord float;
 v_ycoord float;
@@ -181,19 +182,37 @@ BEGIN
 			ELSE
 			raise notice 'v_point %',v_point;
 			raise notice 'v_sensibility %',v_sensibility;
+				--  Get element's parent type in order to be able to find featuretype'
+				EXECUTE 'SELECT lower(feature_type) FROM 
+				(SELECT parent_layer as layer, feature_type FROM cat_feature UNION SELECT child_layer as layer ,feature_type FROM cat_feature) a WHERE
+				layer =  '||quote_literal(v_layer)||';'
+				INTO v_parenttype;
+
 				--  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
-				EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
-				SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_the_geom)||' as the_geom, (SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry) 
-				FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
-				ORDER BY  ST_Distance('||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $1) asc) a'
-						INTO v_ids
-						USING v_point, v_sensibility;
-						xxx:='SELECT array_agg(row_to_json(a)) FROM (
+				IF v_parenttype IS NOT NULL THEN 
+					EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
+					SELECT '||quote_ident(v_idname)||' AS id, CONCAT('||v_idname||','' : '','||v_parenttype||'_type) AS label, 
+					'||quote_ident(v_the_geom)||' as the_geom, 
+					(SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry)
+					FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
+					ORDER BY  ST_Distance('||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $1) asc) a'
+					INTO v_ids
+					USING v_point, v_sensibility;
+				ELSE 
+					EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
+					SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_idname)||' AS label, '||quote_ident(v_the_geom)||' as the_geom, 
+					(SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry)
+					FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
+					ORDER BY  ST_Distance('||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $1) asc) a'
+					INTO v_ids
+					USING v_point, v_sensibility;
+				END IF;
+				
+				xxx:='SELECT array_agg(row_to_json(a)) FROM (
 				SELECT '||v_idname||' AS id, '||v_the_geom||' as the_geom FROM '||v_layer||' WHERE st_dwithin ($1, '||v_layer||'.'||v_the_geom||', $2) 
 				ORDER BY  ST_Distance('||v_layer||'.'||v_the_geom||', $1) asc) a';
-					   
-						
-			raise notice 'yyyy %',xxx;
+				raise notice 'yyyy %',xxx;
+			
 			END IF;
 
 		--     Get geometry (to feature response)
