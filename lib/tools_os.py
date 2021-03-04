@@ -37,6 +37,10 @@ def get_datadir() -> pathlib.Path:
 
 
 def open_file(file_path):
+    """
+    Opens a file (as if you double-click it)
+        :param file_path: Path of the file
+    """
 
     try:
         # Check if file exist
@@ -56,6 +60,7 @@ def open_file(file_path):
 
 
 def set_filename(prefix_name='log', tstamp_format='%Y%m%d'):
+    """ Set a file name format like 'prefix_timestamp.log' """
 
     tstamp = str(time.strftime(tstamp_format))
     name = prefix_name + "_" + tstamp + ".log"
@@ -79,6 +84,7 @@ def get_values_from_dictionary(dictionary):
 
 
 def open_url(widget):
+    """ Opens a url with the default browser """
 
     path = widget.text()
     # Check if file exist
@@ -94,9 +100,10 @@ def open_url(widget):
 
 
 def set_boolean(param):
-    """ Receives a string and returns a bool
-    :param param: String to cast
-    :return: Boolean value, True if param not in bool_dict
+    """
+    Receives a string and returns a bool
+        :param param: String to cast (String)
+        :return: True if param not in bool_dict (bool)
     """
 
     bool_dict = {True: True, "TRUE": True, "True": True, "true": True,

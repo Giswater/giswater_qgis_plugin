@@ -178,10 +178,11 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
 
 
 def save_current_tab(dialog, tab_widget, selector_name):
-    """ Save the name of current tab used by the user into QSettings()
-    :param dialog: QDialog
-    :param tab_widget: QTabWidget
-    :param selector_name: Name of the selector (String)
+    """
+    Save the name of current tab used by the user into QSettings()
+        :param dialog: QDialog
+        :param tab_widget: QTabWidget
+        :param selector_name: Name of the selector (String)
     """
 
     try:
@@ -402,13 +403,14 @@ def set_completer_feature_id(widget, feature_type, viewname):
 
 
 def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child_layers=None, group="GW Layers", style_id="-1"):
-    """ Put selected layer into TOC
-    :param tablename: Postgres table name (String)
-    :param the_geom: Geometry field of the table (String)
-    :param field_id: Field id of the table (String)
-    :param child_layers: List of layers (StringList)
-    :param group: Name of the group that will be created in the toc (String)
-    :param style_id: Id of the style we want to load (integer or String)
+    """
+    Put selected layer into TOC
+        :param tablename: Postgres table name (String)
+        :param the_geom: Geometry field of the table (String)
+        :param field_id: Field id of the table (String)
+        :param child_layers: List of layers (StringList)
+        :param group: Name of the group that will be created in the toc (String)
+        :param style_id: Id of the style we want to load (integer or String)
     """
 
     uri = tools_pgdao.get_uri()
@@ -454,18 +456,19 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
 
 def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
                    group='GW Temporal Layers', call_set_tabs_enabled=True, close=True):
-    """ Add QgsVectorLayer into TOC
-    :param dialog: Dialog where to find the tab to be displayed and the textedit to be filled (QDialog or QMainWindow)
-    :param data: Json with information
-    :param layer_name: Name that will be given to the layer (String)
-    :param force_tab: Boolean that tells us if we want to show the tab or not (Boolean)
-    :param reset_text:It allows us to delete the text from the Qtexedit log, or add text below (Boolean)
-    :param tab_idx: Log tab index (Integer)
-    :param del_old_layers:Delete layers added in previous operations (Boolean)
-    :param group: Name of the group to which we want to add the layer (String)
-    :param call_set_tabs_enabled: set all tabs, except the last, enabled or disabled (boolean).
-    :param close: Manage buttons accept, cancel, close...  in function def fill_tab_log(...) (boolean).
-    :return: Dictionary with text as result of previuos data (String), and list of layers added (QgsVectorLayer).
+    """
+    Add QgsVectorLayer into TOC
+        :param dialog: Dialog where to find the tab to be displayed and the textedit to be filled (QDialog or QMainWindow)
+        :param data: Json with information
+        :param layer_name: Name that will be given to the layer (String)
+        :param force_tab: Boolean that tells us if we want to show the tab or not (bool)
+        :param reset_text: It allows us to delete the text from the Qtexedit log, or add text below (bool)
+        :param tab_idx: Log tab index (int)
+        :param del_old_layers: Delete layers added in previous operations (bool)
+        :param group: Name of the group to which we want to add the layer (String)
+        :param call_set_tabs_enabled: set all tabs, except the last, enabled or disabled (bool).
+        :param close: Manage buttons accept, cancel, close...  in function def fill_tab_log(...) (bool).
+        :return: Dictionary with text as result of previuos data (String), and list of layers added (QgsVectorLayer).
     """
 
     text_result = None
@@ -515,16 +518,16 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
 
 
 def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_set_tabs_enabled=True, close=True):
-    """ Populate txt_infolog QTextEdit widget
-    :param dialog: QDialog
-    :param data: Json
-    :param force_tab: Force show tab (boolean)
-    :param reset_text: Reset(or not) text for each iteration (boolean)
-    :param tab_idx: index of tab to force (integer)
-    :param call_set_tabs_enabled: set all tabs, except the last, enabled or disabled (boolean)
-    :param close: Manage buttons accept, cancel, close... (boolean)
-
-    :return: Text received from data (String)
+    """
+    Populate txt_infolog QTextEdit widget
+        :param dialog: QDialog
+        :param data: Json
+        :param force_tab: Force show tab (bool)
+        :param reset_text: Reset(or not) text for each iteration (bool)
+        :param tab_idx: index of tab to force (int)
+        :param call_set_tabs_enabled: set all tabs, except the last, enabled or disabled (bool)
+        :param close: Manage buttons accept, cancel, close... (bool)
+        :return: Text received from data (String)
     """
 
     change_tab = False
@@ -576,8 +579,8 @@ def fill_layer_temp(virtual_layer, data, layer_type, counter, group='GW Temporal
     """
     :param virtual_layer: Memory QgsVectorLayer (QgsVectorLayer)
     :param data: Json
-    :param layer_type: point, line, polygon...(string)
-    :param counter: control if json have values (integer)
+    :param layer_type: point, line, polygon...(String)
+    :param counter: control if json have values (int)
     :param group: group to which we want to add the layer (string)
     :return:
     """

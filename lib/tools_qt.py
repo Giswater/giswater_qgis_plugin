@@ -309,7 +309,7 @@ def set_widget_enabled(dialog, widget, enabled=True):
 
 
 def add_image(dialog, widget, cat_shape):
-    """ Set pictures for UD"""
+    """  Set pictures for UD """
 
     element = cat_shape.lower()
     if type(widget) is str or type(widget) is str:
@@ -380,9 +380,11 @@ def get_combo_value(dialog, widget, index=0, add_quote=False):
 
 
 def set_combo_value(combo, value, item1):
-    """ Set text to combobox populate with more than 1 item for row
-        @item1: element to compare
-        @item2: element to show
+    """
+    Set text to combobox populate with more than 1 item for row
+        :param combo: QComboBox widget to manage
+        :param value: element to show
+        :param item1: element to compare
     """
 
     for i in range(0, combo.count()):
@@ -410,8 +412,15 @@ def set_combo_value(combo, value, item1):
 
 
 def fill_combo_values(combo, rows, index_to_show=0, combo_clear=True, sort_combo=True, sort_by=1, add_empty=False):
-    """ Populate @combo with list @rows and show field @index_to_show
-    :param sort_by: sort combo by this element (column)
+    """
+    Populate @combo with list @rows and show field @index_to_show
+        :param combo: QComboBox widget to fill (QComboBox)
+        :param rows: the data that'll fill the combo
+        :param index_to_show: the index of the row to show (int)
+        :param combo_clear: whether it should clear the combo or not (bool)
+        :param sort_combo: whether it should sort the items or not (bool)
+        :param sort_by: sort combo by this column (int)
+        :param add_empty: add an empty element as first item (bool)
     """
 
     records = []
@@ -463,12 +472,12 @@ def set_combo_item_selectable_by_id(qcombo, list_id=[]):
 
 
 def set_combo_item_select_unselectable(qcombo, list_id=[], column=0, opt=0):
-    """ Make items of QComboBox visibles but not selectable
-        :param qcombo: QComboBox widget to manage
-        :param list_id: list of strings to manage ex. ['1','3','...'] or ['word1', 'word3','...']
-        :param column: column where to look up the values in the list
-        :param opt: 0 to set item not selectable
-        :param opt: (1 | 32 ) to set item selectable
+    """
+    Make items of QComboBox visibles but not selectable
+        :param qcombo: QComboBox widget to manage (QComboBox)
+        :param list_id: list of strings to manage ex. ['1','3','...'] or ['word1', 'word3','...'] (list)
+        :param column: column where to look up the values in the list (int)
+        :param opt: 0 -> item not selectable // (1 | 32) -> item selectable (int)
     """
     for x in range(0, qcombo.count()):
         elem = qcombo.itemData(x)
@@ -496,6 +505,14 @@ def enable_tab_by_tab_name(tab_widget, tab_name, enable):
 
 
 def double_validator(widget, min_=-9999999, max_=9999999, decimals=2, notation=QDoubleValidator().StandardNotation):
+    """
+    Create and apply a validator for doubles to ensure the number is within a maximum and minimum values
+        :param widget: Widget to apply the validator
+        :param min_: Minimum value (int)
+        :param max_: Maximum value (int)
+        :param decimals: Number of decimals (int)
+        :param notation:
+    """
 
     validator = QDoubleValidator(min_, max_, decimals)
     validator.setNotation(notation)

@@ -14,9 +14,10 @@ from . import tools_log, tools_qt, tools_qgis, tools_config, tools_pgdao
 
 
 def create_list_for_completer(sql):
-    """ Prepare a list with the necessary items for the completer
-    :param sql: Query to be executed, where will we get the list of items (string)
-    :return list_items: List with the result of the query executed (List) ["item1","item2","..."]
+    """
+    Prepare a list with the necessary items for the completer
+        :param sql: Query to be executed, where will we get the list of items (string)
+        :return: list_items: List with the result of the query executed (List) ["item1","item2","..."]
     """
 
     rows = get_rows(sql)
