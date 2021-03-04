@@ -109,18 +109,21 @@ BEGIN
 	-- 1) set the starting element
 	v_querytext = 'UPDATE temp_anlgraf SET water=1 , flag = 1 WHERE arc_id='||quote_literal(v_arc); 
 	EXECUTE v_querytext;
+
+	UPDATE temp_anlgraf SET checkf = 0;
 	
 	EXECUTE v_querytext;-- inundation process
 	LOOP	
 		cont1 = cont1+1;
-		UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1 FROM v_anl_graf a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
+		UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf = checkf + 1 FROM v_anl_graf a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
 		GET DIAGNOSTICS affected_rows =row_count;
 		EXIT WHEN affected_rows = 0;
-		EXIT WHEN cont1 = 100;
 	END LOOP;
 
 	-- 2) remove results (arc twin as closest choosed arc connected with valve if click on user takes it)
-	UPDATE temp_anlgraf SET water=0 WHERE arc_id IN (
+	IF v_mincutstep = 1 THEN 
+
+		UPDATE temp_anlgraf SET water=0 WHERE arc_id IN (
 
 			SELECT distinct (t.arc_id) FROM temp_anlgraf t JOIN 
 			(SELECT node_1 AS node_id, arc_id FROM temp_anlgraf WHERE arc_id = v_arc UNION SELECT node_2, arc_id FROM temp_anlgraf WHERE arc_id = v_arc) a
@@ -128,6 +131,7 @@ BEGIN
 			JOIN om_mincut_valve v on v.node_id = a.node_id::text
 			WHERE result_id=v_mincutid AND (unaccess = FALSE AND broken = FALSE)
 			AND t.arc_id <> a.arc_id);
+	END IF;
 
 	-- finish engine
 	----------------
@@ -149,25 +153,19 @@ BEGIN
 	IF v_mincutstep = 1 THEN 
 		v_querytext = 'UPDATE om_mincut_valve SET proposed=TRUE WHERE proposed IS NULL AND result_id = '||v_mincutid||' AND node_id IN 
 			(SELECT node_1::varchar(16) FROM (
-			select id, arc_id, node_1, node_2, water, flag, checkf from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
-			)a group by node_1  having sum(flag) = 5)';
+			select id, arc_id, node_1, node_2, water, flag from temp_anlgraf where checkf > 0 UNION select id, arc_id, node_2, node_1, water, flag from temp_anlgraf  where checkf > 0 
+			)a)';
 		EXECUTE v_querytext;
 
 	ELSIF v_mincutstep = 2 THEN 
+	
 		v_querytext = 'UPDATE om_mincut_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id = '||v_mincutid||' AND node_id IN 
 			(SELECT node_1::varchar(16) FROM (
-			select id, arc_id, node_1, node_2, water, flag, checkf from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
-			)a group by node_1  having sum(water) > 1 and sum(flag) > 2)';
+			select id, arc_id, node_1, node_2, water, flag, checkf from temp_anlgraf where checkf > 0 UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf  where checkf > 0 
+			)a group by node_1  having sum(water) > 1 and sum(flag) > 2 or  sum(flag) = 6)';
 		EXECUTE v_querytext;
 	
 	END IF;
-
-	v_querytext = 'UPDATE om_mincut_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id = '||v_mincutid||' AND node_id IN 
-			(SELECT node_1::varchar(16) FROM (
-			select id, arc_id, node_1, node_2, water, flag, checkf from temp_anlgraf UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraf 
-			)a group by node_1  having sum(flag) = 6)';
-	EXECUTE v_querytext;
-
 
 	-- looking for check-valves
 	FOR v_checkvalve IN 
