@@ -586,7 +586,8 @@ class ApiCF(ApiParent, QObject):
                             self.feature_type, self.tablename, self.field_id))
 
         # Set variables
-        self.filter = str(complet_result[0]['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
+        id_name = complet_result[0]['body']['feature']['idName']
+        self.filter = str(id_name) + " = '" + str(self.feature_id) + "'"
         dlg_cf = self.dlg_cf
         layer = self.layer
         fid = self.feature_id
@@ -611,8 +612,8 @@ class ApiCF(ApiParent, QObject):
         # Actions signals
         action_edit.triggered.connect(partial(self.manage_edition, dlg_cf, action_edit, complet_result[0]['body']['data'], fid, new_feature))
         action_catalog.triggered.connect(partial(self.open_catalog, tab_type, self.feature_type))
-        action_workcat.triggered.connect(partial(self.get_catalog, 'new_workcat', self.tablename, self.feature_type, self.feature_id, self.field_id, list_points))
-        action_mapzone.triggered.connect(partial(self.get_catalog, 'new_mapzone', self.tablename, self.feature_type, self.feature_id, self.field_id, list_points))
+        action_workcat.triggered.connect(partial(self.get_catalog, 'new_workcat', self.tablename, self.feature_type, self.feature_id, self.field_id, list_points, id_name))
+        action_mapzone.triggered.connect(partial(self.get_catalog, 'new_mapzone', self.tablename, self.feature_type, self.feature_id, self.field_id, list_points, id_name))
         action_set_to_arc.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_set_to_arc, 'v_edit_arc', 'set_to_arc', None))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id,  'v_edit_arc', 'arc', 'data_arc_id'))
         action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_parent_id, 'v_edit_node', 'node', 'data_parent_id'))
@@ -3080,7 +3081,7 @@ class ApiCF(ApiParent, QObject):
                 plan_layout.addItem(plan_vertical_spacer)
 
 
-    def get_catalog(self, form_name, table_name, feature_type, feature_id, field_id, list_points):
+    def get_catalog(self, form_name, table_name, feature_type, feature_id, field_id, list_points, id_name):
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"tableName":"{table_name}", "featureId":"{feature_id}", "feature_type":"{feature_type}"'
         extras = f'"coordinates":{{{list_points}}}'
@@ -3095,7 +3096,8 @@ class ApiCF(ApiParent, QObject):
         # Set signals
         dlg_generic.btn_close.clicked.connect(partial(self.close_dialog, dlg_generic))
         dlg_generic.rejected.connect(partial(self.close_dialog, dlg_generic))
-        dlg_generic.btn_accept.clicked.connect(partial(self.set_catalog, dlg_generic, form_name, table_name))
+        dlg_generic.btn_accept.clicked.connect(
+            partial(self.set_catalog, dlg_generic, form_name, table_name, feature_id, id_name))
 
         self.populate_basic_info(dlg_generic, [json_result], field_id)
 
@@ -3104,7 +3106,7 @@ class ApiCF(ApiParent, QObject):
         self.open_dialog(dlg_generic)
 
 
-    def set_catalog(self, dialog, form_name, table_name):
+    def set_catalog(self, dialog, form_name, table_name, feature_id, id_name):
         """ Insert table 'cat_work'. Add cat_work """
 
         # Manage mandatory fields
@@ -3131,9 +3133,9 @@ class ApiCF(ApiParent, QObject):
         # Call gw_fct_setcatalog
         fields = f'"fields":{fields}'
         form = f'"formName":"{form_name}"'
-        feature = f'"tableName":"{table_name}"'
+        feature = f'"tableName":"{table_name}", "id":"{feature_id}", "idName":"{id_name}"'
         body = self.create_body(form, feature, extras=fields)
-        result = self.controller.get_json('gw_fct_setcatalog', body, log_sql=True)
+        result = self.controller.get_json('gw_fct_setcatalog', body)
         if result['status'] != 'Accepted':
             return
 
