@@ -62,6 +62,11 @@ v_dvquery text;
 v_returnfields json;
 v_columnname text;
 v_checkpkey integer;
+v_expl integer;
+v_id_x_expl integer;
+v_mapzone_config json;
+v_idname text;
+v_id text;
 
 v_version text;
 v_error_context text;
@@ -84,17 +89,23 @@ BEGIN
 	v_formname := json_extract_path_text (p_data,'form','formName')::text;
 	v_fields := json_extract_path_text (p_data,'data','fields')::json;
 	v_feature_table := json_extract_path_text (p_data,'feature','tableName')::text;
+	v_idname := json_extract_path_text (p_data,'feature','idName')::text;
+	v_id := json_extract_path_text (p_data,'feature','id')::text;
 
 	--set cat table to upate
 	IF v_formname = 'new_workcat' THEN
 		v_catname = 'cat_work';
 	ELSIF v_formname = 'new_mapzone' THEN
 		v_catname = lower(json_extract_path_text(v_fields, 'mapzoneType'))::text;
+		v_expl = json_extract_path_text(v_fields, 'expl_id')::integer;
 		IF v_catname IS NULL THEN
 			EXECUTE 'SELECT lower(graf_delimiter) FROM cat_feature JOIN cat_feature_node USING (id)
 			WHERE child_layer = '||quote_literal(v_feature_table)||';'
 			INTO v_catname;
 		END IF;
+		--get addmapzone config
+		EXECUTE 'SELECT json_extract_path_text (value::json,'||quote_literal(LOWER(v_catname))||')::json FROM config_param_system WHERE parameter = ''admin_addmapzone'''
+		INTO v_mapzone_config;
 		--remove unnecessary key from insert json
 		v_fields = v_fields::jsonb -'mapzoneType';
 	END IF;
@@ -192,8 +203,31 @@ BEGIN
 	EXECUTE v_querytext INTO v_newid;
 
 	--find query that populates form combo
-	EXECUTE 'SELECT dv_querytext,columnname FROM config_form_fields WHERE dv_querytext ILIKE ''%FROM '||v_catname||'%'' AND formname = '||quote_literal(v_feature_table)||' AND columnname = ''workcat_id'''
-	INTO v_dvquery, v_columnname;
+	IF v_formname = 'new_workcat' THEN
+		EXECUTE 'SELECT dv_querytext,columnname FROM config_form_fields WHERE dv_querytext ILIKE ''%FROM '||v_catname||'%'' 
+		AND formname = '||quote_literal(v_feature_table)||' AND columnname = ''workcat_id'''
+		INTO v_dvquery, v_columnname;
+	ELSE 
+		--change mapzone id depending on expl_id
+		IF json_extract_path_text (v_mapzone_config,'idXExpl')::boolean IS TRUE THEN	
+			EXECUTE 'SELECT max('||v_pkey||'::integer) + 1  FROM '||v_catname||' WHERE expl_id='||v_expl||' and '||v_pkey||'!='||v_newid||'' INTO v_id_x_expl;
+			EXECUTE 'SELECT 1 FROM '||v_catname||' WHERE '||v_catname||'_id = '||v_id_x_expl||'' INTO v_checkpkey;
+			IF v_checkpkey IS NULL THEN
+				EXECUTE 'UPDATE '||v_catname||' SET '||v_pkey||' = '||v_id_x_expl||' WHERE '||v_pkey||' = '||v_newid||';';
+				v_newid = v_id_x_expl;
+			END IF;
+		END IF;
+		--update other fields defined as setUpdate
+		IF json_extract_path_text(v_mapzone_config,'setUpdate')::text IS NOT NULL THEN
+			EXECUTE 'UPDATE '||v_feature_table||' SET '||json_extract_path_text(v_mapzone_config,'setUpdate')::text||' 
+			FROM '||v_catname||' WHERE '||v_catname||'.'||v_pkey||' = '||v_newid||' AND '||v_idname||'='||quote_literal(v_id)||';';
+		END IF;
+		
+		--find query that populates form combo
+		EXECUTE 'SELECT dv_querytext,columnname FROM config_form_fields WHERE dv_querytext ILIKE ''%FROM '||v_catname||'%'' 
+		AND formname = '||quote_literal(v_feature_table)||''
+		INTO v_dvquery, v_columnname;
+	END IF;
 
 	EXECUTE 'SELECT json_build_object (''widgetname'', '||quote_literal(concat('data_',v_columnname))||',''comboIds'',id,''comboNames'',idval, ''selectedId'','||quote_literal(v_newid)||') as fields
 	FROM (SELECT array_agg(id::text)as id, array_agg(idval) as idval FROM 
