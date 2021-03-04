@@ -827,7 +827,7 @@ def manage_feature_cat():
     feature_cat = OrderedDict(sorted(feature_cat.items(), key=lambda t: t[0]))
 
     if msg != "Field child_layer of id: ":
-        tools_qgis.show_warning(msg + "is not defined in table cat_feature")
+        tools_qgis.show_warning(f"{msg} is not defined in table cat_feature")
 
     return feature_cat
 
