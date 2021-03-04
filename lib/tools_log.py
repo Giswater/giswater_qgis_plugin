@@ -175,8 +175,9 @@ def log_error(text=None, context_name=None, parameter=None, logger_file=True, st
 
 
 def _qgis_log_message(text=None, message_level=0, context_name=None, parameter=None, tab_name=None):
-    """ Write message into QGIS Log Messages Panel with selected message level
-        @message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3, NONE = 4}
+    """
+    Write message into QGIS Log Messages Panel with selected message level
+        :param message_level: {INFO = 0, WARNING = 1, CRITICAL = 2, SUCCESS = 3, NONE = 4}
     """
 
     msg = None

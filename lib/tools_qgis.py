@@ -27,8 +27,16 @@ user_parameters = {'log_sql': None, 'show_message_durations': None, 'aux_context
 
 
 def show_message(text, message_level=1, duration=10, context_name=None, parameter=None, title="", logger_file=True):
-    """ Show message to the user with selected message level
-    @message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)} """
+    """
+    Show message to the user with selected message level
+        :param text: The text to be shown (String)
+        :param message_level: {INFO = 0(blue), WARNING = 1(yellow), CRITICAL = 2(red), SUCCESS = 3(green)}
+        :param duration: The duration of the message (int)
+        :param context_name: Where to look for translating the message
+        :param parameter: A text to show after the message (String)
+        :param title: The title of the message (String)
+        :param logger_file: Whether it should log the message in a file or not (bool)
+    """
 
     global user_parameters
 
@@ -55,27 +63,51 @@ def show_message(text, message_level=1, duration=10, context_name=None, paramete
 
 
 def show_info(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
-    """ Show information message to the user """
+    """
+    Show information message to the user
+        :param text: The text to be shown (String)
+        :param duration: The duration of the message (int)
+        :param context_name: Where to look for translating the message
+        :param parameter: A text to show after the message (String)
+        :param logger_file: Whether it should log the message in a file or not (bool)
+        :param title: The title of the message (String) """
 
     show_message(text, 0, duration, context_name, parameter, title, logger_file)
 
 
 def show_warning(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
-    """ Show warning message to the user """
+    """
+    Show warning message to the user
+        :param text: The text to be shown (String)
+        :param duration: The duration of the message (int)
+        :param context_name: Where to look for translating the message
+        :param parameter: A text to show after the message (String)
+        :param logger_file: Whether it should log the message in a file or not (bool)
+        :param title: The title of the message (String) """
 
     show_message(text, 1, duration, context_name, parameter, title, logger_file)
 
 
 def show_critical(text, duration=10, context_name=None, parameter=None, logger_file=True, title=""):
-    """ Show critical message to the user """
+    """
+    Show critical message to the user
+        :param text: The text to be shown (String)
+        :param duration: The duration of the message (int)
+        :param context_name: Where to look for translating the message
+        :param parameter: A text to show after the message (String)
+        :param logger_file: Whether it should log the message in a file or not (bool)
+        :param title: The title of the message (String) """
 
     show_message(text, 2, duration, context_name, parameter, title, logger_file)
 
 
 def get_visible_layers(as_str_list=False, as_list=False):
-    """ Return string as {...} or [...] or list with name of table in DB of all visible layer in TOC
+    """
+    Return string as {...} or [...] or list with name of table in DB of all visible layer in TOC
         False, False --> return str like {"name1", "name2", "..."}
+
         True, False --> return str like ["name1", "name2", "..."]
+
         xxxx, True --> return list like ['name1', 'name2', '...']
     """
 
@@ -456,8 +488,9 @@ def select_features_by_expr(layer, expr):
 
 
 def get_max_rectangle_from_coords(list_coord):
-    """ Returns the minimum rectangle(x1, y1, x2, y2) of a series of coordinates
-    :param list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
+    """
+    Returns the minimum rectangle(x1, y1, x2, y2) of a series of coordinates
+        :param list_coord: list of coords in format ['x1 y1', 'x2 y2',....,'x99 y99']
     """
 
     coords = list_coord.group(1)
@@ -512,8 +545,9 @@ def get_composer_index(name):
 
 
 def get_geometry_vertex(list_coord=None):
-    """ Return list of QgsPoints taken from geometry
-    :type list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
+    """
+    Return list of QgsPoints taken from geometry
+        :param list_coord: list of coors in format ['x1 y1', 'x2 y2',....,'x99 y99']
     """
 
     coords = list_coord.group(1)
@@ -547,8 +581,8 @@ def restore_user_layer(layer_name, user_current_layer=None):
 def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=None):
     """
     :param layer: QgsVectorLayer to be categorized (QgsVectorLayer)
-    :param cat_field: Field to categorize (string)
-    :param size: Size of feature (integer)
+    :param cat_field: Field to categorize (String)
+    :param size: Size of feature (int)
     """
 
     # get unique values
@@ -591,9 +625,10 @@ def set_layer_categoryze(layer, cat_field, size, color_values, unique_values=Non
 
 
 def remove_layer_from_toc(layer_name, group_name):
-    """ Remove layer from toc if exist
-     :param layer_name: Name's layer (string)
-     :param group_name: Name's group (string)
+    """
+    Remove layer from toc if exist
+        :param layer_name: Name's layer (String)
+        :param group_name: Name's group (String)
     """
 
     layer = None
@@ -653,11 +688,11 @@ def is_layer_visible(layer):
 
 
 def set_layer_visible(layer, recursive=True, visible=True):
-    """ Set layer visible
-    :param layer: layer to se visible (QgsVectorLayer)
-    :param recursive: Whether it affects just the layer or all of its parents (Boolean)
-    :param visible: (Boolean)
-    :return:
+    """
+    Set layer visible
+        :param layer: layer to set visible (QgsVectorLayer)
+        :param recursive: Whether it affects just the layer or all of its parents (bool)
+        :param visible: Whether the layer will be visible or not (bool)
     """
 
     if layer:
@@ -677,10 +712,11 @@ def set_layer_index(layer_name):
 
 
 def load_qml(layer, qml_path):
-    """ Apply QML style located in @qml_path in @layer
-    :param layer: layer to set qml (QgsVectorLayer)
-    :param qml_path: desired path (string)
-    :return: True or False (boolean)
+    """
+    Apply QML style located in @qml_path in @layer
+        :param layer: layer to set qml (QgsVectorLayer)
+        :param qml_path: desired path (String)
+        :return: True or False (bool)
     """
 
     if layer is None:
@@ -733,12 +769,13 @@ def create_qml(layer, style):
 
 
 def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, duration_time=None):
-    """ Draw a point on the canvas
-    :param point: (QgsPointXY)
-    :param rubber_band: (QgsRubberBand)
-    :param color: Color of the point (QColor)
-    :param width: width of the point (integer)
-    :param duration_time: Time in milliseconds that the point will be visible. Ex: 3000 for 3 seconds (integer)
+    """
+    Draw a point on the canvas
+        :param point: (QgsPointXY)
+        :param rubber_band: (QgsRubberBand)
+        :param color: Color of the point (QColor)
+        :param width: width of the point (int)
+        :param duration_time: Time in milliseconds that the point will be visible. Ex: 3000 for 3 seconds (int)
     """
 
     rubber_band.reset(0)
@@ -753,12 +790,13 @@ def draw_point(point, rubber_band=None, color=QColor(255, 0, 0, 100), width=3, d
 
 
 def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
-    """ Draw 'line' over canvas following list of points
-    :param points: list of QgsPointXY (points[QgsPointXY_1, QgsPointXY_2, ..., QgsPointXY_x])
-    :param rubber_band: (QgsRubberBand)
-    :param color: Color of the point (QColor)
-    :param width: width of the point (integer)
-    :param duration_time: Time in milliseconds that the point will be visible. Ex: 3000 for 3 seconds (integer)
+    """
+    Draw 'line' over canvas following list of points
+        :param points: list of QgsPointXY (points[QgsPointXY_1, QgsPointXY_2, ..., QgsPointXY_x])
+        :param rubber_band: (QgsRubberBand)
+        :param color: Color of the point (QColor)
+        :param width: width of the point (int)
+        :param duration_time: Time in milliseconds that the point will be visible. Ex: 3000 for 3 seconds (int)
      """
 
     rubber_band.setIconSize(20)
@@ -774,15 +812,20 @@ def draw_polyline(points, rubber_band, color=QColor(255, 0, 0, 100), width=5, du
 
 
 def get_geometry_from_json(feature):
-    """ Get coordinates from GeoJson and return QGsGeometry
-    :param feature: feature to get geometry type and coordinates (GeoJson)
-    :return: Geometry of the feature (QgsGeometry)
-    functions  called in -> getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
+    """
+    Get coordinates from GeoJson and return QGsGeometry
+
+    functions called in:
+        getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
         def _get_vertex_from_point(feature)
         _get_vertex_from_linestring(feature)
         _get_vertex_from_multilinestring(feature)
         _get_vertex_from_polygon(feature)
         _get_vertex_from_multipolygon(feature)
+
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Geometry of the feature (QgsGeometry)
+
     """
 
     try:
@@ -844,51 +887,67 @@ def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, inde
 # region private functions
 
 def _get_vertex_from_point(feature):
-    """ Manage feature geometry when is Point
-    :param feature: feature to get geometry type and coordinates (GeoJson)
-    :return: Coordinates of the feature (String)
+    """
+    Manage feature geometry when is Point
+
     This function is called in def get_geometry_from_json(feature)
-          geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
+            geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
+
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Coordinates of the feature (String)
+
     """
     return f"({feature['geometry']['coordinates'][0]} {feature['geometry']['coordinates'][1]})"
 
 
 def _get_vertex_from_linestring(feature):
-    """ Manage feature geometry when is LineString
-    :param feature: feature to get geometry type and coordinates (GeoJson)
-    :return: Coordinates of the feature (String)
+    """
+    Manage feature geometry when is LineString
+
     This function is called in def get_geometry_from_json(feature)
           geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
+
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Coordinates of the feature (String)
     """
     return _get_vertex_from_points(feature)
 
 
 def _get_vertex_from_multilinestring(feature):
-    """ Manage feature geometry when is MultiLineString
-    :param feature: feature to get geometry type and coordinates (GeoJson)
-    :return: Coordinates of the feature (String)
+    """
+    Manage feature geometry when is MultiLineString
+
     This function is called in def get_geometry_from_json(feature)
           geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
+
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Coordinates of the feature (String)
     """
     return _get_multi_coordinates(feature)
 
 
 def _get_vertex_from_polygon(feature):
-    """ Manage feature geometry when is Polygon
-    :param feature: feature to get geometry type and coordinates (GeoJson)
-    :return: Coordinates of the feature (String)
+    """
+    Manage feature geometry when is Polygon
+
     This function is called in def get_geometry_from_json(feature)
           geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
+
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Coordinates of the feature (String)
     """
     return _get_multi_coordinates(feature)
 
 
 def _get_vertex_from_multipolygon(feature):
-    """ Manage feature geometry when is MultiPolygon
-    :param feature: feature to get geometry type and coordinates (GeoJson)
-    :return: Coordinates of the feature (String)
+    """
+    Manage feature geometry when is MultiPolygon
+
     This function is called in def get_geometry_from_json(feature)
           geometry = getattr(f"get_{feature['geometry']['type'].lower()}")(feature)
+
+        :param feature: feature to get geometry type and coordinates (GeoJson)
+        :return: Coordinates of the feature (String)
     """
 
     coordinates = "("
@@ -905,9 +964,10 @@ def _get_vertex_from_multipolygon(feature):
 
 
 def _get_vertex_from_points(feature):
-    """ Get coordinates of the received feature, to be a point
-    :param feature: Json with the information of the received feature (geoJson)
-    :return: Coordinates of the feature received (String)
+    """
+    Get coordinates of the received feature, to be a point
+        :param feature: Json with the information of the received feature (GeoJson)
+        :return: Coordinates of the feature received (String)
     """
 
     coordinates = "("
@@ -918,9 +978,10 @@ def _get_vertex_from_points(feature):
 
 
 def _get_multi_coordinates(feature):
-    """ Get coordinates of the received feature, can be a line
-    :param feature: Json with the information of the received feature (geoJson)
-    :return: Coordinates of the feature received (String)
+    """
+    Get coordinates of the received feature, can be a line
+        :param feature: Json with the information of the received feature (GeoJson)
+        :return: Coordinates of the feature received (String)
     """
 
     coordinates = "("
