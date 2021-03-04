@@ -340,10 +340,11 @@ class GwLoadProject(QObject):
         restriction = tools_gw.get_role_permissions(global_vars.project_vars['project_role'])
 
         if restriction == 'role_basic':
-            pass
+            return
 
         elif restriction == 'role_om':
             self._enable_toolbar("om")
+            return
 
         elif restriction == 'role_edit':
             self._enable_toolbar("om")
@@ -368,6 +369,11 @@ class GwLoadProject(QObject):
             self._enable_toolbar("epa")
             self._enable_toolbar("plan")
 
+        # Check if exist some feature_cat with active True on cat_feature table
+        self.feature_cat = tools_gw.manage_feature_cat()
+        if self.feature_cat is None:
+            self._enable_button("01", False)
+            self._enable_button("02", False)
 
     def _enable_toolbars(self, visible=True):
         """ Enable/disable all plugin toolbars from QGIS GUI """
