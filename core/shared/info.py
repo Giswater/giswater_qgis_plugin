@@ -588,7 +588,8 @@ class GwInfo(QObject):
                             self._get_combo_child, self.dlg_cf, widget, self.feature_type, self.tablename, self.field_id))
 
         # Set variables
-        self.filter = str(complet_result['body']['feature']['idName']) + " = '" + str(self.feature_id) + "'"
+        id_name = complet_result['body']['feature']['idName']
+        self.filter = str(id_name) + " = '" + str(self.feature_id) + "'"
         dlg_cf = self.dlg_cf
         layer = self.layer
         fid = self.feature_id
@@ -615,8 +616,8 @@ class GwInfo(QObject):
         # Actions signals
         action_edit.triggered.connect(partial(self._manage_edition, dlg_cf, action_edit, fid, new_feature))
         action_catalog.triggered.connect(partial(self._open_catalog, tab_type, self.feature_type, child_type))
-        action_workcat.triggered.connect(partial(self._get_catalog, 'new_workcat', self.tablename, child_type, self.feature_id, list_points))
-        action_mapzone.triggered.connect(partial(self._get_catalog, 'new_mapzone', self.tablename, child_type, self.feature_id, list_points))
+        action_workcat.triggered.connect(partial(self._get_catalog, 'new_workcat', self.tablename, child_type, self.feature_id, list_points, id_name))
+        action_mapzone.triggered.connect(partial(self._get_catalog, 'new_mapzone', self.tablename, child_type, self.feature_id, list_points, id_name))
         action_set_to_arc.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_set_to_arc, 'v_edit_arc', 'set_to_arc', None, child_type))
         action_get_arc_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_arc_id,  'v_edit_arc', 'arc', 'data_arc_id', child_type))
         action_get_parent_id.triggered.connect(partial(self.get_snapped_feature_id, dlg_cf, action_get_parent_id, 'v_edit_node', 'node', 'data_parent_id', child_type))
@@ -3406,7 +3407,7 @@ class GwInfo(QObject):
         return widget
 
 
-    def _get_catalog(self, form_name, table_name, feature_type, feature_id, list_points):
+    def _get_catalog(self, form_name, table_name, feature_type, feature_id, list_points, id_name):
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"tableName":"{table_name}", "featureId":"{feature_id}", "feature_type":"{feature_type}"'
         extras = f'"coordinates":{{{list_points}}}'
@@ -3421,7 +3422,7 @@ class GwInfo(QObject):
         # Set signals
         dlg_generic.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_generic))
         dlg_generic.rejected.connect(partial(tools_gw.close_dialog, dlg_generic))
-        dlg_generic.btn_accept.clicked.connect(partial(self._set_catalog, dlg_generic, form_name, table_name))
+        dlg_generic.btn_accept.clicked.connect(partial(self._set_catalog, dlg_generic, form_name, table_name, feature_id, id_name))
 
         tools_gw.build_dialog_info(dlg_generic, json_result)
 
@@ -3430,7 +3431,7 @@ class GwInfo(QObject):
         tools_gw.open_dialog(dlg_generic)
 
 
-    def _set_catalog(self, dialog, form_name, table_name):
+    def _set_catalog(self, dialog, form_name, table_name, feature_id, id_name):
         """ Insert table 'cat_work'. Add cat_work """
 
         # Manage mandatory fields
@@ -3458,9 +3459,9 @@ class GwInfo(QObject):
         # Call gw_fct_setcatalog
         fields = f'"fields":{fields}'
         form = f'"formName":"{form_name}"'
-        feature = f'"tableName":"{table_name}"'
+        feature = f'"tableName":"{table_name}", "id":"{feature_id}", "idName":"{id_name}"'
         body = tools_gw.create_body(form, feature, extras=fields)
-        result = tools_gw.execute_procedure('gw_fct_setcatalog', body)
+        result = tools_gw.execute_procedure('gw_fct_setcatalog', body, log_sql=True)
         if result['status'] != 'Accepted':
             return
 
