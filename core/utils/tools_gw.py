@@ -806,24 +806,23 @@ def manage_feature_cat():
     # Key: field tablename
     # Value: Object of the class SysFeatureCat
     feature_cat = {}
-    sql = ("SELECT cat_feature.* FROM cat_feature "
-           "WHERE active IS TRUE ORDER BY id")
-    rows = tools_db.get_rows(sql)
 
-    # If rows ara none, probably the conection has broken so try again
-    if not rows:
-        rows = tools_db.get_rows(sql)
-        if not rows:
+    body = create_body()
+    result = execute_procedure('gw_fct_getaddfeaturevalues', body)
+    # If result ara none, probably the conection has broken so try again
+    if not result:
+        result = execute_procedure('gw_fct_getaddfeaturevalues', body)
+        if not result:
             return None
 
     msg = "Field child_layer of id: "
-    for row in rows:
-        tablename = row['child_layer']
+    for value in result['body']['data']['values']:
+        tablename = value['child_layer']
         if not tablename:
-            msg += f"{row['id']}, "
+            msg += f"{value['id']}, "
             continue
-        elem = GwCatFeature(row['id'], row['system_id'], row['feature_type'], row['shortcut_key'],
-                            row['parent_layer'], row['child_layer'])
+        elem = GwCatFeature(value['id'], value['system_id'], value['feature_type'], value['shortcut_key'],
+                            value['parent_layer'], value['child_layer'])
 
         feature_cat[tablename] = elem
 
