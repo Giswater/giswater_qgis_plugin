@@ -23,6 +23,7 @@ DELETE FROM sys_fprocess WHERE fid = 206;
 
 UPDATE sys_function set sample_query=NULL WHERE sample_query='false';
 
+
 UPDATE value_state SET name = 'OPERATIVE' WHERE name ='ON_SERVICE';
 UPDATE value_state SET name = 'OPERATIVO' WHERE name ='EN_SERVICIO';
 UPDATE value_state SET name = 'OPERATIU' WHERE name ='EN_SERVEI';
@@ -30,3 +31,7 @@ UPDATE value_state SET name = 'OPERATIU' WHERE name ='EN_SERVEI';
 UPDATE value_state_type SET name = 'OPERATIVE' WHERE name ='ON_SERVICE';
 UPDATE value_state_type SET name = 'OPERATIVO' WHERE name ='EN_SERVICIO';
 UPDATE value_state_type SET name = 'OPERATIU' WHERE name ='EN_SERVEI';
+
+
+--2021/03/05
+INSERT INTO sys_function VALUES (3028, 'gw_fct_getaddfeaturevalues', 'utils', 'function', 'json', 'json', 'Function that return cat_feature values', 'role_basic');
