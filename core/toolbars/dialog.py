@@ -36,6 +36,7 @@ class GwAction:
             self.action = QAction(icon, text, action_group)
 
         self.action.setObjectName(action_name)
+        self.action.setProperty('action_group', action_group)
         self.action.setCheckable(False)
         self.action.triggered.connect(self.clicked_event)
 

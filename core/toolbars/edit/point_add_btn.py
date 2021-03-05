@@ -13,8 +13,8 @@ from qgis.PyQt.QtWidgets import QAction, QMenu
 from ..dialog import GwAction
 from ...shared.info import GwInfo
 from ...utils import tools_gw
-from ....lib import tools_os
 from .... import global_vars
+from ....lib import tools_os
 
 
 class GwPointAddButton(GwAction):
@@ -28,16 +28,52 @@ class GwPointAddButton(GwAction):
         if toolbar is not None:
             toolbar.removeAction(self.action)
 
-        self.feature_cat = tools_gw.manage_feature_cat()
-
-        project_type = tools_gw.get_project_type()
         self.info_feature = GwInfo('data')
 
-        # Get list of different node and arc types
         self.menu = QMenu()
-        # List of nodes from node_type_cat_type - nodes which we are using
-        if self.feature_cat is not None:
-            list_feature_cat = tools_os.get_values_from_dictionary(self.feature_cat)
+        self.menu.setObjectName("GW_point_menu")
+        self._fill_point_menu()
+
+        self.menu.aboutToShow.connect(self._check_reload)
+
+        if toolbar is not None:
+            self.action.setMenu(self.menu)
+            toolbar.addAction(self.action)
+
+
+    def clicked_event(self):
+
+        if self.menu.property('last_selection') is not None:
+            self.info_feature.add_feature(self.menu.property('last_selection'))
+
+
+    # region private functions
+
+
+    def _check_reload(self):
+        """ Check for reload button """
+        super_users = tools_gw.get_config_parser('system', 'reload_cat_feature', "project", "giswater")
+        super_users = tools_os.set_boolean(super_users)
+        if super_users:
+            self._fill_point_menu()
+
+
+    def _fill_point_menu(self):
+        """ Fill add point menu """
+
+        # disconnect and remove previuos signals and actions
+        actions = self.menu.actions()
+        for action in actions:
+            action.disconnect()
+            self.menu.removeAction(action)
+            del action
+        action_group = self.action.property('action_group')
+
+        # Get list of different connec, gully and node types
+        features_cat = tools_gw.manage_feature_cat()
+        project_type = tools_gw.get_project_type()
+        if features_cat is not None:
+            list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
             for feature_cat in list_feature_cat:
                 if feature_cat.feature_type.upper() == 'NODE':
                     obj_action = QAction(str(feature_cat.id), action_group)
@@ -52,8 +88,8 @@ class GwPointAddButton(GwAction):
                     obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
 
             self.menu.addSeparator()
-            if self.feature_cat is not None:
-                list_feature_cat = tools_os.get_values_from_dictionary(self.feature_cat)
+            if features_cat is not None:
+                list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
                 for feature_cat in list_feature_cat:
                     if feature_cat.feature_type.upper() == 'CONNEC':
                         obj_action = QAction(str(feature_cat.id), action_group)
@@ -67,8 +103,8 @@ class GwPointAddButton(GwAction):
                         obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat))
                         obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
                 self.menu.addSeparator()
-                if self.feature_cat is not None:
-                    list_feature_cat = tools_os.get_values_from_dictionary(self.feature_cat)
+                if features_cat is not None:
+                    list_feature_cat = tools_os.get_values_from_dictionary(features_cat)
                     for feature_cat in list_feature_cat:
                         if feature_cat.feature_type.upper() == 'GULLY' and project_type == 'ud':
                             obj_action = QAction(str(feature_cat.id), action_group)
@@ -83,17 +119,6 @@ class GwPointAddButton(GwAction):
                             obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
                     self.menu.addSeparator()
 
-        if toolbar is not None:
-            self.action.setMenu(self.menu)
-            toolbar.addAction(self.action)
-
-
-    def clicked_event(self):
-        if self.menu.property('last_selection') is not None:
-            self.info_feature.add_feature(self.menu.property('last_selection'))
-
-
-    # region private functions
 
     def _save_last_selection(self, menu, feature_cat):
         menu.setProperty("last_selection", feature_cat)
