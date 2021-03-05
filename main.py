@@ -301,6 +301,9 @@ class Giswater(QObject):
         if docker_info:
             self.iface.removeDockWidget(docker_info)
 
+        # Manage 'dialog_docker' from global_vars.session_vars and remove it if exists
+        tools_gw.close_docker()
+
         # Get 'Layers' docker form and his actions from qgis iface and remove it if exists
         if self.btn_add_layers:
             dockwidget = self.iface.mainWindow().findChild(QDockWidget, 'Layers')
