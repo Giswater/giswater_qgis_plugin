@@ -99,17 +99,18 @@ def open_url(widget):
         webbrowser.open(path)
 
 
-def set_boolean(param):
+def set_boolean(param, default=True):
     """
     Receives a string and returns a bool
         :param param: String to cast (String)
-        :return: True if param not in bool_dict (bool)
+        :param default: Value to return if the parameter is not one of the keys of the dictionary of values (Boolean)
+        :return: default if param not in bool_dict (bool)
     """
 
     bool_dict = {True: True, "TRUE": True, "True": True, "true": True,
                  False: False, "FALSE": False, "False": False, "false": False}
 
-    return bool_dict.get(param, True)
+    return bool_dict.get(param, default)
 
 
 def open_file_path(msg="Select file", filter_="All (*.*)"):
