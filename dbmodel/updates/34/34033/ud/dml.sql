@@ -18,3 +18,5 @@ CREATE INDEX plan_psector_x_gully_arc_id ON plan_psector_x_connec USING btree (a
 CREATE INDEX plan_psector_x_gully_gully_id ON plan_psector_x_gully USING btree (gully_id);
 
 UPDATE sys_table set sys_sequence='plan_psector_x_gully_id_seq', sys_sequence_field='id' WHERE id='plan_psector_x_gully';
+
+UPDATE config_form_fields SET iseditable = true WHERE formname = 'v_edit_arc' AND columnname = 'arc_type';
