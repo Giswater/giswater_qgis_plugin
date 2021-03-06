@@ -76,7 +76,7 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		-- element_id
-		IF (NEW.element_id IS NULL) THEN
+		IF (NEW.element_id IS NULL) OR (NEW.element_id~E'^\\d+$' IS FALSE) THEN
 			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 			NEW.element_id:= (SELECT nextval('urn_id_seq'));
 		END IF;
