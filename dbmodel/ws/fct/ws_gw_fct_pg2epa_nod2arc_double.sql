@@ -29,9 +29,8 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	v_query_text = 'SELECT temp_arc.arc_id, temp_arc.node_1, the_geom, curve_id FROM temp_arc
-			JOIN inp_pump a ON concat(node_id,''_n2a'')=arc_id
-			JOIN inp_curve b ON b.id=a.curve_id
-			WHERE epa_type=''PUMP'' AND isdoublen2a IS TRUE';			
+			JOIN inp_pump a ON concat(node_id,''_n2a'')=arc_id WHERE epa_type=''PUMP'' AND pump_type = ''PRESSPUMP''';	
+			
 
 	FOR v_arc_id, v_node_1, v_geom, v_curve IN EXECUTE v_query_text
 	LOOP
@@ -46,12 +45,12 @@ BEGIN
 		-- New arc (PRV)
 		SELECT * INTO v_record_a2 FROM temp_arc WHERE arc_id = v_arc_id;
 		v_record_a2.arc_id = concat (v_record_a2.arc_id, '_4');
-		v_record_a2.arc_type =  'BINODE2ARC-PRV';
+		v_record_a2.arc_type =  'DOUBLE-NOD2ARC(PRV)';
 		v_record_a2.epa_type =  'VALVE';
 		v_record_a2.node_2 = v_record.node_id;
 		v_record_a2.length = v_record_a2.length/2;
 		v_record_a2.the_geom := ST_LineSubstring(v_record_a2.the_geom,0.5,1);
-		v_record_a2.addparam = concat('{"curve_id":"","pressure":"0" }');
+		v_record_a2.addparam = concat('{"pressure":0.01}');
 		INSERT INTO temp_arc	(result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, expl_id, flw_code, addparam)
 		VALUES(v_record_a2.result_id, v_record_a2.arc_id, v_record_a2.node_1, v_record_a2.node_2, v_record_a2.arc_type, v_record_a2.arccat_id, v_record_a2.epa_type, v_record_a2.sector_id, v_record_a2.state, v_record_a2.state_type, 
 		v_record_a2.annotation, v_record_a2.diameter, v_record_a2.roughness, v_record_a2.length, v_record_a2.status, v_record_a2.the_geom, v_record_a2.expl_id, v_record_a2.flw_code, v_record_a2.addparam);
@@ -59,12 +58,11 @@ BEGIN
 		-- New arc (GPV)
 		SELECT * INTO v_record_a1 FROM temp_arc WHERE arc_id = v_arc_id;
 		v_record_a1.arc_id = concat (v_record_a1.arc_id, '_5');
-		v_record_a1.arc_type =  'BINODE2ARC-GPV';
-		v_record_a1.epa_type =  'VALVE';
+		v_record_a1.arc_type =  'DOUBLE-NOD2ARC(PUMP)';
+		v_record_a1.epa_type =  'PUMP';
 		v_record_a1.node_1 = v_record.node_id;
 		v_record_a1.length = v_record_a1.length/2;
 		v_record_a1.the_geom := ST_LineSubstring(v_record_a1.the_geom,0,0.5);
-		v_record_a1.addparam = concat('{"curve_id":"',v_curve,'"}');
 		INSERT INTO temp_arc	(result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length, status, the_geom, expl_id, flw_code, addparam)
 		VALUES(v_record_a1.result_id, v_record_a1.arc_id, v_record_a1.node_1, v_record_a1.node_2, v_record_a1.arc_type, v_record_a1.arccat_id, v_record_a1.epa_type, v_record_a1.sector_id, v_record_a1.state, v_record_a1.state_type, 
 		v_record_a1.annotation, v_record_a1.diameter, v_record_a1.roughness, v_record_a1.length, v_record_a1.status, v_record_a1.the_geom, v_record_a1.expl_id, v_record_a1.flw_code, v_record_a1.addparam);
