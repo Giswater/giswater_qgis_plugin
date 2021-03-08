@@ -23,6 +23,7 @@ class GwGisFileCreate:
         self.user = None
         self.password = None
         self.srid = None
+        self.sslmode = None
 
 
     def gis_project_database(self, folder_path=None, filename=None, project_type='ws', schema='ws_sample',
@@ -97,6 +98,7 @@ class GwGisFileCreate:
         # Replace __DBNAME__ for db parameter. __HOST__ for host parameter, __PORT__ for port parameter
         content = content.replace("__DBNAME__", self.db)
         content = content.replace("__HOST__", self.host)
+        content = content.replace("__SSLMODE__", self.sslmode)
 
         # Manage username and password
         credentials = self.port
@@ -119,7 +121,7 @@ class GwGisFileCreate:
             tools_qgis.show_warning(message, parameter=qgs_path)
 
 
-    def set_database_parameters(self, host, port, db, user, password, srid):
+    def set_database_parameters(self, host, port, db, user, password, srid, sslmode):
 
         self.host = host
         self.port = port
@@ -127,6 +129,7 @@ class GwGisFileCreate:
         self.user = user
         self.password = password
         self.srid = srid
+        self.sslmode = sslmode
 
 
     # region private functions
@@ -141,7 +144,7 @@ class GwGisFileCreate:
 
         self.set_database_parameters(layer_source['host'], layer_source['port'], layer_source['db'],
                                      layer_source['user'], layer_source['password'],
-                                     tools_db.get_srid('v_edit_node', schema))
+                                     tools_db.get_srid('v_edit_node', schema), layer_source['sslmode'])
 
         return True
 
