@@ -107,9 +107,10 @@ class CreateGisProject:
         content = content.replace("SCHEMA_NAME", schema)
         content = content.replace("SRID_VALUE", str(self.srid))
 
-        # Replace __DBNAME__ for db parameter. __HOST__ for host parameter, __PORT__ for port parameter
+        # Replace __DBNAME__ for db parameter. __HOST__ for host parameter, __SSLMODE__, __PORT__ for port parameter
         content = content.replace("__DBNAME__", self.db)
         content = content.replace("__HOST__", self.host)
+        content = content.replace("__SSLMODE__", self.sslmode)
 
         # Manage username and password
         credentials = self.port
@@ -141,12 +142,12 @@ class CreateGisProject:
             return False
 
         self.set_database_parameters(layer_source['host'], layer_source['port'], layer_source['db'], layer_source['user'],
-            layer_source['password'], self.controller.get_srid('v_edit_node', schema))
+            layer_source['password'], self.controller.get_srid('v_edit_node', schema), layer_source['sslmode'])
 
         return True
 
 
-    def set_database_parameters(self, host, port, db, user, password, srid):
+    def set_database_parameters(self, host, port, db, user, password, srid, sslmode):
 
         self.host = host
         self.port = port
@@ -154,6 +155,7 @@ class CreateGisProject:
         self.user = user
         self.password = password
         self.srid = srid
+        self.sslmode = sslmode
 
 
     def connect_sqlite(self):
