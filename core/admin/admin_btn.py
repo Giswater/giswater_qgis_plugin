@@ -2682,15 +2682,22 @@ class GwAdminButton:
                                                                        "project", "dev")
                         self.text_replace = self.text_replace.split(',')
                         tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
-                        f_to_read = re.sub(str(self.text_replace[0]), str(self.text_replace[1]), f_to_read)
+                        # TODO:: Keep replace or remove it and declare 'qgis_project_text_replace' from 'config/dev.config' without '"'.
+                        #  Example: "dbname='giswater3'", "dbname='__DBNAME__'" or dbname='giswater3', dbname='__DBNAME__'
+                        f_to_read = re.sub(str(self.text_replace[0].replace('"', '')),
+                                           str(self.text_replace[1].replace('"', '')), f_to_read)
 
+                    # f_to_read = re.sub(str("port=5432"), str("port=__PORT__"), f_to_read)
                     for text_replace in self.xml_set_labels:
                         text_replace = text_replace.replace(" ", "")
                         self.text_replace = tools_gw.get_config_parser('qgis_project_xml_set', text_replace, "project",
                                                                        "dev")
                         self.text_replace = self.text_replace.split(',')
                         tools_log.log_info("Replacing template text", parameter=self.text_replace[1])
-                        f_to_read = re.sub(str(self.text_replace[0]), str(self.text_replace[1]), f_to_read)
+                        # TODO:: Keep replace or remove it and declare 'qgis_project_xml_set' from 'config/dev.config' without '"'.
+                        #  Example: "dbname='giswater3'", "dbname='__DBNAME__'" or dbname='giswater3', dbname='__DBNAME__'
+                        f_to_read = re.sub(str(self.text_replace[0].replace('"', '')),
+                                           str(self.text_replace[1].replace('"', '')), f_to_read)
 
                     # Close file
                     f.close()
