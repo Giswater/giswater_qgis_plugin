@@ -2687,7 +2687,6 @@ class GwAdminButton:
                         f_to_read = re.sub(str(self.text_replace[0].replace('"', '')),
                                            str(self.text_replace[1].replace('"', '')), f_to_read)
 
-                    # f_to_read = re.sub(str("port=5432"), str("port=__PORT__"), f_to_read)
                     for text_replace in self.xml_set_labels:
                         text_replace = text_replace.replace(" ", "")
                         self.text_replace = tools_gw.get_config_parser('qgis_project_xml_set', text_replace, "project",
