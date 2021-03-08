@@ -124,6 +124,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
         # Check if the parameter exists in the inventory, if not creates it
         if chk_user_params and config_type in "user":
             _check_user_params(section, raw_parameter, file_name, prefix)
+
     except Exception as e:
         tools_log.log_warning(str(e))
         value = None
@@ -2534,6 +2535,7 @@ def get_parent_layers_visibility():
     :return: example: {<QgsMapLayer: 'Arc' (postgres)>: True, <QgsMapLayer: 'Node' (postgres)>: False,
                        <QgsMapLayer: 'Connec' (postgres)>: True, <QgsMapLayer: 'Element' (postgres)>: False}
     """
+
     layers_visibility = {}
     for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully"]:
         layer = tools_qgis.get_layer_by_tablename(layer_name)
@@ -2555,6 +2557,7 @@ def restore_parent_layers_visibility(layers):
 
 def create_sqlite_conn(file_name):
     """ Creates an sqlite connection to a file """
+
     status = False
     cursor = None
     try:
@@ -2574,10 +2577,14 @@ def create_sqlite_conn(file_name):
 
 def user_params_to_userconfig():
     """ Function to load all the variables from user_params.config to their respective user config files """
+
     inv_sections = _get_user_params_sections()
 
     # For each section (inventory)
     for section in inv_sections:
+
+        file_name = section.split('.')[0]
+        section_name = section.split('.')[1]
         parameters = _get_user_params_parameters(section)
 
         # For each parameter (inventory)
@@ -2590,29 +2597,26 @@ def user_params_to_userconfig():
                 parameter = inv_param[1:]
             # If it's just a comment line
             if parameter.startswith("#"):
-                set_config_parser(section.split('.')[1], parameter, None, "user", section.split('.')[0], prefix=False,
-                                  chk_user_params=False)
-            # If it's a normal value
-            else:
-                # Get value[section][parameter] of the user config file
-                value = get_config_parser(section.split('.')[1], parameter, "user", section.split('.')[0], _pre,
-                                          False, True, False)
-                # If this value (user config file) is None (doesn't exist, isn't set, etc.)
-                if value is None:
-                    # Read the default value for that parameter
-                    value = get_config_parser(section, inv_param, "project", "user_params", False, False, True, False)
-                    # Set value[section][parameter] in the user config file
-                    set_config_parser(section.split('.')[1], parameter, value, "user", section.split('.')[0],
-                                      prefix=_pre, chk_user_params=False)
+                set_config_parser(section_name, parameter, None, "user", file_name, prefix=False, chk_user_params=False)
+                continue
 
-                # If there's an inline comment in the inventory but there isn't one in the user config file, add it
-                elif "#" not in value and "#" in get_config_parser(section, inv_param, "project", "user_params",
-                                                                   False, False, True, False):
-                    # Get the comment (inventory) and set it (user config file)
-                    comentari = get_config_parser(section, inv_param, "project", "user_params", False, False, True,
-                                                  False).split('#')[1]
-                    set_config_parser(section.split('.')[1], parameter, value.strip(), "user", section.split('.')[0],
-                                      comentari, _pre, False)
+            # If it's a normal value
+            # Get value[section][parameter] of the user config file
+            value = get_config_parser(section_name, parameter, "user", file_name, _pre, False, True, False)
+            # If this value (user config file) is None (doesn't exist, isn't set, etc.)
+            if value is None:
+                # Read the default value for that parameter
+                value = get_config_parser(section, inv_param, "project", "user_params", False, False, True, False)
+                # Set value[section][parameter] in the user config file
+                set_config_parser(section_name, parameter, value, "user", file_name, None, _pre, False)
+            else:
+                value2 = get_config_parser(section, inv_param, "project", "user_params", False, False, True, False)
+                if value2 is not None:
+                    # If there's an inline comment in the inventory but there isn't one in the user config file, add it
+                    if "#" not in value and "#" in value2:
+                        # Get the comment (inventory) and set it (user config file)
+                        comment = value2.split('#')[1]
+                        set_config_parser(section_name, parameter, value.strip(), "user", file_name, comment, _pre, False)
 
 
 # region private functions
