@@ -29,7 +29,7 @@ BEGIN
     --INFO: v_visit_type=1 (planned) v_visit_type=2(unexpected/incidencia)	
     v_visit_type=(SELECT visit_type FROM config_visit_class WHERE id=visit_class);
 
-    select value::json->>'lotManage'::boolean INTO v_pluginlot from config_param_system where parameter = 'plugin_lotmanage';
+    select upper(value::json->>'lotManage'::text) INTO v_pluginlot from config_param_system where parameter = 'plugin_lotmanage';
 
     IF TG_OP = 'INSERT' THEN
 
