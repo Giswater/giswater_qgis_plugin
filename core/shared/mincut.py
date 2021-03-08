@@ -163,22 +163,30 @@ class GwMincut:
             # Actions
             if mincut_class_status == '1':
                 self.action_mincut.setDisabled(False)
+                self.action_refresh_mincut.setDisabled(False)
                 self.action_custom_mincut.setDisabled(False)
+                self.action_change_valve_status.setDisabled(False)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(True)
             if mincut_class_status == '2':
                 self.action_mincut.setDisabled(True)
+                self.action_refresh_mincut.setDisabled(True)
                 self.action_custom_mincut.setDisabled(True)
+                self.action_change_valve_status.setDisabled(True)
                 self.action_add_connec.setDisabled(False)
                 self.action_add_hydrometer.setDisabled(True)
             if mincut_class_status == '3':
                 self.action_mincut.setDisabled(True)
+                self.action_refresh_mincut.setDisabled(True)
                 self.action_custom_mincut.setDisabled(True)
+                self.action_change_valve_status.setDisabled(True)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(False)
             if mincut_class_status is None:
                 self.action_mincut.setDisabled(False)
+                self.action_refresh_mincut.setDisabled(False)
                 self.action_custom_mincut.setDisabled(True)
+                self.action_change_valve_status.setDisabled(True)
                 self.action_add_connec.setDisabled(False)
                 self.action_add_hydrometer.setDisabled(False)
 
@@ -215,7 +223,9 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(False)
             # Actions
             self.action_mincut.setDisabled(True)
+            self.action_refresh_mincut.setDisabled(True)
             self.action_custom_mincut.setDisabled(True)
+            self.action_change_valve_status.setDisabled(True)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
 
@@ -251,7 +261,9 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(True)
             # Actions
             self.action_mincut.setDisabled(True)
+            self.action_refresh_mincut.setDisabled(True)
             self.action_custom_mincut.setDisabled(True)
+            self.action_change_valve_status.setDisabled(True)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
 
@@ -459,7 +471,6 @@ class GwMincut:
             tools_qgis.set_layer_visible(layer)
             if layer.featureCount() > 0:
                 layer_zoomed = layer
-
 
         layer = tools_qgis.get_layer_by_tablename("v_om_mincut_node")
         if layer:
@@ -868,7 +879,6 @@ class GwMincut:
                 self.dlg_dtext.btn_accept.clicked.connect(partial(self._force_mincut_overlap))
                 self.dlg_dtext.btn_accept.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
                 self.dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_dtext))
-
                 tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, close=False)
                 tools_gw.open_dialog(self.dlg_dtext)
 
@@ -898,7 +908,7 @@ class GwMincut:
         qtabwidget.widget(0).setEnabled(False)  # Tab plan
         qtabwidget.widget(1).setEnabled(True)   # Tab Exec
         qtabwidget.widget(2).setEnabled(True)   # Tab hydro
-        qtabwidget.widget(3).setEnabled(True)  # Tab Log
+        qtabwidget.widget(3).setEnabled(True)   # Tab Log
 
         self.dlg_mincut.closeMainWin = False
         self.dlg_mincut.mincutCanceled = True
@@ -927,7 +937,9 @@ class GwMincut:
         self._refresh_tab_hydro()
 
         self.action_mincut.setEnabled(False)
+        self.action_refresh_mincut.setEnabled(False)
         self.action_custom_mincut.setEnabled(False)
+        self.action_change_valve_status.setEnabled(False)
 
 
     def _update_result_selector(self, result_mincut_id, commit=True):
@@ -999,7 +1011,9 @@ class GwMincut:
 
         # Disable Auto, Custom, Hydrometer
         self.action_mincut.setDisabled(True)
+        self.action_refresh_mincut.setDisabled(True)
         self.action_custom_mincut.setDisabled(True)
+        self.action_change_valve_status.setDisabled(True)
         self.action_add_hydrometer.setDisabled(True)
 
         # Set dialog add_connec
@@ -1152,7 +1166,9 @@ class GwMincut:
 
         # On inserting work order
         self.action_mincut.setDisabled(True)
+        self.action_refresh_mincut.setDisabled(True)
         self.action_custom_mincut.setDisabled(True)
+        self.action_change_valve_status.setDisabled(True)
         self.action_add_connec.setDisabled(True)
 
         # Set dialog MincutHydrometer
@@ -1791,6 +1807,7 @@ class GwMincut:
 
             # Enable button CustomMincut, ChangeValveStatus and button Start
             self.dlg_mincut.btn_start.setDisabled(False)
+            self.action_refresh_mincut.setDisabled(False)
             self.action_custom_mincut.setDisabled(False)
             self.action_change_valve_status.setDisabled(False)
             self.action_mincut.setDisabled(False)
@@ -2109,7 +2126,9 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(True)
             # Actions
             self.action_mincut.setDisabled(False)
+            self.action_refresh_mincut.setDisabled(True)
             self.action_custom_mincut.setDisabled(True)
+            self.action_change_valve_status.setDisabled(True)
             self.action_add_connec.setDisabled(False)
             self.action_add_hydrometer.setDisabled(False)
 
@@ -2146,7 +2165,9 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(False)
             # Actions
             self.action_mincut.setDisabled(True)
+            self.action_refresh_mincut.setDisabled(True)
             self.action_custom_mincut.setDisabled(True)
+            self.action_change_valve_status.setDisabled(True)
             self.action_add_connec.setDisabled(False)
             self.action_add_hydrometer.setDisabled(False)
 
@@ -2183,7 +2204,9 @@ class GwMincut:
             self.dlg_mincut.btn_end.setDisabled(True)
             # Actions
             self.action_mincut.setDisabled(True)
+            self.action_refresh_mincut.setDisabled(True)
             self.action_custom_mincut.setDisabled(True)
+            self.action_change_valve_status.setDisabled(True)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
 
