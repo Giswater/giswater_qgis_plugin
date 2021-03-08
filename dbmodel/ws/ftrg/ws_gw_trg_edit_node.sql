@@ -89,7 +89,7 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 	
 		-- Node ID	
-		IF (NEW.node_id IS NULL) THEN
+		IF (NEW.node_id IS NULL) OR (NEW.node_id~E'^\\d+$' IS FALSE) THEN
 			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 			NEW.node_id:= (SELECT nextval('urn_id_seq'));
 		END IF;
@@ -607,7 +607,7 @@ BEGIN
 				INSERT INTO inp_reservoir (node_id) VALUES (NEW.node_id);
 				
 		ELSIF (NEW.epa_type = 'PUMP') THEN
-				INSERT INTO inp_pump (node_id, status) VALUES (NEW.node_id, 'OPEN');
+				INSERT INTO inp_pump (node_id, status, pump_type) VALUES (NEW.node_id, 'OPEN', 'FLOWPUMP');
 
 		ELSIF (NEW.epa_type = 'VALVE') THEN
 				INSERT INTO inp_valve (node_id, valv_type, status) VALUES (NEW.node_id, 'PRV', 'ACTIVE');

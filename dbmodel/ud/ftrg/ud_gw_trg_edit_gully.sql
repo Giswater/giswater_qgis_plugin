@@ -95,7 +95,7 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		-- gully ID
-		IF (NEW.gully_id IS NULL) THEN
+		IF (NEW.gully_id IS NULL) OR (NEW.gully_id~E'^\\d+$' IS FALSE) THEN
 			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 			NEW.gully_id:= (SELECT nextval('urn_id_seq'));
 		END IF;

@@ -62,7 +62,7 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN   
 
 		-- Arc ID
-		IF (NEW.arc_id IS NULL) THEN
+		IF (NEW.arc_id IS NULL) OR (NEW.arc_id~E'^\\d+$' IS FALSE) THEN
 			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
 			NEW.arc_id:= (SELECT nextval('urn_id_seq'));
 		END IF;

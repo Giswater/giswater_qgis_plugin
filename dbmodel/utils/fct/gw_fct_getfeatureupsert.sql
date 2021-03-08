@@ -231,8 +231,8 @@ BEGIN
 						v_status = false;
 					END IF;
 
-					-- getting presszone by heritage from nodes
 					IF v_project_type = 'WS' THEN
+						-- getting presszone by heritage from nodes
 						IF v_noderecord1.presszone_id = v_noderecord2.presszone_id THEN
 							v_presszone_id = v_noderecord1.presszone_id;
 						ELSIF v_noderecord1.presszone_id = 0::text THEN
@@ -242,6 +242,17 @@ BEGIN
 						ELSIF v_noderecord1.presszone_id::text != v_noderecord2.presszone_id::text THEN
 							v_presszone_id = v_noderecord1.presszone_id;
 						END IF;
+
+						-- getting dqa_id by heritage from nodes
+						IF v_noderecord1.dqa_id = v_noderecord2.dqa_id THEN
+							v_dqa_id = v_noderecord1.dqa_id;
+						ELSIF v_noderecord1.dqa_id = 0 THEN
+							v_dqa_id = v_noderecord2.dqa_id;
+						ELSIF v_noderecord2.dqa_id = 0 THEN
+							v_dqa_id = v_noderecord1.dqa_id;
+						ELSIF v_noderecord1.dqa_id::text != v_noderecord2.dqa_id::text THEN
+							v_dqa_id = v_noderecord1.dqa_id;
+						END IF;					
 					END IF;
 
 					-- getting sector_id by heritage from nodes
@@ -251,8 +262,8 @@ BEGIN
 						v_sector_id = v_noderecord2.sector_id;
 					ELSIF v_noderecord2.sector_id = 0 THEN
 						v_sector_id = v_noderecord1.sector_id;
-					ELSIF v_noderecord1.presszone_id::text != v_noderecord2.presszone_id::text THEN
-						v_sector_id = true;	
+					ELSIF v_noderecord1.sector_id::text != v_noderecord2.sector_id::text THEN
+						v_sector_id = v_noderecord1.sector_id;
 					END IF;
 
 					-- getting dma_id by heritage from nodes
@@ -264,19 +275,6 @@ BEGIN
 						v_dma_id = v_noderecord1.dma_id;
 					ELSIF v_noderecord1.dma_id::text != v_noderecord2.dma_id::text THEN
 						v_dma_id = v_noderecord1.dma_id;
-					END IF;
-
-					IF v_project_type = 'WS' THEN
-						-- getting dqa_id by heritage from nodes
-						IF v_noderecord1.dqa_id = v_noderecord2.dqa_id THEN
-							v_dqa_id = v_noderecord1.dqa_id;
-						ELSIF v_noderecord1.dqa_id = 0 THEN
-							v_dqa_id = v_noderecord2.dqa_id;
-						ELSIF v_noderecord2.dqa_id = 0 THEN
-							v_dqa_id = v_noderecord1.dqa_id;
-						ELSIF v_noderecord1.dqa_id::text != v_noderecord2.dqa_id::text THEN
-							v_dqa_id = v_noderecord1.dqa_id;
-						END IF;
 					END IF;
 
 					-- getting expl_id by heritage from nodes
