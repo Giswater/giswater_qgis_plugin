@@ -909,6 +909,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionMincut"/>
+   <addaction name="actionRefreshMincut"/>
    <addaction name="actionCustomMincut"/>
    <addaction name="actionChangeValveStatus"/>
    <addaction name="actionAddConnec"/>
@@ -997,6 +998,21 @@
    </property>
    <property name="text">
     <string>Change valve status</string>
+   </property>
+  </action>
+  <action name="actionRefreshMincut">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../../../../icons/dialogs/20x20/125.png</normaloff>../../../../icons/dialogs/20x20/125.png</iconset>
+   </property>
+   <property name="text">
+    <string>Refresh Mincut</string>
    </property>
   </action>
  </widget>
