@@ -180,6 +180,7 @@ class GwMincut:
                 self.action_custom_mincut.setDisabled(True)
                 self.action_add_connec.setDisabled(False)
                 self.action_add_hydrometer.setDisabled(False)
+
         # Current_state == '1': In progress
         elif self.current_state == '1':
 
@@ -255,6 +256,7 @@ class GwMincut:
 
         # Common Actions
         self.action_mincut_composer.setDisabled(False)
+
         return row
 
 
@@ -338,6 +340,11 @@ class GwMincut:
         action.triggered.connect(self._auto_mincut)
         tools_gw.add_icon(action, "126")
         self.action_mincut = action
+
+        action = self.dlg_mincut.findChild(QAction, "actionRefreshMincut")
+        action.triggered.connect(partial(self._refresh_mincut, action))
+        tools_gw.add_icon(action, "125")
+        self.action_refresh_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionCustomMincut")
         action.triggered.connect(partial(self._custom_mincut, action))
@@ -1685,7 +1692,7 @@ class GwMincut:
             snapped_feat = self.snapper_manager.get_snapped_feature(result)
             feature_id = self.snapper_manager.get_snapped_feature_id(result)
             snapped_point = self.snapper_manager.get_snapped_point(result)
-            element_id = snapped_feat.attribute(elem_type + '_id')
+            element_id = snapped_feat.attribute(f'{elem_type}_id')
             layer.select([feature_id])
             description = "Mincut execute"
             self.mincut_task = GwAutoMincutTask(description, self, element_id)
@@ -1801,6 +1808,10 @@ class GwMincut:
         self.set_visible_mincut_layers()
         self.snapper_manager.restore_snap_options(self.previous_snapping)
         self._remove_selection()
+
+
+    def _refresh_mincut(self, action, is_checked):
+        """ B2-125: Refreash current mincut """
 
 
     def _custom_mincut(self, action, is_checked):
@@ -2211,7 +2222,8 @@ class GwMincut:
 
         result_mincut_id = tools_qt.get_text(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
-            extras = f'"nodeId":{elem_id}, "mincutId":{result_mincut_id}'
+            use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
+            extras = f'"nodeId":{elem_id}, "mincutId":{result_mincut_id}, "usePsectors":"{use_planified}"'
             body = tools_gw.create_body(extras=extras)
             result = tools_gw.execute_procedure('gw_fct_setchangevalvestatus', body, log_sql=True)
             if result['status'] == 'Accepted' and result['message']:
