@@ -118,11 +118,15 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
         if value is not None and not get_comment:
             value = value.split('#')[0].strip()
 
+        if str(value) in "None":
+            value = None
+
         # Check if the parameter exists in the inventory, if not creates it
         if chk_user_params and config_type in "user":
             _check_user_params(section, raw_parameter, file_name, prefix)
     except Exception as e:
         tools_log.log_warning(str(e))
+        value = None
     finally:
         return value
 
