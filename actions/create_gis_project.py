@@ -24,6 +24,7 @@ class CreateGisProject:
         self.user = None
         self.password = None
         self.srid = None
+        self.sslmode = None
 
 
     def gis_project_database(self, folder_path=None, filename=None, project_type='ws', schema='ws_sample',
