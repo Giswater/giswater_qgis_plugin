@@ -80,6 +80,7 @@ class GwMincut:
                f" WHERE om_mincut.id = '{result_mincut_id}'")
         row = tools_db.get_row(sql)
         if not row:
+            self._enable_widgets('0')
             return
 
         # Get mincut state name
@@ -1705,6 +1706,7 @@ class GwMincut:
 
     def _cancel_task(self):
         """ Cancel GwAutoMincutTask """
+
         self.action_mincut.setChecked(False)
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
         self.mincut_task.cancel()
@@ -1803,7 +1805,7 @@ class GwMincut:
             # Refresh map canvas
             tools_qgis.refresh_map_canvas()
 
-            # Disconnect snapping and related signals
+        # Disconnect snapping and related signals
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
         self.set_visible_mincut_layers()
         self.snapper_manager.restore_snap_options(self.previous_snapping)
@@ -2061,7 +2063,6 @@ class GwMincut:
 
         # Zoom map to extent, rotation, title
         map_item = layout.itemById('Mapa')
-        # map_item.setMapCanvas(self.canvas)
         map_item.zoomToExtent(self.canvas.extent())
         map_item.setMapRotation(rotation)
         profile_title = layout.itemById('title')
@@ -2079,8 +2080,7 @@ class GwMincut:
         if state == '0':
 
             self.dlg_mincut.work_order.setDisabled(False)
-            # Group
-
+            # Group Location
             self.dlg_mincut.address_add_muni.setDisabled(False)
             self.dlg_mincut.address_add_street.setDisabled(False)
             self.dlg_mincut.address_add_postnumber.setDisabled(False)
