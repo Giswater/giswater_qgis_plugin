@@ -6,7 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsProject
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, pyqtSignal, QObject
 from qgis.PyQt.QtWidgets import QMessageBox
 
 import json
@@ -16,7 +16,7 @@ from collections import OrderedDict
 from .parent import ParentAction
 
 
-class NotifyFunctions(ParentAction):
+class NotifyFunctions(ParentAction, QObject):
     # :var conn_failed: some times, when user click so fast 2 actions, LISTEN channel is stopped, and we need to
     #                   re-LISTEN all channels
 
@@ -24,11 +24,13 @@ class NotifyFunctions(ParentAction):
 
     conn_failed = False
     list_channels = None
-
+    task_start = pyqtSignal()
+    task_finished = pyqtSignal()
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control notify from PostgresSql """
 
         ParentAction.__init__(self, iface, settings, controller, plugin_dir)
+        QObject.__init__(self)
         self.iface = iface
         self.canvas = self.iface.mapCanvas()
         self.settings = settings
@@ -151,7 +153,7 @@ class NotifyFunctions(ParentAction):
             def refresh_canvas(self, **kwargs)
             def show_message(self, **kwargs)
         """
-
+        self.task_start.emit()
         for function in complet_result['functionAction']['functions']:
             function_name = function['name']
             params = function['parameters']
@@ -160,7 +162,7 @@ class NotifyFunctions(ParentAction):
             except AttributeError as e:
                 # If function_name not exist as python function
                 self.controller.log_warning(f"Exception error: {e}")
-
+        self.task_finished.emit()
 
     # Functions called by def wait_notifications(...)
     def set_layer_index(self, **kwargs):

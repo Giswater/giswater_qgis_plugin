@@ -3123,12 +3123,18 @@ class ApiCF(ApiParent, QObject):
             self.controller.show_warning(message)
             return
 
+        # Form handling so that the user cannot change values until the process is finished
+        self.controller.notify.task_start.connect(lambda: self.dlg_cf.setEnabled(False))
+        self.controller.notify.task_finished.connect(self._enable_dialog)
+
         # Get widgets values
         values = {}
         for widget in widgets:
             if widget.property('columnname') in (None, ''): continue
             values = self.get_values(dialog, widget, values)
         fields = json.dumps(values)
+
+
 
         # Call gw_fct_setcatalog
         fields = f'"fields":{fields}'
@@ -3153,6 +3159,12 @@ class ApiCF(ApiParent, QObject):
                 self.my_json[str(widget.property('columnname'))] = field['selectedId']
 
         self.close_dialog(dialog)
+
+
+    def _enable_dialog(self):
+        self.dlg_cf.setEnabled(True)
+        self.controller.notify.task_start.disconnect()
+        self.controller.notify.task_finished.disconnect()
 
 
     def cf_open_dialog(self, dlg=None, dlg_name='giswater', maximize_button=True, stay_on_top=True):
