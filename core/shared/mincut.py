@@ -354,7 +354,7 @@ class GwMincut:
         self.action_mincut = action
 
         action = self.dlg_mincut.findChild(QAction, "actionRefreshMincut")
-        action.triggered.connect(partial(self._refresh_mincut, action))
+        action.triggered.connect(self._refresh_mincut)
         tools_gw.add_icon(action, "125")
         self.action_refresh_mincut = action
 
@@ -1831,11 +1831,72 @@ class GwMincut:
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
             self.action_mincut_composer.setDisabled(False)
+
             # Update table 'selector_mincut_result'
             sql = (f"DELETE FROM selector_mincut_result WHERE cur_user = current_user;\n"
                    f"INSERT INTO selector_mincut_result (cur_user, result_id) VALUES"
                    f" (current_user, {real_mincut_id});")
             tools_db.execute_sql(sql, log_error=True)
+
+            # Refresh map canvas
+            tools_qgis.refresh_map_canvas()
+
+        # Disconnect snapping and related signals
+        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+        self.set_visible_mincut_layers()
+        self._remove_selection()
+        self.action_mincut.setChecked(False)
+
+
+    def _refresh_mincut(self):
+        """ B2-125: Refresh current mincut """
+
+        # Uncheck actions
+        self.action_mincut.setChecked(False)
+        self.action_custom_mincut.setChecked(False)
+        self.action_change_valve_status.setChecked(False)
+
+        # Get elemet_id from current mincut
+        result_mincut_id = self.dlg_mincut.result_mincut_id.text()
+        sql = f"SELECT anl_feature_id FROM om_mincut WHERE id = {result_mincut_id}"
+        row = tools_db.get_row(sql, log_sql=True)
+        if row:
+            # Create task to manage Mincut execution
+            element_id = row['anl_feature_id']
+            self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id)
+            QgsApplication.taskManager().addTask(self.mincut_task)
+            QgsApplication.taskManager().triggerTask(self.mincut_task)
+            self.mincut_task.task_finished.connect(partial(self._refresh_mincut_finished))
+
+
+    def _refresh_mincut_finished(self, signal):
+
+        if not signal[0]:
+            return False
+
+        if signal[1]:
+            complet_result = signal[1]
+            if 'mincutOverlap' in complet_result and complet_result['mincutOverlap'] != "":
+                message = "Mincut done, but has conflict and overlaps with"
+                tools_qt.show_info_box(message, parameter=complet_result['mincutOverlap'])
+            else:
+                message = "Mincut done successfully"
+                tools_qgis.show_info(message)
+
+            # Zoom to rectangle (zoom to mincut)
+            polygon = complet_result['body']['data']['geometry']
+            polygon = polygon[9:len(polygon) - 2]
+            polygon = polygon.split(',')
+            if polygon[0] == '':
+                message = "Error on create auto mincut, you need to review data"
+                tools_qgis.show_warning(message)
+                tools_qgis.restore_cursor()
+                return
+
+            x1, y1 = polygon[0].split(' ')
+            x2, y2 = polygon[2].split(' ')
+            tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
+
             # Refresh map canvas
             tools_qgis.refresh_map_canvas()
 
@@ -1844,22 +1905,10 @@ class GwMincut:
         self.set_visible_mincut_layers()
         self.snapper_manager.restore_snap_options(self.previous_snapping)
         self._remove_selection()
-        self.action_mincut.setChecked(False)
-
-
-    def _refresh_mincut(self, action, is_checked):
-        """ B2-125: Refreash current mincut """
 
 
     def _custom_mincut(self, action, is_checked):
         """ B2-123: Custom mincut analysis. Working just with valve layer """
-
-        # Get Snapper manager
-        self.snapper_manager = GwSnapManager(self.iface)
-
-        # Get Emit point and set canvas maptool
-        self.emit_point = QgsMapToolEmitPoint(self.canvas)
-        self.canvas.setMapTool(self.emit_point)
 
         if is_checked is False:
             # Disconnect snapping and related signals
@@ -2053,11 +2102,9 @@ class GwMincut:
             template_file.close()
             document = QDomDocument()
             document.setContent(template_content)
-
             project = QgsProject.instance()
             comp_view = QgsPrintLayout(project)
             comp_view.loadFromTemplate(document, QgsReadWriteContext())
-
             layout_manager = project.layoutManager()
             layout_manager.addLayout(comp_view)
 
