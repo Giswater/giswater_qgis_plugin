@@ -66,6 +66,9 @@ class Giswater(QObject):
             # Remove Giswater dockers
             self._remove_dockers()
 
+            # Force action pan
+            self.iface.actionPan().trigger()
+
             # Remove 'Main Info button'
             self._unset_info_button()
 
