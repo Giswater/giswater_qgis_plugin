@@ -1950,6 +1950,12 @@ class GwMincut:
     def _custom_mincut_snapping(self, action, point, btn):
         """ Custom mincut snapping function """
 
+        if btn == Qt.RightButton:
+            self.action_custom_mincut.setChecked(False)
+            self.action_change_valve_status.setChecked(False)
+            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+            return
+
         # Get clicked point
         event_point = self.snapper_manager.get_event_point(point=point)
         result = self.snapper_manager.snap_to_current_layer(event_point)
