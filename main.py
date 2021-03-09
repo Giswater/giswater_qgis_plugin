@@ -73,6 +73,9 @@ class Giswater(QObject):
             if hide_gw_button:
                 global_vars.logger.close_logger()
 
+            # Remove 'Giswater menu'
+            self._unset_giswater_menu()
+
             # Set 'Main Info button' if project is unload or project don't have layers
             layers = QgsProject.instance().mapLayers().values()
             if hide_gw_button is False and len(layers) == 0:
@@ -202,6 +205,13 @@ class Giswater(QObject):
         self.action = None
         self.action_info = None
 
+
+    def _unset_giswater_menu(self):
+        """ Unset Giswater menu (when plugin is disabled or reloaded) """
+
+        if self.load_project:
+            self.load_project.load_project_menu.main_menu.setEnabled(False)
+            self.load_project.load_project_menu.main_menu.setTitle("")
 
     def _manage_section_actions_list(self):
         """ Manage section 'actions_list' of config file """

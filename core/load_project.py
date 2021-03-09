@@ -107,8 +107,8 @@ class GwLoadProject(QObject):
             return
 
         # Create menu
-        load_project_menu = GwMenuLoad()
-        load_project_menu.read_menu()
+        self.load_project_menu = GwMenuLoad()
+        self.load_project_menu.read_menu()
 
         # Initialize toolbars
         self._get_buttons_to_hide()
