@@ -527,12 +527,11 @@ class GwMincut:
 
         if global_vars.session_vars['dialog_docker']:
             self.dlg_mincut.dlg_closed.connect(tools_gw.close_docker)
-        self.dlg_mincut.btn_cancel_task.clicked.connect(self._cancel_task)
 
+        self.dlg_mincut.btn_cancel_task.clicked.connect(self._cancel_task)
         self.dlg_mincut.btn_accept.clicked.connect(self._accept_save_data)
         self.dlg_mincut.btn_cancel.clicked.connect(self._mincut_close)
         self.dlg_mincut.dlg_closed.connect(self._mincut_close)
-
         self.dlg_mincut.btn_start.clicked.connect(self._real_start)
         self.dlg_mincut.btn_end.clicked.connect(self._real_end)
 
@@ -549,6 +548,23 @@ class GwMincut:
         self.dlg_mincut.cbx_date_end.dateChanged.connect(partial(
             self._check_dates_coherence, self.dlg_mincut.cbx_date_start, self.dlg_mincut.cbx_date_end,
             self.dlg_mincut.cbx_hours_start, self.dlg_mincut.cbx_hours_end))
+
+        self.action_mincut.toggled.connect(partial(self.manage_checked, self.action_mincut))
+        self.action_custom_mincut.toggled.connect(partial(self.manage_checked, self.action_custom_mincut))
+        self.action_change_valve_status.toggled.connect(partial(self.manage_checked, self.action_change_valve_status))
+
+
+    def manage_checked(self, action):
+
+        if action.objectName() == "actionMincut" and action.isChecked():
+            self.action_custom_mincut.setChecked(False)
+            self.action_change_valve_status.setChecked(False)
+        elif action.objectName() == "actionCustomMincut" and action.isChecked():
+            self.action_mincut.setChecked(False)
+            self.action_change_valve_status.setChecked(False)
+        elif action.objectName() == "actionChangeValveStatus" and action.isChecked():
+            self.action_mincut.setChecked(False)
+            self.action_custom_mincut.setChecked(False)
 
 
     def _refresh_tab_hydro(self):
