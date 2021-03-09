@@ -9,9 +9,9 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 2021/01/22
-INSERT INTO macroexploitation VALUES ('0', 'Undefined', 'Undefined');
-INSERT INTO exploitation VALUES (0, 'Undefined', 0, NULL, NULL, NULL, null, TRUE);
-INSERT INTO macrodma VALUES (0, 'Undefined', 0, NULL, NULL);
-INSERT INTO dma VALUES (0, 'Undefined', 0, NULL, NULL, NULL);
-INSERT INTO macrosector VALUES (0, 'Undefined','Undefined', NULL);
-INSERT INTO sector VALUES (0, 'Undefined', 0, 'Undefined', NULL);
+INSERT INTO macroexploitation VALUES ('0', 'Undefined', 'Undefined') ON CONFLICT (macroexpl_id) DO NOTHING;
+INSERT INTO exploitation VALUES (0, 'Undefined', 0, NULL, NULL, NULL, null, TRUE) ON CONFLICT (expl_id) DO NOTHING;
+INSERT INTO macrodma VALUES (0, 'Undefined', 0, NULL, NULL) ON CONFLICT (macrodma_id) DO NOTHING;
+INSERT INTO dma VALUES (0, 'Undefined', 0, NULL, NULL, NULL) ON CONFLICT (dma_id) DO NOTHING;
+INSERT INTO macrosector VALUES (0, 'Undefined','Undefined', NULL) ON CONFLICT (macrosector_id) DO NOTHING;
+INSERT INTO sector VALUES (0, 'Undefined', 0, 'Undefined', NULL) ON CONFLICT (sector_id) DO NOTHING;

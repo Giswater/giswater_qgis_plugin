@@ -18,9 +18,9 @@ CREATE TABLE IF NOT EXISTS temp_demand(
   
   
 -- 2020/02/11
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"True"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"True"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"True"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"workcat_id_plan", "dataType":"character varying(255)", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_reservoir", "column":"head", "dataType":"double precision", "isUtils":"False"}}$$);
 
