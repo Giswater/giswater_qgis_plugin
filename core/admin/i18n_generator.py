@@ -77,7 +77,7 @@ class GwI18NGenerator:
 
 
     def _check_translate_options(self):
-        """ Checkthe translation options selected by the user """
+        """ Check the translation options selected by the user """
 
         py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
         db_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_msg)
@@ -331,6 +331,7 @@ class GwI18NGenerator:
         file = open(path, "a")
 
         for row in rows:
+            # Get values
             table = row['context'] if row['context'] is not None else ""
             form_name = row['formname']if row['formname'] is not None else ""
             form_type = row['formtype']if row['formtype'] is not None else ""
@@ -344,6 +345,13 @@ class GwI18NGenerator:
             else:
                 tt_value = row['lb_en_us']
             tt_value = tt_value if tt_value is not None else ""
+
+            # Check invalid characters
+            if lbl_value is not None and "\n" in lbl_value:
+                lbl_value = self._replace_invalid_characters(lbl_value)
+            if tt_value is not None and "\n" in tt_value:
+                tt_value = self._replace_invalid_characters(tt_value)
+
             line = f'SELECT gw_fct_admin_schema_i18n($$'
             if row['context'] in ('config_param_system', 'sys_param_user'):
                 line += (f'{{"data":'
@@ -392,10 +400,17 @@ class GwI18NGenerator:
         file = open(path, "a")
 
         for row in rows:
+            # Get values
             table = row['context'] if row['context'] is not None else ""
             source = row['source'] if row['source'] is not None else ""
             ms_value = row[f'ms_{self.lower_lang}'] if row[f'ms_{self.lower_lang}'] is not None else row['ms_en_us']
             ht_value = row[f'ht_{self.lower_lang}'] if row[f'ht_{self.lower_lang}'] is not None else row['ht_en_us']
+
+            # Check invalid characters
+            if ms_value is not None and "\n" in ms_value:
+                ms_value = self._replace_invalid_characters(ms_value)
+            if ht_value is not None and "\n" in ht_value:
+                ht_value = self._replace_invalid_characters(ht_value)
 
             line = f'SELECT gw_fct_admin_schema_i18n($$'
             line += (f'{{"data":'
@@ -515,4 +530,16 @@ class GwI18NGenerator:
         finally:
             return rows
 
+
+    def _replace_invalid_characters(self, param):
+        """
+        This function replaces the characters that break JSON messages
+         (", new line, etc.)
+            :param param: The text to fix (String)
+        """
+        param = param.replace("\"", "'")
+        param = param.replace("\r", "")
+        param = param.replace("\n", " ")
+
+        return param
     # endregion
