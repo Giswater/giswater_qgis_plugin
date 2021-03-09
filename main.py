@@ -72,6 +72,9 @@ class Giswater(QObject):
             # Remove 'Main Info button'
             self._unset_info_button()
 
+            # Remove 'Add child layer button'
+            self._unset_child_layer_button()
+
             # Remove file handler when reloading
             if hide_gw_button:
                 global_vars.logger.close_logger()
@@ -207,6 +210,14 @@ class Giswater(QObject):
         # Set action and button as None
         self.action = None
         self.action_info = None
+
+
+    def _unset_child_layer_button(self):
+        """ Unset Add Child Layer button (when plugin is disabled or reloaded) """
+
+        action = self.iface.mainWindow().findChild(QAction, "GwAddChildLayerButton")
+        if action not in (None, "None"):
+            action.deleteLater()
 
 
     def _unset_giswater_menu(self):
