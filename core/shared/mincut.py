@@ -1898,7 +1898,8 @@ class GwMincut:
             tools_qgis.refresh_map_canvas(True)
             self.set_visible_mincut_layers()
             self._remove_selection()
-            action.setChecked(False)
+            if action.objectName() == "actionCustomMincut":
+                action.setChecked(False)
 
 
     def _custom_mincut_execute(self, elem_id):
@@ -2208,13 +2209,10 @@ class GwMincut:
             self.snapper_manager.recover_snapping_options()
             return
 
-        # Disconnect other snapping and signals in case wrong user clicks
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 
-        # Set vertex marker propierties
+        # Set vertex marker properties
         self.vertex_marker = self.snapper_manager.vertex_marker
 
         # Set active and current layer
@@ -2239,9 +2237,6 @@ class GwMincut:
             if result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 tools_qgis.show_message(result['message']['text'], level)
-
-        # Disconnect snapping and related signals
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
 
 
     # endregion
