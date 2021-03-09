@@ -26,6 +26,8 @@ class NotifyFunctions(ParentAction, QObject):
     list_channels = None
     task_start = pyqtSignal()
     task_finished = pyqtSignal()
+
+
     def __init__(self, iface, settings, controller, plugin_dir):
         """ Class to control notify from PostgresSql """
 

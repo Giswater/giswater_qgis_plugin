@@ -3109,6 +3109,10 @@ class ApiCF(ApiParent, QObject):
     def set_catalog(self, dialog, form_name, table_name, feature_id, id_name):
         """ Insert table 'cat_work'. Add cat_work """
 
+        # Form handling so that the user cannot change values until the process is finished
+        self.dlg_cf.setEnabled(False)
+        self.controller.notify.task_finished.connect(self._enable_dialog)
+
         # Manage mandatory fields
         missing_mandatory = False
         widgets = dialog.findChildren(QWidget)
@@ -3121,11 +3125,9 @@ class ApiCF(ApiParent, QObject):
         if missing_mandatory:
             message = "Mandatory field is missing. Please, set a value"
             self.controller.show_warning(message)
+            self._enable_dialog()
             return
 
-        # Form handling so that the user cannot change values until the process is finished
-        self.controller.notify.task_start.connect(lambda: self.dlg_cf.setEnabled(False))
-        self.controller.notify.task_finished.connect(self._enable_dialog)
 
         # Get widgets values
         values = {}
@@ -3133,8 +3135,6 @@ class ApiCF(ApiParent, QObject):
             if widget.property('columnname') in (None, ''): continue
             values = self.get_values(dialog, widget, values)
         fields = json.dumps(values)
-
-
 
         # Call gw_fct_setcatalog
         fields = f'"fields":{fields}'
@@ -3163,7 +3163,6 @@ class ApiCF(ApiParent, QObject):
 
     def _enable_dialog(self):
         self.dlg_cf.setEnabled(True)
-        self.controller.notify.task_start.disconnect()
         self.controller.notify.task_finished.disconnect()
 
 
