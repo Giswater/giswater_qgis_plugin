@@ -3455,6 +3455,10 @@ class GwInfo(QObject):
             values = tools_gw.get_values(dialog, widget, values)
         fields = json.dumps(values)
 
+        # Form handling so that the user cannot change values until the process is finished
+        global_vars.notify.task_start.connect(lambda: self.dlg_cf.setEnabled(False))
+        global_vars.notify.task_finished.connect(self._enable_buttons)
+
         # Call gw_fct_setcatalog
         fields = f'"fields":{fields}'
         form = f'"formName":"{form_name}"'
@@ -3478,6 +3482,12 @@ class GwInfo(QObject):
                 self.my_json[str(widget.property('columnname'))] = field['selectedId']
 
         tools_gw.close_dialog(dialog)
+
+
+    def _enable_buttons(self):
+        self.dlg_cf.setEnabled(True)
+        global_vars.notify.task_start.disconnect()
+        global_vars.notify.task_finished.disconnect()
 
 
     def _mouse_moved(self, layer, point):

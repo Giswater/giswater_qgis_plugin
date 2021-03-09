@@ -9,12 +9,14 @@ import json
 import threading
 from collections import OrderedDict
 
+from qgis.PyQt.QtCore import pyqtSignal, QObject
+
 from ..utils import tools_backend_calls
 from ... import global_vars
 from ...lib import tools_log, tools_db
 
 
-class GwNotify:
+class GwNotify(QObject):
     # :var conn_failed: some times, when user click so fast 2 actions, LISTEN channel is stopped, and we need to
     #                   re-LISTEN all channels
 
@@ -22,10 +24,13 @@ class GwNotify:
 
     conn_failed = False
     list_channels = None
+    task_start = pyqtSignal()
+    task_finished = pyqtSignal()
+
 
     def __init__(self):
         """ Class to control notify from PostgresSql """
-
+        QObject.__init__(self)
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
         self.settings = global_vars.giswater_settings
@@ -126,7 +131,7 @@ class GwNotify:
 
         """
         global_vars.session_vars['threads'].append(self)
-
+        self.task_start.emit()
         for function in complet_result['functionAction']['functions']:
             function_name = function['name']
             params = function['parameters']
@@ -136,5 +141,6 @@ class GwNotify:
                 # If function_name not exist as python function
                 tools_log.log_warning(f"Exception error: {e}")
         global_vars.session_vars['threads'].remove(self)
+        self.task_finished.emit()
 
     #endregion

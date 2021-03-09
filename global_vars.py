@@ -29,7 +29,7 @@ dao = None                              # An instance of GwPgDao class thats fou
 dao_db_credentials = None               # An instance of credentials used to establish the connection with PostgreSql. Saving {db, schema, table, service, host, port, user, password, sslmode}
 pg_version = None                       # An instance of PostgreSql version of current connection
 shortcut_keys = []                      # An instance of used shortcut_keys for Giswater menu. This keys are configurated on file "init.config" from user config path "/user/AppData/Roaming/Giswater/"
-
+notify = None                           # A instance of GwNotify
 project_vars = {}                       # A instance of project variables from QgsProject relating to Giswater
 project_vars['info_type'] = None        # gwInfoType
 project_vars['add_schema'] = None       # gwAddSchema

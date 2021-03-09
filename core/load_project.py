@@ -126,9 +126,9 @@ class GwLoadProject(QObject):
         self._check_user_roles()
 
         # Create a thread to listen selected database channels
-        self.notify = GwNotify()
+        global_vars.notify = GwNotify()
         list_channels = ['desktop', global_vars.current_user]
-        self.notify.start_listening(list_channels)
+        global_vars.notify.start_listening(list_channels)
 
         # Open automatically 'search docker' depending its value in user settings
         open_search = tools_gw.check_config_settings('btn_search', 'open_search', 'false', "user", "session")
