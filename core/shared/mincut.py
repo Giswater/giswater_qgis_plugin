@@ -527,12 +527,11 @@ class GwMincut:
 
         if global_vars.session_vars['dialog_docker']:
             self.dlg_mincut.dlg_closed.connect(tools_gw.close_docker)
-        self.dlg_mincut.btn_cancel_task.clicked.connect(self._cancel_task)
 
+        self.dlg_mincut.btn_cancel_task.clicked.connect(self._cancel_task)
         self.dlg_mincut.btn_accept.clicked.connect(self._accept_save_data)
         self.dlg_mincut.btn_cancel.clicked.connect(self._mincut_close)
         self.dlg_mincut.dlg_closed.connect(self._mincut_close)
-
         self.dlg_mincut.btn_start.clicked.connect(self._real_start)
         self.dlg_mincut.btn_end.clicked.connect(self._real_end)
 
@@ -549,6 +548,23 @@ class GwMincut:
         self.dlg_mincut.cbx_date_end.dateChanged.connect(partial(
             self._check_dates_coherence, self.dlg_mincut.cbx_date_start, self.dlg_mincut.cbx_date_end,
             self.dlg_mincut.cbx_hours_start, self.dlg_mincut.cbx_hours_end))
+
+        self.action_mincut.toggled.connect(partial(self.manage_checked, self.action_mincut))
+        self.action_custom_mincut.toggled.connect(partial(self.manage_checked, self.action_custom_mincut))
+        self.action_change_valve_status.toggled.connect(partial(self.manage_checked, self.action_change_valve_status))
+
+
+    def manage_checked(self, action):
+
+        if action.objectName() == "actionMincut" and action.isChecked():
+            self.action_custom_mincut.setChecked(False)
+            self.action_change_valve_status.setChecked(False)
+        elif action.objectName() == "actionCustomMincut" and action.isChecked():
+            self.action_mincut.setChecked(False)
+            self.action_change_valve_status.setChecked(False)
+        elif action.objectName() == "actionChangeValveStatus" and action.isChecked():
+            self.action_mincut.setChecked(False)
+            self.action_custom_mincut.setChecked(False)
 
 
     def _refresh_tab_hydro(self):
@@ -1898,7 +1914,8 @@ class GwMincut:
             tools_qgis.refresh_map_canvas(True)
             self.set_visible_mincut_layers()
             self._remove_selection()
-            action.setChecked(False)
+            if action.objectName() == "actionCustomMincut":
+                action.setChecked(False)
 
 
     def _custom_mincut_execute(self, elem_id):
@@ -2208,13 +2225,10 @@ class GwMincut:
             self.snapper_manager.recover_snapping_options()
             return
 
-        # Disconnect other snapping and signals in case wrong user clicks
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-
         # Store user snapping configuration
         self.snapper_manager.store_snapping_options()
 
-        # Set vertex marker propierties
+        # Set vertex marker properties
         self.vertex_marker = self.snapper_manager.vertex_marker
 
         # Set active and current layer
@@ -2239,9 +2253,6 @@ class GwMincut:
             if result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 tools_qgis.show_message(result['message']['text'], level)
-
-        # Disconnect snapping and related signals
-        tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
 
 
     # endregion
