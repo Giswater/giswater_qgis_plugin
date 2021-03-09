@@ -1668,7 +1668,7 @@ class GwMincut:
 
         # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
-        if self.snapper_manager.result_is_valid():
+        if result.isValid():
             layer = self.snapper_manager.get_snapped_layer(result)
             # Check feature
             viewname = tools_qgis.get_layer_source_table_name(layer)
@@ -1872,18 +1872,11 @@ class GwMincut:
     def _mouse_move_valve(self, point):
         """ Waiting for valves when mouse is moved"""
 
-        # Get clicked point
+        # Get clicked point and add marker
         event_point = self.snapper_manager.get_event_point(point=point)
-
-        # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
-        if self.snapper_manager.result_is_valid():
-            layer = self.snapper_manager.get_snapped_layer(result)
-
-            # Check feature
-            tablename = tools_qgis.get_layer_source_table_name(layer)
-            if tablename == 'v_om_mincut_valve':
-                self.snapper_manager.add_marker(result, self.vertex_marker)
+        if result.isValid():
+            self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     # noinspection PyUnusedLocal
@@ -1892,26 +1885,20 @@ class GwMincut:
 
         # Get clicked point
         event_point = self.snapper_manager.get_event_point(point=point)
-
-        # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result.isValid():
-            # Check feature
-            layer = self.snapper_manager.get_snapped_layer(result)
-            viewname = tools_qgis.get_layer_source_table_name(layer)
-            if viewname == 'v_om_mincut_valve':
-                # Get the point. Leave selection
-                snapped_feat = self.snapper_manager.get_snapped_feature(result, True)
-                element_id = snapped_feat.attribute('node_id')
-                if action.objectName() == "actionCustomMincut":
-                    self._custom_mincut_execute(element_id)
-                elif action.objectName() == "actionChangeValveStatus":
-                    self._change_valve_status_execute(element_id)
-                self.snapper_manager.recover_snapping_options()
-                tools_qgis.refresh_map_canvas(True)
-                self.set_visible_mincut_layers()
-                self._remove_selection()
-                action.setChecked(False)
+            # Get the point. Leave selection
+            snapped_feat = self.snapper_manager.get_snapped_feature(result, True)
+            element_id = snapped_feat.attribute('node_id')
+            if action.objectName() == "actionCustomMincut":
+                self._custom_mincut_execute(element_id)
+            elif action.objectName() == "actionChangeValveStatus":
+                self._change_valve_status_execute(element_id)
+            self.snapper_manager.recover_snapping_options()
+            tools_qgis.refresh_map_canvas(True)
+            self.set_visible_mincut_layers()
+            self._remove_selection()
+            action.setChecked(False)
 
 
     def _custom_mincut_execute(self, elem_id):
