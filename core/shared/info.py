@@ -3448,16 +3448,16 @@ class GwInfo(QObject):
             tools_qgis.show_warning(message)
             return
 
+        # Form handling so that the user cannot change values until the process is finished
+        self.dlg_cf.setEnabled(False)
+        global_vars.notify.task_finished.connect(self._enable_buttons)
+
         # Get widgets values
         values = {}
         for widget in widgets:
             if widget.property('columnname') in (None, ''): continue
             values = tools_gw.get_values(dialog, widget, values)
         fields = json.dumps(values)
-
-        # Form handling so that the user cannot change values until the process is finished
-        global_vars.notify.task_start.connect(lambda: self.dlg_cf.setEnabled(False))
-        global_vars.notify.task_finished.connect(self._enable_buttons)
 
         # Call gw_fct_setcatalog
         fields = f'"fields":{fields}'
@@ -3486,7 +3486,6 @@ class GwInfo(QObject):
 
     def _enable_buttons(self):
         self.dlg_cf.setEnabled(True)
-        global_vars.notify.task_start.disconnect()
         global_vars.notify.task_finished.disconnect()
 
 
@@ -3620,8 +3619,8 @@ class GwInfo(QObject):
 
         self.info_feature = GwInfo('data')
         result, dialog = self.info_feature._get_feature_insert(point=list_points, feature_cat=self.feature_cat,
-                                                              new_feature_id=feature_id, new_feature=feature,
-                                                              layer_new_feature=self.info_layer, tab_type='data')
+                                                               new_feature_id=feature_id, new_feature=feature,
+                                                               layer_new_feature=self.info_layer, tab_type='data')
 
         # Restore user value (Settings/Options/Digitizing/Suppress attribute from pop-up after feature creation)
         QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", self.suppres_form)
