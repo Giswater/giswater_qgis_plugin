@@ -212,7 +212,6 @@ class Giswater(QObject):
     def _unset_giswater_menu(self):
         """ Unset Giswater menu (when plugin is disabled or reloaded) """
 
-        tools_qgis.enable_python_console()
         menu_giswater = self.iface.mainWindow().menuBar().findChild(QMenu, "Giswater")
         if menu_giswater not in (None, "None"):
             menu_giswater.deleteLater()
