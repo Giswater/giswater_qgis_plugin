@@ -53,7 +53,6 @@ class GwMincut:
         self._set_states()
         self.current_state = None
         self.is_new = True
-
         self.previous_snapping = None
         self.emit_point = None
         self.vertex_marker = None
@@ -184,7 +183,7 @@ class GwMincut:
                 self.action_add_hydrometer.setDisabled(False)
             if mincut_class_status is None:
                 self.action_mincut.setDisabled(False)
-                self.action_refresh_mincut.setDisabled(False)
+                self.action_refresh_mincut.setDisabled(True)
                 self.action_custom_mincut.setDisabled(True)
                 self.action_change_valve_status.setDisabled(True)
                 self.action_add_connec.setDisabled(False)
@@ -515,7 +514,6 @@ class GwMincut:
         # Parametrize list of layers
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         self.layers_connec = self.layers['connec']
-
         self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
 
         # Set active and current layer
@@ -1273,7 +1271,6 @@ class GwMincut:
             return
 
         # Set expression filter with 'hydro_list'
-
         if row[0] in self.deleted_list:
             self.deleted_list.remove(row[0])
         self.hydro_list.append(row[0])
@@ -1513,12 +1510,11 @@ class GwMincut:
         message = "Are you sure you want to delete these records?"
         title = "Delete records"
         answer = tools_qt.show_question(message, title, inf_text)
-
         if not answer:
             return
-        else:
-            for el in del_id:
-                self.list_ids['connec'].remove(el)
+
+        for el in del_id:
+            self.list_ids['connec'].remove(el)
 
         # Select features which are in the list
         expr_filter = "\"connec_id\" IN ("
@@ -1565,14 +1561,14 @@ class GwMincut:
         message = "Are you sure you want to delete these records?"
         title = "Delete records"
         answer = tools_qt.show_question(message, title, inf_text)
-
         if not answer:
             return
-        else:
-            for el in del_id:
-                self.hydro_list.remove(el)
-                if el not in self.deleted_list:
-                    self.deleted_list.append(el)
+
+        for el in del_id:
+            self.hydro_list.remove(el)
+            if el not in self.deleted_list:
+                self.deleted_list.append(el)
+
         # Select features that are in the list
         expr_filter = "\"hydrometer_id\" IN ("
         for i in range(len(self.hydro_list)):
@@ -1640,8 +1636,15 @@ class GwMincut:
         tools_gw.close_dialog(self.dlg_hydro)
 
 
-    def _auto_mincut(self):
+    def _auto_mincut(self, is_checked):
         """ B1-126: Automatic mincut analysis """
+
+        if is_checked is False:
+            # Disconnect snapping and related signals
+            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+            # Recover snapping options, refresh canvas & set visible layers
+            self.snapper_manager.recover_snapping_options()
+            return
 
         self.mincut_class = 1
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
@@ -1678,28 +1681,21 @@ class GwMincut:
         # Set active layer
         self.iface.setActiveLayer(self.layer_arc)
 
-        # Get clicked point
+        # Get clicked point and add marker
         self.vertex_marker.hide()
         event_point = self.snapper_manager.get_event_point(point=point)
-
-        # Snapping
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result.isValid():
-            layer = self.snapper_manager.get_snapped_layer(result)
-            # Check feature
-            viewname = tools_qgis.get_layer_source_table_name(layer)
-            if viewname == 'v_edit_arc':
-                self.snapper_manager.add_marker(result, self.vertex_marker)
+            self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
     def _auto_mincut_snapping(self, point, btn):
         """ Automatic mincut: Snapping to 'node' and 'arc' layers """
 
         if btn == Qt.RightButton:
-            if btn == Qt.RightButton:
-                self.action_mincut.setChecked(False)
-                tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
-                return
+            self.action_mincut.setChecked(False)
+            tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+            return
 
         # Get coordinates
         event_point = self.snapper_manager.get_event_point(point=point)
@@ -1727,9 +1723,9 @@ class GwMincut:
             snapped_point = self.snapper_manager.get_snapped_point(result)
             element_id = snapped_feat.attribute(f'{elem_type}_id')
             layer.select([feature_id])
-            description = "Mincut execute"
-            self.mincut_task = GwAutoMincutTask(description, self, element_id)
 
+            # Create task to manage Mincut execution
+            self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id)
             QgsApplication.taskManager().addTask(self.mincut_task)
             QgsApplication.taskManager().triggerTask(self.mincut_task)
             self.mincut_task.task_finished.connect(
