@@ -1784,8 +1784,10 @@ class GwMincut:
     def _mincut_task_finished(self, snapped_point, elem_type, element_id, signal):
 
         if not signal[0]:
+            self.action_mincut.setChecked(False)
             return False
-        elif signal[1]:
+
+        if signal[1]:
             complet_result = signal[1]
             real_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
             if 'mincutOverlap' in complet_result and complet_result['mincutOverlap'] != "":
@@ -1803,7 +1805,9 @@ class GwMincut:
                 message = "Error on create auto mincut, you need to review data"
                 tools_qgis.show_warning(message)
                 tools_qgis.restore_cursor()
+                self.action_mincut.setChecked(False)
                 return
+
             x1, y1 = polygon[0].split(' ')
             x2, y2 = polygon[2].split(' ')
             tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
@@ -1819,6 +1823,7 @@ class GwMincut:
                 message = "Error updating element in table, you need to review data"
                 tools_qgis.show_warning(message)
                 tools_qgis.restore_cursor()
+                self.action_mincut.setChecked(False)
                 return
 
             # Enable button CustomMincut, ChangeValveStatus and button Start
@@ -1843,6 +1848,7 @@ class GwMincut:
         self.set_visible_mincut_layers()
         self.snapper_manager.restore_snap_options(self.previous_snapping)
         self._remove_selection()
+        self.action_mincut.setChecked(False)
 
 
     def _refresh_mincut(self, action, is_checked):
