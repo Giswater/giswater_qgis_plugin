@@ -10,7 +10,7 @@ import os
 from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton
+from qgis.PyQt.QtWidgets import QAction, QDockWidget, QToolBar, QToolButton, QMenu
 
 from . import global_vars
 from .core.admin.admin_btn import GwAdminButton
@@ -212,9 +212,11 @@ class Giswater(QObject):
     def _unset_giswater_menu(self):
         """ Unset Giswater menu (when plugin is disabled or reloaded) """
 
-        if self.load_project:
-            self.load_project.load_project_menu.main_menu.setEnabled(False)
-            self.load_project.load_project_menu.main_menu.setTitle("")
+        tools_qgis.enable_python_console()
+        menu_giswater = self.iface.mainWindow().menuBar().findChild(QMenu, "Giswater")
+        if menu_giswater not in (None, "None"):
+            menu_giswater.deleteLater()
+
 
     def _manage_section_actions_list(self):
         """ Manage section 'actions_list' of config file """

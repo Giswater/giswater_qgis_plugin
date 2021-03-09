@@ -40,6 +40,7 @@ class GwMenuLoad(QObject):
         last_action = actions[-1]
 
         self.main_menu = QMenu("&Giswater", self.iface.mainWindow().menuBar())
+        self.main_menu.setObjectName("Giswater")
         tools_gw.set_config_parser("menu", "load", "true", "project", "giswater")
 
         config_icon = QIcon(
