@@ -47,16 +47,7 @@ class GwLogger(object):
         log_info(f"Log file: {filepath}", logger_file=False)
         if remove_previous and os.path.exists(filepath):
             os.remove(filepath)
-
-        # Define format
-        log_format = '%(asctime)s [%(levelname)s] - %(message)s\n'
-        log_date = '%d/%m/%Y %H:%M:%S'
-        formatter = logging.Formatter(log_format, log_date)
-
-        # Create file handler
-        self.fh = logging.FileHandler(filepath)
-        self.fh.setFormatter(formatter)
-        self.logger_file.addHandler(self.fh)
+        self.filepath = filepath
 
         # Initialize number of errors in current process
         self.num_errors = 0
@@ -64,9 +55,23 @@ class GwLogger(object):
         # Initialize min message level
         self.min_message_level = 0
 
+        # Add file handler
+        self.add_file_handler()
+
+
+    def add_file_handler(self):
+        """ Add file handler """
+
+        log_format = '%(asctime)s [%(levelname)s] - %(message)s\n'
+        log_date = '%d/%m/%Y %H:%M:%S'
+        formatter = logging.Formatter(log_format, log_date)
+        self.fh = logging.FileHandler(self.filepath)
+        self.fh.setFormatter(formatter)
+        self.logger_file.addHandler(self.fh)
+
 
     def close_logger(self):
-        """ Close logger file """
+        """ Remove file handler """
 
         try:
             self.logger_file.removeHandler(self.fh)

@@ -56,7 +56,6 @@ class Giswater(QObject):
         self._project_read(False, False)
 
 
-
     def unload(self, hide_gw_button=True):
         """ Removes plugin menu items and icons from QGIS GUI
             :param @remove_modules is True when plugin is disabled or reloaded
@@ -69,7 +68,10 @@ class Giswater(QObject):
 
             # Remove 'Main Info button'
             self._unset_info_button()
-            global_vars.logger.close_logger()
+
+            # Remove file handler when reloading
+            if hide_gw_button:
+                global_vars.logger.close_logger()
 
             # Set 'Main Info button' if project is unload or project don't have layers
             layers = QgsProject.instance().mapLayers().values()
@@ -260,6 +262,10 @@ class Giswater(QObject):
 
         # Unload plugin before reading opened project
         self.unload(hide_gw_button)
+
+        # Add file handler
+        if hide_gw_button:
+            global_vars.logger.add_file_handler()
 
         # Create class to manage code that performs project configuration
         self.load_project = GwLoadProject()
