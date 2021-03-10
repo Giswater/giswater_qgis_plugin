@@ -32,7 +32,7 @@ from ... import global_vars
 from .i18n_generator import GwI18NGenerator
 from ...lib import tools_qt, tools_qgis, tools_log, tools_db
 from ..ui.docker import GwDocker
-
+from ..threads.project_schema_create import GwCreateSchemaTask
 
 class GwAdminButton:
 
@@ -141,10 +141,6 @@ class GwAdminButton:
         
         tools_log.log_info(f"Create schema of type '{project_type}': '{project_name_schema}'")
 
-        if not is_test:
-            self.task1 = GwTask('Manage schema')
-            QgsApplication.taskManager().addTask(self.task1)
-            self.task1.setProgress(0)
 
         if self.rdb_import_data.isChecked():
             self.file_inp = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file')
@@ -167,85 +163,19 @@ class GwAdminButton:
                 else:
                     return
 
-        # Common execution
-        status = self._load_base(project_type=project_type)
-        if not status and self.dev_commit == 'FALSE':
-            self._manage_process_result(is_test=is_test)
-            return
+        # Set background task 'GwCreateSchemaTask'
+        description = f"Create schema"
+        params = {'is_test': is_test, 'project_type': project_type, 'exec_last_process': exec_last_process,
+                  'project_name_schema': project_name_schema, 'project_locale': project_locale,
+                  'project_srid': project_srid, 'example_data': example_data}
+        self.task_create_schema = GwCreateSchemaTask(self, description, params)
+        QgsApplication.taskManager().addTask(self.task_create_schema)
+        QgsApplication.taskManager().triggerTask(self.task_create_schema)
 
-        if not is_test:
-            self.task1 = GwTask('Manage schema')
-            self.task1.setProgress(10)
-        status = self._update_30to31(new_project=True, project_type=project_type)
-        if not status and self.dev_commit == 'FALSE':
-            self._manage_process_result(is_test=is_test)
-            return
-        if not is_test:
-            self.task1.setProgress(20)
-        status = self._load_views(project_type=project_type)
-        if not status and self.dev_commit == 'FALSE':
-            self._manage_process_result(is_test=is_test)
-            return
-        if not is_test:
-            self.task1.setProgress(30)
-        status = self._load_trg(project_type=project_type)
-        if not status and self.dev_commit == 'FALSE':
-            self._manage_process_result(is_test=is_test)
-            return
-        if not is_test:
-            self.task1.setProgress(40)
-        status = self._update_31to39(new_project=True, project_type=project_type)
-        if not status and self.dev_commit == 'FALSE':
-            self._manage_process_result(is_test=is_test)
-            return
-        if not is_test:
-            self.task1.setProgress(50)
-        status = self._api(new_api=True, project_type=project_type)
-        if not status and self.dev_commit == 'FALSE':
-            self._manage_process_result(is_test=is_test)
-            return
-        if not is_test:
-            self.task1.setProgress(60)
 
-        status = True
-        if exec_last_process:
-            status = self._execute_last_process(new_project=True, schema_name=project_name_schema,
-                schema_type=self.schema_type, locale=project_locale, srid=project_srid)
+    def cancel_task(self):
+        self.task_create_schema.cancel()
 
-        if not status and self.dev_commit == 'FALSE':
-            self._manage_process_result(is_test=is_test)
-            return
-
-        # Custom execution
-        if self.rdb_import_data.isChecked():
-            # TODO:
-            if not is_test:
-                self.task1.setProgress(100)
-            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_import_data')
-            msg = ("The base schema have been correctly executed."
-                   "\nNow will start the import process. It is experimental and it may crash."
-                   "\nIf this happens, please notify it by send a e-mail to info@giswater.org.")
-            tools_qt.show_info_box(msg, "Info")
-            self._execute_import_data(schema_type=project_type)
-            return
-        elif self.rdb_sample.isChecked() and example_data:
-            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample')
-            self._load_sample_data(project_type=project_type)
-            if not is_test:
-                self.task1.setProgress(80)
-        elif self.rdb_sample_dev.isChecked():
-            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_dev')
-            self._load_sample_data(project_type=project_type)
-            self._load_dev_data(project_type=project_type)
-            if not is_test:
-                self.task1.setProgress(80)
-        elif self.rdb_data.isChecked():
-            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_data')
-
-        self._manage_process_result(project_name_schema, is_test)
-
-        # Update composer path on config_param_user
-        self._manage_user_params()
 
     # TODO: Rename this function => Update all versions from changelog file.
     def update(self, project_type):
@@ -341,6 +271,8 @@ class GwAdminButton:
 
         self.dlg_readsql_create_project = GwAdminDbProjectUi()
         tools_gw.load_settings(self.dlg_readsql_create_project)
+        self.dlg_readsql_create_project.btn_cancel_task.hide()
+
 
         # Find Widgets in form
         self.project_name = self.dlg_readsql_create_project.findChild(QLineEdit, 'project_name')
@@ -1644,9 +1576,11 @@ class GwAdminButton:
             self.error_count = self.error_count + 1
             return
 
+        schema_name = tools_qt.get_text(self.dlg_readsql_create_project, 'project_name')
+
         extras += ', "isToolbox":false'
         body = tools_gw.create_body(extras=extras)
-        complet_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body, schema_name=self.schema, commit=False)
+        complet_result = tools_gw.execute_procedure('gw_fct_gettoolbox', body, schema_name, False)
         if not complet_result or complet_result['status'] == 'Failed':
             return False
         self._populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data'])
@@ -1814,8 +1748,7 @@ class GwAdminButton:
 
     def _manage_process_result(self, schema_name=None, is_test=False):
         """"""
-        if not is_test:
-            self.task1.setProgress(100)
+
         status = (self.error_count == 0)
         self._manage_result_message(status, parameter="Create project")
         if status:
@@ -2323,6 +2256,7 @@ class GwAdminButton:
 
     def _set_signals_create_project(self):
         """"""
+        self.dlg_readsql_create_project.btn_cancel_task.clicked.connect(self.cancel_task)
         self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
         self.dlg_readsql_create_project.btn_close.clicked.connect(
             partial(self._close_dialog_admin, self.dlg_readsql_create_project))
@@ -2560,7 +2494,6 @@ class GwAdminButton:
 
     def _execute_import_inp(self, accepted=False, schema_type=''):
         """"""
-        is_test = False
 
         if accepted:
 
@@ -2616,6 +2549,7 @@ class GwAdminButton:
             else:
                 self.error_count = self.error_count + 1
 
+            self.task1.setProgress(100)
             # Manage process result
             self._manage_process_result()
 
