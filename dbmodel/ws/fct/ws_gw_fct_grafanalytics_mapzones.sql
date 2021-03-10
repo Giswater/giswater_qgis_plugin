@@ -805,7 +805,7 @@ BEGIN
 							group by '||quote_ident(v_field)||'
 							UNION
 							SELECT c.'||quote_ident(v_field)||', (st_buffer(st_collect(link.the_geom),'||v_geomparamupdate_divide||')) 
-							as geom FROM v_edit_connec connec c, v_edit_link link
+							as geom FROM connec c, v_edit_link link
 							WHERE c.'||quote_ident(v_field)||'::text != ''0'' 
 							AND c.state > 0
 							AND c.'||quote_ident(v_field)||' IN
