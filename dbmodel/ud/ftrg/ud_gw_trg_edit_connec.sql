@@ -64,10 +64,8 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		-- connec ID
-		IF (NEW.connec_id IS NULL) OR (NEW.connec_id~E'^\\d+$' IS FALSE) THEN
-			PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
-			NEW.connec_id:= (SELECT nextval('urn_id_seq'));
-		END IF;
+		PERFORM setval('urn_id_seq', gw_fct_setvalurn(),true);
+		NEW.connec_id:= (SELECT nextval('urn_id_seq'));
 
 		-- connec type
 		IF (NEW.connec_type IS NULL) AND v_customfeature IS NOT NULL THEN
