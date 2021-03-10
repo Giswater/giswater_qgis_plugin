@@ -19,7 +19,7 @@ from ...lib import tools_db, tools_log, tools_qt, tools_qgis
 
 
 class GwGenericDescriptor(object):
-    """A descriptor that set getter and setter. class example from:
+    """ A descriptor that set getter and setter. class example from:
     http://nbviewer.jupyter.org/urls/gist.github.com/ChrisBeaumont/5758381/raw/descriptor_writeup.ipynb"""
 
     def __init__(self, default):
@@ -40,7 +40,7 @@ class GwGenericDescriptor(object):
 
 
 class GwTable(object):
-    """Base class representing a table. Assume it have to be used as a pure virtual."""
+    """ Base class representing a table. Assume it have to be used as a pure virtual. """
 
     def __init__(self, table_name, pk):
         self.__table_name = table_name
@@ -55,7 +55,7 @@ class GwTable(object):
 
 
     def field_names(self):
-        """Return the list of field names composing the table.
+        """ Return the list of field names composing the table.
         Names are that exposed in the class not derived from the db table."""
 
         fields = list(vars(self.__class__).keys())
@@ -65,7 +65,7 @@ class GwTable(object):
 
 
     def fetch(self, commit=True):
-        """retrieve a record with a specified primary key id."""
+        """ Retrieve a record with a specified primary key id."""
 
         if not getattr(self, self.pk()):
             message = "No primary key value set"
@@ -93,8 +93,8 @@ class GwTable(object):
 
 
     def upsert(self, commit=True):
-        """Save current event state in the DB as new record.
-        Eventually add the record if it is not available"""
+        """ Save current event state in the DB as new record.
+        Eventually add the record if it is not available """
 
         fields = list(vars(self.__class__).keys())
         # remove all _<classname>__<name> or __<names>__ vars, e.g. private vars
@@ -125,8 +125,8 @@ class GwTable(object):
 
 
     def nextval(self, commit=True):
-        """Get the next id for the __pk. that will be used for the next insert.
-        BEWARE that this call increment the sequence at each call."""
+        """ Get the next id for the __pk. that will be used for the next insert.
+        BEWARE that this call increment the sequence at each call. """
 
         sql = "SELECT nextval(pg_get_serial_sequence('{}', '{}'))".format(
             self.table_name(), self.pk())
@@ -138,7 +138,7 @@ class GwTable(object):
 
 
     def currval(self, commit=True):
-        """Get the current id for the __pk. that is the id of the last insert."""
+        """ Get the current id for the __pk. that is the id of the last insert. """
 
         # get latest updated sequence ASSUMED a sequence is available!
         # using lastval can generate problems in case of parallel inserts
@@ -154,7 +154,7 @@ class GwTable(object):
 
 
     def max_pk(self, commit=True):
-        """Retrive max value of the primary key (if numeric)."""
+        """ Retrive max value of the primary key (if numeric). """
 
         # doe not use DB nextval function becouse each call it is incremented
         sql = "SELECT MAX({1}) FROM {0}".format(
@@ -167,7 +167,7 @@ class GwTable(object):
 
 
     def pks(self, commit=True):
-        """Fetch all pk values."""
+        """ Fetch all pk values. """
 
         sql = "SELECT {1} FROM {0} ORDER BY {1}".format(
             self.table_name(), self.pk())
@@ -176,8 +176,8 @@ class GwTable(object):
 
 
     def delete(self, pks=[], all_records=False, where_clause='', commit=True):
-        """Delete all listed records with specified pks.
-        If not ids are specified and not remove all => del current record."""
+        """ Delete all listed records with specified pks.
+        If not ids are specified and not remove all => del current record. """
 
         sql = "DELETE FROM {0}".format(self.table_name())
         if not all_records:

@@ -1597,7 +1597,7 @@ class GwInfo(QObject):
         :param p_widget:
         :param clear_json:
         :param close_dlg:
-        :return:
+        :return: (boolean)
         """
         self._disconnect_signals()
 
@@ -1976,8 +1976,9 @@ class GwInfo(QObject):
 
 
     def _show_actions(self, dialog, tab_name):
-        """ Hide all actions and show actions for the corresponding tab
-        :param tab_name: corresponding tab
+        """
+        Hide all actions and show actions for the corresponding tab
+            :param tab_name: corresponding tab
         """
 
         actions_list = dialog.findChildren(QAction)
@@ -2543,6 +2544,7 @@ class GwInfo(QObject):
         # If gallery 'True' or 'False'
         if str(row[0]) == 'True':
             btn_open_gallery.setEnabled(True)
+
 
     def _open_visit_files(self):
 
@@ -3544,9 +3546,11 @@ class GwInfo(QObject):
 
 
     def _set_to_arc(self, feat_id, child_type):
-        """  Function called in def get_id(self, dialog, action, option, point, event):
-                getattr(self, options[option][1])(feat_id, child_type)
-        :param feat_id: Id of the snapped feature
+        """
+        Function called in def get_id(self, dialog, action, option, point, event):
+            getattr(self, options[option][1])(feat_id, child_type)
+
+            :param feat_id: Id of the snapped feature
         """
 
         w_dma_id = self.dlg_cf.findChild(QComboBox, 'data_dma_id')
@@ -3634,12 +3638,14 @@ class GwInfo(QObject):
 
 
     def _get_combo_child(self, dialog, widget, feature_type, tablename, field_id):
-        """ Find QComboBox child and populate it
-        :param dialog: QDialog
-        :param widget: QComboBox parent
-        :param feature_type: PIPE, ARC, JUNCTION, VALVE...
-        :param tablename: view of DB
-        :param field_id: Field id of tablename
+        """
+        Find QComboBox child and populate it
+            :param dialog: QDialog
+            :param widget: QComboBox parent
+            :param feature_type: PIPE, ARC, JUNCTION, VALVE...
+            :param tablename: view of DB
+            :param field_id: Field id of tablename
+            :return: False if failed
         """
 
         combo_parent = widget.property('columnname')

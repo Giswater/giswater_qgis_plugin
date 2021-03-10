@@ -172,10 +172,10 @@ class GwCatalog:
     
     
     def _fill_combo(self, widget, field):
-        """ Fill QComboBox
-        :param widget: combobox destination (QComboBox)
-        :param field: json where find values (Json)
-        :return:
+        """
+        Fill QComboBox
+            :param widget: combobox destination (QComboBox)
+            :param field: json where find values (Json)
         """
 
         # Generate list of items to add into combo
@@ -197,7 +197,7 @@ class GwCatalog:
                 
     
     def _fill_geomcat_id(self, previous_dialog, widget_name):
-        """ Fill the widget of the previous dialogue"""
+        """ Fill the widget of the previous dialogue """
 
         widget_id = self.dlg_catalog.findChild(QComboBox, 'id')
         catalog_id = tools_qt.get_text(self.dlg_catalog, widget_id)

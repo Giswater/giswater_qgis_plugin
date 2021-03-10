@@ -530,10 +530,10 @@ class GwVisit(QObject):
 
 
     def _manage_accepted(self):
-        """Do all action when closed the dialog with Ok.
+        """ Do all action when closed the dialog with Ok.
         e.g. all necessary commits and cleanings.
         A) Trigger SELECT gw_fct_om_visit_multiplier (visit_id, feature_type)
-        for multiple visits management."""
+        for multiple visits management. """
 
         # tab Visit
         if self.current_tab_index == self._tab_index('tab_visit'):
@@ -584,8 +584,8 @@ class GwVisit(QObject):
 
 
     def _manage_rejected(self):
-        """Do all action when closed the dialog with Cancel or X.
-        e.g. all necessary rollbacks and cleanings."""
+        """ Do all action when closed the dialog with Cancel or X.
+        e.g. all necessary rollbacks and cleanings. """
 
         try:
             self.canvas.setMapTool(self.previous_map_tool)
@@ -601,7 +601,7 @@ class GwVisit(QObject):
 
 
     def _tab_index(self, tab_name):
-        """Get the index of a tab basing on objectName."""
+        """ Get the index of a tab basing on objectName. """
 
         for idx in range(self.tabs.count()):
             if self.tabs.widget(idx).objectName() == tab_name:
@@ -610,11 +610,11 @@ class GwVisit(QObject):
 
 
     def _manage_visit_id_change(self, dialog, text):
-        """manage action when the visit id is changed.
+        """ Manage action when the visit id is changed.
         A) Update current Visit record
         B) Fill the GUI values of the current visit
         C) load all related events in the relative table
-        D) load all related documents in the relative table."""
+        D) load all related documents in the relative table. """
 
         self.event_parameter_id = None
         self.event_feature_type = None
@@ -651,10 +651,10 @@ class GwVisit(QObject):
 
 
     def _set_feature_type_by_visit_id(self):
-        """Set the feature_type in Relation tab basing on visit_id.
+        """ Set the feature_type in Relation tab basing on visit_id.
         The steps to follow are:
         1) check geometry type looking what table contain records related with visit_id
-        2) set gemetry type."""
+        2) set gemetry type. """
 
         selected_feature_type = None
         feature_type_index = None
@@ -686,8 +686,8 @@ class GwVisit(QObject):
 
 
     def _manage_leave_visit_tab(self):
-        """ manage all the action when leaving the tab_visit
-        A) Manage sync between GUI values and Visit record in DB."""
+        """ Manage all the action when leaving the tab_visit
+        A) Manage sync between GUI values and Visit record in DB. """
 
         # A) fill Visit basing on GUI values
         self.current_visit.id = int(self.visit_id.text())
@@ -933,9 +933,9 @@ class GwVisit(QObject):
 
 
     def _config_relation_table(self, dialog):
-        """Set all actions related to the table, model and selectionModel.
+        """ Set all actions related to the table, model and selectionModel.
         It's necessary a centralised call because base class can create a None model
-        where all callbacks are lost ance can't be registered."""
+        where all callbacks are lost ance can't be registered. """
 
         if self.feature_type == '':
             return
@@ -992,9 +992,9 @@ class GwVisit(QObject):
 
 
     def _lazy_configuration(self, widget, init_function):
-        """set the init_function where all necessary events are set.
+        """ set the init_function where all necessary events are set.
         This is necessary to allow a lazy setup of the events because set_table_events
-        can create a table with a None model loosing any event connection."""
+        can create a table with a None model loosing any event connection. """
 
         lazy_widget = widget
         lazy_init_function = init_function
@@ -1195,7 +1195,7 @@ class GwVisit(QObject):
 
 
     def _manage_document(self):
-        """Access GUI to manage documents e.g Execute action of button 34 """
+        """ Access GUI to manage documents e.g Execute action of button 34 """
 
         visit_id = tools_qt.get_text(self.dlg_add_visit, self.dlg_add_visit.visit_id)
         manage_document = GwDocument(single_tool=False)
@@ -1206,7 +1206,7 @@ class GwVisit(QObject):
 
 
     def _event_insert(self):
-        """Add and event basing on form associated to the selected parameter_id."""
+        """ Add and event basing on form associated to the selected parameter_id. """
 
         # Parameter to save all selected files associated to events
         self.files_added = []
@@ -1362,7 +1362,7 @@ class GwVisit(QObject):
 
 
     def _get_added_files(self, visit_id, event_id, save):
-        """  Get path of new files """
+        """ Get path of new files """
 
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)
@@ -1430,15 +1430,15 @@ class GwVisit(QObject):
 
 
     def _manage_events_changed(self):
-        """Action when at a Event model is changed.
-        A) if some record is available => enable OK button of VisitDialog"""
+        """ Action when at a Event model is changed.
+        A) if some record is available => enable OK button of VisitDialog """
 
         state = (self.tbl_event.model().rowCount() > 0)
         self.button_box.button(QDialogButtonBox.Ok).setEnabled(state)
 
 
     def _event_update(self):
-        """Update selected event."""
+        """ Update selected event. """
 
         # Parameter to save all selected files associated to events
         self.files_added = []
@@ -1600,7 +1600,7 @@ class GwVisit(QObject):
 
 
     def _event_delete(self):
-        """Delete a selected event."""
+        """ Delete a selected event. """
 
         if not self.tbl_event.selectionModel().hasSelection():
             message = "Any record selected"
@@ -1652,7 +1652,7 @@ class GwVisit(QObject):
 
 
     def _document_insert(self):
-        """Insert a document related to the current visit."""
+        """ Insert a document related to the current visit. """
 
         doc_id = self.doc_id.text()
         visit_id = self.visit_id.text()
@@ -1804,8 +1804,8 @@ class GwVisit(QObject):
 
 
     def _fill_widget_with_fields(self, dialog, data_object, field_names):
-        """Fill the Widget with value get from data_object limited to
-        the list of field_names."""
+        """ Fill the Widget with value get from data_object limited to
+        the list of field_names. """
 
         for field_name in field_names:
             value = getattr(data_object, field_name)

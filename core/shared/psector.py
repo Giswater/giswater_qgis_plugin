@@ -850,10 +850,9 @@ class GwPsector:
     def set_restriction_by_role(self, dialog, widget_to_ignore, restriction):
         """
         Set all widget enabled(False) or readOnly(True) except those on the tuple
-        :param dialog:
-        :param widget_to_ignore: tuple = ('widgetname1', 'widgetname2', 'widgetname3', ...)
-        :param restriction: roles that do not have access. tuple = ('role1', 'role1', 'role1', ...)
-        :return:
+            :param dialog:
+            :param widget_to_ignore: tuple = ('widgetname1', 'widgetname2', 'widgetname3', ...)
+            :param restriction: roles that do not have access. tuple = ('role1', 'role1', 'role1', ...)
         """
 
         role = global_vars.project_vars['project_role']
@@ -1199,7 +1198,7 @@ class GwPsector:
 
 
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
-        """ Populate the QTableView by filtering through the QLineEdit"""
+        """ Populate the QTableView by filtering through the QLineEdit """
 
         schema_name = self.schema_name.replace('"', '')
         psector_id = tools_qt.get_text(dialog, 'psector_id')
@@ -1476,11 +1475,12 @@ class GwPsector:
 
 
     def multi_rows_delete(self, dialog, widget, table_name, column_id, label, action):
-        """ Delete selected elements of the table
-        :param dialog: (QDialog)
-        :param QTableView widget: origin
-        :param table_name: table origin
-        :param column_id: Refers to the id of the source table
+        """
+        Delete selected elements of the table
+            :param dialog: (QDialog)
+            :param QTableView widget: origin
+            :param table_name: table origin
+            :param column_id: Refers to the id of the source table
         """
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()

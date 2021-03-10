@@ -13,7 +13,7 @@ class GwPluginToolbar(object):
     def __init__(self, toolbar_id, name, enabled, toolbar=None, list_actions=[]):
         """ 
         :param toolbar: QToolBar
-        :param list_actions: list
+        :param list_actions: List
         """
         self.toolbar_id = toolbar_id
         self.name = name

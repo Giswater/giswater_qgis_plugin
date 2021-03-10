@@ -888,8 +888,9 @@ class GwSearch:
 
 
     def _draw_polygon(self, points, rubber_band, border=QColor(255, 0, 0, 100), width=3, duration_time=None, fill_color=None):
-        """ Draw 'polygon' over canvas following list of points
-        :param duration_time: integer milliseconds ex: 3000 for 3 seconds
+        """
+        Draw 'polygon' over canvas following list of points
+            :param duration_time: integer milliseconds ex: 3000 for 3 seconds
         """
 
         rubber_band.setIconSize(20)
@@ -907,11 +908,12 @@ class GwSearch:
 
 
     def _document_insert(self, dialog, tablename, field, field_value):
-        """ Insert a document related to the current visit
-        :param dialog: (QDialog )
-        :param tablename: Name of the table to make the queries (string)
-        :param field: Field of the table to make the where clause (string)
-        :param field_value: Value to compare in the clause where (string)
+        """
+        Insert a document related to the current visit
+            :param dialog: (QDialog )
+            :param tablename: Name of the table to make the queries (String)
+            :param field: Field of the table to make the where clause (String)
+            :param field_value: Value to compare in the clause where (String)
         """
 
         doc_id = dialog.doc_id.text()

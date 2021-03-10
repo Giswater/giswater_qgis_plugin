@@ -236,7 +236,7 @@ class GwI18NGenerator:
 
 
     def _get_title(self, py_dialogs, name, key_label):
-        """ Return title according languaje """
+        """ Return title's according language """
 
         title = None
         for py in py_dialogs:
@@ -303,8 +303,9 @@ class GwI18NGenerator:
 
 
     def _write_header(self, path):
-        """ Write the file header
-        :param path: Full destination path (String)
+        """
+        Write the file header
+            :param path: Full destination path (String)
         """
 
         file = open(path, "w")
@@ -322,10 +323,11 @@ class GwI18NGenerator:
 
 
     def _write_dbdialog_values(self, rows, path):
-        """ Generate a string and write into file
-        :param rows: List of values ([List][list])
-        :param path: Full destination path (String)
-        :return: (Boolean)
+        """
+        Generate a string and write into file
+            :param rows: List of values ([List][List])
+            :param path: Full destination path (String)
+            :return: (Boolean)
         """
 
         file = open(path, "a")
@@ -391,10 +393,11 @@ class GwI18NGenerator:
 
 
     def _write_dbmessages_values(self, rows, path):
-        """ Generate a string and write into file
-        :param rows: List of values ([List][list])
-        :param path: Full destination path (String)
-        :return: (Boolean)
+        """
+        Generate a string and write into file
+            :param rows: List of values ([List][List])
+            :param path: Full destination path (String)
+            :return: (Boolean)
         """
 
         file = open(path, "a")
@@ -451,8 +454,9 @@ class GwI18NGenerator:
 
 
     def _load_user_values(self):
-        """ Load last selected user values
-        :return: Dictionary with values
+        """
+        Load last selected user values
+            :return: Dictionary with values
         """
 
         host = tools_gw.get_config_parser('i18n_generator', 'qm_lang_host', "user", "init")

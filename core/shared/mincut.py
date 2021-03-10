@@ -579,11 +579,10 @@ class GwMincut:
     def _check_dates_coherence(self, date_from, date_to, time_from, time_to):
         """
         Chek if date_to.date() is >= than date_from.date()
-        :param date_from: QDateEdit.date from
-        :param date_to: QDateEdit.date to
-        :param time_from: QDateEdit to get date in order to set widget_to_set
-        :param time_to: QDateEdit to set coherence date
-        :return:
+            :param date_from: QDateEdit.date from
+            :param date_to: QDateEdit.date to
+            :param time_from: QDateEdit to get date in order to set widget_to_set
+            :param time_to: QDateEdit to set coherence date
         """
 
         d_from = datetime(date_from.date().year(), date_from.date().month(), date_from.date().day(),

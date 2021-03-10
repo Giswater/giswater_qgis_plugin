@@ -25,7 +25,7 @@ class GwSelector:
 
     def open_selector(self, selector_type='"selector_basic"'):
         """
-        :param selector_type:This parameter must be a string between double quotes. Example: '"selector_basic"'
+        :param selector_type: This parameter must be a string between double quotes. Example: '"selector_basic"'
         """
 
         dlg_selector = GwSelectorUi()
@@ -51,9 +51,10 @@ class GwSelector:
 
     def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None,
                      is_setselector=None, selector_vars={}):
-        """ Ask to DB for selectors and make dialog
-        :param dialog: Is a standard dialog, from file selector.ui, where put widgets
-        :param selector_type: list of selectors to ask DB ['exploitation', 'state', ...]
+        """
+        Ask to DB for selectors and make dialog
+            :param dialog: Is a standard dialog, from file selector.ui, where put widgets
+            :param selector_type: List of selectors to ask DB ['exploitation', 'state', ...]
         """
 
         index = 0
@@ -199,10 +200,11 @@ class GwSelector:
     # region private functions
 
     def _set_selection_mode(self, dialog, widget, selection_mode, selector_vars):
-        """ Manage selection mode
-        :param dialog: QDialog where search all checkbox
-        :param widget: QCheckBox that has changed status (QCheckBox)
-        :param selection_mode: "keepPrevious", "keepPreviousUsingShift", "removePrevious" (String)
+        """
+        Manage selection mode
+            :param dialog: QDialog where search all checkbox
+            :param widget: QCheckBox that has changed status (QCheckBox)
+            :param selection_mode: "keepPrevious", "keepPreviousUsingShift", "removePrevious" (String)
         """
 
         # Get QCheckBox check all
@@ -227,10 +229,11 @@ class GwSelector:
 
 
     def _set_selector(self, dialog, widget, is_alone, selector_vars):
-        """  Send values to DB and reload selectors
-        :param dialog: QDialog
-        :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
-        :param is_alone: Defines if the selector is unique (True) or multiple (False) (Boolean)
+        """
+        Send values to DB and reload selectors
+            :param dialog: QDialog
+            :param widget: QCheckBox that contains the information to generate the json (QCheckBox)
+            :param is_alone: Defines if the selector is unique (True) or multiple (False) (Boolean)
         """
 
         # Get current tab name
@@ -280,11 +283,12 @@ class GwSelector:
 
 
     def _remove_previuos(self, dialog, widget, widget_all, widget_list):
-        """ Remove checks of not selected QCheckBox
-        :param dialog: QDialog
-        :param widget: QCheckBox that has changed status (QCheckBox)
-        :param widget_all: QCheckBox that handles global selection (QCheckBox)
-        :param widget_list: List of all QCheckBox in the current tab ([QCheckBox, QCheckBox, ...])
+        """
+        Remove checks of not selected QCheckBox
+            :param dialog: QDialog
+            :param widget: QCheckBox that has changed status (QCheckBox)
+            :param widget_all: QCheckBox that handles global selection (QCheckBox)
+            :param widget_list: List of all QCheckBox in the current tab ([QCheckBox, QCheckBox, ...])
         """
 
         for checkbox in widget_list:

@@ -22,11 +22,11 @@ from .lib import tools_qgis, tools_os, tools_log
 class Giswater(QObject):
 
     def __init__(self, iface):
-        """ Constructor
-        :param iface: An interface instance that will be passed to this class
-            which provides the hook by which you can manipulate the QGIS
-            application at run time.
-        :type iface: QgsInterface
+        """
+        Constructor
+            :param iface: An interface instance that will be passed to this class
+                which provides the hook by which you can manipulate the QGIS
+                application at run time. (QgsInterface)
         """
 
         super(Giswater, self).__init__()
@@ -57,8 +57,9 @@ class Giswater(QObject):
 
 
     def unload(self, hide_gw_button=True):
-        """ Removes plugin menu items and icons from QGIS GUI
-            :param @remove_modules is True when plugin is disabled or reloaded
+        """
+        Removes plugin menu items and icons from QGIS GUI
+            :param hide_gw_button: is True when plugin is disabled or reloaded
         """
 
         try:
