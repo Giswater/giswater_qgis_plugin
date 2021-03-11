@@ -509,8 +509,7 @@ class GwAdminButton:
         self.dlg_readsql.btn_info.clicked.connect(partial(self._open_update_info))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self._set_info_project))
         self.dlg_readsql.project_schema_name.currentIndexChanged.connect(partial(self._update_manage_ui))
-        self.cmb_project_type.currentIndexChanged.connect(
-            partial(self._populate_data_schema_name, self.cmb_project_type))
+        self.cmb_project_type.currentIndexChanged.connect(partial(self._populate_data_schema_name, self.cmb_project_type))
         self.cmb_project_type.currentIndexChanged.connect(partial(self._change_project_type, self.cmb_project_type))
         self.cmb_project_type.currentIndexChanged.connect(partial(self._set_info_project))
         self.cmb_project_type.currentIndexChanged.connect(partial(self._update_manage_ui))
@@ -1811,8 +1810,10 @@ class GwAdminButton:
         self._manage_result_message(status, parameter="Rename project")
         if status:
             global_vars.dao.commit()
-            self._event_change_connection()
+            # self._event_change_connection()
+            self._populate_data_schema_name(self.cmb_project_type)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
+            self._set_info_project()
             if close_dlg_rename:
                 self._close_dialog_admin(self.dlg_readsql_rename)
         else:
@@ -2460,8 +2461,10 @@ class GwAdminButton:
         self._manage_result_message(status, parameter="Copy project")
         if status:
             global_vars.dao.commit()
-            self._event_change_connection()
+            # self._event_change_connection()
+            self._populate_data_schema_name(self.cmb_project_type)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(new_schema_name))
+            self._set_info_project()
             self._close_dialog_admin(self.dlg_readsql_copy)
         else:
             global_vars.dao.rollback()
