@@ -163,6 +163,9 @@ class GwAdminButton:
                 else:
                     return
 
+        # We retrieve the desired name of the schema, since in case there had been a schema with the same name, we had
+        # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
+        self.schema = project_name_schema
         # Set background task 'GwCreateSchemaTask'
         description = f"Create schema"
         params = {'is_test': is_test, 'project_type': project_type, 'exec_last_process': exec_last_process,
@@ -1810,7 +1813,6 @@ class GwAdminButton:
         self._manage_result_message(status, parameter="Rename project")
         if status:
             global_vars.dao.commit()
-            # self._event_change_connection()
             self._populate_data_schema_name(self.cmb_project_type)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
             self._set_info_project()
@@ -2461,7 +2463,6 @@ class GwAdminButton:
         self._manage_result_message(status, parameter="Copy project")
         if status:
             global_vars.dao.commit()
-            # self._event_change_connection()
             self._populate_data_schema_name(self.cmb_project_type)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(new_schema_name))
             self._set_info_project()
