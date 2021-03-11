@@ -242,7 +242,7 @@ class GwLoadProject(QObject):
             self.buttons_to_hide = [int(x) for x in row.split(',')]
 
         except Exception as e:
-            tools_log.show_warning(f"{type(e).__name__}: {e}")
+            tools_log.log_warning(f"{type(e).__name__}: {e}")
 
 
     def _manage_toolbars(self):
