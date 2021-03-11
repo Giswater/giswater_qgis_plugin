@@ -139,7 +139,8 @@ class GwCreateSchemaTask(GwTask):
             tools_qt.show_info_box(msg, "Info")
             self.admin._execute_import_data(schema_type=self.params['project_type'])
         else:
-            self.admin._manage_process_result(is_test=self.is_test)
+            self.admin._manage_process_result(schema_name=self.params['project_name_schema'],
+                                              project_type=self.params['project_type'], is_test=self.is_test)
 
 
     def cancel(self):

@@ -1746,7 +1746,7 @@ class GwAdminButton:
         return True
 
 
-    def _manage_process_result(self, schema_name=None, is_test=False):
+    def _manage_process_result(self, schema_name=None, project_type=None, is_test=False):
         """"""
 
         status = (self.error_count == 0)
@@ -1757,8 +1757,7 @@ class GwAdminButton:
             if not is_test:
                 self._populate_data_schema_name(self.cmb_project_type)
                 if schema_name is not None:
-                    proyect_type = tools_qt.get_text(self.dlg_readsql_create_project, 'cmb_create_project_type')
-                    tools_qt.set_widget_text(self.dlg_readsql, 'cmb_project_type', proyect_type)
+                    tools_qt.set_widget_text(self.dlg_readsql, 'cmb_project_type', project_type)
                     tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
                     self._set_info_project()
         else:
