@@ -1559,7 +1559,7 @@ class GwAdminButton:
 
     """ Functions execute process """
 
-    def _execute_import_data(self, schema_type=''):
+    def _execute_import_data(self, project_name, project_type):
         """"""
         # Create dialog
         self.dlg_import_inp = GwAdminImportUi()
@@ -1568,9 +1568,9 @@ class GwAdminButton:
         # Hide widgets
         self.dlg_import_inp.progressBar.setVisible(False)
 
-        if schema_type.lower() == 'ws':
+        if project_type.lower() == 'ws':
             extras = '"function":2522'
-        elif schema_type.lower() == 'ud':
+        elif project_type.lower() == 'ud':
             extras = '"function":2524'
         else:
             self.error_count = self.error_count + 1
@@ -1586,9 +1586,8 @@ class GwAdminButton:
         self._populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data'])
 
         # Set listeners
-        self.dlg_import_inp.btn_run.clicked.connect(
-            partial(self._execute_import_inp, accepted=True, schema_type=schema_type))
-        self.dlg_import_inp.btn_close.clicked.connect(partial(self._execute_import_inp, accepted=False))
+        self.dlg_import_inp.btn_run.clicked.connect(partial(self._execute_import_inp, True, project_name, project_type))
+        self.dlg_import_inp.btn_close.clicked.connect(partial(self._execute_import_inp, False, project_name, project_type))
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_import_inp, dlg_name='admin_importinp')
@@ -1746,7 +1745,7 @@ class GwAdminButton:
         return True
 
 
-    def _manage_process_result(self, schema_name=None, project_type=None, is_test=False):
+    def _manage_process_result(self, project_name, project_type, is_test=False):
         """"""
 
         status = (self.error_count == 0)
@@ -1756,9 +1755,9 @@ class GwAdminButton:
             self._close_dialog_admin(self.dlg_readsql_create_project)
             if not is_test:
                 self._populate_data_schema_name(self.cmb_project_type)
-                if schema_name is not None:
+                if project_name is not None:
                     tools_qt.set_widget_text(self.dlg_readsql, 'cmb_project_type', project_type)
-                    tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, schema_name)
+                    tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, project_name)
                     self._set_info_project()
         else:
             global_vars.dao.rollback()
@@ -2491,7 +2490,7 @@ class GwAdminButton:
                 self._set_info_project()
 
 
-    def _execute_import_inp(self, accepted=False, schema_type=''):
+    def _execute_import_inp(self, accepted, project_name, project_type):
         """"""
 
         if accepted:
@@ -2505,11 +2504,11 @@ class GwAdminButton:
             self._insert_inp_into_db(self.file_inp)
 
             # Execute import data
-            if schema_type.lower() == 'ws':
+            if project_type.lower() == 'ws':
                 function_name = 'gw_fct_import_epanet_inp'
                 useNode2arc = self.dlg_import_inp.findChild(QWidget, 'useNode2arc')
                 extras = '"parameters":{"useNode2arc":"' + str(useNode2arc.isChecked()) + '"}'
-            elif schema_type.lower() == 'ud':
+            elif project_type.lower() == 'ud':
                 function_name = 'gw_fct_import_swmm_inp'
                 createSubcGeom = self.dlg_import_inp.findChild(QWidget, 'createSubcGeom')
                 extras = '"parameters":{"createSubcGeom":"' + str(createSubcGeom.isChecked()) + '"}'
@@ -2550,7 +2549,7 @@ class GwAdminButton:
 
             self.task1.setProgress(100)
             # Manage process result
-            self._manage_process_result()
+            self._manage_process_result(project_name, project_type)
 
         else:
             msg = "A rollback on schema will be done."

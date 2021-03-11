@@ -137,10 +137,10 @@ class GwCreateSchemaTask(GwTask):
                    "\nNow will start the import process. It is experimental and it may crash."
                    "\nIf this happens, please notify it by send a e-mail to info@giswater.org.")
             tools_qt.show_info_box(msg, "Info")
-            self.admin._execute_import_data(schema_type=self.params['project_type'])
+            self.admin._execute_import_data(self.params['project_name_schema'], self.params['project_type'])
         else:
-            self.admin._manage_process_result(schema_name=self.params['project_name_schema'],
-                                              project_type=self.params['project_type'], is_test=self.is_test)
+            self.admin._manage_process_result(self.params['project_name_schema'],self.params['project_type'],
+                                              is_test=self.is_test)
 
 
     def cancel(self):
