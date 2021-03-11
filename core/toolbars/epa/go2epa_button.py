@@ -722,6 +722,7 @@ class GwGo2EpaButton(GwAction):
         self._get_event_combo_parent(json_result)
         self.dlg_go2epa_options.btn_accept.clicked.connect(partial(self._update_values, self.epa_options_list))
         self.dlg_go2epa_options.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_options))
+        self.dlg_go2epa_options.rejected.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_options))
 
         tools_gw.open_dialog(self.dlg_go2epa_options, dlg_name='go2epa_options')
 
