@@ -1719,32 +1719,37 @@ class GwAdminButton:
             return False
 
         # Check is project name already exists
-        sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
+        sql = (f"SELECT schema_name, schema_name FROM information_schema.schemata " 
+               f"WHERE schema_name ILIKE '%{project_name}%'ORDER BY schema_name")
         rows = tools_db.get_rows(sql, commit=False)
-        available = False
-        for row in rows:
-            if str(project_name) == str(row[0]):
-                i = 0
-                msg = "This 'Project_name' is already exist. Do you want rename old schema to '" + str(
-                    project_name) + "_bk_" + str(i) + "' ?"
-                result = tools_qt.show_question(msg, "Info")
-                if result:
-                    while available is False:
-                        # TODO: Check this!
-                        for row in rows:
-                            if str(project_name) + "_bk" == str(row[0]) or \
-                                    str(project_name) + "_bk_" + str(i) == str(row[0]):
-                                msg = "This 'Project_name' is already exist. Do you want rename old schema to '" + str(
-                                    project_name) + "_bk_" + str(i + 1) + "' ?"
-                                result = tools_qt.show_question(msg, "Info")
-                                i = i + 1
-                            else:
-                                available = True
-                    self._rename_project_data_schema(str(project_name), str(project_name) + "_bk_" + str(i))
-                else:
-                    return False
 
-        return True
+        available = True
+        for row in rows:
+            if f"{project_name}" == f"{row[0]}":
+                available = False
+                break
+
+        if available: return True
+
+        list_schemas = [row[0] for row in rows if f"{project_name}" in f"{row[0]}"]
+        new_name = self.bk_schema_name(list_schemas, f"{project_name}_bk_", 0)
+
+        msg = f"This 'Project_name' is already exist. Do you want rename old schema to '{new_name}"
+        result = tools_qt.show_question(msg, "Info")
+        if result:
+            self._rename_project_data_schema(str(project_name), str(new_name))
+            return True
+        else:
+            return False
+
+
+    def bk_schema_name(self, list_schemas, project_name, i):
+        """ Check for available bk schema name """
+
+        if f"{project_name}{i}" not in list_schemas:
+            return f"{project_name}{i}"
+        else:
+            return self.bk_schema_name(list_schemas, project_name, i+1)
 
 
     def _manage_process_result(self, project_name, project_type, is_test=False):
@@ -1769,7 +1774,7 @@ class GwAdminButton:
 
     def _rename_project_data_schema(self, schema, create_project=None):
         """"""
-        if create_project is None or create_project is False:
+        if create_project is None:
             close_dlg_rename = True
             self.schema = tools_qt.get_text(self.dlg_readsql_rename, self.dlg_readsql_rename.schema_rename_copy)
             if str(self.schema) == str(schema):
@@ -2096,12 +2101,14 @@ class GwAdminButton:
     def _populate_data_schema_name(self, widget):
         """"""
         # Get filter
+        print(f"widget --> {widget}")
         filter_ = tools_qt.get_text(self.dlg_readsql, widget)
         if filter_ in (None, 'null') and self.schema_type:
             filter_ = self.schema_type
         if filter_ is None:
+            print("TEST 10")
             return
-
+        print("TEST 20")
         # Populate Project data schema Name
         sql = "SELECT schema_name FROM information_schema.schemata"
         rows = tools_db.get_rows(sql)
@@ -2302,7 +2309,7 @@ class GwAdminButton:
         schema = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
         # Set listeners
-        self.dlg_readsql_rename.btn_accept.clicked.connect(partial(self._rename_project_data_schema, schema))
+        self.dlg_readsql_rename.btn_accept.clicked.connect(partial(self._rename_project_data_schema, schema, None))
         self.dlg_readsql_rename.btn_cancel.clicked.connect(partial(self._close_dialog_admin, self.dlg_readsql_rename))
 
         # Set shortcut keys
