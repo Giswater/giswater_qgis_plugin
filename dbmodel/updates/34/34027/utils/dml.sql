@@ -16,7 +16,7 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO config_param_system(parameter, value, descript, label, dv_querytext, dv_filterbyfield, 
 isenabled, layoutorder, project_type, dv_isparent, isautoupdate, datatype, widgettype, ismandatory, iseditable, layoutname)
 VALUES ('edit_feature_auto_builtdate', TRUE, 'If true builtdate is set to the current date', 'Current date as builtdate', null, null, 
-TRUE, 6, 'utils', FALSE, FALSE, 'boolean', 'check', FALSE, TRUE, 'lyt_system');
+TRUE, 6, 'utils', FALSE, FALSE, 'boolean', 'check', FALSE, TRUE, 'lyt_system') ON CONFLICT (parameter) DO NOTHING;
             
 UPDATE config_param_system SET layoutorder=8 where parameter='admin_currency';
 
