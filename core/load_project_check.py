@@ -32,18 +32,15 @@ class GwLoadProjectCheck:
         for layer in layers:
             if layer is None:
                 continue
-            if layer.providerType() != 'postgres':
-                continue
+            if not tools_qgis.check_query_layer(layer): continue
+            if layer.providerType() != 'postgres': continue
             layer_source = tools_qgis.get_layer_source(layer)
-            if layer_source['schema'] is None:
-                continue
+            if layer_source['schema'] is None: continue
             layer_source['schema'] = layer_source['schema'].replace('"', '')
             if 'schema' not in layer_source or layer_source['schema'] != self.schema_name:
                 continue
-            # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
-            uri = layer.dataProvider().dataSourceUri()
-            if 'SELECT row_number() over ()' in str(uri):
-                continue
+
+
             schema_name = layer_source['schema']
             if schema_name is not None:
                 schema_name = schema_name.replace('"', '')

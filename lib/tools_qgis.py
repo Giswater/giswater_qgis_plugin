@@ -18,6 +18,8 @@ from qgis.PyQt.QtWidgets import QDockWidget, QApplication
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
     QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry
+from qgis.core import QgsVectorLayer
+
 
 from . import tools_log, tools_qt, tools_os
 from .. import global_vars
@@ -118,12 +120,10 @@ def get_visible_layers(as_str_list=False, as_list=False):
         visible_layer = '['
     layers = get_project_layers()
     for layer in layers:
+        if not check_query_layer(layer): continue
         if is_layer_visible(layer):
             table_name = get_layer_source_table_name(layer)
-            table = layer.dataProvider().dataSourceUri()
-            # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
-            if 'SELECT row_number() over ()' in str(table) or 'srid' not in str(table):
-                continue
+            if not check_query_layer(layer): continue
             layers_name.append(table_name)
             visible_layer += f'"{table_name}", '
     visible_layer = visible_layer[:-2]
@@ -884,6 +884,23 @@ def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, inde
         rubber_band.show()
     except AttributeError:
         pass
+
+
+def check_query_layer(layer):
+    """
+    Check for query layer and/or bad layer, if layer is a simple table, or an added layer from query, return False
+        :param layer: Layer to be checked (QgsVectorLayer)
+        :return: True/False (Boolean)
+    """
+    try:
+        # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
+        table_uri = layer.dataProvider().dataSourceUri()
+        if 'SELECT row_number() over ()' in str(table_uri) or 'srid' not in str(table_uri) or \
+                layer is None or type(layer) != QgsVectorLayer:
+            return False
+        return True
+    except Exception:
+        return False
 
 # region private functions
 

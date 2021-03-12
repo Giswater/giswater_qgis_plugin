@@ -110,9 +110,8 @@ class GwInfo(QObject):
         self.new_feature = new_feature
 
         # Check for query layer and/or bad layer
-        table_uri = self.iface.activeLayer().dataProvider().dataSourceUri()
-        if 'SELECT row_number() over ()' in str(table_uri) or 'srid' not in str(table_uri) or \
-                self.iface.activeLayer() is None or type(self.iface.activeLayer()) != QgsVectorLayer:
+        if not tools_qgis.check_query_layer(self.iface.activeLayer()) or self.iface.activeLayer() is None or \
+                type(self.iface.activeLayer()) != QgsVectorLayer:
             active_layer = ""
         else:
             active_layer = tools_qgis.get_layer_source_table_name(self.iface.activeLayer())
