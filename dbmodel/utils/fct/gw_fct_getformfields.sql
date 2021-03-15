@@ -106,7 +106,8 @@ BEGIN
 	-- setting device
 	IF p_device IN (1,2,3) THEN
 		v_device = ' b.camelstyle AS type, columnname AS name, datatype AS "dataType", a.camelstyle AS "widgetAction", a.camelstyle as "updateAction", a.camelstyle as "changeAction",
-		     (CASE WHEN layoutname=''0'' THEN ''header'' WHEN layoutname=''9'' THEN ''footer'' ELSE ''body'' END) AS "position",
+		     (CASE WHEN layoutname=''0'' OR layoutname =''lyt_top_1'' THEN ''header'' WHEN layoutname=''9'' OR layoutname =''lyt_bot_1'' OR layoutname =''lyt_bot_2'' 
+		     THEN ''footer'' ELSE ''body'' END) AS "position",
 		     (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,';     
 	ELSE 
 		v_device = '';
@@ -126,8 +127,9 @@ BEGIN
 			
 			WITH typevalue AS (SELECT * FROM config_typevalue)
 		
-			SELECT '||v_label||', columnname, concat('||quote_literal(p_tabname)||',''_'',columnname) AS widgetname, widgettype,
-			widgetfunction, '||v_device||' hidden, widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby,
+			SELECT '||v_label||', columnname, columnname as column_id, concat('||quote_literal(p_tabname)||',''_'',columnname) AS widgetname, widgettype,
+			widgetfunction, widgetfunction as  widgetAction, widgetfunction as updateAction, widgetfunction as changeAction,
+			'||v_device||' hidden, widgetdim, datatype , tooltip, placeholder, iseditable, row_number()over(ORDER BY layoutname, layoutorder) AS orderby,
 			layoutname, layoutorder, dv_parent_id AS "parentId", isparent, ismandatory, linkedaction, dv_querytext AS "queryText", dv_querytext_filterc AS "queryTextFilter", isautoupdate,
 			dv_orderby_id AS "orderById", dv_isnullvalue AS "isNullValue", stylesheet, widgetcontrols
 			FROM config_form_fields 
