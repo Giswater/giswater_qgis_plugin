@@ -79,7 +79,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, error_message) VALUES (213,  concat('------------------------------'));
 
 	-- Get SRID
-	v_srid = (SELECT ST_srid (the_geom) FROM SCHEMA_NAME.sector limit 1);
+	v_srid = (SELECT epsg FROM SCHEMA_NAME.sys_version limit 1);
 
 	-- Make geom point
 	v_geom0:= (SELECT ST_SetSRID(ST_MakePoint(p_x, p_y), v_srid));
