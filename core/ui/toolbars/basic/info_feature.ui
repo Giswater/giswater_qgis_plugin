@@ -72,8 +72,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>634</width>
-             <height>382</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">
@@ -917,10 +917,13 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_17">
         <item row="0" column="0">
-         <layout class="QGridLayout" name="rpt_layout1"/>
+         <layout class="QGridLayout" name="lyt_rpt1"/>
         </item>
         <item row="1" column="0">
-         <layout class="QGridLayout" name="gridLayout_7"/>
+         <layout class="QGridLayout" name="lyt_rpt2"/>
+        </item>
+        <item row="2" column="0">
+         <layout class="QGridLayout" name="lyt_rpt3"/>
         </item>
        </layout>
       </widget>

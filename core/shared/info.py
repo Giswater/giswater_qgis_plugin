@@ -1324,12 +1324,12 @@ class GwInfo(QObject):
             def _manage_textarea(self, **kwargs)
             def _manage_spinbox(self, **kwargs)
             def _manage_doubleSpinbox(self, **kwargs)
-            def _manage_tableView(self, **kwargs)
+            def _manage_tableview(self, **kwargs)
          """
 
         widget = None
         label = None
-        if field['label']:
+        if 'label' in field and field['label']:
             label = QLabel()
             label.setObjectName('lbl_' + field['widgetname'])
             label.setText(field['label'].capitalize())
@@ -1350,7 +1350,7 @@ class GwInfo(QObject):
             kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature}
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         except Exception as e:
-            msg = (f"{type(e).__name__}: {e} WHERE columname='{field['columnname']}' "
+            msg = (f"{type(e).__name__}: {e} Python function: _set_widgets. WHERE columname='{field['columnname']}' "
                    f"AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'")
             tools_qgis.show_message(msg, 2)
             return label, widget
@@ -1547,7 +1547,7 @@ class GwInfo(QObject):
         return widget
 
 
-    def _manage_tableView(self, **kwargs):
+    def _manage_tableview(self, **kwargs):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
@@ -3199,8 +3199,8 @@ class GwInfo(QObject):
     def _init_tbl_rpt(self, complet_result, dialog, new_feature):
         """ Put filter widgets into layout and set headers into QTableView """
 
-        rpt_layout1 = dialog.findChild(QGridLayout, "rpt_layout1")
-        self._reset_grid_layout(rpt_layout1)
+        lyt_rpt1 = dialog.findChild(QGridLayout, "lyt_rpt1")
+        self._reset_grid_layout(lyt_rpt1)
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
         complet_list = self._get_list(complet_result, tab_name=tab_name)
@@ -3215,17 +3215,17 @@ class GwInfo(QObject):
             label, widget = self._set_widgets(dialog, complet_list, field, new_feature)
             if widget is not None:
                 if (type(widget)) == QSpacerItem:
-                    rpt_layout1.addItem(widget, 1, field['layoutorder'])
+                    lyt_rpt1.addItem(widget, 1, field['layoutorder'])
                 elif (type(widget)) == QTableView:
-                    lyt = self.dlg_cf.findChild(QGridLayout, "gridLayout_7")
+                    lyt = self.dlg_cf.findChild(QGridLayout, "lyt_rpt2")
                     lyt.addWidget(widget, 2, field['layoutorder'])
                     widget_list.append(widget)
                 else:
                     widget.setMaximumWidth(150)
                     widget_list.append(widget)
                     if label:
-                        rpt_layout1.addWidget(label, 0, field['layoutorder'])
-                    rpt_layout1.addWidget(widget, 1, field['layoutorder'])
+                        lyt_rpt1.addWidget(label, 0, field['layoutorder'])
+                    lyt_rpt1.addWidget(widget, 1, field['layoutorder'])
 
             # Find combo parents:
             for field_ in complet_list['body']['data']['fields'][0]:
@@ -3314,11 +3314,11 @@ class GwInfo(QObject):
         return filter_fields
 
 
-    def _gw_api_open_rpt_result(self, widget, complet_result):
-        self._open_rpt_result(widget, complet_result)
+    def _open_rpt_result(self, widget, complet_result):
+        self._manage_rpt_result(widget, complet_result)
 
 
-    def _open_rpt_result(self, qtable, complet_list):
+    def _manage_rpt_result(self, qtable, complet_list):
         """ Open form of selected element of the @widget?? """
 
         # Get selected rows
