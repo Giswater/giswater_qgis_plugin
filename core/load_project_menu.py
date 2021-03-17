@@ -192,16 +192,20 @@ class GwMenuLoad(QObject):
         if not os.path.exists(path):
             return None
 
-        parser = configparser.ConfigParser()
+        parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
         parser.read(path)
         for section in parser.sections():
             for parameter in parser[section]:
                 if parameter[0:2] in project_types and tools_gw.get_project_type() != parameter[0:2]:
                     continue
+                value = tools_gw.get_config_parser(section, parameter, "user", file_name.split(".")[0],
+                                                   False, False, True, False, True)
                 values["Section"] = section
                 values["Parameter"] = parameter
-                values["Value"] = parser[section][parameter]
-                self.list_values.append(values)
+                values["Value"] = value.split("#")[0].strip() if value is not None and "#" in value else value
+                values["Description"] = value.split("#")[1].strip() if value is not None and "#" in value else ""
+                if value is not None:
+                    self.list_values.append(values)
                 values = {}
 
 
@@ -209,8 +213,8 @@ class GwMenuLoad(QObject):
         """ Fills a UI table with the local list of values variable. """
 
         self.tree_config_files.resize(500, 200)
-        self.tree_config_files.setColumnCount(3)
-        self.tree_config_files.setHeaderLabels(["Section", "Parameter", "Value"])
+        self.tree_config_files.setColumnCount(4)
+        self.tree_config_files.setHeaderLabels(["Section", "Parameter", "Value", "Description"])
         self.tree_config_files.itemDoubleClicked.connect(partial(self._double_click_event))
         self.tree_config_files.itemChanged.connect(partial(self._set_config_value))
 
@@ -223,7 +227,8 @@ class GwMenuLoad(QObject):
             for row in range(row_count):
                 item_child = QTreeWidgetItem([f"{self.list_values[row]['Section']}",
                                               f"{self.list_values[row]['Parameter']}",
-                                              f"{self.list_values[row]['Value']}"])
+                                              f"{self.list_values[row]['Value']}",
+                                              f"{self.list_values[row]['Description']}"])
                 # item_child.itemDoubleClicked.connect(partial(self._onDoubleClick))
                 item.addChild(item_child)
 
@@ -237,7 +242,7 @@ class GwMenuLoad(QObject):
             section = item.text(0)
             parameter = item.text(1)
             value = item.text(2)
-            tools_gw.set_config_parser(section, parameter, value, file_name=file_name, prefix=False)
+            tools_gw.set_config_parser(section, parameter, value, file_name=file_name, prefix=False, chk_user_params=False)
 
 
     def _double_click_event(self, item, column):
