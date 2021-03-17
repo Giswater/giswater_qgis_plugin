@@ -215,8 +215,7 @@ class GwMenuLoad(QObject):
             for parameter in parser[section]:
                 if parameter[0:2] in project_types and tools_gw.get_project_type() != parameter[0:2]:
                     continue
-                value = tools_gw.get_config_parser(section, parameter, "user", file_name.split(".")[0],
-                                                   False, False, True, False, True)
+                value = parser[section][parameter]
                 values["Section"] = section
                 values["Parameter"] = parameter
                 values["Value"] = value.split("#")[0].strip() if value is not None and "#" in value else value
