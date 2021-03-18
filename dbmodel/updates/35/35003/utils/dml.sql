@@ -35,6 +35,3 @@ UPDATE value_state_type SET name = 'OPERATIU' WHERE name ='EN_SERVEI';
 
 --2021/03/05
 INSERT INTO sys_function VALUES (3028, 'gw_fct_getaddfeaturevalues', 'utils', 'function', 'json', 'json', 'Function that return cat_feature values', 'role_basic');
-
-DELETE FROM sys_table WHERE id  IN ('inp_arc_type', 'inp_node_type');
-INSERT INTO sys_table VALUES ('sys_feature_epa_type', 'epa types', 'role_admin', 0, null, null, null, null, null, null, null, null, 'giswater');

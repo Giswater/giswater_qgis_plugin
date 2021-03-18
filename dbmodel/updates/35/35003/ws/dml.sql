@@ -16,22 +16,3 @@ UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM sys_fe
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM sys_feature_epa_type WHERE active AND feature_type = ''NODE'''  WHERE columnname = 'epa_type' AND formname like '%_node%';
 
 DELETE FROM sys_table WHERE id = 'inp_rules_controls_importinp';
-
-UPDATE inp_arc_type SET epa_table = f.epa_table FROM cat_feature_arc f WHERE inp_arc_type.id=f.epa_default;
-UPDATE inp_arc_type SET epa_table = 'inp_pump_importinp' where id = 'PUMP-IMPORTINP';
-UPDATE inp_arc_type SET epa_table = 'inp_valve_importinp' where id = 'VALVE-IMPORTINP';
-UPDATE inp_arc_type SET epa_table = 'inp_virtualvalve' where id = 'VIRTUALVALVE';
-
-UPDATE inp_node_type SET epa_table = f.epa_table FROM cat_feature_node f WHERE inp_node_type.id=f.epa_default;
-UPDATE inp_node_type SET epa_table = 'inp_inlet' where id = 'INLET';
-
-INSERT INTO sys_feature_epa_type SELECT id, 'NODE', epa_table FROM inp_node_type;
-INSERT INTO sys_feature_epa_type SELECT id, 'ARC', epa_table FROM inp_arc_type;
-
-UPDATE cat_feature_node SET epa_default  ='UNDEFINED' WHERE epa_default  ='NOT DEFINED';
-UPDATE cat_feature_arc SET epa_default  ='UNDEFINED' WHERE epa_default  ='NOT DEFINED';
-UPDATE sys_feature_epa_type SET id  ='UNDEFINED' WHERE id  ='NOT DEFINED';
-UPDATE arc SET epa_type ='UNDEFINED' WHERE epa_type  ='NOT DEFINED';
-UPDATE node SET epa_type ='UNDEFINED' WHERE epa_type  ='NOT DEFINED';
-
-
