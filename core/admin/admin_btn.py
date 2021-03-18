@@ -2164,7 +2164,7 @@ class GwAdminButton:
                "substr(split_part(srtext, ',', 1), 9) as " + '"Description"' + " "
                "FROM public.spatial_ref_sys "
                "WHERE CAST(srid AS TEXT) LIKE '" + str(filter_value))
-        sql += "%' ORDER BY substr(srtext, 1, 6), srid"
+        sql += "%'  AND  srtext ILIKE 'PROJCS%' ORDER BY substr(srtext, 1, 6), srid"
 
         # Populate Table
         self.model_srid = QSqlQueryModel()
