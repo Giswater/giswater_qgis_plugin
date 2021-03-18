@@ -1722,7 +1722,7 @@ class GwAdminButton:
         sql = (f"SELECT schema_name, schema_name FROM information_schema.schemata " 
                f"WHERE schema_name ILIKE '%{project_name}%'ORDER BY schema_name")
         rows = tools_db.get_rows(sql, commit=False)
-        print(f"ROWS-->{rows}")
+
         available = True
         if rows is not None:
             for row in rows:
@@ -2102,14 +2102,11 @@ class GwAdminButton:
     def _populate_data_schema_name(self, widget):
         """"""
         # Get filter
-        print(f"widget --> {widget}")
         filter_ = tools_qt.get_text(self.dlg_readsql, widget)
         if filter_ in (None, 'null') and self.schema_type:
             filter_ = self.schema_type
         if filter_ is None:
-            print("TEST 10")
             return
-        print("TEST 20")
         # Populate Project data schema Name
         sql = "SELECT schema_name FROM information_schema.schemata"
         rows = tools_db.get_rows(sql)
