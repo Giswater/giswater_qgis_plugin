@@ -148,13 +148,7 @@ class GwMenuLoad(QObject):
     def _open_manage_file(self):
         """ Manage files dialog:: """
 
-        message = "Changes on this page are dangerous and can break Giswater plugin in various ways. \n" \
-                  "You will need to restart QGIS to apply changes. Do you want continue?"
-        title = "Advanced Menu"
-        answer = tools_qt.show_question(message, title)
-        if not answer:
-            return
-
+        tools_qgis.set_cursor_wait()
         self.dlg_manage_menu = GwLoadMenuUi()
 
         # Manage widgets
@@ -166,6 +160,15 @@ class GwMenuLoad(QObject):
 
         # Listeners
         self.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manage_menu))
+
+        tools_qgis.restore_cursor()
+
+        message = "Changes on this page are dangerous and can break Giswater plugin in various ways. \n" \
+                  "You will need to restart QGIS to apply changes. Do you want continue?"
+        title = "Advanced Menu"
+        answer = tools_qt.show_question(message, title)
+        if not answer:
+            return
 
         # Open dialog
         self.dlg_manage_menu.open()
