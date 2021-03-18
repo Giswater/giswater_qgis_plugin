@@ -142,7 +142,8 @@ BEGIN
 			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||');';
 		END IF;
 		--create child view
-		v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"False" }}';
+		v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, 
+		"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
 		PERFORM gw_fct_admin_manage_child_views(v_query::json);
 			
 		--insert definition into config_info_layer_x_type if its not present already
@@ -186,7 +187,7 @@ BEGIN
 					ELSE
 		
 						v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, 
-						"data":{"filterFields":{}, "pageInfo":{}, "multi_create":"False" }}';
+						"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
 						PERFORM gw_fct_admin_manage_child_views(v_query::json);
 
 						--insert definition into config_info_layer_x_type if its not present already
@@ -232,7 +233,7 @@ BEGIN
 	
 					EXECUTE 'DROP VIEW IF EXISTS '||v_schemaname||'.'||OLD.child_layer||';';
 					v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, 
-					"data":{"filterFields":{}, "pageInfo":{}, "multi_create":"False" }}';
+					"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
 					PERFORM gw_fct_admin_manage_child_views(v_query::json);
 
 					--insert definition into config_info_layer_x_type if its not present already
@@ -297,7 +298,8 @@ BEGIN
 			DELETE FROM config_form_fields where formname=OLD.child_layer AND formtype = 'form_feature';
 
 			--create child view
-			v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, "data":{"filterFields":{}, "pageInfo":{}, "multi_create":"False" }}';
+			v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"}, 
+			"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
 			PERFORM gw_fct_admin_manage_child_views(v_query::json);
 
 	
