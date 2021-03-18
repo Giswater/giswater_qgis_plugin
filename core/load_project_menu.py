@@ -30,7 +30,6 @@ class GwMenuLoad(QObject):
         self.settings = global_vars.giswater_settings
         self.plugin_dir = global_vars.plugin_dir
         self.user_folder_dir = global_vars.user_folder_dir
-        self.list_values = []
 
 
     def read_menu(self):
@@ -198,33 +197,6 @@ class GwMenuLoad(QObject):
             return
 
 
-    def _get_config_file_values(self, file_name):
-        """ Populates a variable with a list of values parsed from a configuration file. """
-
-        # Get values
-        self.list_values = []
-        values = {}
-        path = f"{self.user_folder_dir}{os.sep}config{os.sep}{file_name}"
-        project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
-        if not os.path.exists(path):
-            return None
-
-        parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
-        parser.read(path)
-        for section in parser.sections():
-            for parameter in parser[section]:
-                if parameter[0:2] in project_types and tools_gw.get_project_type() != parameter[0:2]:
-                    continue
-                value = parser[section][parameter]
-                values["Section"] = section
-                values["Parameter"] = parameter
-                values["Value"] = value.split("#")[0].strip() if value is not None and "#" in value else value
-                values["Description"] = value.split("#")[1].strip() if value is not None and "#" in value else ""
-                if value is not None:
-                    self.list_values.append(values)
-                values = {}
-
-
     def _fill_tbl_config_files(self):
         """ Fills a UI table with the local list of values variable. """
 
@@ -236,17 +208,33 @@ class GwMenuLoad(QObject):
 
         files = [f for f in os.listdir(f"{self.user_folder_dir}{os.sep}config")]
         for file in files:
-            self._get_config_file_values(file)
             item = QTreeWidgetItem([f"{file}"])
 
-            row_count = len(self.list_values)
-            for row in range(row_count):
-                item_child = QTreeWidgetItem([f"{self.list_values[row]['Section']}",
-                                              f"{self.list_values[row]['Parameter']}",
-                                              f"{self.list_values[row]['Value']}",
-                                              f"{self.list_values[row]['Description']}"])
-                # item_child.itemDoubleClicked.connect(partial(self._onDoubleClick))
-                item.addChild(item_child)
+            project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
+            parser = configparser.ConfigParser(comment_prefixes=';', allow_no_value=True)
+            parser.read(f"{self.user_folder_dir}{os.sep}config{os.sep}{file}")
+
+            # For each section we create a sub-item and add all the parameters to that sub-item
+            for section in parser.sections():
+                subitem = QTreeWidgetItem([f"{section}"])
+                item.addChild(subitem)
+                for parameter in parser[section]:
+                    if parameter[0:2] in project_types and tools_gw.get_project_type() != parameter[0:2]:
+                        continue
+                    value = parser[section][parameter]
+                    values = {}
+                    values["Section"] = ""
+                    values["Parameter"] = parameter
+                    values["Value"] = value.split("#")[0].strip() if value is not None and "#" in value else value
+                    values["Description"] = value.split("#")[1].strip() if value is not None and "#" in value else ""
+                    if value is None:
+                        values["Value"] = ""
+
+                    item_child = QTreeWidgetItem([f"{values['Section']}",
+                                                  f"{values['Parameter']}",
+                                                  f"{values['Value']}",
+                                                  f"{values['Description']}"])
+                    subitem.addChild(item_child)
 
             self.tree_config_files.addTopLevelItem(item)
 
@@ -254,8 +242,8 @@ class GwMenuLoad(QObject):
     def _set_config_value(self, item, column):
 
         if column == 2:
-            file_name = item.parent().text(0).replace(".config", "")
-            section = item.text(0)
+            file_name = item.parent().parent().text(0).replace(".config", "")
+            section = item.parent().text(0)
             parameter = item.text(1)
             value = item.text(2)
             tools_gw.set_config_parser(section, parameter, value, file_name=file_name, prefix=False, chk_user_params=False)
@@ -264,7 +252,7 @@ class GwMenuLoad(QObject):
     def _double_click_event(self, item, column):
 
         tmp = item.flags()
-        if column == 2:
+        if column == 2 and item.text(2):
             item.setFlags(tmp | Qt.ItemIsEditable)
 
 
