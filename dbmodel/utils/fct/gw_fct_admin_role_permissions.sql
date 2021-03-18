@@ -45,7 +45,7 @@ BEGIN
 	
 	v_vpn_dbuser = (SELECT value::boolean FROM config_param_system WHERE parameter='admin_vpn_permissions');
 	
-	-- Create (if not exists) roles
+	-- Create (if not exists) roles and grant permissions
 	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_basic';
 	IF v_roleexists is null THEN
 		CREATE ROLE "role_basic" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
@@ -54,42 +54,39 @@ BEGIN
 	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_om';
 	IF v_roleexists is null THEN
 		CREATE ROLE "role_om" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+		GRANT role_basic TO role_om;
 	END IF;
 
 	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_edit';
 	IF v_roleexists is null THEN
 		CREATE ROLE "role_edit" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+		GRANT role_om TO role_edit;
 	END IF;
 
 	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_epa';
 	IF v_roleexists is null THEN
 		CREATE ROLE "role_epa" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+		GRANT role_edit TO role_epa;
 	END IF;
 
 	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_master';
 	IF v_roleexists is null THEN
 		CREATE ROLE "role_master" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+		GRANT role_epa TO role_master;
 	END IF;
 
 	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_admin';
 	IF v_roleexists is null THEN
 		CREATE ROLE "role_admin" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+		GRANT role_master TO role_admin;
+		-- Grant role admin to postgres user
+		GRANT role_admin TO postgres; 	
 	END IF;
 
 	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_crm';
 	IF v_roleexists is null THEN
 		CREATE ROLE "role_crm" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
 	END IF;
-
-	-- Grant permissions
-	GRANT role_basic TO role_om;
-	GRANT role_om TO role_edit;
-	GRANT role_edit TO role_epa;
-	GRANT role_epa TO role_master;
-	GRANT role_master TO role_admin;
-
-	-- Grant role admin to postgres user
-	GRANT role_admin TO postgres; 	
 
 	-- Grant generic permissions
 	IF v_vpn_dbuser THEN
