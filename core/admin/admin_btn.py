@@ -1722,12 +1722,13 @@ class GwAdminButton:
         sql = (f"SELECT schema_name, schema_name FROM information_schema.schemata " 
                f"WHERE schema_name ILIKE '%{project_name}%'ORDER BY schema_name")
         rows = tools_db.get_rows(sql, commit=False)
-
+        print(f"ROWS-->{rows}")
         available = True
-        for row in rows:
-            if f"{project_name}" == f"{row[0]}":
-                available = False
-                break
+        if rows is not None:
+            for row in rows:
+                if f"{project_name}" == f"{row[0]}":
+                    available = False
+                    break
 
         if available: return True
 
