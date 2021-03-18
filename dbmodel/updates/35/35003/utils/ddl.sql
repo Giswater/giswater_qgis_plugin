@@ -32,3 +32,18 @@ CREATE TABLE sys_feature_epa_type
 
 DELETE FROM sys_table WHERE id  IN ('inp_arc_type', 'inp_node_type');
 INSERT INTO sys_table VALUES ('sys_feature_epa_type', 'epa types', 'role_admin', 0, null, null, null, null, null, null, null, null, 'giswater');
+
+--2021/03/18
+
+CREATE TABLE IF NOT EXISTS crm_typevalue
+( typevalue character varying(50) NOT NULL,
+  id character varying(30) NOT NULL,
+  idval character varying(100),
+  descript text,
+  addparam json,
+  CONSTRAINT crm_typevalue_pkey PRIMARY KEY (typevalue, id)
+);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer_x_data", "column":"value_type", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer_x_data", "column":"value_status", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer_x_data", "column":"value_state", "dataType":"integer", "isUtils":"False"}}$$);
