@@ -35,3 +35,4 @@ UPDATE value_state_type SET name = 'OPERATIU' WHERE name ='EN_SERVEI';
 
 --2021/03/05
 INSERT INTO sys_function VALUES (3028, 'gw_fct_getaddfeaturevalues', 'utils', 'function', 'json', 'json', 'Function that return cat_feature values', 'role_basic');
+INSERT INTO sys_function VALUES (3030, 'gw_fct_debugsql', 'utils', 'function', 'json', 'json', 'Function that allows debugging giving error information', 'role_basic');
