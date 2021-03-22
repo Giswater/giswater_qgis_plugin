@@ -1,0 +1,3 @@
+3.4.034
+************
+- Change on delete restrict by on delete cascade on cat_feature fk
