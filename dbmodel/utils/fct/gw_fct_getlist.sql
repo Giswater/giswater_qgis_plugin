@@ -454,21 +454,6 @@ BEGIN
 		v_filter_fields[v_i+1] := json_build_object('type',v_listclass,'dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	END IF;
 
-	-- getting footer buttons
-	SELECT gw_fct_getformfields(v_tablename, 'form_list_footer', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
-		INTO v_footer_fields;
-
-	FOREACH aux_json IN ARRAY v_footer_fields
-	LOOP
-		IF v_device IN (1,2,3) THEN
-			v_filter_fields[v_i+2] := json_build_object('type',aux_json->>'type','label', aux_json->>'label' ,'widgetAction',  aux_json->>'widgetAction', 'position',aux_json->>'position');
-		ELSE
-			v_filter_fields[v_i+2] := json_build_object('widgettype',aux_json->>'widgettype','label', aux_json->>'label' ,'widgetfunction',  aux_json->>'widgetfunction', 'layoutname',aux_json->>'layoutname', 'layoutorder',aux_json->>'layoutorder');
-		END IF;
-		v_i=v_i+1;
-
-	END LOOP;
-
 	-- converting to json
 	v_fields_json = array_to_json (v_filter_fields);
 	
