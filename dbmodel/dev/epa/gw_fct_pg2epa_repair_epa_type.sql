@@ -6,15 +6,16 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_repair_epa_type(p_data json)
+
+CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_repair_epatype(p_data json)
   RETURNS json AS
 $BODY$
 
 /* example
 
-SELECT SCHEMA_NAME.gw_fct_pg2epa_repair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
+SELECT ws.gw_fct_pg2epa_repair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
 
-SELECT * FROM SCHEMA_NAME.audit_check_data where fid = 214 AND criticity  > 1 order by id
+SELECT * FROM ws.audit_check_data where fid = 214 AND criticity  > 1 order by id
 
 */
 
@@ -32,7 +33,7 @@ BEGIN
 
 
 	-- Set search path to local schema
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws", public;
 	
 	--  get version
 	SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version;
@@ -63,11 +64,13 @@ BEGIN
 			IF v_affectrow > 0 THEN v_criticity = 2; ELSE v_criticity = 1; END IF;
 			INSERT INTO audit_check_data (fid,  criticity, error_message)
 			VALUES (v_fid, v_criticity, concat(rec_feature.id,': UPDATE node SET epa_type = ',quote_literal(rec_feature.epa_default),' WHERE nodecat_id = ''', rec_feature.id,''' AND state > 0 - ',v_affectrow, ' ROWS' ));
+
+			RAISE NOTICE 'rec_feature % afected row %', rec_feature, v_affectrow;
 		
 			-- insert missed features on inp tables
 			EXECUTE 'INSERT INTO '||quote_ident(rec_feature.epa_table)||' (node_id)   
 				SELECT node_id FROM node LEFT JOIN (SELECT node_id FROM '||quote_ident(rec_feature.epa_table)||' ) b USING (node_id)
-				WHERE nodecat_id = '||quote_literal(rec_feature.nodecat_id)||'  AND b.node_id IS NULL AND state >0	
+				WHERE epa_type = '||quote_literal(rec_feature.epa_default)||'  AND b.node_id IS NULL AND state >0	
 				ON CONFLICT (node_id) DO NOTHING';
 				
 			GET DIAGNOSTICS v_affectrow = row_count;
@@ -77,24 +80,25 @@ BEGIN
 
 		END LOOP;
 
-		-- delete
+		-- node's delete
 		FOR rec_feature IN 
 		SELECT DISTINCT ON (epa_default) c.*, epa_table FROM cat_feature_node c JOIN sys_feature_epa_type s ON c.epa_default = s.id
 		LOOP
 			-- delete wrong features on inp tables
-			EXECUTE 'DELETE FROM '||quote_ident(rec_feature.epa_table)||' WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = '||quote_literal(rec_feature.epa_default)||' AND state >0)';
+			EXECUTE 'DELETE FROM '||quote_ident(rec_feature.epa_table)||' WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = '||quote_literal(rec_feature.epa_default)||' AND state > 0)';
 		
 			GET DIAGNOSTICS v_affectrow = row_count;
 
 			RAISE NOTICE 'rec_feature % afected row %', rec_feature, v_affectrow;
-
-			
+		
 			IF v_affectrow > 0 THEN v_criticity = 2; ELSE v_criticity = 1; END IF;
 			INSERT INTO audit_check_data (fid,  criticity, error_message)
 			VALUES (v_fid, v_criticity, concat(rec_feature.id,': DELETE FROM ',rec_feature.epa_table,' - ',v_affectrow, ' ROWS'));
 			
 		END LOOP;
 
+
+		-- arc's insert
 		FOR rec_feature IN 
 		SELECT DISTINCT ON (cat_feature_arc.id) cat_feature_arc.*, cat_arc.id as arccat_id, epa_table FROM cat_arc JOIN cat_feature_arc ON cat_arc.arctype_id = cat_feature_arc.id 
 		JOIN cat_feature ON cat_feature_arc.id = cat_feature.id JOIN sys_feature_epa_type s ON cat_feature_arc.epa_default = s.id
@@ -116,11 +120,13 @@ BEGIN
 			IF v_affectrow > 0 THEN v_criticity = 2; ELSE v_criticity = 1; END IF;
 			INSERT INTO audit_check_data (fid,  criticity, error_message)
 			VALUES (v_fid, v_criticity, concat(rec_feature.id,': UPDATE arc SET epa_type = ',quote_literal(rec_feature.epa_default),' WHERE arccat_id = ''', rec_feature.id,''' AND state > 0 - ',v_affectrow, ' ROWS' ));
+
+			RAISE NOTICE 'rec_feature % afected row %', rec_feature, v_affectrow;
 		
 			-- insert missed features on inp tables
 			EXECUTE 'INSERT INTO '||quote_ident(rec_feature.epa_table)||' (arc_id)   
 				SELECT arc_id FROM arc LEFT JOIN (SELECT arc_id FROM '||quote_ident(rec_feature.epa_table)||' ) b USING (arc_id)
-				WHERE arccat_id = '||quote_literal(rec_feature.arccat_id)||'  AND b.arc_id IS NULL AND state >0	
+				WHERE epa_type = '||quote_literal(rec_feature.epa_default)||'  AND b.arc_id IS NULL AND state >0	
 				ON CONFLICT (arc_id) DO NOTHING';
 				
 			GET DIAGNOSTICS v_affectrow = row_count;
@@ -130,12 +136,12 @@ BEGIN
 
 		END LOOP;
 
-		-- delete
+		-- arcs's delete
 		FOR rec_feature IN 
 		SELECT DISTINCT ON (epa_default) c.*, epa_table FROM cat_feature_arc c JOIN sys_feature_epa_type s ON c.epa_default = s.id
 		LOOP
 			-- delete wrong features on inp tables
-			EXECUTE 'DELETE FROM '||quote_ident(rec_feature.epa_table)||' WHERE arc_id NOT IN (SELECT arc_id FROM arc WHERE epa_type = '||quote_literal(rec_feature.epa_default)||' AND state >0)';
+			EXECUTE 'DELETE FROM '||quote_ident(rec_feature.epa_table)||' WHERE arc_id NOT IN (SELECT arc_id FROM arc WHERE epa_type = '||quote_literal(rec_feature.epa_default)||' AND state > 0)';
 		
 			GET DIAGNOSTICS v_affectrow = row_count;
 
@@ -161,7 +167,6 @@ BEGIN
 	     
 	-- Return
 	RETURN '{"status":"Accepted"}';
-
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN

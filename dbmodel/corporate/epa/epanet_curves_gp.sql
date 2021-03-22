@@ -1,5 +1,5 @@
-SET SEARCH_PATH = 'SCHEMA_NAME';
-SELECT setval('SCHEMA_NAME.inp_curve_id_seq', (SELECT max(id) FROM inp_curve_value), true);
+SET SEARCH_PATH = 'ws';
+SELECT setval('ws.inp_curve_id_seq', (SELECT max(id) FROM inp_curve_value), true);
 
 
 INSERT INTO inp_curve VALUES ('GP20', 'PUMP', 'Pressure grup curve type for 20 wmc');
@@ -9,6 +9,8 @@ INSERT INTO inp_curve VALUES ('GP50', 'PUMP', 'Pressure grup curve type for 50 w
 INSERT INTO inp_curve VALUES ('GP60', 'PUMP', 'Pressure grup curve type for 60 wmc');
 INSERT INTO inp_curve VALUES ('GP80', 'PUMP', 'Pressure grup curve type for 80 wmc');
 INSERT INTO inp_curve VALUES ('GP100', 'PUMP', 'Pressure grup curve type for 100 wmc');
+INSERT INTO inp_curve VALUES ('GP120', 'PUMP', 'Pressure grup curve type for 120 wmc');
+INSERT INTO inp_curve VALUES ('GP150', 'PUMP', 'Pressure grup curve type for 150 wmc');
 
 INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP20',1,20.005);
 INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP20',10,20.004);
@@ -51,3 +53,15 @@ INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP100',10,100.
 INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP100',100,100.003);
 INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP100',1000,100.002);
 INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP100',10000,100.001);
+
+INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP120',1,80.005);
+INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP120',10,80.004);
+INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP120',100,80.003);
+INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP120',1000,80.002);
+INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP120',10000,80.001);
+
+INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP150',1,100.005);
+INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP150',10,100.004);
+INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP150',100,100.003);
+INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP150',1000,100.002);
+INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES ('GP150',10000,100.001);
