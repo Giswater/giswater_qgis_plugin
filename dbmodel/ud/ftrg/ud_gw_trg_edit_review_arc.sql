@@ -99,9 +99,9 @@ BEGIN
 			-- updating review_status parameter value
 			IF v_status_new=1 THEN
 				v_review_status=1;
-			ELSIF (v_tol_filter_bool is TRUE) AND (NEW.the_geom::text<>OLD.the_geom::text) THEN
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, OLD.the_geom::text) is FALSE THEN
 				v_review_status=2;
-			ELSIF (v_tol_filter_bool is TRUE) AND (NEW.the_geom::text=OLD.the_geom::text) THEN
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, OLD.the_geom::text) is TRUE THEN
 				v_review_status=3;
 			ELSIF (v_tol_filter_bool is FALSE) THEN
 				v_review_status=0;	

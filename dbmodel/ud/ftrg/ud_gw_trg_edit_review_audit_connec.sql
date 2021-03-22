@@ -51,7 +51,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF v_review_status=1 AND NEW.connec_id NOT IN (SELECT connec_id FROM connec) THEN 
 
 				INSERT INTO v_edit_connec (connec_id, y1, y2, connec_type, connecat_id, annotation, observ, expl_id, the_geom, matcat_id)
-				VALUES (NEW.connec_id, NEW.new_y1, NEW.new_y2, NEW.new_connec_type, NEW.new_connecat_id, NEW.annotation, NEW.observ, NEW.expl_id, 
+				VALUES (NEW.connec_id, NEW.new_y1, NEW.new_y2, NEW.new_connec_type, NEW.new_connecat_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id, 
 				NEW.the_geom, NEW.new_matcat_id); 
 		
 			ELSIF v_review_status=2 THEN

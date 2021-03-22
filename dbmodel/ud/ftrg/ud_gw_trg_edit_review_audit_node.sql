@@ -51,7 +51,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			
 			IF v_review_status=1 AND NEW.node_id NOT IN (SELECT node_id FROM node) THEN 
 				INSERT INTO v_edit_node (node_id, top_elev, ymax, node_type, nodecat_id, annotation, observ, expl_id, the_geom, matcat_id)
-				VALUES (NEW.node_id, NEW.new_top_elev, NEW.new_ymax, NEW.new_node_type, NEW.new_nodecat_id, NEW.annotation, NEW.observ, NEW.expl_id, 
+				VALUES (NEW.node_id, NEW.new_top_elev, NEW.new_ymax, NEW.new_node_type, NEW.new_nodecat_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id, 
 				NEW.the_geom, NEW.new_matcat_id); 
 				
 		
