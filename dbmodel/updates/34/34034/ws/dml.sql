@@ -15,4 +15,7 @@ WHERE id  = 'inp_curve';
 -- 2021/03/23
 UPDATE config_form_fields SET dv_querytext = 'SELECT macrodma_id as id, name as idval FROM macrodma WHERE macrodma_id IS NOT NULL' WHERE formname = 'new_dma';
 UPDATE config_form_fields SET widgettype = 'text' WHERE widgettype ='spinbox' and formtype  ='form_feature';
+UPDATE config_form_fields set widgetcontrols = '{"setQgisMultiline":false}' WHERE widgetcontrols IS NULL AND formtype = 'form_feature' AND widgettype = 'text';
+
+
 
