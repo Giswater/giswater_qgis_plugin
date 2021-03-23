@@ -1,0 +1,18 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+
+-- 2021/03/22
+UPDATE sys_table SET notify_action  = '[{"channel":"desktop","name":"refresh_attribute_table", "enabled":"true", "trg_fields":"id","featureType":["inp_pump_additional", "inp_curve","inp_curve_value","v_edit_inp_valve","v_edit_inp_tank","v_edit_inp_pump"]}]' 
+WHERE id  = 'inp_curve';
+
+-- 2021/03/23
+UPDATE config_form_fields SET dv_querytext = 'SELECT macrodma_id as id, name as idval FROM macrodma WHERE macrodma_id IS NOT NULL' WHERE formname = 'new_dma';
+UPDATE config_form_fields SET widgettype = 'text' WHERE widgettype ='spinbox' and formtype  ='form_feature';
+
