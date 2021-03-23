@@ -94,7 +94,7 @@ class GwMenuLoad(QObject):
         actions_menu.setIcon(config_icon)
         self.main_menu.addMenu(actions_menu)
 
-        action_set_log_sql = actions_menu.addAction(f"Enable log sql")
+        action_set_log_sql = actions_menu.addAction(f"Toggle log sql")
         log_sql_shortcut = tools_gw.get_config_parser("system", f"log_sql_shortcut", "user", "init", prefix=False)
         if not log_sql_shortcut:
             tools_gw.set_config_parser("system", f"log_sql_shortcut", f"{log_sql_shortcut}", "user", "init",
@@ -261,7 +261,7 @@ class GwMenuLoad(QObject):
 
     def _set_log_sql(self):
 
-        log_sql = tools_gw.get_config_parser("system", f"log_sql", "user", "init")
+        log_sql = tools_gw.get_config_parser("system", f"log_sql", "user", "init", get_none=True)
         if log_sql in ("False", "None"):
             message = "Variable log_sql from user config file has been enabled."
             tools_gw.set_config_parser("system", "log_sql", "True", file_name="init")
