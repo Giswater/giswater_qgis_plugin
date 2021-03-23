@@ -93,7 +93,6 @@ class GwInfo(QObject):
         self.tab_visit_loaded = False
         self.tab_event_loaded = False
         self.tab_document_loaded = False
-        self.tab_rpt_loaded = False
         self.tab_plan_loaded = False
         self.dlg_is_destroyed = False
         self.layer = None
@@ -171,7 +170,7 @@ class GwInfo(QObject):
         if function_name is None:
             return False, None
 
-        json_result = tools_gw.execute_procedure(function_name, body, rubber_band=self.rubber_band)
+        json_result = tools_gw.execute_procedure(function_name, body, rubber_band=self.rubber_band, log_sql=True)
         if json_result in (None, False):
             return False, None
 
@@ -563,11 +562,8 @@ class GwInfo(QObject):
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
             if layout is not None:
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
-                if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                if layout not in layout_list and layout.objectName() in ('lyt_data_1', 'lyt_data_2'):
                     layout_list.append(layout)
-                    # Add widgets into layout
-                    layout.addWidget(label, 0, field['layoutorder'])
-                    layout.addWidget(widget, 1, field['layoutorder'])
                 if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                     layout.addWidget(label, 0, field['layoutorder'])
                     layout.addWidget(widget, 1, field['layoutorder'])
@@ -1309,7 +1305,7 @@ class GwInfo(QObject):
             pass
 
 
-    def _set_widgets(self, dialog, complet_result, field, new_feature):
+    def _set_widgets(self, dialog, complet_result, field, new_feature, add_widget=True):
         """
         functions called in -> widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
             def _manage_text(self, **kwargs)
@@ -1345,15 +1341,18 @@ class GwInfo(QObject):
             msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
             tools_qgis.show_message(message, 2, parameter=msg)
             return label, widget
-
-        try:
-            kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature}
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        except Exception as e:
-            msg = (f"{type(e).__name__}: {e} Python function: _set_widgets. WHERE columname='{field['columnname']}' "
-                   f"AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'")
-            tools_qgis.show_message(msg, 2)
-            return label, widget
+        kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature,
+                  "add_widget": add_widget}
+        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+        # try:
+        #     kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature,
+        #               "add_widget": add_widget}
+        #     widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+        # except Exception as e:
+        #     msg = (f"{type(e).__name__}: {e} Python function: _set_widgets. WHERE columname='{field['columnname']}' "
+        #            f"AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'")
+        #     tools_qgis.show_message(msg, 2)
+        #     return label, widget
 
         return label, widget
 
@@ -1547,6 +1546,9 @@ class GwInfo(QObject):
         return widget
 
 
+    def _manage_list(self, **kwargs):
+        self._manage_tableview(**kwargs)
+
     def _manage_tableview(self, **kwargs):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
@@ -1554,7 +1556,13 @@ class GwInfo(QObject):
         complet_result = kwargs['complet_result']
         field = kwargs['field']
         dialog = kwargs['dialog']
-        widget = tools_gw.add_tableview(complet_result, field, self)
+        add_widget = kwargs['add_widget']
+        if add_widget:
+            widget = tools_gw.add_tableview(complet_result, field, self)
+        else:
+            print(f"field['widgetname']-->{field['widgetname']}")
+            widget = self.dlg_cf.findChild(QWidget, f"data_{field['widgetname']}")
+            print(f"WWW -->{widget}->{widget.objectName()}")
         widget = tools_gw.add_tableview_header(widget, field)
         widget = tools_gw.fill_tableview_rows(widget, field)
         widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
@@ -2044,9 +2052,9 @@ class GwInfo(QObject):
         elif self.tab_main.widget(index_tab).objectName() == 'tab_documents' and not self.tab_document_loaded:
             self._fill_tab_document()
             self.tab_document_loaded = True
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt' and not self.tab_rpt_loaded:
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt':
             self._fill_tab_rpt(self.complet_result, new_feature)
-            self.tab_rpt_loaded = True
+
         # Tab 'Plan'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
             self._fill_tab_plan(self.complet_result)
@@ -3188,17 +3196,35 @@ class GwInfo(QObject):
 
 
     def _fill_tab_rpt(self, complet_result, new_feature):
-
-        complet_list, widget_list = self._init_tbl_rpt(complet_result, self.dlg_cf, new_feature)
-        if complet_list is False:
-            return False
-        self._set_listeners(complet_result, self.dlg_cf, widget_list)
+        index_tab = self.tab_main.currentIndex()
+        tab_name = self.tab_main.widget(index_tab).objectName()
+        list_tables = self.tab_main.widget(index_tab).findChildren(QTableView)
+        print(f"list_tables -->{list_tables}")
+        complet_list = []
+        for table in list_tables:
+            columnname = table.property('columnname')
+            complet_list, widget_list = self._init_tbl_rpt(complet_result, self.dlg_cf, new_feature, columnname)
+            if complet_list is False:
+                return False
+            self._set_listeners(complet_result, self.dlg_cf, widget_list)
         return complet_list
 
 
-    def _init_tbl_rpt(self, complet_result, dialog, new_feature):
+    def _init_tbl_rpt(self, complet_result, dialog, new_feature, columnname):
         """ Put filter widgets into layout and set headers into QTableView """
 
+        index_tab = self.tab_main.currentIndex()
+        tab_name = self.tab_main.widget(index_tab).objectName()
+        complet_list = self._get_list(complet_result, tab_name=tab_name, columnname=columnname)
+        if complet_list is False:
+            return False, False
+        for field in complet_list['body']['data']['fields']:
+            if 'hidden' in field and field['hidden']:
+                continue
+            label, widget = self._set_widgets(dialog, complet_list, field, new_feature, False)
+        return complet_list, False
+
+        "************************************************************************"
         lyt_rpt1 = dialog.findChild(QGridLayout, "lyt_rpt1")
         self._reset_grid_layout(lyt_rpt1)
         index_tab = self.tab_main.currentIndex()
@@ -3206,6 +3232,7 @@ class GwInfo(QObject):
         complet_list = self._get_list(complet_result, tab_name=tab_name)
         if complet_list is False:
             return False, False
+
 
         # Put widgets into layout
         widget_list = []
@@ -3262,13 +3289,13 @@ class GwInfo(QObject):
                     self._filter_table, complet_result, model, dialog, widget_list))
 
 
-    def _get_list(self, complet_result, form_name='', tab_name='', filter_fields=''):
+    def _get_list(self, complet_result, form_name='', tab_name='', filter_fields='', columnname=''):
 
-        form = f'"formName":"{form_name}", "tabName":"{tab_name}"'
+        form = f'"formName":"{form_name}", "tabName":"{tab_name}", "columnname":"{columnname}"'
         id_name = complet_result['body']['feature']['idName']
         feature = f'"tableName":"{self.tablename}", "idName":"{id_name}", "id":"{self.feature_id}"'
         body = tools_gw.create_body(form, feature, filter_fields)
-        json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
+        json_result = tools_gw.execute_procedure('gw_fct_getlist', body, log_sql=True)
         if json_result is None or json_result['status'] == 'Failed':
             return False
         complet_list = json_result
@@ -3314,12 +3341,12 @@ class GwInfo(QObject):
         return filter_fields
 
 
-    def _open_rpt_result(self, widget, complet_result):
-        self._manage_rpt_result(widget, complet_result)
-
-
-    def _manage_rpt_result(self, qtable, complet_list):
-        """ Open form of selected element of the @widget?? """
+    def open_rpt_result(self, qtable, complet_list):
+        """
+        Open form of selected element of the @qtable??
+            function called in -> module = tools_gw.add_tableview(complet_result, field, module=sys.modules[__name__])
+            at line: widget.doubleClicked.connect(partial(getattr(module, function_name), widget, complet_result))
+        """
 
         # Get selected rows
         selected_list = qtable.selectionModel().selectedRows()

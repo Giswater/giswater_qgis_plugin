@@ -1011,13 +1011,16 @@ def check_parameters(field):
 
 def add_widget(dialog, field, lbl, widget):
     """ Insert widget into layout """
-
     layout = dialog.findChild(QGridLayout, field['layoutname'])
     if layout in (None, 'null', 'NULL', 'Null'):
         return
-    layout.addWidget(lbl, int(field['layoutorder']), 0)
-    layout.addWidget(widget, int(field['layoutorder']), 2)
-    layout.setColumnStretch(2, 1)
+    row = int(field['layoutorder'])
+    col = 0
+    if not isinstance(widget, QTableView):
+        layout.addWidget(lbl, row, col)
+        col = 1
+    layout.addWidget(widget, row, col)
+    layout.setColumnStretch(col, 1)
 
 
 def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
@@ -1327,9 +1330,8 @@ def add_lineedit(field):
 def add_tableview(complet_result, field, module=sys.modules[__name__]):
     """ Add widgets QTableView type.
     Function called in -> widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), widget, complet_result))
-        module = class GwInfo(QObject) -> gw_api_open_rpt_result(widget, complet_result)
+        module = class GwInfo(QObject) -> open_rpt_result(widget, complet_result)
     """
-
     widget = QTableView()
     widget.setObjectName(field['widgetname'])
     if 'columnname' in field:
@@ -1340,8 +1342,8 @@ def add_tableview(complet_result, field, module=sys.modules[__name__]):
         real_name = widget.objectName()[5:len(widget.objectName())]
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
-            function_name = f"_{field['widgetfunction']}"
-            exist = tools_os.check_python_function(sys.modules[__name__], function_name)
+            function_name = f"{field['widgetfunction']}"
+            exist = tools_os.check_python_function(module, function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
                 tools_qgis.show_message(msg, 2)
@@ -2226,7 +2228,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
 
     widget = tools_qt.get_widget(dialog, widget)
     if not widget:
-        return
+        return widget
 
     if schema_name is not None:
         config_table = f"{schema_name}.config_form_tableview"
@@ -2241,7 +2243,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
            f" ORDER BY columnindex")
     rows = tools_db.get_rows(sql, log_info=False)
     if not rows:
-        return
+        return widget
 
     for row in rows:
         if not row['visible']:
@@ -2289,14 +2291,16 @@ def add_tableview_header(widget, field):
     # Related by Qtable
     widget.setModel(model)
     widget.horizontalHeader().setStretchLastSection(True)
-
-    # Get headers
-    headers = []
-    for x in field['value'][0]:
-        headers.append(x)
-    # Set headers
-    model.setHorizontalHeaderLabels(headers)
-
+    try:
+        # Get headers
+        headers = []
+        for x in field['value'][0]:
+            headers.append(x)
+        # Set headers
+        model.setHorizontalHeaderLabels(headers)
+    except IndexError as e:
+        # if field['value'][0]
+        pass
     return widget
 
 
