@@ -288,6 +288,14 @@ class GwInfo(QObject):
         # parameters are passed to it
         self.info_layer = tools_qgis.get_layer_by_tablename(feature_cat.parent_layer)
         if self.info_layer:
+            try:
+                # The user selects a feature (for example junction) to insert, but before clicking on the canvas he
+                # realizes that he has made a mistake and selects another feature, without this try two features would
+                # be inserted. This disconnect signal avoids it
+                self.info_layer.featureAdded.disconnect(self._open_new_feature)
+            except Exception as e:
+                # If self._open_new_feature is not connected, cause an exception
+                pass
             self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
             QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
             config = self.info_layer.editFormConfig()
