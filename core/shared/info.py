@@ -1730,9 +1730,28 @@ class GwInfo(QObject):
             actions_list = dialog.findChildren(QAction)
             static_actions = ('actionEdit', 'actionCentered', 'actionZoomOut', 'actionZoom', 'actionLink', 'actionHelp',
                               'actionSection')
+
             for action in actions_list:
                 if action.objectName() not in static_actions:
                     self._enable_action(dialog, action, enabled)
+
+            # When we are inserting we want the activation of QAction to be governed by the database,
+            # when we are editing, it will govern the editing state of the layer.
+            global is_inserting
+            if not is_inserting: return
+
+            # Get index of selected tab
+            index_tab = self.tab_main.currentIndex()
+            tab_name = self.tab_main.widget(index_tab).objectName()
+
+            for tab in self.complet_result['body']['form']['visibleTabs']:
+                if tab['tabName'] == tab_name:
+                    if tab['tabactions'] is not None:
+                        for act in tab['tabactions']:
+                            action = dialog.findChild(QAction, act['actionName'])
+                            if action is not None and action.objectName() not in static_actions:
+                                action.setEnabled(not act['disabled'])
+
         except RuntimeError:
             pass
 
