@@ -1557,13 +1557,10 @@ class GwInfo(QObject):
         field = kwargs['field']
         dialog = kwargs['dialog']
         add_widget = kwargs['add_widget']
-        print(f"111 field['widgetname']-->{field['widgetname']}")
         if add_widget:
             widget = tools_gw.add_tableview(complet_result, field, self)
         else:
-            print(f"333 field['widgetname']-->{field['widgetname']}")
             widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
-            print(f"WWW -->{widget}->{widget.objectName()}")
         widget = tools_gw.add_tableview_header(widget, field)
         widget = tools_gw.fill_tableview_rows(widget, field)
         widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
@@ -3204,19 +3201,20 @@ class GwInfo(QObject):
         complet_list = []
         for table in list_tables:
             columnname = table.property('columnname')
-            complet_list, widget_list = self._init_tbl_rpt(complet_result, self.dlg_cf, new_feature, columnname)
+            widgetname = table.objectName()
+            complet_list, widget_list = self._init_tbl_rpt(complet_result, self.dlg_cf, new_feature, columnname, widgetname)
             if complet_list is False:
                 return False
             self._set_listeners(complet_result, self.dlg_cf, widget_list)
         return complet_list
 
 
-    def _init_tbl_rpt(self, complet_result, dialog, new_feature, columnname):
+    def _init_tbl_rpt(self, complet_result, dialog, new_feature, columnname, widgetname):
         """ Put filter widgets into layout and set headers into QTableView """
 
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
-        complet_list = self._get_list(complet_result, tab_name=tab_name, columnname=columnname)
+        complet_list = self._get_list(complet_result, tab_name=tab_name, columnname=columnname, widgetname=widgetname)
         if complet_list is False:
             return False, False
         for field in complet_list['body']['data']['fields']:
@@ -3290,9 +3288,9 @@ class GwInfo(QObject):
                     self._filter_table, complet_result, model, dialog, widget_list))
 
 
-    def _get_list(self, complet_result, form_name='', tab_name='', filter_fields='', columnname=''):
+    def _get_list(self, complet_result, form_name='', tab_name='', filter_fields='', columnname='', widgetname=''):
 
-        form = f'"formName":"{form_name}", "tabName":"{tab_name}", "columnname":"{columnname}"'
+        form = f'"formName":"{form_name}", "tabName":"{tab_name}", "columnname":"{columnname}", "widgetname":"{widgetname}"'
         id_name = complet_result['body']['feature']['idName']
         feature = f'"tableName":"{self.tablename}", "idName":"{id_name}", "id":"{self.feature_id}"'
         body = tools_gw.create_body(form, feature, filter_fields)
