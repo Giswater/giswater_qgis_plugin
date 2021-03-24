@@ -1557,11 +1557,12 @@ class GwInfo(QObject):
         field = kwargs['field']
         dialog = kwargs['dialog']
         add_widget = kwargs['add_widget']
+        print(f"111 field['widgetname']-->{field['widgetname']}")
         if add_widget:
             widget = tools_gw.add_tableview(complet_result, field, self)
         else:
-            print(f"field['widgetname']-->{field['widgetname']}")
-            widget = self.dlg_cf.findChild(QWidget, f"data_{field['widgetname']}")
+            print(f"333 field['widgetname']-->{field['widgetname']}")
+            widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
             print(f"WWW -->{widget}->{widget.objectName()}")
         widget = tools_gw.add_tableview_header(widget, field)
         widget = tools_gw.fill_tableview_rows(widget, field)
@@ -1635,13 +1636,12 @@ class GwInfo(QObject):
                     fields_reload = field['widgetcontrols']['autoupdateReloadFields']
 
             if field['ismandatory']:
-                widget_name = 'data_' + field['columnname']
-                widget = dialog.findChild(QWidget, widget_name)
+                widget = dialog.findChild(QWidget, field['widgetname'])
                 widget.setStyleSheet(None)
                 value = tools_qt.get_text(dialog, widget)
                 if value in ('null', None, ''):
                     widget.setStyleSheet("border: 1px solid red")
-                    list_mandatory.append(widget_name)
+                    list_mandatory.append(field['widgetname'])
 
         if list_mandatory:
             msg = "Some mandatory values are missing. Please check the widgets marked in red."
@@ -3198,6 +3198,7 @@ class GwInfo(QObject):
     def _fill_tab_rpt(self, complet_result, new_feature):
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
+        print(f"tab_name-->{tab_name}")
         list_tables = self.tab_main.widget(index_tab).findChildren(QTableView)
         print(f"list_tables -->{list_tables}")
         complet_list = []

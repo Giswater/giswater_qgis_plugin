@@ -18,10 +18,10 @@ ALTER TABLE ws_sample35.config_form_list DROP CONSTRAINT config_form_list_pkey;
 ALTER TABLE ws_sample35.config_form_list ADD COLUMN columnname varchar(30);
 UPDATE ws_sample35.config_form_list SET columnname='bmaps_columnname';
 ALTER TABLE ws_sample35.config_form_list ADD CONSTRAINT "config_form_list_pkey" PRIMARY KEY ("tablename", "device", "listtype", "columnname");
+
+ALTER TABLE ws_sample35.config_form_fields ADD COLUMN tabname varchar(30);--TODO hacer primary key
+ALTER TABLE ws_sample35.config_form_fields ADD COLUMN is_filter boolean;
+UPDATE ws_sample35.config_form_fields set tabname='data' WHERE formtype='form_feature' AND formname ILIKE 've_%_%';--TODO esto es correcto???
 INSERT INTO ws_sample35.config_form_list(tablename, query_text, device, actionfields, listtype, listclass, vdefault, columnname)
     VALUES ('ve_arc_pipe', 'SELECT * FROM ve_arc_pipe WHERE arc_id IS NOT NULL', 4, NULL, 'tab', 'tableview', '{"orderBy":"1", "orderType": "DESC"}', 'tbl_rpt');
-
-ALTER TABLE ws_sample35.config_form_fields ADD COLUMN tabname varchar(30);
-ALTER TABLE ws_sample35.config_form_fields ADD COLUMN is_filter boolean;
-
 
