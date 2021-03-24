@@ -98,8 +98,8 @@ class NotifyFunctions(ParentAction, QObject):
     def start_thread(self):
 
         self.controller.notify_is_listening = True
-        self.thread = threading.Timer(interval=1, function=self.wait_notifications)
-        self.thread.start()
+        thread = threading.Timer(interval=1, function=self.wait_notifications)
+        thread.start()
 
 
     def stop_thread(self):
@@ -121,13 +121,7 @@ class NotifyFunctions(ParentAction, QObject):
 
             # Check if any notification to process
             dao = self.controller.dao
-            status = dao.get_poll()
-            if status:
-                self.start_thread()
-            else:
-                self.conn_failed = True
-                self.stop_thread()
-                return
+            dao.get_poll()
 
             last_paiload = None
             while dao.conn.notifies:
@@ -142,7 +136,8 @@ class NotifyFunctions(ParentAction, QObject):
                         self.execute_functions(complet_result)
                     except Exception:
                         pass
-
+            thread = threading.Timer(interval=1, function=self.wait_notifications)
+            thread.start()
         except AttributeError:
             self.conn_failed = True
 
