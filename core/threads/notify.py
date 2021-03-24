@@ -95,10 +95,6 @@ class GwNotify(QObject):
 
                 self.conn_failed = False
 
-            # Initialize thread
-            thread = threading.Timer(interval=1, function=self._wait_notifications)
-            thread.start()
-
             # Check if any notification to process
             dao = global_vars.dao
             dao.get_poll()
@@ -116,6 +112,9 @@ class GwNotify(QObject):
                         self._execute_functions(complet_result)
                     except Exception:
                         pass
+            # Initialize thread
+            thread = threading.Timer(interval=1, function=self._wait_notifications)
+            thread.start()
 
         except AttributeError:
             self.conn_failed = True
