@@ -149,6 +149,9 @@ v_debug json;
 v_debug_vars json;
 
 v_columnname text;
+v_widgetname text;
+v_formtype text;
+
 BEGIN
 
 	-- Set search path to local schema
@@ -184,6 +187,8 @@ BEGIN
 	v_filter_feature := (p_data ->> 'data')::json->> 'filterFeatureField';
 	v_isattribute := (p_data ->> 'data')::json->> 'isAttribute';
 	v_columnname := (p_data ->> 'form')::json->> 'columnname';
+	v_widgetname := (p_data ->> 'form')::json->> 'widgetname';
+	v_formtype := (p_data ->> 'form')::json->> 'formtype';
 	IF v_tabname IS NULL THEN
 		v_tabname = 'data';
 	END IF;
@@ -200,10 +205,10 @@ BEGIN
 	-- setting value default for filter fields
 	IF v_filter_values::text IS NULL OR v_filter_values::text = '{}' THEN 
 	
-		v_data = '{"client":{"device":4, "infoType":1, "lang":"ES"},"data":{"formName": "'||v_tablename||'"}}';
-		
+		v_data = '{"client":{"device":4, "infoType":1, "lang":"ES"},"data":{"formName": "'||v_tablename||'", "formType": "'||v_formtype||'", "tabName": "'||v_tabname||'"}}';
+RAISE NOTICE '1111v_data----------->%',v_data;
 		SELECT gw_fct_getfiltervaluesvdef(v_data) INTO v_filter_values;
-
+RAISE NOTICE '222v_filter_values----------->%',v_filter_values;
 		RAISE NOTICE 'gw_fct_getlist - Init Values setted by default %', v_filter_values;
 
 	END IF;
@@ -212,8 +217,6 @@ BEGIN
 ----------------------------
 	IF v_isattribute THEN
 		v_attribute_filter = ' AND listtype = ''attributeTable''';
-	ELSIF v_device = 4 THEN
-		v_attribute_filter = ' AND columnname = '''||v_listtype||'''';
 	ELSE
 		v_attribute_filter = '';
 	END IF;
@@ -298,7 +301,7 @@ BEGIN
 				USING v_tablename;
 		END IF;	
 	END IF;
-
+RAISE NOTICE 'v_filter_values-----------------%',v_filter_values;
 	--  add filters (fields)
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
 	
@@ -457,11 +460,10 @@ BEGIN
 
 	-- setting new element
 	IF v_device = 4 THEN
-		v_filter_fields[v_i+1] := json_build_object('widgettype',v_listclass,'datatype','icon','columnname',v_columnname, 'widgetname', v_columnname, 'value', v_result_list);
+		v_filter_fields[v_i+1] := json_build_object('widgettype',v_listclass,'datatype','icon','columnname',v_columnname, 'widgetname', v_widgetname, 'value', v_result_list);
 	ELSE
 		v_filter_fields[v_i+1] := json_build_object('type',v_listclass,'dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	END IF;
-
 	-- getting footer buttons
 	SELECT gw_fct_getformfields(v_tablename, 'form_list_footer', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_footer_fields;
@@ -513,7 +515,8 @@ BEGIN
        
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	v_msgerr := (v_msgerr::json ->> 'MSGERR')::json;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR":' || to_json(v_msgerr) || '}')::json;
 
 END;
 $BODY$
@@ -524,3 +527,4 @@ ALTER FUNCTION ws_sample35.gw_fct_getlist(json)
 GRANT EXECUTE ON FUNCTION ws_sample35.gw_fct_getlist(json) TO public;
 GRANT EXECUTE ON FUNCTION ws_sample35.gw_fct_getlist(json) TO role_admin;
 GRANT EXECUTE ON FUNCTION ws_sample35.gw_fct_getlist(json) TO role_basic;
+ --SELECT ws_sample35.gw_fct_getlist($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"formName":"", "tabName":"tab_rpt", "columnname":"tbl_rpt", "widgetname":"rpt_tbl_rpt", "formtype":"form_feature"}, "feature":{"tableName":"ve_arc_pipe", "idName":"arc_id", "id":"2100"}, "data":{"filterFields":{}, "pageInfo":{}}}$$);

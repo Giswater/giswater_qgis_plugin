@@ -1432,10 +1432,11 @@ class GwInfo(QObject):
         dialog = kwargs['dialog']
         field = kwargs['field']
         new_feature = kwargs['new_feature']
-
+        complet_result = kwargs['complet_result']
         widget = tools_gw.add_combo(field)
         widget = tools_gw.set_widget_size(widget, field)
         widget = self._set_auto_update_combobox(field, dialog, widget, new_feature)
+        # widget = self.set_filter()
         return widget
 
 
@@ -3194,10 +3195,7 @@ class GwInfo(QObject):
 
     def _fill_tab_rpt(self, complet_result, new_feature):
         index_tab = self.tab_main.currentIndex()
-        tab_name = self.tab_main.widget(index_tab).objectName()
-        print(f"tab_name-->{tab_name}")
         list_tables = self.tab_main.widget(index_tab).findChildren(QTableView)
-        print(f"list_tables -->{list_tables}")
         complet_list = []
         for table in list_tables:
             columnname = table.property('columnname')
@@ -3205,7 +3203,7 @@ class GwInfo(QObject):
             complet_list, widget_list = self._init_tbl_rpt(complet_result, self.dlg_cf, new_feature, columnname, widgetname)
             if complet_list is False:
                 return False
-            self._set_listeners(complet_result, self.dlg_cf, widget_list)
+            # self._set_listeners(complet_result, self.dlg_cf, widget_list)
         return complet_list
 
 
@@ -3214,24 +3212,18 @@ class GwInfo(QObject):
 
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
-        complet_list = self._get_list(complet_result, tab_name=tab_name, columnname=columnname, widgetname=widgetname)
+        complet_list = self._get_list(complet_result, '', tab_name, '',columnname, widgetname, 'form_feature')
+
         if complet_list is False:
             return False, False
         for field in complet_list['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
             label, widget = self._set_widgets(dialog, complet_list, field, new_feature, False)
+
         return complet_list, False
 
         "************************************************************************"
-        lyt_rpt1 = dialog.findChild(QGridLayout, "lyt_rpt1")
-        self._reset_grid_layout(lyt_rpt1)
-        index_tab = self.tab_main.currentIndex()
-        tab_name = self.tab_main.widget(index_tab).objectName()
-        complet_list = self._get_list(complet_result, tab_name=tab_name)
-        if complet_list is False:
-            return False, False
-
 
         # Put widgets into layout
         widget_list = []
@@ -3288,9 +3280,10 @@ class GwInfo(QObject):
                     self._filter_table, complet_result, model, dialog, widget_list))
 
 
-    def _get_list(self, complet_result, form_name='', tab_name='', filter_fields='', columnname='', widgetname=''):
+    def _get_list(self, complet_result, form_name='', tab_name='', filter_fields='', columnname='', widgetname='', formtype=''):
 
-        form = f'"formName":"{form_name}", "tabName":"{tab_name}", "columnname":"{columnname}", "widgetname":"{widgetname}"'
+        form = f'"formName":"{form_name}", "tabName":"{tab_name}", "columnname":"{columnname}", ' \
+               f'"widgetname":"{widgetname}", "formtype":"{formtype}"'
         id_name = complet_result['body']['feature']['idName']
         feature = f'"tableName":"{self.tablename}", "idName":"{id_name}", "id":"{self.feature_id}"'
         body = tools_gw.create_body(form, feature, filter_fields)
