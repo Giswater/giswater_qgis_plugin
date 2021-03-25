@@ -15,7 +15,7 @@ INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', 'ope
 
 
 ALTER TABLE ws_sample35.config_form_list ADD COLUMN columnname varchar(30);
-UPDATE ws_sample35.config_form_list SET columnname = 'bmaps_column';
+UPDATE ws_sample35.config_form_list SET columnname = 'not_used';
 ALTER TABLE ws_sample35.config_form_list DROP CONSTRAINT config_form_list_pkey;
 ALTER TABLE ws_sample35.config_form_list ADD CONSTRAINT "config_form_list_pkey" PRIMARY KEY ("tablename", "device", "listtype", "columnname");
 ALTER TABLE config_form_list DROP COLUMN actionfields;
