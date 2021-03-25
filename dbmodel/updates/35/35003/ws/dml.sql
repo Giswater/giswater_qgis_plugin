@@ -16,3 +16,9 @@ UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM sys_fe
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM sys_feature_epa_type WHERE active AND feature_type = ''NODE'''  WHERE columnname = 'epa_type' AND formname like '%_node%';
 
 DELETE FROM sys_table WHERE id = 'inp_rules_controls_importinp';
+
+UPDATE cat_feature_node SET epa_default  ='UNDEFINED' WHERE epa_default  ='NOT DEFINED';
+UPDATE cat_feature_arc SET epa_default  ='UNDEFINED' WHERE epa_default  ='NOT DEFINED';
+UPDATE sys_feature_epa_type SET id  ='UNDEFINED' WHERE id  ='NOT DEFINED';
+UPDATE arc SET epa_type ='UNDEFINED' WHERE epa_type  ='NOT DEFINED';
+UPDATE node SET epa_type ='UNDEFINED' WHERE epa_type  ='NOT DEFINED';

@@ -114,3 +114,13 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_addf
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sys_table", "column":"sys_roleselect_id"}}$$);
 
 ALTER TABLE IF EXISTS om_visit_parameter_index RENAME TO _om_visit_parameter_index_;
+
+CREATE TABLE sys_feature_epa_type
+(
+  id character varying(30) NOT NULL,
+  feature_type character varying(30),
+  epa_table character varying(50),
+  descript text,
+  active boolean,
+  CONSTRAINT sys_feature_inp_pkey PRIMARY KEY (id, feature_type)
+  );

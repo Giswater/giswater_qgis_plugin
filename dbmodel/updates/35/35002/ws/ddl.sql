@@ -25,3 +25,5 @@ ALTER TABLE macrodqa ALTER COLUMN active SET DEFAULT TRUE;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 ALTER TABLE presszone ALTER COLUMN active SET DEFAULT TRUE;
 
+ALTER TABLE inp_arc_type ADD COLUMN epa_table character varying(30);
+ALTER TABLE inp_node_type ADD COLUMN epa_table character varying(30);
