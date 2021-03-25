@@ -17,7 +17,6 @@ DECLARE
 	v_rev_arc_y2_tol double precision;
 	v_tol_filter_bool boolean;
 	v_review_status smallint;
-	v_status_new integer;
 	rec_arc record;
 
 
@@ -30,7 +29,7 @@ BEGIN
 	v_rev_arc_y2_tol :=(SELECT value::json->>'y2' FROM config_param_system WHERE parameter = 'edit_review_arc_tolerance');		
 
 	--getting original values
-	SELECT arc_id,y1,y2,arc_type, arccat_id, arc.matcat_id, annotation, observ, shape, geom1, geom2, the_geom, expl_id INTO rec_arc 
+	SELECT arc_id,y1,y2,arc.arc_type, arccat_id, arc.matcat_id, annotation, observ, shape, geom1, geom2, the_geom, expl_id INTO rec_arc 
 	FROM arc JOIN cat_arc ON cat_arc.id=arc.arccat_id WHERE arc_id=NEW.arc_id;
 	
 
@@ -77,8 +76,6 @@ BEGIN
 		UPDATE review_arc SET y1=NEW.y1, y2=NEW.y2, arc_type=NEW.arc_type, matcat_id=NEW.matcat_id, arccat_id=NEW.arccat_id,
 		annotation=NEW.annotation, observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE arc_id=NEW.arc_id;
-
-		SELECT review_status_id INTO v_status_new FROM review_audit_arc WHERE arc_id=NEW.arc_id;
 		
 		--looking for insert/update/delete values on audit table
 		IF 	abs(rec_arc.y1-NEW.y1)>v_rev_arc_y1_tol OR  (rec_arc.y1 IS NULL AND NEW.y1 IS NOT NULL) OR
@@ -97,12 +94,16 @@ BEGIN
 		IF (NEW.field_checked is TRUE) THEN
 			
 			-- updating review_status parameter value
-			IF v_status_new=1 THEN
+			-- new element, re-updated after its insert
+			IF (SELECT count(arc_id) FROM arc WHERE arc_id=NEW.arc_id)=0 THEN
 				v_review_status=1;
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, OLD.the_geom::text) is FALSE THEN
-				v_review_status=2;
+			-- only data changes
 			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, OLD.the_geom::text) is TRUE THEN
 				v_review_status=3;
+			-- geometry changes	
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, OLD.the_geom::text) is FALSE THEN
+				v_review_status=2;
+			-- changes under tolerance
 			ELSIF (v_tol_filter_bool is FALSE) THEN
 				v_review_status=0;	
 			END IF;

@@ -15,7 +15,6 @@ DECLARE
 	v_rev_node_ymax_tol double precision;
 	v_tol_filter_bool boolean;
 	v_review_status smallint;
-	v_status_new integer;
 
 	rec_node record;
 
@@ -72,13 +71,10 @@ BEGIN
 		RETURN NEW;
 	
     ELSIF TG_OP = 'UPDATE' THEN
-	
 		-- update values on review table
 		UPDATE review_node SET top_elev=NEW.top_elev, ymax=NEW.ymax, node_type=NEW.node_type, matcat_id=NEW.matcat_id, nodecat_id=NEW.nodecat_id,
 		 annotation=NEW.annotation, observ=NEW.observ, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE node_id=NEW.node_id;
-
-		SELECT review_status_id INTO v_status_new FROM review_audit_node WHERE node_id=NEW.node_id;
 		
 		--looking for insert/update/delete values on audit table
 		IF 	abs(rec_node.top_elev-NEW.top_elev)>v_rev_node_top_elev_tol OR  (rec_node.top_elev IS NULL AND NEW.top_elev IS NOT NULL) OR
@@ -97,12 +93,16 @@ BEGIN
 		IF (NEW.field_checked is TRUE) THEN
 			
 			-- updating review_status parameter value
-			IF v_status_new=1 THEN
+			-- new element, re-updated after its insert
+			IF (SELECT count(node_id) FROM node WHERE node_id=NEW.node_id)=0 THEN
 				v_review_status=1;
-			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, OLD.the_geom::text) is FALSE THEN
-				v_review_status=2;
+			-- only data changes
 			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, OLD.the_geom::text) is TRUE THEN
 				v_review_status=3;
+			-- geometry changes	
+			ELSIF (v_tol_filter_bool is TRUE) AND ST_OrderingEquals(NEW.the_geom::text, OLD.the_geom::text) is FALSE THEN
+				v_review_status=2;
+			-- changes under tolerance
 			ELSIF (v_tol_filter_bool is FALSE) THEN
 				v_review_status=0;	
 			END IF;
