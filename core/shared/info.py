@@ -781,7 +781,7 @@ class GwInfo(QObject):
         tools_gw.draw_by_json(complet_result, self.rubber_band, None, False)
 
         # Store user snapping configuration
-        self.previous_snapping = self.snapper_manager.get_snapping_options
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
         global_vars.iface.setActiveLayer(self.layer_node)
@@ -983,7 +983,7 @@ class GwInfo(QObject):
         self.feature_type = feature_type
 
         # Store user snapping configuration
-        self.previous_snapping = self.snapper_manager.get_snapping_options
+        self.previous_snapping = self.snapper_manager.get_snapping_options()
 
         # Clear snapping
         self.snapper_manager.set_snapping_status()
