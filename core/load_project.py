@@ -161,6 +161,7 @@ class GwLoadProject(QObject):
         global_vars.user_level['level'] = tools_gw.check_config_settings('system', 'user_level', '1', comment=comment)
         global_vars.user_level['showquestion'] = tools_gw.check_config_settings('user_level', 'showquestion', '1,2,3')
         global_vars.user_level['showsnapmessage'] = tools_gw.check_config_settings('user_level', 'showsnapmessage', '1,2,3')
+        global_vars.user_level['showselectmessage'] = tools_gw.check_config_settings('user_level', 'showselectmessage', '1,2,3')
 
 
     def _check_project(self, show_warning):

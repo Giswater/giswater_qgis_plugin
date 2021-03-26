@@ -33,7 +33,8 @@ notify = None                           # An instance of GwNotify
 user_level = {                          # An instance used to know user level and user level configuration
     'level': None,                      # initial=1, normal=2, expert=3
     'showquestion': None,               # Used for show help (default config show for level 1 and 2)
-    'showsnapmessage': None}            # Used to indicate to the user that they can snapping
+    'showsnapmessage': None,            # Used to indicate to the user that they can snapping
+    'showselectmessage': None}          # Used to indicate to the user that they can select
 project_vars = {}                       # An instance of project variables from QgsProject relating to Giswater
 project_vars['info_type'] = None        # gwInfoType
 project_vars['add_schema'] = None       # gwAddSchema

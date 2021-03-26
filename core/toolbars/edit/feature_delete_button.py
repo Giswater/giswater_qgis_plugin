@@ -13,6 +13,7 @@ from qgis.PyQt.QtWidgets import QCompleter
 from ..dialog import GwAction
 from ...ui.ui_manager import GwFeatureDeleteUi
 from ...utils import tools_gw
+from .... import global_vars
 from ....lib import tools_qgis, tools_qt, tools_db
 
 
@@ -171,6 +172,11 @@ class GwFeatureDeleteButton(GwAction):
         """ Set canvas map tool to an instance of class 'GwSelectManager' """
 
         tools_qgis.disconnect_signal_selection_changed()
+        if global_vars.user_level['level'] not in (None, 'None'):
+            if global_vars.user_level['level'] in global_vars.user_level['showselectmessage']:
+                feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+                msg = 'Select '
+                tools_qgis.show_info(msg, 1, parameter=feature_type)
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed()
 
