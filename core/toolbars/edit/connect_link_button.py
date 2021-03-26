@@ -107,7 +107,6 @@ class GwConnectLinkButton(GwMaptool):
                 self.rubber_band.reset()
 
         elif event.button() == Qt.RightButton:
-
             # Check selected records
             number_features = 0
             layer = tools_qgis.get_layer_by_tablename('v_edit_connec')
@@ -138,6 +137,9 @@ class GwConnectLinkButton(GwMaptool):
                         self._link_selected_features('gully', layer)
                         self.cancel_map_tool()
 
+            if number_features == 0:
+                self.cancel_map_tool()
+
         # Force reload dataProvider of layer
         tools_qgis.set_layer_index('v_edit_link')
         tools_qgis.set_layer_index('v_edit_vnode')
@@ -159,7 +161,7 @@ class GwConnectLinkButton(GwMaptool):
         self.snapper_manager.set_snapping_status()
 
         # Set snapping to 'connec' and 'gully'
-        msg = 'Snapp to connec' if tools_gw.get_project_type() == 'ws' else 'Snapp to connec, node or gully'
+        msg = 'Select connec' if tools_gw.get_project_type() == 'ws' else 'Select connec or gully'
         self.snapper_manager.config_snap_to_connec(False)
         self.snapper_manager.config_snap_to_gully(f'{msg}')
 
@@ -206,6 +208,7 @@ class GwConnectLinkButton(GwMaptool):
             body = tools_gw.create_body(feature=feature_id, extras=extras)
             # Execute SQL function and show result to the user
             result = tools_gw.execute_procedure('gw_fct_setlinktonetwork', body)
+            print(f"result -->{result}")
             if result:
                 self.dlg_dtext = GwDialogTextUi('connect_to_network')
                 tools_gw.load_settings(self.dlg_dtext)
