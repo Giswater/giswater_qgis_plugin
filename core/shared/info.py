@@ -1432,11 +1432,9 @@ class GwInfo(QObject):
         dialog = kwargs['dialog']
         field = kwargs['field']
         new_feature = kwargs['new_feature']
-        complet_result = kwargs['complet_result']
         widget = tools_gw.add_combo(field)
         widget = tools_gw.set_widget_size(widget, field)
         widget = self._set_auto_update_combobox(field, dialog, widget, new_feature)
-        # widget = self.set_filter()
         return widget
 
 
@@ -3203,7 +3201,7 @@ class GwInfo(QObject):
             complet_list, widget_list = self._init_tbl_rpt(complet_result, self.dlg_cf, new_feature, columnname, widgetname)
             if complet_list is False:
                 return False
-            # self._set_listeners(complet_result, self.dlg_cf, widget_list)
+            self._set_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname)
         return complet_list
 
 
@@ -3216,14 +3214,17 @@ class GwInfo(QObject):
 
         if complet_list is False:
             return False, False
+
         for field in complet_list['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
             label, widget = self._set_widgets(dialog, complet_list, field, new_feature, False)
+        widget_list = []
+        widget_list.extend(self.tab_main.widget(index_tab).findChildren(QComboBox, QRegExp(f"{tab_name}_")))
+        widget_list.extend(self.tab_main.widget(index_tab).findChildren(QTableView, QRegExp(f"{tab_name}_")))
+        return complet_list, widget_list
 
-        return complet_list, False
-
-        "************************************************************************"
+        "***********************OLD CODE ************************************"
 
         # Put widgets into layout
         widget_list = []
@@ -3266,7 +3267,7 @@ class GwInfo(QObject):
                 child.deleteLater()
 
 
-    def _set_listeners(self, complet_result, dialog, widget_list):
+    def _set_listeners(self, complet_result, dialog, widget_list, columnname, widgetname):
 
         model = None
         for widget in widget_list:
@@ -3274,10 +3275,11 @@ class GwInfo(QObject):
                 model = widget.model()
         for widget in widget_list:
             if type(widget) is QLineEdit:
-                widget.editingFinished.connect(partial(self._filter_table, complet_result, model, dialog, widget_list))
+
+                widget.editingFinished.connect(partial(self._filter_table, complet_result, model, dialog, widget_list, columnname, widgetname))
             elif type(widget) is QComboBox:
                 widget.currentIndexChanged.connect(partial(
-                    self._filter_table, complet_result, model, dialog, widget_list))
+                    self._filter_table, complet_result, model, dialog, widget_list, columnname, widgetname))
 
 
     def _get_list(self, complet_result, form_name='', tab_name='', filter_fields='', columnname='', widgetname='', formtype=''):
@@ -3297,12 +3299,12 @@ class GwInfo(QObject):
         return complet_list
 
 
-    def _filter_table(self, complet_result, standar_model, dialog, widget_list):
+    def _filter_table(self, complet_result, standar_model, dialog, widget_list, columnname, widgetname):
 
         filter_fields = self._get_filter_qtableview(standar_model, dialog, widget_list)
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
-        complet_list = self._get_list(complet_result, tab_name=tab_name, filter_fields=filter_fields)
+        complet_list = self._get_list(complet_result, '', tab_name, filter_fields, columnname, widgetname, 'form_feature')
         if complet_list is False:
             return False
 
@@ -3323,7 +3325,10 @@ class GwInfo(QObject):
         for widget in widget_list:
             if type(widget) != QTableView:
                 columnname = widget.property('columnname')
-                text = tools_qt.get_text(dialog, widget)
+                if type(widget) == QComboBox:
+                    text = tools_qt.get_combo_value(dialog, widget, 0)
+                else:
+                    text = tools_qt.get_text(dialog, widget)
                 if text != "null":
                     filter_fields += f'"{columnname}":"{text}", '
 
