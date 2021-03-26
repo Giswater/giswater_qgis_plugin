@@ -276,10 +276,12 @@ class GwInfo(QObject):
         self.snapper_manager.store_snapping_options()
 
         # Set snapping to 'node', 'connec' and 'gully'
-        self.snapper_manager.config_snap_to_arc()
-        self.snapper_manager.config_snap_to_node()
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
+        msg = 'Snapp to arc, connec or node'
+        if tools_gw.get_project_type() == 'ud': msg = 'Snapp to arc, connec, node or gully'
+        self.snapper_manager.config_snap_to_arc(False)
+        self.snapper_manager.config_snap_to_node(False)
+        self.snapper_manager.config_snap_to_connec(False)
+        self.snapper_manager.config_snap_to_gully(f'{msg}')
         self.snapper_manager.set_snap_mode()
         self.iface.actionAddFeature().toggled.connect(self._action_is_checked)
 
@@ -784,6 +786,7 @@ class GwInfo(QObject):
         self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
         global_vars.iface.setActiveLayer(self.layer_node)
 
+        self.snapper_manager.show_snap_message(True, self.layer_node.name())
         global_vars.canvas.xyCoordinates.connect(partial(self._mouse_move))
         ep.canvasClicked.connect(partial(self._snapping_node, ep, dlg_dtext, rb_interpolate))
 

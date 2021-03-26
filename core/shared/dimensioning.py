@@ -229,9 +229,11 @@ class GwDimensioning:
         self.previous_snapping = self.snapper_manager.get_snapping_options()
         self.snapper_manager.set_snapping_status()
         self.snapper_manager.set_snapping_layers()
-        self.snapper_manager.config_snap_to_node()
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
+
+        msg = 'Snapp to connec or node' if tools_gw.get_project_type() == 'ws' else msg = 'Snapp to connec, node or gully'
+        self.snapper_manager.config_snap_to_node(False)
+        self.snapper_manager.config_snap_to_connec(False)
+        self.snapper_manager.config_snap_to_gully(f'{msg}')
         self.snapper_manager.set_snap_mode()
 
         self.dlg_dim.actionOrientation.setChecked(False)
@@ -330,9 +332,11 @@ class GwDimensioning:
         self.previous_snapping = self.snapper_manager.get_snapping_options()
         self.snapper_manager.set_snapping_status()
         self.snapper_manager.set_snapping_layers()
-        self.snapper_manager.config_snap_to_node()
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
+
+        msg = 'Snapp to connec or node' if tools_gw.get_project_type() == 'ws' else msg = 'Snapp to connec, node or gully'
+        self.snapper_manager.config_snap_to_node(False)
+        self.snapper_manager.config_snap_to_connec(False)
+        self.snapper_manager.config_snap_to_gully(f'{msg}')
         self.snapper_manager.set_snap_mode()
 
         self.dlg_dim.actionSnapping.setChecked(False)

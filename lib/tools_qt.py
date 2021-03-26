@@ -934,7 +934,7 @@ def show_question(text, title=None, inf_text=None, context_name=None, parameter=
 
     # Expert mode does not ask and accept all actions
     if global_vars.user_level['level'] not in (None, 'None'):
-        if global_vars.user_level['level'] not in global_vars.user_level['show_question']:
+        if global_vars.user_level['level'] not in global_vars.user_level['showquestion']:
             return True
 
     msg_box = QMessageBox()

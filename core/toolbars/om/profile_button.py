@@ -301,6 +301,7 @@ class GwProfileButton(GwAction):
         self.canvas.setMapTool(self.emit_point)
         self.snapper = self.snapper_manager.get_snapper()
         self.iface.setActiveLayer(self.layer_node)
+        self.snapper_manager.show_snap_message(True, self.layer_node.name())
         self.canvas.xyCoordinates.connect(self._mouse_move)
         self.emit_point.canvasClicked.connect(partial(self._snapping_node))
 

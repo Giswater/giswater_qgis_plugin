@@ -159,8 +159,9 @@ class GwConnectLinkButton(GwMaptool):
         self.snapper_manager.set_snapping_status()
 
         # Set snapping to 'connec' and 'gully'
-        self.snapper_manager.config_snap_to_connec()
-        self.snapper_manager.config_snap_to_gully()
+        msg = 'Snapp to connec' if tools_gw.get_project_type() == 'ws' else msg = 'Snapp to connec, node or gully'
+        self.snapper_manager.config_snap_to_connec(False)
+        self.snapper_manager.config_snap_to_gully(f'{msg}')
 
         # Change cursor
         cursor = tools_gw.get_cursor_multiple_selection()

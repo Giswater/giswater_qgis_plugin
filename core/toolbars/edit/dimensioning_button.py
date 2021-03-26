@@ -9,6 +9,7 @@ from qgis.PyQt.QtCore import QSettings, Qt
 
 from ..maptool import GwMaptool
 from ...shared.dimensioning import GwDimensioning
+from ...utils import tools_gw
 from ....lib import tools_qt, tools_qgis
 
 
@@ -60,11 +61,11 @@ class GwDimensioningButton(GwMaptool):
 
             # Implement the Add Feature button
             self.iface.actionAddFeature().trigger()
-
-            self.snapper_manager.config_snap_to_arc()
-            self.snapper_manager.config_snap_to_connec()
-            self.snapper_manager.config_snap_to_gully()
-            self.snapper_manager.config_snap_to_node()
+            msg = 'Snapp to arc or connec' if tools_gw.get_project_type() == 'ws' else msg = 'Snapp to arc, connec or gully'
+            self.snapper_manager.config_snap_to_arc(False)
+            self.snapper_manager.config_snap_to_connec(False)
+            self.snapper_manager.config_snap_to_gully(False)
+            self.snapper_manager.config_snap_to_node(f'{msg}')
             self.snapper_manager.set_snap_mode()
 
             # Manage new tool

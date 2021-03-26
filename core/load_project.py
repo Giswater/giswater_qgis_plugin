@@ -157,9 +157,10 @@ class GwLoadProject(QObject):
 
     def _get_user_level_variables(self):
         """ Get config related with user_level variables """
-
-        global_vars.user_level['level'] = tools_gw.check_config_settings('system', 'user_level', '2')
-        global_vars.user_level['show_question'] = tools_gw.check_config_settings('user_level', 'show_question', '1,2')
+        comment = f"initial=1, normal=2, expert=3, u can config some parameters in [user_level] section"
+        global_vars.user_level['level'] = tools_gw.check_config_settings('system', 'user_level', '1', comment=comment)
+        global_vars.user_level['showquestion'] = tools_gw.check_config_settings('user_level', 'showquestion', '1,2,3')
+        global_vars.user_level['showsnapmessage'] = tools_gw.check_config_settings('user_level', 'showsnapmessage', '1,2,3')
 
 
     def _check_project(self, show_warning):

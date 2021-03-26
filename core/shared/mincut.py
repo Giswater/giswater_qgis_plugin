@@ -723,6 +723,8 @@ class GwMincut:
         # Vertex marker
         self.vertex_marker = self.snapper_manager.vertex_marker
 
+        self.snapper_manager.show_snap_message(True, 'arc')
+
         # Activate snapping of node and arcs
         self.canvas.xyCoordinates.connect(self._mouse_move_node_arc)
         self.emit_point.canvasClicked.connect(self._snapping_node_arc_real_location)
@@ -1667,6 +1669,8 @@ class GwMincut:
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
+        self.snapper_manager.show_snap_message(True, 'arc')
+
         # Set signals
         self.canvas.xyCoordinates.connect(self._mouse_move_node_arc)
         self.emit_point.canvasClicked.connect(self._auto_mincut_snapping)
@@ -1929,6 +1933,8 @@ class GwMincut:
         self.layer = tools_qgis.get_layer_by_tablename("v_om_mincut_valve")
         self.iface.setActiveLayer(self.layer)
         self.current_layer = self.layer
+
+        self.snapper_manager.show_snap_message(True, self.layer.name())
 
         # Waiting for signals
         self.canvas.xyCoordinates.connect(self._mouse_move_valve)
@@ -2289,6 +2295,8 @@ class GwMincut:
         self.layer = tools_qgis.get_layer_by_tablename("v_edit_node")
         self.iface.setActiveLayer(self.layer)
         self.current_layer = self.layer
+
+        self.snapper_manager.show_snap_message(True, 'valve')
 
         # Waiting for signals
         self.canvas.xyCoordinates.connect(self._mouse_move_valve)

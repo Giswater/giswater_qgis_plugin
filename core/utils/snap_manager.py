@@ -98,8 +98,10 @@ class GwSnapManager(object):
             QgsProject.instance().snappingConfigChanged.emit(snapping_options)
 
 
-    def config_snap_to_arc(self):
+    def config_snap_to_arc(self, msg=True):
         """ Set snapping to 'arc' """
+
+        self.show_snap_message(msg, 'arc')
 
         QgsProject.instance().blockSignals(True)
         self.set_snapping_layers()
@@ -114,8 +116,10 @@ class GwSnapManager(object):
         self.restore_snap_options(self.snapping_config)
 
 
-    def config_snap_to_node(self):
+    def config_snap_to_node(self, msg=True):
         """ Set snapping to 'node' """
+
+        self.show_snap_message(msg, 'node')
 
         QgsProject.instance().blockSignals(True)
         layer_settings = self.config_snap_to_layer(self.layer_node, QgsPointLocator.Vertex, True)
@@ -129,8 +133,10 @@ class GwSnapManager(object):
         self.restore_snap_options(self.snapping_config)
 
 
-    def config_snap_to_connec(self):
+    def config_snap_to_connec(self, msg=True):
         """ Set snapping to 'connec' """
+
+        self.show_snap_message(msg, 'connec')
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
@@ -145,8 +151,10 @@ class GwSnapManager(object):
         self.restore_snap_options(self.snapping_config)
 
 
-    def config_snap_to_gully(self):
+    def config_snap_to_gully(self, msg=True):
         """ Set snapping to 'gully' """
+
+        self.show_snap_message(msg, 'gully')
 
         QgsProject.instance().blockSignals(True)
         snapping_config = self.get_snapping_options()
@@ -360,6 +368,16 @@ class GwSnapManager(object):
         vertex_marker.setPenWidth(pen_width)
 
 
+    def show_snap_message(self, msg, feature_type):
+        if global_vars.user_level['level'] not in (None, 'None'):
+            if global_vars.user_level['level'] in global_vars.user_level['showsnapmessage']:
+                if msg is True:
+                    msg = f'Snapp to {feature_type}'
+                    tools_qgis.show_info(msg, 0)
+                elif type(msg) is str:
+                    tools_qgis.show_info(msg, 0)
+
+
     # region private functions
 
 
@@ -399,5 +417,6 @@ class GwSnapManager(object):
 
         layer = result.layer()
         layer.select([feature_id])
+
 
     # endregion
