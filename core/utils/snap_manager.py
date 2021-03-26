@@ -360,7 +360,7 @@ class GwSnapManager(object):
         icons = {0: QgsVertexMarker.ICON_NONE, 1: QgsVertexMarker.ICON_CROSS, 2: QgsVertexMarker.ICON_X,
                  3: QgsVertexMarker.ICON_BOX, 4: QgsVertexMarker.ICON_CIRCLE}
         colors = {0: QColor(255, 100, 255), 1: QColor(0, 255, 0), 2: QColor(0, 255, 0),
-                 3: QColor(255, 0, 0), 4: QColor(0, 0, 255)}
+                  3: QColor(255, 0, 0), 4: QColor(0, 0, 255)}
         
         vertex_marker.setIconType(icons[icon_type])
         vertex_marker.setColor(colors[color_type])
@@ -373,9 +373,9 @@ class GwSnapManager(object):
             if global_vars.user_level['level'] in global_vars.user_level['showsnapmessage']:
                 if msg is True:
                     msg = f'Snapp to {feature_type}'
-                    tools_qgis.show_info(msg, 0)
+                    tools_qgis.show_info(msg, 1)
                 elif type(msg) is str:
-                    tools_qgis.show_info(msg, 0)
+                    tools_qgis.show_info(msg, 1)
 
 
     # region private functions
