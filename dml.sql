@@ -13,20 +13,6 @@ INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_rp
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_rpt_3', 'lyt_rpt_3','lytRpt3');
 INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', 'open_rpt_result', 'open_rpt_result','openRptResult');
 
-
-ALTER TABLE ws_sample35.config_form_list ADD COLUMN columnname varchar(30);
-UPDATE ws_sample35.config_form_list SET columnname = 'not_used';
-ALTER TABLE ws_sample35.config_form_list DROP CONSTRAINT config_form_list_pkey;
-ALTER TABLE ws_sample35.config_form_list ADD CONSTRAINT "config_form_list_pkey" PRIMARY KEY ("tablename", "device", "listtype", "columnname");
-ALTER TABLE config_form_list DROP COLUMN actionfields;
-
-ALTER TABLE ws_sample35.config_form_fields ADD COLUMN isfilter boolean;
-ALTER TABLE ws_sample35.config_form_fields ADD COLUMN tabname varchar(30);
-UPDATE ws_sample35.config_form_fields SET tabname = 'main';
-UPDATE ws_sample35.config_form_fields set tabname = 'data' WHERE formtype = 'form_feature' AND formname ILIKE 've_%_%';
-ALTER TABLE ws_sample35.config_form_fields DROP CONSTRAINT config_form_fields_pkey;
-ADD CONSTRAINT config_form_fields_pkey PRIMARY KEY(formname, formtype, columnname, tabname);
-
 INSERT INTO ws_sample35.config_form_list(tablename, query_text, device, actionfields, listtype, listclass, vdefault, columnname)
     VALUES ('ve_arc_pipe', 'SELECT * FROM ve_arc_pipe WHERE arc_id IS NOT NULL', 4, NULL, 'tab', 'tableview', '{"orderBy":"1", "orderType": "DESC"}', 'tbl_rpt');
 
