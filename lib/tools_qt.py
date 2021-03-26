@@ -932,6 +932,11 @@ def show_warning_open_file(text, inf_text, file_path, context_name=None):
 def show_question(text, title=None, inf_text=None, context_name=None, parameter=None):
     """ Ask question to the user """
 
+    # Expert mode does not ask and accept all actions
+    if global_vars.user_level['level'] not in (None, 'None'):
+        if global_vars.user_level['level'] not in global_vars.user_level['show_question']:
+            return True
+
     msg_box = QMessageBox()
     msg = tr(text, context_name)
     if parameter:

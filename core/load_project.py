@@ -73,6 +73,7 @@ class GwLoadProject(QObject):
                   f' duration option'
         value = tools_gw.check_config_settings('system', 'show_message_durations', 'None', comment=comment)
         tools_qgis.user_parameters['show_message_durations'] = value
+        self._get_user_level_variables()
 
         # Log values of system user parameters located in 'giswater.config'
         for parameter, value in tools_qgis.user_parameters.items():
@@ -152,7 +153,15 @@ class GwLoadProject(QObject):
 
 
     # region private functions
-    
+
+
+    def _get_user_level_variables(self):
+        """ Get config related with user_level variables """
+
+        global_vars.user_level['level'] = tools_gw.check_config_settings('system', 'user_level', '2')
+        global_vars.user_level['show_question'] = tools_gw.check_config_settings('user_level', 'show_question', '1,2')
+
+
     def _check_project(self, show_warning):
         """ Check if loaded project is valid for Giswater """
 
