@@ -67,7 +67,7 @@ BEGIN
 		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 
 		-- setup graf closing proposable valves
-		UPDATE temp_anlgraf SET flag=1
+		UPDATE temp_anlgraf SET flag = 1
 		FROM om_mincut_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE))
 		AND (temp_anlgraf.node_1 = om_mincut_valve.node_id OR temp_anlgraf.node_2 = om_mincut_valve.node_id);
 		
@@ -91,18 +91,30 @@ BEGIN
 		
 	ELSIF v_mincutstep = 2 THEN 
 
-		-- setup graf reset water flag
-		UPDATE temp_anlgraf SET water=0;
+		-- setup graf reset water and flag
+		UPDATE temp_anlgraf SET water=0, flag=0;
 
-		-- setup graf opening proposable valves closed on step1
-		UPDATE temp_anlgraf SET flag=0
-		FROM om_mincut_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE))
-		AND (temp_anlgraf.node_1 = om_mincut_valve.node_id OR temp_anlgraf.node_2 = om_mincut_valve.node_id);
-
-		-- setup graf closing only with proposed valves defined on step1
-		UPDATE temp_anlgraf SET flag=2
+		-- setup graf closing only proposed valves closed on step1
+		UPDATE temp_anlgraf SET flag = 1
 		FROM om_mincut_valve WHERE result_id=v_mincutid AND proposed = TRUE
 		AND (temp_anlgraf.node_1 = om_mincut_valve.node_id OR temp_anlgraf.node_2 = om_mincut_valve.node_id);
+
+		-- setup graf closing check-valves
+		UPDATE temp_anlgraf SET flag = 1 
+		FROM config_mincut_checkvalve c 
+		WHERE (temp_anlgraf.node_1 = c.node_id OR temp_anlgraf.node_2 = c.node_id);
+
+		-- setup graf closing closed valves
+		UPDATE temp_anlgraf SET flag = 1
+		FROM om_mincut_valve WHERE result_id=v_mincutid AND closed=TRUE 
+		AND (temp_anlgraf.node_1 = om_mincut_valve.node_id OR temp_anlgraf.node_2 = om_mincut_valve.node_id);
+
+		-- setup graf closing tank's inlet
+		UPDATE temp_anlgraf SET flag = 1
+		FROM config_mincut_inlet 
+		WHERE (temp_anlgraf.node_1 = config_mincut_inlet.node_id OR temp_anlgraf.node_2 = config_mincut_inlet.node_id);
+
+		
 		
 	END IF;
 
