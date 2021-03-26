@@ -401,4 +401,64 @@ CREATE OR REPLACE VIEW v_plan_current_psector AS
   WHERE selector_plan_psector.cur_user = "current_user"()::text;
 
 
+CREATE OR REPLACE VIEW v_plan_psector_budget_arc AS 
+ SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
+    plan_psector_x_arc.psector_id,
+    plan_psector.psector_type,
+    v_plan_arc.arc_id,
+    v_plan_arc.arccat_id,
+    v_plan_arc.cost_unit,
+    v_plan_arc.cost::numeric(14,2) AS cost,
+    v_plan_arc.length,
+    v_plan_arc.budget,
+    v_plan_arc.other_budget,
+    v_plan_arc.total_budget,
+    v_plan_arc.state,
+    plan_psector.expl_id,
+    plan_psector.atlas_id,
+    plan_psector_x_arc.doable,
+    plan_psector.priority,
+    v_plan_arc.the_geom
+   FROM v_plan_arc
+     JOIN plan_psector_x_arc ON plan_psector_x_arc.arc_id::text = v_plan_arc.arc_id::text
+     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_arc.psector_id
+  WHERE plan_psector_x_arc.doable = true
+  ORDER BY plan_psector_x_arc.psector_id;
 
+
+CREATE OR REPLACE VIEW v_plan_psector_budget_node AS 
+ SELECT row_number() OVER (ORDER BY v_plan_node.node_id) AS rid,
+    plan_psector_x_node.psector_id,
+    plan_psector.psector_type,
+    v_plan_node.node_id,
+    v_plan_node.nodecat_id,
+    v_plan_node.cost::numeric(12,2) AS cost,
+    v_plan_node.measurement,
+    v_plan_node.budget AS total_budget,
+    v_plan_node.state,
+    v_plan_node.expl_id,
+    plan_psector.atlas_id,
+    plan_psector_x_node.doable,
+    plan_psector.priority,
+    v_plan_node.the_geom
+   FROM v_plan_node
+     JOIN plan_psector_x_node ON plan_psector_x_node.node_id::text = v_plan_node.node_id::text
+     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_node.psector_id
+  WHERE plan_psector_x_node.doable = true
+  ORDER BY plan_psector_x_node.psector_id;
+
+
+CREATE OR REPLACE VIEW v_plan_psector_budget_other AS 
+ SELECT plan_psector_x_other.id,
+    plan_psector_x_other.psector_id,
+    plan_psector.psector_type,
+    v_price_compost.id AS price_id,
+    v_price_compost.descript,
+    v_price_compost.price,
+    plan_psector_x_other.measurement,
+    (plan_psector_x_other.measurement * v_price_compost.price)::numeric(14,2) AS total_budget,
+    plan_psector.priority
+   FROM plan_psector_x_other
+     JOIN v_price_compost ON v_price_compost.id::text = plan_psector_x_other.price_id::text
+     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_other.psector_id
+  ORDER BY plan_psector_x_other.psector_id;
