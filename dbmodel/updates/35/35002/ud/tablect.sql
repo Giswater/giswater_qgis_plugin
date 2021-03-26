@@ -9,3 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 --2021/01/30
 ALTER TABLE inp_flwreg_orifice ALTER COLUMN "offset" drop NOT NULL;
+
+ALTER TABLE node DROP CONSTRAINT IF EXISTS node_epa_type_fkey ;
+ALTER TABLE arc DROP CONSTRAINT IF EXISTS arc_epa_type_fkey ;

@@ -15,8 +15,8 @@ SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAM
 SELECT gw_fct_admin_manage_ct($${"client":{"lang":"ES"}, "data":{"action":"RENAME", "table":"config_graf_checkvalve", "oldName":"anl_mincut_checkvalve_pkey", "newName":"config_graf_checkvalve_pkey"}}$$);
 
 
-ALTER TABLE cat_feature_node DROP CONSTRAINT cat_feature_node_epa_default_fkey;
-ALTER TABLE cat_feature_arc DROP CONSTRAINT cat_feature_arc_epa_default_fkey;
+ALTER TABLE cat_feature_node DROP CONSTRAINT IF EXISTS cat_feature_node_epa_default_fkey;
+ALTER TABLE cat_feature_arc DROP CONSTRAINT IF EXISTS cat_feature_arc_epa_default_fkey;
 
-ALTER TABLE node DROP CONSTRAINT node_epa_type_fkey;
-ALTER TABLE arc DROP CONSTRAINT arc_epa_type_fkey;
+ALTER TABLE node DROP CONSTRAINT IF EXISTS node_epa_type_fkey;
+ALTER TABLE arc DROP CONSTRAINT IF EXISTS arc_epa_type_fkey;

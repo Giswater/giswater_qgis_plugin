@@ -124,3 +124,7 @@ CREATE TABLE sys_feature_epa_type
   active boolean,
   CONSTRAINT sys_feature_inp_pkey PRIMARY KEY (id, feature_type)
   );
+
+
+ALTER TABLE inp_arc_type ADD COLUMN epa_table character varying(30);
+ALTER TABLE inp_node_type ADD COLUMN epa_table character varying(30);

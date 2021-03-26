@@ -64,3 +64,19 @@ UPDATE config_param_user SET value =
 WHERE parameter = 'inp_options_vdefault';
 
 
+
+UPDATE inp_arc_type SET epa_table = f.epa_table FROM cat_feature_arc f WHERE inp_arc_type.id=f.epa_default;
+UPDATE inp_arc_type SET epa_table = 'inp_outlet' where id = 'OUTLET';
+UPDATE inp_arc_type SET epa_table = 'inp_orifice' where id = 'ORIFICE';
+UPDATE inp_arc_type SET epa_table = 'inp_pump' where id = 'PUMP';
+UPDATE inp_arc_type SET epa_table = 'inp_virtual' where id = 'VIRTUAL';
+UPDATE inp_arc_type SET epa_table = 'inp_weir' where id = 'WEIR';
+
+UPDATE inp_node_type SET epa_table = f.epa_table FROM cat_feature_node f WHERE inp_node_type.id=f.epa_default;
+UPDATE inp_node_type SET epa_table = 'inp_divider' where id = 'DIVIDER';
+
+INSERT INTO sys_feature_epa_type SELECT id, 'NODE', epa_table FROM inp_node_type;
+INSERT INTO sys_feature_epa_type SELECT id, 'ARC', epa_table FROM inp_arc_type;
+
+ALTER TABLE cat_feature_node DROP CONSTRAINT cat_feature_node_epa_default_fkey;
+ALTER TABLE cat_feature_arc DROP CONSTRAINT cat_feature_arc_epa_default_fkey;
