@@ -883,9 +883,9 @@ class GwMincut:
         if self.mincut_class in (2, 3):
             self._mincut_ok(result)
         if self.mincut_class == 1:
-            if result['body']['actions']['overlap'] == 'Ok':
+            if result['body']['overlapStatus'] == 'Ok':
                 self._mincut_ok(result)
-            elif result['body']['actions']['overlap'] == 'Conflict':
+            elif result['body']['overlapStatus'] == 'Conflict':
                 self.dlg_dtext = GwDialogTextUi()
                 tools_gw.load_settings(self.dlg_dtext)
                 self.dlg_dtext.btn_close.setText('Cancel')
