@@ -52,9 +52,9 @@ class GwPointAddButton(GwAction):
 
     def _check_reload(self):
         """ Check for reload button """
-        super_users = tools_gw.get_config_parser('system', 'reload_cat_feature', "project", "giswater")
-        super_users = tools_os.set_boolean(super_users)
-        if super_users:
+        check_reload = tools_gw.get_config_parser('system', 'reload_cat_feature', "project", "giswater")
+        check_reload = tools_os.set_boolean(check_reload)
+        if check_reload:
             self._fill_point_menu()
 
 
