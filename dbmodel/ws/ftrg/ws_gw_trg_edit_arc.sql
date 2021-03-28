@@ -88,7 +88,7 @@ BEGIN
 		
 		
 		 -- Set EPA type
-       	IF (NEW.epa_type IS NULL) THEN
+		IF (NEW.epa_type IS NULL) THEN
 			NEW.epa_type = 'PIPE';   
 		END IF;
 		
@@ -300,10 +300,9 @@ BEGIN
 		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature JOIN cat_arc ON cat_feature.id=cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id;
 	
 		--Copy id to code field	
-		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
+		IF (v_code_autofill_bool IS TRUE) THEN 
 			NEW.code=NEW.arc_id;
 		END IF;
-
 
 		-- Workcat_id
 		IF (NEW.workcat_id IS NULL) THEN

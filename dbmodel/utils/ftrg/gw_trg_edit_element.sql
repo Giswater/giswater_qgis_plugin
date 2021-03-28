@@ -130,7 +130,7 @@ BEGIN
 		SELECT code_autofill INTO v_code_autofill_bool FROM element_type join cat_element on element_type.id=cat_element.elementtype_id where cat_element.id=NEW.elementcat_id;
 
 		--Copy id to code field
-		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
+		IF (v_code_autofill_bool IS TRUE) THEN 
 			NEW.code=NEW.element_id;
 		END IF;
 

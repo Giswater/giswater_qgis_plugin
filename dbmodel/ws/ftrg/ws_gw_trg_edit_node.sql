@@ -342,7 +342,7 @@ BEGIN
 		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature JOIN cat_node ON cat_feature.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id;
 		
 		--Copy id to code field
-		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
+		IF (v_code_autofill_bool IS TRUE) THEN 
 			NEW.code=NEW.node_id;
 		END IF;
 

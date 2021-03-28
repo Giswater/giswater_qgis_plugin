@@ -334,7 +334,7 @@ BEGIN
 		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature join cat_connec on cat_feature.id=cat_connec.connectype_id where cat_connec.id=NEW.connecat_id;
 		
 		--Copy id to code field
-		IF (NEW.code IS NULL AND v_code_autofill_bool IS TRUE) THEN 
+		IF (v_code_autofill_bool IS TRUE) THEN 
 			NEW.code=NEW.connec_id;
 		END IF;	 
 		

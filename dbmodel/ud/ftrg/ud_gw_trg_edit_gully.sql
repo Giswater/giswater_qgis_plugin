@@ -321,8 +321,6 @@ BEGIN
 			END IF;
 		END IF;  
 
-		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id=NEW.gully_type;
-
 		--Inventory	
 		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
 
@@ -330,8 +328,14 @@ BEGIN
 		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
 
 		--Uncertain
-		NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');		
+		NEW.uncertain := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_uncertain_sysvdefault');	
 
+		-- Code
+		SELECT code_autofill INTO v_code_autofill_bool FROM cat_feature WHERE id=NEW.gully_type;
+		IF (v_code_autofill_bool IS TRUE) THEN 
+			NEW.code=NEW.gully_id;
+		END IF;	
+		
 		--Units
 		IF (NEW.units IS NULL) THEN
 			NEW.units :='1';
