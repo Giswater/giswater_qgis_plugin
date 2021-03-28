@@ -49,7 +49,6 @@ v_audit_result text;
 v_level integer;
 v_status text;
 v_message text;
-v_hide_form boolean;
 v_array_addfields text[];
 v_array_node_id json;
 v_node_id text;
@@ -71,9 +70,6 @@ BEGIN
     INSERT INTO config_param_user (value, parameter, cur_user)
     VALUES (txid_current(),'utils_cur_trans',current_user );
 
-    -- Get parameters from configs table
-    SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
-   
    -- Get parameters from input json
    v_array_node_id = lower(((p_data ->>'feature')::json->>'id')::text);
    v_node_id = (SELECT json_array_elements_text(v_array_node_id)); 
@@ -367,7 +363,6 @@ BEGIN
     v_status := COALESCE(v_status, '{}'); 
     v_level := COALESCE(v_level, '0'); 
     v_message := COALESCE(v_message, '{}'); 
-    v_hide_form := COALESCE(v_hide_form, true); 
 
 	--  Return
     RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
@@ -376,9 +371,8 @@ BEGIN
                 '"point":'||v_result_point||','||
                 '"line":'||v_result_line||','||
                 '"polygon":'||v_result_polygon||'}'||
-                ', "actions":{"hideForm":' || v_hide_form || '}'||
                '}'
-        '}')::json, 2112);
+        '}')::json, 2112, null, null, null);
 
     EXCEPTION WHEN OTHERS THEN
     GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

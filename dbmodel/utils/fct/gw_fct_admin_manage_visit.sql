@@ -120,7 +120,6 @@ v_audit_result text;
 v_level integer;
 v_status text;
 v_message text;
-v_hide_form boolean;	
 v_version text;		
 v_layoutorder integer;
 
@@ -137,8 +136,6 @@ BEGIN
     INSERT INTO config_param_user (value, parameter, cur_user)
     VALUES (txid_current(),'utils_cur_trans',current_user );
     
-	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
-
 	-- get input parameters -,man_addfields
 	v_schemaname = 'SCHEMA_NAME';
 	--v_id = (SELECT nextval('config_addfields_parameter_id_seq') +1);
@@ -588,9 +585,8 @@ raise notice 'v_config_fields,%',v_config_fields;
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
-				', "actions":{"hideForm":' || v_hide_form || '}'||
 		       '}'||
-	    '}')::json, 2746);
+	    '}')::json, 2746, null, null, null);
 
 
 	--EXCEPTION WHEN OTHERS THEN

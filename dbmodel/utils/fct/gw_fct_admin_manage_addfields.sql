@@ -113,7 +113,6 @@ v_audit_result text;
 v_level integer;
 v_status text;
 v_message text;
-v_hide_form boolean;	
 v_version text;	
 v_idaddparam integer;
 
@@ -131,8 +130,6 @@ BEGIN
 	INSERT INTO config_param_user (value, parameter, cur_user)
 	VALUES (txid_current(),'utils_cur_trans',current_user );
     
-	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
-
 	-- get input parameters -,man_addfields
 	v_id = (SELECT nextval('SCHEMA_NAME.sys_addfields_id_seq') +1);
 
@@ -838,6 +835,7 @@ BEGIN
 
     END IF;
 
+	-- Control NULL's
 	v_result_info := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
@@ -845,9 +843,6 @@ BEGIN
 	v_result_line = '{"geometryType":"", "features":[]}';
 	v_result_polygon = '{"geometryType":"", "features":[]}';
 
-	-- Control NULL's
-	v_hide_form := COALESCE(v_hide_form, FALSE); 
-	
 	--  Return
 	RETURN gw_fct_json_create_return( ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
@@ -855,7 +850,6 @@ BEGIN
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
-				', "actions":{"hideForm":' || v_hide_form || '}'||
 		       '}'||
 	    '}')::json, 2690);
 

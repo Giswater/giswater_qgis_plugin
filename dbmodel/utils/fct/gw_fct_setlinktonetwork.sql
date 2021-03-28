@@ -66,7 +66,6 @@ v_audit_result text;
 v_level integer;
 v_status text;
 v_message text;
-v_hide_form boolean;
 v_version text;
 v_autoupdate_dma boolean;
 
@@ -77,7 +76,6 @@ BEGIN
 
     SELECT ((value::json)->>'value') INTO v_node_proximity FROM config_param_system WHERE parameter='edit_node_proximity';
     IF v_node_proximity IS NULL THEN v_node_proximity=0.01; END IF;
-	SELECT value::boolean INTO v_hide_form FROM config_param_user where parameter='qgis_form_log_hidden' AND cur_user=current_user;
 
     -- select project type
     SELECT project_type, giswater INTO v_projecttype, v_version FROM sys_version LIMIT 1;
@@ -349,9 +347,8 @@ BEGIN
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
-				', "actions":{"hideForm":' || v_hide_form || '}'||
 		       '}'||
-	    '}')::json, 2124);
+	    '}')::json, 2124, null, null, null);
 
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

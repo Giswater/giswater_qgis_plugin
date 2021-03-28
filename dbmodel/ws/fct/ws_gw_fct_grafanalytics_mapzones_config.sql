@@ -53,7 +53,6 @@ v_audit_result text;
 v_level integer;
 v_status text;
 v_message text;
-v_hide_form boolean;
 v_flag boolean = false;
 
 BEGIN
@@ -232,8 +231,6 @@ BEGIN
 	v_status := COALESCE(v_status, '{}'); 
 	v_level := COALESCE(v_level, '0'); 
 	v_message := COALESCE(v_message, '{}'); 
-	v_hide_form := COALESCE(v_hide_form, true); 
-
 
 	v_result_point = '{"geometryType":"", "features":[]}';
 	v_result_line = '{"geometryType":"", "features":[]}';
@@ -246,9 +243,8 @@ BEGIN
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
-				', "actions":{"hideForm":' || v_hide_form || '}'||
 		       '}'||
-	    '}')::json, 2970);
+	    '}')::json, 2970, null, null, null);
 
 	--EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
