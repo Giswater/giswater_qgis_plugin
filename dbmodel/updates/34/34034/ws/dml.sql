@@ -18,5 +18,5 @@ UPDATE config_form_fields SET widgettype = 'text' WHERE widgettype ='spinbox' an
 UPDATE config_form_fields SET widgettype = 'text' WHERE columnname ='to_arc' and formtype  ='form_feature';
 UPDATE config_form_fields set widgetcontrols = '{"setQgisMultiline":false}' WHERE widgetcontrols IS NULL AND formtype = 'form_feature' AND widgettype = 'text';
 
-
+UPDATE cat_feature_node SET num_arcs = 9 WHERE man_table = 'man_tank';
 
