@@ -85,9 +85,6 @@ BEGIN
 		UPDATE temp_anlgraf SET flag = 1 
 		FROM config_graf_inlet 
 		WHERE (temp_anlgraf.node_1 = config_graf_inlet.node_id OR temp_anlgraf.node_2 = config_graf_inlet.node_id);
-
-		-- setup graf reset water flag
-		UPDATE temp_anlgraf SET water=0;
 		
 	ELSIF v_mincutstep = 2 THEN 
 
@@ -101,7 +98,7 @@ BEGIN
 
 		-- setup graf closing check-valves
 		UPDATE temp_anlgraf SET flag = 1 
-		FROM config_mincut_checkvalve c 
+		FROM config_graf_checkvalve c 
 		WHERE (temp_anlgraf.node_1 = c.node_id OR temp_anlgraf.node_2 = c.node_id);
 
 		-- setup graf closing closed valves
@@ -111,11 +108,9 @@ BEGIN
 
 		-- setup graf closing tank's inlet
 		UPDATE temp_anlgraf SET flag = 1
-		FROM config_mincut_inlet 
-		WHERE (temp_anlgraf.node_1 = config_mincut_inlet.node_id OR temp_anlgraf.node_2 = config_mincut_inlet.node_id);
-
-		
-		
+		FROM config_graf_inlet 
+		WHERE (temp_anlgraf.node_1 = config_graf_inlet.node_id OR temp_anlgraf.node_2 = config_graf_inlet.node_id);
+	
 	END IF;
 
 	-- start engine
@@ -124,13 +119,14 @@ BEGIN
 	-- 1) set the starting element
 	v_querytext = 'UPDATE temp_anlgraf SET water=1 , flag = 1 WHERE arc_id='||quote_literal(v_arc); 
 	EXECUTE v_querytext;
+	RAISE NOTICE 'ARC------ %',v_arc;
 
 	UPDATE temp_anlgraf SET checkf = 0;
 	
 	EXECUTE v_querytext;-- inundation process
 	LOOP	
 		cont1 = cont1+1;
-		UPDATE temp_anlgraf n SET water= 1, flag=n.flag+1, checkf = checkf + 1 FROM v_anl_graf a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
+		UPDATE temp_anlgraf n SET water = 1, flag = n.flag+1, checkf = checkf + 1 FROM v_anl_graf a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
 		GET DIAGNOSTICS affected_rows =row_count;
 		EXIT WHEN affected_rows = 0;
 	END LOOP;
