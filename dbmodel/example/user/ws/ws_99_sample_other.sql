@@ -585,3 +585,5 @@ INSERT INTO sector (sector_id, name, grafconfig) VALUES (11,'Conflict mapzone', 
 UPDATE cat_feature SET active = false WHERE id IN ('CURVE','MANHOLE','WTP');
 
 DELETE FROM inp_junction WHERE node_id = '1007'; -- air valve
+
+UPDATE config_param_system SET value = 'TRUE' WHERE parameter  = 'admin_raster_dem';

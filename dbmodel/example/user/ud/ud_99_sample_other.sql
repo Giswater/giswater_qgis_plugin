@@ -553,3 +553,5 @@ DELETE FROM config_info_layer_x_type where tableinfo_id = 'v_edit_om_visit';
 UPDATE config_param_system SET value = 'false' WHERE parameter = 'admin_utils_schema';
 
 UPDATE config_info_layer SET addparam = '{"forceWhenActive":true}' WHERE layer_id IN ('v_edit_dimensions','v_edit_om_visit');
+
+UPDATE config_param_system SET value = 'TRUE' WHERE parameter  = 'admin_raster_dem';
