@@ -274,18 +274,22 @@ BEGIN
 		
 	DELETE FROM temp_node WHERE epa_type = 'TODELETE';
 	
-	
-	-- update shortpipe/valve diameter when is null USING neighbourg from node_1
+	-- update diameter when is null USING neighbourg from node_1
 	UPDATE temp_arc SET diameter = dint FROM (
 	SELECT node_1 as n1, diameter dint FROM temp_arc UNION SELECT node_2, diameter FROM temp_arc
-	)t WHERE t.dint IS NOT NULL AND t.n1 = node_1 AND epa_type IN ('SHORTPIPE', 'VALVE') AND diameter IS NULL;
+	)t WHERE t.dint IS NOT NULL AND t.n1 = node_1 AND diameter IS NULL;
 	UPDATE temp_arc SET diameter = dint FROM (
 	SELECT node_1 as n1, diameter dint FROM temp_arc UNION SELECT node_2, diameter FROM temp_arc
-	)t WHERE t.dint IS NOT NULL AND t.n1 = node_2 AND epa_type IN ('SHORTPIPE', 'VALVE') AND diameter IS NULL;
+	)t WHERE t.dint IS NOT NULL AND t.n1 = node_2 AND diameter IS NULL;
 
-	-- update shortpipe/valve diameter when is null forcing value
-	UPDATE temp_arc SET diameter = 150.999 WHERE epa_type IN ('SHORTPIPE', 'VALVE') AND diameter IS NULL;
-	
+	-- update diameter when is null USING neighbourg from node_2
+	UPDATE temp_arc SET diameter = dint FROM (
+	SELECT node_1 as n2, diameter dint FROM temp_arc UNION SELECT node_2, diameter FROM temp_arc
+	)t WHERE t.dint IS NOT NULL AND t.n2 = node_1 AND diameter IS NULL;
+	UPDATE temp_arc SET diameter = dint FROM (
+	SELECT node_2 as n2, diameter dint FROM temp_arc UNION SELECT node_2, diameter FROM temp_arc
+	)t WHERE t.dint IS NOT NULL AND t.n2 = node_2 AND diameter IS NULL;
+
 	-- other null values
 	UPDATE temp_arc SET minorloss = 0 WHERE minorloss IS NULL;
 	UPDATE temp_arc SET status = 'OPEN' WHERE status IS NULL OR status = '';
