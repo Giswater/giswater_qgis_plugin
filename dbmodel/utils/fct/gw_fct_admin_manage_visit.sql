@@ -236,14 +236,14 @@ BEGIN
 					LOOP
 						EXECUTE 'INSERT INTO config_form_fields(formname,'||v_config_fields||')
 						SELECT '''||v_viewname||''','||v_config_fields||' FROM config_form_fields
-						WHERE columnname='''||rec.columnname||''' ON CONFLICT (formname, formtype, columnname) DO NOTHING;';
+						WHERE columnname='''||rec.columnname||''' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;';
 					END LOOP;
 				ELSE
 					FOR rec IN (SELECT * FROM config_form_fields WHERE formname='visit_singlevent')
 					LOOP
 						EXECUTE 'INSERT INTO config_form_fields(formname,'||v_config_fields||')
 						SELECT '''||v_viewname||''','||v_config_fields||' FROM config_form_fields
-						WHERE columnname='''||rec.columnname||''' ON CONFLICT (formname, formtype, columnname) DO NOTHING;';
+						WHERE columnname='''||rec.columnname||''' ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;';
 					END LOOP;
 				END IF;
 				RAISE NOTICE 'v_config_fields_update';

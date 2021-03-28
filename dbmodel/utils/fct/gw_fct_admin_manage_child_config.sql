@@ -90,7 +90,7 @@ BEGIN
 		EXECUTE 'INSERT INTO config_form_fields('||v_config_fields||')
 		SELECT '''||v_view_name||''','||v_insert_fields||' FROM config_form_fields WHERE columnname='''||rec.columnname||'''
 		AND formname=concat(''ve_'','''||v_feature_type||''')
-		ON CONFLICT (formname, formtype, columnname) DO NOTHING';
+		ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING';
 
 	END LOOP;
 
@@ -138,7 +138,7 @@ BEGIN
 		INSERT INTO config_form_fields (formname,formtype,columnname,datatype,widgettype, layoutname, layoutorder,
 			label, ismandatory, isparent, iseditable, isautoupdate) 
 		VALUES (v_view_name,'form_feature', rec.column_name, v_datatype, v_widgettype, 'lyt_data_1',v_orderby, 
-			rec.column_name, false, false,true,false) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+			rec.column_name, false, false,true,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 	END LOOP;
 
@@ -170,7 +170,7 @@ BEGIN
 		INSERT INTO config_form_fields (formname,formtype,columnname,datatype,widgettype, layoutname,layoutorder,
 			label, ismandatory,isparent,iseditable,isautoupdate) 
 		VALUES (v_view_name,'form_feature',rec.param_name, v_datatype,v_widgettype, 'lyt_data_1',v_orderby,
-			rec.param_name, rec.is_mandatory, false,rec.iseditable,false) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+			rec.param_name, rec.is_mandatory, false,rec.iseditable,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 				
 	END LOOP;
 

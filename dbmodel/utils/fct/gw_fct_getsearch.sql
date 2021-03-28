@@ -88,6 +88,9 @@ BEGIN
 			-- todo: send message to response
 		END IF;
 	END IF;
+
+	-- profilactic control if table selector_expl is empty
+	IF (SELECT count(*) FROM selector_expl WHERE cur_user = current_user) = 0 THEN INSERT INTO selector_expl VALUES(0,current_user); END IF;
         
 	-- Create tabs array
 	v_form := '[';

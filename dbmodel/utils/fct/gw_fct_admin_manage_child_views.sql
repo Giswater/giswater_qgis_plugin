@@ -125,7 +125,7 @@ BEGIN
 				dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam,
 				layoutname, widgetcontrols, hidden 
 			FROM config_form_fields WHERE formname = v_parent_layer AND columnname = v_newcolumn
-			ON CONFLICT (formname, columnname, formtype) DO NOTHING;
+			ON CONFLICT (formname, columnname, formtype, tabname) DO NOTHING;
 			
 		END LOOP;
 
@@ -158,7 +158,7 @@ BEGIN
 			dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam,
 			layoutname, widgetcontrols, hidden 
 		FROM config_form_fields WHERE formname = v_parent_layer AND columnname = v_newcolumn
-		ON CONFLICT (formname, columnname, formtype) DO NOTHING;
+		ON CONFLICT (formname, columnname, formtype, tabname) DO NOTHING;
 	
 		v_return_status = 'Accepted';
 		v_return_msg = 'Single-update view successfully';
