@@ -72,6 +72,9 @@ BEGIN
 
 	END LOOP;
 
+	-- update nodarc diameter when is null, keeping possible values of inp_valve.diameter USING cat_node.dint
+	UPDATE temp_arc SET diameter = dint FROM cat_node c WHERE arccat_id = c.id AND c.id IS NOT NULL AND diameter IS NULL;
+
 	RETURN 1;
 		
 END;
