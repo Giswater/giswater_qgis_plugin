@@ -973,14 +973,12 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 	v_result_line := COALESCE(v_result_line, '{}'); 
 
+
 	--  Return
 	RETURN  gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}, "data":{ "info":'||v_result_info||','||
-					  '"setVisibleLayers":["'||v_visible_layer||'"],'||
-  					  '"setStyle":"Mapzones",'||
 					  '"point":'||v_result_point||','||
-					  '"line":'||v_result_line||
-					  '}}}')::json, 2710);
+					  '"line":'||v_result_line||'}'||'}}')::json, 2710, null, ('{"visible": ["'||v_visible_layer||'"]}')::json, null);
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
