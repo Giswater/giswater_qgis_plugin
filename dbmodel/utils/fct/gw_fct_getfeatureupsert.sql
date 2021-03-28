@@ -306,7 +306,7 @@ BEGIN
 				END IF;
 	
 				--getting 1st approach of gis length
-				v_gislength = (SELECT st_length(p_reduced_geometry))::float;		
+				v_gislength = (SELECT st_length(p_reduced_geometry))::numeric(12,0);		
 				
 			ELSIF upper(v_catfeature.feature_type) ='CONNEC' THEN 
 				v_numnodes := (SELECT COUNT(*) FROM connec WHERE ST_DWithin(p_reduced_geometry, connec.the_geom, v_connec_proximity) AND connec.connec_id != p_id AND connec.state!=0);		
