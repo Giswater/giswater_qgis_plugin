@@ -583,3 +583,5 @@ INSERT INTO dqa (dqa_id, name, expl_id, grafconfig) VALUES (12,'Conflict mapzone
 INSERT INTO sector (sector_id, name, grafconfig) VALUES (11,'Conflict mapzone', '{"status":"useWhenConflict"}');
 
 UPDATE cat_feature SET active = false WHERE id IN ('CURVE','MANHOLE','WTP');
+
+DELETE FROM inp_junction WHERE node_id = '1007'; -- air valve
