@@ -284,7 +284,7 @@ BEGIN
 	)t WHERE t.dint IS NOT NULL AND t.n1 = node_2 AND epa_type IN ('SHORTPIPE', 'VALVE') AND diameter IS NULL;
 
 	-- update shortpipe/valve diameter when is null forcing value
-	UPDATE temp_arc SET diameter = 999.999 WHERE epa_type IN ('SHORTPIPE', 'VALVE') AND diameter IS NULL
+	UPDATE temp_arc SET diameter = 150.999 WHERE epa_type IN ('SHORTPIPE', 'VALVE') AND diameter IS NULL;
 	
 	-- other null values
 	UPDATE temp_arc SET minorloss = 0 WHERE minorloss IS NULL;
