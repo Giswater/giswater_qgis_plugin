@@ -5,8 +5,8 @@ This version of Giswater is provided by Giswater Association
 */
 --FUNCTION CODE: 2976
 
-DROP FUNCTION IF EXISTS ws_sample.gw_fct_json_create_return(json, integer);
-CREATE OR REPLACE FUNCTION ws_sample.gw_fct_json_create_return(
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_json_create_return(json, integer);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_json_create_return(
     p_data json,
     p_fnumber integer,
     p_returnmanager json,
@@ -35,7 +35,7 @@ v_zoomed_exist boolean ;
 
 BEGIN
 	-- Search path
-	SET search_path = 'ws_sample', public;
+	SET search_path = 'SCHEMA_NAME', public;
 
 	-- getting parameters
 	If p_returnmanager IS NOT NULL THEN v_returnmanager = p_returnmanager; ELSE v_returnmanager = (SELECT returnmanager FROM config_function where id = p_fnumber); END IF;
