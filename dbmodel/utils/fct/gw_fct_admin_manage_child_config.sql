@@ -135,9 +135,9 @@ BEGIN
 		END IF;
 
 		--insert into config_form_fields
-		INSERT INTO config_form_fields (formname,formtype,columnname,datatype,widgettype, layoutname, layoutorder,
+		INSERT INTO config_form_fields (formname, formtype, columnname, tabname, datatype, widgettype, layoutname, layoutorder,
 			label, ismandatory, isparent, iseditable, isautoupdate) 
-		VALUES (v_view_name,'form_feature', rec.column_name, v_datatype, v_widgettype, 'lyt_data_1',v_orderby, 
+		VALUES (v_view_name,'form_feature', rec.column_name, 'data', v_datatype, v_widgettype, 'lyt_data_1',v_orderby, 
 			rec.column_name, false, false,true,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 	END LOOP;
