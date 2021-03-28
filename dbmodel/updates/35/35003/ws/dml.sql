@@ -23,6 +23,7 @@ UPDATE sys_feature_epa_type SET id  ='UNDEFINED' WHERE id  ='NOT DEFINED';
 UPDATE arc SET epa_type ='UNDEFINED' WHERE epa_type  ='NOT DEFINED';
 UPDATE node SET epa_type ='UNDEFINED' WHERE epa_type  ='NOT DEFINED';
 
+--2021/03/29
 UPDATE config_toolbox SET  inputparams =
 '[{"widgetname":"grafClass", "label":"Graf class:", "widgettype":"combo","datatype":"text","tooltip": "Grafanalytics method used", "layoutname":"grl_option_parameters","layoutorder":1,"comboIds":["PRESSZONE","DQA","DMA","SECTOR"],
 "comboNames":["Pressure Zonification (PRESSZONE)", "District Quality Areas (DQA) ", "District Metering Areas (DMA)", "Inlet Sectorization (SECTOR-HIGH / SECTOR-LOW)"], "selectedId":""}, 
@@ -43,3 +44,44 @@ UPDATE config_toolbox SET  inputparams =
 
 {"widgetname":"geomParamUpdate", "label":"Pipe buffer","widgettype":"text","datatype":"float","tooltip":"Buffer from arcs to create mapzone geometry using [PIPE BUFFER] options. Normal values maybe between 3-20 mts.", "layoutname":"grl_option_parameters","layoutorder":8, "isMandatory":false, "placeholder":"5-30", "value":""}]'
 WHERE id = 2768;
+
+
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘JUNCTION' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘VALVE' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘REGISTER' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’MINSECTOR' WHERE type = ‘VALVE' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’DQA' WHERE type = ‘NETELEMENT' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘REGISTER' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘JUNCTION' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘JUNCTION' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘EXPANSIONTANK' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘FILTER' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’MINSECTOR' WHERE type = ‘VALVE' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘FLEXUNION' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’DMA' WHERE type = ‘METER' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’MINSECTOR' WHERE type = ‘VALVE' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘VALVE' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘HYDRANT' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘JUNCTION' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘MANHOLE' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘NETELEMENT' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘NETSAMPLEPOINT' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘VALVE' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’PRESSZONE' WHERE type = ‘VALVE' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’PRESSZONE' WHERE type = ‘VALVE' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’PRESSZONE' WHERE type = ‘VALVE' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘METER' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘PUMP' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘REDUCTION' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘REGISTER' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’MINSECTOR' WHERE type = ‘VALVE' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’SECTOR' WHERE type = ‘SOURCE' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘JUNCTION' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’SECTOR' WHERE type = ‘TANK' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘JUNCTION' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’MINSECTOR' WHERE type = ‘VALVE' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘REGISTER' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘NETWJOIN' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’SECTOR' WHERE type = ‘WATERWELL' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’SECTOR' WHERE type = ‘WTP' AND grafconfig IS NULL;
+UPDATE cat_feature_node SET grafconfig=’NONE' WHERE type = ‘JUNCTION' AND grafconfig IS NULL;
