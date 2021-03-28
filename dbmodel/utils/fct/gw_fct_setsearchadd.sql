@@ -131,7 +131,7 @@ BEGIN
 	RETURN gw_fct_json_create_return(('{"status":"Accepted"' ||
 		', "version":'|| v_version ||
 		', "data":' || v_response ||    
-		'}')::json, 2620);
+		'}')::json, 2620, null, null, null);
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 

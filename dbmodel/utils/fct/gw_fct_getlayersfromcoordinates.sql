@@ -240,7 +240,7 @@ BEGIN
 			',"form":{}'||
 			',"feature":{}'||
 			',"data":{"layersNames":' || fields ||'}}'||
-	    '}')::json, 2590);
+	    '}')::json, 2590, null, null, null);
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 

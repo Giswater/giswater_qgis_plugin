@@ -173,7 +173,7 @@ BEGIN
 	v_version := COALESCE(v_version, '[]');
 
 	-- Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":'||v_message||', "version":"' || v_version ||'","body":{"data":{}}}')::json, 3006);
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":'||v_message||', "version":"' || v_version ||'","body":{"data":{}}}')::json, 3006, null, null, null);
 
 
 	-- Exception handling

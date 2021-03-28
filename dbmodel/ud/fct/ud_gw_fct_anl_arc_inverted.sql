@@ -122,7 +122,7 @@ BEGIN
 		     ',"data":{ "info":'||v_result_info||','||
 				'"line":'||v_result_line||
 		       '}}'||
-	    '}')::json, 2204); 
+	    '}')::json, 2204, null, null, null); 
 
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

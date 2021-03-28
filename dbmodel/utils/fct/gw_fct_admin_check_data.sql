@@ -382,7 +382,7 @@ BEGIN
 				'"line":{"geometryType":"", "values":[]}'||','||
 				'"polygon":{"geometryType":"", "values":[]}'||
 			   '}}'||
-		'}')::json, 2776);
+		'}')::json, 2776, null, null, null);
 
 END;
 $BODY$

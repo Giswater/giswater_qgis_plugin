@@ -152,7 +152,7 @@ BEGIN
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||
 			'}}'||
-	    '}')::json, 2496);
+	    '}')::json, 2496, null, null, null);
     
 END;  
 $BODY$

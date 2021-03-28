@@ -591,7 +591,7 @@ BEGIN
 				'"info":'||v_result_info||','||
 				'"point":'||v_result_point||'}'||
 			'}'||
-		'}')::json, 2848);
+		'}')::json, 2848, null, null, null);
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN

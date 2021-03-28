@@ -424,7 +424,7 @@ BEGIN
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||'}'||
 		       '}'||
-	    '}')::json, 2524);
+	    '}')::json, 2524, null, null, null);
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN

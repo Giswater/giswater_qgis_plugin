@@ -82,7 +82,7 @@ BEGIN
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
 				'}'
-			'}')::json, 2214);
+			'}')::json, 2214, null, null, null);
 
 	ELSE 
 		RETURN v_result_json;

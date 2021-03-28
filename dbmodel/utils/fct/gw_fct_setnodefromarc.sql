@@ -161,7 +161,7 @@ BEGIN
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||	
 				'"point":'||v_result_point||'}}'||
-	    '}')::json, 2118);
+	    '}')::json, 2118, null, null, null);
 	
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 

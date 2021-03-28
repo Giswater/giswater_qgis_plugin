@@ -248,7 +248,7 @@ BEGIN
 			
 	--   Call and return gw_fct_getinfofromid
 	RETURN gw_fct_json_create_return(gw_fct_getinfofromid(concat('{"client":',(p_data->>'client'),',"form":{"editable":"',v_iseditable, 
-	'"},"feature":{"tableName":"',v_layer.layer_id,'","id":"',v_id,'"},"data":{"toolBar":"'||v_toolbar||'","rolePermissions":"', v_role,'"}}')::json), 2580);
+	'"},"feature":{"tableName":"',v_layer.layer_id,'","id":"',v_id,'"},"data":{"toolBar":"'||v_toolbar||'","rolePermissions":"', v_role,'"}}')::json), 2580, null, null, null);
 	
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN

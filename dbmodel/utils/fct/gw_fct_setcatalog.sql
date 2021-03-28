@@ -250,7 +250,7 @@ BEGIN
 	-- Return
 	RETURN gw_fct_json_create_return( ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'",'||
 	'"body": {"form":{},"feature":{},'||
-	'"data": {"fields":['||v_returnfields||']}}}')::json, 3010);
+	'"data": {"fields":['||v_returnfields||']}}}')::json, 3010, null, null, null);
 
 
 	-- Exception handling

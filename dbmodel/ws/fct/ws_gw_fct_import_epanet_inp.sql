@@ -607,7 +607,7 @@ BEGIN
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||'}'||
-	    '}}')::json, 2522);
+	    '}}')::json, 2522, null, null, null);
 	
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN

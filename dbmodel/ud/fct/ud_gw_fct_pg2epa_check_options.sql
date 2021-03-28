@@ -40,7 +40,7 @@ BEGIN
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version order by 1 desc limit 1 ;
 	
 	--  Return
-	RETURN gw_fct_json_create_return(v_return, 2860);
+	RETURN gw_fct_json_create_return(v_return, 2860, null, null, null);
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN

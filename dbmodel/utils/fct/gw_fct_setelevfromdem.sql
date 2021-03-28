@@ -176,7 +176,7 @@ BEGIN
 			     ',"data":{ "info":'||v_result_info||','||
 					'"point":'||v_result_point||
 				'}}'||
-		    '}')::json,2760);
+		    '}')::json,2760, null, null, null);
 
 	END IF;
 	RETURN null;

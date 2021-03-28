@@ -71,7 +71,7 @@ BEGIN
 		
 	ELSIF v_action = 'mincutValveUnaccess' THEN
 
-		RETURN gw_fct_json_create_return(gw_fct_mincut_valve_unaccess(p_data), 2980);
+		RETURN gw_fct_json_create_return(gw_fct_mincut_valve_unaccess(p_data), 2980, null, null, null);
 		
 	ELSIF v_action = 'mincutAccept' THEN
 

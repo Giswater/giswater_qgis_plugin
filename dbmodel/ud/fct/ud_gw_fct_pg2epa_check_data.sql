@@ -413,7 +413,7 @@ BEGIN
 				'"polygon":'||v_result_polygon||
 				'}'||
 			'}'||
-		'}')::json, 2431);
+		'}')::json, 2431, null, null, null);
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN

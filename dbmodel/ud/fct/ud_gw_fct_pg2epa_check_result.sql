@@ -417,7 +417,7 @@ BEGIN
 			',"data":{"options":'||v_options||','||
 				'"info":'||v_result_info||'}'||
 			'}'||
-		'}')::json, 2858);
+		'}')::json, 2858, null, null, null);
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN

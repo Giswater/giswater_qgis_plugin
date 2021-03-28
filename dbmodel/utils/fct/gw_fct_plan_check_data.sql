@@ -545,7 +545,7 @@ BEGIN
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
 		       '}'||
-	    '}')::json, 2436);
+	    '}')::json, 2436, null, null, null);
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN

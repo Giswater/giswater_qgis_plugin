@@ -168,7 +168,7 @@ BEGIN
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||
 		       '}}'||
-	    '}')::json, 2102);
+	    '}')::json, 2102, null, null, null);
 
 	EXCEPTION WHEN OTHERS THEN
 	 GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

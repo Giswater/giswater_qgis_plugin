@@ -697,7 +697,7 @@ BEGIN
 			      ',"fields":' || v_fields || 
 			      '}'||
 			'}'||
-		'}')::json, 2582);
+		'}')::json, 2582, null, null, null);
 
 	-- Exception handling
 	 EXCEPTION WHEN OTHERS THEN

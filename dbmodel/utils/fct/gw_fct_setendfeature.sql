@@ -145,7 +145,7 @@ BEGIN
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||				
 			'}}'||
-	    '}')::json, 3022);
+	    '}')::json, 3022, null, null, null);
 
 	--EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;

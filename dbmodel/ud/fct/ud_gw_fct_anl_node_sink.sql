@@ -129,7 +129,7 @@ BEGIN
 		     ',"data":{ "info":'||v_result_info||','||
 				'"point":'||v_result_point||
 			'}}'||
-	    '}')::json, 2210);
+	    '}')::json, 2210, null, null, null);
 
    
 	EXCEPTION WHEN OTHERS THEN
