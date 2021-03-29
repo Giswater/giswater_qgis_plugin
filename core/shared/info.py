@@ -564,6 +564,7 @@ class GwInfo(QObject):
 
         result = complet_result['body']['data']
         layout_list = []
+
         for field in complet_result['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue

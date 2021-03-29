@@ -154,12 +154,16 @@ class GwToolBoxTask(GwTask):
         self.dialog.btn_close.show()
         self.dialog.progressBar.setVisible(False)
         if self.isCanceled(): return
+
         if result is False and self.exception is not None:
             msg = f"<b>Key: </b>{self.exception}<br>"
             msg += f"<b>key container: </b>'body/data/ <br>"
             msg += f"<b>Python file: </b>{__name__} <br>"
             msg += f"<b>Python function:</b> {self.__class__.__name__} <br>"
             tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
+        # If database fail
+        elif result is False and global_vars.session_vars['last_error_msg'] is not None:
+            tools_qt.show_exception_message(msg=global_vars.session_vars['last_error_msg'])
         elif result:
             tools_gw.fill_tab_log(self.dialog, self.json_result['body']['data'], True, True, 1, True, False)
 

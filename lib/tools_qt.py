@@ -1106,6 +1106,7 @@ def show_exception_message(title=None, msg="", window_title="Information about e
     if len(global_vars.session_vars['threads']) > 0:
         return
 
+    global_vars.session_vars['last_error_msg'] = None
     dlg_text.btn_accept.setVisible(False)
     dlg_text.btn_close.clicked.connect(lambda: dlg_text.close())
     dlg_text.setWindowTitle(window_title)
