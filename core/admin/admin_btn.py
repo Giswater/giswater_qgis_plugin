@@ -232,9 +232,6 @@ class GwAdminButton:
             status = self._update_31to39(project_type=project_type)
         self.task1.setProgress(60)
         if status:
-            status = self._api(project_type=project_type)
-        self.task1.setProgress(80)
-        if status:
             status = self._execute_last_process(schema_name=schema_name, locale=True)
         self.task1.setProgress(100)
 
@@ -446,10 +443,6 @@ class GwAdminButton:
         self.folderExemple = self.sql_dir + os.sep + 'example' + os.sep
         self.folderPath = ''
 
-        # Declare all API folders
-        self.folderUpdatesApi = self.sql_dir + os.sep + 'api' + os.sep + 'updates' + os.sep
-        self.folderApi = self.sql_dir + os.sep + 'api' + os.sep
-
         # Check if user have dev permissions
         self.dev_user = tools_gw.get_config_parser('system', 'dev_mode', "project", "dev")
         self.dev_commit = tools_gw.get_config_parser('system', 'dev_commit', "project", "dev")
@@ -460,9 +453,8 @@ class GwAdminButton:
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
         if self.dev_user != 'TRUE':
-            tools_qt.remove_tab(self.dlg_readsql.tab_main, "schema_manager")
-            tools_qt.remove_tab(self.dlg_readsql.tab_main, "api_manager")
-            tools_qt.remove_tab(self.dlg_readsql.tab_main, "custom")
+            tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_schema_manager")
+            tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_advanced")
             self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
 
         else:
@@ -481,10 +473,9 @@ class GwAdminButton:
         self.lbl_schema_name = self.dlg_readsql.findChild(QLabel, 'lbl_schema_name')
         self.btn_constrains = self.dlg_readsql.findChild(QPushButton, 'btn_constrains')
 
-        # Checkbox SCHEMA & API
+        # Checkbox SCHEMA
         self.chk_schema_view = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_view')
         self.chk_schema_funcion = self.dlg_readsql.findChild(QCheckBox, 'chk_schema_funcion')
-        self.chk_api_view = self.dlg_readsql.findChild(QCheckBox, 'chk_api_view')
         self.software_version_info = self.dlg_readsql.findChild(QTextEdit, 'software_version_info')
 
         # Set Listeners
@@ -798,6 +789,7 @@ class GwAdminButton:
             status = self._execute_files(folder)
             if not status and self.dev_commit == 'FALSE':
                 return False
+
             folder = self.folderUtils + self.file_pattern_ftrg
             status = self._execute_files(folder)
             if not status and self.dev_commit == 'FALSE':
@@ -860,6 +852,7 @@ class GwAdminButton:
 
     def _update_31to39(self, new_project=False, project_type=False, no_ct=False):
         """"""
+
         if str(project_type) in ('ws', 'ud'):
             if not os.path.exists(self.folderUpdates):
                 tools_qgis.show_message("The update folder was not found in sql folder")
@@ -1352,213 +1345,6 @@ class GwAdminButton:
         return True
 
 
-    def _api(self, new_api=False, project_type=False):
-        """"""
-        folder = self.folderApi + self.file_pattern_ftrg
-        status = self._execute_files(folder)
-        if not status and self.dev_commit == 'FALSE':
-            return False
-
-        folder = self.folderApi + self.file_pattern_fct
-        status = self._execute_files(folder)
-        if not status and self.dev_commit == 'FALSE':
-            return False
-
-        if not os.path.exists(self.folderUpdatesApi):
-            tools_log.log_info(f"Folder not found: {self.folderUpdatesApi}")
-            return True
-
-        if project_type is False:
-            project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-
-        folders = sorted(os.listdir(self.folderUpdatesApi + ''))
-        tools_log.log_info(str(folders))
-        for folder in folders:
-            sub_folders = sorted(os.listdir(self.folderUpdatesApi + folder))
-            for sub_folder in sub_folders:
-                if new_api:
-                    if self.dev_commit == 'TRUE':
-                        if self._process_folder(
-                                self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
-                                '') is True:
-                            status = self._execute_files(self.folderUpdatesApi + folder +
-                                                       os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
-                            if status is False:
-                                return False
-                        if self._process_folder(
-                                self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
-                                '') is True:
-                            status = self._execute_files(self.folderUpdatesApi + folder +
-                                                       os.sep + sub_folder + os.sep + project_type + os.sep + '')
-                            if status is False:
-                                return False
-                        if self._process_folder(
-                                self.folderUpdatesApi + folder + os.sep + sub_folder +
-                                os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
-                                '') is True:
-                            status = self._execute_files(
-                                self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                    self.locale + os.sep), True)
-                            if status is False:
-                                return False
-                        elif self._process_folder(
-                                self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep,
-                                'en_US') is True:
-                            status = self._execute_files(self.folderUpdatesApi + folder + os.sep +
-                                                       sub_folder + os.sep + 'i18n' + os.sep + 'en_US' + os.sep, True)
-                            if status is False:
-                                return False
-                        if self._process_folder(self.sql_dir + os.sep + 'api' + os.sep, self.file_pattern_trg) is True:
-                            status = self._execute_files(self.sql_dir + os.sep + 'api' + os.sep + self.file_pattern_trg)
-                            if status is False:
-                                return False
-                        if self._process_folder(self.sql_dir + os.sep + 'api' + os.sep,
-                                               self.file_pattern_tablect) is True:
-                            status = self._execute_files(self.sql_dir + os.sep + 'api' +
-                                                       os.sep + self.file_pattern_tablect)
-                            if status is False:
-                                return False
-                    else:
-                        if str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                            if self._process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
-                                    '') is True:
-                                status = self._execute_files(self.folderUpdatesApi + folder +
-                                                           os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
-                                if status is False:
-                                    return False
-                            if self._process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
-                                    '') is True:
-                                status = self._execute_files(self.folderUpdatesApi + folder +
-                                                           os.sep + sub_folder + os.sep + project_type + os.sep + '')
-                                if status is False:
-                                    return False
-                            if self._process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep),
-                                    '') is True:
-                                status = self._execute_files(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), True)
-                                if status is False:
-                                    return False
-                            elif self._process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep,
-                                    'en_US') is True:
-                                status = self._execute_files(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US' + os.sep,
-                                    True)
-                                if status is False:
-                                    return False
-                            if self._process_folder(self.sql_dir + os.sep + 'api' + os.sep,
-                                                   self.file_pattern_trg) is True:
-                                status = self._execute_files(self.sql_dir + os.sep + 'api' +
-                                                           os.sep + self.file_pattern_trg)
-                                if status is False:
-                                    return False
-                            if self._process_folder(self.sql_dir + os.sep + 'api' + os.sep,
-                                                   self.file_pattern_tablect) is True:
-                                status = self._execute_files(self.sql_dir + os.sep + 'api' +
-                                                           os.sep + self.file_pattern_tablect)
-                                if status is False:
-                                    return False
-
-                else:
-                    if self.dev_commit == 'TRUE':
-                        if str(sub_folder) > str(self.project_version).replace('.', ''):
-                            if self._process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
-                                    '') is True:
-                                status = self._execute_files(self.folderUpdatesApi + folder +
-                                                           os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
-                                if status is False:
-                                    return False
-                            if self._process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
-                                    '') is True:
-                                status = self._execute_files(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
-                                if status is False:
-                                    return False
-                            if self._process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder +
-                                    os.sep + 'i18n' + os.sep + str(self.locale + os.sep),
-                                    '') is True:
-                                status = self._execute_files(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), True)
-                                if status is False:
-                                    return False
-                            elif self._process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep,
-                                    'en_US') is True:
-                                status = self._execute_files(self.folderUpdatesApi + folder + os.sep +
-                                                           sub_folder + os.sep + 'i18n' + os.sep + 'en_US' + os.sep,
-                                                           True)
-                                if status is False:
-                                    return False
-                            if self._process_folder(self.sql_dir + os.sep + 'api' + os.sep,
-                                                   self.file_pattern_trg) is True:
-                                status = self._execute_files(self.sql_dir + os.sep + 'api' +
-                                                           os.sep + self.file_pattern_trg)
-                                if status is False:
-                                    return False
-                            if self._process_folder(self.sql_dir + os.sep + 'api' + os.sep,
-                                                   self.file_pattern_tablect) is True:
-                                status = self._execute_files(self.sql_dir + os.sep + 'api' +
-                                                           os.sep + self.file_pattern_tablect)
-                                if status is False:
-                                    return False
-                    else:
-                        if str(self.project_version).replace('.', '') < str(sub_folder) <= \
-                                str(self.plugin_version).replace('.', ''):
-                            if self._process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'utils' + os.sep,
-                                    '') is True:
-                                status = self._execute_files(self.folderUpdatesApi + folder +
-                                                           os.sep + sub_folder + os.sep + 'utils' + os.sep + '')
-                                if status is False:
-                                    return False
-                            if self._process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + project_type + os.sep,
-                                    '') is True:
-                                status = self._execute_files(self.folderUpdatesApi + folder +
-                                                           os.sep + sub_folder + os.sep + project_type + os.sep + '')
-                                if status is False:
-                                    return False
-                            if self._process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep),
-                                    '') is True:
-                                status = self._execute_files(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
-                                        self.locale + os.sep), True)
-                                if status is False:
-                                    return False
-                            elif self._process_folder(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep,
-                                    'en_US') is True:
-                                status = self._execute_files(
-                                    self.folderUpdatesApi + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US' + os.sep,
-                                    True)
-                                if status is False:
-                                    return False
-                            if self._process_folder(self.sql_dir + os.sep + 'api' + os.sep,
-                                                   self.file_pattern_trg) is True:
-                                status = self._execute_files(self.sql_dir + os.sep + 'api' +
-                                                           os.sep + self.file_pattern_trg)
-                                if status is False:
-                                    return False
-                            if self._process_folder(self.sql_dir + os.sep + 'api' + os.sep,
-                                                   self.file_pattern_tablect) is True:
-                                status = self._execute_files(self.sql_dir + os.sep + 'api' +
-                                                           os.sep + self.file_pattern_tablect)
-                                if status is False:
-                                    return False
-
-        return True
-
     """ Functions execute process """
 
     def _execute_import_data(self, project_name, project_type):
@@ -1803,11 +1589,7 @@ class GwAdminButton:
         status = tools_db.execute_sql(sql, commit=False)
         if status:
             self._reload_fct_ftrg(project_type=self.project_type_selected)
-            self.task1.setProgress(20)
-            self._reload_fct_ftrg(project_type='api')
             self.task1.setProgress(40)
-            self._api(False)
-            self.task1.setProgress(60)
             sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_rename_fixviews($${"data":{"currentSchemaName":"'
                    + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
             tools_db.execute_sql(sql, commit=False)

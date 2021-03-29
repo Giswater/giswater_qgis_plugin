@@ -72,12 +72,6 @@ class GwCreateSchemaTask(GwTask):
                 return False
 
             if not self.is_test:
-                self.setProgress(50)
-            status = self.admin._api(new_api=True, project_type=project_type)
-            if not status and self.admin.dev_commit == 'FALSE':
-                return False
-
-            if not self.is_test:
                 self.setProgress(60)
 
             status = True
