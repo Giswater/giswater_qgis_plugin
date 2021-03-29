@@ -118,8 +118,11 @@ class GwEpaFileManager(GwTask):
             return
 
         if self.function_failed:
-            tools_gw.manage_json_exception(self.complet_result)
 
+            if "Failed" in self.complet_result['status']:
+                tools_gw.manage_json_exception(self.complet_result)
+            if self.rpt_result and "Failed" in self.rpt_result['status']:
+                tools_gw.manage_json_exception(self.rpt_result)
         if self.error_msg:
             title = f"Task aborted - {self.description()}"
             tools_qt.show_info_box(self.error_msg, title=title)
@@ -132,7 +135,9 @@ class GwEpaFileManager(GwTask):
 
         # If Database exception, show dialog after task has finished
         if global_vars.session_vars['last_error']:
-            tools_qt.dlg_text.show()
+            tools_qt.show_exception_message(msg=global_vars.session_vars['last_error_msg'])
+
+
 
 
     def cancel(self):

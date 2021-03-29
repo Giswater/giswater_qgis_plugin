@@ -1085,6 +1085,8 @@ def manage_exception_db(exception=None, sql=None, stack_level=2, stack_level_inc
             msg += f"SQL:\n {sql}\n\n"
         msg += f"Schema name: {schema_name}"
 
+        global_vars.session_vars['last_error_msg'] = msg
+
         # Show exception message in dialog and log it
         if show_exception_msg:
             title = "Database error"
