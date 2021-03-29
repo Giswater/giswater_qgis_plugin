@@ -659,7 +659,7 @@ BEGIN
 	ELSIF v_project_type = 'UD' THEN
 		v_querytext = 'with c as (
 					Select '||v_edit||'connec.connec_id as id, arc_id as arc,'||v_edit||'connec.connecat_id as 
-					feature_catalog, the_geom '||v_edit||'connec.expl_id from '||v_edit||'connec
+					feature_catalog, the_geom, '||v_edit||'connec.expl_id from '||v_edit||'connec
 					UNION select '||v_edit||'gully.gully_id as id, arc_id as arc,'||v_edit||'gully.gratecat_id, 
 					the_geom, '||v_edit||'gully.expl_id  from '||v_edit||'gully
 					)
