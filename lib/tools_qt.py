@@ -1156,11 +1156,13 @@ def fill_combo_unicodes(combo):
     """ Populate combo with full list of codes """
 
     unicode_list = []
-    sorted_list = None
+    matches = ["utf8", "windows", "latin"]
     for item in list(aliases.items()):
-        unicode_list.append(str(item[0]))
-        sorted_list = sorted(unicode_list, key=str.lower)
+        for x in matches:
+            if not f"{item[0]}".startswith(x): continue
+            unicode_list.append(str(item[0]))
 
+    sorted_list = sorted(unicode_list, key=str.lower)
     if sorted_list:
         set_autocompleter(combo, sorted_list)
 
