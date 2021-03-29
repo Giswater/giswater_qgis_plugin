@@ -2085,7 +2085,7 @@ class GwAdminButton:
     def _update_locale(self):
         """"""
         # TODO: Check this!
-        cmb_locale = tools_qt.get_text(self.dlg_readsql, self.cmb_locale)
+        cmb_locale = tools_qt.get_combo_value(self.dlg_readsql, self.cmb_locale, 0)
         self.folderLocale = self.sql_dir + os.sep + 'i18n' + os.sep + cmb_locale + os.sep
 
 
