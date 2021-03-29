@@ -19,26 +19,23 @@ class GwProjectLayersConfig(GwTask):
 
     fake_progress = pyqtSignal()
 
-    def __init__(self, description):
+    def __init__(self, description, params):
 
         super().__init__(description, QgsTask.CanCancel)
         self.exception = None
         self.message = None
         self.available_layers = None
-        self.get_layers = True
-        self.project_type = None
-        self.schema_name = None
-        self.qgis_project_infotype = None
-        self.db_layers = None
+        self.project_type = params['project_type']
+        self.schema_name = params['schema_name']
+        self.qgis_project_infotype = params['qgis_project_infotype']
+        self.db_layers = params['db_layers']
 
 
     def run(self):
         global_vars.session_vars['threads'].append(self)
         tools_log.log_info(f"Task started: {self.description()}")
         self.setProgress(0)
-        if self.get_layers:
-            # tools_log.log_info("get_layers_to_config")
-            self._get_layers_to_config()
+        self._get_layers_to_config()
         self._set_layer_config(self.available_layers)
         self.setProgress(100)
 
@@ -61,15 +58,6 @@ class GwProjectLayersConfig(GwTask):
 
         tools_log.log_info(f"Task cancelled: {self.description()}")
         super().cancel()
-
-
-    def set_params(self, project_type, schema_name, qgis_project_infotype, db_layers, get_layers=True):
-
-        self.project_type = project_type
-        self.schema_name = schema_name
-        self.qgis_project_infotype = qgis_project_infotype
-        self.db_layers = db_layers
-        self.get_layers = get_layers
 
 
     # region private functions
