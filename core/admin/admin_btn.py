@@ -158,6 +158,7 @@ class GwAdminButton:
                     self.project_epsg = '25831'
                     self.locale = 'en_US'
                     project_locale = 'en_US'
+                    self.folderLocale = self.sql_dir + os.sep + 'i18n' + os.sep + project_locale + os.sep
                     tools_qt.set_widget_text(self.dlg_readsql_create_project, 'srid_id', self.project_epsg)
                     tools_qt.set_widget_text(self.dlg_readsql_create_project, 'cmb_locale', self.locale)
                 else:
@@ -860,7 +861,6 @@ class GwAdminButton:
                 return
             folders = sorted(os.listdir(self.folderUpdates + ''))
             for folder in folders:
-                folder_locale = {"31": "EN", "32": "EN", "33": "EN", "34": "EN"}
                 sub_folders = sorted(os.listdir(self.folderUpdates + folder))
                 for sub_folder in sub_folders:
                     if new_project:
@@ -882,9 +882,9 @@ class GwAdminButton:
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
-                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, folder_locale.get(folder, "en_US")):
+                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'en_US'):
                                     status = self._execute_files(self.folderUpdates + folder +
-                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + folder_locale.get(folder, "en_US"), True)
+                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', True)
                                     if status is False:
                                         return False
 
@@ -905,9 +905,9 @@ class GwAdminButton:
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
-                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, folder_locale.get(folder, "en_US")):
+                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'en_US'):
                                     status = self._execute_files(self.folderUpdates + folder +
-                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + folder_locale.get(folder, "en_US"), True)
+                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', True)
                                     if status is False:
                                         return False
 
@@ -934,9 +934,9 @@ class GwAdminButton:
                                             self.locale + os.sep), True)
                                     if status is False:
                                         return False
-                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, folder_locale.get(folder, "en_US")) is True:
+                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'en_US') is True:
                                     status = self._execute_files(self.folderUpdates + folder +
-                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + folder_locale.get(folder, "en_US"), True)
+                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', True)
                                     if status is False:
                                         return False
 
@@ -959,9 +959,9 @@ class GwAdminButton:
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
-                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, folder_locale.get(folder, "en_US")) is True:
+                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'en_US') is True:
                                     status = self._execute_files(self.folderUpdates + folder +
-                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + folder_locale.get(folder, "en_US"), True)
+                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', True)
                                     if status is False:
                                         return False
 
@@ -972,7 +972,6 @@ class GwAdminButton:
             folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) +
                              os.sep + os.sep + 'updates' + os.sep + ''))
             for folder in folders:
-                folder_locale = {"31": "EN", "32": "EN", "33": "EN", "34": "EN"}
                 sub_folders = sorted(os.listdir(self.sql_dir + os.sep + str(project_type) +
                                      os.sep + os.sep + 'updates' + os.sep + folder))
                 for sub_folder in sub_folders:
@@ -984,9 +983,9 @@ class GwAdminButton:
                                                                folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
-                                elif self._process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + folder_locale.get(folder, "en_US"), '') is True:
+                                elif self._process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', '') is True:
                                     status = self._execute_files(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' +
-                                                               os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + folder_locale.get(folder, "en_US"), True)
+                                                               os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', True)
                                     if status is False:
                                         return False
 
@@ -1003,9 +1002,9 @@ class GwAdminButton:
                                     status = self._execute_files(self.sql_dir + os.sep + str(
                                         project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
                                         self.locale + os.sep), True)
-                                elif self._process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, folder_locale.get(folder, "en_US")) is True:
+                                elif self._process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'en_US') is True:
                                     status = self._execute_files(
-                                        self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + folder_locale.get(folder, "en_US"), True)
+                                        self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'en_US', True)
                                     if status is False:
                                         return False
 
@@ -1030,9 +1029,9 @@ class GwAdminButton:
                                             self.locale + os.sep), True)
                                     if status is False:
                                         return False
-                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, folder_locale.get(folder, "en_US")) is True:
+                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'en_US') is True:
                                     status = self._execute_files(self.folderUpdates + folder +
-                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + folder_locale.get(folder, "en_US"), True)
+                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', True)
                                     if status is False:
                                         return False
 
@@ -1059,9 +1058,9 @@ class GwAdminButton:
                                             self.locale + os.sep), True)
                                     if status is False:
                                         return False
-                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, folder_locale.get(folder, "en_US")) is True:
+                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'en_US') is True:
                                     status = self._execute_files(self.folderUpdates + folder +
-                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + folder_locale.get(folder, "en_US"), True)
+                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', True)
                                     if status is False:
                                         return False
 
