@@ -387,7 +387,7 @@ BEGIN
 		SELECT node_id as feature_id, ''NODE'' as feature, nodecat_id as catalog, the_geom FROM node WHERE state=2 AND node_id NOT IN (select node_id FROM plan_psector_x_node) UNION
 		SELECT arc_id as feature_id, ''ARC'' as feature, arccat_id as catalog, the_geom  FROM arc WHERE state=2 AND arc_id NOT IN (select arc_id FROM plan_psector_x_arc) UNION
 		SELECT connec_id as feature_id, ''CONNEC'' as feature, connecat_id  as catalog, the_geom  FROM connec WHERE state=2 AND connec_id NOT IN (select connec_id FROM plan_psector_x_connec) UNION
-		SELECT gully_id as feature_id, ''GULLY'' as feature , gratecat_id as catalog, the_geom FROM gully WHERE state=2 AND connec_id NOT IN (select gully_id FROM plan_psector_x_gully)) a 
+		SELECT gully_id as feature_id, ''GULLY'' as feature , gratecat_id as catalog, the_geom FROM gully WHERE state=2 AND gully_id NOT IN (select gully_id FROM plan_psector_x_gully)) a 
 		GROUP BY a.feature_id, a.feature ,a.catalog, a.the_geom';
 	END IF;
 
