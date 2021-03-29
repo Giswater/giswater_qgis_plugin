@@ -40,8 +40,6 @@ INSERT INTO sys_function VALUES (3030, 'gw_fct_debugsql', 'utils', 'function', '
 
 --2021/03/25
 
-ALTER TABLE config_form_list DROP COLUMN actionfields;
-ALTER TABLE config_form_list ADD COLUMN columnname varchar(30);
 UPDATE config_form_list SET columnname = 'not_used';
 ALTER TABLE config_form_list DROP CONSTRAINT config_form_list_pkey;
 ALTER TABLE config_form_list ADD CONSTRAINT "config_form_list_pkey" PRIMARY KEY ("tablename", "device", "listtype", "columnname");
@@ -51,8 +49,7 @@ UPDATE config_form_fields SET dv_parent_id = 'matcat_id' WHERE formname = 'upser
 UPDATE config_form_fields SET dv_parent_id = 'matcat_id' WHERE formname = 'upsert_catalog_node' AND columnname = 'matcat_id' AND formtype ='form_catalog';
 UPDATE config_form_fields SET dv_parent_id = 'matcat_id' WHERE formname = 'upsert_catalog_connec' AND columnname = 'matcat_id' AND formtype ='form_catalog';
 
-ALTER TABLE config_form_fields ADD COLUMN isfilter boolean;
-ALTER TABLE config_form_fields ADD COLUMN tabname varchar(30);
+
 UPDATE config_form_fields SET tabname = 'main';
 UPDATE config_form_fields set tabname = 'data' WHERE formtype = 'form_feature' AND formname ILIKE 've_%_%';
 ALTER TABLE config_form_fields DROP CONSTRAINT config_form_fields_pkey;

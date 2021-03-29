@@ -125,6 +125,5 @@ CREATE TABLE sys_feature_epa_type
   CONSTRAINT sys_feature_inp_pkey PRIMARY KEY (id, feature_type)
   );
 
-
-ALTER TABLE inp_arc_type ADD COLUMN epa_table character varying(30);
-ALTER TABLE inp_node_type ADD COLUMN epa_table character varying(30);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_arc_type", "column":"epa_table", "dataType":"character varying(30)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_node_type", "column":"epa_table", "dataType":"character varying(30)", "isUtils":"False"}}$$);

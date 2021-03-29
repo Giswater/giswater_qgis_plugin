@@ -13,8 +13,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE inp_rules_controls_importinp RENAME TO _inp_rules_controls_importinp_ ;
 
-ALTER TABLE cat_feature_node DROP COLUMN epa_table;
-ALTER TABLE cat_feature_arc DROP COLUMN epa_table;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_feature_node", "column":"epa_table"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_feature_arc", "column":"epa_table"}}$$);
 
 DROP TABLE IF EXISTS inp_node_type;
 DROP TABLE IF EXISTS inp_arc_type;

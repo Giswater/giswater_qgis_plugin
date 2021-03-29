@@ -9,7 +9,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 --2021/02/27
-ALTER TABLE sys_feature_cat ADD COLUMN man_table character varying(30);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_feature_cat", "column":"man_table", "dataType":"character varying(30)", "isUtils":"False"}}$$);
 
 UPDATE sys_feature_cat SET man_table = f.man_table FROM cat_feature_node f WHERE sys_feature_cat.id=f.type;
 UPDATE sys_feature_cat SET man_table = f.man_table FROM cat_feature_arc f WHERE sys_feature_cat.id=f.type;
@@ -36,3 +36,8 @@ CREATE TABLE IF NOT EXISTS crm_typevalue
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer_x_data", "column":"value_type", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer_x_data", "column":"value_status", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer_x_data", "column":"value_state", "dataType":"integer", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_form_list", "column":"actionfields"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_form_list", "column":"columnname", "dataType":"varchar(30)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_form_fields", "column":"isfilter", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_form_fields", "column":"tabname", "dataType":"varchar(30)", "isUtils":"False"}}$$);
