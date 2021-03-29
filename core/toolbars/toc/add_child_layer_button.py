@@ -10,6 +10,7 @@ from functools import partial
 from qgis.PyQt.QtCore import QPoint, Qt
 from qgis.PyQt.QtWidgets import QAction, QApplication, QMenu
 from qgis.PyQt.QtGui import QCursor
+from qgis.core import QgsApplication
 
 from ..dialog import GwAction
 from ...load_project_check import GwLoadProjectCheck
@@ -137,11 +138,19 @@ class GwAddChildLayerButton(GwAction):
 
         # Set project layers with gw_fct_getinfofromid: This process takes time for user
         # Set background task 'ConfigLayerFields'
+        schema_name = self.schema_name.replace('"', '')
+        sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
+               f"UNION "
+               f"SELECT DISTINCT(child_layer) FROM cat_feature "
+               f"WHERE child_layer IN ("
+               f"     SELECT table_name FROM information_schema.tables"
+               f"     WHERE table_schema = '{schema_name}')")
+        rows = tools_db.get_rows(sql)
         description = f"ConfigLayerFields"
         task_get_layers = GwProjectLayersConfig(description)
-        task_get_layers.set_params(self.project_type, self.schema_name, self.qgis_project_infotype)
-        # QgsApplication.taskManager().addTask(task_get_layers)
-        # QgsApplication.taskManager().triggerTask(task_get_layers)
+        task_get_layers.set_params(self.project_type, self.schema_name, self.qgis_project_infotype, rows)
+        QgsApplication.taskManager().addTask(task_get_layers)
+        QgsApplication.taskManager().triggerTask(task_get_layers)
 
         return True
 

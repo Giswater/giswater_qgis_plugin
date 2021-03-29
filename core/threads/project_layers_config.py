@@ -29,12 +29,12 @@ class GwProjectLayersConfig(GwTask):
         self.project_type = None
         self.schema_name = None
         self.qgis_project_infotype = None
+        self.db_layers = None
 
 
     def run(self):
         global_vars.session_vars['threads'].append(self)
         tools_log.log_info(f"Task started: {self.description()}")
-
         self.setProgress(0)
         if self.get_layers:
             # tools_log.log_info("get_layers_to_config")
@@ -63,11 +63,12 @@ class GwProjectLayersConfig(GwTask):
         super().cancel()
 
 
-    def set_params(self, project_type, schema_name, qgis_project_infotype, get_layers=True):
+    def set_params(self, project_type, schema_name, qgis_project_infotype, db_layers, get_layers=True):
 
         self.project_type = project_type
         self.schema_name = schema_name
         self.qgis_project_infotype = qgis_project_infotype
+        self.db_layers = db_layers
         self.get_layers = get_layers
 
 
@@ -77,15 +78,7 @@ class GwProjectLayersConfig(GwTask):
     def _get_layers_to_config(self):
         """ Get available layers to be configured """
 
-        schema_name = self.schema_name.replace('"', '')
-        sql = (f"SELECT DISTINCT(parent_layer) FROM cat_feature "
-               f"UNION "
-               f"SELECT DISTINCT(child_layer) FROM cat_feature "
-               f"WHERE child_layer IN ("
-               f"     SELECT table_name FROM information_schema.tables"
-               f"     WHERE table_schema = '{schema_name}')")
-        rows = tools_db.get_rows(sql)
-        self.available_layers = [layer[0] for layer in rows]
+        self.available_layers = [layer[0] for layer in self.db_layers]
 
         self._set_form_suppress(self.available_layers)
         all_layers_toc = tools_qgis.get_project_layers()
