@@ -48,6 +48,7 @@ project_vars['project_type'] = None     # gwProjectType
 
 session_vars = {}
 session_vars['last_error'] = None       # An instance of the last database runtime error
+session_vars['last_error_msg'] = None   # An instance of the last database runtime error message
 session_vars['threads'] = []            # An instance of the different threads for the execution of the Giswater functionalities (type:list)
 session_vars['dialog_docker'] = None    # An instance of GwDocker from "/core/ui/docker.py" which is used to mount a docker form
 session_vars['info_docker'] = None      # An instance of current status of the info docker form configured by user. Can be True or False
