@@ -1505,13 +1505,13 @@ def get_actions_from_json(json_result, sql):
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
 
 
-def check_config_settings(section, parameter, value, config_type="user", file_name="init", comment=None):
+def check_config_settings(section, parameter, value, config_type="user", file_name="init", comment=None, prefix=True):
     """ Check if @section and @parameter exists in file @file_name. If not add them = None """
 
-    result = get_config_parser(section, parameter, config_type, file_name)
+    result = get_config_parser(section, parameter, config_type, file_name, prefix)
     if result is not None:
         return result
-    set_config_parser(section, parameter, value, config_type, file_name, comment)
+    set_config_parser(section, parameter, value, config_type, file_name, comment, prefix)
     return value
 
 
@@ -1541,7 +1541,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     sql += f");"
 
     # Get log_sql for developers
-    dev_log_sql = get_config_parser('system', 'log_sql', "user", "init")
+    dev_log_sql = get_config_parser('system', 'log_sql', "user", "init", False)
     if dev_log_sql in ("True", "False"):
         log_sql = tools_os.set_boolean(dev_log_sql)
 

@@ -576,9 +576,6 @@ class GwInfo(QObject):
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
                 if layout not in layout_list and layout.objectName() not in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                     layout_list.append(layout)
-                    # Add widgets into layout
-                    layout.addWidget(label, 0, field['layoutorder'])
-                    layout.addWidget(widget, 1, field['layoutorder'])
                 if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
                     layout.addWidget(label, 0, field['layoutorder'])
                     layout.addWidget(widget, 1, field['layoutorder'])

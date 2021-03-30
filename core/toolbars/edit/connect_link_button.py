@@ -208,7 +208,6 @@ class GwConnectLinkButton(GwMaptool):
             body = tools_gw.create_body(feature=feature_id, extras=extras)
             # Execute SQL function and show result to the user
             result = tools_gw.execute_procedure('gw_fct_setlinktonetwork', body)
-            print(f"result -->{result}")
             if result:
                 self.dlg_dtext = GwDialogTextUi('connect_to_network')
                 tools_gw.load_settings(self.dlg_dtext)

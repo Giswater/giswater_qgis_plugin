@@ -20,7 +20,7 @@ class GwAutoMincutTask(GwTask):
 
     def __init__(self, description, mincut_class, element_id):
 
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description)
         self.mincut_class = mincut_class
         self.element_id = element_id
         self.exception = None
@@ -28,7 +28,7 @@ class GwAutoMincutTask(GwTask):
 
     def run(self):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
-        global_vars.session_vars['threads'].append(self)
+        super().run()
         self.mincut_class.dlg_mincut.btn_cancel_task.show()
         self.mincut_class.dlg_mincut.btn_cancel.hide()
 
@@ -65,10 +65,10 @@ class GwAutoMincutTask(GwTask):
 
 
     def finished(self, result):
+        super().finished(result)
         self.mincut_class.dlg_mincut.btn_cancel_task.hide()
         self.mincut_class.dlg_mincut.btn_cancel.show()
-        global_vars.session_vars['threads'].remove(self)
-        
+
         # Handle exception
         if self.exception is not None:
             msg = f"<b>Key: </b>{self.exception}<br>"

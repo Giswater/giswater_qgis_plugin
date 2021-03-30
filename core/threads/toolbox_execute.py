@@ -24,7 +24,7 @@ class GwToolBoxTask(GwTask):
 
     def __init__(self, toolbox, description, dialog, combo, result):
 
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description)
         self.toolbox = toolbox
         self.dialog = dialog
         self.combo = combo
@@ -34,9 +34,9 @@ class GwToolBoxTask(GwTask):
 
 
     def run(self):
+        super().run()
         extras = ''
         feature_field = ''
-        global_vars.session_vars['threads'].append(self)
 
         # Get function name
         function = None
@@ -148,8 +148,7 @@ class GwToolBoxTask(GwTask):
 
 
     def finished(self, result):
-
-        global_vars.session_vars['threads'].remove(self)
+        super().finished(result)
         self.dialog.btn_cancel.hide()
         self.dialog.btn_close.show()
         self.dialog.progressBar.setVisible(False)
