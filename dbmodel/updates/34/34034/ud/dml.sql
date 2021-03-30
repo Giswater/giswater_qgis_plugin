@@ -344,3 +344,9 @@ ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
 
 
+INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutorder, project_type, isparent, 
+isautoupdate, datatype, widgettype, ismandatory, layoutname, iseditable, vdefault)
+VALUES ('edit_node_interpolate', 'hidden', 'Values to use with tool node interpolate',
+'role_edit', 'Values to manage node interpolate tool', FALSE, NULL, 'ud', FALSE, FALSE, 'json', 'text', true, NULL, NULL,
+'{"topElev":{"status":false, "column":"custom_top_elev"},  "elev":{"status":false, "column":"custom_elev"}, "ymax":{"status":true, "column":"custom_ymax"}}'
+) ON CONFLICT (id) DO NOTHING;
