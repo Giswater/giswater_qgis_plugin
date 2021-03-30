@@ -121,7 +121,7 @@ BEGIN
 	v_elev1:= (SELECT sys_elev FROM v_edit_node WHERE node_id=p_node1);
 	
 	INSERT INTO audit_check_data (fid,  criticity, error_message)
-	VALUES (213, 4, concat('System values of node 1  (',p_node1,') - top elev:',v_top1 , ', elev:', v_elev1));
+	VALUES (213, 4, concat('System values of node 1 (',p_node1,') - top elev:',v_top1 , ', elev:', v_elev1));
 
 	-- Get node2 system values
 	v_geom2:= (SELECT the_geom FROM node WHERE node_id=p_node2);
@@ -171,7 +171,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Elev:',v_elev0::numeric(12,3)::text));
 	END IF;
 
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, '	INFO: To configure columns to set please upsert user variable edit_node_interpolate');
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, 'INFO: To configure columns to set please upsert user variable edit_node_interpolate');
 
 	-- get results
 	-- info
