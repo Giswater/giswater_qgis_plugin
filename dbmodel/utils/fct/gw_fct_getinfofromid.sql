@@ -237,7 +237,6 @@ BEGIN
 		INTO v_parentfields
 		USING v_table_parent, v_schemaname; 
 
-	raise notice 'v_parentfields %', v_parentfields;
 	v_parentfields = replace (v_parentfields::text, '{', '[');
 	v_parentfields = replace (v_parentfields::text, '}', ']');
 
@@ -452,8 +451,6 @@ BEGIN
 			INTO tableparent_id_arg
 			USING v_tablename;
                 
-		raise notice'Parent-Child. Table parent: %' , tableparent_id_arg;
-
 		-- Identify tableinfotype_id		
 		EXECUTE' SELECT tableinfotype_id FROM cat_feature
 			JOIN config_info_layer_x_type ON child_layer=tableinfo_id
@@ -462,15 +459,11 @@ BEGIN
 			INTO v_tablename
 			USING v_id, v_infotype;
 
-		raise notice'Parent-Child. Table child: %, v_infotype: %' , v_tablename, v_infotype;
-
 	-- parent, and epa toolbar
 	ELSIF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS TRUE) AND v_toolbar ='epa' THEN
 
 		parent_child_relation:=true;
 		v_tablename_original = v_tablename;
-
-		raise notice'Parent-Child. Table child: %, v_infotype: %' , v_tablename, v_infotype;
 
 		-- check parent_epa_view
 		EXECUTE 'SELECT tableparentepa_id from config_info_layer WHERE layer_id=$1'
@@ -481,8 +474,6 @@ BEGIN
 		EXECUTE' SELECT epatable FROM '||quote_ident(tableparent_id_arg)||' WHERE nid::text=$1'
 			INTO v_tablename
 			USING v_id;
-
-			raise notice'Parent-Child with epa table. Table child: %' , v_tablename;
 
 		IF v_tablename IS NULL THEN
 
@@ -511,19 +502,17 @@ BEGIN
 		WHERE layer_id=$1 AND infotype_id=$2'
 			INTO v_tablename
 		USING v_tablename, v_infotype;
-		raise notice 'NO parent-child, NO editable, Informable: %, v_infotype: %' , v_tablename, v_infotype;
 
 	-- Check if it is not parent, not editable and has not tableinfo_id (is not informable)
 	ELSIF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS FALSE AND is_editable IS FALSE AND tableinfo_id IS NULL) THEN 
 		v_tablename= null;
-		raise notice 'NO parent-child, NO editable NO informable: %' , v_tablename;
-        END IF;
+	END IF;
 
 	-- Get child type
 	EXECUTE 'SELECT id FROM cat_feature WHERE child_layer = $1 LIMIT 1'
 		INTO v_childtype
 		USING v_tablename;
-	v_childtype := COALESCE(v_childtype, ''); 
+		v_childtype := COALESCE(v_childtype, ''); 
 	
 	-- Propierties of info layer's
 	------------------------------

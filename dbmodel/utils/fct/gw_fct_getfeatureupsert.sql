@@ -721,8 +721,6 @@ BEGIN
 	-- Convert to json
 	v_fields := array_to_json(v_fields_array);
 
-	raise notice 'v_fields %', v_fields;
-
 	-- Control NULL's
 	v_version := COALESCE(v_version, '[]');
 	v_fields := COALESCE(v_fields, '[]');    
