@@ -21,7 +21,7 @@ class GwProjectLayersConfig(GwTask):
 
     def __init__(self, description, params):
 
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description)
         self.exception = None
         self.message = None
         self.available_layers = None
@@ -32,8 +32,7 @@ class GwProjectLayersConfig(GwTask):
 
 
     def run(self):
-        global_vars.session_vars['threads'].append(self)
-        tools_log.log_info(f"Task started: {self.description()}")
+        super().run()
         self.setProgress(0)
         self._get_layers_to_config()
         self._set_layer_config(self.available_layers)
@@ -43,9 +42,8 @@ class GwProjectLayersConfig(GwTask):
 
 
     def finished(self, result):
-        global_vars.session_vars['threads'].remove(self)
+        super().finished(result)
         if result:
-            tools_log.log_info(f"Task finished: {self.description()}")
             return
 
         if self.exception:
@@ -55,8 +53,6 @@ class GwProjectLayersConfig(GwTask):
 
 
     def cancel(self):
-
-        tools_log.log_info(f"Task cancelled: {self.description()}")
         super().cancel()
 
 

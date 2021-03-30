@@ -21,7 +21,7 @@ class GwCreateSchemaTask(GwTask):
 
     def __init__(self, admin, description, params):
 
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description)
         self.admin = admin
         self.params = params
 
@@ -29,7 +29,7 @@ class GwCreateSchemaTask(GwTask):
 
     def run(self):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
-        global_vars.session_vars['threads'].append(self)
+        super().run()
         self.admin.dlg_readsql_create_project.btn_cancel_task.show()
         self.admin.dlg_readsql_create_project.btn_accept.hide()
         self.is_test = self.params['is_test']
@@ -111,10 +111,10 @@ class GwCreateSchemaTask(GwTask):
             return False
 
     def finished(self, result):
+        super().finished(result)
         self.setProgress(100)
         self.admin.dlg_readsql_create_project.btn_cancel_task.hide()
         self.admin.dlg_readsql_create_project.btn_accept.show()
-        global_vars.session_vars['threads'].remove(self)
         if self.isCanceled(): return
 
         # Handle exception

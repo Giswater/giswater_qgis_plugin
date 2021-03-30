@@ -23,32 +23,15 @@ class GwTask(QgsTask, QObject):
 
         QObject.__init__(self)
         super().__init__(description, QgsTask.CanCancel)
+
         self.exception = None
         self.duration = duration
 
 
     def run(self):
         global_vars.session_vars['threads'].append(self)
-
         tools_log.log_info(f"Started task {self.description()}")
-
-        if self.duration is 0:
-            if self.isCanceled():
-                return False
-            if self.progress() >= 100:
-                return True
-            return True
-        else:
-            wait_time = self.duration / 100
-            sleep(wait_time)
-            for i in range(100):
-                sleep(wait_time)
-                self.setProgress(i)
-                if self.isCanceled():
-                    return False
-
-            return True
-
+        
 
     def finished(self, result):
         global_vars.session_vars['threads'].remove(self)

@@ -25,7 +25,7 @@ class GwEpaFileManager(GwTask):
 
     def __init__(self, description, go2epa):
 
-        super().__init__(description, QgsTask.CanCancel)
+        super().__init__(description)
         self.go2epa = go2epa
         self.exception = None
         self.error_msg = None
@@ -55,6 +55,7 @@ class GwEpaFileManager(GwTask):
 
 
     def run(self):
+        super().run()
 
         # Initialize instance variables
         self.exception = None
@@ -63,7 +64,6 @@ class GwEpaFileManager(GwTask):
         self.common_msg = ""
         self.function_failed = False
         self.complet_result = None
-        global_vars.session_vars['threads'].append(self)
 
         status = True
 
@@ -83,7 +83,7 @@ class GwEpaFileManager(GwTask):
 
 
     def finished(self, result):
-        global_vars.session_vars['threads'].remove(self)
+        super().finished(result)
         self.dlg_go2epa.btn_cancel.setEnabled(False)
         if self.isCanceled(): return
 
