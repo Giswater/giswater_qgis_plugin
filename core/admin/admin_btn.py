@@ -119,6 +119,9 @@ class GwAdminButton:
         self.schema_type = project_type
         self.project_epsg = project_srid
         self.locale = project_locale
+
+        self.folderLocale = self.sql_dir + os.sep + 'i18n' + os.sep + str(self.locale) + os.sep
+
         self.project_issample = example_data
 
         # Save in settings
