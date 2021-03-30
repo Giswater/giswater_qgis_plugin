@@ -1045,7 +1045,9 @@ class ApiParent(ParentAction):
         self.dlg_dtext = DialogTextUi()
         self.load_settings(self.dlg_dtext)
 
-        utils_giswater.setWidgetText(self.dlg_dtext, self.dlg_dtext.txt_infolog, 'Interpolate tool')
+        utils_giswater.setWidgetText(self.dlg_dtext, self.dlg_dtext.txt_infolog, 'Interpolate tool.\n'
+        'To modify columns (top_elev, ymax, elev among others) to be interpolated set variable edit_node_interpolate '
+        'on table config_param_user')
         self.dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
                                         "interpolation\nNode1: \nNode2:")
 
