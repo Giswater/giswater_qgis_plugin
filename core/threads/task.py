@@ -12,7 +12,7 @@ from qgis.core import QgsTask
 
 from ... import global_vars
 from ...lib import tools_log, tools_db
-
+from qgis.utils import iface
 
 class GwTask(QgsTask, QObject):
     """ This shows how to subclass QgsTask """
@@ -32,11 +32,14 @@ class GwTask(QgsTask, QObject):
 
         global_vars.session_vars['threads'].append(self)
         tools_log.log_info(f"Started task {self.description()}")
-        
+        iface.actionOpenProject().setEnabled(False)
+        iface.actionNewProject().setEnabled(False)
+
 
     def finished(self, result):
         global_vars.session_vars['threads'].remove(self)
-
+        iface.actionOpenProject().setEnabled(True)
+        iface.actionNewProject().setEnabled(True)
         if result:
             tools_log.log_info(f"Task {self.description()} completed")
         else:
