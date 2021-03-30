@@ -102,8 +102,9 @@ BEGIN
 	p_node1 = (((p_data ->>'data')::json->>'parameters')::json->>'node1')::text;
 	p_node2 = (((p_data ->>'data')::json->>'parameters')::json->>'node2')::text;
 	p_action = (((p_data ->>'data')::json->>'parameters')::json->>'action');
+	
 	IF p_action IS NULL THEN 
-		p_action = 'INTERPOLATE'
+		p_action = 'INTERPOLATE';
 	END IF;
 
 	-- manage log (fid: 213)
@@ -120,7 +121,7 @@ BEGIN
 	v_elev1:= (SELECT sys_elev FROM v_edit_node WHERE node_id=p_node1);
 	
 	INSERT INTO audit_check_data (fid,  criticity, error_message)
-	VALUES (213, 4, concat('System values of node 1 - top elev:',v_top1 , ', elev:', v_elev1));
+	VALUES (213, 4, concat('System values of node 1  (',p_node1,') - top elev:',v_top1 , ', elev:', v_elev1));
 
 	-- Get node2 system values
 	v_geom2:= (SELECT the_geom FROM node WHERE node_id=p_node2);
@@ -128,7 +129,7 @@ BEGIN
 	v_elev2:= (SELECT sys_elev FROM v_edit_node WHERE node_id=p_node2);
 
 	INSERT INTO audit_check_data (fid,  criticity, error_message)
-	VALUES (213, 4, concat('System values of node 2 - top elev:',v_top2 , ', elev:', v_elev2));
+	VALUES (213, 4, concat('System values of node 2 (',p_node2,') - top elev:',v_top2 , ', elev:', v_elev2));
 
 	-- Calculate distances
 	v_distance01 = (SELECT ST_distance (v_geom0 , v_geom1));
@@ -169,6 +170,8 @@ BEGIN
 		v_elev:= (SELECT to_json(v_elev0::numeric(12,3)::text));
 		INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Elev:',v_elev0::numeric(12,3)::text));
 	END IF;
+
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, '	INFO: To configure columns to set please upsert user variable edit_node_interpolate');
 
 	-- get results
 	-- info
