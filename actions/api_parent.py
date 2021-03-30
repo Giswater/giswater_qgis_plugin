@@ -26,7 +26,7 @@ from .. import utils_giswater
 from .parent import ParentAction
 from .HyperLinkLabel import HyperLinkLabel
 from ..map_tools.snapping_utils_v3 import SnappingConfigManager
-from ..ui_manager import DialogTextUi
+from ..ui_manager import Interpolate
 
 
 class ApiParent(ParentAction):
@@ -1033,7 +1033,7 @@ class ApiParent(ParentAction):
 
     def manage_close_interpolate(self):
 
-        self.save_settings(self.dlg_dtext)
+        self.save_settings(self.dlg_interpolate)
         self.remove_interpolate_rb()
 
 
@@ -1042,8 +1042,8 @@ class ApiParent(ParentAction):
         self.rb_interpolate = []
         self.interpolate_result = None
         self.resetRubberbands()
-        self.dlg_dtext = DialogTextUi()
-        self.load_settings(self.dlg_dtext)
+        self.dlg_interpolate = Interpolate()
+        self.load_settings(self.dlg_interpolate)
 
         utils_giswater.setWidgetText(self.dlg_dtext, self.dlg_dtext.txt_infolog, 'Interpolate tool.\n'
         'To modify columns (top_elev, ymax, elev among others) to be interpolated set variable edit_node_interpolate '
@@ -1051,12 +1051,11 @@ class ApiParent(ParentAction):
         self.dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
                                         "interpolation\nNode1: \nNode2:")
 
-        self.dlg_dtext.btn_accept.clicked.connect(partial(self.chek_for_existing_values))
-        self.dlg_dtext.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_dtext))
-        self.dlg_dtext.rejected.connect(partial(self.save_settings, self.dlg_dtext))
-        self.dlg_dtext.rejected.connect(partial(self.remove_interpolate_rb))
-
-        self.open_dialog(self.dlg_dtext, dlg_name='dialog_text')
+        self.dlg_interpolate.btn_accept.clicked.connect(partial(self.chek_for_existing_values))
+        self.dlg_interpolate.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_interpolate))
+        self.dlg_interpolate.rejected.connect(partial(self.save_settings, self.dlg_interpolate))
+        self.dlg_interpolate.rejected.connect(partial(self.remove_interpolate_rb))
+        self.open_dialog(self.dlg_interpolate, dlg_name='interpolate')
 
         # Set circle vertex marker
         color = QColor(255, 100, 255)
@@ -1132,30 +1131,38 @@ class ApiParent(ParentAction):
                     rb = self.draw_point(QgsPointXY(result.point()), color=QColor(
                         0, 150, 55, 100), width=10, is_new=True)
                     self.rb_interpolate.append(rb)
-                    self.dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
+                    self.dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
                     self.controller.show_message(message, message_level=0, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
                     rb = self.draw_point(QgsPointXY(result.point()), color=QColor(
                         0, 150, 55, 100), width=10, is_new=True)
                     self.rb_interpolate.append(rb)
-                    self.dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
+                    self.dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
                     self.controller.show_message(message, message_level=0, parameter=self.node2)
 
         if self.node1 and self.node2:
+
+            # Get checkbox extrapolate value from dialog
+            chk_extrapolate = self.dlg_interpolate.findChild(QCheckBox, 'chk_extrapolate')
+            action_dict = {True: 'EXTRAPOLATE', False: 'INTERPOLATE'}
+
             self.canvas.xyCoordinates.disconnect()
             ep.canvasClicked.disconnect()
 
             self.iface.setActiveLayer(self.layer)
             self.iface.mapCanvas().scene().removeItem(self.vertex_marker)
             extras = f'"parameters":{{'
+            extras += f'"action":"{action_dict[chk_extrapolate.isChecked()]}", '
             extras += f'"x":{self.last_point[0]}, '
             extras += f'"y":{self.last_point[1]}, '
             extras += f'"node1":"{self.node1}", '
             extras += f'"node2":"{self.node2}"}}'
             body = self.create_body(extras=extras)
             self.interpolate_result = self.controller.get_json('gw_fct_node_interpolate', body, log_sql=True)
-            self.add_layer.populate_info_text(self.dlg_dtext, self.interpolate_result['body']['data'])
+            self.add_layer.populate_info_text(self.dlg_interpolate, self.interpolate_result['body']['data'])
+            
+            self.iface.actionPan().trigger()
 
 
     def chek_for_existing_values(self):
@@ -1184,7 +1191,7 @@ class ApiParent(ParentAction):
                 widget.setStyleSheet(None)
                 utils_giswater.setWidgetText(self.dlg_cf, widget, f'{v}')
                 widget.editingFinished.emit()
-        self.close_dialog(self.dlg_dtext)
+        self.close_dialog(self.dlg_interpolate)
 
 
     def remove_interpolate_rb(self):

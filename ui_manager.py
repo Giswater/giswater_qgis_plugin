@@ -215,6 +215,11 @@ class DialogTextUi(GwDialog, FORM_CLASS):
     pass
 
 
+FORM_CLASS = get_ui_class('interpolate.ui')
+class Interpolate(GwDialog, FORM_CLASS):
+    pass
+
+
 FORM_CLASS = get_ui_class('dialog_table.ui')
 class BasicTable(GwDialog, FORM_CLASS):
     pass
