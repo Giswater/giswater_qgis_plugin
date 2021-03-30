@@ -934,8 +934,8 @@ BEGIN
 		-- restore plan_psector_force_delete
 		UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
 
-		--remove node from config_mincut_inlet
-		DELETE FROM config_mincut_inlet WHERE node_id=OLD.node_id;
+		--remove node from config_graf_inlet
+		DELETE FROM config_graf_inlet WHERE node_id=OLD.node_id;
 
 		--Delete addfields (after or before deletion of node, doesn't matter)
 		DELETE FROM man_addfields_value WHERE feature_id = OLD.node_id  and parameter_id in 
