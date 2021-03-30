@@ -20,3 +20,6 @@ UPDATE config_form_fields set widgetcontrols = '{"setQgisMultiline":false}' WHER
 
 UPDATE cat_feature_node SET num_arcs = 9 WHERE man_table = 'man_tank';
 
+-- 2021/03/30
+UPDATE om_mincut_cat_type SET descript=id WHERE descript IS NULL;
+
