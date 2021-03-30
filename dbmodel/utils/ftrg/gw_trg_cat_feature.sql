@@ -240,7 +240,7 @@ BEGIN
 					IF NEW.child_layer NOT IN (SELECT tableinfo_id from config_info_layer_x_type)
 					and NEW.child_layer IS NOT NULL THEN
 						INSERT INTO config_info_layer_x_type (tableinfo_id,infotype_id,tableinfotype_id)
-						VALUES (NEW.child_layer,1,NEW.child_layer) ON CONFLICT (tableinfo_id) DO NOTHING;
+						VALUES (NEW.child_layer,1,NEW.child_layer) ON CONFLICT (tableinfo_id, infotype_id) DO NOTHING;
 					END IF;
 
 				END IF;
