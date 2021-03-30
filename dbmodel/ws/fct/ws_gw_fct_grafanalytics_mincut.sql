@@ -14,10 +14,13 @@ $BODY$
 /*
 TO EXECUTE
 INSERT INTO om_mincut values (-1);
-select gw_fct_mincut('113910', 'arc', -1)
+select SCHEMA_NAME.gw_fct_mincut('132328', 'arc', 1718)
 
+for step:1 an initial inundation process must be executed from specific arc
+for step:2 all arc on the other side for valves of step1 have been setted before. As result no arc is needed
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"arc":"2001", "step":1, "parameters":{"id":-1}}}')
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"arc":"2001", "step":2, "parameters":{"id":-1}}}')
+SELECT SCHEMA_NAME.gw_fct_grafanalytics_mincut('{"data":{"step":2, "parameters":{"id":-1}}}')
+
 */
 
 DECLARE
@@ -83,8 +86,17 @@ BEGIN
 		
 		-- setup graf closing tank's inlet
 		UPDATE temp_anlgraf SET flag = 1 
+
 		FROM config_graf_inlet 
 		WHERE (temp_anlgraf.node_1 = config_graf_inlet.node_id OR temp_anlgraf.node_2 = config_graf_inlet.node_id);
+
+		-- setup graf reset water flag
+		UPDATE temp_anlgraf SET water=0;
+
+		-- set the starting element
+		v_querytext = 'UPDATE temp_anlgraf SET water=1 , flag = 1 WHERE arc_id='||quote_literal(v_arc); 
+		EXECUTE v_querytext;
+
 		
 	ELSIF v_mincutstep = 2 THEN 
 
@@ -111,19 +123,15 @@ BEGIN
 		FROM config_graf_inlet 
 		WHERE (temp_anlgraf.node_1 = config_graf_inlet.node_id OR temp_anlgraf.node_2 = config_graf_inlet.node_id);
 	
+		-- set the starting elements
+		UPDATE temp_anlgraf SET water=1 , flag = 1 WHERE arc_id::text IN (SELECT arc_id FROM temp_arc WHERE result_id = v_mincutid::text);
+		
 	END IF;
 
 	-- start engine
 	---------------
-
-	-- 1) set the starting element
-	v_querytext = 'UPDATE temp_anlgraf SET water=1 , flag = 1 WHERE arc_id='||quote_literal(v_arc); 
-	EXECUTE v_querytext;
-	RAISE NOTICE 'ARC------ %',v_arc;
-
 	UPDATE temp_anlgraf SET checkf = 0;
 	
-	EXECUTE v_querytext;-- inundation process
 	LOOP	
 		cont1 = cont1+1;
 		UPDATE temp_anlgraf n SET water = 1, flag = n.flag+1, checkf = checkf + 1 FROM v_anl_graf a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;

@@ -50,6 +50,7 @@ BEGIN
 	SELECT macroexpl_id INTO v_macroexpl FROM exploitation WHERE expl_id=mincut_rec.expl_id;
 
 	DELETE FROM temp_mincut;
+	DELETE FROM temp_arc;
 
 	-- Create the matrix to work with pgrouting
 	INSERT INTO temp_mincut 
@@ -146,26 +147,27 @@ BEGIN
 		END LOOP;
 	
 		IF inlet_path IS FALSE THEN
+		
 			IF v_debug THEN
-				RAISE NOTICE 'Finding additional affectations to valve %', rec_valve.node_id;
+				RAISE NOTICE 'Finding additional affectations for valve %', rec_valve.node_id;
 			END IF;
+			
 			SELECT arc_id INTO element_id_arg FROM v_edit_arc WHERE (node_1=rec_valve.node_id OR node_2=rec_valve.node_id)
 			AND arc_id NOT IN (SELECT arc_id FROM om_mincut_arc WHERE result_id=result_id_arg);
 	
 			IF element_id_arg IS NOT NULL THEN
 		
-				-- Select public.geometry
-				SELECT the_geom INTO arc_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
-	
 				-- Insert arc id
 				IF v_debug THEN
-					RAISE NOTICE 'inserting into om_mincut_arc arc_id: %',element_id_arg;
+					RAISE NOTICE 'Manage arc on the other side for non-inlet valve: %',element_id_arg;
 				END IF;
-				INSERT INTO "om_mincut_arc" (arc_id, the_geom, result_id) VALUES (element_id_arg, arc_aux, result_id_arg);
-			
-				-- call engine in function of mincut version used
-					
+
 				IF v_mincutversion =  3 THEN
+
+					-- Select public.geometry
+					SELECT the_geom INTO arc_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
+
+					INSERT INTO "om_mincut_arc" (arc_id, the_geom, result_id) VALUES (element_id_arg, arc_aux, result_id_arg);
 
 					-- Run for extremes node
 					SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
@@ -185,33 +187,24 @@ BEGIN
 					IF controlValue = 0 THEN
 						-- Compute the tributary area using DFS
 						PERFORM gw_fct_mincut_inverted_flowtrace_engine(node_2_aux, result_id_arg);
-					END IF;	
-					
-				ELSIF v_mincutversion = 4 OR v_mincutversion =  5 THEN
-
-					-- call graf analytics function
-					v_data = concat ('{"data":{"grafClass":"MINCUT", "arc":', element_id_arg ,', "step":2, "parameters":{"id":', result_id_arg ,'}}}');
-
-					PERFORM gw_fct_grafanalytics_mincut(v_data);		
-				END IF;
-			ELSE 
-				IF v_debug THEN
-					RAISE NOTICE 'Valve: % has no more arc to affect',rec_valve.node_id;
+					END IF;
+				ELSE
+					-- agg arc_id in order to collect into gw_fct_grafanalytics_mincut function
+					INSERT INTO temp_arc (arc_id, result_id) VALUES (element_id_arg, result_id_arg);						
 				END IF;
 			END IF;
-
-			raise notice ' valve no intlet %', rec_valve.node_id;
+			
 			--Valve has no exit. Update proposed value
 			UPDATE om_mincut_valve SET proposed=FALSE WHERE result_id=result_id_arg AND node_id=rec_valve.node_id;
-
-		END IF;
-
-		IF v_debug THEN
-			RAISE NOTICE 'End flow analisys process for valve: %',rec_valve.node_id;
-		END IF;
-	
+		END IF;	
 	END LOOP;
 
+	-- call graf analytics function
+	IF v_mincutversion = 4 OR v_mincutversion =  5 THEN
+		v_data = concat ('{"data":{"grafClass":"MINCUT", "step":2, "parameters":{"id":', result_id_arg ,'}}}');	
+		PERFORM gw_fct_grafanalytics_mincut(v_data);	
+	END IF;
+	
 	RETURN 1;
 END;
 $BODY$
