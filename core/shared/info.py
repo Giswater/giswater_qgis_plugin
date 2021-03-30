@@ -1320,6 +1320,7 @@ class GwInfo(QObject):
             def _manage_textarea(self, **kwargs)
             def _manage_spinbox(self, **kwargs)
             def _manage_doubleSpinbox(self, **kwargs)
+            def _manage_list(self, **kwargs)
             def _manage_tableview(self, **kwargs)
          """
 
@@ -1546,6 +1547,7 @@ class GwInfo(QObject):
 
 
     def _manage_list(self, **kwargs):
+        print(f"TEST LIST")
         self._manage_tableview(**kwargs)
 
     def _manage_tableview(self, **kwargs):
@@ -3192,6 +3194,7 @@ class GwInfo(QObject):
 
 
     def _fill_tab_rpt(self, complet_result, new_feature):
+
         index_tab = self.tab_main.currentIndex()
         list_tables = self.tab_main.widget(index_tab).findChildren(QTableView)
         complet_list = []
@@ -3210,7 +3213,7 @@ class GwInfo(QObject):
 
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
-        complet_list = self._get_list(complet_result, '', tab_name, '',columnname, widgetname, 'form_feature')
+        complet_list = self._get_list(complet_result, '', tab_name, '', columnname, widgetname, 'form_feature')
 
         if complet_list is False:
             return False, False

@@ -50,7 +50,6 @@ RAISE NOTICE '%---%',v_formname, v_formtype;
 	IF (SELECT columnname FROM config_form_fields WHERE formname = v_formname AND formtype= v_formtype LIMIT 1) IS NOT NULL THEN
 		RAISE NOTICE '%---%',v_formname, v_formtype;
 		IF v_device = 4 THEN
-		RAISE NOTICE 'TEST';
 			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT columnname, layoutorder as orderby FROM config_form_fields WHERE formname = $1 AND formtype= $2 AND tabname = $3 ORDER BY orderby) a'
 					INTO fields_array
 					USING v_formname, v_formtype, v_tabname;
@@ -63,38 +62,41 @@ RAISE NOTICE 'fields_array---%',fields_array;
 
 		-- v_fields (1step)
 		v_fields = '{';
-		
+
 		-- v_fields (2 step)
 		FOREACH aux_json IN ARRAY fields_array
 		LOOP
 			v_key = fields_array[(aux_json->>'orderby')::INT]->>'columnname';
-			v_value = (SELECT listfilterparam->>'vdefault' FROM config_form_fields WHERE formname=v_formname AND columnname=v_key);
-			
-			IF i>1 THEN 
+			IF v_device = 4 THEN
+				v_value = (SELECT listfilterparam->>'vdefault' FROM config_form_fields WHERE formname=v_formname AND columnname=v_key AND tabname =v_tabname);
+			ELSE
+				v_value = (SELECT listfilterparam->>'vdefault' FROM config_form_fields WHERE formname=v_formname AND columnname=v_key);
+			END IF;
+			IF i>1 THEN
 				v_fields = concat (v_fields,',');
 			END IF;
 
 			-- setting values
-			IF v_value is null then 
-				v_fields = concat (v_fields, '"',v_key, '":null');	
+			IF v_value is null then
+				v_fields = concat (v_fields, '"',v_key, '":null');
 			ELSE
-				v_fields = concat (v_fields, '"',v_key, '":"', v_value, '"');	
+				v_fields = concat (v_fields, '"',v_key, '":"', v_value, '"');
 			END IF;
-		
+
 			i=i+1;
-		END LOOP;				
+		END LOOP;
 
 		-- v_fields (3 step)
-		v_fields = concat (v_fields ,'}');			
+		v_fields = concat (v_fields ,'}');
 	END IF;
 RAISE NOTICE 'v_fields----------->%',v_fields;
 
 	-- Return
-    RETURN (v_fields);    
+    RETURN (v_fields);
 
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;    
+	EXCEPTION WHEN OTHERS THEN
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$
@@ -105,4 +107,3 @@ ALTER FUNCTION ws_sample35.gw_fct_getfiltervaluesvdef(json)
 GRANT EXECUTE ON FUNCTION ws_sample35.gw_fct_getfiltervaluesvdef(json) TO public;
 GRANT EXECUTE ON FUNCTION ws_sample35.gw_fct_getfiltervaluesvdef(json) TO role_admin;
 GRANT EXECUTE ON FUNCTION ws_sample35.gw_fct_getfiltervaluesvdef(json) TO role_basic;
---SELECT ws_sample35.gw_fct_getfiltervaluesvdef('{"client":{"device":4, "infoType":1, "lang":"ES"},"data":{"formName": "ve_arc_pipe", "formType": "form_feature", "tabName":"tab_rpt"}}');

@@ -454,14 +454,18 @@ RAISE NOTICE 'v_filter_values-----------------%',v_filter_values;
 	-- adding the widget of list
 	v_i = cardinality(v_filter_fields) ;
 	
-	EXECUTE 'SELECT listclass FROM config_form_list WHERE tablename = $1 LIMIT 1'
-		INTO v_listclass
-		USING v_tablename;
+
 
 	-- setting new element
 	IF v_device = 4 THEN
+		EXECUTE 'SELECT listclass FROM config_form_list WHERE tablename = $1 AND columnname = $2 LIMIT 1'
+		INTO v_listclass
+		USING v_tablename, v_columnname;
 		v_filter_fields[v_i+1] := json_build_object('widgettype',v_listclass,'datatype','icon','columnname',v_columnname, 'widgetname', v_widgetname, 'value', v_result_list);
 	ELSE
+		EXECUTE 'SELECT listclass FROM config_form_list WHERE tablename = $1 LIMIT 1'
+		INTO v_listclass
+		USING v_tablename;
 		v_filter_fields[v_i+1] := json_build_object('type',v_listclass,'dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	END IF;
 	-- getting footer buttons
@@ -527,4 +531,3 @@ ALTER FUNCTION ws_sample35.gw_fct_getlist(json)
 GRANT EXECUTE ON FUNCTION ws_sample35.gw_fct_getlist(json) TO public;
 GRANT EXECUTE ON FUNCTION ws_sample35.gw_fct_getlist(json) TO role_admin;
 GRANT EXECUTE ON FUNCTION ws_sample35.gw_fct_getlist(json) TO role_basic;
- --SELECT ws_sample35.gw_fct_getlist($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"formName":"", "tabName":"tab_rpt", "columnname":"tbl_rpt", "widgetname":"rpt_tbl_rpt", "formtype":"form_feature"}, "feature":{"tableName":"ve_arc_pipe", "idName":"arc_id", "id":"2100"}, "data":{"filterFields":{}, "pageInfo":{}}}$$);
