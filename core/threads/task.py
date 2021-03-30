@@ -29,6 +29,7 @@ class GwTask(QgsTask, QObject):
 
 
     def run(self):
+
         global_vars.session_vars['threads'].append(self)
         tools_log.log_info(f"Started task {self.description()}")
         
