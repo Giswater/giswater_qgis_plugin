@@ -68,6 +68,10 @@ BEGIN
 					
 	END IF;
 
+ 	EXECUTE 'SELECT gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, 
+ 	"data":{"filterFields":{}, "pageInfo":{}, "version":"3.5.03", "fid":101, "initProject":true, "addSchema":"", 
+ 	"mainSchema":"'||v_project_type||'", "projecRole":"", "infoType":"None", "qgisVersion":"3.10.4-A Coruña", "osVersion":"Windows 10"}}$$);';
+
 	FOR rec_role IN (SELECT * FROM sys_role WHERE id ='role_admin') LOOP
 
 		--set role and insert values into exploitation selector
@@ -78,8 +82,7 @@ BEGIN
 		INSERT INTO selector_expl (expl_id,cur_user) SELECT DISTINCT expl_id, current_user FROM exploitation ON CONFLICT (expl_id, cur_user) DO NOTHING;
 		
 
-		FOR rec_fct IN (SELECT function_name, sample_query FROM sys_function WHERE sample_query IS NOT NULL AND active IS TRUE
-		ORDER BY id) LOOP
+		FOR rec_fct IN (SELECT function_name, sample_query FROM sys_function WHERE sample_query IS NOT NULL ORDER BY id) LOOP
 
 			IF rec_fct.function_name = 'gw_fct_arc_divide' OR rec_fct.function_name = 'gw_fct_setarcdivide' THEN
 
@@ -142,13 +145,13 @@ BEGIN
 									END IF;
 											
 									IF v_project_type = 'WS' THEN
-										EXECUTE 'INSERT INTO '||rec_feature_node.child_layer||'(the_geom) 
-										VALUES (st_setsrid(st_point(419049.60815202154,4576503.991683105),25831)) RETURNING node_id ;'
+										EXECUTE 'INSERT INTO '||rec_feature_node.child_layer||'(the_geom, state_type) 
+										VALUES (st_setsrid(st_point(419049.60815202154,4576503.991683105),25831), 2) RETURNING node_id ;'
 										INTO v_feature_id;
 
 									ELSIF v_project_type = 'UD' THEN
-										EXECUTE 'INSERT INTO '||rec_feature_node.child_layer||'(the_geom) 
-										VALUES (st_setsrid(st_point(419041.021099364, 4576512.66540741),25831)) RETURNING node_id ;'
+										EXECUTE 'INSERT INTO '||rec_feature_node.child_layer||'(the_geom, state_type) 
+										VALUES (st_setsrid(st_point(419041.021099364, 4576512.66540741),25831), 2) RETURNING node_id ;'
 										INTO v_feature_id;
 										
 									END IF;
@@ -170,12 +173,12 @@ BEGIN
 
 									--insert new nodes with state 2
 									IF v_project_type = 'WS' THEN
-										EXECUTE 'INSERT INTO '||rec_feature_node.child_layer||'(the_geom) 
-										VALUES (st_setsrid(st_point(419205.716051442,4576517.416978596),25831)) RETURNING node_id;'
+										EXECUTE 'INSERT INTO '||rec_feature_node.child_layer||'(the_geom,state_type) 
+										VALUES (st_setsrid(st_point(419205.716051442,4576517.416978596),25831),3) RETURNING node_id;'
 										INTO v_feature_id;
 									ELSIF v_project_type = 'UD' THEN
-										EXECUTE 'INSERT INTO '||rec_feature_node.child_layer||'(the_geom) 
-										VALUES (st_setsrid(st_point(419124.612373783, 4576271.60134376),25831)) RETURNING node_id;'
+										EXECUTE 'INSERT INTO '||rec_feature_node.child_layer||'(the_geom,state_type) 
+										VALUES (st_setsrid(st_point(419124.612373783, 4576271.60134376),25831),3) RETURNING node_id;'
 										INTO v_feature_id;
 									END IF;
 								END IF;
@@ -217,6 +220,7 @@ BEGIN
 								
 								--delete node created with state 2
 								IF rec_state = 2 THEN
+									DELETE FROM doc_x_arc WHERE arc_id = (SELECT max(arc_id) FROM plan_psector_x_arc WHERE psector_id = v_psector_id);
 									DELETE FROM plan_psector_x_arc WHERE psector_id = v_psector_id 
 									AND arc_id = (SELECT max(arc_id) FROM plan_psector_x_arc WHERE psector_id = v_psector_id);
 								END IF;
