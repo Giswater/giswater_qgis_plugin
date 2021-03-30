@@ -125,10 +125,10 @@ class GwAdminButton:
         self.project_issample = example_data
 
         # Save in settings
-        tools_gw.set_config_parser('btn_admin', 'project_name_schema', f'{project_name_schema}')
-        tools_gw.set_config_parser('btn_admin', 'project_descript', f'{project_descript}')
+        tools_gw.set_config_parser('btn_admin', 'project_name_schema', f'{project_name_schema}', prefix=False)
+        tools_gw.set_config_parser('btn_admin', 'project_descript', f'{project_descript}', prefix=False)
         inp_file_path = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file', False, False)
-        tools_gw.set_config_parser('btn_admin', 'inp_file_path', f'{inp_file_path}')
+        tools_gw.set_config_parser('btn_admin', 'inp_file_path', f'{inp_file_path}', prefix=False)
         locale = tools_qt.get_combo_value(self.dlg_readsql_create_project, self.cmb_locale, 0)
         tools_gw.set_config_parser('btn_admin', 'project_locale', f'{locale}', prefix=False)
 
@@ -288,14 +288,14 @@ class GwAdminButton:
         self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
 
         # Load user values
-        self.project_name.setText(tools_gw.get_config_parser('btn_admin', 'project_name_schema', "user", "session"))
-        self.project_descript.setText(tools_gw.get_config_parser('btn_admin', 'project_descript', "user", "session"))
-        create_schema_type = tools_gw.get_config_parser('btn_admin', 'create_schema_type', "user", "session")
+        self.project_name.setText(tools_gw.get_config_parser('btn_admin', 'project_name_schema', "user", "session", False))
+        self.project_descript.setText(tools_gw.get_config_parser('btn_admin', 'project_descript', "user", "session", False))
+        create_schema_type = tools_gw.get_config_parser('btn_admin', 'create_schema_type', "user", "session", False)
         if create_schema_type:
             chk_widget = self.dlg_readsql_create_project.findChild(QWidget, create_schema_type)
             chk_widget.setChecked(True)
-        if tools_gw.get_config_parser('btn_admin', 'inp_file_path', "user", "session") not in ('null', None):
-            self.data_file.setText(tools_gw.get_config_parser('btn_admin', 'inp_file_path', "user", "session"))
+        if tools_gw.get_config_parser('btn_admin', 'inp_file_path', "user", "session", False) not in ('null', None):
+            self.data_file.setText(tools_gw.get_config_parser('btn_admin', 'inp_file_path', "user", "session", False))
 
         # TODO: do and call listener for buton + table -> temp_csv
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
@@ -325,7 +325,7 @@ class GwAdminButton:
         status, sqlite_cur = tools_gw.create_sqlite_conn("config")
         list_locale = self._select_active_locales(sqlite_cur)
         tools_qt.fill_combo_values(self.cmb_locale, list_locale, 1)
-        locale = tools_gw.get_config_parser('btn_admin', 'project_locale', 'user', 'session', prefix=False)
+        locale = tools_gw.get_config_parser('btn_admin', 'project_locale', 'user', 'session', False)
         tools_qt.set_combo_value(self.cmb_locale, locale, 0)
 
         # Set shortcut keys
@@ -622,9 +622,9 @@ class GwAdminButton:
 
         # Load last schema name selected and project type
         tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type,
-                                 tools_gw.get_config_parser('btn_admin', 'project_type', "user", "session"))
+                                 tools_gw.get_config_parser('btn_admin', 'project_type', "user", "session", False))
         tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name,
-                                 tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "session"))
+                                 tools_gw.get_config_parser('btn_admin', 'schema_name', "user", "session", False))
 
         if show_dialog:
             self.manage_docker()
@@ -3090,8 +3090,8 @@ class GwAdminButton:
         # Save last Project schema name and type selected
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, False, False)
         project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
-        tools_gw.set_config_parser('btn_admin', 'project_type', f'{project_type}')
-        tools_gw.set_config_parser('btn_admin', 'schema_name', f'{schema_name}')
+        tools_gw.set_config_parser('btn_admin', 'project_type', f'{project_type}', prefix=False)
+        tools_gw.set_config_parser('btn_admin', 'schema_name', f'{schema_name}', prefix=False)
 
 
     def _create_credentials_form(self, set_connection):
