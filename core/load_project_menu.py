@@ -261,13 +261,13 @@ class GwMenuLoad(QObject):
 
     def _set_log_sql(self):
 
-        log_sql = tools_gw.get_config_parser("system", f"log_sql", "user", "init", get_none=True)
+        log_sql = tools_gw.get_config_parser("system", f"log_sql", "user", "init", False, get_none=True)
         if log_sql in ("False", "None"):
             message = "Variable log_sql from user config file has been enabled."
-            tools_gw.set_config_parser("system", "log_sql", "True", file_name="init")
+            tools_gw.set_config_parser("system", "log_sql", "True", file_name="init", prefix=False)
         else:
             message = "Variable log_sql from user config file has been disabled."
-            tools_gw.set_config_parser("system", "log_sql", "None", file_name="init")
+            tools_gw.set_config_parser("system", "log_sql", "None", file_name="init", prefix=False)
 
         tools_qgis.show_info(message)
 

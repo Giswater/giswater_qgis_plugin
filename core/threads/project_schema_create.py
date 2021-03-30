@@ -90,18 +90,18 @@ class GwCreateSchemaTask(GwTask):
                     self.setProgress(100)
                 return True
             elif self.admin.rdb_sample.isChecked() and example_data:
-                tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample')
+                tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample', prefix=False)
                 self.admin._load_sample_data(project_type=project_type)
                 if not self.is_test:
                     self.setProgress(80)
             elif self.admin.rdb_sample_dev.isChecked():
-                tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_dev')
+                tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_dev', prefix=False)
                 self.admin._load_sample_data(project_type=project_type)
                 self.admin._load_dev_data(project_type=project_type)
                 if not self.is_test:
                     self.setProgress(80)
             elif self.admin.rdb_data.isChecked():
-                tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_data')
+                tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_data', prefix=False)
 
             return True
 
@@ -126,7 +126,7 @@ class GwCreateSchemaTask(GwTask):
             tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg)
 
         if self.finish_execution['import_data']:
-            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_import_data')
+            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_import_data', prefix=False)
             msg = ("The base schema have been correctly executed."
                    "\nNow will start the import process. It is experimental and it may crash."
                    "\nIf this happens, please notify it by send a e-mail to info@giswater.org.")
