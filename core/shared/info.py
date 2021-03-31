@@ -93,6 +93,7 @@ class GwInfo(QObject):
         self.tab_visit_loaded = False
         self.tab_event_loaded = False
         self.tab_document_loaded = False
+        self.tab_rpt_loaded = False
         self.tab_plan_loaded = False
         self.dlg_is_destroyed = False
         self.layer = None
@@ -2062,8 +2063,10 @@ class GwInfo(QObject):
         elif self.tab_main.widget(index_tab).objectName() == 'tab_documents' and not self.tab_document_loaded:
             self._fill_tab_document()
             self.tab_document_loaded = True
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt':
+        elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt' and not self.tab_rpt_loaded:
             self._fill_tab_rpt(self.complet_result, new_feature)
+            self.tab_rpt_loaded = True
+
 
         # Tab 'Plan'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
@@ -3292,9 +3295,12 @@ class GwInfo(QObject):
         for widget in widget_list:
             if type(widget) is QLineEdit:
                 widget.textChanged.connect(partial(self._filter_table, complet_result, model, dialog, widget_list, columnname, widgetname))
+                text = tools_qt.get_text(dialog, widget, False, False)
+                widget.textChanged.emit(text)
             elif type(widget) is QComboBox:
                 widget.currentIndexChanged.connect(partial(
                     self._filter_table, complet_result, model, dialog, widget_list, columnname, widgetname))
+                widget.currentIndexChanged.emit(widget.currentIndex())
 
 
     def _get_list(self, complet_result, form_name='', tab_name='', filter_fields='', columnname='', widgetname='', formtype=''):
@@ -3348,9 +3354,9 @@ class GwInfo(QObject):
                 if type(widget) == QComboBox:
                     text = tools_qt.get_combo_value(dialog, widget, 0)
                 else:
-                    text = tools_qt.get_text(dialog, widget)
-                if text != "null":
-                    filter_fields += f'"{columnname}":"%{text}%", '
+                    text = tools_qt.get_text(dialog, widget, False, False)
+
+                filter_fields += f'"{columnname}":"%{text}%", '
 
         if filter_fields != "":
             filter_fields = filter_fields[:-2]

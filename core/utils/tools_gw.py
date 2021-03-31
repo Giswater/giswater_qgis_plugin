@@ -1324,8 +1324,6 @@ def add_lineedit(field):
         widget.setReadOnly(not field['iseditable'])
         if not field['iseditable']:
             widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
-    if field['isfilter'] is True:
-        return widget
     if 'value' in field:
         widget.setText(field['value'])
     return widget
