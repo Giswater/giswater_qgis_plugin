@@ -1045,10 +1045,10 @@ class ApiParent(ParentAction):
         self.dlg_interpolate = Interpolate()
         self.load_settings(self.dlg_interpolate)
 
-        utils_giswater.setWidgetText(self.dlg_dtext, self.dlg_dtext.txt_infolog, 'Interpolate tool.\n'
+        utils_giswater.setWidgetText(self.dlg_interpolate, self.dlg_interpolate.txt_infolog, 'Interpolate tool.\n'
         'To modify columns (top_elev, ymax, elev among others) to be interpolated set variable edit_node_interpolate '
         'on table config_param_user')
-        self.dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
+        self.dlg_interpolate.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
                                         "interpolation\nNode1: \nNode2:")
 
         self.dlg_interpolate.btn_accept.clicked.connect(partial(self.chek_for_existing_values))
@@ -1161,7 +1161,7 @@ class ApiParent(ParentAction):
             body = self.create_body(extras=extras)
             self.interpolate_result = self.controller.get_json('gw_fct_node_interpolate', body, log_sql=True)
             self.add_layer.populate_info_text(self.dlg_interpolate, self.interpolate_result['body']['data'])
-            
+
             self.iface.actionPan().trigger()
 
 
