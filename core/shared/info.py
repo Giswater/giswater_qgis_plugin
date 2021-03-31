@@ -34,7 +34,7 @@ from .visit import GwVisit
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, GwInfoCrossectUi, \
-    GwDialogTextUi
+    GwInterpolate
 from ... import global_vars
 from ...lib import tools_qgis, tools_qt, tools_log, tools_db
 
@@ -753,19 +753,22 @@ class GwInfo(QObject):
         rb_interpolate = []
         self.interpolate_result = None
         self.rubber_band.reset()
-        dlg_dtext = GwDialogTextUi()
-        tools_gw.load_settings(dlg_dtext)
+        dlg_interpolate = GwInterpolate()
+        tools_gw.load_settings(dlg_interpolate)
 
-        tools_qt.set_widget_text(dlg_dtext, dlg_dtext.txt_infolog, 'Interpolate tool')
-        dlg_dtext.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
+        tools_qt.set_widget_text(dlg_interpolate, dlg_interpolate.txt_infolog, 'Interpolate tool. \n'
+                                'To modify columns (top_elev, ymax, elev among others) to be interpolated set variable '
+                                'edit_node_interpolate on table config_param_user')
+
+        dlg_interpolate.lbl_text.setText("Please, use the cursor to select two nodes to proceed with the "
                                    "interpolation\nNode1: \nNode2:")
 
-        dlg_dtext.btn_accept.clicked.connect(partial(self._chek_for_existing_values, dlg_dtext))
-        dlg_dtext.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_dtext))
-        dlg_dtext.rejected.connect(partial(tools_gw.save_settings, dlg_dtext))
-        dlg_dtext.rejected.connect(partial(self._remove_interpolate_rb, rb_interpolate))
+        dlg_interpolate.btn_accept.clicked.connect(partial(self._chek_for_existing_values, dlg_interpolate))
+        dlg_interpolate.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_interpolate))
+        dlg_interpolate.rejected.connect(partial(tools_gw.save_settings, dlg_interpolate))
+        dlg_interpolate.rejected.connect(partial(self._remove_interpolate_rb, rb_interpolate))
 
-        tools_gw.open_dialog(dlg_dtext, dlg_name='dialog_text')
+        tools_gw.open_dialog(dlg_interpolate, dlg_name='dialog_text')
 
         # Set circle vertex marker
         self.vertex_marker = self.snapper_manager.vertex_marker
@@ -786,10 +789,10 @@ class GwInfo(QObject):
 
         self.snapper_manager.show_snap_message(True, self.layer_node.name())
         global_vars.canvas.xyCoordinates.connect(partial(self._mouse_move))
-        ep.canvasClicked.connect(partial(self._snapping_node, ep, dlg_dtext, rb_interpolate))
+        ep.canvasClicked.connect(partial(self._snapping_node, ep, dlg_interpolate, rb_interpolate))
 
 
-    def _snapping_node(self, ep, dlg_dtext, rb_interpolate, point, button):
+    def _snapping_node(self, ep, dlg_interpolate, rb_interpolate, point, button):
         """ Get id of selected nodes (node1 and node2) """
 
         if button == 2:
@@ -814,22 +817,28 @@ class GwInfo(QObject):
                     self.node1 = str(element_id)
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
                     rb_interpolate.append(rb)
-                    dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
+                    dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2:")
                     tools_qgis.show_message(message, message_level=0, parameter=self.node1)
                 elif self.node1 != str(element_id):
                     self.node2 = str(element_id)
                     tools_qgis.draw_point(QgsPointXY(result.point()), rb, color=QColor(0, 150, 55, 100), width=10)
                     rb_interpolate.append(rb)
-                    dlg_dtext.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
+                    dlg_interpolate.lbl_text.setText(f"Node1: {self.node1}\nNode2: {self.node2}")
                     tools_qgis.show_message(message, message_level=0, parameter=self.node2)
 
         if self.node1 and self.node2:
+
+            # Get checkbox extrapolate value from dialog
+            chk_extrapolate = dlg_interpolate.findChild(QCheckBox, 'chk_extrapolate')
+            action_dict = {True: 'EXTRAPOLATE', False: 'INTERPOLATE'}
+
             global_vars.canvas.xyCoordinates.disconnect()
             ep.canvasClicked.disconnect()
 
             global_vars.iface.setActiveLayer(self.layer)
             global_vars.iface.mapCanvas().scene().removeItem(self.vertex_marker)
             extras = f'"parameters":{{'
+            extras += f'"action":"{action_dict[chk_extrapolate.isChecked()]}", '
             extras += f'"x":{self.last_point[0]}, '
             extras += f'"y":{self.last_point[1]}, '
             extras += f'"node1":"{self.node1}", '
@@ -838,10 +847,12 @@ class GwInfo(QObject):
             self.interpolate_result = tools_gw.execute_procedure('gw_fct_node_interpolate', body)
             if not self.interpolate_result or self.interpolate_result['status'] == 'Failed':
                 return False
-            tools_gw.fill_tab_log(dlg_dtext, self.interpolate_result['body']['data'], close=False)
+            tools_gw.fill_tab_log(dlg_interpolate, self.interpolate_result['body']['data'], close=False)
+
+            self.iface.actionPan().trigger()
 
 
-    def _chek_for_existing_values(self, dlg_dtext):
+    def _chek_for_existing_values(self, dlg_interpolate):
 
         text = False
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
@@ -852,13 +863,13 @@ class GwInfo(QObject):
                     msg = "Do you want to overwrite custom values?"
                     answer = tools_qt.show_question(msg, "Overwrite values")
                     if answer:
-                        self._set_values(dlg_dtext)
+                        self._set_values(dlg_interpolate)
                     break
         if not text:
-            self._set_values(dlg_dtext)
+            self._set_values(dlg_interpolate)
 
 
-    def _set_values(self, dlg_dtext):
+    def _set_values(self, dlg_interpolate):
 
         # Set values tu info form
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
@@ -867,7 +878,7 @@ class GwInfo(QObject):
                 widget.setStyleSheet(None)
                 tools_qt.set_widget_text(self.dlg_cf, widget, f'{v}')
                 widget.editingFinished.emit()
-        tools_gw.close_dialog(dlg_dtext)
+        tools_gw.close_dialog(dlg_interpolate)
 
 
     def _dlg_destroyed(self, layer=None, vertex=None):

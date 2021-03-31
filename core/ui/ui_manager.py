@@ -399,4 +399,9 @@ class GwVisitEventUi(GwDialog, FORM_CLASS):
 FORM_CLASS = _get_ui_class('visit_manager.ui')
 class GwVisitManagerUi(GwDialog, FORM_CLASS):
     pass
+
+FORM_CLASS = _get_ui_class('interpolate.ui')
+class GwInterpolate(GwDialog, FORM_CLASS):
+    pass
+
 # endregion
