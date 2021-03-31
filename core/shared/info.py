@@ -1320,7 +1320,6 @@ class GwInfo(QObject):
             def _manage_textarea(self, **kwargs)
             def _manage_spinbox(self, **kwargs)
             def _manage_doubleSpinbox(self, **kwargs)
-            def _manage_list(self, **kwargs)
             def _manage_tableview(self, **kwargs)
          """
 
@@ -1546,10 +1545,6 @@ class GwInfo(QObject):
         return widget
 
 
-    def _manage_list(self, **kwargs):
-        print(f"TEST LIST")
-        self._manage_tableview(**kwargs)
-
     def _manage_tableview(self, **kwargs):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
@@ -1564,7 +1559,7 @@ class GwInfo(QObject):
             widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
         widget = tools_gw.add_tableview_header(widget, field)
         widget = tools_gw.fill_tableview_rows(widget, field)
-        widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=1, isQStandardItemModel=True)
+        widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], 1, True)
         tools_qt.set_tableview_config(widget)
         return widget
 
@@ -3315,15 +3310,20 @@ class GwInfo(QObject):
             if field['widgettype'] == "tableview":
                 qtable = dialog.findChild(QTableView, field['widgetname'])
                 if qtable:
+                    if field['value'] is None:
+                        standar_model.removeRows(0, standar_model.rowCount())
+                        return complet_list
+                    standar_model.clear()
                     tools_gw.add_tableview_header(qtable, field)
                     tools_gw.fill_tableview_rows(qtable, field)
+                    tools_gw.set_tablemodel_config(dialog, qtable, field['widgetname'], 1, True)
+                    tools_qt.set_tableview_config(qtable)
 
         return complet_list
 
 
     def _get_filter_qtableview(self, standar_model, dialog, widget_list):
 
-        standar_model.clear()
         filter_fields = ""
         for widget in widget_list:
             if type(widget) != QTableView:

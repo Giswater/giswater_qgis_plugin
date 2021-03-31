@@ -2298,15 +2298,18 @@ def add_tableview_header(widget, field):
             headers.append(x)
         # Set headers
         model.setHorizontalHeaderLabels(headers)
-    except IndexError as e:
-        # if field['value'][0]
+    except Exception as e:
+        # if field['value'][0] is None
         pass
+
     return widget
 
 
 def fill_tableview_rows(widget, field):
 
+    if field is None or field['value'] is None:return
     model = widget.model()
+
     for item in field['value']:
         row = []
         for value in item.values():
