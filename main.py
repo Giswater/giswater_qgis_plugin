@@ -95,6 +95,7 @@ class Giswater(QObject):
 
             # Check if project is current loaded and remove giswater action from PluginMenu and Toolbars
             if self.load_project:
+                global_vars.project_type = None
                 if self.load_project.buttons != {}:
                     for button in list(self.load_project.buttons.values()):
                         self.iface.removePluginMenu(self.plugin_name, button.action)
