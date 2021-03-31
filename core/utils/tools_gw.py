@@ -1334,6 +1334,8 @@ def add_tableview(complet_result, field, module=sys.modules[__name__]):
     """
     widget = QTableView()
     widget.setObjectName(field['widgetname'])
+    widget.setSortingEnabled(True)
+
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
     function_name = 'no_function_asociated'

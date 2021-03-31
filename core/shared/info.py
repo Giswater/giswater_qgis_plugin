@@ -1557,6 +1557,7 @@ class GwInfo(QObject):
             widget = tools_gw.add_tableview(complet_result, field, self)
         else:
             widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
+
         widget = tools_gw.add_tableview_header(widget, field)
         widget = tools_gw.fill_tableview_rows(widget, field)
         widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], 1, True)
