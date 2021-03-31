@@ -737,6 +737,7 @@ class GwAdminButton:
             partial(tools_qt.get_folder_path, self.dlg_create_gis_project, "txt_gis_folder"))
         self.dlg_create_gis_project.btn_accept.clicked.connect(partial(self._gis_create_project))
         self.dlg_create_gis_project.btn_close.clicked.connect(partial(self._close_dialog_admin, self.dlg_create_gis_project))
+        self.dlg_create_gis_project.dlg_closed.connect(partial(self._close_dialog_admin, self.dlg_create_gis_project))
         self.dlg_create_gis_project.chk_is_sample.stateChanged.connect(partial(self._sample_state_changed))
 
         # Set shortcut keys
