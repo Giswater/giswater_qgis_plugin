@@ -1619,7 +1619,9 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
             if 'SQLCONTEXT' in json_result:
                 msg += f"Context: {json_result['SQLCONTEXT']}\n"
             if sql:
-                msg += f"SQL: {sql}"
+                msg += f"SQL: {sql}\n"
+            if 'MSGERR' in json_result:
+                msg += f"Message error: {json_result['MSGERR']}"
             global_vars.session_vars['last_error_msg'] = msg
             tools_log.log_warning(msg, stack_level_increase=2)
             # Show exception message only if we are not in a task process
