@@ -1019,7 +1019,10 @@ def add_widget(dialog, field, lbl, widget):
     if not isinstance(widget, QTableView):
         layout.addWidget(lbl, row, col)
         col = 1
-    layout.addWidget(widget, row, col)
+    if type(widget) is QSpacerItem:
+        layout.addItem(widget, row, col)
+    else:
+        layout.addWidget(widget, row, col)
     layout.setColumnStretch(col, 1)
 
 

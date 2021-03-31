@@ -564,9 +564,12 @@ class GwInfo(QObject):
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
                 if layout not in layout_list and layout.objectName() in ('lyt_data_1', 'lyt_data_2'):
                     layout_list.append(layout)
-                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2'):
+                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2', 'lyt_rpt_2'):
                     layout.addWidget(label, 0, field['layoutorder'])
-                    layout.addWidget(widget, 1, field['layoutorder'])
+                    if type(widget) is QSpacerItem:
+                        layout.addItem(widget, 1, field['layoutorder'])
+                    else:
+                        layout.addWidget(widget, 1, field['layoutorder'])
                 else:
                     tools_gw.add_widget(self.dlg_cf, field, label, widget)
 
@@ -1820,6 +1823,8 @@ class GwInfo(QObject):
 
 
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
+
+        if field['isfilter'] is True: return widget
         if self._check_tab_data(dialog):
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
             # does not jump, making it lose focus, which will cause the accept function to jump sent invalid parameters
@@ -1841,6 +1846,7 @@ class GwInfo(QObject):
 
     def _set_auto_update_textarea(self, field, dialog, widget, new_feature):
 
+        if field['isfilter'] is True: return widget
         if self._check_tab_data(dialog):
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
             # does not jump, making it lose focus, which will cause the accept function to jump sent invalid parameters
@@ -1910,6 +1916,7 @@ class GwInfo(QObject):
 
     def _set_auto_update_combobox(self, field, dialog, widget, new_feature):
 
+        if field['isfilter'] is True: return widget
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
@@ -1925,6 +1932,7 @@ class GwInfo(QObject):
 
     def _set_auto_update_dateedit(self, field, dialog, widget, new_feature):
 
+        if field['isfilter'] is True: return widget
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
@@ -1940,6 +1948,7 @@ class GwInfo(QObject):
 
     def _set_auto_update_spinbox(self, field, dialog, widget, new_feature):
 
+        if field['isfilter'] is True: return widget
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
@@ -1955,6 +1964,7 @@ class GwInfo(QObject):
 
     def _set_auto_update_checkbox(self, field, dialog, widget, new_feature):
 
+        if field['isfilter'] is True: return widget
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
@@ -3221,6 +3231,7 @@ class GwInfo(QObject):
         widget_list = []
         widget_list.extend(self.tab_main.widget(index_tab).findChildren(QComboBox, QRegExp(f"{tab_name}_")))
         widget_list.extend(self.tab_main.widget(index_tab).findChildren(QTableView, QRegExp(f"{tab_name}_")))
+        widget_list.extend(self.tab_main.widget(index_tab).findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
         return complet_list, widget_list
 
         "***********************OLD CODE ************************************"
@@ -3274,8 +3285,7 @@ class GwInfo(QObject):
                 model = widget.model()
         for widget in widget_list:
             if type(widget) is QLineEdit:
-
-                widget.editingFinished.connect(partial(self._filter_table, complet_result, model, dialog, widget_list, columnname, widgetname))
+                widget.textChanged.connect(partial(self._filter_table, complet_result, model, dialog, widget_list, columnname, widgetname))
             elif type(widget) is QComboBox:
                 widget.currentIndexChanged.connect(partial(
                     self._filter_table, complet_result, model, dialog, widget_list, columnname, widgetname))
@@ -3300,7 +3310,7 @@ class GwInfo(QObject):
 
     def _filter_table(self, complet_result, standar_model, dialog, widget_list, columnname, widgetname):
 
-        filter_fields = self._get_filter_qtableview(standar_model, dialog, widget_list)
+        filter_fields = self._get_filter_qtableview(dialog, widget_list)
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
         complet_list = self._get_list(complet_result, '', tab_name, filter_fields, columnname, widgetname, 'form_feature')
@@ -3323,7 +3333,7 @@ class GwInfo(QObject):
         return complet_list
 
 
-    def _get_filter_qtableview(self, standar_model, dialog, widget_list):
+    def _get_filter_qtableview(self, dialog, widget_list):
 
         filter_fields = ""
         for widget in widget_list:
@@ -3334,7 +3344,7 @@ class GwInfo(QObject):
                 else:
                     text = tools_qt.get_text(dialog, widget)
                 if text != "null":
-                    filter_fields += f'"{columnname}":"{text}", '
+                    filter_fields += f'"{columnname}":"%{text}%", '
 
         if filter_fields != "":
             filter_fields = filter_fields[:-2]

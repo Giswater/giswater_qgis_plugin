@@ -206,9 +206,7 @@ BEGIN
 	IF v_filter_values::text IS NULL OR v_filter_values::text = '{}' THEN 
 	
 		v_data = '{"client":{"device":4, "infoType":1, "lang":"ES"},"data":{"formName": "'||v_tablename||'", "formType": "'||v_formtype||'", "tabName": "'||v_tabname||'"}}';
-RAISE NOTICE '1111v_data----------->%',v_data;
 		SELECT gw_fct_getfiltervaluesvdef(v_data) INTO v_filter_values;
-RAISE NOTICE '222v_filter_values----------->%',v_filter_values;
 		RAISE NOTICE 'gw_fct_getlist - Init Values setted by default %', v_filter_values;
 
 	END IF;
@@ -301,10 +299,10 @@ RAISE NOTICE '222v_filter_values----------->%',v_filter_values;
 				USING v_tablename;
 		END IF;	
 	END IF;
-RAISE NOTICE 'v_filter_values-----------------%',v_filter_values;
+
 	--  add filters (fields)
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
-	
+
 	IF v_text IS NOT NULL THEN
 		FOREACH text IN ARRAY v_text
 		LOOP
