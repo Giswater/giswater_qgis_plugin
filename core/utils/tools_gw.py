@@ -633,6 +633,7 @@ def enable_widgets(dialog, result, enable):
         for widget in widget_list:
             for field in result['fields']:
                 if widget.property('columnname') == field['columnname']:
+                    if widget.property('isfilter'): break
                     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
                         widget.setReadOnly(not enable)
                         widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
@@ -1319,13 +1320,14 @@ def add_lineedit(field):
         widget.setProperty('columnname', field['columnname'])
     if 'placeholder' in field:
         widget.setPlaceholderText(field['placeholder'])
-    if 'value' in field:
-        widget.setText(field['value'])
     if 'iseditable' in field:
         widget.setReadOnly(not field['iseditable'])
         if not field['iseditable']:
             widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color: rgb(100, 100, 100)}")
-
+    if field['isfilter'] is True:
+        return widget
+    if 'value' in field:
+        widget.setText(field['value'])
     return widget
 
 

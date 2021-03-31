@@ -1344,18 +1344,24 @@ class GwInfo(QObject):
             msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
             tools_qgis.show_message(message, 2, parameter=msg)
             return label, widget
-        kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature,
-                  "add_widget": add_widget}
-        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        # try:
-        #     kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature,
-        #               "add_widget": add_widget}
-        #     widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        # except Exception as e:
-        #     msg = (f"{type(e).__name__}: {e} Python function: _set_widgets. WHERE columname='{field['columnname']}' "
-        #            f"AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'")
-        #     tools_qgis.show_message(msg, 2)
-        #     return label, widget
+
+        try:
+            kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature,
+                      "add_widget": add_widget}
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+        except Exception as e:
+            msg = (f"{type(e).__name__}: {e} Python function: _set_widgets. WHERE columname='{field['columnname']}' "
+                   f"AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'")
+            tools_qgis.show_message(msg, 2)
+            return label, widget
+
+        try:
+            widget.setProperty('isfilter', False)
+            if 'isfilter' in field and field['isfilter'] is True:
+                widget.setProperty('isfilter', True)
+        except Exception:
+            # AttributeError: 'QSpacerItem' object has no attribute 'setProperty'
+            pass
 
         return label, widget
 
