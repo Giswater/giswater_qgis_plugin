@@ -1302,12 +1302,11 @@ def set_data_type(field, widget):
 
 
 def set_widget_size(widget, field):
-
-    if 'widgetdim' in field:
-        if field['widgetdim']:
-            widget.setMaximumWidth(field['widgetdim'])
-            widget.setMinimumWidth(field['widgetdim'])
-
+    if 'widgetdim' in field and field['widgetdim']:
+        widget.setMaximumWidth(field['widgetdim'])
+        widget.setMinimumWidth(field['widgetdim'])
+    else:
+        widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
     return widget
 
 
