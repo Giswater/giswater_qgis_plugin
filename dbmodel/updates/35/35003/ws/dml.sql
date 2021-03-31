@@ -84,3 +84,7 @@ UPDATE cat_feature_node SET grafconfig= 'NONE' WHERE type =  'NETWJOIN' AND graf
 UPDATE cat_feature_node SET grafconfig= 'SECTOR' WHERE type =  'WATERWELL' AND grafconfig IS NULL;
 UPDATE cat_feature_node SET grafconfig= 'SECTOR' WHERE type =  'WTP' AND grafconfig IS NULL;
 UPDATE cat_feature_node SET grafconfig= 'NONE' WHERE type =  'JUNCTION' AND grafconfig IS NULL;
+
+UPDATE config_param_system SET value  =
+'{"SECTOR":{"mode":"Random", "column":"sector_id"}, "DMA":{"mode":"Random", "column":"name"}, "PRESSZONE":{"mode":"Stylesheet", "column":"presszone_id"}, "DQA":{"mode":"Random", "column":"dqa_id"}, "MINSECTOR":{"mode":"Random", "column":"minsector_id"}}'
+WHERE parameter = 'utils_grafanalytics_dynamic_symbology';
