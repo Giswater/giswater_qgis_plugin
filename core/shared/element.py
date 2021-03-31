@@ -393,15 +393,15 @@ class GwElement:
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate, ownercat_id"
                        ", location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
                 sql_values = (f" VALUES ('{elementcat_id}', '{num_elements}', '{state}', '{state_type}', "
-                              f"'{expl_id}', '{rotation}', '{comment}', '{observ}', "
-                              f"'{link}', '{undelete}'")
+                              f"'{expl_id}', '{rotation}', $${comment}$$, $${observ}$$, "
+                              f"$${link}$$, '{undelete}'")
             else:
                 sql = ("INSERT INTO v_edit_element (element_id, elementcat_id, num_elements, state, state_type"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate, ownercat_id"
                        ", location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
 
                 sql_values = (f" VALUES ('{element_id}', '{elementcat_id}', '{num_elements}',  '{state}', "
-                              f"'{state_type}', '{expl_id}', '{rotation}', '{comment}', '{observ}', '{link}', "
+                              f"'{state_type}', '{expl_id}', '{rotation}', $${comment}$$, $${observ}$$, $${link}$$, "
                               f"'{undelete}'")
 
             if builtdate:
@@ -439,7 +439,7 @@ class GwElement:
             else:
                 sql_values += ", null"
             if code:
-                sql_values += f", '{code}'"
+                sql_values += f", $${code}$$"
             else:
                 sql_values += ", null"
             if element_id == '':
@@ -461,8 +461,8 @@ class GwElement:
             sql = (f"UPDATE element"
                    f" SET elementcat_id = '{elementcat_id}', num_elements = '{num_elements}', state = '{state}'"
                    f", state_type = '{state_type}', expl_id = '{expl_id}', rotation = '{rotation}'"
-                   f", comment = '{comment}', observ = '{observ}'"
-                   f", link = '{link}', undelete = '{undelete}'")
+                   f", comment = $${comment}$$, observ = $${observ}$$"
+                   f", link = $${link}$$, undelete = '{undelete}'")
             if builtdate:
                 sql += f", builtdate = '{builtdate}'"
             else:
@@ -484,7 +484,7 @@ class GwElement:
             else:
                 sql += ", workcat_id = null"
             if code:
-                sql += f", code = '{code}'"
+                sql += f", code = $${code}$$"
             else:
                 sql += ", code = null"
             if workcat_id_end:
