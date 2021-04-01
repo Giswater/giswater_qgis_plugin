@@ -213,7 +213,7 @@ BEGIN
 
 		-- Return formtabs
 		RETURN ('{"status":"Accepted", "version":'||v_version||
-			',"body":{"message":{"level":1, "text":"This is a test message"}'||
+			',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 			',"form":{"formName":"", "formLabel":"", "currentTab":"'||v_currenttab||'", "formText":"", "formTabs":'||v_formTabs||'}'||
 			',"feature":{}'||
 			',"data":{"geometry":'||v_geometry||'}'||

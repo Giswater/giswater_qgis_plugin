@@ -253,7 +253,7 @@ BEGIN
 	v_nodecat := COALESCE(v_nodecat, '');
 	
 	-- make return
-	v_return ='{"status":"Accepted", "message":{"level":1, "text":"This is a test message"}, "version":'||v_version||',"body":{"form":{}'||
+	v_return ='{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":'||v_version||',"body":{"form":{}'||
 		     ',"feature":{}'||
 		     ',"data":{"fields":{ "om":' || v_om_fields ||
 				      ' , "edit":' || v_edit_fields ||

@@ -217,7 +217,7 @@ BEGIN
 
 	--  Return
 	RETURN ('{"status":"Accepted", "version":'||v_version||
-	      ',"body":{"message":{"level":1, "text":"This is a test message"}'||
+	      ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 		      ',"form":'||(p_data->>'form')::json||
 		      ',"feature":'||(p_data->>'feature')::json||
 		      ',"data":{"fields":' || fields ||'}}'||		     

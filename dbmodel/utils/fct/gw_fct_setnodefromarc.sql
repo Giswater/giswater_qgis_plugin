@@ -157,7 +157,7 @@ BEGIN
 	v_result_point := COALESCE(v_result_point, '{}'); 
 
 	-- Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"This is a test message"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||','||	
 				'"point":'||v_result_point||'}}'||

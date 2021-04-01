@@ -236,7 +236,7 @@ BEGIN
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
-             ',"body":{"message":{"level":1, "text":"This is a test message"}'||
+             ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 			',"form":{}'||
 			',"feature":{}'||
 			',"data":{"layersNames":' || fields ||'}}'||
