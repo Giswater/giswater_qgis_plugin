@@ -50,6 +50,7 @@ class GwMincut:
         self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
 
         # Serialize data of mincut states
+        self.states = {}
         self._set_states()
         self.current_state = None
         self.is_new = True
@@ -490,16 +491,14 @@ class GwMincut:
     def _set_states(self):
         """ Serialize data of mincut states """
 
-        self.states = {}
         sql = ("SELECT id, idval "
                "FROM om_typevalue WHERE typevalue = 'mincut_state' "
                "ORDER BY id")
         rows = tools_db.get_rows(sql)
-        if not rows:
-            return
-
-        for row in rows:
-            self.states[int(row['id'])] = row['idval']
+        if rows:
+            for row in rows:
+                if 'idval' in row:
+                    self.states[int(row['id'])] = row['idval']
 
 
     def _init_mincut_canvas(self):
