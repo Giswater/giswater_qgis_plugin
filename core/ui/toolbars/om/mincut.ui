@@ -909,9 +909,9 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionMincut"/>
-   <addaction name="actionRefreshMincut"/>
    <addaction name="actionCustomMincut"/>
    <addaction name="actionChangeValveStatus"/>
+   <addaction name="actionRefreshMincut"/>
    <addaction name="actionAddConnec"/>
    <addaction name="actionAddHydrometer"/>
    <addaction name="actionComposer"/>
