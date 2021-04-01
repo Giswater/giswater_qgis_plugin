@@ -164,13 +164,13 @@ BEGIN
     
 	-- Return
     RETURN ('{"status":"Accepted"' ||
-       ', "apiVersion":'|| v_version ||
+       ', "version":'|| v_version ||
         ', "fields":' || v_fields ||
         '}')::json;
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

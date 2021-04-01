@@ -157,7 +157,7 @@ BEGIN
     
 	--Return
     RETURN ('{"status":"Accepted",'||
-     '"apiVersion":'|| v_version ||
+     '"version":'|| v_version ||
      ',"data":{'||
          '"geometry":'|| v_geometry ||
         ',"map":"' || v_mapcomposer_name || '"'
@@ -166,7 +166,7 @@ BEGIN
 
 	-- Exception handling
     EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

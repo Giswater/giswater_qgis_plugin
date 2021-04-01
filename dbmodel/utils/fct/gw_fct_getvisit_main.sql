@@ -844,7 +844,7 @@ BEGIN
 	END IF;
   
 	-- Return
-	RETURN ('{"status":"Accepted", "message":"'||v_returnmessage||'", "apiVersion":'||v_version||
+	RETURN ('{"status":"Accepted", "message":"'||v_returnmessage||'", "version":'||v_version||
              ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idName":"visit_id", "id":'||v_id||'}'||
 		    ', "form":'||v_forminfo||
 		    ', "data":{"layerManager":'||v_layermanager||

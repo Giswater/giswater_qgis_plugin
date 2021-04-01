@@ -677,7 +677,7 @@ BEGIN
 
 	--    Return
 	-----------------------
-	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "apiVersion":' || v_version ||
+	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":'||v_message||', "version":' || v_version ||
 	      ',"body":{"form":' || v_forminfo ||
 		     ', "feature":'|| v_featureinfo ||
 		      ',"data":{"linkPath":' || v_linkpath ||

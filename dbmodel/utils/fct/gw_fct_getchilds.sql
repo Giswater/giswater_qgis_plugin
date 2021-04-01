@@ -208,7 +208,7 @@ BEGIN
 	v_fields := COALESCE(v_fields, '[]');    
     
 	--  Return
-    RETURN ('{"status":"Accepted"' || ', "message":'|| v_message || ', "apiVersion":'|| v_version ||
+    RETURN ('{"status":"Accepted"' || ', "message":'|| v_message || ', "version":'|| v_version ||
         ', "body": {"form":{}'||
 		 ', "feature":{}'||
 		 ', "data":' || v_fields ||
@@ -216,7 +216,7 @@ BEGIN
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "apiVersion":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$
