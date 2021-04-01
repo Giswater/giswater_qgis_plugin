@@ -18,6 +18,7 @@ v_noderec record;
 v_valvemode integer;
 v_mincutresult integer;
 v_networkmode integer;
+v_querytext text;
     
 BEGIN
 
@@ -59,28 +60,25 @@ BEGIN
 		END IF;
 	
 	ELSIF v_networkmode = 2 OR v_networkmode = 4 THEN -- Because shut-off valves are exported as nodarcs, directly we can set the status of shut-off valves
-				
-		IF v_valvemode = 3 THEN --mincut results
-			UPDATE temp_arc a SET status='CLOSED'
-			FROM man_valve v
-				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=true AND epa_type = 'SHORTPIPE';
 
-			UPDATE temp_arc a SET status='OPEN'
-			FROM man_valve v
-				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=false AND epa_type = 'SHORTPIPE';
+		-- getting querytext for shutoff valves in function if they are TCV OR SHORTPIPES
+		IF (SELECT value FROM config_param_system WHERE parameter = 'epa_shutoffvalve') = 'VALVE' THEN
+			v_querytext = ' AND epa_type = ''VALVE'' and addparam::json->>''valv_type'' = ''TCV''';
+		ELSE
+			v_querytext = ' AND epa_type = ''SHORTPIPE''';
+		END IF;
+			
+		IF v_valvemode = 3 THEN --mincut results
+			EXECUTE ' UPDATE temp_arc a SET status=''CLOSED'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=true '||v_querytext;
+			EXECUTE ' UPDATE temp_arc a SET status=''OPEN'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=false'||v_querytext;
 		
 			UPDATE temp_arc a SET status='CLOSED' 
 			FROM om_mincut_valve v
 			WHERE a.arc_id=concat(v.node_id,'_n2a') AND v.result_id = v_mincutresult AND (proposed IS TRUE OR closed IS TRUE);
 			
 		ELSIF v_valvemode = 2 THEN -- inventory
-			UPDATE temp_arc a SET status='CLOSED'
-			FROM man_valve v
-				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=true AND epa_type = 'SHORTPIPE';
-
-			UPDATE temp_arc a SET status='OPEN'
-			FROM man_valve v
-				WHERE a.arc_id=concat(v.node_id,'_n2a') AND closed=false AND epa_type = 'SHORTPIPE';
+			EXECUTE ' UPDATE temp_arc a SET status=''CLOSED'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=true '||v_querytext;
+			EXECUTE ' UPDATE temp_arc a SET status=''OPEN'' FROM man_valve v WHERE a.arc_id=concat(v.node_id,''_n2a'') AND closed=false'||v_querytext;
 		
 		ELSIF v_valvemode = 1 THEN -- epa tables
 			UPDATE temp_arc a SET status=p.status 
