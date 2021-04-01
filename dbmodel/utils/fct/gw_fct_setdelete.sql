@@ -61,7 +61,13 @@ BEGIN
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 	INTO v_version;
-       
+	
+  	--set current process as users parameter
+	DELETE FROM config_param_user  WHERE  parameter = 'utils_cur_trans' AND cur_user =current_user;
+
+	INSERT INTO config_param_user (value, parameter, cur_user)
+	VALUES (txid_current(),'utils_cur_trans',current_user );
+     
 	-- Get input parameters:
 	v_feature := (p_data ->> 'feature');
 	v_featuretype := (p_data ->> 'feature')::json->> 'featureType';
