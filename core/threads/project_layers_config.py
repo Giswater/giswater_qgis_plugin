@@ -90,8 +90,6 @@ class GwProjectLayersConfig(GwTask):
             At the moment manage:
                 Column names as alias, combos as ValueMap, typeahead as textedit"""
 
-        tools_log.log_info("Start set_layer_config")
-
         msg_failed = ""
         msg_key = ""
         total_layers = len(layers)
@@ -112,10 +110,12 @@ class GwProjectLayersConfig(GwTask):
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = self._create_body(feature=feature, extras=extras)
             complet_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
-            if not complet_result or complet_result['status'] == 'Failed':
+            if not complet_result:
                 continue
-
-            # tools_log.log_info(str(complet_result))
+            if 'status' not in complet_result:
+                continue
+            if complet_result['status'] == 'Failed':
+                continue
             if 'body' not in complet_result:
                 tools_log.log_info("Not 'body'")
                 continue
@@ -123,7 +123,6 @@ class GwProjectLayersConfig(GwTask):
                 tools_log.log_info("Not 'data'")
                 continue
 
-            # tools_log.log_info(complet_result['body']['data']['fields'])
             for field in complet_result['body']['data']['fields']:
                 valuemap_values = {}
 
@@ -194,8 +193,6 @@ class GwProjectLayersConfig(GwTask):
 
         if msg_key != "":
             tools_qt.show_exception_message("Key on returned json from ddbb is missed.", msg_key)
-
-        tools_log.log_info("Finish set_layer_config")
 
 
     def _set_read_only(self, layer, field, field_index):
