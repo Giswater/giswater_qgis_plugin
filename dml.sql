@@ -1,3 +1,21 @@
+
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_elements_1', 'lyt_elements_1','lytElements1');
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_elements_2', 'lyt_elements_2','lytElements2');
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_elements_3', 'lyt_elements_3','lytElements3');
+INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', '_open_selected_element', '_open_selected_element','openSselectedElement');
+INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', '_filter_table', '_filter_table','filterTable');
+
+INSERT INTO ws_sample35.config_form_list(tablename, query_text, device, listtype, listclass, vdefault, columnname)
+    VALUES ('ve_arc_pipe', 'SELECT * FROM v_ui_element_x_arc WHERE element_id IS NOT NULL', 4, 'attributeTable', 'tableview', '{"orderBy":"1", "orderType": "DESC"}', 'tbl_elements');
+
+
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, layoutname, tabname, isfilter)
+    VALUES ('ve_arc_pipe', 'form_feature', 'button1_lyt_elements_1', 1, 'string', 'button', 'Element id', false, false, true, false, 'SELECT element_id as id, element_id as idval FROM element WHERE element_id IS NOT NULL ', 'lyt_elements_1', 'tab_elements', true);
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetfunction, layoutname, tabname, isfilter)
+    VALUES ('ve_arc_pipe', 'form_feature', 'tbl_elements', 1, 'tableview', false, false, false, false, '_open_selected_element', 'lyt_elements_3', 'tab_elements', false);
+
+
+/***********************************************************************/
 INSERT INTO ws_sample35.config_typevalue VALUES('tabname_typevalue', 'tab_rpt', 'tab_rpt','tabRpt');
 INSERT INTO ws_sample35.config_typevalue VALUES('widgettype_typevalue', 'tableview', 'tableview','tableview');
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_rpt_1', 'lyt_rpt_1','lytRpt1');
@@ -16,15 +34,13 @@ INSERT INTO ws_sample35.config_form_tabs VALUES ('v_edit_arc','tab_rpt','EPA res
 {"actionName": "actionRotation", "actionTooltip": "Rotation","disabled": false}]',4, 1);
 
 
-INSERT INTO ws_sample35.config_form_list(tablename, query_text, device, listtype, listclass, vdefault, columnname)
-    VALUES ('ve_arc_pipe', 'SELECT * FROM ve_arc_pipe WHERE arc_id IS NOT NULL', 4, 'attributeTable', 'tableview', '{"orderBy":"1", "orderType": "DESC"}', 'tbl_rpt');
 
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_isnullvalue, layoutname, tabname, isfilter)
-    VALUES ('ve_arc_pipe', 'form_feature', 'expl_id', 1, 'string', 'combo',  'Expl id', false, false, true, false, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL AND active IS TRUE ', True, 'lyt_rpt_2', 'tab_rpt', True);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, ismandatory, isparent, iseditable, isautoupdate, layoutname, tabname, isfilter)
-    VALUES ('ve_arc_pipe', 'form_feature', 'arc_id', 2, 'string', 'text', false, false, true, false, 'lyt_rpt_2', 'tab_rpt', true);
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, layoutname, tabname, isfilter)
-    VALUES ('ve_arc_pipe', 'form_feature', 'arccat_id', 3, 'string', 'typeahead', 'Arc cat', false, false, true, false, 'SELECT id, id as idval FROM cat_arc WHERE id IS NOT NULL AND active IS TRUE ', 'lyt_rpt_2', 'tab_rpt', true);
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_isnullvalue, widgetfunction, layoutname, tabname, isfilter)
+    VALUES ('ve_arc_pipe', 'form_feature', 'expl_id', 1, 'string', 'combo',  'Expl id', false, false, true, false, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL AND active IS TRUE ', True, '_filter_table', 'lyt_rpt_2', 'tab_rpt', True);
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetfunction, layoutname, tabname, isfilter)
+    VALUES ('ve_arc_pipe', 'form_feature', 'arc_id', 2, 'string', 'text', false, false, true, false, '_filter_table', 'lyt_rpt_2', 'tab_rpt', true);
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetfunction, layoutname, tabname, isfilter)
+    VALUES ('ve_arc_pipe', 'form_feature', 'arccat_id', 3, 'string', 'typeahead', 'Arc cat', false, false, true, false, 'SELECT id, id as idval FROM cat_arc WHERE id IS NOT NULL AND active IS TRUE ', '_filter_table', 'lyt_rpt_2', 'tab_rpt', true);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, layoutname, tabname)
     VALUES ('ve_arc_pipe', 'form_feature', 'hspacer_lyt_rpt_2', 4, 'hspacer', false, false, true, false, 'lyt_rpt_2', 'tab_rpt');
 

@@ -270,7 +270,7 @@ BEGIN
 			INTO v_the_geom;
 
 		--  get querytext
-		EXECUTE concat('SELECT query_text, vdefault, listtype, columnname FROM config_form_list WHERE tablename = $1 AND device = $2', v_attribute_filter)
+		EXECUTE concat('SELECT query_text, vdefault, listtype, columnname FROM config_form_list WHERE tablename = $1 AND device = $2 AND columnname=$3', v_attribute_filter)
 			INTO v_query_result, v_default, v_listtype
 			USING v_tablename, v_device, v_columnname;
 
