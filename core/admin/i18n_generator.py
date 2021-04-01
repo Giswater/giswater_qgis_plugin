@@ -97,11 +97,11 @@ class GwI18NGenerator:
         if db_msg:
             status_cfg_msg = self._create_db_files()
             if status_cfg_msg is True:
-                msg += "Data base translation successful\n"
+                msg += "Database translation successful\n"
             elif status_cfg_msg is False:
-                msg += "Data base translation failed\n"
+                msg += "Database translation failed\n"
             elif status_cfg_msg is None:
-                msg += "Data base translation canceled\n"
+                msg += "Database translation canceled\n"
 
         if msg != '':
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
@@ -250,6 +250,7 @@ class GwI18NGenerator:
 
     def _create_db_files(self):
         """ Read the values of the database and update the i18n files """
+
         major_version = tools_qgis.get_major_version(plugin_dir=self.plugin_dir).replace(".", "")
         ver_build = tools_qgis.get_build_version(plugin_dir=self.plugin_dir)
 
@@ -262,28 +263,31 @@ class GwI18NGenerator:
             msg = "Are you sure you want to overwrite this file?"
             answer = tools_qt.show_question(msg, "Overwrite", parameter=f"\n\n{cfg_path}{file_name}")
             if not answer:
-                return
+                return None
         else:
             os.makedirs(cfg_path, exist_ok=True)
 
         self._write_header(cfg_path + file_name)
 
         rows = self._get_dbdialog_values()
-        status = self._write_dbdialog_values(rows, cfg_path + file_name)
-
+        if not rows:
+            return False
+        self._write_dbdialog_values(rows, cfg_path + file_name)
         rows = self._get_dbmessages_values()
-        status = self._write_dbmessages_values(rows, cfg_path + file_name)
+        if not rows:
+            return False
+        self._write_dbmessages_values(rows, cfg_path + file_name)
 
-        return status
+        return True
 
 
     def _get_dbdialog_values(self):
         """ Get db dialog values """
 
         sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_us, lb_{self.lower_lang}, tt_en_us, "
-               f"tt_{self.lower_lang}"
-               f" FROM i18n.dbdialog "
-               f" ORDER BY context, formname;")
+               f"tt_{self.lower_lang} "
+               f"FROM i18n.dbdialog "
+               f"ORDER BY context, formname;")
         rows = self._get_rows(sql)
         if not rows:
             return False
@@ -389,7 +393,6 @@ class GwI18NGenerator:
             file.write(line)
         file.close()
         del file
-        return True
 
 
     def _write_dbmessages_values(self, rows, path):
@@ -430,8 +433,6 @@ class GwI18NGenerator:
             file.write(line)
         file.close()
         del file
-
-        return True
 
 
     def _save_user_values(self):

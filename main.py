@@ -91,7 +91,8 @@ class Giswater(QObject):
             # Unlisten notify channel and stop thread
             if hasattr(global_vars, 'notify'):
                 list_channels = ['desktop', global_vars.current_user]
-                global_vars.notify.stop_listening(list_channels)
+                if global_vars.notify:
+                    global_vars.notify.stop_listening(list_channels)
 
             # Check if project is current loaded and remove giswater action from PluginMenu and Toolbars
             if self.load_project:

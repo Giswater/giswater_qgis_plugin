@@ -247,7 +247,7 @@ def get_layer_source(layer):
     """ Get database connection paramaters of @layer """
 
     # Initialize variables
-    layer_source = {'db': None, 'schema': None, 'table': None,
+    layer_source = {'db': None, 'schema': None, 'table': None, 'service': None,
                     'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
 
     if layer is None:
@@ -258,10 +258,6 @@ def get_layer_source(layer):
     
     # Get dbname, host, port, user and password
     uri = layer.dataProvider().dataSourceUri()
-
-    # Initialize variables
-    layer_source = {'db': None, 'schema': None, 'table': None, 'service': None,
-                    'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
 
     # split with quoted substrings preservation
     splt = shlex.split(uri)
@@ -340,7 +336,11 @@ def get_layer_by_tablename(tablename, show_warning_=False, log_info=False, schem
     layer = None
     get_project_variables()
     if schema_name is None:
-        schema_name = global_vars.project_vars['main_schema']
+        if 'main_schema' in global_vars.project_vars:
+            schema_name = global_vars.project_vars['main_schema']
+        else:
+            tools_log.log_warning("Key not found", parameter='main_schema')
+
     for cur_layer in layers:
         uri_table = get_layer_source_table_name(cur_layer)
         table_schema = get_layer_schema(cur_layer)
@@ -841,27 +841,19 @@ def get_geometry_from_json(feature):
 
 def get_locale():
 
-    # Get locale of QGIS application
-    override = QSettings().value('locale/overrideFlag')
-
-    locale = None
-    if tools_os.set_boolean(override):
-        try:
+    locale = "en_US"
+    try:
+        # Get locale of QGIS application
+        override = QSettings().value('locale/overrideFlag')
+        if tools_os.set_boolean(override):
             locale = QSettings().value('locale/globalLocale')
-        except AttributeError as e:
-            locale = "en_US"
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
-    else:
-        try:
+        else:
             locale = QSettings().value('locale/userLocale')
-        except AttributeError as e:
-            locale = "en_US"
-            tools_log.log_info(f"{type(e).__name__} --> {e}")
-
-    if locale is None:
+    except AttributeError as e:
         locale = "en_US"
-
-    return locale
+        tools_log.log_info(f"{type(e).__name__} --> {e}")
+    finally:
+        return locale
 
 
 def hilight_feature_by_id(qtable, layer_name, field_id, rubber_band, width, index):
