@@ -851,4 +851,6 @@ BEGIN
 		               ',"geometry":'|| v_geometry ||'}}'||
 		    '}')::json;
 END;
-$BODY$;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
