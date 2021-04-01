@@ -9,8 +9,8 @@ INSERT INTO ws_sample35.config_form_list(tablename, query_text, device, listtype
     VALUES ('ve_arc_pipe', 'SELECT * FROM v_ui_element_x_arc WHERE element_id IS NOT NULL', 4, 'attributeTable', 'tableview', '{"orderBy":"1", "orderType": "DESC"}', 'tbl_elements');
 
 
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, layoutname, tabname, isfilter)
-    VALUES ('ve_arc_pipe', 'form_feature', 'button1_lyt_elements_1', 1, 'string', 'button', 'Element id', false, false, true, false, 'SELECT element_id as id, element_id as idval FROM element WHERE element_id IS NOT NULL ', 'lyt_elements_1', 'tab_elements', true);
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, layoutname, widgetcontrols, tabname, isfilter)
+    VALUES ('ve_arc_pipe', 'form_feature', 'element_id', 1, 'string', 'typeahead', 'Element id', false, false, true, false, 'SELECT element_id as id, element_id as idval FROM element WHERE element_id IS NOT NULL ', 'lyt_elements_1', '{"accept":false}', 'tab_elements', false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetfunction, layoutname, tabname, isfilter)
     VALUES ('ve_arc_pipe', 'form_feature', 'tbl_elements', 1, 'tableview', false, false, false, false, '_open_selected_element', 'lyt_elements_3', 'tab_elements', false);
 

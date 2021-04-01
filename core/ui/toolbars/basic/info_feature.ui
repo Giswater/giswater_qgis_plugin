@@ -94,10 +94,10 @@
         <string>Elements</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0">
+        <item row="3" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="QLineEdit" name="element_id">
+           <widget class="QLineEdit" name="element_id_">
             <property name="maximumSize">
              <size>
               <width>200</width>
@@ -234,12 +234,14 @@
           </item>
          </layout>
         </item>
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="lyt_elements_1"/>
+        </item>
+        <item row="2" column="0">
+         <layout class="QGridLayout" name="lyt_elements_3"/>
+        </item>
         <item row="1" column="0">
-         <widget class="QTableView" name="tbl_element">
-          <property name="sortingEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
+         <layout class="QGridLayout" name="lyt_elements_2"/>
         </item>
        </layout>
       </widget>

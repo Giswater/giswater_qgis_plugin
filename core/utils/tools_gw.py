@@ -1336,7 +1336,7 @@ def add_lineedit(field):
     return widget
 
 
-def add_tableview(complet_result, field, module=sys.modules[__name__]):
+def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]):
     """ Add widgets QTableView type.
     Function called in -> widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), **kwargs))
         module = class GwInfo(QObject) -> open_rpt_result(**kwargs)
@@ -1344,7 +1344,6 @@ def add_tableview(complet_result, field, module=sys.modules[__name__]):
     widget = QTableView()
     widget.setObjectName(field['widgetname'])
     widget.setSortingEnabled(True)
-
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
     function_name = 'no_function_asociated'
@@ -1361,7 +1360,7 @@ def add_tableview(complet_result, field, module=sys.modules[__name__]):
                 return widget
 
     # noinspection PyUnresolvedReferences
-    kwargs = {"widget": widget, "complet_result": complet_result}
+    kwargs = {"qtable": widget, "complet_result": complet_result, "dialog": dialog}
     widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget

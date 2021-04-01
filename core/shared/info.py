@@ -415,8 +415,6 @@ class GwInfo(QObject):
         # Get widget controls
         self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
         self.tab_main.currentChanged.connect(partial(self._tab_activation, self.dlg_cf, new_feature))
-        self.tbl_element = self.dlg_cf.findChild(QTableView, "tbl_element")
-        tools_qt.set_tableview_config(self.tbl_element)
         self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
         tools_qt.set_tableview_config(self.tbl_relations)
         self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
@@ -607,7 +605,6 @@ class GwInfo(QObject):
                 tools_gw.enable_all(dlg_cf, self.complet_result['body']['data'])
             else:
                 tools_gw.enable_widgets(dlg_cf, self.complet_result['body']['data'], False)
-
 
         # We assign the function to a global variable,
         # since as it receives parameters we will not be able to disconnect the signals
@@ -1352,21 +1349,27 @@ class GwInfo(QObject):
             msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
             tools_qgis.show_message(message, 2, parameter=msg)
             return label, widget
-
-        try:
-            kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature,
-                      "add_widget": add_widget}
-            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        except Exception as e:
-            msg = (f"{type(e).__name__}: {e} Python function: _set_widgets. WHERE columname='{field['columnname']}' "
-                   f"AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'")
-            tools_qgis.show_message(msg, 2)
-            return label, widget
+        kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature,
+                  "add_widget": add_widget}
+        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+        # try:
+        #     kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature,
+        #               "add_widget": add_widget}
+        #     widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+        # except Exception as e:
+        #     msg = (f"{type(e).__name__}: {e} Python function: _set_widgets. WHERE columname='{field['columnname']}' "
+        #            f"AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'")
+        #     tools_qgis.show_message(msg, 2)
+        # return label, widget
 
         try:
             widget.setProperty('isfilter', False)
             if 'isfilter' in field and field['isfilter'] is True:
                 widget.setProperty('isfilter', True)
+
+            widget.setProperty('widgetfunction', False)
+            if 'widgetfunction' in field and field['widgetfunction'] is not None:
+                widget.setProperty('widgetfunction', field['widgetfunction'])
         except Exception:
             # AttributeError: 'QSpacerItem' object has no attribute 'setProperty'
             pass
@@ -1569,7 +1572,7 @@ class GwInfo(QObject):
         dialog = kwargs['dialog']
         add_widget = kwargs['add_widget']
         if add_widget:
-            widget = tools_gw.add_tableview(complet_result, field, self)
+            widget = tools_gw.add_tableview(complet_result, field, dialog, self)
         else:
             widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
 
@@ -1837,6 +1840,9 @@ class GwInfo(QObject):
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
 
         if field['isfilter'] is True: return widget
+        if field['widgetcontrols'] is not None and 'accept' in field['widgetcontrols']:
+            if field['widgetcontrols']['accept'] is False: return widget
+
         if self._check_tab_data(dialog):
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
             # does not jump, making it lose focus, which will cause the accept function to jump sent invalid parameters
@@ -1859,6 +1865,9 @@ class GwInfo(QObject):
     def _set_auto_update_textarea(self, field, dialog, widget, new_feature):
 
         if field['isfilter'] is True: return widget
+        if field['widgetcontrols'] is not None and 'accept' in field['widgetcontrols']:
+            if field['widgetcontrols']['accept'] is False: return widget
+
         if self._check_tab_data(dialog):
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
             # does not jump, making it lose focus, which will cause the accept function to jump sent invalid parameters
@@ -1929,6 +1938,9 @@ class GwInfo(QObject):
     def _set_auto_update_combobox(self, field, dialog, widget, new_feature):
 
         if field['isfilter'] is True: return widget
+        if field['widgetcontrols'] is not None and 'accept' in field['widgetcontrols']:
+            if field['widgetcontrols']['accept'] is False: return widget
+
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
@@ -1945,6 +1957,9 @@ class GwInfo(QObject):
     def _set_auto_update_dateedit(self, field, dialog, widget, new_feature):
 
         if field['isfilter'] is True: return widget
+        if field['widgetcontrols'] is not None and 'accept' in field['widgetcontrols']:
+            if field['widgetcontrols']['accept'] is False: return widget
+
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
@@ -1961,6 +1976,9 @@ class GwInfo(QObject):
     def _set_auto_update_spinbox(self, field, dialog, widget, new_feature):
 
         if field['isfilter'] is True: return widget
+        if field['widgetcontrols'] is not None and 'accept' in field['widgetcontrols']:
+            if field['widgetcontrols']['accept'] is False: return widget
+
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
@@ -1977,6 +1995,9 @@ class GwInfo(QObject):
     def _set_auto_update_checkbox(self, field, dialog, widget, new_feature):
 
         if field['isfilter'] is True: return widget
+        if field['widgetcontrols'] is not None and 'accept' in field['widgetcontrols']:
+            if field['widgetcontrols']['accept'] is False: return widget
+
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
                 _json = {}
@@ -2038,7 +2059,8 @@ class GwInfo(QObject):
 
         # Tab 'Elements'
         if self.tab_main.widget(index_tab).objectName() == 'tab_elements' and not self.tab_element_loaded:
-            self._fill_tab_element()
+            # self._fill_tab_element()
+            self._fill_tab_rpt(self.complet_result, new_feature)
             self.tab_element_loaded = True
         # Tab 'Relations'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_relations' and not self.tab_relations_loaded:
@@ -2101,8 +2123,8 @@ class GwInfo(QObject):
         btn_new_element = self.dlg_cf.findChild(QPushButton, "btn_new_element")
 
         # Set signals
-        self.tbl_element.doubleClicked.connect(partial(self._open_selected_element, dialog, widget))
-        btn_open_element.clicked.connect(partial(self._open_selected_element, dialog, widget))
+        # self.tbl_element.doubleClicked.connect(partial(self._open_selected_element, dialog, widget))
+        # btn_open_element.clicked.connect(partial(self._open_selected_element, dialog, widget))
         btn_delete.clicked.connect(partial(self._delete_records, widget, table_name))
         btn_insert.clicked.connect(partial(self._add_object, widget, "element", "v_ui_element"))
         btn_new_element.clicked.connect(partial(self._manage_element, dialog, feature=self.feature))
@@ -2117,21 +2139,25 @@ class GwInfo(QObject):
         tools_gw.set_completer_object(dialog, self.table_object)
 
 
-    def _open_selected_element(self, dialog, widget):
-        """ Open form of selected element of the @widget?? """
-
+    # def _open_selected_element(self, dialog, widget):
+    def _open_selected_element(self, **kwargs):
+        """
+            Open form of selected element of the @widget??
+              function called in def _set_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
+              at line: widget.textChanged.connect(partial(getattr(self, widgetfunction), **kwargs))
+          """
+        dialog = kwargs['dialog']
+        qtable = kwargs['qtable']
         # Get selected rows
-        selected_list = widget.selectionModel().selectedRows()
+        selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             tools_qgis.show_warning(message)
             return
-
-        element_id = ""
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            element_id = widget.model().record(row).value("element_id")
-            break
+        index = selected_list[0]
+        row = index.row()
+        column_index = tools_qt.get_col_index_by_col_name(qtable, 'element_id')
+        element_id = index.sibling(row, column_index).data()
 
         # Open selected element
         self._manage_element(dialog, element_id)
@@ -2240,18 +2266,6 @@ class GwInfo(QObject):
         # Open dialog
         tools_gw.open_dialog(elem.dlg_add_element)
 
-
-        # index_tab = self.tab_main.currentIndex()
-        # list_tables = self.tab_main.widget(index_tab).findChildren(QTableView)
-        # complet_list = []
-        # for table in list_tables:
-        #     columnname = table.property('columnname')
-        #     widgetname = table.objectName()
-        #     complet_list, widget_list = self._init_tbl_rpt(complet_result, self.dlg_cf, new_feature, columnname, widgetname)
-        #     if complet_list is False:
-        #         return False
-        #     self._set_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname)
-        # return complet_list
 
     def _manage_element_new(self, dialog, elem):
         """ Get inserted element_id and add it to current feature """
@@ -3231,8 +3245,13 @@ class GwInfo(QObject):
         list_tables = self.tab_main.widget(index_tab).findChildren(QTableView)
         complet_list = []
         for table in list_tables:
-            columnname = table.property('columnname')
             widgetname = table.objectName()
+            columnname = table.property('columnname')
+            if columnname is None:
+                msg = f"widget {widgetname} in tab {self.tab_main.widget(index_tab).objectName()} has not columnname and cant be configured"
+                tools_qgis.show_info(msg, 1)
+                continue
+
             complet_list, widget_list = self._init_tbl_rpt(complet_result, self.dlg_cf, new_feature, columnname, widgetname)
             if complet_list is False:
                 return False
@@ -3304,26 +3323,30 @@ class GwInfo(QObject):
 
 
     def _set_listeners(self, complet_result, dialog, widget_list, columnname, widgetname):
-
+        """def _open_selected_element(self, **kwargs):"""
         model = None
         for widget in widget_list:
             if type(widget) is QTableView:
                 model = widget.model()
 
-        # Emitting the text change signal of a widget slows down the process, so instead of emitting a signal for each
+        # Emitting the text changed signal of a widget slows down the process, so instead of emitting a signal for each
         # widget, we will emit only the one of the last widget. This is enough for the correct filtering of the
         # QTableView and we gain in performance
         last_widget = None
         for widget in widget_list:
+            if widget.property('isfilter') is not True: continue
+            widgetfunction = widget.property('widgetfunction')
+            kwargs = {"complet_result": complet_result, "model": model, "dialog": dialog, "widget_list": widget_list,
+                      "columnname": columnname, "widget": widget, "widgetname": widgetname}
+            if widgetfunction is False: continue
             if type(widget) is QLineEdit:
                 last_widget = widget
-                widget.textChanged.connect(partial(self._filter_table, complet_result, model, dialog, widget_list, columnname, widgetname))
+                widget.textChanged.connect(partial(getattr(self, widgetfunction), **kwargs))
             elif type(widget) is QComboBox:
                 last_widget = widget
-                widget.currentIndexChanged.connect(partial(
-                    self._filter_table, complet_result, model, dialog, widget_list, columnname, widgetname))
+                widget.currentIndexChanged.connect(partial(getattr(self, widgetfunction), **kwargs))
 
-        # Emit signal change
+        # Emit signal changed
         if last_widget is not None:
             if type(last_widget) is QLineEdit:
                 text = tools_qt.get_text(dialog, last_widget, False, False)
@@ -3349,7 +3372,17 @@ class GwInfo(QObject):
         return complet_list
 
 
-    def _filter_table(self, complet_result, standar_model, dialog, widget_list, columnname, widgetname):
+    def _filter_table(self, **kwargs):
+        """
+             function called in def _set_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
+             at line: widget.textChanged.connect(partial(getattr(self, widgetfunction), **kwargs))
+         """
+        complet_result = kwargs['complet_result']
+        model = kwargs['model']
+        dialog = kwargs['dialog']
+        widget_list = kwargs['widget_list']
+        columnname = kwargs['columnname']
+        widgetname = kwargs['widgetname']
 
         filter_fields = self._get_filter_qtableview(dialog, widget_list)
         index_tab = self.tab_main.currentIndex()
@@ -3363,9 +3396,9 @@ class GwInfo(QObject):
                 qtable = dialog.findChild(QTableView, field['widgetname'])
                 if qtable:
                     if field['value'] is None:
-                        standar_model.removeRows(0, standar_model.rowCount())
+                        model.removeRows(0, model.rowCount())
                         return complet_list
-                    standar_model.clear()
+                    model.clear()
                     tools_gw.add_tableview_header(qtable, field)
                     tools_gw.fill_tableview_rows(qtable, field)
                     tools_gw.set_tablemodel_config(dialog, qtable, field['widgetname'], 1, True)
@@ -3399,7 +3432,7 @@ class GwInfo(QObject):
             function called in -> module = tools_gw.add_tableview(complet_result, field, module=sys.modules[__name__])
             at line: widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
         """
-        qtable = kwargs['widget']
+        qtable = kwargs['qtable']
         complet_list = kwargs['complet_result']
         # Get selected rows
         selected_list = qtable.selectionModel().selectedRows()
