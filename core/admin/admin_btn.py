@@ -213,6 +213,7 @@ class GwAdminButton:
         # Reset count error variable to 0
         self.error_count = 0
 
+
     """ Checkbox calling functions """
 
     def load_updates(self, project_type=None, update_changelog=False, schema_name=None):
@@ -252,6 +253,7 @@ class GwAdminButton:
 
         return status
 
+
     """ Other functions """
 
     def visit_manager(self):
@@ -269,6 +271,7 @@ class GwAdminButton:
         # self.dlg_readsql.btn_visit_create.clicked.connect(partial(self._create_visit_param))
         # self.dlg_readsql.btn_visit_update.clicked.connect(partial(self.update_visit))
         # self.dlg_readsql.btn_visit_delete.clicked.connect(partial(self.delete_visit))
+
 
     def init_dialog_create_project(self, project_type=None):
         """ Initialize dialog (only once) """
@@ -337,6 +340,7 @@ class GwAdminButton:
         # Set signals
         self._set_signals_create_project()
 
+
     def fill_table(self, qtable, table_name, model, expr_filter, edit_strategy=QSqlTableModel.OnManualSubmit):
         """ Set a model with selected filter.
         Attach that model to selected table """
@@ -357,6 +361,7 @@ class GwAdminButton:
             tools_qgis.show_warning(model.lastError().text())
         # Attach model to table view
         qtable.setModel(model)
+
 
     # region private functions
 
@@ -388,6 +393,7 @@ class GwAdminButton:
 
     def _populate_combo_connections(self):
         """ Fill the combo with the connections that exist in QGis """
+
         s = QSettings()
         s.beginGroup("PostgreSQL/connections")
         default_connection = s.value('selected')

@@ -29,7 +29,6 @@ class GwLoadProject(QObject):
         """ Class to manage layers. Refactor code from main.py """
 
         super().__init__()
-
         self.iface = global_vars.iface
         self.settings = global_vars.giswater_settings
         self.plugin_dir = global_vars.plugin_dir
@@ -37,7 +36,6 @@ class GwLoadProject(QObject):
         self.buttons_to_hide = []
         self.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', global_vars.plugin_dir)
         self.icon_folder = self.plugin_dir + os.sep + 'icons' + os.sep + 'toolbars' + os.sep
-
         self.buttons = {}
 
 
@@ -52,6 +50,11 @@ class GwLoadProject(QObject):
         if not self._check_database_connection(show_warning):
             return
 
+        # Get water software from table 'sys_version'
+        project_type = tools_gw.get_project_type()
+        if project_type is None:
+            return
+
         # Manage schema name
         tools_db.get_current_user()
         layer_source = tools_qgis.get_layer_source(self.layer_node)
@@ -61,7 +64,7 @@ class GwLoadProject(QObject):
 
         # TEMP
         global_vars.schema_name = self.schema_name
-        global_vars.project_type = tools_gw.get_project_type()
+        global_vars.project_type = project_type
         global_vars.plugin_name = self.plugin_name
 
         # Check for developers options
@@ -102,11 +105,6 @@ class GwLoadProject(QObject):
         if status is False:
             return
 
-        # Get water software from table 'version'
-        self.project_type = tools_gw.get_project_type()
-        if self.project_type is None:
-            return
-
         # Create menu
         load_project_menu = GwMenuLoad()
         load_project_menu.read_menu()
@@ -114,14 +112,11 @@ class GwLoadProject(QObject):
         # Initialize toolbars
         self._get_buttons_to_hide()
 
-        # Manage records from table 'cat_feature'
-        self.feature_cat = tools_gw.manage_feature_cat()
-
         # Manage snapping layers
         self._manage_snapping_layers()
 
         # Manage actions of the different plugin_toolbars
-        self._manage_toolbars()
+        self._manage_toolbars(project_type)
 
         # Check roles of this user to show or hide toolbars
         self._check_user_roles()
@@ -154,9 +149,9 @@ class GwLoadProject(QObject):
 
     # region private functions
 
-
     def _get_user_level_variables(self):
         """ Get config related with user_level variables """
+
         comment = f"initial=1, normal=2, expert=3, u can config some parameters in [user_level] section"
         global_vars.user_level['level'] = tools_gw.check_config_settings('system', 'user_level', '1', comment=comment)
         global_vars.user_level['showquestion'] = tools_gw.check_config_settings('user_level', 'showquestion', '1,2,3')
@@ -246,7 +241,6 @@ class GwLoadProject(QObject):
 
         try:
             row = tools_gw.get_config_parser('qgis_toolbar_hidebuttons', 'buttons_to_hide', "user", "init")
-
             if not row or row in (None, 'None'):
                 return
 
@@ -256,7 +250,7 @@ class GwLoadProject(QObject):
             tools_log.log_warning(f"{type(e).__name__}: {e}")
 
 
-    def _manage_toolbars(self):
+    def _manage_toolbars(self, project_type):
         """ Manage actions of the custom plugin toolbars. project_type in ('ws', 'ud') """
 
         # Dynamically get list of toolbars from config file
@@ -289,7 +283,7 @@ class GwLoadProject(QObject):
                     self.buttons[index_action] = button
 
         # Disable buttons which are project type exclusive
-        project_exclusive = tools_gw.check_config_settings('project_exclusive', str(self.project_type), 'None',
+        project_exclusive = tools_gw.check_config_settings('project_exclusive', str(project_type), 'None',
                                                            "project", "giswater")
 
         if project_exclusive not in (None, 'None'):
@@ -311,6 +305,7 @@ class GwLoadProject(QObject):
 
 
     def _create_toolbar(self, toolbar_id):
+
         list_actions = tools_gw.check_config_settings('toolbars', str(toolbar_id), 'None', "project", "giswater")
 
         if list_actions in (None, 'None'):
@@ -385,6 +380,7 @@ class GwLoadProject(QObject):
         if self.feature_cat is None:
             self._enable_button("01", False)
             self._enable_button("02", False)
+
 
     def _enable_toolbars(self, visible=True):
         """ Enable/disable all plugin toolbars from QGIS GUI """
