@@ -545,8 +545,7 @@ class GwSearch:
 
         search_csv_path = tools_gw.get_config_parser('search', 'search_csv_path', "user", "session")
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.txt_path, search_csv_path)
-        tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_init, f"Filter by: {field_id}")
-        tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_end, f"Filter by: {field_id}")
+
 
         self.items_dialog.tbl_psm.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.items_dialog.tbl_psm.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -620,6 +619,10 @@ class GwSearch:
         tools_gw.open_dialog(self.items_dialog, dlg_name='search_workcat')
         title = self.items_dialog.windowTitle()
         self.items_dialog.setWindowTitle(f"{title} - {display_name}")
+        text = tools_qt.get_text(self.items_dialog, self.items_dialog.lbl_init, False, False)
+        tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_init, f"{text} {field_id}")
+        text = tools_qt.get_text(self.items_dialog, self.items_dialog.lbl_end, False, False)
+        tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_end, f"{text} {field_id}")
 
     def _manage_document(self, qtable, item_id):
         """ Access GUI to manage documents e.g Execute action of button 34 """
