@@ -34,5 +34,6 @@ INSERT INTO config_toolbox VALUES (2760, 'Get values from raster DEM', TRUE, '{"
 "comboIds":["allValues", "nullValues"], "comboNames":["ALL NODES", "NODES NULL ELEV"], "selectedId":"nullValues"}]', NULL, TRUE)
 ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO sys_function (id, function_name, project_type, function_type, sys_role) VALUES (3032, 'gw_trg_man2inp_values', 'ws', 'trigger function', 'role_edit');
 
 

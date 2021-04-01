@@ -46,15 +46,6 @@ v_removedemand boolean;
 v_fid integer = 227;
 v_error_context text;
 v_breakpipes boolean;
-v_automatic_man2inp_values json;
-v_rec json;
-
-v_sourcetable text;
-v_targettable text;
-v_sourcecol text;
-v_targetcol text;
-v_idname text;
-v_querytext text;
 	
 BEGIN
 
@@ -64,9 +55,6 @@ BEGIN
 	-- get input data
 	v_result = (p_data->>'data')::json->>'resultId';
 	v_usenetworkgeom = (p_data->>'data')::json->>'useNetworkGeom';  -- use network previously defined
-
-	-- get system parameteres
-	v_automatic_man2inp_values := (SELECT value FROM config_param_system WHERE parameter = 'epa_automatic_man2inp_values');
 
 	-- get user parameteres
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
@@ -130,23 +118,6 @@ BEGIN
 
 	-- when existing network is used (check on go2epa dialog)
 	IF v_usenetworkgeom IS NOT TRUE THEN
-
-		-- automatic update of inp values from man table (according variable config_param_system = epa_automatic_man2inp_values)
-		IF v_automatic_man2inp_values->>'status' THEN
-
-			v_automatic_man2inp_values := v_automatic_man2inp_values ->>'values';
-
-			FOR v_rec IN SELECT json_array_elements_text(v_automatic_man2inp_values)
-			LOOP
-				v_sourcetable := (v_rec::json->>'source')::json->>'table';
-				v_targettable := (v_rec::json->>'target')::json->>'table';
-				v_sourcecol := (v_rec->>'source')::json->>'column';
-				v_targetcol := (v_rec->>'target')::json->>'column';
-				v_idname := v_rec->>'idname';
-				v_querytext = ' UPDATE '||v_targettable||' t SET '||v_targetcol||' = '||v_sourcecol||' FROM '||v_sourcetable||' s WHERE t.'||v_idname||' = s.'||v_idname;
-				EXECUTE v_querytext;
-			END LOOP;
-		END IF;
 
 		RAISE NOTICE '2 - check system data';
 		IF v_checkdata THEN

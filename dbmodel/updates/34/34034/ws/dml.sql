@@ -49,11 +49,8 @@ ON CONFLICT (parameter) DO NOTHING;
 INSERT INTO config_param_system (parameter, value, descript, standardvalue, isenabled, project_type) VALUES(
 'epa_automatic_man2inp_values', 
 '{"status":false, "values":[
-{"source":{"table":"ve_node_deposito", "column":"hmax"}, "target":{"table":"inp_tank", "column":"maxlevel", "idname":"node_id"}}, 
-{"source":{"table":"ve_node_valvula_reductora_pres", "column":"press_exit"}, "target":{"table":"inp_valve", "column":"pressure", "idname":"node_id"}}]}',
+{"source":{"table":"ve_node_shutoff_valve", "column":"pression_exit"}, "target":{"table":"inp_valve", "column":"pressure"}}]}',
 'Before trigger go2epa, automatic loop updating values on inp tables',
-'{"status":false, "values":[
-{"source":{"table":"ve_node_deposito", "column":"hmax"}, "target":{"table":"inp_tank", "column":"maxlevel", "idname":"node_id"}}, 
-{"source":{"table":"ve_node_valvula_reductora_pres", "column":"press_exit"}, "target":{"table":"inp_valve", "column":"pressure", "idname":"node_id"}}]}'
+'{"status":false}'
 , FALSE, 'ws')
 ON CONFLICT (parameter) DO NOTHING;
