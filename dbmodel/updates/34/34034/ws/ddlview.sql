@@ -25,7 +25,7 @@ CREATE OR REPLACE VIEW vi_tanks AS
 
 
 -- 2021/04/01
-CREATE OR REPLACE VIEW inpvi_valves AS 
+CREATE OR REPLACE VIEW vi_valves AS 
  SELECT DISTINCT ON (a.arc_id) a.arc_id,
     a.node_1,
     a.node_2,
@@ -40,8 +40,7 @@ CREATE OR REPLACE VIEW inpvi_valves AS
             ((rpt_inp_arc.addparam::json ->> 'valv_type'::text))::character varying(18) AS valv_type,
             rpt_inp_arc.addparam::json ->> 'pressure'::text AS setting,
             rpt_inp_arc.minorloss
-           FROM inpselector_inp_result,
-            inprpt_inp_arc
+           FROM selector_inp_result, rpt_inp_arc
           WHERE ((rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'PRV'::text OR (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'PSV'::text OR (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'PBV'::text) AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
         UNION
          SELECT rpt_inp_arc.arc_id,
@@ -51,8 +50,7 @@ CREATE OR REPLACE VIEW inpvi_valves AS
             rpt_inp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
             rpt_inp_arc.addparam::json ->> 'flow'::text AS setting,
             rpt_inp_arc.minorloss
-           FROM inpselector_inp_result,
-            inprpt_inp_arc
+           FROM selector_inp_result, rpt_inp_arc
           WHERE (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'FCV'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
         UNION
          SELECT rpt_inp_arc.arc_id,
@@ -62,8 +60,7 @@ CREATE OR REPLACE VIEW inpvi_valves AS
             rpt_inp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
             rpt_inp_arc.addparam::json ->> 'coef_loss'::text AS setting,
             rpt_inp_arc.minorloss
-           FROM inpselector_inp_result,
-            inprpt_inp_arc
+           FROM selector_inp_result, rpt_inp_arc
           WHERE (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'TCV'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
         UNION
          SELECT rpt_inp_arc.arc_id,
@@ -73,8 +70,7 @@ CREATE OR REPLACE VIEW inpvi_valves AS
             rpt_inp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
             rpt_inp_arc.addparam::json ->> 'curve_id'::text AS setting,
             rpt_inp_arc.minorloss
-           FROM inpselector_inp_result,
-            inprpt_inp_arc
+           FROM selector_inp_result, rpt_inp_arc
           WHERE (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'GPV'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
         UNION
          SELECT rpt_inp_arc.arc_id,
@@ -84,9 +80,8 @@ CREATE OR REPLACE VIEW inpvi_valves AS
             'PRV'::character varying(18) AS valv_type,
             rpt_inp_arc.addparam::json ->> 'pressure'::text AS setting,
             rpt_inp_arc.minorloss
-           FROM inpselector_inp_result,
-            inprpt_inp_arc
-             JOIN inpinp_pump ON rpt_inp_arc.arc_id::text = concat(inp_pump.node_id, '_n2a_4')
+           FROM selector_inp_result,rpt_inp_arc
+             JOIN inp_pump ON rpt_inp_arc.arc_id::text = concat(inp_pump.node_id, '_n2a_4')
           WHERE rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
         UNION
          SELECT rpt_inp_arc.arc_id,
@@ -96,8 +91,7 @@ CREATE OR REPLACE VIEW inpvi_valves AS
             rpt_inp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
             rpt_inp_arc.addparam::json ->> 'pressure'::text AS setting,
             rpt_inp_arc.minorloss
-           FROM inpselector_inp_result,
-            inprpt_inp_arc
+           FROM selector_inp_result,rpt_inp_arc
           WHERE ((rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'PRV'::text OR (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'PSV'::text OR (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'PBV'::text) AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
         UNION
          SELECT rpt_inp_arc.arc_id,
@@ -107,8 +101,7 @@ CREATE OR REPLACE VIEW inpvi_valves AS
             rpt_inp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
             rpt_inp_arc.addparam::json ->> 'flow'::text AS setting,
             rpt_inp_arc.minorloss
-           FROM inpselector_inp_result,
-            inprpt_inp_arc
+           FROM selector_inp_result,rpt_inp_arc
           WHERE (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'FCV'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
         UNION
          SELECT rpt_inp_arc.arc_id,
@@ -118,8 +111,7 @@ CREATE OR REPLACE VIEW inpvi_valves AS
             rpt_inp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
             rpt_inp_arc.addparam::json ->> 'coef_loss'::text AS setting,
             rpt_inp_arc.minorloss
-           FROM inpselector_inp_result,
-            inprpt_inp_arc
+           FROM selector_inp_result,rpt_inp_arc
           WHERE (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'TCV'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text
         UNION
          SELECT rpt_inp_arc.arc_id,
@@ -129,6 +121,6 @@ CREATE OR REPLACE VIEW inpvi_valves AS
             rpt_inp_arc.addparam::json ->> 'valv_type'::text AS valv_type,
             rpt_inp_arc.addparam::json ->> 'curve_id'::text AS setting,
             rpt_inp_arc.minorloss
-           FROM inpselector_inp_result,
-            inprpt_inp_arc
+           FROM selector_inp_result,
+            rpt_inp_arc
           WHERE (rpt_inp_arc.addparam::json ->> 'valv_type'::text) = 'GPV'::text AND rpt_inp_arc.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text) a;
