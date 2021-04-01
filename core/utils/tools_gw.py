@@ -880,7 +880,8 @@ def build_dialog_info(dialog, result, my_json=None):
             widget = add_checkbox(field)
             widget.stateChanged.connect(partial(get_values, dialog, widget, my_json))
         elif field['widgettype'] == 'button':
-            widget = add_button(dialog, field)
+            kwargs = {"dialog": dialog, "field": field}
+            widget = add_button(**kwargs)
         widget.setProperty('ismandatory', field['ismandatory'])
 
         if 'layoutorder' in field: order = field['layoutorder']
@@ -965,7 +966,8 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                 widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
             elif field['widgettype'] == 'button':
-                widget = add_button(dialog, field, temp_layers_added, module)
+                kwargs = {"dialog": dialog, "field": field, "temp_layers_added": temp_layers_added}
+                widget = add_button(module, **kwargs)
                 widget = set_widget_size(widget, field)
 
             # Set editable/readonly
@@ -1058,7 +1060,7 @@ def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
     tools_log.log_info(str(list))
 
 
-def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name__]):
+def add_button(module=sys.modules[__name__], **kwargs):
     """
     :param dialog: (QDialog)
     :param field: Part of json where find info (Json)
@@ -1069,7 +1071,7 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
     functions called in -> widget.clicked.connect(partial(getattr(module, function_name), **kwargs)) atm:
         None
     """
-
+    field = kwargs['field']
     widget = QPushButton()
     widget.setObjectName(field['widgetname'])
 
@@ -1082,6 +1084,11 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
     real_name = widget.objectName()
     if 'data_' in widget.objectName():
         real_name = widget.objectName()[5:len(widget.objectName())]
+
+    if field['stylesheet'] is not None and 'icon' in field['stylesheet']:
+        icon = field['stylesheet']['icon']
+        add_icon(widget, f'{icon}')
+
     if 'widgetfunction' in field:
         if field['widgetfunction'] is not None:
             function_name = field['widgetfunction']
@@ -1094,9 +1101,9 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
             message = "Parameter button_function is null for button"
             tools_qgis.show_message(message, 2, parameter=widget.objectName())
 
-    kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name,
-              'temp_layers_added': temp_layers_added}
-
+    kwargs['widget'] = widget
+    kwargs['message_level'] = 1
+    kwargs['function_name'] = function_name
     widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
@@ -1331,8 +1338,8 @@ def add_lineedit(field):
 
 def add_tableview(complet_result, field, module=sys.modules[__name__]):
     """ Add widgets QTableView type.
-    Function called in -> widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), widget, complet_result))
-        module = class GwInfo(QObject) -> open_rpt_result(widget, complet_result)
+    Function called in -> widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), **kwargs))
+        module = class GwInfo(QObject) -> open_rpt_result(**kwargs)
     """
     widget = QTableView()
     widget.setObjectName(field['widgetname'])
@@ -1354,7 +1361,8 @@ def add_tableview(complet_result, field, module=sys.modules[__name__]):
                 return widget
 
     # noinspection PyUnresolvedReferences
-    widget.doubleClicked.connect(partial(getattr(module, function_name), widget, complet_result))
+    kwargs = {"widget": widget, "complet_result": complet_result}
+    widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
 
@@ -2279,6 +2287,7 @@ def add_icon(widget, icon, sub_folder="20x20"):
     # Get icons folder
     icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}{sub_folder}")
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
+
     if os.path.exists(icon_path):
         widget.setIcon(QIcon(icon_path))
         if type(widget) is QPushButton:

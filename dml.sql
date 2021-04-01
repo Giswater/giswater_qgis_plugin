@@ -21,11 +21,12 @@ INSERT INTO ws_sample35.config_form_list(tablename, query_text, device, listtype
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_isnullvalue, layoutname, tabname, isfilter)
     VALUES ('ve_arc_pipe', 'form_feature', 'expl_id', 1, 'string', 'combo',  'Expl id', false, false, true, false, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL AND active IS TRUE ', True, 'lyt_rpt_2', 'tab_rpt', True);
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, ismandatory, isparent, iseditable, isautoupdate, layoutname, tabname, isfilter)
+    VALUES ('ve_arc_pipe', 'form_feature', 'arc_id', 2, 'string', 'text', false, false, true, false, 'lyt_rpt_2', 'tab_rpt', true);
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, layoutname, tabname, isfilter)
+    VALUES ('ve_arc_pipe', 'form_feature', 'arccat_id', 3, 'string', 'typeahead', 'Arc cat', false, false, true, false, 'SELECT id, id as idval FROM cat_arc WHERE id IS NOT NULL AND active IS TRUE ', 'lyt_rpt_2', 'tab_rpt', true);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, layoutname, tabname)
-    VALUES ('ve_arc_pipe', 'form_feature', 'hspacer_lyt_rpt_2', 2, 'hspacer', false, false, true, false, 'lyt_rpt_2', 'tab_rpt');
-INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, layoutname, tabname, isfilter)
-    VALUES ('ve_arc_pipe', 'form_feature', 'arc_id', 3, 'text', false, false, true, false, 'lyt_rpt_2', 'tab_rpt', true);
-
+    VALUES ('ve_arc_pipe', 'form_feature', 'hspacer_lyt_rpt_2', 4, 'hspacer', false, false, true, false, 'lyt_rpt_2', 'tab_rpt');
 
 
 

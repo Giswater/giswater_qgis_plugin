@@ -571,6 +571,13 @@ class GwInfo(QObject):
                         layout.addItem(widget, 1, field['layoutorder'])
                     else:
                         layout.addWidget(widget, 1, field['layoutorder'])
+                elif field['layoutname'] in ('lyt_rpt_1'):
+                    layout.addWidget(label, 0, field['layoutorder'])
+                    if type(widget) is QSpacerItem:
+                        layout.addItem(widget, 0, field['layoutorder']*2)
+                    else:
+                        layout.addWidget(widget, 0, field['layoutorder']*2)
+
                 else:
                     tools_gw.add_widget(self.dlg_cf, field, label, widget)
 
@@ -1479,10 +1486,8 @@ class GwInfo(QObject):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
-        dialog = kwargs['dialog']
         field = kwargs['field']
-
-        widget = tools_gw.add_button(dialog, field, module=self)
+        widget = tools_gw.add_button(module=self, **kwargs)
         widget = tools_gw.set_widget_size(widget, field)
         return widget
 
@@ -2235,6 +2240,18 @@ class GwInfo(QObject):
         # Open dialog
         tools_gw.open_dialog(elem.dlg_add_element)
 
+
+        # index_tab = self.tab_main.currentIndex()
+        # list_tables = self.tab_main.widget(index_tab).findChildren(QTableView)
+        # complet_list = []
+        # for table in list_tables:
+        #     columnname = table.property('columnname')
+        #     widgetname = table.objectName()
+        #     complet_list, widget_list = self._init_tbl_rpt(complet_result, self.dlg_cf, new_feature, columnname, widgetname)
+        #     if complet_list is False:
+        #         return False
+        #     self._set_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname)
+        # return complet_list
 
     def _manage_element_new(self, dialog, elem):
         """ Get inserted element_id and add it to current feature """
@@ -3376,13 +3393,14 @@ class GwInfo(QObject):
         return filter_fields
 
 
-    def open_rpt_result(self, qtable, complet_list):
+    def open_rpt_result(self, **kwargs):
         """
         Open form of selected element of the @qtable??
             function called in -> module = tools_gw.add_tableview(complet_result, field, module=sys.modules[__name__])
-            at line: widget.doubleClicked.connect(partial(getattr(module, function_name), widget, complet_result))
+            at line: widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
         """
-
+        qtable = kwargs['widget']
+        complet_list = kwargs['complet_result']
         # Get selected rows
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:

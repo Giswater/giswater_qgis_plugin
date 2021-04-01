@@ -448,7 +448,8 @@ class GwDimensioning:
         elif field['widgettype'] == 'datetime':
             widget = tools_gw.add_calendar(dialog, field)
         elif field['widgettype'] == 'button':
-            widget = tools_gw.add_button(dialog, field)
+            kwargs = {"dialog": dialog,  "field": field}
+            widget = tools_gw.add_button(**kwargs)
             widget = tools_gw.set_widget_size(widget, field)
         elif field['widgettype'] == 'hyperlink':
             widget = tools_gw.add_hyperlink(field)
