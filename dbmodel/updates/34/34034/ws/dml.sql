@@ -23,3 +23,37 @@ UPDATE cat_feature_node SET num_arcs = 9 WHERE man_table = 'man_tank';
 -- 2021/03/30
 UPDATE om_mincut_cat_type SET descript=id WHERE descript IS NULL;
 
+-- 2021/04/01
+INSERT INTO config_param_system (parameter, value, descript, isenabled, project_type) VALUES(
+'epa_valve_vdefault_tcv', 
+'{"catfeatureId":["SHUTOFF_VALVE", "FL_CONTR_VALVE"], "vdefault":{"valv_type":"TCV", "coef_loss":0.02, "minorloss":0.02, "status":"OPEN"}}', 
+'Vdefault values for epa-tcv-valves. This parameter must be according the epa_default definition for all valves', FALSE, 'ws')
+ON CONFLICT (parameter) DO NOTHING;
+
+INSERT INTO config_param_system (parameter, value, descript, isenabled, project_type) VALUES(
+'epa_valve_vdefault_prv', 
+'{"catfeatureId":["PR_REDUC_VALVE"], "vdefault":{"valv_type":"PRV", "minorloss":0.02, "status":"ACTIVE"}}', 
+'Vdefault values for epa-prv-valves. This parameter must be according the epa_default definition for all valves', FALSE, 'ws')
+ON CONFLICT (parameter) DO NOTHING;
+
+INSERT INTO config_param_system (parameter, value, descript, isenabled, project_type, standardvalue) VALUES(
+'epa_shutoffvalve', 'SHORTPIPE', 
+'On the fly transformation for shutoff-valves. This parameter must be according the epa_default definition for shutoff valves on cat_feature_node table (SHORPIPE or VALVE)', FALSE, 'ws', 'SHORTPIPE')
+ON CONFLICT (parameter) DO NOTHING;
+
+INSERT INTO config_param_system (parameter, value, descript, isenabled, project_type, standardvalue) VALUES(
+'epa_patterns', '{"ceateNewPatternWhenNewDma":true}', 
+'Configure variables for vdefault values on pattern_id for dma table among others',FALSE, 'ws','{"ceateNewPatternWhenNewDma":false}')
+ON CONFLICT (parameter) DO NOTHING;
+
+INSERT INTO config_param_system (parameter, value, descript, standardvalue, isenabled, project_type) VALUES(
+'epa_automatic_man2inp_values', 
+'{"status":false, "values":[
+{"source":{"table":"ve_node_deposito", "column":"hmax"}, "target":{"table":"inp_tank", "column":"maxlevel", "idname":"node_id"}}, 
+{"source":{"table":"ve_node_valvula_reductora_pres", "column":"press_exit"}, "target":{"table":"inp_valve", "column":"pressure", "idname":"node_id"}}]}',
+'Before trigger go2epa, automatic loop updating values on inp tables',
+'{"status":false, "values":[
+{"source":{"table":"ve_node_deposito", "column":"hmax"}, "target":{"table":"inp_tank", "column":"maxlevel", "idname":"node_id"}}, 
+{"source":{"table":"ve_node_valvula_reductora_pres", "column":"press_exit"}, "target":{"table":"inp_valve", "column":"pressure", "idname":"node_id"}}]}'
+, FALSE, 'ws')
+ON CONFLICT (parameter) DO NOTHING;
