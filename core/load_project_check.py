@@ -25,6 +25,7 @@ class GwLoadProjectCheck:
 
         self.schema_name = global_vars.schema_name
 
+
     def fill_check_project_table(self, layers, init_project):
         """ Fill table 'audit_check_project' table with layers data """
 
@@ -39,7 +40,6 @@ class GwLoadProjectCheck:
             layer_source['schema'] = layer_source['schema'].replace('"', '')
             if 'schema' not in layer_source or layer_source['schema'] != self.schema_name:
                 continue
-
 
             schema_name = layer_source['schema']
             if schema_name is not None:
@@ -60,6 +60,7 @@ class GwLoadProjectCheck:
         result = self._execute_check_project_function(init_project, fields)
 
         return True, result
+
 
     # region private functions
 
@@ -102,7 +103,8 @@ class GwLoadProjectCheck:
         self._show_check_project_result(result)
 
         return result
-    
+
+
     def _show_check_project_result(self, result):
         """ Show dialog with audit check project results """
 
@@ -129,6 +131,7 @@ class GwLoadProjectCheck:
             self.dlg_audit_project.chk_hide_form.stateChanged.connect(partial(self._update_config))
             tools_gw.open_dialog(self.dlg_audit_project, dlg_name='project_check')
 
+
     def _update_config(self, state):
         """ Set qgis_form_initproject_hidden True or False into config_param_user """
 
@@ -138,6 +141,7 @@ class GwLoadProjectCheck:
                f" ON CONFLICT  (parameter, cur_user) "
                f" DO UPDATE SET value='{value[state]}'")
         tools_db.execute_sql(sql)
+
 
     def _get_missing_layers(self, dialog, m_layers, critical_level):
 
@@ -173,6 +177,7 @@ class GwLoadProjectCheck:
                 tools_qt.manage_exception(None, description, schema_name=global_vars.schema_name)
 
         return critical_level
+
 
     def _add_selected_layers(self, dialog, m_layers):
         """ Receive a list of layers, look for the checks associated with each layer and if they are checked,

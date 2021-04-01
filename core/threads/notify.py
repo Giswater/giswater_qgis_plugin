@@ -30,6 +30,7 @@ class GwNotify(QObject):
 
     def __init__(self):
         """ Class to control notify from PostgresSql """
+
         QObject.__init__(self)
         self.iface = global_vars.iface
         self.canvas = global_vars.canvas
@@ -41,6 +42,7 @@ class GwNotify(QObject):
         """
         :param list_channels: List of channels to be listened
         """
+
         self.list_channels = list_channels
         for channel_name in list_channels:
             tools_db.execute_sql(f'LISTEN "{channel_name}";')

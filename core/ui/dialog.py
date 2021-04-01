@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 import configparser
 import os
 import webbrowser
@@ -19,6 +18,7 @@ from ... import global_vars
 class GwDialog(QDialog):
 
     def __init__(self, subtag=None):
+
         super().__init__()
         self.setupUi(self)
         self.subtag = subtag
@@ -33,7 +33,7 @@ class GwDialog(QDialog):
             parser = configparser.ConfigParser()
             path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}giswater.config"
             if not os.path.exists(path):
-                print(f"File not found: {path}")
+                # print(f"File not found: {path}")
                 webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
                 return True
 

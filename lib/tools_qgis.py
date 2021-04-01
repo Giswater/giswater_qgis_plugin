@@ -20,7 +20,6 @@ from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
     QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry
 from qgis.core import QgsVectorLayer
 
-
 from . import tools_log, tools_qt, tools_os
 from .. import global_vars
 
@@ -884,6 +883,7 @@ def check_query_layer(layer):
         :param layer: Layer to be checked (QgsVectorLayer)
         :return: True/False (Boolean)
     """
+
     try:
         # TODO:: Find differences between PostgreSQL and query layers, and replace this if condition.
         table_uri = layer.dataProvider().dataSourceUri()
@@ -893,6 +893,7 @@ def check_query_layer(layer):
         return True
     except Exception:
         return False
+
 
 # region private functions
 

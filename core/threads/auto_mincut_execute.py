@@ -28,6 +28,7 @@ class GwAutoMincutTask(GwTask):
 
     def run(self):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
+
         super().run()
         self.mincut_class.dlg_mincut.btn_cancel_task.show()
         self.mincut_class.dlg_mincut.btn_cancel.hide()
@@ -65,6 +66,7 @@ class GwAutoMincutTask(GwTask):
 
 
     def finished(self, result):
+
         super().finished(result)
         self.mincut_class.dlg_mincut.btn_cancel_task.hide()
         self.mincut_class.dlg_mincut.btn_cancel.show()
@@ -79,7 +81,8 @@ class GwAutoMincutTask(GwTask):
             self.task_finished.emit([False, self.complet_result])
 
         # Task finished but postgres function failed
-        elif self.complet_result in (False, None) or ('status' in self.complet_result and self.complet_result['status'] == 'Failed'):
+        elif self.complet_result in (False, None) or \
+            ('status' in self.complet_result and self.complet_result['status'] == 'Failed'):
             self.task_finished.emit([False, self.complet_result])
 
         # Task finished with Accepted result

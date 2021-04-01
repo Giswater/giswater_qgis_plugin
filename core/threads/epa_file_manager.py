@@ -55,6 +55,7 @@ class GwEpaFileManager(GwTask):
 
 
     def run(self):
+
         super().run()
 
         # Initialize instance variables
@@ -83,6 +84,7 @@ class GwEpaFileManager(GwTask):
 
 
     def finished(self, result):
+
         super().finished(result)
         self.dlg_go2epa.btn_cancel.setEnabled(False)
         if self.isCanceled(): return
@@ -136,8 +138,6 @@ class GwEpaFileManager(GwTask):
         # If Database exception, show dialog after task has finished
         if global_vars.session_vars['last_error']:
             tools_qt.show_exception_message(msg=global_vars.session_vars['last_error_msg'])
-
-
 
 
     def cancel(self):
@@ -257,7 +257,7 @@ class GwEpaFileManager(GwTask):
 
 
     def _import_rpt(self):
-        """import result file"""
+        """ Import result file """
 
         tools_log.log_info(f"Import rpt file........: {self.file_rpt}")
 

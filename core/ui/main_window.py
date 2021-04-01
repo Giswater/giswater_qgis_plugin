@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-
 import configparser
 import os
 import webbrowser
@@ -23,6 +22,7 @@ class GwMainWindow(QMainWindow):
     key_enter = QtCore.pyqtSignal()
 
     def __init__(self, subtag=None):
+
         super().__init__()
         self.setupUi(self)
         self.subtag = subtag
@@ -31,6 +31,7 @@ class GwMainWindow(QMainWindow):
 
 
     def closeEvent(self, event):
+
         try:
             self.dlg_closed.emit()
             return super().closeEvent(event)
@@ -47,7 +48,7 @@ class GwMainWindow(QMainWindow):
             parser = configparser.ConfigParser()
             path = f"{global_vars.plugin_dir}{os.sep}config{os.sep}giswater.config"
             if not os.path.exists(path):
-                print(f"File not found: {path}")
+                # print(f"File not found: {path}")
                 webbrowser.open_new_tab('https://giswater.gitbook.io/giswater-manual')
                 return True
 
@@ -66,6 +67,7 @@ class GwMainWindow(QMainWindow):
 
 
     def keyPressEvent(self, event):
+
         if event.key() == QtCore.Qt.Key_Escape:
             self.key_escape.emit()
             return super().keyPressEvent(event)

@@ -9,10 +9,11 @@ from time import sleep
 
 from qgis.PyQt.QtCore import pyqtSignal, QObject
 from qgis.core import QgsTask
+from qgis.utils import iface
 
 from ... import global_vars
 from ...lib import tools_log, tools_db
-from qgis.utils import iface
+
 
 class GwTask(QgsTask, QObject):
     """ This shows how to subclass QgsTask """
@@ -23,7 +24,6 @@ class GwTask(QgsTask, QObject):
 
         QObject.__init__(self)
         super().__init__(description, QgsTask.CanCancel)
-
         self.exception = None
         self.duration = duration
 
@@ -37,6 +37,7 @@ class GwTask(QgsTask, QObject):
 
 
     def finished(self, result):
+
         global_vars.session_vars['threads'].remove(self)
         iface.actionOpenProject().setEnabled(True)
         iface.actionNewProject().setEnabled(True)
@@ -51,6 +52,7 @@ class GwTask(QgsTask, QObject):
 
 
     def cancel(self):
+
         pid = global_vars.dao.conn.get_backend_pid()
         if isinstance(pid, int):
             result = tools_db.cancel_pid(pid)

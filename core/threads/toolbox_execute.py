@@ -34,6 +34,7 @@ class GwToolBoxTask(GwTask):
 
 
     def run(self):
+
         super().run()
         extras = ''
         feature_field = ''
@@ -59,7 +60,6 @@ class GwToolBoxTask(GwTask):
                 layer = self.toolbox.set_selected_layer(self.dialog, self.combo)
                 if not layer:
                     return False
-
 
             selection_mode = self.toolbox.rbt_checked['widget']
             extras += f'"selectionMode":"{selection_mode}",'
@@ -117,6 +117,7 @@ class GwToolBoxTask(GwTask):
                                 extras += f'"{param_name}":null, '
                             else:
                                 extras += f'"{param_name}":"{value}", '
+
         if widget_is_void:
             message = "This param is mandatory. Please, set a value"
             tools_log.log_info(message, parameter='')
@@ -148,6 +149,7 @@ class GwToolBoxTask(GwTask):
 
 
     def finished(self, result):
+
         super().finished(result)
         self.dialog.btn_cancel.hide()
         self.dialog.btn_close.show()

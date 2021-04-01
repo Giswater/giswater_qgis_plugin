@@ -7,11 +7,11 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsTask
+
 from .task import GwTask
 from ..utils import tools_gw
 from ... import global_vars
 from ...lib import tools_log, tools_db, tools_qgis, tools_qt
-
 
 
 class GwProjectLayersConfig(GwTask):
@@ -32,6 +32,7 @@ class GwProjectLayersConfig(GwTask):
 
 
     def run(self):
+
         super().run()
         self.setProgress(0)
         self._get_layers_to_config()
@@ -42,6 +43,7 @@ class GwProjectLayersConfig(GwTask):
 
 
     def finished(self, result):
+
         super().finished(result)
         if result:
             return
@@ -50,10 +52,6 @@ class GwProjectLayersConfig(GwTask):
             tools_log.log_info(f"Task aborted: {self.description()}")
             tools_log.log_warning(f"Exception: {self.exception}")
             raise self.exception
-
-
-    def cancel(self):
-        super().cancel()
 
 
     # region private functions

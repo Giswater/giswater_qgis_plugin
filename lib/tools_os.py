@@ -16,7 +16,6 @@ from qgis.PyQt.QtWidgets import QFileDialog
 
 
 def get_datadir() -> pathlib.Path:
-
     """
     Returns a parent directory path
     where persistent application data can be stored.
@@ -122,5 +121,6 @@ def open_file_path(msg="Select file", filter_="All (*.*)"):
 
 def check_python_function(module, function_name):
     """ Check if function exist in @module """
+
     object_functions = [method_name for method_name in dir(module) if callable(getattr(module, method_name))]
     return function_name in object_functions

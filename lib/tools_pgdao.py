@@ -20,7 +20,6 @@ class GwPgDao(object):
         self.last_error = None
         self.set_search_path = None
         self.conn = None
-        self.conn_aux = None
 
 
     def init_db(self):

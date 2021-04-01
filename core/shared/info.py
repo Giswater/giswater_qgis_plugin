@@ -295,7 +295,7 @@ class GwInfo(QObject):
                 # realizes that he has made a mistake and selects another feature, without this try two features would
                 # be inserted. This disconnect signal avoids it
                 self.info_layer.featureAdded.disconnect(self._open_new_feature)
-            except Exception as e:
+            except Exception:
                 # If self._open_new_feature is not connected, cause an exception
                 pass
             self.suppres_form = QSettings().value("/Qgis/digitizing/disable_enter_attribute_values_dialog")
@@ -414,6 +414,7 @@ class GwInfo(QObject):
         # But if it has not been received, it is drawn
         # Using variable exist_rb for check if alredy exist rubberband
         try:
+            # noinspection PyUnusedLocal
             exist_rb = complet_result['body']['returnManager']['style']['ruberband']
         except KeyError:
             tools_gw.draw_by_json(complet_result, self.rubber_band)
@@ -465,7 +466,6 @@ class GwInfo(QObject):
         self.feature_id = complet_result['body']['feature']['id']
 
         # Get the start point and end point of the feature
-        list_points = None
         if new_feature:
             list_points = tools_qgis.get_points_from_geometry(self.layer, new_feature)
         else:
@@ -1785,7 +1785,7 @@ class GwInfo(QObject):
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
         try:
             getattr(self, f"_check_{widget.property('datatype')}")(value, widget, btn)
-        except AttributeError as e:
+        except AttributeError:
             """ If the function called by getattr don't exist raise this exception """
             pass
 

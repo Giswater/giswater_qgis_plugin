@@ -29,6 +29,7 @@ class GwCreateSchemaTask(GwTask):
 
     def run(self):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
+
         super().run()
         self.admin.dlg_readsql_create_project.btn_cancel_task.show()
         self.admin.dlg_readsql_create_project.btn_accept.hide()
@@ -42,7 +43,7 @@ class GwCreateSchemaTask(GwTask):
 
         self.finish_execution = {'import_data': False}
         try:
-            # # Common execution
+            # Common execution
             status = self.admin._load_base(project_type=project_type)
             if not status and self.admin.dev_commit == 'FALSE':
                 return False
@@ -110,7 +111,9 @@ class GwCreateSchemaTask(GwTask):
             self.exception = e
             return False
 
+
     def finished(self, result):
+
         super().finished(result)
         self.setProgress(100)
         self.admin.dlg_readsql_create_project.btn_cancel_task.hide()
@@ -136,6 +139,3 @@ class GwCreateSchemaTask(GwTask):
             self.admin._manage_process_result(self.params['project_name_schema'],self.params['project_type'],
                                               is_test=self.is_test)
 
-
-    def cancel(self):
-        super().cancel()
