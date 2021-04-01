@@ -13,11 +13,32 @@ $BODY$
 
 /* example
 
+-- execute
 SELECT ws.gw_fct_pg2epa_repair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
 
+-- log
 SELECT * FROM ws.audit_check_data where fid = 214 AND criticity  > 1 order by id
 
+-- check
+SELECT * FROM 
+(SELECT epa_type, count(*) as count_node FROM node where state > 0 group by epa_type order by 2)a
+FULL JOIN
+(SELECT 'JUNCTION' AS epa_type, count(*) as count_inp FROM inp_junction join node using (node_id ) where state > 0
+union
+SELECT 'RESERVOIR', count(*) FROM inp_reservoir join node using (node_id ) where state > 0
+union
+SELECT 'PUMP', count(*) FROM inp_pump join node using (node_id ) where state > 0
+union
+SELECT 'TANK', count(*) FROM inp_tank join node using (node_id ) where state > 0
+union
+SELECT 'SHORTPIPE', count(*) FROM inp_shortpipe join node using (node_id ) where state > 0
+union
+SELECT 'VALVE', count(*) FROM inp_junction join node using (node_id ) where state > 0
+union
+SELECT 'INLET', count(*) FROM inp_inlet join node using (node_id ) where state > 0)b
+USING (epa_type)
 */
+
 
 DECLARE
 v_version text;
@@ -80,23 +101,27 @@ BEGIN
 
 		END LOOP;
 
+		UPDATE node SET epa_type = 'UNDEFINED' FROM cat_feature_node f JOIN cat_node c ON c.nodetype_id = f.id WHERE f.epa_default = 'UNDEFINED' and node.nodecat_id = c.id;
+
 		-- node's delete
 		FOR rec_feature IN 
-		SELECT DISTINCT ON (epa_default) c.*, epa_table FROM cat_feature_node c JOIN sys_feature_epa_type s ON c.epa_default = s.id
+		SELECT DISTINCT ON (epa_default) c.*, epa_table FROM cat_feature_node c JOIN sys_feature_epa_type s ON c.epa_default = s.id WHERE epa_default !='NOT DEFINED'
 		LOOP
+			RAISE NOTICE 'rec_feature % ', rec_feature;
+			
 			-- delete wrong features on inp tables
 			EXECUTE 'DELETE FROM '||quote_ident(rec_feature.epa_table)||' WHERE node_id NOT IN (SELECT node_id FROM node WHERE epa_type = '||quote_literal(rec_feature.epa_default)||' AND state > 0)';
-		
 			GET DIAGNOSTICS v_affectrow = row_count;
-
-			RAISE NOTICE 'rec_feature % afected row %', rec_feature, v_affectrow;
-		
 			IF v_affectrow > 0 THEN v_criticity = 2; ELSE v_criticity = 1; END IF;
 			INSERT INTO audit_check_data (fid,  criticity, error_message)
 			VALUES (v_fid, v_criticity, concat(rec_feature.id,': DELETE FROM ',rec_feature.epa_table,' - ',v_affectrow, ' ROWS'));
-			
-		END LOOP;
 
+			EXECUTE 'DELETE FROM '||quote_ident(rec_feature.epa_table)||' WHERE node_id IN (SELECT node_id FROM node WHERE epa_type = ''NOT DEFINED'' AND state > 0)';
+			GET DIAGNOSTICS v_affectrow = row_count;
+			IF v_affectrow > 0 THEN v_criticity = 2; ELSE v_criticity = 1; END IF;
+			INSERT INTO audit_check_data (fid,  criticity, error_message)
+			VALUES (v_fid, v_criticity, concat(rec_feature.id,': DELETE FROM ',rec_feature.epa_table,' - ',v_affectrow, ' ROWS'));			
+		END LOOP;
 
 		-- arc's insert
 		FOR rec_feature IN 
