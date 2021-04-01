@@ -25,3 +25,14 @@ UPDATE config_form_tableview SET columnindex = 8 WHERE columnname = 'arc_state' 
 UPDATE config_form_tableview SET columnindex = 9 WHERE columnname = 'feature_state' AND tablename ='v_ui_arc_x_relations';
 UPDATE config_form_tableview SET columnindex = 10 WHERE columnname = 'x' AND tablename ='v_ui_arc_x_relations';
 UPDATE config_form_tableview SET columnindex = 11 WHERE columnname = 'y' AND tablename ='v_ui_arc_x_relations';
+
+
+INSERT INTO config_toolbox VALUES (2760, 'Get values from raster DEM', TRUE, '{"featureType":["node"]}', 
+'[{"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text","tooltip": "Choose exploitation to work with", "layoutname":"grl_option_parameters","layoutorder":2, 
+"dvQueryText":"select expl_id as id, name as idval from exploitation where active is not false order by name", "selectedId":"$userExploitation"},
+{"widgetname":"updateValues", "label":"Nodes to update:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":7,
+"comboIds":["allValues", "nullValues"], "comboNames":["ALL NODES", "NODES NULL ELEV"], "selectedId":"nullValues"}]', NULL, TRUE)
+ON CONFLICT (id) DO NOTHING;
+
+
+
