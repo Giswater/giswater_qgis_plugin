@@ -851,7 +851,7 @@ BEGIN
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_polygon||'}'||
 		       '}'||
-	    '}')::json, 2690);
+	    '}')::json, 2690, null, null, null);
 
 
 	EXCEPTION WHEN OTHERS THEN
