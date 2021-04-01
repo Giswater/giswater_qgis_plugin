@@ -50,6 +50,9 @@ v_isautoinsertdma boolean = false;
 v_isautoinsertsector boolean = false;
 v_isautoinsertpresszone boolean = false;
 
+-- vdefault values for epa-valves
+v_epavdef json;
+
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -562,7 +565,7 @@ BEGIN
 			IF (v_man_table IN ('man_register', 'man_tank') and (v_insert_double_geom IS TRUE)) THEN
 					
 				v_auto_pol_id:= (SELECT nextval('urn_id_seq'));
-                v_sys_type := (SELECT type FROM cat_feature_node JOIN cat_node ON cat_node.nodetype_id=cat_feature_node.id WHERE cat_node.id = NEW.nodecat_id);
+				v_sys_type := (SELECT type FROM cat_feature_node JOIN cat_node ON cat_node.nodetype_id=cat_feature_node.id WHERE cat_node.id = NEW.nodecat_id);
 
 				INSERT INTO polygon(pol_id, sys_type, the_geom) 
 				VALUES (v_auto_pol_id, v_sys_type, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer))) 
@@ -596,26 +599,32 @@ BEGIN
 
 		-- EPA insert
 		IF (NEW.epa_type = 'JUNCTION') THEN 
-				INSERT INTO inp_junction (node_id) VALUES (NEW.node_id);
+			INSERT INTO inp_junction (node_id) VALUES (NEW.node_id);
 
 		ELSIF (NEW.epa_type = 'TANK') THEN 
-				INSERT INTO inp_tank (node_id) VALUES (NEW.node_id);
+			INSERT INTO inp_tank (node_id) VALUES (NEW.node_id);
 
 		ELSIF (NEW.epa_type = 'RESERVOIR') THEN
-				INSERT INTO inp_reservoir (node_id) VALUES (NEW.node_id);
+			INSERT INTO inp_reservoir (node_id) VALUES (NEW.node_id);
 				
 		ELSIF (NEW.epa_type = 'PUMP') THEN
-				INSERT INTO inp_pump (node_id, status, pump_type) VALUES (NEW.node_id, 'OPEN', 'FLOWPUMP');
+			INSERT INTO inp_pump (node_id, status, pump_type) VALUES (NEW.node_id, 'OPEN', 'FLOWPUMP');
 
 		ELSIF (NEW.epa_type = 'VALVE') THEN
-				INSERT INTO inp_valve (node_id, valv_type, status) VALUES (NEW.node_id, 'PRV', 'ACTIVE');
+
+			v_customfeature	:= (SELECT nodetype_id FROM cat_node WHERE id = NEW.nodecat_id);		
+			SELECT vdef INTO v_epavdef FROM (
+			SELECT json_array_elements_text ((value::json->>'catfeatureId')::json) id , (value::json->>'vdefault') vdef FROM config_param_system WHERE parameter like 'epa_valve_vdefault_%'
+			)a WHERE id = v_customfeature;
+			
+			INSERT INTO inp_valve (node_id, valv_type, coef_loss, pressure, status, minorloss) 
+			VALUES (NEW.node_id, v_epavdef ->>'valv_type', (v_epavdef ->>'coef_loss')::numeric, (v_epavdef ->>'pressure')::numeric, v_epavdef ->>'status', (v_epavdef ->>'minorloss')::numeric);
 
 		ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
-				INSERT INTO inp_shortpipe (node_id) VALUES (NEW.node_id);
+			INSERT INTO inp_shortpipe (node_id) VALUES (NEW.node_id);
 				
 		ELSIF (NEW.epa_type = 'INLET') THEN
-				INSERT INTO inp_inlet (node_id) VALUES (NEW.node_id);
-				
+			INSERT INTO inp_inlet (node_id) VALUES (NEW.node_id);		
 		END IF;
 
 		RETURN NEW;
