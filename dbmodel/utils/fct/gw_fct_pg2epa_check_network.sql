@@ -164,15 +164,30 @@ BEGIN
 	
 
 	RAISE NOTICE '4 - Check disconnected network';	
+
+	IF v_fid = 227 THEN
 	
-	-- fill the graf table
-	INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
-	select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
-	from temp_arc a where result_id = v_result_id
-	union all
-	select  a.arc_id, case when node_2 is null then '00000' else node_2 end, case when node_1 is null then '00000' else node_1 end, 0, 0, 0
-	from temp_arc a where result_id = v_result_id
-	ON CONFLICT (arc_id, node_1) DO NOTHING;
+		-- fill the graf table
+		INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
+		select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
+		from temp_arc a
+		union all
+		select  a.arc_id, case when node_2 is null then '00000' else node_2 end, case when node_1 is null then '00000' else node_1 end, 0, 0, 0
+		from temp_arc a
+		ON CONFLICT (arc_id, node_1) DO NOTHING;
+		
+	ELSIF v_fid = 139 THEN
+
+		-- fill the graf table
+		INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
+		select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
+		from rpt_inp_arc a where result_id = v_result_id
+		union all
+		select  a.arc_id, case when node_2 is null then '00000' else node_2 end, case when node_1 is null then '00000' else node_1 end, 0, 0, 0
+		from rpt_inp_arc a where result_id = v_result_id
+		ON CONFLICT (arc_id, node_1) DO NOTHING;
+
+	END IF;
 
 	-- set boundary conditions of graf table
 	IF v_project_type = 'WS' THEN
@@ -197,19 +212,31 @@ BEGIN
 		GET DIAGNOSTICS v_affectedrows =row_count;
 		EXIT WHEN v_affectedrows = 0;
 		EXIT WHEN v_cont = 2000;
-			RAISE NOTICE '% - %', v_cont, v_affectedrows;
 	END LOOP;
 
-	-- arc results
-	INSERT INTO anl_arc (fid, result_id, arc_id, the_geom, descript)
-	SELECT DISTINCT ON (a.arc_id) 139, v_result, a.arc_id, the_geom, concat('Arc disconnected from any', v_boundaryelem)  
-		FROM temp_anlgraf a
-		JOIN temp_arc b ON a.arc_id=b.arc_id
-		GROUP BY a.arc_id,the_geom
-		having max(water) = 0;
+	-- getting arc results
+	IF v_fid = 139 THEN 
+		-- arc results
+		INSERT INTO anl_arc (fid, result_id, arc_id, the_geom, descript)
+		SELECT DISTINCT ON (a.arc_id) 139, v_result, a.arc_id, the_geom, concat('Arc disconnected from any', v_boundaryelem)  
+			FROM temp_anlgraf a
+			JOIN rpt_inp_arc b ON a.arc_id=b.arc_id
+			WHERE result_id = v_result_id
+			GROUP BY a.arc_id,the_geom
+			having max(water) = 0;
+			
+	ELSIF  v_fid = 227 THEN  
+		-- arc results
+		INSERT INTO anl_arc (fid, result_id, arc_id, the_geom, descript)
+		SELECT DISTINCT ON (a.arc_id) 139, v_result, a.arc_id, the_geom, concat('Arc disconnected from any', v_boundaryelem)  
+			FROM temp_anlgraf a
+			JOIN temp_arc b ON a.arc_id=b.arc_id
+			GROUP BY a.arc_id,the_geom
+			having max(water) = 0;
+	END IF;
 
+	-- counting arc results
 	SELECT count(*) FROM anl_arc INTO v_count WHERE fid = 139 AND cur_user=current_user;
-
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) topological disconnected from any ', v_boundaryelem
@@ -221,51 +248,35 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, concat('INFO: No arcs topological disconnected found on this result from any ', v_boundaryelem));
 	END IF;
 
-	-- node results
-	INSERT INTO anl_node (fid, result_id, node_id, the_geom, descript)
-	SELECT DISTINCT ON (a.node_1) 139, v_result, a.node_1, the_geom, concat('Node disconnected from any', v_boundaryelem)  
-		FROM temp_anlgraf a
-		JOIN temp_node b ON a.node_1=b.node_id
-		GROUP BY a.node_1,the_geom
-		having max(water) = 0;
-
-	INSERT INTO anl_node (fid, result_id, node_id, the_geom, descript)
-	SELECT DISTINCT ON (a.node_2) 139, v_result, a.node_2, the_geom, concat('Node disconnected from any', v_boundaryelem)  
-		FROM temp_anlgraf a
-		JOIN temp_node b ON a.node_2=b.node_id
-		GROUP BY a.node_2,the_geom
-		having max(water) = 0;
-
-	SELECT count(*) FROM anl_arc INTO v_count WHERE fid = 139 AND cur_user=current_user;
-
-	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) because topological disconnected from any ', v_boundaryelem
-		,'. Main reasons may be: state_type, epa_type, sector_id or expl_id or some node not connected'), v_count);
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('HINT: Use toolbox function ''Check network topology for specific result'' for more information'));
-	ELSE
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, v_result_id, 1, concat('INFO: No arcs topological disconnected found on this result from any ', v_boundaryelem),v_count);
-
-	END IF;
-
-
 	IF v_project_type = 'WS' THEN
 
 		RAISE NOTICE '5 - Check dry network';	
-
-		TRUNCATE temp_anlgraf;
+		DELETE FROM temp_anlgraf;
 		v_cont = 0;
-									
-		-- fill the graf table
-		INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
-		select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
-		from temp_arc a where result_id = v_result_id
-		union all
-		select  a.arc_id, case when node_2 is null then '00000' else node_2 end, case when node_1 is null then '00000' else node_1 end, 0, 0, 0
-		from temp_arc a where result_id = v_result_id
-		ON CONFLICT (arc_id, node_1) DO NOTHING;
+
+		IF v_fid = 227 THEN
+
+			-- fill the graf table
+			INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
+			select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
+			from temp_arc a
+			union all
+			select  a.arc_id, case when node_2 is null then '00000' else node_2 end, case when node_1 is null then '00000' else node_1 end, 0, 0, 0
+			from temp_arc a
+			ON CONFLICT (arc_id, node_1) DO NOTHING;
+			
+		ELSIF v_fid = 139 THEN
+
+			-- fill the graf table
+			INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
+			select  a.arc_id, case when node_1 is null then '00000' else node_1 end, case when node_2 is null then '00000' else node_2 end, 0, 0, 0
+			from rpt_inp_arc a where result_id = v_result_id
+			union all
+			select  a.arc_id, case when node_2 is null then '00000' else node_2 end, case when node_1 is null then '00000' else node_1 end, 0, 0, 0
+			from rpt_inp_arc a where result_id = v_result_id
+			ON CONFLICT (arc_id, node_1) DO NOTHING;
+
+		END IF;
 
 		-- set boundary conditions of graf table
 		UPDATE temp_anlgraf
@@ -287,17 +298,50 @@ BEGIN
 			RAISE NOTICE '% - %', v_cont, v_affectedrows;
 		END LOOP;
 
-		-- insert into result table disconnected arcs
-		INSERT INTO anl_arc (fid, result_id, arc_id, the_geom, descript)
-		SELECT DISTINCT ON (a.arc_id) 232, v_result, a.arc_id, the_geom, concat('Arc dry from any', v_boundaryelem)  
-			FROM temp_anlgraf a
-			JOIN temp_arc b ON a.arc_id=b.arc_id
-			GROUP BY a.arc_id,the_geom
-			having max(water) = 0;
+		IF v_fid = 139 THEN 
+			-- insert arc results
+			INSERT INTO anl_arc (fid, result_id, arc_id, the_geom, descript)
+			SELECT DISTINCT ON (a.arc_id) 232, v_result, a.arc_id, the_geom, concat('Arc dry from any', v_boundaryelem)  
+				FROM temp_anlgraf a
+				JOIN rpt_inp_arc b ON a.arc_id=b.arc_id
+				WHERE result_id = v_result_id
+				GROUP BY a.arc_id,the_geom
+				having max(water) = 0;
+				
+			-- insert into result table dry nodes with demands (error)
+			INSERT INTO anl_node (fid, node_id, the_geom, descript)
+			SELECT 233, n.node_id, n.the_geom, concat('Dry nodes with demands') FROM node n
+				JOIN
+				(SELECT node_1 AS node_id FROM arc JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				UNION
+				SELECT node_2 FROM arc JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id))
+				a USING (node_id)
+				JOIN rpt_inp_node ON a.node_id = rpt_inp_node.node_id
+				WHERE demand > 0 AND result_id = v_result_id;
 
-			
+		ELSIF  v_fid = 227 THEN  
+			-- insert into result table arc results
+			INSERT INTO anl_arc (fid, result_id, arc_id, the_geom, descript)
+			SELECT DISTINCT ON (a.arc_id) 232, v_result, a.arc_id, the_geom, concat('Arc dry from any', v_boundaryelem)  
+				FROM temp_anlgraf a
+				JOIN temp_arc b ON a.arc_id=b.arc_id
+				GROUP BY a.arc_id,the_geom
+				having max(water) = 0;
+
+			-- insert into result table dry nodes with demands (error)
+			INSERT INTO anl_node (fid, node_id, the_geom, descript)
+			SELECT 233, n.node_id, n.the_geom, concat('Dry nodes with demands') FROM node n
+				JOIN
+				(SELECT node_1 AS node_id FROM arc JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
+				UNION
+				SELECT node_2 FROM arc JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id))
+				a USING (node_id)
+				JOIN temp_node ON a.node_id = temp_node.node_id
+				WHERE demand > 0;			
+		END IF;
+
+		-- counting arcs
 		SELECT count(*) FROM anl_arc INTO v_count WHERE fid = 232 AND cur_user=current_user;
-
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' Dry arc(s) because closed elements'), v_count);
@@ -308,19 +352,8 @@ BEGIN
 			VALUES (v_fid, v_result_id, 1, concat('INFO: No dry arcs found'),v_count);
 		END IF;
 
-		-- insert into result table dry nodes with demands (error)
-		INSERT INTO anl_node (fid, node_id, the_geom, descript)
-		SELECT 233, n.node_id, n.the_geom, concat('Dry nodes with demands') FROM node n
-		JOIN
-		(SELECT node_1 AS node_id FROM arc JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id)
-		UNION
-		SELECT node_2 FROM arc JOIN (SELECT arc_id FROM anl_arc WHERE fid = 232 AND cur_user=current_user)a USING (arc_id))
-		a USING (node_id)
-		JOIN temp_node ON a.node_id = temp_node.node_id
-		WHERE demand > 0;
-
+		-- counting nodes
 		SELECT count(*) FROM anl_node INTO v_count WHERE fid = 233 AND cur_user=current_user;
-
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' Dry nodes with demands'), v_count);
