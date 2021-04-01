@@ -332,32 +332,13 @@ def set_autocompleter(combobox, list_items=None):
     if list_items is None:
         list_items = [combobox.itemText(i) for i in range(combobox.count())]
     proxy_model = QSortFilterProxyModel()
-    set_model_by_list(list_items, combobox, proxy_model)
+    _set_model_by_list(list_items, combobox, proxy_model)
     combobox.editTextChanged.connect(partial(filter_by_list, combobox, proxy_model))
 
 
 def filter_by_list(widget, proxy_model):
     """ Create the model """
     proxy_model.setFilterFixedString(widget.currentText())
-
-
-def set_model_by_list(string_list, widget, proxy_model):
-    """ Set the model according to the list """
-
-    model = QStringListModel()
-    model.setStringList(string_list)
-    proxy_model.setSourceModel(model)
-    proxy_model.setFilterKeyColumn(0)
-    proxy_model_aux = QSortFilterProxyModel()
-    proxy_model_aux.setSourceModel(model)
-    proxy_model_aux.setFilterKeyColumn(0)
-    widget.setModel(proxy_model_aux)
-    widget.setModelColumn(0)
-    completer = QCompleter()
-    completer.setModel(proxy_model)
-    completer.setCompletionColumn(0)
-    completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
-    widget.setCompleter(completer)
 
 
 def get_combo_value(dialog, widget, index=0, add_quote=False):
@@ -1286,6 +1267,25 @@ def _translate_tooltip(context_name, widget, idx=None, aux_context='ui_message')
                 widget.setToolTip(widget.title())
             else:
                 widget.setToolTip(widget.text())
+
+
+def set_model_by_list(string_list, widget, proxy_model):
+    """ Set the model according to the list """
+
+    model = QStringListModel()
+    model.setStringList(string_list)
+    proxy_model.setSourceModel(model)
+    proxy_model.setFilterKeyColumn(0)
+    proxy_model_aux = QSortFilterProxyModel()
+    proxy_model_aux.setSourceModel(model)
+    proxy_model_aux.setFilterKeyColumn(0)
+    widget.setModel(proxy_model_aux)
+    widget.setModelColumn(0)
+    completer = QCompleter()
+    completer.setModel(proxy_model)
+    completer.setCompletionColumn(0)
+    completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+    widget.setCompleter(completer)
 
 
 # endregion
