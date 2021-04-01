@@ -246,8 +246,8 @@ def get_layer_source(layer):
     """ Get database connection paramaters of @layer """
 
     # Initialize variables
-    layer_source = {'db': None, 'schema': None, 'table': None, 'service': None,
-                    'host': None, 'port': None, 'user': None, 'password': None, 'sslmode': None}
+    layer_source = {'db': None, 'schema': None, 'table': None, 'service': None, 'host': None, 'port': None,
+                    'user': None, 'password': None, 'sslmode': None}
 
     if layer is None:
         return layer_source
@@ -261,9 +261,20 @@ def get_layer_source(layer):
     # split with quoted substrings preservation
     splt = shlex.split(uri)
 
-    splt_dct = dict([tuple(v.split('=')) for v in splt if '=' in v])
-    splt_dct['db'] = splt_dct['dbname']
-    splt_dct['schema'], splt_dct['table'] = splt_dct['table'].split('.')
+    list_uri = []
+    for v in splt:
+        if '=' in v:
+            elem_uri = tuple(v.split('='))
+            if len(elem_uri) == 2:
+                list_uri.append(elem_uri)
+
+    splt_dct = dict(list_uri)
+    if 'service' in splt_dct:
+        splt_dct['service'] = splt_dct['service']
+    if 'dbname' in splt_dct:
+        splt_dct['db'] = splt_dct['dbname']
+    if 'table' in splt_dct:
+        splt_dct['schema'], splt_dct['table'] = splt_dct['table'].split('.')
 
     for key in layer_source.keys():
         layer_source[key] = splt_dct.get(key)
