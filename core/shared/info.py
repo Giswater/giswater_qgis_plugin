@@ -3292,16 +3292,28 @@ class GwInfo(QObject):
         for widget in widget_list:
             if type(widget) is QTableView:
                 model = widget.model()
+
+        # Emitting the text change signal of a widget slows down the process, so instead of emitting a signal for each
+        # widget, we will emit only the one of the last widget. This is enough for the correct filtering of the
+        # QTableView and we gain in performance
+        last_widget = None
         for widget in widget_list:
             if type(widget) is QLineEdit:
+                last_widget = widget
                 widget.textChanged.connect(partial(self._filter_table, complet_result, model, dialog, widget_list, columnname, widgetname))
-                text = tools_qt.get_text(dialog, widget, False, False)
-                widget.textChanged.emit(text)
             elif type(widget) is QComboBox:
+                last_widget = widget
                 widget.currentIndexChanged.connect(partial(
                     self._filter_table, complet_result, model, dialog, widget_list, columnname, widgetname))
-                widget.currentIndexChanged.emit(widget.currentIndex())
 
+        # Emit signal change
+        if last_widget is not None:
+            if type(last_widget) is QLineEdit:
+                text = tools_qt.get_text(dialog, last_widget, False, False)
+                last_widget.textChanged.emit(text)
+            elif type(last_widget) is QComboBox:
+                last_widget.currentIndexChanged.emit(last_widget.currentIndex())
+                
 
     def _get_list(self, complet_result, form_name='', tab_name='', filter_fields='', columnname='', widgetname='', formtype=''):
 
