@@ -56,7 +56,7 @@ BEGIN
 	v_buttons := COALESCE(v_buttons, '{}');
 	
 	-- Return
-    RETURN ('{"status":"Accepted", "message":{"level":1, "text":"This is a test message"}, "version":'||v_version||
+    RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":'||v_version||
              ',"body":{"form":{}'||
 		     ',"feature":{}'||
 		     ',"data":{"buttons":' || v_buttons ||
@@ -65,7 +65,7 @@ BEGIN
        
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
-    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_apiversion || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

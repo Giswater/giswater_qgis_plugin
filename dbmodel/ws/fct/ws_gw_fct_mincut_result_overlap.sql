@@ -401,7 +401,7 @@ BEGIN
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
 				'"polygon":'||v_result_pol||'}'||
-			', "overlapStatus":' || v_signal || '"}}')::json, 2244, null, null, null);
+			', "overlapStatus":"' || v_signal || '"}}')::json, 2244, null, null, null);
 		
 	ELSIF v_status  = 'continue' THEN
 

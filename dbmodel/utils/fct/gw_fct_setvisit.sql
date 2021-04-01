@@ -299,7 +299,7 @@ BEGIN
 	return_event_manager_aux := COALESCE(return_event_manager_aux, '{}');
 				  
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "apiVersion":'|| v_version ||',
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_version ||',
 	"body": {"feature":{"id":"'||v_id||'"}, "data":{"geometry":'|| return_event_manager_aux ||'}}}')::json; 
 
 	-- Exception handling

@@ -111,6 +111,7 @@ v_activedatatab boolean;
 v_activefilestab boolean;
 v_client json;
 v_pageinfo json;
+v_layermanager json;
 v_filterfields json;
 v_data json;
 isnewvisit boolean default false;
@@ -155,10 +156,12 @@ v_check_code text;
 v_filter_lot_null text = '';
 v_visit_id integer;
 v_load_visit boolean;
-v_audit_result text;
+v_pluginlot text;
+v_returnstatus text;
 v_error_context text;
 v_level integer;
-
+v_audit_result  text;
+v_returnmessage text;
 BEGIN
 	
 	-- Set search path to local schema
@@ -168,6 +171,9 @@ BEGIN
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
+
+	--check plugin lotes
+	select upper(value::json->>'lotManage'::text) INTO v_pluginlot from config_param_system where parameter = 'plugin_lotmanage';
 
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
@@ -238,40 +244,47 @@ BEGIN
 			EXECUTE ('SELECT lower(sys_type) FROM '||v_featuretablename||' LIMIT 1') INTO v_featuretype;
 		END IF;
 
-
 		IF v_offline THEN
 			v_id = NULL;
 		ELSE
-			IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
-				-- Compare current lot_id with old visits for only show existing visits for current lot
-				v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id=current_user);
+			IF v_pluginlot = 'TRUE' THEN
+				IF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
+					-- Compare current lot_id with old visits for only show existing visits for current lot
+					v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id=current_user);
 
-				-- getting visit class in function: 1st v_lot, 2nd feature_type
-				IF v_lot IS NOT NULL AND p_visittype = 1 THEN
-					v_visitclass := (SELECT visitclass_id FROM om_visit_lot WHERE id=v_lot);
-				END IF;
-				
-				IF v_visitclass IS NULL THEN
-					v_visitclass := (SELECT id FROM config_visit_class WHERE visit_type=p_visittype AND feature_type = upper(v_featuretype) AND param_options->>'offlineDefault' = 'true' LIMIT 1)::integer;
-				END IF;
-				
-				IF v_visitclass IS NULL THEN
-					v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=1 LIMIT 1);
-				END IF;
+					-- getting visit class in function: 1st v_lot, 2nd feature_type
+					IF v_lot IS NOT NULL AND p_visittype = 1 THEN
+						v_visitclass := (SELECT visitclass_id FROM om_visit_lot WHERE id=v_lot);
+					END IF;
+					
+					IF v_visitclass IS NULL THEN
+						v_visitclass := (SELECT id FROM config_visit_class WHERE visit_type=p_visittype AND feature_type = upper(v_featuretype) AND param_options->>'offlineDefault' = 'true' LIMIT 1)::integer;
+					END IF;
+					
+					IF v_visitclass IS NULL THEN
+						v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type=upper(v_featuretype) AND visit_type=1 LIMIT 1);
+					END IF;
 
-				IF v_lot IS NOT NULL THEN
-					v_filter_lot_null = concat(' AND om_visit.lot_id = ', v_lot);
+					IF v_lot IS NOT NULL THEN
+						v_filter_lot_null = concat(' AND om_visit.lot_id = ', v_lot);
+					END IF;
+			
+					-- get if visit already exists
+					EXECUTE ('SELECT visit_id FROM om_visit_x_'|| (v_featuretype) ||' 
+					JOIN om_visit ON om_visit.id = om_visit_x_'|| (v_featuretype) ||'.visit_id 
+					WHERE ' || (v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text ' || v_filter_lot_null || ' AND om_visit.class_id = '|| v_visitclass || '
+					ORDER BY om_visit_x_'|| (v_featuretype) ||'.id desc LIMIT 1') INTO v_visit_id;
+
+					
 				END IF;
-
-				-- get if visit already exists
-				EXECUTE ('SELECT visit_id FROM om_visit_x_'|| (v_featuretype) ||' 
-				JOIN om_visit ON om_visit.id = om_visit_x_'|| (v_featuretype) ||'.visit_id 
-				WHERE ' || (v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text ' || v_filter_lot_null || ' AND om_visit.class_id = '|| v_visitclass || '
-				ORDER BY om_visit_x_'|| (v_featuretype) ||'.id desc LIMIT 1') INTO v_visit_id;
-
-				
+			ELSIF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
+				v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type= upper(v_featuretype) order by id asc limit 1);
+					-- get if visit already exists
+					EXECUTE ('SELECT visit_id FROM om_visit_x_'|| (v_featuretype) ||' 
+					JOIN om_visit ON om_visit.id = om_visit_x_'|| (v_featuretype) ||'.visit_id 
+					WHERE ' || (v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text  AND om_visit.class_id = '|| v_visitclass || '
+					ORDER BY om_visit_x_'|| (v_featuretype) ||'.id desc LIMIT 1') INTO v_visit_id;
 			END IF;
-
 			-- if visit exists, get v_id and control if we have to load its form according to days interval
 			IF v_visit_id IS NOT NULL THEN
 				v_id = v_visit_id;
@@ -396,10 +409,10 @@ BEGIN
 			EXECUTE 'SELECT code FROM '||v_featuretablename||' WHERE ' || (v_featuretype) || '_id = '||v_featureid||'::text' INTO v_code;
 		END IF;
 		
-
-		-- lot
-		v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id=current_user);		
-	
+		IF v_pluginlot = 'TRUE' THEN
+			-- lot
+			v_lot = (SELECT lot_id FROM om_visit_lot_x_user WHERE endtime IS NULL AND user_id=current_user);		
+		END IF;
 
 		-- statics (configured on config_param_user forcing values)--
 		--status
@@ -527,15 +540,15 @@ BEGIN
 			IF isnewvisit THEN
 
 				IF v_formname IS NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3158", "function":"2740","debug_msg":"v_formname"}}$$);' INTO v_audit_result;
+					RAISE EXCEPTION 'Api is bad configured. There is no form related to tablename';
 				END IF;
 				
 				RAISE NOTICE ' --- GETTING tabData DEFAULT VALUES ON NEW VISIT ---';
 				SELECT gw_fct_getformfields( v_formname, 'form_visit', 'data', v_tablename, null, null, null, 'INSERT', null, v_device, null) INTO v_fields;
-
+			
 				FOREACH aux_json IN ARRAY v_fields
-				LOOP					
+				LOOP		
+				raise notice 'aux_json,%',aux_json;
 					-- setting feature id value
 					IF (aux_json->>'columnname') = 'arc_id' OR (aux_json->>'columnname')='node_id' OR (aux_json->>'columnname')='connec_id' OR (aux_json->>'columnname') ='gully_id' 
 					OR (aux_json->>'columnname') ='pol_id' OR (aux_json->>'columnname') ='sys_pol_id' THEN
@@ -647,7 +660,7 @@ BEGIN
 
 						-- setting parameter in case of singleevent visit
 						--IF v_ismultievent IS FALSE AND (aux_json->>'columnname') = 'parameter_id' THEN
-							--v_parameter := (SELECT parameter_id FROM config_visit_class_x_parameter WHERE class_id=v_visitclass LIMIT 1);
+							--v_parameter := (SELECT parameter_id FROM config_visit_parameter_action WHERE class_id=v_visitclass LIMIT 1);
 							--v_fields[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(v_fields[(aux_json->>'orderby')::INT], 'selectedId', v_parameter::text);
 						--END IF;
 					
@@ -742,7 +755,7 @@ BEGIN
 			
 				RAISE NOTICE '--- CALLING gw_fct_getlist USING p_data: % ---', p_data;
 				SELECT gw_fct_getlist (p_data) INTO v_fields_json;
-
+				RAISE NOTICE '0 -> %',v_fields_json;
 				-- getting pageinfo and list values
 				v_pageinfo = ((v_fields_json->>'body')::json->>'data')::json->>'pageInfo';
 				v_fields_json = ((v_fields_json->>'body')::json->>'data')::json->>'fields';
@@ -803,48 +816,39 @@ BEGIN
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formName', v_formheader);
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formTabs', v_formtabs::json);
 	
+	IF v_audit_result is null THEN
+        v_returnstatus = 'Accepted';
+        v_level = 3;
+        v_returnmessage = 'Process done successfully';
+  
+    ELSE
 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_returnstatus; 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_returnmessage;
+
+    END IF;
+    
 	--  Control NULL's
 	v_version := COALESCE(v_version, '{}');
 	v_id := COALESCE(v_id, '{}');
-	v_message := COALESCE(v_message, '{}');
+	v_returnmessage := COALESCE(v_returnmessage, '{}');
 	v_forminfo := COALESCE(v_forminfo, '{}');
 	v_tablename := COALESCE(v_tablename, '{}');
+	v_layermanager := COALESCE(v_layermanager, '{}');
 	v_geometry := COALESCE(v_geometry, '{}');
 
 	-- If project is offline dont send id
 	IF v_offline THEN
 		v_id = '""';
 	END IF;
-
-	IF v_audit_result is null THEN
-        v_status = 'Accepted';
-        v_level = 3;
-        v_message = 'Process done successfully';
-    ELSE
-
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
-
-    END IF;
-
+  
 	-- Return
-	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "apiVersion":'||v_version||
+	RETURN ('{"status":"Accepted", "message":"'||v_returnmessage||'", "version":'||v_version||
              ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idName":"visit_id", "id":'||v_id||'}'||
 		    ', "form":'||v_forminfo||
-		    ', "data":{"geometry":'|| v_geometry ||'}}'||
-		    '}')::json;   
-
-	EXCEPTION WHEN OTHERS THEN
-    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-
- 
+		    ', "data":{"layerManager":'||v_layermanager||
+		               ',"geometry":'|| v_geometry ||'}}'||
+		    '}')::json;
 END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
-
-
-
+$BODY$;

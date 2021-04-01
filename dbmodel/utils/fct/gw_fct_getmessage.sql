@@ -113,7 +113,12 @@ BEGIN
 			END IF;
 
 			RETURN NULL;
-						
+		ELSIF rec_cat_error.log_level = 0 THEN
+			SELECT  concat('Function: ',function_name,' - ',rec_cat_error.error_message,'. HINT: ', rec_cat_error.hint_message,'.')  INTO v_return_text 
+			FROM sys_function WHERE sys_function.id=v_function_id; 
+		
+			v_level = 3;
+			v_status = 'Accepted';
 		END IF;
 		
 	END IF;
@@ -127,7 +132,7 @@ BEGIN
 	v_result_info := COALESCE(v_result_info, '{}'); 
 
 	-- Return
-	RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Error message passed successfully"}, "version":"'||v_version||'"'||
+	RETURN ('{"status":"Accepted", "message":{"level":3, "text":"Message passed successfully"}, "version":"'||v_version||'"'||
        ',"body":{"form":{}'||
            ',"data":{"info":'||v_result_info||' }}'||
             '}')::json;

@@ -107,7 +107,7 @@ BEGIN
 
   
 	-- Return
-	RETURN ('{"status":"Accepted", "message":{"level":0, "text":"This is a test message"}, "admin_version":'||v_version||
+	RETURN ('{"status":"Accepted", "message":{"level":0, "text":"Process done successfully"}, "admin_version":'||v_version||
              ',"body":{"feature":'||v_feature||
 					 ',"data":{"geometry":'||v_geometry||'}}'||
 	    '}')::json;

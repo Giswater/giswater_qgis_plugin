@@ -336,7 +336,7 @@ BEGIN
 
 	-- Return
     RETURN ('{"status":"Accepted", "version":'||v_version||
-             ',"body":{"message":{"level":1, "text":"This is a test message"}'||
+             ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 			',"form":{"formName":"", "formLabel":"", "formText":""'|| 
 				',"formTabs":'||v_formtabs||
 				',"formActions":[]}'||

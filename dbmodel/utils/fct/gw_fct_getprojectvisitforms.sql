@@ -205,7 +205,7 @@ Generate one form for layer and one form for visitclass=incident
 	
 
 	--  Control NULL's
-	v_apiversion := COALESCE(v_apiversion, '{}');
+	v_version := COALESCE(v_version, '{}');
 	v_id := COALESCE(v_id, '{}');
 	v_message := COALESCE(v_message, '{}');
 	v_forminfo := COALESCE(v_forminfo, '{}');
@@ -214,7 +214,7 @@ Generate one form for layer and one form for visitclass=incident
 
   */
 	-- Return
-	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'||v_apiversion||
+	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'||v_version||
              ',"body":{"feature":{"featureType":"visit", "tableName":"'||v_tablename||'", "idName":"visit_id", "id":'||v_id||'}'||
 		    ', "form":'||v_forminfo||
 		    ', "data":{"layerManager":'||v_layermanager||'}}'||
