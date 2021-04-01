@@ -295,20 +295,38 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '273','INFO: Valve type checked. No mandatory values missed.',v_count);
 	END IF;
-	
-	RAISE NOTICE '13 - Valve status & others (274)';					
+
+	RAISE NOTICE '13 - Valve status (274), to_arc (368), pressure (275), curve_id (276), coef_loss (277), flow (278)';
+
+	-- status (274)
 	SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE status IS NULL;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '274', concat(
-		'ERROR-274: There is/are ',v_count,' valve(s) with null values at least on mandatory columns for valve (valv_type, status, to_arc).'),v_count);
+		'ERROR: There is/are ',v_count,' valve(s) with null values at least on mandatory column status).'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '274', 'INFO: Valve status checked. No mandatory values missed.',v_count);
 	END IF;
 
-	-- Valve pressure (275)';
+	-- to_arc (368)
+	IF (SELECT value FROM config_param_system WHERE parameter = 'epa_shutoffvalve') = 'VALVE' THEN
+		SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE to_arc IS NULL AND valv_type != 'TCV';
+	ELSE 
+		SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE to_arc IS NULL;
+	END IF;
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
+		VALUES (v_fid, v_result_id, 3, '368', concat(
+		'ERROR: There is/are ',v_count,' valve(s) with null values at least on mandatory column to_arc).'), v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id, 1, '368', 'INFO: Valve to_arc values checked. No mandatory values missed.');
+	END IF;
+
+	-- pressure (275)
 	SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE ((valv_type='PBV' OR valv_type='PRV' OR valv_type='PSV') AND (pressure IS NULL));
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -320,7 +338,7 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, '275', 'INFO: PBC-PRV-PSV valves checked. No mandatory values missed.',v_count);
 	END IF;				
 
-	-- GPV valve check (276)';
+	-- curve_id (276)';
 	SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE ((valv_type='GPV') AND (curve_id IS NULL));
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id,error_message, fcount)
@@ -332,8 +350,8 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, '276','INFO: GPV valves checked. No mandatory values missed.',v_count);
 	END IF;	
 
-	-- TCV valve check (277)';
-	SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE ((valv_type='TCV'));
+	-- coef_loss (277)
+	SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE valv_type='TCV' AND coef_loss IS NULL;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '277',concat('ERROR-277: There is/are ',v_count,' TCV valve(s) with null values at least on mandatory column for Losses Valves.'),v_count);
@@ -343,7 +361,7 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, '277','INFO: TCV valves checked. No mandatory values missed.',v_count);
 	END IF;				
 
-	-- FCV valve check (278)';
+	-- flow (278)
 	SELECT count(*) INTO v_count FROM v_edit_inp_valve WHERE ((valv_type='FCV') AND (flow IS NULL));
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -437,8 +455,9 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO anl_arc (fid, arc_id, arccat_id, the_geom, descript)
 		SELECT 230, arc_id, arccat_id , the_geom, concat('Length: ', (st_length(the_geom))::numeric (12,3)) FROM v_edit_inp_pipe where st_length(the_geom) < 0.05;
+
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, '230',concat('WARNING-230: There is/are ',v_count,
+		VALUES (v_fid, v_result_id, 2, '230',concat('WARNING-230: There is/are ',v_count,
 		' pipe(s) with length less than 0.05 meters. Check it before continue.'),v_count);
 		v_count=0;
 		
@@ -598,6 +617,21 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '295','INFO: Epa type for arc features checked. No inconsistencies aganints epa table found.');
 	END IF;	
 	
+	-- check connecs <-> inp_connecs
+	SELECT c1-c2 INTO v_count FROM (SELECT count(*) as c1, null AS c2 FROM connec UNION SELECT null, count(*) FROM inp_connec)a1
+	WHERE c1 > c2
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id, 3, '295',concat(
+		'WARNING: There were ',v_count,' missed inp rows on inp_connec. They have been automatic inserted'));
+		INSERT INTO inp_connec SELECT connec_id FROM connec ON CONFLICT (connec_id) DO NOTHING;		
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id , 1,  '295','INFO: Epa type for arc features checked. No inconsistencies aganints epa table found.');
+	END IF;	
+
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 2, '');
