@@ -601,7 +601,8 @@ BEGIN
 							UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux2.arc_id;
 
 							-- Insert existig arc (downgraded) to the current alternative
-							INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector, v_arc_id, 0, FALSE);
+							INSERT INTO plan_psector_x_arc (psector_id, arc_id, state, doable) VALUES (v_psector, v_arc_id, 0, FALSE) 
+							ON CONFLICT (arc_id, psector_id) DO NOTHING;
 
 						ELSIF v_state_arc = 2 THEN -- planned arc									
 
