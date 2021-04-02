@@ -42,13 +42,25 @@ BEGIN
 			"data":{"message":"3160", "function":"1130","debug_msg":'||OLD.psector_id||'}}$$);';
 		ELSE
 			IF v_parent = 'arc' THEN
-				DELETE FROM arc WHERE arc_id = OLD.arc_id;
+				EXECUTE' SELECT gw_fct_setfeaturedelete($${
+				"client":{"device":4, "infoType":1, "lang":"ES"},
+				"form":{},"feature":{"type":"ARC"},
+				"data":{"feature_id":"'||OLD.arc_id||'"}}$$);';
 			ELSIF v_parent = 'node' THEN
-				DELETE FROM node WHERE node_id = OLD.node_id;
+				EXECUTE' SELECT gw_fct_setfeaturedelete($${
+				"client":{"device":4, "infoType":1, "lang":"ES"},
+				"form":{},"feature":{"type":"NODE"},
+				"data":{"feature_id":"'||OLD.node_id||'"}}$$);';
 			ELSIF v_parent = 'connec' THEN
-				DELETE FROM connec WHERE connec_id = OLD.connec_id;
+				EXECUTE' SELECT gw_fct_setfeaturedelete($${
+				"client":{"device":4, "infoType":1, "lang":"ES"},
+				"form":{},"feature":{"type":"CONNEC"},
+				"data":{"feature_id":"'||OLD.connec_id||'"}}$$);';	
 			ELSIF v_parent = 'gully' THEN
-				DELETE FROM gully WHERE gully_id = OLD.gully_id;
+				EXECUTE' SELECT gw_fct_setfeaturedelete($${
+				"client":{"device":4, "infoType":1, "lang":"ES"},
+				"form":{},"feature":{"type":"GULLY"},
+				"data":{"feature_id":"'||OLD.gully_id||'"}}$$);';
 			END IF;
 		END IF;
 	END IF;
