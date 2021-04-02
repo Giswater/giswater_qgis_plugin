@@ -55,7 +55,5 @@ UPDATE config_form_fields set tabname = 'data' WHERE formtype = 'form_feature' A
 ALTER TABLE config_form_fields DROP CONSTRAINT config_form_fields_pkey;
 ALTER TABLE config_form_fields ADD CONSTRAINT config_form_fields_pkey PRIMARY KEY(formname, formtype, columnname, tabname);
 
-update sys_function  set sample_query=NULL WHERE sample_query='false';
-
 -- 2021/01/04
 INSERT INTO sys_fprocess VALUES (368, 'Null values on to_arc valves', 'ws');
