@@ -24,5 +24,7 @@ ALTER TABLE node ADD CONSTRAINT node_epa_type_check
 CHECK (epa_type = ANY(ARRAY['JUNCTION', 'STORAGE', 'DIVIDER', 'OUTFALL', 'UNDEFINED']));
 
 
+ALTER TABLE om_visit_x_gully DROP CONSTRAINT IF EXISTS om_visit_x_gully_unique ;
+ALTER TABLE om_visit_x_gully ADD CONSTRAINT om_visit_x_gully_unique UNIQUE(gully_id, visit_id);
 
 
