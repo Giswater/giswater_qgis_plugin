@@ -56,7 +56,7 @@ BEGIN
 
 	--remove previous results 
 	DELETE FROM audit_check_data where fid = 215;
-	
+	UPDATE sys_function set sample_query=NULL WHERE sample_query='false';
 	--set configuration for gw_fct_pg2epa_main
 	IF v_project_type = 'WS'  THEN
 		DELETE FROM config_param_user WHERE cur_user=current_user AND parameter IN ('inp_options_patternmethod', 
@@ -72,7 +72,7 @@ BEGIN
  	"data":{"filterFields":{}, "pageInfo":{}, "version":"3.5.03", "fid":101, "initProject":true, "addSchema":"", 
  	"mainSchema":"'||v_project_type||'", "projecRole":"", "infoType":"None", "qgisVersion":"3.10.4-A Coruña", "osVersion":"Windows 10"}}$$);';
 
-	FOR rec_role IN (SELECT * FROM sys_role WHERE id ='role_admin') LOOP
+	FOR rec_role IN (SELECT * FROM sys_role) LOOP
 
 		--set role and insert values into exploitation selector
 		EXECUTE 'SET ROLE '||rec_role.id||';';
@@ -163,9 +163,8 @@ BEGIN
 
 								ELSIF rec_state = 2 THEN
 									--set selector to  2 and sleect current_psector
-									DELETE FROM selector_state WHERE current_user = cur_user;
 									INSERT INTO selector_state (state_id,cur_user) VALUES (2, current_user) ON CONFLICT (state_id, cur_user) DO NOTHING;
-								
+									
 									SELECT psector_id INTO v_psector_id FROM plan_psector LIMIT 1;
 									INSERT INTO  config_param_user (parameter, value, cur_user) VALUES ('plan_psector_vdefault',1, current_user)
 									ON CONFLICT (parameter, cur_user)  DO
@@ -174,11 +173,11 @@ BEGIN
 									--insert new nodes with state 2
 									IF v_project_type = 'WS' THEN
 										EXECUTE 'INSERT INTO '||rec_feature_node.child_layer||'(the_geom,state_type) 
-										VALUES (st_setsrid(st_point(419205.716051442,4576517.416978596),25831),3) RETURNING node_id;'
+										VALUES (st_setsrid(st_point(419205.25,4576514.05),25831),3) RETURNING node_id;'
 										INTO v_feature_id;
 									ELSIF v_project_type = 'UD' THEN
 										EXECUTE 'INSERT INTO '||rec_feature_node.child_layer||'(the_geom,state_type) 
-										VALUES (st_setsrid(st_point(419124.612373783, 4576271.60134376),25831),3) RETURNING node_id;'
+										VALUES (st_setsrid(st_point(418980.51,4576662.87),25831),3) RETURNING node_id;'
 										INTO v_feature_id;
 									END IF;
 								END IF;
@@ -220,6 +219,11 @@ BEGIN
 								
 								--delete node created with state 2
 								IF rec_state = 2 THEN
+									UPDATE connec SET arc_id = NULL WHERE arc_id = (SELECT max(arc_id) FROM plan_psector_x_arc WHERE psector_id = v_psector_id);
+									IF v_project_type = 'UD'  THEN
+										UPDATE gully SET arc_id = NULL WHERE arc_id = (SELECT max(arc_id) FROM plan_psector_x_arc WHERE psector_id = v_psector_id);
+									END IF;
+									DELETE FROM om_visit_x_arc WHERE arc_id = (SELECT max(arc_id) FROM plan_psector_x_arc WHERE psector_id = v_psector_id);
 									DELETE FROM doc_x_arc WHERE arc_id = (SELECT max(arc_id) FROM plan_psector_x_arc WHERE psector_id = v_psector_id);
 									DELETE FROM plan_psector_x_arc WHERE psector_id = v_psector_id 
 									AND arc_id = (SELECT max(arc_id) FROM plan_psector_x_arc WHERE psector_id = v_psector_id);
