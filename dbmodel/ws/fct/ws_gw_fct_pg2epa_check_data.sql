@@ -108,7 +108,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 2, '187' ,concat('WARNING-187: There is/are ',v_count,' node(s) with state > 0 and state_type.is_operative on FALSE. Please, check your data before continue.'),v_count);
 		INSERT INTO audit_check_data (fid, criticity, error_message, fcount)
-		VALUES (v_fid, 2, concat('SELECT * FROM anl_node WHERE fid = 187 AND cur_user=current_user'));
+		VALUES (v_fid, 2, concat('SELECT * FROM anl_node WHERE fid = 187 AND cur_user=current_user'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 	VALUES (v_fid, 1, '187','INFO: No nodes with state > 0 AND state_type.is_operative on FALSE found.',v_count);
@@ -619,7 +619,7 @@ BEGIN
 	
 	-- check connecs <-> inp_connecs
 	SELECT c1-c2 INTO v_count FROM (SELECT count(*) as c1, null AS c2 FROM connec UNION SELECT null, count(*) FROM inp_connec)a1
-	WHERE c1 > c2
+	WHERE c1 > c2;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
 		VALUES (v_fid, v_result_id, 3, '295',concat(
