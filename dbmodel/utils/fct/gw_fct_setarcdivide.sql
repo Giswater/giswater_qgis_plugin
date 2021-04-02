@@ -405,8 +405,8 @@ BEGIN
 										END IF;
 									END LOOP;
 																
-									INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES (v_newvisit1, rec_aux1.arc_id);
-									INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES (v_newvisit2, rec_aux2.arc_id);
+									INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES (v_newvisit1, rec_aux1.arc_id) ON CONFLICT (visit_id, arc_id) DO NOTHING;
+									INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES (v_newvisit2, rec_aux2.arc_id) ON CONFLICT (visit_id, arc_id) DO NOTHING;
 								
 									-- delete old visit
 									DELETE FROM om_visit WHERE id=rec_visit.id;
@@ -423,7 +423,7 @@ BEGIN
 									END IF;
 								
 									-- distribute visit to new arc
-									INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES (rec_visit.id, v_newarc);
+									INSERT INTO om_visit_x_arc (visit_id, arc_id) VALUES (rec_visit.id, v_newarc) ON CONFLICT (visit_id, arc_id) DO NOTHING;
 									DELETE FROM om_visit_x_arc WHERE arc_id=v_arc_id;
 								END IF;
 							END LOOP;
@@ -467,8 +467,12 @@ BEGIN
 						END IF;
 
 						-- delete old arc
-						DELETE FROM arc WHERE arc_id=v_arc_id;
-						
+						--DELETE FROM arc WHERE arc_id=v_arc_id;
+						EXECUTE 'SELECT SCHEMA_NAME.gw_fct_setfeaturedelete($${
+						"client":{"device":4, "infoType":1, "lang":"ES"},
+						"form":{},"feature":{"type":"ARC"},
+						"data":{"feature_id":"'||v_arc_id||'"}}$$);';
+
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1, concat('Delete old arc: ',v_arc_id,'.'));
 
@@ -625,7 +629,11 @@ BEGIN
 							IF v_count > 1 THEN
 								DELETE FROM plan_psector_x_arc WHERE arc_id=v_arc_id AND psector_id=v_psector;
 							ELSE
-								DELETE FROM arc WHERE arc_id=v_arc_id;
+								--DELETE FROM arc WHERE arc_id=v_arc_id;
+								EXECUTE 'SELECT SCHEMA_NAME.gw_fct_setfeaturedelete($${
+								"client":{"device":4, "infoType":1, "lang":"ES"},
+								"form":{},"feature":{"type":"ARC"},
+								"data":{"feature_id":"'||v_arc_id||'"}}$$);';
 							END IF;
 
 							UPDATE plan_psector_x_connec SET arc_id=NULL WHERE arc_id=v_arc_id AND psector_id=v_psector;				
