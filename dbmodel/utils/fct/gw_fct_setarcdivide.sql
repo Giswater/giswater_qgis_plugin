@@ -467,7 +467,6 @@ BEGIN
 						END IF;
 
 						-- delete old arc
-						--DELETE FROM arc WHERE arc_id=v_arc_id;
 						EXECUTE 'SELECT SCHEMA_NAME.gw_fct_setfeaturedelete($${
 						"client":{"device":4, "infoType":1, "lang":"ES"},
 						"form":{},"feature":{"type":"ARC"},
@@ -629,7 +628,6 @@ BEGIN
 							IF v_count > 1 THEN
 								DELETE FROM plan_psector_x_arc WHERE arc_id=v_arc_id AND psector_id=v_psector;
 							ELSE
-								--DELETE FROM arc WHERE arc_id=v_arc_id;
 								EXECUTE 'SELECT SCHEMA_NAME.gw_fct_setfeaturedelete($${
 								"client":{"device":4, "infoType":1, "lang":"ES"},
 								"form":{},"feature":{"type":"ARC"},
