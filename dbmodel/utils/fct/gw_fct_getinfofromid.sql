@@ -136,7 +136,7 @@ v_flag boolean = false;
 v_isgrafdelimiter boolean  = false;
 v_isepatoarc boolean  = false;
 v_nodetype text;
-v_isarcdivide boolean = true;
+v_isarcdivide boolean = false;
 
 BEGIN
 
@@ -205,8 +205,8 @@ BEGIN
 			END IF;
 		END IF;
 
-		IF (SELECT isarcdivide FROM cat_feature_node JOIN cat_feature USING (id) WHERE child_layer=v_tablename) IS FALSE THEN
-				v_isarcdivide = FALSE;
+		IF (SELECT isarcdivide FROM cat_feature_node JOIN cat_feature USING (id) WHERE child_layer=v_tablename) IS TRUE THEN
+				v_isarcdivide = TRUE;
 		END IF;
 	ELSE
 		-- tablename is used as table parent.
@@ -217,8 +217,8 @@ BEGIN
 			
 				EXECUTE 'SELECT nodetype_id FROM '||v_table_parent||' WHERE node_id = '||quote_literal(v_id)||';'
 				INTO v_nodetype;
-				IF (SELECT isarcdivide FROM cat_feature_node WHERE id=v_nodetype) IS FALSE THEN
-					v_isarcdivide = FALSE;
+				IF (SELECT isarcdivide FROM cat_feature_node WHERE id=v_nodetype) IS TRUE THEN
+					v_isarcdivide = TRUE;
 				END IF;
 				
 				IF (SELECT upper(graf_delimiter) FROM cat_feature_node WHERE id=v_nodetype) IN ('DMA','PRESSZONE') THEN
