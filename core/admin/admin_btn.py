@@ -303,7 +303,7 @@ class GwAdminButton:
         # TODO: do and call listener for buton + table -> temp_csv
         self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
 
-        if self.dev_user != 'TRUE':
+        if global_vars.user_level['level'] not in global_vars.user_level['showadminadvanced']:
             self.rdb_sample_dev.setVisible(False)
 
         # Manage SRID
@@ -453,16 +453,15 @@ class GwAdminButton:
         self.folderExemple = self.sql_dir + os.sep + 'example' + os.sep
         self.folderPath = ''
 
-        # Check if user have dev permissions
-        self.dev_user = tools_gw.get_config_parser('system', 'dev_mode', "project", "dev")
-        self.dev_commit = tools_gw.get_config_parser('system', 'dev_commit', "project", "dev")
+        # Check if user have commit permissions
+        self.dev_commit = tools_gw.check_config_settings('system', 'dev_commit', "False", "user", "init", prefix=False)
 
         # Create dialog object
         self.dlg_readsql = GwAdminUi()
         tools_gw.load_settings(self.dlg_readsql)
         self.cmb_project_type = self.dlg_readsql.findChild(QComboBox, 'cmb_project_type')
 
-        if self.dev_user != 'TRUE':
+        if global_vars.user_level['level'] not in global_vars.user_level['showadminadvanced']:
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_schema_manager")
             tools_qt.remove_tab(self.dlg_readsql.tab_main, "tab_advanced")
             self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater")
@@ -3012,12 +3011,12 @@ class GwAdminButton:
 
             if progress % 500 == 0:
                 # TODO:: Use dev_commit or dev_user?
-                tools_db.execute_sql(sql, commit=self.dev_user)
+                tools_db.execute_sql(sql, commit=self.dev_commit)
                 sql = ""
 
         if sql != "":
             # TODO:: Use dev_commit or dev_user?
-            tools_db.execute_sql(sql, commit=self.dev_user)
+            tools_db.execute_sql(sql, commit=self.dev_commit)
 
         _file.close()
         del _file

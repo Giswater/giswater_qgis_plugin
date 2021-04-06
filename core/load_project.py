@@ -41,6 +41,8 @@ class GwLoadProject(QObject):
 
     def project_read(self, show_warning=True):
         """ Function executed when a user opens a QGIS project (*.qgs) """
+        
+        self._get_user_level_variables()
 
         # Check if loaded project is valid for Giswater
         if not self._check_project(show_warning):
@@ -76,7 +78,6 @@ class GwLoadProject(QObject):
                   f' duration option'
         value = tools_gw.check_config_settings('system', 'show_message_durations', 'None', comment=comment, prefix=False)
         tools_qgis.user_parameters['show_message_durations'] = value
-        self._get_user_level_variables()
 
         # Log values of system user parameters located in 'giswater.config'
         for parameter, value in tools_qgis.user_parameters.items():
@@ -153,10 +154,12 @@ class GwLoadProject(QObject):
         """ Get config related with user_level variables """
 
         comment = f"initial=1, normal=2, expert=3, u can config some parameters in [user_level] section"
-        global_vars.user_level['level'] = tools_gw.check_config_settings('system', 'user_level', '1', comment=comment)
-        global_vars.user_level['showquestion'] = tools_gw.check_config_settings('user_level', 'showquestion', '1,2,3')
-        global_vars.user_level['showsnapmessage'] = tools_gw.check_config_settings('user_level', 'showsnapmessage', '1,2,3')
-        global_vars.user_level['showselectmessage'] = tools_gw.check_config_settings('user_level', 'showselectmessage', '1,2,3')
+        global_vars.user_level['level'] = tools_gw.check_config_settings('system', 'user_level', '1', comment=comment, prefix=False)
+        global_vars.user_level['showquestion'] = tools_gw.check_config_settings('user_level', 'showquestion', '1,2,3', prefix=False)
+        global_vars.user_level['showsnapmessage'] = tools_gw.check_config_settings('user_level', 'showsnapmessage', '1,2,3', prefix=False)
+        global_vars.user_level['showselectmessage'] = tools_gw.check_config_settings('user_level', 'showselectmessage', '1,2,3', prefix=False)
+        comment = f"Manage advanced tab, fields manager tab and sample dev radio button from admin"
+        global_vars.user_level['showadminadvanced'] = tools_gw.check_config_settings('user_level', 'showadminadvanced', "3", "user", "init", comment=comment, prefix=False)
 
 
     def _check_project(self, show_warning):
