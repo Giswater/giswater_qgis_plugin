@@ -631,9 +631,9 @@ def enable_widgets(dialog, result, enable):
     try:
         widget_list = dialog.findChildren(QWidget)
         for widget in widget_list:
+            if widget.property('isfilter'): continue
             for field in result['fields']:
                 if widget.property('columnname') == field['columnname']:
-                    if widget.property('isfilter'): break
                     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit):
                         widget.setReadOnly(not enable)
                         widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(0, 0, 0)}")
