@@ -59,7 +59,7 @@ def _save_config_parser():
     """ Save user settings file """
 
     try:
-        with open(global_vars.user_folder_dir, 'w') as configfile:
+        with open(f"{global_vars.user_folder_dir}{os.sep}config{os.sep}init.conf", 'w') as configfile:
             config_parser.write(configfile)
             configfile.close()
     except Exception as e:
