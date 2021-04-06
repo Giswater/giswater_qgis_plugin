@@ -14,13 +14,14 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
-"feature":{}, "data":{"filterFields":{}, "addSchema":"ud_sample", "qgisVersion":"3.10.003.1", "initProject":"false", "pageInfo":{}, "version":"3.3.019", "fid":1}}$$);
+"feature":{}, "data":{"filterFields":{}, "addSchema":"ud_sample", "qgisVersion":"3.10.003.1", "initProject":"false", "pageInfo":{}, "version":"3.3.019", "fid":101}}$$);
 
- SELECT SCHEMA_NAME.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"3.4.019", "fid":101, "initProject":true, "addSchema":"ud", "mainSchema":"ws", "projecRole":"", "infoType":"None", "qgisVersion":"3.10.4-A Coruña", "osVersion":"Windows 10"}}$$);
+ SELECT SCHEMA_NAME.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "version":"3.4.019", "fid":101, "initProject":true, "addSchema":"ud", "mainSchema":"ws", "projecRole":"", "infoType":"None", "logFolderVolume":"34MB", "qgisVersion":"3.10.4-A Coruña", "osVersion":"Windows 10"}}$$);
 
 -- fid: main: 101
 	om: 125
 	graf: 211
+	edit: 29
 	epa: 225
 	plan: 115
 	admin: 195
@@ -79,6 +80,7 @@ v_insert_fields json;
 field json;
 query_text text;
 v_qgis_project_type text;
+v_logfoldervolume text;
 
 BEGIN 
 
@@ -98,8 +100,10 @@ BEGIN
 	v_mainschema := (p_data ->> 'data')::json->> 'mainSchema';
 	v_projectrole := (p_data ->> 'data')::json->> 'projectRole';
 	v_infotype := (p_data ->> 'data')::json->> 'infoType';
-    v_insert_fields := (p_data ->> 'data')::json->> 'fields';
+	v_insert_fields := (p_data ->> 'data')::json->> 'fields';
 	v_qgis_project_type := (p_data ->> 'data')::json->> 'projectType';
+	v_logfoldervolume := (p_data ->> 'data')::json->> 'logFolderVolume';
+
 
 	-- profilactic control of qgis variables
 	IF lower(v_mainschema) = 'none' OR v_mainschema = '' OR lower(v_mainschema) ='null' THEN v_mainschema = null; END IF;
@@ -180,7 +184,9 @@ BEGIN
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('PostGIS versión: ',(SELECT postgis_version())));
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS versión: ', v_qgisversion));
 	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('O/S versión: ', v_osversion));
-	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS variables: gwProjectType:',quote_nullable(v_qgis_project_type),', gwInfoType:',quote_nullable(v_infotype),', gwProjectRole:',quote_nullable(v_projectrole),', gwMainSchema:',quote_nullable(v_mainschema),', gwAddSchema:',quote_nullable(v_addschema)));
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('Log volume (User folder): ', v_logfoldervolume));
+	INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS variables: gwProjectType:',quote_nullable(v_qgis_project_type),', gwInfoType:',
+	quote_nullable(v_infotype),', gwProjectRole:', quote_nullable(v_projectrole),', gwMainSchema:',quote_nullable(v_mainschema),', gwAddSchema:',quote_nullable(v_addschema)));
 		
 	
 	-- Reset urn sequence
@@ -345,7 +351,7 @@ BEGIN
 
 			INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
 			SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
-			WHERE fid=125 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6 ;
+			WHERE fid=125 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 
 			IF v_project_type = 'WS' THEN
 
@@ -358,7 +364,7 @@ BEGIN
 
 				INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
 				SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
-				WHERE fid=211 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6 ;
+				WHERE fid=211 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 			END IF;
 		END IF;
 
@@ -374,7 +380,7 @@ BEGIN
 
 			INSERT INTO audit_check_data  (fid, criticity, error_message)
 			SELECT 101, criticity, error_message FROM audit_check_data 
-			WHERE fid=296 AND criticity = 1 AND error_message !='';
+			WHERE fid=296 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 		END IF;
 		
 
@@ -388,7 +394,7 @@ BEGIN
 
 				INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
 				SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
-				WHERE fid=225 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
+				WHERE fid=225 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 		END IF;
 
 		IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -401,7 +407,7 @@ BEGIN
 
 				INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
 				SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
-				WHERE fid=115 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
+				WHERE fid=115 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 		END IF;
 
 		IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
@@ -414,7 +420,7 @@ BEGIN
 
 			INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
 			SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
-			WHERE fid=195 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
+			WHERE fid=195 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 			
 		END IF;
 
@@ -428,7 +434,7 @@ BEGIN
 
 		INSERT INTO audit_check_data  (fid, criticity, result_id, error_message, fcount)
 		SELECT 101, criticity, result_id, error_message, fcount FROM audit_check_data 
-		WHERE fid=251 AND criticity < 4 AND error_message !='' AND cur_user=current_user OFFSET 6;
+		WHERE fid=251 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 			
 	END IF;
 
