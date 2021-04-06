@@ -57,3 +57,11 @@ ALTER TABLE config_form_fields ADD CONSTRAINT config_form_fields_pkey PRIMARY KE
 
 -- 2021/01/04
 INSERT INTO sys_fprocess VALUES (368, 'Null values on to_arc valves', 'ws');
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)   
+VALUES (3174, 'No valve has been choosen','You can continue by clicking on more valves or finish the process by clicking again on Change Valve Status', 0, TRUE, 'ws')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)   
+VALUES (3176, 'Change valve status done successfully','You can continue by clicking on more valves or finish the process by executing Refresh Mincut', 0, TRUE, 'ws')
+ON CONFLICT (id) DO NOTHING;

@@ -19,6 +19,7 @@ v_status text;
 v_message text;
 v_version text;
 v_usepsectors text;
+v_getmessage JSON;
 BEGIN
 
 	-- Search path
@@ -32,18 +33,23 @@ BEGIN
 	IF (SELECT count(*) FROM man_valve WHERE node_id  = v_node) > 0 THEN
 
 		UPDATE man_valve SET closed = NOT closed WHERE node_id = v_node;
-		v_message = 'Change valve status done successfully. You can continue by click on more valves or finish the process by click on...';
-		
+		--v_message = 'Change valve status done successfully. You can continue by clicking on more valves or finish the process by executing Refresh Mincut';
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3176", "function":"3026","debug_msg":""}}$$)' 
+		INTO v_getmessage;
 	ELSE
-		v_message = 'No valve have been choosed. You can continue by click on more valves or finish the process by click on...';
-	
+		--v_message = 'No valve has been choosen. You can continue by clicking on more valves or finish the process by clicking again on Change Valve Status';
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3174", "function":"3026","debug_msg":""}}$$)' 
+		INTO v_getmessage;
 	END IF;
-
+	
+	v_message = json_extract_path(v_getmessage,'body','data','info','message');
 	v_status = 'Accepted';
 	v_level = 3;
 	
 
-	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}}')::json;
+	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":'||v_message||'}}')::json;
 
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
