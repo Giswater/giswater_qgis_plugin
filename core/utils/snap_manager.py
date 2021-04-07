@@ -373,7 +373,7 @@ class GwSnapManager(object):
             if global_vars.user_level['level'] in global_vars.user_level['showsnapmessage']:
                 if msg is True:
                     msg = f'Snapp to '
-                    tools_qgis.show_info(msg, 1, parameter={feature_type})
+                    tools_qgis.show_info(msg, 1, parameter=feature_type)
                 elif type(msg) is str:
                     tools_qgis.show_info(msg, 1)
 
