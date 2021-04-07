@@ -2193,8 +2193,13 @@ class ApiCF(ApiParent, QObject):
             message = "Selected date interval is not valid"
             self.controller.show_warning(message)
             return
+        visit_class = utils_giswater.get_item_data(self.dlg_cf, self.cmb_visit_class, 0)
+
+        if visit_class in (None, ''):
+            return
+
         if type(table_name) is dict:
-            table_name = str(table_name[utils_giswater.get_item_data(self.dlg_cf, self.cmb_visit_class, 0)])
+            table_name = str(table_name[visit_class])
 
         # Set model of selected widget
         if visitClass:
@@ -2263,6 +2268,10 @@ class ApiCF(ApiParent, QObject):
 
 
     def set_filter_dates(self, mindate, maxdate, table_name, widget_fromdate, widget_todate, column_filter=None, value_filter=None, widget=None):
+
+        if table_name is None:
+            return
+
         if self.schema_name not in table_name:
             table_name = self.schema_name + "." + table_name
 
@@ -2603,7 +2612,7 @@ class ApiCF(ApiParent, QObject):
     def update_visit_table(self):
         """ Convenience fuction set as slot to update table after a Visit GUI close. """
         table_name = "v_ui_event_x_" + self.geom_type
-        self.set_dates_from_to(self.date_event_from, self.date_event_to, table_name, 'visit_start', 'visit_end')
+        self.set_dates_from_to(self.date_visit_from, self.date_visit_to, table_name, 'visit_start', 'visit_end')
         self.tbl_event_cf.model().select()
 
 
@@ -2617,11 +2626,14 @@ class ApiCF(ApiParent, QObject):
             self.controller.show_warning(msg)
             return
 
-        if type(table_name) is dict:
-            table_name = str(table_name[utils_giswater.get_item_data(self.dlg_cf, self.cmb_visit_class, 0)])
+        visit_class = utils_giswater.get_item_data(self.dlg_cf, self.cmb_visit_class, 0)
+        if type(table_name) is dict and visit_class not in (None, ''):
+            table_name = str(table_name[visit_class])
+        else:
+            table_name = None
 
         manage_visit = ManageVisit(self.iface, self.settings, self.controller, self.plugin_dir)
-        manage_visit.visit_added.connect(self.update_visit_table)
+        # manage_visit.visit_added.connect(self.update_visit_table)
         # TODO: the following query fix a (for me) misterious bug
         # the DB connection is not available during manage_visit.manage_visit first call
         # so the workaroud is to do a unuseful query to have the dao controller active
@@ -2632,7 +2644,7 @@ class ApiCF(ApiParent, QObject):
         if tab == 'event':
             self.set_filter_dates('visit_start', 'visit_end', table_name, self.date_event_from, self.date_event_to)
         elif tab == 'visit':
-            self.set_filter_dates('visit_start', 'visit_end', table_name, self.date_visit_from, self.date_visit_to)
+            self.set_filter_dates('startdate', 'enddate', table_name, self.date_visit_from, self.date_visit_to)
 
 
     def open_gallery(self):
