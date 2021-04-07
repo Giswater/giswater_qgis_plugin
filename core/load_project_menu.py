@@ -17,7 +17,7 @@ from .toolbars import buttons
 from .ui.ui_manager import GwLoadMenuUi
 from .utils import tools_gw
 from .. import global_vars
-from ..lib import tools_log, tools_qt, tools_qgis
+from ..lib import tools_log, tools_qt, tools_qgis, tools_os
 
 
 class GwMenuLoad(QObject):
@@ -116,9 +116,15 @@ class GwMenuLoad(QObject):
         # endregion
 
         # region Open user folder
+
+        log_folder = os.path.join(global_vars.user_folder_dir, 'log')
+        size = tools_os.get_folder_size(log_folder)
+        log_folder_volume = f"{round(size / (1024 * 1024), 2)} MB"
+
         folder_icon = QIcon(
             f"{os.path.dirname(__file__)}{os.sep}..{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}102.png")
-        action_open_path = self.main_menu.addAction(f"Open folder")
+        action_open_path = self.main_menu.addAction(f"Open folder  ({log_folder_volume})")
+
         action_open_path.setIcon(folder_icon)
         action_open_path.triggered.connect(self._open_config_path)
         # endregion
