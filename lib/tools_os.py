@@ -58,14 +58,6 @@ def open_file(file_path):
         return True
 
 
-def set_filename(prefix_name='log', tstamp_format='%Y%m%d'):
-    """ Set a file name format like 'prefix_timestamp.log' """
-
-    tstamp = str(time.strftime(tstamp_format))
-    name = prefix_name + "_" + tstamp + ".log"
-    return name
-
-
 def get_relative_path(filepath, levels=1):
 
     common = filepath
@@ -124,3 +116,19 @@ def check_python_function(module, function_name):
 
     object_functions = [method_name for method_name in dir(module) if callable(getattr(module, method_name))]
     return function_name in object_functions
+
+
+def get_folder_size(folder):
+    """ Get folder size """
+
+    if not os.path.exists(folder):
+        return 0
+
+    size = 0
+    for file in os.listdir(folder):
+        filepath = os.path.join(folder, file)
+        if os.path.isfile(filepath):
+            size += os.path.getsize(filepath)
+
+    return size
+
