@@ -243,7 +243,12 @@ BEGIN
 
 		
 		-- force all cat feature not active in order to increase step-by-step 
-		UPDATE cat_feature SET active = false;
+		IF v_projecttype = 'WS' THEN 
+			UPDATE cat_feature SET active = false WHERE system_id NOT IN ('VALVE', 'WJOIN', 'JUNCTION', 'TANK', 'PIPE'); -- ws projects
+		ELSE
+			UPDATE cat_feature SET active = false WHERE system_id NOT IN ('CONDUIT', 'JUNCTION', 'CONNEC', 'GULLY', 'OUTFALL'); -- ud projects
+		END IF;
+		
 		
 		-- hidden lastupdate and lastupdate_user columns
 		update config_form_fields SET hidden = true WHERE columnname IN ('lastupdate', 'lastupdate_user', 'publish', 'uncertain');
