@@ -7,11 +7,11 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
 --2021/02/27
-INSERT INTO sys_fprocess VALUES (367, 'Check graf config', 'ws');
+INSERT INTO sys_fprocess VALUES (367, 'Check graf config', 'ws') ON CONFLICT (fid) DO NOTHING;
 
-INSERT INTO sys_function VALUES (3026, 'gw_fct_setchangevalvestatus', 'ws', 'function', 'json', 'json', 'Function that changes status valve', 'role_om');
+INSERT INTO sys_function VALUES (3026, 'gw_fct_setchangevalvestatus', 'ws', 'function', 'json', 'json', 'Function that changes status valve', 'role_om') 
+ON CONFLICT (id) DO NOTHING;
 
 
 --2021/03/01
@@ -34,8 +34,10 @@ UPDATE value_state_type SET name = 'OPERATIU' WHERE name ='EN_SERVEI';
 
 
 --2021/03/05
-INSERT INTO sys_function VALUES (3028, 'gw_fct_getaddfeaturevalues', 'utils', 'function', 'json', 'json', 'Function that return cat_feature values', 'role_basic');
-INSERT INTO sys_function VALUES (3030, 'gw_fct_debugsql', 'utils', 'function', 'json', 'json', 'Function that allows debugging giving error information', 'role_basic');
+INSERT INTO sys_function VALUES (3028, 'gw_fct_getaddfeaturevalues', 'utils', 'function', 'json', 'json', 'Function that return cat_feature values', 'role_basic') 
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_function VALUES (3030, 'gw_fct_debugsql', 'utils', 'function', 'json', 'json', 'Function that allows debugging giving error information', 'role_basic') 
+ON CONFLICT (id) DO NOTHING;
 
 
 --2021/03/25
@@ -56,7 +58,7 @@ ALTER TABLE config_form_fields DROP CONSTRAINT config_form_fields_pkey;
 ALTER TABLE config_form_fields ADD CONSTRAINT config_form_fields_pkey PRIMARY KEY(formname, formtype, columnname, tabname);
 
 -- 2021/01/04
-INSERT INTO sys_fprocess VALUES (368, 'Null values on to_arc valves', 'ws');
+INSERT INTO sys_fprocess VALUES (368, 'Null values on to_arc valves', 'ws') ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO sys_message(id, error_message, hint_message, log_level, show_user, project_type)   
 VALUES (3174, 'No valve has been choosen','You can continue by clicking on more valves or finish the process by clicking again on Change Valve Status', 0, TRUE, 'ws')
@@ -67,6 +69,7 @@ VALUES (3176, 'Change valve status done successfully','You can continue by click
 ON CONFLICT (id) DO NOTHING;
 
 -- 07/04/2021
+UPDATE _config_form_fields_ SET tabname = 'main' WHERE tabname IS NULL;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, widgetcontrols, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 

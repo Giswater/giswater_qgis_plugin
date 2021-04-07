@@ -20,7 +20,7 @@ ALTER TABLE cat_feature_arc DROP COLUMN man_table;
 ALTER TABLE cat_feature_connec DROP COLUMN man_table;
 
 DELETE FROM sys_table WHERE id  IN ('inp_arc_type', 'inp_node_type');
-INSERT INTO sys_table VALUES ('sys_feature_epa_type', 'epa types', 'role_admin', 0, null, null, null, null, null, null, null, null, 'giswater');
+INSERT INTO sys_table VALUES ('sys_feature_epa_type', 'epa types', 'role_admin', 0, null, null, null, null, null, null, null, null, 'giswater') ON CONFLICT (id) DO NOTHING;
 
 --2021/03/18
 

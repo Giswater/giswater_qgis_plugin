@@ -11,7 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --2021/02/27
 
 
-ALTER TABLE inp_rules_controls_importinp RENAME TO _inp_rules_controls_importinp_ ;
+ALTER TABLE IF EXISTS inp_rules_controls_importinp RENAME TO _inp_rules_controls_importinp_ ;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_feature_node", "column":"epa_table"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_feature_arc", "column":"epa_table"}}$$);
