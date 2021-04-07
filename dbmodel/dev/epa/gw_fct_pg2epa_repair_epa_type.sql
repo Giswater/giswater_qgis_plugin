@@ -8,13 +8,18 @@ This version of Giswater is provided by Giswater Association
 
 
 CREATE OR REPLACE FUNCTION ws.gw_fct_pg2epa_repair_epatype(p_data json)
-  RETURNS json AS
-$BODY$
 
 /* example
 
 -- execute
 SELECT ws.gw_fct_pg2epa_repair_epatype($${"client":{"device":4, "infoType":1, "lang":"ES"}}$$);
+
+
+ALTER TABLE ws.cat_feature_node DROP CONSTRAINT node_type_epa_table_check;
+
+ALTER TABLE ws.cat_feature_node
+  ADD CONSTRAINT node_type_epa_table_check CHECK (epa_table::text = ANY (ARRAY['inp_virtualvalve'::text, 'inp_inlet'::text, 'not_defined'::text, 'inp_junction'::text, 'inp_pump'::text, 'inp_reservoir'::text, 'inp_tank'::text, 'inp_valve'::text, 'inp_shortpipe'::text]));
+
 
 -- log
 SELECT * FROM ws.audit_check_data where fid = 214 AND criticity  > 1 order by id
@@ -33,7 +38,7 @@ SELECT 'TANK', count(*) FROM inp_tank join node using (node_id ) where state > 0
 union
 SELECT 'SHORTPIPE', count(*) FROM inp_shortpipe join node using (node_id ) where state > 0
 union
-SELECT 'VALVE', count(*) FROM inp_junction join node using (node_id ) where state > 0
+SELECT 'VALVE', count(*) FROM inp_valve join node using (node_id ) where state > 0
 union
 SELECT 'INLET', count(*) FROM inp_inlet join node using (node_id ) where state > 0)b
 USING (epa_type)

@@ -199,18 +199,16 @@ BEGIN
 
 	RAISE NOTICE '8 - Node2arcs with more than two arcs (fid: 166)';
 	INSERT INTO anl_node (fid, node_id, nodecat_id, the_geom, descript)
-	SELECT 166, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with more than two arcs' FROM (
+		SELECT 166, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with more than two arcs' FROM (
 		SELECT node_id, nodecat_id, node.the_geom FROM node
-		JOIN selector_sector USING (sector_id) 
-		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
-		AND node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user)
+		JOIN v_edit_arc a1 ON node_id=a1.node_1
+		AND node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP')
 		UNION ALL
 		SELECT node_id, nodecat_id, node.the_geom FROM node
-		JOIN selector_sector USING (sector_id) 
-		JOIN arc a1 ON node_id=a1.node_2 WHERE cur_user = current_user
-		AND node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP') AND a1.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user))a
+		JOIN v_edit_arc a1 ON node_id=a1.node_2
+		AND node.epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP'))a
 	GROUP by node_id, nodecat_id, the_geom
-	HAVING count(*) >2;
+	HAVING count(*) > 2;
 	
 	SELECT count(*) INTO v_count FROM anl_node WHERE fid = 166 AND cur_user=current_user;
 	IF v_count > 0 THEN
@@ -620,6 +618,7 @@ BEGIN
 	-- check connecs <-> inp_connecs
 	SELECT c1-c2 INTO v_count FROM (SELECT count(*) as c1, null AS c2 FROM connec UNION SELECT null, count(*) FROM inp_connec)a1
 	WHERE c1 > c2;
+
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
 		VALUES (v_fid, v_result_id, 3, '295',concat(
