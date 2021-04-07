@@ -44,3 +44,52 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_form
 
 --2021/03/29
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature_node", "column":"grafconfig", "dataType":"varchar(30)", "isUtils":"False"}}$$);
+
+--2021/04/07
+ALTER TABLE IF EXISTS config_form_fields RENAME TO _config_form_fields_;
+ALTER TABLE IF EXISTS _config_form_fields_ RENAME CONSTRAINT config_form_fields_pkey TO config_form_fieldspkey_;
+
+CREATE TABLE IF NOT EXISTS config_form_fields(
+formname character varying(50) NOT NULL,
+formtype character varying(50) NOT NULL,
+tabname character varying(30) NOT NULL,
+columnname character varying(30) NOT NULL,
+layoutname character varying(16),
+layoutorder integer,
+datatype character varying(30),
+widgettype character varying(30),
+widgetcontrols json,
+label text,
+tooltip text,
+placeholder text,
+ismandatory boolean,
+isparent boolean,
+iseditable boolean,
+isautoupdate boolean,
+isfilter boolean,
+dv_querytext text,
+dv_orderby_id boolean,
+dv_isnullvalue boolean,
+dv_parent_id text,
+dv_querytext_filterc text,
+stylesheet json,
+widgetfunction text,
+linkedaction text,
+hidden boolean NOT NULL DEFAULT false,
+CONSTRAINT config_form_fields_pkey PRIMARY KEY (formname, formtype, columnname, tabname)
+);
+COMMENT ON TABLE config_form_fields
+  IS 'INSTRUCTIONS TO WORK WITH THIS TABLE:
+With this table form fields are configured:
+The function gw_api_get_formfields is called to build widget forms using this table.
+formname: warning with formname. If it is used to work with listFilter fields tablename of an existing relation on database must be mandatory to put here
+formtype: There are diferent formtypes:
+	feature: the standard one. Used to show fields from feature tables
+	info: used to build the infoplan widget
+	visit: used on visit forms
+	form: used on specific forms (search, mincut)
+	catalog: used on catalog forms (workcat and featurecatalog)
+	listfilter: used to filter list
+	editbuttons:  buttons on form bottom used to edit (accept, cancel)
+	navbuttons: buttons on form bottom used to navigate (goback....)
+layout_id and layout_order, used to define the position';
