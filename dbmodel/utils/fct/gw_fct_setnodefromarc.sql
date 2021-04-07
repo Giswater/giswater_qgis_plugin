@@ -49,6 +49,7 @@ v_state integer;
 v_state_type integer;
 v_builtdate date;
 v_nodecat_id text;
+v_arclist json;
 
 BEGIN
 
@@ -110,10 +111,11 @@ BEGIN
 		-- set isarcdivide of chosed nodetype on falsea
 		SELECT isarcdivide INTO v_isarcdivide FROM cat_feature_node WHERE id=v_nodetype_id;
 		UPDATE cat_feature_node SET isarcdivide=FALSE WHERE id=v_nodetype_id;	
-	
+		
+		EXECUTE 'SELECT array_to_json(array_agg(arc_id::text)) FROM arc WHERE expl_id='||v_expl||' AND (node_1 IS NULL OR node_2 IS NULL)'
+		INTO v_arclist;
 		-- execute function
-		EXECUTE 'SELECT gw_fct_arc_repair($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":
-		"SELECT array_to_json(array_agg(arc_id::text)) FROM arc WHERE expl_id='||v_expl||' AND (node_1 IS NULL OR node_2 IS NULL)"},
+		EXECUTE 'SELECT gw_fct_arc_repair($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":{"id":'||v_arclist||'},
 		"data":{}}$$);';
 
 		-- restore isarcdivide to previous value
