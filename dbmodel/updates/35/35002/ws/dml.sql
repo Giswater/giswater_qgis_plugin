@@ -48,3 +48,7 @@ UPDATE inp_node_type SET epa_table = 'inp_inlet' where id = 'INLET';
 
 INSERT INTO sys_feature_epa_type SELECT id, 'NODE', epa_table FROM inp_node_type;
 INSERT INTO sys_feature_epa_type SELECT id, 'ARC', epa_table FROM inp_arc_type;
+
+UPDATE config_form_fields set dv_parent_id ='muni_id' WHERE formname='v_om_mincut' AND columnname='streetname';
+UPDATE config_form_fields set dv_querytext_filterc =NULL WHERE (formname='upsert_catalog_arc' OR formname='upsert_catalog_node'  OR formname='upsert_catalog_connec') 
+AND columnname='matcat_id';
