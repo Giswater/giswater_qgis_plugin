@@ -55,9 +55,12 @@ class GwAutoMincutTask(GwTask):
             extras = (f'"action":"mincutNetwork", "mincutId":"{real_mincut_id}", "arcId":"{self.element_id}", '
                       f'"usePsectors":"{use_planified}"')
             body = tools_gw.create_body(extras=extras)
-
             self.complet_result = tools_gw.execute_procedure('gw_fct_setmincut', body)
-            if self.isCanceled(): return False
+            if self.isCanceled():
+                return False
+            if not self.complet_result or self.complet_result['status'] == 'Failed':
+                return False
+
             return True
 
         except KeyError as e:
@@ -84,6 +87,7 @@ class GwAutoMincutTask(GwTask):
         elif self.complet_result in (False, None) or \
             ('status' in self.complet_result and self.complet_result['status'] == 'Failed'):
             self.task_finished.emit([False, self.complet_result])
+            tools_gw.manage_json_exception(self.complet_result)
 
         # Task finished with Accepted result
         elif 'mincutOverlap' in self.complet_result or self.complet_result['status'] == 'Accepted':

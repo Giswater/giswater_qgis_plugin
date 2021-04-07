@@ -42,12 +42,12 @@ class GwTask(QgsTask, QObject):
         iface.actionOpenProject().setEnabled(True)
         iface.actionNewProject().setEnabled(True)
         if result:
-            tools_log.log_info(f"Task {self.description()} completed")
+            tools_log.log_info(f"Task '{self.description()}' completed")
         else:
             if self.exception is None:
-                tools_log.log_info(f"Task {self.description()} not successful but without exception")
+                tools_log.log_info(f"Task '{self.description()}' not successful but without exception")
             else:
-                tools_log.log_info(f"Task {self.description()} Exception: {self.exception}")
+                tools_log.log_info(f"Task '{self.description()}' Exception: {self.exception}")
                 raise self.exception
 
 
@@ -59,5 +59,5 @@ class GwTask(QgsTask, QObject):
             if result['last_error'] is not None:
                 tools_log.log_warning(result['last_error'])
             global_vars.dao.rollback()
-        tools_log.log_info(f"Task {self.description()} was cancelled")
+        tools_log.log_info(f"Task '{self.description()}' was cancelled")
         super().cancel()
