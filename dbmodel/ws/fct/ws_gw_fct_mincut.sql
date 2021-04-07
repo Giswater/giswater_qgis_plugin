@@ -104,7 +104,7 @@ BEGIN
 	UPDATE om_mincut SET muni_id=v_muni_id WHERE id=result_id_arg;
 
 	-- mincut is on planning
-    UPDATE om_mincut SET mincut_state=4 WHERE id=result_id_arg AND mincut_state IS NULL;
+	UPDATE om_mincut SET mincut_state=4 WHERE id=result_id_arg AND mincut_state IS NULL;
 
 	IF v_debug THEN
 		RAISE NOTICE '3-Update user selectors';
@@ -285,8 +285,14 @@ BEGIN
 
 	IF v_debug THEN	RAISE NOTICE '11-Insert into om_mincut_connec table ';	END IF;			
 	
-	INSERT INTO om_mincut_connec (result_id, connec_id, the_geom)
-	SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state=1;
+	-- insert connecs
+	IF p_usepsectors IS TRUE AND 'role_master' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
+		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom)
+		SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state>0;
+	ELSE
+		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom)
+		SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state=1;
+	END IF;
 
 	IF v_debug THEN RAISE NOTICE '12-Insert into om_mincut_hydrometer table ';	END IF;
 	
