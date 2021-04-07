@@ -43,8 +43,6 @@ ON CONFLICT (id) DO NOTHING;
 --2021/03/25
 
 UPDATE config_form_list SET columnname = 'not_used';
-ALTER TABLE config_form_list DROP CONSTRAINT config_form_list_pkey;
-ALTER TABLE config_form_list ADD CONSTRAINT "config_form_list_pkey" PRIMARY KEY ("tablename", "device", "listtype", "columnname");
 
 UPDATE config_form_fields SET dv_parent_id = 'muni_id' WHERE formname = 'v_om_mincut' AND columnname = 'streetname' AND formtype ='form_feature';
 UPDATE config_form_fields SET dv_parent_id = 'matcat_id' WHERE formname = 'upsert_catalog_arc' AND columnname = 'matcat_id' AND formtype ='form_catalog';
@@ -54,8 +52,6 @@ UPDATE config_form_fields SET dv_parent_id = 'matcat_id' WHERE formname = 'upser
 
 UPDATE config_form_fields SET tabname = 'main';
 UPDATE config_form_fields set tabname = 'data' WHERE formtype = 'form_feature' AND formname ILIKE 've_%_%';
-ALTER TABLE config_form_fields DROP CONSTRAINT config_form_fields_pkey;
-ALTER TABLE config_form_fields ADD CONSTRAINT config_form_fields_pkey PRIMARY KEY(formname, formtype, columnname, tabname);
 
 -- 2021/01/04
 INSERT INTO sys_fprocess VALUES (368, 'Null values on to_arc valves', 'ws') ON CONFLICT (fid) DO NOTHING;
@@ -69,6 +65,8 @@ VALUES (3176, 'Change valve status done successfully','You can continue by click
 ON CONFLICT (id) DO NOTHING;
 
 -- 07/04/2021
+ALTER TABLE _config_form_fields_ DISABLE TRIGGER gw_trg_config_control;
+
 UPDATE _config_form_fields_ SET tabname = 'main' WHERE tabname IS NULL;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, widgetcontrols, label, tooltip, 
