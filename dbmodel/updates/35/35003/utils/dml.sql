@@ -77,5 +77,3 @@ placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_query
 stylesheet, widgetfunction, linkedaction, hidden FROM _config_form_fields_ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
             
 DROP TABLE iF EXISTS _config_form_fields_;
-
-DELETE FROM config_form_fields where formname='inp_flwreg_type';

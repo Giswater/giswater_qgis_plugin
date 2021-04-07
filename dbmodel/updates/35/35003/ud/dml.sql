@@ -23,3 +23,6 @@ UPDATE sys_feature_epa_type SET id  ='UNDEFINED' WHERE id  ='NOT DEFINED';
 UPDATE arc SET epa_type ='UNDEFINED' WHERE epa_type  ='NOT DEFINED';
 UPDATE node SET epa_type ='UNDEFINED' WHERE epa_type  ='NOT DEFINED';
 
+--2021/04/07
+DELETE FROM config_form_fields where formname='inp_flwreg_type';
+DELETE FROM sys_table where id='inp_flwreg_type';
