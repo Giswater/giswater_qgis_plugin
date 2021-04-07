@@ -118,12 +118,12 @@ BEGIN
 			PERFORM gw_fct_admin_manage_child_views(v_query);
 					
 			-- insert into config_form_fields new column values coyping from parent
-			INSERT INTO config_form_fields (formtype, , columnname, layoutname, layoutorder, 
+			INSERT INTO config_form_fields (formname, formtype,tabname,  columnname, layoutname, layoutorder, 
       		datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
       		ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
       		dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
        		stylesheet, widgetfunction, linkedaction, hidden)
-			SELECT v_childview, formtype, , columnname, layoutname, layoutorder, 
+			SELECT v_childview, formtype,tabname, columnname, layoutname, layoutorder, 
        		datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
        		ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
      		dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
@@ -155,12 +155,12 @@ BEGIN
 		PERFORM gw_fct_admin_manage_child_views(v_query);
 		
 		-- insert into config_form_fields new column values coyping from parent
-		INSERT INTO config_form_fields (formname, formtype, , columnname, layoutname, layoutorder, 
+		INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
        datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
        ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
        dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
        stylesheet, widgetfunction, linkedaction, hidden)
-		SELECT v_childview, formtype, , columnname, layoutname, layoutorder, 
+		SELECT v_childview, formtype,tabname, columnname, layoutname, layoutorder, 
        datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
        ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
        dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
