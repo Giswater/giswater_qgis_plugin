@@ -140,6 +140,9 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
     try:
         raw_parameter = parameter
 
+        if global_vars.project_type is None:
+            global_vars.project_type = get_project_type()
+
         if config_type == 'user' and prefix and global_vars.project_type is not None:
             parameter = f"{global_vars.project_type}_{parameter}"
 

@@ -15,7 +15,7 @@ from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QHeaderView, \
-    QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget
+    QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget, QDockWidget
 from qgis.core import QgsPointXY, QgsGeometry
 from qgis.gui import QgsRubberBand
 
@@ -52,6 +52,10 @@ class GwSearch:
 
         # If search is open, dont let user open another one
         open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
+
+        docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
+        if docker_search:
+            return
         if open_search in ("True", "true", True) and dlg_mincut is None and load_project is False:
             return
 
