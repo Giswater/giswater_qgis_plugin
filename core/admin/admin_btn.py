@@ -168,6 +168,12 @@ class GwAdminButton:
                 else:
                     return
 
+        # Check postGis version
+        major_version = self.postgis_version.split(".")
+        if int(major_version[0]) >= 3:
+            sql = f"CREATE EXTENSION IF NOT EXISTS postgis_raster;"
+            tools_db.execute_sql(sql)
+
         # We retrieve the desired name of the schema, since in case there had been a schema with the same name, we had
         # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
         self.schema = project_name_schema
