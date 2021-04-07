@@ -1826,10 +1826,10 @@ class GwMincut:
 
             # Enable button CustomMincut, ChangeValveStatus and button Start
             self.dlg_mincut.btn_start.setDisabled(False)
+            self.action_mincut.setDisabled(True)
             self.action_refresh_mincut.setDisabled(False)
             self.action_custom_mincut.setDisabled(False)
             self.action_change_valve_status.setDisabled(False)
-            self.action_mincut.setDisabled(False)
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
             self.action_mincut_composer.setDisabled(False)
