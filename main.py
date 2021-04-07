@@ -143,14 +143,15 @@ class Giswater(QObject):
         global_vars.init_qgis_settings(self.plugin_name)
 
         # Enable Python console and Log Messages panel if parameter 'enable_python_console' = True
-        python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', "project", "giswater")
+        python_enable_console = tools_gw.get_config_parser('system', 'enable_python_console', 'project', 'giswater')
         if python_enable_console == 'TRUE':
             tools_qgis.enable_python_console()
 
         # Set logger (no database connection yet)
         min_log_level = int(tools_gw.check_config_settings('system', 'log_level', '20', 'user', 'init'))
         tools_log.min_log_level = min_log_level
-        tools_log.set_logger(self.plugin_name)
+        log_limit_characters = tools_gw.get_config_parser('system', 'log_limit_characters', 'user', 'init', prefix=False)
+        tools_log.set_logger(self.plugin_name, log_limit_characters)
 
         # Define signals
         self._set_signals()
