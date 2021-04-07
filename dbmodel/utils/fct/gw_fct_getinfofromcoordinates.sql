@@ -71,6 +71,10 @@ v_projectrole text;
 v_flag boolean = false;
 v_infotype text;
 v_data json;
+v_querystring text;
+v_debug_vars json;
+v_debug json;
+v_msgerr json;
 
 
 BEGIN
@@ -146,13 +150,16 @@ BEGIN
 	SELECT ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_epsg) INTO v_point;
 	
 	-- Get feature
-	v_sql := 'SELECT layer_id, 0 as orderby, addparam->>''geomType'' as geomtype FROM  '||quote_ident(v_config_layer)||' WHERE layer_id = '||quote_literal(v_activelayer)||'::text 
+	v_sql = concat('SELECT layer_id, 0 as orderby, addparam->>''geomType'' as geomtype FROM  ',quote_ident(v_config_layer),' WHERE layer_id = ',quote_literal(v_activelayer),'::text 
 		AND (addparam->>''forceWhenActive'')::boolean IS TRUE
 		UNION
-		SELECT layer_id, orderby , addparam->>''geomType'' as geomtype FROM  '||quote_ident(v_config_layer)||' WHERE layer_id = any('||quote_literal(v_visiblelayer)||'::text[]) 
+		SELECT layer_id, orderby , addparam->>''geomType'' as geomtype FROM  ',quote_ident(v_config_layer),' WHERE layer_id = any(',quote_literal(v_visiblelayer),'::text[]) 
 		UNION 
-		SELECT DISTINCT ON (layer_id) layer_id, orderby+100, addparam->>''geomType'' as geomtype FROM  '||quote_ident(v_config_layer)||' JOIN cat_feature ON parent_layer=layer_id 
-		WHERE child_layer = any('||quote_literal(v_visiblelayer)||'::text[]) ORDER BY orderby';
+		SELECT DISTINCT ON (layer_id) layer_id, orderby+100, addparam->>''geomType'' as geomtype FROM  ',quote_ident(v_config_layer),' JOIN cat_feature ON parent_layer=layer_id 
+		WHERE child_layer = any(',quote_literal(v_visiblelayer),'::text[]) ORDER BY orderby');
+	v_debug_vars := json_build_object('v_config_layer', v_config_layer, 'v_activelayer', v_activelayer, 'v_visiblelayer', v_visiblelayer);
+	v_debug := json_build_object('querystring', v_sql, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 10);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
 	FOR v_layer IN EXECUTE v_sql     
 	LOOP
@@ -162,48 +169,63 @@ BEGIN
 		v_count=v_count+1;
 
 		--    Get id column
-		EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
-		INTO v_idname
-		USING v_layer.layer_id;
+		v_querystring = concat('SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = ''',v_layer.layer_id,'''::regclass AND i.indisprimary');
+		v_debug_vars := json_build_object('layer_id', v_layer.layer_id);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 20);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
+		EXECUTE v_querystring INTO v_idname;
             
 		--    For views it suposse pk is the first column
 		IF v_idname IS NULL THEN
-			EXECUTE 'SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-			AND t.relname = $1 
-			AND s.nspname = $2
-			ORDER BY a.attnum LIMIT 1'
-			INTO v_idname
-			USING v_layer.layer_id, v_schemaname;
+			v_querystring = concat('SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
+			AND t.relname = ''',v_layer.layer_id,''' 
+			AND s.nspname = ''',v_schemaname,'''
+			ORDER BY a.attnum LIMIT 1');
+			v_debug_vars := json_build_object('layer_id', v_layer.layer_id, 'v_schemaname', v_schemaname);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 30);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
+			EXECUTE v_querystring INTO v_idname;
 
 		END IF;
 
 		--     Get geometry_column
-		EXECUTE 'SELECT attname FROM pg_attribute a        
+		v_querystring = concat('SELECT attname FROM pg_attribute a        
                 JOIN pg_class t on a.attrelid = t.oid
                 JOIN pg_namespace s on t.relnamespace = s.oid
                 WHERE a.attnum > 0 
                 AND NOT a.attisdropped
-                AND t.relname = $1
-                AND s.nspname = $2
+                AND t.relname = ',quote_nullable(v_layer.layer_id),'
+                AND s.nspname = ',quote_nullable(v_schemaname),'
                 AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
-                ORDER BY a.attnum' 
-	        INTO v_the_geom
-	        USING v_layer.layer_id, v_schemaname;
+                ORDER BY a.attnum');
+		v_debug_vars := json_build_object('layer_id', v_layer.layer_id, 'v_schemaname', v_schemaname);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 40);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
+		EXECUTE v_querystring INTO v_the_geom;
 	        
 		IF v_layer.geomtype = 'polygon' THEN
 
 			--  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)        
-			EXECUTE 'SELECT '||quote_ident(v_idname)||' FROM '||quote_ident(v_layer.layer_id)||' WHERE st_dwithin ($1, '||quote_ident(v_layer.layer_id)||'.'||quote_ident(v_the_geom)||', $2) 
-			ORDER BY  ST_area('||v_layer.layer_id||'.'||v_the_geom||') asc LIMIT 1'
-			INTO v_id
-			USING v_point, v_sensibility;
+			v_querystring = concat('SELECT ',quote_ident(v_idname),' FROM ',quote_ident(v_layer.layer_id),' WHERE st_dwithin (''',v_point,''', ',quote_ident(v_layer.layer_id),'.',quote_ident(v_the_geom),', ',v_sensibility,') 
+			ORDER BY  ST_area(',v_layer.layer_id,'.',v_the_geom,') asc LIMIT 1');
+			v_debug_vars := json_build_object('v_idname', v_idname, 'layer_id', v_layer.layer_id, 'v_point', v_point, 'v_the_geom', v_the_geom, 'v_sensibility', v_sensibility);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 50);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
+			EXECUTE v_querystring INTO v_id;
 		ELSE
 
 			--  Get element from active layer, using the distance from the clicked point to order possible multiselection (minor as first)
-			EXECUTE 'SELECT '||quote_ident(v_idname)||' FROM '||quote_ident(v_layer.layer_id)||' WHERE st_dwithin ($1, '||quote_ident(v_layer.layer_id)||'.'||quote_ident(v_the_geom)||', $2) 
-			ORDER BY  ST_Distance('||v_layer.layer_id||'.'||v_the_geom||', $1) asc LIMIT 1'
-			INTO v_id
-			USING v_point, v_sensibility;
+			v_querystring = concat('SELECT ',quote_ident(v_idname),' FROM ',quote_ident(v_layer.layer_id),' WHERE st_dwithin (''',v_point,''', ',quote_ident(v_layer.layer_id),'.',quote_ident(v_the_geom),', ',v_sensibility,') 
+			ORDER BY  ST_Distance(',v_layer.layer_id,'.',v_the_geom,', ''',v_point,''') asc LIMIT 1');
+			v_debug_vars := json_build_object('v_idname', v_idname, 'layer_id', v_layer.layer_id, 'v_point', v_point, 'v_the_geom', v_the_geom, 'v_sensibility', v_sensibility);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 60);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
+			EXECUTE v_querystring INTO v_id;
 		END IF;      
 
 		IF v_id IS NOT NULL THEN 
@@ -217,9 +239,13 @@ BEGIN
 	IF v_iseditable THEN
 
 		-- Get editability of layer
-		EXECUTE 'SELECT (CASE WHEN is_editable=TRUE AND layer_id = any('||quote_literal(v_visiblelayer)||'::text[]) THEN ''True'' ELSE ''False'' END) 
-		FROM  '||quote_ident(v_config_layer)||' WHERE layer_id='||quote_literal(v_layer.layer_id)||';'
-			INTO v_iseditable;
+		v_querystring = concat('SELECT (CASE WHEN is_editable=TRUE AND layer_id = any(',quote_literal(v_visiblelayer),'::text[]) THEN ''True'' ELSE ''False'' END) 
+		FROM  ',quote_ident(v_config_layer),' WHERE layer_id=',quote_literal(v_layer.layer_id),';');
+		v_debug_vars := json_build_object('v_visiblelayer', v_visiblelayer, 'v_config_layer', v_config_layer, 'layer_id', v_layer.layer_id);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 70);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
+		EXECUTE v_querystring INTO v_iseditable;
 	END IF;
 
 	-- looking for additional schema 
@@ -228,7 +254,12 @@ BEGIN
 		v_data = gw_fct_json_object_set_key((p_data->>'data')::json, 'editable', 'false'::text);
 		p_data = gw_fct_json_object_set_key(p_data, 'data', v_data::text);
 		
-		EXECUTE 'SET search_path = '||v_addschema||', public';
+		v_querystring = concat('SET search_path = ',v_addschema,', public');
+		v_debug_vars := json_build_object('v_addschema', v_addschema);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 80);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+
+		EXECUTE v_querystring;
 		SELECT gw_fct_getinfofromcoordinates(p_data) INTO v_return;
 		SET search_path = 'SCHEMA_NAME', public;
 		RETURN v_return;
@@ -253,7 +284,7 @@ BEGIN
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
-	RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_errcontext) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	 RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 
 END;
 $BODY$

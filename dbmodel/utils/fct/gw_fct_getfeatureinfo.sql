@@ -37,6 +37,11 @@ v_version json;
 v_values_array json;
 v_formtype text;
 v_tabname text = 'data';
+v_errcontext text;
+v_querystring text;
+v_debug_vars json;
+v_debug json;
+v_msgerr json;
 
 BEGIN
 
@@ -51,9 +56,11 @@ BEGIN
 	schemas_array := current_schemas(FALSE);
 	
 	-- getting values from feature
-	EXECUTE 'SELECT (row_to_json(a)) FROM (SELECT * FROM '||quote_ident(p_table_id)||' WHERE '||quote_ident(p_idname)||' = CAST($1 AS '||(p_columntype)||'))a'
-	    INTO v_values_array
-	    USING p_id;
+	v_querystring = concat('SELECT (row_to_json(a)) FROM (SELECT * FROM ',quote_ident(p_table_id),' WHERE ',quote_ident(p_idname),' = CAST(',quote_nullable(p_id),' AS ',(p_columntype),'))a');
+	v_debug_vars := json_build_object('p_table_id', p_table_id, 'p_idname', p_idname, 'p_id', p_id, 'p_columntype', p_columntype);
+	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureinfo', 'flag', 10);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+	EXECUTE v_querystring INTO v_values_array;
 
 	IF  p_configtable THEN 
 
@@ -70,9 +77,9 @@ BEGIN
 			
 		ELSE
 			-- Get fields
-			EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
+			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM 
 				(SELECT a.attname as label, 
-				concat('||quote_literal(v_tabname)||',''_'',a.attname) AS widgetname,
+				concat(',quote_literal(v_tabname),',''_'',a.attname) AS widgetname,
 				(case when a.atttypid=16 then ''check'' else ''text'' end ) as widgettype, 
 				(case when a.atttypid=16 then ''boolean'' else ''string'' end ) as "datatype", 
 				''::TEXT AS tooltip, 
@@ -93,13 +100,15 @@ BEGIN
 				JOIN pg_namespace s on t.relnamespace = s.oid
 				WHERE a.attnum > 0 
 				AND NOT a.attisdropped
-				AND t.relname = $1 
-				AND s.nspname = $2
+				AND t.relname = ',quote_nullable(p_table_id),' 
+				AND s.nspname = ',quote_nullable(schemas_array[1]),'
 				AND a.attname !=''the_geom''
 				AND a.attname !=''geom''
-				ORDER BY a.attnum) a'
-				INTO fields_array
-				USING p_table_id, schemas_array[1]; 
+				ORDER BY a.attnum) a');
+			v_debug_vars := json_build_object('v_tabname', v_tabname, 'p_table_id', p_table_id, 'schemas_array[1]', schemas_array[1]);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureinfo', 'flag', 20);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO fields_array;
 		END IF;
 	END IF;
 
@@ -130,6 +139,11 @@ BEGIN
 
 	-- Return
 	RETURN  fields;
+
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 	
 END;
 $BODY$

@@ -131,6 +131,11 @@ v_current_idval text;
 v_new_id text; 
 v_selected_id text;
 v_selected_idval text;
+v_errcontext text;
+v_querystring text;
+v_debug_vars json;
+v_debug json;
+v_msgerr json;
 
 BEGIN
 
@@ -180,8 +185,11 @@ BEGIN
 
 	--  get feature propierties
 	---------------------------
-	v_active_feature = 'SELECT cat_feature.* FROM cat_feature WHERE active IS TRUE
-	AND (child_layer = '''|| p_table_id ||''' OR parent_layer = ''' || p_table_id || ''') ORDER BY cat_feature.id';
+	v_active_feature = concat('SELECT cat_feature.* FROM cat_feature WHERE active IS TRUE
+	AND (child_layer = ', quote_nullable(p_table_id) ,' OR parent_layer = ' , quote_nullable(p_table_id) , ') ORDER BY cat_feature.id');
+	v_debug_vars := json_build_object('p_table_id', p_table_id);
+	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 10);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
 	EXECUTE v_active_feature INTO v_catfeature;
 
@@ -390,13 +398,16 @@ BEGIN
 	ELSIF p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN
 
 		-- getting values from feature
-		EXECUTE 'SELECT (row_to_json(a)) FROM 
-			(SELECT * FROM '||p_table_id||' WHERE '||quote_ident(p_idname)||' = CAST($1 AS '||(p_columntype)||'))a'
-			INTO v_values_array
-			USING p_id;		
-			-- getting node values in case of arcs (update)
-			v_node1 := (v_values_array->>'node_1');
-			v_node2 := (v_values_array->>'node_2');	
+		v_querystring = concat('SELECT (row_to_json(a)) FROM 
+			(SELECT * FROM ',p_table_id,' WHERE ',quote_ident(p_idname),' = CAST(',p_id,' AS ',(p_columntype),'))a');
+		v_debug_vars := json_build_object('p_table_id', p_table_id, 'p_idname', p_idname, 'p_id', p_id, 'p_columntype', p_columntype);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 20);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_values_array;
+
+		-- getting node values in case of arcs (update)
+		v_node1 := (v_values_array->>'node_1');
+		v_node2 := (v_values_array->>'node_2');	
 	END IF;
 
 	-- building the form widgets
@@ -419,9 +430,9 @@ BEGIN
 		PERFORM gw_fct_debug(concat('{"data":{"msg":"--> Configuration fields are NOT defined on layoutorder table. System values are used <--", "variables":""}}')::json);
 	
 		-- Get fields
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM 
+		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM 
 			(SELECT a.attname as label, a.attname as columnname, 
-			concat('||quote_literal(v_tabname)||',''_'',a.attname) AS widgetname,
+			concat(',quote_literal(v_tabname),',''_'',a.attname) AS widgetname,
 			(case when a.atttypid=16 then ''check'' else ''text'' end ) as widgettype, 
 			(case when a.atttypid=16 then ''boolean'' else ''string'' end ) as "datatype", 
 			''::TEXT AS tooltip, 
@@ -443,13 +454,15 @@ BEGIN
 			JOIN pg_namespace s on t.relnamespace = s.oid
 			WHERE a.attnum > 0 
 			AND NOT a.attisdropped
-			AND t.relname = $1 
-			AND s.nspname = $2
+			AND t.relname = ',quote_nullable(v_tablename),' 
+			AND s.nspname = ',quote_nullable(schemas_array[1]),'
 			AND a.attname !=''the_geom''
 			AND a.attname !=''geom''
-			ORDER BY a.attnum) a'
-				INTO v_fields_array
-				USING v_tablename, schemas_array[1]; 
+			ORDER BY a.attnum) a');
+		v_debug_vars := json_build_object('v_tabname', v_tabname, 'v_tablename', v_tablename, 'schemas_array[1]', schemas_array[1]);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 30);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_fields_array;
 	END IF;
 
 	
@@ -469,19 +482,25 @@ BEGIN
 			WHERE (a->>'param') = 'arccat_id' OR (a->>'param') = 'nodecat_id' OR (a->>'param') = 'connecat_id' OR (a->>'param') = 'gratecat_id';
 
 		IF v_project_type ='WS' AND v_catfeature.feature_type IS NOT NULL THEN 
-			EXECUTE 'SELECT pnom::integer, dnom::integer, matcat_id FROM cat_'||lower(v_catfeature.feature_type)||' WHERE id=$1'
-				USING v_catalog
-				INTO v_pnom, v_dnom, v_matcat_id;
+			v_querystring = concat('SELECT pnom::integer, dnom::integer, matcat_id FROM cat_',lower(v_catfeature.feature_type),' WHERE id=',quote_nullable(v_catalog));
+			v_debug_vars := json_build_object('v_catfeature.feature_type', v_catfeature.feature_type, 'v_catalog', v_catalog);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 40);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO v_pnom, v_dnom, v_matcat_id;
 				
 		ELSIF v_project_type ='UD' AND v_catfeature.feature_type IS NOT NULL THEN 
 			IF (v_catfeature.feature_type) ='GULLY' THEN
-				EXECUTE 'SELECT matcat_id FROM cat_grate WHERE id=$1'
-					USING v_catalog
-					INTO v_matcat_id;
+				v_querystring = concat('SELECT matcat_id FROM cat_grate WHERE id=',quote_nullable(v_catalog));
+				v_debug_vars := json_build_object('v_catalog', v_catalog);
+				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 50);
+				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+				EXECUTE v_querystring INTO v_matcat_id;
 			ELSE
-				EXECUTE 'SELECT shape, geom1, geom2, matcat_id FROM cat_'||lower(v_catfeature.feature_type)||' WHERE id=$1'
-					USING v_catalog
-					INTO v_shape, v_geom1, v_geom2, v_matcat_id;
+				v_querystring = concat('SELECT shape, geom1, geom2, matcat_id FROM cat_',lower(v_catfeature.feature_type),' WHERE id=',quote_nullable(v_catalog));
+				v_debug_vars := json_build_object('v_catfeature.feature_type', v_catfeature.feature_type, 'v_catalog', v_catalog);
+				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 60);
+				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+				EXECUTE v_querystring INTO v_shape, v_geom1, v_geom2, v_matcat_id;
 			END IF;
 		END IF;					
 	END IF;
@@ -513,7 +532,11 @@ BEGIN
 				WHEN quote_ident(p_idname) THEN
 					field_value = p_id;
 				WHEN concat(lower(v_catfeature.feature_type),'_type') THEN 
-					EXECUTE 'SELECT id FROM cat_feature WHERE child_layer = ''' || p_table_id ||''' LIMIT 1' INTO field_value;
+					v_querystring = concat('SELECT id FROM cat_feature WHERE child_layer = ' , quote_nullable(p_table_id) ,' LIMIT 1');
+					v_debug_vars := json_build_object('p_table_id', p_table_id);
+					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 70);
+					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+					EXECUTE v_querystring INTO field_value;
 				WHEN 'code' THEN 
 					field_value = v_code;
 				WHEN 'customer_code' THEN 
@@ -525,7 +548,11 @@ BEGIN
 				WHEN 'gis_length' THEN 
 					field_value = v_gislength;
 				WHEN 'epa_type' THEN 
-					EXECUTE 'SELECT epa_default FROM cat_feature_'||(v_catfeature.feature_type)||' WHERE id = $1'INTO field_value USING v_catfeature.id;
+					v_querystring = concat('SELECT epa_default FROM cat_feature_',(v_catfeature.feature_type),' WHERE id = ', quote_nullable(v_catfeature.id));
+					v_debug_vars := json_build_object('v_catfeature.feature_type', v_catfeature.feature_type, 'v_catfeature.id', v_catfeature.id);
+					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 80);
+					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+					EXECUTE v_querystring INTO field_value;
 				WHEN 'fire_code' THEN
 					IF v_use_fire_code_seq THEN	
 						field_value = nextval ('man_hydrant_fire_code_seq'::regclass);
@@ -629,8 +656,11 @@ BEGIN
 						v_state_value=1;
 					END IF;
 
-					v_querytext = 'SELECT value::text FROM sys_param_user JOIN config_param_user ON sys_param_user.id=parameter 
-					WHERE cur_user=current_user AND parameter = concat(''edit_statetype_'','||v_state_value||',''_vdefault'')';
+					v_querytext = concat('SELECT value::text FROM sys_param_user JOIN config_param_user ON sys_param_user.id=parameter 
+					WHERE cur_user=current_user AND parameter = concat(''edit_statetype_'',',v_state_value,',''_vdefault'')');
+					v_debug_vars := json_build_object('v_state_value', v_state_value);
+					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 90);
+					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 					
 					EXECUTE v_querytext INTO field_value;
 				
@@ -674,17 +704,23 @@ BEGIN
 				--check if selected id is on combo list
 				IF field_value::text not in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) then
 					--find dvquerytext for combo
-					EXECUTE 'SELECT dv_querytext FROM config_form_fields WHERE 
-					columnname::text = ('||quote_literal(v_fields_array[array_index])||'::json->>''columnname'')::text
-					and formname = '||quote_literal(p_table_id)||';'
-					INTO v_querytext;
+					v_querystring = concat('SELECT dv_querytext FROM config_form_fields WHERE 
+					columnname::text = (',quote_literal(v_fields_array[array_index]),'::json->>''columnname'')::text
+					and formname = ',quote_literal(p_table_id),';');
+					v_debug_vars := json_build_object('v_fields_array[array_index]', v_fields_array[array_index], 'p_table_id', p_table_id);
+					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 100);
+					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+					EXECUTE v_querystring INTO v_querytext;
 					
 					v_querytext = replace(v_querytext,'AND active IS TRUE','');
 
 					--select values for missing id
-					EXECUTE 'SELECT id, idval FROM ('||v_querytext||')a
-					WHERE id::text = '||quote_literal(field_value)||''
-					INTO v_selected_id,v_selected_idval;
+					v_querystring = concat('SELECT id, idval FROM (',v_querytext,')a
+					WHERE id::text = ',quote_literal(field_value),'');
+					v_debug_vars := json_build_object('v_querytext', v_querytext, 'field_value', field_value);
+					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 110);
+					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+					EXECUTE v_querystring INTO v_selected_id,v_selected_idval;
 					
 					v_current_id =json_extract_path_text(v_fields_array[array_index],'comboIds');
 		
@@ -740,6 +776,11 @@ BEGIN
 				'}'||
 			'}')::json;
 	END IF;
+
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 		
 END;
 $BODY$
