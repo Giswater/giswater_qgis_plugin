@@ -31,7 +31,9 @@ class GwDateSelectorButton(GwAction):
 
     # region private functions
 
+
     def _open_date_selector(self):
+
         self.dlg_selector_date = GwSelectorDateUi()
         tools_gw.load_settings(self.dlg_selector_date)
         self.widget_date_from = self.dlg_selector_date.findChild(QDateEdit, "date_from")
@@ -67,7 +69,6 @@ class GwDateSelectorButton(GwAction):
             sql = (f"UPDATE selector_date"
                    f" SET (from_date, to_date) = ('{from_date}', '{to_date}')"
                    f" WHERE cur_user = '{self.current_user}'")
-
         tools_db.execute_sql(sql)
 
         tools_gw.close_dialog(self.dlg_selector_date)

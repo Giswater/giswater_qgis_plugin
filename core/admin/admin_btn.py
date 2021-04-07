@@ -34,6 +34,7 @@ from ...lib import tools_qt, tools_qgis, tools_log, tools_db
 from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
 
+
 class GwAdminButton:
 
     def __init__(self):
