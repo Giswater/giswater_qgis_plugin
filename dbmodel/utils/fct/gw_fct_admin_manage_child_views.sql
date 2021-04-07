@@ -118,12 +118,16 @@ BEGIN
 			PERFORM gw_fct_admin_manage_child_views(v_query);
 					
 			-- insert into config_form_fields new column values coyping from parent
-			INSERT INTO config_form_fields 
-			SELECT v_childview, formtype, columnname, layoutorder, datatype, widgettype, 
-				label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, 
-				isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
-				dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam,
-				layoutname, widgetcontrols, hidden 
+			INSERT INTO config_form_fields (formtype, , columnname, layoutname, layoutorder, 
+      		datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
+      		ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
+      		dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+       		stylesheet, widgetfunction, linkedaction, hidden)
+			SELECT v_childview, formtype, , columnname, layoutname, layoutorder, 
+       		datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
+       		ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
+     		dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+       		stylesheet, widgetfunction, linkedaction, hidden
 			FROM config_form_fields WHERE formname = v_parent_layer AND columnname = v_newcolumn
 			ON CONFLICT (formname, columnname, formtype, tabname) DO NOTHING;
 			
@@ -151,12 +155,16 @@ BEGIN
 		PERFORM gw_fct_admin_manage_child_views(v_query);
 		
 		-- insert into config_form_fields new column values coyping from parent
-		INSERT INTO config_form_fields 
-		SELECT v_childview, formtype, columnname, layoutorder, datatype, widgettype, 
-			label, widgetdim, tooltip, placeholder, ismandatory, isparent, iseditable, 
-			isautoupdate, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, 
-			dv_querytext_filterc, widgetfunction, linkedaction, stylesheet, listfilterparam,
-			layoutname, widgetcontrols, hidden 
+		INSERT INTO config_form_fields (formname, formtype, , columnname, layoutname, layoutorder, 
+       datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
+       ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
+       dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+       stylesheet, widgetfunction, linkedaction, hidden)
+		SELECT v_childview, formtype, , columnname, layoutname, layoutorder, 
+       datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
+       ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
+       dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+       stylesheet, widgetfunction, linkedaction, hidden
 		FROM config_form_fields WHERE formname = v_parent_layer AND columnname = v_newcolumn
 		ON CONFLICT (formname, columnname, formtype, tabname) DO NOTHING;
 	
