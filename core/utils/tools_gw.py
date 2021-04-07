@@ -1601,6 +1601,8 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
         else:
 
             stack_level += stack_level_increase
+            if stack_level >= len(inspect.stack()):
+                stack_level = len(inspect.stack()) - 1
             module_path = inspect.stack()[stack_level][1]
             file_name = tools_os.get_relative_path(module_path, 2)
             function_line = inspect.stack()[stack_level][2]

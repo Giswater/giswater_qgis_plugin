@@ -124,6 +124,8 @@ class GwLogger(object):
             if int(log_level) < int(valor):
                 return
 
+            if stack_level >= len(inspect.stack()):
+                stack_level = len(inspect.stack()) - 1
             module_path = inspect.stack()[stack_level][1]
             file_name = os.path.basename(module_path)
             function_line = inspect.stack()[stack_level][2]
