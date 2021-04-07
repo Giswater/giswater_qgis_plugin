@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 -- FUNCTION CODE: 2962
 
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_trg_ui_mincut_result_cat();
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_trg_ui_mincut_result_cat() CASCADE;
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_ui_mincut() RETURNS trigger AS $BODY$
 DECLARE 
 v_sql text;
