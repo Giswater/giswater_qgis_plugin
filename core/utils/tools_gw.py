@@ -1299,10 +1299,10 @@ def set_data_type(field, widget):
 
 def set_widget_size(widget, field):
 
-    if 'widgetdim' in field:
-        if field['widgetdim']:
-            widget.setMaximumWidth(field['widgetdim'])
-            widget.setMinimumWidth(field['widgetdim'])
+    if field['widgetcontrols'] and 'widgetdim' in field['widgetcontrols']:
+        if field['widgetcontrols']['widgetdim']:
+            widget.setMaximumWidth(field['widgetcontrols']['widgetdim'])
+            widget.setMinimumWidth(field['widgetcontrols']['widgetdim'])
 
     return widget
 
