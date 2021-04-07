@@ -96,7 +96,7 @@ class GwMincut:
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_getmincut', body)
         if result and result['status'] == 'Accepted':
-            tools_gw.add_layer_temp(self.dlg_mincut, result['body']['data'], None, False, call_set_tabs_enabled=False)
+            tools_gw.add_layer_temp(self.dlg_mincut, result['body']['data'], None, False, call_set_tabs_enabled=False, close=False)
 
         # Manage location
         tools_qt.set_combo_value(self.dlg_mincut.address_add_muni, str(row['muni_id']), 0)
