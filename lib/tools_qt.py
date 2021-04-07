@@ -1269,7 +1269,7 @@ def _translate_tooltip(context_name, widget, idx=None, aux_context='ui_message')
                 widget.setToolTip(widget.text())
 
 
-def set_model_by_list(string_list, widget, proxy_model):
+def _set_model_by_list(string_list, widget, proxy_model):
     """ Set the model according to the list """
 
     model = QStringListModel()
