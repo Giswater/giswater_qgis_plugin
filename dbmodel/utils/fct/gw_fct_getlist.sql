@@ -308,8 +308,6 @@ BEGIN
 			raise notice 'v_field % v_value %', v_field, v_value;
 	
 			-- Getting the sign of the filter
-			SELECT listfilterparam->>'sign' INTO v_sign FROM config_form_fields WHERE formname=v_tablename  AND columnname=v_field;
-
 			IF v_listtype = 'attributeTable' THEN
 				v_sign = 'ILIKE';
 			ELSIF v_sign IS NULL THEN
