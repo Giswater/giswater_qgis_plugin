@@ -301,7 +301,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '274', concat(
-		'ERROR: There is/are ',v_count,' valve(s) with null values at least on mandatory column status).'), v_count);
+		'ERROR: There is/are ',v_count,' valve(s) with null values at least on mandatory column status.'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -317,7 +317,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '368', concat(
-		'ERROR: There is/are ',v_count,' valve(s) with null values at least on mandatory column to_arc).'), v_count);
+		'ERROR: There is/are ',v_count,' valve(s) with null values at least on mandatory column to_arc.'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
