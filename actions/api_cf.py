@@ -2128,8 +2128,6 @@ class ApiCF(ApiParent, QObject):
         self.cmb_visit_class = self.dlg_cf.findChild(QComboBox, "cmb_visit_class")
         self.date_visit_to = self.dlg_cf.findChild(QDateEdit, "date_visit_to")
         self.date_visit_from = self.dlg_cf.findChild(QDateEdit, "date_visit_from")
-        self.date_visit_to.setDisplayFormat('dd/MM/yyyy')
-        self.date_visit_from.setDisplayFormat('dd/MM/yyyy')
         btn_new_visit = self.dlg_cf.findChild(QPushButton, "btn_new_visit_2")
         date = QDate.currentDate()
         self.date_visit_to.setDate(date)
