@@ -301,7 +301,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '274', concat(
-		'ERROR: There is/are ',v_count,' valve(s) with null values at least on mandatory column status.'), v_count);
+		'ERROR-274: There is/are ',v_count,' valve(s) with null values at least on mandatory column status.'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -317,7 +317,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '368', concat(
-		'ERROR: There is/are ',v_count,' valve(s) with null values at least on mandatory column to_arc.'), v_count);
+		'ERROR-368: There is/are ',v_count,' valve(s) with null values at least on mandatory column to_arc.'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
@@ -498,7 +498,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '283',concat(
-		'WARNING: There is/are ',v_count,' register(s) on node''s catalog without dint defined. If this registers acts as shortipe on the epanet exportation dint is needed.'), v_count);
+		'WARNING-283: There is/are ',v_count,' register(s) on node''s catalog without dint defined. If this registers acts as shortipe on the epanet exportation dint is needed.'), v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -622,7 +622,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
 		VALUES (v_fid, v_result_id, 3, '295',concat(
-		'WARNING: There were ',v_count,' missed inp rows on inp_connec. They have been automatic inserted'));
+		'WARNING-295: There were ',v_count,' missed inp rows on inp_connec. They have been automatic inserted'));
 		INSERT INTO inp_connec SELECT connec_id FROM connec ON CONFLICT (connec_id) DO NOTHING;		
 		v_count=0;
 	ELSE
