@@ -547,7 +547,6 @@ SELECT gw_fct_setvnoderepair($${ "client":{"device":4, "infoType":1, "lang":"ES"
 SELECT gw_fct_setvnoderepair($${ "client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"tolerance":"0.01", "forceNodes":true}}}$$);
 
 
-UPDATE config_info_layer SET  tableinfo_id  =NULL;
 DELETE FROM config_info_layer_x_type where tableinfo_id = 'v_edit_om_visit';
 
 UPDATE config_param_system SET value = 'false' WHERE parameter = 'admin_utils_schema';

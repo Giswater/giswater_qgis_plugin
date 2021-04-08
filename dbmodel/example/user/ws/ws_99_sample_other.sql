@@ -565,7 +565,7 @@ UPDATE sys_param_user SET vdefault ='{"reservoir":{"switch2Junction":["WTP", "WA
 WHERE id = 'inp_options_buildup_supply';
 
 UPDATE cat_feature SET parent_layer = 'v_edit_node' WHERE id = 'CLORINATHOR';
-UPDATE config_info_layer SET  tableinfo_id  =NULL;
+
 DELETE FROM config_info_layer_x_type where tableinfo_id = 'v_edit_om_visit';
 
 UPDATE config_param_system SET value = 'false' WHERE parameter = 'admin_utils_schema';

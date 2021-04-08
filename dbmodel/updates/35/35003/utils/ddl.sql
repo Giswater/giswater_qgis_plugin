@@ -93,3 +93,8 @@ formtype: There are diferent formtypes:
 	editbuttons:  buttons on form bottom used to edit (accept, cancel)
 	navbuttons: buttons on form bottom used to navigate (goback....)
 layout_id and layout_order, used to define the position';
+
+--2021/04/08
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_info_layer", "column":"link_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_info_layer", "column":"tableinfo_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_info_layer", "column":"is_tiled"}}$$);

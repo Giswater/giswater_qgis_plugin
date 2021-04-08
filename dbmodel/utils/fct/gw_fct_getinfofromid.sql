@@ -93,7 +93,6 @@ v_fields json;
 formid_arg text;
 tableparent_id_arg text;
 parent_child_relation boolean = false;
-link_id_aux text;
 v_idname text;
 v_featuretype text;
 v_linkpath json;
@@ -363,30 +362,7 @@ BEGIN
 		EXECUTE v_querystring INTO v_geometry;
 	END IF;
 	
-	-- Get link (if exists) for the layer
-	------------------------------------------
-	link_id_aux := (SELECT link_id FROM config_info_layer WHERE layer_id=v_tablename);
-
-	IF  link_id_aux IS NOT NULL THEN 
-
-		-- Get link field value
-		v_querystring = concat('SELECT row_to_json(row) FROM (SELECT ',quote_ident(link_id_aux),' FROM ',quote_ident(v_tablename),' WHERE ',quote_ident(v_idname),' = CAST(',quote_nullable(v_id),' AS ',(column_type),'))row');
-		v_debug_vars := json_build_object('link_id_aux', link_id_aux, 'v_tablename', v_tablename, 'v_idname', v_idname, 'v_id', v_id, 'column_type', column_type);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 130);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_linkpath;
-
-		-- IF v_linkpath is null and layer it's child layer --> parent v_linkpath is used
-		IF v_linkpath IS NULL AND v_table_parent IS NOT NULL THEN
-			-- Get link field value
-			v_querystring = concat('SELECT row_to_json(row) FROM (SELECT ',quote_ident(link_id_aux),' FROM ',quote_ident(v_tablename),' WHERE ',quote_ident(v_idname),' = CAST(',quote_nullable(v_id),' AS ',(column_type),'))row');
-			v_debug_vars := json_build_object('link_id_aux', link_id_aux, 'v_tablename', v_tablename, 'v_idname', v_idname, 'v_id', v_id, 'column_type', column_type);
-			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 140);
-			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-			EXECUTE v_querystring INTO v_linkpath;
-		END IF;
-	END IF;
-
+	
 	-- Get tabs for form
 	--------------------------------
 	IF v_isgrafdelimiter OR upper(v_project_type) != 'WS' THEN
@@ -567,20 +543,9 @@ BEGIN
 			EXECUTE v_querystring INTO v_tablename;
 		END IF;
 					
-	-- not parent, not editable and has tableinfo_id
-	ELSIF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS FALSE AND is_editable IS FALSE AND tableinfo_id IS NOT NULL) THEN
-
-		-- Identify tableinfotype_id 
-		v_querystring = concat('SELECT tableinfotype_id FROM config_info_layer
-			JOIN config_info_layer_x_type ON config_info_layer.tableinfo_id=config_info_layer_x_type.tableinfo_id
-			WHERE layer_id=',quote_nullable(v_tablename),' AND infotype_id=',quote_nullable(v_infotype));
-		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_infotype', v_infotype);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 310);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_tablename;
 
 	-- Check if it is not parent, not editable and has not tableinfo_id (is not informable)
-	ELSIF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS FALSE AND is_editable IS FALSE AND tableinfo_id IS NULL) THEN 
+	ELSIF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS FALSE AND is_editable IS FALSE) THEN 
 		v_tablename= null;
 	END IF;
 
