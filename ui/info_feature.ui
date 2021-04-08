@@ -72,8 +72,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>765</width>
-             <height>382</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">
@@ -408,6 +408,9 @@
               <height>16777215</height>
              </size>
             </property>
+            <property name="displayFormat">
+             <string>dd/MM/yyyy</string>
+            </property>
             <property name="calendarPopup">
              <bool>true</bool>
             </property>
@@ -434,6 +437,9 @@
               <width>150</width>
               <height>16777215</height>
              </size>
+            </property>
+            <property name="displayFormat">
+             <string>dd/MM/yyyy</string>
             </property>
             <property name="calendarPopup">
              <bool>true</bool>
@@ -567,6 +573,9 @@
               <height>16777215</height>
              </size>
             </property>
+            <property name="displayFormat">
+             <string>dd/MM/yyyy</string>
+            </property>
             <property name="calendarPopup">
              <bool>true</bool>
             </property>
@@ -579,6 +588,9 @@
               <width>150</width>
               <height>16777215</height>
              </size>
+            </property>
+            <property name="displayFormat">
+             <string>dd/MM/yyyy</string>
             </property>
             <property name="calendarPopup">
              <bool>true</bool>
@@ -702,6 +714,9 @@
           </property>
           <item row="1" column="1">
            <widget class="QDateEdit" name="date_document_to">
+            <property name="displayFormat">
+             <string>dd/MM/yyyy</string>
+            </property>
             <property name="calendarPopup">
              <bool>true</bool>
             </property>
@@ -726,6 +741,9 @@
           </item>
           <item row="1" column="0">
            <widget class="QDateEdit" name="date_document_from">
+            <property name="displayFormat">
+             <string>dd/MM/yyyy</string>
+            </property>
             <property name="calendarPopup">
              <bool>true</bool>
             </property>

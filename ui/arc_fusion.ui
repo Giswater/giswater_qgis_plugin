@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>314</width>
-    <height>165</height>
+    <height>171</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -76,6 +76,9 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="displayFormat">
+            <string>dd/MM/yyyy</string>
            </property>
            <property name="calendarPopup">
             <bool>true</bool>
