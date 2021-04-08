@@ -224,10 +224,10 @@ class GwProjectLayersConfig(GwTask):
 
 
     def _set_column_multiline(self, layer, field, field_index):
-        """ Set multiline selected fields according table config_form_fields.widgetcontrols['setQgisMultiline'] """
+        """ Set multiline selected fields according table config_form_fields.widgetcontrols['setMultiline'] """
 
-        if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
-            editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
+        if field['widgetcontrols'] and 'setMultiline' in field['widgetcontrols']:
+            editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': field['widgetcontrols']['setMultiline']})
         else:
             editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': False})
         layer.setEditorWidgetSetup(field_index, editor_widget_setup)

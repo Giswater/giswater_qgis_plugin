@@ -67,8 +67,8 @@ def refresh_attribute_table(**kwargs):
                 kwargs = {"layer": layer, "field": field['columnname'], "hidden": field['hidden']}
                 set_column_visibility(**kwargs)
 
-            # Set multiline fields according table config_form_fields.widgetcontrols['setQgisMultiline']
-            if field['widgetcontrols'] is not None and 'setQgisMultiline' in field['widgetcontrols']:
+            # Set multiline fields according table config_form_fields.widgetcontrols['setMultiline']
+            if field['widgetcontrols'] is not None and 'setMultiline' in field['widgetcontrols']:
                 kwargs = {"layer": layer, "field": field, "fieldIndex": field_idx}
                 set_column_multiline(**kwargs)
             # Set alias column
@@ -161,7 +161,7 @@ def set_column_visibility(**kwargs):
 
 
 def set_column_multiline(**kwargs):
-    """ Set multiline selected fields according table config_form_fields.widgetcontrols['setQgisMultiline'] """
+    """ Set multiline selected fields according table config_form_fields.widgetcontrols['setMultiline'] """
 
     try:
         field = kwargs["field"]
@@ -174,9 +174,9 @@ def set_column_multiline(**kwargs):
         return
 
     if field['widgettype'] == 'text':
-        if field['widgetcontrols'] and 'setQgisMultiline' in field['widgetcontrols']:
+        if field['widgetcontrols'] and 'setMultiline' in field['widgetcontrols']:
             editor_widget_setup = QgsEditorWidgetSetup(
-                'TextEdit', {'IsMultiline': field['widgetcontrols']['setQgisMultiline']})
+                'TextEdit', {'IsMultiline': field['widgetcontrols']['setMultiline']})
             layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
 
