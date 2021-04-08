@@ -330,7 +330,7 @@ BEGIN
 			RAISE NOTICE 'Mapzone grafanalytics is not enabled to continue';
 	
 			INSERT INTO audit_check_data (fid, criticity, error_message)
-			VALUES (v_fid, 3, concat('ERROR: Dynamic analysis for ',v_class,'''s is not configured on database. Please update system variable ''utils_grafanalytics_status''
+			VALUES (v_fid, 3, concat('ERROR-',v_fid,': Dynamic analysis for ',v_class,'''s is not configured on database. Please update system variable ''utils_grafanalytics_status''
 			 to enable it '));
 		ELSE 
 			RAISE NOTICE 'Mapzone grafanalytics is in progress';
@@ -644,7 +644,7 @@ BEGIN
 						
 						IF v_count > 0 THEN
 							INSERT INTO audit_check_data (fid, criticity, error_message)
-							VALUES (v_fid, 2, concat('WARNING: ', v_count ,' arc''s have been disconnected'));
+							VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' arc''s have been disconnected'));
 						ELSE
 							INSERT INTO audit_check_data (fid, criticity, error_message)
 							VALUES (v_fid, 1, concat('INFO: ', v_count ,' arc''s have been disconnected'));
@@ -654,7 +654,7 @@ BEGIN
 						SELECT count(*) INTO v_count FROM v_edit_connec c WHERE arc_id NOT IN (SELECT arc_id FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid);
 						IF v_count > 0 THEN
 							INSERT INTO audit_check_data (fid, criticity, error_message)
-							VALUES (v_fid, 2, concat('WARNING: ', v_count ,' connec''s have been disconnected'));
+							VALUES (v_fid, 2, concat('WARNING-',v_fid,': ', v_count ,' connec''s have been disconnected'));
 						ELSE
 							INSERT INTO audit_check_data (fid, criticity, error_message)
 							VALUES (v_fid, 1, concat('INFO: ', v_count ,' connec''s have been disconnected'));

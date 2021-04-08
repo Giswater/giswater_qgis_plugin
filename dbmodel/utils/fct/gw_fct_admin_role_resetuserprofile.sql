@@ -177,13 +177,13 @@ BEGIN
 
 				ELSE
 					-- Destination user and copied user has not the same role
-					INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('ERROR: User and copied User has not the same role'));
+					INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('ERROR-358: User and copied User has not the same role'));
 					v_level = 2;
 					v_message = 'Destination user and copied user has not the same role';
 				END IF;
 			ELSE
 				-- Destination user and copied user has not the same role
-				INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('ERROR: Copied user does not exists'));
+				INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('ERROR-358: Copied user does not exists'));
 				v_level = 2;
 				v_message = 'From user does not exists';
 			END IF;
@@ -216,7 +216,7 @@ BEGIN
 		
 	ELSE
 		-- User does not exists
-		INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('ERROR: User does not exists'));
+		INSERT INTO audit_check_data (fid, error_message) VALUES (358, concat('ERROR-358: User does not exists'));
 		v_level = 2;
 		v_message = 'User does not exists';
 	END IF;	

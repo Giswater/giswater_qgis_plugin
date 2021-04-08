@@ -239,7 +239,7 @@ BEGIN
 	SELECT count(*) FROM anl_arc INTO v_count WHERE fid = 139 AND cur_user=current_user;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' arc(s) topological disconnected from any ', v_boundaryelem
+		VALUES (v_fid, v_result_id, 3, concat('ERROR-',v_fid,': There is/are ',v_count,' arc(s) topological disconnected from any ', v_boundaryelem
 		,'. Main reasons may be: state_type, epa_type, sector_id or expl_id or some node not connected'));
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 3, concat('HINT: Use toolbox function ''Check network topology for specific result'' for more information'));

@@ -63,7 +63,7 @@ BEGIN
 	IF v_selectionmode = 'previousSelection' THEN
 
 		IF v_array ='()' THEN
-			INSERT INTO audit_check_data (fid, error_message) VALUES (357, 'ERROR: No arcs have been selected');
+			INSERT INTO audit_check_data (fid, error_message) VALUES (357, 'ERROR-357: No arcs have been selected');
 		ELSE
 			-- execute
 			EXECUTE 'INSERT INTO anl_arc(fid, arc_id, the_geom, descript) 

@@ -98,7 +98,7 @@ BEGIN
 	-- log for hydrometer's state
 	IF v_count = 0 THEN
 		INSERT INTO audit_check_data (fid, error_message)
-		VALUES (216, concat ('WARNING: There are not values selected for hydrometer''s state with is_operative True. As result no hydrometer have been attached to this mincut'));
+		VALUES (216, concat ('WARNING-216: There are not values selected for hydrometer''s state with is_operative True. As result no hydrometer have been attached to this mincut'));
 	ELSIF v_count = 1 THEN
 		INSERT INTO audit_check_data (fid, error_message)
 		VALUES (216, concat ('INFO: There is one value for hydrometer''s state selected with is_operative True: ',v_selected,'.'));
@@ -232,7 +232,7 @@ BEGIN
 
 					-- info
 					INSERT INTO audit_check_data (fid, error_message)
-					VALUES (216, concat ('WARNING: There is a temporal overlap with spatial intersection on the same macroexploitation with:',v_conflictmsg));
+					VALUES (216, concat ('WARNING-216: There is a temporal overlap with spatial intersection on the same macroexploitation with:',v_conflictmsg));
 					INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat ('WARNING: additional pipes are involved and more connecs are affected ( ',v_addaffconnecs,' units. )'));
 												
 					-- point: connecs affected
@@ -248,7 +248,7 @@ BEGIN
 
 					-- info
 					INSERT INTO audit_check_data (fid, error_message)
-					VALUES (216, concat ('WARNING: There is a temporal overlap with spatial intersection on the same macroexploitation wit:',v_conflictmsg));
+					VALUES (216, concat ('WARNING-216: There is a temporal overlap with spatial intersection on the same macroexploitation wit:',v_conflictmsg));
 					INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat ('WARNING: additional pipes are involved'));
 					INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat ('INFO: No more connecs are affected'));
 					

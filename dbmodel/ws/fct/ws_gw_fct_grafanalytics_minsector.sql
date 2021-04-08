@@ -157,7 +157,7 @@ BEGIN
 			INSERT INTO selector_expl (expl_id, cur_user) SELECT expl_id, current_user FROM exploitation JOIN (SELECT (json_array_elements_text(v_expl))::integer AS expl_id)a USING (expl_id) ;
 		ELSE
 			INSERT INTO audit_check_data (fid, error_message) VALUES (v_fid,
-			concat('ERROR: Please entry exploitation id''s as tooltip shows using []'));
+			concat('ERROR-',v_fid,': Please insert exploitation id''s as tooltip shows using []'));
 			DELETE FROM selector_expl WHERE cur_user=current_user;  
 			v_returnerror = true;
 			 --dissabling all:
@@ -289,7 +289,7 @@ BEGIN
 
 		-- message
 		INSERT INTO audit_check_data (fid, error_message)
-		VALUES (v_fid, concat('WARNING: Minsector attribute (minsector_id) on arc/node/connec features have been updated by this process'));
+		VALUES (v_fid, concat('WARNING-',v_fid,': Minsector attribute (minsector_id) on arc/node/connec features have been updated by this process'));
 		
 	ELSIF v_updatefeature IS FALSE and v_returnerror IS FALSE THEN
 		-- message
@@ -359,7 +359,7 @@ BEGIN
 	IF v_updatemapzgeom > 0 THEN
 		-- message
 		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (v_fid, 2, concat('WARNING: Geometry of mapzone ',v_class ,' have been modified by this process'));
+		VALUES (v_fid, 2, concat('WARNING-',v_fid,': Geometry of mapzone ',v_class ,' have been modified by this process'));
 	END IF;
 	
 	-- get results

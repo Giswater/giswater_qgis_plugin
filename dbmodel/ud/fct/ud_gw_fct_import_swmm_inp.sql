@@ -308,9 +308,9 @@ BEGIN
 	ALTER TABLE config_param_user DROP CONSTRAINT config_param_user_parameter_cur_user_unique;
 
 	RAISE NOTICE 'step 4/7';
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING: Values of options / times / report are updated WITH swmm model: Check mainstream parameters as inp_options_links_offsets');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING-239: Values of options / times / report are updated WITH swmm model: Check mainstream parameters as inp_options_links_offsets');
 	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Inserting data into tables using vi_* views -> Done');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING: Controls and rules have been stored on inp_controls_importinp table. This is a temporary table. Data need to be moved to inp_controls_x_arc table to be used later');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING-239: Controls and rules have been stored on inp_controls_importinp table. This is a temporary table. Data need to be moved to inp_controls_x_arc table to be used later');
 
 	-- Create arc geom
 	v_querytext = 'SELECT * FROM arc ';
@@ -337,7 +337,7 @@ BEGIN
 
 	RAISE NOTICE 'step 5/7';
 	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Creating arc geometry from extremal nodes and intermediate vertex -> Done');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING: Link geometries as ORIFICE, WEIRS, PUMPS AND OULETS will not transformed using reverse nod2arc strategy as nodes. It will keep as arc');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING-239: Link geometries as ORIFICE, WEIRS, PUMPS AND OULETS will not transformed using reverse nod2arc strategy as nodes. It will keep as arc');
 
 	
 	-- Subcatchments geometry

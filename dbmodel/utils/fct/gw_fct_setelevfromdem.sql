@@ -129,7 +129,7 @@ BEGIN
 			--if node is out of raster, add warning, if it's inside update value of node layer
 			IF v_elevation = -9999 OR v_elevation IS NULL THEN
 				INSERT INTO audit_check_data(fid,result_id, error_message)
-				VALUES (168,'elevation from raster',concat('WARNING: SELECTED FEATURE IS OUT OF RASTER: ', rec.feature_id));
+				VALUES (168,'elevation from raster',concat('WARNING-168: SELECTED FEATURE IS OUT OF RASTER: ', rec.feature_id));
 			ELSE
 				IF v_project_type = 'WS' AND v_feature_type='vnode' THEN 
 					EXECUTE 'UPDATE vnode SET elev = '||v_elevation||'::numeric WHERE vnode_id = '||rec.feature_id||';';
