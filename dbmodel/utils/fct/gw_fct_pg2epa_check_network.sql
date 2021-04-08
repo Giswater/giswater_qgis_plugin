@@ -115,8 +115,8 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom)
 		SELECT 228, node_id, nodecat_id, ''Orphan node'', the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 3, concat('ERROR: There is/are ',v_count,
-		' node''s orphan on this result. Some inconsistency may have been generated because state_type (228).'),v_count);
+		VALUES (v_fid, 3, concat('ERROR-228: There is/are ',v_count,
+		' node''s orphan on this result. This could be because closests arcs may have UNDEFINED epa_type or because on-the-fly transformations. Fix it before continue.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity,  error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, 'INFO: No orphan node(s) found on this result. ', v_count);
@@ -132,7 +132,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, descript, the_geom)
 		SELECT 290, n1, concat(''Duplicated node with '', n2 ), the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, criticity, error_message)
-		VALUES (v_fid, 3, concat('ERROR: There is/are ',v_count,
+		VALUES (v_fid, 3, concat('ERROR-290: There is/are ',v_count,
 		' node(s) duplicated on this result. It means that there is a topological jump on that point (state 0-1-2). Please check your network'));
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -140,7 +140,7 @@ BEGIN
 	END IF;
 
 	
-	RAISE NOTICE '3 - Check result arcs without start/end node (fid:  231)';
+	RAISE NOTICE '3 - Check result arcs without start/end node on rpt tables (fid:  231)';
 	v_querytext = '	SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc where result_id = '||quote_literal(v_result_id)||'
 			EXCEPT ( 
 			SELECT 231, arc_id, arccat_id, state, expl_id, the_geom, '||quote_literal(v_result_id)||', ''Arcs without node_1 or node_2.'' FROM temp_arc JOIN 
@@ -155,8 +155,8 @@ BEGIN
 	IF v_count > 0 THEN
 		EXECUTE 'INSERT INTO anl_arc (fid, arc_id, arccat_id, state, expl_id, the_geom, result_id, descript)'||v_querytext;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-		VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,
-		' arc(s) without start/end nodes on this result. Some inconsistency may have been generated because state_type.'),v_count);
+		VALUES (v_fid, v_result_id, 3, concat('ERROR-231: There is/are ',v_count,
+		' arc(s) without start/end nodes on this result. Some inconsistency may have been generated because on-the-fly transformations. Check your network'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1,'INFO: There is/are no arcs without start/end nodes on this result.',v_count);
@@ -344,7 +344,7 @@ BEGIN
 		SELECT count(*) FROM anl_arc INTO v_count WHERE fid = 232 AND cur_user=current_user;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' Dry arc(s) because closed elements'), v_count);
+			VALUES (v_fid, v_result_id, 2, concat('WARNING-232: There is/are ',v_count,' Dry arc(s) because closed elements'), v_count);
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 2, concat('HINT: Use toolbox function ''Check network for specific result'' for more information'));
 		ELSE
@@ -356,7 +356,7 @@ BEGIN
 		SELECT count(*) FROM anl_node INTO v_count WHERE fid = 233 AND cur_user=current_user;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' Dry nodes with demands'), v_count);
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-233: There is/are ',v_count,' Dry nodes with demands'), v_count);
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 3, concat('HINT: Use toolbox function ''Check network for specific result'' for more information'));
 		ELSE

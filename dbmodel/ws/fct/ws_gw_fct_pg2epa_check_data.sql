@@ -91,7 +91,7 @@ BEGIN
 		the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 2, '107', 
-		concat('WARNING-107: There is/are ',v_count,' node''s orphans ready-to-export (epa_type & state_type & sector). Check if they are actually orphan or closests arcs are not ready-to-export (epa_type & state_type & sector)'),v_count);
+		concat('WARNING-107: There is/are ',v_count,' node''s orphans ready-to-export (epa_type & state_type). If they are actually orphan, you could change the epa_type to fix it'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id,  error_message, fcount)
 		VALUES (v_fid, 1, '107', 'INFO: No node(s) orphan found.',v_count);
