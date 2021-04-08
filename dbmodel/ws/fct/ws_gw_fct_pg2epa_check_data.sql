@@ -90,13 +90,12 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 107, node_id, nodecat_id, ''Orphan node'',
 		the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 2, '107', concat('WARNING-107: ',v_count,' node''s orphans with epa_type and state_type ready to work, will not exported because any arcs are connected. Take a look on temporal for details.'),v_count);
+		VALUES (v_fid, 2, '107', concat('WARNING-107: There is/are ',v_count,' node''s orphans ready to work (epa_type & state_type) but Giswater filters may prevent the export: if they are JUNCTION will be not exported.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, criticity, result_id,  error_message, fcount)
 		VALUES (v_fid, 1, '107', 'INFO: No node(s) orphan found.',v_count);
 	END IF;
-
-			
+	
 	RAISE NOTICE '2 - Check nodes with state_type isoperative = false (fid:  187)';
 	v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM v_edit_node n JOIN selector_sector USING (sector_id) JOIN value_state_type ON value_state_type.id=state_type 
 			WHERE n.state > 0 AND is_operative IS FALSE AND cur_user = current_user';
