@@ -57,7 +57,7 @@ BEGIN
 		FOREACH aux_json IN ARRAY fields_array
 		LOOP
 			v_key = fields_array[(aux_json->>'orderby')::INT]->>'columnname';
-			v_value = (SELECT listfilterparam->>'vdefault' FROM config_form_fields WHERE formname=v_formname AND columnname=v_key);
+			v_value = (SELECT widgetcontrols->>'vdefault' FROM config_form_fields WHERE formname=v_formname AND columnname=v_key);
 			
 			IF i>1 THEN 
 				v_fields = concat (v_fields,',');
