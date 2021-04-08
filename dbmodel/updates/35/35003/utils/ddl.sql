@@ -100,3 +100,4 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_inf
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_info_layer", "column":"is_tiled"}}$$);
 
 ALTER TABLE IF EXISTS config_form RENAME TO _config_form_;
+ALTER TABLE IF EXISTS config_form RENAME TO _inp_value_yesnofull_;
