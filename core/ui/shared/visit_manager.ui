@@ -90,6 +90,9 @@
           </item>
           <item>
            <widget class="QDateEdit" name="date_event_from">
+            <property name="displayFormat">
+             <string>dd/MM/yyyy</string>
+            </property>
             <property name="calendarPopup">
              <bool>true</bool>
             </property>
@@ -135,6 +138,9 @@
           </item>
           <item>
            <widget class="QDateEdit" name="date_event_to">
+            <property name="displayFormat">
+             <string>dd/MM/yyyy</string>
+            </property>
             <property name="calendarPopup">
              <bool>true</bool>
             </property>

@@ -243,6 +243,9 @@
            <property name="styleSheet">
             <string notr="true"/>
            </property>
+           <property name="displayFormat">
+            <string>dd/MM/yyyy</string>
+           </property>
            <property name="calendarPopup">
             <bool>true</bool>
            </property>
@@ -318,6 +321,9 @@
            </property>
            <property name="styleSheet">
             <string notr="true"/>
+           </property>
+           <property name="displayFormat">
+            <string>dd/MM/yyyy</string>
            </property>
            <property name="calendarPopup">
             <bool>true</bool>
