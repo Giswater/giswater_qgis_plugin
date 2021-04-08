@@ -158,10 +158,14 @@ v_visit_id integer;
 v_load_visit boolean;
 v_pluginlot text;
 v_returnstatus text;
-v_error_context text;
+v_errcontext text;
 v_level integer;
 v_audit_result  text;
 v_returnmessage text;
+v_querystring text;
+v_debug_vars json;
+v_debug json;
+v_msgerr json;
 BEGIN
 	
 	-- Set search path to local schema
@@ -201,13 +205,16 @@ BEGIN
 	v_offline = ((p_data ->>'data')::json->>'isOffline')::boolean;
 	
 	--   Get editability of layer
-	EXECUTE 'SELECT r1.rolname as "role"
+	v_querystring = concat('SELECT r1.rolname as "role"
 		FROM pg_catalog.pg_roles r JOIN pg_catalog.pg_auth_members m
 		ON (m.member = r.oid)
 		JOIN pg_roles r1 ON (m.roleid=r1.oid)                                  
-		WHERE r.rolcanlogin AND r.rolname = ''' || current_user || '''
-		ORDER BY 1;'
-        INTO v_userrole;
+		WHERE r.rolcanlogin AND r.rolname = ', quote_nullable(current_user),'
+		ORDER BY 1;');
+	v_debug_vars := json_build_object('current_user', current_user);
+	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 10);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+	EXECUTE v_querystring INTO v_userrole;
 
         -- get v_featuretype if is null or 'visit'(when open it from visit_manager)
 	IF v_featuretype IS NULL OR v_featuretype='visit' THEN
@@ -240,8 +247,11 @@ BEGIN
 		END IF;
 		
 		IF v_featuretype IS NULL AND p_visittype=1 AND v_id IS NULL THEN
-		
-			EXECUTE ('SELECT lower(sys_type) FROM '||v_featuretablename||' LIMIT 1') INTO v_featuretype;
+			v_querystring = concat('SELECT lower(sys_type) FROM ',v_featuretablename,' LIMIT 1');
+			v_debug_vars := json_build_object('v_featuretablename', v_featuretablename);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 20);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO v_featuretype;
 		END IF;
 
 		IF v_offline THEN
@@ -270,25 +280,37 @@ BEGIN
 					END IF;
 			
 					-- get if visit already exists
-					EXECUTE ('SELECT visit_id FROM om_visit_x_'|| (v_featuretype) ||' 
-					JOIN om_visit ON om_visit.id = om_visit_x_'|| (v_featuretype) ||'.visit_id 
-					WHERE ' || (v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text ' || v_filter_lot_null || ' AND om_visit.class_id = '|| v_visitclass || '
-					ORDER BY om_visit_x_'|| (v_featuretype) ||'.id desc LIMIT 1') INTO v_visit_id;
+					v_querystring = concat('SELECT visit_id FROM om_visit_x_', (v_featuretype) ,' 
+						JOIN om_visit ON om_visit.id = om_visit_x_', (v_featuretype) ,'.visit_id 
+						WHERE ', (v_featuretype) ,'_id = ', quote_literal(v_featureid) ,'::text ', v_filter_lot_null ,' AND om_visit.class_id = ',v_visitclass ,'
+						ORDER BY om_visit_x_', (v_featuretype) ,'.id desc LIMIT 1');
+					v_debug_vars := json_build_object('v_featuretype', v_featuretype, 'v_featureid', v_featureid, 'v_filter_lot_null', v_filter_lot_null, 'v_visitclass', v_visitclass);
+					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 30);
+					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+					EXECUTE v_querystring INTO v_visit_id;
 
 					
 				END IF;
 			ELSIF v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
 				v_visitclass := (SELECT id FROM config_visit_class WHERE feature_type= upper(v_featuretype) order by id asc limit 1);
 					-- get if visit already exists
-					EXECUTE ('SELECT visit_id FROM om_visit_x_'|| (v_featuretype) ||' 
-					JOIN om_visit ON om_visit.id = om_visit_x_'|| (v_featuretype) ||'.visit_id 
-					WHERE ' || (v_featuretype) || '_id = ' || quote_literal(v_featureid) || '::text  AND om_visit.class_id = '|| v_visitclass || '
-					ORDER BY om_visit_x_'|| (v_featuretype) ||'.id desc LIMIT 1') INTO v_visit_id;
+					v_querystring = concat('SELECT visit_id FROM om_visit_x_',(v_featuretype) ,' 
+						JOIN om_visit ON om_visit.id = om_visit_x_',(v_featuretype) ,'.visit_id 
+						WHERE ', (v_featuretype) ,'_id = ', quote_literal(v_featureid) ,'::text  AND om_visit.class_id = ', v_visitclass ,'
+						ORDER BY om_visit_x_', (v_featuretype) ,'.id desc LIMIT 1');
+					v_debug_vars := json_build_object('v_featuretype', v_featuretype, 'v_featureid', v_featureid, 'v_visitclass', v_visitclass);
+					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 40);
+					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+					EXECUTE v_querystring INTO v_visit_id;
 			END IF;
 			-- if visit exists, get v_id and control if we have to load its form according to days interval
 			IF v_visit_id IS NOT NULL THEN
 				v_id = v_visit_id;
-				EXECUTE ('SELECT true FROM om_visit WHERE enddate > now() - ''7 days''::interval AND id = '|| v_visit_id || ' ORDER BY id desc LIMIT 1') INTO v_load_visit;
+				v_querystring = concat('SELECT true FROM om_visit WHERE enddate > now() - ''7 days''::interval AND id = ', quote_nullable(v_visit_id),' ORDER BY id desc LIMIT 1');
+				v_debug_vars := json_build_object('v_visit_id', v_visit_id);
+				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 50);
+				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+				EXECUTE v_querystring INTO v_load_visit;
 			END IF;
 		
 			RAISE NOTICE 'v_load_visit -> %',v_load_visit;
@@ -334,8 +356,11 @@ BEGIN
 							
 		-- existing visit
 		ELSIF v_load_visit AND v_id IS NULL THEN
-				
-			EXECUTE ('SELECT class_id FROM om_visit WHERE id = '|| v_visit_id || ' ORDER BY id desc LIMIT 1') INTO v_visitclass;
+			v_querystring = concat('SELECT class_id FROM om_visit WHERE id = ', quote_nullable(v_visit_id),' ORDER BY id desc LIMIT 1');
+			v_debug_vars := json_build_object('v_visit_id', v_visit_id);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 60);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO v_visitclass;
 			v_id = v_visit_id;
 		ELSE 
 			v_visitclass := (SELECT class_id FROM om_visit WHERE id=v_id::bigint);			
@@ -404,9 +429,17 @@ BEGIN
 		--visitcat
 		v_visitcat = (SELECT value FROM config_param_user WHERE parameter = 'om_visit_cat_vdefault' AND cur_user=current_user)::integer;
 		--code
-		EXECUTE 'SELECT feature_type FROM config_visit_class WHERE id = '||v_visitclass INTO v_check_code;
+		v_querystring = concat('SELECT feature_type FROM config_visit_class WHERE id = ', quote_nullable(v_visitclass));
+		v_debug_vars := json_build_object('v_visitclass', v_visitclass);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 70);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_check_code;
 		IF v_check_code IS NOT NULL THEN
-			EXECUTE 'SELECT code FROM '||v_featuretablename||' WHERE ' || (v_featuretype) || '_id = '||v_featureid||'::text' INTO v_code;
+			v_querystring = concat('SELECT code FROM ',v_featuretablename,' WHERE ',(v_featuretype),'_id = ',quote_nullable(v_featureid),'::text');
+			v_debug_vars := json_build_object('v_featuretablename', v_featuretablename, 'v_featuretype', v_featuretype, 'v_featureid', v_featureid);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 80);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO v_code;
 		END IF;
 		
 		IF v_pluginlot = 'TRUE' THEN
@@ -440,34 +473,39 @@ BEGIN
 	END IF;
 
 	-- Get id column
-	EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
-		INTO v_idname
-		USING v_tablename;
+	v_querystring = concat('SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = ',quote_nullable(v_tablename),'::regclass AND i.indisprimary');
+	v_debug_vars := json_build_object('v_tablename', v_tablename);
+	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 90);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+	EXECUTE v_querystring INTO v_idname;
 	
 	-- For views it suposse pk is the first column
 	IF v_idname ISNULL THEN
-		EXECUTE '
-		SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-		AND t.relname = $1 
-		AND s.nspname = $2
-		AND a.attname = ''visit_id''
-		ORDER BY a.attnum LIMIT 1'
-		INTO v_idname
-		USING v_tablename, v_schemaname;
+		v_querystring = concat('SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
+			AND t.relname = ',quote_nullable(v_tablename),' 
+			AND s.nspname = ',quote_nullable(v_schemaname),'
+			AND a.attname = ''visit_id''
+			ORDER BY a.attnum LIMIT 1');
+		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_schemaname', v_schemaname);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 100);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_idname;
 	END IF;
 
 	-- Get id column type
-	EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
+	v_querystring = concat('SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
 		JOIN pg_class t on a.attrelid = t.oid
 		JOIN pg_namespace s on t.relnamespace = s.oid
 		WHERE a.attnum > 0 
 		AND NOT a.attisdropped
-		AND a.attname = $3
-		AND t.relname = $2 
-		AND s.nspname = $1
-		ORDER BY a.attnum'
-			USING v_schemaname, v_tablename, v_idname
-			INTO v_columntype;
+		AND a.attname = ',quote_nullable(v_idname),'
+		AND t.relname = ',quote_nullable(v_tablename),' 
+		AND s.nspname = ',quote_nullable(v_schemaname),'
+		ORDER BY a.attnum');
+	v_debug_vars := json_build_object('v_idname', v_idname, 'v_tablename', v_tablename, 'v_schemaname', v_schemaname);
+	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 110);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+	EXECUTE v_querystring INTO v_columntype;
 
 	RAISE NOTICE '--- gw_fct_getvisit : Visit parameters: p_visittype % isnewvisit: % featuretype: %, feature_id % v_isclasschanged: % visitclass: %,  v_visit: %,  v_status %  formname: %,  tablename: %,  idname: %, columntype %, device: % ---',
 							     p_visittype, isnewvisit, v_featuretype, v_featureid, v_isclasschanged, v_visitclass, v_id, v_status, v_formname, v_tablename, v_idname, v_columntype, v_device;
@@ -635,10 +673,12 @@ BEGIN
 				RAISE NOTICE ' --- GETTING tabData VALUES ON VISIT  ---';
 
 				-- getting values from feature
-				EXECUTE ('SELECT (row_to_json(a)) FROM 
-					(SELECT * FROM ' || quote_ident(v_tablename) || ' WHERE ' || quote_ident(v_idname) || ' = CAST($1 AS ' || (v_columntype) || '))a')
-					INTO v_values
-					USING v_id;
+				v_querystring = concat('SELECT (row_to_json(a)) FROM 
+					(SELECT * FROM ',quote_ident(v_tablename),' WHERE ',quote_ident(v_idname),' = CAST(',v_id,' AS ',(v_columntype),'))a');
+				v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_idname', v_idname, 'v_id', v_id, 'v_columntype', v_columntype);
+				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 120);
+				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+				EXECUTE v_querystring INTO v_values;
 	
 				-- replace in case of om_visit table
 				v_values = REPLACE (v_values::text, '"id":', '"visit_id":');
@@ -801,13 +841,19 @@ BEGIN
 	END IF;
 
 	-- getting geometry
-	EXECUTE ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id=' || quote_literal(v_id) || ')a')
-            INTO v_geometry;
+	v_querystring = concat('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id=',quote_literal(v_id),')a');
+	v_debug_vars := json_build_object('v_id', v_id);
+	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 130);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+	EXECUTE v_querystring INTO v_geometry;
 
         IF isnewvisit IS FALSE THEN        
 		IF v_geometry IS NULL AND v_featuretype IS NOT NULL AND v_featureid IS NOT NULL THEN
-			EXECUTE ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM ' || quote_ident(v_featuretype) || ' WHERE ' || (v_featuretype) || '_id::text=' || quote_literal(v_featureid) || '::text)a')
-				INTO v_geometry;
+			v_querystring = concat('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM ',quote_ident(v_featuretype),' WHERE ',(v_featuretype),'_id::text=',quote_literal(v_featureid),'::text)a');
+			v_debug_vars := json_build_object('v_featuretype', v_featuretype, 'v_featureid', v_featureid);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getvisit_main', 'flag', 140);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO v_geometry;
 		END IF;
 	END IF;
     		
@@ -850,6 +896,11 @@ BEGIN
 		    ', "data":{"layerManager":'||v_layermanager||
 		               ',"geometry":'|| v_geometry ||'}}'||
 		    '}')::json;
+
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

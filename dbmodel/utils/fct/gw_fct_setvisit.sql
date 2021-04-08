@@ -70,8 +70,12 @@ v_addphotos json;
 v_addphotos_array json[];
 v_list_photos text[];
 v_event_id bigint;
-v_error_context text;
+v_errcontext text;
 v_project_type text;
+v_querystring text;
+v_debug_vars json;
+v_debug json;
+v_msgerr json;
 
 BEGIN
 
@@ -182,7 +186,11 @@ BEGIN
 	ELSE 
 
 		-- refactorize om_visit and om_visit_event in case of update of class the change of parameters is need)
-		EXECUTE ('SELECT visit_id FROM ' || quote_ident(v_tablename) || ' WHERE visit_id = ' || quote_literal(v_id) || '') INTO v_ckeckchangeclass;
+		v_querystring = concat('SELECT visit_id FROM ',quote_ident(v_tablename),' WHERE visit_id = ',quote_literal(v_id));
+		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_setvisit', 'flag', 10);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_ckeckchangeclass;
 		IF v_ckeckchangeclass IS NULL THEN
 			DELETE FROM om_visit_event WHERE visit_id = v_id;
 			INSERT INTO om_visit_event (parameter_id, visit_id) SELECT parameter_id, v_id 
@@ -205,22 +213,38 @@ BEGIN
 	SELECT array_agg(row_to_json(a)) FROM (SELECT json_array_elements(v_addphotos))a into v_addphotos_array;
 	
 	IF v_addphotos_array IS NOT NULL THEN
-		EXECUTE 'SELECT id FROM om_visit_event WHERE visit_id = ' || v_id || '' into v_event_id;
+		v_querystring = concat('SELECT id FROM om_visit_event WHERE visit_id = ',v_id);
+		v_debug_vars := json_build_object('v_id', v_id);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_setvisit', 'flag', 20);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_event_id;
 		FOREACH v_addphotos IN ARRAY v_addphotos_array
 		LOOP
 			-- Inserting data
-			EXECUTE 'INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, hash, fextension)
-			 VALUES('''||v_id||''', '''||v_event_id||''', '''||NOW()||''', '''||CONCAT((v_addphotos->>'json_array_elements')::json->>'photo_url'::text, (v_addphotos->>'json_array_elements')::json->>'hash'::text)||''',
-			 '''||((v_addphotos->>'json_array_elements')::json->>'hash'::text)::text||''','''||((v_addphotos->>'json_array_elements')::json->>'fextension'::text)::text||''')';
+			v_querystring = concat('INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, hash, fextension)
+			 VALUES(',quote_nullable(v_id),', ',quote_nullable(v_event_id)', ',quote_nullable(NOW())', ',quote_nullable(CONCAT((v_addphotos->>'json_array_elements')::json->>'photo_url'::text, (v_addphotos->>'json_array_elements')::json->>'hash'::text)),',
+			 ',quote_nullable(((v_addphotos->>'json_array_elements')::json->>'hash'::text)::text),',',quote_nullable(((v_addphotos->>'json_array_elements')::json->>'fextension'::text)::text),')');
+			v_debug_vars := json_build_object('v_id', v_id, 'v_event_id', v_event_id, 'v_addphotos', v_addphotos, 'v_addphotos', v_addphotos);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_setvisit', 'flag', 30);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring;
 			
 			-- message
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3118", "function":"2622","debug_msg":""}}$$);'INTO v_message;
 			
 		END LOOP;
-		EXECUTE 'UPDATE om_visit_event SET value = ''true'' WHERE visit_id = ' || v_id || ' AND parameter_id = ''photo''';
+		v_querystring = concat('UPDATE om_visit_event SET value = ''true'' WHERE visit_id = ',quote_nullable(v_id),' AND parameter_id = ''photo''');
+		v_debug_vars := json_build_object('v_id', v_id);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_setvisit', 'flag', 40);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring;
 	ELSE
-		EXECUTE 'UPDATE om_visit_event SET value = ''false'' WHERE visit_id = ' || v_id || ' AND parameter_id = ''photo''';
+		v_querystring = concat('UPDATE om_visit_event SET value = ''false'' WHERE visit_id = ',quote_nullable(v_id),' AND parameter_id = ''photo''');
+		v_debug_vars := json_build_object('v_id', v_id);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_setvisit', 'flag', 50);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring;
 
 	END IF;
 	
@@ -278,8 +302,11 @@ BEGIN
 	
 	-- getting geometry
 	IF v_id IS NOT NULL THEN
-		EXECUTE ('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id=' || v_id || ')a')
-		    INTO v_geometry;
+		v_querystring = concat('SELECT row_to_json(a) FROM (SELECT St_AsText(St_simplify(the_geom,0)) FROM om_visit WHERE id=',quote_nullable(v_id),')a');
+		v_debug_vars := json_build_object('v_id', v_id);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_setvisit', 'flag', 60);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_geometry;
 	END IF;
 	
 	-- only applied for arbrat viari (nodes).
@@ -304,8 +331,8 @@ BEGIN
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 	
 END;
 $BODY$

@@ -59,6 +59,11 @@ v_numhydrometer integer;
 v_volume float;
 v_priority json;
 
+v_querystring text;
+v_debug_vars json;
+v_debug_sql json;
+v_msgerr json;
+
 BEGIN
 
 	-- Search path
@@ -160,8 +165,14 @@ BEGIN
 	IF type_element_arg = 'arc' OR type_element_arg='ARC' THEN
 	
 		IF (SELECT state FROM arc WHERE (arc_id = element_id_arg))=0 THEN
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3002", "function":"2304","debug_msg":"'||element_id_arg::text||'"}}$$);' INTO v_error_message;
+			v_querystring = concat('SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3002", "function":"2304","debug_msg":"',element_id_arg::text,'"}}$$);');
+			v_debug_vars := json_build_object('element_id_arg', element_id_arg);
+			v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_mincut', 'flag', 10);
+			SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
+			EXECUTE v_querystring INTO v_error_message;
+/*EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3002", "function":"2304","debug_msg":"'||element_id_arg::text||'"}}$$);' INTO v_error_message;*/
 		END IF;
 		
 		-- Check an existing arc
@@ -191,8 +202,14 @@ BEGIN
 				SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
 
 				IF node_1_aux IS NULL OR node_2_aux IS NULL THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3006", "function":"2304","debug_msg":"'||element_id_arg::text||'"}}$$);' INTO v_error_message;
+					v_querystring = concat('SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3006", "function":"2304","debug_msg":"',element_id_arg::text,'"}}$$);');
+					v_debug_vars := json_build_object('element_id_arg', element_id_arg);
+					v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_mincut', 'flag', 20);
+					SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
+					EXECUTE v_querystring INTO v_error_message;
+/*EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3006", "function":"2304","debug_msg":"'||element_id_arg::text||'"}}$$);' INTO v_error_message;*/
 				END IF;
 
 				-- Check extreme being a valve
@@ -246,8 +263,14 @@ BEGIN
 			
 		-- The arc_id was not found
 		ELSE 
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"1082", "function":"2304","debug_msg":"'||element_id_arg::text||'"}}$$);' INTO v_error_message;
+			v_querystring = concat('SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"1082", "function":"2304","debug_msg":"',element_id_arg::text,'"}}$$);');
+			v_debug_vars := json_build_object('element_id_arg', element_id_arg);
+			v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_mincut', 'flag', 30);
+			SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
+			EXECUTE v_querystring INTO v_error_message;
+/*EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"1082", "function":"2304","debug_msg":"'||element_id_arg::text||'"}}$$);' INTO v_error_message;*/
 		END IF;
 
 	ELSE
@@ -338,9 +361,15 @@ BEGIN
 	UPDATE om_mincut SET output = v_mincutdetails WHERE id = result_id_arg;
 
 	-- calculate the boundary of mincut using arcs and valves
-	EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM om_mincut_arc WHERE result_id='||result_id_arg||
+	v_querystring = concat('SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM om_mincut_arc WHERE result_id=',quote_nullable(result_id_arg),
+		' UNION SELECT the_geom FROM om_mincut_valve WHERE result_id=',quote_nullable(result_id_arg),') a');
+	v_debug_vars := json_build_object('result_id_arg', result_id_arg);
+	v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_mincut', 'flag', 40);
+	SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
+	EXECUTE v_querystring INTO v_geometry;
+/*EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM om_mincut_arc WHERE result_id='||result_id_arg||
 		' UNION SELECT the_geom FROM om_mincut_valve WHERE result_id='||result_id_arg||') a'    
-	        INTO v_geometry;
+	        INTO v_geometry;*/
 	
 	-- restore state selector
 	INSERT INTO selector_state (state_id, cur_user)
@@ -379,10 +408,10 @@ BEGIN
 			'}'||
 	'}')::json;
 
-    EXCEPTION WHEN OTHERS THEN
-    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-    RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
- 
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json; 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
