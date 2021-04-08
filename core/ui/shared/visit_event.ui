@@ -289,15 +289,15 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>parameter_id</tabstop>
-  <tabstop>event_code</tabstop>
   <tabstop>value</tabstop>
+  <tabstop>event_code</tabstop>
   <tabstop>position_id</tabstop>
   <tabstop>position_value</tabstop>
   <tabstop>text</tabstop>
   <tabstop>tbl_docs_x_event</tabstop>
   <tabstop>btn_add_file</tabstop>
   <tabstop>btn_delete_file</tabstop>
+  <tabstop>parameter_id</tabstop>
  </tabstops>
  <resources/>
  <connections>
