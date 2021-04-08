@@ -298,3 +298,19 @@ UPDATE config_form_fields set layoutorder=18 where formname='v_edit_element' and
 UPDATE config_form_fields set layoutorder=19 where formname='v_edit_element' and columnname = 'rotation';
 
 UPDATE config_form_fields set hidden=true where layoutorder is null and formname='v_edit_element';
+
+-- 2021/04/08
+UPDATE config_form_fields set widgetcontrols = widgetcontrols::jsonb || jsonb_build_object('widgetdim', widgetdim)
+where widgetcontrols is not null  AND widgetdim is not null AND listfilterparam is null;
+
+UPDATE config_form_fields set  widgetcontrols = jsonb_build_object('widgetdim', widgetdim)
+where widgetcontrols is null  AND widgetdim is not null AND listfilterparam is null;
+
+UPDATE config_form_fields set  widgetcontrols = listfilterparam::jsonb - 'sign'
+where widgetcontrols is null  AND widgetdim is null AND listfilterparam is not null;
+
+UPDATE config_form_fields set  widgetcontrols = widgetcontrols::jsonb || listfilterparam::jsonb - 'sign'
+where widgetcontrols is not null AND widgetdim is null  AND listfilterparam is not null;
+
+UPDATE config_form_fields set  widgetcontrols = widgetcontrols::jsonb || listfilterparam::jsonb - 'sign'|| jsonb_build_object('widgetdim', widgetdim)
+where widgetcontrols is not null AND widgetdim is not null  AND listfilterparam is not null;
