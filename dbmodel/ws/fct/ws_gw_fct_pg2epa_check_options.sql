@@ -57,7 +57,7 @@ BEGIN
 			v_return = '{"status":"Failed", "message":{"level":1, "text":"Pattern method and network mode are incompatibles. The process is aborted...."},"body":{"data":{}}}';
 		END IF;
 
-	ELSIF v_networkmode IN (3,4) THEN
+	ELSIF v_networkmode = 3 THEN
 
 		IF v_patternmethod IN (11,12,13,31,32,41,42,51,52) THEN 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)

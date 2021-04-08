@@ -34,7 +34,7 @@ BEGIN
 	UPDATE temp_arc SET status=inp_valve.status FROM inp_valve WHERE temp_arc.arc_id=concat(inp_valve.node_id,'_n2a');
 
 	-- update shut-off valves
-	IF v_networkmode = 1 OR v_networkmode = 3 THEN -- Because shut-off valves are not exported as a shortpipe, pipes closer shut-off valves will be setted
+	IF v_networkmode = 1 THEN -- Because shut-off valves are not exported as a shortpipe, pipes closer shut-off valves will be setted
 
 		IF v_valvemode = 3 THEN	--mincut results
 			UPDATE temp_arc SET status='CLOSED' 
@@ -59,7 +59,7 @@ BEGIN
 				WHERE a.arc_id=temp_arc.arc_id;
 		END IF;
 	
-	ELSIF v_networkmode = 2 OR v_networkmode = 4 THEN -- Because shut-off valves are exported as nodarcs, directly we can set the status of shut-off valves
+	ELSIF v_networkmode = 2 OR v_networkmode = 3 THEN -- Because shut-off valves are exported as nodarcs, directly we can set the status of shut-off valves
 
 		-- getting querytext for shutoff valves in function if they are TCV OR SHORTPIPES
 		IF (SELECT value FROM config_param_system WHERE parameter = 'epa_shutoffvalve') = 'VALVE' THEN

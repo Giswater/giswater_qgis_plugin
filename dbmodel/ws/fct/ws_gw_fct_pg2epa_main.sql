@@ -82,7 +82,7 @@ BEGIN
 	-- setting variables
 	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fid":227}}}')::json;
 	
-	IF v_networkmode = 1 OR v_networkmode = 3 THEN 
+	IF v_networkmode = 1 THEN 
 		v_onlymandatory_nodarc = TRUE;
 	END IF;
 
@@ -140,7 +140,7 @@ BEGIN
 		PERFORM gw_fct_pg2epa_manage_varc(v_result);	
 
 		RAISE NOTICE '8 - Try to trim arcs with vnode';
-		IF v_networkmode = 3 OR v_networkmode = 4 THEN
+		IF v_networkmode = 3 THEN
 		
 			-- profilactic control on temp_table
 			TRUNCATE temp_table;

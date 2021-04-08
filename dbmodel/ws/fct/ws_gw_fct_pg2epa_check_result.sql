@@ -270,7 +270,7 @@ BEGIN
 		END IF;
 			
 		RAISE NOTICE '5 - Check for network mode';
-		IF v_networkmode = 3 OR v_networkmode = 4 THEN
+		IF v_networkmode = 3 THEN
 
 			-- vnode over nodarc for case of use vnode treaming arcs on network model
 			SELECT count(vnode_id) INTO v_count FROM temp_arc , vnode JOIN v_edit_link a ON vnode_id=exit_id::integer

@@ -36,4 +36,9 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, sys_role) VALUES (3032, 'gw_trg_man2inp_values', 'ws', 'trigger function', 'role_edit');
 
+-- 2021/04/08
+ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+DELETE FROM inp_typevalue WHERE typevalue = 'inp_options_networkmode' and id = '4';
+ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+UPDATE inp_typevalue SET idval = 'PJOINT (ALL NODARCS)' WHERE typevalue = 'inp_options_networkmode' and id = '3';
 

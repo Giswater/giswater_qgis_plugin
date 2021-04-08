@@ -61,8 +61,8 @@ BEGIN
 	IF v_project_type = 'WS'  THEN
 		DELETE FROM config_param_user WHERE cur_user=current_user AND parameter IN ('inp_options_patternmethod', 
 		'inp_options_demandtype', 'inp_options_rtc_period_id','inp_options_networkmode');
-		INSERT INTO config_param_user(parameter, value, cur_user) VALUES ('inp_options_patternmethod', 27, current_user);
-		INSERT INTO config_param_user(parameter, value, cur_user) VALUES ('inp_options_demandtype', 2, current_user);
+		INSERT INTO config_param_user(parameter, value, cur_user) VALUES ('inp_options_patternmethod', 34, current_user);
+		INSERT INTO config_param_user(parameter, value, cur_user) VALUES ('inp_options_demandtype', 3, current_user);
 		INSERT INTO config_param_user(parameter, value, cur_user) VALUES ('inp_options_rtc_period_id', 5, current_user);
 		INSERT INTO config_param_user(parameter, value, cur_user) VALUES ('inp_options_networkmode', 4, current_user);
 					
