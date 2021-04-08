@@ -77,18 +77,10 @@ v_inputgeometry public.geometry;
 v_editable boolean = true;
 v_device integer;
 v_infotype integer;
-v_forminfo json;
-v_form_tabs_info json;    
-v_action_info json;
+v_forminfo json;   
 form_tabs json[];
 form_tablabel varchar[];
-form_tabtext varchar[];
-v_form_actiontooltip varchar[];
-v_formactions json;
-v_form_actiontooltip_json json;
 form_tabs_json json;
-form_tablabel_json json;
-form_tabtext_json json;
 v_fields json;
 formid_arg text;
 tableparent_id_arg text;
@@ -122,7 +114,7 @@ v_mincanvasmargin double precision;
 v_canvasmargin  double precision;
 v_canvasmargin_text text ;
 v_toolbar text;
-v_layermanager json;
+--v_layermanager json;
 v_role text;
 v_parentfields text;
 v_status text ='Accepted';
@@ -461,23 +453,6 @@ BEGIN
 		END IF;
 	END IF;
 
-	-- Getting actions and layer manager
-	------------------------------------------
-	v_querystring = concat('SELECT actions,  layermanager FROM config_form WHERE formname = ',quote_nullable(v_tablename),' AND projecttype=',quote_literal(LOWER(v_project_type)));
-	v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_project_type', v_project_type);
-	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 230);
-	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-	EXECUTE v_querystring INTO v_formactions, v_layermanager;
-
-	-- IF actions and tooltip are null's and layer it's child layer --> parent form_tabs is used
-        IF v_formactions IS NULL AND v_table_parent IS NOT NULL THEN
-		v_querystring = concat('SELECT actions,  layermanager FROM config_form WHERE formname = ',quote_nullable(v_table_parent),' AND projecttype=',quote_literal(LOWER(v_project_type)));
-		v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_project_type', v_project_type);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 240);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_formactions, v_layermanager;
-	END IF;
-
 	-- Check if it is parent table 
 	-------------------------------------
         IF v_tablename IN (SELECT layer_id FROM config_info_layer WHERE is_parent IS TRUE) AND v_toolbar !='epa' AND v_id IS NOT NULL THEN
@@ -576,9 +551,6 @@ BEGIN
 		-- Add default tab
 		---------------------
 		form_tabs_json := array_to_json(form_tabs);
-	
-		-- Form info
-		v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'actions', v_formactions);
 	
 		-- Form Tabs info
 		v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'visibleTabs', form_tabs_json);

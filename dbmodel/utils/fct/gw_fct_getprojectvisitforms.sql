@@ -190,14 +190,7 @@ Generate one form for layer and one form for visitclass=incident
 	-- header form
 	v_formheader :=concat('VISIT - ',v_id);	
 
-	-- actions and layermanager
-	EXECUTE 'SELECT actions, layermanager FROM config_form WHERE formname = ''visit'' AND (projecttype ='||quote_literal(LOWER(v_projecttype))||' OR projecttype=''utils'')'
-			INTO v_formactions, v_layermanager;
-
-	RAISE NOTICE 'v_layermanager %', v_layermanager;
-
-	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formActions', v_formactions);
-		
+			
 	-- Create new form
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formId', 'F11'::text);
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo, 'formName', v_formheader);

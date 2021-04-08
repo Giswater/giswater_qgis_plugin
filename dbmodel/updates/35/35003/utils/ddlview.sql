@@ -103,4 +103,4 @@ CREATE OR REPLACE VIEW ve_config_sysfields AS
      LEFT JOIN cat_feature ON cat_feature.child_layer::text = config_form_fields.formname::text
   WHERE config_form_fields.formtype::text = 'form_feature'::text AND config_form_fields.formname::text <> 've_arc'::text AND config_form_fields.formname::text <> 've_node'::text AND config_form_fields.formname::text <> 've_connec'::text AND config_form_fields.formname::text <> 've_gully'::text;
 
-ALTER VIEW v_edit_vnode RENAME TO v_vnode;
+ALTER VIEW IF EXISTS v_edit_vnode RENAME TO v_vnode;

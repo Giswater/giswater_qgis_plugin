@@ -98,3 +98,5 @@ layout_id and layout_order, used to define the position';
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_info_layer", "column":"link_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_info_layer", "column":"tableinfo_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_info_layer", "column":"is_tiled"}}$$);
+
+ALTER TABLE IF EXISTS config_form RENAME TO _config_form_;
