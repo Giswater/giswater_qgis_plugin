@@ -2,8 +2,9 @@
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_elements_1', 'lyt_elements_1','lytElements1');
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_elements_2', 'lyt_elements_2','lytElements2');
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_elements_3', 'lyt_elements_3','lytElements3');
-INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', '_open_selected_element', '_open_selected_element','openSselectedElement');
+INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', '_open_selected_element', '_open_selected_element','openSelectedElement');
 INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', '_filter_table', '_filter_table','filterTable');
+INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', '_add_object', '_add_object','addObject');
 
 INSERT INTO ws_sample35.config_form_list(tablename, query_text, device, listtype, listclass, vdefault, columnname)
     VALUES ('ve_arc_pipe', 'SELECT * FROM v_ui_element_x_arc WHERE element_id IS NOT NULL', 4, 'attributeTable', 'tableview', '{"orderBy":"1", "orderType": "DESC"}', 'tbl_elements');
@@ -11,6 +12,14 @@ INSERT INTO ws_sample35.config_form_list(tablename, query_text, device, listtype
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, layoutname, widgetcontrols, tabname, isfilter)
     VALUES ('ve_arc_pipe', 'form_feature', 'element_id', 1, 'string', 'typeahead', 'Element id', false, false, true, false, 'SELECT element_id as id, element_id as idval FROM element WHERE element_id IS NOT NULL ', 'lyt_elements_1', '{"accept":false}', 'tab_elements', false);
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, widgetfunction, stylesheet, layoutname, widgetcontrols, tabname, isfilter)
+VALUES ('ve_arc_pipe', 'form_feature', 'insert_element', 2, 'button', 'Insert element', false, false, true, false, '_add_object', '{"icon":"111"}', 'lyt_elements_1', '{"accept":false}', 'tab_elements', false);
+
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, layoutname, tabname)
+    VALUES ('ve_arc_pipe', 'form_feature', 'hspacer_lyt_elements_2', 4, 'hspacer', false, false, true, false, 'lyt_elements_1', 'tab_elements');
+
+
+
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetfunction, layoutname, tabname, isfilter)
     VALUES ('ve_arc_pipe', 'form_feature', 'tbl_elements', 1, 'tableview', false, false, false, false, '_open_selected_element', 'lyt_elements_3', 'tab_elements', false);
 

@@ -569,7 +569,7 @@ class GwInfo(QObject):
                         layout.addItem(widget, 1, field['layoutorder'])
                     else:
                         layout.addWidget(widget, 1, field['layoutorder'])
-                elif field['layoutname'] in ('lyt_rpt_1'):
+                elif field['layoutname'] in ('lyt_rpt_1', 'lyt_elements_1'):
                     layout.addWidget(label, 0, field['layoutorder'])
                     if type(widget) is QSpacerItem:
                         layout.addItem(widget, 0, field['layoutorder']*2)
@@ -1562,6 +1562,8 @@ class GwInfo(QObject):
         widget = self._set_auto_update_spinbox(field, dialog, widget, new_feature)
         return widget
 
+    def _manage_list(self, **kwargs):
+        self._manage_tableview(kwargs)
 
     def _manage_tableview(self, **kwargs):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
@@ -2143,7 +2145,7 @@ class GwInfo(QObject):
     def _open_selected_element(self, **kwargs):
         """
             Open form of selected element of the @widget??
-              function called in def _set_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
+              function called in def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
               at line: widget.textChanged.connect(partial(getattr(self, widgetfunction), **kwargs))
           """
         dialog = kwargs['dialog']
@@ -3255,7 +3257,7 @@ class GwInfo(QObject):
             complet_list, widget_list = self._init_tbl_rpt(complet_result, self.dlg_cf, new_feature, columnname, widgetname)
             if complet_list is False:
                 return False
-            self._set_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname)
+            self._set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname)
         return complet_list
 
 
@@ -3322,7 +3324,7 @@ class GwInfo(QObject):
                 child.deleteLater()
 
 
-    def _set_listeners(self, complet_result, dialog, widget_list, columnname, widgetname):
+    def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname):
         """def _open_selected_element(self, **kwargs):"""
         model = None
         for widget in widget_list:
@@ -3374,7 +3376,7 @@ class GwInfo(QObject):
 
     def _filter_table(self, **kwargs):
         """
-             function called in def _set_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
+             function called in def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
              at line: widget.textChanged.connect(partial(getattr(self, widgetfunction), **kwargs))
          """
         complet_result = kwargs['complet_result']
