@@ -53,7 +53,7 @@ BEGIN
 				when st_linelocatepoint (temp_arc.the_geom , vnode.the_geom) > 0.9999 then 0.9999
 				when st_linelocatepoint (temp_arc.the_geom , vnode.the_geom) < 0.0001 then 0.0001
 				else (st_linelocatepoint (temp_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate
-			FROM temp_arc , v_edit_vnode AS vnode
+			FROM temp_arc , v_vnode AS vnode
 			JOIN link a ON vnode_id=exit_id::integer
 			WHERE st_dwithin ( temp_arc.the_geom, vnode.the_geom, 0.01) AND vnode.state > 0 AND temp_arc.arc_type != 'NODE2ARC' AND a.state > 0
 		UNION	

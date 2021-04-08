@@ -24,3 +24,4 @@ DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON config_form_fields;
 CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON config_form_fields
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('config_form_fields');
 
+DROP TRIGGER IF EXISTS gw_trg_edit_vnode ON v_vnode;

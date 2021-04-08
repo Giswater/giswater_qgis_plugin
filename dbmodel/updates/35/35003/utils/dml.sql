@@ -77,3 +77,5 @@ placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_query
 stylesheet, widgetfunction, linkedaction, hidden FROM _config_form_fields_ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
             
 DROP TABLE iF EXISTS _config_form_fields_;
+
+UPDATE sys_table SET id = 'v_vnode',descript='Shows information about virtual nodes.' WHERE id = 'v_edit_vnode';
