@@ -121,13 +121,13 @@ def get_calendar_date(dialog, widget, date_format="yyyy/MM/dd", datetime_format=
 
 def set_calendar(dialog, widget, date, default_current_date=True):
 
-    if global_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
-        widget.setDisplayFormat(global_vars.date_format)
-
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
     if not widget:
         return
+
+    if global_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
+        widget.setDisplayFormat(global_vars.date_format)
     if type(widget) is QDateEdit \
             or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in
                 ('dd/MM/yyyy', 'yyyy/MM/dd', 'dd-MM-yyyy', 'yyyy-MM-dd')):
