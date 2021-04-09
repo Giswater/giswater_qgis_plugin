@@ -159,11 +159,8 @@ class GwLoadProject(QObject):
         global_vars.user_level['showquestion'] = tools_gw.check_config_settings('user_level', 'showquestion', '1,2,3', prefix=False)
         global_vars.user_level['showsnapmessage'] = tools_gw.check_config_settings('user_level', 'showsnapmessage', '1,2,3', prefix=False)
         global_vars.user_level['showselectmessage'] = tools_gw.check_config_settings('user_level', 'showselectmessage', '1,2,3', prefix=False)
-        comment = f"Manage advanced tab, fields manager tab and sample dev radio button from admin"
-        global_vars.user_level['showadminadvanced'] = tools_gw.check_config_settings('user_level', 'showadminadvanced', "3", "user", "init", comment=comment, prefix=False)
-        comment = f"Display format of the dates allowed in the forms:: " \
-                  f"dd/MM/yyyy or dd-MM-yyyy or yyyy/MM/dd or yyyy-MM-dd"
-        global_vars.date_format = tools_gw.check_config_settings('system', 'date_format', None, comment=comment, prefix=False)
+        global_vars.user_level['showadminadvanced'] = tools_gw.check_config_settings('user_level', 'showadminadvanced', "3", "user", "init", prefix=False)
+        global_vars.date_format = tools_gw.check_config_settings('system', 'date_format', 'dd/MM/yyyy', prefix=False)
 
 
     def _check_project(self, show_warning):
