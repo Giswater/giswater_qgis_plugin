@@ -337,7 +337,7 @@ BEGIN
 
 	RAISE NOTICE 'step 5/7';
 	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'INFO: Creating arc geometry from extremal nodes and intermediate vertex -> Done');
-	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING-239: Link geometries as ORIFICE, WEIRS, PUMPS AND OULETS will not transformed using reverse nod2arc strategy as nodes. It will keep as arc');
+	INSERT INTO audit_check_data (fid, error_message) VALUES (239, 'WARNING-239: Link geometries like ORIFICE, WEIRS, PUMPS AND OULETS will not be transformed, using reverse node2arc strategy, into nodes. They will stay as arc');
 
 	
 	-- Subcatchments geometry

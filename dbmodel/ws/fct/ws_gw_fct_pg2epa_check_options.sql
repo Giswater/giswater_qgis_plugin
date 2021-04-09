@@ -51,7 +51,7 @@ BEGIN
 	
 		IF v_patternmethod IN (21,22,23,33,34,43,44,53,54) THEN 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: The pattern method used, it is incompatible with the export network mode used'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-161: The pattern method is incompatible with the used export network mode'));
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 3, 'Change the pattern method using some of the (PJOINT) method avaliable or change export network USING some of TRIMED ARCS method avaliable.');
 			v_return = '{"status":"Failed", "message":{"level":1, "text":"Pattern method and network mode are incompatibles. The process is aborted...."},"body":{"data":{}}}';
@@ -61,7 +61,7 @@ BEGIN
 
 		IF v_patternmethod IN (11,12,13,31,32,41,42,51,52) THEN 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: The pattern method used, it is incompatible with the export network mode used'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-161: The pattern method is incompatible with the used export network mode'));
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 3, 'Change the pattern method using some of the (NODE) method avaliable or change export network USING some of NOT TRIMED ARCS method avaliable.');
 			v_return = '{"status":"Failed", "message":{"level":1, "text":"Pattern method and network mode are incompatibles. The process is aborted...."},"body":{"data":{}}}'; 
@@ -86,7 +86,7 @@ BEGIN
 
 				IF v_count > 0 THEN
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-					VALUES (v_fid, v_result_id, 3, concat('ERROR: There are ',v_count,' connec with same vnode and different pattern on inp_connec table'));
+					VALUES (v_fid, v_result_id, 3, concat('ERROR-162: There are ',v_count,' connec with same vnode and different pattern on inp_connec table'));
 					INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (v_fid, v_result_id, 3, 'HINT: Look for inp_connec table and modify some pattern on connecs with same vnode in order to force same pattern_id for all connecs with same vnode.');
 				END IF;

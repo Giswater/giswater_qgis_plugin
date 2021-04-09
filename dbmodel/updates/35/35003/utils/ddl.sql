@@ -101,3 +101,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_inf
 
 ALTER TABLE IF EXISTS config_form RENAME TO _config_form_;
 ALTER TABLE IF EXISTS config_form RENAME TO _inp_value_yesnofull_;
+
+ALTER TABLE sys_fprocess ALTER COLUMN fprocess_name TYPE character varying(100);

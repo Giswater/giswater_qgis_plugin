@@ -172,7 +172,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment WHERE outlet_id is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column outlet_id column.'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column outlet_id column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -182,7 +182,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where rg_id is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' inp_subcatchment(s) with null values on mandatory column rg_id column.'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' inp_subcatchment(s) with null values on mandatory column rg_id column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -192,7 +192,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where area is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column area column.'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column area column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -202,7 +202,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where width is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column width column.'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column width column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -212,7 +212,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where slope is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column slope column.'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column slope column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -222,7 +222,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where clength is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column clength column.'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column clength column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -232,7 +232,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where nimp is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nimp column.'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nimp column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -242,7 +242,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where nperv is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nperv column.'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column nperv column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -252,7 +252,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where simp is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column simp column.'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column simp column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -262,7 +262,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where sperv is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column sperv column.'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column sperv column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -272,7 +272,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where zero is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column zero column.'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column zero column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -282,7 +282,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where routeto is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column routeto column.'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column routeto column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -293,7 +293,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where rted is null;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' subcatchment(s) with null values on mandatory column rted column.'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,' subcatchment(s) with null values on mandatory column rted column.'));
 			v_count=0;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -311,7 +311,7 @@ BEGIN
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 3,
-				concat('ERROR: There is/are ',v_count, ' subcatchment(s) with null values on mandatory columns of curve number infiltartion method (curveno, conduct_2, drytime_2).',
+				concat('ERROR-369: There is/are ',v_count, ' subcatchment(s) with null values on mandatory columns of curve number infiltartion method (curveno, conduct_2, drytime_2).',
 				'Acording EPA SWMM user''s manual, conduct_2 is deprecated, but is mandatory to fill it. Any value is valid because it will be ignored by SWMM.'));
 				v_count=0;
 			ELSE
@@ -327,7 +327,7 @@ BEGIN
 			
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',
+				VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',
 				v_count,' subcatchment(s) with null values on mandatory columns of Green-Apt infiltartion method (suction, conduct, initdef).'));
 				v_count=0;
 			ELSE
@@ -344,7 +344,7 @@ BEGIN
 			
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,
+				VALUES (v_fid, v_result_id, 3, concat('ERROR-369: There is/are ',v_count,
 				' subcatchment(s) with null values on mandatory columns of Horton/Horton modified infiltartion method (maxrate, minrate, decay, drytime, maxinfil).'));
 				v_count=0;
 			ELSE
@@ -369,14 +369,14 @@ BEGIN
 			INTO v_count; 
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ', v_count, ' arcs with sector_id = 0 that didn''t take part in the simulation'));
+				VALUES (v_fid, v_result_id, 3, concat('ERROR-370: There is/are ', v_count, ' arcs with sector_id = 0 that didn''t take part in the simulation'));
 			END IF;
 
 			EXECUTE 'SELECT count FROM ('||v_querytext||')b WHERE feature = ''NODE'';'
 			INTO v_count; 
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ', v_count, ' nodes with sector_id = 0 that didn''t take part in the simulation'));
+				VALUES (v_fid, v_result_id, 3, concat('ERROR-370: There is/are ', v_count, ' nodes with sector_id = 0 that didn''t take part in the simulation'));
 			END IF;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
