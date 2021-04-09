@@ -1370,6 +1370,10 @@ class GwInfo(QObject):
             widget.setProperty('widgetfunction', False)
             if 'widgetfunction' in field and field['widgetfunction'] is not None:
                 widget.setProperty('widgetfunction', field['widgetfunction'])
+
+            if field['widgetcontrols'] is not None and 'saveValue' in field['widgetcontrols']:
+                if field['widgetcontrols']['saveValue'] is False:
+                    widget.setProperty('saveValue', False)
         except Exception:
             # AttributeError: 'QSpacerItem' object has no attribute 'setProperty'
             pass
@@ -1840,10 +1844,8 @@ class GwInfo(QObject):
 
 
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
-
-        if field['isfilter'] is True: return widget
-        if field['widgetcontrols'] is not None and 'accept' in field['widgetcontrols']:
-            if field['widgetcontrols']['accept'] is False: return widget
+        if widget.property('isfilter'): return widget
+        if widget.property('saveValue') is False: return widget
 
         if self._check_tab_data(dialog):
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
@@ -1866,9 +1868,8 @@ class GwInfo(QObject):
 
     def _set_auto_update_textarea(self, field, dialog, widget, new_feature):
 
-        if field['isfilter'] is True: return widget
-        if field['widgetcontrols'] is not None and 'accept' in field['widgetcontrols']:
-            if field['widgetcontrols']['accept'] is False: return widget
+        if widget.property('isfilter'): return widget
+        if widget.property('saveValue') is False: return widget
 
         if self._check_tab_data(dialog):
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
@@ -1939,9 +1940,8 @@ class GwInfo(QObject):
 
     def _set_auto_update_combobox(self, field, dialog, widget, new_feature):
 
-        if field['isfilter'] is True: return widget
-        if field['widgetcontrols'] is not None and 'accept' in field['widgetcontrols']:
-            if field['widgetcontrols']['accept'] is False: return widget
+        if widget.property('isfilter'): return widget
+        if widget.property('saveValue') is False: return widget
 
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
@@ -1958,9 +1958,8 @@ class GwInfo(QObject):
 
     def _set_auto_update_dateedit(self, field, dialog, widget, new_feature):
 
-        if field['isfilter'] is True: return widget
-        if field['widgetcontrols'] is not None and 'accept' in field['widgetcontrols']:
-            if field['widgetcontrols']['accept'] is False: return widget
+        if widget.property('isfilter'): return widget
+        if widget.property('saveValue') is False: return widget
 
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
@@ -1977,9 +1976,8 @@ class GwInfo(QObject):
 
     def _set_auto_update_spinbox(self, field, dialog, widget, new_feature):
 
-        if field['isfilter'] is True: return widget
-        if field['widgetcontrols'] is not None and 'accept' in field['widgetcontrols']:
-            if field['widgetcontrols']['accept'] is False: return widget
+        if widget.property('isfilter'): return widget
+        if widget.property('saveValue') is False: return widget
 
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
@@ -1996,9 +1994,8 @@ class GwInfo(QObject):
 
     def _set_auto_update_checkbox(self, field, dialog, widget, new_feature):
 
-        if field['isfilter'] is True: return widget
-        if field['widgetcontrols'] is not None and 'accept' in field['widgetcontrols']:
-            if field['widgetcontrols']['accept'] is False: return widget
+        if widget.property('isfilter'): return widget
+        if widget.property('saveValue') is False: return widget
 
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:

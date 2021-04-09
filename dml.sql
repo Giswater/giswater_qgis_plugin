@@ -13,7 +13,7 @@ INSERT INTO ws_sample35.config_form_list(tablename, query_text, device, listtype
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, layoutname, widgetcontrols, tabname, isfilter)
     VALUES ('ve_arc_pipe', 'form_feature', 'element_id', 1, 'string', 'typeahead', 'Element id', false, false, true, false, 'SELECT element_id as id, element_id as idval FROM element WHERE element_id IS NOT NULL ', 'lyt_elements_1', '{"accept":false}', 'tab_elements', false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, widgetfunction, stylesheet, layoutname, widgetcontrols, tabname, isfilter)
-VALUES ('ve_arc_pipe', 'form_feature', 'insert_element', 2, 'button', 'Insert element', false, false, true, false, '_add_object', '{"icon":"111"}', 'lyt_elements_1', '{"accept":false}', 'tab_elements', false);
+VALUES ('ve_arc_pipe', 'form_feature', 'insert_element', 2, 'button', 'Insert element', false, false, true, false, '_add_object', '{"icon":"111"}', 'lyt_elements_1', '{"saveValue":false}', 'tab_elements', false);
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, layoutname, tabname)
     VALUES ('ve_arc_pipe', 'form_feature', 'hspacer_lyt_elements_2', 4, 'hspacer', false, false, true, false, 'lyt_elements_1', 'tab_elements');
