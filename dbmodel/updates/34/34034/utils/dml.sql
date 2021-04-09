@@ -42,3 +42,5 @@ DELETE FROM inp_typevalue WHERE typevalue = 'inp_options_networkmode' and id = '
 ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 UPDATE inp_typevalue SET idval = 'PJOINT (ALL NODARCS)' WHERE typevalue = 'inp_options_networkmode' and id = '3';
 
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (371, 'Check arc catalog with matcat_id null','ws')  ON CONFLICT (fid) DO NOTHING;
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (372, 'Check operative arcs with wrong topology','utils')  ON CONFLICT (fid) DO NOTHING;

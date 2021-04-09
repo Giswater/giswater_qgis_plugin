@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"test_bgeo_b1", "us
 
 
 -- fid: main: 225
-		other: 107,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295
+		other: 107,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295,371 
 
 */
 
@@ -630,6 +630,19 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '295','INFO: Epa type for arc features checked. No inconsistencies aganints epa table found.');
 	END IF;	
 
+
+	-- check matcat_id for arcs
+	SELECT count(*) INTO v_count FROM (SELECT * FROM cat_arc WHERE matcat_id IS NULL);
+
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id, 3, '371',concat(
+		'ERROR-371: There were ',v_count,' rows with missed matcat_id on cat_arc table. Fix it before continue'));
+		v_count=0;
+	ELSE
+		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
+		VALUES (v_fid, v_result_id , 1,  '371','INFO: No registers found without material on cat_arc table.');
+	END IF;	
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');

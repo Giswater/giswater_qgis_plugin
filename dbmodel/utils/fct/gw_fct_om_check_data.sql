@@ -23,7 +23,7 @@ SELECT gw_fct_om_check_data($${
 SELECT * FROM audit_check_data WHERE fid = 125
 
 --fid:  main: 125
-	other: 104,187,188,196,197,201,202,203,204,205,257,296
+	other: 104,187,188,196,197,201,202,203,204,205,257,296,372
 
 */
 
@@ -75,10 +75,10 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid = 125 AND cur_user=current_user;
 	
 	-- delete old values on anl table
-	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (210,201,202,204,205,257, 291);
-	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (103, 196, 197, 188, 223, 202 );
+	DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (210,201,202,204,205,257,291);
+	DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (103, 196, 197, 188, 223,202,372 );
 	DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (177,187, 202, 296);
-
+	DELETE FROM temp_arc;
 
 	-- Starting process
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, null, 4, concat('DATA QUALITY ANALYSIS ACORDING O&M RULES'));
@@ -871,7 +871,34 @@ BEGIN
 			VALUES (125, 1, '299','INFO: All hydrometers on crm schema have code',v_count);
 		END IF;
 	END IF;
+
+	RAISE NOTICE '31 - Check operative arcs with wrong topology (372)';
+	-- update node_1
+	UPDATE temp_arc t SET node_1 = node_id, state = 9 FROM (
+	SELECT arc.arc_id, node.node_id, min(ST_Distance(node.the_geom, ST_startpoint(arc.the_geom))) as d FROM node, arc 
+	WHERE arc.state = 1 and node.state = 1 and ST_DWithin(ST_startpoint(arc.the_geom), node.the_geom, 0.10) group by 1,2 ORDER BY 1 DESC,3 DESC
+	)a where t.arc_id = a.arc_id AND t.node_1 != a.node_id;
 	
+	--update node_2
+	UPDATE temp_arc t SET node_2 = node_id, state = 9 FROM (
+	SELECT arc.arc_id, node.node_id, min(ST_Distance(node.the_geom, ST_endpoint(arc.the_geom))) as d FROM node, arc 
+	WHERE arc.state = 1 and node.state = 1 and ST_DWithin(ST_endpoint(arc.the_geom), node.the_geom, 0.10) group by 1,2 ORDER BY 1 DESC,3 DESC
+	)a where t.arc_id = a.arc_id AND t.node_2 != a.node_id;
+
+	EXECUTE 'SELECT count(*) FROM temp_arc WHERE state = 9'
+	INTO v_count;
+	IF v_count > 0 THEN
+		EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, node_1, node_2, descript, the_geom, expl_id)
+		SELECT 372, t.arc_id, t.node_1, t.node_2, concat(''Operative arcs with wrong topology. Proposed nodes: {node_1:'',t.node_1,'', node_2:'', t.node_2, ''}''), a.the_geom, a.expl_id 
+		FROM temp_arc t JOIN arc a USING(arc_id) WHERE t.state = 9');
+		INSERT INTO audit_check_data (fid, criticity,result_id,error_message, fcount)
+		VALUES (125, 3, '372', concat('ERROR-372: There is/are ',v_count,' operative arcs with wrong topology.'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity,result_id, error_message,fcount)
+		VALUES (125, 1, '372','INFO: All arcs has well-defined topology',v_count);
+	END IF;
+
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 3, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (125, v_result_id, 2, '');
@@ -919,7 +946,7 @@ BEGIN
 	'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom
-  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (103, 196, 197, 188, 223, 202)) row) features;
+  	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (103, 196, 197, 188, 223, 202, 372)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
