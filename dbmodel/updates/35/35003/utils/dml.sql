@@ -80,7 +80,7 @@ DROP TABLE iF EXISTS _config_form_fields_;
 
 UPDATE sys_table SET id = 'v_vnode',descript='Shows information about virtual nodes.' WHERE id = 'v_edit_vnode';
 
-UPDATE config_form_fields SET widgetcontrols = replace (widgetcontrols, 'setQgisMultiline', 'setMultiline') WHERE widgetcontrols is not null;
+UPDATE config_form_fields SET widgetcontrols = replace (widgetcontrols::text, 'setQgisMultiline', 'setMultiline')::json WHERE widgetcontrols is not null;
 
 UPDATE sys_fprocess SET fprocess_name='Check if pattern method is compatible with networkmode' WHERE fid=161;
 UPDATE sys_fprocess SET fprocess_name='Ckeck if pattern for connec is the same for all connecs related to the same vnode' WHERE fid=162;
