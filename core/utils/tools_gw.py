@@ -2658,6 +2658,8 @@ def _check_user_params(section, parameter, file_name, prefix=False):
     """ Check if a parameter exists in the config/user_params.config
         If it doesn't exist, it creates it and assigns 'None' as a default value
     """
+    if section == "i18n_generator":
+        return
     # Check if the parameter needs the prefix or not
     if prefix and global_vars.project_type is not None:
         parameter = f"_{parameter}"
