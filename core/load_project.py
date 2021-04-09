@@ -42,7 +42,7 @@ class GwLoadProject(QObject):
     def project_read(self, show_warning=True):
         """ Function executed when a user opens a QGIS project (*.qgs) """
         
-        self._get_user_level_variables()
+        self._get_user_variables()
 
         # Check if loaded project is valid for Giswater
         if not self._check_project(show_warning):
@@ -150,8 +150,9 @@ class GwLoadProject(QObject):
 
     # region private functions
 
-    def _get_user_level_variables(self):
-        """ Get config related with user_level variables """
+
+    def _get_user_variables(self):
+        """ Get config related with user variables """
 
         comment = f"initial=1, normal=2, expert=3, u can config some parameters in [user_level] section"
         global_vars.user_level['level'] = tools_gw.check_config_settings('system', 'user_level', '1', comment=comment, prefix=False)
@@ -160,6 +161,9 @@ class GwLoadProject(QObject):
         global_vars.user_level['showselectmessage'] = tools_gw.check_config_settings('user_level', 'showselectmessage', '1,2,3', prefix=False)
         comment = f"Manage advanced tab, fields manager tab and sample dev radio button from admin"
         global_vars.user_level['showadminadvanced'] = tools_gw.check_config_settings('user_level', 'showadminadvanced', "3", "user", "init", comment=comment, prefix=False)
+        comment = f"Display format of the dates allowed in the forms:: " \
+                  f"dd/MM/yyyy or dd-MM-yyyy or yyyy/MM/dd or yyyy-MM-dd"
+        global_vars.date_format = tools_gw.check_config_settings('system', 'date_format', None, comment=comment, prefix=False)
 
 
     def _check_project(self, show_warning):

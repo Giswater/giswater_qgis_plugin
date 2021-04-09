@@ -18,7 +18,7 @@ from ..dialog import GwAction
 from ...ui.ui_manager import GwConfigUi
 from ...utils import tools_gw
 from ....lib import tools_qt, tools_db, tools_qgis
-
+from .... import global_vars
 
 class GwConfigButton(GwAction):
     """ Button 99: Config """
@@ -191,7 +191,8 @@ class GwConfigButton(GwAction):
                         widget.setAllowNull(True)
                         widget.setCalendarPopup(True)
                         widget.setDisplayFormat('dd/MM/yyyy')
-
+                        if global_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
+                            widget.setDisplayFormat(global_vars.date_format)
                         if field['value']:
                             field['value'] = field['value'].replace('/', '-')
                         date = QDate.fromString(field['value'], 'yyyy-MM-dd')
@@ -199,6 +200,7 @@ class GwConfigButton(GwAction):
                             widget.setDate(date)
                         else:
                             widget.clear()
+
                         widget.dateChanged.connect(partial(self._get_dialog_changed_values, widget, self.tab, self.chk))
                         widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
                     elif field['widgettype'] == 'spinbox':
@@ -223,9 +225,8 @@ class GwConfigButton(GwAction):
 
                     self._order_widgets(field, lbl, widget)
 
-            except Exception:
-                msg = f"key 'comboIds' or/and comboNames not found WHERE " \
-                      f"widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
+            except Exception as e:
+                msg = f"{type(e).__name__} {e}. widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
                 tools_qgis.show_message(msg, 2)
 
 

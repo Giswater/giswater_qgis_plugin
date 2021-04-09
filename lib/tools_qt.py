@@ -111,7 +111,7 @@ def get_calendar_date(dialog, widget, date_format="yyyy/MM/dd", datetime_format=
         date = widget.date().toString(date_format)
     elif type(widget) is QDateTimeEdit:
         date = widget.dateTime().toString(datetime_format)
-    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy', 'yyyy/MM/dd'):
+    elif type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy', 'yyyy/MM/dd', 'dd-MM-yyyy', 'yyyy-MM-dd'):
         date = widget.dateTime().toString(date_format)
     elif type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy hh:mm:ss', 'yyyy/MM/dd hh:mm:ss'):
         date = widget.dateTime().toString(datetime_format)
@@ -121,12 +121,16 @@ def get_calendar_date(dialog, widget, date_format="yyyy/MM/dd", datetime_format=
 
 def set_calendar(dialog, widget, date, default_current_date=True):
 
+    if global_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
+        widget.setDisplayFormat(global_vars.date_format)
+
     if type(widget) is str or type(widget) is str:
         widget = dialog.findChild(QWidget, widget)
     if not widget:
         return
     if type(widget) is QDateEdit \
-            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy', 'yyyy/MM/dd')):
+            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in
+                ('dd/MM/yyyy', 'yyyy/MM/dd', 'dd-MM-yyyy', 'yyyy-MM-dd')):
         if date is None:
             if default_current_date:
                 date = QDate.currentDate()
@@ -134,7 +138,7 @@ def set_calendar(dialog, widget, date, default_current_date=True):
                 date = QDate.fromString('01-01-2000', 'dd-MM-yyyy')
         widget.setDate(date)
     elif type(widget) is QDateTimeEdit \
-            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy hh:mm:ss', 'yyyy/MM/dd hh:mm:ss')):
+            or (type(widget) is QgsDateTimeEdit and widget.displayFormat() in ('dd/MM/yyyy hh:mm:ss', 'yyyy/MM/dd hh:mm:ss','dd-MM-yyyy hh:mm:ss', 'yyyy-MM-dd hh:mm:ss')):
         if date is None:
             date = QDateTime.currentDateTime()
         widget.setDateTime(date)

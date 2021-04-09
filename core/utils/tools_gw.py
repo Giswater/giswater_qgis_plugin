@@ -953,6 +953,8 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                 widget.setAllowNull(True)
                 widget.setCalendarPopup(True)
                 widget.setDisplayFormat('yyyy/MM/dd')
+                if global_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
+                    widget.setDisplayFormat(global_vars.date_format)
                 date = QDate.currentDate()
                 if 'value' in field and field['value'] not in ('', None, 'null'):
                     date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
@@ -2333,10 +2335,8 @@ def set_calendar_from_user_param(dialog, widget, table_name, value, parameter):
     sql = (f"SELECT {value} FROM {table_name}"
            f" WHERE parameter = '{parameter}' AND cur_user = current_user")
     row = tools_db.get_row(sql)
-    if row:
-        if row[0]:
-            row[0] = row[0].replace('/', '-')
-        date = QDate.fromString(row[0], 'yyyy-MM-dd')
+    if row and row[0]:
+        date = QDate.fromString(row[0].replace('/', '-'), 'yyyy-MM-dd')
     else:
         date = QDate.currentDate()
     tools_qt.set_calendar(dialog, widget, date)
