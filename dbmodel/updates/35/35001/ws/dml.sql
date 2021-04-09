@@ -58,8 +58,12 @@ VALUES (2980, 'gw_fct_setmincut', 'utils', 'function', 'json', 'json', NULL, 'ro
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2244,'gw_fct_mincut_result_overlap',
 '{"style":{"point":{"style":"qml", "id":"106"},  "line":{"style":"qml", "id":"105"}, "polygon":{"style":"qml", "id":"107"}}}',
-'{"visible": ["v_om_mincut_arc", "v_om_mincut_node", "v_om_mincut_connec", "v_om_mincut_initpoint"]}',NULL) 
+'{"visible": ["v_om_mincut_arc", "v_om_mincut_node", "v_om_mincut_connec", "v_om_mincut"]}',NULL) 
 ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
+VALUES(2980,'gw_fct_setmincut',NULL,'{"visible": ["v_om_mincut_arc", "v_om_mincut_connec", "v_om_mincut", "v_om_mincut_node"], "zoom":{"layer":"v_om_mincut_arc", "margin":20}}',NULL)
+ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
 VALUES(2302,'gw_fct_anl_node_topological_consistency','{"style":{"point":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 

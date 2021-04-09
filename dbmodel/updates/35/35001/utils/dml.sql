@@ -136,9 +136,6 @@ VALUES(2914,'gw_fct_anl_node_proximity', '{"style":{"point":{"style":"unique", "
 "line":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}, 
 "polygon":{"style":"unique", "values":{"width":3, "color":[255,1,1], "transparency":0.5}}}}', NULL, NULL)  ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO config_function (id, function_name, returnmanager, layermanager, actions) 
-VALUES(2980,'gw_fct_setmincut',NULL,'{"visible": ["v_om_mincut_arc", "v_om_mincut_connec", "v_om_mincut_initpoint", "v_om_mincut_node"], "zoom":{"layer":"v_om_mincut_arc", "margin":20}}',NULL)
- ON CONFLICT (id) DO NOTHING;
 
 
 
