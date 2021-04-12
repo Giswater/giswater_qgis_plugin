@@ -109,7 +109,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
                 tools_log.log_warning(f"Section '{section}' not found")
             return None
         if not parser.has_option(section, parameter):
-            if chk_user_params:
+            if chk_user_params and config_type in "user":
                 value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
                 set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
             return value
