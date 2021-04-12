@@ -90,40 +90,40 @@ UPDATE config_param_system SET value  =
 WHERE parameter = 'utils_grafanalytics_dynamic_symbology';
 
 
-UPDATE config_form_tabs SET tabactions = '[{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},
-{"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false},
-{"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},
-{"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false},
-{"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},
-{"actionName":"actionWorkcat", "actionTooltip":"Add Workcat",  "disabled":false},
-{"actionName":"actionCopyPaste", "actionTooltip":"Copy Paste",  "disabled":false},
-{"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false},
-{"actionName":"actionMapZone", "actionTooltip":"Add Mapzone",  "disabled":false},
-{"actionName":"actionSetToArc", "actionTooltip":"Set to_arc",  "disabled":false},
-{"actionName":"actionGetParentId", "actionTooltip":"Set parent_id",  "disabled":false},
-{"actionName":"actionGetArcId", "actionTooltip":"Set arc_id",  "disabled":false},
-{"actionName": "actionRotation", "actionTooltip": "Rotation","disabled": false}]'
+UPDATE config_form_tabs SET tabactions = '[{"actionName":"actionEdit",  "disabled":false},
+{"actionName":"actionZoom",  "disabled":false},
+{"actionName":"actionCentered",  "disabled":false},
+{"actionName":"actionZoomOut" , "disabled":false},
+{"actionName":"actionCatalog",  "disabled":false},
+{"actionName":"actionWorkcat",  "disabled":false},
+{"actionName":"actionCopyPaste",  "disabled":false},
+{"actionName":"actionLink",  "disabled":false},
+{"actionName":"actionMapZone",  "disabled":false},
+{"actionName":"actionSetToArc",  "disabled":false},
+{"actionName":"actionGetParentId",  "disabled":false},
+{"actionName":"actionGetArcId", "disabled":false},
+{"actionName": "actionRotation","disabled": false}]'
 WHERE formname ='v_edit_node';
 
 
-UPDATE config_form_tabs SET tabactions = '[{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},
-{"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false},
-{"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},
-{"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false},
-{"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},
-{"actionName":"actionWorkcat", "actionTooltip":"Add Workcat",  "disabled":false},
-{"actionName":"actionCopyPaste", "actionTooltip":"Copy Paste",  "disabled":false},
-{"actionName":"actionSection", "actionTooltip":"Show Section",  "disabled":false},
-{"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false}]'
+UPDATE config_form_tabs SET tabactions = '[{"actionName":"actionEdit", "disabled":false},
+{"actionName":"actionZoom", "disabled":false},
+{"actionName":"actionCentered", "disabled":false},
+{"actionName":"actionZoomOut", "disabled":false},
+{"actionName":"actionCatalog", "disabled":false},
+{"actionName":"actionWorkcat", "disabled":false},
+{"actionName":"actionCopyPaste","disabled":false},
+{"actionName":"actionSection", "disabled":false},
+{"actionName":"actionLink",  "disabled":false}]'
 WHERE formname ='v_edit_arc';
 
-UPDATE config_form_tabs SET tabactions = '[{"actionName":"actionEdit", "actionTooltip":"Edit",  "disabled":false},
-{"actionName":"actionZoom", "actionTooltip":"Zoom In",  "disabled":false},
-{"actionName":"actionCentered", "actionTooltip":"Center",  "disabled":false},
-{"actionName":"actionZoomOut", "actionTooltip":"Zoom Out",  "disabled":false},
-{"actionName":"actionCatalog", "actionTooltip":"Change Catalog",  "disabled":false},
-{"actionName":"actionWorkcat", "actionTooltip":"Add Workcat",  "disabled":false},
-{"actionName":"actionCopyPaste", "actionTooltip":"Copy Paste",  "disabled":false},
-{"actionName":"actionLink", "actionTooltip":"Open Link",  "disabled":false},
-{"actionName":"actionGetArcId", "actionTooltip":"Set arc_id",  "disabled":false}]'
+UPDATE config_form_tabs SET tabactions = '[{"actionName":"actionEdit", "disabled":false},
+{"actionName":"actionZoom", "disabled":false},
+{"actionName":"actionCentered", "disabled":false},
+{"actionName":"actionZoomOut", "disabled":false},
+{"actionName":"actionCatalog", "disabled":false},
+{"actionName":"actionWorkcat","disabled":false},
+{"actionName":"actionCopyPaste",  "disabled":false},
+{"actionName":"actionLink",  "disabled":false},
+{"actionName":"actionGetArcId", "disabled":false}]'
 WHERE formname ='v_edit_connec';

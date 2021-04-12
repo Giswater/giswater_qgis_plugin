@@ -103,3 +103,6 @@ ALTER TABLE IF EXISTS config_form RENAME TO _config_form_;
 ALTER TABLE IF EXISTS config_form RENAME TO _inp_value_yesnofull_;
 
 ALTER TABLE sys_fprocess ALTER COLUMN fprocess_name TYPE character varying(100);
+
+--2021/04/12
+ALTER TABLE IF EXISTS config_form_actions RENAME TO _config_form_actions_;

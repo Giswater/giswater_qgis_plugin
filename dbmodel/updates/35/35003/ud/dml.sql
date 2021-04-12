@@ -26,3 +26,54 @@ UPDATE node SET epa_type ='UNDEFINED' WHERE epa_type  ='NOT DEFINED';
 --2021/04/07
 DELETE FROM config_form_fields where formname='inp_flwreg_type';
 DELETE FROM sys_table where id='inp_flwreg_type';
+
+UPDATE config_form_tabs SET tabactions = '[{"actionName": "actionEdit", "disabled": false}, 
+{"actionName": "actionZoom", "disabled": false}, 
+{"actionName": "actionCentered", "disabled": false}, 
+{"actionName": "actionZoomOut", "disabled": false}, 
+{"actionName": "actionCatalog", "disabled": false}, 
+{"actionName": "actionWorkcat", "disabled": false}, 
+{"actionName": "actionCopyPaste", "disabled": false}, 
+{"actionName": "actionLink", "disabled": false},
+{"actionName":"actionGetArcId", "disabled":false},
+{"actionName":"actionInterpolate", "disabled":false},
+{"actionName": "actionHelp", "disabled": false}]'
+WHERE formname ='v_edit_node';
+
+
+UPDATE config_form_tabs SET tabactions = '[{"actionName":"actionEdit", "disabled":false},
+{"actionName":"actionZoom", "disabled":false},
+{"actionName":"actionCentered", "disabled":false},
+{"actionName":"actionZoomOut", "disabled":false},
+{"actionName":"actionCatalog", "disabled":false},
+{"actionName":"actionWorkcat", "disabled":false},
+{"actionName":"actionCopyPaste", "disabled":false},
+{"actionName":"actionSection", "disabled":false},
+{"actionName":"actionLink", "disabled":false},
+{"actionName":"actionHelp", "disabled":false}]'
+WHERE formname ='v_edit_arc';
+
+
+UPDATE config_form_tabs SET tabactions = '[{"actionName":"actionEdit", "disabled":false},
+{"actionName":"actionZoom", "disabled":false},
+{"actionName":"actionCentered", "disabled":false},
+{"actionName":"actionZoomOut", "disabled":false},
+{"actionName":"actionCatalog", "disabled":false},
+{"actionName":"actionWorkcat", "disabled":false},
+{"actionName":"actionCopyPaste", "disabled":false},
+{"actionName":"actionLink", "disabled":false},
+{"actionName":"actionHelp", "disabled":false}, 
+{"actionName":"actionGetArcId", "disabled":false}]'
+WHERE formname ='v_edit_connec';
+
+
+UPDATE config_form_tabs SET tabactions = '[{"actionName":"actionEdit", "disabled":true},
+{"actionName":"actionZoom", "disabled":false},
+{"actionName":"actionCentered", "disabled":false},
+{"actionName":"actionZoomOut", "disabled":false},
+{"actionName":"actionWorkcat", "disabled":false},
+{"actionName":"actionCopyPaste", "disabled":false},
+{"actionName":"actionLink", "disabled":false},
+{"actionName":"actionHelp", "disabled":false}, 
+{"actionName":"actionGetArcId", "disabled":false}]'
+WHERE formname ='v_edit_gully';

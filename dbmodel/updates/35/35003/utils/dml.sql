@@ -86,3 +86,27 @@ UPDATE sys_fprocess SET fprocess_name='Check if pattern method is compatible wit
 UPDATE sys_fprocess SET fprocess_name='Ckeck if pattern for connec is the same for all connecs related to the same vnode' WHERE fid=162;
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (369, 'Check subcatchment configuration','ud') ON CONFLICT (fid) DO NOTHING;
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (370, 'Check features with sector_id=0','ud')  ON CONFLICT (fid) DO NOTHING;
+
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionAddFile', 'Add File') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionAddPhoto', 'Add Photo') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionCatalog', 'Change Catalog') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionCentered', 'Center') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionCopyPaste', 'Copy Paste') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionDelete', 'Delete') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionEdit', 'Edit') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionGetArcId', 'Set arc_id') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionGetParentId', 'Set parent_id') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionHelp', 'Help') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionInterpolate', 'Interpolate') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionLink', 'Open Link') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionMapZone', 'Add Mapzone') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionRotation', 'Rotation') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionSection', 'Show Section') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionSetToArc', 'Set to_arc') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionVisitEnd', 'End Visit') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionVisitStart', 'Start Visit') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionWorkcat', 'Add Workcat') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionZoom', 'Zoom') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionZoomIn', 'Zoom In') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionZoomOut', 'Zoom Out') ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'getInfoFromId', 'Info') ON CONFLICT (typevalue, id) DO NOTHING;
