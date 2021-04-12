@@ -365,6 +365,11 @@ class GwI18NGenerator:
                          f'"formname":"{form_name}", '
                          f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
                          f'"tooltip":{{"column":"descript", "value":"{tt_value}"}}')
+            elif row['context'] in ('config_typevalue'):
+                line += (f'{{"data":'
+                         f'{{"table":"{table}", '
+                         f'"formname":"{form_name}", '
+                         f'"label":{{"column":"idval", "value":"{tt_value}"}} ')
             elif row['context'] not in ('config_param_system', 'sys_param_user'):
                 line += (f'{{"data":'
                          f'{{"table":"{table}", '
@@ -382,8 +387,8 @@ class GwI18NGenerator:
             elif row['context'] == 'config_form_groupbox':
                 line += (f', "clause":"WHERE formname = \'{form_name}\' '
                          f'AND layout_id  = \'{source}\'"')
-            elif row['context'] == 'config_form_actions':
-                line += f', "clause":"WHERE actioname  = \'{source}\''
+            elif row['context'] == 'config_typevalue':
+                line += f', "clause":"WHERE typevalue = \'{form_name}\' AND id  = \'{source}\'"'
             elif row['context'] == 'config_param_system':
                 line += f', "clause":"WHERE parameter = \'{source}\'"'
             elif row['context'] == 'sys_param_user':
