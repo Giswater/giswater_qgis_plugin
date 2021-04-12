@@ -88,7 +88,7 @@ BEGIN
 	v_version = (SELECT giswater FROM sys_version LIMIT 1);
 
 	-- set variables
-	v_fid=116;  
+	v_fid=376;  
 
 	-- data quality analysis
 	v_input = '{"client":{"device":3, "infoType":100, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}'::json;
@@ -329,7 +329,7 @@ BEGIN
 	END LOOP;
 	
 	INSERT INTO audit_check_data (fid, error_message) 
-	VALUES (v_fid, concat('WARNING: LRS attributes on node features have been updated'));
+	VALUES (v_fid, concat('WARNING-376: LRS attributes on node features have been updated'));
 
 	-- get results
 	-- info

@@ -233,7 +233,7 @@ BEGIN
 					-- info
 					INSERT INTO audit_check_data (fid, error_message)
 					VALUES (216, concat ('WARNING-216: There is a temporal overlap with spatial intersection on the same macroexploitation with:',v_conflictmsg));
-					INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat ('WARNING: additional pipes are involved and more connecs are affected ( ',v_addaffconnecs,' units. )'));
+					INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat ('WARNING-216: additional pipes are involved and more connecs are affected ( ',v_addaffconnecs,' units. )'));
 												
 					-- point: connecs affected
 					INSERT INTO anl_connec (fid, connec_id, descript, the_geom)
@@ -249,7 +249,7 @@ BEGIN
 					-- info
 					INSERT INTO audit_check_data (fid, error_message)
 					VALUES (216, concat ('WARNING-216: There is a temporal overlap with spatial intersection on the same macroexploitation wit:',v_conflictmsg));
-					INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat ('WARNING: additional pipes are involved'));
+					INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat ('WARNING-216: additional pipes are involved'));
 					INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat ('INFO: No more connecs are affected'));
 					
 				END IF;
@@ -299,7 +299,7 @@ BEGIN
 					
 					--info
 					INSERT INTO audit_check_data (fid, error_message)
-					VALUES (216, concat ('WARNING: There is a temporal overlap with spatial intersection on the same macroexploitation with:',v_conflictmsg));
+					VALUES (216, concat ('WARNING-216: There is a temporal overlap with spatial intersection on the same macroexploitation with:',v_conflictmsg));
 					INSERT INTO audit_check_data (fid, error_message) VALUES (216, concat ('INFO: No additional pipes are involved and no more connecs are affected'));
 					
 					-- line: the oposite mincuts 
@@ -451,7 +451,7 @@ BEGIN
 		SELECT * INTO v_mincutrec FROM om_mincut WHERE id=v_mincutid;
 
 		-- creating log
-		INSERT INTO audit_check_data (fid, error_message) VALUES (216, 'WARNING: Mincut have been executed with conflicts. All additional affetations have been joined to present mincut');
+		INSERT INTO audit_check_data (fid, error_message) VALUES (216, 'WARNING-216: Mincut have been executed with conflicts. All additional affetations have been joined to present mincut');
 		INSERT INTO audit_check_data (fid, error_message) VALUES (216, '');
 		INSERT INTO audit_check_data (fid, error_message) VALUES (216, 'Mincut stats (with additional affectations)');
 		INSERT INTO audit_check_data (fid, error_message) VALUES (216, '-----------------------------------------------');

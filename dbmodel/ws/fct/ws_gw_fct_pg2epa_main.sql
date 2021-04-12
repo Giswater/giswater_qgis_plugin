@@ -157,7 +157,7 @@ BEGIN
 			IF v_response = 0 THEN
 				v_message = concat ('INFO: vnodes over nodarcs have been checked without any inconsistency. In terms of vnode/nodarc topological relation network is ok');
 			ELSE
-				v_message = concat ('WARNING: vnodes over nodarcs have been checked. In order to keep inlet flows from connecs using vnode_id, ' , 
+				v_message = concat ('WARNING-159: vnodes over nodarcs have been checked. In order to keep inlet flows from connecs using vnode_id, ' , 
 				v_response, ' nodarc nodes have been renamed using vnode_id');
 			END IF;
 		ELSE

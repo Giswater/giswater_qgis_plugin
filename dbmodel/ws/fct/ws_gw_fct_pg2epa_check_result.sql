@@ -199,10 +199,10 @@ BEGIN
 				USING (curve_id))a using (curve_id)) b group by curve_id having count(*)=3)c;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' pump(s) with a curve defined by 3 points. Please check your data before continue because a bug of EPANET with 3-point curves, it will not work.'));
+			VALUES (v_fid, v_result_id, 3, concat('ERROR-172: There is/are ',v_count,' pump(s) with a curve defined by 3 points. Please check your data before continue because a bug of EPANET with 3-point curves, it will not work.'));
 		ELSE 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, 'INFO: Pumps with 3-point curves checked. No results founded. Due a EPANET''s bug with 3-point curves, it is forbidden to export curves like this because newer it will work on EPANET.');
+			VALUES (v_fid, v_result_id, 1, 'INFO: Pumps with 3-point curves checked. No results found. Due a EPANET''s bug with 3-point curves, it is forbidden to export curves like this because newer it will work on EPANET.');
 		END IF;
 
 
@@ -212,7 +212,7 @@ BEGIN
 
 		IF  v_nodearc_user > (v_nodearc_real+0.01) THEN 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING: The node2arc parameter have been modified from ',
+			VALUES (v_fid, v_result_id, 2, concat('WARNING-375: The node2arc parameter have been modified from ',
 			v_nodearc_user::numeric(12,3), ' to ', v_nodearc_real::numeric(12,3), ' in order to prevent length conflicts.'));
 		ELSE 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -228,17 +228,17 @@ BEGIN
 		IF v_headloss = 'D-W' AND (v_min < 0.0025 AND v_max > 0.15) THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 2, concat(
-				'WARNING: There is/are at least one value of roughnesss out of range using headloss formula D-W (0.0025-0.15) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
+				'WARNING-371: There is/are at least one value of roughnesss out of range using headloss formula D-W (0.0025-0.15) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
 			
 		ELSIF v_headloss = 'H-W' AND (v_min < 110 AND v_max > 150) THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 2, concat(
-				'WARNING: There is/are at least one value of roughnesss out of range using headloss formula h-W (110-150) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
+				'WARNING-371: There is/are at least one value of roughnesss out of range using headloss formula h-W (110-150) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
 			
 		ELSIF v_headloss = 'C-M' AND (v_min < 0.011 AND v_max > 0.017) THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 2, concat(
-				'WARNING: There is/are at least one value of roughnesss out of range using headloss formula C-M (0.011-0.017) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
+				'WARNING-371: There is/are at least one value of roughnesss out of range using headloss formula C-M (0.011-0.017) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
 		ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 1, concat(
@@ -261,7 +261,7 @@ BEGIN
 
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ',v_count,' pump''s with null values at least on curve_id.'));
+				VALUES (v_fid, v_result_id, 3, concat('ERROR-280: There is/are ',v_count,' pump''s with null values at least on curve_id.'));
 				v_count=0;
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -279,7 +279,7 @@ BEGIN
 			IF v_count > 0 THEN
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,
+				VALUES (v_fid, v_result_id, 2, concat('WARNING-159: There is/are ',v_count,
 				' vnode(s) over node2arc. This is an important inconsistency. You need to reduce the nodarc length or check affected vnodes. For more info you can type'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 2, concat('SELECT * FROM anl_node WHERE fid = 159 AND cur_user=current_user'));
@@ -321,11 +321,11 @@ BEGIN
 			IF  v_count = 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 3, concat(
-				'ERROR: There is/are not hydrometers to define the CRM period demand. Please check your hydrometer selector or simply verify if there are hydrometers on the project.'));
+				'ERROR-372: There is/are no hydrometers to define the CRM period demand. Please check your hydrometer selector or simply verify if there are hydrometers on the project.'));
 				v_count=0;
 			ELSIF v_count_2 < v_count THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ', v_count, ' hydrometer(s) on current settings for user (v_rtc_hydrometer) and there are only ',
+				VALUES (v_fid, v_result_id, 2, concat('WARNING-372: There is/are ', v_count, ' hydrometer(s) on current settings for user (v_rtc_hydrometer) and there are only ',
 				v_count_2,' hydrometer(s) with period values from that settings on the hydrometer-period table (ext_rtc_hydrometer_x_data).'));
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -347,9 +347,9 @@ BEGIN
 				INSERT INTO anl_connec (fid, connec_id, connecat_id, the_geom)
 				SELECT 160, connec_id, connecat_id, the_geom FROM v_edit_connec LEFT JOIN v_rtc_hydrometer h USING (connec_id) WHERE h.connec_id is null;
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' connec(s) without hydrometers. It means that vnode is generated but pattern is null and demand is null for that vnode.'));
+				VALUES (v_fid, v_result_id, 2, concat('WARNING-160: There is/are ',v_count,' connec(s) without hydrometers. It means that vnode is generated but pattern is null and demand is null for that vnode.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('SELECT * FROM anl_connec WHERE fid = 60 AND cur_user=current_user'));
+				VALUES (v_fid, v_result_id, 2, concat('SELECT * FROM anl_connec WHERE fid = 160 AND cur_user=current_user'));
 			END IF;
 
 		END IF;
@@ -367,11 +367,11 @@ BEGIN
 
 			IF  v_count = 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING: There aren''t dma''s defined on the dma-period table (ext_rtc_dma_period). Please check it before continue.'));
+				VALUES (v_fid, v_result_id, 2, concat('WARNING-374: There aren''t dma''s defined on the dma-period table (ext_rtc_dma_period). Please check it before continue.'));
 			
 			ELSIF v_count_2 > v_count THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ', v_count_2,
+				VALUES (v_fid, v_result_id, 2, concat('WARNING-374: There is/are ', v_count_2,
 				' connec dma''s attribute on this exportation but there is/are only ',v_count,' dma''s defined on dma-period table (ext_rtc_dma_period). Please check it before continue.'));
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -387,7 +387,7 @@ BEGIN
 			
 			IF  v_count2 >  v_count THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING: Some mandatory values on ext_rtc_dma_period (eff) are missed. Please check it before continue.'));
+				VALUES (v_fid, v_result_id, 2, concat('WARNING-374: Some mandatory values on ext_rtc_dma_period (eff) are missed. Please check it before continue.'));
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 1, concat('INFO: All mandatory values on ext_rtc_dma_period (eff) are filled.'));
@@ -400,7 +400,7 @@ BEGIN
 			
 			IF  v_count2 >  v_count THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING: Some values for pattern_volume on ext_rtc_dma_period are missed. Please check it before continue.'));
+				VALUES (v_fid, v_result_id, 2, concat('WARNING-374: Some values for pattern_volume on ext_rtc_dma_period are missed. Please check it before continue.'));
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 1, concat('INFO: All pattern_volume values on ext_rtc_dma_period are filled.'));
@@ -414,7 +414,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM anl_node WHERE fid = 297 AND cur_user = current_user;
 		IF  v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' nodes with epa_type UNDEFINED on this exportation. If are disconnected, may be have been deleted, but please check it before continue.'));
+			VALUES (v_fid, v_result_id, 2, concat('WARNING-297: There is/are ',v_count,' nodes with epa_type UNDEFINED on this exportation. If are disconnected, may be have been deleted, but please check it before continue.'));
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: All nodes have epa_type defined.'));
@@ -426,7 +426,7 @@ BEGIN
 		SELECT count(*) INTO v_count FROM temp_arc WHERE epa_type = 'UNDEFINED';
 		IF  v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ',v_count,' arcs with epa_type UNDEFINED on this exportation. Please check it before continue.'));
+			VALUES (v_fid, v_result_id, 2, concat('WARNING-297: There is/are ',v_count,' arcs with epa_type UNDEFINED on this exportation. Please check it before continue.'));
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: All arcs have epa_type defined.'));
@@ -442,7 +442,7 @@ BEGIN
 			
 			IF  v_count2 >  v_count THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING: Some values for pattern on ext_rtc_dma_period are missed. Please check it before continue.'));
+				VALUES (v_fid, v_result_id, 2, concat('WARNING-374WA: Some values for pattern on ext_rtc_dma_period are missed. Please check it before continue.'));
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 1, concat('INFO: All pattern values on ext_rtc_dma_period are filled.'));
@@ -457,11 +457,11 @@ BEGIN
 			IF v_count = 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 3, concat(
-				'ERROR: There is not values on ext_hydrometer_category_x_pattern for this period_type. Please check it before continue.'));
+				'ERROR-372: There is not values on ext_hydrometer_category_x_pattern for this period_type. Please check it before continue.'));
 			ELSIF v_count2 > v_count THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 3, concat(
-				'ERROR: There is more category_type hydrometers on network that defined on ext_hydrometer_category_x_pattern. Please check it before continue.'));
+				'ERROR-372: There is more category_type hydrometers on network that defined on ext_hydrometer_category_x_pattern. Please check it before continue.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 3, concat('HINT: UPDATE ext_rtc_hydrometer_x_data SET pattern_id = pattern_id FROM .'));
 			ELSE
@@ -480,13 +480,13 @@ BEGIN
 			IF  v_count_2 = 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 3, concat(
-				'ERROR: By using this pattern method, hydrometers''s must be defined with pattern on the hydrometer-period table (ext_rtc_hydrometer_x_data). Please check it before continue.'));
+				'ERROR-372: By using this pattern method, hydrometers''s must be defined with pattern on the hydrometer-period table (ext_rtc_hydrometer_x_data). Please check it before continue.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 3, concat(
 				'HINT: UPDATE ext_rtc_hydrometer_x_data SET pattern_id = pattern_id FROM .'));
 			ELSIF v_count > v_count_2 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING: There is/are ', v_count, ' hydrometers''s with volume but only', v_count_2,
+				VALUES (v_fid, v_result_id, 2, concat('WARNING-372: There is/are ', v_count, ' hydrometers''s with volume but only', v_count_2,
 				' with defined pattern on on the hydrometer-period table (ext_rtc_hydrometer_x_data). Please check it before continue.'));
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -502,7 +502,7 @@ BEGIN
 		
 		IF  v_count > 0 THEN 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 2, concat('WARNING: There are ', v_count , ' epanet shortpipe and valves without diameter. Neighbourg value have been setted. Please fill dint column on cat_node table'));
+			VALUES (v_fid, v_result_id, 2, concat('WARNING-375: There are ', v_count , ' epanet shortpipe and valves without diameter. Neighbourg value have been setted. Please fill dint column on cat_node table'));
 		ELSE 
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: There aren''t any shortpipe and valves without diameter defined on dint column in cat_node table'));
@@ -529,13 +529,13 @@ BEGIN
 			INTO v_count; 
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ', v_count, ' arcs with sector_id = 0 that didn''t take part in the simulation'));
+				VALUES (v_fid, v_result_id, 3, concat('ERROR-373: There is/are ', v_count, ' arcs with sector_id = 0 that didn''t take part in the simulation'));
 			END IF;
 			EXECUTE 'SELECT count FROM ('||v_querytext||')b WHERE feature = ''NODE'';'
 			INTO v_count; 
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 3, concat('ERROR: There is/are ', v_count, ' nodes with sector_id = 0 that didn''t take part in the simulation'));
+				VALUES (v_fid, v_result_id, 3, concat('ERROR-373: There is/are ', v_count, ' nodes with sector_id = 0 that didn''t take part in the simulation'));
 			END IF;
 		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)

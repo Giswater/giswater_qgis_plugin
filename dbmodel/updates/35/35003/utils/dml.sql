@@ -110,3 +110,12 @@ INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typeval
 INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionZoomIn', 'Zoom In') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'actionZoomOut', 'Zoom Out') ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO config_typevalue (typevalue, id, idval) VALUES ('formactions_typevalue', 'getInfoFromId', 'Info') ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (371, 'Check roughness configuration','ws') ON CONFLICT (fid) DO NOTHING;
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (372, 'Check hydrometer configuration','ws') ON CONFLICT (fid) DO NOTHING;
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (373, 'Check features with sector_id = 0, not involved in the simulation','utils') ON CONFLICT (fid) DO NOTHING;
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (374, 'Check period configuration for dma','ws') ON CONFLICT (fid) DO NOTHING;
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (375, 'Check node2arc configuration','utils') ON CONFLICT (fid) DO NOTHING;
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (376, 'Grafanalytics LRS','utils') ON CONFLICT (fid) DO NOTHING;
+
+UPDATE sys_fprocess SET fprocess_name = 'Features with EPA type UNDEFINED' WHERE fid =297;
