@@ -10,7 +10,7 @@ import sys
 from qgis.PyQt.QtCore import QSettings
 
 
-# region Static Variables (values are initialized on load project without changes during session)
+# region system variables (values are initialized on load project without changes during session)
 
 iface = None                            # An instance of interface that provides the hook by which you can manipulate the QGIS application at run time. Type "QgsInterface"
 canvas = None                           # An insance of QGIS canvas. Contains "canvas", "mapTool", "xyCoordinates", "Cursor", "Extent"
@@ -28,23 +28,29 @@ qgis_db_credentials = None              # An instance of QSqlDatabase (QPSQL) us
 dao = None                              # An instance of GwPgDao class thats found in "/lib/tools_db.py"
 dao_db_credentials = None               # An instance of credentials used to establish the connection with PostgreSql. Saving {db, schema, table, service, host, port, user, password, sslmode}
 pg_version = None                       # An instance of PostgreSql version of current connection
-shortcut_keys = []                      # An instance of used shortcut_keys for Giswater menu. This keys are configurated on file "init.config" from user config path "/user/AppData/Roaming/Giswater/"
 notify = None                           # An instance of GwNotify
-user_level = {                          # An instance used to know user level and user level configuration
-    'level': None,                      # initial=1, normal=2, expert=3
-    'showquestion': None,               # Used for show help (default config show for level 1 and 2)
-    'showsnapmessage': None,            # Used to indicate to the user that they can snapping
-    'showselectmessage': None,          # Used to indicate to the user that they can select
-    'showadminadvanced': None}          # Manage advanced tab, fields manager tab and sample dev radio button from admin
 project_vars = {}                       # An instance of project variables from QgsProject relating to Giswater
 project_vars['info_type'] = None        # gwInfoType
 project_vars['add_schema'] = None       # gwAddSchema
 project_vars['main_schema'] = None      # gwMainSchema
 project_vars['project_role'] = None     # gwProjectRole
 project_vars['project_type'] = None     # gwProjectType
-date_format = None                      # Display format of the dates allowed in the forms: dd/MM/yyyy or dd-MM-yyyy or yyyy/MM/dd or yyyy-MM-dd
 
 # endregion
+
+
+# region global user variables (values are initialized on load project without changes during session)
+shortcut_keys = []                      # An instance of used shortcut_keys for Giswater menu. This keys are configurated on file "init.config" from user config path "/user/AppData/Roaming/Giswater/"
+user_level = {                          # An instance used to know user level and user level configuration
+    'level': None,                      # initial=1, normal=2, expert=3
+    'showquestion': None,               # Used for show help (default config show for level 1 and 2)
+    'showsnapmessage': None,            # Used to indicate to the user that they can snapping
+    'showselectmessage': None,          # Used to indicate to the user that they can select
+    'showadminadvanced': None}          # Manage advanced tab, fields manager tab and sample dev radio button from admin
+date_format = None                      # Display format of the dates allowed in the forms: dd/MM/yyyy or dd-MM-yyyy or yyyy/MM/dd or yyyy-MM-dd
+# endregion
+
+
 
 # region Dynamic Variables (variables may change value during user's session)
 
