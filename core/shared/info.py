@@ -709,7 +709,7 @@ class GwInfo(QObject):
 
         if self.new_feature_id is not None:
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(True)
-            save = self._stop_editing(dialog, action_edit, result, fid, my_json, new_feature)
+            save = self._stop_editing(dialog, action_edit, layer, fid, my_json, new_feature)
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(False)
             if save and not self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').isChecked():
                 self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').trigger()
