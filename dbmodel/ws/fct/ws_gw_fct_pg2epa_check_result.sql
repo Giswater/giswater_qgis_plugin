@@ -228,17 +228,17 @@ BEGIN
 		IF v_headloss = 'D-W' AND (v_min < 0.0025 AND v_max > 0.15) THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 2, concat(
-				'WARNING-371: There is/are at least one value of roughnesss out of range using headloss formula D-W (0.0025-0.15) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
+				'WARNING-377: There is/are at least one value of roughnesss out of range using headloss formula D-W (0.0025-0.15) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
 			
 		ELSIF v_headloss = 'H-W' AND (v_min < 110 AND v_max > 150) THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 2, concat(
-				'WARNING-371: There is/are at least one value of roughnesss out of range using headloss formula h-W (110-150) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
+				'WARNING-377: There is/are at least one value of roughnesss out of range using headloss formula h-W (110-150) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
 			
 		ELSIF v_headloss = 'C-M' AND (v_min < 0.011 AND v_max > 0.017) THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 2, concat(
-				'WARNING-371: There is/are at least one value of roughnesss out of range using headloss formula C-M (0.011-0.017) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
+				'WARNING-377: There is/are at least one value of roughnesss out of range using headloss formula C-M (0.011-0.017) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
 		ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 1, concat(
@@ -321,11 +321,11 @@ BEGIN
 			IF  v_count = 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 3, concat(
-				'ERROR-372: There is/are no hydrometers to define the CRM period demand. Please check your hydrometer selector or simply verify if there are hydrometers on the project.'));
+				'ERROR-378: There is/are no hydrometers to define the CRM period demand. Please check your hydrometer selector or simply verify if there are hydrometers on the project.'));
 				v_count=0;
 			ELSIF v_count_2 < v_count THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING-372: There is/are ', v_count, ' hydrometer(s) on current settings for user (v_rtc_hydrometer) and there are only ',
+				VALUES (v_fid, v_result_id, 2, concat('WARNING-378: There is/are ', v_count, ' hydrometer(s) on current settings for user (v_rtc_hydrometer) and there are only ',
 				v_count_2,' hydrometer(s) with period values from that settings on the hydrometer-period table (ext_rtc_hydrometer_x_data).'));
 
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -457,11 +457,11 @@ BEGIN
 			IF v_count = 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 3, concat(
-				'ERROR-372: There is not values on ext_hydrometer_category_x_pattern for this period_type. Please check it before continue.'));
+				'ERROR-378: There is not values on ext_hydrometer_category_x_pattern for this period_type. Please check it before continue.'));
 			ELSIF v_count2 > v_count THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 3, concat(
-				'ERROR-372: There is more category_type hydrometers on network that defined on ext_hydrometer_category_x_pattern. Please check it before continue.'));
+				'ERROR-378: There is more category_type hydrometers on network that defined on ext_hydrometer_category_x_pattern. Please check it before continue.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 3, concat('HINT: UPDATE ext_rtc_hydrometer_x_data SET pattern_id = pattern_id FROM .'));
 			ELSE
@@ -480,13 +480,13 @@ BEGIN
 			IF  v_count_2 = 0 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 3, concat(
-				'ERROR-372: By using this pattern method, hydrometers''s must be defined with pattern on the hydrometer-period table (ext_rtc_hydrometer_x_data). Please check it before continue.'));
+				'ERROR-378: By using this pattern method, hydrometers''s must be defined with pattern on the hydrometer-period table (ext_rtc_hydrometer_x_data). Please check it before continue.'));
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 3, concat(
 				'HINT: UPDATE ext_rtc_hydrometer_x_data SET pattern_id = pattern_id FROM .'));
 			ELSIF v_count > v_count_2 THEN
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-				VALUES (v_fid, v_result_id, 2, concat('WARNING-372: There is/are ', v_count, ' hydrometers''s with volume but only', v_count_2,
+				VALUES (v_fid, v_result_id, 2, concat('WARNING-378: There is/are ', v_count, ' hydrometers''s with volume but only', v_count_2,
 				' with defined pattern on on the hydrometer-period table (ext_rtc_hydrometer_x_data). Please check it before continue.'));
 			ELSE
 				INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
