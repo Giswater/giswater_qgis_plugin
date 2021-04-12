@@ -600,7 +600,16 @@ BEGIN
 				= 'plan_psector_vdefault'::text AND config_param_user.cur_user::name = "current_user"() LIMIT 1), 1, true);
 			END IF;
 			IF NEW.state = 1 AND OLD.state=2 THEN
-				DELETE FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id;					
+				-- force plan_psector_force_delete
+				SELECT value INTO v_force_delete FROM config_param_user WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+				UPDATE config_param_user SET value = 'true' WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;
+
+				-- update state to prevent delete gully on gw_trg_plan_psector_delete
+				UPDATE gully SET state=1 WHERE gully_id=NEW.gully_id;
+				DELETE FROM plan_psector_x_gully WHERE gully_id=NEW.gully_id;	
+
+				-- restore plan_psector_force_delete
+				UPDATE config_param_user SET value = v_force_delete WHERE parameter = 'plan_psector_force_delete' and cur_user = current_user;				
 			END IF;
 		END IF;
 
