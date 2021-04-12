@@ -109,9 +109,10 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
                 tools_log.log_warning(f"Section '{section}' not found")
             return None
         if not parser.has_option(section, parameter):
-            if log_warning:
-                tools_log.log_warning(f"Parameter '{parameter}' not found in section '{section}'")
-            return None
+            if chk_user_params:
+                value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
+                set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
+            return value
         value = parser[section][parameter]
 
         # If there is a value and you don't want to get the comment, it only gets the value part
@@ -2670,6 +2671,8 @@ def _check_user_params(section, parameter, file_name, value=None, prefix=False):
     if check_value is None:
         set_config_parser(f"{file_name}.{section}", parameter, value, "project", "user_params", prefix=False,
                           chk_user_params=False)
+    else:
+        return check_value
 
 
 def _get_user_params_sections():
