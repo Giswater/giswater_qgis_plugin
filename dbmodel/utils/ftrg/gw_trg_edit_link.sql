@@ -11,25 +11,26 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_link()
 $BODY$
 
 DECLARE 
-	v_mantable varchar;
-	v_projectype varchar;
-	v_arc record;
-	v_connect record;
-	v_node record;
-	v_connec1 record;
-	v_gully1 record;
-	v_connec2 record;
-	v_gully2 record;
-	v_vnode record;
-	v_end_point public.geometry;
-	v_link_searchbuffer double precision;
-	v_count integer;
-	v_node_id integer;
-	v_arc_id text;
-	v_userdefined_geom boolean;
-	v_end_state integer;
-	v_autoupdate_dma boolean;
-
+v_mantable varchar;
+v_projectype varchar;
+v_arc record;
+v_connect record;
+v_node record;
+v_connec1 record;
+v_gully1 record;
+v_connec2 record;
+v_gully2 record;
+v_vnode record;
+v_end_point public.geometry;
+v_link_searchbuffer double precision;
+v_count integer;
+v_node_id integer;
+v_arc_id text;
+v_userdefined_geom boolean;
+v_end_state integer;
+v_autoupdate_dma boolean;
+v_pjoint_id text;
+v_pjoint_type text;
 
 BEGIN
 
@@ -47,7 +48,7 @@ BEGIN
 	-- Control insertions ID
 	IF TG_OP = 'INSERT' THEN
      
-        -- link ID
+		-- link ID
 		IF (NEW.link_id IS NULL) THEN
 			NEW.link_id:= (SELECT nextval('link_link_id_seq'));
 		END IF;	
@@ -232,10 +233,6 @@ BEGIN
 					expl_id=v_node.expl_id, dma_id=v_node.dma_id, sector_id=v_node.sector_id, pjoint_type='NODE', pjoint_id=v_node.node_id
 					WHERE connec_id=v_connec1.connec_id;
 				END IF;
-				
-			ELSIF NEW.ispsectorgeom IS TRUE THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 			END IF;
 			
 			-- specific updates for projectype
@@ -253,12 +250,8 @@ BEGIN
 						WHERE gully_id=v_gully1.gully_id;
 
 					END IF;
-					
-				ELSIF NEW.ispsectorgeom IS TRUE THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';				
 				END IF;
-				
+									
 			ELSIF v_projectype='WS' AND NEW.ispsectorgeom IS NOT TRUE THEN
 				UPDATE connec SET presszone_id = v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id
 				WHERE connec_id=v_connec1.connec_id;
@@ -269,6 +262,9 @@ BEGIN
 			NEW.exit_id=v_node.node_id;
 			v_end_point = v_node.the_geom;
 			v_end_state= v_node.state;
+			v_pjoint_id = v_node.node_id;
+			v_pjoint_type = 'NODE';
+			v_arc_id = (SELECT arc_id FROM arc WHERE state > 0 AND node_1 = v_node.node_id LIMIT 1);
 		
 		ELSIF v_connec2.connec_id IS NOT NULL THEN
 
@@ -284,10 +280,6 @@ BEGIN
 					WHERE connec_id=v_connec1.connec_id;
 
 				END IF;
-				
-			ELSIF NEW.ispsectorgeom IS TRUE THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 			END IF;
 				
 			-- specific updates for projectype
@@ -305,10 +297,6 @@ BEGIN
 						WHERE gully_id=v_gully1.gully_id;
 
 					END IF;
-					
-				ELSIF NEW.ispsectorgeom IS TRUE THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';				
 				END IF;
 		
 			ELSIF v_projectype='WS' AND NEW.ispsectorgeom IS NOT TRUE THEN
@@ -320,6 +308,9 @@ BEGIN
 			NEW.exit_id=v_connec2.connec_id;
 			v_end_point = v_connec2.the_geom;
 			v_end_state= v_connec2.state;
+			v_pjoint_id = v_connec2.pjoint_id;
+			v_pjoint_type = v_connec2.pjoint_type;
+			v_arc_id =  v_connec2.arc_id;
 		END IF;
 		
 		IF v_projectype='UD' THEN
@@ -344,16 +335,15 @@ BEGIN
 						sector_id=v_gully2.sector_id, pjoint_type=v_gully2.pjoint_type, pjoint_id=v_gully2.pjoint_id
 						WHERE connec_id=v_connec1.connec_id;
 					END IF;
-					
-				ELSIF NEW.ispsectorgeom IS TRUE THEN
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3082", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 				END IF;
 							
 				NEW.exit_type='GULLY';
 				NEW.exit_id=v_gully2.gully_id;
 				v_end_point = v_gully2.the_geom;
 				v_end_state = v_gully2.state;
+				v_pjoint_id = v_gully2.pjoint_id;
+				v_pjoint_type = v_gully2.pjoint_type;
+				v_arc_id =  v_gully2.arc_id;
 			END IF;
 		END IF;
 		
@@ -365,12 +355,24 @@ BEGIN
 		
 		-- upsert link
 		NEW.the_geom = (ST_SetPoint(NEW.the_geom, (ST_NumPoints(NEW.the_geom)-1), v_end_point));
+	END IF;
 
+	-- check exit type control 
+	IF NEW.exit_type != 'VNODE' AND NEW.ispsectorgeom IS TRUE  THEN-- pjoint_id, pjoint,type, exit_id, exit_type, arc_id must be used one time -> it is possible to planify with only one psector (the only one alternative scenario)
+
+		IF NEW.feature_type =  'CONNEC' THEN
+			SELECT count(*) INTO v_count FROM plan_psector_x_connec WHERE connec_id = NEW.feature_id;
+		ELSIF NEW.feature_type =  'GULLY' THEN
+			SELECT count(*) INTO v_count FROM plan_psector_x_gully WHERE gully_id = NEW.feature_id;
+		END IF;
+
+		IF v_count > 1 THEN	
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3082", "function":"1116","debug_msg":null}}$$);';
+		END IF;
 	END IF;
 	
-	
-	-- upsert process
-		
+	-- upsert process	
 	IF TG_OP ='INSERT' THEN
 	
 		-- exception control. It's no possible to create another link when already exists for the connect
@@ -389,7 +391,6 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        		"data":{"message":"3080", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 		END IF;
-		
 
 		INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, 
 		state, the_geom, vnode_topelev)	
@@ -421,22 +422,37 @@ BEGIN
 
 			END IF;
 
-			IF v_projectype = 'WS' THEN
+			--raise exception ' NEW.the_geom, vnode_geom=v_end_point, % %',  NEW.the_geom, v_end_point;
+
+			-- update values on plan_psector tables
+			IF NEW.feature_type='CONNEC' THEN
 				UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom, vnode_geom=v_end_point, userdefined_geom = v_userdefined_geom
 				WHERE plan_psector_x_connec.id=NEW.psector_rowid;
-			
-			ELSIF v_projectype = 'UD' THEN
-					
-				IF NEW.feature_type='CONNEC' THEN
-					UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom, vnode_geom=v_end_point, userdefined_geom = v_userdefined_geom
-					WHERE plan_psector_x_connec.id=NEW.psector_rowid;
-				ELSIF NEW.feature_type='GULLY' THEN
-					UPDATE plan_psector_x_gully SET link_geom = NEW.the_geom, vnode_geom=v_end_point, userdefined_geom = v_userdefined_geom
-					WHERE plan_psector_x_gully.id=NEW.psector_rowid;
-				END IF;
-				
+	
+			ELSIF NEW.feature_type='GULLY' THEN
+				UPDATE plan_psector_x_gully SET link_geom = NEW.the_geom, vnode_geom=v_end_point, userdefined_geom = v_userdefined_geom
+				WHERE plan_psector_x_gully.id=NEW.psector_rowid;
 			END IF;
+			
+			-- update values on other tables (if exit_type !='VNODE' considering the scenario of only one alternative
+			IF NEW.exit_type !='VNODE' THEN
 
+				-- update link table
+				UPDATE link SET exit_id = NEW.exit_id, exit_type = NEW.exit_type WHERE link_id = NEW.link_id;
+
+				-- update connect tables (connec & gully psector_*) -> arc_id must be the same of the exit_type because this is like limited alternative
+				IF NEW.feature_type='CONNEC' THEN
+					UPDATE plan_psector_x_connec SET arc_id = v_arc_id
+					WHERE plan_psector_x_connec.id=NEW.psector_rowid;
+					UPDATE connec SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type WHERE connec_id = NEW.feature_id;
+
+				ELSIF NEW.feature_type='GULLY' THEN
+
+					UPDATE plan_psector_x_gully SET arc_id = v_arc_id
+					WHERE  plan_psector_x_gully.id=NEW.psector_rowid;
+					UPDATE gully SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type WHERE gully_id = NEW.feature_id;
+				END IF;
+			END IF;
 		END IF;
 	
 		-- Update state_type if edit_connect_update_statetype is TRUE
@@ -469,16 +485,12 @@ BEGIN
 			END IF;
 			
 		ELSE
-			IF v_projectype = 'WS' THEN
-				UPDATE plan_psector_x_connec SET link_geom = NULL, userdefined_geom = NULL, vnode_geom=NULL, arc_id=NULL
-				WHERE plan_psector_x_connec.id=OLD.psector_rowid;
+			UPDATE plan_psector_x_connec SET link_geom = NULL, userdefined_geom = NULL, vnode_geom=NULL, arc_id=NULL, exit_type=NULL, exit_id=NULL
+			WHERE plan_psector_x_connec.id=OLD.psector_rowid;
 			
-			ELSIF v_projectype = 'UD' THEN
-				IF OLD.feature_type='CONNEC' THEN
-					UPDATE plan_psector_x_connec SET link_geom = NULL, userdefined_geom = NULL, vnode_geom=NULL, arc_id=NULL
-					WHERE plan_psector_x_connec.id=OLD.psector_rowid;
-				ELSIF OLD.feature_type='GULLY' THEN
-					UPDATE plan_psector_x_gully SET link_geom = NULL, userdefined_geom = NULL, vnode_geom=NULL, arc_id=NULL
+			IF v_projectype = 'UD' THEN
+				IF OLD.feature_type='GULLY' THEN
+					UPDATE plan_psector_x_gully SET link_geom = NULL, userdefined_geom = NULL, vnode_geom=NULL, arc_id=NULL, exit_type=NULL, exit_id=NULL
 					WHERE plan_psector_x_gully.id=OLD.psector_rowid;
 				END IF;
 			END IF;

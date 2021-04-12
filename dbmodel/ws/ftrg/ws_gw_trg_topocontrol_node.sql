@@ -40,6 +40,7 @@ v_epaquerytext1 text;
 v_epaquerytext2 text;
 v_schemaname text;
 v_connec_id varchar;
+v_linkrec record;
 
 BEGIN
 
@@ -199,7 +200,7 @@ BEGIN
 						LOOP
 							INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, link_geom, vnode_geom, userdefined_geom)						
 							SELECT connec_id, v_arcrecordtb.arc_id, v_psector_id, 1, false, l.the_geom, st_endpoint(l.the_geom), userdefined_geom 
-							FROM ws_sample.link l JOIN ws_sample.connec c ON connec_id = l.feature_id WHERE l.feature_type  ='CONNEC' AND connec_id = v_connec_id;
+							FROM link l JOIN connec c ON connec_id = l.feature_id WHERE l.feature_type  ='CONNEC' AND connec_id = v_connec_id;
 						END LOOP;
 					END IF;
 				END LOOP;			
@@ -240,6 +241,16 @@ BEGIN
 						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(arcrec."arc_id") USING arcrec.the_geom, NEW.the_geom; 
 					END IF;
 				END IF;
+			
+			--update links
+			v_querytext:= 'SELECT * FROM v_edit_link WHERE v_edit_link.exit_id= ' || quote_literal(NEW.node_id) || ' AND exit_type=''NODE''';
+
+			FOR v_linkrec IN EXECUTE v_querytext
+			LOOP
+				-- Coordinates
+				EXECUTE 'UPDATE v_edit_link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(v_linkrec."link_id")
+				USING v_linkrec.the_geom, NEW.the_geom; 					
+			END LOOP; 
 			END LOOP; 
 		END IF;
 				
