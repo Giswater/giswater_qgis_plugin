@@ -207,7 +207,10 @@ class ApiCF(ApiParent, QObject):
         qgis_project_role = self.controller.plugin_settings_value('gwProjectRole')
 
         # Check for query layer and/or bad layer
-        table_uri = self.iface.activeLayer().dataProvider().dataSourceUri()
+        table_uri = None
+        if self.iface.activeLayer() is not None:
+            table_uri = self.iface.activeLayer().dataProvider().dataSourceUri()
+
         if 'SELECT row_number() over ()' in str(table_uri) or 'srid' not in str(table_uri) or \
                 self.iface.activeLayer() is None or type(self.iface.activeLayer()) != QgsVectorLayer:
             active_layer = ""
