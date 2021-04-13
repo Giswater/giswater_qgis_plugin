@@ -474,15 +474,17 @@ BEGIN
 
 				-- update link table (if comes from link_class = 1)
 				IF OLD.link_class = 1 THEN
-					UPDATE link SET exit_id = NEW.exit_id, exit_type = NEW.exit_type, userdefined_geom = v_userdefined_geom, the_geom = NEW.the_geom WHERE link_id = NEW.link_id;
+					UPDATE link SET exit_id = NEW.exit_id, exit_type = NEW.exit_type WHERE link_id = NEW.link_id;
 				END IF;
 			
-			-- update values on other tables (if exit_type !='VNODE' considering the scenario of only one alternative
+			-- update values on other tables (if exit_type !='VNODE' considering the scenario of only one alternative)
 			ELSIF NEW.exit_type !='VNODE' THEN -- link class  = 1
 
-				-- update link table (if comes from link_class = 2)
-				IF OLD.link_class = 2 THEN
-					UPDATE link SET exit_id = NEW.exit_id, exit_type = NEW.exit_type, userdefined_geom = v_userdefined_geom, the_geom = NEW.the_geom WHERE link_id = NEW.link_id;
+				-- update link table, because as link class = 1 may change in any moment exit_id, exit_type, geom, etc.....
+				UPDATE link SET exit_id = NEW.exit_id, exit_type = NEW.exit_type, userdefined_geom = v_userdefined_geom, the_geom = NEW.the_geom WHERE link_id = NEW.link_id;
+
+				-- delete old vnode if no more links are using it
+				IF (SELECT count(*) FROM link WHERE exit_id = OLD.exit_id) = 0 THEN
 					DELETE FROM vnode WHERE vnode_id = OLD.exit_id::integer;
 				END IF;
 				

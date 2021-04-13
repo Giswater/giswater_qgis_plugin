@@ -90,6 +90,7 @@ DROP VIEW IF EXISTS v_edit_vnode;
 DROP VIEW IF EXISTS v_edit_link;
 CREATE VIEW v_edit_link as
 
+CREATE OR REPLACE VIEW v_edit_link AS 
  SELECT DISTINCT ON (a.link_id) a.link_id,
     a.feature_type,
     a.feature_id,
@@ -100,7 +101,7 @@ CREATE VIEW v_edit_link as
     a.sector_id,
     a.dma_id,
     a.expl_id,
-    a.state_id as state,
+    a.state AS state,
     a.gis_length,
     a.userdefined_geom,
     a.the_geom,
@@ -108,8 +109,8 @@ CREATE VIEW v_edit_link as
     a.psector_rowid,
     a.fluid_type,
     a.vnode_topelev
-   FROM selector_state, ( 
-   SELECT link.link_id,
+   FROM selector_state,
+    ( SELECT link.link_id,
             link.feature_type,
             link.feature_id,
             sector.macrosector_id,
@@ -121,22 +122,19 @@ CREATE VIEW v_edit_link as
             arc.sector_id,
             arc.dma_id,
             arc.expl_id,
-            case when p.state is null then c.state else p.state end as state_id,
-            case when p.link_geom is null then st_length2d(link.the_geom) else  st_length2d(link_geom) end AS gis_length,
-            case when p.userdefined_geom is null then link.userdefined_geom else p.userdefined_geom end as userdefined_geom,
-            case when p.link_geom is null then (link.the_geom) else (link_geom) end AS the_geom,
-            case when p.arc_id IS NULL THEN 0 when p.link_geom IS NULL THEN 1 ELSE 2 end link_class,
-			case when p.id IS NULL THEN null else p.id end as psector_rowid
-            FROM v_edit_connec c
-            LEFT JOIN link ON link.feature_id::text = c.connec_id::text
-            LEFT JOIN arc USING (arc_id)
-            LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
-            LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
-            LEFT JOIN plan_psector_x_connec p ON p.arc_id = c.arc_id AND p.connec_id = c.connec_id
-
-        UNION
-        
-	  SELECT link.link_id,
+            c.state,
+            st_length2d(link.the_geom) AS gis_length,
+            link.userdefined_geom,
+            link.the_geom,
+            0 AS link_class,
+            NULL::integer AS psector_rowid
+           FROM v_edit_connec c
+             LEFT JOIN link ON link.feature_id::text = c.connec_id::text
+             LEFT JOIN arc USING (arc_id)
+             LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
+             LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
+UNION
+         SELECT link.link_id,
             link.feature_type,
             link.feature_id,
             sector.macrosector_id,
@@ -148,20 +146,94 @@ CREATE VIEW v_edit_link as
             arc.sector_id,
             arc.dma_id,
             arc.expl_id,
-            case when p.state is null then c.state else p.state end as state_id,
-            case when p.link_geom is null then st_length2d(link.the_geom) else  st_length2d(link_geom) end AS gis_length,
-            case when p.userdefined_geom is null then link.userdefined_geom else p.userdefined_geom end as userdefined_geom,
-            case when p.link_geom is null then (link.the_geom) else (link_geom) end AS the_geom,
-            case when p.arc_id IS NULL THEN 0 when p.link_geom IS NULL THEN 1 ELSE 2 end link_class,
-			case when p.id IS NULL THEN null else p.id end as psector_rowid
-            FROM v_edit_gully c
-            LEFT JOIN link ON link.feature_id::text = c.gully_id::text
-            LEFT JOIN arc USING (arc_id)
-            LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
-            LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
-            LEFT JOIN plan_psector_x_gully p ON p.arc_id = c.arc_id AND p.gully_id = c.gully_id          
-          ) a
-	WHERE selector_state.cur_user = "current_user"()::text AND selector_state.state_id = a.state_id;
+            c.state,
+            st_length2d(link.the_geom) AS gis_length,
+            link.userdefined_geom,
+            link.the_geom,
+            0 AS link_class,
+            NULL::integer AS psector_rowid
+        FROM v_edit_gully c
+        LEFT JOIN link ON link.feature_id::text = c.gully_id::text
+        LEFT JOIN arc USING (arc_id)
+        LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
+        LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
+UNION
+	SELECT
+	    l.link_id,
+            l.feature_type,
+            l.feature_id,
+            sector.macrosector_id,
+            dma.macrodma_id,
+            l.exit_type,
+            l.exit_id,
+            l.vnode_topelev,
+            c.fluid_type,
+            a.sector_id,
+            a.dma_id,
+            a.expl_id,
+            p.state,
+				CASE
+                    WHEN p.link_geom IS NULL THEN st_length2d(l.the_geom)
+                    ELSE st_length2d(p.link_geom)
+                END AS gis_length,
+                CASE
+                    WHEN p.userdefined_geom IS NULL THEN l.userdefined_geom
+                    ELSE p.userdefined_geom
+                END AS userdefined_geom,
+                CASE
+                    WHEN p.link_geom IS NULL THEN l.the_geom
+                    ELSE p.link_geom
+                END AS the_geom,
+                CASE
+                    WHEN p.link_geom IS NULL THEN 1
+                    ELSE 2
+                END AS link_class,
+                p.id AS psector_rowid
+	FROM link l, plan_psector_x_connec p
+	JOIN connec c USING (connec_id)
+	LEFT JOIN arc a ON a.arc_id = p.arc_id
+	LEFT JOIN sector ON sector.sector_id::text = a.sector_id::text
+	LEFT JOIN dma ON dma.dma_id::text = a.dma_id::text
+	WHERE l.feature_id = p.connec_id AND p.state=1
+UNION
+	SELECT
+	    l.link_id,
+            l.feature_type,
+            l.feature_id,
+            sector.macrosector_id,
+            dma.macrodma_id,
+            l.exit_type,
+            l.exit_id,
+            l.vnode_topelev,
+            g.fluid_type,
+            a.sector_id,
+            a.dma_id,
+            a.expl_id,
+            p.state,
+				CASE
+                    WHEN p.link_geom IS NULL THEN st_length2d(l.the_geom)
+                    ELSE st_length2d(p.link_geom)
+                END AS gis_length,
+                CASE
+                    WHEN p.userdefined_geom IS NULL THEN l.userdefined_geom
+                    ELSE p.userdefined_geom
+                END AS userdefined_geom,
+                CASE
+                    WHEN p.link_geom IS NULL THEN l.the_geom
+                    ELSE p.link_geom
+                END AS the_geom,
+                CASE
+                    WHEN p.link_geom IS NULL THEN 1
+                    ELSE 2
+                END AS link_class,
+                p.id AS psector_rowid
+	FROM link l, plan_psector_x_gully p
+	JOIN gully g USING (gully_id)
+	LEFT JOIN arc a ON a.arc_id = p.arc_id
+	LEFT JOIN sector ON sector.sector_id::text = a.sector_id::text
+	LEFT JOIN dma ON dma.dma_id::text = a.dma_id::text
+	WHERE l.feature_id = p.gully_id AND p.state=1) a
+  WHERE selector_state.cur_user = "current_user"()::text AND selector_state.state_id = a.state;
 
 
 CREATE TRIGGER gw_trg_edit_link
