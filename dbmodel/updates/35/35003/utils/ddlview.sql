@@ -57,7 +57,7 @@ CREATE OR REPLACE VIEW ve_config_addfields AS
     config_form_fields.dv_parent_id,
     config_form_fields.dv_querytext_filterc,
     config_form_fields.widgetfunction,
-    config_form_fields.linkedaction,
+    config_form_fields.linkedobject,
     config_form_fields.stylesheet,
     config_form_fields.widgetcontrols,
         CASE
@@ -97,7 +97,7 @@ CREATE OR REPLACE VIEW ve_config_sysfields AS
     config_form_fields.dv_querytext_filterc,
     config_form_fields.widgetcontrols::text AS widgetcontrols,
     config_form_fields.widgetfunction,
-    config_form_fields.linkedaction,
+    config_form_fields.linkedobject,
     cat_feature.id AS cat_feature_id
    FROM config_form_fields
      LEFT JOIN cat_feature ON cat_feature.child_layer::text = config_form_fields.formname::text

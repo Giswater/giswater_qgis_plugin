@@ -306,11 +306,14 @@ where widgetcontrols is not null  AND widgetdim is not null AND listfilterparam 
 UPDATE config_form_fields set  widgetcontrols = jsonb_build_object('widgetdim', widgetdim)
 where widgetcontrols is null  AND widgetdim is not null AND listfilterparam is null;
 
-UPDATE config_form_fields set  widgetcontrols = listfilterparam::jsonb - 'sign'
+UPDATE config_form_fields set  widgetcontrols = listfilterparam::jsonb
 where widgetcontrols is null  AND widgetdim is null AND listfilterparam is not null;
 
-UPDATE config_form_fields set  widgetcontrols = widgetcontrols::jsonb || listfilterparam::jsonb - 'sign'
+UPDATE config_form_fields set  widgetcontrols = widgetcontrols::jsonb || listfilterparam::jsonb 
 where widgetcontrols is not null AND widgetdim is null  AND listfilterparam is not null;
 
-UPDATE config_form_fields set  widgetcontrols = widgetcontrols::jsonb || listfilterparam::jsonb - 'sign'|| jsonb_build_object('widgetdim', widgetdim)
+UPDATE config_form_fields set  widgetcontrols = widgetcontrols::jsonb || listfilterparam::jsonb || jsonb_build_object('widgetdim', widgetdim)
 where widgetcontrols is not null AND widgetdim is not null  AND listfilterparam is not null;
+
+UPDATE config_form_fields SET  widgetcontrols = widgetcontrols::jsonb  - 'sign' ||  jsonb_build_object('filterSign', listfilterparam->'sign')
+WHERE widgetcontrols is not null AND widgetcontrols->'sign' IS NOT NULL;

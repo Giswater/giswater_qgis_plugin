@@ -19,4 +19,7 @@ ALTER TABLE om_visit_x_connec DROP CONSTRAINT IF EXISTS om_visit_x_connec_unique
 ALTER TABLE om_visit_x_connec ADD CONSTRAINT om_visit_x_connec_unique UNIQUE(connec_id, visit_id);
 
 ALTER TABLE config_form_list DROP CONSTRAINT IF EXISTS config_form_list_pkey;
-ALTER TABLE config_form_list ADD CONSTRAINT config_form_list_pkey PRIMARY KEY (tablename, device, listtype, columnname);
+ALTER TABLE config_form_list ADD CONSTRAINT config_form_list_pkey PRIMARY KEY (listname, device);
+
+-- 2021/04/13
+ALTER TABLE config_form_list ALTER COLUMN listtype DROP NOT NULL;

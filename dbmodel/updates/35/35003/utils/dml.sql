@@ -42,8 +42,6 @@ ON CONFLICT (id) DO NOTHING;
 
 --2021/03/25
 
-UPDATE config_form_list SET columnname = 'not_used';
-
 UPDATE config_form_fields SET dv_parent_id = 'muni_id' WHERE formname = 'v_om_mincut' AND columnname = 'streetname' AND formtype ='form_feature';
 UPDATE config_form_fields SET dv_parent_id = 'matcat_id' WHERE formname = 'upsert_catalog_arc' AND columnname = 'matcat_id' AND formtype ='form_catalog';
 UPDATE config_form_fields SET dv_parent_id = 'matcat_id' WHERE formname = 'upsert_catalog_node' AND columnname = 'matcat_id' AND formtype ='form_catalog';
@@ -71,11 +69,13 @@ UPDATE _config_form_fields_ SET tabname = 'main' WHERE tabname IS NULL;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, widgetcontrols, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
-stylesheet, widgetfunction, linkedaction, hidden)
+stylesheet, widgetfunction, linkedobject, hidden)
 SELECT formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, widgetcontrols, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
-stylesheet, widgetfunction, linkedaction, hidden FROM _config_form_fields_ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-            
+stylesheet, case when widgetfunction IS NOT NULL THEN jsonb_build_object('functionName', widgetfunction) ELSE NULL end as widgetfunction, linkedaction, hidden FROM _config_form_fields_ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+DELETE FROM sys_foreignkey WHERE target_table = 'config_form_fields' AND target_field = 'widgetfunction';
+
 DROP TABLE iF EXISTS _config_form_fields_;
 
 UPDATE sys_table SET id = 'v_vnode',descript='Shows information about virtual nodes.' WHERE id = 'v_edit_vnode';

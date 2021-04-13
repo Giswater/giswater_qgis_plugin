@@ -32,7 +32,6 @@ BEGIN
 	stylesheet = NEW.stylesheet::json,
 	datatype = NEW.datatype,
 	widgettype = NEW.widgettype,
-	widgetdim = NEW.widgetdim,
 	isparent = NEW.isparent,
 	isautoupdate = NEW.isautoupdate,
 	dv_querytext = NEW.dv_querytext,
