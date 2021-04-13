@@ -25,7 +25,6 @@ UPDATE config_form_tableview SET columnindex = 8 WHERE columnname = 'arc_state' 
 UPDATE config_form_tableview SET columnindex = 9 WHERE columnname = 'feature_state' AND tablename ='v_ui_arc_x_relations';
 UPDATE config_form_tableview SET columnindex = 10 WHERE columnname = 'x' AND tablename ='v_ui_arc_x_relations';
 UPDATE config_form_tableview SET columnindex = 11 WHERE columnname = 'y' AND tablename ='v_ui_arc_x_relations';
-
 
 INSERT INTO config_toolbox VALUES (2760, 'Get values from raster DEM', TRUE, '{"featureType":["node"]}', 
 '[{"widgetname":"exploitation", "label":"Exploitation:","widgettype":"combo","datatype":"text","tooltip": "Choose exploitation to work with", "layoutname":"grl_option_parameters","layoutorder":2, 
@@ -45,9 +44,9 @@ UPDATE inp_typevalue SET idval = 'PJOINT (ALL NODARCS)' WHERE typevalue = 'inp_o
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (371, 'Check arc catalog with matcat_id null','ws')  ON CONFLICT (fid) DO NOTHING;
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (372, 'Check operative arcs with wrong topology','utils')  ON CONFLICT (fid) DO NOTHING;
 
-UPDATA sys_message SET 
+UPDATE sys_message SET 
 error_message = 'The psector strategy is limited to only one psector when connect is related to not VNODE exit_type (link_class = 1). If you like to manage diferent psector with this connect, please use VNODE as exit_type feature'
 WHERE id = 3082;
 
-INSERT INTO sys_message VALUES (3178, 'It is no possible to relate planned connec/gully over planned connec/gully wich not are on same psector.', 2, TRUE, 'utils');
-INSERT INTO sys_message VALUES (3180, 'You are trying to modify some network element with related connects (connec / gully) on psector not selected. Please activate the psector before!', 2, TRUE, 'utils');
+INSERT INTO sys_message VALUES (3178, 'It is no possible to relate planned connec/gully over planned connec/gully wich not are on same psector.', NULL,2, TRUE, 'utils');
+INSERT INTO sys_message VALUES (3180, 'You are trying to modify some network element with related connects (connec / gully) on psector not selected.', 'Please activate the psector before!', 2, TRUE, 'utils');

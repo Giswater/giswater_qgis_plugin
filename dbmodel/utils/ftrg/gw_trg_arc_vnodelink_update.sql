@@ -24,7 +24,7 @@ BEGIN
 		-- check if there are not-selected psector affected
 		IF (SELECT count (*) FROM plan_psector_x_connec WHERE arc_id = NEW.arc_id AND state_id = 1 AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3180", "function":"2542","debug_msg":null}}$$);' INTO v_audit_result;
+			"data":{"message":"3180", "function":"2542","debug_msg":null}}$$);';
 		END IF;
 		
 		-- Redraw link and vnode
