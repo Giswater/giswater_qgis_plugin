@@ -212,22 +212,26 @@ BEGIN
 		v_table_parent = v_tablename;
 		IF v_id IS NOT NULL THEN 
 	
-			IF upper(v_project_type) = 'WS' AND v_table_parent='v_edit_node' THEN
-				v_querystring = concat('SELECT nodetype_id FROM ',v_table_parent,' WHERE node_id = ',quote_literal(v_id),';');
+			IF v_table_parent='v_edit_node' THEN
+				
+				v_querystring = concat('SELECT node_type FROM ',v_table_parent,' WHERE node_id = ',quote_literal(v_id),';');
+				
 				v_debug_vars := json_build_object('v_table_parent', v_table_parent, 'v_id', v_id);
 				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromid', 'flag', 20);
 				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 				EXECUTE v_querystring INTO v_nodetype;
-
+				
 				IF (SELECT isarcdivide FROM cat_feature_node WHERE id=v_nodetype) IS TRUE THEN
 					v_isarcdivide = TRUE;
 				END IF;
-				
-				IF (SELECT upper(graf_delimiter) FROM cat_feature_node WHERE id=v_nodetype) IN ('DMA','PRESSZONE') THEN
-					v_isgrafdelimiter = TRUE;
-				ELSIF (SELECT upper(epa_type) FROM node WHERE node_id = v_id) IN ('PUMP', 'VALVE', 'SHORTPIPE') THEN
-					v_isepatoarc = TRUE;
+				IF upper(v_project_type) = 'WS' THEN
+					IF ((SELECT upper(graf_delimiter) FROM cat_feature_node WHERE id=v_nodetype) IN ('DMA','PRESSZONE')) THEN
+						v_isgrafdelimiter = TRUE;
+					ELSIF (SELECT upper(epa_type) FROM node WHERE node_id = v_id) IN ('PUMP', 'VALVE', 'SHORTPIPE') THEN
+						v_isepatoarc = TRUE;
+					END IF;
 				END IF;
+				
 			END IF;
 		END IF;
 	END IF;
@@ -357,7 +361,7 @@ BEGIN
 	
 	-- Get tabs for form
 	--------------------------------
-	IF v_isgrafdelimiter OR upper(v_project_type) != 'WS' THEN
+	IF v_isgrafdelimiter THEN 
 		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip", 
 			tabfunction as "tabFunction", b.tab as tabActions 
 			FROM (SELECT json_agg(item_object || jsonb_build_object(''actionTooltip'', idval)) as tab 
@@ -413,7 +417,7 @@ BEGIN
 	-- IF form_tabs is null and layer it's child layer it's child layer --> parent form_tabs is used
         IF v_linkpath IS NULL AND v_table_parent IS NOT NULL THEN
         	
-        	IF v_isgrafdelimiter OR upper(v_project_type) != 'WS' THEN
+        	IF v_isgrafdelimiter THEN 
 			-- Get form_tabs
 			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT DISTINCT ON (tabname) tabname as "tabName", label as "tabLabel", tooltip as "tooltip",
 				tabfunction as "tabFunction", b.tab as tabActions  
