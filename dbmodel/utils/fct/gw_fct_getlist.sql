@@ -148,6 +148,7 @@ v_audit_result text;
 v_status text;
 v_level integer;
 v_message text;
+v_value_type text;
 
 BEGIN
 
@@ -263,13 +264,13 @@ BEGIN
 			INTO v_the_geom;
 
 		--  get querytext
-		EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_form_list WHERE tablename = $1 AND device = $2', v_attribute_filter)
+		EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_form_list WHERE listname = $1 AND device = $2', v_attribute_filter)
 			INTO v_query_result, v_default, v_listtype
 			USING v_tablename, v_device;
 
 		-- if v_device is not configured on config_form_list table
 		IF v_query_result IS NULL THEN
-			EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_form_list WHERE tablename = $1 LIMIT 1', v_attribute_filter)
+			EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_form_list WHERE listname = $1 LIMIT 1', v_attribute_filter)
 				INTO v_query_result, v_default, v_listtype
 				USING v_tablename;
 		END IF;	
@@ -303,21 +304,30 @@ BEGIN
 			SELECT v_text [i] into v_json_field;
 			v_field:= (SELECT (v_json_field ->> 'key')) ;
 			v_value:= (SELECT (v_json_field ->> 'value')) ;
+
+			-- Getting the sign of the filter
+			IF v_value::json->>'filterSign' is not null THEN
+				v_sign = v_value::json->>'filterSign';
+				v_value = v_value::json->>'value';
+				IF upper(v_sign) IN ('LIKE', 'ILIKE') THEN
+					v_value = '''%'||v_value||'%'''; 
+				END IF;
+			ELSE
+				IF v_listtype = 'attributeTable' THEN
+					v_sign = 'ILIKE';
+				ELSIF v_sign IS NULL THEN
+					v_sign = '=';
+				END IF;
+			END IF;
+			
 			i=i+1;
 
 			raise notice 'v_field % v_value %', v_field, v_value;
 	
-			-- Getting the sign of the filter
-			IF v_listtype = 'attributeTable' THEN
-				v_sign = 'ILIKE';
-			ELSIF v_sign IS NULL THEN
-				v_sign = '=';
-			END IF;
 			
 			-- creating the query_text
 			IF v_value IS NOT NULL AND v_field != 'limit' THEN
-				
-				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||quote_literal(v_value) ||'::text';
+				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||v_value ||'::text';
 
 			ELSIF v_field='limit' THEN
 				v_query_result := v_query_result;
@@ -325,7 +335,7 @@ BEGIN
 			END IF;
 		END LOOP;
 	END IF;
-	
+	raise notice '00 -> %',v_query_result;
 	-- add feature filter
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_feature) a;
 	IF v_text IS NOT NULL THEN
@@ -405,11 +415,11 @@ BEGIN
 
 	-- building pageinfo
 	v_pageinfo := json_build_object('orderBy',v_orderby, 'orderType', v_ordertype, 'currentPage', v_currentpage, 'lastPage', v_lastpage);
-
+raise notice 'AAA - % --- %',v_tablename, v_tabname;
 	-- getting filter fields
 	SELECT gw_fct_getformfields(v_tablename, 'form_list_header', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_filter_fields;
-
+		
 		--  setting values of filter fields
 		
 		SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
@@ -441,7 +451,7 @@ BEGIN
 	-- adding the widget of list
 	v_i = cardinality(v_filter_fields) ;
 	
-	EXECUTE 'SELECT listclass FROM config_form_list WHERE tablename = $1 LIMIT 1'
+	EXECUTE 'SELECT listclass FROM config_form_list WHERE listname = $1 LIMIT 1'
 		INTO v_listclass
 		USING v_tablename;
 

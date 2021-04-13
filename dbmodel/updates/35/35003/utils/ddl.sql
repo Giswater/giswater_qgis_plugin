@@ -57,7 +57,6 @@ layoutname character varying(16),
 layoutorder integer,
 datatype character varying(30),
 widgettype character varying(30),
-widgetcontrols json,
 label text,
 tooltip text,
 placeholder text,
@@ -72,8 +71,9 @@ dv_isnullvalue boolean,
 dv_parent_id text,
 dv_querytext_filterc text,
 stylesheet json,
-widgetfunction text,
-linkedaction text,
+widgetcontrols json,
+widgetfunction json,
+linkedobject text,
 hidden boolean NOT NULL DEFAULT false,
 CONSTRAINT config_form_fields_pkey PRIMARY KEY (formname, formtype, columnname, tabname)
 );
@@ -105,3 +105,6 @@ ALTER TABLE sys_fprocess ALTER COLUMN fprocess_name TYPE character varying(100);
 
 --2021/04/12
 ALTER TABLE IF EXISTS config_form_actions RENAME TO _config_form_actions_;
+
+--2021/04/13
+ALTER TABLE config_form_list RENAME tablename TO listname;

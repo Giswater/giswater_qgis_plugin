@@ -69,11 +69,13 @@ UPDATE _config_form_fields_ SET tabname = 'main' WHERE tabname IS NULL;
 
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, widgetcontrols, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
-stylesheet, widgetfunction, linkedaction, hidden)
+stylesheet, widgetfunction, linkedobject, hidden)
 SELECT formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, widgetcontrols, label, tooltip, 
 placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
-stylesheet, widgetfunction, linkedaction, hidden FROM _config_form_fields_ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-            
+stylesheet, case when widgetfunction IS NOT NULL THEN jsonb_build_object('functionName', widgetfunction) ELSE NULL end as widgetfunction, linkedaction, hidden FROM _config_form_fields_ ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+
+DELETE FROM sys_foreignkey WHERE target_table = 'config_form_fields' AND target_field = 'widgetfunction';
+
 DROP TABLE iF EXISTS _config_form_fields_;
 
 UPDATE sys_table SET id = 'v_vnode',descript='Shows information about virtual nodes.' WHERE id = 'v_edit_vnode';
