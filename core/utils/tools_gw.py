@@ -1077,8 +1077,11 @@ def add_button(module=sys.modules[__name__], **kwargs):
 
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
     if 'value' in field:
         widget.setText(field['value'])
+
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
     function_name = 'no_function_associated'
     real_name = widget.objectName()
@@ -1126,6 +1129,8 @@ def add_spinbox(field):
         widget.setMaximum(field['widgetcontrols']['maxMinValues']['max'])
 
     widget.setObjectName(field['widgetname'])
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
@@ -1164,6 +1169,8 @@ def add_checkbox(field):
 
     widget = QCheckBox()
     widget.setObjectName(field['widgetname'])
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
     widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
         if field['value'] in ("t", "true", True):
@@ -1178,6 +1185,8 @@ def add_textarea(field):
 
     widget = QTextEdit()
     widget.setObjectName(field['widgetname'])
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
@@ -1211,6 +1220,8 @@ def add_hyperlink(field):
 
     widget = GwHyperLinkLabel()
     widget.setObjectName(field['widgetname'])
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
     if 'value' in field:
@@ -1246,6 +1257,8 @@ def add_calendar(dialog, field):
 
     widget = QgsDateTimeEdit()
     widget.setObjectName(field['widgetname'])
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
     widget.setAllowNull(True)
@@ -1310,11 +1323,7 @@ def set_data_type(field, widget):
 
 
 def set_widget_size(widget, field):
-    if 'widgetdim' in field and field['widgetdim']:
-        widget.setMaximumWidth(field['widgetdim'])
-        widget.setMinimumWidth(field['widgetdim'])
-    else:
-        widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+    widget.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
     return widget
 
 
@@ -1323,6 +1332,8 @@ def add_lineedit(field):
 
     widget = QLineEdit()
     widget.setObjectName(field['widgetname'])
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
     if 'placeholder' in field:
@@ -1344,8 +1355,12 @@ def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]):
     widget = QTableView()
     widget.setObjectName(field['widgetname'])
     widget.setSortingEnabled(True)
+
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
+
     function_name = 'no_function_asociated'
     real_name = widget.objectName()
     if 'data_' in widget.objectName():
@@ -1370,8 +1385,11 @@ def add_frame(field, x=None):
 
     widget = QFrame()
     widget.setObjectName(f"{field['widgetname']}_{x}")
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
+
     widget.setFrameShape(QFrame.HLine)
     widget.setFrameShadow(QFrame.Sunken)
 
@@ -1382,6 +1400,8 @@ def add_combo(field):
 
     widget = QComboBox()
     widget.setObjectName(field['widgetname'])
+    if 'widgetcontrols' in field and field['widgetcontrols']:
+        widget.setProperty('widgetcontrols', field['widgetcontrols'])
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
     widget = fill_combo(widget, field)

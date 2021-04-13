@@ -1567,7 +1567,7 @@ class GwInfo(QObject):
         return widget
 
     def _manage_list(self, **kwargs):
-        self._manage_tableview(kwargs)
+        self._manage_tableview(**kwargs)
 
     def _manage_tableview(self, **kwargs):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
@@ -3384,8 +3384,8 @@ class GwInfo(QObject):
         widgetname = kwargs['widgetname']
 
         filter_fields = self._get_filter_qtableview(dialog, widget_list)
-        index_tab = self.tab_main.currentIndex()
-        tab_name = self.tab_main.widget(index_tab).objectName()
+        index_tab = dialog.tab_main.currentIndex()
+        tab_name = dialog.tab_main.widget(index_tab).objectName()
         complet_list = self._get_list(complet_result, '', tab_name, filter_fields, columnname, widgetname, 'form_feature')
         if complet_list is False:
             return False
