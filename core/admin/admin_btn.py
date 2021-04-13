@@ -794,62 +794,62 @@ class GwAdminButton:
 
             folder = self.folderUtils + self.file_pattern_ddl
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderUtils + self.file_pattern_dml
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderUtils + self.file_pattern_fct
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderUtils + self.file_pattern_ftrg
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderSoftware + self.file_pattern_ddl
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderSoftware + self.file_pattern_ddlrule
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderSoftware + self.file_pattern_dml
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderSoftware + self.file_pattern_tablect
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderSoftware + self.file_pattern_fct
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderSoftware + self.file_pattern_ftrg
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderUtils + self.file_pattern_tablect
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderUtils + self.file_pattern_ddlrule
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             if self._process_folder(self.folderLocale, '') is False:
@@ -857,11 +857,11 @@ class GwAdminButton:
                     return False
                 else:
                     status = self._execute_files(self.sql_dir + os.sep + 'i18n' + os.sep + 'EN', True)
-                    if status is False and self.dev_commit == 'FALSE':
+                    if status is False and self.dev_commit is False:
                         return False
             else:
                 status = self._execute_files(self.folderLocale, True)
-                if status is False and self.dev_commit == 'FALSE':
+                if status is False and self.dev_commit is False:
                     return False
 
         return True
@@ -880,7 +880,7 @@ class GwAdminButton:
                 sub_folders = sorted(os.listdir(self.folderUpdates + folder))
                 for sub_folder in sub_folders:
                     if new_project:
-                        if self.dev_commit == 'TRUE':
+                        if self.dev_commit is True:
                             if str(sub_folder) > '31100':
                                 if self._process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep):
                                     status = self._load_sql(self.folderUpdates + folder + os.sep +
@@ -928,7 +928,7 @@ class GwAdminButton:
                                         return False
 
                     else:
-                        if self.dev_commit == 'TRUE':
+                        if self.dev_commit is True:
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
                                 if self._process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
                                     status = self._load_sql(self.folderUpdates + folder + os.sep +
@@ -992,7 +992,7 @@ class GwAdminButton:
                                      os.sep + os.sep + 'updates' + os.sep + folder))
                 for sub_folder in sub_folders:
                     if new_project:
-                        if self.dev_commit == 'TRUE':
+                        if self.dev_commit is True:
                             if str(sub_folder) > '31100':
                                 if self._process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), '') is True:
                                     status = self._execute_files(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep +
@@ -1025,7 +1025,7 @@ class GwAdminButton:
                                         return False
 
                     else:
-                        if self.dev_commit == 'TRUE':
+                        if self.dev_commit is True:
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
                                 if self._process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
                                     status = self._load_sql(self.folderUpdates + folder + os.sep +
@@ -1088,18 +1088,18 @@ class GwAdminButton:
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderSoftware + self.file_pattern_ddlview
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderUtils + self.file_pattern_ddlview
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
         else:
             folder = self.folderSoftware + self.file_pattern_ddlview
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
         return True
@@ -1241,13 +1241,13 @@ class GwAdminButton:
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderExemple + 'user' + os.sep + project_type
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
         else:
             folder = self.folderSoftware + 'example' + os.sep + 'user' + os.sep
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
         return True
@@ -1258,12 +1258,12 @@ class GwAdminButton:
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderExemple + 'dev' + os.sep + project_type
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
         else:
             folder = self.folderSoftware + 'example' + os.sep + 'dev' + os.sep
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
         return True
@@ -1274,33 +1274,33 @@ class GwAdminButton:
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderUtils + self.file_pattern_fct
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderUtils + self.file_pattern_ftrg
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderSoftware + self.file_pattern_fct
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderSoftware + self.file_pattern_ftrg
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
         else:
             folder = self.folderSoftware + self.file_pattern_fct
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderSoftware + self.file_pattern_ftrg
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
         return True
@@ -1311,18 +1311,18 @@ class GwAdminButton:
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderSoftware + self.file_pattern_tablect
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderUtils + self.file_pattern_tablect
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
         else:
             folder = self.folderSoftware + self.file_pattern_tablect
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
         return True
@@ -1333,18 +1333,18 @@ class GwAdminButton:
         if str(project_type) == 'ws' or str(project_type) == 'ud':
             folder = self.folderUtils + self.file_pattern_trg
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
             folder = self.folderSoftware + self.file_pattern_trg
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
         else:
             folder = self.folderSoftware + self.file_pattern_trg
             status = self._execute_files(folder)
-            if not status and self.dev_commit == 'FALSE':
+            if not status and self.dev_commit is False:
                 return False
 
         return True
@@ -2148,7 +2148,7 @@ class GwAdminButton:
                     if log_files:
                         tools_log.log_info(str(filedir + os.sep + file))
                     status = self._read_execute_file(filedir, file, schema_name, self.project_epsg)
-                if not status and self.dev_commit == 'FALSE':
+                if not status and self.dev_commit is False:
                     return False
         else:
             for file in filelist:
@@ -2157,7 +2157,7 @@ class GwAdminButton:
                         if log_files:
                             tools_log.log_info(str(filedir + os.sep + file))
                         status = self._read_execute_file(filedir, file, schema_name, self.project_epsg)
-                        if not status and self.dev_commit == 'FALSE':
+                        if not status and self.dev_commit is False:
                             return False
 
         return status
@@ -2172,7 +2172,7 @@ class GwAdminButton:
             f = open(filepath, 'r', encoding="utf8")
             if f:
                 f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", project_epsg))
-                if self.dev_commit == 'TRUE':
+                if self.dev_commit is True:
                     status = tools_db.execute_sql(str(f_to_read), filepath=filepath)
                 else:
                     status = tools_db.execute_sql(str(f_to_read), commit=False, filepath=filepath)
@@ -2181,14 +2181,14 @@ class GwAdminButton:
                     self.error_count = self.error_count + 1
                     tools_log.log_info(str("_read_execute_file error"), parameter=filepath)
                     tools_log.log_info(str('Message: ' + str(global_vars.session_vars['last_error'])))
-                    if self.dev_commit == 'TRUE':
+                    if self.dev_commit is True:
                         global_vars.dao.rollback()
                     return False
         except Exception as e:
             self.error_count = self.error_count + 1
             tools_log.log_info(str("_read_execute_file exception"), parameter=file)
             tools_log.log_info(str(e))
-            if self.dev_commit == 'TRUE':
+            if self.dev_commit is True:
                 global_vars.dao.rollback()
             status = False
         finally:

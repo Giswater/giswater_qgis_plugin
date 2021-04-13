@@ -45,31 +45,31 @@ class GwCreateSchemaTask(GwTask):
         try:
             # Common execution
             status = self.admin._load_base(project_type=project_type)
-            if not status and self.admin.dev_commit == 'FALSE':
+            if not status and self.admin.dev_commit is False:
                 return False
 
             if not self.is_test:
                 self.setProgress(10)
             status = self.admin._update_30to31(new_project=True, project_type=project_type)
-            if not status and self.admin.dev_commit == 'FALSE':
+            if not status and self.admin.dev_commit is False:
                 return False
 
             if not self.is_test:
                 self.setProgress(20)
             status = self.admin._load_views(project_type=project_type)
-            if not status and self.admin.dev_commit == 'FALSE':
+            if not status and self.admin.dev_commit is False:
                 return False
 
             if not self.is_test:
                 self.setProgress(30)
             status = self.admin._load_trg(project_type=project_type)
-            if not status and self.admin.dev_commit == 'FALSE':
+            if not status and self.admin.dev_commit is False:
                 return False
 
             if not self.is_test:
                 self.setProgress(40)
             status = self.admin._update_31to39(new_project=True, project_type=project_type)
-            if not status and self.admin.dev_commit == 'FALSE':
+            if not status and self.admin.dev_commit is False:
                 return False
 
             if not self.is_test:
@@ -80,7 +80,7 @@ class GwCreateSchemaTask(GwTask):
                 status = self.admin._execute_last_process(True, project_name_schema, self.admin.schema_type,
                                                           project_locale, project_srid)
 
-            if not status and self.admin.dev_commit == 'FALSE':
+            if not status and self.admin.dev_commit is False:
                 return False
 
             # Custom execution
