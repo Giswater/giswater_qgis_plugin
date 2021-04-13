@@ -148,9 +148,9 @@ class Giswater(QObject):
             tools_qgis.enable_python_console()
 
         # Set logger (no database connection yet)
-        min_log_level = int(tools_gw.check_config_settings('system', 'log_level', '20', 'user', 'init', prefix=False))
+        min_log_level = int(tools_gw.get_config_parser('system', 'log_level', 'user', 'init', False))
         tools_log.min_log_level = min_log_level
-        log_limit_characters = tools_gw.get_config_parser('system', 'log_limit_characters', 'user', 'init', prefix=False)
+        log_limit_characters = tools_gw.get_config_parser('system', 'log_limit_characters', 'user', 'init', False)
         tools_log.set_logger(self.plugin_name, log_limit_characters)
 
         # Define signals

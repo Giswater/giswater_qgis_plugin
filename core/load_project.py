@@ -70,13 +70,9 @@ class GwLoadProject(QObject):
         global_vars.plugin_name = self.plugin_name
 
         # Check for developers options
-        comment = f'log_sql --> If True then show all get_json log, if False then does ' \
-                  f'not show any, anything else will use the show python log_sql option'
-        value = tools_gw.check_config_settings('system', 'log_sql', 'None', comment=comment, prefix=False)
+        value = tools_gw.get_config_parser('system', 'log_sql', "user", "init", False)
         tools_qgis.user_parameters['log_sql'] = value
-        comment = f'show_message_durations --> Integer or None, if none then show python' \
-                  f' duration option'
-        value = tools_gw.check_config_settings('system', 'show_message_durations', 'None', comment=comment, prefix=False)
+        value = tools_gw.get_config_parser('system', 'show_message_durations', "user", "init", False)
         tools_qgis.user_parameters['show_message_durations'] = value
 
         # Log values of system user parameters located in 'giswater.config'
@@ -128,7 +124,7 @@ class GwLoadProject(QObject):
         global_vars.notify.start_listening(list_channels)
 
         # Open automatically 'search docker' depending its value in user settings
-        open_search = tools_gw.check_config_settings('btn_search', 'open_search', 'false', "user", "session")
+        open_search = tools_gw.get_config_parser('btn_search', 'open_search', "user", "session")
         if tools_os.set_boolean(open_search):
             dlg_search = GwSearchUi()
             GwSearch().open_search(dlg_search, load_project=True)
@@ -154,13 +150,12 @@ class GwLoadProject(QObject):
     def _get_user_variables(self):
         """ Get config related with user variables """
 
-        comment = f"initial=1, normal=2, expert=3, u can config some parameters in [user_level] section"
-        global_vars.user_level['level'] = tools_gw.check_config_settings('system', 'user_level', '1', comment=comment, prefix=False)
-        global_vars.user_level['showquestion'] = tools_gw.check_config_settings('user_level', 'showquestion', '1,2,3', prefix=False)
-        global_vars.user_level['showsnapmessage'] = tools_gw.check_config_settings('user_level', 'showsnapmessage', '1,2,3', prefix=False)
-        global_vars.user_level['showselectmessage'] = tools_gw.check_config_settings('user_level', 'showselectmessage', '1,2,3', prefix=False)
-        global_vars.user_level['showadminadvanced'] = tools_gw.check_config_settings('user_level', 'showadminadvanced', "3", "user", "init", prefix=False)
-        global_vars.date_format = tools_gw.check_config_settings('system', 'date_format', 'dd/MM/yyyy', prefix=False)
+        global_vars.user_level['level'] = tools_gw.get_config_parser('system', 'user_level', "user", "init", False)
+        global_vars.user_level['showquestion'] = tools_gw.get_config_parser('user_level', 'showquestion', "user", "init", False)
+        global_vars.user_level['showsnapmessage'] = tools_gw.get_config_parser('user_level', 'showsnapmessage', "user", "init", False)
+        global_vars.user_level['showselectmessage'] = tools_gw.get_config_parser('user_level', 'showselectmessage', "user", "init", False)
+        global_vars.user_level['showadminadvanced'] = tools_gw.get_config_parser('user_level', 'showadminadvanced', "user", "init", False)
+        global_vars.date_format = tools_gw.get_config_parser('system', 'date_format', "user", "init", False)
 
 
     def _check_project(self, show_warning):
@@ -258,13 +253,10 @@ class GwLoadProject(QObject):
         """ Manage actions of the custom plugin toolbars. project_type in ('ws', 'ud') """
 
         # Dynamically get list of toolbars from config file
-        toolbar_names = tools_gw.check_config_settings('toolbars', 'list_toolbars',
-                                                       'basic, om, edit, cad, epa, plan, utilities, toc',
-                                                       "project", "giswater")
+        toolbar_names = tools_gw.get_config_parser('toolbars', 'list_toolbars', "project", "giswater")
         if toolbar_names in (None, 'None'): return
 
-        toolbars_order = tools_gw.check_config_settings('toolbars_position', 'toolbars_order', toolbar_names,
-                                                        'user', 'init')
+        toolbars_order = tools_gw.get_config_parser('toolbars_position', 'toolbars_order', 'user', 'init')
         toolbars_order = toolbars_order.replace(' ', '').split(',')
 
         # Call each of the functions that configure the toolbars 'def toolbar_xxxxx(self, toolbar_id, x=0, y=0):'
@@ -277,8 +269,7 @@ class GwLoadProject(QObject):
             ag = QActionGroup(parent)
             ag.setProperty('gw_name', 'gw_QActionGroup')
             for index_action in plugin_toolbar.list_actions:
-                button_def = tools_gw.check_config_settings('buttons_def', str(index_action), 'None',
-                                                            "project",  "giswater")
+                button_def = tools_gw.get_config_parser('buttons_def', str(index_action), "project", "giswater")
 
                 if button_def not in (None, 'None'):
                     text = self.translate(f'{index_action}_text')
@@ -287,8 +278,7 @@ class GwLoadProject(QObject):
                     self.buttons[index_action] = button
 
         # Disable buttons which are project type exclusive
-        project_exclusive = tools_gw.check_config_settings('project_exclusive', str(project_type), 'None',
-                                                           "project", "giswater")
+        project_exclusive = tools_gw.get_config_parser('project_exclusive', str(project_type), "project", "giswater")
 
         if project_exclusive not in (None, 'None'):
             project_exclusive = project_exclusive.replace(' ', '').split(',')
@@ -310,7 +300,7 @@ class GwLoadProject(QObject):
 
     def _create_toolbar(self, toolbar_id):
 
-        list_actions = tools_gw.check_config_settings('toolbars', str(toolbar_id), 'None', "project", "giswater")
+        list_actions = tools_gw.get_config_parser('toolbars', str(toolbar_id), "project", "giswater")
 
         if list_actions in (None, 'None'):
             return

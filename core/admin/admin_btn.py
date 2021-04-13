@@ -461,7 +461,7 @@ class GwAdminButton:
         self.folderPath = ''
 
         # Check if user have commit permissions
-        self.dev_commit = tools_gw.check_config_settings('system', 'dev_commit', "False", "user", "init", prefix=False)
+        self.dev_commit = tools_gw.get_config_parser('system', 'dev_commit', "user", "init", False)
 
         # Create dialog object
         self.dlg_readsql = GwAdminUi()

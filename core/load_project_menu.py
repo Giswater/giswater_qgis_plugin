@@ -56,8 +56,8 @@ class GwMenuLoad(QObject):
             toolbars_menu.addMenu(toolbar_submenu)
             buttons_toolbar = global_vars.giswater_settings.value(f"toolbars/{toolbar}")
 
-            project_exclusive = tools_gw.check_config_settings('project_exclusive', str(global_vars.project_type), 'None',
-                                                               "project", "giswater")
+            project_exclusive = tools_gw.get_config_parser('project_exclusive', str(global_vars.project_type),
+                                                           "project", "giswater")
             if project_exclusive not in (None, 'None'):
                 project_exclusive = project_exclusive.replace(' ', '').split(',')
 

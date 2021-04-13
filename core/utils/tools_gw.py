@@ -100,15 +100,13 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
 
         path = path_folder + os.sep + "config" + os.sep + f'{file_name}.config'
         if not os.path.exists(path):
-            tools_log.log_warning(f"get_config_parser - File not found: {path}")
-            return None
+            if chk_user_params and config_type in "user":
+                value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
+                set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
+            return value
 
         parser.read(path)
-        if not parser.has_section(section):
-            if log_warning:
-                tools_log.log_warning(f"Section '{section}' not found")
-            return None
-        if not parser.has_option(section, parameter):
+        if not parser.has_section(section) or not parser.has_option(section, parameter):
             if chk_user_params and config_type in "user":
                 value = _check_user_params(section, raw_parameter, file_name, prefix=prefix)
                 set_config_parser(section, raw_parameter, value, config_type, file_name, prefix=prefix, chk_user_params=False)
@@ -1509,16 +1507,6 @@ def get_actions_from_json(json_result, sql):
                 tools_log.log_debug(f"{type(e).__name__}: {e}")
     except Exception as e:
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, global_vars.schema_name)
-
-
-def check_config_settings(section, parameter, value, config_type="user", file_name="init", comment=None, prefix=True):
-    """ Check if @section and @parameter exists in file @file_name. If not add them = None """
-
-    result = get_config_parser(section, parameter, config_type, file_name, prefix)
-    if result is not None:
-        return result
-    set_config_parser(section, parameter, value, config_type, file_name, comment, prefix)
-    return value
 
 
 def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False, log_result=False,
