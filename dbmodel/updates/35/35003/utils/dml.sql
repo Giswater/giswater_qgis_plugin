@@ -42,8 +42,6 @@ ON CONFLICT (id) DO NOTHING;
 
 --2021/03/25
 
-UPDATE config_form_list SET columnname = 'not_used';
-
 UPDATE config_form_fields SET dv_parent_id = 'muni_id' WHERE formname = 'v_om_mincut' AND columnname = 'streetname' AND formtype ='form_feature';
 UPDATE config_form_fields SET dv_parent_id = 'matcat_id' WHERE formname = 'upsert_catalog_arc' AND columnname = 'matcat_id' AND formtype ='form_catalog';
 UPDATE config_form_fields SET dv_parent_id = 'matcat_id' WHERE formname = 'upsert_catalog_node' AND columnname = 'matcat_id' AND formtype ='form_catalog';

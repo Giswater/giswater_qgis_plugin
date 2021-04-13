@@ -38,7 +38,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hyd
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"ext_rtc_hydrometer_x_data", "column":"value_state", "dataType":"integer", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_form_list", "column":"actionfields"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_form_list", "column":"columnname", "dataType":"varchar(30)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_form_fields", "column":"isfilter", "dataType":"boolean", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"config_form_fields", "column":"tabname", "dataType":"varchar(30)", "isUtils":"False"}}$$);
 
