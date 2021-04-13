@@ -174,8 +174,7 @@ CREATE VIEW v_edit_link as
             LEFT JOIN arc USING (arc_id)
             LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
             LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
-            LEFT JOIN plan_psector_x_connec p ON p.arc_id = c.arc_id 
-			WHERE p.connec_id = c.connec_id
+            LEFT JOIN plan_psector_x_connec p ON p.arc_id = c.arc_id AND p.connec_id = c.connec_id
           ) a
 	WHERE selector_state.cur_user = "current_user"()::text AND selector_state.state_id = a.state_id;
 
@@ -185,7 +184,6 @@ CREATE TRIGGER gw_trg_edit_link
   ON v_edit_link
   FOR EACH ROW
   EXECUTE PROCEDURE gw_trg_edit_link();
-
 
 
 
@@ -200,39 +198,38 @@ CREATE OR REPLACE VIEW v_arc_x_vnode AS
     (a.length * a.locate::double precision)::numeric(12,3) AS vnode_distfromnode1,
     (a.length * (1::numeric - a.locate)::double precision)::numeric(12,3) AS vnode_distfromnode2,
         CASE
-            WHEN a.vnode_topelev IS NULL THEN (a.top_elev1 - a.locate * (a.top_elev1 - a.top_elev2))::numeric(12,3)::double precision
+            WHEN a.vnode_topelev IS NULL THEN (a.elevation1 - a.locate * (a.elevation1 - a.elevation2))::numeric(12,3)::double precision
             ELSE a.vnode_topelev
         END AS vnode_topelev,
-    (a.sys_y1 - a.locate * (a.sys_y1 - a.sys_y2))::numeric(12,3) AS vnode_ymax,
-    (a.sys_elev1 - a.locate * (a.sys_elev1 - a.sys_elev2))::numeric(12,3) AS vnode_elev
+    (a.depth1 - a.locate * (a.depth1 - a.depth2))::numeric(12,3) AS vnode_ymax,
+    (a.elev1 - a.locate * (a.elev1 - a.elev2))::numeric(12,3) AS vnode_elev
    FROM ( SELECT a_1.link_id,
             vnode.vnode_id,
-            v_edit_arc.arc_id,
+            v_arc.arc_id,
             a_1.feature_type,
             a_1.feature_id,
             a_1.vnode_topelev,
-            st_length(v_edit_arc.the_geom) AS length,
-            st_linelocatepoint(v_edit_arc.the_geom, vnode.the_geom)::numeric(12,3) AS locate,
-            v_edit_arc.node_1,
-            v_edit_arc.node_2,
-            v_edit_arc.sys_elev1,
-            v_edit_arc.sys_elev2,
-            v_edit_arc.sys_y1,
-            v_edit_arc.sys_y2,
-            v_edit_arc.sys_elev1 + v_edit_arc.sys_y1 AS top_elev1,
-            v_edit_arc.sys_elev2 + v_edit_arc.sys_y2 AS top_elev2
-           FROM v_edit_arc,
+            st_length(v_arc.the_geom) AS length,
+            st_linelocatepoint(v_arc.the_geom, vnode.the_geom)::numeric(12,3) AS locate,
+            v_arc.node_1,
+            v_arc.node_2,
+            v_arc.elevation1,
+            v_arc.elevation2,
+            v_arc.depth1,
+            v_arc.depth2,
+            v_arc.elevation1 - v_arc.depth1 AS elev1,
+            v_arc.elevation2 - v_arc.depth2 AS elev2
+           FROM v_arc,
             vnode
              JOIN v_edit_link a_1 ON vnode.vnode_id = a_1.exit_id::integer
-          WHERE st_dwithin(v_edit_arc.the_geom, vnode.the_geom, 0.01::double precision) AND v_edit_arc.state > 0 AND vnode.state > 0) a
+          WHERE st_dwithin(v_arc.the_geom, vnode.the_geom, 0.01::double precision) AND v_arc.state > 0 AND vnode.state > 0) a
   ORDER BY a.arc_id, a.node_2 DESC;
-
 
 
 CREATE OR REPLACE VIEW v_edit_vnode AS 
  SELECT a.vnode_id,
     a.feature_type,
-    a.top_elev,
+    a.elev,
     a.sector_id,
     a.dma_id,
     a.state,
@@ -242,7 +239,7 @@ CREATE OR REPLACE VIEW v_edit_vnode AS
     a.psector_rowid
    FROM ( SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
             link.feature_type,
-            vnode.top_elev,
+            vnode.elev,
             link.sector_id,
             link.dma_id,
                 CASE
@@ -266,33 +263,5 @@ CREATE OR REPLACE VIEW v_edit_vnode AS
              JOIN vnode ON link.exit_id::text = vnode.vnode_id::text AND link.exit_type::text = 'VNODE'::text
              LEFT JOIN v_state_connec ON link.feature_id::text = v_state_connec.connec_id::text
              LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
-          WHERE link.feature_id::text = v_state_connec.connec_id::text
-        UNION
-         SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
-            link.feature_type,
-            vnode.top_elev,
-            link.sector_id,
-            link.dma_id,
-                CASE
-                    WHEN plan_psector_x_gully.gully_id IS NULL OR plan_psector_x_gully.state = 0 THEN link.state
-                    ELSE plan_psector_x_gully.state
-                END AS state,
-                CASE
-                    WHEN plan_psector_x_gully.gully_id IS NULL OR plan_psector_x_gully.state = 0 THEN vnode.the_geom
-                    ELSE plan_psector_x_gully.vnode_geom
-                END AS the_geom,
-            link.expl_id,
-                CASE
-                    WHEN plan_psector_x_gully.gully_id IS NULL OR plan_psector_x_gully.state = 0 THEN false
-                    ELSE true
-                END AS ispsectorgeom,
-                CASE
-                    WHEN plan_psector_x_gully.gully_id IS NULL OR plan_psector_x_gully.state = 0 THEN NULL::integer
-                    ELSE plan_psector_x_gully.id
-                END AS psector_rowid
-           FROM v_edit_link link
-             JOIN vnode ON link.exit_id::text = vnode.vnode_id::text AND link.exit_type::text = 'VNODE'::text
-             LEFT JOIN v_state_gully ON link.feature_id::text = v_state_gully.gully_id::text
-             LEFT JOIN plan_psector_x_gully USING (arc_id, gully_id)
-          WHERE link.feature_id::text = v_state_gully.gully_id::text) a
+          WHERE link.feature_id::text = v_state_connec.connec_id::text) a
   WHERE a.state > 0;

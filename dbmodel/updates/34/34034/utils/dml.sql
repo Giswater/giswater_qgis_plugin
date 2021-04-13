@@ -50,3 +50,5 @@ WHERE id = 3082;
 
 INSERT INTO sys_message VALUES (3178, 'It is no possible to relate planned connec/gully over planned connec/gully wich not are on same psector.', NULL,2, TRUE, 'utils');
 INSERT INTO sys_message VALUES (3180, 'You are trying to modify some network element with related connects (connec / gully) on psector not selected.', 'Please activate the psector before!', 2, TRUE, 'utils');
+
+UPDATE sys_table SET sys_role ='role_edit' WHERE id like 'plan_psector_%';

@@ -93,7 +93,6 @@ BEGIN
 			-- update plan_psector tables
 			IF v_table_name = 'connec' THEN
 				UPDATE plan_psector_x_connec SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
-	
 			ELSIF v_table_name = 'gully' THEN
 				UPDATE plan_psector_x_gully SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
 			END IF;	
@@ -128,7 +127,8 @@ BEGIN
 		END IF;	
 	
 	ELSIF v_table_name = 'gully' THEN
-	-- looking for related connecs
+	
+		-- looking for related connecs
 		FOR v_connect IN SELECT connec_id FROM connec JOIN link l ON l.feature_id = connec_id WHERE l.feature_type = 'CONNEC' AND exit_type = 'GULLY' and exit_id = NEW.gully_id
 		LOOP
 			UPDATE connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect;

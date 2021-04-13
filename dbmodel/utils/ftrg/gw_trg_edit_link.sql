@@ -381,7 +381,7 @@ BEGIN
 					    UNION SELECT psector_id FROM plan_psector_x_gully WHERE gully_id = NEW.exit_id) NOT IN 	
 					   (SELECT psector_id FROM plan_psector_x_gully WHERE gully_id = v_connect.gully_id) THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3178", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);'
+						"data":{"message":"3178", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 					END IF;
 				END IF;
 			END IF;			
@@ -413,10 +413,10 @@ BEGIN
 		IF (SELECT feature_id FROM link WHERE feature_id=NEW.feature_id AND state > 0) IS NOT NULL THEN
 			IF NEW.feature_type = 'CONNEC' THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       			"data":{"message":"3076", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
+				"data":{"message":"3076", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 			ELSIF NEW.feature_type = 'GULLY' THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       			"data":{"message":"3078", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
+				"data":{"message":"3078", "function":"1116","debug_msg":"'||NEW.feature_id||'"}}$$);';
 			END IF;		
 		END IF;
 
@@ -454,7 +454,12 @@ BEGIN
 
 				-- update values on plan_psector tables
 				IF NEW.feature_type='CONNEC' THEN
-					UPDATE plan_psector_x_connec SET arc_id = v_arc.arc_id, link_geom = NEW.the_geom, vnode_geom=v_end_point, userdefined_geom = v_userdefined_geom
+
+					-- update only arc to trigger psector table
+					UPDATE plan_psector_x_connec SET arc_id = v_arc.arc_id WHERE plan_psector_x_connec.id=NEW.psector_rowid;
+
+					-- update to set values
+					UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom, vnode_geom=v_end_point, userdefined_geom = v_userdefined_geom
 					WHERE plan_psector_x_connec.id=NEW.psector_rowid;
 		
 				ELSIF NEW.feature_type='GULLY' THEN
@@ -478,22 +483,19 @@ BEGIN
 				-- update link table (if comes from link_class = 2)
 				IF OLD.link_class = 2 THEN
 					UPDATE link SET exit_id = NEW.exit_id, exit_type = NEW.exit_type, userdefined_geom = v_userdefined_geom, the_geom = NEW.the_geom WHERE link_id = NEW.link_id;
-				END IF;
-
-				-- delete vnode when it comes from
-				IF OLD.exit_type = 'VNODE' THEN
 					DELETE FROM vnode WHERE vnode_id = OLD.exit_id::integer;
 				END IF;
-
+				
 				-- update connect tables (connec & gully psector_*) -> arc_id must be the same of the exit_type because this is like limited alternative
 				IF NEW.feature_type='CONNEC' THEN
+				
 					UPDATE plan_psector_x_connec SET arc_id = v_arc_id, link_geom = NULL, vnode_geom = NULL, userdefined_geom = NULL
 					WHERE plan_psector_x_connec.id=NEW.psector_rowid;
 					UPDATE connec SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type WHERE connec_id = NEW.feature_id;
 
 				ELSIF NEW.feature_type='GULLY' THEN
 
-					UPDATE plan_psector_x_gully SET arc_id = v_arc_id,link_geom = NULL, vnode_geom = NULL, userdefined_geom = NULL
+					UPDATE plan_psector_x_gully SET arc_id = v_arc_id, link_geom = NULL, vnode_geom = NULL, userdefined_geom = NULL
 					WHERE  plan_psector_x_gully.id=NEW.psector_rowid;
 					UPDATE gully SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type WHERE gully_id = NEW.feature_id;
 				END IF;
@@ -551,7 +553,8 @@ BEGIN
 		RETURN NULL;
 	   
 	END IF;
-END;
+    
+END; 
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

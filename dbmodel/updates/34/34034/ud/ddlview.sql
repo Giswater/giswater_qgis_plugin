@@ -132,8 +132,7 @@ CREATE VIEW v_edit_link as
             LEFT JOIN arc USING (arc_id)
             LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
             LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
-            LEFT JOIN plan_psector_x_connec p ON p.arc_id = c.arc_id 
-			WHERE p.connec_id = c.connec_id
+            LEFT JOIN plan_psector_x_connec p ON p.arc_id = c.arc_id AND p.connec_id = c.connec_id
 
         UNION
         
@@ -160,8 +159,7 @@ CREATE VIEW v_edit_link as
             LEFT JOIN arc USING (arc_id)
             LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
             LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
-            LEFT JOIN plan_psector_x_gully p ON p.arc_id = c.arc_id 
-			WHERE p.gully_id = c.gully_id          
+            LEFT JOIN plan_psector_x_gully p ON p.arc_id = c.arc_id AND p.gully_id = c.gully_id          
           ) a
 	WHERE selector_state.cur_user = "current_user"()::text AND selector_state.state_id = a.state_id;
 
