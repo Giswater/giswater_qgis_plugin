@@ -10,22 +10,34 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_plan_psector_x_connec()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-    v_stateaux smallint;	
-    v_arcaux text;	
+v_stateaux smallint;	
+v_arcaux text;
+v_connect text;
+v_project_type text;
 
 
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	
+	v_project_type := (SELECT project_type FROM sys_version LIMIT 1);
 
 	-- control if connect has link
 	IF TG_OP = 'INSERT' AND (SELECT link_id FROM link WHERE feature_id = NEW.connec_id) IS NULL THEN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
          "data":{"message":"3138", "function":"2936","debug_msg":null}}$$);';
 	END IF;
+	
+	-- control if connec exists and it is link_class =  1
+	IF (SELECT count(*) FROM plan_psector_x_connec WHERE connec_id = NEW.connec_id) > 0 THEN
+		IF (SELECT link_geom FROM plan_psector_x_connec WHERE connec_id = NEW.connec_id ORDER BY link_geom limit 1) IS NULL THEN
+		        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3082", "function":"2936","debug_msg":null}}$$);';
+		END IF;
+	END IF;
 
 	SELECT connec.state, connec.arc_id INTO v_stateaux, v_arcaux FROM connec WHERE connec_id=NEW.connec_id;
-			
+	
 	IF NEW.state IS NULL THEN
 		NEW.state=0;
 	END IF;
@@ -42,6 +54,11 @@ BEGIN
 		NEW.state=1;
 		NEW.doable=true;
 		-- looking for arc_id state=2 closest
+	END IF;
+	
+	-- profilactic control of doable
+	IF NEW.doable IS NULL THEN
+		NEW.doable =  TRUE;
 	END IF;
 
 	RETURN NEW;

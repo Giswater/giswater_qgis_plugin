@@ -207,107 +207,96 @@ BEGIN
 				
 				-- update link with new vnode
 				UPDATE link SET exit_type='VNODE', exit_id=v_vnode WHERE exit_type='NODE' and exit_id=v_node_id;  
-			END IF;    
-			
-		    IF v_state_node = 1 THEN
 
-			-- update elements
-			SELECT count(distinct element_id) INTO v_count FROM element_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-			IF v_count > 0 THEN
-				INSERT INTO element_x_arc (element_id, arc_id) 
-				SELECT DISTINCT ON (element_id) element_id, v_new_record.arc_id 
-				FROM element_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+			END IF; 
 
-				DELETE FROM element_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-
-				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (214, 1, concat('Copy ',v_count,' elements from old arcs to new one.'));
-			END IF;
-
-			-- update documents
-			SELECT count(distinct doc_id) INTO v_count FROM doc_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-			IF v_count > 0 THEN
-				INSERT INTO doc_x_arc (doc_id, arc_id) 
-				SELECT DISTINCT ON (doc_id) doc_id, v_new_record.arc_id 
-				FROM doc_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-
-				DELETE FROM doc_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-
-				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (214, 1, concat('Copy ',v_count,' documents from old arcs to new one.'));
-			END IF;
-
-			-- update visits
-			SELECT count(distinct visit_id) INTO v_count FROM om_visit_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-			IF v_count > 0 THEN
-				INSERT INTO om_visit_x_arc (visit_id, arc_id) 
-				SELECT DISTINCT ON (visit_id) visit_id, v_new_record.arc_id 
-				FROM om_visit_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-
-				DELETE FROM om_visit_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-
-				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (214, 1, concat('Copy ',v_count,' visits from old arcs to new one.'));
-			END IF;
-		    
-			-- update connecs
+			-- update operative connecs
 			SELECT count(connec_id) INTO v_count FROM connec WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 			IF v_count > 0 THEN
 				UPDATE connec SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				VALUES (214, 1, concat('Reconnect ',v_count,' connecs.'));
+				VALUES (214, 1, concat('Reconnect operative ',v_count,' connecs.'));
 			END IF;
 
-			-- update gullies
+			-- update operative gullies
 			IF v_project_type='UD' THEN
 				SELECT count(gully_id) INTO v_count FROM gully WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-			IF v_count > 0 THEN
-				UPDATE gully SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+				IF v_count > 0 THEN
+					UPDATE gully SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 
-				INSERT INTO audit_check_data (fid,  criticity, error_message)
-				    VALUES (214, 1, concat('Reconnect ',v_count,' gullies.'));
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
+					VALUES (214, 1, concat('Reconnect operative ',v_count,' gullies.'));
 				END IF;
-			END IF;
+			END IF;   
 
-			-- Delete arcs
-			DELETE FROM arc WHERE arc_id = v_my_record1.arc_id;
-			DELETE FROM arc WHERE arc_id = v_my_record2.arc_id;
-
-			-- Moving to obsolete the previous node
-			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Change state of node  ',v_node_id,' to obsolete.'));
-			UPDATE node SET state=0, workcat_id_end=v_workcat_id_end, enddate=v_enddate WHERE node_id = v_node_id;
-		    
-		    ELSIF v_state_node = 2 THEN -- psector
-
-			-- update connecs
+			-- update planned connecs
 			SELECT count(connec_id) INTO v_count FROM plan_psector_x_connec WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 			IF v_count > 0 THEN
 				UPDATE plan_psector_x_connec SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Reconnect ',v_count,' connecs.'));
+				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Reconnect planned ',v_count,' connecs.'));
 			END IF;
 
-			-- update gullies
+			-- update planned gullies
 			IF v_project_type = 'UD' THEN
 				SELECT count(gully_id) INTO v_count FROM plan_psector_x_gully WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
 				IF v_count > 0 THEN
 					UPDATE plan_psector_x_gully SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
-					INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Reconnect ',v_count,' gullies.'));
+					INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Reconnect planned ',v_count,' gullies.'));
 				END IF;
 			END IF;
 			
-			-- Delete arcs
-			DELETE FROM arc WHERE arc_id = v_my_record1.arc_id;
-			DELETE FROM arc WHERE arc_id = v_my_record2.arc_id;
+			IF v_state_node = 1 THEN
 
-			-- Delete node
-			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Delete planned node ',v_node_id));
-			DELETE FROM node WHERE node_id = v_node_id;
-		
-		    END IF;
+				-- update elements
+				SELECT count(id) INTO v_count FROM element_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+				IF v_count > 0 THEN
+					UPDATE element_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
+					VALUES (214, 1, concat('Copy ',v_count,' elements from old arcs to new one.'));
+				END IF;
+
+				-- update documents
+				SELECT count(id) INTO v_count FROM doc_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+				IF v_count > 0 THEN
+					UPDATE doc_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
+					VALUES (214, 1, concat('Copy ',v_count,' documents from old arcs to new one.'));
+				END IF;
+
+				-- update visits
+				SELECT count(id) INTO v_count FROM om_visit_x_arc WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+				IF v_count > 0 THEN
+					UPDATE om_visit_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_my_record1.arc_id OR arc_id=v_my_record2.arc_id;
+
+					INSERT INTO audit_check_data (fid,  criticity, error_message)
+					VALUES (214, 1, concat('Copy ',v_count,' visits from old arcs to new one.'));
+				END IF;
+
+				-- Delete arcs
+				DELETE FROM arc WHERE arc_id = v_my_record1.arc_id;
+				DELETE FROM arc WHERE arc_id = v_my_record2.arc_id;
+
+				-- Moving to obsolete the previous node
+				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Change state of node  ',v_node_id,' to obsolete.'));
+				UPDATE node SET state=0, workcat_id_end=v_workcat_id_end, enddate=v_enddate WHERE node_id = v_node_id;
+			    
+			ELSIF v_state_node = 2 THEN
+						
+				-- Delete arcs
+				DELETE FROM arc WHERE arc_id = v_my_record1.arc_id;
+				DELETE FROM arc WHERE arc_id = v_my_record2.arc_id;
+
+				-- Delete node
+				INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (214, 1, concat('Delete planned node ',v_node_id));
+				DELETE FROM node WHERE node_id = v_node_id;
+			
+			END IF;
 		    
-		    INSERT INTO audit_check_data (fid,  criticity, error_message)
-		    VALUES (214, 1, concat('Delete arcs: ',v_my_record1.arc_id,', ',v_my_record2.arc_id,'.'));
+			INSERT INTO audit_check_data (fid,  criticity, error_message)
+			VALUES (214, 1, concat('Delete arcs: ',v_my_record1.arc_id,', ',v_my_record2.arc_id,'.'));
 
             -- Arcs has different types
             ELSE
@@ -329,13 +318,6 @@ BEGIN
         "data":{"message":"2002", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;  
 
     END IF;
-
-
-   -- EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-   -- "data":{"message":"0", "function":"2112","debug_msg":null}}$$)' INTO v_audit_result;  
-
-	-- get results
-    -- info
 
     SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
     FROM (SELECT id, error_message as message FROM audit_check_data 

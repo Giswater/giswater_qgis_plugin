@@ -83,3 +83,203 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"review_aud
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"review_audit_gully", "column":"new_connec_matcat_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"review_gully", "column":"connec_matcat_id"}}$$);
 
+
+DROP VIEW IF EXISTS v_arc_x_vnode;
+DROP VIEW IF EXISTS v_edit_vnode;
+
+DROP VIEW IF EXISTS v_edit_link;
+CREATE VIEW v_edit_link as
+
+ SELECT DISTINCT ON (a.link_id) a.link_id,
+    a.feature_type,
+    a.feature_id,
+    a.macrosector_id,
+    a.macrodma_id,
+    a.exit_type,
+    a.exit_id,
+    a.sector_id,
+    a.dma_id,
+    a.expl_id,
+    a.state_id as state,
+    a.gis_length,
+    a.userdefined_geom,
+    a.the_geom,
+    a.link_class,
+    a.psector_rowid,
+    a.fluid_type,
+    a.vnode_topelev
+   FROM selector_state, ( 
+   SELECT link.link_id,
+            link.feature_type,
+            link.feature_id,
+            sector.macrosector_id,
+            dma.macrodma_id,
+            link.exit_type,
+            link.exit_id,
+            link.vnode_topelev,
+            c.fluid_type,
+            arc.sector_id,
+            arc.dma_id,
+            arc.expl_id,
+            case when p.state is null then c.state else p.state end as state_id,
+            case when p.link_geom is null then st_length2d(link.the_geom) else  st_length2d(link_geom) end AS gis_length,
+            case when p.userdefined_geom is null then link.userdefined_geom else p.userdefined_geom end as userdefined_geom,
+            case when p.link_geom is null then (link.the_geom) else (link_geom) end AS the_geom,
+            case when p.arc_id IS NULL THEN 0 when p.link_geom IS NULL THEN 1 ELSE 2 end link_class,
+			case when p.id IS NULL THEN null else p.id end as psector_rowid
+            FROM v_edit_connec c
+            LEFT JOIN link ON link.feature_id::text = c.connec_id::text
+            LEFT JOIN arc USING (arc_id)
+            LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
+            LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
+            LEFT JOIN plan_psector_x_connec p ON p.arc_id = c.arc_id 
+			WHERE p.connec_id = c.connec_id
+
+        UNION
+        
+	  SELECT link.link_id,
+            link.feature_type,
+            link.feature_id,
+            sector.macrosector_id,
+            dma.macrodma_id,
+            link.exit_type,
+            link.exit_id,
+            link.vnode_topelev,
+            c.fluid_type,
+            arc.sector_id,
+            arc.dma_id,
+            arc.expl_id,
+            case when p.state is null then c.state else p.state end as state_id,
+            case when p.link_geom is null then st_length2d(link.the_geom) else  st_length2d(link_geom) end AS gis_length,
+            case when p.userdefined_geom is null then link.userdefined_geom else p.userdefined_geom end as userdefined_geom,
+            case when p.link_geom is null then (link.the_geom) else (link_geom) end AS the_geom,
+            case when p.arc_id IS NULL THEN 0 when p.link_geom IS NULL THEN 1 ELSE 2 end link_class,
+			case when p.id IS NULL THEN null else p.id end as psector_rowid
+            FROM v_edit_gully c
+            LEFT JOIN link ON link.feature_id::text = c.gully_id::text
+            LEFT JOIN arc USING (arc_id)
+            LEFT JOIN sector ON sector.sector_id::text = arc.sector_id::text
+            LEFT JOIN dma ON dma.dma_id::text = arc.dma_id::text
+            LEFT JOIN plan_psector_x_gully p ON p.arc_id = c.arc_id 
+			WHERE p.gully_id = c.gully_id          
+          ) a
+	WHERE selector_state.cur_user = "current_user"()::text AND selector_state.state_id = a.state_id;
+
+
+CREATE TRIGGER gw_trg_edit_link
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_link
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_link();
+
+
+
+
+CREATE OR REPLACE VIEW v_arc_x_vnode AS 
+ SELECT a.link_id,
+    a.vnode_id,
+    a.arc_id,
+    a.feature_type,
+    a.feature_id,
+    a.node_1,
+    a.node_2,
+    (a.length * a.locate::double precision)::numeric(12,3) AS vnode_distfromnode1,
+    (a.length * (1::numeric - a.locate)::double precision)::numeric(12,3) AS vnode_distfromnode2,
+        CASE
+            WHEN a.vnode_topelev IS NULL THEN (a.top_elev1 - a.locate * (a.top_elev1 - a.top_elev2))::numeric(12,3)::double precision
+            ELSE a.vnode_topelev
+        END AS vnode_topelev,
+    (a.sys_y1 - a.locate * (a.sys_y1 - a.sys_y2))::numeric(12,3) AS vnode_ymax,
+    (a.sys_elev1 - a.locate * (a.sys_elev1 - a.sys_elev2))::numeric(12,3) AS vnode_elev
+   FROM ( SELECT a_1.link_id,
+            vnode.vnode_id,
+            v_edit_arc.arc_id,
+            a_1.feature_type,
+            a_1.feature_id,
+            a_1.vnode_topelev,
+            st_length(v_edit_arc.the_geom) AS length,
+            st_linelocatepoint(v_edit_arc.the_geom, vnode.the_geom)::numeric(12,3) AS locate,
+            v_edit_arc.node_1,
+            v_edit_arc.node_2,
+            v_edit_arc.sys_elev1,
+            v_edit_arc.sys_elev2,
+            v_edit_arc.sys_y1,
+            v_edit_arc.sys_y2,
+            v_edit_arc.sys_elev1 + v_edit_arc.sys_y1 AS top_elev1,
+            v_edit_arc.sys_elev2 + v_edit_arc.sys_y2 AS top_elev2
+           FROM v_edit_arc,
+            vnode
+             JOIN v_edit_link a_1 ON vnode.vnode_id = a_1.exit_id::integer
+          WHERE st_dwithin(v_edit_arc.the_geom, vnode.the_geom, 0.01::double precision) AND v_edit_arc.state > 0 AND vnode.state > 0) a
+  ORDER BY a.arc_id, a.node_2 DESC;
+
+
+
+CREATE OR REPLACE VIEW v_edit_vnode AS 
+ SELECT a.vnode_id,
+    a.feature_type,
+    a.top_elev,
+    a.sector_id,
+    a.dma_id,
+    a.state,
+    a.the_geom,
+    a.expl_id,
+    a.ispsectorgeom,
+    a.psector_rowid
+   FROM ( SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
+            link.feature_type,
+            vnode.top_elev,
+            link.sector_id,
+            link.dma_id,
+                CASE
+                    WHEN plan_psector_x_connec.connec_id IS NULL OR plan_psector_x_connec.state = 0 THEN link.state
+                    ELSE plan_psector_x_connec.state
+                END AS state,
+                CASE
+                    WHEN plan_psector_x_connec.connec_id IS NULL OR plan_psector_x_connec.state = 0 THEN vnode.the_geom
+                    ELSE plan_psector_x_connec.vnode_geom
+                END AS the_geom,
+            link.expl_id,
+                CASE
+                    WHEN plan_psector_x_connec.connec_id IS NULL OR plan_psector_x_connec.state = 0 THEN false
+                    ELSE true
+                END AS ispsectorgeom,
+                CASE
+                    WHEN plan_psector_x_connec.connec_id IS NULL OR plan_psector_x_connec.state = 0 THEN NULL::integer
+                    ELSE plan_psector_x_connec.id
+                END AS psector_rowid
+           FROM v_edit_link link
+             JOIN vnode ON link.exit_id::text = vnode.vnode_id::text AND link.exit_type::text = 'VNODE'::text
+             LEFT JOIN v_state_connec ON link.feature_id::text = v_state_connec.connec_id::text
+             LEFT JOIN plan_psector_x_connec USING (arc_id, connec_id)
+          WHERE link.feature_id::text = v_state_connec.connec_id::text
+        UNION
+         SELECT DISTINCT ON (vnode.vnode_id) vnode.vnode_id,
+            link.feature_type,
+            vnode.top_elev,
+            link.sector_id,
+            link.dma_id,
+                CASE
+                    WHEN plan_psector_x_gully.gully_id IS NULL OR plan_psector_x_gully.state = 0 THEN link.state
+                    ELSE plan_psector_x_gully.state
+                END AS state,
+                CASE
+                    WHEN plan_psector_x_gully.gully_id IS NULL OR plan_psector_x_gully.state = 0 THEN vnode.the_geom
+                    ELSE plan_psector_x_gully.vnode_geom
+                END AS the_geom,
+            link.expl_id,
+                CASE
+                    WHEN plan_psector_x_gully.gully_id IS NULL OR plan_psector_x_gully.state = 0 THEN false
+                    ELSE true
+                END AS ispsectorgeom,
+                CASE
+                    WHEN plan_psector_x_gully.gully_id IS NULL OR plan_psector_x_gully.state = 0 THEN NULL::integer
+                    ELSE plan_psector_x_gully.id
+                END AS psector_rowid
+           FROM v_edit_link link
+             JOIN vnode ON link.exit_id::text = vnode.vnode_id::text AND link.exit_type::text = 'VNODE'::text
+             LEFT JOIN v_state_gully ON link.feature_id::text = v_state_gully.gully_id::text
+             LEFT JOIN plan_psector_x_gully USING (arc_id, gully_id)
+          WHERE link.feature_id::text = v_state_gully.gully_id::text) a
+  WHERE a.state > 0;
+

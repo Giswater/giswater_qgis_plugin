@@ -65,6 +65,7 @@ v_count integer;
 v_count_connec integer=0;
 v_count_gully integer=0;
 
+rec_link record;
 rec_visit record;
 rec_node record;
 rec_event record;
@@ -88,6 +89,7 @@ v_message text;
 v_hide_form boolean;
 v_array_node_id json;
 v_node_id text;
+v_arc_closest text;
 
 BEGIN
 
@@ -194,6 +196,20 @@ BEGIN
 					"data":{"message":"3094", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 				ELSE
 
+					-- check if there are not-selected psector affecting connecs
+					IF (SELECT count (*) FROM plan_psector_x_connec WHERE arc_id = v_arc_id AND state = 1 AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3180", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;								
+					END IF;
+					
+					-- check if there are not-selected psector affecting connecs
+					IF v_project_type = 'UD' THEN
+						IF (SELECT count (*) FROM plan_psector_x_gully WHERE arc_id = v_arc_id AND state = 1 AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
+							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+							"data":{"message":"3180", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;								
+						END IF;
+					END IF;
+
 					-- Get arc data
 					SELECT * INTO rec_aux1 FROM arc WHERE arc_id = v_arc_id;
 					SELECT * INTO rec_aux2 FROM arc WHERE arc_id = v_arc_id;
@@ -231,7 +247,6 @@ BEGIN
 					END IF;
 					v_epaquerytext1 =  'INSERT INTO '||v_epatable||' SELECT ';
 					v_epaquerytext2 =  v_epaquerytext||' FROM '||v_epatable||' WHERE arc_id= '||v_arc_id||'::text';
-
 
 					-- In function of states and user's variables proceed.....
 					IF v_state_node=1 THEN 
@@ -447,8 +462,8 @@ BEGIN
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1, 'Update arc_id on node.');
-			
-						-- reconnect links
+
+						-- reconnect operative links
 						UPDATE arc SET state=0 WHERE arc_id=v_arc_id;
 
 						IF v_count_connec > 0  AND v_array_connec IS NOT NULL THEN
@@ -465,7 +480,34 @@ BEGIN
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (212, 1, concat('Reconnect ',v_count_gully,' gullies with state 1.'));
 						END IF;
+											
+						-- reconnect planned vnode links
+						FOR rec_link IN SELECT v_edit_link.* FROM v_edit_connec JOIN v_edit_link ON v_edit_link.feature_id=connec_id 
+						WHERE v_edit_link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=v_arc_id
+						LOOP
+							SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
+							UPDATE plan_psector_x_connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
+						END LOOP;
 
+						IF v_project_type ='UD' THEN
+
+							FOR rec_link IN SELECT v_edit_link.* FROM v_edit_gully JOIN v_edit_link ON v_edit_link.feature_id=gully_id 
+							WHERE v_edit_link.feature_type='GULLY' AND exit_type='VNODE' AND arc_id=v_arc_id
+							LOOP
+								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
+								UPDATE plan_psector_x_gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
+							END LOOP;
+						END IF;
+
+						-- reconnect planned node links
+						FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'NODE' AND exit_id = (SELECT node_1 FROM arc WHERE arc_id = rec_aux1.arc_id)
+						LOOP
+							UPDATE plan_psector_x_connec SET arc_id = rec_aux1.arc_id WHERE connec_id = rec_link.feature_id;
+							IF v_project_type ='UD' THEN
+								UPDATE plan_psector_x_gully SET arc_id = rec_aux1.arc_id WHERE gully_id = rec_link.feature_id;
+							END IF;							
+						END LOOP;
+						
 						-- delete old arc
 						EXECUTE 'SELECT SCHEMA_NAME.gw_fct_setfeaturedelete($${
 						"client":{"device":4, "infoType":1, "lang":"ES"},
@@ -587,18 +629,45 @@ BEGIN
 							INSERT INTO audit_arc_traceability ("type", arc_id, code, arc_id1, arc_id2, node_id, tstamp, cur_user) 
 							VALUES ('DIVIDE EXISTING ARC WITH PLANNED NODE',  v_arc_id, v_code, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id, now(), current_user);
 
-							-- insert connec's on alternative in order to reconnect
+							-- insert operative connec's on alternative in order to reconnect
 							INSERT INTO plan_psector_x_connec (psector_id, connec_id, arc_id, state, doable)
 							SELECT v_psector, connec_id, NULL, 1,false FROM connec WHERE arc_id = v_arc_id
 							ON CONFLICT DO NOTHING;
 
-							-- insert gully's on alternative in order to reconnect
+							-- insert operative gully's on alternative in order to reconnect
 							IF v_project_type='UD' THEN
 								INSERT INTO plan_psector_x_gully (psector_id, gully_id, arc_id, state, doable)
 								SELECT v_psector, gully_id, NULL, 1, false FROM gully WHERE arc_id = v_arc_id
 								ON CONFLICT DO NOTHING;
 							END IF;
+
+							-- reconnect planned vnode links
+							FOR rec_link IN SELECT v_edit_link.* FROM v_edit_connec JOIN v_edit_link ON v_edit_link.feature_id=connec_id 
+							WHERE v_edit_link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=v_arc_id
+							LOOP
+								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
+								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
+							END LOOP;
+
+							IF v_project_type ='UD' THEN
 							
+								FOR rec_link IN SELECT v_edit_link.* FROM v_edit_gully JOIN v_edit_link ON v_edit_link.feature_id=gully_id 
+								WHERE v_edit_link.feature_type='GULLY' AND exit_type='VNODE' AND arc_id=v_arc_id
+								LOOP
+									SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
+									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
+								END LOOP;
+							END IF;						
+
+							-- reconnect planned node links
+							FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'NODE' AND exit_id = (SELECT node_1 FROM arc WHERE arc_id = rec_aux1.arc_id)
+							LOOP
+								UPDATE plan_psector_x_connec SET arc_id = rec_aux1.arc_id WHERE connec_id = rec_link.feature_id;
+								IF v_project_type ='UD' THEN
+									UPDATE plan_psector_x_gully SET arc_id = rec_aux1.arc_id WHERE gully_id = rec_link.feature_id;
+								END IF;							
+							END LOOP;
+													
 							-- Update doability for the new arcs
 							UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux1.arc_id;
 							UPDATE plan_psector_x_arc SET doable=FALSE where arc_id=rec_aux2.arc_id;
@@ -625,6 +694,35 @@ BEGIN
 
 							SELECT count(*) INTO v_count FROM plan_psector_x_arc WHERE arc_id=v_arc_id;
 
+							-- reconnect planned vnode links
+							FOR rec_link IN SELECT v_edit_link.* FROM v_edit_connec JOIN v_edit_link ON v_edit_link.feature_id=connec_id 
+							WHERE v_edit_link.feature_type='CONNEC' AND exit_type='VNODE' AND arc_id=v_arc_id
+							LOOP
+								SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
+								UPDATE plan_psector_x_connec SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND connec_id = rec_link.feature_id;
+							END LOOP;
+
+							IF v_project_type ='UD' THEN
+							
+								FOR rec_link IN SELECT v_edit_link.* FROM v_edit_gully JOIN v_edit_link ON v_edit_link.feature_id=gully_id 
+								WHERE v_edit_link.feature_type='GULLY' AND exit_type='VNODE' AND arc_id=v_arc_id
+								LOOP
+									SELECT arc_id INTO v_arc_closest FROM v_edit_link l, v_edit_arc a WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom),1) AND l.link_id = rec_link.link_id LIMIT 1; 
+									UPDATE plan_psector_x_gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
+								END LOOP;
+							END IF;						
+
+							-- reconnect planned node links
+							FOR rec_link IN SELECT * FROM v_edit_link WHERE exit_type = 'NODE' AND exit_id = (SELECT node_1 FROM arc WHERE arc_id = rec_aux1.arc_id)
+							LOOP
+								UPDATE connec SET arc_id = rec_aux1.arc_id WHERE connec_id = rec_link.feature_id;
+								UPDATE plan_psector_x_connec SET arc_id = rec_aux1.arc_id WHERE connec_id = rec_link.feature_id;
+								IF v_project_type ='UD' THEN
+									UPDATE gully SET arc_id = rec_aux1.arc_id WHERE gully_idn = rec_link.feature_id;
+									UPDATE plan_psector_x_gully SET arc_id = rec_aux1.arc_id WHERE gully_id = rec_link.feature_id;
+								END IF;							
+							END LOOP;
+
 							IF v_count > 1 THEN
 								DELETE FROM plan_psector_x_arc WHERE arc_id=v_arc_id AND psector_id=v_psector;
 							ELSE
@@ -633,22 +731,11 @@ BEGIN
 								"form":{},"feature":{"type":"ARC"},
 								"data":{"feature_id":"'||v_arc_id||'"}}$$);';
 							END IF;
-
-							UPDATE plan_psector_x_connec SET arc_id=NULL WHERE arc_id=v_arc_id AND psector_id=v_psector;				
 						END IF;
-
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1,concat('Insert old arc as downgraded into current psector: ',v_psector,'.'));
 						
-						-- reconnect connec
-						UPDATE v_edit_connec SET arc_id=NULL WHERE arc_id=v_arc_id;					
-
-						-- reconnect gully
-						IF v_project_type='UD' THEN
-							UPDATE v_edit_gully SET arc_id=NULL WHERE arc_id=v_arc_id;
-						END IF;				
-
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
 						VALUES (212, 1,'Set values on plan_psector_x_arc addparam.');	
 
@@ -662,10 +749,8 @@ BEGIN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3042", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 				ELSE  
-
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3044", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
-
 				END IF;
 			END IF;
 		ELSE

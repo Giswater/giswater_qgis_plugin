@@ -10,9 +10,8 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_plan_psector_x_gully()
   RETURNS trigger AS
 $BODY$
 DECLARE 
-    v_stateaux smallint;
-	v_arcaux text;
-
+v_stateaux smallint;
+v_arcaux text;
 
 BEGIN 
 
@@ -24,6 +23,14 @@ BEGIN
          "data":{"message":"3138", "function":"2936","debug_msg":null}}$$);';
 	END IF;
 
+	-- control if gully exists and it is link_class =  1
+	IF (SELECT count(*) FROM plan_psector_x_gully WHERE gully_id = NEW.gully_id) > 0 THEN
+		IF (SELECT link_geom FROM plan_psector_x_gully WHERE gully_id = NEW.gully_id ORDER BY link_geom limit 1) IS NULL THEN
+		        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3082", "function":"2936","debug_msg":null}}$$);';
+		END IF;
+	END IF;
+
 	SELECT gully.state, gully.arc_id INTO v_stateaux, v_arcaux FROM gully WHERE gully_id=NEW.gully_id;
 	
 	IF NEW.state IS NULL THEN
@@ -32,7 +39,6 @@ BEGIN
 	
 	IF NEW.state = 1 AND v_stateaux = 1 THEN
 		NEW.doable=false;
-		-- looking for arc_id state=2 closest
 	
 	ELSIF NEW.state = 0 AND v_stateaux=1 THEN
 		NEW.doable=false;
@@ -41,7 +47,11 @@ BEGIN
 	ELSIF v_stateaux=2 THEN
 		NEW.state=1;
 		NEW.doable=true;
-		-- looking for arc_id state=2 closest
+	END IF;
+
+	-- profilactic control of doable
+	IF NEW.doable IS NULL THEN
+		NEW.doable =  TRUE;
 	END IF;
 
 	RETURN NEW;

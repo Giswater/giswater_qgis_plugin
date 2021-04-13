@@ -303,12 +303,12 @@ BEGIN
 			END LOOP; 
 
 			--updating links
-			v_querytext:= 'SELECT * FROM v_edit_link WHERE v_edit_link.exit_id= ' || quote_literal(NEW.node_id) || ' AND exit_type=''NODE''';
+			v_querytext:= 'SELECT * FROM link WHERE link.exit_id= ' || quote_literal(NEW.node_id) || ' AND exit_type=''NODE''';
 
 			FOR v_linkrec IN EXECUTE v_querytext
 			LOOP
 				-- Coordinates
-				EXECUTE 'UPDATE v_edit_link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(v_linkrec."link_id")
+				EXECUTE 'UPDATE link SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE link_id = ' || quote_literal(v_linkrec."link_id")
 				USING v_linkrec.the_geom, NEW.the_geom; 					
 			END LOOP; 
 			

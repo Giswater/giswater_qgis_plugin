@@ -25,6 +25,7 @@ v_schemaname text;
 v_arc_id text;
 v_projecttype text;
 v_exit_type text;
+v_connect text;
 	
 BEGIN 
 
@@ -46,8 +47,7 @@ BEGIN
 		SELECT exit_type INTO v_exit_type FROM v_edit_link WHERE feature_id =  NEW.gully_id;
 	END IF;
 
-
-	IF v_exit_type ='VNODE' THEN
+	IF v_exit_type ='VNODE' THEN -- link_class =  2
 	
 		-- getting arc_geom
 		IF NEW.arc_id IS NOT NULL THEN
@@ -56,7 +56,7 @@ BEGIN
 		
 			IF v_table_name = 'connec' THEN
 				-- getting closest arc
-				SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, v_edit_connec c WHERE st_dwithin(a.the_geom, c.the_geom, 1000) AND connec_id = NEW.connec_id AND a.state = 2
+				SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, v_edit_connec c WHERE st_dwithin(a.the_geom, c.the_geom, 1000) AND connec_id = NEW.connec_id AND a.state > 0
 				ORDER BY st_distance (a.the_geom, c.the_geom) LIMIT 1;
 
 				-- this update makes a recall of self.trigger but in this case with NEW.arc_id IS NOT NULL recall will finish next one
@@ -66,7 +66,7 @@ BEGIN
 				
 			ELSIF v_table_name = 'gully' THEN
 				-- getting closest arc
-				SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, v_edit_gully g WHERE st_dwithin(a.the_geom, g.the_geom, 1000) AND gully_id = NEW.gully_id AND a.state = 2
+				SELECT a.arc_id INTO v_arc_id FROM v_edit_arc a, v_edit_gully g WHERE st_dwithin(a.the_geom, g.the_geom, 1000) AND gully_id = NEW.gully_id AND a.state > 0
 				ORDER BY st_distance (a.the_geom, g.the_geom) LIMIT 1;
 
 				-- this update makes a recall of self.trigger but in this case with NEW.arc_id IS NOT NULL recall will finish next one
@@ -93,12 +93,7 @@ BEGIN
 			-- update plan_psector tables
 			IF v_table_name = 'connec' THEN
 				UPDATE plan_psector_x_connec SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
-				IF (SELECT exit_type FROM link WHERE feature_id = NEW.connec_id AND feature_type ='CONNEC') ='NODE' 
-				AND v_projecttype ='WS' THEN -- this is because enable the export to inp model using pjoint
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3154", "function":"2938","debug_msg":"'||NEW.connec_id::text||'"}}$$);';
-				END IF;
-
+	
 			ELSIF v_table_name = 'gully' THEN
 				UPDATE plan_psector_x_gully SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
 			END IF;	
@@ -112,8 +107,43 @@ BEGIN
 			END IF;	
 		END IF;
 	END IF;
+
+	-- reconnect connects
+	IF v_table_name = 'connec' THEN
 	
-   
+		-- looking for related connecs
+		FOR v_connect IN SELECT connec_id FROM connec JOIN link l ON l.feature_id = connec_id WHERE l.feature_type = 'CONNEC' AND exit_type = 'CONNEC' and exit_id = NEW.connec_id
+		LOOP
+			UPDATE connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect;
+			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect;
+		END LOOP;
+		
+		-- looking for related gullies
+		IF v_projecttype = 'UD' THEN
+			FOR v_connect IN SELECT gully_id FROM gully JOIN link l ON l.feature_id = gully_id WHERE l.feature_type = 'GULLY' AND exit_type = 'CONNEC' and exit_id = NEW.connec_id
+			LOOP
+				UPDATE gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect;
+				UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect;
+			END LOOP;
+		END IF;	
+	
+	ELSIF v_table_name = 'gully' THEN
+	-- looking for related connecs
+		FOR v_connect IN SELECT connec_id FROM connec JOIN link l ON l.feature_id = connec_id WHERE l.feature_type = 'CONNEC' AND exit_type = 'GULLY' and exit_id = NEW.gully_id
+		LOOP
+			UPDATE connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect;
+			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect;
+		END LOOP;
+		
+		-- looking for related gullies
+		FOR v_connect IN SELECT gully_id FROM gully JOIN link l ON l.feature_id = gully_id WHERE l.feature_type = 'GULLY' AND exit_type = 'GULLY' and exit_id = NEW.gully_id
+		LOOP
+			UPDATE gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect;
+			UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect;
+		END LOOP;
+		
+	END IF;	
+
 	-- notify to qgis in order to reindex geometries for snapping
 	v_channel := replace (current_user::text,'.','_');
 	PERFORM pg_notify (v_channel, '{"functionAction":{"functions":[{"name":"set_layer_index","parameters":{"tableName":"v_edit_link"}},
