@@ -1844,8 +1844,10 @@ class GwInfo(QObject):
 
 
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
+
         if widget.property('isfilter'): return widget
-        if widget.property('saveValue') is False: return widget
+        if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
+            if widget.property('widgetcontrols')['saveValue'] is False: return widget
 
         if self._check_tab_data(dialog):
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
@@ -1869,7 +1871,8 @@ class GwInfo(QObject):
     def _set_auto_update_textarea(self, field, dialog, widget, new_feature):
 
         if widget.property('isfilter'): return widget
-        if widget.property('saveValue') is False: return widget
+        if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
+            if widget.property('widgetcontrols')['saveValue'] is False: return widget
 
         if self._check_tab_data(dialog):
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
@@ -1941,7 +1944,8 @@ class GwInfo(QObject):
     def _set_auto_update_combobox(self, field, dialog, widget, new_feature):
 
         if widget.property('isfilter'): return widget
-        if widget.property('saveValue') is False: return widget
+        if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
+            if widget.property('widgetcontrols')['saveValue'] is False: return widget
 
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
@@ -1959,7 +1963,8 @@ class GwInfo(QObject):
     def _set_auto_update_dateedit(self, field, dialog, widget, new_feature):
 
         if widget.property('isfilter'): return widget
-        if widget.property('saveValue') is False: return widget
+        if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
+            if widget.property('widgetcontrols')['saveValue'] is False: return widget
 
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
@@ -1977,7 +1982,9 @@ class GwInfo(QObject):
     def _set_auto_update_spinbox(self, field, dialog, widget, new_feature):
 
         if widget.property('isfilter'): return widget
-        if widget.property('saveValue') is False: return widget
+        if widget.property('isfilter'): return widget
+        if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
+            if widget.property('widgetcontrols')['saveValue'] is False: return widget
 
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
@@ -1995,7 +2002,8 @@ class GwInfo(QObject):
     def _set_auto_update_checkbox(self, field, dialog, widget, new_feature):
 
         if widget.property('isfilter'): return widget
-        if widget.property('saveValue') is False: return widget
+        if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
+            if widget.property('widgetcontrols')['saveValue'] is False: return widget
 
         if self._check_tab_data(dialog):
             if field['isautoupdate'] and self.new_feature_id is None:
