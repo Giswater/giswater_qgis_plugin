@@ -1313,7 +1313,7 @@ class GwInfo(QObject):
             pass
 
 
-    def _set_widgets(self, dialog, complet_result, field, new_feature, add_widget=True):
+    def _set_widgets(self, dialog, complet_result, field, new_feature):
         """
         functions called in -> widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
             def _manage_text(self, **kwargs)
@@ -1349,18 +1349,15 @@ class GwInfo(QObject):
             msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
             tools_qgis.show_message(message, 2, parameter=msg)
             return label, widget
-        kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature,
-                  "add_widget": add_widget}
-        widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        # try:
-        #     kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature,
-        #               "add_widget": add_widget}
-        #     widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
-        # except Exception as e:
-        #     msg = (f"{type(e).__name__}: {e} Python function: _set_widgets. WHERE columname='{field['columnname']}' "
-        #            f"AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'")
-        #     tools_qgis.show_message(msg, 2)
-        # return label, widget
+
+        try:
+            kwargs = {"dialog": dialog, "complet_result": complet_result, "field": field, "new_feature": new_feature}
+            widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
+        except Exception as e:
+            msg = (f"{type(e).__name__}: {e} Python function: _set_widgets. WHERE columname='{field['columnname']}' "
+                   f"AND widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'")
+            tools_qgis.show_message(msg, 2)
+            return label, widget
 
         try:
             widget.setProperty('isfilter', False)
@@ -1576,12 +1573,7 @@ class GwInfo(QObject):
         complet_result = kwargs['complet_result']
         field = kwargs['field']
         dialog = kwargs['dialog']
-        add_widget = kwargs['add_widget']
-        if add_widget:
-            widget = tools_gw.add_tableview(complet_result, field, dialog, self)
-        else:
-            widget = self.dlg_cf.findChild(QWidget, field['widgetname'])
-
+        widget = tools_gw.add_tableview(complet_result, field, dialog, self)
         widget = tools_gw.add_tableview_header(widget, field)
         widget = tools_gw.fill_tableview_rows(widget, field)
         widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], 1, True)
@@ -3258,28 +3250,33 @@ class GwInfo(QObject):
                 msg = f"widget {widgetname} in tab {self.tab_main.widget(index_tab).objectName()} has not columnname and cant be configured"
                 tools_qgis.show_info(msg, 1)
                 continue
-
-            complet_list, widget_list = self._init_tbl_rpt(complet_result, self.dlg_cf, new_feature, columnname, widgetname)
+            linkedobject = table.property('linkedobject')
+            complet_list, widget_list = self._init_tbl_rpt(complet_result, self.dlg_cf, new_feature, widgetname, linkedobject)
             if complet_list is False:
                 return False
             self._set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname)
         return complet_list
 
 
-    def _init_tbl_rpt(self, complet_result, dialog, new_feature, columnname, widgetname):
+    def _init_tbl_rpt(self, complet_result, dialog, new_feature, widgetname, linkedobject):
         """ Put filter widgets into layout and set headers into QTableView """
 
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
-        complet_list = self._get_list(complet_result, '', tab_name, '', columnname, widgetname, 'form_feature')
+        complet_list = self._get_list(complet_result, '', tab_name, '', widgetname, 'form_feature', linkedobject)
 
         if complet_list is False:
             return False, False
-
         for field in complet_list['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']:
-                continue
-            label, widget = self._set_widgets(dialog, complet_list, field, new_feature, False)
+            if 'hidden' in field and field['hidden']: continue
+
+            widget = self.dlg_cf.findChild(QTableView, field['widgetname'])
+            if widget is None: continue
+            widget = tools_gw.add_tableview_header(widget, field)
+            widget = tools_gw.fill_tableview_rows(widget, field)
+            widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], 1, True)
+            tools_qt.set_tableview_config(widget)
+
         widget_list = []
         widget_list.extend(self.tab_main.widget(index_tab).findChildren(QComboBox, QRegExp(f"{tab_name}_")))
         widget_list.extend(self.tab_main.widget(index_tab).findChildren(QTableView, QRegExp(f"{tab_name}_")))
@@ -3362,12 +3359,11 @@ class GwInfo(QObject):
                 last_widget.currentIndexChanged.emit(last_widget.currentIndex())
                 
 
-    def _get_list(self, complet_result, form_name='', tab_name='', filter_fields='', columnname='', widgetname='', formtype=''):
+    def _get_list(self, complet_result, form_name='', tab_name='', filter_fields='', widgetname='', formtype='', linkedobject=''):
 
-        form = f'"formName":"{form_name}", "tabName":"{tab_name}", "columnname":"{columnname}", ' \
-               f'"widgetname":"{widgetname}", "formtype":"{formtype}"'
+        form = f'"formName":"{form_name}", "tabName":"{tab_name}", "widgetname":"{widgetname}", "formtype":"{formtype}"'
         id_name = complet_result['body']['feature']['idName']
-        feature = f'"tableName":"{self.tablename}", "idName":"{id_name}", "id":"{self.feature_id}"'
+        feature = f'"tableName":"{linkedobject}", "idName":"{id_name}", "id":"{self.feature_id}"'
         body = tools_gw.create_body(form, feature, filter_fields)
         json_result = tools_gw.execute_procedure('gw_fct_getlist', body, log_sql=True)
         if json_result is None or json_result['status'] == 'Failed':
@@ -3394,7 +3390,7 @@ class GwInfo(QObject):
         filter_fields = self._get_filter_qtableview(dialog, widget_list)
         index_tab = dialog.tab_main.currentIndex()
         tab_name = dialog.tab_main.widget(index_tab).objectName()
-        complet_list = self._get_list(complet_result, '', tab_name, filter_fields, columnname, widgetname, 'form_feature')
+        complet_list = self._get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature')
         if complet_list is False:
             return False
 
@@ -3441,6 +3437,7 @@ class GwInfo(QObject):
         """
         qtable = kwargs['qtable']
         complet_list = kwargs['complet_result']
+        func_params = kwargs['func_params']
         # Get selected rows
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -3451,10 +3448,8 @@ class GwInfo(QObject):
         index = selected_list[0]
         row = index.row()
         table_name = complet_list['body']['feature']['tableName']
-        column_index = tools_qt.get_col_index_by_col_name(qtable, 'sys_id')
+        column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columname'])
         feature_id = index.sibling(row, column_index).data()
-
-        # return
         info_feature = GwInfo(self.tab_type)
         complet_result, dialog = info_feature.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
         if not complet_result:

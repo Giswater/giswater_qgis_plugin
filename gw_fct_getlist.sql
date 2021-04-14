@@ -48,7 +48,7 @@ SELECT ws_sample35.gw_fct_getlist($${
 "feature":{"tableName":"om_visit_file"},
 "data":{"filterFields":{},
 	"pageInfo":{}}}$$)
-	
+
 -- not first call
 SELECT ws_sample35.gw_fct_getlist($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
@@ -143,21 +143,14 @@ v_audit_result text;
 v_status text;
 v_level integer;
 v_message text;
-v_msgerr json;
-v_querystring text;
-v_debug json;
-v_debug_vars json;
-
-v_columnname text;
+v_value_type text;
 v_widgetname text;
-v_formtype text;
-
 BEGIN
 
 	-- Set search path to local schema
     SET search_path = "ws_sample35", public;
     v_schemaname := 'ws_sample35';
-  
+
 	--  get api version
     EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
@@ -186,13 +179,12 @@ BEGIN
 	v_offset := ((p_data ->> 'data')::json->> 'pageInfo')::json->>'offset';
 	v_filter_feature := (p_data ->> 'data')::json->> 'filterFeatureField';
 	v_isattribute := (p_data ->> 'data')::json->> 'isAttribute';
-	v_columnname := (p_data ->> 'form')::json->> 'columnname';
 	v_widgetname := (p_data ->> 'form')::json->> 'widgetname';
-	v_formtype := (p_data ->> 'form')::json->> 'formtype';
+
 	IF v_tabname IS NULL THEN
 		v_tabname = 'data';
 	END IF;
-	
+
 	-- control nulls
 	IF v_tablename IS NULL THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -203,10 +195,12 @@ BEGIN
 
 
 	-- setting value default for filter fields
-	IF v_filter_values::text IS NULL OR v_filter_values::text = '{}' THEN 
-	
-		v_data = '{"client":{"device":4, "infoType":1, "lang":"ES"},"data":{"formName": "'||v_tablename||'", "formType": "'||v_formtype||'", "tabName": "'||v_tabname||'"}}';
+	IF v_filter_values::text IS NULL OR v_filter_values::text = '{}' THEN
+
+		v_data = '{"client":{"device":4, "infoType":1, "lang":"ES"},"data":{"formName": "'||v_tablename||'"}}';
+
 		SELECT gw_fct_getfiltervaluesvdef(v_data) INTO v_filter_values;
+
 		RAISE NOTICE 'gw_fct_getlist - Init Values setted by default %', v_filter_values;
 
 	END IF;
@@ -218,25 +212,21 @@ BEGIN
 	ELSE
 		v_attribute_filter = '';
 	END IF;
-	
+
 --  Creating the list fields
 ----------------------------
 	-- control not existing table
 	IF v_tablename IN (SELECT table_name FROM information_schema.tables WHERE table_schema = v_schemaname) THEN
 
 		-- Get idname column
-		v_querystring = concat('SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = ''',v_tablename,'''::regclass AND i.indisprimary');
-		v_debug_vars := json_build_object('v_tablename', v_tablename);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getlist', 'line', 225);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO v_idname;
+		EXECUTE 'SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey) WHERE  i.indrelid = $1::regclass AND i.indisprimary'
+			INTO v_idname
+			USING v_tablename;
 
-       
 		-- For views it suposse pk is the first column
-
 		IF v_idname ISNULL THEN
 			EXECUTE 'SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
-				AND t.relname = $1 
+				AND t.relname = $1
 				AND s.nspname = $2
 				ORDER BY a.attnum LIMIT 1'
 					INTO v_idname
@@ -247,39 +237,39 @@ BEGIN
 		EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a
 		JOIN pg_class t on a.attrelid = t.oid
 		JOIN pg_namespace s on t.relnamespace = s.oid
-		WHERE a.attnum > 0 
+		WHERE a.attnum > 0
 		AND NOT a.attisdropped
 		AND a.attname = $3
-		AND t.relname = $2 
+		AND t.relname = $2
 		AND s.nspname = $1
 		ORDER BY a.attnum'
 			USING v_schemaname, v_tablename, v_idname
 			INTO v_column_type;
 
 		-- Getting geometry column
-		EXECUTE 'SELECT attname FROM pg_attribute a        
+		EXECUTE 'SELECT attname FROM pg_attribute a
 		JOIN pg_class t on a.attrelid = t.oid
 		JOIN pg_namespace s on t.relnamespace = s.oid
-		WHERE a.attnum > 0 
+		WHERE a.attnum > 0
 		AND NOT a.attisdropped
 		AND t.relname = $1
 		AND s.nspname = $2
 		AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
-		ORDER BY a.attnum' 
+		ORDER BY a.attnum'
 			USING v_tablename, v_schemaname
 			INTO v_the_geom;
 
 		--  get querytext
-		EXECUTE concat('SELECT query_text, vdefault, listtype, columnname FROM config_form_list WHERE tablename = $1 AND device = $2 AND columnname=$3', v_attribute_filter)
+		EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_form_list WHERE listname = $1 AND device = $2', v_attribute_filter)
 			INTO v_query_result, v_default, v_listtype
-			USING v_tablename, v_device, v_columnname;
+			USING v_tablename, v_device;
 
 		-- if v_device is not configured on config_form_list table
 		IF v_query_result IS NULL THEN
-			EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_form_list WHERE tablename = $1 LIMIT 1', v_attribute_filter)
+			EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_form_list WHERE listname = $1 LIMIT 1', v_attribute_filter)
 				INTO v_query_result, v_default, v_listtype
 				USING v_tablename;
-		END IF;	
+		END IF;
 
 		-- if v_tablename is not configured on config_form_list table
 		IF v_query_result IS NULL THEN
@@ -288,16 +278,16 @@ BEGIN
 
 	ELSE
 		--  get querytext
-		EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_form_list WHERE tablename = $1 AND device = $2', v_attribute_filter)
+		EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_form_list WHERE listname = $1 AND device = $2', v_attribute_filter)
 			INTO v_query_result, v_default, v_listtype
 			USING v_tablename, v_device;
 
 		-- if v_device is not configured on config_form_list table
 		IF v_query_result IS NULL THEN
-			EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_form_list WHERE tablename = $1 LIMIT 1', v_attribute_filter)
+			EXECUTE concat('SELECT query_text, vdefault, listtype FROM config_form_list WHERE listname = $1 LIMIT 1', v_attribute_filter)
 				INTO v_query_result, v_default, v_listtype
 				USING v_tablename;
-		END IF;	
+		END IF;
 	END IF;
 
 	--  add filters (fields)
@@ -310,23 +300,30 @@ BEGIN
 			SELECT v_text [i] into v_json_field;
 			v_field:= (SELECT (v_json_field ->> 'key')) ;
 			v_value:= (SELECT (v_json_field ->> 'value')) ;
+
+			-- Getting the sign of the filter
+			IF v_value::json->>'filterSign' is not null THEN
+				v_sign = v_value::json->>'filterSign';
+				v_value = v_value::json->>'value';
+				IF upper(v_sign) IN ('LIKE', 'ILIKE') THEN
+					v_value = '''%'||v_value||'%''';
+				END IF;
+			ELSE
+				IF v_listtype = 'attributeTable' THEN
+					v_sign = 'ILIKE';
+				ELSIF v_sign IS NULL THEN
+					v_sign = '=';
+				END IF;
+			END IF;
+
 			i=i+1;
 
 			raise notice 'v_field % v_value %', v_field, v_value;
-	
-			-- Getting the sign of the filter
-			SELECT listfilterparam->>'sign' INTO v_sign FROM config_form_fields WHERE formname=v_tablename  AND columnname=v_field;
 
-			IF v_listtype = 'attributeTable' THEN
-				v_sign = 'ILIKE';
-			ELSIF v_sign IS NULL THEN
-				v_sign = '=';
-			END IF;
-			
+
 			-- creating the query_text
 			IF v_value IS NOT NULL AND v_field != 'limit' THEN
-				
-				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||quote_literal(v_value) ||'::text';
+				v_query_result := v_query_result || ' AND '||v_field||'::text '||v_sign||' '||v_value ||'::text';
 
 			ELSIF v_field='limit' THEN
 				v_query_result := v_query_result;
@@ -334,7 +331,7 @@ BEGIN
 			END IF;
 		END LOOP;
 	END IF;
-	
+
 	-- add feature filter
 	SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_feature) a;
 	IF v_text IS NOT NULL THEN
@@ -344,28 +341,28 @@ BEGIN
 			SELECT v_text [1] into v_json_field;
 			v_field:= (SELECT (v_json_field ->> 'key')) ;
 			v_value:= (SELECT (v_json_field ->> 'value')) ;
-				
+
 			-- creating the query_text
 			v_query_result := v_query_result || ' AND '||v_field||'::text = '||quote_literal(v_value) ||'::text';
 		END LOOP;
 	END IF;
-	
+
 	-- add extend filter
 	IF v_the_geom IS NOT NULL AND v_canvasextend IS NOT NULL THEN
-		
+
 		-- getting coordinates values
 		v_x1 = v_canvasextend->>'x1coord';
 		v_y1 = v_canvasextend->>'y1coord';
 		v_x2 = v_canvasextend->>'x2coord';
-		v_y2 = v_canvasextend->>'y2coord';	
+		v_y2 = v_canvasextend->>'y2coord';
 
 		-- adding on the query text the extend filter
-		v_query_result := v_query_result || ' AND ST_dwithin ( '|| v_tablename || '.' || v_the_geom || ',' || 
+		v_query_result := v_query_result || ' AND ST_dwithin ( '|| v_tablename || '.' || v_the_geom || ',' ||
 		'ST_MakePolygon(ST_GeomFromText(''LINESTRING ('||v_x1||' '||v_y1||', '||v_x1||' '||v_y2||', '||v_x2||' '||v_y2||', '||v_x2||' '||v_y1||', '||v_x1||' '||v_y1||')'','||v_srid||')),1)';
 	END IF;
-	
+
 	-- add orderby
-	
+
 	IF v_orderby IS NULL THEN
 		v_orderby = v_default->>'orderBy';
 		v_ordertype = v_default->>'orderType';
@@ -387,14 +384,14 @@ BEGIN
 
 	EXECUTE 'SELECT count(*)/'||v_limit||' FROM (' || v_query_result || ') a'
 		INTO v_lastpage;
-	
+
 	-- add limit
 	IF v_device != 4 THEN
-		v_query_result := v_query_result || ' LIMIT '|| v_limit;
+	    v_query_result := v_query_result || ' LIMIT '|| v_limit;
 	END IF;
 
 	-- calculating current page
-	IF v_currentpage IS NULL THEN 
+	IF v_currentpage IS NULL THEN
 		v_currentpage=1;
 	END IF;
 
@@ -412,17 +409,17 @@ BEGIN
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (' || v_query_result || ') a'
 		INTO v_result_list;
 
-	--RAISE NOTICE '--- gw_fct_getlist - List: % ---', v_result_list;
+	RAISE NOTICE '--- gw_fct_getlist - List: % ---', v_result_list;
 
 	-- building pageinfo
 	v_pageinfo := json_build_object('orderBy',v_orderby, 'orderType', v_ordertype, 'currentPage', v_currentpage, 'lastPage', v_lastpage);
-
+raise notice 'AAA - % --- %',v_tablename, v_tabname;
 	-- getting filter fields
 	SELECT gw_fct_getformfields(v_tablename, 'form_list_header', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
 		INTO v_filter_fields;
 
 		--  setting values of filter fields
-		
+
 		SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
 		i=1;
 		IF v_text IS NOT NULL THEN
@@ -434,61 +431,43 @@ BEGIN
 
 				-- set value (from v_value)
 				IF v_filter_fields[i] IS NOT NULL THEN
-					
+
 					IF (v_filter_fields[i]->>'widgettype')='combo' THEN
 						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'selectedId', v_value);
 					ELSE
 						v_filter_fields[i] := gw_fct_json_object_set_key(v_filter_fields[i], 'value', v_value);
 					END IF;
 				END IF;
-				
+
 				--raise notice 'v_value % v_filter_fields %', v_value, v_filter_fields[i];
 
-				i=i+1;			
-		
+				i=i+1;
+
 			END LOOP;
 		END IF;
 
 	-- adding the widget of list
 	v_i = cardinality(v_filter_fields) ;
-	
 
+	EXECUTE 'SELECT listclass FROM config_form_list WHERE listname = $1 LIMIT 1'
+		INTO v_listclass
+		USING v_tablename;
 
 	-- setting new element
 	IF v_device = 4 THEN
-		EXECUTE 'SELECT listclass FROM config_form_list WHERE tablename = $1 AND columnname = $2 LIMIT 1'
-		INTO v_listclass
-		USING v_tablename, v_columnname;
-		v_filter_fields[v_i+1] := json_build_object('widgettype',v_listclass,'datatype','icon','columnname',v_columnname, 'widgetname', v_widgetname, 'value', v_result_list);
+		v_filter_fields[v_i+1] := json_build_object('widgetname',v_widgetname,'widgettype',v_listclass,'datatype','icon','columnname','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	ELSE
-		EXECUTE 'SELECT listclass FROM config_form_list WHERE tablename = $1 LIMIT 1'
-		INTO v_listclass
-		USING v_tablename;
 		v_filter_fields[v_i+1] := json_build_object('type',v_listclass,'dataType','icon','name','fileList','orderby', v_i+3, 'position','body', 'value', v_result_list);
 	END IF;
-	-- getting footer buttons
-	SELECT gw_fct_getformfields(v_tablename, 'form_list_footer', v_tabname, null, null, null, null,'INSERT', null, v_device, null)
-		INTO v_footer_fields;
-
-	FOREACH aux_json IN ARRAY v_footer_fields
-	LOOP
-		IF v_device IN (1,2,3) THEN
-			v_filter_fields[v_i+2] := json_build_object('type',aux_json->>'type','label', aux_json->>'label' ,'widgetAction',  aux_json->>'widgetAction', 'position',aux_json->>'position');
-		ELSE
-			v_filter_fields[v_i+2] := json_build_object('widgettype',aux_json->>'widgettype','label', aux_json->>'label' ,'widgetfunction',  aux_json->>'widgetfunction', 'layoutname',aux_json->>'layoutname', 'layoutorder',aux_json->>'layoutorder');
-		END IF;
-		v_i=v_i+1;
-
-	END LOOP;
 
 	-- converting to json
 	v_fields_json = array_to_json (v_filter_fields);
-	
+
 	-- Control NULL's
 	v_version := COALESCE(v_version, '{}');
 	v_featuretype := COALESCE(v_featuretype, '');
 	v_tablename := COALESCE(v_tablename, '');
-	v_idname := COALESCE(v_idname, '');	
+	v_idname := COALESCE(v_idname, '');
 	v_fields_json := COALESCE(v_fields_json, '{}');
 	v_pageinfo := COALESCE(v_pageinfo, '{}');
 
@@ -499,7 +478,7 @@ BEGIN
         v_message = 'Process done successfully';
     ELSE
 
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 
@@ -514,11 +493,10 @@ BEGIN
 			     '}'||
 		       '}'||
 	    '}')::json;
-       
+
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	v_msgerr := (v_msgerr::json ->> 'MSGERR')::json;
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR":' || to_json(v_msgerr) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+    RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$

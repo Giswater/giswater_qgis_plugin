@@ -1354,11 +1354,14 @@ def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]):
 
     if 'widgetcontrols' in field and field['widgetcontrols']:
         widget.setProperty('widgetcontrols', field['widgetcontrols'])
-    if 'columnname' in field:
+    if 'columnname' in field and field['columnname']:
         widget.setProperty('columnname', field['columnname'])
+    if 'linkedobject' in field and field['linkedobject']:
+        widget.setProperty('linkedobject', field['linkedobject'])
 
     function_name = 'no_function_asociated'
     real_name = widget.objectName()
+    func_params = ""
     if 'data_' in widget.objectName():
         real_name = widget.objectName()[5:len(widget.objectName())]
     if 'widgetfunction' in field and field['widgetfunction'] and 'functionName' in field['widgetfunction']:
@@ -1368,11 +1371,13 @@ def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]):
             msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
             tools_qgis.show_message(msg, 2)
             return widget
+        if 'params' in field['widgetfunction']:
+            func_params = field['widgetfunction']['params']
     else:
         message = "Parameter  widgetfunction.functionName is null for widget"
         tools_qgis.show_message(message, 2, parameter=real_name)
     # noinspection PyUnresolvedReferences
-    kwargs = {"qtable": widget, "complet_result": complet_result, "dialog": dialog}
+    kwargs = {"qtable": widget, "func_params": func_params, "complet_result": complet_result, "dialog": dialog}
     widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
