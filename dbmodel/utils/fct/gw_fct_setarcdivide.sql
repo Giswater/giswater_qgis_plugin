@@ -195,16 +195,17 @@ BEGIN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 					"data":{"message":"3094", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;
 				ELSE
-
 					-- check if there are not-selected psector affecting connecs
-					IF (SELECT count (*) FROM plan_psector_x_connec WHERE arc_id = v_arc_id AND state = 1 AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
+					IF (SELECT count (*) FROM plan_psector_x_connec JOIN plan_psector USING (psector_id) 
+					WHERE arc_id = v_arc_id AND state = 1 AND status IN (1,2) AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"3180", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;								
 					END IF;
 					
-					-- check if there are not-selected psector affecting connecs
+					-- check if there are not-selected psector affecting gullies
 					IF v_project_type = 'UD' THEN
-						IF (SELECT count (*) FROM plan_psector_x_gully WHERE arc_id = v_arc_id AND state = 1 AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
+						IF (SELECT count (*) FROM plan_psector_x_gully JOIN plan_psector USING (psector_id) 
+						WHERE arc_id = v_arc_id AND state = 1 AND status IN (1,2) AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 							"data":{"message":"3180", "function":"2114","debug_msg":null}}$$);' INTO v_audit_result;								
 						END IF;

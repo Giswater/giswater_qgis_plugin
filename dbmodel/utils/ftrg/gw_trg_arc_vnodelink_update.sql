@@ -22,9 +22,10 @@ BEGIN
     IF st_orderingequals(OLD.the_geom, NEW.the_geom) IS FALSE THEN
 	
 		-- check if there are not-selected psector affected
-		IF (SELECT count (*) FROM plan_psector_x_connec WHERE arc_id = NEW.arc_id AND state_id = 1 AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
+		IF (SELECT count (*) FROM plan_psector_x_connec JOIN plan_psector USING (psector_id) 
+		WHERE arc_id = NEW.arc_id AND state = 1 AND status IN (1,2) AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3180", "function":"2542","debug_msg":null}}$$);';
+			"data":{"message":"3180", "function":"2114","debug_msg":null}}$$);';								
 		END IF;
 		
 		-- Redraw link and vnode
@@ -43,10 +44,10 @@ BEGIN
 		IF (select project_type FROM sys_version LIMIT 1)='UD' THEN
 		
 			-- check if there are not-selected psector affected
-			IF (SELECT count (*) FROM plan_psector_x_gully WHERE arc_id = NEW.arc_id AND state_id = 1 AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
+			IF (SELECT count (*) FROM plan_psector_x_gully JOIN plan_psector USING (psector_id) 
+			WHERE arc_id = NEW.arc_id AND state = 1 AND status IN (1,2) AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3180", "function":"2542","debug_msg":null}}$$);';
-
+				"data":{"message":"3180", "function":"2114","debug_msg":null}}$$);';								
 			END IF;
 
 			FOR v_link IN SELECT v_edit_link.* FROM v_edit_gully JOIN v_edit_link ON v_edit_link.feature_id=gully_id 
