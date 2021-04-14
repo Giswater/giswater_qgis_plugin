@@ -18,3 +18,8 @@ DROP TRIGGER IF EXISTS gw_trg_edit_review_audit_gully ON v_edit_review_audit_gul
 CREATE TRIGGER gw_trg_edit_review_audit_gully INSTEAD OF UPDATE ON v_edit_review_audit_gully
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_review_audit_gully();
 
+
+DROP TRIGGER IF EXISTS gw_trg_edit_link ON v_edit_link;
+CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE
+ON v_edit_link FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_link();
+
