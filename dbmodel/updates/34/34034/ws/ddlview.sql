@@ -206,13 +206,16 @@ UNION
                     ELSE 3
                 END AS link_class,
                 p.id AS psector_rowid
-	FROM link l, plan_psector_x_connec p
+	FROM link l, selector_psector s, selector_expl e, plan_psector_x_connec p
 	JOIN connec c USING (connec_id)
 	LEFT JOIN arc a ON a.arc_id = p.arc_id
 	LEFT JOIN sector ON sector.sector_id::text = a.sector_id::text
 	LEFT JOIN dma ON dma.dma_id::text = a.dma_id::text
-	WHERE l.feature_id = p.connec_id AND p.state=1) a
-  WHERE selector_state.cur_user = "current_user"()::text AND selector_state.state_id = a.state;
+	WHERE l.feature_id = p.connec_id AND p.state=1
+	AND s.psector_id = p.psector_id AND s.cur_user = current_user AND e.expl_id = c.expl_id AND e.cur_user = current_user	
+	) a
+	WHERE selector_state.cur_user = "current_user"()::text AND selector_state.state_id = a.state
+
 
 
 CREATE OR REPLACE VIEW v_arc_x_vnode AS 

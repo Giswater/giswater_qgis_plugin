@@ -389,21 +389,21 @@ BEGIN
 		
 		-- upsert link
 		NEW.the_geom = (ST_SetPoint(NEW.the_geom, (ST_NumPoints(NEW.the_geom)-1), v_end_point));
-	END IF;
 
-	-- check exit type control 
-	IF NEW.exit_type != 'VNODE' AND NEW.link_class > 1 THEN-- pjoint_id, pjoint,type, exit_id, exit_type, arc_id must be used one time -> it is possible to planify with only one psector (the only one alternative scenario)
+		-- check exit type control 
+		IF NEW.exit_type != 'VNODE' AND NEW.link_class > 1 THEN-- pjoint_id, pjoint,type, exit_id, exit_type, arc_id must be used one time -> it is possible to planify with only one psector (the only one alternative scenario)
 
-		IF NEW.feature_type =  'CONNEC' THEN
-			SELECT count(*) INTO v_count FROM plan_psector_x_connec WHERE connec_id = NEW.feature_id;
-		ELSIF NEW.feature_type =  'GULLY' THEN
-			SELECT count(*) INTO v_count FROM plan_psector_x_gully WHERE gully_id = NEW.feature_id;
-		END IF;
+			IF NEW.feature_type =  'CONNEC' THEN
+				SELECT count(*) INTO v_count FROM plan_psector_x_connec WHERE connec_id = NEW.feature_id;
+			ELSIF NEW.feature_type =  'GULLY' THEN
+				SELECT count(*) INTO v_count FROM plan_psector_x_gully WHERE gully_id = NEW.feature_id;
+			END IF;
 
-		IF v_count > 1 THEN	
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3082", "function":"1116","debug_msg":null}}$$);';
-		END IF;
+			IF v_count > 1 THEN	
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3082", "function":"1116","debug_msg":null}}$$);';
+			END IF;
+		END IF;		
 	END IF;
 	
 	-- upsert process	
@@ -424,6 +424,13 @@ BEGIN
 		state, the_geom, vnode_topelev)	
 		VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, v_arc.expl_id, NEW.exit_id, NEW.exit_type, TRUE,
 		NEW.state, NEW.the_geom, NEW.vnode_topelev );
+
+		-- update feature 
+		IF NEW.feature_type='CONNEC' THEN
+			UPDATE connec SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type WHERE connec_id = NEW.feature_id;
+		ELSIF NEW.feature_type='GULLY' THEN
+			UPDATE gully SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type WHERE gully_id = NEW.feature_id;
+		END IF;
 		
 		RETURN NEW;
 		
