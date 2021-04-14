@@ -31,7 +31,7 @@ from .document import GwDocument
 from .element import GwElement
 from .visit_gallery import GwVisitGallery
 from .visit import GwVisit
-from ..utils import tools_gw
+from ..utils import tools_gw, tools_backend_calls
 from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, GwInfoCrossectUi, \
     GwDialogTextUi
@@ -415,8 +415,6 @@ class GwInfo(QObject):
         # Get widget controls
         self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
         self.tab_main.currentChanged.connect(partial(self._tab_activation, self.dlg_cf, new_feature))
-        self.tbl_relations = self.dlg_cf.findChild(QTableView, "tbl_relations")
-        tools_qt.set_tableview_config(self.tbl_relations)
         self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
         tools_qt.set_tableview_config(self.tbl_upstream)
         self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
@@ -1573,7 +1571,7 @@ class GwInfo(QObject):
         complet_result = kwargs['complet_result']
         field = kwargs['field']
         dialog = kwargs['dialog']
-        widget = tools_gw.add_tableview(complet_result, field, dialog, self)
+        widget = tools_gw.add_tableview(complet_result, field, dialog, tools_backend_calls)
         widget = tools_gw.add_tableview_header(widget, field)
         widget = tools_gw.fill_tableview_rows(widget, field)
         widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], 1, True)
@@ -2059,11 +2057,11 @@ class GwInfo(QObject):
         # Tab 'Elements'
         if self.tab_main.widget(index_tab).objectName() == 'tab_elements' and not self.tab_element_loaded:
             # self._fill_tab_element()
-            self._fill_tab_rpt(self.complet_result, new_feature)
+            self._init_tab(self.complet_result, new_feature)
             self.tab_element_loaded = True
         # Tab 'Relations'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_relations' and not self.tab_relations_loaded:
-            self._fill_tab_relations()
+            self._init_tab(self.complet_result, new_feature)
             self.tab_relations_loaded = True
         # Tab 'Connections'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_connections' and not self.tab_connections_loaded:
@@ -2090,7 +2088,7 @@ class GwInfo(QObject):
             self._fill_tab_document()
             self.tab_document_loaded = True
         elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt' and not self.tab_rpt_loaded:
-            self._fill_tab_rpt(self.complet_result, new_feature)
+            self._init_tab(self.complet_result, new_feature)
             self.tab_rpt_loaded = True
 
 
@@ -2278,17 +2276,6 @@ class GwInfo(QObject):
 
 
     """ FUNCTIONS RELATED WITH TAB RELATIONS"""
-
-    def _fill_tab_relations(self):
-        """ Fill tab 'Relations' """
-
-        table_relations = f"v_ui_{self.feature_type}_x_relations"
-        message = tools_qt.fill_table(self.tbl_relations, self.schema_name + "." + table_relations, self.filter)
-        if message:
-            tools_qgis.show_warning(message)
-        tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_relations, table_relations)
-        self.tbl_relations.doubleClicked.connect(partial(self._open_selected_feature, self.tbl_relations))
-
 
     def _open_selected_feature(self, qtable):
         """ Open selected feature from @qtable """
@@ -3238,7 +3225,7 @@ class GwInfo(QObject):
     """ FUNCTIONS RELATED WITH TAB RPT """
 
 
-    def _fill_tab_rpt(self, complet_result, new_feature):
+    def _init_tab(self, complet_result, new_feature):
 
         index_tab = self.tab_main.currentIndex()
         list_tables = self.tab_main.widget(index_tab).findChildren(QTableView)
@@ -3251,14 +3238,14 @@ class GwInfo(QObject):
                 tools_qgis.show_info(msg, 1)
                 continue
             linkedobject = table.property('linkedobject')
-            complet_list, widget_list = self._init_tbl_rpt(complet_result, self.dlg_cf, new_feature, widgetname, linkedobject)
+            complet_list, widget_list = self._fill_tbl(complet_result, self.dlg_cf, new_feature, widgetname, linkedobject)
             if complet_list is False:
                 return False
             self._set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname)
         return complet_list
 
 
-    def _init_tbl_rpt(self, complet_result, dialog, new_feature, widgetname, linkedobject):
+    def _fill_tbl(self, complet_result, dialog, new_feature, widgetname, linkedobject):
         """ Put filter widgets into layout and set headers into QTableView """
 
         index_tab = self.tab_main.currentIndex()

@@ -1,11 +1,22 @@
 INSERT INTO ws_sample35.config_typevalue VALUES('widgettype_typevalue', 'tableview', 'tableview','tableview');
+INSERT INTO ws_sample35.config_typevalue VALUES('tabname_typevalue', 'tab_relations', 'tab_relations','tabRelations');
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_relations_1', 'lyt_relations_1','lytRelations1');
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_relations_2', 'lyt_relations_2','lytRelations2');
+INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_relations_3', 'lyt_relations_3','lytRelations3');
+INSERT INTO ws_sample35.config_form_list(listname, query_text, device)
+    VALUES ('tbl_relations', 'SELECT rid as sys_id, * FROM v_ui_arc_x_relations WHERE rid IS NOT NULL', 4);
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetcontrols, widgetfunction, layoutname, isfilter, linkedobject)
+    VALUES ('ve_arc_pipe', 'form_feature', 'tab_relations', 'tbl_relations', 1, 'tableview', false, false, false, false, '{"saveValue": false}','{"functionName": "open_selected_feature", "params":{"tablefind":"sys_table_id","columnfind":"feature_id"}}', 'lyt_relations_3', false, 'tbl_relations');
+
+
+/*******************************************************/
 
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_elements_1', 'lyt_elements_1','lytElements1');
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_elements_2', 'lyt_elements_2','lytElements2');
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_elements_3', 'lyt_elements_3','lytElements3');
-INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', '_open_selected_element', '_open_selected_element','openSelectedElement');
-INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', '_filter_table', '_filter_table','filterTable');
-INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', '_add_object', '_add_object','addObject');
+--INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', '_open_selected_element', '_open_selected_element','openSelectedElement');
+--INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', '_filter_table', '_filter_table','filterTable');
+--INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', '_add_object', '_add_object','addObject');
 
 INSERT INTO ws_sample35.config_form_list(tablename, query_text, device, listtype, listclass, vdefault, columnname)
     VALUES ('ve_arc_pipe', 'SELECT * FROM v_ui_element_x_arc WHERE element_id IS NOT NULL', 4, 'attributeTable', 'tableview', '{"orderBy":"1", "orderType": "DESC"}', 'tbl_elements');
