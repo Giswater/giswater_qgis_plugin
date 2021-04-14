@@ -578,7 +578,7 @@ class GwAdminButton:
 
         # Set title
         connection = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_connection)
-        window_title = f'Giswater ({connection} - {self.plugin_version})'
+        window_title = f'Giswater ({self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
         if connection_status is False:
@@ -2007,7 +2007,7 @@ class GwAdminButton:
 
         # Update windowTitle
         connection = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_connection)
-        window_title = f'Giswater ({connection} - {self.plugin_version})'
+        window_title = f'Giswater ({self.plugin_version})'
         self.dlg_readsql.setWindowTitle(window_title)
 
         if schema_name == 'Nothing to select' or schema_name == '':
@@ -2083,6 +2083,7 @@ class GwAdminButton:
         self.cmb_project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         tools_qt.set_widget_text(self.dlg_readsql_create_project, self.cmb_create_project_type, self.cmb_project_type)
         self._change_project_type(self.cmb_create_project_type)
+        self.connection_name = str(tools_qt.get_text(self.dlg_readsql, self.cmb_connection))
 
         # Open dialog
         self.dlg_readsql_create_project.setWindowTitle(f"Create Project - {self.connection_name}")
