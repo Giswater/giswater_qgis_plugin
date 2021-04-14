@@ -30,7 +30,7 @@ from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, 
 from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
-from ...lib import tools_qt, tools_qgis, tools_log, tools_db
+from ...lib import tools_qt, tools_qgis, tools_log, tools_db, tools_os
 from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
 
@@ -462,6 +462,7 @@ class GwAdminButton:
 
         # Check if user have commit permissions
         self.dev_commit = tools_gw.get_config_parser('system', 'dev_commit', "user", "init", False)
+        self.dev_commit = tools_os.set_boolean(self.dev_commit)
 
         # Create dialog object
         self.dlg_readsql = GwAdminUi()
