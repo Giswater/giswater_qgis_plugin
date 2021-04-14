@@ -130,7 +130,6 @@ DROP VIEW IF EXISTS v_arc_x_vnode;
 DROP VIEW IF EXISTS v_edit_vnode;
 
 DROP VIEW IF EXISTS v_edit_link;
-CREATE VIEW v_edit_link as
 
 CREATE OR REPLACE VIEW v_edit_link AS 
  SELECT DISTINCT ON (a.link_id) a.link_id,
