@@ -214,13 +214,6 @@ UNION
 	WHERE l.feature_id = p.connec_id AND p.state=1) a
   WHERE selector_state.cur_user = "current_user"()::text AND selector_state.state_id = a.state;
 
-CREATE TRIGGER gw_trg_edit_link
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_link
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_link();
-
-
 
 CREATE OR REPLACE VIEW v_arc_x_vnode AS 
  SELECT a.link_id,
