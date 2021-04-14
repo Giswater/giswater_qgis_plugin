@@ -41,7 +41,10 @@ class GwLoadProject(QObject):
 
     def project_read(self, show_warning=True):
         """ Function executed when a user opens a QGIS project (*.qgs) """
-        
+
+        # Check if user has all config params
+        tools_gw.user_params_to_userconfig()
+
         self._get_user_variables()
 
         # Check if loaded project is valid for Giswater
@@ -132,8 +135,6 @@ class GwLoadProject(QObject):
         # call dynamic mapzones repaint
         tools_gw.set_style_mapzones()
 
-        # Check if user has all config params
-        tools_gw.user_params_to_userconfig()
 
         # Log it
         message = "Project read successfully"
