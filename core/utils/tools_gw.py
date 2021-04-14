@@ -1082,8 +1082,8 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
     if 'data_' in widget.objectName():
         real_name = widget.objectName()[5:len(widget.objectName())]
     if 'widgetfunction' in field:
-        if field['widgetfunction'] is not None:
-            function_name = field['widgetfunction']
+        if field['widgetfunction']['functionName'] is not None:
+            function_name = field['widgetfunction']['functionName']
             exist = tools_os.check_python_function(module, function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
@@ -1214,8 +1214,8 @@ def add_hyperlink(field):
     if 'data_' in widget.objectName():
         real_name = widget.objectName()[5:len(widget.objectName())]
     if 'widgetfunction' in field:
-        if field['widgetfunction'] is not None:
-            func_name = field['widgetfunction']
+        if field['widgetfunction']['functionName'] is not None:
+            func_name = field['widgetfunction']['functionName']
             exist = tools_os.check_python_function(tools_backend_calls, func_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
@@ -1345,8 +1345,8 @@ def add_tableview(complet_result, field, module=sys.modules[__name__]):
     if 'data_' in widget.objectName():
         real_name = widget.objectName()[5:len(widget.objectName())]
     if 'widgetfunction' in field:
-        if field['widgetfunction'] is not None:
-            function_name = f"_{field['widgetfunction']}"
+        if field['widgetfunction']['functionName'] is not None:
+            function_name = f"_{field['widgetfunction']['functionName']}"
             exist = tools_os.check_python_function(sys.modules[__name__], function_name)
             if not exist:
                 msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
