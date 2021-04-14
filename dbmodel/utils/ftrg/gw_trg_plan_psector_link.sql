@@ -47,7 +47,7 @@ BEGIN
 		SELECT exit_type INTO v_exit_type FROM v_edit_link WHERE feature_id =  NEW.gully_id;
 	END IF;
 
-	IF v_exit_type ='VNODE' THEN -- link_class =  2
+	IF v_exit_type ='VNODE' THEN -- link_class =  3
 	
 		-- getting arc_geom
 		IF NEW.arc_id IS NOT NULL THEN

@@ -28,7 +28,7 @@ BEGIN
          "data":{"message":"3138", "function":"2936","debug_msg":null}}$$);';
 	END IF;
 	
-	-- control if connec exists and it is link_class =  1
+	-- control if connec exists and it is link_class =  2
 	IF (SELECT count(*) FROM plan_psector_x_connec WHERE connec_id = NEW.connec_id) > 0 THEN
 		IF (SELECT link_geom FROM plan_psector_x_connec WHERE connec_id = NEW.connec_id ORDER BY link_geom limit 1) IS NULL THEN
 		        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},

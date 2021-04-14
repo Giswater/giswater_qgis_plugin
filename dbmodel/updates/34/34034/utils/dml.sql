@@ -45,7 +45,7 @@ INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (371, 'Check 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (372, 'Check operative arcs with wrong topology','utils')  ON CONFLICT (fid) DO NOTHING;
 
 UPDATE sys_message SET 
-error_message = 'The psector strategy is limited to only one psector when connect is related to not VNODE exit_type (link_class = 1). If you like to manage diferent psector with this connect, please use VNODE as exit_type feature'
+error_message = 'The psector strategy is limited to only one psector when connect is related to not VNODE exit_type (link_class = 2). If you like to manage diferent psector with this connect, please use VNODE as exit_type feature'
 WHERE id = 3082;
 
 INSERT INTO sys_message VALUES (3178, 'It is no possible to relate planned connec/gully over planned connec/gully wich not are on same psector.', NULL,2, TRUE, 'utils');

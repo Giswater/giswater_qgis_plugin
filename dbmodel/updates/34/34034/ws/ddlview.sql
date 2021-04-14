@@ -167,7 +167,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
             st_length2d(link.the_geom) AS gis_length,
             link.userdefined_geom,
             link.the_geom,
-            0 AS link_class,
+            1 AS link_class,
             NULL::integer AS psector_rowid
            FROM v_edit_connec c
              LEFT JOIN link ON link.feature_id::text = c.connec_id::text
@@ -202,8 +202,8 @@ UNION
                     ELSE p.link_geom
                 END AS the_geom,
                 CASE
-                    WHEN p.link_geom IS NULL THEN 1
-                    ELSE 2
+                    WHEN p.link_geom IS NULL THEN 2
+                    ELSE 3
                 END AS link_class,
                 p.id AS psector_rowid
 	FROM link l, plan_psector_x_connec p
