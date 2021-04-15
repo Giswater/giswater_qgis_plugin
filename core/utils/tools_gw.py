@@ -1771,7 +1771,9 @@ def get_project_type(schemaname=None):
 
     # init variables
     project_type = None
-    if schemaname is None:
+    if schemaname is None and global_vars.schema_name is None:
+        return None
+    elif schemaname is None:
         schemaname = global_vars.schema_name
 
     # start process
