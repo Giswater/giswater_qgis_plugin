@@ -214,7 +214,7 @@ UNION
 	WHERE l.feature_id = p.connec_id AND p.state=1
 	AND s.psector_id = p.psector_id AND s.cur_user = current_user AND e.expl_id = c.expl_id AND e.cur_user = current_user	
 	) a
-	WHERE selector_state.cur_user = "current_user"()::text AND selector_state.state_id = a.state
+	WHERE selector_state.cur_user = "current_user"()::text AND selector_state.state_id = a.state;
 
 
 
