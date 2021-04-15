@@ -148,7 +148,7 @@ class GwMenuLoad(QObject):
         """ Opens the OS-specific Config directory """
 
         path = os.path.realpath(self.user_folder_dir)
-        os.startfile(path)
+        tools_os.open_file(path)
 
 
     def _open_manage_file(self):

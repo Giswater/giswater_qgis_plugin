@@ -14,6 +14,7 @@ import urllib.parse as parse
 import webbrowser
 from collections import OrderedDict
 from functools import partial
+
 from sip import isdeleted
 
 from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, QStringListModel, Qt, QSettings
@@ -36,7 +37,7 @@ from ..utils.snap_manager import GwSnapManager
 from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi, GwMainWindow, GwVisitDocumentUi, GwInfoCrossectUi, \
     GwInterpolate
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_db
+from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
 
 global is_inserting
 is_inserting = False
@@ -2372,15 +2373,7 @@ class GwInfo(QObject):
         row = selected_list[0].row()
         url = self.tbl_hydrometer.model().record(row).value("hydrometer_link")
         if url != '':
-            if os.path.exists(url):
-                # Open the document
-                if sys.platform == "win32":
-                    os.startfile(url)
-                else:
-                    opener = "open" if sys.platform == "darwin" else "xdg-open"
-                    subprocess.call([opener, url])
-            else:
-                webbrowser.open(url)
+            tools_os.open_file(url)
 
 
     def _fill_tbl_hydrometer(self, qtable, table_name):
@@ -2800,18 +2793,8 @@ class GwInfo(QObject):
         # Get row index
         index = self.dlg_event_full.tbl_docs_x_event.selectionModel().selectedRows()[0]
         column_index = tools_qt.get_col_index_by_col_name(self.dlg_event_full.tbl_docs_x_event, 'value')
-
         path = index.sibling(index.row(), column_index).data()
-        # Check if file exist
-        if os.path.exists(path):
-            # Open the document
-            if sys.platform == "win32":
-                os.startfile(path)
-            else:
-                opener = "open" if sys.platform == "darwin" else "xdg-open"
-                subprocess.call([opener, path])
-        else:
-            webbrowser.open(path)
+        tools_os.open_file(path)
 
 
     def _tbl_event_clicked(self, table_name):
@@ -3009,16 +2992,14 @@ class GwInfo(QObject):
             # Open selected document
             # Check if path is URL
             if url.scheme == "http" or url.scheme == "https":
-                # If path is URL open URL in browser
                 webbrowser.open(path)
             else:
-                # If its not URL ,check if file exist
+
                 if not os.path.exists(path):
                     message = "File not found"
                     tools_qgis.show_warning(message, parameter=path)
                 else:
-                    # Open the document
-                    os.startfile(path)
+                    tools_os.open_file(path)
 
         else:
             # If more then one document is attached open dialog with list of documents
@@ -3065,16 +3046,13 @@ class GwInfo(QObject):
         # Open selected document
         # Check if path is URL
         if url.scheme == "http" or url.scheme == "https":
-            # If path is URL open URL in browser
             webbrowser.open(path)
         else:
-            # If its not URL ,check if file exist
             if not os.path.exists(path):
                 message = "File not found"
                 tools_qgis.show_warning(message, parameter=path)
             else:
-                # Open the document
-                os.startfile(path)
+                tools_os.open_file(path)
 
 
     """ FUNCTIONS RELATED WITH TAB DOC"""
@@ -3183,17 +3161,7 @@ class GwInfo(QObject):
         # Get document path (can be relative or absolute)
         row = selected_list[0].row()
         path = widget.model().record(row).value("path")
-
-        # Check if file exist
-        if os.path.exists(path):
-            # Open the document
-            if sys.platform == "win32":
-                os.startfile(path)
-            else:
-                opener = "open" if sys.platform == "darwin" else "xdg-open"
-                subprocess.call([opener, path])
-        else:
-            webbrowser.open(path)
+        tools_os.open_file(path)
 
 
     def _manage_new_document(self, dialog, doc_id=None, feature=None):

@@ -25,7 +25,7 @@ from .document import GwDocument, global_vars
 from ..shared.psector_duplicate import GwPsectorDuplicate
 from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi
 from ..utils import tools_gw
-from ...lib import tools_db, tools_qgis, tools_qt, tools_log
+from ...lib import tools_db, tools_qgis, tools_qt, tools_log, tools_os
 
 
 class GwPsector:
@@ -629,7 +629,7 @@ class GwPsector:
                 if os.path.exists(path):
                     message = "Document PDF created in"
                     tools_qgis.show_info(message, parameter=path)
-                    os.startfile(path)
+                    tools_os.open_file(path)
                 else:
                     message = "Cannot create file, check if its open"
                     tools_qgis.show_warning(message, parameter=path)

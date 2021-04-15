@@ -6,9 +6,6 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
-import sys
-import subprocess
-import webbrowser
 from datetime import datetime
 from functools import partial
 
@@ -31,7 +28,7 @@ from ..ui.ui_manager import GwVisitUi, GwVisitEventUi, GwVisitEventRehabUi, GwVi
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
-from ...lib import tools_qgis, tools_qt, tools_log, tools_db
+from ...lib import tools_qgis, tools_qt, tools_log, tools_db, tools_os
 
 
 class GwVisit(QObject):
@@ -1309,15 +1306,7 @@ class GwVisit(QObject):
         index = self.dlg_event.tbl_docs_x_event.selectionModel().selectedRows()[0]
         column_index = tools_qt.get_col_index_by_col_name(self.dlg_event.tbl_docs_x_event, 'value')
         path = index.sibling(index.row(), column_index).data()
-        if os.path.exists(path):
-            # Open the document
-            if sys.platform == "win32":
-                os.startfile(path)
-            else:
-                opener = "open" if sys.platform == "darwin" else "xdg-open"
-                subprocess.call([opener, path])
-        else:
-            webbrowser.open(path)
+        tools_os.open_file(path)
 
 
     def _populate_tbl_docs_x_event(self, event_id=0):
