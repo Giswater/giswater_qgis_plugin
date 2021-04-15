@@ -1489,11 +1489,6 @@ class UpdateSQL(ApiParent):
     def create_project_data_schema(self, project_name_schema=None, project_title_schema=None, project_type=None,
             project_srid=None, project_locale=None, is_test=False, exec_last_process=True, example_data=True):
 
-        msg = "This process will take time (few minutes). Are you sure to continue?"
-        title = "Create example"
-        answer = self.controller.ask_question(msg, title)
-        if not answer:
-            return
 
         # Get project parameters
         if project_name_schema is None or not project_name_schema:
@@ -1531,6 +1526,12 @@ class UpdateSQL(ApiParent):
             self.controller.show_info_box(msg, "Info")
             return
 
+        msg = "This process will take time (few minutes). Are you sure to continue?"
+        title = "Create example"
+        answer = self.controller.ask_question(msg, title)
+        if not answer:
+            return
+        
         self.controller.log_info(f"Create schema of type '{project_type}': '{project_name_schema}'")
 
         if not is_test:
