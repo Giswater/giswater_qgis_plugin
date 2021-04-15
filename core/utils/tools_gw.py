@@ -335,7 +335,7 @@ def draw_by_json(complet_result, rubber_band, margin=None, reset_rb=True, color=
     except KeyError:
         return
 
-    list_coord = re.search('\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
+    list_coord = re.search(r'\((.*)\)', str(complet_result['body']['feature']['geometry']['st_astext']))
     max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
 
     if reset_rb:
@@ -1656,7 +1656,7 @@ def manage_json_return(json_result, sql, rubber_band=None):
                 opacity = return_manager['style']['ruberband']['transparency'] * 255
             if 'color' in return_manager['style']['ruberband']:
                 color = return_manager['style']['ruberband']['color']
-                color = QColor(color[0], color[1], color[2], opacity)
+                color = QColor(int(color[0]), int(color[1]), int(color[2]), int(opacity))
             if 'width' in return_manager['style']['ruberband']:
                 width = return_manager['style']['ruberband']['width']
             draw_by_json(json_result, rubber_band, margin, color=color, width=width)

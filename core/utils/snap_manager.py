@@ -282,7 +282,7 @@ class GwSnapManager(object):
                 map_point = self.canvas.getCoordinateTransform().transform(point)
                 x = map_point.x()
                 y = map_point.y()
-            event_point = QPoint(x, y)
+            event_point = QPoint(int(x), int(y))
         except:
             pass
         finally:
