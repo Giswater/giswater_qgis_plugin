@@ -61,7 +61,7 @@ class GwDimensioningButton(GwMaptool):
 
             # Implement the Add Feature button
             self.iface.actionAddFeature().trigger()
-            msg = 'Snapp to arc or connec' if tools_gw.get_project_type() == 'ws' else 'Snapp to arc, connec or gully'
+            msg = 'Snap to arc or connec' if tools_gw.get_project_type() == 'ws' else 'Snap to arc, connec or gully'
             self.snapper_manager.config_snap_to_arc(False)
             self.snapper_manager.config_snap_to_connec(False)
             self.snapper_manager.config_snap_to_gully(False)
