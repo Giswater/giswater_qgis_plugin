@@ -9,7 +9,6 @@ import os
 import pathlib
 import sys
 import subprocess
-import time
 import webbrowser
 
 from qgis.PyQt.QtWidgets import QFileDialog
@@ -42,9 +41,7 @@ def open_file(file_path):
     """
 
     try:
-        # Check if file exist
         if os.path.exists(file_path):
-            # Open file
             if sys.platform == "win32":
                 os.startfile(file_path)
             else:
@@ -72,22 +69,6 @@ def get_values_from_dictionary(dictionary):
 
     list_values = iter(dictionary.values())
     return list_values
-
-
-def open_url(widget):
-    """ Opens a url with the default browser """
-
-    path = widget.text()
-    # Check if file exist
-    if os.path.exists(path):
-        # Open the document
-        if sys.platform == "win32":
-            os.startfile(path)
-        else:
-            opener = "open" if sys.platform == "darwin" else "xdg-open"
-            subprocess.call([opener, path])
-    else:
-        webbrowser.open(path)
 
 
 def set_boolean(param, default=True):

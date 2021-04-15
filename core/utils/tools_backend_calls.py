@@ -236,7 +236,7 @@ def load_qml(**kwargs):
 def open_url(widget):
     """ Function called in def add_hyperlink(field): -->
             widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget))"""
-    tools_os.open_url(widget)
+    tools_os.open_file(widget.text())
 
 
 # region unused functions atm
