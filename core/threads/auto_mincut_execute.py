@@ -6,11 +6,9 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.core import QgsTask
 
 from .task import GwTask
 from ..utils import tools_gw
-from ... import global_vars
 from ...lib import tools_db, tools_qt
 
 

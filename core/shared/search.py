@@ -976,6 +976,6 @@ class GwSearch:
             self.aux_rubber_band.setColor(QColor(255, 0, 0, 125))
             self.aux_rubber_band.setWidth(width.get(feature_type, 10))
             self.aux_rubber_band.show()
-        except AttributeError as e:
+        except AttributeError:
             pass
     # endregions

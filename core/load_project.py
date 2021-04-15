@@ -6,10 +6,8 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
-import json
-from collections import OrderedDict
 
-from qgis.PyQt.QtCore import QObject, Qt
+from qgis.PyQt.QtCore import QObject
 from qgis.PyQt.QtWidgets import QToolBar, QActionGroup, QDockWidget
 
 from .models.plugin_toolbar import GwPluginToolbar

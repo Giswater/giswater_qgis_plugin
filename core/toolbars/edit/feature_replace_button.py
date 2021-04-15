@@ -228,7 +228,7 @@ class GwFeatureReplaceButton(GwMaptool):
 
         # Get feature_type
         child_type = tools_qt.get_text(self.dlg_replace, self.dlg_replace.feature_type_new)
-        if child_type is 'null':
+        if child_type == 'null':
             msg = "New feature type is null. Please, select a valid value."
             tools_qt.show_info_box(msg, "Info")
             return

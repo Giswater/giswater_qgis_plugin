@@ -8,8 +8,6 @@ or (at your option) any later version.
 import json
 import os
 import re
-import subprocess
-import sys
 import urllib.parse as parse
 import webbrowser
 from collections import OrderedDict

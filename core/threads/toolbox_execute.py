@@ -8,7 +8,6 @@ or (at your option) any later version.
 
 from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDoubleSpinBox, QSpinBox, QWidget, QLineEdit
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.core import QgsTask
 from qgis.gui import QgsDateTimeEdit
 
 from .task import GwTask

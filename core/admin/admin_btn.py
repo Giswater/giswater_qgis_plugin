@@ -151,10 +151,9 @@ class GwAdminButton:
         
         tools_log.log_info(f"Create schema of type '{project_type}': '{project_name_schema}'")
 
-
         if self.rdb_import_data.isChecked():
             self.file_inp = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file')
-            if self.file_inp is 'null':
+            if self.file_inp == 'null':
                 msg = "The 'Path' field is required for Import INP data."
                 tools_qt.show_info_box(msg, "Info")
                 return
@@ -1970,8 +1969,9 @@ class GwAdminButton:
 
     def _filter_srid_changed(self):
         """"""
+
         filter_value = tools_qt.get_text(self.dlg_readsql_create_project, self.filter_srid)
-        if filter_value is 'null':
+        if filter_value == 'null':
             filter_value = ''
         sql = ("SELECT substr(srtext, 1, 6) as " + '"Type"' + ", srid as " + '"SRID"' + ", "
                "substr(split_part(srtext, ',', 1), 9) as " + '"Description"' + " "
@@ -1989,6 +1989,7 @@ class GwAdminButton:
 
     def _set_info_project(self):
         """"""
+
         # set variables from table version
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
 
@@ -2845,6 +2846,7 @@ class GwAdminButton:
 
     def _manage_accept(self, action, form_name, model=None):
         """"""
+
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
 
         # Execute manage add fields function
@@ -2860,7 +2862,7 @@ class GwAdminButton:
             label = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.label)
             widget_type = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.widgettype)
             dv_query_text = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.dv_querytext)
-            if column_name is 'null' or label is 'null':
+            if column_name == 'null' or label == 'null':
                 msg = "Column name and Label fields are mandatory. Please set correct value."
                 tools_qt.show_info_box(msg, "Info")
                 return

@@ -6,12 +6,11 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtCore import pyqtSignal
-from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsTask
+from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints
 
 from .task import GwTask
 from ..utils import tools_gw
-from ... import global_vars
-from ...lib import tools_log, tools_db, tools_qgis, tools_qt
+from ...lib import tools_log, tools_qgis, tools_qt
 
 
 class GwProjectLayersConfig(GwTask):

@@ -365,7 +365,7 @@ class GwI18NGenerator:
                          f'"formname":"{form_name}", '
                          f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
                          f'"tooltip":{{"column":"descript", "value":"{tt_value}"}}')
-            elif row['context'] in ('config_typevalue'):
+            elif row['context'] in 'config_typevalue':
                 line += (f'{{"data":'
                          f'{{"table":"{table}", '
                          f'"formname":"{form_name}", '

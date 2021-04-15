@@ -348,13 +348,14 @@ class GwVisit(QObject):
             self.controller.log_info("set_model_to_table: widget not found")
         current_visit_class = tools_qt.get_combo_value(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)
         feature_key = tools_qgis.get_primary_key()
+        feature_type = 'node'
         if feature_key == 'node_id':
             feature_type = 'node'
-        if feature_key == 'connec_id':
+        elif feature_key == 'connec_id':
             feature_type = 'connec'
-        if feature_key == 'arc_id':
+        elif feature_key == 'arc_id':
             feature_type = 'arc'
-        if feature_key == 'gully_id':
+        elif feature_key == 'gully_id':
             feature_type = 'gully'
         # Fill ComboBox cmb_visit_class
         sql = ("SELECT DISTINCT(class_id), om_visit_class.idval"

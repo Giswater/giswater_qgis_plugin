@@ -921,7 +921,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
             if 'tooltip' in field:
                 lbl.setToolTip(field['tooltip'])
 
-
+            widget = None
             if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
                 widget = QLineEdit()
                 if 'isMandatory' in field:
@@ -972,6 +972,8 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
             elif field['widgettype'] == 'button':
                 widget = add_button(dialog, field, temp_layers_added, module)
                 widget = set_widget_size(widget, field)
+
+            if widget is None: continue
 
             # Set editable/readonly
             if type(widget) in (QLineEdit, QDoubleSpinBox):
