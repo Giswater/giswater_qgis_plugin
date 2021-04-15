@@ -2134,6 +2134,14 @@ class UpdateSQL(ApiParent):
         self.tbl_srid.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.model_srid = QSqlQueryModel()
         self.tbl_srid.setModel(self.model_srid)
+        self.tbl_srid.clicked.connect(partial(self.set_selected_srid))
+
+
+    def set_selected_srid(self):
+        selected_list = self.tbl_srid.selectionModel().selectedRows()
+        selected_row = selected_list[0].row()
+        srid = self.tbl_srid.model().record(selected_row).value("SRID")
+        utils_giswater.setWidgetText(self.dlg_readsql_create_project, self.filter_srid, srid)
 
 
     def filter_srid_changed(self):
