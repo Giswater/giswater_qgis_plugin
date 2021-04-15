@@ -8,6 +8,12 @@ This version of Giswater is provided by Giswater Association
 
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_connect_update() RETURNS trigger LANGUAGE plpgsql AS $$
+
+/*
+This trigger updates mapzone connect columns ( if that connecs are connected) and redraw link geometry if end connect geometry is also updated
+As updateable links only must be class 2 (wich geometry is stored on link table, it is not need to work with v_edit_link, and as a result this trigger works with table link)
+*/
+
 DECLARE 
 
 linkrec Record; 

@@ -9,6 +9,12 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_plan_psector_link()
   RETURNS trigger AS
 $BODY$
+
+/*
+This trigger CREATES the initial geometry of planned link (always forced for planned connects) working only with links class 3. 
+Also UPDATES the link and vnode geometry for psector tables. On create and update works in combination with arc_id
+*/
+
 DECLARE 
     
 v_link_geom public.geometry;

@@ -18,7 +18,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"data":{ "resultId":"test_bgeo_b1", "us
 
 
 -- fid: main: 225
-		other: 107,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295,371 
+		other: 107,164,165,166,167,169,170,171,188,198,227,229,230,292,293,294,295,371,379
 
 */
 
@@ -486,7 +486,7 @@ BEGIN
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '283',concat(
-		'ERROR-283: There is/are ',v_count,' register(s) on arc''s catalog not VARC with null values on dint column for the whole system.'),v_count);
+		'ERROR-283: There is/are ',v_count,' register(s) on arc''s catalog with null values on dint column for the whole system.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)

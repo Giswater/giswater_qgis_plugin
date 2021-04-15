@@ -9,6 +9,11 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_plan_psector_x_connec()
   RETURNS trigger AS
 $BODY$
+
+/*
+This trigger controls if connect has link and wich class of link it has as well as sets some values for states
+*/
+
 DECLARE 
 v_stateaux smallint;	
 v_arcaux text;

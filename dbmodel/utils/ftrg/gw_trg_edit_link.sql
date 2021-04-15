@@ -10,6 +10,40 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_link()
   RETURNS trigger AS
 $BODY$
 
+/*
+There are three class of links:
+		- 1: operative (createds in automatic or manual way)
+		- 2: Single psector links when endfeature is not VNODE (lets say NODES, CONNECS & GULLIES). 
+		     Only one psector is enabled to work with. Created automaticly as class-3 by trg_plan_psector_link and moved after as class-2
+		- 3: Multi psector links when endfeature is VNODE (let say ARCS) created automaticly by trg_plan_psector_link as class-3
+
+There are three diferent workflows to create and manage links:
+
+- gw_fct_setlinktonetwork function that creates link as automatic way, works only with links class 1.
+
+- gw_fct_setarcfusion & gw_fct_setarcdivide functions that updates values of related connect using the spatial intersection of existing link and works with links class 1,3
+
+- trg_edit_link to create custom links (only class-1) and to update automatic links (class-1, 2 or 3).
+  In addition, workflow for this function is complex managing with planned network elements. Works with links class 1,2,3 and acts in combination with:
+
+	- trg_plan_psector_link, This trigger CREATES the initial geometry of planned link (always forced for planned connects) creating always as class-3. Also UPDATES the link
+      and vnode geometry on the psector tables if link is class-3. In additaionn works in combination with arc_id (to relate arc_id endfeature)
+	
+	- control for link class, keeping for the rules of links class-2 and class-3
+	- trg_plan_psector_x_connec: This trigger controls if connect has link and wich class of link it has
+	- trg_plan_psector_x_gully: This trigger controls if connect has link and wich class of link it has
+	
+	Redraw links when endfeature geometry is updated:
+	- trg_connect_update: This trigger updates mapzone connect columns (if endpoint of link is another connec or gully) 
+	  and redraws link geometry if also its geometry is updated. Works with 1,2 class links
+	- trg_topocontrol_node: It updates geometry links if the geometry of node is updated. It updates arc_id of connect if this changes
+	- trg_arc_vnodelink_update: This function redraws links when arc geometry is updated
+	
+To create new link only with this tool only is possible with operative connects. When a planned connects is created automatic his link is also created.
+After that the trg_edit_link can update geometry and enpoint. By updating endpoint maybe link may change class for 3 to 2 or viceversa	
+
+*/
+
 DECLARE 
 v_mantable varchar;
 v_projectype varchar;

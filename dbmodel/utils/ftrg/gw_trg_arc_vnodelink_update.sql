@@ -10,6 +10,12 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_arc_vnodelink_update()
   RETURNS trigger AS
 $BODY$
+
+/*
+This function redraws links when arc geometry is updated
+It works over v_edit_link, wich means that is mandatory to activate psectors in order to do not disconnect planned links
+*/
+
 DECLARE 
 v_link record;
 v_closest_point PUBLIC.geometry;

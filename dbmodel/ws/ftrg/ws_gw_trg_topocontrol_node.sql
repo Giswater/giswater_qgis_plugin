@@ -8,6 +8,8 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_topocontrol_node() RETURNS trigger AS
 $BODY$
+
+
 DECLARE 
 numNodes numeric;
 psector_vdefault_var integer;
