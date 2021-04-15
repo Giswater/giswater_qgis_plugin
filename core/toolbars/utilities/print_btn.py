@@ -326,8 +326,8 @@ class GwPrintButton(GwAction):
             widget = tools_gw.set_widget_size(widget, field)
             widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, my_json))
             if 'widgetfunction' in field:
-                if field['widgetfunction'] is not None:
-                    function_name = field['widgetfunction']
+                if field['widgetfunction']['functionName'] is not None:
+                    function_name = field['widgetfunction']['functionName']
                     widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json))
 
         return label, widget
