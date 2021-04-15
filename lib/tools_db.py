@@ -289,11 +289,11 @@ def get_postgis_version():
     return postgis_version
 
 
-def get_row(sql, log_info=True, log_sql=False, commit=True, params=None):
+def get_row(sql, log_info=True, log_sql=False, commit=True, params=None, aux_conn=None):
     """ Execute SQL. Check its result in log tables, and show it to the user """
 
     sql = _get_sql(sql, log_sql, params)
-    row = global_vars.dao.get_row(sql, commit)
+    row = global_vars.dao.get_row(sql, commit, aux_conn=aux_conn)
     global_vars.session_vars['last_error'] = global_vars.dao.last_error
     if not row:
         # Check if any error has been raised
@@ -373,7 +373,7 @@ def set_search_path(schema_name):
     global_vars.dao.set_search_path = sql
 
 
-def check_function(function_name, schema_name=None, commit=True):
+def check_function(function_name, schema_name=None, commit=True, aux_conn=None):
     """ Check if @function_name exists in selected schema """
 
     if schema_name is None:
@@ -384,7 +384,7 @@ def check_function(function_name, schema_name=None, commit=True):
            "WHERE lower(routine_schema) = %s "
            "AND lower(routine_name) = %s")
     params = [schema_name, function_name]
-    row = get_row(sql, params=params, commit=commit)
+    row = get_row(sql, params=params, commit=commit, aux_conn=aux_conn)
     return row
 
 

@@ -128,7 +128,7 @@ class GwToolBoxTask(GwTask):
         else:
             extras += '}'
         body = tools_gw.create_body(feature=feature_field, extras=extras)
-        self.json_result = tools_gw.execute_procedure(function_name, body, log_sql=True)
+        self.json_result = tools_gw.execute_procedure(function_name, body, log_sql=True, aux_conn=self.aux_conn)
         if self.isCanceled(): return False
         if self.json_result['status'] == 'Failed': return False
         if not self.json_result or self.json_result is None: return False
@@ -151,6 +151,7 @@ class GwToolBoxTask(GwTask):
     def finished(self, result):
 
         super().finished(result)
+
         self.dialog.btn_cancel.hide()
         self.dialog.btn_close.show()
         self.dialog.progressBar.setVisible(False)

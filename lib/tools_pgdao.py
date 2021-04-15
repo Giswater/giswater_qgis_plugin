@@ -152,20 +152,26 @@ class GwPgDao(object):
             return rows
 
 
-    def get_row(self, sql, commit=False):
+    def get_row(self, sql, commit=False, aux_conn=None):
         """ Get single row from selected query """
+
 
         self.last_error = None
         row = None
         try:
-            self.cursor_execute(sql)
-            row = self.cursor.fetchone()
+            if aux_conn is not None:
+                cursor = aux_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+                cursor.execute(sql)
+                row = cursor.fetchone()
+            else:
+                self.cursor_execute(sql)
+                row = self.cursor.fetchone()
             if commit:
                 self.commit()
         except Exception as e:
             self.last_error = e
             if commit:
-                self.rollback()
+                self.rollback(aux_conn)
         finally:
             return row
 
@@ -237,14 +243,20 @@ class GwPgDao(object):
         return self.cursor.rowcount
 
 
-    def commit(self):
+    def commit(self, aux_conn=None):
         """ Commit current database transaction """
+        if aux_conn is not None:
+            aux_conn.commit()
+            return
         self.check_cursor()
         self.conn.commit()
 
 
-    def rollback(self):
+    def rollback(self, aux_conn=None):
         """ Rollback current database transaction """
+        if aux_conn is not None:
+            aux_conn.rollback()
+            return
         self.check_cursor()
         self.conn.rollback()
 
@@ -278,6 +290,30 @@ class GwPgDao(object):
             last_error = e
             status = False
 
+        return {'status': status, 'last_error': last_error}
+
+
+    def get_aux_conn(self):
+
+        try:
+            aux_conn = psycopg2.connect(self.conn_string)
+            return aux_conn
+        except Exception as e:
+            last_error = e
+            status = False
+
+        return {'status': status, 'last_error': last_error}
+
+
+    def delete_aux_con(self, aux_conn):
+        # Delete auxiliary connection
+        try:
+            aux_conn.close()
+            del aux_conn
+            return
+        except Exception as e:
+            last_error = e
+            status = False
         return {'status': status, 'last_error': last_error}
 
 

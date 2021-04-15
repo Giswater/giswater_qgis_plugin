@@ -170,7 +170,7 @@ class GwEpaFileManager(GwTask):
         extras += f', "useNetworkGeom":"{self.net_geom}"'
         extras += f', "dumpSubcatch":"{self.export_subcatch}"'
         body = self._create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', body)
+        json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', body, self.conn)
         self.complet_result = json_result
         if json_result is None or not json_result:
             self.function_failed = True
@@ -417,7 +417,7 @@ class GwEpaFileManager(GwTask):
         if self.json_rpt:
             extras += f', "file": {self.json_rpt}'
         body = self._create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', body)
+        json_result = tools_gw.execute_procedure('gw_fct_rpt2pg_main', body, self.conn)
         self.rpt_result = json_result
         if json_result is None or not json_result:
             self.function_failed = True

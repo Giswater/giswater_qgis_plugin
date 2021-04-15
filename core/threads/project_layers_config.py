@@ -109,7 +109,7 @@ class GwProjectLayersConfig(GwTask):
             feature = '"tableName":"' + str(layer_name) + '", "id":"", "isLayer":true'
             extras = f'"infoType":"{self.qgis_project_infotype}"'
             body = self._create_body(feature=feature, extras=extras)
-            complet_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body)
+            complet_result = tools_gw.execute_procedure('gw_fct_getinfofromid', body, aux_conn=self.aux_conn)
             if not complet_result:
                 continue
             if 'status' not in complet_result:
