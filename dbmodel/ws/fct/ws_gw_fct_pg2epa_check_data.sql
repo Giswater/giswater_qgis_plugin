@@ -482,7 +482,7 @@ BEGIN
 	
 	
 	RAISE NOTICE '19 - Check dint value for catalogs';
-	SELECT count(*) INTO v_count FROM cat_arc WHERE dint IS NULL AND arctype_id !='VARC';
+	SELECT count(*) INTO v_count FROM cat_arc WHERE dint IS NULL;
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '283',concat(
@@ -494,7 +494,7 @@ BEGIN
 	END IF;
 
 
-	SELECT count(*) INTO v_count FROM cat_node WHERE dint IS NULL AND id IN (SELECT DISTINCT(nodecat_id) from v_edit_node WHERE epa_type IN ('SHORTPIPE', 'VALVE'));
+	SELECT count(*) INTO v_count FROM cat_node WHERE dint IS NULL AND id IN (SELECT DISTINCT(nodecat_id) from v_edit_node WHERE epa_type IN ('SHORTPIPE', 'VALVE', 'PUMP'));
 	IF v_count > 0 THEN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 3, '283',concat(
@@ -571,7 +571,7 @@ BEGIN
 	END IF;	
 
 	
-    RAISE NOTICE '23 - Inconsistency on inp node tables (294)';
+	RAISE NOTICE '23 - Inconsistency on inp node tables (294)';
 	INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom)
 		SELECT 294, n.node_id, n.nodecat_id, concat(epa_type, ' using inp_junction table') AS epa_table, n.the_geom FROM v_edit_inp_junction JOIN node n USING (node_id) WHERE epa_type !='JUNCTION'
 		UNION
@@ -614,8 +614,8 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
 		VALUES (v_fid, v_result_id , 1,  '295','INFO: Epa type for arc features checked. No inconsistencies aganints epa table found.');
 	END IF;	
-	
-	-- check connecs <-> inp_connecs
+
+	RAISE NOTICE '24 - check connecs <-> inp_connecs (295)';
 	SELECT c1-c2 INTO v_count FROM (SELECT count(*) as c1, null AS c2 FROM connec UNION SELECT null, count(*) FROM inp_connec)a1
 	WHERE c1 > c2;
 
@@ -630,8 +630,7 @@ BEGIN
 		VALUES (v_fid, v_result_id , 1,  '295','INFO: Epa type for arc features checked. No inconsistencies aganints epa table found.');
 	END IF;	
 
-
-	-- check matcat_id for arcs
+	RAISE NOTICE '25 - check matcat_id for arcs (371)';
 	SELECT count(*) INTO v_count FROM (SELECT * FROM cat_arc WHERE matcat_id IS NULL)a1;
 
 	IF v_count > 0 THEN
@@ -643,6 +642,23 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, table_id, error_message)
 		VALUES (v_fid, v_result_id , 1,  '371','INFO: No registers found without material on cat_arc table.');
 	END IF;	
+
+	RAISE NOTICE '26 - Topological nodes with epa_type UNDEFINED (379)';
+	v_querytext = 'SELECT n.node_id, nodecat_id, the_geom FROM (SELECT node_1 node_id FROM v_edit_arc UNION SELECT node_2 FROM v_edit_arc)a 
+		       LEFT JOIN  (SELECT node_id, nodecat_id, the_geom FROM v_edit_node WHERE epa_type = ''UNDEFINED'') n USING (node_id) WHERE n.node_id IS NOT NULL';
+	
+	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+	IF v_count > 0 THEN
+		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom) SELECT 379, node_id, nodecat_id, ''nodes
+		with state_type isoperative = false'', the_geom FROM (', v_querytext,')a');
+		INSERT INTO audit_check_data (fid,  criticity, result_id, error_message, fcount)
+		VALUES (v_fid, 2, '379' ,concat('ERROR-379: There is/are ',v_count,' node(s) with epa_type UNDEFINED acting as node_1 or node_2 of arcs. Please, check your data before continue.'),v_count);
+		INSERT INTO audit_check_data (fid, criticity, error_message, fcount)
+		VALUES (v_fid, 2, concat('SELECT * FROM anl_node WHERE fid = 379 AND cur_user=current_user'),v_count);
+	ELSE
+		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
+	VALUES (v_fid, 1, '379','INFO: No nodes with epa_type UNDEFINED acting as node_1 or node_2 of arcs found.',v_count);
+	END IF;
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 4, '');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (225, v_result_id, 3, '');

@@ -17,3 +17,6 @@ INSERT INTO config_form_tabs(formname, tabname, label, tooltip, sys_role, tabfun
 VALUES ('search', 'tab_visit', 'Visit', 'Visit', 'role_basic', NULL, NULL, 4, 6) 
 ON CONFLICT (formname, tabname, device) DO UPDATE set orderby= 6 where config_form_tabs.orderby is null;
 UPDATE config_form_tabs SET orderby = 7  WHERE formname = 'search' AND tabname = 'tab_psector' AND orderby IS NULL;
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES 
+(379, 'Check not defined nodes acting as topological nodes as node_1 or node_2 on arcs, 'utils')  ON CONFLICT (fid) DO NOTHING;
