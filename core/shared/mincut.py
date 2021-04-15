@@ -2001,8 +2001,6 @@ class GwMincut:
         # Disconnect snapping and related signals
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
 
-        self.iface.actionPan().trigger()
-
 
     def _remove_selection(self):
         """ Remove selected features of all layers """
