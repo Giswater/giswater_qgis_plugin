@@ -15,7 +15,8 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, layoutname, isfilter, linkedobject)
     VALUES ('ve_arc_pipe', 'form_feature', 'tab_relations', 'arc_id', 1, 'string', 'typeahead', 'Arc id', false, false, true, false, 'SELECT arc_id as id, arc_id as idval FROM v_ui_arc_x_relations WHERE arc_id IS NOT NULL ','{"saveValue": false, "filterSign":"ILIKE"}', '{"functionName": "filter_table"}', 'lyt_relations_2', true, 'tbl_relations');
-
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, layoutname)
+    VALUES ('ve_arc_pipe', 'form_feature', 'tab_relations', 'hspacer_lyt_relations_2', 4, 'hspacer', false, false, true, false, 'lyt_relations_2');
 
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_elements_1', 'lyt_elements_1','lytElements1');
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_elements_2', 'lyt_elements_2','lytElements2');
