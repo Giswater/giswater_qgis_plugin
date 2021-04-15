@@ -1649,8 +1649,6 @@ class GwMincut:
         self.mincut_class = 1
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(self.emit_point)
-
-        # Snapper
         self.snapper_manager = GwSnapManager(self.iface)
         self.snapper = self.snapper_manager.get_snapper()
 
@@ -1913,8 +1911,10 @@ class GwMincut:
         """ B2-123: Custom mincut analysis. Working just with valve layer """
 
         # Declare snapper_manager and emit_point
-        self.snapper_manager = GwSnapManager(self.iface)
         self.emit_point = QgsMapToolEmitPoint(self.canvas)
+        self.canvas.setMapTool(self.emit_point)
+        self.snapper_manager = GwSnapManager(self.iface)
+        self.snapper = self.snapper_manager.get_snapper()
 
         if is_checked is False:
             # Disconnect snapping and related signals
@@ -2000,6 +2000,8 @@ class GwMincut:
 
         # Disconnect snapping and related signals
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
+
+        self.iface.actionPan().trigger()
 
 
     def _remove_selection(self):
