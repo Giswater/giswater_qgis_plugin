@@ -137,6 +137,12 @@ class GwAdminButton:
         if not self._check_project_name(project_name_schema, project_descript):
             return
 
+        # Check if srid value is valid
+        if self.last_srids is None:
+            msg = "This SRID value does not exist on Postgres Database. Please select a diferent one."
+            tools_qt.show_info_box(msg, "Info")
+        return
+
         msg = "This process will take time (few minutes). Are you sure to continue?"
         title = "Create example"
         answer = tools_qt.show_question(msg, title)
@@ -1951,6 +1957,15 @@ class GwAdminButton:
         self.tbl_srid.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.model_srid = QSqlQueryModel()
         self.tbl_srid.setModel(self.model_srid)
+        self.tbl_srid.clicked.connect(partial(self._set_selected_srid))
+
+
+    def _set_selected_srid(self):
+
+        selected_list = self.tbl_srid.selectionModel().selectedRows()
+        selected_row = selected_list[0].row()
+        srid = self.tbl_srid.model().record(selected_row).value("SRID")
+        tools_qt.set_widget_text(self.dlg_readsql_create_project, self.filter_srid, srid)
 
 
     def _filter_srid_changed(self):
@@ -1963,6 +1978,7 @@ class GwAdminButton:
                "FROM public.spatial_ref_sys "
                "WHERE CAST(srid AS TEXT) LIKE '" + str(filter_value))
         sql += "%'  AND  srtext ILIKE 'PROJCS%' ORDER BY substr(srtext, 1, 6), srid"
+        self.last_srids = tools_db.get_rows(sql)
 
         # Populate Table
         self.model_srid = QSqlQueryModel()
