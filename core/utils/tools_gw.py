@@ -139,12 +139,11 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
     try:
         raw_parameter = parameter
 
-        if global_vars.project_type is None and prefix:
-            global_vars.project_type = get_project_type()
+        if global_vars.project_vars['project_type'] is None and prefix:
+            global_vars.project_vars['project_type'] = get_project_type()
 
-        if config_type == 'user' and prefix and global_vars.project_type is not None:
-            parameter = f"{global_vars.project_type}_{parameter}"
-
+        if config_type == 'user' and prefix and global_vars.project_vars['project_type'] is not None:
+            parameter = f"{global_vars.project_vars['project_type']}_{parameter}"
         parser = configparser.ConfigParser(comment_prefixes=";", allow_no_value=True)
         if config_type in "user":
             path_folder = os.path.join(tools_os.get_datadir(), global_vars.user_folder_dir)

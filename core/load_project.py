@@ -40,6 +40,9 @@ class GwLoadProject(QObject):
     def project_read(self, show_warning=True):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
+        # Get variables from qgis project
+        tools_qgis.get_project_variables()
+
         # Check if user has all config params
         tools_gw.user_params_to_userconfig()
 
@@ -94,9 +97,6 @@ class GwLoadProject(QObject):
         # Get SRID from table node
         srid = tools_db.get_srid('v_edit_node', self.schema_name)
         global_vars.srid = srid
-
-        # Get variables from qgis project
-        tools_qgis.get_project_variables()
 
         # Check that there are no layers (v_edit_node) with the same view name, coming from different schemes
         status = self._check_layers_from_distinct_schema()
