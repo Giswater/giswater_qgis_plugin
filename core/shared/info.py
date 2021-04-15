@@ -504,6 +504,7 @@ class GwInfo(QObject):
             self._enable_action(self.dlg_cf, "actionZoom", False)
             self._enable_action(self.dlg_cf, "actionZoomOut", False)
             self._enable_action(self.dlg_cf, "actionCentered", False)
+            self._enable_action(self.dlg_cf, "actionSetToArc", False)
         self._show_actions(self.dlg_cf, 'tab_data')
 
         try:
@@ -1686,6 +1687,7 @@ class GwInfo(QObject):
             self._enable_action(dialog, "actionZoom", True)
             self._enable_action(dialog, "actionZoomOut", True)
             self._enable_action(dialog, "actionCentered", True)
+            self._enable_action(dialog, "actionSetToArc", True)
             global is_inserting
             is_inserting = False
             my_json = json.dumps(_json)
@@ -1742,7 +1744,7 @@ class GwInfo(QObject):
         try:
             actions_list = dialog.findChildren(QAction)
             static_actions = ('actionEdit', 'actionCentered', 'actionZoomOut', 'actionZoom', 'actionLink', 'actionHelp',
-                              'actionSection')
+                              'actionSection', 'actionSetToArc')
 
             for action in actions_list:
                 if action.objectName() not in static_actions:
