@@ -172,8 +172,6 @@ BEGIN
 			v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_mincut', 'flag', 10);
 			SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
 			EXECUTE v_querystring INTO v_error_message;
-/*EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3002", "function":"2304","debug_msg":"'||element_id_arg::text||'"}}$$);' INTO v_error_message;*/
 		END IF;
 		
 		-- Check an existing arc
@@ -190,7 +188,6 @@ BEGIN
 			
 				-- call graf analytics function (step:1)
 				v_data = concat ('{"data":{"grafClass":"MINCUT", "arc":"', element_id_arg ,'", "step":1, "parameters":{"id":', result_id_arg, '}}}');
-				RAISE NOTICE 'v_data MINCUT %', v_data;
 				PERFORM gw_fct_grafanalytics_mincut(v_data);
 			
 			ELSIF v_mincutversion = 3 THEN
@@ -209,8 +206,6 @@ BEGIN
 					v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_mincut', 'flag', 20);
 					SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
 					EXECUTE v_querystring INTO v_error_message;
-/*EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3006", "function":"2304","debug_msg":"'||element_id_arg::text||'"}}$$);' INTO v_error_message;*/
 				END IF;
 
 				-- Check extreme being a valve
@@ -270,8 +265,6 @@ BEGIN
 			v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_mincut', 'flag', 30);
 			SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
 			EXECUTE v_querystring INTO v_error_message;
-/*EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"1082", "function":"2304","debug_msg":"'||element_id_arg::text||'"}}$$);' INTO v_error_message;*/
 		END IF;
 
 	ELSE
@@ -368,9 +361,6 @@ BEGIN
 	v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_mincut', 'flag', 40);
 	SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
 	EXECUTE v_querystring INTO v_geometry;
-/*EXECUTE ' SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM om_mincut_arc WHERE result_id='||result_id_arg||
-		' UNION SELECT the_geom FROM om_mincut_valve WHERE result_id='||result_id_arg||') a'    
-	        INTO v_geometry;*/
 	
 	-- restore state selector
 	INSERT INTO selector_state (state_id, cur_user)
@@ -380,6 +370,10 @@ BEGIN
 	-- returning
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
+	v_error_message := COALESCE(v_error_message, '{}'); 
+	v_version := COALESCE(v_version, '{}'); 
+	v_geometry := COALESCE(v_geometry, '{}'); 
+	v_mincutdetails := COALESCE(v_mincutdetails, '{}'); 
 
 
 	IF v_error_message is null THEN
