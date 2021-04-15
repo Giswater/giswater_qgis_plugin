@@ -60,7 +60,7 @@ v_priority json;
 v_output json;
 v_version record;
 v_selected text;
-
+v_usepsectors boolean;
 
 BEGIN
 
@@ -70,6 +70,10 @@ BEGIN
 	-- get input data 
 	v_status :=  ((p_data ->>'data')::json->>'status')::text;
 	v_mincutid :=  ((p_data ->>'data')::json->>'mincutId')::integer;
+	v_output := (SELECT output->>'psectors' FROM om_mincut WHERE id = v_mincutid);
+	v_usepsectors := (SELECT v_output->>'used');
+	v_count := (v_output->>'psectors')::json->>'unselected';
+
 
 	-- Reset temporal tables
 	DELETE FROM audit_check_data WHERE fid = 216 and cur_user=current_user;
@@ -94,6 +98,18 @@ BEGIN
 	SELECT array_agg(a.c) INTO v_selected FROM (SELECT concat(state_id,'-',name) as c FROM selector_hydrometer 
 	JOIN ext_rtc_hydrometer_state ON state_id = id WHERE cur_user = current_user AND is_operative IS TRUE order by state_id) a;
 
+	IF v_count > 0 THEN
+		INSERT INTO audit_check_data (fid, error_message)
+		VALUES (216, concat ('WARNING-287: ', v_count,' Psectors have been unselected on current exploitation in order to execute this mincut without planned network.'));
+	ELSE
+		IF v_usepsectors THEN
+			INSERT INTO audit_check_data (fid, error_message)
+			VALUES (216, concat ('WARNING-287: ', v_count,' Psectors have been used to execute this mincut in order to calculate mincut affectations with planned network.'));
+		ELSE
+			INSERT INTO audit_check_data (fid, error_message)
+			VALUES (216, concat ('INFO: ', ' Mincut have been executed without planned network.'));
+		END IF;
+	END IF;
 
 	-- log for hydrometer's state
 	IF v_count = 0 THEN

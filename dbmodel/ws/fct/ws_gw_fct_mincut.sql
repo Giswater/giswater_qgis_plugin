@@ -41,7 +41,6 @@ v_geometry text;
 v_data json;
 v_mincutversion integer;
 v_mincutdetails	json;
-v_visiblelayer text = '"v_om_mincut_arc", "v_om_mincut_node", "v_om_mincut_connec", "v_anl_mincut_init_point"';
 
 v_result text;
 v_result_info text;
@@ -63,6 +62,7 @@ v_querystring text;
 v_debug_vars json;
 v_debug_sql json;
 v_msgerr json;
+v_count integer = 0;
 
 BEGIN
 
@@ -130,7 +130,8 @@ BEGIN
 		DELETE FROM temp_table WHERE fid=287 AND cur_user=current_user;
 		INSERT INTO temp_table (fid, text_column)  
 		SELECT 287, (array_agg(psector_id)) FROM selector_psector WHERE cur_user=current_user;
-		DELETE FROM selector_psector WHERE cur_user = current_user;
+		DELETE FROM selector_psector WHERE psector_id IN (SELECT psector_id FROM plan_psector WHERE expl_id = expl_id_arg) AND cur_user = current_user;
+		GET DIAGNOSTICS v_count =  row_count;
 	END IF;
 	
 	-- set state selector
@@ -311,10 +312,10 @@ BEGIN
 	-- insert connecs
 	IF p_usepsectors IS TRUE AND 'role_master' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
 		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom)
-		SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state>0;
+		SELECT result_id_arg, connec_id, c.the_geom FROM v_edit_connec c JOIN om_mincut_arc ON c.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state > 0;
 	ELSE
 		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom)
-		SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state=1;
+		SELECT result_id_arg, connec_id, connec.the_geom FROM connec JOIN om_mincut_arc ON connec.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state = 1;
 	END IF;
 
 	IF v_debug THEN RAISE NOTICE '12-Insert into om_mincut_hydrometer table ';	END IF;
@@ -330,7 +331,7 @@ BEGIN
 	SELECT count(arc_id), sum(st_length(arc.the_geom))::numeric(12,2) INTO v_numarcs, v_length 
 	FROM om_mincut_arc JOIN arc USING (arc_id) WHERE result_id=result_id_arg group by result_id;
 	
-	SELECT sum(area*st_length(arc.the_geom))::numeric(12,2) INTO v_volume 
+	SELECT sum(pi()*(dint*dint/4000000)*st_length(arc.the_geom))::numeric(12,2) INTO v_volume 
 	FROM om_mincut_arc JOIN arc USING (arc_id) JOIN cat_arc ON arccat_id=cat_arc.id 
 	WHERE result_id=result_id_arg;
 
@@ -354,7 +355,7 @@ BEGIN
 				
 	IF v_priority IS NULL THEN v_priority='{}'; END IF;
 	
-	v_mincutdetails = (concat('{"minsector_id":"',element_id_arg,'","arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"', 
+	v_mincutdetails = (concat('{"minsector_id":"',element_id_arg,'","psectors":{"used":"',p_usepsectors,'", "unselected":',v_count,'}, "arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"', 
 	v_volume, '"}, "connecs":{"number":"',v_numconnecs,'","hydrometers":{"total":"',v_numhydrometer,'","classified":',v_priority,'}}}'));
 			
 	--update output results
@@ -376,13 +377,6 @@ BEGIN
 	select unnest(text_column::integer[]), current_user from temp_table where fid=199 and cur_user=current_user
 	ON CONFLICT (state_id, cur_user) DO NOTHING;
 	
-	-- restore psector selector
-	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
-		INSERT INTO selector_psector (psector_id, cur_user)
-		select unnest(text_column::integer[]), current_user from temp_table where fid=287 and cur_user=current_user
-		ON CONFLICT (psector_id, cur_user) DO NOTHING;
-	END IF;
-
 	-- returning
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
@@ -403,9 +397,8 @@ BEGIN
 			',"data":{ '||
 			'  "info":'||v_result_info||
 			', "geometry":"'||v_geometry||'"'||
-			', "mincutDetails":'||v_mincutdetails||
-			', "setVisibleLayers":['||v_visiblelayer||']}'||
-			'}'||
+			', "mincutDetails":'||v_mincutdetails||'}'||
+			'}'
 	'}')::json;
 
 	-- Exception handling
