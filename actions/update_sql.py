@@ -1525,6 +1525,12 @@ class UpdateSQL(ApiParent):
         if not self.check_project_name(project_name_schema, project_title_schema):
             return
 
+        # Check if srid value is valid
+        if self.last_srids is None:
+            msg = "This SRID value does not exist on Postgres Database. Please select a diferent one."
+            self.controller.show_info_box(msg, "Info")
+            return
+
         self.controller.log_info(f"Create schema of type '{project_type}': '{project_name_schema}'")
 
         if not is_test:
@@ -2140,6 +2146,7 @@ class UpdateSQL(ApiParent):
                "FROM public.spatial_ref_sys "
                "WHERE CAST(srid AS TEXT) LIKE '" + str(filter_value))
         sql += "%' AND srtext ILIKE 'PROJCS%' ORDER BY substr(srtext, 1, 6), srid"
+        self.last_srids = self.controller.get_rows(sql, log_sql=False, commit=True)
 
         # Populate Table
         self.model_srid = QSqlQueryModel()
