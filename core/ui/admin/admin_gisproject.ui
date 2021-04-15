@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_main_gisproject</class>
- <widget class="QMainWindow" name="dlg_main_gisproject">
+ <class>dlg_admin_gisproject</class>
+ <widget class="QMainWindow" name="dlg_admin_gisproject">
   <property name="geometry">
    <rect>
     <x>0</x>

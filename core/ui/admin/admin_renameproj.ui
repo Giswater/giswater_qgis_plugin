@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_main_renameproj</class>
- <widget class="QMainWindow" name="dlg_main_renameproj">
+ <class>dlg_admin_renameproj</class>
+ <widget class="QMainWindow" name="dlg_admin_renameproj">
   <property name="geometry">
    <rect>
     <x>0</x>

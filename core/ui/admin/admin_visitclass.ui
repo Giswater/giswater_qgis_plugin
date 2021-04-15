@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_main_visitclass</class>
- <widget class="QDialog" name="dlg_main_visitclass">
+ <class>dlg_admin_visitclass</class>
+ <widget class="QDialog" name="dlg_admin_visitclass">
   <property name="geometry">
    <rect>
     <x>0</x>

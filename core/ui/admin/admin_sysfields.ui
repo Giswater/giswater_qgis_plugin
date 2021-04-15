@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_main_sysfields</class>
- <widget class="QDialog" name="dlg_main_sysfields">
+ <class>dlg_admin_sysfields</class>
+ <widget class="QDialog" name="dlg_admin_sysfields">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -65,8 +65,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>586</width>
-            <height>672</height>
+            <width>594</width>
+            <height>689</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
