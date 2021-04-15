@@ -1526,12 +1526,6 @@ class UpdateSQL(ApiParent):
             self.controller.show_info_box(msg, "Info")
             return
 
-        msg = "This process will take time (few minutes). Are you sure to continue?"
-        title = "Create example"
-        answer = self.controller.ask_question(msg, title)
-        if not answer:
-            return
-        
         self.controller.log_info(f"Create schema of type '{project_type}': '{project_name_schema}'")
 
         if not is_test:
@@ -1559,6 +1553,12 @@ class UpdateSQL(ApiParent):
                 else:
                     return
 
+        msg = "This process will take time (few minutes). Are you sure to continue?"
+        title = "Create example"
+        answer = self.controller.ask_question(msg, title)
+        if not answer:
+            return
+        
         # Common execution
         status = self.load_base(project_type=project_type)
         if not status and self.dev_commit == 'FALSE':
