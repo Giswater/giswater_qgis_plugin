@@ -167,7 +167,7 @@ class GwPgDao(object):
                 self.cursor_execute(sql)
                 row = self.cursor.fetchone()
             if commit:
-                self.commit()
+                self.commit(aux_conn)
         except Exception as e:
             self.last_error = e
             if commit:
