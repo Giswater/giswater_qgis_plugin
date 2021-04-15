@@ -1344,8 +1344,9 @@ def add_lineedit(field):
 
 
 def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]):
-    """ Add widgets QTableView type.
-    Function called in -> widget.doubleClicked.connect(partial(getattr(sys.modules[__name__], function_name), **kwargs))
+    """
+    Add widgets QTableView type.
+        Function called in -> widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
         module = class GwInfo(QObject) -> open_rpt_result(**kwargs)
     """
     widget = QTableView()

@@ -8,19 +8,94 @@ or (at your option) any later version.
 import os
 
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QMessageBox
+from qgis.PyQt.QtWidgets import QComboBox, QMessageBox, QTableView
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer
 
 from ..utils import tools_gw
 from ...lib import tools_qgis, tools_qt, tools_log, tools_os
 from ..shared.info import GwInfo
 
+
+def filter_table(**kwargs):
+    """
+         Function called in module GwInfo: def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
+         at lines:  widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+                    widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+     """
+    complet_result = kwargs['complet_result']
+    model = kwargs['model']
+    dialog = kwargs['dialog']
+    widget_list = kwargs['widget_list']
+    widgetname = kwargs['widgetname']
+    linkedobject = kwargs['linkedobject']
+    feature_id = kwargs['feature_id']
+    filter_fields = _get_filter_qtableview(dialog, widget_list)
+    index_tab = dialog.tab_main.currentIndex()
+    tab_name = dialog.tab_main.widget(index_tab).objectName()
+    complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject, feature_id)
+    if complet_list is False:
+        return False
+    for field in complet_list['body']['data']['fields']:
+        qtable = dialog.findChild(QTableView, field['widgetname'])
+        if qtable:
+            if field['value'] is None:
+                model.removeRows(0, model.rowCount())
+                return complet_list
+            model.clear()
+            tools_gw.add_tableview_header(qtable, field)
+            tools_gw.fill_tableview_rows(qtable, field)
+            tools_gw.set_tablemodel_config(dialog, qtable, field['widgetname'], 1, True)
+            tools_qt.set_tableview_config(qtable)
+
+    return complet_list
+
+
+def _get_filter_qtableview(dialog, widget_list):
+
+    filter_fields = ""
+    for widget in widget_list:
+        if type(widget) != QTableView:
+            columnname = widget.property('columnname')
+            filter_sign = "ILIKE"
+            if widget.property('widgetcontrols') is not None and 'filterSign' in widget.property('widgetcontrols'):
+                if widget.property('widgetcontrols')['filterSign'] is not None:
+                    filter_sign = widget.property('widgetcontrols')['filterSign']
+            if type(widget) == QComboBox:
+                value = tools_qt.get_combo_value(dialog, widget, 0)
+            else:
+                value = tools_qt.get_text(dialog, widget, False, False)
+
+            filter_fields += f'"{columnname}":{{"value":"{value}","filterSign":"{filter_sign}"}}, '
+
+    if filter_fields != "":
+        filter_fields = filter_fields[:-2]
+
+    return filter_fields
+
+
+def _get_list(complet_result, form_name='', tab_name='', filter_fields='', widgetname='', formtype='', linkedobject='', feature_id=''):
+
+    form = f'"formName":"{form_name}", "tabName":"{tab_name}", "widgetname":"{widgetname}", "formtype":"{formtype}"'
+    id_name = complet_result['body']['feature']['idName']
+    feature = f'"tableName":"{linkedobject}", "idName":"{id_name}", "id":"{feature_id}"'
+    body = tools_gw.create_body(form, feature, filter_fields)
+    json_result = tools_gw.execute_procedure('gw_fct_getlist', body, log_sql=True)
+    if json_result is None or json_result['status'] == 'Failed':
+        return False
+    complet_list = json_result
+    if not complet_list:
+        return False
+
+    return complet_list
+
+
 def open_rpt_result(**kwargs):
     """
     Open form of selected element of the @qtable??
-        function called in -> module = tools_gw.add_tableview(complet_result, field, module=sys.modules[__name__])
-        at line: widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
+        function called in module tools_gw: def add_tableview(complet_result, field, module=sys.modules[__name__])
+        at lines:   widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
     """
+
     qtable = kwargs['qtable']
     complet_list = kwargs['complet_result']
     func_params = kwargs['func_params']
@@ -45,8 +120,11 @@ def open_rpt_result(**kwargs):
 
 
 def open_selected_feature(**kwargs):
-    """ Open selected feature from @qtable """
-
+    """
+    Open selected feature from @qtable
+        function called in -> module = tools_gw.add_tableview(complet_result, field, module=sys.modules[__name__])
+        at line: widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
+    """
     qtable = kwargs['qtable']
     complet_list = kwargs['complet_result']
     func_params = kwargs['func_params']

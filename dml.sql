@@ -1,3 +1,5 @@
+INSERT INTO ws_sample35.config_typevalue VALUES('widgettype_typevalue', 'hspacer', 'hspacer','hSpacer');
+
 INSERT INTO ws_sample35.config_typevalue VALUES('widgettype_typevalue', 'tableview', 'tableview','tableview');
 INSERT INTO ws_sample35.config_typevalue VALUES('tabname_typevalue', 'tab_relations', 'tab_relations','tabRelations');
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_relations_1', 'lyt_relations_1','lytRelations1');
@@ -11,15 +13,16 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
 
 /*******************************************************/
 
+INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, layoutname, isfilter, linkedobject)
+    VALUES ('ve_arc_pipe', 'form_feature', 'tab_relations', 'arc_id', 1, 'string', 'typeahead', 'Arc id', false, false, true, false, 'SELECT arc_id as id, arc_id as idval FROM v_ui_arc_x_relations WHERE arc_id IS NOT NULL ','{"saveValue": false, "filterSign":"ILIKE"}', '{"functionName": "filter_table"}', 'lyt_relations_2', true, 'tbl_relations');
+
+
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_elements_1', 'lyt_elements_1','lytElements1');
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_elements_2', 'lyt_elements_2','lytElements2');
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_elements_3', 'lyt_elements_3','lytElements3');
 --INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', '_open_selected_element', '_open_selected_element','openSelectedElement');
 --INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', '_filter_table', '_filter_table','filterTable');
 --INSERT INTO ws_sample35.config_typevalue VALUES('widgetfunction_typevalue', '_add_object', '_add_object','addObject');
-
-INSERT INTO ws_sample35.config_form_list(tablename, query_text, device, listtype, listclass, vdefault, columnname)
-    VALUES ('ve_arc_pipe', 'SELECT * FROM v_ui_element_x_arc WHERE element_id IS NOT NULL', 4, 'attributeTable', 'tableview', '{"orderBy":"1", "orderType": "DESC"}', 'tbl_elements');
 
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, layoutname, widgetcontrols, tabname, isfilter)
@@ -38,6 +41,8 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layo
 
 
 /***********************************************************************/
+
+
 INSERT INTO ws_sample35.config_typevalue VALUES('tabname_typevalue', 'tab_rpt', 'tab_rpt','tabRpt');
 INSERT INTO ws_sample35.config_typevalue VALUES('widgettype_typevalue', 'tableview', 'tableview','tableview');
 INSERT INTO ws_sample35.config_typevalue VALUES('layout_name_typevalue', 'lyt_rpt_1', 'lyt_rpt_1','lytRpt1');

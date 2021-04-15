@@ -414,7 +414,7 @@ class GwInfo(QObject):
 
         # Get widget controls
         self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
-        self.tab_main.currentChanged.connect(partial(self._tab_activation, self.dlg_cf, new_feature))
+        self.tab_main.currentChanged.connect(partial(self._tab_activation, self.dlg_cf))
         self.tbl_upstream = self.dlg_cf.findChild(QTableView, "tbl_upstream")
         tools_qt.set_tableview_config(self.tbl_upstream)
         self.tbl_downstream = self.dlg_cf.findChild(QTableView, "tbl_downstream")
@@ -561,19 +561,21 @@ class GwInfo(QObject):
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
                 if layout not in layout_list and layout.objectName() in ('lyt_data_1', 'lyt_data_2'):
                     layout_list.append(layout)
-                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2', 'lyt_rpt_2'):
+                # Layouts where the label goes above the widget
+                if field['layoutname'] in ('lyt_top_1', 'lyt_bot_1', 'lyt_bot_2', 'lyt_rpt_2', 'lyt_relations_2'):
                     layout.addWidget(label, 0, field['layoutorder'])
                     if type(widget) is QSpacerItem:
                         layout.addItem(widget, 1, field['layoutorder'])
                     else:
                         layout.addWidget(widget, 1, field['layoutorder'])
+                # Layouts where the widget has no label
                 elif field['layoutname'] in ('lyt_rpt_1', 'lyt_elements_1'):
                     layout.addWidget(label, 0, field['layoutorder'])
                     if type(widget) is QSpacerItem:
                         layout.addItem(widget, 0, field['layoutorder']*2)
                     else:
                         layout.addWidget(widget, 0, field['layoutorder']*2)
-
+                # Layouts where the label goes next to the widge
                 else:
                     tools_gw.add_widget(self.dlg_cf, field, label, widget)
 
@@ -1365,7 +1367,8 @@ class GwInfo(QObject):
             widget.setProperty('widgetfunction', False)
             if 'widgetfunction' in field and field['widgetfunction'] is not None:
                 widget.setProperty('widgetfunction', field['widgetfunction'])
-
+            if 'linkedobject' in field and field['linkedobject']:
+                widget.setProperty('linkedobject', field['linkedobject'])
             if field['widgetcontrols'] is not None and 'saveValue' in field['widgetcontrols']:
                 if field['widgetcontrols']['saveValue'] is False:
                     widget.setProperty('saveValue', False)
@@ -2046,7 +2049,7 @@ class GwInfo(QObject):
 
     """ MANAGE TABS """
 
-    def _tab_activation(self, dialog, new_feature):
+    def _tab_activation(self, dialog):
         """ Call functions depend on tab selection """
 
         # Get index of selected tab
@@ -2061,7 +2064,7 @@ class GwInfo(QObject):
             self.tab_element_loaded = True
         # Tab 'Relations'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_relations' and not self.tab_relations_loaded:
-            self._init_tab(self.complet_result, new_feature)
+            self._init_tab(self.complet_result)
             self.tab_relations_loaded = True
         # Tab 'Connections'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_connections' and not self.tab_connections_loaded:
@@ -2088,7 +2091,7 @@ class GwInfo(QObject):
             self._fill_tab_document()
             self.tab_document_loaded = True
         elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt' and not self.tab_rpt_loaded:
-            self._init_tab(self.complet_result, new_feature)
+            self._init_tab(self.complet_result)
             self.tab_rpt_loaded = True
 
 
@@ -3225,7 +3228,7 @@ class GwInfo(QObject):
     """ FUNCTIONS RELATED WITH TAB RPT """
 
 
-    def _init_tab(self, complet_result, new_feature):
+    def _init_tab(self, complet_result, filter_fields=''):
 
         index_tab = self.tab_main.currentIndex()
         list_tables = self.tab_main.widget(index_tab).findChildren(QTableView)
@@ -3238,19 +3241,19 @@ class GwInfo(QObject):
                 tools_qgis.show_info(msg, 1)
                 continue
             linkedobject = table.property('linkedobject')
-            complet_list, widget_list = self._fill_tbl(complet_result, self.dlg_cf, new_feature, widgetname, linkedobject)
+            complet_list, widget_list = self._fill_tbl(complet_result, self.dlg_cf, widgetname, linkedobject, filter_fields)
             if complet_list is False:
                 return False
             self._set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname)
         return complet_list
 
 
-    def _fill_tbl(self, complet_result, dialog, new_feature, widgetname, linkedobject):
+    def _fill_tbl(self, complet_result, dialog, widgetname, linkedobject, filter_fields):
         """ Put filter widgets into layout and set headers into QTableView """
 
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
-        complet_list = self._get_list(complet_result, '', tab_name, '', widgetname, 'form_feature', linkedobject)
+        complet_list = self._get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject)
 
         if complet_list is False:
             return False, False
@@ -3314,7 +3317,12 @@ class GwInfo(QObject):
 
 
     def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname):
-        """def _open_selected_element(self, **kwargs):"""
+        """
+        functions called in -> widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+                            -> widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+           module = tools_backend_calls -> def open_rpt_result(**kwargs)
+                                        -> def filter_table(self, **kwargs)
+         """
         model = None
         for widget in widget_list:
             if type(widget) is QTableView:
@@ -3326,16 +3334,25 @@ class GwInfo(QObject):
         last_widget = None
         for widget in widget_list:
             if widget.property('isfilter') is not True: continue
-            widgetfunction = widget.property('widgetfunction')
-            kwargs = {"complet_result": complet_result, "model": model, "dialog": dialog, "widget_list": widget_list,
-                      "columnname": columnname, "widget": widget, "widgetname": widgetname}
+            widgetfunction = False
+            if widget.property('widgetfunction') is not None and 'functionName' in widget.property('widgetfunction'):
+                widgetfunction = widget.property('widgetfunction')['functionName']
             if widgetfunction is False: continue
+
+            linkedobject = ""
+            if widget.property('linkedobject') is not None:
+                linkedobject = widget.property('linkedobject')
+
+            kwargs = {"complet_result": complet_result, "model": model, "dialog": dialog, "linkedobject": linkedobject,
+                      "columnname": columnname, "widget": widget, "widgetname": widgetname, "widget_list": widget_list,
+                      "feature_id": self.feature_id}
             if type(widget) is QLineEdit:
-                last_widget = widget
-                widget.textChanged.connect(partial(getattr(self, widgetfunction), **kwargs))
+                widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
             elif type(widget) is QComboBox:
-                last_widget = widget
-                widget.currentIndexChanged.connect(partial(getattr(self, widgetfunction), **kwargs))
+                widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
+            else:
+                continue
+            last_widget = widget
 
         # Emit signal changed
         if last_widget is not None:
@@ -3344,7 +3361,7 @@ class GwInfo(QObject):
                 last_widget.textChanged.emit(text)
             elif type(last_widget) is QComboBox:
                 last_widget.currentIndexChanged.emit(last_widget.currentIndex())
-                
+
 
     def _get_list(self, complet_result, form_name='', tab_name='', filter_fields='', widgetname='', formtype='', linkedobject=''):
 
@@ -3360,91 +3377,6 @@ class GwInfo(QObject):
             return False
 
         return complet_list
-
-
-    def _filter_table(self, **kwargs):
-        """
-             function called in def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
-             at line: widget.textChanged.connect(partial(getattr(self, widgetfunction), **kwargs))
-         """
-        complet_result = kwargs['complet_result']
-        model = kwargs['model']
-        dialog = kwargs['dialog']
-        widget_list = kwargs['widget_list']
-        columnname = kwargs['columnname']
-        widgetname = kwargs['widgetname']
-
-        filter_fields = self._get_filter_qtableview(dialog, widget_list)
-        index_tab = dialog.tab_main.currentIndex()
-        tab_name = dialog.tab_main.widget(index_tab).objectName()
-        complet_list = self._get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature')
-        if complet_list is False:
-            return False
-
-        for field in complet_list['body']['data']['fields']:
-            if field['widgettype'] == "tableview":
-                qtable = dialog.findChild(QTableView, field['widgetname'])
-                if qtable:
-                    if field['value'] is None:
-                        model.removeRows(0, model.rowCount())
-                        return complet_list
-                    model.clear()
-                    tools_gw.add_tableview_header(qtable, field)
-                    tools_gw.fill_tableview_rows(qtable, field)
-                    tools_gw.set_tablemodel_config(dialog, qtable, field['widgetname'], 1, True)
-                    tools_qt.set_tableview_config(qtable)
-
-        return complet_list
-
-
-    def _get_filter_qtableview(self, dialog, widget_list):
-
-        filter_fields = ""
-        for widget in widget_list:
-            if type(widget) != QTableView:
-                columnname = widget.property('columnname')
-                if type(widget) == QComboBox:
-                    text = tools_qt.get_combo_value(dialog, widget, 0)
-                else:
-                    text = tools_qt.get_text(dialog, widget, False, False)
-
-                filter_fields += f'"{columnname}":"%{text}%", '
-
-        if filter_fields != "":
-            filter_fields = filter_fields[:-2]
-
-        return filter_fields
-
-
-    def open_rpt_result(self, **kwargs):
-        """
-        Open form of selected element of the @qtable??
-            function called in -> module = tools_gw.add_tableview(complet_result, field, module=sys.modules[__name__])
-            at line: widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
-        """
-        qtable = kwargs['qtable']
-        complet_list = kwargs['complet_result']
-        func_params = kwargs['func_params']
-        # Get selected rows
-        selected_list = qtable.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
-            return
-
-        index = selected_list[0]
-        row = index.row()
-        table_name = complet_list['body']['feature']['tableName']
-        column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columname'])
-        feature_id = index.sibling(row, column_index).data()
-        info_feature = GwInfo(self.tab_type)
-        complet_result, dialog = info_feature.open_form(table_name=table_name, feature_id=feature_id, tab_type=self.tab_type)
-        if not complet_result:
-            tools_log.log_info("FAIL open_rpt_result")
-            return
-
-        margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-        tools_gw.draw_by_json(complet_result, self.rubber_band, margin)
 
 
     """ FUNCTIONS RELATED WITH TAB PLAN """
