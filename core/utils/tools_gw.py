@@ -122,7 +122,7 @@ def get_config_parser(section: str, parameter: str, config_type, file_name, pref
 
         # Check if the parameter exists in the inventory, if not creates it
         if chk_user_params and config_type in "user":
-            _check_user_params(section, raw_parameter, file_name, value, prefix)
+            _check_user_params(section, raw_parameter, file_name, prefix)
 
     except Exception as e:
         tools_log.log_warning(str(e))
@@ -173,7 +173,7 @@ def set_config_parser(section: str, parameter: str, value: str = None, config_ty
             parser.set(section, parameter, value)
             # Check if the parameter exists in the inventory, if not creates it
             if chk_user_params and config_type in "user":
-                _check_user_params(section, raw_parameter, file_name, value, prefix)
+                _check_user_params(section, raw_parameter, file_name, prefix)
         else:
             parser.set(section, parameter)  # This is just for writing comments
 
@@ -2660,7 +2660,7 @@ def _delete_feature_psector(dialog, feature_type, list_id):
     tools_db.execute_sql(sql)
 
 
-def _check_user_params(section, parameter, file_name, value=None, prefix=False):
+def _check_user_params(section, parameter, file_name, prefix=False):
     """ Check if a parameter exists in the config/user_params.config
         If it doesn't exist, it creates it and assigns 'None' as a default value
     """
@@ -2674,7 +2674,7 @@ def _check_user_params(section, parameter, file_name, value=None, prefix=False):
                               chk_user_params=False, get_none=True)
     # If it doesn't exist in the inventory, add it with "None" as value
     if check_value is None:
-        set_config_parser(f"{file_name}.{section}", parameter, value, "project", "user_params", prefix=False,
+        set_config_parser(f"{file_name}.{section}", parameter, None, "project", "user_params", prefix=False,
                           chk_user_params=False)
     else:
         return check_value
