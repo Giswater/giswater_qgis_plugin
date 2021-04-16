@@ -127,7 +127,7 @@ class GwToolBoxTask(GwTask):
         else:
             extras += '}'
         body = tools_gw.create_body(feature=feature_field, extras=extras)
-        self.json_result = tools_gw.execute_procedure(function_name, body, log_sql=True, aux_conn=self.aux_conn)
+        self.json_result = tools_gw.execute_procedure(function_name, body, log_sql=True)
         if self.isCanceled(): return False
         if self.json_result['status'] == 'Failed': return False
         if not self.json_result or self.json_result is None: return False

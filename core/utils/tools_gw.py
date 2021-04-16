@@ -1511,18 +1511,17 @@ def get_actions_from_json(json_result, sql):
 
 
 def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=False, log_result=False,
-                      json_loads=False, rubber_band=None, aux_conn=None):
+                      json_loads=False, rubber_band=None):
     """ Manage execution database function
     :param function_name: Name of function to call (text)
     :param parameters: Parameters for function (json) or (query parameters)
     :param commit: Commit sql (bool)
     :param log_sql: Show query in qgis log (bool)
-    :param aux_conn: Auxiliar connection to database used by threads (psycopg2.connection)
     :return: Response of the function executed (json)
     """
 
     # Check if function exists
-    row = tools_db.check_function(function_name, schema_name, commit, aux_conn=aux_conn)
+    row = tools_db.check_function(function_name, schema_name, commit)
     if row in (None, ''):
         tools_qgis.show_warning("Function not found in database", parameter=function_name)
         return None
@@ -1541,7 +1540,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     if dev_log_sql in ("True", "False"):
         log_sql = tools_os.set_boolean(dev_log_sql)
 
-    row = tools_db.get_row(sql, commit=commit, log_sql=log_sql, aux_conn=aux_conn)
+    row = tools_db.get_row(sql, commit=commit, log_sql=log_sql)
 
     if not row or not row[0]:
         tools_log.log_warning(f"Function error: {function_name}")
