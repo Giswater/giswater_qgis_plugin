@@ -1170,7 +1170,7 @@ class ApiParent(ParentAction):
         text = False
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
             widget = self.dlg_cf.findChild(QWidget, k)
-            if widget:
+            if widget and len(v) > 0 :
                 text = utils_giswater.getWidgetText(self.dlg_cf, widget, False, False)
                 if text:
                     msg = "Do you want to overwrite custom values?"
@@ -1187,7 +1187,7 @@ class ApiParent(ParentAction):
         # Set values tu info form
         for k, v in self.interpolate_result['body']['data']['fields'][0].items():
             widget = self.dlg_cf.findChild(QWidget, k)
-            if widget:
+            if widget and len(v) > 0 :
                 widget.setStyleSheet(None)
                 utils_giswater.setWidgetText(self.dlg_cf, widget, f'{v}')
                 widget.editingFinished.emit()
