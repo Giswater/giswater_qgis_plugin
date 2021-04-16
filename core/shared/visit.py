@@ -547,7 +547,7 @@ class GwVisit(QObject):
             
         layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
         if layer:
-            layer.dataProvider().forceReload()
+            layer.dataProvider().reloadData()
 
         # If new visit, execute PG function
         if self.it_is_new_visit:
@@ -558,7 +558,7 @@ class GwVisit(QObject):
 
         layer = tools_qgis.get_layer_by_tablename('v_edit_om_visit')
         if layer:
-            layer.dataProvider().forceReload()
+            layer.dataProvider().reloadData()
         tools_qgis.refresh_map_canvas()
 
 

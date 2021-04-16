@@ -192,7 +192,7 @@ class GwAuxPointAddButton(GwMaptool):
                    f"{self.dist_y}, {self.direction}, {self.delete_prev})")
             tools_db.execute_sql(sql)
             self.layer_points.commitChanges()
-            self.layer_points.dataProvider().forceReload()
+            self.layer_points.dataProvider().reloadData()
             self.layer_points.triggerRepaint()
 
         else:
