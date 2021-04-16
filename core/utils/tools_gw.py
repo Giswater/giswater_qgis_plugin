@@ -1060,7 +1060,7 @@ def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
     tools_log.log_info(str(list))
 
 
-def add_button(module=sys.modules[__name__], **kwargs):
+def add_button(**kwargs):
     """
     :param dialog: (QDialog)
     :param field: Part of json where find info (Json)
@@ -1069,12 +1069,12 @@ def add_button(module=sys.modules[__name__], **kwargs):
     :return: (QWidget)
 
     functions called in -> widget.clicked.connect(partial(getattr(module, function_name), **kwargs)) atm:
-        None
+        module = tools_backend_calls -> def add_object(**kwargs)
+
     """
     field = kwargs['field']
     widget = QPushButton()
     widget.setObjectName(field['widgetname'])
-
     if 'columnname' in field:
         widget.setProperty('columnname', field['columnname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
@@ -1091,14 +1091,16 @@ def add_button(module=sys.modules[__name__], **kwargs):
     if field['stylesheet'] is not None and 'icon' in field['stylesheet']:
         icon = field['stylesheet']['icon']
         add_icon(widget, f'{icon}')
-
+    func_params = ""
     if 'widgetfunction' in field and field['widgetfunction'] and 'functionName' in field['widgetfunction']:
         function_name = field['widgetfunction']['functionName']
-        exist = tools_os.check_python_function(module, function_name)
+        exist = tools_os.check_python_function(tools_backend_calls, function_name)
         if not exist:
             msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
             tools_qgis.show_message(msg, 2)
             return widget
+        if 'parameters' in field['widgetfunction']:
+            func_params = field['widgetfunction']['parameters']
     else:
         message = "Parameter widgetfunction.functionName is null for button"
         tools_qgis.show_message(message, 2, parameter=widget.objectName())
@@ -1106,7 +1108,8 @@ def add_button(module=sys.modules[__name__], **kwargs):
     kwargs['widget'] = widget
     kwargs['message_level'] = 1
     kwargs['function_name'] = function_name
-    widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
+    kwargs['func_params'] = func_params
+    widget.clicked.connect(partial(getattr(tools_backend_calls, function_name), **kwargs))
 
     return widget
 
@@ -1372,10 +1375,10 @@ def add_tableview(complet_result, field, dialog, module=sys.modules[__name__]):
             msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
             tools_qgis.show_message(msg, 2)
             return widget
-        if 'params' in field['widgetfunction']:
-            func_params = field['widgetfunction']['params']
+        if 'parameters' in field['widgetfunction']:
+            func_params = field['widgetfunction']['parameters']
     else:
-        message = "Parameter  widgetfunction.functionName is null for widget"
+        message = "Parameter widgetfunction.functionName is null for widget"
         tools_qgis.show_message(message, 2, parameter=real_name)
     # noinspection PyUnresolvedReferences
     kwargs = {"qtable": widget, "func_params": func_params, "complet_result": complet_result, "dialog": dialog}

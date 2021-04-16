@@ -6,14 +6,145 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
-
-from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QComboBox, QMessageBox, QTableView
+from functools import partial
+from qgis.PyQt.QtCore import QDate, Qt
+from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QMessageBox, QTableView
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer
 
-from ..utils import tools_gw
-from ...lib import tools_qgis, tools_qt, tools_log, tools_os
+from ..shared.element import GwElement
 from ..shared.info import GwInfo
+from ..utils import tools_gw
+from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
+
+
+def add_object(**kwargs):
+    """
+    Open form of selected element of the @qtable??
+        function called in module tools_gw: def add_button(module=sys.modules[__name__], **kwargs):
+        at lines:   widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
+    """
+    dialog = kwargs['dialog']
+    index_tab = dialog.tab_main.currentIndex()
+    tab_name = dialog.tab_main.widget(index_tab).objectName()
+    func_params = kwargs['func_params']
+
+    complet_result = kwargs['complet_result']
+    feature_type = complet_result['body']['feature']['featureType']
+    feature_id = complet_result['body']['feature']['id']
+    field_id = str(complet_result['body']['feature']['idName'])
+    qtable_name = func_params['targetwidget']
+    qtable = tools_qt.get_widget(dialog, f"{tab_name}_{qtable_name}")
+
+    # Get values from dialog
+    object_id = tools_qt.get_text(dialog, f"{tab_name}_{func_params['sourcewidget']}")
+    if object_id == 'null':
+        message = "You need to insert data"
+        tools_qgis.show_warning(message, parameter=func_params['sourcewidget'] + "_id")
+        return
+
+    # Check if this object exists
+    view_object = f"v_ui_{func_params['sourceview']}"
+    sql = ("SELECT * FROM " + view_object + ""
+           " WHERE id = '" + object_id + "'")
+    row = tools_db.get_row(sql)
+    if not row:
+        tools_qgis.show_warning("Object id not found", parameter=object_id)
+        return
+
+    # Check if this object is already associated to current feature
+    field_object_id = func_params['sourcewidget']
+    tablename = func_params['sourceview'] + "_x_" + feature_type
+    sql = ("SELECT * FROM " + str(tablename) + ""
+           " WHERE " + str(field_id) + " = '" + str(feature_id) + "'"
+           " AND " + str(field_object_id) + " = '" + str(object_id) + "'")
+    row = tools_db.get_row(sql, log_info=False)
+
+    # If object already exist show warning message
+    if row:
+        message = "Object already associated with this feature"
+        tools_qgis.show_warning(message)
+    # If object not exist perform an INSERT
+    else:
+        sql = ("INSERT INTO " + tablename + " "
+               "(" + str(field_object_id) + ", " + str(field_id) + ")"
+               " VALUES ('" + str(object_id) + "', '" + str(feature_id) + "');")
+        tools_db.execute_sql(sql, log_sql=False)
+        if qtable.objectName() == 'tbl_document':
+            date_to = dialog.tab_main.findChild(QDateEdit, 'date_document_to')
+            if date_to:
+                current_date = QDate.currentDate()
+                date_to.setDate(current_date)
+        qtable.model().select()
+
+
+
+
+
+
+
+
+
+def open_selected_element(**kwargs):
+    """
+    Open form of selected element of the @qtable??
+        function called in module tools_gw: def add_tableview(complet_result, field, module=sys.modules[__name__])
+        at lines:   widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
+    """
+    dialog = kwargs['dialog']
+    qtable = kwargs['qtable']
+    complet_result = kwargs['complet_result']
+    feature_type = complet_result['body']['feature']['featureType']
+    func_params = kwargs['func_params']
+    # Get selected rows
+    selected_list = qtable.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message)
+        return
+
+    index = selected_list[0]
+    row = index.row()
+    column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
+    element_id = index.sibling(row, column_index).data()
+
+    # Open selected element
+    _manage_element(dialog, element_id, None, feature_type)
+
+
+def _manage_element(dialog, element_id=None, feature=None, feature_type=None):
+    """ Execute action of button 33 """
+
+
+    elem = GwElement()
+    elem.get_element(True, feature, feature_type)
+    elem.dlg_add_element.accepted.connect(partial(_manage_element_new, dialog, elem))
+    elem.dlg_add_element.rejected.connect(partial(_manage_element_new, dialog, elem))
+
+
+    if element_id:
+        tools_qt.set_widget_text(elem.dlg_add_element, "element_id", element_id)
+
+    # Open dialog
+    tools_gw.open_dialog(elem.dlg_add_element)
+
+
+
+
+def _manage_element_new(dialog, elem):
+    """ Get inserted element_id and add it to current feature """
+
+    if elem.element_id is None:
+        return
+
+    tools_qt.set_widget_text(dialog, "element_id", elem.element_id)
+    add_object(self.tbl_element, "element", "v_ui_element")
+    tbl_element.model().select()
+
+
+
+
+
+
 
 
 def filter_table(**kwargs):
@@ -165,6 +296,21 @@ def set_layer_index(**kwargs):
         for layer_name in layers_name_list:
             tools_qgis.set_layer_index(layer_name)
 
+
+def get_info_node(**kwargs):
+    """ Function called in class tools_gw.add_button(...) -->
+            widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
+
+    dialog = kwargs['dialog']
+    widget = kwargs['widget']
+
+    feature_id = tools_qt.get_text(dialog, widget)
+    customForm = GwInfo('tab_data')
+    complet_result, dialog = customForm.open_form(table_name='v_edit_node', feature_id=feature_id,
+                                                       tab_type='tab_data', is_docker=False)
+    if not complet_result:
+        tools_log.log_info("FAIL open_node")
+        return
 
 def refresh_attribute_table(**kwargs):
     """ Set layer fields configured according to client configuration.

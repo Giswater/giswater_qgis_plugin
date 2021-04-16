@@ -247,22 +247,6 @@ class GwInfo(QObject):
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
 
 
-    def get_info_node(self, **kwargs):
-        """ Function called in class tools_gw.add_button(...) -->
-                widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
-
-        dialog = kwargs['dialog']
-        widget = kwargs['widget']
-
-        feature_id = tools_qt.get_text(dialog, widget)
-        self.customForm = GwInfo(self.tab_type)
-        complet_result, dialog = self.customForm.open_form(table_name='v_edit_node', feature_id=feature_id,
-                                                           tab_type=self.tab_type, is_docker=False)
-        if not complet_result:
-            tools_log.log_info("FAIL open_node")
-            return
-
-
     def add_feature(self, feature_cat):
         """ Button 01, 02: Add 'node' or 'arc' """
 
@@ -1492,7 +1476,7 @@ class GwInfo(QObject):
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
         field = kwargs['field']
-        widget = tools_gw.add_button(module=self, **kwargs)
+        widget = tools_gw.add_button(**kwargs)
         widget = tools_gw.set_widget_size(widget, field)
         return widget
 
@@ -2064,7 +2048,8 @@ class GwInfo(QObject):
             self.tab_element_loaded = True
         # Tab 'Relations'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_relations' and not self.tab_relations_loaded:
-            self._init_tab(self.complet_result)
+            filter_fields = f'"arc_id":{{"value":"{self.feature_id}","filterSign":"="}}'
+            self._init_tab(self.complet_result, filter_fields)
             self.tab_relations_loaded = True
         # Tab 'Connections'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_connections' and not self.tab_connections_loaded:
@@ -2138,8 +2123,7 @@ class GwInfo(QObject):
         self.table_object = "element"
         tools_gw.set_completer_object(dialog, self.table_object)
 
-
-    # def _open_selected_element(self, dialog, widget):
+    # TODO borrar esto, esta en toolsbackend???
     def _open_selected_element(self, **kwargs):
         """
             Open form of selected element of the @widget??
@@ -2165,7 +2149,7 @@ class GwInfo(QObject):
 
     def _add_object(self, widget, table_object, view_object):
         """ Add object (doc or element) to selected feature """
-
+        #      ( widget, "element", "v_ui_element"))
         # Get values from dialog
         object_id = tools_qt.get_text(self.dlg_cf, table_object + "_id")
         if object_id == 'null':
@@ -2248,10 +2232,10 @@ class GwInfo(QObject):
 
     """ FUNCTIONS RELATED WITH TAB ELEMENT"""
 
-
+    # TODO borrar esto, esta en toolsbackend ???
     def _manage_element(self, dialog, element_id=None, feature=None):
         """ Execute action of button 33 """
-
+        print("TEST 10")
         elem = GwElement()
         elem.get_element(True, feature, self.feature_type)
         elem.dlg_add_element.accepted.connect(partial(self._manage_element_new, dialog, elem))
