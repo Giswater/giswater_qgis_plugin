@@ -3130,7 +3130,7 @@ class GwAdminButton:
     def _create_credentials_form(self, set_connection):
         """"""
         self.dlg_credentials = GwCredentialsUi()
-
+        tools_gw.load_settings(self.dlg_credentials)
         if str(self.list_connections) != '[]':
             tools_qt.fill_combo_values(self.dlg_credentials.cmb_connection, self.list_connections, 1)
         else:
