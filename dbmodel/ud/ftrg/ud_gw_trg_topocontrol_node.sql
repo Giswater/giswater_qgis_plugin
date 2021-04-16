@@ -78,7 +78,7 @@ BEGIN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"1097", "function":"1334","debug_msg":"'||NEW.node_id||'"}}$$);';	
 					ELSE
-						INSERT INTO aSCHEMA_NAMEit_log_data (fid, feature_id, log_message)
+						INSERT INTO audit_log_data (fid, feature_id, log_message)
 						VALUES (4, NEW.node_id, 'Node with state 1 over another node with state=1 it is not allowed');
 					END IF;
 				END IF;		
@@ -96,7 +96,7 @@ BEGIN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"1096", "function":"1334","debug_msg":"'||NEW.node_id||'"}}$$);';	
 					ELSE
-						INSERT INTO aSCHEMA_NAMEit_log_data (fid, feature_id, log_message) VALUES (4,
+						INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (4,
 						NEW.node_id, 'Node with state 2 over another node with state=2 on same alternative it is not allowed');
 					END IF;
 				END IF;		
@@ -240,13 +240,7 @@ BEGIN
 			END IF;  
 	   
 			-- Select arcs with start-end on the updated node to modify coordinates
-			v_querytext:= 'SELECT * FROM "arc" WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id); 
-
-			IF NEW.custom_top_elev IS NULL 
-				THEN v_topelev=NEW.top_elev;
-			ELSE 
-				v_topelev=NEW.custom_top_elev;
-			END IF;
+			v_querytext:= 'SELECT * FROM "v_edit_arc" WHERE node_1 = ' || quote_literal(NEW.node_id) || ' OR node_2 = ' || quote_literal(NEW.node_id); 
 
 			--updating arcs
 			FOR v_arcrec IN EXECUTE v_querytext
@@ -255,46 +249,43 @@ BEGIN
 				-- Initial and final node of the arc
 				SELECT * INTO v_noderecord1 FROM node WHERE node.node_id = v_arcrec.node_1;
 				SELECT * INTO v_noderecord2 FROM node WHERE node.node_id = v_arcrec.node_2;
+				
+				--  controls
+				IF (v_noderecord1.node_id IS NOT NULL) AND (v_noderecord2.node_id IS NOT NULL) THEN
+
+					-- geometry updates
+					IF st_equals(NEW.the_geom, OLD.the_geom) IS FALSE THEN
+	
+						-- Update arc node coordinates and direction
+						IF (v_noderecord1.node_id = NEW.node_id) THEN
+							EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(v_arcrec."arc_id") USING v_arcrec.the_geom, NEW.the_geom;			
 		
-				-- Control de lineas de longitSCHEMA_NAME 0
-				IF (v_noderecord1.node_id IS NOT NULL) AND (v_noderecord2.node_id IS NOT NULL) AND st_equals(NEW.the_geom, OLD.the_geom) IS FALSE THEN
-		
-					-- Update arc node coordinates, node_id and direction
-					IF (v_noderecord1.node_id = NEW.node_id) THEN
-					
-						-- Coordinates
-						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, 0, $2) WHERE arc_id = ' || quote_literal(v_arcrec."arc_id") USING v_arcrec.the_geom, NEW.the_geom; 
+						ELSIF (v_noderecord2.node_id = NEW.node_id) THEN
+							EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(v_arcrec."arc_id") USING v_arcrec.the_geom, NEW.the_geom;
+						END IF;
 						
-						-- Calculating new values of v_z1 and v_z2
-						IF v_arcrec.custom_elev1 IS NULL AND v_arcrec.elev1 IS NULL THEN
-							v_z1 = (v_topelev - v_arcrec.y1);
-						END IF;
+					ELSE -- rest of updates
 
-						IF v_arcrec.custom_elev2 IS NULL AND v_arcrec.elev2 IS NULL THEN				
-							IF v_noderecord2.custom_top_elev IS NULL THEN
-								v_z2 = (v_noderecord2.top_elev - v_arcrec.y2);
-							ELSE
-								v_z2 = (v_noderecord2.custom_top_elev - v_arcrec.y2);
+						-- update custom_y1 usign sys_ymax when sys_y1 is null or cero or has same value of custom_ymax
+						IF (v_noderecord1.node_id = NEW.node_id) AND (v_arcrec.sys_y1 IS NULL OR v_arcrec.sys_y1 = 0 OR v_arcrec.sys_y1 = OLD.custom_ymax) THEN
+							IF OLD.custom_ymax::text != NEW.custom_ymax::text AND NEW.custom_ymax IS NOT NULL THEN	
+								UPDATE arc SET custom_y1 = NEW.custom_ymax WHERE arc_id = v_arcrec."arc_id";
+							ELSIF OLD.ymax::text != NEW.ymax::text AND NEW.ymax IS NOT NULL THEN	
+								UPDATE arc SET custom_y1 = NEW.custom_ymax WHERE arc_id = v_arcrec."arc_id";
 							END IF;
 						END IF;
-							
-					ELSIF (v_noderecord2.node_id = NEW.node_id) THEN
-						-- Coordinates
-						EXECUTE 'UPDATE arc SET the_geom = ST_SetPoint($1, ST_NumPoints($1) - 1, $2) WHERE arc_id = ' || quote_literal(v_arcrec."arc_id") USING v_arcrec.the_geom, NEW.the_geom; 
-		
-						-- Calculating new values of v_z1 and v_z2
-						IF v_arcrec.custom_elev2 IS NULL AND v_arcrec.elev2 IS NULL THEN
-							v_z2 = (v_topelev - v_arcrec.y2);
-						END IF; 
-
-						IF v_arcrec.custom_elev1 IS NULL AND v_arcrec.elev1 IS NULL THEN						
-							IF v_noderecord1.custom_top_elev IS NULL THEN	
-								v_z1 = (v_noderecord1.top_elev - v_arcrec.y1);
-							ELSE
-								v_z1 = (v_noderecord1.custom_top_elev - v_arcrec.y1);
+						
+						-- update custom_y2 usign sys_ymax when sys_y1 is null or cero or has same value of custom_ymax
+						IF (v_noderecord2.node_id = NEW.node_id) AND (v_arcrec.sys_y2 IS NULL OR v_arcrec.sys_y2  = 0 OR v_arcrec.sys_y2 = OLD.custom_ymax) THEN
+							IF OLD.custom_ymax::text != NEW.custom_ymax::text AND NEW.custom_ymax IS NOT NULL THEN	
+								UPDATE arc SET custom_y2 = NEW.custom_ymax WHERE arc_id = v_arcrec."arc_id";
+							ELSIF OLD.ymax::text != NEW.ymax::text AND NEW.ymax IS NOT NULL THEN	
+								UPDATE arc SET custom_y2 = NEW.custom_ymax WHERE arc_id = v_arcrec."arc_id";
 							END IF;
 						END IF;
-					END IF;				
+						
+					END IF;
+					
 				END IF;
 
 				-- Force a simple update on arc in order to update direction
