@@ -297,7 +297,7 @@ BEGIN
 	v_priority := 1;
 
 	-- Return
-	RETURN ('{"message":{"level":"'||v_priority||'", "text":"'||v_message||'"}}');	
+	RETURN ('{"status":"Accepted", "message":{"level":"'||v_priority||'", "text":"'||v_message||'"}}');	
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
