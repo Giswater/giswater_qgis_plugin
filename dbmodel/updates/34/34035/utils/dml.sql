@@ -19,4 +19,4 @@ ON CONFLICT (formname, tabname, device) DO UPDATE set orderby= 6 where config_fo
 UPDATE config_form_tabs SET orderby = 7  WHERE formname = 'search' AND tabname = 'tab_psector' AND orderby IS NULL;
 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES 
-(379, 'Check not defined nodes acting as topological nodes as node_1 or node_2 on arcs, 'utils')  ON CONFLICT (fid) DO NOTHING;
+(379, 'Check undefined nodes as topological nodes', 'utils')  ON CONFLICT (fid) DO NOTHING;
