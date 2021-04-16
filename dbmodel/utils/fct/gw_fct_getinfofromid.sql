@@ -132,6 +132,7 @@ v_querystring text;
 v_debug_vars json;
 v_debug json;
 v_msgerr json;
+v_pkeyfield text;
 
 BEGIN
 
@@ -154,9 +155,24 @@ BEGIN
 	v_addschema := (p_data ->> 'data')::json->> 'addSchema';
 	v_editable = (p_data ->> 'data')::json->> 'editable';
 
+		-- Get values from config
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
+		INTO v_version;
+		
 	-- control strange null
 	IF lower(v_addschema) = 'none' or v_addschema = '' THEN 
 		v_addschema = null;
+	END IF;
+
+	-- Check if feature exist
+	IF v_id IS NOT NULL THEN
+		EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_tablename||''');' INTO v_pkeyfield;
+		EXECUTE 'SELECT ' || v_pkeyfield || ' FROM '|| v_tablename || ' WHERE ' || v_pkeyfield || '::text = ' || v_id || '::text' INTO v_idname;
+		
+		IF v_idname IS NULL THEN
+			RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":'|| v_version 
+			||', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
+		END IF;
 	END IF;
 
 	-- looking for additional schema 
@@ -181,10 +197,6 @@ BEGIN
 	IF v_id = '' THEN
 		v_id = NULL;
 	END IF;
-	
-	-- Get values from config
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
-		INTO v_version;
 		
 	-- get project type
 	SELECT project_type INTO v_project_type FROM sys_version LIMIT 1;
@@ -750,4 +762,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-  
