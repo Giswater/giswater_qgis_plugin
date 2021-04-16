@@ -20,6 +20,7 @@ class GwPgDao(object):
         self.last_error = None
         self.set_search_path = None
         self.conn = None
+        self.cursor = None
 
 
     def init_db(self):
@@ -55,6 +56,11 @@ class GwPgDao(object):
         return status
 
 
+    def get_cursor(self):
+
+        return self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+
     def reset_db(self):
         """ Reset database connection """
 
@@ -74,15 +80,9 @@ class GwPgDao(object):
         return status
 
 
-    def cursor_execute(self, sql):
-        """ Check if cursor is closed before execution """
-
-        if self.check_cursor():
-            self.cursor.execute(sql)
-
-
     def get_poll(self):
         """ Check if the connection is established """
+
         try:
             if self.check_cursor():
                 self.conn.poll()
@@ -127,7 +127,8 @@ class GwPgDao(object):
 
         query = sql
         try:
-            query = self.cursor.mogrify(sql, params)
+            cursor = self.get_cursor()
+            query = cursor.mogrify(sql, params)
         except Exception as e:
             self.last_error = e
         finally:
@@ -140,8 +141,9 @@ class GwPgDao(object):
         self.last_error = None
         rows = None
         try:
-            self.cursor_execute(sql)
-            rows = self.cursor.fetchall()
+            cursor = self.get_cursor()
+            cursor.execute(sql)
+            rows = cursor.fetchall()
             if commit:
                 self.commit()
         except Exception as e:
@@ -152,54 +154,24 @@ class GwPgDao(object):
             return rows
 
 
-    def get_row(self, sql, commit=False, aux_conn=None):
+    def get_row(self, sql, commit=False):
         """ Get single row from selected query """
 
 
         self.last_error = None
         row = None
         try:
-            if aux_conn is not None:
-                cursor = aux_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-                cursor.execute(sql)
-                row = cursor.fetchone()
-            else:
-                self.cursor_execute(sql)
-                row = self.cursor.fetchone()
+            cursor = self.get_cursor()
+            cursor.execute(sql)
+            row = cursor.fetchone()
             if commit:
-                self.commit(aux_conn)
+                self.commit()
         except Exception as e:
             self.last_error = e
             if commit:
-                self.rollback(aux_conn)
+                self.rollback()
         finally:
             return row
-
-
-    def get_column_name(self, index):
-        """ Get column name of selected index """
-
-        name = None
-        try:
-            self.check_cursor()
-            name = self.cursor.description[index][0]
-        except Exception as e:
-            self.last_error = e
-        finally:
-            return name
-
-
-    def get_columns_length(self):
-        """ Get number of columns of current query """
-
-        total = None
-        try:
-            self.check_cursor()
-            total = len(self.cursor.description)
-        except Exception as e:
-            self.last_error = e
-        finally:
-            return total
 
 
     def execute_sql(self, sql, commit=True):
@@ -208,7 +180,8 @@ class GwPgDao(object):
         self.last_error = None
         status = True
         try:
-            self.cursor_execute(sql)
+            cursor = self.get_cursor()
+            cursor.execute(sql)
             if commit:
                 self.commit()
         except Exception as e:
@@ -226,8 +199,9 @@ class GwPgDao(object):
         self.last_error = None
         value = None
         try:
-            self.cursor_execute(sql)
-            value = self.cursor.fetchone()
+            cursor = self.get_cursor()
+            cursor.execute(sql)
+            value = cursor.fetchone()
             if commit:
                 self.commit()
         except Exception as e:
@@ -237,27 +211,13 @@ class GwPgDao(object):
             return value
 
 
-    def get_rowcount(self):
-        """ Returns number of rows of current query """
-        self.check_cursor()
-        return self.cursor.rowcount
-
-
-    def commit(self, aux_conn=None):
+    def commit(self):
         """ Commit current database transaction """
-        if aux_conn is not None:
-            aux_conn.commit()
-            return
-        self.check_cursor()
         self.conn.commit()
 
 
-    def rollback(self, aux_conn=None):
+    def rollback(self):
         """ Rollback current database transaction """
-        if aux_conn is not None:
-            aux_conn.rollback()
-            return
-        self.check_cursor()
         self.conn.rollback()
 
 
@@ -265,7 +225,8 @@ class GwPgDao(object):
         """ Dumps contents of the query to selected CSV file """
 
         try:
-            self.cursor.export_to_csv(sql, csv_file)
+            cursor = self.get_cursor()
+            cursor.export_to_csv(sql, csv_file)
             return None
         except Exception as e:
             return e
@@ -273,6 +234,7 @@ class GwPgDao(object):
 
     def cancel_pid(self, pid):
         """ Cancel one process by pid """
+
         # Create an auxiliary connection with the intention of being able to cancel processes of the main connection
         last_error = None
         try:
@@ -290,30 +252,6 @@ class GwPgDao(object):
             last_error = e
             status = False
 
-        return {'status': status, 'last_error': last_error}
-
-
-    def get_aux_conn(self):
-
-        try:
-            aux_conn = psycopg2.connect(self.conn_string)
-            return aux_conn
-        except Exception as e:
-            last_error = e
-            status = False
-
-        return {'status': status, 'last_error': last_error}
-
-
-    def delete_aux_con(self, aux_conn):
-        # Delete auxiliary connection
-        try:
-            aux_conn.close()
-            del aux_conn
-            return
-        except Exception as e:
-            last_error = e
-            status = False
         return {'status': status, 'last_error': last_error}
 
 
