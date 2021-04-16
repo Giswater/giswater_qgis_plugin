@@ -1548,6 +1548,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
 
     row = tools_db.get_row(sql, commit=commit, log_sql=log_sql)
 
+    # Control null
     if not row or not row[0]:
         tools_log.log_warning(f"Function error: {function_name}")
         tools_log.log_warning(sql)
@@ -1563,6 +1564,12 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     # Log result
     if log_result:
         tools_log.log_info(json_result, stack_level_increase=1)
+
+    # All functions called from python should return 'status', if not, something has probably failed in postrgres
+    if 'status' not in json_result:
+        tools_log.log_warning(f"Function error: {function_name}")
+        manage_json_exception(json_result, sql)
+        return False
 
     # If failed, manage exception
     if 'status' in json_result and json_result['status'] == 'Failed':
