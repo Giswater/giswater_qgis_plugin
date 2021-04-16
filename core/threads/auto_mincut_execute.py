@@ -69,8 +69,6 @@ class GwAutoMincutTask(GwTask):
     def finished(self, result):
 
         super().finished(result)
-        self.mincut_class.dlg_mincut.btn_cancel_task.hide()
-        self.mincut_class.dlg_mincut.btn_cancel.show()
 
         # Handle exception
         if self.exception is not None:
@@ -90,4 +88,10 @@ class GwAutoMincutTask(GwTask):
         # Task finished with Accepted result
         elif 'mincutOverlap' in self.complet_result or self.complet_result['status'] == 'Accepted':
             self.task_finished.emit([True, self.complet_result])
+
+        try:
+            self.mincut_class.dlg_mincut.btn_cancel_task.hide()
+            self.mincut_class.dlg_mincut.btn_cancel.show()
+        except:
+            pass
 
