@@ -84,7 +84,7 @@ class GwVisit(QObject):
         # Create the dialog and signals and related ORM Visit class
         self.current_visit = GwOmVisit()
         self.dlg_add_visit = GwVisitUi(tag)
-
+        tools_gw.load_settings(self.dlg_add_visit)
         # Get layer visibility to restore when dialog is closed
         layers_visibility = {}
         for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully"]:
