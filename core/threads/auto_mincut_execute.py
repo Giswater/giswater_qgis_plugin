@@ -80,8 +80,7 @@ class GwAutoMincutTask(GwTask):
             self.task_finished.emit([False, self.complet_result])
 
         # Task finished but postgres function failed
-        elif self.complet_result in (False, None) or \
-            ('status' in self.complet_result and self.complet_result['status'] == 'Failed'):
+        elif 'status' in self.complet_result and self.complet_result['status'] == 'Failed':
             self.task_finished.emit([False, self.complet_result])
             tools_gw.manage_json_exception(self.complet_result)
 
