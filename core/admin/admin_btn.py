@@ -141,7 +141,7 @@ class GwAdminButton:
         if self.last_srids is None:
             msg = "This SRID value does not exist on Postgres Database. Please select a diferent one."
             tools_qt.show_info_box(msg, "Info")
-        return
+            return
 
         msg = "This process will take time (few minutes). Are you sure to continue?"
         title = "Create example"
