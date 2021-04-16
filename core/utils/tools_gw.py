@@ -1078,26 +1078,28 @@ def add_button(dialog, field, temp_layers_added=None, module=sys.modules[__name_
     if 'value' in field:
         widget.setText(field['value'])
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
-    function_name = 'no_function_associated'
+    function_name = None
     real_name = widget.objectName()
     if 'data_' in widget.objectName():
         real_name = widget.objectName()[5:len(widget.objectName())]
     if 'widgetfunction' in field:
-        if field['widgetfunction']['functionName'] is not None:
-            function_name = field['widgetfunction']['functionName']
-            exist = tools_os.check_python_function(module, function_name)
-            if not exist:
-                msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
-                tools_qgis.show_message(msg, 2)
-                return widget
-        else:
-            message = "Parameter button_function is null for button"
-            tools_qgis.show_message(message, 2, parameter=widget.objectName())
+        if 'functionName' in field['widgetfunction']:
+            if field['widgetfunction']['functionName']:
+                function_name = field['widgetfunction']['functionName']
+                exist = tools_os.check_python_function(module, function_name)
+                if not exist:
+                    msg = f"widget {real_name} have associated function {function_name}, but {function_name} not exist"
+                    tools_qgis.show_message(msg, 2)
+                    return widget
+            else:
+                message = "Parameter button_function is null for button"
+                tools_qgis.show_message(message, 2, parameter=widget.objectName())
 
     kwargs = {'dialog': dialog, 'widget': widget, 'message_level': 1, 'function_name': function_name,
               'temp_layers_added': temp_layers_added}
 
-    widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
+    if function_name:
+        widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
 
     return widget
 
@@ -1210,27 +1212,31 @@ def add_hyperlink(field):
         widget.setText(field['value'])
     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
     widget.resize(widget.sizeHint().width(), widget.sizeHint().height())
-    func_name = 'no_function_associated'
+    func_name = None
     real_name = widget.objectName()
     if 'data_' in widget.objectName():
         real_name = widget.objectName()[5:len(widget.objectName())]
     if 'widgetfunction' in field:
-        if field['widgetfunction']['functionName'] is not None:
-            func_name = field['widgetfunction']['functionName']
-            exist = tools_os.check_python_function(tools_backend_calls, func_name)
-            if not exist:
-                msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
-                tools_qgis.show_message(msg, 2)
-                return widget
+        if 'functionName' in field['widgetfunction']:
+            if field['widgetfunction']['functionName']:
+                func_name = field['widgetfunction']['functionName']
+                exist = tools_os.check_python_function(tools_backend_calls, func_name)
+                if not exist:
+                    msg = f"widget {real_name} have associated function {func_name}, but {func_name} not exist"
+                    tools_qgis.show_message(msg, 2)
+                    return widget
+            else:
+                message = "Parameter widgetfunction is null for widget"
+                tools_qgis.show_message(message, 2, parameter=real_name)
         else:
-            message = "Parameter widgetfunction is null for widget"
-            tools_qgis.show_message(message, 2, parameter=real_name)
+            tools_log.log_info(field['widgetfunction'])
     else:
         message = "Parameter not found"
         tools_qgis.show_message(message, 2, parameter='widgetfunction')
 
-    # Call function-->func_name(widget) or def no_function_associated(self, widget=None, message_level=1)
-    widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget))
+    if func_name is not None:
+        # Call function-->func_name(widget) or def no_function_associated(self, widget=None, message_level=1)
+        widget.clicked.connect(partial(getattr(tools_backend_calls, func_name), widget))
 
     return widget
 
