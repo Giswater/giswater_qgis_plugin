@@ -466,7 +466,7 @@ class GwAdminButton:
         self.folderPath = ''
 
         # Check if user have commit permissions
-        self.dev_commit = tools_gw.get_config_parser('system', 'dev_commit', "user", "init", False)
+        self.dev_commit = tools_gw.get_config_parser('system', 'dev_commit', "project", "dev", False)
         self.dev_commit = tools_os.set_boolean(self.dev_commit)
 
         # Create dialog object
@@ -1578,6 +1578,7 @@ class GwAdminButton:
             global_vars.dao.rollback()
             # Reset count error variable to 0
             self.error_count = 0
+            tools_qt.show_exception_message(msg=global_vars.session_vars['last_error_msg'])
 
 
     def _rename_project_data_schema(self, schema, create_project=None):
