@@ -1057,7 +1057,7 @@ class GwMincut:
             self._select_features_connec()
         self._snapping_selection_connec()
         for layer in self.layers_connec:
-            layer.dataProvider().forceReload()
+            layer.dataProvider().reloadData()
 
         tools_gw.open_dialog(self.dlg_connec, dlg_name='mincut_connec')
 

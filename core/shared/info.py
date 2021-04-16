@@ -1503,8 +1503,8 @@ class GwInfo(QObject):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
-        field = kwargs['field']
 
+        field = kwargs['field']
         widget = tools_gw.add_hyperlink(field)
         widget = tools_gw.set_widget_size(widget, field)
         return widget
@@ -1523,6 +1523,7 @@ class GwInfo(QObject):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
+
         widget = tools_qt.add_verticalspacer()
         return widget
 
@@ -1531,10 +1532,10 @@ class GwInfo(QObject):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
+
         dialog = kwargs['dialog']
         field = kwargs['field']
         new_feature = kwargs['new_feature']
-
         widget = tools_gw.add_textarea(field)
         widget = self._set_auto_update_textarea(field, dialog, widget, new_feature)
         return widget
@@ -1544,10 +1545,10 @@ class GwInfo(QObject):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
+
         dialog = kwargs['dialog']
         field = kwargs['field']
         new_feature = kwargs['new_feature']
-
         widget = tools_gw.add_spinbox(field)
         widget = self._set_auto_update_spinbox(field, dialog, widget, new_feature)
         return widget
@@ -1557,12 +1558,11 @@ class GwInfo(QObject):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
+
         dialog = kwargs['dialog']
         field = kwargs['field']
         new_feature = kwargs['new_feature']
-
         widget = tools_gw.add_spinbox(field)
-
         widget = self._set_auto_update_spinbox(field, dialog, widget, new_feature)
         return widget
 
@@ -1571,6 +1571,7 @@ class GwInfo(QObject):
         """ This function is called in def _set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
+
         complet_result = kwargs['complet_result']
         field = kwargs['field']
         dialog = kwargs['dialog']
@@ -1621,6 +1622,7 @@ class GwInfo(QObject):
         :param close_dlg:
         :return: (boolean)
         """
+
         self._disconnect_signals()
 
         # Check if C++ object has been deleted
@@ -1770,6 +1772,7 @@ class GwInfo(QObject):
 
 
     def _enable_action(self, dialog, action, enabled):
+
         if type(action) is str:
             action = dialog.findChild(QAction, action)
         if not action:
@@ -1783,6 +1786,7 @@ class GwInfo(QObject):
             def check_integer(self, value, widget, btn_accept)
             def check_double(self, value, widget, btn_accept)
         """
+
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
         try:
             getattr(self, f"_check_{widget.property('datatype')}")(value, widget, btn)
@@ -1858,6 +1862,7 @@ class GwInfo(QObject):
 
 
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
+
         if self._check_tab_data(dialog):
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
             # does not jump, making it lose focus, which will cause the accept function to jump sent invalid parameters
