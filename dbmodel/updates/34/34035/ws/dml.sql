@@ -15,3 +15,12 @@ UPDATE config_form_fields SET dv_querytext = 'SELECT DISTINCT ''DMA'' as id, ''D
 WHERE formname = 'new_dma' AND columnname = 'mapzoneType';
 UPDATE config_form_fields SET dv_querytext = 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id != 0 AND expl_id IS NOT NULL' 
 WHERE formname = 'new_dma' AND columnname = 'expl_id';
+
+-- 2021/04/18
+UPDATE config_param_system set standardvalue = 
+'{"status":false, "values":[
+{"source":{"table":"ve_node_shutoff_valve", "column":"pression_exit"}, "target":{"table":"inp_valve", "column":"pressure"}}]}'
+WHERE parameter = 'epa_automatic_man2inp_values';
+
+UPDATE config_param_system set standardvalue = 'True' WHERE parameter = 'admin_raster_dem';
+

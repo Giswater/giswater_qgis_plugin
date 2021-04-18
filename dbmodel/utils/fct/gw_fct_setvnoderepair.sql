@@ -145,7 +145,7 @@ BEGIN
 	--log
 	SELECT count(*) INTO v_count FROM anl_node WHERE fid = 300 AND cur_user = current_user;
 	IF v_count > 0 THEN
-		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, concat('INFO: There were ', v_count, ' overlaped vnode(s) that have been automatic fusioned. See log N-300 for more details'));
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, concat('INFO (DB OM): There were ', v_count, ' overlaped vnode(s) that have been automatic fusioned. See log N-300 for more details'));
 	END IF;
 	
 	-- get results
