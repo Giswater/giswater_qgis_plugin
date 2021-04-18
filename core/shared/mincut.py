@@ -871,9 +871,10 @@ class GwMincut:
         if not row:
             return
 
+        use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         extras = f'"action":"mincutAccept", "mincutClass":{self.mincut_class}, "status":"check", '
-        extras += f'"mincutId":"{result_mincut_id_text}"'
+        extras += f'"mincutId":"{result_mincut_id_text}", "usePsectors":"{use_planified}"'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_setmincut', body)
         if not result or result['status'] == 'Failed':
@@ -902,9 +903,10 @@ class GwMincut:
 
     def _force_mincut_overlap(self):
 
+        use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
         result_mincut_id_text = self.dlg_mincut.result_mincut_id.text()
         extras = f'"action":"mincutAccept", "mincutClass":{self.mincut_class}, "status":"continue", '
-        extras += f'"mincutId":"{result_mincut_id_text}"'
+        extras += f'"mincutId":"{result_mincut_id_text}", "usePsectors":"{use_planified}"'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_setmincut', body)
         if not result or result['status'] == 'Failed':
@@ -1989,9 +1991,11 @@ class GwMincut:
         # Change cursor to 'WaitCursor'
         tools_qgis.set_cursor_wait()
 
+
+        use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
         result_mincut_id = tools_qt.get_text(self.dlg_mincut, "result_mincut_id")
         if result_mincut_id != 'null':
-            extras = f'"action":"mincutValveUnaccess", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}"'
+            extras = f'"action":"mincutValveUnaccess", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}", "usePsectors":"{use_planified}"'
             body = tools_gw.create_body(extras=extras)
             result = tools_gw.execute_procedure('gw_fct_setmincut', body)
             if result['status'] == 'Accepted' and result['message']:
