@@ -28,7 +28,7 @@ BEGIN
 	-- get input parameters
 	v_node_id := (p_data ->>'data')::json->>'nodeId';
 	v_result_id := ((p_data ->>'data')::json->>'mincutId')::integer;
-	v_usepsectors := ((p_data ->>'data')::json->>'usePsectors')::integer;
+	v_usepsectors := ((p_data ->>'data')::json->>'usePsectors')::boolean;
 
 	SELECT anl_feature_id INTO feature_id_aux FROM om_mincut WHERE id=v_result_id;
 	SELECT anl_feature_type INTO feature_type_aux FROM om_mincut WHERE id=v_result_id;

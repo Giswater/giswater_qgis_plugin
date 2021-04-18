@@ -501,7 +501,7 @@ BEGIN
 			',"data":{ "info":'||v_result_info||','||
 				  '"geometry":"'||v_geometry||'"'|| 
 			'}}'||
-			'}')::json, 2244);
+			'}')::json, 2244,null,null,null);
 	END IF;
 
 	EXCEPTION WHEN OTHERS THEN

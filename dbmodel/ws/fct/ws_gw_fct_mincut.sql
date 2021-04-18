@@ -354,6 +354,8 @@ BEGIN
 	--update output results
 	UPDATE om_mincut SET output = v_mincutdetails WHERE id = result_id_arg;
 
+	IF v_debug THEN RAISE NOTICE '13- Boundary calculation ';	END IF;
+
 	-- calculate the boundary of mincut using arcs and valves
 	v_querystring = concat('SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) FROM (SELECT the_geom FROM om_mincut_arc WHERE result_id=',quote_nullable(result_id_arg),
 		' UNION SELECT the_geom FROM om_mincut_valve WHERE result_id=',quote_nullable(result_id_arg),') a');
@@ -370,12 +372,11 @@ BEGIN
 	-- returning
 	v_result := COALESCE(v_result, '{}'); 
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	v_error_message := COALESCE(v_error_message, '{}'); 
 	v_version := COALESCE(v_version, '{}'); 
 	v_geometry := COALESCE(v_geometry, '{}'); 
 	v_mincutdetails := COALESCE(v_mincutdetails, '{}'); 
-
-
+	v_geometry := COALESCE(v_geometry, '{}'); 
+	
 	IF v_error_message is null THEN
 		v_status = 'Accepted';
 		v_level = 3;
@@ -385,6 +386,8 @@ BEGIN
 		v_level = ((((v_error_message::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer;
 		v_message = ((((v_error_message::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text;
 	END IF;
+
+	IF v_debug THEN RAISE NOTICE '14- Return mincut function ';END IF;
 
 	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
 	',"body":{"form":{}'||
