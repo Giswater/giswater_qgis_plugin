@@ -115,7 +115,7 @@ BEGIN
 		EXECUTE concat ('INSERT INTO anl_node (fid, node_id, nodecat_id, descript, the_geom)
 		SELECT 228, node_id, nodecat_id, ''Orphan node'', the_geom FROM ', v_querytext);
 		INSERT INTO audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 3, concat('ERROR-228: There is/are ',v_count,
+		VALUES (v_fid, 3, v_result_id, concat('ERROR-228: There is/are ',v_count,
 		' node''s orphan on this result. This could be because closests arcs may have UNDEFINED epa_type or because on-the-fly transformations. Fix it before continue.'),v_count);
 	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity,  error_message, fcount)
@@ -436,7 +436,7 @@ BEGIN
 		'properties', to_jsonb(row) - 'the_geom_p'
 		) AS feature
 		FROM (SELECT id, node_id, node_id, state, expl_id, descript, fid, the_geom
-			  FROM  anl_node WHERE cur_user="current_user"() AND (fid = 139 OR fid = 227 OR fid = 233 OR fid = 290)
+			  FROM  anl_node WHERE cur_user="current_user"() AND fid  IN (139,228,227,233,290)
 		) row) features;
   	
 	v_result := COALESCE(v_result, '{}'); 
