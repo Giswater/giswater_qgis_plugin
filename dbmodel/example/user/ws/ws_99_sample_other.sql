@@ -452,8 +452,7 @@ UPDATE inp_connec SET pattern_id = 'pattern_01', demand = demand*0.5 FROM (SELEC
 UPDATE v_edit_arc SET arccat_id = 'VIRTUAL' WHERE arc_type = 'VARC';
 
 UPDATE cat_mat_roughness set roughness  = 0.003;
-UPDATE cat_arc SET dint = null, dext = null, dnom = null, descript = 'Virtual arc' WHERE arctype_id = 'VARC';
-DELETE FROM cat_arc  WHERE arctype_id = 'VARC' AND id !='VIRTUAL';
+DELETE FROM cat_arc WHERE arctype_id = 'VARC' AND id !='VIRTUAL';
 
 
 UPDATE config_form_fields SET dv_querytext_filterc  = ' AND id ' 
