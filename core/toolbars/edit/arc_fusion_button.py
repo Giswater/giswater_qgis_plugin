@@ -134,6 +134,7 @@ class GwArcFusionButton(GwMaptool):
             # Set signals
             self.dlg_fusion.btn_accept.clicked.connect(self._fusion_arc)
             self.dlg_fusion.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
+            self.dlg_fusion.rejected.connect(partial(tools_gw.close_dialog, self.dlg_fusion))
 
             tools_gw.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
 
