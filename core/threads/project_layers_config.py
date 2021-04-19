@@ -44,6 +44,11 @@ class GwProjectLayersConfig(GwTask):
     def finished(self, result):
 
         super().finished(result)
+
+        # If user cancel task
+        if self.isCanceled():
+            return
+
         if result:
             return
 

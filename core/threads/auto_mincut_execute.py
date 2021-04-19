@@ -9,7 +9,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
 from ..utils import tools_gw
-from ...lib import tools_db, tools_qt
+from ...lib import tools_db, tools_qt, tools_log
 
 
 class GwAutoMincutTask(GwTask):
@@ -70,8 +70,18 @@ class GwAutoMincutTask(GwTask):
 
         super().finished(result)
 
-        # Handle exception
-        if self.exception is not None:
+        # If user cancel task
+        if self.isCanceled():
+            self.task_finished.emit([False, self.complet_result])
+
+        # If sql function return null
+        elif self.complet_result is None:
+            self.task_finished.emit([False, self.complet_result])
+            msg = f"Error. Data base return null"
+            tools_log.log_warning(msg)
+
+        # Handle python exception
+        elif self.exception is not None:
             msg = f"<b>Key: </b>{self.exception}<br>"
             msg += f"<b>key container: </b>'body/data/ <br>"
             msg += f"<b>Python file: </b>{__name__} <br>"
