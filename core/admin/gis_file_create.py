@@ -112,7 +112,7 @@ class GwGisFileCreate:
                 f.write(content)
             tools_qgis.show_info("GIS file generated successfully", parameter=qgs_path)
             message = "Do you want to open GIS project?"
-            answer = tools_qt.show_question(message, "GIS file generated successfully")
+            answer = tools_qt.show_question(message, "GIS file generated successfully", force_action=True)
             if answer:
                 return True, qgs_path
             return False, qgs_path

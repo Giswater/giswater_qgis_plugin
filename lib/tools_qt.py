@@ -865,11 +865,11 @@ def show_details(detail_text, title=None, inf_text=None):
     msg_box.exec_()
 
 
-def show_question(text, title=None, inf_text=None, context_name=None, parameter=None):
+def show_question(text, title=None, inf_text=None, context_name=None, parameter=None, force_action=False):
     """ Ask question to the user """
 
     # Expert mode does not ask and accept all actions
-    if global_vars.user_level['level'] not in (None, 'None'):
+    if global_vars.user_level['level'] not in (None, 'None') and not force_action:
         if global_vars.user_level['level'] not in global_vars.user_level['showquestion']:
             return True
 
