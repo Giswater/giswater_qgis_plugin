@@ -35,6 +35,7 @@ class GwEpaFileManager(GwTask):
         self.file_rpt = None
         self.fid = 140
         self.set_variables_from_go2epa()
+        self.funtion_name = None
 
 
     def set_variables_from_go2epa(self):
@@ -66,8 +67,8 @@ class GwEpaFileManager(GwTask):
         self.complet_result = None
 
         status = True
-
         if not self._exec_function_pg2epa():
+            self.funtion_name = 'gw_fct_pg2epa_main'
             return False
 
         if self.go2epa_export_inp:
@@ -77,6 +78,7 @@ class GwEpaFileManager(GwTask):
             status = self._execute_epa()
 
         if status and self.import_result:
+            self.funtion_name = 'gw_fct_rpt2pg_main'
             status = self._import_rpt()
 
         return status
@@ -90,7 +92,12 @@ class GwEpaFileManager(GwTask):
 
         self._close_file()
 
-        if result:
+        # If sql function return null
+        if self.complet_result is None:
+            msg = f"Data base return null. Check postgres function '{self.funtion_name}'"
+            tools_log.log_warning(msg)
+
+        elif result:
 
             if self.go2epa_export_inp and self.complet_result:
                 if 'status' in self.complet_result:
