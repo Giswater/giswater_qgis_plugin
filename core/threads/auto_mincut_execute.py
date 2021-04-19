@@ -53,7 +53,7 @@ class GwAutoMincutTask(GwTask):
             extras = (f'"action":"mincutNetwork", "mincutId":"{real_mincut_id}", "arcId":"{self.element_id}", '
                       f'"usePsectors":"{use_planified}"')
             body = tools_gw.create_body(extras=extras)
-            self.complet_result = tools_gw.execute_procedure('gw_fct_setmincut', body)
+            self.complet_result = tools_gw.execute_procedure('gw_fct_setmincut', body, aux_conn=self.aux_conn)
             if self.isCanceled():
                 return False
             if not self.complet_result or self.complet_result['status'] == 'Failed':
