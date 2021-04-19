@@ -1782,7 +1782,11 @@ class GwMincut:
     def _mincut_task_finished(self, snapped_point, elem_type, element_id, signal):
 
         if not signal[0]:
-            self.action_mincut.setChecked(False)
+            try:
+                # If user open other docker form before mincut end, the second form force close mincut form
+                self.action_mincut.setChecked(False)
+            except Exception:
+                pass
             return False
 
         if signal[1]:
