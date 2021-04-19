@@ -219,7 +219,7 @@ class GwPsector:
                    f"WHERE expl_id = {row['expl_id']}")
             result = tools_db.get_row(sql)
             tools_qt.set_combo_value(self.cmb_expl_id, str(result['name']), 1)
-
+            tools_qt.set_combo_value(self.cmb_status, str(row['status']), 0)
             # Check if expl_id already exists in expl_selector
             sql = ("SELECT DISTINCT(expl_id, cur_user)"
                    " FROM selector_expl"
