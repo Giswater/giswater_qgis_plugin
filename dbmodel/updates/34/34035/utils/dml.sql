@@ -20,3 +20,13 @@ UPDATE config_form_tabs SET orderby = 7  WHERE formname = 'search' AND tabname =
 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES 
 (379, 'Check undefined nodes as topological nodes', 'utils')  ON CONFLICT (fid) DO NOTHING;
+
+UPDATE sys_message SET hint_message = 'If you are looking to unlink from this psector, it is necessary to remove it from ve_* or v_edit_* or using end feature tool.'
+WHERE id = 3160;
+
+INSERT INTO sys_message VALUES (3182, 'It is not allowed to downgrade (state=0) on psector tables for planned features (state=2). Planned features only must have state=1 on psector.' ,
+'If you are looking for unlink it, please remove it from psector. If feature only belongs to this psector, and you are looking to unlink it, you will need to delete from ve_* or v_edit_* or use end feature tool.',
+2, TRUE, 'utils');
+
+
+

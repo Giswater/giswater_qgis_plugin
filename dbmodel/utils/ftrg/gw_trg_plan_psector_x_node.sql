@@ -24,7 +24,10 @@ BEGIN
 		NEW.state=0;
 		NEW.doable=false;
 	ELSIF v_stateaux=2 THEN
-		NEW.state=1;
+		IF NEW.state = 0 THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3182", "function":"1130","debug_msg":'||OLD.psector_id||'}}$$);';
+		END IF;		
 		NEW.doable=true;
 	END IF;
 
