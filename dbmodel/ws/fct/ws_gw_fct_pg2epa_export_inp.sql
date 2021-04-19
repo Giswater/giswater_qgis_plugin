@@ -69,10 +69,10 @@ BEGIN
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Demand type: ', v_demandtypeval, v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Pattern method: ', v_patternmethodval, v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Valve mode: ', v_valvemodeval, v_fid);
-	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Default values: ',(SELECT regexp_replace(value, '\r|\n', ' ', 'g') 
-	FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user), v_fid);
-	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Advanced settings: ',(SELECT regexp_replace(value, '\r|\n', ' ', 'g') 
-	FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user = current_user), v_fid);
+	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Default values: ',
+	(SELECT value::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user), v_fid);
+	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Advanced settings: ',
+	(SELECT value::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user = current_user), v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';Datetime: ',left((date_trunc('second'::text, now()))::text, 19),v_fid);
 	INSERT INTO temp_csv (source, csv1,csv2,fid) VALUES ('header',';User: ',current_user, v_fid);
 
