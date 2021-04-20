@@ -365,9 +365,11 @@ BEGIN
 			END IF;
 
 			-- reset mapzone geometry
-			v_querytext = 'UPDATE '||quote_ident(v_table)||' SET the_geom = null 
-			WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND active IS TRUE';
-			EXECUTE v_querytext;
+			IF lower(v_table) != 'sector' THEN
+				v_querytext = 'UPDATE '||quote_ident(v_table)||' SET the_geom = null 
+				WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND active IS TRUE';
+				EXECUTE v_querytext;
+			END IF;
 
 			-- fill the graf table
 			INSERT INTO temp_anlgraf (arc_id, node_1, node_2, water, flag, checkf)
