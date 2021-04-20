@@ -8,10 +8,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2021/04/20
-ALTER TABLE plan_psector_x_gully DROP CONSTRAINT IF EXISTS plan_psector_x_gully_state_check;
-ALTER TABLE plan_psector_x_gully ADD CONSTRAINT plan_psector_x_gully_state_check CHECK (state = ANY (ARRAY[0,1]::integer[]));
-
--- 2021/04/20
 ALTER TABLE plan_psector_x_arc DROP CONSTRAINT IF EXISTS plan_psector_x_arc_state_check;
 ALTER TABLE plan_psector_x_arc ADD CONSTRAINT plan_psector_x_arc_state_check CHECK (state = ANY (ARRAY[0,1]::integer[]));
 
