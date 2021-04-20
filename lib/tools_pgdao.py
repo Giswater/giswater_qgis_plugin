@@ -10,8 +10,6 @@ import psycopg2.extras
 
 from qgis.core import QgsDataSourceUri
 
-from .. import global_vars
-
 
 class GwPgDao(object):
 
@@ -28,9 +26,8 @@ class GwPgDao(object):
 
         try:
             self.conn = psycopg2.connect(self.conn_string)
-            self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            self.cursor = self.get_cursor()
             status = True
-
         except psycopg2.DatabaseError as e:
             self.last_error = e
             status = False
@@ -56,9 +53,13 @@ class GwPgDao(object):
         return status
 
 
-    def get_cursor(self):
+    def get_cursor(self, aux_conn=None):
 
-        return self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        if aux_conn:
+            cursor = aux_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        else:
+            cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        return cursor
 
 
     def reset_db(self):
@@ -164,12 +165,11 @@ class GwPgDao(object):
     def get_row(self, sql, commit=False, aux_conn=None):
         """ Get single row from selected query """
 
-
         self.last_error = None
         row = None
         try:
             if aux_conn is not None:
-                cursor = aux_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+                cursor = self.get_cursor(aux_conn)
                 cursor.execute(sql)
                 row = cursor.fetchone()
             else:
@@ -224,18 +224,26 @@ class GwPgDao(object):
 
     def commit(self, aux_conn=None):
         """ Commit current database transaction """
-        if aux_conn is not None:
-            aux_conn.commit()
-            return
-        self.conn.commit()
+
+        try:
+            if aux_conn is not None:
+                aux_conn.commit()
+                return
+            self.conn.commit()
+        except:
+            pass
 
 
     def rollback(self, aux_conn=None):
         """ Rollback current database transaction """
-        if aux_conn is not None:
-            aux_conn.commit()
-            return
-        self.conn.rollback()
+
+        try:
+            if aux_conn is not None:
+                aux_conn.rollback()
+                return
+            self.conn.rollback()
+        except:
+            pass
 
 
     def export_to_csv(self, sql, csv_file):
@@ -255,16 +263,14 @@ class GwPgDao(object):
         # Create an auxiliary connection with the intention of being able to cancel processes of the main connection
         last_error = None
         try:
-            conn = psycopg2.connect(self.conn_string)
-            cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            aux_conn = psycopg2.connect(self.conn_string)
+            cursor = self.get_cursor(aux_conn)
             cursor.execute(f"SELECT pg_cancel_backend({pid})")
             status = True
-
-            # Delete auxiliary connection
             cursor.close()
-            conn.close()
+            aux_conn.close()
             del cursor
-            del conn
+            del aux_conn
         except Exception as e:
             last_error = e
             status = False
@@ -276,7 +282,7 @@ class GwPgDao(object):
 
         try:
             aux_conn = psycopg2.connect(self.conn_string)
-            cursor = aux_conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            cursor = self.get_cursor(aux_conn)
             if self.set_search_path:
                 cursor.execute(self.set_search_path)
             return aux_conn
