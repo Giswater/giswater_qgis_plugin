@@ -119,3 +119,6 @@ INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (377, 'Check 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES (378, 'Check hydrometer configuration','ws') ON CONFLICT (fid) DO NOTHING;
 
 UPDATE sys_fprocess SET fprocess_name = 'Features with EPA type UNDEFINED' WHERE fid =297;
+
+--2021/04/20
+update sys_function set function_name ='gw_fct_setelevfromdem' where id=2760;
