@@ -125,7 +125,7 @@ BEGIN
 
 	-- get om toolbox parameters
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname, isparametric
+		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname
 		 FROM sys_function 
 		 JOIN config_toolbox USING (id)
 		 WHERE alias LIKE ''%'|| v_filter ||'%'' AND sys_role =''role_om'' AND config_toolbox.active IS TRUE
@@ -135,7 +135,7 @@ BEGIN
 
 	-- get edit toolbox parameters
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname, isparametric
+		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname
 		 FROM sys_function
  		 JOIN config_toolbox USING (id)
 		 WHERE alias LIKE ''%'|| v_filter ||'%'' AND sys_role =''role_edit'' AND config_toolbox.active IS TRUE
@@ -145,7 +145,7 @@ BEGIN
 
 	-- get epa toolbox parameters
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname, isparametric
+		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname
 		FROM sys_function
 		JOIN config_toolbox USING (id)
 		WHERE alias LIKE ''%'|| v_filter ||'%'' AND sys_role =''role_epa'' AND config_toolbox.active IS TRUE
@@ -157,7 +157,7 @@ BEGIN
 
 	-- get master toolbox parameters
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname, isparametric
+		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, function_name as functionname
 		 FROM sys_function
  		 JOIN config_toolbox USING (id)
 		 WHERE alias LIKE ''%'|| v_filter ||'%'' AND sys_role =''role_master'' AND config_toolbox.active IS TRUE
@@ -168,7 +168,7 @@ BEGIN
 	-- get admin toolbox parameters
 	EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 		 SELECT alias, descript, functionparams AS input_params, inputparams AS return_type, observ AS isnotparammsg, sys_role, 
-		 function_name as functionname, isparametric
+		 function_name as functionname
 		 FROM sys_function
 		 JOIN config_toolbox USING (id)
 		 WHERE alias LIKE ''%'|| v_filter ||'%'' AND sys_role =''role_admin'' AND config_toolbox.active IS TRUE
