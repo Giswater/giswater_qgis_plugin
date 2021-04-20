@@ -111,4 +111,3 @@ ALTER TABLE config_form_list RENAME tablename TO listname;
 
 --2021/04/20
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_toolbox", "column":"isparametric"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_function", "column":"function_name"}}$$);
