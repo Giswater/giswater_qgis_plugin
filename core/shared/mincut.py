@@ -830,7 +830,11 @@ class GwMincut:
 
         # If state 'In Progress' or 'Finished'
         if mincut_result_state == 1 or mincut_result_state == 2:
-            sql += f", exec_start = '{forecast_start_real}', exec_end = '{forecast_end_real}'"
+
+            sql += f", exec_start = '{forecast_start_real}'"
+            
+            if mincut_result_state == 2:
+                sql += f", exec_end = '{forecast_end_real}'"
             if exec_from_plot != '':
                 sql += f", exec_from_plot = '{exec_from_plot}'"
             if exec_depth != '':
