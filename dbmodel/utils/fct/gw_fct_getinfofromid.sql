@@ -165,16 +165,21 @@ BEGIN
 	END IF;
 
 	-- Check if feature exist
-	IF v_id IS NOT NULL THEN
+	
+	IF v_id NOT IN ('', NULL) THEN
+
 		EXECUTE 'SELECT gw_fct_getpkeyfield('''||v_tablename||''');' INTO v_pkeyfield;
 		EXECUTE 'SELECT ' || v_pkeyfield || ' FROM '|| v_tablename || ' WHERE ' || v_pkeyfield || '::text = ' || v_id || '::text' INTO v_idname;
 		
 		IF v_idname IS NULL THEN
+				
 			RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":'|| v_version 
 			||', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
+			
 		END IF;
+				
 	END IF;
-
+	
 	-- looking for additional schema 
 	IF v_addschema NOT IN (NULL, 'NULL') AND v_addschema != v_schemaname AND v_flag IS FALSE THEN
 		v_querystring = concat('SET search_path = ',v_addschema,', public');
