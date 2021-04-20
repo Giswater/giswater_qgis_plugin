@@ -112,6 +112,8 @@ class GwMincut:
         tools_qt.set_widget_text(self.dlg_mincut, "depth", row['exec_depth'])
         tools_qt.set_widget_text(self.dlg_mincut, "assigned_to", row['assigned_to_name'])
 
+        tools_qt.set_checked(self.dlg_mincut, "appropiate", row['exec_appropiate'])
+
         # Update table 'selector_mincut_result'
         self._update_result_selector(result_mincut_id)
         tools_qgis.refresh_map_canvas()
