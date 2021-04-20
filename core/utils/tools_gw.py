@@ -421,7 +421,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
         :param style_id: Id of the style we want to load (integer or String)
     """
 
-    uri = tools_pgdao.get_uri()
+    uri = tools_db.get_uri()
     schema_name = global_vars.dao_db_credentials['schema'].replace('"', '')
     if child_layers is not None:
         for layer in child_layers:

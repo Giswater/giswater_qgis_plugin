@@ -479,6 +479,17 @@ def get_layer_source_from_credentials(sslmode_value, layer_name='v_edit_node'):
     return credentials, not_version
 
 
+def get_uri():
+    """ Set the component parts of a RDBMS data source URI
+    :return: QgsDataSourceUri() with the connection established according to the parameters of the credentials.
+    """
+
+    uri = QgsDataSourceUri()
+    uri.setConnection(global_vars.dao_db_credentials['host'], global_vars.dao_db_credentials['port'],
+                      global_vars.dao_db_credentials['db'], global_vars.dao_db_credentials['user'],
+                      global_vars.dao_db_credentials['password'])
+    return uri
+
 # region private functions
 
 

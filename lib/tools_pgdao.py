@@ -298,14 +298,3 @@ class GwPgDao(object):
             status = False
         return {'status': status, 'last_error': last_error}
 
-
-def get_uri():
-    """ Set the component parts of a RDBMS data source URI
-    :return: QgsDataSourceUri() with the connection established according to the parameters of the credentials.
-    """
-
-    uri = QgsDataSourceUri()
-    uri.setConnection(global_vars.dao_db_credentials['host'], global_vars.dao_db_credentials['port'],
-                      global_vars.dao_db_credentials['db'], global_vars.dao_db_credentials['user'],
-                      global_vars.dao_db_credentials['password'])
-    return uri
