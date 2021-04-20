@@ -179,8 +179,8 @@ class GwToolBoxButton(GwAction):
             tools_qgis.show_message(message, parameter=self.function_selected)
             return
 
-        self.dlg_functions.btn_run.clicked.connect(partial(self._execute_function, self.dlg_functions,
-                                                           self.dlg_functions.cmb_layers, json_result['body']['data']))
+        self.dlg_functions.btn_run.clicked.connect(partial(self._execute_function, self.function_selected,
+            self.dlg_functions, self.dlg_functions.cmb_layers, json_result['body']['data']))
         self.dlg_functions.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_functions))
         self.dlg_functions.rejected.connect(partial(tools_gw.close_dialog, self.dlg_functions))
         self.dlg_functions.btn_cancel.clicked.connect(partial(self.remove_layers))
@@ -246,7 +246,8 @@ class GwToolBoxButton(GwAction):
             tools_qt.set_checked(dialog, 'rbt_layer', True)
 
 
-    def _execute_function(self, dialog, combo, result):
+    def _execute_function(self, description, dialog, combo, result):
+
         self.dlg_functions.btn_cancel.show()
         self.dlg_functions.btn_close.hide()
         dialog.progressBar.setRange(0, 0)
@@ -256,13 +257,13 @@ class GwToolBoxButton(GwAction):
                                          "QProgressBar::chunk {background-color:#0bd82c; width: 10 px; margin: 0.5px;}")
 
         # Set background task 'GwToolBoxTask'
-        description = f"ToolBox function"
         self.toolbox_task = GwToolBoxTask(self, description, dialog, combo, result)
         QgsApplication.taskManager().addTask(self.toolbox_task)
         QgsApplication.taskManager().triggerTask(self.toolbox_task)
 
 
     def _populate_functions_dlg(self, dialog, result, module=tools_backend_calls):
+
         status = False
         for group, function in result['fields'].items():
             if len(function) != 0:
