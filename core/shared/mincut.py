@@ -88,6 +88,10 @@ class GwMincut:
         if row['mincut_state'] in self.states:
             mincut_state_name = self.states[row['mincut_state']]
 
+        # Get mincut class
+        if row['mincut_class']:
+            self.mincut_class = row['mincut_class']
+
         tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.work_order, row['work_order'])
         tools_qt.set_combo_value(self.dlg_mincut.type, row['mincut_type'], 0)
         tools_qt.set_combo_value(self.dlg_mincut.cause, row['anl_cause'], 0)
@@ -118,12 +122,6 @@ class GwMincut:
         self._update_result_selector(result_mincut_id)
         tools_qgis.refresh_map_canvas()
         self.current_state = str(row['mincut_state'])
-        sql = (f"SELECT mincut_class FROM om_mincut"
-               f" WHERE id = '{result_mincut_id}'")
-        row = tools_db.get_row(sql)
-        mincut_class_status = None
-        if row[0]:
-            mincut_class_status = str(row[0])
 
         expr_filter = f"result_id={result_mincut_id}"
         tools_qt.set_tableview_config(self.dlg_mincut.tbl_hydro)
@@ -163,28 +161,28 @@ class GwMincut:
             self.dlg_mincut.btn_start.setDisabled(False)
             self.dlg_mincut.btn_end.setDisabled(True)
             # Actions
-            if mincut_class_status == '1':
+            if self.mincut_class == '1':
                 self.action_mincut.setDisabled(False)
                 self.action_refresh_mincut.setDisabled(False)
                 self.action_custom_mincut.setDisabled(False)
                 self.action_change_valve_status.setDisabled(False)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(True)
-            if mincut_class_status == '2':
+            if self.mincut_class == '2':
                 self.action_mincut.setDisabled(True)
                 self.action_refresh_mincut.setDisabled(True)
                 self.action_custom_mincut.setDisabled(True)
                 self.action_change_valve_status.setDisabled(True)
                 self.action_add_connec.setDisabled(False)
                 self.action_add_hydrometer.setDisabled(True)
-            if mincut_class_status == '3':
+            if self.mincut_class == '3':
                 self.action_mincut.setDisabled(True)
                 self.action_refresh_mincut.setDisabled(True)
                 self.action_custom_mincut.setDisabled(True)
                 self.action_change_valve_status.setDisabled(True)
                 self.action_add_connec.setDisabled(True)
                 self.action_add_hydrometer.setDisabled(False)
-            if mincut_class_status is None:
+            if self.mincut_class is None:
                 self.action_mincut.setDisabled(False)
                 self.action_refresh_mincut.setDisabled(True)
                 self.action_custom_mincut.setDisabled(True)
