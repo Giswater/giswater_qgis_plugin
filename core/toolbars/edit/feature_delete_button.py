@@ -172,11 +172,6 @@ class GwFeatureDeleteButton(GwAction):
         """ Set canvas map tool to an instance of class 'GwSelectManager' """
 
         tools_qgis.disconnect_signal_selection_changed()
-        if global_vars.user_level['level'] not in (None, 'None'):
-            if global_vars.user_level['level'] in global_vars.user_level['showselectmessage']:
-                feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
-                msg = 'Select '
-                tools_qgis.show_info(msg, 1, parameter=feature_type)
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed()
 

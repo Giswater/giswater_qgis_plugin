@@ -62,7 +62,7 @@ class GwFlowTraceButton(GwMaptool):
         self.snapper_manager.set_snapping_layers()
 
         # Set snapping to node
-        self.snapper_manager.config_snap_to_node()
+        self.snapper_manager.config_snap_to_node(False)
 
         # Change cursor
         self.canvas.setCursor(self.cursor)

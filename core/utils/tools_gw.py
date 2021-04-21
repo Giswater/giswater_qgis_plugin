@@ -1988,11 +1988,6 @@ def selection_init(class_object, dialog, table_object, query=False):
     if class_object.feature_type in ('all', None):
         class_object.feature_type = 'arc'
 
-    if global_vars.user_level['level'] not in (None, 'None'):
-        if global_vars.user_level['level'] in global_vars.user_level['showselectmessage']:
-            msg = 'Select '
-            tools_qgis.show_info(msg, 1, parameter=class_object.feature_type)
-
     select_manager = GwSelectManager(class_object, table_object, dialog, query)
     global_vars.canvas.setMapTool(select_manager)
     cursor = get_cursor_multiple_selection()

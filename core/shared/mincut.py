@@ -724,7 +724,7 @@ class GwMincut:
         # Vertex marker
         self.vertex_marker = self.snapper_manager.vertex_marker
 
-        self.snapper_manager.show_snap_message(True, 'arc')
+        self.snapper_manager.show_snap_message(False)
 
         # Activate snapping of node and arcs
         self.canvas.xyCoordinates.connect(self._mouse_move_node_arc)
@@ -1674,7 +1674,7 @@ class GwMincut:
         # Store user snapping configuration
         self.previous_snapping = self.snapper_manager.get_snapping_options()
 
-        self.snapper_manager.show_snap_message(True, 'arc')
+        self.snapper_manager.show_snap_message(False)
 
         # Set signals
         self.canvas.xyCoordinates.connect(self._mouse_move_node_arc)
@@ -1949,7 +1949,7 @@ class GwMincut:
         self.iface.setActiveLayer(self.layer)
         self.current_layer = self.layer
 
-        self.snapper_manager.show_snap_message(True, self.layer.name())
+        self.snapper_manager.show_snap_message(False)
 
         # Waiting for signals
         self.canvas.xyCoordinates.connect(self._mouse_move_valve)
@@ -2313,7 +2313,7 @@ class GwMincut:
         self.iface.setActiveLayer(self.layer)
         self.current_layer = self.layer
 
-        self.snapper_manager.show_snap_message(True, 'valve')
+        self.snapper_manager.show_snap_message(False)
 
         # Waiting for signals
         self.canvas.xyCoordinates.connect(self._mouse_move_valve)
