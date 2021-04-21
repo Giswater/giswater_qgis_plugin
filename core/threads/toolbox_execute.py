@@ -151,6 +151,9 @@ class GwToolBoxTask(GwTask):
 
         super().finished(result)
 
+        # Execute layer manager
+        tools_gw.manage_layer_manager(self.json_result)
+
         self.dialog.btn_cancel.hide()
         self.dialog.btn_close.show()
         self.dialog.progressBar.setVisible(False)

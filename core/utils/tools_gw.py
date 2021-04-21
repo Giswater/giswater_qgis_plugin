@@ -1576,7 +1576,6 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
     try:
         # Layer styles
         manage_json_return(json_result, sql, rubber_band)
-        manage_layer_manager(json_result, sql)
         get_actions_from_json(json_result, sql)
     except Exception:
         pass
@@ -1890,7 +1889,7 @@ def get_config_value(parameter='', columns='value', table='config_param_user', s
     return row
 
 
-def manage_layer_manager(json_result, sql):
+def manage_layer_manager(json_result, sql=None):
     """
     Manage options for layers (active, visible, zoom and indexing)
     :param json_result: Json result of a query (Json)
