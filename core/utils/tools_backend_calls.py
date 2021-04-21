@@ -7,8 +7,8 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 from functools import partial
-from qgis.PyQt.QtCore import QDate, Qt
-from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QMessageBox, QTableView
+from qgis.PyQt.QtCore import QDate, QRegExp, Qt
+from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QMessageBox, QTableView
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer
 
 from ..shared.element import GwElement
@@ -24,22 +24,27 @@ def add_object(**kwargs):
         at lines:   widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
     """
     dialog = kwargs['dialog']
+    button = kwargs['widget']
+
     index_tab = dialog.tab_main.currentIndex()
     tab_name = dialog.tab_main.widget(index_tab).objectName()
     func_params = kwargs['func_params']
-
     complet_result = kwargs['complet_result']
     feature_type = complet_result['body']['feature']['featureType']
     feature_id = complet_result['body']['feature']['id']
     field_id = str(complet_result['body']['feature']['idName'])
     qtable_name = func_params['targetwidget']
     qtable = tools_qt.get_widget(dialog, f"{tab_name}_{qtable_name}")
+    if button.property('widgetcontrols') is not None and 'filterSign' in button.property('widgetcontrols'):
+        if button.property('widgetcontrols')['filterSign'] is not None:
+            filter_sign = button.property('widgetcontrols')['filterSign']
+
 
     # Get values from dialog
     object_id = tools_qt.get_text(dialog, f"{tab_name}_{func_params['sourcewidget']}")
     if object_id == 'null':
         message = "You need to insert data"
-        tools_qgis.show_warning(message, parameter=func_params['sourcewidget'] + "_id")
+        tools_qgis.show_warning(message, parameter=func_params['sourcewidget'])
         return
 
     # Check if this object exists
@@ -74,14 +79,41 @@ def add_object(**kwargs):
             if date_to:
                 current_date = QDate.currentDate()
                 date_to.setDate(current_date)
-        qtable.model().select()
+
+
+        linkedobject = ""
+        if qtable.property('linkedobject') is not None:
+            linkedobject = qtable.property('linkedobject')
+
+        filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"{filter_sign}"}}'
+        _fill_tbl(complet_result, dialog, qtable.objectName(), linkedobject, filter_fields)
 
 
 
+def _fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
+    """ Put filter widgets into layout and set headers into QTableView """
 
+    index_tab = dialog.tab_main.currentIndex()
+    tab_name = dialog.tab_main.widget(index_tab).objectName()
+    complet_list = _get_list(complet_result, '', tab_name, filter_fields, widgetname, 'form_feature', linkedobject)
 
+    if complet_list is False:
+        return False, False
+    for field in complet_list['body']['data']['fields']:
+        if 'hidden' in field and field['hidden']: continue
 
+        widget = dialog.findChild(QTableView, field['widgetname'])
+        if widget is None: continue
+        widget = tools_gw.add_tableview_header(widget, field)
+        widget = tools_gw.fill_tableview_rows(widget, field)
+        widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], 1, True)
+        tools_qt.set_tableview_config(widget)
 
+    widget_list = []
+    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QComboBox, QRegExp(f"{tab_name}_")))
+    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QTableView, QRegExp(f"{tab_name}_")))
+    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
+    return complet_list, widget_list
 
 
 def open_selected_element(**kwargs):

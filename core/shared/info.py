@@ -2044,11 +2044,12 @@ class GwInfo(QObject):
         # Tab 'Elements'
         if self.tab_main.widget(index_tab).objectName() == 'tab_elements' and not self.tab_element_loaded:
             # self._fill_tab_element()
-            self._init_tab(self.complet_result)
+            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+            self._init_tab(self.complet_result, filter_fields)
             self.tab_element_loaded = True
         # Tab 'Relations'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_relations' and not self.tab_relations_loaded:
-            filter_fields = f'"arc_id":{{"value":"{self.feature_id}","filterSign":"="}}'
+            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             self.tab_relations_loaded = True
         # Tab 'Connections'

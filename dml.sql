@@ -22,7 +22,7 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnn
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label,  ismandatory, isparent, iseditable, isautoupdate, dv_querytext, widgetcontrols, widgetfunction, isfilter)
     VALUES ('ve_arc_pipe', 'form_feature', 'tab_elements', 'element_id', 'lyt_elements_1', 1, 'string', 'typeahead', 'Arc id:', false, false, true, false, 'SELECT element_id as id, element_id as idval FROM element WHERE element_id IS NOT NULL ','{"saveValue": false, "filterSign":"ILIKE"}', '{"functionName": "filter_table"}', false);
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, tabname,  columnname, layoutname, layoutorder,  widgettype, tooltip, ismandatory, isparent, iseditable, isautoupdate, stylesheet, widgetcontrols, widgetfunction, isfilter)
-VALUES ('ve_arc_pipe', 'form_feature', 'tab_elements', 'insert_element', 'lyt_elements_1', 2, 'button', 'Insert element', false, false, true, false,  '{"icon":"111"}', '{"saveValue":false}', '{"functionName": "add_object", "parameters":{"sourcewidget":"element_id", "targetwidget":"tbl_elements", "sourceview":"element"}}', false);
+VALUES ('ve_arc_pipe', 'form_feature', 'tab_elements', 'insert_element', 'lyt_elements_1', 2, 'button', 'Insert element', false, false, true, false,  '{"icon":"111"}', '{"saveValue":false, "filterSign":"="}', '{"functionName": "add_object", "parameters":{"sourcewidget":"element_id", "targetwidget":"tbl_elements", "sourceview":"element"}}', false);
 
 /*******************************************************/
 

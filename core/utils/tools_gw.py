@@ -2326,7 +2326,9 @@ def add_tableview_header(widget, field):
     model = widget.model()
     if model is None:
         model = QStandardItemModel()
+
     # Related by Qtable
+    model.clear()
     widget.setModel(model)
     widget.horizontalHeader().setStretchLastSection(True)
     try:
