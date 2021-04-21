@@ -1803,7 +1803,7 @@ class GwMincut:
                 tools_qt.show_info_box(message, parameter=complet_result['mincutOverlap'])
             else:
                 message = "Mincut done successfully"
-                tools_qgis.show_info(message)
+                tools_qgis.show_message(message, 3)
 
             # Zoom to rectangle (zoom to mincut)
             polygon = complet_result['body']['data']['geometry']
@@ -1893,7 +1893,7 @@ class GwMincut:
                 tools_qt.show_info_box(message, parameter=complet_result['mincutOverlap'])
             else:
                 message = "Mincut done successfully"
-                tools_qgis.show_info(message)
+                tools_qgis.show_message(message, 3)
 
             # Zoom to rectangle (zoom to mincut)
             polygon = complet_result['body']['data']['geometry']
