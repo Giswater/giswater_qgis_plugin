@@ -127,11 +127,18 @@ BEGIN
 
 	END IF;
 
-	-- get envelope
-	SELECT row_to_json (a) 
-	INTO v_geometry
-	FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
-	FROM (SELECT st_collect(the_geom) as the_geom FROM v_edit_arc) b) a;
+	-- get envelope over arcs or over exploitation if arcs dont exist
+	IF (SELECT the_geom FROM v_edit_arc LIMIT 1) IS NOT NULL or (v_checkall IS False and v_id is null) THEN
+		SELECT row_to_json (a) 
+		INTO v_geometry
+		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
+		FROM (SELECT st_collect(the_geom) as the_geom FROM v_edit_arc) b) a;
+	ELSE
+		SELECT row_to_json (a) 
+		INTO v_geometry
+		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
+		FROM (SELECT the_geom FROM exploitation where expl_id=v_id) b) a;
+	END IF;
 
 	/*set expl as vdefault if only one value on selector. In spite expl_vdefault is a hidden value, user can enable this variable if he needs it when working on more than
 	one exploitation in order to choose what is the default (remember default value has priority over spatial intersection)*/ 
