@@ -46,6 +46,9 @@ class GwFeatureDeleteButton(GwAction):
         # Disable button delete feature
         self.dlg_feature_delete.btn_delete.setEnabled(False)
 
+        # Hide button delete another feature
+        self.dlg_feature_delete.btn_delete_another.setVisible(False)
+
         # Configure feature_id as typeahead
         completer = QCompleter()
         model = QStringListModel()
@@ -64,6 +67,7 @@ class GwFeatureDeleteButton(GwAction):
         self.dlg_feature_delete.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_feature_delete))
         self.dlg_feature_delete.rejected.connect(tools_qgis.disconnect_signal_selection_changed)
         self.dlg_feature_delete.rejected.connect(partial(tools_gw.save_settings, self.dlg_feature_delete))
+        self.dlg_feature_delete.btn_delete_another.clicked.connect(partial(self._delete_another_feature))
 
         self.dlg_feature_delete.btn_relations.clicked.connect(partial(self._show_feature_relation))
         self.dlg_feature_delete.btn_delete.clicked.connect(partial(self._delete_feature_relation))
@@ -73,7 +77,29 @@ class GwFeatureDeleteButton(GwAction):
         tools_gw.open_dialog(self.dlg_feature_delete, dlg_name='feature_delete')
 
 
+    def _delete_another_feature(self):
+
+        # Reset delete feature form
+        self.dlg_feature_delete.txt_infolog.clear()
+        feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
+        tools_qt.set_combo_value(self.dlg_feature_delete.feature_type, feature_type.upper(), 1)
+        self.dlg_feature_delete.feature_id.clear()
+
+        # Set widget enabled True
+        self.dlg_feature_delete.mainTab.widget(0).setEnabled(True)
+        self.dlg_feature_delete.btn_delete_another.setVisible(False)
+
+        # Set delete feature tab as current index
+        self.dlg_feature_delete.mainTab.setCurrentIndex(0)
+
+
     def _filter_typeahead(self, widget, completer, model):
+
+        # Refresh infolog
+        self.dlg_feature_delete.txt_feature_infolog.clear()
+
+        # Set widget btn_delete enabled false
+        self.dlg_feature_delete.btn_delete.setEnabled(False)
 
         # Get feature_type and feature_id
         feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
@@ -137,11 +163,7 @@ class GwFeatureDeleteButton(GwAction):
         # Get feature_type and feature_id
         feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type)
         feature_id = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_id)
-        
-        if feature_id == 'null':
-            self.dlg_feature_delete.feature_id.setStyleSheet("border: 1px solid red")
-            return
-        self.dlg_feature_delete.feature_id.setStyleSheet(None)
+
         feature = '"type":"' + feature_type + '"'
         extras = '"feature_id":"' + feature_id + '"'
         body = tools_gw.create_body(feature=feature, extras=extras)
@@ -161,7 +183,9 @@ class GwFeatureDeleteButton(GwAction):
             if str(k) == "info":
                 change_tab = tools_gw.fill_tab_log(self.dlg_feature_delete, data)
 
-        self.dlg_feature_delete.btn_cancel.setText('Accept')
+        # Set visible button delete another feature
+        self.dlg_feature_delete.btn_delete_another.setVisible(True)
+
 
         # Close dialog
         if not change_tab:
