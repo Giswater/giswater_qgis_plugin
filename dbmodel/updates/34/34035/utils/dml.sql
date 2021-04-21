@@ -32,4 +32,24 @@ UPDATE sys_table SET notify_action=
 '[{"channel":"user","name":"set_layer_index", "enabled":"true", "trg_fields":"state","featureType":["connec", "v_edit_link"]}]'
 WHERE id ='plan_psector_x_connec';
 
+INSERT INTO config_form_fields(formname, formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, 
+dv_querytext, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, layoutname, tooltip, hidden)
+VALUES ('v_edit_node','form_feature', 'district_id', 'integer', 'combo', 'district',false, false, true, false, 
+'SELECT a.district_id AS id, a.name AS idval FROM ext_district a JOIN ext_municipality m USING (muni_id) WHERE district_id IS NOT NULL ', true, 'muni_id', 'AND m.muni_id',
+'lyt_data_3','district_id - Identificador del barrio con el que se vincula el elemento. A escoger entre los disponibles en el desplegable (se filtra en función del municipio seleccionado)',
+true) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
 
+INSERT INTO config_form_fields(formname, formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, 
+dv_querytext, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, layoutname, tooltip, hidden)
+VALUES ('v_edit_arc','form_feature', 'district_id', 'integer', 'combo', 'district',false, false, true, false, 
+'SELECT a.district_id AS id, a.name AS idval FROM ext_district a JOIN ext_municipality m USING (muni_id) WHERE district_id IS NOT NULL ', true, 'muni_id', 'AND m.muni_id',
+'lyt_data_3','district_id - Identificador del barrio con el que se vincula el elemento. A escoger entre los disponibles en el desplegable (se filtra en función del municipio seleccionado)',
+true) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
+
+
+INSERT INTO config_form_fields(formname,  formtype, columnname, datatype, widgettype, label, ismandatory, isparent, iseditable, isautoupdate, 
+dv_querytext, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, layoutname, tooltip, hidden)
+VALUES ('v_edit_connec','form_feature', 'district_id', 'integer', 'combo', 'district',false, false, true, false, 
+'SELECT a.district_id AS id, a.name AS idval FROM ext_district a JOIN ext_municipality m USING (muni_id) WHERE district_id IS NOT NULL ', true, 'muni_id', 'AND m.muni_id',
+'lyt_data_3','district_id - Identificador del barrio con el que se vincula el elemento. A escoger entre los disponibles en el desplegable (se filtra en función del municipio seleccionado)',
+true) ON CONFLICT (formname, formtype, columnname) DO NOTHING;
