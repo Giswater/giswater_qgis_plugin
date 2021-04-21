@@ -260,20 +260,20 @@ class GwPsector:
             self.qtbl_node.model().setFilter(expr)
             self.qtbl_node.model().select()
             self.qtbl_node.clicked.connect(partial(
-                tools_qgis.hilight_feature_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band, 1))
+                tools_qgis.hilight_feature_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band, 10))
 
             expr = " psector_id = " + str(psector_id)
             self.qtbl_connec.model().setFilter(expr)
             self.qtbl_connec.model().select()
             self.qtbl_connec.clicked.connect(partial(
-                tools_qgis.hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
+                tools_qgis.hilight_feature_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
 
             if self.project_type.upper() == 'UD':
                 expr = " psector_id = " + str(psector_id)
                 self.qtbl_gully.model().setFilter(expr)
                 self.qtbl_gully.model().select()
                 self.qtbl_gully.clicked.connect(partial(
-                    tools_qgis.hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
+                    tools_qgis.hilight_feature_by_id, self.qtbl_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
 
             self.populate_budget(self.dlg_plan_psector, psector_id)
             self.update = True

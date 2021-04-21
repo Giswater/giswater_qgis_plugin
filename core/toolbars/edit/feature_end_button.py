@@ -115,13 +115,13 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work_end.tbl_cat_work_x_arc.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
             self.dlg_work_end.tbl_cat_work_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
         self.dlg_work_end.tbl_cat_work_x_node.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_work_end.tbl_cat_work_x_node, "v_edit_node", "node_id", self.rubber_band, 1))
+            self.dlg_work_end.tbl_cat_work_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
         self.dlg_work_end.tbl_cat_work_x_connec.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_work_end.tbl_cat_work_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 1))
+            self.dlg_work_end.tbl_cat_work_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
         self.dlg_work_end.tbl_cat_work_x_gully.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_work_end.tbl_cat_work_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 1))
+            self.dlg_work_end.tbl_cat_work_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
         self.dlg_work_end.tbl_cat_work_x_element.clicked.connect(partial(tools_qgis.hilight_feature_by_id,
-            self.dlg_work_end.tbl_cat_work_x_element, "v_edit_element", "element_id", self.rubber_band, 1))
+            self.dlg_work_end.tbl_cat_work_x_element, "v_edit_element", "element_id", self.rubber_band, 10))
 
         # Set values
         self._fill_fields()
