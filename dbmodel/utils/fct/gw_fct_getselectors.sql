@@ -150,7 +150,7 @@ BEGIN
 			FROM '|| v_table ||' WHERE ' || v_table_id || ' IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '|| v_fullfilter ||' UNION 
 			SELECT '||quote_ident(v_table_id)||', concat(' || v_label || ') AS label, '||v_orderby||' as orderby , '||v_name||' as name, '|| v_table_id || '::text as widgetname, ''' || v_selector_id || ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 			FROM '|| v_table ||' WHERE ' || v_table_id || ' NOT IN (SELECT ' || v_selector_id || ' FROM '|| v_selector ||' WHERE cur_user=' || quote_literal(current_user) || ') '||
-			 v_fullfilter ||' ORDER BY orderby ) a';
+			 v_fullfilter ||' ORDER BY orderby desc) a';
 
 
 		raise notice 'v_finalquery %', v_finalquery;
