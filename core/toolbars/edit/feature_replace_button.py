@@ -218,7 +218,7 @@ class GwFeatureReplaceButton(GwMaptool):
         self.dlg_replace.btn_new_workcat.clicked.connect(partial(self._new_workcat))
         self.dlg_replace.btn_accept.clicked.connect(partial(self._replace_feature, self.dlg_replace))
         self.dlg_replace.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_replace))
-        self.dlg_replace.rejected.connect(self.cancel_map_tool)
+
         # Open dialog
         tools_gw.open_dialog(self.dlg_replace, maximize_button=False)
 

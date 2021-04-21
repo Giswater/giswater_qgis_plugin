@@ -247,15 +247,8 @@ def open_dialog(dlg, dlg_name=None, info=True, maximize_button=True, stay_on_top
 def close_dialog(dlg):
     """ Close dialog """
 
-    try:
-        save_settings(dlg)
-        dlg.close()
-        map_tool = global_vars.canvas.mapTool()
-        # If selected map tool is from the plugin, set 'Pan' as current one
-        if map_tool.toolName() == '':
-            global_vars.iface.actionPan().trigger()
-    except Exception:
-        pass
+    save_settings(dlg)
+    dlg.close()
 
 
 def create_body(form='', feature='', filter_fields='', extras=None):
