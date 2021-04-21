@@ -20,6 +20,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant,  QDate
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem
+from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget,\
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
     QToolButton, QWidget
@@ -2373,7 +2374,7 @@ def load_tableview_psector(dialog, feature_type):
     value = tools_qt.get_text(dialog, dialog.psector_id)
     expr = f"psector_id = '{value}'"
     qtable = tools_qt.get_widget(dialog, f'tbl_psector_x_{feature_type}')
-    message = tools_qt.fill_table(qtable, f"plan_psector_x_{feature_type}", expr)
+    message = tools_qt.fill_table(qtable, f"plan_psector_x_{feature_type}", expr, QSqlTableModel.OnFieldChange)
     if message:
         tools_qgis.show_warning(message)
     set_tablemodel_config(dialog, qtable, f"plan_psector_x_{feature_type}")
