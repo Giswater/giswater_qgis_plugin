@@ -28,5 +28,8 @@ INSERT INTO sys_message VALUES (3182, 'It is not allowed to downgrade (state=0) 
 'If you are looking for unlink it, please remove it from psector. If feature only belongs to this psector, and you are looking to unlink it, you will need to delete from ve_* or v_edit_* or use end feature tool.',
 2, TRUE, 'utils');
 
+UPDATE sys_table SET notify_action=
+'[{"channel":"user","name":"set_layer_index", "enabled":"true", "trg_fields":"the_geom","featureType":["connec", "v_edit_link"]}]'
+WHERE id ='plan_psector_x_connec';
 
 
