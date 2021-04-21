@@ -568,6 +568,7 @@ class GwVisit(QObject):
         feature = f'"id":"{self.current_visit.id}"'
         body = tools_gw.create_body(feature=feature)
         complet_result = tools_gw.execute_procedure('gw_fct_om_visit_multiplier', body)
+        if complet_result is None: return
         tools_log.log_info(f"execute_pgfunction: {complet_result}")
 
 

@@ -149,7 +149,7 @@ class GwProfileButton(GwAction):
 
         # Execute query
         self.profile_json = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
-        if self.profile_json['status'] == 'Failed': return
+        if self.profile_json is None or self.profile_json['status'] == 'Failed': return
 
         # Manage level and message from query result
         if self.profile_json['message']:
@@ -353,7 +353,7 @@ class GwProfileButton(GwAction):
                     extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
                     body = tools_gw.create_body(extras=extras)
                     result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
-                    if result['status'] == 'Failed': return
+                    if result is None or result['status'] == 'Failed': return
                     self.layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
 
                     # Manage level and message from query result
@@ -1319,7 +1319,7 @@ class GwProfileButton(GwAction):
         extras = f'"profile_id":"{profile_id}", "action":"delete"'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_setprofile', body)
-        if 'message' in result:
+        if result and 'message' in result:
             message = f"{result['message']}"
             tools_qgis.show_info(message)
 

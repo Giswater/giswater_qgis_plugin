@@ -1508,7 +1508,7 @@ class GwPsector:
             feature = f'"id":[{inf_text}], "featureType":"PSECTOR"'
             body = tools_gw.create_body(feature=feature)
             result = tools_gw.execute_procedure('gw_fct_getcheckdelete', body)
-            if result['status'] == "Accepted":
+            if result is not None and result['status'] == "Accepted":
                 if result['message']:
                     answer = tools_qt.show_question(result['message']['text'])
                     if answer:

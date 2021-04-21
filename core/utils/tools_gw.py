@@ -437,7 +437,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
                 if style_id is not None:
                     body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
                     style = execute_procedure('gw_fct_getstyle', body)
-                    if style['status'] == 'Failed': return
+                    if style is None or style['status'] == 'Failed': return
                     if 'styles' in style['body']:
                         if 'style' in style['body']['styles']:
                             qml = style['body']['styles']['style']
@@ -453,7 +453,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", child
         if style_id not in (None, "-1"):
             body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
             style = execute_procedure('gw_fct_getstyle', body)
-            if style['status'] == 'Failed': return
+            if style is None or style['status'] == 'Failed': return
             if 'styles' in style['body']:
                 if 'style' in style['body']['styles']:
                     qml = style['body']['styles']['style']
@@ -1457,6 +1457,8 @@ def fill_child(dialog, widget, action, feature_type=''):
     combo_id = tools_qt.get_combo_value(dialog, widget)
     # TODO cambiar por gw_fct_getchilds then unified with get_child if posible
     json_result = execute_procedure('gw_fct_getcombochilds', f"'{action}' ,'' ,'' ,'{combo_parent}', '{combo_id}','{feature_type}'")
+    if json_result is None: return
+
     for combo_child in json_result['fields']:
         if combo_child is not None:
             fill_combo_child(dialog, combo_child)
@@ -1731,7 +1733,7 @@ def manage_json_return(json_result, sql, rubber_band=None):
                         extras = f'"style_id":"{style_id}"'
                         body = create_body(extras=extras)
                         style = execute_procedure('gw_fct_getstyle', body)
-                        if style['status'] == 'Failed': return
+                        if style is None or style['status'] == 'Failed': return
                         if 'styles' in style['body']:
                             if 'style' in style['body']['styles']:
                                 qml = style['body']['styles']['style']

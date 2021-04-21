@@ -297,7 +297,7 @@ class GwCSVButton(GwAction):
         body = tools_gw.create_body(extras=values)
         result = tools_gw.execute_procedure('gw_fct_setcsv', body)
 
-        if 'status' in result and result['status'] == 'Accepted':
+        if result and 'status' in result and result['status'] == 'Accepted':
             return True
 
         return False

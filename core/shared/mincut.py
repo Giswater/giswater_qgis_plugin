@@ -2024,7 +2024,8 @@ class GwMincut:
             extras = f'"action":"mincutValveUnaccess", "nodeId":{elem_id}, "mincutId":"{result_mincut_id}", "usePsectors":"{use_planified}"'
             body = tools_gw.create_body(extras=extras)
             result = tools_gw.execute_procedure('gw_fct_setmincut', body)
-            if result['status'] == 'Accepted' and result['message']:
+
+            if result is not None and result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 tools_qgis.show_message(result['message']['text'], level)
 
@@ -2345,7 +2346,7 @@ class GwMincut:
             extras = f'"nodeId":{elem_id}, "mincutId":{result_mincut_id}, "usePsectors":"{use_planified}"'
             body = tools_gw.create_body(extras=extras)
             result = tools_gw.execute_procedure('gw_fct_setchangevalvestatus', body, log_sql=True)
-            if result['status'] == 'Accepted' and result['message']:
+            if result is not None and result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 tools_qgis.show_message(result['message']['text'], level)
 

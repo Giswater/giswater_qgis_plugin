@@ -3579,6 +3579,8 @@ class GwInfo(QObject):
                   f'"dqaId":"{dqa_id}"')
         body = tools_gw.create_body(feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_settoarc', body)
+        if json_result is None: return
+
         if 'status' in json_result and json_result['status'] == 'Accepted':
             if json_result['message']:
                 level = 1

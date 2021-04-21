@@ -34,6 +34,7 @@ class GwCatalog:
         feature = f'"feature_type":"{child_type}"'
         body = tools_gw.create_body(form, feature)
         json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body, log_sql=True)
+        if json_result is None: return
 
         group_box_1 = QGroupBox("Filter")
         self.filter_form = QGridLayout()
@@ -109,6 +110,8 @@ class GwCatalog:
 
         body = tools_gw.create_body(form=form, feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body, log_sql=True)
+        if json_result is None: return
+
         if json_result['status'] == "Failed":
             tools_log.log_warning(json_result)
             return False
@@ -130,6 +133,8 @@ class GwCatalog:
         extras = f'"fields":{{"matcat_id":"{matcat_id_value}"}}'
         body = tools_gw.create_body(form=form, feature=feature, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getcatalog', body, log_sql=True)
+        if json_result is None: return
+
         for field in json_result['body']['data']['fields']:
             if field['columnname'] in ('pnom', 'shape'):
                 self._fill_combo(pnom, field)

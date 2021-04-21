@@ -254,7 +254,7 @@ class GwSelector:
 
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
-        if json_result['status'] == 'Failed': return
+        if json_result is None or json_result['status'] == 'Failed': return
         if str(tab_name) == 'tab_exploitation':
             try:
                 # Zoom to exploitation
