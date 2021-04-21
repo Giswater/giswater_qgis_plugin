@@ -904,11 +904,6 @@ class GwAdminButton:
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
-                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'en_US'):
-                                    status = self._execute_files(self.folderUpdates + folder +
-                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', True)
-                                    if status is False:
-                                        return False
 
                         else:
                             if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
@@ -925,11 +920,6 @@ class GwAdminButton:
                                 if self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), ''):
                                     status = self._execute_files(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
-                                    if status is False:
-                                        return False
-                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'en_US'):
-                                    status = self._execute_files(self.folderUpdates + folder +
-                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', True)
                                     if status is False:
                                         return False
 
@@ -956,11 +946,6 @@ class GwAdminButton:
                                             self.locale + os.sep), True)
                                     if status is False:
                                         return False
-                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'en_US') is True:
-                                    status = self._execute_files(self.folderUpdates + folder +
-                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', True)
-                                    if status is False:
-                                        return False
 
                         else:
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
@@ -979,11 +964,6 @@ class GwAdminButton:
                                 if self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), '') is True:
                                     status = self._execute_files(
                                         self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
-                                    if status is False:
-                                        return False
-                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'en_US') is True:
-                                    status = self._execute_files(self.folderUpdates + folder +
-                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', True)
                                     if status is False:
                                         return False
 
@@ -1005,12 +985,6 @@ class GwAdminButton:
                                                                folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(self.locale + os.sep), True)
                                     if status is False:
                                         return False
-                                elif self._process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', '') is True:
-                                    status = self._execute_files(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' +
-                                                               os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', True)
-                                    if status is False:
-                                        return False
-
                         else:
                             if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self._process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder,
@@ -1024,12 +998,6 @@ class GwAdminButton:
                                     status = self._execute_files(self.sql_dir + os.sep + str(
                                         project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
                                         self.locale + os.sep), True)
-                                elif self._process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'en_US') is True:
-                                    status = self._execute_files(
-                                        self.sql_dir + os.sep + str(project_type) + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'en_US', True)
-                                    if status is False:
-                                        return False
-
                     else:
                         if self.dev_commit is True:
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
@@ -1051,12 +1019,6 @@ class GwAdminButton:
                                             self.locale + os.sep), True)
                                     if status is False:
                                         return False
-                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'en_US') is True:
-                                    status = self._execute_files(self.folderUpdates + folder +
-                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', True)
-                                    if status is False:
-                                        return False
-
                         else:
                             if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
                                 if self._process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
@@ -1080,12 +1042,6 @@ class GwAdminButton:
                                             self.locale + os.sep), True)
                                     if status is False:
                                         return False
-                                elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'en_US') is True:
-                                    status = self._execute_files(self.folderUpdates + folder +
-                                                               os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'en_US', True)
-                                    if status is False:
-                                        return False
-
         return True
 
 
@@ -1145,11 +1101,6 @@ class GwAdminButton:
                                         self.locale + os.sep), True)
                                 if status is False:
                                     return False
-                            elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is False:
-                                status = self._execute_files(self.folderUpdates + folder +
-                                                           os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
-                                if status is False:
-                                    return False
                     else:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= '31100':
                             if self._process_folder(self.folderUpdates + folder + os.sep + sub_folder, os.sep + 'utils' + os.sep) is True:
@@ -1173,12 +1124,6 @@ class GwAdminButton:
                                         self.locale + os.sep), True)
                                 if status is False:
                                     return False
-                            elif self._process_folder(self.folderUpdates + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', '') is True:
-                                status = self._execute_files(self.folderUpdates + folder +
-                                                           os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN', True)
-                                if status is False:
-                                    return False
-
         else:
 
             if not os.path.exists(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + ''):
@@ -1207,12 +1152,6 @@ class GwAdminButton:
                                     self.locale + os.sep), True)
                                 if status is False:
                                     return False
-                            elif self._process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                status = self._execute_files(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' +
-                                                           os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
-                                if status is False:
-                                    return False
-
                     else:
                         if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) <= '31100':
                             if self._process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder, '') is True:
@@ -1228,11 +1167,6 @@ class GwAdminButton:
                                 status = self._execute_files(self.sql_dir + os.sep + str(
                                     project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + str(
                                     self.locale + os.sep), True)
-                                if status is False:
-                                    return False
-                            elif self._process_folder(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' + os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep, 'EN') is True:
-                                status = self._execute_files(self.sql_dir + os.sep + str(project_type) + os.sep + os.sep + 'updates' +
-                                                           os.sep + folder + os.sep + sub_folder + os.sep + 'i18n' + os.sep + 'EN' + os.sep, True)
                                 if status is False:
                                     return False
 
