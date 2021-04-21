@@ -29,7 +29,7 @@ INSERT INTO sys_message VALUES (3182, 'It is not allowed to downgrade (state=0) 
 2, TRUE, 'utils');
 
 UPDATE sys_table SET notify_action=
-'[{"channel":"user","name":"set_layer_index", "enabled":"true", "trg_fields":"the_geom","featureType":["connec", "v_edit_link"]}]'
+'[{"channel":"user","name":"set_layer_index", "enabled":"true", "trg_fields":"state","featureType":["connec", "v_edit_link"]}]'
 WHERE id ='plan_psector_x_connec';
 
 

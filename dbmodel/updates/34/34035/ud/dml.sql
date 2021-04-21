@@ -8,5 +8,5 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 UPDATE sys_table SET notify_action=
-'[{"channel":"user","name":"set_layer_index", "enabled":"true", "trg_fields":"the_geom","featureType":["gully", "v_edit_link"]}]'
+'[{"channel":"user","name":"set_layer_index", "enabled":"true", "trg_fields":"state","featureType":["gully", "v_edit_link"]}]'
 WHERE id ='plan_psector_x_gully';
