@@ -28,11 +28,8 @@ class GwAutoMincutTask(GwTask):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
 
         super().run()
-        self.mincut_class.dlg_mincut.btn_cancel_task.show()
-        self.mincut_class.dlg_mincut.btn_cancel.hide()
 
         try:
-
             real_mincut_id = tools_qt.get_text(self.mincut_class.dlg_mincut, 'result_mincut_id')
             if self.mincut_class.is_new:
                 self.mincut_class.set_id_val()
@@ -97,10 +94,3 @@ class GwAutoMincutTask(GwTask):
         # Task finished with Accepted result
         elif 'mincutOverlap' in self.complet_result or self.complet_result['status'] == 'Accepted':
             self.task_finished.emit([True, self.complet_result])
-
-        try:
-            self.mincut_class.dlg_mincut.btn_cancel_task.hide()
-            self.mincut_class.dlg_mincut.btn_cancel.show()
-        except:
-            pass
-

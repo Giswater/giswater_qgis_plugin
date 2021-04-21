@@ -1733,6 +1733,8 @@ class GwMincut:
             layer.select([feature_id])
 
             # Create task to manage Mincut execution
+            self.mincut_class.dlg_mincut.btn_cancel_task.show()
+            self.mincut_class.dlg_mincut.btn_cancel.hide()
             self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id)
             QgsApplication.taskManager().addTask(self.mincut_task)
             QgsApplication.taskManager().triggerTask(self.mincut_task)
@@ -1786,6 +1788,12 @@ class GwMincut:
 
 
     def _mincut_task_finished(self, snapped_point, elem_type, element_id, signal):
+
+        try:
+            self.mincut_class.dlg_mincut.btn_cancel_task.hide()
+            self.mincut_class.dlg_mincut.btn_cancel.show()
+        except:
+            pass
 
         if not signal[0]:
             try:
@@ -1875,6 +1883,8 @@ class GwMincut:
         if row:
             # Create task to manage Mincut execution
             element_id = row['anl_feature_id']
+            self.mincut_class.dlg_mincut.btn_cancel_task.show()
+            self.mincut_class.dlg_mincut.btn_cancel.hide()
             self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id)
             QgsApplication.taskManager().addTask(self.mincut_task)
             QgsApplication.taskManager().triggerTask(self.mincut_task)
@@ -1882,6 +1892,12 @@ class GwMincut:
 
 
     def _refresh_mincut_finished(self, signal):
+
+        try:
+            self.mincut_class.dlg_mincut.btn_cancel_task.hide()
+            self.mincut_class.dlg_mincut.btn_cancel.show()
+        except:
+            pass
 
         if not signal[0]:
             return False
