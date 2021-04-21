@@ -9,7 +9,7 @@ import os
 from datetime import datetime
 from functools import partial
 
-from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime
+from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime, QDateTime
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsApplication,  QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext,\
@@ -712,6 +712,7 @@ class GwMincut:
 
         # Set signals
         self.dlg_fin.btn_accept.clicked.connect(self._real_end_accept)
+        self.dlg_fin.btn_accept.clicked.connect(self._accept_save_data)
         self.dlg_fin.btn_cancel.clicked.connect(self._real_end_cancel)
         self.dlg_fin.btn_set_real_location.clicked.connect(self._set_real_location)
 
@@ -2060,16 +2061,18 @@ class GwMincut:
     def _manage_date(self, date_value, widget_date, widget_time):
         """ Manage date of current field """
 
-        if date_value:
-            date_time = (str(date_value))
-            date = str(date_time.split()[0])
-            time = str(date_time.split()[1])
-            if date:
-                date = date.replace('/', '-')
-            qt_date = QDate.fromString(date, 'yyyy-MM-dd')
-            qt_time = QTime.fromString(time, 'h:mm:ss')
-            tools_qt.set_calendar(self.dlg_mincut, widget_date, qt_date)
-            tools_qt.set_time(self.dlg_mincut, widget_time, qt_time)
+        if date_value in ('', None):
+            date_value = QDateTime.currentDateTime().toString('yyyy-MM-dd HH:mm:ss')
+
+        date_time = (str(date_value))
+        date = str(date_time.split()[0])
+        time = str(date_time.split()[1])
+        if date:
+            date = date.replace('/', '-')
+        qt_date = QDate.fromString(date, 'yyyy-MM-dd')
+        qt_time = QTime.fromString(time, 'h:mm:ss')
+        tools_qt.set_calendar(self.dlg_mincut, widget_date, qt_date)
+        tools_qt.set_time(self.dlg_mincut, widget_time, qt_time)
 
 
     def _mincut_composer(self):
