@@ -25,7 +25,6 @@ def add_object(**kwargs):
     """
     dialog = kwargs['dialog']
     button = kwargs['widget']
-
     index_tab = dialog.tab_main.currentIndex()
     tab_name = dialog.tab_main.widget(index_tab).objectName()
     func_params = kwargs['func_params']
@@ -122,7 +121,6 @@ def open_selected_element(**kwargs):
         function called in module tools_gw: def add_tableview(complet_result, field, module=sys.modules[__name__])
         at lines:   widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
     """
-    dialog = kwargs['dialog']
     qtable = kwargs['qtable']
     complet_result = kwargs['complet_result']
     feature_type = complet_result['body']['feature']['featureType']
@@ -140,18 +138,13 @@ def open_selected_element(**kwargs):
     element_id = index.sibling(row, column_index).data()
 
     # Open selected element
-    _manage_element(dialog, element_id, None, feature_type)
+    _manage_element(element_id, None, feature_type, **kwargs)
 
 
-def _manage_element(dialog, element_id=None, feature=None, feature_type=None):
-    """ Execute action of button 33 """
-
-
+def _manage_element(element_id, feature, feature_type, **kwargs):
     elem = GwElement()
     elem.get_element(True, feature, feature_type)
-    elem.dlg_add_element.accepted.connect(partial(_manage_element_new, dialog, elem))
-    elem.dlg_add_element.rejected.connect(partial(_manage_element_new, dialog, elem))
-
+    elem.dlg_add_element.btn_accept.clicked.connect(partial(_reload_table_element, **kwargs))
 
     if element_id:
         tools_qt.set_widget_text(elem.dlg_add_element, "element_id", element_id)
@@ -160,22 +153,20 @@ def _manage_element(dialog, element_id=None, feature=None, feature_type=None):
     tools_gw.open_dialog(elem.dlg_add_element)
 
 
-
-
-def _manage_element_new(dialog, elem):
+def _reload_table_element(**kwargs):
     """ Get inserted element_id and add it to current feature """
 
-    if elem.element_id is None:
-        return
+    dialog = kwargs['dialog']
+    complet_result = kwargs['complet_result']
+    feature_id = complet_result['body']['feature']['id']
+    field_id = str(complet_result['body']['feature']['idName'])
+    qtable = kwargs['qtable']
+    linkedobject = ""
+    if qtable.property('linkedobject') is not None:
+        linkedobject = qtable.property('linkedobject')
 
-    tools_qt.set_widget_text(dialog, "element_id", elem.element_id)
-    add_object(self.tbl_element, "element", "v_ui_element")
-    tbl_element.model().select()
-
-
-
-
-
+    filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}'
+    _fill_tbl(complet_result, dialog, qtable.objectName(), linkedobject, filter_fields)
 
 
 

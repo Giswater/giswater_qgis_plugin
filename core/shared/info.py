@@ -2236,7 +2236,6 @@ class GwInfo(QObject):
     # TODO borrar esto, esta en toolsbackend ???
     def _manage_element(self, dialog, element_id=None, feature=None):
         """ Execute action of button 33 """
-        print("TEST 10")
         elem = GwElement()
         elem.get_element(True, feature, self.feature_type)
         elem.dlg_add_element.accepted.connect(partial(self._manage_element_new, dialog, elem))
