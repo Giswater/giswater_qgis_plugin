@@ -37,6 +37,7 @@ class GwI18NGenerator:
         self.dlg_qm.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_qm))
         self.dlg_qm.rejected.connect(self._save_user_values)
         self.dlg_qm.rejected.connect(self._close_db)
+        self.dlg_qm.cmb_language.currentIndexChanged.connect(partial(self._set_editability_dbmessage))
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_translation')
 
 
@@ -552,4 +553,14 @@ class GwI18NGenerator:
         param = param.replace("\n", " ")
 
         return param
+
+
+    def _set_editability_dbmessage(self):
+
+        if tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0) == 'en_US':
+            tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_db_msg, False)
+            self.dlg_qm.chk_db_msg.setEnabled(False)
+        else:
+            self.dlg_qm.chk_db_msg.setEnabled(True)
+
     # endregion
