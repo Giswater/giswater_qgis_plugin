@@ -110,7 +110,7 @@ BEGIN
 	
 	-- setting device
 	IF p_device IN (1,2,3) THEN
-		v_device = ' b.camelstyle AS type, columnname AS name, datatype AS "dataType", a.camelstyle AS "widgetAction", a.camelstyle as "updateAction", a.camelstyle as "changeAction",
+		v_device = ' b.camelstyle AS type, columnname AS name, datatype AS "dataType", b.camelstyle AS "widgetAction", b.camelstyle as "updateAction", b.camelstyle as "changeAction",
 		     (CASE WHEN layoutname=''0'' OR layoutname =''lyt_top_1'' THEN ''header'' WHEN layoutname=''9'' OR layoutname =''lyt_bot_1'' OR layoutname =''lyt_bot_2'' 
 		     THEN ''footer'' ELSE ''body'' END) AS "position",
 		     (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,';     

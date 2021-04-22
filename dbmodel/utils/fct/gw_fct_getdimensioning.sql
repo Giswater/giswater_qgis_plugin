@@ -78,7 +78,8 @@ BEGIN
 
 	EXECUTE 'SELECT gw_fct_getformfields($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)'
 	INTO v_fields_array
-	USING 'v_edit_dimensions', 'form_feature', '', NULL, NULL, NULL, NULL, 'SELECT', null, 3, null::json;
+	USING 'v_edit_dimensions', 'form_feature', '', NULL, NULL, NULL, NULL, 'SELECT', null, 4, null::json;
+
 
 	-- USE reduced geometry to intersect with expl mapzone in order to enhance the selectedId expl
 
