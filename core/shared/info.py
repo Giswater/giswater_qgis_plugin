@@ -705,7 +705,9 @@ class GwInfo(QObject):
 
     def _block_action_edit(self, dialog, action_edit, result, layer, fid, my_json, new_feature):
 
-        if self.new_feature_id is not None:
+        current_layer = self.iface.activeLayer()
+
+        if self.new_feature_id is not None and current_layer == layer:
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(True)
             save = self._stop_editing(dialog, action_edit, layer, fid, my_json, new_feature)
             self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').blockSignals(False)
@@ -720,7 +722,7 @@ class GwInfo(QObject):
         if not self.connected:
             self.layer.editingStarted.connect(self.fct_start_editing)
             self.layer.editingStopped.connect(self.fct_stop_editing)
-            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').toggled.connect(self.fct_block_action_edit)
+            self.iface.mainWindow().findChild(QAction, 'mActionToggleEditing').triggered.connect(self.fct_block_action_edit)
             self.connected = True
 
 
