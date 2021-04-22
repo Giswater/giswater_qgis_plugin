@@ -1116,25 +1116,8 @@ class GwInfo(QObject):
         """ Get current QgsFeature """
 
         expr_filter = f"{self.field_id} = '{self.feature_id}'"
-        self.feature = self._get_feature_by_expr(self.layer, expr_filter)
+        self.feature = tools_qgis.get_feature_by_expr(self.layer, expr_filter)
         return self.feature
-
-
-    def _get_feature_by_expr(self, layer, expr_filter):
-
-        # Check filter and existence of fields
-        expr = QgsExpression(expr_filter)
-        if expr.hasParserError():
-            message = f"{expr.parserErrorString()}: {expr_filter}"
-            tools_qgis.show_warning(message)
-            return
-
-        it = layer.getFeatures(QgsFeatureRequest(expr))
-        # Iterate over features
-        for feature in it:
-            return feature
-
-        return False
 
 
     def _manage_action_zoom_in(self, canvas, layer):
@@ -1165,7 +1148,7 @@ class GwInfo(QObject):
         canvas.zoomToSelected(layer)
         canvas.zoomOut()
         expr_filter = f"{self.field_id} = '{self.feature_id}'"
-        self.feature = self._get_feature_by_expr(self.layer, expr_filter)
+        self.feature = tools_qgis.get_feature_by_expr(self.layer, expr_filter)
         return self.feature
 
 

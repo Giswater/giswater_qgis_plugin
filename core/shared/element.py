@@ -340,6 +340,7 @@ class GwElement:
 
     def _manage_element_accept(self, table_object):
         """ Insert or update table 'element'. Add element to selected feature """
+        print(f"TEST 20")
 
         # Get values from dialog
         element_id = tools_qt.get_text(self.dlg_add_element, "element_id", return_string_null=False)
@@ -384,7 +385,7 @@ class GwElement:
         sql = (f"SELECT DISTINCT(element_id)"
                f" FROM {table_object}"
                f" WHERE element_id = '{element_id}'")
-        row = tools_db.get_row(sql, log_info=False)
+        row = tools_db.get_row(sql, log_sql=True)
 
         if row is None:
             # If object not exist perform an INSERT
@@ -520,8 +521,9 @@ class GwElement:
             for feature_id in self.list_ids['connec']:
                 sql += (f"\nINSERT INTO element_x_connec (element_id, connec_id)"
                         f" VALUES ('{element_id}', '{feature_id}');")
-
+        print(f"STATUS -->{sql}")
         status = tools_db.execute_sql(sql)
+        print(f"STATUS -->{status}")
         if status:
             self.element_id = element_id
             self.layers = tools_gw.manage_close(self.dlg_add_element, table_object, layers=self.layers)

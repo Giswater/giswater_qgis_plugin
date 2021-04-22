@@ -89,7 +89,6 @@ def add_object(**kwargs):
         if button.property('widgetcontrols')['filterSign'] is not None:
             filter_sign = button.property('widgetcontrols')['filterSign']
 
-
     # Get values from dialog
     object_id = tools_qt.get_text(dialog, f"{tab_name}_{func_params['sourcewidget']}")
     if object_id == 'null':
@@ -173,8 +172,6 @@ def open_selected_element(**kwargs):
         at lines:   widget.doubleClicked.connect(partial(getattr(module, function_name), **kwargs))
     """
     qtable = kwargs['qtable']
-    complet_result = kwargs['complet_result']
-    feature_type = complet_result['body']['feature']['featureType']
     func_params = kwargs['func_params']
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
@@ -189,10 +186,28 @@ def open_selected_element(**kwargs):
     element_id = index.sibling(row, column_index).data()
 
     # Open selected element
-    _manage_element(element_id, None, feature_type, **kwargs)
+    manage_element(element_id,  **kwargs)
 
 
-def _manage_element(element_id, feature, feature_type, **kwargs):
+def manage_element(element_id, **kwargs):
+    """ Function called in class tools_gw.add_button(...) -->
+            widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
+
+    feature = None
+    complet_result = kwargs['complet_result']
+    feature_type = complet_result['body']['feature']['featureType']
+    feature_id = complet_result['body']['feature']['id']
+    field_id = str(complet_result['body']['feature']['idName'])
+    table_parent = str(complet_result['body']['feature']['tableParent'])
+    schema_name = str(complet_result['body']['feature']['schemaName'])
+
+    # When click button 'new_element' element id is the signal emited by the button
+    if element_id is False:
+        layer = tools_qgis.get_layer_by_tablename(table_parent, False, False, schema_name)
+        if layer:
+            expr_filter = f"{field_id} = '{feature_id}'"
+            feature = tools_qgis.get_feature_by_expr(layer, expr_filter)
+
     elem = GwElement()
     elem.get_element(True, feature, feature_type)
     elem.dlg_add_element.btn_accept.clicked.connect(partial(_reload_table, **kwargs))
@@ -206,6 +221,7 @@ def _manage_element(element_id, feature, feature_type, **kwargs):
 
 def _reload_table(**kwargs):
     """ Get inserted element_id and add it to current feature """
+    print(f"TEST 100")
     dialog = kwargs['dialog']
     index_tab = dialog.tab_main.currentIndex()
     tab_name = dialog.tab_main.widget(index_tab).objectName()

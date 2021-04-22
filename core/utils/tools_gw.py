@@ -1070,6 +1070,8 @@ def add_button(**kwargs):
 
     functions called in -> widget.clicked.connect(partial(getattr(module, function_name), **kwargs)) atm:
         module = tools_backend_calls -> def add_object(**kwargs)
+        module = tools_backend_calls -> def manage_element(element_id, **kwargs):
+
 
     """
     field = kwargs['field']

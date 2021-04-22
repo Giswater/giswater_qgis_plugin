@@ -18,7 +18,7 @@ from qgis.PyQt.QtWidgets import QDockWidget, QApplication
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsPointLocator, \
     QgsSnappingUtils, QgsTolerance, QgsPointXY, QgsFeatureRequest, QgsRectangle, QgsSymbol, \
     QgsLineSymbol, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsGeometry
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsExpression, QgsVectorLayer
 
 
 from . import tools_log, tools_qt, tools_os
@@ -26,6 +26,22 @@ from .. import global_vars
 
 # List of user parameters (optionals)
 user_parameters = {'log_sql': None, 'show_message_durations': None, 'aux_context': 'ui_message'}
+
+
+def get_feature_by_expr(layer, expr_filter):
+    # Check filter and existence of fields
+    expr = QgsExpression(expr_filter)
+    if expr.hasParserError():
+        message = f"{expr.parserErrorString()}: {expr_filter}"
+        show_warning(message)
+        return
+
+    it = layer.getFeatures(QgsFeatureRequest(expr))
+    # Iterate over features
+    for feature in it:
+        return feature
+
+    return False
 
 
 def show_message(text, message_level=1, duration=10, context_name=None, parameter=None, title="", logger_file=True):
