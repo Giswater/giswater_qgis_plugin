@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2876
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getunexpected(json);
+--DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getunexpected(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getunexpected(p_data json)
   RETURNS json AS
   

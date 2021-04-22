@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2604
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getvisit(json);
+--DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getvisit(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getvisit(p_data json)
   RETURNS json AS
   
