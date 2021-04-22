@@ -2194,7 +2194,7 @@ class GwInfo(QObject):
                     date_to.setDate(current_date)
             widget.model().select()
 
-
+    # TODO borrar esto, esta en toolsbackend ???
     def _delete_records(self, widget, table_name):
         """ Delete selected objects (elements or documents) of the @widget """
 

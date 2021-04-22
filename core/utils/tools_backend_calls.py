@@ -17,6 +17,56 @@ from ..utils import tools_gw
 from ...lib import tools_qgis, tools_qt, tools_log, tools_os, tools_db
 
 
+def delete_object(**kwargs):
+    """ Delete selected objects (elements or documents) of the @widget """
+    dialog = kwargs['dialog']
+    index_tab = dialog.tab_main.currentIndex()
+    tab_name = dialog.tab_main.widget(index_tab).objectName()
+    func_params = kwargs['func_params']
+    complet_result = kwargs['complet_result']
+    feature_type = complet_result['body']['feature']['featureType']
+
+    qtable_name = func_params['targetwidget']
+    qtable = tools_qt.get_widget(dialog, f"{tab_name}_{qtable_name}")
+
+    tablename = f"v_ui_{func_params['sourceview']}_x_{feature_type}"
+    # "v_ui_element_x_" + self.feature_type
+
+    # Get selected rows
+    selected_list = qtable.selectionModel().selectedRows()
+    if len(selected_list) == 0:
+        message = "Any record selected"
+        tools_qgis.show_warning(message)
+        return
+    print(f"selected_list -->{selected_list}")
+
+    inf_text = ""
+    list_object_id = ""
+    row_index = ""
+    list_id = ""
+    for i in range(0, len(selected_list)):
+        index = selected_list[i]
+        row = index.row()
+        column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
+        object_id = index.sibling(row, column_index).data()
+        column_index = tools_qt.get_col_index_by_col_name(qtable, 'id')
+        id_ = index.sibling(row, column_index).data()
+
+        inf_text += str(object_id) + ", "
+        list_id += str(id_) + ", "
+        list_object_id = list_object_id + str(object_id) + ", "
+        row_index += str(row + 1) + ", "
+
+    list_object_id = list_object_id[:-2]
+    list_id = list_id[:-2]
+    message = "Are you sure you want to delete these records?"
+    answer = tools_qt.show_question(message, "Delete records", list_object_id)
+    if answer:
+        sql = ("DELETE FROM " + tablename + ""
+               " WHERE id::integer IN (" + list_id + ")")
+        tools_db.execute_sql(sql, log_sql=False)
+        _reload_table(**kwargs)
+
 def add_object(**kwargs):
     """
     Open form of selected element of the @qtable??
@@ -34,6 +84,7 @@ def add_object(**kwargs):
     field_id = str(complet_result['body']['feature']['idName'])
     qtable_name = func_params['targetwidget']
     qtable = tools_qt.get_widget(dialog, f"{tab_name}_{qtable_name}")
+    filter_sign = '='
     if button.property('widgetcontrols') is not None and 'filterSign' in button.property('widgetcontrols'):
         if button.property('widgetcontrols')['filterSign'] is not None:
             filter_sign = button.property('widgetcontrols')['filterSign']
@@ -144,7 +195,7 @@ def open_selected_element(**kwargs):
 def _manage_element(element_id, feature, feature_type, **kwargs):
     elem = GwElement()
     elem.get_element(True, feature, feature_type)
-    elem.dlg_add_element.btn_accept.clicked.connect(partial(_reload_table_element, **kwargs))
+    elem.dlg_add_element.btn_accept.clicked.connect(partial(_reload_table, **kwargs))
 
     if element_id:
         tools_qt.set_widget_text(elem.dlg_add_element, "element_id", element_id)
@@ -153,20 +204,83 @@ def _manage_element(element_id, feature, feature_type, **kwargs):
     tools_gw.open_dialog(elem.dlg_add_element)
 
 
-def _reload_table_element(**kwargs):
+def _reload_table(**kwargs):
     """ Get inserted element_id and add it to current feature """
-
     dialog = kwargs['dialog']
+    index_tab = dialog.tab_main.currentIndex()
+    tab_name = dialog.tab_main.widget(index_tab).objectName()
+
+    list_tables = dialog.tab_main.widget(index_tab).findChildren(QTableView)
     complet_result = kwargs['complet_result']
     feature_id = complet_result['body']['feature']['id']
     field_id = str(complet_result['body']['feature']['idName'])
-    qtable = kwargs['qtable']
-    linkedobject = ""
-    if qtable.property('linkedobject') is not None:
-        linkedobject = qtable.property('linkedobject')
+    widget_list = []
+    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QComboBox, QRegExp(f"{tab_name}_")))
+    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QTableView, QRegExp(f"{tab_name}_")))
+    widget_list.extend(dialog.tab_main.widget(index_tab).findChildren(QLineEdit, QRegExp(f"{tab_name}_")))
 
-    filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}'
-    _fill_tbl(complet_result, dialog, qtable.objectName(), linkedobject, filter_fields)
+    for table in list_tables:
+        widgetname = table.objectName()
+        columnname = table.property('columnname')
+        if columnname is None:
+            msg = f"widget {widgetname} in tab {dialog.tab_main.widget(index_tab).objectName()} has not columnname and cant be configured"
+            tools_qgis.show_info(msg, 1)
+            continue
+
+        # Get value from filter widgets
+        filter_fields = _get_filter_qtableview(dialog, widget_list)
+
+        # if tab dont have any filter widget
+        if filter_fields in ('', None):
+            filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}'
+
+        linkedobject = table.property('linkedobject')
+        complet_list, widget_list = _fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields)
+        if complet_list is False:
+            return False
+
+
+
+
+
+
+
+
+
+
+
+    # dialog = kwargs['dialog']
+    # complet_result = kwargs['complet_result']
+    # feature_id = complet_result['body']['feature']['id']
+    # field_id = str(complet_result['body']['feature']['idName'])
+    #
+    # # When we come from doubleclick on the qtable, we have the qtable
+    # if 'qtable' in kwargs:
+    #     qtable = kwargs['qtable']
+    #
+    # # When we come from a button, we have to search for the qtable through func_params
+    # else:
+    #     index_tab = dialog.tab_main.currentIndex()
+    #     tab_name = dialog.tab_main.widget(index_tab).objectName()
+    #     func_params = kwargs['func_params']
+    #     qtable_name = func_params['targetwidget']
+    #     qtable = tools_qt.get_widget(dialog, f"{tab_name}_{qtable_name}")
+    #
+    # linkedobject = ""
+    # if qtable.property('linkedobject') is not None:
+    #     linkedobject = qtable.property('linkedobject')
+    #
+    # try:
+    #     widget_list = kwargs['widget_list']
+    #     filter_fields = _get_filter_qtableview(dialog, widget_list)
+    # except Exception as e:
+    #     print(f"EX--{e}")
+    #     filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}'
+    #
+    #
+    #
+    # # filter_fields = f'"{field_id}":{{"value":"{feature_id}","filterSign":"="}}'
+    # _fill_tbl(complet_result, dialog, qtable.objectName(), linkedobject, filter_fields)
 
 
 
@@ -208,7 +322,7 @@ def _get_filter_qtableview(dialog, widget_list):
 
     filter_fields = ""
     for widget in widget_list:
-        if type(widget) != QTableView:
+        if widget.property('isfilter'):
             columnname = widget.property('columnname')
             filter_sign = "ILIKE"
             if widget.property('widgetcontrols') is not None and 'filterSign' in widget.property('widgetcontrols'):
