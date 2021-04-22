@@ -18,7 +18,6 @@ Also UPDATES the link and vnode geometry for psector tables. On create and updat
 DECLARE 
     
 v_link_geom public.geometry;
-v_vnode_geom public.geometry;
 v_table_name text;
 v_feature_geom public.geometry;
 v_point_aux public.geometry;
@@ -47,10 +46,11 @@ BEGIN
 	-- getting table and exit_type
 	IF v_table_name = 'connec' THEN
 		SELECT the_geom INTO v_feature_geom FROM connec WHERE connec_id=NEW.connec_id;
-		SELECT exit_type INTO v_exit_type FROM v_edit_link WHERE feature_id =  NEW.connec_id;
+		SELECT exit_type, the_geom INTO v_exit_type, v_link_geom FROM v_edit_link WHERE feature_id =  NEW.connec_id;
+		
 	ELSIF v_table_name = 'gully' THEN
 		SELECT the_geom INTO v_feature_geom FROM gully WHERE gully_id=NEW.gully_id;
-		SELECT exit_type INTO v_exit_type FROM v_edit_link WHERE feature_id =  NEW.gully_id;
+		SELECT exit_type, the_geom INTO v_exit_type, v_link_geom FROM v_edit_link WHERE feature_id =  NEW.gully_id;
 	END IF;
 
 	IF v_exit_type ='VNODE' THEN -- link_class =  3
@@ -87,27 +87,25 @@ BEGIN
 			-- update values on plan psector table
 			IF NEW.userdefined_geom IS NOT TRUE THEN
 				v_link_geom := ST_ShortestLine(v_feature_geom, v_arc_geom);
-				v_vnode_geom = ST_EndPoint(v_link_geom);
 				v_userdefined_geom=FALSE;
 			ELSE	
 				v_point_aux := St_closestpoint(v_arc_geom, St_endpoint(v_link_geom));
 				v_link_geom  := ST_SetPoint(v_link_geom, ST_NumPoints(v_link_geom) - 1, v_point_aux);
-				v_vnode_geom = ST_EndPoint(v_link_geom);
 				v_userdefined_geom = TRUE;
 			END IF;
 					
-			-- update plan_psector tables
+			-- update plan_psector table			
 			IF v_table_name = 'connec' THEN
-				UPDATE plan_psector_x_connec SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
+				UPDATE plan_psector_x_connec SET link_geom=v_link_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
 			ELSIF v_table_name = 'gully' THEN
-				UPDATE plan_psector_x_gully SET link_geom=v_link_geom, vnode_geom=v_vnode_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
+				UPDATE plan_psector_x_gully SET link_geom=v_link_geom, userdefined_geom=v_userdefined_geom WHERE id=NEW.id;
 			END IF;	
 		ELSE
 			IF v_table_name = 'connec' THEN
-				UPDATE plan_psector_x_connec SET link_geom=NULL, vnode_geom=NULL, userdefined_geom=NULL WHERE id=NEW.id;
+				UPDATE plan_psector_x_connec SET link_geom=NULL, userdefined_geom=NULL WHERE id=NEW.id;
 
 			ELSIF v_table_name = 'gully' THEN
-				UPDATE plan_psector_x_gully SET link_geom=NULL, vnode_geom=NULL, userdefined_geom=NULL WHERE id=NEW.id;
+				UPDATE plan_psector_x_gully SET link_geom=NULL, userdefined_geom=NULL WHERE id=NEW.id;
 
 			END IF;	
 		END IF;

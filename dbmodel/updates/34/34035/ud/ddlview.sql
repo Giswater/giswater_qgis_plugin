@@ -307,4 +307,18 @@ CREATE OR REPLACE VIEW v_edit_link AS
          order by link_class desc
           ) a ;
 
-
+CREATE OR REPLACE VIEW v_edit_vnode AS 
+SELECT DISTINCT ON (vnode_id) * FROM
+(SELECT vnode_id,
+    l.feature_type,
+    v.top_elev,
+    l.sector_id,
+    l.dma_id,
+    l.state,
+    st_endpoint(l.the_geom),
+    l.expl_id,
+    l.link_class
+FROM v_edit_link l
+JOIN vnode v ON exit_id::integer = vnode_id
+WHERE exit_type = 'VNODE'
+ORDER BY link_class  DESC)a;

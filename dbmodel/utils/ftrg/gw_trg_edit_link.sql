@@ -65,6 +65,7 @@ v_end_state integer;
 v_autoupdate_dma boolean;
 v_pjoint_id text;
 v_pjoint_type text;
+v_expl_id integer;
 
 BEGIN
 
@@ -246,8 +247,9 @@ BEGIN
 			NEW.exit_type='VNODE';
 			NEW.exit_id=v_node_id;
 			v_end_state= (SELECT state FROM arc WHERE arc_id = v_arc.arc_id);
+			v_expl_id = v_arc.expl_id;
+			v_arc_id = v_arc.arc_id;
 
-			
 		ELSIF v_node.node_id IS NOT NULL THEN
 	
 			-- get arc values
@@ -301,6 +303,8 @@ BEGIN
 			v_pjoint_id = v_node.node_id;
 			v_pjoint_type = 'NODE';
 			v_arc_id = (SELECT arc_id FROM arc WHERE state > 0 AND node_1 = v_node.node_id LIMIT 1);
+			v_expl_id = v_node.expl_id;
+
 		
 		ELSIF v_connec2.connec_id IS NOT NULL THEN
 
@@ -347,6 +351,8 @@ BEGIN
 			v_pjoint_id = v_connec2.pjoint_id;
 			v_pjoint_type = v_connec2.pjoint_type;
 			v_arc_id =  v_connec2.arc_id;
+			v_expl_id = v_connec2.expl_id;
+
 		END IF;
 		
 		IF v_projectype='UD' THEN
@@ -380,6 +386,8 @@ BEGIN
 				v_pjoint_id = v_gully2.pjoint_id;
 				v_pjoint_type = v_gully2.pjoint_type;
 				v_arc_id =  v_gully2.arc_id;
+				v_expl_id = v_gully2.expl_id;
+
 			END IF;
 		END IF;
 		
@@ -455,8 +463,8 @@ BEGIN
 		END IF;
 
 		INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, 
-		state, the_geom, vnode_topelev)	
-		VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, v_arc.expl_id, NEW.exit_id, NEW.exit_type, TRUE,
+		state, the_geom, vnode_topelev)
+		VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, v_expl_id, NEW.exit_id, NEW.exit_type, TRUE,
 		NEW.state, NEW.the_geom, NEW.vnode_topelev );
 
 		-- update feature 
@@ -500,7 +508,7 @@ BEGIN
 					UPDATE plan_psector_x_connec SET arc_id = v_arc.arc_id WHERE plan_psector_x_connec.id=NEW.psector_rowid;
 
 					-- update to set values
-					UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom, vnode_geom=v_end_point, userdefined_geom = v_userdefined_geom
+					UPDATE plan_psector_x_connec SET link_geom = NEW.the_geom, userdefined_geom = v_userdefined_geom
 					WHERE plan_psector_x_connec.id=NEW.psector_rowid;
 		
 				ELSIF NEW.feature_type='GULLY' THEN
@@ -509,7 +517,7 @@ BEGIN
 					UPDATE plan_psector_x_gully SET arc_id = v_arc.arc_id WHERE plan_psector_x_gully.id=NEW.psector_rowid;
 
 					-- update to set values
-					UPDATE plan_psector_x_gully SET link_geom = NEW.the_geom, vnode_geom=v_end_point, userdefined_geom = v_userdefined_geom
+					UPDATE plan_psector_x_gully SET link_geom = NEW.the_geom, userdefined_geom = v_userdefined_geom
 					WHERE plan_psector_x_gully.id=NEW.psector_rowid;
 				END IF;
 
@@ -532,13 +540,13 @@ BEGIN
 				-- update connect tables (connec & gully psector_*) -> arc_id must be the same of the exit_type because this is like limited alternative
 				IF NEW.feature_type='CONNEC' THEN
 				
-					UPDATE plan_psector_x_connec SET arc_id = v_arc_id, link_geom = NULL, vnode_geom = NULL, userdefined_geom = NULL
+					UPDATE plan_psector_x_connec SET arc_id = v_arc_id, link_geom = NULL, userdefined_geom = NULL
 					WHERE plan_psector_x_connec.id=NEW.psector_rowid;
 					UPDATE connec SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type WHERE connec_id = NEW.feature_id;
 
 				ELSIF NEW.feature_type='GULLY' THEN
 
-					UPDATE plan_psector_x_gully SET arc_id = v_arc_id, link_geom = NULL, vnode_geom = NULL, userdefined_geom = NULL
+					UPDATE plan_psector_x_gully SET arc_id = v_arc_id, link_geom = NULL, userdefined_geom = NULL
 					WHERE  plan_psector_x_gully.id=NEW.psector_rowid;
 					UPDATE gully SET arc_id = v_arc_id, pjoint_id = v_pjoint_id, pjoint_type = v_pjoint_type WHERE gully_id = NEW.feature_id;
 				END IF;
@@ -575,12 +583,12 @@ BEGIN
 			END IF;
 			
 		ELSE
-			UPDATE plan_psector_x_connec SET link_geom = NULL, userdefined_geom = NULL, vnode_geom=NULL, arc_id=NULL, exit_type=NULL, exit_id=NULL
+			UPDATE plan_psector_x_connec SET link_geom = NULL, userdefined_geom = NULL, arc_id=NULL, exit_type=NULL, exit_id=NULL
 			WHERE plan_psector_x_connec.id=OLD.psector_rowid;
 			
 			IF v_projectype = 'UD' THEN
 				IF OLD.feature_type='GULLY' THEN
-					UPDATE plan_psector_x_gully SET link_geom = NULL, userdefined_geom = NULL, vnode_geom=NULL, arc_id=NULL, exit_type=NULL, exit_id=NULL
+					UPDATE plan_psector_x_gully SET link_geom = NULL, userdefined_geom = NULL, arc_id=NULL, exit_type=NULL, exit_id=NULL
 					WHERE plan_psector_x_gully.id=OLD.psector_rowid;
 				END IF;
 			END IF;

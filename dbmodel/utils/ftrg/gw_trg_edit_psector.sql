@@ -188,7 +188,7 @@ BEGIN
 							FROM plan_psector_x_'||lower(rec_type.id)||' p WHERE link.feature_id = p.'||lower(rec_type.id)||'_id 
 							AND p.state = 1 AND p.psector_id='||OLD.psector_id||' AND link.feature_id = '''||rec.id||''';';
 
-							EXECUTE 'UPDATE vnode SET the_geom = vnode_geom	FROM plan_psector_x_'||lower(rec_type.id)||' p 
+							EXECUTE 'UPDATE vnode SET the_geom = st_endpoint(link_geom)	FROM plan_psector_x_'||lower(rec_type.id)||' p 
 							JOIN link ON link.feature_id = p.'||lower(rec_type.id)||'_id AND p.state = 1 AND p.psector_id='||OLD.psector_id||' 
 							AND link.feature_id = '''||rec.id||''' WHERE link.exit_id::integer=vnode.vnode_id;';
 							
@@ -221,9 +221,9 @@ BEGIN
 				SELECT node_id, OLD.psector_id, state, doable, descript FROM plan_psector_x_node WHERE psector_id=v_temporal_psector_id;
 
 				--only new connecs or ones which link's geom have changed
-				INSERT INTO plan_psector_x_connec(connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom, userdefined_geom) 
-				SELECT connec_id, pc.arc_id, OLD.psector_id, pc.state, pc.doable, pc.descript, link_geom, vnode_geom, pc.userdefined_geom FROM plan_psector_x_connec pc	
-				JOIN arc ON ST_DWithin(st_buffer(vnode_geom, 0.5), arc.the_geom,0.001)
+				INSERT INTO plan_psector_x_connec(connec_id, arc_id, psector_id, state, doable, descript, link_geom, userdefined_geom) 
+				SELECT connec_id, pc.arc_id, OLD.psector_id, pc.state, pc.doable, pc.descript, link_geom, pc.userdefined_geom FROM plan_psector_x_connec pc	
+				JOIN arc ON ST_DWithin(st_buffer(st_endpoint(link_geom), 0.5), arc.the_geom,0.001)
 				WHERE pc.psector_id=v_temporal_psector_id AND arc.state=2;
 				
 				--delete temporal psector after all changes

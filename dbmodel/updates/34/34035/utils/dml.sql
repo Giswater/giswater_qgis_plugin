@@ -24,6 +24,10 @@ INSERT INTO sys_fprocess (fid, fprocess_name, project_type) VALUES
 UPDATE sys_message SET hint_message = 'If you are looking to unlink from this psector, it is necessary to remove it from ve_* or v_edit_* or using end feature tool.'
 WHERE id = 3160;
 
+UPDATE sys_message SET error_message = 'It is not possible to relate connect with state=1 over network feature with state=2, connect:', 
+hint_message = 'Choose another end feature element with operative state (1).'
+WHERE id = 3080;
+
 INSERT INTO sys_message VALUES (3182, 'It is not allowed to downgrade (state=0) on psector tables for planned features (state=2). Planned features only must have state=1 on psector.' ,
 'If you are looking for unlink it, please remove it from psector. If feature only belongs to this psector, and you are looking to unlink it, you will need to delete from ve_* or v_edit_* or use end feature tool.',
 2, TRUE, 'utils');
