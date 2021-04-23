@@ -316,3 +316,7 @@ where widgetcontrols is not null AND widgetdim is not null  AND listfilterparam 
 
 UPDATE config_form_fields SET  widgetcontrols = widgetcontrols::jsonb  - 'sign' ||  jsonb_build_object('filterSign', listfilterparam->'sign')
 WHERE widgetcontrols is not null AND widgetcontrols->'sign' IS NOT NULL;
+
+-- 2021/04/23
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type)
+VALUES (380, 'Admin manage recreating views', 'utils') ON CONFLICT (fid) DO NOTHING;

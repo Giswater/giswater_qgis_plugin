@@ -54,3 +54,51 @@ CREATE OR REPLACE VIEW v_ui_node_x_relations AS
 	'v_edit_node' AS sys_table_id
    FROM v_node
   WHERE v_node.parent_id IS NOT NULL;
+
+
+
+--SAVE VIEWS AND REMOVE 1ST FIELD
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_vnode","v_arc_x_vnode","v_edit_link"], "action":"saveView","hasChilds":"False"}}$$);
+
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_connec"], "fieldName":"featurecat_id","action":"deleteField","hasChilds":"True"}}$$);
+
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_ui_workcat_x_feature_end","v_rtc_period_pjoint", "v_rtc_period_pjointpattern", "v_rtc_interval_nodepattern", "v_rtc_period_nodepattern", 
+    "v_rtc_period_node", "v_rtc_period_dma", "v_rtc_period_hydrometer","vp_basic_connec", "vi_pjoint", "v_edit_inp_demand",
+    "vi_parent_hydrometer","v_ui_arc_x_relations", "v_edit_inp_connec"], "action":"saveView","hasChilds":"False"}}$$);
+
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["vi_parent_connec","ve_connec","v_connec","vu_connec"], "fieldName":"featurecat_id","action":"deleteField","hasChilds":"False"}}$$);
+
+--RESTORE CONNEC VIEWS
+
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["vu_connec", "v_connec", "ve_connec","vi_parent_connec"], "action":"restoreView","hasChilds":"False"}}$$);
+
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_connec"], "action":"restoreView","hasChilds":"True"}}$$);
+
+--DELETE 2ND FIELD
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_connec"], "fieldName":"feature_id","action":"deleteField","hasChilds":"True"}}$$);
+
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":[ "vi_parent_connec","ve_connec","v_connec","vu_connec"], "fieldName":"feature_id","action":"deleteField","hasChilds":"False"}}$$);
+
+--REMOVE FIELDS FROM TABLE
+	SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"connec", "column":"fwature_id"}}$$);
+	SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"connec", "column":"fwaturecat_id"}}$$);
+
+--RESTORE ALL VIEWS
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["vu_connec", "v_connec", "ve_connec","vi_parent_connec"], "action":"restoreView","hasChilds":"False"}}$$);
+
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_connec"], "action":"restoreView","hasChilds":"True"}}$$);
+
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_inp_connec","v_ui_arc_x_relations","vi_parent_hydrometer", "v_edit_inp_demand", "vi_pjoint", "vp_basic_connec","v_rtc_period_hydrometer",
+    "v_rtc_period_dma", "v_rtc_period_node", "v_rtc_period_nodepattern", "v_rtc_interval_nodepattern","v_rtc_period_pjointpattern",
+    "v_rtc_period_pjoint", "v_ui_workcat_x_feature_end","v_edit_link","v_vnode","v_arc_x_vnode"], "action":"restoreView","hasChilds":"False"}}$$);
