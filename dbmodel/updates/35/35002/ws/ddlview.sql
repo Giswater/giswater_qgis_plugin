@@ -58,14 +58,12 @@ CREATE OR REPLACE VIEW v_ui_node_x_relations AS
 
 
 --SAVE VIEWS AND REMOVE 1ST FIELD
-    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["v_vnode","v_arc_x_vnode","v_edit_link"], "action":"saveView","hasChilds":"False"}}$$);
 
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
     "data":{"viewName":["v_edit_connec"], "fieldName":"featurecat_id","action":"deleteField","hasChilds":"True"}}$$);
 
     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
-    "data":{"viewName":["v_ui_workcat_x_feature_end","v_rtc_period_pjoint", "v_rtc_period_pjointpattern", "v_rtc_interval_nodepattern", "v_rtc_period_nodepattern", 
+    "data":{"viewName":["v_vnode","v_arc_x_vnode","v_edit_link","v_ui_workcat_x_feature_end","v_rtc_period_pjoint", "v_rtc_period_pjointpattern", "v_rtc_interval_nodepattern", "v_rtc_period_nodepattern", 
     "v_rtc_period_node", "v_rtc_period_dma", "v_rtc_period_hydrometer","vp_basic_connec", "vi_pjoint", "v_edit_inp_demand",
     "vi_parent_hydrometer","v_ui_arc_x_relations", "v_edit_inp_connec"], "action":"saveView","hasChilds":"False"}}$$);
 

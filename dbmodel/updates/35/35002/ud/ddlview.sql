@@ -51,6 +51,7 @@ CREATE OR REPLACE VIEW ve_visit_gully_singlevent AS
   WHERE config_visit_class.ismultievent = false;
 
 
+DROP VIEW IF EXISTS v_ui_arc_x_relations;
 CREATE OR REPLACE VIEW v_ui_arc_x_relations AS 
  SELECT row_number() OVER () + 1000000 AS rid,
     v_connec.arc_id,
@@ -63,10 +64,11 @@ CREATE OR REPLACE VIEW v_ui_arc_x_relations AS
     v_connec.state AS feature_state,
     st_x(v_connec.the_geom) AS x,
     st_y(v_connec.the_geom) AS y,
-    v_connec.featurecat_id AS proceed_from,
-    v_connec.feature_id AS proceed_from_id,
+    l.exit_type AS proceed_from,
+    l.exit_id AS proceed_from_id,
     'v_edit_connec' AS sys_table_id
    FROM v_connec
+   LEFT JOIN v_edit_link l ON connec_id = l.feature_id
   WHERE v_connec.arc_id IS NOT NULL
 UNION
  SELECT row_number() OVER () + 2000000 AS rid,
@@ -80,12 +82,12 @@ UNION
     v_gully.state AS feature_state,
     st_x(v_gully.the_geom) AS x,
     st_y(v_gully.the_geom) AS y,
-    v_gully.featurecat_id AS proceed_from,
-    v_gully.feature_id AS proceed_from_id,
+    l.exit_type AS proceed_from,
+    l.exit_id AS proceed_from_id,
     'v_edit_gully' AS sys_table_id
    FROM v_gully
+   LEFT JOIN v_edit_link l ON gully_id = l.feature_id
   WHERE v_gully.arc_id IS NOT NULL;
-
 
 CREATE OR REPLACE VIEW v_ui_node_x_connection_downstream AS 
  SELECT row_number() OVER (ORDER BY v_arc.node_1) + 1000000 AS rid,
@@ -184,3 +186,57 @@ UNION
      JOIN node ON v_gully.pjoint_id::text = node.node_id::text AND v_gully.pjoint_type::text = 'NODE'::text
      LEFT JOIN cat_connec ON v_gully.connec_arccat_id::text = cat_connec.id::text
      JOIN value_state ON v_gully.state = value_state.id;
+
+
+
+  
+--SAVE VIEWS AND REMOVE 1ST FIELD
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_ui_arc_x_relations","v_vnode","v_arc_x_vnode","v_edit_link","v_ui_workcat_x_feature_end","v_rtc_period_pjoint", 
+    "v_rtc_period_node", "v_rtc_period_dma", "v_rtc_period_hydrometer","vp_basic_connec", 
+    "v_ui_node_x_connection_upstream","vp_basic_gully","v_anl_flow_gully"], "action":"saveView","hasChilds":"False"}}$$);
+
+     SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_connec"], "fieldName":"featurecat_id","action":"deleteField","hasChilds":"True"}}$$);
+
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_gully"], "fieldName":"featurecat_id","action":"deleteField","hasChilds":"True"}}$$);
+
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["ve_connec","v_connec","vu_connec","ve_gully","v_gully","vu_gully"], "fieldName":"featurecat_id",
+    "action":"deleteField","hasChilds":"False"}}$$);
+
+--RESTORE CONNEC VIEWS
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["vu_connec", "v_connec", "ve_connec","vu_gully","v_gully","ve_gully"], "action":"restoreView","hasChilds":"False"}}$$);
+
+   SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{}, 
+    "data":{"viewName":["v_edit_connec"], "action":"restoreView","hasChilds":"True"}}$$);
+
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_gully"], "action":"restoreView","hasChilds":"True"}}$$);
+
+--DELETE 2ND FIELD
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_connec"], "fieldName":"feature_id","action":"deleteField","hasChilds":"True"}}$$);
+
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_gully"], "fieldName":"feature_id","action":"deleteField","hasChilds":"True"}}$$);
+
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["ve_connec","v_connec","vu_connec","ve_gully","v_gully","vu_gully"], "fieldName":"feature_id","action":"deleteField","hasChilds":"False"}}$$);
+
+--RESTORE ALL VIEWS
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["vu_connec", "v_connec", "ve_connec","vu_gully", "v_gully","ve_gully"], "action":"restoreView","hasChilds":"False"}}$$);
+        
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_connec"], "action":"restoreView","hasChilds":"True"}}$$);
+    
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["v_edit_gully"], "action":"restoreView","hasChilds":"True"}}$$);
+    
+    SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
+    "data":{"viewName":["vp_basic_gully", "v_anl_flow_gully","v_ui_node_x_connection_upstream","vp_basic_connec","v_rtc_period_hydrometer",
+    "v_rtc_period_dma", "v_rtc_period_node", 
+    "v_rtc_period_pjoint", "v_ui_workcat_x_feature_end","v_edit_link","v_vnode","v_arc_x_vnode","v_ui_arc_x_relations"], "action":"restoreView","hasChilds":"False"}}$$);

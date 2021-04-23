@@ -45,23 +45,23 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	
 			IF review_status=1 AND NEW.gully_id NOT IN (SELECT gully_id FROM gully) THEN 
 
-				INSERT INTO v_edit_gully (gully_id, top_elev, ymax, sandbox, gratecat_id, gully_type, units, groove, siphon,  connec_arccat_id, featurecat_id, 
-				feature_id, annotation, observ, expl_id, the_geom)
+				INSERT INTO v_edit_gully (gully_id, top_elev, ymax, sandbox, gratecat_id, gully_type, units, groove, siphon,  connec_arccat_id,  
+				annotation, observ, expl_id, the_geom)
 				VALUES (NEW.gully_id, NEW.new_top_elev, NEW.new_ymax, NEW.new_sandbox, NEW.new_gratecat_id, NEW.new_gully_type, NEW.new_units, NEW.new_groove,
-				NEW.new_siphon, NEW.new_connec_arccat_id, NEW.new_featurecat_id, NEW.new_feature_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id, NEW.the_geom); 
+				NEW.new_siphon, NEW.new_connec_arccat_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id, NEW.the_geom); 
 				
 		
 			ELSIF review_status=2 THEN
 				UPDATE v_edit_gully SET the_geom=NEW.the_geom, top_elev=NEW.new_top_elev, ymax=NEW.new_ymax, sandbox=NEW.new_sandbox, 
 				gratecat_id=NEW.new_gratecat_id,gully_type=NEW.new_gully_type, units=NEW.new_units, groove=NEW.new_groove, 
-				siphon=NEW.new_siphon, connec_arccat_id=NEW.new_connec_arccat_id, featurecat_id=NEW.new_featurecat_id, 
-				feature_id=NEW.new_feature_id, annotation=NEW.new_annotation, observ=NEW.new_observ WHERE gully_id=NEW.gully_id;
+				siphon=NEW.new_siphon, connec_arccat_id=NEW.new_connec_arccat_id, 
+				annotation=NEW.new_annotation, observ=NEW.new_observ WHERE gully_id=NEW.gully_id;
 					
 			ELSIF review_status=3 THEN
 
 				UPDATE v_edit_gully SET top_elev=NEW.new_top_elev, ymax=NEW.new_ymax, sandbox=NEW.new_sandbox, gratecat_id=NEW.new_gratecat_id,
 				gully_type=NEW.new_gully_type, units=NEW.new_units, groove=NEW.new_groove, siphon=NEW.new_siphon, connec_arccat_id=NEW.new_connec_arccat_id, 
-				featurecat_id=NEW.new_featurecat_id, feature_id=NEW.new_feature_id, annotation=NEW.new_annotation, observ=NEW.new_observ
+				 annotation=NEW.new_annotation, observ=NEW.new_observ
 				WHERE gully_id=NEW.gully_id;
 	
 			END IF;	
