@@ -61,6 +61,10 @@ v_coordy numeric;
 v_srid integer;
 v_grafdelimiter text;
 v_formgroup text;
+v_querystring text;
+v_debug_vars json;
+v_debug json;
+v_msgerr json;
 
 BEGIN
 
@@ -87,8 +91,11 @@ BEGIN
 	fields_array[1] := gw_fct_json_object_set_key(fields_array[1], 'selectedId', v_matcat);
 	
 	IF v_formname='new_mapzone' THEN
-		EXECUTE 'SELECT lower(graf_delimiter) FROM cat_feature_node WHERE id='||quote_literal(v_feature_type)||';'
-		INTO v_grafdelimiter;
+		v_querystring = concat('SELECT lower(graf_delimiter) FROM cat_feature_node WHERE id=',quote_literal(v_feature_type),';');
+		v_debug_vars := json_build_object('v_feature_type', v_feature_type);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getcatalog', 'flag', 10);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_grafdelimiter;
 
 		IF v_grafdelimiter IN ('dma','presszone') THEN
 			v_formgroup = 'new_mapzone';
@@ -108,16 +115,25 @@ BEGIN
 	
 		IF v_formgroup='new_mapzone' AND json_extract_path_text(field,'columnname') = 'expl_id' THEN
 
-			EXECUTE 'SELECT lower(feature_type) FROM cat_feature WHERE id = '||quote_literal(v_feature_type)||';'
-			INTO v_system_id;
+			v_querystring = concat('SELECT lower(feature_type) FROM cat_feature WHERE id = ',quote_literal(v_feature_type),';');
+			v_debug_vars := json_build_object('v_feature_type', v_feature_type);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getcatalog', 'flag', 20);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO v_system_id;
 			
-			EXECUTE 'SELECT expl_id FROM '||v_system_id||' WHERE '||v_system_id||'_id = '||quote_literal(v_featureid)||';'
-			INTO v_expl_id;
+			v_querystring = concat('SELECT expl_id FROM ',v_system_id,' WHERE ',v_system_id,'_id = ',quote_literal(v_featureid),';');
+			v_debug_vars := json_build_object('v_system_id', v_system_id, 'v_featureid', v_featureid);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getcatalog', 'flag', 30);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO v_expl_id;
 
 			IF v_expl_id IS NULL THEN
-				EXECUTE 'SELECT expl_id FROM exploitation WHERE active IS TRUE AND
-				ST_DWithin(ST_SetSrid(ST_MakePoint('||v_coordx||','||v_coordy||'),'||v_srid||'),the_geom,0.1);'
-				INTO v_expl_id;
+				v_querystring = concat('SELECT expl_id FROM exploitation WHERE active IS TRUE AND
+							ST_DWithin(ST_SetSrid(ST_MakePoint(',v_coordx,',',v_coordy,'),',v_srid,'),the_geom,0.1);');
+				v_debug_vars := json_build_object('v_coordx', v_coordx, 'v_coordy', v_coordy, 'v_srid', v_srid);
+				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getcatalog', 'flag', 40);
+				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+				EXECUTE v_querystring INTO v_expl_id;
 			END IF;
 
 			fields_array[(field->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(field->>'orderby')::INT], 'selectedId', v_expl_id::text);
@@ -155,9 +171,11 @@ BEGIN
 	IF v_formname='upsert_catalog_arc' OR v_formname='upsert_catalog_node' OR v_formname='upsert_catalog_connec' OR v_formname='upsert_catalog_gully' THEN
 
 		--  get querytext
-		EXECUTE 'SELECT dv_querytext FROM config_form_fields WHERE formname = $1 and columnname=''id'''
-			INTO v_query_result
-			USING v_formname;
+		v_querystring = concat('SELECT dv_querytext FROM config_form_fields WHERE formname = ',quote_nullable(v_formname), ' and columnname=''id''');
+		v_debug_vars := json_build_object('v_formname', v_formname);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getcatalog', 'flag', 50);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_query_result;
 
 		--  add filters
 		v_filter_values := (p_data ->> 'data')::json->> 'fields';
@@ -194,11 +212,17 @@ BEGIN
 		END IF;
 		raise notice 'v_query_result %', v_query_result;
 
-		EXECUTE 'SELECT array_to_json(array_agg(id)) FROM (' || (v_query_result) || ') a'
-			INTO query_result_ids;
+		v_querystring = concat('SELECT array_to_json(array_agg(id)) FROM (',(v_query_result),') a');
+		v_debug_vars := json_build_object('v_query_result', v_query_result);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getcatalog', 'flag', 60);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO query_result_ids;
 
-		EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM (' || (v_query_result) || ') a'
-		INTO query_result_names;
+		v_querystring = concat('SELECT array_to_json(array_agg(idval)) FROM (',(v_query_result),') a');
+		v_debug_vars := json_build_object('v_query_result', v_query_result);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getcatalog', 'flag', 70);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO query_result_names;
 
 		-- Set new values json of id's (it's supossed that id is on 4th position on json)	
 		fields_array[4] := gw_fct_json_object_set_key(fields_array[4], 'queryText', v_query_result);
@@ -224,9 +248,9 @@ BEGIN
 	       '}')::json;
 		   
 	-- Exception handling
-	 EXCEPTION WHEN OTHERS THEN
-	 GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
-	 RETURN ('{"status":"Failed", "SQLERR":' || to_json(SQLERRM) || ',"SQLCONTEXT":' || to_json(v_errcontext) || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 
 END;
 $BODY$

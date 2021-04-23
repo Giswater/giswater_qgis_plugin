@@ -55,6 +55,11 @@ v_config_param_user record;
 v_message json;
 v_orderby text;
 v_editability text;
+v_errcontext text;
+v_querystring text;
+v_debug_vars json;
+v_debug json;
+v_msgerr json;
 
 BEGIN
 
@@ -78,26 +83,31 @@ BEGIN
 
 			
 	-- get column type of idname
-        EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(v_tablename) || ' AND column_name = $2'
-            USING schemas_array[1], v_idname
-            INTO v_column_type;
+	v_querystring = concat('SELECT data_type FROM information_schema.columns  WHERE table_schema = ',quote_nullable(schemas_array[1]),' AND table_name = ',quote_literal(v_tablename),' AND column_name = ',quote_nullable(v_idname));
+	v_debug_vars := json_build_object('schemas_array[1]', schemas_array[1], 'v_tablename', v_tablename, 'v_idname', v_idname);
+	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getchilds', 'flag', 10);
+	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+	EXECUTE v_querystring INTO v_column_type;
 
 	IF (v_tablename = 'config') THEN
 
 		--  Combo rows child CONFIG
-		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
-		 SELECT label, sys_param_user.id as widgetname, datatype, widgettype, layoutorder,layoutname,
-		(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
-		 row_number()over(ORDER BY layoutname, layoutorder) AS orderby, value, project_type, dv_querytext, dv_querytext_filterc, dv_parent_id, isparent, sys_role,
-		 placeholder,
-		 dv_orderby_id,feature_dv_parent_value, descript AS tooltip, dv_isnullvalue AS "isNullValue", widgetcontrols
-		 FROM sys_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=sys_param_user.id 
-		 WHERE sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-		 AND dv_parent_id='||quote_literal(v_comboparent)||'
-		 AND isenabled IS TRUE
-		 ORDER BY orderby) a WHERE widgettype = ''combo'''
-			INTO v_combo_rows_child;
-			v_combo_rows_child := COALESCE(v_combo_rows_child, '{}');
+		v_querystring = concat('SELECT (array_agg(row_to_json(a))) FROM (
+				 SELECT label, sys_param_user.id as widgetname, datatype, widgettype, layoutorder,layoutname,
+				(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN ''True'' ELSE ''False'' END) AS iseditable,
+				 row_number()over(ORDER BY layoutname, layoutorder) AS orderby, value, project_type, dv_querytext, dv_querytext_filterc, dv_parent_id, isparent, sys_role,
+				 placeholder,
+				 dv_orderby_id,feature_dv_parent_value, descript AS tooltip, dv_isnullvalue AS "isNullValue", widgetcontrols
+				 FROM sys_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=sys_param_user.id 
+				 WHERE sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
+				 AND dv_parent_id=',quote_literal(v_comboparent),'
+				 AND isenabled IS TRUE
+				 ORDER BY orderby) a WHERE widgettype = ''combo''');
+		v_debug_vars := json_build_object('v_comboparent', v_comboparent);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getchilds', 'flag', 20);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_combo_rows_child;
+		v_combo_rows_child := COALESCE(v_combo_rows_child, '{}');
 
 		v_formtype='config';
 
@@ -107,20 +117,25 @@ BEGIN
 		v_parameter:= 'upsert_catalog_' || v_featuretype;
 
 		--  Combo rows child CATALOG
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT columnname, widgettype, columnname as widgetname,
-		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layoutorder) AS orderby , dv_querytext_filterc, isautoupdate, placeholder, dv_orderby_id, tooltip, dv_isnullvalue AS "isNullValue", widgetcontrols
-		FROM columnname WHERE formname = '||quote_literal(v_parameter)||' AND dv_parent_id='||quote_literal(v_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
-		INTO v_combo_rows_child;
+		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT columnname, widgettype, columnname as widgetname,
+				dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layoutorder) AS orderby , dv_querytext_filterc, isautoupdate, placeholder, dv_orderby_id, tooltip, dv_isnullvalue AS "isNullValue", widgetcontrols
+				FROM columnname WHERE formname = ',quote_literal(v_parameter),' AND dv_parent_id=',quote_literal(v_comboparent),' ORDER BY orderby) a WHERE widgettype = ''combo''');
+		v_debug_vars := json_build_object('v_parameter', v_parameter, 'v_comboparent', v_comboparent);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getchilds', 'flag', 30);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_combo_rows_child;
 		v_combo_rows_child := COALESCE(v_combo_rows_child, '{}');
 		v_formtype='catalog';
 
 	ELSE
 		--  Combo rows child
-		EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (SELECT columnname, widgettype, datatype, concat(''data_'',columnname) as widgetname,
-		dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layoutorder) AS orderby , dv_querytext_filterc, isautoupdate, placeholder, dv_orderby_id, tooltip, dv_isnullvalue AS "isNullValue", widgetcontrols
-		FROM config_form_fields WHERE formname = $1 AND dv_parent_id='||quote_literal(v_comboparent)||' ORDER BY orderby) a WHERE widgettype = ''combo'''
-		INTO v_combo_rows_child
-		USING v_tablename;
+		v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (SELECT columnname, widgettype, datatype, concat(''data_'',columnname) as widgetname,
+				dv_querytext, isparent, dv_parent_id, row_number()over(ORDER BY layoutname, layoutorder) AS orderby , dv_querytext_filterc, isautoupdate, placeholder, dv_orderby_id, tooltip, dv_isnullvalue AS "isNullValue", widgetcontrols
+				FROM config_form_fields WHERE formname = ',quote_nullable(v_tablename),' AND dv_parent_id=',quote_literal(v_comboparent),' ORDER BY orderby) a WHERE widgettype = ''combo''');
+		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_comboparent', v_comboparent);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getchilds', 'flag', 40);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO v_combo_rows_child;
 		v_combo_rows_child := COALESCE(v_combo_rows_child, '{}');
 		v_formtype='feature';
 	END IF;
@@ -149,11 +164,17 @@ BEGIN
 		
 		-- Get combo id's
 		IF (v_aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_combovalue IS NOT NULL THEN
-			query_text= 'SELECT array_to_json(array_agg(id)) FROM ('||((v_aux_json_child->>'dv_querytext'))||((v_aux_json_child->>'dv_querytext_filterc'))||'::text = '||(quote_literal(v_combovalue))||' ORDER BY '||v_orderby||') a';
-
-			execute query_text INTO combo_json_child;
+			query_text = concat('SELECT array_to_json(array_agg(id)) FROM (',((v_aux_json_child->>'dv_querytext')),((v_aux_json_child->>'dv_querytext_filterc')),'::text = ',(quote_literal(v_combovalue)),' ORDER BY ',v_orderby,') a');
+			v_debug_vars := json_build_object('v_aux_json_child->>''dv_querytext''', (v_aux_json_child->>'dv_querytext'), 'v_aux_json_child->>''dv_querytext_filterc''', (v_aux_json_child->>'dv_querytext_filterc'), 'v_combovalue', v_combovalue, 'v_orderby', v_orderby);
+			v_debug := json_build_object('querystring', query_text, 'vars', v_debug_vars, 'funcname', 'gw_fct_getchilds', 'flag', 50);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE query_text INTO combo_json_child;
 		ELSE 	
-			EXECUTE 'SELECT array_to_json(array_agg(id)) FROM ('||((v_aux_json_child->>'dv_querytext'))||' ORDER BY '||v_orderby||')a' INTO combo_json_child;
+			v_querystring = concat('SELECT array_to_json(array_agg(id)) FROM (',((v_aux_json_child->>'dv_querytext')),' ORDER BY ',v_orderby,')a');
+			v_debug_vars := json_build_object('v_aux_json_child->>''dv_querytext''', (v_aux_json_child->>'dv_querytext'), 'v_orderby', v_orderby);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getchilds', 'flag', 60);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO combo_json_child;
 		END IF;
 		
 		combo_json_child := COALESCE(combo_json_child, '[]');
@@ -161,12 +182,17 @@ BEGIN
 	
 		-- Get combo value's
 		IF (v_aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_combovalue IS NOT NULL THEN
-			query_text= 'SELECT array_to_json(array_agg(idval)) FROM ('||(v_aux_json_child->>'dv_querytext')||(v_aux_json_child->>'dv_querytext_filterc')||'::text = '||quote_literal(v_combovalue)||' ORDER BY '||v_orderby||') a';
-
-			execute query_text INTO combo_json_child;
+			query_text = concat('SELECT array_to_json(array_agg(idval)) FROM (',(v_aux_json_child->>'dv_querytext'),(v_aux_json_child->>'dv_querytext_filterc'),'::text = ',quote_literal(v_combovalue),' ORDER BY ',v_orderby,') a');
+			v_debug_vars := json_build_object('v_aux_json_child->>''dv_querytext''', (v_aux_json_child->>'dv_querytext'), 'v_aux_json_child->>''dv_querytext_filterc''', (v_aux_json_child->>'dv_querytext_filterc'), 'v_combovalue', v_combovalue, 'v_orderby', v_orderby);
+			v_debug := json_build_object('querystring', query_text, 'vars', v_debug_vars, 'funcname', 'gw_fct_getchilds', 'flag', 70);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE query_text INTO combo_json_child;
 		ELSE 	
-			EXECUTE 'SELECT array_to_json(array_agg(idval)) FROM ('||((v_aux_json_child->>'dv_querytext'))||' ORDER BY '||v_orderby||')a'
-				INTO combo_json_child;
+			v_querystring = concat('SELECT array_to_json(array_agg(idval)) FROM (',((v_aux_json_child->>'dv_querytext')),' ORDER BY ',v_orderby,')a');
+			v_debug_vars := json_build_object('v_aux_json_child->>''dv_querytext''', (v_aux_json_child->>'dv_querytext'), 'v_orderby', v_orderby);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getchilds', 'flag', 80);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO combo_json_child;
 		END IF;
 		combo_json_child := COALESCE(combo_json_child, '[]');
 		v_combo_rows_child[(v_aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(v_combo_rows_child[(v_aux_json_child->>'orderby')::INT], 'comboNames', combo_json_child);
@@ -215,8 +241,9 @@ BEGIN
 		'}}')::json;
 
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
 
 END;
 $BODY$

@@ -62,6 +62,11 @@ v_dv_querytext_child text;
 p_tgop text = 'INSERT';
 v_layers_name text;
 v_layers_table text;
+v_errcontext text;
+v_querystring text;
+v_debug_vars json;
+v_debug json;
+v_msgerr json;
 
 BEGIN
 
@@ -102,20 +107,23 @@ BEGIN
     IF rec_tab.tabname IS NOT NULL THEN
 
 		-- Get all parameters from audit_cat param_user
-		EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (
-			SELECT label, sys_param_user.id as widgetname, value , datatype, widgettype, layoutorder, layoutname,
-			(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN True ELSE False END) AS iseditable,
-			row_number()over(ORDER BY layoutname, layoutorder) AS orderby, isparent, sys_role, project_type, widgetcontrols,
-			(CASE WHEN value IS NOT NULL AND value != ''false'' THEN True ELSE False END) AS checked, placeholder, descript AS tooltip, 
-			dv_parent_id, dv_querytext, dv_querytext_filterc, dv_orderby_id, dv_isnullvalue	
-			FROM sys_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=sys_param_user.id 
-			WHERE sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
-			AND formname ='||quote_literal(lower(v_formname))||'
-			AND (epaversion::json->>''from''= '||quote_literal(v_epaversion)||' or formname !=''epaoptions'')
-			AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||')
-			AND isenabled IS TRUE
-			ORDER by orderby)a'
-				INTO fields_array ;
+		v_querystring = concat('SELECT (array_agg(row_to_json(a))) FROM (
+					SELECT label, sys_param_user.id as widgetname, value , datatype, widgettype, layoutorder, layoutname,
+					(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN True ELSE False END) AS iseditable,
+					row_number()over(ORDER BY layoutname, layoutorder) AS orderby, isparent, sys_role, project_type, widgetcontrols,
+					(CASE WHEN value IS NOT NULL AND value != ''false'' THEN True ELSE False END) AS checked, placeholder, descript AS tooltip, 
+					dv_parent_id, dv_querytext, dv_querytext_filterc, dv_orderby_id, dv_isnullvalue	
+					FROM sys_param_user LEFT JOIN (SELECT * FROM config_param_user WHERE cur_user=current_user) a ON a.parameter=sys_param_user.id 
+					WHERE sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
+					AND formname =',quote_literal(lower(v_formname)),'
+					AND (epaversion::json->>''from''= ',quote_literal(v_epaversion),' or formname !=''epaoptions'')
+					AND (project_type =''utils'' or project_type=',quote_literal(lower(v_project_type)),')
+					AND isenabled IS TRUE
+					ORDER by orderby)a');
+		v_debug_vars := json_build_object('v_formname', v_formname, 'v_epaversion', v_epaversion, 'v_project_type', v_project_type);
+		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 10);
+		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+		EXECUTE v_querystring INTO fields_array;
 
 		fields_array := COALESCE(fields_array, '{}');  
 
@@ -156,8 +164,11 @@ BEGIN
 				IF (aux_json->>'widgettype') = 'combo' THEN
 		
 					-- Get combo id's
-					EXECUTE 'SELECT (array_agg(id)) FROM ('||v_dv_querytext||' ORDER BY '||v_orderby||')a'
-						INTO v_array;
+					v_querystring = concat('SELECT (array_agg(id)) FROM (',v_dv_querytext,' ORDER BY ',v_orderby,')a');
+					v_debug_vars := json_build_object('v_dv_querytext', v_dv_querytext, 'v_orderby', v_orderby);
+					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 20);
+					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+					EXECUTE v_querystring INTO v_array;
 					
 					-- Enable null values
 					IF (aux_json->>'dv_isnullvalue')::boolean IS TRUE THEN
@@ -168,8 +179,11 @@ BEGIN
 					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));		
 
 					-- Get combo values
-					EXECUTE 'SELECT (array_agg(idval)) FROM ('||v_dv_querytext||' ORDER BY '||v_orderby||')a'
-						INTO v_array;
+					v_querystring = concat('SELECT (array_agg(idval)) FROM (',v_dv_querytext,' ORDER BY ',v_orderby,')a');
+					v_debug_vars := json_build_object('v_dv_querytext', v_dv_querytext, 'v_orderby', v_orderby);
+					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 30);
+					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+					EXECUTE v_querystring INTO v_array;
 
 					-- Enable null values
 					IF (aux_json->>'dv_isnullvalue')::boolean IS TRUE THEN
@@ -214,11 +228,17 @@ BEGIN
 							
 								-- Get combo id's
 								IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN		
-									query_text= 'SELECT (array_agg(id)) FROM ('|| v_dv_querytext_child || (aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY '||v_orderby_child||') a';
-									execute query_text INTO v_array_child;									
+									query_text= concat('SELECT (array_agg(id)) FROM (', v_dv_querytext_child , (aux_json_child->>'dv_querytext_filterc'),' ',quote_literal(v_selected_id),' ORDER BY ',v_orderby_child,') a');
+									v_debug_vars := json_build_object('v_dv_querytext_child', v_dv_querytext_child, 'aux_json_child->>''dv_querytext_filterc''', (aux_json_child->>'dv_querytext_filterc'), 'v_selected_id', v_selected_id, 'v_orderby_child', v_orderby_child);
+									v_debug := json_build_object('querystring', query_text, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 40);
+									SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+									EXECUTE query_text INTO v_array_child;								
 								ELSE 	
-									EXECUTE 'SELECT (array_agg(id)) FROM ('||(aux_json_child->>'dv_querytext')||' ORDER BY '||v_orderby_child||')a' INTO v_array_child;
-									
+									v_querystring = concat('SELECT (array_agg(id)) FROM (',(aux_json_child->>'dv_querytext'),' ORDER BY ',v_orderby_child,')a');
+									v_debug_vars := json_build_object('aux_json_child->>''dv_querytext''', (aux_json_child->>'dv_querytext'), 'v_selected_id', v_selected_id);
+									v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 50);
+									SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+									EXECUTE v_querystring INTO v_array_child;
 								END IF;
 								
 								-- Enable null values
@@ -231,10 +251,17 @@ BEGIN
 								
 								-- Get combo values
 								IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN
-									query_text= 'SELECT (array_agg(idval)) FROM ('|| v_dv_querytext_child ||(aux_json_child->>'dv_querytext_filterc')||' '||quote_literal(v_selected_id)||' ORDER BY '||v_orderby_child||') a';
-									execute query_text INTO v_array_child;
+									query_text = concat('SELECT (array_agg(idval)) FROM (', v_dv_querytext_child ,(aux_json_child->>'dv_querytext_filterc'),' ',quote_literal(v_selected_id),' ORDER BY ',v_orderby_child,') a');
+									v_debug_vars := json_build_object('v_dv_querytext_child', v_dv_querytext_child, 'aux_json_child->>''dv_querytext_filterc''', (aux_json_child->>'dv_querytext_filterc'), 'v_selected_id', v_selected_id, 'v_orderby_child', v_orderby_child);
+									v_debug := json_build_object('querystring', query_text, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 60);
+									SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+									EXECUTE query_text INTO v_array_child;
 								ELSE 	
-									EXECUTE 'SELECT (array_agg(idval)) FROM ('||(aux_json_child->>'dv_querytext')||' ORDER BY '||v_orderby_child||')a' INTO v_array_child;
+									v_querystring = concat('SELECT (array_agg(idval)) FROM (',(aux_json_child->>'dv_querytext'),' ORDER BY ',v_orderby_child,')a');
+									v_debug_vars := json_build_object('aux_json_child->>''dv_querytext''', (aux_json_child->>'dv_querytext'), 'v_orderby_child', v_orderby_child);
+									v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 70);
+									SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+									EXECUTE v_querystring INTO v_array_child;
 								END IF;
 								
 								-- Enable null values
@@ -296,20 +323,26 @@ BEGIN
 		IF rec_tab.tabname IS NOT NULL AND 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN 
 
 			-- Get fields for admin enabled
-			EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS widgetname, parameter as widgetname, concat(''admin_'',parameter), value, 
-				widgettype, datatype, layoutname, layoutorder, row_number() over (order by layoutname, layoutorder) as orderby, descript as tooltip,
-				(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN True ELSE False END) AS iseditable,
-				placeholder
-				FROM config_param_system WHERE isenabled=TRUE AND layoutname IS NOT NULL AND layoutorder IS NOT NULL AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||') ORDER BY orderby) a'
-				INTO fields_array;
+			v_querystring = concat('SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS widgetname, parameter as widgetname, concat(''admin_'',parameter), value, 
+							widgettype, datatype, layoutname, layoutorder, row_number() over (order by layoutname, layoutorder) as orderby, descript as tooltip,
+							(CASE WHEN iseditable IS NULL OR iseditable IS TRUE THEN True ELSE False END) AS iseditable,
+							placeholder
+							FROM config_param_system WHERE isenabled=TRUE AND layoutname IS NOT NULL AND layoutorder IS NOT NULL AND (project_type =''utils'' or project_type=',quote_literal(lower(v_project_type)),') ORDER BY orderby) a');
+			v_debug_vars := json_build_object('v_project_type', v_project_type);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 80);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO fields_array;
 
 		ELSE 
 			-- Get fields for admin disabled (only to show)
-			EXECUTE 'SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS widgetname, parameter as widgetname, concat(''admin_'',parameter), value, 
-				widgettype, datatype, layoutname, layoutorder, row_number() over (order by layoutname, layoutorder) as orderby, descript as tooltip, FALSE AS iseditable,
-				placeholder
-				FROM config_param_system WHERE isenabled=TRUE AND (project_type =''utils'' or project_type='||quote_literal(lower(v_project_type))||') ORDER BY orderby) a'
-				INTO fields_array;
+			v_querystring = concat('SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS widgetname, parameter as widgetname, concat(''admin_'',parameter), value, 
+							widgettype, datatype, layoutname, layoutorder, row_number() over (order by layoutname, layoutorder) as orderby, descript as tooltip, FALSE AS iseditable,
+							placeholder
+							FROM config_param_system WHERE isenabled=TRUE AND (project_type =''utils'' or project_type=',quote_literal(lower(v_project_type)),') ORDER BY orderby) a');
+			v_debug_vars := json_build_object('v_project_type', v_project_type);
+			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 90);
+			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+			EXECUTE v_querystring INTO fields_array;
 		END IF;
 
 		-- Convert to json
@@ -343,7 +376,13 @@ BEGIN
 			',"feature":{}'||
 			',"data":{}}'||
 	    '}')::json;
-       
+    
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || ',"MSGERR": '|| to_json(v_msgerr::json ->> 'MSGERR') ||'}')::json;
+
+	
 	-- Exception handling
 --EXCEPTION WHEN OTHERS THEN 
     --RETURN ('{"status":"Failed","SQLERR":' || to_json(SQLERRM) || ', "version":'|| v_version || ',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
