@@ -226,7 +226,8 @@ def _manage_element_new(elem, **kwargs):
     dialog = kwargs['dialog']
     index_tab = dialog.tab_main.currentIndex()
     tab_name = dialog.tab_main.widget(index_tab).objectName()
-    tools_qt.set_widget_text(dialog, f"{tab_name}_element_id", elem.element_id)
+    func_params = kwargs['func_params']
+    tools_qt.set_widget_text(dialog, f"{tab_name}_{func_params['sourcewidget']}", elem.element_id)
     add_object(**kwargs)
 
 

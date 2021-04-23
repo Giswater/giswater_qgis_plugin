@@ -499,11 +499,6 @@ class GwInfo(QObject):
         tools_gw.add_icon(action_interpolate, "194")
 
         # Set buttons icon
-        # tab elements
-        tools_gw.add_icon(self.dlg_cf.btn_insert, "111b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_delete, "112b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_new_element, "131b", "24x24")
-        tools_gw.add_icon(self.dlg_cf.btn_open_element, "134b", "24x24")
         # tab hydrometer
         tools_gw.add_icon(self.dlg_cf.btn_link, "70", "24x24")
         # tab visit
