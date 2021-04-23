@@ -377,7 +377,8 @@ class GwToolBox(ApiParent):
         try:
             dialog.progressBar.setFormat(f"Function {function_name} has finished")
             self.add_layer.add_temp_layer(dialog, json_result['body']['data'], self.alias_function, True, True, 1, True)
-            self.add_layer.set_layers_visible(json_result['body']['data']['setVisibleLayers'])
+            if 'setVisibleLayers' in json_result['body']['data']:
+                self.add_layer.set_layers_visible(json_result['body']['data']['setVisibleLayers'])
 
             # getting simbology capabilities
             if 'setStyle' in json_result['body']['data']:
