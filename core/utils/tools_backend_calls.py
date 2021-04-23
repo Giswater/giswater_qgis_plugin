@@ -209,10 +209,14 @@ def manage_element(element_id, **kwargs):
 
     elem = GwElement()
     elem.get_element(True, feature, feature_type)
-    elem.dlg_add_element.btn_accept.clicked.connect(partial(_manage_element_new, elem, **kwargs))
 
+    # If element exist
     if element_id:
         tools_qt.set_widget_text(elem.dlg_add_element, "element_id", element_id)
+        elem.dlg_add_element.btn_accept.clicked.connect(partial(_reload_table, **kwargs))
+    # If we are creating a new element
+    else:
+        elem.dlg_add_element.btn_accept.clicked.connect(partial(_manage_element_new, elem, **kwargs))
 
     # Open dialog
     tools_gw.open_dialog(elem.dlg_add_element)

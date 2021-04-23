@@ -2051,7 +2051,9 @@ class GwInfo(QObject):
             self.tab_event_loaded = True
         # Tab 'Documents'
         elif self.tab_main.widget(index_tab).objectName() == 'tab_documents' and not self.tab_document_loaded:
-            self._fill_tab_document()
+            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+            self._init_tab(self.complet_result, filter_fields)
+            # self._fill_tab_document()
             self.tab_document_loaded = True
         elif self.tab_main.widget(index_tab).objectName() == 'tab_rpt' and not self.tab_rpt_loaded:
             self._init_tab(self.complet_result)
@@ -2146,24 +2148,6 @@ class GwInfo(QObject):
             tools_db.execute_sql(sql, log_sql=False)
             widget.model().select()
 
-
-    """ FUNCTIONS RELATED WITH TAB ELEMENT"""
-
-    # TODO borrar esto, esta en toolsbackend ???
-    def _manage_element(self, dialog, element_id=None, feature=None):
-        """ Execute action of button 33 """
-        elem = GwElement()
-        elem.get_element(True, feature, self.feature_type)
-
-
-        # Set completer
-        tools_gw.set_completer_object(dialog, self.table_object)
-
-        if element_id:
-            tools_qt.set_widget_text(elem.dlg_add_element, "element_id", element_id)
-
-        # Open dialog
-        tools_gw.open_dialog(elem.dlg_add_element)
 
 
     """ FUNCTIONS RELATED WITH TAB RELATIONS"""
