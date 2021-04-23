@@ -47,13 +47,13 @@ SELECT gw_fct_setlinktonetwork($${
 "data":{"feature_type":"CONNEC"}}$$);
 
 
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3103', NULL, 1, 0, false, NULL, NULL, NULL);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3104', NULL, 1, 0, false, NULL, NULL, NULL);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('3014', NULL, 2, 0, false, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom) VALUES ('3103', NULL, 1, 0, false, NULL, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom) VALUES ('3104', NULL, 1, 0, false, NULL, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom) VALUES ('3014', NULL, 2, 0, false, NULL, NULL);
 
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('114461', '20851', 1, 1, true, NULL, NULL, NULL);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('114462', '20851', 1, 1, true, NULL, NULL, NULL);
-INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom, vnode_geom) VALUES ('114463', '20651', 2, 1, true, NULL, NULL, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom) VALUES ('114461', '20851', 1, 1, true, NULL, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom) VALUES ('114462', '20851', 1, 1, true, NULL, NULL);
+INSERT INTO plan_psector_x_connec (connec_id, arc_id, psector_id, state, doable, descript, link_geom) VALUES ('114463', '20651', 2, 1, true, NULL, NULL);
 
 
 INSERT INTO doc VALUES ('Demo document 1', 'OTHER', 'https://github.com/Giswater/docs/blob/master/user/manual_usuario_giswater3.doc', NULL, '2018-03-11 19:40:20.449663', current_user, '2018-03-11 19:40:20.449663');
