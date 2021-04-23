@@ -50,7 +50,6 @@ class GwTask(QgsTask, QObject):
                 tools_log.log_info(f"Task '{self.description()}' not successful but without exception")
             else:
                 tools_log.log_info(f"Task '{self.description()}' Exception: {self.exception}")
-                raise self.exception
 
 
     def cancel(self):
