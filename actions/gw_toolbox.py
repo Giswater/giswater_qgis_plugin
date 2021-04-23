@@ -387,11 +387,8 @@ class GwToolBox(ApiParent):
                     self.set_style_mapzones()
 
         except KeyError as e:
-            msg = f"<b>Key: </b>{e}<br>"
-            msg += f"<b>key container: </b>'body/data/ <br>"
-            msg += f"<b>Python file: </b>{__name__} <br>"
-            msg += f"<b>Python function:</b> {self.execute_function.__name__} <br>"
-            self.show_exceptions_msg("Key on returned json from ddbb is missed.", msg)
+            pass
+
 
         self.remove_layers()
 
