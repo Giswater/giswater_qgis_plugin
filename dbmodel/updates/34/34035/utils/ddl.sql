@@ -9,4 +9,4 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2021/04/22  
 DROP VIEW IF EXISTS v_edit_vnode;
-ALTER TABLE plan_psector_x_connec DROP COLUMN vnode_geom;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_connec", "column":"vnode_geom"}}$$);

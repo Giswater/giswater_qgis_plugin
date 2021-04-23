@@ -8,4 +8,4 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 2021/04/22
-ALTER TABLE plan_psector_x_gully DROP COLUMN vnode_geom;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"plan_psector_x_gully", "column":"vnode_geom"}}$$);
