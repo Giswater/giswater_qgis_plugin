@@ -38,7 +38,6 @@ def delete_object(**kwargs):
         message = "Any record selected"
         tools_qgis.show_warning(message)
         return
-    print(f"selected_list -->{selected_list}")
 
     inf_text = ""
     list_object_id = ""
@@ -210,7 +209,7 @@ def manage_element(element_id, **kwargs):
 
     elem = GwElement()
     elem.get_element(True, feature, feature_type)
-    elem.dlg_add_element.btn_accept.clicked.connect(partial(_reload_table, **kwargs))
+    elem.dlg_add_element.btn_accept.clicked.connect(partial(_manage_element_new, elem, **kwargs))
 
     if element_id:
         tools_qt.set_widget_text(elem.dlg_add_element, "element_id", element_id)
@@ -219,9 +218,20 @@ def manage_element(element_id, **kwargs):
     tools_gw.open_dialog(elem.dlg_add_element)
 
 
+def _manage_element_new(elem, **kwargs):
+    """ Get inserted element_id and add it to current feature """
+    if elem.element_id is None:
+        return
+
+    dialog = kwargs['dialog']
+    index_tab = dialog.tab_main.currentIndex()
+    tab_name = dialog.tab_main.widget(index_tab).objectName()
+    tools_qt.set_widget_text(dialog, f"{tab_name}_element_id", elem.element_id)
+    add_object(**kwargs)
+
+
 def _reload_table(**kwargs):
     """ Get inserted element_id and add it to current feature """
-    print(f"TEST 100")
     dialog = kwargs['dialog']
     index_tab = dialog.tab_main.currentIndex()
     tab_name = dialog.tab_main.widget(index_tab).objectName()
