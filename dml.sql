@@ -57,7 +57,7 @@ INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layo
 
 
 INSERT INTO ws_sample35.config_form_fields (formname, formtype, columnname, layoutorder, widgettype, ismandatory, isparent, iseditable, isautoupdate, widgetfunction, layoutname, tabname, isfilter)
-    VALUES ('ve_arc_pipe', 'form_feature', 'tbl_elements', 1, 'tableview', false, false, false, false, '_open_selected_element', 'lyt_elements_3', 'tab_elements', false);
+    VALUES ('ve_arc_pipe', 'form_feature', 'tbl_elements', 1, 'tableview', false, false, false, false, 'open_selected_element', 'lyt_elements_3', 'tab_elements', false);
 
 
 /***********************************************************************/
