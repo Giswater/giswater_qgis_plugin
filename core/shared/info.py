@@ -2026,7 +2026,6 @@ class GwInfo(QObject):
 
         # Tab 'Elements'
         if self.tab_main.widget(index_tab).objectName() == 'tab_elements' and not self.tab_element_loaded:
-            # self._fill_tab_element()
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             self.tab_element_loaded = True
@@ -2068,67 +2067,6 @@ class GwInfo(QObject):
         elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
             self._fill_tab_plan(self.complet_result)
             self.tab_plan_loaded = True
-
-
-    def _fill_tab_element(self):
-        """ Fill tab 'Element' """
-
-        table_element = "v_ui_element_x_" + self.feature_type
-        self._fill_tbl_element_man(self.dlg_cf, self.tbl_element, table_element, self.filter)
-        tools_gw.set_tablemodel_config(self.dlg_cf, self.tbl_element, table_element)
-
-
-    def _fill_tbl_element_man(self, dialog, widget, table_name, expr_filter):
-        """ Fill the table control to show elements """
-
-        if not self.feature:
-            self._get_feature(self.tab_type)
-
-        # Get widgets
-        self.element_id = self.dlg_cf.findChild(QLineEdit, "element_id")
-        btn_open_element = self.dlg_cf.findChild(QPushButton, "btn_open_element")
-        btn_delete = self.dlg_cf.findChild(QPushButton, "btn_delete")
-        btn_insert = self.dlg_cf.findChild(QPushButton, "btn_insert")
-        btn_new_element = self.dlg_cf.findChild(QPushButton, "btn_new_element")
-
-        # Set signals
-        # self.tbl_element.doubleClicked.connect(partial(self._open_selected_element, dialog, widget))
-        # btn_open_element.clicked.connect(partial(self._open_selected_element, dialog, widget))
-        btn_delete.clicked.connect(partial(self._delete_records, widget, table_name))
-        btn_insert.clicked.connect(partial(self._add_object, widget, "element", "v_ui_element"))
-        btn_new_element.clicked.connect(partial(self._manage_element, dialog, feature=self.feature))
-
-        # Set model of selected widget
-        message = tools_qt.fill_table(widget, table_name, expr_filter)
-        if message:
-            tools_qgis.show_warning(message)
-
-        # Adding auto-completion to a QLineEdit
-        self.table_object = "element"
-        tools_gw.set_completer_object(dialog, self.table_object)
-
-    # TODO borrar esto, esta en toolsbackend???
-    def _open_selected_element(self, **kwargs):
-        """
-            Open form of selected element of the @widget??
-              function called in def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
-              at line: widget.textChanged.connect(partial(getattr(self, widgetfunction), **kwargs))
-          """
-        dialog = kwargs['dialog']
-        qtable = kwargs['qtable']
-        # Get selected rows
-        selected_list = qtable.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
-            return
-        index = selected_list[0]
-        row = index.row()
-        column_index = tools_qt.get_col_index_by_col_name(qtable, 'element_id')
-        element_id = index.sibling(row, column_index).data()
-
-        # Open selected element
-        self._manage_element(dialog, element_id)
 
 
     def _add_object(self, widget, table_object, view_object):
@@ -2221,8 +2159,7 @@ class GwInfo(QObject):
         """ Execute action of button 33 """
         elem = GwElement()
         elem.get_element(True, feature, self.feature_type)
-        elem.dlg_add_element.accepted.connect(partial(self._manage_element_new, dialog, elem))
-        elem.dlg_add_element.rejected.connect(partial(self._manage_element_new, dialog, elem))
+
 
         # Set completer
         tools_gw.set_completer_object(dialog, self.table_object)
@@ -2232,17 +2169,6 @@ class GwInfo(QObject):
 
         # Open dialog
         tools_gw.open_dialog(elem.dlg_add_element)
-
-
-    def _manage_element_new(self, dialog, elem):
-        """ Get inserted element_id and add it to current feature """
-
-        if elem.element_id is None:
-            return
-
-        tools_qt.set_widget_text(dialog, "element_id", elem.element_id)
-        self._add_object(self.tbl_element, "element", "v_ui_element")
-        self.tbl_element.model().select()
 
 
     """ FUNCTIONS RELATED WITH TAB RELATIONS"""
